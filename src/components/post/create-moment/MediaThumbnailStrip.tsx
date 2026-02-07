@@ -1,11 +1,12 @@
-import { useState, useCallback, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Play, X } from "lucide-react";
 import { VideoPlayIndicator } from "@/components/ui/VideoPlayIndicator";
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
 import { StudioEdits } from "@/types/studio";
 import { buildVideoPosterUrl } from "@/utils/mediaThumbs";
 import { MediaUploadOverlay } from "./MediaUploadOverlay";
+import { VideoProcessingOverlay } from "./VideoProcessingOverlay";
 import {
   DndContext,
   closestCenter,
@@ -36,6 +37,12 @@ interface MediaThumbnailStripProps {
   onDragStateChange?: (isDragging: boolean) => void;
   /** Whether uploading is in progress (disables reordering and removal) */
   isUploading?: boolean;
+  /** Video IDs currently being processed (duration/poster extraction) */
+  processingMediaIds?: Set<string>;
+  /** Video IDs that had processing warnings (poster failed) */
+  warningMediaIds?: Set<string>;
+  /** Media IDs being animated out before removal */
+  removingMediaIds?: Set<string>;
 }
 
 interface SortableThumbProps {
@@ -48,6 +55,11 @@ interface SortableThumbProps {
   onRemove: () => void;
   isDragOverlay?: boolean;
   isUploading?: boolean;
+  isProcessing?: boolean;
+  hasWarning?: boolean;
+  isRemoving?: boolean;
+  isNewEntry?: boolean;
+  entryDelay?: number;
 }
 
 // Static thumbnail content used both in sortable and overlay
@@ -60,7 +72,9 @@ function ThumbContent({
   onRemove,
   isDragOverlay = false,
   isUploading = false,
-}: Omit<SortableThumbProps, 'onSelect'>) {
+  isProcessing = false,
+  hasWarning = false,
+}: Omit<SortableThumbProps, 'onSelect' | 'isRemoving' | 'isNewEntry' | 'entryDelay'>) {
   const [videoThumbnail, setVideoThumbnail] = useState<string | null>(null);
 
   const edits = getEdits(item.id);
@@ -158,7 +172,15 @@ function ThumbContent({
       </div>
 
       {/* Video indicator - bottom left, inside thumbnail */}
-      {item.type === 'video' && !item.uploadStatus && <VideoPlayIndicator />}
+      {item.type === 'video' && !item.uploadStatus && !isProcessing && <VideoPlayIndicator />}
+
+      {/* Video processing overlay (per-item, non-blocking) */}
+      {item.type === 'video' && (
+        <VideoProcessingOverlay 
+          isProcessing={isProcessing} 
+          hasWarning={hasWarning} 
+        />
+      )}
 
       {/* Upload status overlay */}
       <MediaUploadOverlay 
@@ -167,7 +189,7 @@ function ThumbContent({
       />
 
       {/* Remove button — gentle dismiss, not aggressive red */}
-      {!isDragOverlay && !isUploading && !item.uploadStatus && (
+      {!isDragOverlay && !isUploading && !item.uploadStatus && !isProcessing && (
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -183,7 +205,10 @@ function ThumbContent({
   );
 }
 
-function SortableThumb({ item, index, isActive, isFirst, getEdits, onSelect, onRemove, isUploading }: SortableThumbProps) {
+function SortableThumb({ 
+  item, index, isActive, isFirst, getEdits, onSelect, onRemove, 
+  isUploading, isProcessing, hasWarning, isRemoving, isNewEntry, entryDelay = 0,
+}: SortableThumbProps) {
   const {
     attributes,
     listeners,
@@ -208,6 +233,20 @@ function SortableThumb({ item, index, isActive, isFirst, getEdits, onSelect, onR
       ref={setNodeRef}
       style={style}
       className={`relative flex-shrink-0 cursor-pointer touch-none border-2 transition-colors ${isDragging ? 'border-primary' : 'border-transparent'}`}
+      // Stagger-in animation for newly added items
+      initial={isNewEntry ? { opacity: 0, scale: 0.9 } : undefined}
+      animate={
+        isRemoving 
+          ? { opacity: 0, scale: 0.8 } 
+          : { opacity: 1, scale: 1 }
+      }
+      transition={
+        isNewEntry 
+          ? { duration: 0.2, delay: entryDelay, ease: 'easeOut' }
+          : isRemoving
+            ? { duration: 0.2 }
+            : undefined
+      }
       whileTap={isUploading ? undefined : { scale: 0.95 }}
       onClick={onSelect}
       {...attributes}
@@ -221,6 +260,8 @@ function SortableThumb({ item, index, isActive, isFirst, getEdits, onSelect, onR
         getEdits={getEdits}
         onRemove={onRemove}
         isUploading={isUploading}
+        isProcessing={isProcessing}
+        hasWarning={hasWarning}
       />
     </motion.div>
   );
@@ -235,8 +276,34 @@ export default function MediaThumbnailStrip({
   getEdits,
   onDragStateChange,
   isUploading = false,
+  processingMediaIds,
+  warningMediaIds,
+  removingMediaIds,
 }: MediaThumbnailStripProps) {
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
+  
+  // Track which IDs we've already seen for stagger-in animation
+  const seenIdsRef = useRef<Set<string>>(new Set());
+  const newEntryIdsRef = useRef<Set<string>>(new Set());
+  
+  // On each render, detect new entries
+  const currentIds = media.map(m => m.id);
+  const newEntryIds = new Set<string>();
+  currentIds.forEach(id => {
+    if (!seenIdsRef.current.has(id)) {
+      newEntryIds.add(id);
+      newEntryIdsRef.current.add(id);
+    }
+  });
+  
+  // After animation, mark all as seen
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      currentIds.forEach(id => seenIdsRef.current.add(id));
+      newEntryIdsRef.current.clear();
+    }, 500); // Clear after stagger animations complete
+    return () => clearTimeout(timer);
+  }, [currentIds.join(',')]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -282,6 +349,9 @@ export default function MediaThumbnailStrip({
   // Calculate thumbnail width: viewport - 2px (edges) - 5px (gaps between 6 items) / 6
   // This ensures 6 thumbnails fit exactly with 1px gaps
   const thumbnailWidth = `calc((100% - 2px - 5px) / 6)`;
+  
+  // Calculate stagger index for new entries
+  const newEntryArray = Array.from(newEntryIds);
 
   return (
     <div 
@@ -306,20 +376,30 @@ export default function MediaThumbnailStrip({
             className="flex gap-[1px] px-[1px]"
             style={{ width: '100%' }}
           >
-            {media.map((item, index) => (
-              <div key={item.id} style={{ width: thumbnailWidth }}>
-                <SortableThumb
-                  item={item}
-                  index={index}
-                  isActive={item.id === activeMediaId}
-                  isFirst={index === 0}
-                  getEdits={getEdits}
-                  onSelect={() => onSelect(item.id)}
-                  onRemove={() => onRemove(item.id)}
-                  isUploading={isUploading}
-                />
-              </div>
-            ))}
+            {media.map((item, index) => {
+              const isNew = newEntryIds.has(item.id);
+              const staggerIdx = isNew ? newEntryArray.indexOf(item.id) : 0;
+              
+              return (
+                <div key={item.id} style={{ width: thumbnailWidth }}>
+                  <SortableThumb
+                    item={item}
+                    index={index}
+                    isActive={item.id === activeMediaId}
+                    isFirst={index === 0}
+                    getEdits={getEdits}
+                    onSelect={() => onSelect(item.id)}
+                    onRemove={() => onRemove(item.id)}
+                    isUploading={isUploading}
+                    isProcessing={processingMediaIds?.has(item.id)}
+                    hasWarning={warningMediaIds?.has(item.id)}
+                    isRemoving={removingMediaIds?.has(item.id)}
+                    isNewEntry={isNew}
+                    entryDelay={staggerIdx * 0.05}
+                  />
+                </div>
+              );
+            })}
           </div>
         </SortableContext>
         

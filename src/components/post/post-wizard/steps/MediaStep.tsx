@@ -1,8 +1,8 @@
 // MediaStep - Step 1: Add Media, Studio, Tags
 // Uses native OS picker via pickMediaFiles utility
 import { useCallback, useMemo, useState, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Camera, Images, Plus, Wand2, Award, Loader2, MapPin, AtSign } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Camera, Images, Plus, Wand2, Award, MapPin, AtSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { pickMediaFiles, validateMediaFiles } from '@/utils/media/pickMediaFiles';
@@ -11,11 +11,16 @@ import { StudioEdits } from '@/types/studio';
 import { ComposerMediaItem } from '@/hooks/useSnapModal';
 import { PermissionDeniedCard } from '../components';
 import { useFirstRunFlag } from '@/hooks/useFirstRunFlag';
+import { useToast } from '@/hooks/use-toast';
 
 // Lazy imports for heavy components
 import CreateMomentMediaStage from '@/components/post/create-moment/CreateMomentMediaStage';
 import { POST_LIMITS } from '@/constants/postLimits';
 import { validateMediaFile } from '@/constants/postLimits';
+
+// Processing UX components
+import { MediaProcessingBanner } from '@/components/post/create-moment/MediaProcessingBanner';
+import { PickerLoadingBanner } from '@/components/post/create-moment/PickerLoadingBanner';
 
 // Helper functions for background video processing
 async function readVideoDuration(src: string, timeoutMs = 3000): Promise<number | undefined> {
@@ -139,13 +144,20 @@ export function MediaStep({
 }: MediaStepProps) {
   const hasMedia = state.mediaItems.length > 0;
   const canAddMore = state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT;
+  const { toast } = useToast();
   
-  // Loading states for picker and processing
+  // Loading states for picker
   const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const [processingCount, setProcessingCount] = useState(0);
   const [permissionDenied, setPermissionDenied] = useState<'camera' | 'photos' | null>(null);
   
-  const isLoading = isPickerOpen || processingCount > 0;
+  // Per-item processing tracking (replaces blocking overlay)
+  const [processingMediaIds, setProcessingMediaIds] = useState<Set<string>>(new Set());
+  const [warningMediaIds, setWarningMediaIds] = useState<Set<string>>(new Set());
+  const [removingMediaIds, setRemovingMediaIds] = useState<Set<string>>(new Set());
+  
+  // Batch progress tracking
+  const [batchTotal, setBatchTotal] = useState(0);
+  const [batchCompleted, setBatchCompleted] = useState(0);
   
   // First-run flags for Studio & Badges discovery
   const studioFirstRun = useFirstRunFlag('postWizard:studio');
@@ -174,6 +186,30 @@ export function MediaStep({
   const getEdits = useCallback((mediaId: string): StudioEdits => {
     return state.studioEditsByMediaId[mediaId] ?? {};
   }, [state.studioEditsByMediaId]);
+  
+  // Animated removal — shrink out before dispatching REMOVE_MEDIA
+  const animateAndRemove = useCallback((mediaId: string) => {
+    setRemovingMediaIds(prev => new Set(prev).add(mediaId));
+    setTimeout(() => {
+      dispatch({ type: 'REMOVE_MEDIA', payload: mediaId });
+      setRemovingMediaIds(prev => {
+        const next = new Set(prev);
+        next.delete(mediaId);
+        return next;
+      });
+      // Also clean up processing/warning state
+      setProcessingMediaIds(prev => {
+        const next = new Set(prev);
+        next.delete(mediaId);
+        return next;
+      });
+      setWarningMediaIds(prev => {
+        const next = new Set(prev);
+        next.delete(mediaId);
+        return next;
+      });
+    }, 200);
+  }, [dispatch]);
   
   // Non-blocking file processing
   const handleFilesSelected = useCallback(async (files: File[]) => {
@@ -205,7 +241,15 @@ export function MediaStep({
     // Count videos that need processing
     const videosToProcess = placeholderItems.filter(item => item.type === 'video');
     if (videosToProcess.length > 0) {
-      setProcessingCount(prev => prev + videosToProcess.length);
+      // Mark videos as processing (per-item tracking)
+      setProcessingMediaIds(prev => {
+        const next = new Set(prev);
+        videosToProcess.forEach(v => next.add(v.id));
+        return next;
+      });
+      
+      // Set batch progress
+      setBatchTotal(prev => prev + videosToProcess.length);
     }
     
     // Process videos in background (non-blocking)
@@ -220,14 +264,36 @@ export function MediaStep({
         const validation = validateMediaFile(item.file!, duration);
         if (!validation.valid) {
           console.warn('Video validation failed:', validation.error);
-          dispatch({ type: 'REMOVE_MEDIA', payload: item.id });
-          setProcessingCount(prev => Math.max(0, prev - 1));
+          
+          // Show toast explaining why the video was removed
+          toast({
+            title: 'Video removed',
+            description: validation.error || 'Video exceeds the allowed limits.',
+            variant: 'destructive',
+          });
+          triggerHaptic('error');
+          
+          // Animate out then remove
+          animateAndRemove(item.id);
+          setBatchCompleted(prev => prev + 1);
           URL.revokeObjectURL(tmpUrl);
           return;
         }
         
         // Generate poster in background
-        const thumbnailUrl = await generateVideoPoster(item.file!);
+        let thumbnailUrl: string | undefined;
+        try {
+          thumbnailUrl = await generateVideoPoster(item.file!);
+        } catch (posterErr) {
+          console.warn('Poster generation failed:', posterErr);
+          // Mark as warning — video still usable, just no custom poster
+          setWarningMediaIds(prev => new Set(prev).add(item.id));
+        }
+        
+        // If poster came back undefined (not error, just failed), also mark warning
+        if (!thumbnailUrl) {
+          setWarningMediaIds(prev => new Set(prev).add(item.id));
+        }
         
         // Update the specific media item with thumbnail and duration
         dispatch({ 
@@ -244,12 +310,31 @@ export function MediaStep({
         URL.revokeObjectURL(tmpUrl);
       } catch (err) {
         console.error('Video processing error:', err);
-        // Even on error, video is still usable - just without thumbnail
+        // Mark as warning — video still usable
+        setWarningMediaIds(prev => new Set(prev).add(item.id));
       } finally {
-        setProcessingCount(prev => Math.max(0, prev - 1));
+        // Remove from processing set
+        setProcessingMediaIds(prev => {
+          const next = new Set(prev);
+          next.delete(item.id);
+          return next;
+        });
+        setBatchCompleted(prev => prev + 1);
       }
     });
-  }, [dispatch]);
+  }, [dispatch, toast, animateAndRemove]);
+  
+  // Reset batch counters when all processing completes
+  useEffect(() => {
+    if (batchTotal > 0 && batchCompleted >= batchTotal && processingMediaIds.size === 0) {
+      // Reset after the completion banner fades (2s + buffer)
+      const timer = setTimeout(() => {
+        setBatchTotal(0);
+        setBatchCompleted(0);
+      }, 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [batchTotal, batchCompleted, processingMediaIds.size]);
   
   // Open camera via native OS picker with capture attribute
   const handleCamera = useCallback(async () => {
@@ -353,28 +438,6 @@ export function MediaStep({
     triggerHaptic('selection');
   }, [state.mediaItems, dispatch]);
 
-  // Loading overlay component
-  const LoadingOverlay = () => (
-    <motion.div 
-      className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      <Loader2 className="w-10 h-10 text-white animate-spin" />
-      <p className="mt-3 text-white text-sm font-medium">
-        {isPickerOpen 
-          ? 'Loading from your library...' 
-          : `Processing ${processingCount} video${processingCount !== 1 ? 's' : ''}...`}
-      </p>
-      {isPickerOpen && (
-        <p className="mt-1 text-white/70 text-xs text-center px-8">
-          Large videos from iCloud may take a few minutes
-        </p>
-      )}
-    </motion.div>
-  );
-
   // Empty state - Apple-level: refined, visible text, with max media tip
   if (!hasMedia) {
     // Show permission denied UI if permission was denied
@@ -389,7 +452,8 @@ export function MediaStep({
     
     return (
       <div className="h-full flex flex-col items-center justify-center px-8 bg-background relative">
-        {isLoading && <LoadingOverlay />}
+        {/* Non-blocking picker loading banner */}
+        <PickerLoadingBanner isVisible={isPickerOpen} />
         
         <motion.div 
           className="flex flex-col items-center text-center w-full max-w-sm"
@@ -421,7 +485,7 @@ export function MediaStep({
           <div className="flex gap-3 w-full max-w-[260px]">
             <Button
               onClick={handleCamera}
-              disabled={isLoading}
+              disabled={isPickerOpen}
               className="flex-1 gap-2 rounded-xl h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-medium active:scale-[0.97] transition-all duration-150"
             >
               <Camera className="h-4 w-4" />
@@ -430,7 +494,7 @@ export function MediaStep({
             <Button
               variant="outline"
               onClick={handleGallery}
-              disabled={isLoading}
+              disabled={isPickerOpen}
               className="flex-1 gap-2 rounded-xl h-11 border-border bg-background hover:bg-muted/50 text-foreground font-medium active:scale-[0.97] transition-all duration-150"
             >
               <Images className="h-4 w-4" />
@@ -461,7 +525,8 @@ export function MediaStep({
   // Media selected state - Apple-level flexbox constraints
   return (
     <div className="h-full flex flex-col bg-[#F8FAFC] relative">
-      {isLoading && <LoadingOverlay />}
+      {/* Non-blocking picker loading banner (for adding more media) */}
+      <PickerLoadingBanner isVisible={isPickerOpen} />
       
       {/* Media stage - fills available space, never overflows (flex-1 min-h-0 pattern) */}
       <div className="flex-1 min-h-0 relative overflow-hidden">
@@ -474,6 +539,9 @@ export function MediaStep({
           onRemoveMedia={handleRemoveMedia}
           onReorder={handleReorder}
           getEdits={getEdits}
+          processingMediaIds={processingMediaIds}
+          warningMediaIds={warningMediaIds}
+          removingMediaIds={removingMediaIds}
         />
         
         {/* Media counter pill — elevated z-index, frosted glass */}
@@ -491,6 +559,12 @@ export function MediaStep({
         className="flex-shrink-0 border-t border-border bg-background px-4 py-3"
         style={{ boxShadow: '0 -2px 8px rgba(0,0,0,0.06)' }}
       >
+        {/* Non-blocking processing progress banner */}
+        <MediaProcessingBanner 
+          totalVideos={batchTotal} 
+          completedVideos={batchCompleted} 
+        />
+        
         {/* Media counter */}
         <div className="text-center mb-2">
           <p className="text-xs text-muted-foreground">
@@ -505,7 +579,7 @@ export function MediaStep({
             variant="ghost"
             size="sm"
             onClick={handleGallery}
-            disabled={!canAddMore || isLoading}
+            disabled={!canAddMore || isPickerOpen}
             className={`gap-1.5 px-4 py-2.5 h-auto rounded-full bg-muted hover:bg-muted/80 text-sm font-medium transition-colors text-foreground ${!canAddMore ? 'opacity-30 cursor-not-allowed' : ''}`}
           >
             <Plus className="h-4 w-4" />

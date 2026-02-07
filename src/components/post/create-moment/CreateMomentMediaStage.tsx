@@ -33,6 +33,12 @@ interface CreateMomentMediaStageProps {
   selectedBadges?: string[];
   // Callback when drag state changes (to block sheet dismiss)
   onDragStateChange?: (isDragging: boolean) => void;
+  // Per-item processing state (videos being processed)
+  processingMediaIds?: Set<string>;
+  // Per-item warning state (poster generation failed)
+  warningMediaIds?: Set<string>;
+  // Items being animated out before removal
+  removingMediaIds?: Set<string>;
 }
 
 export default function CreateMomentMediaStage({
@@ -51,6 +57,9 @@ export default function CreateMomentMediaStage({
   onSelectOverlay,
   selectedBadges,
   onDragStateChange,
+  processingMediaIds,
+  warningMediaIds,
+  removingMediaIds,
 }: CreateMomentMediaStageProps) {
   const prefersReducedMotion = useReducedMotion();
   const { toast } = useToast();
@@ -270,6 +279,9 @@ export default function CreateMomentMediaStage({
           onReorder={onReorder}
           getEdits={getEdits}
           onDragStateChange={onDragStateChange}
+          processingMediaIds={processingMediaIds}
+          warningMediaIds={warningMediaIds}
+          removingMediaIds={removingMediaIds}
         />
       )}
     </motion.div>
