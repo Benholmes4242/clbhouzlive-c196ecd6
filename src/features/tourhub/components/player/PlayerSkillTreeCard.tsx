@@ -1,14 +1,13 @@
 /**
  * PlayerSkillTreeCard - RPG-style skill visualization for player profiles
  * 
- * Displays a player's 5-attribute skill build in a radar-like visualization
- * with animated level bars and attribute breakdown.
- * 
- * Part of Pro Dashboard V1 - Gamified Tour Hub
+ * Displays a player's 5-attribute skill build with animated level bars,
+ * attribute breakdown, and a radar chart visualization.
  */
 
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { Zap, Target, Flame, Shield, Activity } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   usePlayerSkillTree, 
@@ -17,7 +16,23 @@ import {
   type SkillAttribute,
 } from '../../hooks/usePlayerSkillTree';
 
-// Spring physics for smooth animations
+// Lucide icon map for each skill
+const SKILL_ICONS: Record<SkillAttributeKey, React.ElementType> = {
+  power: Zap,
+  precision: Target,
+  scoring: Flame,
+  recovery: Shield,
+  consistency: Activity,
+};
+
+const SKILL_ICON_BG: Record<SkillAttributeKey, string> = {
+  power: 'bg-red-500/10 text-red-500',
+  precision: 'bg-blue-500/10 text-blue-500',
+  scoring: 'bg-amber-500/10 text-amber-500',
+  recovery: 'bg-green-500/10 text-green-500',
+  consistency: 'bg-purple-500/10 text-purple-500',
+};
+
 const springSnappy = {
   type: "spring" as const,
   stiffness: 500,
@@ -25,60 +40,33 @@ const springSnappy = {
   mass: 0.8,
 };
 
-/**
- * Animated Level Bar - 10 blocks with stagger
- */
-const LevelBar = memo(({ 
-  level, 
-  gradient,
-  delay = 0,
-}: { 
-  level: number; 
-  gradient: string;
-  delay?: number;
-}) => {
-  return (
-    <div className="flex gap-0.5 flex-1">
-      {Array.from({ length: 10 }).map((_, index) => {
-        const isFilled = index < level;
-        return (
-          <motion.div
-            key={index}
-            className={cn(
-              "flex-1 h-3 rounded-sm",
-              isFilled 
-                ? `bg-gradient-to-r ${gradient}` 
-                : "bg-muted/30"
-            )}
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ ...springSnappy, delay: delay + (index * 0.03) }}
-            style={{ originX: 0 }}
-          />
-        );
-      })}
-    </div>
-  );
-});
-
+/** Animated Level Bar - 10 blocks with stagger */
+const LevelBar = memo(({ level, gradient, delay = 0 }: { level: number; gradient: string; delay?: number }) => (
+  <div className="flex gap-0.5 flex-1">
+    {Array.from({ length: 10 }).map((_, index) => (
+      <motion.div
+        key={index}
+        className={cn(
+          "flex-1 h-3 rounded-sm",
+          index < level ? `bg-gradient-to-r ${gradient}` : "bg-muted/30"
+        )}
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: 1 }}
+        transition={{ ...springSnappy, delay: delay + (index * 0.03) }}
+        style={{ originX: 0 }}
+      />
+    ))}
+  </div>
+));
 LevelBar.displayName = 'LevelBar';
 
-/**
- * Single Attribute Row
- */
-const AttributeRow = memo(({ 
-  attribute, 
-  isStrongest,
-  delay = 0,
-}: { 
-  attribute: SkillAttribute; 
-  isStrongest: boolean;
-  delay?: number;
-}) => {
+/** Single Attribute Row */
+const AttributeRow = memo(({ attribute, isStrongest, delay = 0 }: { attribute: SkillAttribute; isStrongest: boolean; delay?: number }) => {
   const config = SKILL_ATTRIBUTES[attribute.key];
-  
+  const Icon = SKILL_ICONS[attribute.key];
+
   return (
-    <motion.div 
+    <motion.div
       className={cn(
         "flex items-center gap-3 py-3 px-3 rounded-xl transition-colors",
         isStrongest && "bg-gradient-to-r from-amber-500/10 to-transparent border border-amber-500/20"
@@ -87,75 +75,48 @@ const AttributeRow = memo(({
       animate={{ opacity: 1, x: 0 }}
       transition={{ ...springSnappy, delay }}
     >
-      {/* Attribute Icon & Name */}
       <div className="flex items-center gap-2 w-28 shrink-0">
-        <span className="text-lg">{config.icon}</span>
-        <span className={cn(
-          "text-sm font-semibold",
-          isStrongest ? "text-amber-600" : config.color
-        )}>
+        <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center", SKILL_ICON_BG[attribute.key])}>
+          <Icon className="w-3.5 h-3.5" />
+        </div>
+        <span className={cn("text-sm font-semibold", isStrongest ? "text-amber-600" : config.color)}>
           {config.name}
         </span>
       </div>
-
-      {/* Level Bar */}
-      <LevelBar 
-        level={attribute.level} 
+      <LevelBar
+        level={attribute.level}
         gradient={isStrongest ? "from-amber-500 to-amber-400" : config.gradient}
         delay={delay}
       />
-
-      {/* Level Badge */}
-      <div className={cn(
-        "w-12 text-right",
-        isStrongest ? "text-amber-600" : config.color
-      )}>
-        <span className="text-sm font-bold">Lv.{attribute.level}</span>
+      <div className={cn("w-12 text-right", isStrongest ? "text-amber-600" : config.color)}>
+        <span className="text-sm font-bold font-mono">Lv.{attribute.level}</span>
       </div>
-
-      {/* Raw Value */}
       <div className="w-16 text-right shrink-0">
-        <span className="text-xs text-muted-foreground">
+        <span className="text-xs text-muted-foreground font-mono">
           {attribute.rawValue?.toFixed(attribute.key === 'consistency' ? 2 : 1)} {config.unit}
         </span>
       </div>
     </motion.div>
   );
 });
-
 AttributeRow.displayName = 'AttributeRow';
 
-/**
- * Overall Level Badge
- */
+/** Overall Level Badge */
 const OverallLevelBadge = memo(({ level }: { level: number }) => {
-  // Determine tier based on overall level
-  const getTier = (lvl: number): { name: string; color: string; gradient: string } => {
+  const getTier = (lvl: number) => {
     if (lvl >= 9) return { name: 'Elite', color: 'text-amber-500', gradient: 'from-amber-500 to-yellow-400' };
     if (lvl >= 7) return { name: 'Champion', color: 'text-purple-500', gradient: 'from-purple-500 to-violet-400' };
     if (lvl >= 5) return { name: 'Contender', color: 'text-blue-500', gradient: 'from-blue-500 to-cyan-400' };
     return { name: 'Rising', color: 'text-emerald-500', gradient: 'from-emerald-500 to-green-400' };
   };
-
   const tier = getTier(level);
 
   return (
-    <motion.div 
-      className="flex items-center gap-3"
-      initial={{ scale: 0.8, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={springSnappy}
-    >
-      {/* Level Circle */}
-      <div className={cn(
-        "w-16 h-16 rounded-2xl bg-gradient-to-br flex flex-col items-center justify-center",
-        tier.gradient
-      )}>
+    <motion.div className="flex items-center gap-3" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={springSnappy}>
+      <div className={cn("w-16 h-16 rounded-2xl bg-gradient-to-br flex flex-col items-center justify-center", tier.gradient)}>
         <span className="text-white/80 text-[10px] uppercase tracking-wide font-medium">Overall</span>
-        <span className="text-white text-2xl font-bold">{level}</span>
+        <span className="text-white text-2xl font-bold font-mono">{level}</span>
       </div>
-      
-      {/* Tier Label */}
       <div>
         <span className={cn("text-lg font-bold", tier.color)}>{tier.name}</span>
         <p className="text-xs text-muted-foreground">Skill Tier</p>
@@ -163,12 +124,105 @@ const OverallLevelBadge = memo(({ level }: { level: number }) => {
     </motion.div>
   );
 });
-
 OverallLevelBadge.displayName = 'OverallLevelBadge';
 
-/**
- * Loading Skeleton
- */
+/** SVG Radar / Spider Chart */
+function SkillRadarChart({ attributes }: { attributes: SkillAttribute[] }) {
+  const SIZE = 200;
+  const CENTER = SIZE / 2;
+  const RADIUS = 75;
+  const LABEL_RADIUS = RADIUS + 20;
+  const LEVELS = 10;
+
+  // Ensure we have all 5 attributes in the correct order
+  const orderedKeys: SkillAttributeKey[] = ['power', 'precision', 'scoring', 'recovery', 'consistency'];
+  const ordered = orderedKeys.map(key => attributes.find(a => a.key === key) || { key, level: 0 } as SkillAttribute);
+  const count = ordered.length;
+
+  const angleStep = (2 * Math.PI) / count;
+  const startAngle = -Math.PI / 2; // Start from top
+
+  const getPoint = (index: number, level: number) => {
+    const angle = startAngle + index * angleStep;
+    const r = (level / LEVELS) * RADIUS;
+    return { x: CENTER + r * Math.cos(angle), y: CENTER + r * Math.sin(angle) };
+  };
+
+  // Grid rings
+  const gridRings = [2, 4, 6, 8, 10].map(level => {
+    const points = Array.from({ length: count }).map((_, i) => {
+      const p = getPoint(i, level);
+      return `${p.x},${p.y}`;
+    }).join(' ');
+    return <polygon key={level} points={points} fill="none" stroke="hsl(var(--border))" strokeWidth="0.5" opacity="0.4" />;
+  });
+
+  // Axis lines
+  const axisLines = Array.from({ length: count }).map((_, i) => {
+    const p = getPoint(i, LEVELS);
+    return <line key={i} x1={CENTER} y1={CENTER} x2={p.x} y2={p.y} stroke="hsl(var(--border))" strokeWidth="0.5" opacity="0.3" />;
+  });
+
+  // Data polygon
+  const dataPoints = ordered.map((attr, i) => {
+    const p = getPoint(i, attr.level);
+    return `${p.x},${p.y}`;
+  }).join(' ');
+
+  // Labels
+  const labels = ordered.map((attr, i) => {
+    const angle = startAngle + i * angleStep;
+    const x = CENTER + LABEL_RADIUS * Math.cos(angle);
+    const y = CENTER + LABEL_RADIUS * Math.sin(angle);
+    const config = SKILL_ATTRIBUTES[attr.key];
+    return (
+      <text
+        key={attr.key}
+        x={x}
+        y={y}
+        textAnchor="middle"
+        dominantBaseline="central"
+        className="fill-muted-foreground text-[9px] font-medium"
+      >
+        {config.name}
+      </text>
+    );
+  });
+
+  return (
+    <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="w-full max-w-[240px] mx-auto">
+      {gridRings}
+      {axisLines}
+      <motion.polygon
+        points={dataPoints}
+        fill="hsl(var(--primary) / 0.15)"
+        stroke="hsl(var(--primary))"
+        strokeWidth="1.5"
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+        style={{ transformOrigin: `${CENTER}px ${CENTER}px` }}
+      />
+      {ordered.map((attr, i) => {
+        const p = getPoint(i, attr.level);
+        return (
+          <motion.circle
+            key={attr.key}
+            cx={p.x}
+            cy={p.y}
+            r="3"
+            fill="hsl(var(--primary))"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.5 + i * 0.1 }}
+          />
+        );
+      })}
+      {labels}
+    </svg>
+  );
+}
+
 function SkillTreeSkeleton() {
   return (
     <div className="space-y-3">
@@ -190,13 +244,12 @@ function SkillTreeSkeleton() {
   );
 }
 
-/**
- * Empty State
- */
 function SkillTreeEmpty() {
   return (
     <div className="flex flex-col items-center justify-center py-12 text-center">
-      <span className="text-4xl mb-3">🌳</span>
+      <div className="w-12 h-12 rounded-xl bg-muted/50 flex items-center justify-center mb-3">
+        <Activity className="w-6 h-6 text-muted-foreground" />
+      </div>
       <p className="text-base font-semibold text-foreground">Skill Tree Unavailable</p>
       <p className="text-sm text-muted-foreground mt-1">
         Statistics for this player are not available yet
@@ -205,17 +258,14 @@ function SkillTreeEmpty() {
   );
 }
 
-/**
- * Main PlayerSkillTreeCard Component
- */
 export function PlayerSkillTreeCard({ playerId }: { playerId: string }) {
   const { data: skillTree, isLoading, error } = usePlayerSkillTree(playerId);
 
   if (isLoading) {
     return (
       <div className="bg-card rounded-xl border border-border/50 p-6">
-        <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-          <span className="text-xl">🌳</span>
+        <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2 pl-3 border-l-3 border-primary">
+          <Activity className="w-5 h-5 text-primary" />
           Skill Build
         </h2>
         <SkillTreeSkeleton />
@@ -226,8 +276,8 @@ export function PlayerSkillTreeCard({ playerId }: { playerId: string }) {
   if (error || !skillTree || skillTree.attributes.length === 0) {
     return (
       <div className="bg-card rounded-xl border border-border/50 p-6">
-        <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-          <span className="text-xl">🌳</span>
+        <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2 pl-3 border-l-3 border-primary">
+          <Activity className="w-5 h-5 text-primary" />
           Skill Build
         </h2>
         <SkillTreeEmpty />
@@ -239,18 +289,16 @@ export function PlayerSkillTreeCard({ playerId }: { playerId: string }) {
     <div className="bg-card rounded-xl border border-border/50 p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-          <span className="text-xl">🌳</span>
+        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2 pl-3 border-l-3 border-primary">
+          <Activity className="w-5 h-5 text-primary" />
           Skill Build
         </h2>
-        
-        {/* Overall Level Badge */}
         <OverallLevelBadge level={skillTree.overallLevel} />
       </div>
 
       {/* Strongest Attribute Callout */}
       {skillTree.strongestAttribute && (
-        <motion.div 
+        <motion.div
           className="mb-4 px-4 py-3 rounded-xl bg-gradient-to-r from-amber-500/10 to-transparent border border-amber-500/20"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -258,11 +306,10 @@ export function PlayerSkillTreeCard({ playerId }: { playerId: string }) {
         >
           <div className="flex items-center gap-2">
             <span className="text-amber-500 text-sm font-semibold">🏆 Dominant Skill:</span>
-            <span className="text-lg">{SKILL_ATTRIBUTES[skillTree.strongestAttribute].icon}</span>
-            <span className={cn(
-              "font-bold text-sm",
-              SKILL_ATTRIBUTES[skillTree.strongestAttribute].color
-            )}>
+            <div className={cn("w-6 h-6 rounded-md flex items-center justify-center", SKILL_ICON_BG[skillTree.strongestAttribute])}>
+              {(() => { const Ic = SKILL_ICONS[skillTree.strongestAttribute]; return <Ic className="w-3.5 h-3.5" />; })()}
+            </div>
+            <span className={cn("font-bold text-sm", SKILL_ATTRIBUTES[skillTree.strongestAttribute].color)}>
               {SKILL_ATTRIBUTES[skillTree.strongestAttribute].name}
             </span>
           </div>
@@ -281,30 +328,22 @@ export function PlayerSkillTreeCard({ playerId }: { playerId: string }) {
         ))}
       </div>
 
-      {/* Legend */}
+      {/* Radar Chart */}
       <div className="mt-6 pt-4 border-t border-border/30">
-        <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <span className="w-3 h-3 rounded-sm bg-gradient-to-r from-red-500 to-orange-500" />
-            Power
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="w-3 h-3 rounded-sm bg-gradient-to-r from-blue-500 to-indigo-500" />
-            Precision
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="w-3 h-3 rounded-sm bg-gradient-to-r from-amber-500 to-yellow-500" />
-            Scoring
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="w-3 h-3 rounded-sm bg-gradient-to-r from-green-500 to-emerald-500" />
-            Recovery
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="w-3 h-3 rounded-sm bg-gradient-to-r from-purple-500 to-violet-500" />
-            Consistency
-          </span>
-        </div>
+        <SkillRadarChart attributes={skillTree.attributes} />
+      </div>
+
+      {/* Legend */}
+      <div className="mt-4 flex flex-wrap gap-3 justify-center text-xs text-muted-foreground">
+        {(['power', 'precision', 'scoring', 'recovery', 'consistency'] as SkillAttributeKey[]).map(key => {
+          const Ic = SKILL_ICONS[key];
+          return (
+            <span key={key} className="flex items-center gap-1">
+              <Ic className="w-3 h-3" />
+              {SKILL_ATTRIBUTES[key].name}
+            </span>
+          );
+        })}
       </div>
     </div>
   );

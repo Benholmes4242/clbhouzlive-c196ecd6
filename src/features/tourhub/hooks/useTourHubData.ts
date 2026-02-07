@@ -47,6 +47,8 @@ export interface TourPlayer {
   photo_url: string | null;
   height: string | null;
   weight: string | null;
+  pga_tour_id: string | null;
+  handedness: string | null;
 }
 
 // Raw data structure from SportsRadar
@@ -645,6 +647,57 @@ export function useTournamentScoringStats(tournamentId: string) {
       };
     },
     enabled: !!tournamentId,
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+// Hook: Get single player's statistics (optimized - 1 row instead of 236)
+export function useSinglePlayerStatistics(playerId: string | undefined) {
+  return useQuery({
+    queryKey: ['tourhub', 'single-player-statistics', playerId],
+    queryFn: async () => {
+      if (!playerId) return null;
+      
+      const { data, error } = await supabase
+        .from('sr_player_statistics')
+        .select('*')
+        .eq('player_id', playerId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (error) {
+        console.error('Error fetching single player stats:', error);
+        return null;
+      }
+      
+      if (!data) return null;
+      
+      // Extract raw stats same way as bulk hook
+      const rawExtracted = extractRawStats(data.raw_data as { statistics?: RawStatistics } | null);
+      
+      return {
+        ...data,
+        fedex_points: data.fedex_points ?? rawExtracted.fedex_points ?? null,
+        fedex_rank: data.fedex_rank ?? rawExtracted.fedex_rank ?? null,
+        wins: data.wins ?? rawExtracted.wins ?? null,
+        top_10s: data.top_10s ?? rawExtracted.top_10s ?? null,
+        top_25s: data.top_25s ?? rawExtracted.top_25s ?? null,
+        scoring_average: data.scoring_average ?? rawExtracted.scoring_average ?? null,
+        driving_distance: data.driving_distance ?? rawExtracted.driving_distance ?? null,
+        driving_accuracy: data.driving_accuracy ?? rawExtracted.driving_accuracy ?? null,
+        greens_in_reg: data.greens_in_reg ?? rawExtracted.greens_in_reg ?? null,
+        putting_average: data.putting_average ?? rawExtracted.putting_average ?? null,
+        sand_saves: data.sand_saves ?? rawExtracted.sand_saves ?? null,
+        world_rank: rawExtracted.world_rank ?? null,
+        earnings: rawExtracted.earnings ?? null,
+        earnings_rank: rawExtracted.earnings_rank ?? null,
+        scrambling: rawExtracted.scrambling ?? null,
+        birdies_per_round: rawExtracted.birdies_per_round ?? null,
+        strokes_gained_total: rawExtracted.strokes_gained_total ?? null,
+      } as TourPlayerStatistics;
+    },
+    enabled: !!playerId,
     staleTime: 5 * 60 * 1000,
   });
 }
