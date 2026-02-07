@@ -582,6 +582,8 @@ export function PostWizard({
               onOpenProfileSelector={() => setShowProfileSelector(true)}
               draftCount={drafts?.length ?? 0}
               scheduledCount={scheduledPosts?.length ?? 0}
+              scheduledAt={state.scheduledAt}
+              onClearSchedule={() => setScheduledAt(null)}
               onBack={handleBack}
               onOpenDrafts={() => setShowDraftsSheet(true)}
               onOpenScheduled={() => setShowDraftsSheet(true)}

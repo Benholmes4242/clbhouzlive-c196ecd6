@@ -1,11 +1,16 @@
 // PostWizardHeader - Header with profile selector, schedule, drafts
 // World-class wizard header with backdrop blur and context-aware CTA
-import { X, ChevronDown, FileEdit, Clock, Loader2, ChevronLeft } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, ChevronDown, FileEdit, Clock, Loader2, ChevronLeft, Calendar } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { Button } from '@/components/ui/button';
 import { PostWizardStep, ActorRef } from './types';
+import { format } from 'date-fns';
+
+const SCHEDULE_TOOLTIP_KEY = 'pw-schedule-tooltip-seen';
 
 export interface PostWizardHeaderProps {
   currentStep: PostWizardStep;
@@ -24,6 +29,10 @@ export interface PostWizardHeaderProps {
   // Counts for badges
   draftCount: number;
   scheduledCount: number;
+  
+  // Schedule state
+  scheduledAt?: Date | null;
+  onClearSchedule?: () => void;
   
   // Callbacks
   onBack: () => void;
@@ -53,6 +62,8 @@ export function PostWizardHeader({
   onOpenProfileSelector,
   draftCount,
   scheduledCount,
+  scheduledAt,
+  onClearSchedule,
   onBack,
   onOpenDrafts,
   onOpenScheduled,
@@ -63,10 +74,45 @@ export function PostWizardHeader({
   hasHeroAbove = false,
 }: PostWizardHeaderProps) {
   const getInitials = (name: string) => name.charAt(0).toUpperCase();
+  const [showTooltip, setShowTooltip] = useState(false);
   
-  // Name removed from header — avatar-only for cleaner creation flow
+  // One-time tooltip for schedule discoverability
+  useEffect(() => {
+    if (!isFirstStep) return;
+    try {
+      const seen = localStorage.getItem(SCHEDULE_TOOLTIP_KEY);
+      if (!seen) {
+        const timer = setTimeout(() => setShowTooltip(true), 800);
+        return () => clearTimeout(timer);
+      }
+    } catch {}
+  }, [isFirstStep]);
+
+  const dismissTooltip = () => {
+    setShowTooltip(false);
+    try { localStorage.setItem(SCHEDULE_TOOLTIP_KEY, '1'); } catch {}
+  };
+
+  // Auto-dismiss tooltip after 3 seconds
+  useEffect(() => {
+    if (!showTooltip) return;
+    const timer = setTimeout(dismissTooltip, 3000);
+    return () => clearTimeout(timer);
+  }, [showTooltip]);
+
+  const handleClockTap = () => {
+    dismissTooltip();
+    if (scheduledCount > 0) {
+      onOpenScheduled();
+    } else {
+      onOpenScheduleSheet();
+    }
+  };
   
-  const nextButtonText = isLastStep ? 'Post' : 'Next';
+  const hasSchedule = !!scheduledAt;
+  const nextButtonText = hasSchedule
+    ? 'Schedule'
+    : isLastStep ? 'Post' : 'Next';
 
   return (
     <header 
@@ -131,44 +177,88 @@ export function PostWizardHeader({
       
       {/* Right: Context-aware CTA */}
       <div className="flex items-center gap-1 min-w-[72px] justify-end">
-        {/* Schedule button — hidden when no scheduled posts (reduces cognitive load) */}
-        {isFirstStep && scheduledCount > 0 && (
+        {/* Schedule button — always visible on Step 1 */}
+        {isFirstStep && (
+          <div className="relative">
+            <button
+              onClick={handleClockTap}
+              className={cn(
+                "w-9 h-9 rounded-full flex items-center justify-center relative transition-colors hover:bg-muted",
+                showTooltip && "animate-pulse"
+              )}
+              aria-label={scheduledCount > 0 ? `View ${scheduledCount} scheduled posts` : "Schedule post"}
+            >
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              {scheduledCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] rounded-full bg-primary text-primary-foreground text-[9px] font-semibold flex items-center justify-center">
+                  {scheduledCount > 9 ? '9+' : scheduledCount}
+                </span>
+              )}
+            </button>
+            
+            {/* First-time tooltip */}
+            <AnimatePresence>
+              {showTooltip && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -4, scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                  onClick={dismissTooltip}
+                  className="absolute top-full right-0 mt-2 px-3 py-1.5 bg-foreground text-background text-xs font-medium rounded-lg whitespace-nowrap shadow-lg z-20"
+                >
+                  Schedule your post
+                  <div className="absolute -top-1 right-3 w-2 h-2 bg-foreground rotate-45" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
+
+        {/* Schedule button on Step 3 — opens picker */}
+        {isLastStep && !isFirstStep && (
           <button
-            onClick={onOpenScheduled}
-            className="w-9 h-9 rounded-full flex items-center justify-center relative transition-colors hover:bg-muted"
-            aria-label={`View ${scheduledCount} scheduled posts`}
+            onClick={onOpenScheduleSheet}
+            className={cn(
+              "w-8 h-8 rounded-full flex items-center justify-center transition-colors",
+              hasSchedule 
+                ? "bg-primary/10 text-primary" 
+                : "text-muted-foreground hover:bg-muted"
+            )}
+            aria-label="Schedule post"
           >
-            <Clock className="h-4 w-4 text-muted-foreground" />
-            <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] rounded-full bg-primary text-primary-foreground text-[9px] font-semibold flex items-center justify-center">
-              {scheduledCount > 9 ? '9+' : scheduledCount}
-            </span>
+            <Calendar className="h-4 w-4" />
           </button>
         )}
         
-        {/* Next/Post button — vibrant emerald on final step, brand primary otherwise */}
-        <Button
-          size="sm"
-          onClick={onNext}
-          disabled={!canProceed || isSubmitting}
-          className={cn(
-            'px-4 py-1.5 h-8 rounded-full text-sm font-medium transition-all duration-200 active:scale-[0.96]',
-            !canProceed || isSubmitting
-              ? 'bg-muted text-muted-foreground'
-              : isLastStep
-                ? 'text-white shadow-md hover:shadow-lg'
-                : 'bg-primary text-primary-foreground hover:bg-primary/90'
-          )}
-          style={canProceed && !isSubmitting && isLastStep ? {
-            background: 'linear-gradient(135deg, #10b981, #059669)',
-          } : undefined}
-        >
-          {isSubmitting ? (
-            <>
-              <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
-              <span>Posting…</span>
-            </>
-          ) : <span className="text-inherit">{nextButtonText}</span>}
-        </Button>
+        {/* Next/Post/Schedule button */}
+        <div className="flex flex-col items-end">
+          <Button
+            size="sm"
+            onClick={onNext}
+            disabled={!canProceed || isSubmitting}
+            className={cn(
+              'px-4 py-1.5 h-8 rounded-full text-sm font-medium transition-all duration-200 active:scale-[0.96]',
+              !canProceed || isSubmitting
+                ? 'bg-muted text-muted-foreground'
+                : hasSchedule
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                  : isLastStep
+                    ? 'text-white shadow-md hover:shadow-lg'
+                    : 'bg-primary text-primary-foreground hover:bg-primary/90'
+            )}
+            style={canProceed && !isSubmitting && isLastStep && !hasSchedule ? {
+              background: 'linear-gradient(135deg, #10b981, #059669)',
+            } : undefined}
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                <span>{hasSchedule ? 'Scheduling…' : 'Posting…'}</span>
+              </>
+            ) : <span className="text-inherit">{nextButtonText}</span>}
+          </Button>
+        </div>
       </div>
     </header>
   );
