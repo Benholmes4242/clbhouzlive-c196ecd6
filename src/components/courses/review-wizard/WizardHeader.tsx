@@ -47,11 +47,42 @@ export function WizardHeader({
   onDelete,
   onOpenProfileSelector,
 }: WizardHeaderProps) {
-  // Only show header for numeric steps (1-4)
-  if (typeof currentStep !== 'number') return null;
+  const isNumericStep = typeof currentStep === 'number';
+  const isFirstStep = isNumericStep && currentStep === 1;
+  const isLastStep = isNumericStep && currentStep === totalSteps;
   
-  const isFirstStep = currentStep === 1;
-  const isLastStep = currentStep === totalSteps;
+  // Determine if Next should be Skip (for optional steps 2 and 3)
+  const isOptionalStep = isNumericStep && (currentStep === 2 || currentStep === 3);
+  const showSkip = isOptionalStep && !canProceed;
+  
+  // Fix 1: Submit button always shows "Submit" — auth validation happens on tap, not on render
+  const nextButtonText = isLastStep 
+    ? 'Submit' 
+    : (showSkip ? 'Skip' : 'Next');
+  
+  // Fix 1: Remove isLoadingUser from submit gate — by Step 4, user is already authenticated.
+  const isNextEnabled = isLastStep 
+    ? (canProceed && !isSubmitting && !isDeleting)
+    : (showSkip || (canProceed && !isDeleting));
+
+  // Debug: Log button state on every render (TEMPORARY — remove before shipping)
+  React.useEffect(() => {
+    if (!isNumericStep) return;
+    console.log('[SUBMIT BUTTON STATE]', {
+      isNextEnabled,
+      isLastStep,
+      canProceed,
+      isSubmitting,
+      isDeleting,
+      isLoadingUser,
+      nextButtonText,
+      currentStep,
+      totalSteps,
+    });
+  }, [isNextEnabled, isLastStep, canProceed, isSubmitting, isDeleting, isLoadingUser, isNumericStep]);
+
+  // Only show header for numeric steps (1-4)
+  if (!isNumericStep) return null;
   
   const getInitials = (name: string) => name.charAt(0).toUpperCase();
   
@@ -64,27 +95,22 @@ export function WizardHeader({
   };
   
   const handleNextOrSubmit = () => {
+    console.log('[SUBMIT] 2. handleNextOrSubmit called', {
+      isLastStep, isNextEnabled, isSubmitting, isDeleting, isLoadingUser, canProceed,
+      currentStep, totalSteps,
+    });
+    if (isSubmitting || isDeleting) {
+      console.log('[SUBMIT] 2a. BLOCKED by isSubmitting/isDeleting', { isSubmitting, isDeleting });
+      return;
+    }
     if (isLastStep) {
+      console.log('[SUBMIT] 3. Calling onSubmit()');
       onSubmit();
     } else {
+      console.log('[SUBMIT] 3. Calling onNext()');
       onNext();
     }
   };
-  
-  // Determine if Next should be Skip (for optional steps 2 and 3)
-  const isOptionalStep = currentStep === 2 || currentStep === 3;
-  const showSkip = isOptionalStep && !canProceed;
-  
-  // Fix 1: Submit button always shows "Submit" — auth validation happens on tap, not on render
-  const nextButtonText = isLastStep 
-    ? 'Submit' 
-    : (showSkip ? 'Skip' : 'Next');
-  
-  // Fix 1: Remove isLoadingUser from submit gate — by Step 4, user is already authenticated.
-  // Auth check moved inside handleSubmit for session-expired edge case.
-  const isNextEnabled = isLastStep 
-    ? (canProceed && !isSubmitting && !isDeleting)
-    : (showSkip || (canProceed && !isDeleting));
 
   return (
     <header 
@@ -152,8 +178,14 @@ export function WizardHeader({
       <div className="flex items-center min-w-[72px] justify-end">
         <Button
           size="sm"
-          onClick={handleNextOrSubmit}
+          onClick={() => {
+            console.log('[SUBMIT] 1. Button onClick fired');
+            handleNextOrSubmit();
+          }}
+          onTouchStart={() => console.log('[SUBMIT] 0. TouchStart fired')}
+          onTouchEnd={() => console.log('[SUBMIT] 0b. TouchEnd fired')}
           disabled={!isNextEnabled}
+          style={{ pointerEvents: 'auto', position: 'relative', zIndex: 9999 }}
           className={cn(
             'px-4 py-1.5 h-8 rounded-full text-sm font-medium transition-all duration-200',
             isNextEnabled

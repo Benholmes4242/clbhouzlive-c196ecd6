@@ -186,7 +186,8 @@ export function useReviewWizard({
   const { submitReview } = useReviewUpload({
     userId: currentUserId,
     onSuccess: (ratingId) => {
-      console.log('[useReviewWizard] Review submitted successfully:', ratingId);
+      console.log('[SUBMIT] 10. onSuccess callback fired:', ratingId, 'submissionInProgressRef was:', submissionInProgressRef.current);
+      submissionInProgressRef.current = false; // CRITICAL: Reset ref so user can submit again if needed
       submitCompletedRef.current = true;
       
       // Store the ratingId for preview/success screens
@@ -263,7 +264,8 @@ export function useReviewWizard({
       }
     },
     onError: (error) => {
-      console.error('[useReviewWizard] Submit error:', error);
+      console.error('[SUBMIT] 10a. onError callback fired:', error, 'submissionInProgressRef was:', submissionInProgressRef.current);
+      submissionInProgressRef.current = false; // CRITICAL: Reset ref so user can retry
       toast({
         title: 'Error',
         description: 'Failed to save your review. Please try again.',
@@ -490,17 +492,38 @@ export function useReviewWizard({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const submissionInProgressRef = useRef(false);
 
+  // DEBUG: Periodic check if submissionInProgressRef is stuck (TEMPORARY — remove before shipping)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (submissionInProgressRef.current) {
+        console.warn('[SUBMIT WARNING] submissionInProgressRef is TRUE — submit is blocked. isSubmitting:', isSubmitting);
+      }
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [isSubmitting]);
+
   // Submit handler - uses unified upload pipeline
   const handleSubmit = useCallback(async () => {
+    console.log('[SUBMIT] 5. handleSubmit entered', {
+      submissionInProgress: submissionInProgressRef.current,
+      isSubmitting,
+      rating: state.rating,
+      courseId: course?.id,
+      currentUserId,
+    });
+
     // Guard against double submission
     if (submissionInProgressRef.current || isSubmitting) {
-      console.log('[useReviewWizard] Submission already in progress, ignoring');
+      console.log('[SUBMIT] 5a. BLOCKED by submission guard', {
+        ref: submissionInProgressRef.current,
+        state: isSubmitting,
+      });
       return;
     }
     
     // Fix 1: Auth check inside handleSubmit instead of gating the button.
-    // By Step 4, the user was already authenticated — this catches session expiry edge case.
     if (!currentUserId) {
+      console.log('[SUBMIT] 5b. BLOCKED — no currentUserId (session expired)');
       toast({
         title: 'Session expired',
         description: 'Please sign in again to submit your review.',
@@ -510,6 +533,7 @@ export function useReviewWizard({
     }
     
     if (!course) {
+      console.log('[SUBMIT] 5c. BLOCKED — no course');
       toast({
         title: 'Error',
         description: 'No course selected. Please go back and select a course.',
@@ -519,6 +543,7 @@ export function useReviewWizard({
     }
     
     if (!state.rating) {
+      console.log('[SUBMIT] 5d. BLOCKED — no rating');
       toast({
         title: 'Rating Required',
         description: 'Please provide a rating before submitting.',
@@ -527,16 +552,21 @@ export function useReviewWizard({
       return;
     }
     
+    console.log('[SUBMIT] 6. Past all guards, about to call submitReview');
     submissionInProgressRef.current = true;
     setIsSubmitting(true);
     
     try {
-      // Submit via unified pipeline - this handles EVERYTHING:
-      // - Creates/updates course_ratings record
-      // - Uploads media with TUS (videos) and compression (images)
-      // - Creates course_review_media records
-      // - Shows progress in UploadProgressBanner
-      await submitReview({
+      console.log('[SUBMIT] 7. Calling submitReview with params:', {
+        courseId: course.id,
+        courseName: course.name,
+        rating: state.rating,
+        hasMedia: pendingFiles.length > 0,
+        hasReview: !!state.review,
+        isEditMode,
+      });
+      
+      const jobId = await submitReview({
         courseId: course.id,
         courseName: course.name,
         ratingId: isEditMode ? existingRating?.id : undefined,
@@ -554,16 +584,17 @@ export function useReviewWizard({
         selectedTags: state.selectedTags,
       });
       
-      // The submitReview callback handles navigation via onSuccess/onPreview
-      // (called by useReviewUpload's event listener when upload completes)
+      console.log('[SUBMIT] 8. submitReview returned jobId:', jobId);
+      // Note: submitReview only enqueues the job — actual processing is async.
+      // submissionInProgressRef stays true until onSuccess/onError callbacks fire.
       
     } catch (error) {
-      console.error('[useReviewWizard] Submit error:', error);
-      // Error toast is shown by useReviewUpload's onError callback
+      console.error('[SUBMIT] 8a. submitReview THREW:', error);
       // Reset the guard on error so user can retry
       submissionInProgressRef.current = false;
     } finally {
       setIsSubmitting(false);
+      console.log('[SUBMIT] 9. finally block — isSubmitting=false, submissionInProgressRef=', submissionInProgressRef.current);
     }
   }, [course, state, currentUserId, isEditMode, existingRating, submitReview, pendingFiles, toast, isSubmitting]);
 
