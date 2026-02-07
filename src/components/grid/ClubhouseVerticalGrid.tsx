@@ -479,6 +479,19 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     }
   }, [currentIndex, filteredPosts]);
 
+  // Sync forced mute fallback from safePlay back to global state
+  // When autoplay fails unmuted, safePlay forces video.muted = true imperatively.
+  // This listener keeps the React UI icon in sync with the actual audio state.
+  useEffect(() => {
+    const handleForcedMute = () => {
+      if (!isGloballyMuted) {
+        setGlobalMute(true);
+      }
+    };
+    window.addEventListener('autoplay-muted-fallback', handleForcedMute);
+    return () => window.removeEventListener('autoplay-muted-fallback', handleForcedMute);
+  }, [isGloballyMuted, setGlobalMute]);
+
   // FIX #1: Sync activeVideoId with GlobalAudioContext when currentIndex changes
   // This ensures non-prefetched videos respect the global mute state
   useEffect(() => {
@@ -1352,6 +1365,15 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
               onMeaningfulInteraction?.();
             }}
             isReviewPost={isReviewPost(currentPost)}
+            audioMode={(() => {
+              const mi = currentPost.media?.[0] as any;
+              return mi?.studio_edits?.audioMode || 'original';
+            })()}
+            postHasMusic={(() => {
+              const mi = currentPost.media?.[0] as any;
+              const md = mi?.studio_edits?.music;
+              return !!md?.url || !!md?.r2Key;
+            })()}
             onNextMedia={() => {
               const newIndex = currentMediaIdx + 1;
               setMediaIndices(prev => ({
