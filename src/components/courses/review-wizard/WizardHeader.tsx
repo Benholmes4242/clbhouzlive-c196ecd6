@@ -65,21 +65,6 @@ export function WizardHeader({
     ? (canProceed && !isSubmitting && !isDeleting)
     : (showSkip || (canProceed && !isDeleting));
 
-  // Debug: Log button state on every render (TEMPORARY — remove before shipping)
-  React.useEffect(() => {
-    if (!isNumericStep) return;
-    console.log('[SUBMIT BUTTON STATE]', {
-      isNextEnabled,
-      isLastStep,
-      canProceed,
-      isSubmitting,
-      isDeleting,
-      isLoadingUser,
-      nextButtonText,
-      currentStep,
-      totalSteps,
-    });
-  }, [isNextEnabled, isLastStep, canProceed, isSubmitting, isDeleting, isLoadingUser, isNumericStep]);
 
   // Only show header for numeric steps (1-4)
   if (!isNumericStep) return null;
@@ -95,19 +80,10 @@ export function WizardHeader({
   };
   
   const handleNextOrSubmit = () => {
-    console.log('[SUBMIT] 2. handleNextOrSubmit called', {
-      isLastStep, isNextEnabled, isSubmitting, isDeleting, isLoadingUser, canProceed,
-      currentStep, totalSteps,
-    });
-    if (isSubmitting || isDeleting) {
-      console.log('[SUBMIT] 2a. BLOCKED by isSubmitting/isDeleting', { isSubmitting, isDeleting });
-      return;
-    }
+    if (isSubmitting || isDeleting) return;
     if (isLastStep) {
-      console.log('[SUBMIT] 3. Calling onSubmit()');
       onSubmit();
     } else {
-      console.log('[SUBMIT] 3. Calling onNext()');
       onNext();
     }
   };
@@ -178,14 +154,8 @@ export function WizardHeader({
       <div className="flex items-center min-w-[72px] justify-end">
         <Button
           size="sm"
-          onClick={() => {
-            console.log('[SUBMIT] 1. Button onClick fired');
-            handleNextOrSubmit();
-          }}
-          onTouchStart={() => console.log('[SUBMIT] 0. TouchStart fired')}
-          onTouchEnd={() => console.log('[SUBMIT] 0b. TouchEnd fired')}
+          onClick={handleNextOrSubmit}
           disabled={!isNextEnabled}
-          style={{ pointerEvents: 'auto', position: 'relative', zIndex: 9999 }}
           className={cn(
             'px-4 py-1.5 h-8 rounded-full text-sm font-medium transition-all duration-200',
             isNextEnabled
