@@ -2,8 +2,8 @@
 // A*-polished: media preview strip, compact caption, promoted AI, smart counter
 import { useCallback, useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, X, Sparkles, Tag, ChevronRight, Pencil, Camera, AtSign } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { MapPin, X, Tag, ChevronRight, Pencil, Camera, AtSign } from 'lucide-react';
+
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { StepProps } from '../types';
@@ -15,7 +15,6 @@ import { useKeyboardAwareScroll } from '@/hooks/useKeyboardAwareScroll';
 interface CaptionStepProps extends StepProps {
   onOpenCourseSearch: () => void;
   onOpenCategories: () => void;
-  onOpenAiCaption?: () => void;
 }
 
 const CAPTION_MAX_LENGTH = 2200;
@@ -25,7 +24,6 @@ export function CaptionStep({
   dispatch,
   onOpenCourseSearch,
   onOpenCategories,
-  onOpenAiCaption,
 }: CaptionStepProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -212,40 +210,6 @@ export function CaptionStep({
             maxLength={CAPTION_MAX_LENGTH + 100}
           />
 
-          {/* Priority 3: AI Caption button — floating pill */}
-          {onOpenAiCaption && !hasContent && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="flex justify-center pb-4"
-            >
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onOpenAiCaption}
-                className="h-9 px-4 text-sm gap-1.5 rounded-full bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200/50 text-amber-700 hover:from-amber-100 hover:to-orange-100 hover:border-amber-300/60 transition-all"
-              >
-                <Sparkles className="h-3.5 w-3.5" />
-                Suggest caption
-              </Button>
-            </motion.div>
-          )}
-
-          {/* AI button — corner icon when typing */}
-          {onOpenAiCaption && hasContent && (
-            <div className="flex justify-end px-3 pb-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onOpenAiCaption}
-                className="h-7 w-7 p-0 rounded-full text-amber-600 hover:bg-amber-50"
-                aria-label="Suggest caption with AI"
-              >
-                <Sparkles className="h-3.5 w-3.5" />
-              </Button>
-            </div>
-          )}
           
           {/* Tagged entities chips */}
           {state.selectedTags.length > 0 && (

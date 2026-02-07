@@ -43,7 +43,7 @@ import { CourseSearchSheet } from "@/components/courses/CourseSearchSheet";
 import CreateMomentHeader from "./CreateMomentHeader";
 import PostingOptionsSheet from "./PostingOptionsSheet";
 import { UploadProgressBar } from "./UploadProgressBar";
-import { MomentCategorySheet, EnhanceMomentSheet, MomentBadgesSheet, AiCaptionSheet, SmartCompilationSheet, DraftsAndScheduledSheet, ScheduleSheet } from "./sheets";
+import { MomentCategorySheet, EnhanceMomentSheet, MomentBadgesSheet, SmartCompilationSheet, DraftsAndScheduledSheet, ScheduleSheet } from "./sheets";
 import { CreateMomentProps, GolfCourse, TaggableEntity, MomentVisibility } from "./types";
 import type { DraftWithMedia } from "@/services/drafts";
 
@@ -97,7 +97,7 @@ export default function CreateMomentModal({
   const [showPostingOptionsSheet, setShowPostingOptionsSheet] = useState(false);
   const [showEnhanceSheet, setShowEnhanceSheet] = useState(false);
   const [showBadgesSheet, setShowBadgesSheet] = useState(false);
-  const [showAiCaptionSheet, setShowAiCaptionSheet] = useState(false);
+  
   const [showSmartCompilationSheet, setShowSmartCompilationSheet] = useState(false);
   const [showDraftsSheet, setShowDraftsSheet] = useState(false);
   const [showScheduleSheet, setShowScheduleSheet] = useState(false);
@@ -1429,10 +1429,6 @@ export default function CreateMomentModal({
           setShowEnhanceSheet(false);
           setShowBadgesSheet(true);
         }}
-        onOpenAiCaption={() => {
-          setShowEnhanceSheet(false);
-          setShowAiCaptionSheet(true);
-        }}
         onOpenSmartCompilation={() => {
           setShowEnhanceSheet(false);
           setShowSmartCompilationSheet(true);
@@ -1447,19 +1443,6 @@ export default function CreateMomentModal({
         onBadgesChange={setSelectedBadges}
       />
 
-      <AiCaptionSheet
-        isOpen={showAiCaptionSheet}
-        onClose={() => setShowAiCaptionSheet(false)}
-        onInsertCaption={(text, mode) => {
-          if (mode === 'replace') {
-            setCaption(text);
-          } else {
-            setCaption(prev => prev.trim() ? `${prev}\n\n${text}` : text);
-          }
-        }}
-        existingCaption={caption}
-        prefilledCourseName={course?.name}
-      />
 
       <SmartCompilationSheet
         isOpen={showSmartCompilationSheet}

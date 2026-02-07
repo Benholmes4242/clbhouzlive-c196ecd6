@@ -85,7 +85,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isButtonShaking, setIsButtonShaking] = useState(false);
   const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
-  const [aiLoading, setAiLoading] = useState(false);
+  
   const [visibility, setVisibility] = useState<"public" | "private">("public");
   const isMobile = useIsMobile();
   const previouslyOpenRef = useRef(false);
@@ -170,42 +170,6 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
     setCaption(newCaption);
     setSelectedTags(prev => [...prev, entity]);
     setShowSuggestions(false);
-  };
-
-  // AI Caption Generation
-  const handleAICaption = async () => {
-    try {
-      setAiLoading(true);
-      const first = files?.[0];
-      if (!first) return;
-
-      const body = {
-        type: first.type.startsWith('video') ? "video" : "image",
-        previewUrl: URL.createObjectURL(first),
-        captionContext: caption || "",
-      };
-
-      const { data, error } = await supabase.functions.invoke('ai-caption-generator', {
-        body
-      });
-      
-      if (error) throw error;
-      
-      if (data?.caption) {
-        setCaption(data.caption);
-      } else {
-        throw new Error('Failed to generate caption');
-      }
-    } catch (error) {
-      console.error('AI caption error:', error);
-      toast({
-        title: "Caption Generation Failed",
-        description: "Please try writing a caption manually.",
-        variant: "destructive"
-      });
-    } finally {
-      setAiLoading(false);
-    }
   };
 
   const handleSubmit = async () => {
@@ -546,14 +510,6 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                       <label className="block text-sm font-medium text-gray-700">
                         Add a caption
                       </label>
-                      <button
-                        onClick={handleAICaption}
-                        disabled={aiLoading || files.length === 0}
-                        className="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 transition-colors disabled:opacity-50"
-                        aria-label="Write a caption for me"
-                      >
-                        {aiLoading ? "..." : "✨ Write a caption for me"}
-                      </button>
                     </div>
                     <div className="relative">
                       <EnhancedRichTextInput

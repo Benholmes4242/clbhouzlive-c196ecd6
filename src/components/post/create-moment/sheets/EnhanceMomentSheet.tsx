@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, Wand2, Type, Film, ChevronRight, Award } from 'lucide-react';
+import { X, Sparkles, Wand2, Film, ChevronRight, Award } from 'lucide-react';
 
 interface EnhanceOption {
   id: string;
@@ -26,12 +26,6 @@ const ENHANCE_OPTIONS: EnhanceOption[] = [
     icon: <Award className="w-5 h-5" />,
   },
   {
-    id: 'ai-caption',
-    label: 'AI Caption',
-    description: 'Generate a caption with AI',
-    icon: <Type className="w-5 h-5" />,
-  },
-  {
     id: 'smart-compilation',
     label: 'Smart Compilation',
     description: 'Merge multiple clips into one video',
@@ -53,7 +47,7 @@ interface EnhanceMomentSheetProps {
   onClose: () => void;
   onOpenStudio: () => void;
   onOpenBadges?: () => void;
-  onOpenAiCaption?: () => void;
+  
   onOpenSmartCompilation?: () => void;
   videoCount?: number;
 }
@@ -67,7 +61,7 @@ export const EnhanceMomentSheet: React.FC<EnhanceMomentSheetProps> = ({
   onClose,
   onOpenStudio,
   onOpenBadges,
-  onOpenAiCaption,
+  
   onOpenSmartCompilation,
   videoCount = 0,
 }) => {
@@ -89,9 +83,6 @@ export const EnhanceMomentSheet: React.FC<EnhanceMomentSheetProps> = ({
     } else if (optionId === 'badges' && onOpenBadges) {
       onClose();
       onOpenBadges();
-    } else if (optionId === 'ai-caption' && onOpenAiCaption) {
-      onClose();
-      onOpenAiCaption();
     } else if (optionId === 'smart-compilation' && onOpenSmartCompilation) {
       onClose();
       onOpenSmartCompilation();
