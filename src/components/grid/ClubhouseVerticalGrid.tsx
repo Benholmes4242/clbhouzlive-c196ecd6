@@ -8,6 +8,7 @@
 
 import React, { useState, useEffect, useRef, useCallback, useMemo, forwardRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { InlineSpinner } from '@/components/ui/InlineSpinner';
 import { LoadingBoundary } from '@/components/ui/LoadingBoundary';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -699,7 +700,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
   };
 
   const handleShare = () => {
-    // Share action handled by native share sheet
+    console.warn('[Clubhouse] Share not yet implemented');
   };
 
   // Scroll handler with parent callback
@@ -1158,7 +1159,9 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                     <>
                       {/* Left arrow - positioned to match the top slot of action rail */}
                       {currentMediaIndex > 0 && (
-                        <button
+                        <motion.button
+                          whileTap={{ scale: 0.93 }}
+                          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                           data-control="media-nav"
                           onClick={handlePrevMedia}
                           className="fixed left-4 z-30 p-0 flex items-center justify-center rounded-full"
@@ -1173,11 +1176,13 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           aria-label="Previous media"
                         >
                           <ChevronLeft className="w-6 h-6 text-white" />
-                        </button>
+                        </motion.button>
                       )}
                       {/* Right arrow - only for non-review posts (review posts use CinematicActionRail) */}
                       {!isReviewItem && currentMediaIndex < mediaItems.length - 1 && (
-                        <button
+                        <motion.button
+                          whileTap={{ scale: 0.93 }}
+                          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                           data-control="media-nav"
                           onClick={handleNextMedia}
                           className="fixed right-4 z-30 p-0 flex items-center justify-center rounded-full"
@@ -1192,7 +1197,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           aria-label="Next media"
                         >
                           <ChevronRight className="w-6 h-6 text-white" />
-                        </button>
+                        </motion.button>
                       )}
                     </>
                   );

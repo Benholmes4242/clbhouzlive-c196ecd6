@@ -38,8 +38,8 @@ export const MediaNavigationDots: React.FC<MediaNavigationDotsProps> = ({
             onClick={() => onJump?.(index)}
             className={`h-1.5 rounded-full transition-all duration-200 ease-out relative after:content-[''] after:absolute after:-inset-2 ${
               isActive 
-                ? 'w-5 bg-white dark:bg-white' 
-                : 'w-1.5 bg-white/60 dark:bg-white/50'
+                ? 'w-5 bg-white' 
+                : 'w-1.5 bg-white/60'
             }`}
           />
         );
