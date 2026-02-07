@@ -20,10 +20,14 @@ export type MomentCategoryDef = {
   discoverEnabled?: boolean; // If true, appears in Discover filter pills
 };
 
+export type BadgeTier = 'legendary' | 'achievement' | 'milestone' | 'experience';
+
 export type MomentBadgeDef = {
   id: string;
   label: string;
+  description: string;
   category?: 'scoring' | 'shot' | 'performance' | 'experience';
+  tier: BadgeTier;
   keywords?: string[];
 };
 
@@ -314,94 +318,124 @@ export const MOMENT_BADGES: MomentBadgeDef[] = [
   {
     id: 'break-100',
     label: 'Breaking 100',
+    description: 'Shot under 100 for 18 holes',
     category: 'scoring',
+    tier: 'milestone',
     keywords: ['broke 100', 'break 100', 'breaking 100', 'under 100', '99', '98', '97', '96', '95', '94', '93', '92', '91'],
   },
   {
     id: 'break-90',
     label: 'Breaking 90',
+    description: 'Shot under 90 for 18 holes',
     category: 'scoring',
+    tier: 'milestone',
     keywords: ['broke 90', 'break 90', 'breaking 90', 'under 90', '89', '88', '87', '86', '85', '84', '83', '82', '81'],
   },
   {
     id: 'break-80',
     label: 'Breaking 80',
+    description: 'Shot under 80 for 18 holes',
     category: 'scoring',
+    tier: 'achievement',
     keywords: ['broke 80', 'break 80', 'breaking 80', 'under 80', '79', '78', '77', '76', '75', '74', '73', '72'],
   },
   {
     id: 'break-70',
     label: 'Breaking 70',
+    description: 'Shot under 70 for 18 holes',
     category: 'scoring',
+    tier: 'achievement',
     keywords: ['broke 70', 'break 70', 'breaking 70', 'under 70', '69', '68', '67', '66', '65'],
   },
   // Shot / Hole (4)
   {
     id: 'hio',
     label: 'Hole-in-One',
+    description: 'Aced a hole in a single stroke',
     category: 'shot',
+    tier: 'legendary',
     keywords: ['hole in one', 'hole-in-one', 'hio', 'aced', 'ace'],
   },
   {
     id: 'albatross',
     label: 'Albatross',
+    description: '3 under par on a single hole',
     category: 'shot',
+    tier: 'legendary',
     keywords: ['albatross', 'double eagle', '-3'],
   },
   {
     id: 'eagle',
     label: 'Eagle',
+    description: '2 under par on a single hole',
     category: 'shot',
+    tier: 'achievement',
     keywords: ['eagle', 'eagled', '-2'],
   },
   {
     id: 'birdie',
     label: 'Birdie',
+    description: '1 under par on a single hole',
     category: 'shot',
+    tier: 'achievement',
     keywords: ['birdie', 'birdied', '-1'],
   },
   // Performance (4)
   {
     id: 'pb',
     label: 'Personal Best',
+    description: 'Your lowest ever round score',
     category: 'performance',
+    tier: 'milestone',
     keywords: ['personal best', 'pb', 'new low', 'best score', 'best round', 'career low'],
   },
   {
     id: 'best-front-9',
     label: 'Best Front 9',
+    description: 'Your lowest score for the first 9 holes',
     category: 'performance',
+    tier: 'milestone',
     keywords: ['best front 9', 'front nine', 'best front nine', 'front 9 pb'],
   },
   {
     id: 'best-back-9',
     label: 'Best Back 9',
+    description: 'Your lowest score for the last 9 holes',
     category: 'performance',
+    tier: 'milestone',
     keywords: ['best back 9', 'back nine', 'best back nine', 'back 9 pb'],
   },
   {
     id: 'longest-drive',
     label: 'Longest Drive',
+    description: 'Your longest recorded drive',
     category: 'performance',
+    tier: 'experience',
     keywords: ['longest drive', 'bomb', 'bombed', 'crushed', 'smashed', 'distance'],
   },
   // Experience (3)
   {
     id: 'tournament',
     label: 'Tournament Round',
+    description: 'Competed in an official tournament',
     category: 'experience',
+    tier: 'experience',
     keywords: ['tournament', 'competition', 'comp', 'medal', 'club championship'],
   },
   {
     id: 'away-course',
     label: 'Away Course',
+    description: 'Played a course that isn\'t your home club',
     category: 'experience',
+    tier: 'experience',
     keywords: ['away', 'visitor', 'guest', 'first time', 'new course', 'traveled'],
   },
   {
     id: 'match-play',
     label: 'Match Play Win',
+    description: 'Won a match play competition',
     category: 'experience',
+    tier: 'experience',
     keywords: ['match play', 'won match', 'beat', 'victory', '1 up', '2 up', '3 up'],
   },
 ];
