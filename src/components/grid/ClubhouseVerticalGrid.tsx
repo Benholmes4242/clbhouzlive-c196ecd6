@@ -1015,7 +1015,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                     )}
                     
                     {/* Review overlay for video review posts */}
-                    {item.categories?.includes('review') && (item as any).sourceReviewId && (
+                    {isReviewPost(item) && (
                       <div className="absolute inset-0 pointer-events-none">
                         <FullscreenReviewPost
                           mode="live"
@@ -1070,7 +1070,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                     </div>
                     
                     {/* Review overlay - conditionally rendered */}
-                    {item.categories?.includes('review') && (item as any).sourceReviewId ? (
+                    {isReviewPost(item) ? (
                       <div className="absolute inset-0 pointer-events-none">
                         <FullscreenReviewPost
                           mode="live"

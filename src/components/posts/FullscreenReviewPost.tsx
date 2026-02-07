@@ -91,7 +91,7 @@ export function FullscreenReviewPost({
   children,
   renderMedia = true,
 }: FullscreenReviewPostProps) {
-  console.log('[FullscreenReviewPost] rendered', { mode, courseId, courseName, reviewId, userId: user?.name });
+  
   const navigate = useNavigate();
   
   // Controlled sheet state for review bottom sheet
@@ -99,12 +99,12 @@ export function FullscreenReviewPost({
 
   const handleOpenReviewSheet = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log('[FullscreenReviewPost] opening review sheet', { courseId, courseName, reviewId });
+    
     setIsReviewSheetOpen(true);
   }, [courseId, courseName, reviewId]);
   
   const handleCloseReviewSheet = useCallback(() => {
-    console.log('[FullscreenReviewPost] closing review sheet - staying on current page');
+    
     setIsReviewSheetOpen(false);
     // No navigation - user stays on Clubhouse
   }, []);
@@ -305,18 +305,19 @@ export function FullscreenReviewPost({
         transition={{ duration: prefersReducedMotion ? 0 : 0.3, ease: 'easeOut', delay: 0.1 }}
         onClick={handleOpenReviewSheet}
         className={cn(
-          "absolute left-4 right-4 z-20 top-[66px]",
+          "absolute left-4 right-4 z-20",
           "rounded-xl border",
           "shadow-[0_4px_20px_rgba(0,0,0,0.2)]",
           "pointer-events-auto cursor-pointer transition-transform active:scale-[0.98]",
           "text-left w-auto"
         )}
         style={{
+          top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)',
           background: isOutstanding 
             ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(251, 191, 36, 0.05) 100%)'
             : 'linear-gradient(135deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.3) 100%)',
-          backdropFilter: 'blur(16px) saturate(150%)',
-          WebkitBackdropFilter: 'blur(16px) saturate(150%)',
+          backdropFilter: 'blur(20px) saturate(150%)',
+          WebkitBackdropFilter: 'blur(20px) saturate(150%)',
           borderColor: isOutstanding 
             ? 'rgba(245, 158, 11, 0.2)' 
             : 'rgba(255, 255, 255, 0.08)',
