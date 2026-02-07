@@ -100,16 +100,19 @@ export const ClubSearchDropdown: React.FC<ClubSearchDropdownProps> = ({
           "flex items-center gap-2 px-3 py-2.5 border rounded-sq-sm bg-muted/30",
           error ? "border-destructive" : "border-border"
         )}>
-          {value.country && (
-            <img
-              src={`https://flagcdn.com/w20/${getFlagCode(value.country)}.png`}
-              alt={value.country}
-              className="w-5 h-4 object-cover rounded-sm flex-shrink-0"
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none';
-              }}
-            />
-          )}
+          {(() => {
+            const flagCode = value.country ? getFlagCode(value.country) : null;
+            return flagCode ? (
+              <img
+                src={`https://flagcdn.com/w20/${flagCode}.png`}
+                alt={value.country}
+                className="w-5 h-4 object-cover rounded-sm flex-shrink-0"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
+              />
+            ) : null;
+          })()}
           <div className="flex-1 min-w-0">
             <div className="text-sm font-medium truncate">{value.name}</div>
             {(value.sub_country || value.country) && (
@@ -168,16 +171,19 @@ export const ClubSearchDropdown: React.FC<ClubSearchDropdownProps> = ({
                       onClick={() => handleSelect(club)}
                       className="w-full px-3 py-2.5 text-left hover:bg-slate-100 transition-colors flex items-center gap-3"
                     >
-                      {club.country && (
-                        <img
-                          src={`https://flagcdn.com/w20/${getFlagCode(club.country)}.png`}
-                          alt={club.country}
-                          className="w-5 h-4 object-cover rounded-sm flex-shrink-0"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = 'none';
-                          }}
-                        />
-                      )}
+                      {(() => {
+                        const flagCode = club.country ? getFlagCode(club.country) : null;
+                        return flagCode ? (
+                          <img
+                            src={`https://flagcdn.com/w20/${flagCode}.png`}
+                            alt={club.country}
+                            className="w-5 h-4 object-cover rounded-sm flex-shrink-0"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                        ) : null;
+                      })()}
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-medium truncate">
                           {club.name}

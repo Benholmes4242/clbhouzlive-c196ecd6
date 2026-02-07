@@ -180,7 +180,28 @@ export const countryToFlagCode: Record<string, string> = {
   'Qatar': 'QA',
   'SAUDI ARABIA': 'SA',
   'Saudi Arabia': 'SA',
+
+  // Regions with no single representative flag — explicitly null
+  // These are intentionally unmapped; the null guard in UI components
+  // will simply skip rendering a flag for these values.
+  // 'Asia': null,
+  // 'Caribbean': null,
+  // 'Central and South America': null,
+  // 'Middle East': null,
+  // 'Oceania': null,
+  // 'Rest of World': null,
 };
+
+// Explicitly unmapped regions — getFlagCode returns null for these.
+// Documented here so future maintainers know the omission is intentional.
+export const UNMAPPED_REGIONS = [
+  'Asia',
+  'Caribbean',
+  'Central and South America',
+  'Middle East',
+  'Oceania',
+  'Rest of World',
+] as const;
 
 export const getFlagCode = (country: string | null | undefined): string | null => {
   if (!country) return null;
