@@ -944,7 +944,7 @@ export default function CreateMomentModal({
     }
   };
 
-  // Load draft handler (from DraftsListSheet)
+  // Load draft handler
   const handleLoadDraft = (draft: DraftWithMedia) => {
     // Track the loaded draft ID for updates
     setCurrentDraftId(draft.id);

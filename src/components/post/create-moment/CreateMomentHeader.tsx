@@ -58,26 +58,20 @@ export function CreateMomentHeader({
   };
 
   return (
-    <div 
-      className="flex items-center justify-between px-4 h-14"
-      style={{ 
-        background: '#F8FAFC',
-      }}
-    >
+    <div className="flex items-center justify-between px-4 h-14 bg-card">
       {/* Left: Close button */}
       <button
         onClick={onClose}
-        className="w-9 h-9 -ml-1 rounded-full flex items-center justify-center transition-colors"
-        style={{ background: 'transparent' }}
+        className="w-9 h-9 -ml-1 rounded-full flex items-center justify-center transition-colors text-muted-foreground"
         aria-label="Close"
       >
-        <X className="h-5 w-5" style={{ color: 'var(--cm-text-secondary)' }} />
+        <X className="h-5 w-5" />
       </button>
       
       {/* Center: Identity selector - Avatar + Name + Chevron */}
       <button 
         onClick={onOpenPostingOptions}
-        className="flex items-center gap-2.5 px-3 py-1.5 rounded-full transition-colors hover:bg-[#f1f5f9] active:bg-[#e2e8f0]"
+        className="flex items-center gap-2.5 px-3 py-1.5 rounded-full transition-colors hover:bg-muted active:bg-muted/80"
       >
         {selectedActor && (
           <>
@@ -88,10 +82,7 @@ export function CreateMomentHeader({
               fallback={getInitials(selectedActor.name)}
               hideRing
             />
-            <span 
-              className="font-medium text-sm max-w-[140px] truncate"
-              style={{ color: 'var(--cm-text-primary)' }}
-            >
+            <span className="font-medium text-sm max-w-[140px] truncate text-foreground">
               {truncateDisplayName(selectedActor.name)}
             </span>
             {selectedActor.verified && <VerifiedBadge size="sm" />}
@@ -104,7 +95,7 @@ export function CreateMomentHeader({
               strokeWidth="2.5" 
               strokeLinecap="round" 
               strokeLinejoin="round"
-              style={{ color: 'var(--cm-text-tertiary)' }}
+              className="text-muted-foreground"
             >
               <polyline points="6 9 12 15 18 9" />
             </svg>
@@ -122,14 +113,11 @@ export function CreateMomentHeader({
               e.stopPropagation();
               onOpenDrafts();
             }}
-            className="w-9 h-9 rounded-full flex items-center justify-center relative transition-colors hover:bg-[#f1f5f9]"
+            className="w-9 h-9 rounded-full flex items-center justify-center relative transition-colors hover:bg-muted"
             aria-label={`View ${draftCount} drafts`}
           >
-            <FileEdit className="h-5 w-5" style={{ color: 'var(--cm-text-secondary)' }} />
-            <span 
-              className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] rounded-full text-white text-[9px] font-semibold flex items-center justify-center"
-              style={{ background: '#ef4444' }}
-            >
+            <FileEdit className="h-5 w-5 text-muted-foreground" />
+            <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] rounded-full bg-destructive text-destructive-foreground text-[9px] font-semibold flex items-center justify-center">
               {draftCount > 9 ? '9+' : draftCount}
             </span>
           </button>
@@ -143,14 +131,11 @@ export function CreateMomentHeader({
               e.stopPropagation();
               onOpenScheduled();
             }}
-            className="w-9 h-9 rounded-full flex items-center justify-center relative transition-colors hover:bg-[#f1f5f9]"
+            className="w-9 h-9 rounded-full flex items-center justify-center relative transition-colors hover:bg-muted"
             aria-label={`View ${scheduledCount} scheduled posts`}
           >
-            <Clock className="h-5 w-5" style={{ color: 'var(--cm-text-secondary)' }} />
-            <span 
-              className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] rounded-full text-white text-[9px] font-semibold flex items-center justify-center"
-              style={{ background: '#3b82f6' }}
-            >
+            <Clock className="h-5 w-5 text-muted-foreground" />
+            <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] rounded-full bg-primary text-primary-foreground text-[9px] font-semibold flex items-center justify-center">
               {scheduledCount > 9 ? '9+' : scheduledCount}
             </span>
           </button>
@@ -160,10 +145,10 @@ export function CreateMomentHeader({
         {scheduledCount === 0 && (
           <button
             onClick={onOpenScheduleSheet}
-            className="w-9 h-9 rounded-full flex items-center justify-center transition-colors hover:bg-[#f1f5f9]"
+            className="w-9 h-9 rounded-full flex items-center justify-center transition-colors hover:bg-muted text-muted-foreground"
             aria-label="Schedule post"
           >
-            <Clock className="h-5 w-5" style={{ color: 'var(--cm-text-secondary)' }} />
+            <Clock className="h-5 w-5" />
           </button>
         )}
         
@@ -174,13 +159,9 @@ export function CreateMomentHeader({
           className={cn(
             "h-8 px-4 rounded-full font-semibold text-sm transition-all duration-200 ml-1",
             canPost && !isSubmitting
-              ? "active:scale-[0.97]"
-              : "cursor-not-allowed"
+              ? "bg-muted text-foreground active:scale-[0.97]"
+              : "bg-muted/50 text-muted-foreground cursor-not-allowed"
           )}
-          style={{
-            background: canPost && !isSubmitting ? '#e2e8f0' : '#f1f5f9',
-            color: canPost && !isSubmitting ? '#1e293b' : '#94a3b8',
-          }}
         >
           {isSubmitting ? 'Posting...' : isEditMode ? 'Update' : 'Post'}
         </button>
