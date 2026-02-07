@@ -6,11 +6,13 @@
  * - Franchise cards with medallion + performance ring
  * - Status badges (hot streak, defending champ, rising)
  * - Momentum rings showing weekly movement
- * - Normalized performance visualization
+ * - URL-persisted active tab
  */
 
 import { useState, useMemo, useRef, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCollegeSeasonStats, type CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
@@ -26,13 +28,25 @@ const METRIC_TABS: { value: MetricTab; label: string }[] = [
   { value: 'top10s', label: 'Top 10s' },
 ];
 
+const VALID_METRICS = new Set<string>(['earnings', 'wins', 'cuts', 'top10s']);
+
 interface FranchiseLeaderboardProps {
   limit?: number;
   className?: string;
 }
 
 export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderboardProps) {
-  const [activeMetric, setActiveMetric] = useState<MetricTab>('earnings');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const sortParam = searchParams.get('sort') || 'earnings';
+  const activeMetric: MetricTab = VALID_METRICS.has(sortParam) ? (sortParam as MetricTab) : 'earnings';
+
+  const setActiveMetric = (metric: MetricTab) => {
+    const params = new URLSearchParams(searchParams);
+    if (metric === 'earnings') params.delete('sort');
+    else params.set('sort', metric);
+    setSearchParams(params, { replace: true });
+  };
+
   const { data: allStats, isLoading, error } = useCollegeSeasonStats();
   const { data: collegeMap } = useCollegeMediaMap();
   const statusMap = useCollegeStatusMap();
@@ -126,6 +140,7 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
                   "text-sm font-medium",
                   "transition-colors duration-200",
                   "rounded-lg",
+                  "active:scale-95",
                   isSelected 
                     ? "text-foreground" 
                     : "text-muted-foreground hover:text-foreground/80"
@@ -176,8 +191,10 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
             );
           })
         ) : (
-          <div className="text-center py-12 text-sm text-muted-foreground">
-            No colleges with stats this season
+          <div className="flex flex-col items-center py-12 text-center">
+            <Loader2 className="w-5 h-5 text-muted-foreground/50 animate-spin mb-3" />
+            <p className="text-sm font-medium text-foreground mb-1">Season stats are being calculated</p>
+            <p className="text-xs text-muted-foreground">Check back soon.</p>
           </div>
         )}
       </div>

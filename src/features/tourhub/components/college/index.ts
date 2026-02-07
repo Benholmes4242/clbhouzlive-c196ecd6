@@ -1,14 +1,10 @@
 export { CollegeCard } from './CollegeCard';
 export { FranchiseCard } from './FranchiseCard';
 export { CollegeSearch } from './CollegeSearch';
-export { CollegeLeaderboard } from './CollegeLeaderboard';
 export { FranchiseLeaderboard } from './FranchiseLeaderboard';
-export { CollegeAlumniList } from './CollegeAlumniList';
 export { AlumniDepthChart } from './AlumniDepthChart';
-export { CollegeHero } from './CollegeHero';
 export { FranchiseHero } from './FranchiseHero';
 export { FranchiseStoryStrip } from './FranchiseStoryStrip';
-export { CollegeWeeklyMovers } from './CollegeWeeklyMovers';
 export { FranchiseMovers } from './FranchiseMovers';
 export { CollegeRivalsCarousel } from './CollegeRivalsCarousel';
 export { FollowCollegeButton } from './FollowCollegeButton';

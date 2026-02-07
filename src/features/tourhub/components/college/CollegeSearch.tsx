@@ -1,6 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Search, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useCollegeSearch } from '../../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
 import { CollegeCard } from './CollegeCard';
@@ -10,28 +12,29 @@ interface CollegeSearchProps {
 }
 
 export function CollegeSearch({ className }: CollegeSearchProps) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const { data: results, isLoading } = useCollegeSearch(searchTerm);
+  const [searchInput, setSearchInput] = useState('');
+  const debouncedSearch = useDebouncedValue(searchInput, 200);
+  const { data: results, isLoading } = useCollegeSearch(debouncedSearch);
   const { data: collegeMap } = useCollegeMediaMap();
   
-  const showResults = searchTerm.length >= 2;
+  const showResults = debouncedSearch.length >= 2;
   
   return (
     <div className={cn('relative', className)}>
       {/* Search Input */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8] pointer-events-none" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
         <input
           type="text"
           placeholder="Search colleges..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full h-11 pl-9 pr-9 bg-white border border-[#e2e8f0] rounded-xl text-sm text-[#1e293b] placeholder:text-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#e2e8f0] focus:border-[#e2e8f0] transition-all"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          className="w-full h-11 pl-9 pr-9 bg-card border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-border focus:border-border transition-all"
         />
-        {searchTerm && (
+        {searchInput && (
           <button
-            onClick={() => setSearchTerm('')}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-[#94a3b8] hover:text-[#1e293b] transition-colors"
+            onClick={() => setSearchInput('')}
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-muted-foreground hover:text-foreground active:scale-90 transition-all"
           >
             <X className="w-4 h-4" />
           </button>
@@ -39,27 +42,41 @@ export function CollegeSearch({ className }: CollegeSearchProps) {
       </div>
       
       {/* Results */}
-      {showResults && (
-        <div className="mt-3 space-y-2">
-          {isLoading ? (
-            <div className="text-center py-8 text-sm text-[#64748b]">
-              Searching...
-            </div>
-          ) : results && results.length > 0 ? (
-            results.map((stats) => (
-              <CollegeCard
-                key={stats.normalized_name}
-                stats={stats}
-                college={collegeMap?.get(stats.normalized_name) || null}
-              />
-            ))
-          ) : (
-            <div className="text-center py-8 text-sm text-[#64748b]">
-              No colleges found matching "{searchTerm}"
-            </div>
-          )}
-        </div>
-      )}
+      <AnimatePresence mode="wait">
+        {showResults && (
+          <motion.div
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 4 }}
+            transition={{ duration: 0.2 }}
+            className="mt-3 space-y-2"
+          >
+            {isLoading ? (
+              <div className="text-center py-8 text-sm text-muted-foreground">
+                Searching...
+              </div>
+            ) : results && results.length > 0 ? (
+              results.map((stats, index) => (
+                <motion.div
+                  key={stats.normalized_name}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2, delay: index * 0.04 }}
+                >
+                  <CollegeCard
+                    stats={stats}
+                    college={collegeMap?.get(stats.normalized_name) || null}
+                  />
+                </motion.div>
+              ))
+            ) : (
+              <div className="text-center py-8 text-sm text-muted-foreground">
+                No colleges found matching "{debouncedSearch}"
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

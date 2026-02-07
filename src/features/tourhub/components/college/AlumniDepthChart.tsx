@@ -22,15 +22,7 @@ interface AlumniDepthChartProps {
   className?: string;
 }
 
-function formatCurrency(amount: number): string {
-  if (amount >= 1_000_000) {
-    return `$${(amount / 1_000_000).toFixed(1)}M`;
-  }
-  if (amount >= 1_000) {
-    return `$${(amount / 1_000).toFixed(0)}K`;
-  }
-  return `$${amount.toFixed(0)}`;
-}
+import { formatCurrency } from '@/lib/utils/formatCurrency';
 
 interface AlumniRowProps {
   alumnus: CollegeAlumnus;

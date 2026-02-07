@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useTourSeason } from './useTourHubData';
 
 export interface CollegeSeasonStats {
   id: string;
@@ -20,12 +19,30 @@ export interface CollegeSeasonStats {
 }
 
 /**
- * Hook to get current tour season ID.
- * Other hooks depend on this to avoid hardcoding season IDs.
+ * Hook to get the latest season ID that has college data.
+ * Queries college_season_stats for the most recent season_id,
+ * making the page resilient to pipeline timing mismatches.
  */
 export function useCurrentSeasonId() {
-  const { data: season } = useTourSeason();
-  return season?.id;
+  const { data } = useQuery({
+    queryKey: ['college-latest-season'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('college_season_stats')
+        .select('season_id')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) {
+        console.error('[useCurrentSeasonId] Error:', error);
+        throw error;
+      }
+      return data?.season_id ?? null;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+  return data ?? undefined;
 }
 
 /**

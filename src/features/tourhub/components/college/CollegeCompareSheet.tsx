@@ -1,12 +1,5 @@
 /**
  * CollegeCompareSheet - Bottom sheet for quick college comparison
- * 
- * Shows:
- * - Both logos with rings
- * - Select Rival row (horizontal chips)
- * - 4 metric tabs (earnings/wins/cuts/top10s)
- * - Winner highlight per tab
- * - Deep link to full compare page
  */
 
 import { useState, useEffect } from 'react';
@@ -23,9 +16,9 @@ type CompareMetric = 'earnings' | 'wins' | 'cuts' | 'top10s';
 interface CollegeCompareSheetProps {
   isOpen: boolean;
   onClose: () => void;
-  college1: string; // normalized_name
-  college2: string; // normalized_name
-  rivals?: string[]; // array of rival normalized_names
+  college1: string;
+  college2: string;
+  rivals?: string[];
   onCollegeChange?: (rivalSlug: string) => void;
 }
 
@@ -50,7 +43,6 @@ function CollegeSide({ college, value, metric, isWinner }: CollegeSideProps) {
   
   return (
     <div className="flex flex-col items-center flex-1">
-      {/* Logo with ring */}
       <div className={cn(
         "relative w-16 h-16 rounded-full mb-3",
         "bg-background border-2",
@@ -58,7 +50,6 @@ function CollegeSide({ college, value, metric, isWinner }: CollegeSideProps) {
         "flex items-center justify-center overflow-hidden",
         "transition-all duration-300"
       )}>
-        {/* Winner glow */}
         {isWinner && (
           <div className="absolute inset-0 rounded-full bg-primary/10 animate-pulse" />
         )}
@@ -75,12 +66,10 @@ function CollegeSide({ college, value, metric, isWinner }: CollegeSideProps) {
         )}
       </div>
       
-      {/* Name */}
       <h4 className="text-sm font-medium text-foreground text-center mb-2 line-clamp-1">
         {displayName}
       </h4>
       
-      {/* Value */}
       <motion.div
         key={`${college?.normalized_name}-${metric}`}
         initial={{ scale: 0.9, opacity: 0 }}
@@ -97,7 +86,6 @@ function CollegeSide({ college, value, metric, isWinner }: CollegeSideProps) {
   );
 }
 
-/** Rival chip for the select row */
 interface RivalChipProps {
   normalizedName: string;
   college: CollegeMedia | null;
@@ -114,15 +102,15 @@ function RivalChip({ normalizedName, college, isSelected, onClick }: RivalChipPr
       className={cn(
         "shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl",
         "border transition-all duration-200",
+        "active:scale-95",
         isSelected 
-          ? "bg-[#f8fafc] border-[#e2e8f0] shadow-sm" 
-          : "bg-white border-[#e2e8f0] hover:bg-[#f1f5f9]"
+          ? "bg-muted border-border shadow-sm" 
+          : "bg-card border-border hover:bg-muted/80"
       )}
     >
-      {/* Mini logo */}
       <div className={cn(
         "w-7 h-7 rounded-lg flex items-center justify-center overflow-hidden",
-        "bg-[#f1f5f9]"
+        "bg-muted"
       )}>
         {college?.logo_url ? (
           <img 
@@ -131,23 +119,21 @@ function RivalChip({ normalizedName, college, isSelected, onClick }: RivalChipPr
             className="w-5 h-5 object-contain"
           />
         ) : (
-          <span className="text-xs font-bold text-[#64748b]">
+          <span className="text-xs font-bold text-muted-foreground">
             {displayName.charAt(0)}
           </span>
         )}
       </div>
       
-      {/* Name */}
       <span className={cn(
         "text-xs font-medium whitespace-nowrap",
-        isSelected ? "text-[#1e293b]" : "text-[#64748b]"
+        isSelected ? "text-foreground" : "text-muted-foreground"
       )}>
         {displayName}
       </span>
       
-      {/* Selected indicator */}
       {isSelected && (
-        <Check className="w-3.5 h-3.5 text-[#1e293b]" />
+        <Check className="w-3.5 h-3.5 text-foreground" />
       )}
     </button>
   );
@@ -174,7 +160,6 @@ export function CollegeCompareSheet({
   const { data: allStats, isLoading: statsLoading, error: statsError } = useCollegeSeasonStats();
   const { data: collegeMap, isLoading: mediaLoading, error: mediaError } = useCollegeMediaMap();
 
-  // Sync selectedCollege2 when college2 prop changes (opening from different rival)
   useEffect(() => {
     if (isOpen && college2) {
       setSelectedCollege2(college2);
@@ -186,7 +171,6 @@ export function CollegeCompareSheet({
   const media1 = collegeMap?.get(college1) || null;
   const media2 = collegeMap?.get(selectedCollege2) || null;
 
-  // Error state - college1 data failed to load or is invalid
   const hasError = (statsError || mediaError) || (!statsLoading && !mediaLoading && !stats1 && college1);
   const hasNoRivals = rivals.length === 0;
 
@@ -210,13 +194,9 @@ export function CollegeCompareSheet({
   
   const hasValidComparison = college1 && selectedCollege2 && !hasNoRivals;
 
-  // Log error for debugging
   if (hasError) {
     console.error('CollegeCompareSheet: Failed to load college data', { 
-      college1, 
-      statsError, 
-      mediaError,
-      stats1Exists: !!stats1 
+      college1, statsError, mediaError, stats1Exists: !!stats1 
     });
   }
 
@@ -224,7 +204,6 @@ export function CollegeCompareSheet({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -233,7 +212,6 @@ export function CollegeCompareSheet({
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
           />
           
-          {/* Sheet */}
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
@@ -241,18 +219,16 @@ export function CollegeCompareSheet({
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className={cn(
               "fixed bottom-0 left-0 right-0 z-50",
-              "bg-white rounded-t-3xl",
-              "border-t border-[#e2e8f0]",
+              "bg-card rounded-t-3xl",
+              "border-t border-border",
               "shadow-2xl shadow-black/20",
               "max-h-[85vh] overflow-hidden"
             )}
           >
-            {/* Handle */}
             <div className="flex justify-center pt-3 pb-2">
-              <div className="w-10 h-1 rounded-full bg-[#e2e8f0]" />
+              <div className="w-10 h-1 rounded-full bg-border" />
             </div>
             
-            {/* Header */}
             <div className="flex items-center justify-between px-4 pb-3">
               <h3 className="text-lg font-semibold text-foreground">Head to Head</h3>
               <button
@@ -263,7 +239,6 @@ export function CollegeCompareSheet({
               </button>
             </div>
             
-            {/* Error State */}
             {hasError && (
               <div className="flex flex-col items-center justify-center py-12 px-6">
                 <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center mb-3">
@@ -279,7 +254,6 @@ export function CollegeCompareSheet({
               </div>
             )}
 
-            {/* No Rivals Empty State */}
             {!hasError && hasNoRivals && (
               <div className="flex flex-col items-center justify-center py-12 px-6">
                 <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
@@ -292,7 +266,6 @@ export function CollegeCompareSheet({
               </div>
             )}
 
-            {/* Select Rival Row */}
             {!hasError && rivals.length > 0 && (
               <div className="px-4 pb-4">
                 <p className="text-xs font-medium text-muted-foreground mb-2">Select Rival</p>
@@ -310,7 +283,6 @@ export function CollegeCompareSheet({
               </div>
             )}
             
-            {/* Metric Tabs - only show when we have rivals */}
             {!hasError && !hasNoRivals && (
               <div className="flex gap-2 px-4 pb-4">
                 {METRICS.map(({ key, label, icon: Icon }) => (
@@ -320,9 +292,10 @@ export function CollegeCompareSheet({
                     className={cn(
                       "flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg",
                       "text-xs font-medium transition-all",
+                      "active:scale-95",
                       activeMetric === key
-                        ? "bg-white text-[#1e293b] border border-[#e2e8f0] shadow-sm"
-                        : "bg-[#f1f5f9] text-[#64748b] border border-transparent hover:bg-[#e2e8f0]"
+                        ? "bg-card text-foreground border border-border shadow-sm"
+                        : "bg-muted text-muted-foreground border border-transparent hover:bg-muted/80"
                     )}
                   >
                     <Icon className="w-3.5 h-3.5" />
@@ -332,31 +305,14 @@ export function CollegeCompareSheet({
               </div>
             )}
             
-            {/* Comparison - only show when we have valid data */}
             {!hasError && !hasNoRivals && hasValidComparison && (
               <div className="flex items-center justify-around px-6 py-6">
-                <CollegeSide
-                  college={media1}
-                  value={value1}
-                  metric={activeMetric}
-                  isWinner={value1 > value2}
-                />
-                
-                {/* VS Badge */}
-                <div className="mx-4 px-3 py-1.5 rounded-full bg-muted text-xs font-bold text-muted-foreground">
-                  VS
-                </div>
-                
-                <CollegeSide
-                  college={media2}
-                  value={value2}
-                  metric={activeMetric}
-                  isWinner={value2 > value1}
-                />
+                <CollegeSide college={media1} value={value1} metric={activeMetric} isWinner={value1 > value2} />
+                <div className="mx-4 px-3 py-1.5 rounded-full bg-muted text-xs font-bold text-muted-foreground">VS</div>
+                <CollegeSide college={media2} value={value2} metric={activeMetric} isWinner={value2 > value1} />
               </div>
             )}
             
-            {/* CTA - only show when we have rivals and no error */}
             {!hasError && !hasNoRivals && (
               <div className="px-4 pb-8">
                 {hasValidComparison ? (

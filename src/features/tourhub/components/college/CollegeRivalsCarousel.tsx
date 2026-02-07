@@ -8,11 +8,9 @@ import { useCollegeSeasonStats } from '../../hooks/useCollegeStats';
 interface CollegeRivalsCarouselProps {
   normalizedName: string;
   className?: string;
-  /** Optional callback for opening compare sheet instead of navigating */
   onCompare?: (rivalNormalizedName: string) => void;
 }
 
-/** Format currency for compact display */
 function formatDelta(amount: number): string {
   const sign = amount >= 0 ? '+' : '';
   if (Math.abs(amount) >= 1_000_000) {
@@ -24,7 +22,6 @@ function formatDelta(amount: number): string {
   return `${sign}$${amount.toFixed(0)}`;
 }
 
-/** Head-to-head chip showing win count or earnings diff */
 interface HeadToHeadChipProps {
   winsA: number;
   winsB: number;
@@ -33,7 +30,6 @@ interface HeadToHeadChipProps {
 }
 
 function HeadToHeadChip({ winsA, winsB, earningsDiff, winner }: HeadToHeadChipProps) {
-  // Show W/L record
   const isWinning = winner === 'A';
   const isTied = winner === 'tie';
   
@@ -56,7 +52,6 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
   const { data: rivalries, isLoading } = useCollegeRivalries(normalizedName);
   const { data: allStats } = useCollegeSeasonStats();
   
-  // Calculate head-to-head for each rivalry
   const enrichedRivalries = useMemo(() => {
     if (!rivalries || !allStats) return [];
     
@@ -67,7 +62,6 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
       const rivalStats = allStats.find(s => s.normalized_name === rivalry.rivalNormalizedName);
       if (!rivalStats) return { ...rivalry, h2h: null };
       
-      // Count wins by category
       let winsA = 0;
       let winsB = 0;
       
@@ -101,7 +95,7 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
     return (
       <div className={cn('flex gap-3 overflow-x-auto pb-2', className)}>
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="shrink-0 w-28 h-36 bg-surface-card border border-border-subtle rounded-sq-lg animate-pulse" />
+          <div key={i} className="shrink-0 w-28 h-36 bg-card border border-border rounded-xl animate-pulse" />
         ))}
       </div>
     );
@@ -127,11 +121,9 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
         const college = rivalry.college;
         const displayName = college?.short_name || college?.college_name || rivalName;
         
-        // Common card content
         const cardContent = (
           <>
-            {/* Logo with subtle depth */}
-            <div className="relative w-12 h-12 rounded-sq-lg bg-background-secondary flex items-center justify-center overflow-hidden mb-2 shadow-sm">
+            <div className="relative w-12 h-12 rounded-xl bg-muted flex items-center justify-center overflow-hidden mb-2 shadow-sm">
               <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
               {college?.logo_url ? (
                 <img 
@@ -141,39 +133,36 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
                   loading="lazy"
                 />
               ) : (
-                <span className="text-lg font-bold text-text-tertiary relative z-10">
+                <span className="text-lg font-bold text-muted-foreground relative z-10">
                   {displayName.charAt(0).toUpperCase()}
                 </span>
               )}
             </div>
             
-            {/* Name */}
-            <p className="text-body-xs font-semibold text-text-primary truncate w-full group-hover:text-primary transition-colors">
+            <p className="text-xs font-semibold text-foreground truncate w-full group-hover:text-primary transition-colors">
               {displayName}
             </p>
             
-            {/* Head-to-head chip */}
             {rivalry.h2h && (
               <div className="mt-1.5">
                 <HeadToHeadChip {...rivalry.h2h} />
               </div>
             )}
             
-            {/* Compare CTA */}
-            <span className="text-[10px] text-text-tertiary mt-1.5 flex items-center gap-0.5 group-hover:text-primary transition-colors">
+            <span className="text-[10px] text-muted-foreground mt-1.5 flex items-center gap-0.5 group-hover:text-primary transition-colors">
               Compare <ArrowRight className="w-2.5 h-2.5" />
             </span>
           </>
         );
         
         const cardStyles = cn(
-          'shrink-0 w-28 p-3 rounded-sq-lg',
-          'bg-surface-card border border-border-subtle',
-          'hover:border-primary/30 hover:bg-surface-card-hover transition-all duration-200',
+          'shrink-0 w-28 p-3 rounded-xl',
+          'bg-card border border-border',
+          'hover:border-primary/30 hover:bg-card/90 transition-all duration-200',
+          'active:scale-[0.98]',
           'flex flex-col items-center text-center group'
         );
         
-        // If onCompare callback is provided, use button; otherwise use Link
         if (onCompare) {
           return (
             <button
