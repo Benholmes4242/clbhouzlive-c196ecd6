@@ -1,6 +1,6 @@
 /**
  * Wizard Progress Indicator
- * Horizontal progress bar matching Post Wizard design
+ * Horizontal progress bar — amber gradient for review flow
  * Hidden on post-submit screens (preview, success, share-success)
  */
 
@@ -21,14 +21,11 @@ export function WizardProgress({ currentStep, totalSteps = 4 }: WizardProgressPr
 
   const progressPercent = (currentStep / totalSteps) * 100;
 
-  // Thin progress bar with amber gradient - edge-to-edge, matches Post Wizard
+  // Amber gradient progress bar — intentional brand differentiation from Post Wizard's emerald
   return (
     <div className="h-1 w-full bg-muted/30">
       <motion.div
-        className="h-full"
-        style={{
-          background: 'linear-gradient(to right, #f59e0b, #fbbf24)',
-        }}
+        className="h-full bg-gradient-to-r from-amber-500 to-amber-400"
         initial={{ width: '0%' }}
         animate={{ width: `${progressPercent}%` }}
         transition={{ duration: 0.3, ease: 'easeOut' }}

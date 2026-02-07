@@ -20,7 +20,7 @@ interface WizardHeaderProps {
   isSubmitting: boolean;
   isDeleting?: boolean;
   isLoadingUser?: boolean;
-  hasHeroAbove?: boolean; // When true, hero handles safe-area - header doesn't need it
+  hasHeroAbove?: boolean;
   selectedActor: ActiveActor | null;
   onBack: () => void;
   onNext: () => void;
@@ -55,11 +55,6 @@ export function WizardHeader({
   
   const getInitials = (name: string) => name.charAt(0).toUpperCase();
   
-  const truncateDisplayName = (name: string, maxLength = 16) => {
-    if (!name) return '';
-    return name.length > maxLength ? `${name.slice(0, maxLength)}…` : name;
-  };
-  
   const handleBackOrClose = () => {
     if (isFirstStep) {
       onClose();
@@ -90,7 +85,7 @@ export function WizardHeader({
 
   return (
     <header 
-      className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-[#F8FAFC]/95 backdrop-blur-md px-3"
+      className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background/95 backdrop-blur-md px-3"
       style={{ 
         paddingTop: hasHeroAbove ? '0px' : 'max(env(safe-area-inset-top, 0px), 47px)',
         minHeight: hasHeroAbove ? '48px' : 'calc(48px + max(env(safe-area-inset-top, 0px), 47px))'
@@ -142,8 +137,8 @@ export function WizardHeader({
             fallback={getInitials(selectedActor?.name || 'U')}
             hideRing
           />
-          <span className="font-medium text-sm max-w-[100px] truncate text-slate-900">
-            {truncateDisplayName(selectedActor?.name || 'Select')}
+          <span className="font-medium text-sm max-w-[140px] truncate text-foreground">
+            {selectedActor?.name || 'Select'}
           </span>
           {selectedActor?.verified && <VerifiedBadge size="sm" />}
           <ChevronDown className="h-3 w-3 text-muted-foreground" />
@@ -159,19 +154,17 @@ export function WizardHeader({
           className={cn(
             'px-4 py-1.5 h-8 rounded-full text-sm font-medium transition-all duration-200',
             isNextEnabled
-              ? 'bg-foreground text-background hover:bg-foreground/90'
+              ? 'bg-primary text-primary-foreground hover:bg-primary/90'
               : 'bg-muted text-muted-foreground'
           )}
         >
           {isSubmitting ? (
             <>
               <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
-              <span className="text-background">Submitting...</span>
+              Submitting...
             </>
           ) : (
-            <span className={isNextEnabled ? 'text-background' : 'text-muted-foreground'}>
-              {nextButtonText}
-            </span>
+            nextButtonText
           )}
         </Button>
       </div>
