@@ -34,15 +34,12 @@ export function ScheduleMonthHeader({
         {/* Month label with icon */}
         <div className="flex items-center gap-2">
           <div 
-            className="w-7 h-7 rounded-lg flex items-center justify-center"
-            style={{ 
-              background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
-            }}
+            className="w-7 h-7 rounded-lg flex items-center justify-center bg-foreground"
           >
-            <Calendar className="w-3.5 h-3.5 text-white" />
+            <Calendar className="w-3.5 h-3.5 text-background" />
           </div>
           <h3 
-            className="font-extrabold text-slate-800 uppercase"
+            className="font-extrabold text-foreground uppercase"
             style={{ 
               fontSize: '13px',
               letterSpacing: '0.1em',
@@ -54,23 +51,14 @@ export function ScheduleMonthHeader({
         
         {/* Event count badge */}
         <span 
-          className="text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide"
-          style={{ 
-            background: 'rgba(30, 41, 59, 0.08)',
-            color: '#64748b',
-          }}
+          className="text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide bg-muted text-muted-foreground"
         >
           {eventCount} event{eventCount !== 1 ? 's' : ''}
         </span>
       </div>
       
       {/* Gradient divider */}
-      <div 
-        className="h-px"
-        style={{
-          background: 'linear-gradient(90deg, rgba(30, 41, 59, 0.2) 0%, rgba(30, 41, 59, 0.05) 100%)',
-        }}
-      />
+      <div className="h-px bg-gradient-to-r from-border to-transparent" />
     </motion.div>
   );
 }

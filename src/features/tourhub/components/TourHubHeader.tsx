@@ -38,7 +38,7 @@ export function TourHubHeader({ activeTab = 'overview' }: TourHubHeaderProps) {
       <div className="flex items-center justify-center">
         {isSchedule ? (
           <h1 
-            className="font-extrabold text-slate-800 text-center"
+            className="font-extrabold text-foreground text-center"
             style={{ 
               fontSize: '28px',
               lineHeight: 1.1,
@@ -57,7 +57,7 @@ export function TourHubHeader({ activeTab = 'overview' }: TourHubHeaderProps) {
       {/* Second row: Dynamic subtext or Schedule divider */}
       {isSchedule ? (
         <div className="flex justify-center mt-4 mb-2">
-          <div className="w-[80vw] border-t border-slate-800/20" />
+          <div className="w-[80vw] border-t border-border" />
         </div>
       ) : subtext ? (
         <p className="mt-2 text-center text-[13px] text-muted-foreground">

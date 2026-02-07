@@ -8,23 +8,28 @@
  * - Stronger text hierarchy
  * - Smooth image loading with skeleton placeholder
  * - Smart date formatting for cross-month ranges
+ * - Lazy image loading
+ * - font-mono on stat values
  */
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { format, isSameMonth } from 'date-fns';
-import { MapPin, DollarSign, Flag, Ruler, ChevronRight, Trophy } from 'lucide-react';
+import { MapPin, DollarSign, Flag, Ruler, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { TourTournament } from '../../hooks/useTourHubData';
 import type { SeasonTournament } from '../../hooks/useSeasonTournaments';
+import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
 import { useSingleCourseImage } from '../../hooks/useCourseImageResolver';
 import { getCourseImage } from '../../utils/placeholders';
 
 interface ScheduleTournamentCardProps {
   tournament: TourTournament | SeasonTournament;
   className?: string;
-  compact?: boolean; // For carousel view - smaller sizing
+  compact?: boolean;
+  /** Leader/winner data from useTournamentLeadersWinners */
+  leaderWinner?: TournamentLeaderWinner;
 }
 
 /**
@@ -99,7 +104,6 @@ function ImageSkeleton({ compact }: { compact: boolean }) {
         animation: 'shimmer 1.5s ease-in-out infinite',
       }}
     >
-      {/* Subtle golf course silhouette */}
       <div className="absolute inset-0 flex items-center justify-center">
         <div 
           className="w-16 h-16 rounded-full flex items-center justify-center"
@@ -117,7 +121,7 @@ function isSeasonTournament(t: TourTournament | SeasonTournament): t is SeasonTo
   return 'startDate' in t;
 }
 
-export function ScheduleTournamentCard({ tournament, className, compact = false }: ScheduleTournamentCardProps) {
+export function ScheduleTournamentCard({ tournament, className, compact = false, leaderWinner }: ScheduleTournamentCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null);
   
@@ -130,15 +134,18 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
   const venuePar = isSeasonTournament(tournament) ? tournament.venuePar : tournament.venue_par;
   const venueYardage = isSeasonTournament(tournament) ? tournament.venueYardage : tournament.venue_yardage;
   
-  // Winner info (only available in SeasonTournament)
+  // Winner info from SeasonTournament type
   const winnerFirstName = isSeasonTournament(tournament) ? tournament.winnerFirstName : null;
   const winnerLastName = isSeasonTournament(tournament) ? tournament.winnerLastName : null;
   const winnerScore = isSeasonTournament(tournament) ? (tournament as any).winnerScore : null;
-  const hasWinner = winnerFirstName && winnerLastName && 
-    (tournament.status === 'closed' || tournament.status === 'complete');
   
-  // Check if live
+  // Determine winner display: prefer SeasonTournament fields, fallback to leaderWinner prop
+  const isFinal = tournament.status === 'closed' || tournament.status === 'complete';
   const isLive = tournament.status === 'inprogress';
+  
+  const hasSeasonWinner = winnerFirstName && winnerLastName && isFinal;
+  const hasLeaderWinnerData = leaderWinner && isFinal;
+  const hasLeaderData = leaderWinner && isLive;
   
   // Resolve course image
   const { courseImage } = useSingleCourseImage(
@@ -172,13 +179,12 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
     >
       <motion.div
         className={cn(
-          "relative overflow-hidden",
+          "relative overflow-hidden border border-border/30",
           !compact && "mx-4"
         )}
         style={{ 
           aspectRatio: '4/3',
           borderRadius: '14px',
-          border: '1px solid rgba(0, 0, 0, 0.06)',
           boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
         }}
         whileHover={{ 
@@ -208,10 +214,11 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         >
           <motion.img 
-            key={imageUrl} // Key by URL to trigger re-render on change
+            key={imageUrl}
             src={imageUrl}
             alt={venueName || tournament.name}
             className="w-full h-full object-cover"
+            loading="lazy"
             onLoad={handleImageLoad}
             initial={{ opacity: 0 }}
             animate={{ opacity: imageLoaded ? 1 : 0 }}
@@ -266,8 +273,8 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
             {tournament.name}
           </h3>
           
-          {/* Winner Display (for completed tournaments) - Gold highlight */}
-          {hasWinner && (
+          {/* Winner Display (completed tournaments) — prefer SeasonTournament data, fallback to leaderWinner */}
+          {isFinal && (hasSeasonWinner || hasLeaderWinnerData) && (
             <div 
               className="flex items-center gap-1.5"
               style={{ 
@@ -280,16 +287,19 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
             >
               <span>🏆</span>
               <span>
-                {winnerFirstName?.charAt(0)}. {winnerLastName}
-                {winnerScore && (
-                  <span style={{ fontFamily: 'JetBrains Mono, monospace' }}> ({winnerScore})</span>
+                {hasSeasonWinner 
+                  ? `${winnerFirstName?.charAt(0)}. ${winnerLastName}`
+                  : leaderWinner!.displayName
+                }
+                {(hasSeasonWinner ? winnerScore : leaderWinner?.displayScore) && (
+                  <span className="font-mono"> ({hasSeasonWinner ? winnerScore : leaderWinner!.displayScore})</span>
                 )}
               </span>
             </div>
           )}
           
-          {/* Leader Display (for live tournaments) - Green highlight */}
-          {isLive && !hasWinner && (
+          {/* Leader Display (live tournaments) — real leader data */}
+          {isLive && hasLeaderData && (
             <div 
               className="flex items-center gap-1"
               style={{ 
@@ -300,7 +310,24 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
                 textShadow: '0 1px 3px rgba(0,0,0,0.5)',
               }}
             >
-              <span>Leader: Check leaderboard</span>
+              <span>Leader: {leaderWinner!.displayName}</span>
+              <span className="font-mono">{leaderWinner!.displayScore}</span>
+            </div>
+          )}
+          
+          {/* Live fallback — no leader data yet */}
+          {isLive && !hasLeaderData && (
+            <div 
+              className="flex items-center gap-1"
+              style={{ 
+                fontSize: '12px',
+                fontWeight: 600,
+                color: '#FF3B30',
+                marginBottom: '3px',
+                textShadow: '0 1px 3px rgba(0,0,0,0.5)',
+              }}
+            >
+              <span>Tap for leaderboard</span>
             </div>
           )}
           
@@ -333,7 +360,7 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
             </div>
           )}
 
-          {/* Meta Info - Glassmorphic pills (hidden in compact mode) */}
+          {/* Meta Info - Glassmorphic pills with font-mono on values */}
           {!compact && (
             <div className="flex items-center gap-2 mt-2.5 text-[11px]">
               {tournament.purse && (
@@ -342,7 +369,7 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
                   style={{ background: 'rgba(255,255,255,0.15)' }}
                 >
                   <DollarSign className="w-3 h-3" />
-                  <span>{(tournament.purse / 1_000_000).toFixed(1)}M</span>
+                  <span className="font-mono">${(tournament.purse / 1_000_000).toFixed(1)}M</span>
                 </div>
               )}
               {venuePar && (
@@ -351,7 +378,7 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
                   style={{ background: 'rgba(255,255,255,0.1)' }}
                 >
                   <Flag className="w-3 h-3" />
-                  <span>Par {venuePar}</span>
+                  <span className="font-mono">Par {venuePar}</span>
                 </div>
               )}
               {venueYardage && (
@@ -360,7 +387,7 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
                   style={{ background: 'rgba(255,255,255,0.1)' }}
                 >
                   <Ruler className="w-3 h-3" />
-                  <span>{venueYardage.toLocaleString()} yds</span>
+                  <span className="font-mono">{venueYardage.toLocaleString()} yds</span>
                 </div>
               )}
             </div>
@@ -373,7 +400,6 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
 
 /**
  * Prefetch course images for a list of tournaments
- * Used by ScheduleModule to preload adjacent pages
  */
 export function prefetchTournamentImages(tournaments: (TourTournament | SeasonTournament)[]) {
   tournaments.forEach(tournament => {
