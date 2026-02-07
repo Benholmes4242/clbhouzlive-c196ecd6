@@ -287,8 +287,16 @@ export function FullscreenReviewPost({
       {/* Top gradient - subtle fade behind panel */}
       <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-black/30 via-black/15 to-transparent pointer-events-none z-[4]" />
       
-      {/* Bottom gradient - softer fade */}
-      <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-black/45 via-black/15 to-transparent pointer-events-none z-[5]" />
+      {/* Bottom gradient — strengthened multi-stop scrim for text legibility on any photo */}
+      <div 
+        className="absolute inset-x-0 bottom-0 pointer-events-none z-[5]" 
+        style={{
+          height: '50%',
+          background: mode === 'preview'
+            ? 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.7) 25%, rgba(0,0,0,0.3) 50%, transparent 100%)'
+            : 'linear-gradient(to top, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.15) 50%, transparent 100%)',
+        }}
+      />
       
       {/* Premium Top Overlay Panel - Entire tile opens review sheet */}
       <motion.button
@@ -331,21 +339,21 @@ export function FullscreenReviewPost({
               </p>
             )}
             {mode === 'preview' && (
-              <span className="inline-block mt-1 px-1.5 py-0.5 rounded bg-white/10 text-white/60 text-[9px] font-medium tracking-wide uppercase">
+              <span className="inline-block mt-1 px-1.5 py-0.5 rounded-full bg-white/20 backdrop-blur-sm text-white text-[10px] font-semibold uppercase tracking-wider">
                 Preview
               </span>
             )}
           </div>
           
-          {/* Right: Rating Number (elegant, confident) */}
+          {/* Right: Rating Number (elegant, confident) — amber in preview mode */}
           <div className="flex flex-col items-center gap-0 flex-shrink-0">
             <span 
               className="font-bold tracking-tight leading-none"
               style={{ 
                 fontSize: '2.25rem',
                 fontVariantNumeric: 'tabular-nums',
-                color: isOutstanding ? '#f59e0b' : '#6b7280',
-                textShadow: isOutstanding 
+                color: (mode === 'preview' || isOutstanding) ? '#f59e0b' : '#6b7280',
+                textShadow: (mode === 'preview' || isOutstanding) 
                   ? '0 0 16px rgba(245, 158, 11, 0.4)' 
                   : 'none',
               }}
@@ -355,7 +363,7 @@ export function FullscreenReviewPost({
             {/* Smaller, secondary tier label */}
             <span 
               className="text-[9px] font-medium uppercase tracking-wider mt-0.5"
-              style={{ color: isOutstanding ? 'rgba(245, 158, 11, 0.7)' : 'rgba(107, 114, 128, 0.9)' }}
+              style={{ color: (mode === 'preview' || isOutstanding) ? 'rgba(245, 158, 11, 0.7)' : 'rgba(107, 114, 128, 0.9)' }}
             >
               {tierData.label}
             </span>

@@ -433,6 +433,7 @@ export function ReviewWizard({
                         media={wizard.allMedia}
                         coverMediaId={wizard.state.coverMediaId}
                         creator={creator}
+                        visibility={visibility}
                         onSkip={handleSkipShare}
                         onShare={handleShareFromPreview}
                         onClose={handleCloseFromPreview}
