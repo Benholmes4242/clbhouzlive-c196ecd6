@@ -1,8 +1,8 @@
 // ConfirmStep - Step 3: Review & Post (Read-Only Confirmation)
 // All inputs are now on CaptionStep - this is review only with Edit links
 import { useMemo, useCallback, useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { MapPin, Tag, Eye, Image, Play } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { MapPin, Tag, Image, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { StepProps, OrderedMediaItem } from '../types';
@@ -30,26 +30,32 @@ import { CSS } from '@dnd-kit/utilities';
 import { restrictToParentElement } from '@dnd-kit/modifiers';
 
 interface ConfirmStepProps extends StepProps {
-  onOpenCategories?: () => void; // Now optional - just for Edit link
-  onOpenVisibility?: () => void;
+  onOpenCategories?: () => void;
   onEditCaption?: () => void;
   onEditLocation?: () => void;
 }
 
-// Review Card Component - Apple-level refined
+// Review Card — themed with left accent & stagger entrance
 function ReviewCard({ 
   label, 
   value, 
-  onEdit 
+  onEdit,
+  delay = 0,
 }: { 
   label: string; 
   value: React.ReactNode; 
   onEdit?: () => void;
+  delay?: number;
 }) {
   return (
-    <div className="px-4 py-3 bg-white rounded-2xl border border-border shadow-sm">
+    <motion.div 
+      className="px-4 py-3 bg-card rounded-2xl border border-border border-l-2 border-l-primary shadow-sm"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: 'easeOut', delay }}
+    >
       <div className="flex items-center justify-between mb-1">
-        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+        <span className="text-xs font-medium text-primary uppercase tracking-wide">
           {label}
         </span>
         {onEdit && (
@@ -57,7 +63,7 @@ function ReviewCard({
             variant="ghost"
             size="sm"
             onClick={onEdit}
-            className="h-5 px-1.5 text-xs text-primary font-medium hover:text-primary/80"
+            className="h-7 px-2 py-1 -mr-2 text-xs text-primary font-medium hover:text-primary/80 active:bg-muted/50 rounded-lg"
           >
             Edit
           </Button>
@@ -66,7 +72,7 @@ function ReviewCard({
       <div className="text-sm text-foreground">
         {value}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -135,17 +141,26 @@ function ConfirmThumbnailContent({
 
   return (
     <div className="relative aspect-square flex-shrink-0 w-full">
-      {/* Cover indicator dot - orange (hidden during drag) */}
+      {/* Cover badge — clear "Cover" pill instead of ambiguous dot */}
       {isFirst && !isDragOverlay && (
         <span 
-          className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-primary border-2 border-white shadow-sm z-30"
-          aria-label="Cover image"
-        />
+          className="absolute top-1 left-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium z-30"
+          style={{
+            background: 'rgba(255, 255, 255, 0.9)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            color: '#334E3D',
+          }}
+        >
+          Cover
+        </span>
       )}
 
       <div className={cn(
         "absolute inset-0 overflow-hidden transition-all duration-150",
-        isActive ? '' : 'opacity-70 hover:opacity-100'
+        isActive 
+          ? 'ring-2 ring-primary ring-inset' 
+          : 'opacity-70 hover:opacity-100'
       )}>
         {item.type === 'image' ? (
           <img
@@ -236,7 +251,6 @@ export function ConfirmStep({
   state, 
   dispatch,
   onOpenCategories,
-  onOpenVisibility,
   onEditCaption,
   onEditLocation,
 }: ConfirmStepProps) {
@@ -248,13 +262,6 @@ export function ConfirmStep({
   const activeItem = useMemo(() => {
     return state.mediaItems[activePreviewIndex] || state.mediaItems[0];
   }, [state.mediaItems, activePreviewIndex]);
-  
-  // Visibility label
-  const visibilityLabel = state.visibility === 'anyone' 
-    ? 'Everyone' 
-    : state.visibility === 'followers' 
-      ? 'Followers only' 
-      : 'Only me';
 
   // Drag-and-drop sensors with delay for touch devices
   const sensors = useSensors(
@@ -315,27 +322,51 @@ export function ConfirmStep({
     setActivePreviewIndex(index);
   }, []);
 
+  // Stagger delay base for review cards
+  const cardBaseDelay = 0.1;
+
   return (
-    <div className="h-full flex flex-col bg-[#F8FAFC] overflow-y-auto">
-      {/* Preview container - constrained to 55vh max, 4:3 aspect for Apple-level proportions */}
+    <div className="h-full flex flex-col bg-background overflow-y-auto">
+      {/* Hero preview — 4:3 aspect, crossfade between items, video auto-loop */}
       <div className="flex-shrink-0 w-full aspect-[4/3] max-h-[55vh] bg-muted relative overflow-hidden">
-        {activeItem ? (
-          <>
-            <img
-              src={activeItem.previewUrl}
-              alt="Post preview"
-              className="w-full h-full object-cover"
-            />
-            {/* Bottom scrim for text readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-          </>
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <Image className="h-12 w-12 text-muted-foreground" />
-          </div>
-        )}
+        <AnimatePresence mode="wait">
+          {activeItem ? (
+            <motion.div
+              key={activeItem.id}
+              className="absolute inset-0"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+            >
+              {activeItem.type === 'video' ? (
+                <video
+                  src={activeItem.previewUrl}
+                  className="w-full h-full object-cover"
+                  muted
+                  autoPlay
+                  loop
+                  playsInline
+                />
+              ) : (
+                <img
+                  src={activeItem.previewUrl}
+                  alt="Post preview"
+                  className="w-full h-full object-cover"
+                />
+              )}
+            </motion.div>
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <Image className="h-12 w-12 text-muted-foreground" />
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* Bottom scrim — taller gradient for caption legibility */}
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/50 via-black/20 to-transparent pointer-events-none" />
         
-        {/* Media counter pill - refined */}
+        {/* Media counter pill */}
         {state.mediaItems.length > 1 && (
           <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-md">
             <span className="text-xs text-white font-medium tabular-nums">
@@ -344,9 +375,9 @@ export function ConfirmStep({
           </div>
         )}
         
-        {/* Caption preview overlay */}
+        {/* Caption preview overlay — responsive width */}
         {state.caption && (
-          <div className="absolute bottom-3 left-3 right-16 max-w-[280px]">
+          <div className="absolute bottom-3 left-3 right-3 max-w-[85%]">
             <p className="text-sm text-white font-medium line-clamp-2 drop-shadow-md">
               {state.caption}
             </p>
@@ -354,7 +385,7 @@ export function ConfirmStep({
         )}
       </div>
       
-      {/* Thumbnail strip - 3x2 grid with drag-and-drop matching MediaStep */}
+      {/* Thumbnail grid — drag-to-reorder, 4px gaps, active ring */}
       {state.mediaItems.length > 1 && (
         <div style={{ paddingTop: '2px', paddingBottom: '2px' }}>
           <DndContext
@@ -369,7 +400,7 @@ export function ConfirmStep({
               items={state.mediaItems.map(item => item.id)}
               strategy={rectSortingStrategy}
             >
-              <div className="grid grid-cols-3 gap-[2px] w-full">
+              <div className="grid grid-cols-3 gap-1 w-full">
                 {state.mediaItems.map((item, index) => (
                   <SortableConfirmThumbnail
                     key={item.id}
@@ -386,7 +417,7 @@ export function ConfirmStep({
             {/* Drag overlay - follows finger */}
             <DragOverlay adjustScale={false}>
               {activeDragItem && (
-                <div className="scale-105 shadow-xl rounded-lg overflow-hidden" style={{ width: 'calc((100vw - 4px) / 3)' }}>
+                <div className="scale-105 shadow-xl rounded-lg overflow-hidden" style={{ width: 'calc((100vw - 8px) / 3)' }}>
                   <ConfirmThumbnailContent
                     item={activeDragItem}
                     index={activeDragIndex}
@@ -401,12 +432,13 @@ export function ConfirmStep({
         </div>
       )}
       
-      {/* Review details - Apple-level: tighter spacing, all read-only with Edit links */}
+      {/* Review cards — staggered entrance, left accent, themed tokens */}
       <div className="flex-shrink-0 p-4 space-y-2.5">
         {/* Caption review card */}
         {state.caption && (
           <ReviewCard
             label="Caption"
+            delay={cardBaseDelay}
             value={
               <p className="whitespace-pre-wrap line-clamp-3">
                 {state.caption}
@@ -416,11 +448,16 @@ export function ConfirmStep({
           />
         )}
         
-        {/* Location review card - Multi-course support */}
+        {/* Location review card — vertical list for 2+ courses */}
         {state.selectedCourses.length > 0 && (
-          <div className="px-4 py-3 bg-primary/5 rounded-2xl border border-primary/20 shadow-sm">
+          <motion.div 
+            className="px-4 py-3 bg-card rounded-2xl border border-border border-l-2 border-l-primary shadow-sm"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: 'easeOut', delay: cardBaseDelay + 0.1 }}
+          >
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wide">
+              <span className="text-xs font-medium text-primary uppercase tracking-wide">
                 {state.selectedCourses.length === 1 ? 'Location' : 'Locations'}
               </span>
               {onEditLocation && (
@@ -428,28 +465,42 @@ export function ConfirmStep({
                   variant="ghost"
                   size="sm"
                   onClick={onEditLocation}
-                  className="h-5 px-1.5 text-xs text-primary font-medium hover:text-primary/80"
+                  className="h-7 px-2 py-1 -mr-2 text-xs text-primary font-medium hover:text-primary/80 active:bg-muted/50 rounded-lg"
                 >
                   Edit
                 </Button>
               )}
             </div>
-            <div className="flex flex-wrap gap-2">
-              {state.selectedCourses.map((course) => (
-                <div key={course.id} className="flex items-center gap-2 text-sm text-slate-900">
-                  <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
-                  <span className="font-medium">{course.name}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+            {state.selectedCourses.length === 1 ? (
+              /* Single course — inline */
+              <div className="flex items-center gap-2 text-sm text-foreground">
+                <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                <span className="font-medium">{state.selectedCourses[0].name}</span>
+              </div>
+            ) : (
+              /* Multiple courses — vertical stack */
+              <div className="flex flex-col gap-1.5">
+                {state.selectedCourses.map((course) => (
+                  <div key={course.id} className="flex items-center gap-2 text-sm text-foreground">
+                    <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                    <span className="font-medium">{course.name}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </motion.div>
         )}
         
-        {/* Categories card - READ-ONLY display with Edit link */}
+        {/* Categories card — consistent accent, stagger */}
         {hasCategories && (
-          <div className="px-4 py-3 bg-primary/5 rounded-2xl border border-primary/20 shadow-sm">
+          <motion.div 
+            className="px-4 py-3 bg-card rounded-2xl border border-border border-l-2 border-l-primary shadow-sm"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: 'easeOut', delay: cardBaseDelay + 0.2 }}
+          >
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wide">
+              <span className="text-xs font-medium text-primary uppercase tracking-wide">
                 Categories
               </span>
               {onOpenCategories && (
@@ -457,7 +508,7 @@ export function ConfirmStep({
                   variant="ghost"
                   size="sm"
                   onClick={onOpenCategories}
-                  className="h-5 px-1.5 text-xs text-primary font-medium hover:text-primary/80"
+                  className="h-7 px-2 py-1 -mr-2 text-xs text-primary font-medium hover:text-primary/80 active:bg-muted/50 rounded-lg"
                 >
                   Edit
                 </Button>
@@ -466,7 +517,7 @@ export function ConfirmStep({
             <div className="flex items-center gap-2">
               <Tag className="h-4 w-4 text-primary flex-shrink-0" />
               <div className="flex flex-wrap gap-1">
-                {state.selectedCategories.map((cat, idx) => (
+                {state.selectedCategories.map((cat) => (
                   <span 
                     key={typeof cat === 'string' ? cat : cat.id}
                     className="px-2 py-0.5 text-xs rounded-full bg-primary text-primary-foreground font-medium"
@@ -476,21 +527,7 @@ export function ConfirmStep({
                 ))}
               </div>
             </div>
-          </div>
-        )}
-        
-        {/* Visibility review card */}
-        {onOpenVisibility && (
-          <ReviewCard
-            label="Visibility"
-            value={
-              <div className="flex items-center gap-2">
-                <Eye className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                <span>{visibilityLabel}</span>
-              </div>
-            }
-            onEdit={onOpenVisibility}
-          />
+          </motion.div>
         )}
       </div>
     </div>
