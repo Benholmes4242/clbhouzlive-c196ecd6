@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
 interface MediaNavigationDotsProps {
   mediaCount: number;
@@ -18,7 +19,10 @@ export const MediaNavigationDots: React.FC<MediaNavigationDotsProps> = ({
   if (mediaCount <= 1) return null;
 
   return (
-    <div 
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.2, delay: 0.15 }}
       className={`absolute z-30 pointer-events-none chrome-follow-bottom ${className ?? ''}`}
       style={{ bottom: bottomOffset ?? 'calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px) + 8px)', left: 0, right: 0 }}
     >
@@ -45,6 +49,6 @@ export const MediaNavigationDots: React.FC<MediaNavigationDotsProps> = ({
         );
       })}
       </div>
-    </div>
+    </motion.div>
   );
 };

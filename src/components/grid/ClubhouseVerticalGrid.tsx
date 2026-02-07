@@ -1123,7 +1123,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                         )}
                         
                         {/* Multi-media navigation dots for non-review posts */}
-                        {hasMultipleMedia && (
+                        {hasMultipleMedia && !isReviewPost(item) && (
                           <MediaNavigationDots
                             mediaCount={mediaItems.length}
                             currentIndex={currentMediaIndex}
@@ -1133,7 +1133,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                                 [item.id]: index
                               }));
                             }}
-                            bottomOffset="calc(var(--bottom-nav-height, 72px) + 32px + 180px)"
+                            bottomOffset="calc(var(--bottom-nav-height, 64px) + 166px)"
                           />
                         )}
                         
