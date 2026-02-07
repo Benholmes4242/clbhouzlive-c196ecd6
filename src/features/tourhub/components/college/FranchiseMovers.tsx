@@ -1,17 +1,11 @@
 /**
  * FranchiseMovers - Enhanced weekly movers with reason chips + medallions
- * 
- * Features:
- * - Medallion logos with subtle ring
- * - Reason chips (earnings, wins, cuts deltas)
- * - Link context to alumni contributors
- * - Rising/Falling tabs with glass styling
  */
 
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { DollarSign, Trophy, Target, ChevronRight, TrendingUp, TrendingDown } from 'lucide-react';
+import { DollarSign, Trophy, Target, ChevronRight, TrendingUp, TrendingDown, CalendarDays } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCollegeWeeklyMovers } from '../../hooks/useCollegeMovers';
 import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
@@ -43,7 +37,6 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
   const containerRef = useRef<HTMLDivElement>(null);
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
 
-  // Update indicator position
   useEffect(() => {
     if (!containerRef.current) return;
     
@@ -60,26 +53,30 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
   }, [direction]);
   
   // Enrich movers with college media
-  const enrichedMovers = useMemo(() => {
-    if (!movers) return [];
-    return movers.map(mover => ({
-      ...mover,
-      college: collegeMap?.get(mover.normalized_name) || mover.college || null,
-    }));
-  }, [movers, collegeMap]);
+  const enrichedMovers = (movers || []).map(mover => ({
+    ...mover,
+    college: collegeMap?.get(mover.normalized_name) || mover.college || null,
+  }));
   
-  // Get the week date for display
-  const weekDate = movers?.[0]?.week_start 
-    ? format(new Date(movers[0].week_start), 'MMMM d, yyyy')
+  // Week date range for subtitle
+  const weekStart = movers?.[0]?.week_start;
+  const weekLabel = weekStart
+    ? (() => {
+        const start = new Date(weekStart);
+        const end = new Date(start);
+        end.setDate(end.getDate() + 6);
+        return `Week of ${format(start, 'MMM d')} – ${format(end, 'd, yyyy')}`;
+      })()
     : null;
   
   return (
     <div className={cn('', className)}>
       {/* Week context */}
-      {weekDate && (
-        <p className="text-sm text-muted-foreground/70 mb-4">
-          Week of {weekDate}
-        </p>
+      {weekLabel && (
+        <div className="flex items-center gap-1.5 text-sm text-muted-foreground/70 mb-4">
+          <CalendarDays className="w-3.5 h-3.5" />
+          {weekLabel}
+        </div>
       )}
       
       {/* Glass Bar Tabs */}
@@ -98,7 +95,6 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
           role="tablist"
           aria-label="Mover direction"
         >
-          {/* Sliding indicator */}
           <motion.div
             className={cn(
               "absolute bottom-0 h-[2px] rounded-full",
@@ -131,6 +127,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
                   "transition-colors duration-200",
                   "rounded-lg",
                   "flex items-center justify-center gap-1.5",
+                  "active:scale-95",
                   isSelected 
                     ? "text-foreground" 
                     : "text-muted-foreground hover:text-foreground/80"
@@ -150,7 +147,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
           Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="h-[88px] bg-card/50 border border-border/30 rounded-xl animate-pulse" />
           ))
-        ) : enrichedMovers && enrichedMovers.length > 0 ? (
+        ) : enrichedMovers.length > 0 ? (
           enrichedMovers.map((mover, idx) => {
             const displayName = mover.college?.short_name || mover.college?.college_name || mover.normalized_name;
             
@@ -180,7 +177,6 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
                   
                   {/* Medallion Logo */}
                   <div className="relative shrink-0">
-                    {/* Subtle ring */}
                     <div className={cn(
                       "absolute inset-0 rounded-full",
                       "border-2",
@@ -217,7 +213,6 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
                     
                     {/* Reason Chips */}
                     <div className="flex flex-wrap items-center gap-1.5 mt-2">
-                      {/* Earnings chip - always show */}
                       <span className={cn(
                         'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium',
                         mover.earnings_delta >= 0 
@@ -228,7 +223,6 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
                         {formatDelta(mover.earnings_delta, '$')}
                       </span>
                       
-                      {/* Wins chip */}
                       {mover.wins_delta !== 0 && (
                         <span className={cn(
                           'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium',
@@ -241,7 +235,6 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
                         </span>
                       )}
                       
-                      {/* Cuts chip */}
                       {mover.cuts_delta !== 0 && (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground">
                           <Target className="w-3 h-3" />
@@ -270,8 +263,13 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
             );
           })
         ) : (
-          <div className="text-center py-12 text-sm text-muted-foreground">
-            No {direction === 'up' ? 'rising' : 'falling'} colleges this week
+          <div className="flex flex-col items-center py-12 text-center">
+            <p className="text-sm font-medium text-foreground mb-1">
+              No movement this week
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Check back after the next tournament.
+            </p>
           </div>
         )}
       </div>

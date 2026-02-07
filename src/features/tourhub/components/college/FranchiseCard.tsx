@@ -1,20 +1,12 @@
 /**
  * FranchiseCard - Premium college card with medallion + performance ring
- * 
- * Features:
- * - Medallion container with glass/metal feel for logo
- * - Performance ring around logo (normalized score visualization)
- * - Momentum ring (inner ring showing weekly movement)
- * - Status badges (🔥 Hot streak, 🛡️ Defending champ, ⚡ Rising)
- * - Rank badge with movement indicator
- * - Contextual metrics per tab
- * - Subtle tap scale animation
  */
 
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Users, ChevronRight, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { formatCurrency } from '@/lib/utils/formatCurrency';
 import type { CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import type { CollegeMedia } from '../../hooks/useCollegeMedia';
 import type { CollegeStatus, CollegeMomentum } from '../../hooks/useCollegeStatus';
@@ -23,31 +15,16 @@ interface FranchiseCardProps {
   stats: CollegeSeasonStats;
   college: CollegeMedia | null;
   rank: number;
-  /** For calculating normalized performance ring */
   maxValue?: number;
-  /** Which metric to show the ring for */
   activeMetric?: 'earnings' | 'wins' | 'cuts' | 'top10s';
-  /** Previous rank for movement indicator */
   previousRank?: number;
-  /** Status badge (hot streak, defending champ, etc.) */
   status?: CollegeStatus | null;
-  /** Weekly momentum data for inner ring */
   momentum?: CollegeMomentum | null;
   className?: string;
 }
 
-function formatCurrency(amount: number): string {
-  if (amount >= 1_000_000) {
-    return `$${(amount / 1_000_000).toFixed(1)}M`;
-  }
-  if (amount >= 1_000) {
-    return `$${(amount / 1_000).toFixed(0)}K`;
-  }
-  return `$${amount.toFixed(0)}`;
-}
-
 interface PerformanceRingProps {
-  progress: number; // 0-1
+  progress: number;
   size?: number;
   strokeWidth?: number;
   isTopThree?: boolean;
@@ -65,7 +42,6 @@ function PerformanceRing({ progress, size = 60, strokeWidth = 2.5, isTopThree = 
       height={size}
       className="absolute inset-0 -rotate-90"
     >
-      {/* Background ring */}
       <circle
         cx={size / 2}
         cy={size / 2}
@@ -75,7 +51,6 @@ function PerformanceRing({ progress, size = 60, strokeWidth = 2.5, isTopThree = 
         strokeWidth={strokeWidth}
         className="text-border/30"
       />
-      {/* Progress ring */}
       <motion.circle
         cx={size / 2}
         cy={size / 2}
@@ -103,7 +78,6 @@ function PerformanceRing({ progress, size = 60, strokeWidth = 2.5, isTopThree = 
   );
 }
 
-/** Inner momentum ring - shows weekly movement */
 interface MomentumRingProps {
   isRising: boolean;
   size?: number;
@@ -111,7 +85,7 @@ interface MomentumRingProps {
 }
 
 function MomentumRing({ isRising, size = 60, strokeWidth = 1.5 }: MomentumRingProps) {
-  const radius = (size - 12) / 2; // Inner ring
+  const radius = (size - 12) / 2;
   const circumference = 2 * Math.PI * radius;
   
   if (!isRising) return null;
@@ -146,7 +120,6 @@ function MomentumRing({ isRising, size = 60, strokeWidth = 1.5 }: MomentumRingPr
   );
 }
 
-/** Status badge component */
 interface StatusBadgeProps {
   status: CollegeStatus;
 }
@@ -173,7 +146,6 @@ function StatusBadge({ status }: StatusBadgeProps) {
   );
 }
 
-/** Premium medallion with glossy highlight + shadow depth + status badge */
 interface MedallionProps {
   logoUrl?: string | null;
   displayName: string;
@@ -188,7 +160,6 @@ function Medallion({ logoUrl, displayName, isTopThree = false, progress, status,
   
   return (
     <div className="relative shrink-0 w-[60px] h-[60px]">
-      {/* Subtle radial glow for top 3 */}
       {isTopThree && (
         <div 
           className="absolute inset-0 rounded-full bg-amber-400/15 blur-xl scale-150"
@@ -196,30 +167,22 @@ function Medallion({ logoUrl, displayName, isTopThree = false, progress, status,
         />
       )}
       
-      {/* Status Badge */}
       {status && <StatusBadge status={status} />}
       
-      {/* Outer Performance Ring */}
       <PerformanceRing progress={progress} size={60} isTopThree={isTopThree} />
       
-      {/* Inner Momentum Ring - pulses when rising */}
       {isRising && <MomentumRing isRising={isRising} size={60} />}
       
-      {/* Medallion Container with premium depth */}
       <div className={cn(
         "absolute inset-[6px] rounded-full z-10",
         "bg-gradient-to-br from-background via-background to-muted/30",
         "border border-border/50",
         "flex items-center justify-center overflow-hidden",
-        // Premium shadow depth - soft and diffused
         isTopThree 
           ? "shadow-[0_4px_20px_-4px_rgba(251,191,36,0.25),0_2px_8px_-2px_rgba(0,0,0,0.08)]"
           : "shadow-[0_2px_8px_-2px_rgba(0,0,0,0.1),0_4px_16px_-4px_rgba(0,0,0,0.06)]"
       )}>
-        {/* Glossy highlight overlay - top-left sheen */}
         <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/20 via-transparent to-transparent pointer-events-none" />
-        
-        {/* Inner shadow for depth */}
         <div className="absolute inset-0 rounded-full shadow-[inset_0_1px_2px_rgba(255,255,255,0.1),inset_0_-1px_2px_rgba(0,0,0,0.05)] pointer-events-none" />
         
         {logoUrl ? (
@@ -253,7 +216,6 @@ export function FranchiseCard({
   const displayName = college?.short_name || college?.college_name || stats.normalized_name;
   const slug = stats.normalized_name;
 
-  // Calculate performance ring progress based on active metric
   const getMetricValue = () => {
     switch (activeMetric) {
       case 'wins': return stats.wins_total;
@@ -265,11 +227,9 @@ export function FranchiseCard({
   
   const progress = maxValue > 0 ? getMetricValue() / maxValue : 0;
 
-  // Calculate rank movement
   const rankDelta = previousRank ? previousRank - rank : 0;
   const RankIcon = rankDelta > 0 ? TrendingUp : rankDelta < 0 ? TrendingDown : Minus;
 
-  // Get contextual metric display
   const getMetricDisplay = () => {
     switch (activeMetric) {
       case 'wins': 
@@ -284,7 +244,6 @@ export function FranchiseCard({
   };
 
   const metricDisplay = getMetricDisplay();
-
   const isTopThree = rank <= 3;
 
   return (
@@ -304,7 +263,7 @@ export function FranchiseCard({
           className
         )}
       >
-        {/* Rank Badge with Movement */}
+        {/* Rank Badge */}
         <div className="flex flex-col items-center shrink-0 w-8">
           <span className={cn(
             "text-lg font-bold tabular-nums",
@@ -323,7 +282,7 @@ export function FranchiseCard({
           )}
         </div>
         
-        {/* Premium Medallion with Status + Momentum */}
+        {/* Medallion */}
         <Medallion 
           logoUrl={college?.logo_url}
           displayName={displayName}
@@ -333,15 +292,13 @@ export function FranchiseCard({
           momentum={momentum}
         />
         
-        {/* Content - Enhanced hierarchy */}
+        {/* Content */}
         <div className="flex-1 min-w-0">
           <h3 className="text-[15px] font-bold text-foreground truncate group-hover:text-primary transition-colors">
             {displayName}
           </h3>
           
-          {/* Stats Row - metric emphasized, player count subdued */}
           <div className="flex items-center gap-3 mt-1.5">
-            {/* Primary metric - emphasized */}
             <span className={cn(
               "text-sm font-semibold",
               activeMetric === 'earnings' ? "text-emerald-600" : "text-foreground"
@@ -351,7 +308,6 @@ export function FranchiseCard({
                 : `${metricDisplay.value} ${metricDisplay.label}`
               }
             </span>
-            {/* Player count - subdued */}
             <span className="inline-flex items-center gap-1 text-xs text-muted-foreground/60">
               <Users className="w-3 h-3" />
               {stats.player_count}
@@ -359,7 +315,6 @@ export function FranchiseCard({
           </div>
         </div>
         
-        {/* Arrow - consistent alignment */}
         <ChevronRight className="w-5 h-5 text-muted-foreground/30 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0 self-center" />
       </Link>
     </motion.div>
