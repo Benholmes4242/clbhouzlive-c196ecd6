@@ -84,17 +84,10 @@ export const CourseDNACard = memo(function CourseDNACard({ items, courseName }: 
 
   return (
     <div 
-      className="rounded-2xl p-5"
-      style={{
-        background: '#FFFFFF',
-        border: '1px solid rgba(0, 0, 0, 0.06)',
-        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
-      }}
+      className="rounded-2xl p-5 bg-card border border-border"
+      style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)' }}
     >
-      <h3 
-        className="text-base font-bold mb-4"
-        style={{ color: '#111827' }}
-      >
+      <h3 className="text-base font-bold mb-4 text-foreground">
         What Matters{courseName ? ` at ${courseName}` : ''}
       </h3>
 
@@ -116,9 +109,7 @@ export const CourseDNACard = memo(function CourseDNACard({ items, courseName }: 
               }}
               viewport={{ once: true }}
               className="flex items-center gap-3 p-3.5 px-4 rounded-xl"
-              style={{
-                background: '#F8F9FA',
-              }}
+              style={{ background: '#F8F9FA' }}
             >
               {/* Skill icon */}
               <div 
@@ -135,18 +126,12 @@ export const CourseDNACard = memo(function CourseDNACard({ items, courseName }: 
               {/* Name, tag, and bar */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-2">
-                  <span 
-                    className="text-sm font-semibold"
-                    style={{ color: '#1F2937' }}
-                  >
+                  <span className="text-sm font-semibold text-foreground">
                     {item.label}
                   </span>
                   <span 
                     className="text-[10px] font-bold uppercase"
-                    style={{ 
-                      color: hexColor,
-                      letterSpacing: '1px',
-                    }}
+                    style={{ color: hexColor, letterSpacing: '1px' }}
                   >
                     {tierToLabel[item.tier]}
                   </span>

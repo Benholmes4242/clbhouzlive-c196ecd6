@@ -54,11 +54,9 @@ function LiveTournamentCard({
   return (
     <motion.button
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
-      className="w-[280px] flex-shrink-0 rounded-2xl overflow-hidden text-left cursor-pointer transition-all duration-300"
+      className="w-[280px] flex-shrink-0 rounded-2xl overflow-hidden text-left cursor-pointer transition-all duration-300 bg-card border border-border"
       style={{
-        background: '#FFFFFF',
-        border: '1px solid rgba(0, 0, 0, 0.06)',
-        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)',
         scrollSnapAlign: 'start',
       }}
       initial={{ opacity: 0, y: 20 }}
@@ -71,7 +69,6 @@ function LiveTournamentCard({
       whileHover={{ 
         y: -2,
         boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-        borderColor: 'rgba(0, 0, 0, 0.1)',
       }}
       whileTap={{ scale: 0.98 }}
     >
@@ -163,34 +160,23 @@ function LiveTournamentCard({
       </div>
 
       {/* Body Content - flex layout with score on right */}
-      <div 
-        className="p-3.5 flex items-end justify-between"
-      >
+      <div className="p-3.5 flex items-end justify-between">
         <div className="flex-1 min-w-0">
           {/* Tournament name - single line truncated */}
           <h3 
-            className="text-[15px] font-bold mb-[3px] truncate"
-            style={{ 
-              color: '#111827',
-              letterSpacing: '-0.2px',
-            }}
+            className="text-[15px] font-bold mb-[3px] truncate text-foreground"
+            style={{ letterSpacing: '-0.2px' }}
           >
             {tournament.name}
           </h3>
           
           {/* Leader name */}
           {tournament.leader ? (
-            <span 
-              className="text-[12.5px] font-normal truncate block"
-              style={{ color: 'rgba(0, 0, 0, 0.45)' }}
-            >
+            <span className="text-[12.5px] font-normal truncate block text-muted-foreground">
               {tournament.leader.name}
             </span>
           ) : (
-            <span 
-              className="text-[12.5px] italic truncate block"
-              style={{ color: 'rgba(0, 0, 0, 0.35)' }}
-            >
+            <span className="text-[12.5px] italic truncate block text-muted-foreground/60">
               Starting Soon
             </span>
           )}
@@ -223,10 +209,8 @@ function UpNextCard({ tournament }: { tournament: { id: string; name: string; st
   return (
     <motion.button
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
-      className="flex items-center gap-3 p-3 rounded-xl w-full text-left"
+      className="flex items-center gap-3 p-3 rounded-xl w-full text-left bg-card border border-border"
       style={{
-        background: '#FFFFFF',
-        border: '1px solid rgba(0, 0, 0, 0.06)',
         boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
       }}
       initial={{ opacity: 0, y: 10 }}
@@ -251,18 +235,12 @@ function UpNextCard({ tournament }: { tournament: { id: string; name: string; st
 
       {/* Tournament Info */}
       <div className="flex-1 min-w-0">
-        <h4 
-          className="text-sm font-semibold truncate"
-          style={{ color: '#111827' }}
-        >
+        <h4 className="text-sm font-semibold truncate text-foreground">
           {tournament.name}
         </h4>
         <div className="flex items-center gap-1.5 mt-0.5">
-          <Calendar className="w-3 h-3" style={{ color: 'rgba(0, 0, 0, 0.35)' }} />
-          <span 
-            className="text-xs"
-            style={{ color: 'rgba(0, 0, 0, 0.45)' }}
-          >
+          <Calendar className="w-3 h-3 text-muted-foreground/60" />
+          <span className="text-xs text-muted-foreground">
             {getStartLabel(tournament.startDate)}
             {tournament.venueCity && ` · ${tournament.venueCity}`}
           </span>
@@ -270,7 +248,7 @@ function UpNextCard({ tournament }: { tournament: { id: string; name: string; st
       </div>
 
       {/* Chevron */}
-      <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: 'rgba(0, 0, 0, 0.35)' }} />
+      <ChevronRight className="w-4 h-4 flex-shrink-0 text-muted-foreground/60" />
     </motion.button>
   );
 }
@@ -283,40 +261,23 @@ function NoLiveEventsState() {
   const nextTournament = upcomingTournaments?.[0];
 
   return (
-    <section 
-      className="pt-7 px-4"
-      style={{ background: '#f8fafc' }}
-    >
-      {/* Header */}
+    <section className="pt-7 px-4 bg-background">
+      {/* Header — FIX 2: Design system section label */}
       <div className="flex items-center gap-2 mb-4">
         <span 
           className="w-2 h-2 rounded-full"
           style={{ background: 'rgba(0, 0, 0, 0.2)' }}
         />
-        <h2 
-          className="text-[13px] font-bold uppercase"
-          style={{ 
-            color: '#111827',
-            letterSpacing: '1.5px',
-          }}
-        >
+        <h2 className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
           Live Right Now
         </h2>
       </div>
 
       {/* Empty State Card */}
-      <div 
-        className="rounded-2xl p-4"
-        style={{
-          background: '#FFFFFF',
-          border: '1px solid rgba(0, 0, 0, 0.06)',
-          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
-        }}
+      <div className="rounded-2xl p-4 bg-card border border-border"
+        style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)' }}
       >
-        <p 
-          className="text-sm mb-3"
-          style={{ color: 'rgba(0, 0, 0, 0.45)' }}
-        >
+        <p className="text-sm mb-3 text-muted-foreground">
           No competitions live right now
         </p>
         
@@ -325,12 +286,8 @@ function NoLiveEventsState() {
           <Skeleton className="h-16 w-full rounded-xl" />
         ) : nextTournament ? (
           <div>
-            <p 
-              className="text-xs font-semibold uppercase mb-2"
-              style={{ 
-                color: '#111827',
-                letterSpacing: '0.5px',
-              }}
+            <p className="text-xs font-semibold uppercase mb-2 text-foreground"
+              style={{ letterSpacing: '0.5px' }}
             >
               Up Next
             </p>
@@ -345,10 +302,7 @@ function NoLiveEventsState() {
             />
           </div>
         ) : (
-          <p 
-            className="text-xs"
-            style={{ color: 'rgba(0, 0, 0, 0.35)' }}
-          >
+          <p className="text-xs text-muted-foreground/60">
             Check back soon for upcoming events
           </p>
         )}
@@ -367,10 +321,7 @@ export function LiveRightNow() {
 
   if (isLoading) {
     return (
-      <section 
-        className="pt-7 px-4"
-        style={{ background: '#f8fafc' }}
-      >
+      <section className="pt-7 px-4 bg-background">
         <div className="flex items-center gap-2 mb-4">
           <span 
             className="w-2 h-2 rounded-full animate-live-pulse"
@@ -391,11 +342,7 @@ export function LiveRightNow() {
           {[1, 2].map(i => (
             <div 
               key={i} 
-              className="w-[280px] flex-shrink-0 rounded-2xl overflow-hidden"
-              style={{
-                background: '#FFFFFF',
-                border: '1px solid rgba(0, 0, 0, 0.06)',
-              }}
+              className="w-[280px] flex-shrink-0 rounded-2xl overflow-hidden bg-card border border-border"
             >
               <div 
                 className="h-[140px] w-full animate-shimmer"
@@ -417,10 +364,10 @@ export function LiveRightNow() {
 
   return (
     <section 
-      className="pt-7"
-      style={{ background: '#f8fafc', marginBottom: '24px' }}
+      className="pt-7 bg-background"
+      style={{ marginBottom: '24px' }}
     >
-      {/* Header - with breathing room */}
+      {/* Header — FIX 2: Design system section label */}
       <div className="flex items-center gap-2 mb-4 px-4">
         <span 
           className="w-2 h-2 rounded-full animate-live-pulse"
@@ -429,13 +376,7 @@ export function LiveRightNow() {
             boxShadow: '0 0 10px rgba(255, 59, 48, 0.35)',
           }}
         />
-        <h2 
-          className="text-[13px] font-bold uppercase"
-          style={{ 
-            color: '#111827',
-            letterSpacing: '1.5px',
-          }}
-        >
+        <h2 className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
           Live Right Now
         </h2>
       </div>
@@ -452,7 +393,7 @@ export function LiveRightNow() {
             scrollbarWidth: 'none',
           }}
         >
-          {/* Left inset (more robust than padding alone; prevents “flush” even if padding is overridden) */}
+          {/* Left inset */}
           <div className="w-4 flex-shrink-0" aria-hidden />
 
           {liveTournaments!.map((tournament, idx) => (
@@ -467,7 +408,7 @@ export function LiveRightNow() {
           <div className="w-4 flex-shrink-0" aria-hidden />
         </div>
 
-        {/* Right edge fade hint - pinned to the edge */}
+        {/* Right edge fade hint */}
         <div
           className="absolute top-0 right-0 bottom-0 pointer-events-none z-10"
           style={{

@@ -37,17 +37,16 @@ export const TournamentInsights = memo(function TournamentInsights() {
   }
 
   return (
-    <div className="space-y-0">
-      {/* Hero Card — stays outside the intelligence wrapper */}
-      <TournamentHeroCard tournament={data.tournament} />
+    <section aria-label="Featured tournament analysis" className="space-y-0">
+      {/* Hero Card — full bleed, negative margin to escape parent padding */}
+      <div className="-mx-4">
+        <TournamentHeroCard tournament={data.tournament} />
+      </div>
 
       {/* ═══ UNIFIED INTELLIGENCE WRAPPER — LIGHT THEME ═══ */}
       <div 
-        className="mt-0 px-4 pt-7"
-        style={{ 
-          background: '#f8fafc',
-          borderTop: '1px solid rgba(0, 0, 0, 0.05)',
-        }}
+        className="mt-0 px-4 pt-7 bg-background"
+        style={{ borderTop: '1px solid rgba(0, 0, 0, 0.05)' }}
       >
         {/* Section Header — Premium Feature Reveal */}
         <motion.div 
@@ -72,15 +71,12 @@ export const TournamentInsights = memo(function TournamentInsights() {
 
             <div className="flex flex-col">
               <h2 
-                className="text-lg font-bold tracking-tight leading-tight"
-                style={{ color: '#111827', letterSpacing: '-0.3px' }}
+                className="text-lg font-bold tracking-tight leading-tight text-foreground"
+                style={{ letterSpacing: '-0.3px' }}
               >
                 clbhouz intelligence
               </h2>
-              <p 
-                className="text-xs font-normal mt-0.5"
-                style={{ color: 'rgba(0, 0, 0, 0.4)' }}
-              >
+              <p className="text-xs font-normal mt-0.5 text-muted-foreground">
                 AI-powered tournament analysis
               </p>
             </div>
@@ -133,6 +129,6 @@ export const TournamentInsights = memo(function TournamentInsights() {
           </motion.div>
         )}
       </div>
-    </div>
+    </section>
   );
 });

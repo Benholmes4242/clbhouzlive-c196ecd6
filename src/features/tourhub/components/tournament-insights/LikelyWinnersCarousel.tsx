@@ -1,10 +1,10 @@
 /**
  * LikelyWinnersCarousel - Premium light theme treatment
- * Warm cream #1 hero card, white runner-ups, threat reframe with lightning bolt
+ * Warm cream #1 hero card, white runner-ups, dark horse reframe with lightning bolt
  */
 
-import { memo } from 'react';
-import { motion } from 'framer-motion';
+import { memo, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Zap, Info } from 'lucide-react';
 import type { WinnerProfile, ContenderCard } from './types';
@@ -43,8 +43,9 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
   cards,
 }: LikelyWinnersCarouselProps) {
   const navigate = useNavigate();
+  const [showConfidenceInfo, setShowConfidenceInfo] = useState(false);
 
-  // Split cards into contenders (#2, #3) and threats
+  // Split cards into contenders (#2, #3) and dark horses
   const contenderCards = cards.filter(c => c.type === 'contender');
   const threatCards = cards.filter(c => c.type === 'threat');
 
@@ -56,21 +57,42 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         viewport={{ once: true }}
-        className="flex items-center justify-between mb-3.5"
+        className="mb-3.5"
       >
-        <h3 
-          className="text-base font-bold"
-          style={{ color: '#111827' }}
-        >
-          Likely Winners
-        </h3>
-        <button 
-          className="flex items-center gap-1 text-xs font-medium bg-transparent border-none cursor-pointer p-0"
-          style={{ color: 'rgba(180, 130, 0, 0.6)' }}
-        >
-          <Info className="w-3 h-3" />
-          <span>AI confidence score</span>
-        </button>
+        <div className="flex items-center justify-between">
+          <h3 className="text-base font-bold text-foreground">
+            Likely Winners
+          </h3>
+          <button 
+            onClick={() => setShowConfidenceInfo(!showConfidenceInfo)}
+            className="flex items-center gap-1 active:opacity-70 transition-opacity"
+            style={{ color: 'rgba(180, 130, 0, 0.6)' }}
+          >
+            <Info className="w-3.5 h-3.5" />
+            <span style={{ fontSize: '12px', fontWeight: 500 }}>AI confidence score</span>
+          </button>
+        </div>
+
+        {/* FIX 1: AI Confidence Info Popover */}
+        <AnimatePresence>
+          {showConfidenceInfo && (
+            <motion.div
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              className="mt-2 p-3 rounded-xl"
+              style={{
+                background: '#FFFDF5',
+                border: '1px solid rgba(255,184,0,0.2)',
+                fontSize: '12px',
+                lineHeight: 1.5,
+                color: 'rgba(0,0,0,0.6)',
+              }}
+            >
+              AI confidence is calculated from course history, recent form, strokes gained metrics, and field strength. Higher scores indicate stronger statistical alignment with what this course rewards.
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
 
       {/* ── #1 PICK — HERO CARD — Premium Gold Treatment ── */}
@@ -125,19 +147,13 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
           <div className="flex-1 min-w-0">
             {/* Name + country */}
             <div className="flex items-center gap-2 mb-1">
-              <span 
-                className="text-lg font-bold tracking-tight"
-                style={{ color: '#111827' }}
-              >
+              <span className="text-lg font-bold tracking-tight text-foreground">
                 {featured.name}
               </span>
               {featured.countryCode && (
                 <span 
-                  className="text-[10px] font-semibold px-2 py-0.5 rounded-md"
-                  style={{
-                    color: 'rgba(0, 0, 0, 0.45)',
-                    background: 'rgba(0, 0, 0, 0.04)',
-                  }}
+                  className="text-[10px] font-semibold px-2 py-0.5 rounded-md text-muted-foreground"
+                  style={{ background: 'rgba(0, 0, 0, 0.04)' }}
                 >
                   {featured.countryCode}
                 </span>
@@ -174,10 +190,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                     >
                       ◆
                     </span>
-                    <span 
-                      className="text-[13px] leading-relaxed"
-                      style={{ color: 'rgba(0, 0, 0, 0.5)' }}
-                    >
+                    <span className="text-[13px] leading-relaxed text-muted-foreground">
                       {bullet}
                     </span>
                   </div>
@@ -215,10 +228,8 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                   }}
                   viewport={{ once: true }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-[220px] flex-shrink-0 rounded-[14px] p-4 cursor-pointer"
+                  className="w-[220px] flex-shrink-0 rounded-[14px] p-4 cursor-pointer bg-card border border-border"
                   style={{
-                    background: '#FFFFFF',
-                    border: '1px solid rgba(0, 0, 0, 0.06)',
                     boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
                     scrollSnapAlign: 'start',
                   }}
@@ -229,14 +240,12 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                       <img
                         src={card.avatarUrl}
                         alt={card.name}
-                        className="w-12 h-12 rounded-xl object-cover"
-                        style={{ border: '1px solid rgba(0, 0, 0, 0.06)' }}
+                        className="w-12 h-12 rounded-xl object-cover border border-border"
                         loading="lazy"
                       />
                     ) : (
                       <div 
-                        className={`w-12 h-12 rounded-xl ${avatarColors[(i + 1) % avatarColors.length]} flex items-center justify-center text-sm font-extrabold text-white`}
-                        style={{ border: '1px solid rgba(0, 0, 0, 0.06)' }}
+                        className={`w-12 h-12 rounded-xl ${avatarColors[(i + 1) % avatarColors.length]} flex items-center justify-center text-sm font-extrabold text-white border border-border`}
                       >
                         {getInitials(card.name)}
                       </div>
@@ -252,19 +261,13 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                   </div>
 
                   {/* Name */}
-                  <div 
-                    className="text-[15px] font-bold tracking-tight mb-0.5"
-                    style={{ color: '#111827' }}
-                  >
+                  <div className="text-[15px] font-bold tracking-tight mb-0.5 text-foreground">
                     {card.name}
                   </div>
 
                   {/* Country */}
                   {card.countryCode && (
-                    <div 
-                      className="text-[10px] font-medium mb-2"
-                      style={{ color: 'rgba(0, 0, 0, 0.35)' }}
-                    >
+                    <div className="text-[10px] font-medium mb-2 text-muted-foreground/60">
                       {card.countryCode}
                     </div>
                   )}
@@ -278,9 +281,8 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
 
                   {/* Description — max 2 lines */}
                   <p 
-                    className="text-xs leading-relaxed m-0"
+                    className="text-xs leading-relaxed m-0 text-muted-foreground"
                     style={{
-                      color: 'rgba(0, 0, 0, 0.4)',
                       display: '-webkit-box',
                       WebkitLineClamp: 2,
                       WebkitBoxOrient: 'vertical',
@@ -298,13 +300,13 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
           <div 
             className="absolute top-0 right-0 bottom-0 w-10 pointer-events-none z-10"
             style={{
-              background: 'linear-gradient(to left, #f8fafc 0%, transparent 100%)',
+              background: 'linear-gradient(to left, hsl(var(--background)) 0%, transparent 100%)',
             }}
           />
         </div>
       )}
 
-      {/* ── THREAT CARDS — Reframed with Lightning Bolt ── */}
+      {/* ── DARK HORSE CARDS — Reframed with Lightning Bolt ── */}
       {threatCards.length > 0 && (
         <div className="relative">
           <div 
@@ -367,19 +369,13 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                   </div>
 
                   {/* Name */}
-                  <div 
-                    className="text-[15px] font-bold tracking-tight mb-0.5"
-                    style={{ color: '#111827' }}
-                  >
+                  <div className="text-[15px] font-bold tracking-tight mb-0.5 text-foreground">
                     {card.name}
                   </div>
 
                   {/* Country */}
                   {card.countryCode && (
-                    <div 
-                      className="text-[10px] font-medium mb-2"
-                      style={{ color: 'rgba(0, 0, 0, 0.35)' }}
-                    >
+                    <div className="text-[10px] font-medium mb-2 text-muted-foreground/60">
                       {card.countryCode}
                     </div>
                   )}
@@ -400,9 +396,8 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
 
                   {/* Description — max 2 lines */}
                   <p 
-                    className="text-xs leading-relaxed m-0"
+                    className="text-xs leading-relaxed m-0 text-muted-foreground"
                     style={{
-                      color: 'rgba(0, 0, 0, 0.4)',
                       display: '-webkit-box',
                       WebkitLineClamp: 2,
                       WebkitBoxOrient: 'vertical',
@@ -420,7 +415,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
           <div 
             className="absolute top-0 right-0 bottom-0 w-10 pointer-events-none z-10"
             style={{
-              background: 'linear-gradient(to left, #f8fafc 0%, transparent 100%)',
+              background: 'linear-gradient(to left, hsl(var(--background)) 0%, transparent 100%)',
             }}
           />
         </div>

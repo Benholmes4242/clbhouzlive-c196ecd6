@@ -50,9 +50,9 @@ function TourPill({
         borderRadius: '10px',
         fontSize: '13px',
         fontWeight: isActive ? 600 : 500,
-        background: isActive ? '#111827' : '#FFFFFF',
-        color: isActive ? '#FFFFFF' : 'rgba(0, 0, 0, 0.5)',
-        border: `1px solid ${isActive ? '#111827' : 'rgba(0, 0, 0, 0.08)'}`,
+        background: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--card))',
+        color: isActive ? 'hsl(var(--card))' : 'hsl(var(--muted-foreground))',
+        border: isActive ? '1px solid hsl(var(--foreground))' : '1px solid hsl(var(--border))',
         boxShadow: isActive ? '0 2px 6px rgba(0, 0, 0, 0.1)' : 'none',
         transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
       }}
@@ -277,10 +277,10 @@ export function ScheduleModule() {
         transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
       >
         <h2 
+          className="text-foreground"
           style={{ 
             fontSize: '20px', 
             fontWeight: 700, 
-            color: '#111827',
             letterSpacing: '-0.3px',
           }}
         >
@@ -289,11 +289,10 @@ export function ScheduleModule() {
         
         <button 
           onClick={() => navigate('/tourhub?tab=schedule')}
-          className="flex items-center gap-1 group transition-all duration-300 active:scale-[0.97]"
+          className="flex items-center gap-1 group transition-all duration-300 active:scale-95 text-muted-foreground"
           style={{ 
             fontSize: '13px', 
-            fontWeight: 600, 
-            color: 'rgba(0, 0, 0, 0.35)',
+            fontWeight: 600,
           }}
         >
           <span className="group-hover:text-primary transition-colors">View All</span>
@@ -355,8 +354,8 @@ export function ScheduleModule() {
       {(!tournaments || tournaments.length === 0) && !isFetching && (
         <div className="text-center py-12 px-4">
           <Calendar className="w-12 h-12 mx-auto mb-3" style={{ color: 'rgba(0, 0, 0, 0.15)' }} />
-          <p style={{ color: '#111827', fontWeight: 600 }}>No tournaments scheduled</p>
-          <p className="text-sm mt-1" style={{ color: 'rgba(0, 0, 0, 0.35)' }}>
+          <p className="text-foreground" style={{ fontWeight: 600 }}>No tournaments scheduled</p>
+          <p className="text-sm mt-1 text-muted-foreground/60">
             No tournaments scheduled for {currentTourName} this season
           </p>
         </div>
@@ -423,16 +422,16 @@ export function ScheduleModule() {
                     width: '32px',
                     height: '32px',
                     borderRadius: '10px',
-                    background: '#FFFFFF',
-                    border: '1px solid rgba(0, 0, 0, 0.08)',
+                    background: 'hsl(var(--card))',
+                    border: '1px solid hsl(var(--border))',
                     boxShadow: currentPage === 0 ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.04)',
                     opacity: currentPage === 0 ? 0.3 : 1,
                     pointerEvents: currentPage === 0 ? 'none' : 'auto',
                   }}
                 >
-                  <ChevronLeft 
-                    className="w-3.5 h-3.5" 
-                    style={{ color: currentPage === 0 ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.4)' }} 
+                <ChevronLeft 
+                    className="w-3.5 h-3.5 text-muted-foreground" 
+                    style={{ opacity: currentPage === 0 ? 0.4 : 1 }} 
                   />
                 </button>
                 
@@ -468,27 +467,26 @@ export function ScheduleModule() {
                     width: '32px',
                     height: '32px',
                     borderRadius: '10px',
-                    background: '#FFFFFF',
-                    border: '1px solid rgba(0, 0, 0, 0.08)',
+                    background: 'hsl(var(--card))',
+                    border: '1px solid hsl(var(--border))',
                     boxShadow: currentPage === totalPages - 1 ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.04)',
                     opacity: currentPage === totalPages - 1 ? 0.3 : 1,
                     pointerEvents: currentPage === totalPages - 1 ? 'none' : 'auto',
                   }}
                 >
-                  <ChevronRight 
-                    className="w-3.5 h-3.5" 
-                    style={{ color: currentPage === totalPages - 1 ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.4)' }} 
+                <ChevronRight 
+                    className="w-3.5 h-3.5 text-muted-foreground" 
+                    style={{ opacity: currentPage === totalPages - 1 ? 0.4 : 1 }} 
                   />
                 </button>
               </div>
               
               {/* Page count label */}
               <p 
-                className="text-center"
+                className="text-center text-muted-foreground/60"
                 style={{
                   fontSize: '11px',
                   fontWeight: 500,
-                  color: 'rgba(0, 0, 0, 0.3)',
                   marginTop: '6px',
                 }}
               >

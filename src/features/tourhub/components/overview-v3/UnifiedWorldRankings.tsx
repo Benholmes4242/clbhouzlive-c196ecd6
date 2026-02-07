@@ -305,7 +305,7 @@ function CompactMoverCard({ entry, index, onTap }: CompactMoverCardProps) {
         style={{ 
           fontSize: '12px', 
           fontWeight: 600, 
-          color: '#111827',
+          color: 'hsl(var(--foreground))',
           marginTop: '10px',
           maxWidth: '78px',
         }}
@@ -318,7 +318,7 @@ function CompactMoverCard({ entry, index, onTap }: CompactMoverCardProps) {
         style={{ 
           fontSize: '11px', 
           fontWeight: 400, 
-          color: 'rgba(0, 0, 0, 0.35)',
+          color: 'hsl(var(--muted-foreground))',
           marginTop: '1px',
         }}
       >
@@ -481,8 +481,8 @@ export function UnifiedWorldRankings() {
       {/* White Card Container */}
       <div 
         style={{
-          background: '#FFFFFF',
-          border: '1px solid rgba(0, 0, 0, 0.06)',
+          background: 'hsl(var(--card))',
+          border: '1px solid hsl(var(--border))',
           borderRadius: '16px',
           boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
           overflow: 'hidden',
@@ -498,10 +498,10 @@ export function UnifiedWorldRankings() {
           transition={{ duration: 0.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
         >
           <h2 
+            className="text-foreground"
             style={{ 
               fontSize: '18px', 
               fontWeight: 700, 
-              color: '#111827',
               letterSpacing: '-0.3px',
             }}
           >
@@ -509,8 +509,8 @@ export function UnifiedWorldRankings() {
           </h2>
           <button 
             onClick={() => navigate('/tourhub?tab=players')}
-            className="flex items-center gap-1 group transition-all duration-300 active:scale-[0.97]"
-            style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(0, 0, 0, 0.35)' }}
+            className="flex items-center gap-1 group transition-all duration-300 active:scale-95 text-muted-foreground"
+            style={{ fontSize: '13px', fontWeight: 600 }}
           >
             <span className="group-hover:text-primary transition-colors">View All</span>
             <ChevronRight 
@@ -542,11 +542,11 @@ export function UnifiedWorldRankings() {
                 >
                   <TrendingUp style={{ width: '12px', height: '12px', color: '#16A34A' }} />
                 </div>
-                <span style={{ fontSize: '14px', fontWeight: 600, color: '#111827' }}>
+                <span className="text-foreground" style={{ fontSize: '14px', fontWeight: 600 }}>
                   Movers This Week
                 </span>
               </div>
-              <span style={{ fontSize: '11px', fontWeight: 500, color: 'rgba(0, 0, 0, 0.3)' }}>
+              <span className="text-muted-foreground/60" style={{ fontSize: '11px', fontWeight: 500 }}>
                 1–{Math.min(4, moversCount)} of {moversCount}
               </span>
             </motion.div>
@@ -786,7 +786,7 @@ export function UnifiedWorldRankings() {
                         style={{ 
                           fontSize: '15px', 
                           fontWeight: 600, 
-                          color: '#111827',
+                          color: 'hsl(var(--foreground))',
                           lineHeight: 1.3,
                         }}
                         title={fullName}
@@ -937,7 +937,7 @@ export function UnifiedWorldRankings() {
               style={{
                 fontSize: '11px',
                 fontWeight: 500,
-                color: 'rgba(0, 0, 0, 0.3)',
+                color: 'hsl(var(--muted-foreground) / 0.6)',
                 marginTop: '6px',
               }}
             >

@@ -224,7 +224,7 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
           className="absolute inset-x-0 bottom-0 pointer-events-none z-[2]"
           style={{
             height: '70%',
-            background: 'linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.3) 40%, transparent 100%)',
+            background: 'linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.4) 35%, rgba(0, 0, 0, 0.1) 60%, transparent 100%)',
           }}
         />
         
@@ -309,7 +309,7 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
             style={{
               fontSize: '11px',
               fontWeight: 400,
-              color: 'rgba(255, 255, 255, 0.6)',
+              color: 'rgba(255, 255, 255, 0.7)',
               textShadow: '0 1px 3px rgba(0,0,0,0.5)',
             }}
           >

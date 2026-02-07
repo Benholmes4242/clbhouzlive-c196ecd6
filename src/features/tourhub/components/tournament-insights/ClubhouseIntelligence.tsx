@@ -28,24 +28,14 @@ export const ClubhouseIntelligence = memo(function ClubhouseIntelligence({
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
       viewport={{ once: true }}
-      className="rounded-2xl p-5"
-      style={{
-        background: '#FFFFFF',
-        border: '1px solid rgba(0, 0, 0, 0.06)',
-        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
-      }}
+      className="rounded-2xl p-5 bg-card border border-border"
+      style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)' }}
     >
-      <h3 
-        className="text-base font-bold mb-2.5"
-        style={{ color: '#111827' }}
-      >
+      <h3 className="text-base font-bold mb-2.5 text-foreground">
         Course Breakdown
       </h3>
 
-      <p 
-        className="text-sm leading-relaxed m-0"
-        style={{ color: 'rgba(0, 0, 0, 0.55)' }}
-      >
+      <p className="text-sm leading-relaxed m-0 text-muted-foreground">
         {insight.primaryText}
         {isExpanded && insight.expandedText && (
           <>
