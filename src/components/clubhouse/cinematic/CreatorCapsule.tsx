@@ -14,7 +14,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { Button } from '@/components/ui/button';
 import { ChevronUp, User, Music, ChevronRight } from 'lucide-react';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import CourseLocationRow from '@/components/posts/CourseLocationRow';
@@ -103,7 +102,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   reviewData,
   onReviewTap,
 }) => {
-  console.log('[CreatorCapsule] rendered', { isReview, userId: user.id, userName: user.name });
+  
   const [isExpanded, setIsExpanded] = useState(false);
   const navigate = useNavigate();
   const capsuleRef = useRef<HTMLDivElement>(null);
@@ -219,37 +218,35 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
       <div className="flex items-center gap-2 pt-1 border-t border-white/10">
         {/* Follow button (not for own posts) */}
         {!isOwnPost && onFollow && (
-          <Button
-            size="sm"
-            variant={isFollowing ? 'secondary' : 'default'}
+          <motion.button
+            whileTap={{ scale: 0.97 }}
             onClick={(e) => {
               e.stopPropagation();
               onFollow();
             }}
             className={cn(
-              'h-8 px-3 text-[12px] font-medium rounded-sq-sm',
+              'h-10 px-4 text-[13px] font-semibold rounded-sq-sm transition-colors',
               isFollowing 
                 ? 'bg-white/10 text-white hover:bg-white/15' 
                 : 'bg-white text-black hover:bg-white/90'
             )}
           >
             {isFollowing ? 'Following' : 'Follow'}
-          </Button>
+          </motion.button>
         )}
 
         {/* View Profile */}
-        <Button
-          size="sm"
-          variant="ghost"
+        <motion.button
+          whileTap={{ scale: 0.97 }}
           onClick={(e) => {
             e.stopPropagation();
             handleViewProfile();
           }}
-          className="h-8 px-3 text-[12px] font-medium rounded-sq-sm text-white/80 hover:text-white hover:bg-white/10"
+          className="h-10 flex items-center gap-1 px-3 text-[13px] font-medium rounded-sq-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors"
         >
-          <User className="w-3.5 h-3.5 mr-1" />
+          <User className="w-3.5 h-3.5" />
           Profile
-        </Button>
+        </motion.button>
 
       </div>
     </div>
@@ -291,14 +288,15 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           {user?.name || 'Golfer'}
         </div>
         {/* Read review CTA - same position as caption preview in regular capsule */}
-        <button
+        <motion.button
+          whileTap={{ scale: 0.97 }}
           type="button"
           onClick={(e) => {
             e.stopPropagation();
             onReviewTap?.();
           }}
           className={cn(
-            "flex items-center gap-0.5 mt-0.5",
+            "flex items-center gap-0.5 mt-0.5 py-2 px-3 -mx-3 rounded-md",
             "text-[11px] font-medium",
             "transition-opacity duration-150",
             isOutstanding 
@@ -308,7 +306,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
         >
           <span>Read review</span>
           <ChevronRight className="w-3 h-3" />
-        </button>
+        </motion.button>
       </div>
     </div>
   );
@@ -425,8 +423,8 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
                   ? 'rgba(251, 191, 36, 0.05)'
                   : 'rgba(0, 0, 0, 0.35)')
               : 'rgba(0, 0, 0, 0.35)',
-            backdropFilter: 'blur(12px) saturate(130%)',
-            WebkitBackdropFilter: 'blur(12px) saturate(130%)',
+            backdropFilter: 'blur(20px) saturate(130%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(130%)',
             border: `1px solid ${isReview ? (isOutstanding ? 'rgba(251, 191, 36, 0.15)' : 'rgba(255, 255, 255, 0.06)') : 'rgba(255, 255, 255, 0.06)'}`,
             boxShadow: '0 2px 12px rgba(0, 0, 0, 0.2)',
           }}

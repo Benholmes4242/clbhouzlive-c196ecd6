@@ -100,8 +100,8 @@ const CourseLocationRow: React.FC<CourseLocationRowProps> = ({
       onClick={handleClick}
       disabled={!isClickable}
       className={cn(
-        "flex items-start gap-2 py-1 transition-all text-left w-full",
-        isClickable && "cursor-pointer active:opacity-70 hover:opacity-80",
+        "flex items-start gap-2 py-2.5 transition-all text-left w-full",
+        isClickable && "cursor-pointer active:scale-[0.98] active:opacity-80",
         !isClickable && "cursor-default",
         className
       )}
