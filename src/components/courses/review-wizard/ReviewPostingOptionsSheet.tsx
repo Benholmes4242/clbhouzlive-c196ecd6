@@ -4,11 +4,14 @@
  * Key difference from PostingOptionsSheet:
  * - Business accounts are DISABLED (grayed out) for reviews
  * - Only personal profiles can write course reviews
+ * 
+ * A* Polish: tokens, color-coded visibility, radio animations,
+ * consistent card treatment, removed Info icon on disabled row
  */
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Globe, Users, Lock, AlertCircle } from 'lucide-react';
+import { Globe, Users, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -22,6 +25,10 @@ interface VisibilityOption {
   label: string;
   description: string;
   icon: React.ReactNode;
+  /** Color classes for the icon circle when selected */
+  selectedColor: string;
+  /** Color classes for the icon circle when unselected */
+  defaultColor: string;
 }
 
 const VISIBILITY_OPTIONS: VisibilityOption[] = [
@@ -30,18 +37,24 @@ const VISIBILITY_OPTIONS: VisibilityOption[] = [
     label: 'Anyone',
     description: 'Visible to everyone on Clbhouz',
     icon: <Globe className="w-5 h-5" />,
+    selectedColor: 'bg-emerald-100 text-emerald-600',
+    defaultColor: 'bg-muted/50 text-muted-foreground',
   },
   {
     value: 'followers',
     label: 'Followers',
     description: 'Only your followers can see this',
     icon: <Users className="w-5 h-5" />,
+    selectedColor: 'bg-amber-100 text-amber-600',
+    defaultColor: 'bg-muted/50 text-muted-foreground',
   },
   {
     value: 'private',
     label: 'Private',
     description: 'Visible only to you',
     icon: <Lock className="w-5 h-5" />,
+    selectedColor: 'bg-muted text-muted-foreground',
+    defaultColor: 'bg-muted/50 text-muted-foreground',
   },
 ];
 
@@ -61,6 +74,32 @@ interface ReviewPostingOptionsSheetProps {
  */
 function canActorReview(actor: ActiveActor): boolean {
   return actor.type === 'personal';
+}
+
+/** Radio dot with spring animation */
+function RadioDot({ selected }: { selected: boolean }) {
+  return (
+    <div
+      className={cn(
+        "w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200 border-2",
+        selected
+          ? "border-primary bg-primary"
+          : "border-muted-foreground/30 bg-transparent"
+      )}
+    >
+      <AnimatePresence>
+        {selected && (
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+            className="w-2 h-2 rounded-full bg-white"
+          />
+        )}
+      </AnimatePresence>
+    </div>
+  );
 }
 
 export function ReviewPostingOptionsSheet({
@@ -98,7 +137,7 @@ export function ReviewPostingOptionsSheet({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[10000]"
+        className="light fixed inset-0 z-[10000]"
         onClick={onClose}
       >
         {/* Backdrop */}
@@ -110,9 +149,8 @@ export function ReviewPostingOptionsSheet({
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-          className="absolute bottom-0 left-0 right-0 rounded-t-3xl overflow-hidden"
+          className="absolute bottom-0 left-0 right-0 rounded-t-3xl overflow-hidden bg-card"
           style={{ 
-            background: 'var(--cm-surface-card)',
             paddingBottom: 'env(safe-area-inset-bottom, 16px)',
             maxHeight: '85vh',
           }}
@@ -120,18 +158,18 @@ export function ReviewPostingOptionsSheet({
         >
           {/* Handle */}
           <div className="flex justify-center pt-3 pb-1">
-            <div className="w-10 h-1 rounded-full bg-[#d1d5db]" />
+            <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
           </div>
 
           {/* Scrollable Content */}
           <div className="overflow-y-auto" style={{ maxHeight: 'calc(85vh - 80px)' }}>
             {/* Account Section */}
             <div className="px-5 pt-3 pb-4">
-              <h3 className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wide mb-3">
+              <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">
                 Account
               </h3>
               
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 {availableActors.map(actor => {
                   const isSelected = selectedActor?.type === actor.type && selectedActor?.id === actor.id;
                   const canReview = canActorReview(actor);
@@ -144,9 +182,9 @@ export function ReviewPostingOptionsSheet({
                       disabled={!canReview}
                       className={cn(
                         "w-full flex items-center gap-3 p-3 rounded-xl transition-all",
-                        canReview && isSelected && "bg-primary/5",
-                        canReview && !isSelected && "hover:bg-muted/30",
-                        !canReview && "opacity-50 cursor-not-allowed"
+                        canReview && isSelected && "bg-primary/5 border border-primary/20",
+                        canReview && !isSelected && "bg-muted/10 hover:bg-muted/20",
+                        !canReview && "bg-muted/10 opacity-50 cursor-not-allowed"
                       )}
                     >
                       <SquircleAvatar
@@ -176,23 +214,8 @@ export function ReviewPostingOptionsSheet({
                         </p>
                       </div>
                       
-                      {/* Radio indicator or disabled icon */}
-                      {canReview ? (
-                        <div 
-                          className={cn(
-                            "w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all border-2",
-                            isSelected 
-                              ? "border-primary bg-primary"
-                              : "border-muted-foreground/30 bg-transparent"
-                          )}
-                        >
-                          {isSelected && (
-                            <div className="w-2 h-2 rounded-full bg-white" />
-                          )}
-                        </div>
-                      ) : (
-                        <AlertCircle className="w-4 h-4 text-muted-foreground/50 flex-shrink-0" />
-                      )}
+                      {/* Radio indicator — no icon on disabled rows */}
+                      {canReview && <RadioDot selected={isSelected} />}
                     </motion.button>
                   );
                 })}
@@ -204,11 +227,11 @@ export function ReviewPostingOptionsSheet({
 
             {/* Who Can See Section */}
             <div className="px-5 pt-4 pb-2">
-              <h3 className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wide mb-3">
+              <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">
                 Who can see this?
               </h3>
               
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 {VISIBILITY_OPTIONS.map(option => {
                   const isSelected = visibility === option.value;
                   
@@ -220,17 +243,15 @@ export function ReviewPostingOptionsSheet({
                       className={cn(
                         "w-full flex items-center gap-3 p-3 rounded-xl transition-all",
                         isSelected 
-                          ? "bg-primary/5"
-                          : "hover:bg-muted/30"
+                          ? "bg-primary/5 border border-primary/20"
+                          : "bg-muted/10 hover:bg-muted/20"
                       )}
                     >
-                      {/* Icon circle */}
+                      {/* Icon circle — color-coded per visibility level */}
                       <div 
                         className={cn(
-                          "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0",
-                          isSelected 
-                            ? "bg-primary/10 text-primary" 
-                            : "bg-muted/50 text-muted-foreground"
+                          "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-200",
+                          isSelected ? option.selectedColor : option.defaultColor
                         )}
                       >
                         {option.icon}
@@ -245,19 +266,8 @@ export function ReviewPostingOptionsSheet({
                         </p>
                       </div>
                       
-                      {/* Radio indicator */}
-                      <div 
-                        className={cn(
-                          "w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all border-2",
-                          isSelected 
-                            ? "border-primary bg-primary"
-                            : "border-muted-foreground/30 bg-transparent"
-                        )}
-                      >
-                        {isSelected && (
-                          <div className="w-2 h-2 rounded-full bg-white" />
-                        )}
-                      </div>
+                      {/* Radio indicator with animation */}
+                      <RadioDot selected={isSelected} />
                     </motion.button>
                   );
                 })}
@@ -265,13 +275,13 @@ export function ReviewPostingOptionsSheet({
             </div>
           </div>
 
-          {/* Done Button - dark sophisticated style */}
+          {/* Done Button — primary token */}
           <div className="px-5 pt-3 pb-4 border-t border-border">
             <button
               onClick={handleDone}
-              className="w-full h-12 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[0.98] bg-foreground text-background hover:bg-foreground/90"
+              className="w-full h-12 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[0.98] bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              <span className="text-background font-semibold">Done</span>
+              Done
             </button>
           </div>
         </motion.div>
