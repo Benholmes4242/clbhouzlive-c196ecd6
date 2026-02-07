@@ -5,7 +5,7 @@ import { TourHubHeader } from '../components/TourHubHeader';
 import { TourHubNavOverlay } from '../components/TourHubNavOverlay';
 import type { TourHubTab } from '../components/TourHubTabs';
 import { TourHubEmptyState } from '../components/TourHubEmptyState';
-import { OverviewTab, ScheduleTab, PlayersTab, CinematicLeadersTab } from '../components/tabs';
+import { OverviewTab, ScheduleTab, PlayersTab, LeadersTab } from '../components/tabs';
 import { TourNavProvider, useTourNav } from '../contexts/TourNavContext';
 import { useLiveTournamentSync } from '../hooks/useLiveTournamentSync';
 
@@ -52,7 +52,7 @@ function TourHubMainPageInner() {
       case 'players':
         return <PlayersTab />;
       case 'leaderboards':
-        return <CinematicLeadersTab />;
+        return <LeadersTab />;
       case 'summary':
         return <TourHubEmptyState variant="summary" />;
       case 'tee-times':
