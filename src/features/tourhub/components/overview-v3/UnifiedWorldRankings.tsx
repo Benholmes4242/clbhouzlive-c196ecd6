@@ -223,7 +223,7 @@ interface CompactMoverCardProps {
 function CompactMoverCard({ entry, index, onTap }: CompactMoverCardProps) {
   const isUp = entry.rankChange > 0;
   const badgeStyle = getMovementBadgeStyle(entry.rankChange);
-  const initials = `${entry.firstName[0]}${entry.lastName[0]}`;
+  const initials = `${entry.firstName?.[0] ?? ''}${entry.lastName?.[0] ?? ''}`.toUpperCase() || '?';
 
   return (
     <motion.button
