@@ -1,11 +1,12 @@
 /**
- * LeaderboardCard - Premium glassmorphic leaderboard display
+ * LeaderboardCard - Premium leaderboard display (overview compact mode)
  * 
  * Features:
  * - Podium-style top 3 with metallic accents
  * - Clean row design with position badges
- * - Score to par color coding
+ * - Score to par color coding (PGA convention)
  * - Player avatars with linking
+ * - Semantic token compliance
  */
 
 import { Link } from 'react-router-dom';
@@ -13,6 +14,7 @@ import { ChevronRight, Trophy } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { BatchPlayerAvatar } from '../PlayerAvatar';
+import { TOUR_COLORS } from '../../constants/colors';
 
 interface LeaderboardEntry {
   id: string;
@@ -39,18 +41,26 @@ interface LeaderboardCardProps {
   title?: string;
 }
 
-// Score to par display with color coding
+// Score to par display with PGA convention colors
 function ScoreToPar({ score, className }: { score: number | null; className?: string }) {
-  if (score === null) return <span className={cn("text-slate-400", className)}>—</span>;
+  if (score === null) return <span className={cn("text-muted-foreground/70", className)}>—</span>;
   
   const formatted = score === 0 ? 'E' : score > 0 ? `+${score}` : String(score);
-  const colorClass = score < 0 
-    ? 'text-red-600' 
-    : score > 0 
-      ? 'text-blue-600' 
-      : 'text-slate-700';
   
-  return <span className={cn(colorClass, "font-bold tabular-nums", className)}>{formatted}</span>;
+  return (
+    <span 
+      className={cn("score-mono font-bold tabular-nums", className)}
+      style={{ 
+        color: score < 0 
+          ? TOUR_COLORS.scoreUnderPar 
+          : score > 0 
+            ? TOUR_COLORS.scoreOverPar 
+            : TOUR_COLORS.scoreEven 
+      }}
+    >
+      {formatted}
+    </span>
+  );
 }
 
 // Position badge with podium styling
@@ -72,7 +82,7 @@ function PositionBadge({ position, tied, isMissedCut, status }: {
   return (
     <div className={cn(
       "w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold shrink-0",
-      isTop3 ? podiumStyles[position] : "bg-slate-100 text-slate-600"
+      isTop3 ? podiumStyles[position] : "bg-muted text-muted-foreground"
     )}>
       {display}
     </div>
@@ -102,8 +112,8 @@ function LeaderboardRow({
         to={`/tourhub/player/${entry.player?.id}`}
         className={cn(
           "flex items-center gap-3 py-3 px-3 rounded-xl transition-all duration-200",
-          "hover:bg-slate-50 active:scale-[0.99]",
-          isTop3 && "bg-slate-50/50",
+          "hover:bg-muted active:scale-[0.99]",
+          isTop3 && "bg-muted/50",
           isMissedCut && "opacity-50"
         )}
       >
@@ -127,7 +137,7 @@ function LeaderboardRow({
         {/* Name */}
         <div className="flex-1 min-w-0">
           <p className={cn(
-            "font-semibold truncate text-slate-900",
+            "font-semibold truncate text-foreground",
             isTop3 ? "text-base" : "text-sm"
           )}>
             {entry.player?.full_name || 'Unknown'}
@@ -142,7 +152,7 @@ function LeaderboardRow({
         {/* Thru (if in progress) */}
         {entry.thru !== null && entry.thru < 18 && (
           <div className="text-right shrink-0 w-12 hidden sm:block">
-            <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+            <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
               Thru {entry.thru}
             </span>
           </div>
@@ -158,7 +168,7 @@ function LeaderboardRow({
         )}
         
         {/* Chevron */}
-        <ChevronRight className="w-4 h-4 text-slate-300 shrink-0" />
+        <ChevronRight className="w-4 h-4 text-muted-foreground/50 shrink-0" />
       </Link>
     </motion.div>
   );
@@ -172,25 +182,25 @@ export function LeaderboardCard({
   showHeader = true,
   title = "Leaderboard",
 }: LeaderboardCardProps) {
-  const displayEntries = entries.slice(0, limit);
-  const hasMore = entries.length > limit;
+  const displayEntries = limit === 0 ? entries : entries.slice(0, limit);
+  const hasMore = limit > 0 && entries.length > limit;
   
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
+    <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
       {/* Header */}
       {showHeader && (
-        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border/60">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
               <Trophy className="w-4 h-4 text-amber-600" />
             </div>
-            <h3 className="font-semibold text-slate-900">{title}</h3>
+            <h3 className="font-semibold text-foreground">{title}</h3>
           </div>
           
           {onViewAll && hasMore && (
             <button 
               onClick={onViewAll}
-              className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5"
+              className="text-xs font-semibold text-primary hover:text-primary/80 flex items-center gap-0.5 active:scale-[0.97] transition-transform"
             >
               View All
               <ChevronRight className="w-3.5 h-3.5" />
@@ -200,7 +210,7 @@ export function LeaderboardCard({
       )}
       
       {/* Leaderboard rows */}
-      <div className="divide-y divide-slate-100/50">
+      <div className="divide-y divide-border/50">
         {displayEntries.map((entry, index) => (
           <LeaderboardRow
             key={entry.id}
@@ -215,7 +225,7 @@ export function LeaderboardCard({
       {onViewAll && hasMore && (
         <button 
           onClick={onViewAll}
-          className="w-full py-3 text-sm font-semibold text-emerald-600 hover:bg-slate-50 transition-colors flex items-center justify-center gap-1 border-t border-slate-100"
+          className="w-full py-3 text-sm font-semibold text-primary bg-primary/5 border-t border-primary/10 rounded-b-xl hover:bg-primary/10 transition-colors flex items-center justify-center gap-1 active:scale-[0.97] transition-transform"
         >
           View Full Leaderboard
           <ChevronRight className="w-4 h-4" />

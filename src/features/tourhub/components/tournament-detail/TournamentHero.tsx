@@ -7,6 +7,7 @@
  * - Premium glassmorphism status badges
  * - Gradient scrim overlays
  * - Floating metadata pills
+ * - Line-clamped tournament name
  */
 
 import { format } from 'date-fns';
@@ -70,6 +71,25 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
+// Standardized glassmorphic pill
+function HeroPill({ children, className }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div 
+      className={cn(
+        "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-white active:opacity-70 transition-opacity",
+        className
+      )}
+      style={{ 
+        background: 'rgba(255,255,255,0.12)', 
+        backdropFilter: 'blur(12px)',
+        border: '1px solid rgba(255,255,255,0.1)',
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
 export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
   const formattedPurse = tournament.purse 
     ? `$${(tournament.purse / 1_000_000).toFixed(1)}M`
@@ -88,9 +108,9 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
         {/* Background image with Ken Burns animation */}
         <motion.div
           className="absolute inset-0"
-          initial={{ scale: 1.08 }}
+          initial={{ scale: 1.05 }}
           animate={{ scale: 1 }}
-          transition={{ duration: 12, ease: 'linear' }}
+          transition={{ duration: 20, ease: 'linear' }}
         >
           {imageUrl ? (
             <img 
@@ -135,7 +155,7 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
 
         {/* Content overlay - bottom aligned */}
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6">
-          {/* Tournament Name */}
+          {/* Tournament Name - line clamped */}
           <motion.h1 
             className="font-extrabold text-white mb-3"
             style={{ 
@@ -143,6 +163,10 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
               lineHeight: 1.05,
               letterSpacing: '-0.03em',
               textShadow: '0 4px 24px rgba(0,0,0,0.6)',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
             }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -177,7 +201,7 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
             )}
           </motion.div>
 
-          {/* Glassmorphic metadata pills */}
+          {/* Glassmorphic metadata pills - standardized */}
           <motion.div 
             className="flex flex-wrap items-center gap-2"
             initial={{ opacity: 0, y: 20 }}
@@ -185,49 +209,30 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
             transition={{ delay: 0.2, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           >
             {formattedPurse && (
-              <div 
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-white"
-                style={{ 
-                  background: 'rgba(255,255,255,0.15)', 
-                  backdropFilter: 'blur(12px)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                }}
-              >
+              <HeroPill>
                 <DollarSign className="w-3.5 h-3.5" />
                 <span>{formattedPurse}</span>
-              </div>
+              </HeroPill>
             )}
             
             {tournament.venue_course_name && (
-              <div 
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-white/90"
-                style={{ 
-                  background: 'rgba(255,255,255,0.1)', 
-                  backdropFilter: 'blur(8px)',
-                }}
-              >
+              <HeroPill>
                 <Flag className="w-3.5 h-3.5" />
                 <span className="max-w-[150px] truncate">{tournament.venue_course_name}</span>
-              </div>
+              </HeroPill>
             )}
             
             {tournament.venue_par && (
-              <div 
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs text-white/80"
-                style={{ background: 'rgba(255,255,255,0.08)' }}
-              >
+              <HeroPill>
                 <span>Par {tournament.venue_par}</span>
-              </div>
+              </HeroPill>
             )}
             
             {tournament.venue_yardage && (
-              <div 
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs text-white/80"
-                style={{ background: 'rgba(255,255,255,0.08)' }}
-              >
+              <HeroPill>
                 <Ruler className="w-3.5 h-3.5" />
                 <span>{tournament.venue_yardage.toLocaleString()} yds</span>
-              </div>
+              </HeroPill>
             )}
           </motion.div>
         </div>

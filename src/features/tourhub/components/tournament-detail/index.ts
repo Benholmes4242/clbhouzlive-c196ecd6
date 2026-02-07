@@ -1,6 +1,11 @@
 export { TournamentHero } from './TournamentHero';
 export { LeaderboardCard } from './LeaderboardCard';
+export { FullLeaderboard } from './FullLeaderboard';
 export { CourseInfoCard } from './CourseInfoCard';
 export { TournamentInfoGrid } from './TournamentInfoGrid';
 export { TournamentDetailTabs, type TournamentTab } from './TournamentDetailTabs';
-export { LiveUpdateIndicator } from './LiveUpdateIndicator';
+export { LiveUpdateIndicator, StatusBar } from './LiveUpdateIndicator';
+export { RoundSelector } from './RoundSelector';
+export { TeeTimesTab } from './TeeTimesTab';
+export { HoleStatsTab } from './HoleStatsTab';
+export { SummaryTab } from './SummaryTab';

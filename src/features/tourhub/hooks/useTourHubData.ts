@@ -541,11 +541,108 @@ export function useTourTournamentSummary(tournamentId: string) {
         .eq('tournament_id', tournamentId)
         .single();
       
-      if (error && error.code !== 'PGRST116') { // Not found is ok
+      if (error && error.code !== 'PGRST116') {
         console.error('Error fetching tournament summary:', error);
         return null;
       }
       return data || null;
+    },
+    enabled: !!tournamentId,
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+// Hook: Get enriched tee times with player details
+export function useTourTeeTimesEnriched(tournamentId: string, roundNumber?: number) {
+  return useQuery({
+    queryKey: ['tourhub', 'tee-times-enriched', tournamentId, roundNumber],
+    queryFn: async () => {
+      let query = supabase
+        .from('sr_tee_times')
+        .select(`
+          *,
+          players:sr_tee_time_players(
+            *,
+            player:sr_players(id, full_name, country, country_code, photo_url)
+          )
+        `)
+        .eq('tournament_id', tournamentId)
+        .order('tee_time', { ascending: true });
+      
+      if (roundNumber) {
+        query = query.eq('round_number', roundNumber);
+      }
+      
+      const { data, error } = await query;
+      if (error) {
+        console.error('Error fetching enriched tee times:', error);
+        return [];
+      }
+      return data || [];
+    },
+    enabled: !!tournamentId,
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+// Hook: Get tournament scoring stats aggregated from scorecards
+export function useTournamentScoringStats(tournamentId: string) {
+  return useQuery({
+    queryKey: ['tourhub', 'scoring-stats', tournamentId],
+    queryFn: async () => {
+      // Get scorecards with round summaries (hole_number = 1 has round totals)
+      const { data: scorecards, error } = await supabase
+        .from('sr_scorecards')
+        .select('*')
+        .eq('tournament_id', tournamentId)
+        .eq('hole_number', 1)
+        .not('round_score', 'is', null);
+      
+      if (error) {
+        console.error('Error fetching scoring stats:', error);
+        return null;
+      }
+      
+      if (!scorecards || scorecards.length === 0) return null;
+      
+      // Aggregate by round
+      const roundStats = new Map<number, { scores: number[]; birdies: number; eagles: number; bogeys: number; doubleBogeys: number; pars: number }>();
+      
+      for (const card of scorecards) {
+        if (!card.round_number || card.round_score === null) continue;
+        
+        const existing = roundStats.get(card.round_number) || { scores: [], birdies: 0, eagles: 0, bogeys: 0, doubleBogeys: 0, pars: 0 };
+        existing.scores.push(card.round_score);
+        existing.birdies += card.birdies || 0;
+        existing.eagles += card.eagles || 0;
+        existing.bogeys += card.bogeys || 0;
+        existing.doubleBogeys += card.double_bogeys || 0;
+        existing.pars += card.pars || 0;
+        roundStats.set(card.round_number, existing);
+      }
+      
+      const rounds = Array.from(roundStats.entries()).map(([round, stats]) => ({
+        round,
+        lowScore: Math.min(...stats.scores),
+        avgScore: stats.scores.reduce((a, b) => a + b, 0) / stats.scores.length,
+        playerCount: stats.scores.length,
+        totalBirdies: stats.birdies,
+        totalEagles: stats.eagles,
+        totalBogeys: stats.bogeys,
+        totalDoubleBogeys: stats.doubleBogeys,
+        totalPars: stats.pars,
+      })).sort((a, b) => a.round - b.round);
+      
+      const totalBirdies = rounds.reduce((a, r) => a + r.totalBirdies, 0);
+      const totalEagles = rounds.reduce((a, r) => a + r.totalEagles, 0);
+      const totalBogeys = rounds.reduce((a, r) => a + r.totalBogeys, 0);
+      const totalDoubleBogeys = rounds.reduce((a, r) => a + r.totalDoubleBogeys, 0);
+      const totalPars = rounds.reduce((a, r) => a + r.totalPars, 0);
+      
+      return {
+        rounds,
+        totals: { birdies: totalBirdies, eagles: totalEagles, bogeys: totalBogeys, doubleBogeys: totalDoubleBogeys, pars: totalPars },
+      };
     },
     enabled: !!tournamentId,
     staleTime: 5 * 60 * 1000,
