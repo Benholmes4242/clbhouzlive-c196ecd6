@@ -330,7 +330,7 @@ function PreviewCTA({
         
         {/* Buttons - stacked with primary action first */}
         <div className="flex flex-col gap-2 max-w-xs mx-auto w-full">
-          {/* Primary action — brand primary (emerald) */}
+          {/* Primary action — brand primary */}
           <Button
             className="w-full h-12 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 gap-2 active:scale-[0.97] transition-all duration-200"
             onClick={onShare}

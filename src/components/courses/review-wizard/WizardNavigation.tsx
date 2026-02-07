@@ -74,13 +74,13 @@ export function WizardNavigation({
         </Button>
       )}
 
-      {/* Next/Submit Button - dark sophisticated style */}
+      {/* Next/Submit Button - brand primary */}
       {isLastStep ? (
         <Button
           size="lg"
           onClick={onSubmit}
           disabled={!canProceed || isSubmitting || isDeleting}
-          className="gap-2 min-w-[140px] bg-foreground text-background hover:bg-foreground/90 rounded-full transition-all duration-200"
+          className="gap-2 min-w-[140px] bg-primary text-primary-foreground hover:bg-primary/90 rounded-full active:scale-[0.97] transition-all duration-200"
         >
           {isSubmitting ? (
             <>
@@ -99,7 +99,7 @@ export function WizardNavigation({
           size="lg"
           onClick={onNext}
           disabled={(!canProceed && !isOptionalStep) || isDeleting}
-          className="gap-2 min-w-[120px] bg-foreground text-background hover:bg-foreground/90 rounded-full transition-all duration-200"
+          className="gap-2 min-w-[120px] bg-primary text-primary-foreground hover:bg-primary/90 rounded-full active:scale-[0.97] transition-all duration-200"
         >
           {isOptionalStep && !canProceed ? 'Skip' : 'Next'}
           <ArrowRight className="h-4 w-4" />

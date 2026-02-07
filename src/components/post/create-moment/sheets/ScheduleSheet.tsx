@@ -268,7 +268,7 @@ export default function ScheduleSheet({
               <button
                 onClick={handleSchedule}
                 disabled={!isValidScheduleTime || isScheduling}
-                className="w-full h-14 bg-foreground text-background font-semibold rounded-full hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="w-full h-14 bg-primary text-primary-foreground font-semibold rounded-full hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.97] transition-all duration-200"
               >
                 {isScheduling ? "Scheduling..." : "Schedule Post"}
               </button>
