@@ -26,7 +26,7 @@ export const ViewAllFooter = memo(function ViewAllFooter({ categoryName, accentC
     <div style={{ padding: '4px 20px 20px' }}>
       <button
         onClick={() => navigate('/tourhub/stats')}
-        className="w-full flex items-center justify-center transition-all duration-300 hover:scale-[1.01] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+        className="w-full flex items-center justify-center transition-all duration-300 hover:scale-[1.01] active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
         style={{ 
           padding: '12px',
           background: accent.bgLight,

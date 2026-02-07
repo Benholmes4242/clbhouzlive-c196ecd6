@@ -111,7 +111,7 @@ export const CategoryTabs = memo(function CategoryTabs({
               role="tab"
               aria-selected={isActive}
               aria-label={`${category.name} category`}
-              className="flex items-center whitespace-nowrap flex-shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+              className="flex items-center whitespace-nowrap flex-shrink-0 active:scale-95 transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
               style={{
                 padding: '8px 14px',
                 gap: '6px',

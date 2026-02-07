@@ -60,7 +60,7 @@ export const ClubhouseIntelligence = memo(function ClubhouseIntelligence({
           onClick={() => setIsExpanded(!isExpanded)}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
-          className="flex items-center gap-1.5 mt-3 text-[13px] font-semibold bg-transparent border-none cursor-pointer p-0 transition-colors duration-200"
+          className="flex items-center gap-1.5 mt-3 text-[13px] font-semibold bg-transparent border-none cursor-pointer p-0 transition-colors duration-200 active:opacity-70"
           style={{
             color: isHovered ? '#DAA520' : '#B8860B',
           }}

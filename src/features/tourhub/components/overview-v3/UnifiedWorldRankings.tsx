@@ -509,10 +509,10 @@ export function UnifiedWorldRankings() {
           </h2>
           <button 
             onClick={() => navigate('/tourhub?tab=players')}
-            className="flex items-center gap-1 group transition-all duration-300"
+            className="flex items-center gap-1 group transition-all duration-300 active:scale-[0.97]"
             style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(0, 0, 0, 0.35)' }}
           >
-            <span className="group-hover:text-[#3478F6] transition-colors">View All</span>
+            <span className="group-hover:text-primary transition-colors">View All</span>
             <ChevronRight 
               className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-[3px] transition-all" 
             />
