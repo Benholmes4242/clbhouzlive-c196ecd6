@@ -94,7 +94,7 @@ export function HandicapImprovementLeaderboard({
               profilePhotoUrl={entry.avatar_url}
               isCurrentUser={entry.user_id === user?.id}
             >
-              <div className="flex items-center gap-1 text-[#334E3D]">
+              <div className="flex items-center gap-1 text-emerald-700">
                 <TrendingDown className="h-4 w-4" />
                 <LeaderboardStat
                   value={`-${entry.improvement.toFixed(1)}`}

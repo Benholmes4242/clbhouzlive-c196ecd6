@@ -93,6 +93,7 @@ export function HandicapPodiumSlot({
       className="flex flex-col items-center cursor-pointer relative flex-1"
       initial={{ opacity: 0, scale: 0.95, y: 10 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
+      whileTap={{ scale: 0.97 }}
       transition={{
         duration: 0.3,
         delay: animationDelay,

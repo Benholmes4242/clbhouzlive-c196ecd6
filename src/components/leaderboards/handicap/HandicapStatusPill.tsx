@@ -15,7 +15,7 @@ interface HandicapStatusPillProps {
 }
 
 export function HandicapStatusPill({ label, className }: HandicapStatusPillProps) {
-  const colors = PILL_COLORS[label] || { bg: 'rgba(100, 116, 139, 0.1)', text: '#64748b' };
+  const colors = PILL_COLORS[label] || { bg: 'rgba(100, 116, 139, 0.1)', text: 'hsl(var(--muted-foreground))' };
   
   return (
     <span
