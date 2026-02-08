@@ -25,7 +25,7 @@ export const MediaFilterRow: React.FC<MediaFilterRowProps> = ({
   if (hasUserMedia) tabCount++;
 
   return (
-    <div className="px-4 py-2 bg-slate-50 border-b border-slate-200/60">
+    <div className="px-4 py-2 bg-card border-b border-border/60">
       <Tabs value={filterMode} onValueChange={(v) => onFilterChange(v as MediaFilterMode)} className="w-full">
         <TabsList 
           className="bg-transparent border-0 px-0 py-0 gap-0 w-full flex justify-center"

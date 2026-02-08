@@ -5,8 +5,8 @@ import { adaptExploreContentToMediaItems } from '@/components/media-grid';
 import type { ExtendedMediaItem as NewMediaItem } from '@/components/media-grid';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
-// New components for media tab polish
 import { CourseMediaSummaryCard } from './CourseMediaSummaryCard';
+import { SectionHeading } from './SectionHeading';
 import { SegmentedTabOption } from '@/components/ui/SegmentedTabs';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { MediaFilterMode } from './MediaFilterRow';
@@ -74,7 +74,7 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     }
   }, [mediaResp]);
 
-  // A3: Pre-warm HLS.js when media tab mounts with videos (kept for additional warmup)
+  // A3: Pre-warm HLS.js when media tab mounts with videos
   useEffect(() => {
     if (mediaResp && mediaResp.length > 0) {
       const hasVideos = mediaResp.some(item => item.media_type === 'video');
@@ -86,13 +86,13 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     }
   }, [mediaResp]);
 
-  // Phase 1 Fix #3: Simplified transformation pipeline - pure data transformation
+  // Phase 1 Fix #3: Simplified transformation pipeline
   const exploreItems = useMemo(
     () => adaptClubMediaArrayToExploreItems(mediaResp ?? []),
     [mediaResp]
   );
 
-  // Build summary input items - pure memo
+  // Build summary input items
   const summaryItems = useMemo(
     () =>
       exploreItems.map(item => ({
@@ -104,10 +104,9 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     [exploreItems]
   );
 
-  // ✅ Hook called at top level, outside any memo/effect
   const summary = useCourseMediaSummary(summaryItems, user?.id || null);
 
-  // Contributors in separate memo - pure
+  // Contributors
   const contributors = useMemo(() => {
     const contributorIds = Array.from(new Set(exploreItems.map(item => item.user?.id).filter(Boolean))) as string[];
     return contributorIds.slice(0, 3).map(id => {
@@ -120,16 +119,14 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     }).filter(Boolean) as Array<{ id: string; name: string; avatarUrl: string | null }>;
   }, [exploreItems]);
 
-  // Filter options with clear option when filter active
-  const isFilterActive = filterMode === 'photos' || filterMode === 'videos';
-  
+  // Filter options
   const filterOptions: SegmentedTabOption[] = [
     { value: 'most_recent', label: 'Most recent' },
     { value: 'photos', label: 'Photos' },
     { value: 'videos', label: 'Videos' },
   ];
 
-  // Phase 1 Fix #3: Lightweight filter memo only
+  // Lightweight filter memo
   const filteredItems = useMemo(() => {
     switch (filterMode) {
       case 'videos':
@@ -144,18 +141,18 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     }
   }, [exploreItems, filterMode, user?.id]);
 
-  // Adapt for MediaGrid using filtered items
+  // Adapt for MediaGrid
   const mediaItems = useMemo(
     () => adaptExploreContentToMediaItems(filteredItems),
     [filteredItems]
   );
 
-  // Lazy loading: only mount grid items in/near viewport
+  // Lazy loading
   const { visibleIndices, registerTile } = useLazyTiles({
     totalItems: mediaItems.length,
-    initialVisible: 8, // First 2 rows on mobile (4) or 1 row on desktop (4)
+    initialVisible: 8,
     preloadViewports: 2,
-    estimatedRowHeight: 150, // Smaller tiles = shorter rows
+    estimatedRowHeight: 150,
   });
 
   // Engagement hook for fullscreen
@@ -183,68 +180,56 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     }
   }, [courseId, courseName]);
 
-  // Use unified fullscreen player for course media
+  // Unified fullscreen player
   const { openFullscreen } = useUnifiedFullscreen('explore', {
     allowLandscape: true,
-    
-    // Track current post when user swipes
     onIndexChange: (index) => {
       const currentItem = filteredItems[index];
       setCurrentFullscreenPostId(currentItem?.id || null);
     },
-    
-    // Like handler
     onLike: (itemId) => {
       toggleLike();
     },
-    
-    // Comment handler
-    onComment: (itemId) => {
-      // CommentsPage opens automatically
-    },
-    
-    // Share handler
+    onComment: (itemId) => {},
     onShare: (itemId) => {
       handleShareReview(itemId);
     },
-    
-    // Close handler
     onClose: () => {
       setCurrentFullscreenPostId(null);
     },
   });
 
-  // Phase 1 Fix #4: Memoized click handler - opens unified fullscreen
+  // Memoized click handler
   const handleMediaClick = useCallback((item: NewMediaItem) => {
     const index = filteredItems.findIndex(media => media.id === item.id);
     if (index !== -1) {
-      setCurrentFullscreenPostId(item.id); // Set initial post
+      setCurrentFullscreenPostId(item.id);
       openFullscreen(filteredItems, index);
     }
   }, [filteredItems, openFullscreen]);
 
-  // Loading state with proper skeleton placeholders
+  // Loading skeleton — semantic tokens
   if (isLoading) {
     return (
       <div className="flex flex-col">
-        {/* Header skeleton - slate-50 */}
-        <section className="px-4 pt-6 pb-6 bg-slate-50">
+        {/* Header skeleton */}
+        <section className="px-4 pt-6 pb-6 bg-card">
           <div className="space-y-2">
-            <div className="h-3 w-24 bg-slate-200 rounded animate-pulse" />
-            <div className="h-4 w-32 bg-slate-200 rounded animate-pulse" />
-            <div className="h-3 w-28 bg-slate-200 rounded animate-pulse" />
+            <div className="h-3 w-24 bg-muted rounded animate-pulse" />
+            <div className="h-4 w-32 bg-muted rounded animate-pulse" />
+            <div className="h-3 w-28 bg-muted rounded animate-pulse" />
           </div>
         </section>
-        {/* Filter skeleton - slate-100 */}
-        <section className="px-4 pt-4 pb-4 bg-slate-100">
-          <div className="h-3 w-20 bg-slate-200 rounded animate-pulse mb-3" />
-          <div className="h-10 w-full bg-slate-200 rounded-sq-md animate-pulse" />
+        {/* Filter skeleton */}
+        <section className="px-4 pt-4 pb-4 bg-muted/50">
+          <div className="h-3 w-20 bg-muted rounded animate-pulse mb-3" />
+          <div className="h-10 w-full bg-muted rounded-sq-md animate-pulse" />
         </section>
-        {/* Grid skeleton - slate-50 */}
-        <section className="bg-slate-50">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-[1px] bg-slate-200">
+        {/* Grid skeleton */}
+        <section className="bg-card">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-[1px] bg-border">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="aspect-square bg-slate-100 animate-pulse" />
+              <div key={i} className="aspect-square bg-muted animate-pulse" />
             ))}
           </div>
         </section>
@@ -252,11 +237,11 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     );
   }
 
-  // Error state - slate-50 background
+  // Error state
   if (isError) {
     return (
-      <section className="px-4 py-8 bg-slate-50">
-        <div className="rounded-sq-lg border border-slate-200 bg-white px-4 py-6 text-center">
+      <section className="px-4 py-8 bg-card">
+        <div className="rounded-sq-lg border border-border bg-card px-4 py-6 text-center">
           <p className="text-sm font-semibold text-foreground">Couldn't load media</p>
           <p className="mt-1 text-xs text-muted-foreground">
             Something went wrong. Please try again.
@@ -264,7 +249,7 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
           <button
             type="button"
             onClick={() => refetch()}
-            className="mt-4 inline-flex items-center gap-1.5 rounded-sq-md bg-[#F8FAFC] text-slate-700 px-4 py-2 text-sm font-medium hover:bg-slate-200 active:scale-[0.98] transition-all"
+            className="mt-4 inline-flex items-center gap-1.5 rounded-sq-md bg-muted text-foreground px-4 py-2.5 text-sm font-medium hover:bg-muted/80 active:scale-[0.98] transition-all min-h-[44px]"
           >
             Tap to retry
           </button>
@@ -273,21 +258,13 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     );
   }
 
-  // Empty state and filtered state are handled inline in the main render
-
-  // Calculate overflow count for "+X" indicator on last visible tile
-  const totalMediaCount = exploreItems.length;
-  const visibleCount = 4; // Show 4 tiles in preview
-  const overflowCount = Math.max(0, mediaItems.length - visibleCount);
-
-  // Check if we have any media at all (before filtering)
   const hasAnyMedia = exploreItems.length > 0;
 
   return (
     <div className="flex flex-col">
-      {/* Summary Card - slate-50 background to match About tab pattern */}
+      {/* Summary Card */}
       {hasAnyMedia && (
-        <section className="bg-slate-50">
+        <section className="bg-card">
           <CourseMediaSummaryCard
             photoCount={summary.photoCount}
             videoCount={summary.videoCount}
@@ -298,19 +275,19 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
         </section>
       )}
 
-      {/* Sort/Filter Bar - slate-100 background */}
+      {/* Sort/Filter Bar — SectionHeading for consistency with About tab */}
       {hasAnyMedia && (
-        <section className="px-4 pt-8 pb-6 bg-slate-100">
-          <p className="mb-4 text-[11px] font-semibold tracking-[0.12em] uppercase text-muted-foreground">
-            Sort &amp; filter
-          </p>
+        <section className="px-4 pt-8 pb-6 bg-muted/50">
+          <div className="mb-4">
+            <SectionHeading title="Sort & Filter" />
+          </div>
           <Tabs value={filterMode} onValueChange={(v) => setFilterMode(v as MediaFilterMode)} className="w-full">
             <TabsList className="bg-transparent border-0 px-0 py-0 gap-0 w-full flex justify-center">
               {filterOptions.map((option) => (
                 <TabsTrigger
                   key={option.value}
                   value={option.value}
-                  className="relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]"
+                  className="relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out min-h-[44px] active:scale-[0.98] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]"
                 >
                   {option.label}
                 </TabsTrigger>
@@ -320,10 +297,10 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
         </section>
       )}
 
-      {/* Empty state - no media at all (slate-50 background) */}
+      {/* Empty state — no media at all */}
       {!hasAnyMedia && !isLoading && (
-        <section className="px-4 py-12 bg-slate-50 flex flex-col items-center text-center">
-          <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+        <section className="px-4 pt-8 pb-12 bg-card flex flex-col items-center text-center">
+          <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-4">
             <svg className="h-6 w-6 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -336,19 +313,22 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
           <button
             type="button"
             onClick={() => navigate(`/courses/${courseId}/rate`)}
-            className="inline-flex items-center gap-2 rounded-sq-pill bg-[#F8FAFC] text-slate-700 px-5 py-2.5 text-sm font-medium hover:bg-slate-200 active:scale-[0.98] transition-all"
+            className="inline-flex items-center gap-2 rounded-sq-pill bg-muted text-foreground px-5 py-2.5 text-sm font-medium ring-1 ring-border hover:bg-muted/80 active:scale-[0.98] transition-all min-h-[44px]"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
             Add a photo or video
           </button>
+          <p className="text-xs text-muted-foreground/60 mt-3">
+            Photos help other golfers discover great courses
+          </p>
         </section>
       )}
 
-      {/* Filtered empty state - has media but filter shows none (slate-50 background) */}
+      {/* Filtered empty state */}
       {hasAnyMedia && filteredItems.length === 0 && !isLoading && (
-        <section className="px-4 py-8 bg-slate-50 flex flex-col items-center text-center">
+        <section className="px-4 py-8 bg-card flex flex-col items-center text-center">
           <p className="text-sm font-semibold text-foreground mb-1">
             {filterMode === 'photos' ? 'No photos yet' : 'No videos yet'}
           </p>
@@ -358,21 +338,20 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
           <button
             type="button"
             onClick={() => setFilterMode('most_recent')}
-            className="inline-flex items-center gap-1.5 rounded-sq-sm bg-[#F8FAFC] text-slate-700 px-4 py-2 text-sm font-medium hover:bg-slate-200 active:scale-[0.98] transition-all"
+            className="inline-flex items-center gap-1.5 rounded-sq-sm bg-muted text-foreground px-4 py-2.5 text-sm font-medium hover:bg-muted/80 active:scale-[0.98] transition-all min-h-[44px]"
           >
             Clear filter
           </button>
         </section>
       )}
 
-      {/* Square Media Grid - 2 columns mobile, 4 desktop with lazy loading (slate-50 background) */}
+      {/* Media Grid — 2 columns mobile, 4 desktop, lazy loaded */}
       {filteredItems.length > 0 && (
-        <section className="bg-slate-50">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-[1px] bg-slate-200">
+        <section className="bg-card">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-[1px] bg-border">
             {mediaItems.map((item, index) => {
               const isVisible = visibleIndices.has(index);
               
-              // Render placeholder for tiles not yet visible
               if (!isVisible) {
                 return (
                   <LazyMediaGridItem
@@ -388,17 +367,20 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
                   key={item.id}
                   item={item}
                   onClick={handleMediaClick}
-                  // Show overflow count on 4th tile (index 3) if there's more
-                  overflowCount={index === visibleCount - 1 && overflowCount > 0 ? overflowCount : undefined}
                 />
               );
             })}
           </div>
+
+          {/* End-of-gallery indicator */}
+          <div className="py-6 text-center">
+            <p className="text-xs text-muted-foreground/60">
+              End of gallery
+            </p>
+          </div>
         </section>
       )}
 
-      {/* Unified Fullscreen Player - rendered via context provider in App.tsx */}
-      
       <ScrollToTopGlass />
     </div>
   );
