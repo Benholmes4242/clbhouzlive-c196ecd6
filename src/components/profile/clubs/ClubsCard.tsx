@@ -95,7 +95,7 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
           <motion.button
             onClick={onEditClick}
             whileTap={{ scale: 0.95 }}
-            className="p-2 -m-0.5 rounded-full text-muted-foreground/60 hover:text-foreground hover:bg-muted transition-colors"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full text-muted-foreground/60 hover:text-foreground hover:bg-muted transition-colors"
             aria-label="Edit clubs"
           >
             <Pencil className="w-4 h-4" strokeWidth={2} />
@@ -128,7 +128,7 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
               </p>
             ))}
             {remainingCount > 0 && (
-              <button className="text-xs text-muted-foreground hover:text-foreground hover:underline transition-colors">
+              <button className="text-sm text-muted-foreground hover:text-foreground hover:underline transition-colors min-h-[44px] flex items-center active:scale-[0.98]">
                 + {remainingCount} more
               </button>
             )}
