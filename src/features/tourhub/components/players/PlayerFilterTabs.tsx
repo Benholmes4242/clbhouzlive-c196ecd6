@@ -66,6 +66,7 @@ export function PlayerFilterTabs({
 
         {OPTIONS.map((option) => {
           const isActive = activeFilter === option.value;
+          const count = counts[option.value];
           return (
             <button
               key={option.value}
@@ -81,6 +82,14 @@ export function PlayerFilterTabs({
               )}
             >
               {option.label}
+              {count > 0 && (
+                <span className={cn(
+                  "ml-1 text-[10px] font-bold tabular-nums",
+                  isActive ? "text-foreground/50" : "text-muted-foreground/50"
+                )}>
+                  ({count})
+                </span>
+              )}
             </button>
           );
         })}

@@ -1,23 +1,26 @@
 /**
- * PlayersTab - Clean orchestrator for the Players tab.
+ * PlayersTab - Complete redesign orchestrator.
  * 
  * Features:
- * - World's Best showcase (top 5 OWGR)
- * - Debounced search (200ms, min 2 chars)
- * - Tier filter tabs with URL persistence (?tab=players&tier=elite)
- * - PlayerListRow for all players
- * - Semantic tokens, font-mono stats, tap feedback
+ * - Immersive #1 player hero (adapts per tour)
+ * - Tour filter pills with dynamic counts
+ * - Category filter tabs (Field, Elite, On Tour, Rising)
+ * - Debounced search within active tour
+ * - Load More pagination (50 per batch)
+ * - Dynamic descriptions per tour
+ * - URL persistence (?tab=players&tour=pga&tier=elite)
  */
 
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, X } from 'lucide-react';
+import { Search, X, ChevronDown } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useTourPlayers, type TourPlayer } from '../../hooks/useTourHubData';
 import { useElitePlayers, type ElitePlayer } from '../../hooks/useElitePlayers';
-import { useActivePlayers, type ActivePlayer } from '../../hooks/useActivePlayers';
-import { PlayersWorldsBest } from '../players/PlayersWorldsBest';
+import { useActivePlayers } from '../../hooks/useActivePlayers';
+import { PlayersHero } from '../players/PlayersHero';
+import { PlayersTourFilter, type PlayerTourCode, TOUR_LABELS } from '../players/PlayersTourFilter';
 import { PlayerFilterTabs, type PlayerTierType } from '../players/PlayerFilterTabs';
 import { PlayerListRow } from '../players/PlayerListRow';
 import { PlayersEmptyState } from '../players/PlayersEmptyState';
@@ -37,19 +40,46 @@ function useDebouncedValue(value: string, delay: number): string {
   return debounced;
 }
 
-const TIER_DESCRIPTIONS: Record<PlayerTierType, string> = {
-  field: 'The complete PGA Tour field for the current season.',
-  elite: 'Top 50 in the Official World Golf Ranking.',
-  active: 'Players with 10+ events this season.',
-  rising: 'Players who turned pro in the last 3 years.',
-};
+/** Dynamic tier descriptions that adapt to tour filter */
+function getTierDescription(tier: PlayerTierType, activeTour: PlayerTourCode): string {
+  const tourLabel = activeTour === 'all' ? 'tour' : TOUR_LABELS[activeTour];
 
-const DISPLAY_LIMIT = 100;
+  switch (tier) {
+    case 'field':
+      return `The complete ${tourLabel} field for the current season.`;
+    case 'elite':
+      return activeTour === 'all'
+        ? 'Top 50 in the Official World Golf Ranking.'
+        : `Top-ranked ${tourLabel} players by OWGR.`;
+    case 'active':
+      return `Players with 10+ events this season.`;
+    case 'rising':
+      return `Players who turned pro in the last 3 years.`;
+  }
+}
+
+const PAGE_SIZE = 50;
 
 export function PlayersTab() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebouncedValue(search, 200);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const listRef = useRef<HTMLDivElement>(null);
+
+  // Tour filter from URL
+  const activeTour = (searchParams.get('tour') as PlayerTourCode) || 'all';
+  const setActiveTour = useCallback((tour: PlayerTourCode) => {
+    const params = new URLSearchParams(searchParams);
+    if (tour === 'all') {
+      params.delete('tour');
+    } else {
+      params.set('tour', tour);
+    }
+    params.set('tab', 'players');
+    setSearchParams(params, { replace: true });
+    setVisibleCount(PAGE_SIZE); // Reset pagination on tour change
+  }, [searchParams, setSearchParams]);
 
   // Tier from URL
   const tier = (searchParams.get('tier') as PlayerTierType) || 'field';
@@ -62,29 +92,67 @@ export function PlayersTab() {
     }
     params.set('tab', 'players');
     setSearchParams(params, { replace: true });
+    setVisibleCount(PAGE_SIZE); // Reset pagination on tier change
   }, [searchParams, setSearchParams]);
 
   // Data hooks
   const { data: allPlayers, isLoading: allLoading } = useTourPlayers();
   const { data: elitePlayers, isLoading: eliteLoading } = useElitePlayers(50);
-  const { data: activePlayers, isLoading: activeLoading } = useActivePlayers(10, 100);
+  const { data: activePlayers, isLoading: activeLoading } = useActivePlayers(10, 200);
 
-  const isLoading = tier === 'elite' ? eliteLoading : tier === 'active' ? activeLoading : allLoading;
+  // Reset pagination when search changes
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [debouncedSearch]);
 
-  // World's Best top 5
-  const worldTop5 = useMemo(() => {
-    if (!elitePlayers) return [];
-    return elitePlayers.slice(0, 5);
-  }, [elitePlayers]);
+  // ─── Tour-level filtering ───
+  const tourFilteredPlayers = useMemo(() => {
+    if (!allPlayers || activeTour === 'all') return allPlayers || [];
+    return allPlayers.filter(p =>
+      p.tour_codes && p.tour_codes.includes(activeTour)
+    );
+  }, [allPlayers, activeTour]);
 
-  // Search filter helper
+  // Tour counts for the filter pills
+  const tourCounts = useMemo(() => {
+    if (!allPlayers) return {};
+    const counts: Record<string, number> = {};
+    allPlayers.forEach(p => {
+      if (p.tour_codes) {
+        p.tour_codes.forEach(code => {
+          counts[code] = (counts[code] || 0) + 1;
+        });
+      }
+    });
+    return counts;
+  }, [allPlayers]);
+
+  // ─── Hero: find the #1 player per tour ───
+  const heroPlayers = useMemo<ElitePlayer[]>(() => {
+    if (!elitePlayers || elitePlayers.length === 0) return [];
+
+    if (activeTour === 'all') {
+      return elitePlayers.slice(0, 5);
+    }
+
+    // Filter elite players to those on the active tour
+    const tourElite = elitePlayers.filter(ep => {
+      // Match against allPlayers tour_codes
+      const player = allPlayers?.find(p => p.id === ep.playerId);
+      return player?.tour_codes?.includes(activeTour);
+    });
+
+    return tourElite.slice(0, 5);
+  }, [elitePlayers, activeTour, allPlayers]);
+
+  // ─── Search filter ───
   const matchesSearch = useCallback((name: string, country: string | null) => {
     if (!debouncedSearch || debouncedSearch.length < 2) return true;
     const q = debouncedSearch.toLowerCase();
     return name.toLowerCase().includes(q) || (country?.toLowerCase().includes(q) ?? false);
   }, [debouncedSearch]);
 
-  // Processed players per tier
+  // ─── Pipeline: tour → search → category → pagination ───
   const { rows, totalCount } = useMemo(() => {
     let items: Array<{
       id: string;
@@ -102,7 +170,15 @@ export function PlayersTab() {
     switch (tier) {
       case 'elite': {
         if (!elitePlayers) break;
-        const filtered = elitePlayers.filter(p => matchesSearch(p.playerName, p.country));
+        // Filter elite by tour membership
+        let filtered = elitePlayers;
+        if (activeTour !== 'all') {
+          filtered = filtered.filter(ep => {
+            const player = allPlayers?.find(p => p.id === ep.playerId);
+            return player?.tour_codes?.includes(activeTour);
+          });
+        }
+        filtered = filtered.filter(p => matchesSearch(p.playerName, p.country));
         items = filtered.map(p => ({
           id: p.playerId,
           fullName: p.playerName,
@@ -119,7 +195,14 @@ export function PlayersTab() {
       }
       case 'active': {
         if (!activePlayers) break;
-        const filtered = activePlayers.filter(p => matchesSearch(p.playerName, p.country));
+        let filtered = activePlayers;
+        if (activeTour !== 'all') {
+          filtered = filtered.filter(ap => {
+            const player = allPlayers?.find(p => p.id === ap.playerId);
+            return player?.tour_codes?.includes(activeTour);
+          });
+        }
+        filtered = filtered.filter(p => matchesSearch(p.playerName, p.country));
         items = filtered.map((p, i) => ({
           id: p.playerId,
           fullName: p.playerName,
@@ -135,9 +218,8 @@ export function PlayersTab() {
         break;
       }
       case 'rising': {
-        if (!allPlayers) break;
         const currentYear = new Date().getFullYear();
-        const rising = allPlayers
+        const rising = tourFilteredPlayers
           .filter(p => p.turned_pro != null && p.turned_pro >= currentYear - 3 && matchesSearch(p.full_name, p.country))
           .sort((a, b) => (b.turned_pro || 0) - (a.turned_pro || 0));
         items = rising.map(p => ({
@@ -154,9 +236,8 @@ export function PlayersTab() {
         break;
       }
       default: {
-        // field
-        if (!allPlayers) break;
-        const filtered = allPlayers
+        // field — use tour-filtered players
+        const filtered = tourFilteredPlayers
           .filter(p => matchesSearch(p.full_name, p.country))
           .sort((a, b) => a.full_name.localeCompare(b.full_name));
         items = filtered.map(p => ({
@@ -173,34 +254,51 @@ export function PlayersTab() {
     }
 
     return { rows: items, totalCount: items.length };
-  }, [tier, allPlayers, elitePlayers, activePlayers, debouncedSearch, matchesSearch]);
+  }, [tier, tourFilteredPlayers, elitePlayers, activePlayers, allPlayers, activeTour, debouncedSearch, matchesSearch]);
 
-  // Counts for filter tabs
-  const counts = useMemo(() => ({
-    field: allPlayers?.length || 0,
-    elite: elitePlayers?.length || 0,
-    active: activePlayers?.length || 0,
-    rising: allPlayers?.filter(p => {
-      const y = new Date().getFullYear();
-      return p.turned_pro != null && p.turned_pro >= y - 3;
-    }).length || 0,
-  }), [allPlayers, elitePlayers, activePlayers]);
+  // ─── Dynamic counts per tier (filtered by active tour) ───
+  const counts = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    const fieldCount = tourFilteredPlayers.length;
 
-  const displayRows = rows.slice(0, DISPLAY_LIMIT);
-  const hasMore = totalCount > DISPLAY_LIMIT;
-  const showWorldsBest = tier === 'field' && !debouncedSearch;
+    // Elite filtered by tour
+    let eliteCount = elitePlayers?.length || 0;
+    if (activeTour !== 'all' && elitePlayers && allPlayers) {
+      eliteCount = elitePlayers.filter(ep => {
+        const player = allPlayers.find(p => p.id === ep.playerId);
+        return player?.tour_codes?.includes(activeTour);
+      }).length;
+    }
+
+    // Active filtered by tour
+    let activeCount = activePlayers?.length || 0;
+    if (activeTour !== 'all' && activePlayers && allPlayers) {
+      activeCount = activePlayers.filter(ap => {
+        const player = allPlayers.find(p => p.id === ap.playerId);
+        return player?.tour_codes?.includes(activeTour);
+      }).length;
+    }
+
+    const risingCount = tourFilteredPlayers.filter(p =>
+      p.turned_pro != null && p.turned_pro >= currentYear - 3
+    ).length;
+
+    return { field: fieldCount, elite: eliteCount, active: activeCount, rising: risingCount };
+  }, [tourFilteredPlayers, elitePlayers, activePlayers, allPlayers, activeTour]);
+
+  const displayRows = rows.slice(0, visibleCount);
+  const hasMore = visibleCount < totalCount;
+  const showHero = tier === 'field' && !debouncedSearch;
+  const isLoading = tier === 'elite' ? eliteLoading : tier === 'active' ? activeLoading : allLoading;
 
   // Loading skeleton
   if (isLoading && totalCount === 0) {
     return (
       <div className="space-y-4 py-6">
-        {/* World's Best skeleton */}
-        <div className="rounded-2xl bg-muted/50 h-[280px] animate-pulse" />
-        {/* Search skeleton */}
+        <div className="rounded-2xl bg-muted/50 h-[340px] animate-pulse" />
         <div className="bg-muted/50 h-12 rounded-xl animate-pulse" />
-        {/* Filter skeleton */}
         <div className="bg-muted/50 h-12 rounded-xl animate-pulse" />
-        {/* Row skeletons */}
+        <div className="bg-muted/50 h-12 rounded-xl animate-pulse" />
         <div className="rounded-2xl border border-border/50 overflow-hidden">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="h-[72px] bg-muted/30 border-b border-border/30 animate-pulse" />
@@ -212,9 +310,9 @@ export function PlayersTab() {
 
   return (
     <div className="space-y-4 py-6">
-      {/* World's Best */}
-      {showWorldsBest && worldTop5.length > 0 && (
-        <PlayersWorldsBest players={worldTop5} />
+      {/* Immersive Hero */}
+      {showHero && heroPlayers.length > 0 && (
+        <PlayersHero players={heroPlayers} activeTour={activeTour} />
       )}
 
       {/* Search */}
@@ -248,7 +346,14 @@ export function PlayersTab() {
         </AnimatePresence>
       </div>
 
-      {/* Filter tabs */}
+      {/* Tour filter pills */}
+      <PlayersTourFilter
+        activeTour={activeTour}
+        onTourChange={setActiveTour}
+        tourCounts={tourCounts}
+      />
+
+      {/* Category filter tabs */}
       <PlayerFilterTabs
         activeFilter={tier}
         onFilterChange={setTier}
@@ -258,7 +363,7 @@ export function PlayersTab() {
       {/* Context line */}
       <div className="flex items-center justify-between px-1">
         <p className="text-sm text-muted-foreground">
-          {TIER_DESCRIPTIONS[tier]}
+          {getTierDescription(tier, activeTour)}
         </p>
         <p className="text-sm font-mono text-muted-foreground shrink-0 ml-3">
           {totalCount} player{totalCount !== 1 ? 's' : ''}
@@ -266,36 +371,51 @@ export function PlayersTab() {
       </div>
 
       {/* Player list */}
-      {displayRows.length > 0 ? (
-        <div className="bg-card rounded-2xl border border-border/50 overflow-hidden">
-          {displayRows.map((row) => (
-            <PlayerListRow
-              key={row.id}
-              player={{
-                id: row.id,
-                fullName: row.fullName,
-                country: row.country,
-                countryCode: row.countryCode,
-                photoUrl: row.photoUrl,
-                pgaTourId: row.pgaTourId,
-              }}
-              rank={row.rank}
-              statValue={row.statValue}
-              statLabel={row.statLabel}
-              variant={row.variant}
-            />
-          ))}
-        </div>
-      ) : (
-        <PlayersEmptyState />
-      )}
+      <div ref={listRef}>
+        {displayRows.length > 0 ? (
+          <div className="bg-card rounded-2xl border border-border/50 overflow-hidden">
+            {displayRows.map((row) => (
+              <PlayerListRow
+                key={row.id}
+                player={{
+                  id: row.id,
+                  fullName: row.fullName,
+                  country: row.country,
+                  countryCode: row.countryCode,
+                  photoUrl: row.photoUrl,
+                  pgaTourId: row.pgaTourId,
+                }}
+                rank={row.rank}
+                statValue={row.statValue}
+                statLabel={row.statLabel}
+                variant={row.variant}
+              />
+            ))}
+          </div>
+        ) : (
+          <PlayersEmptyState />
+        )}
+      </div>
 
-      {/* Pagination notice */}
+      {/* Load More button */}
       {hasMore && (
-        <p className="text-center text-sm text-muted-foreground py-2">
-          Showing <span className="font-mono">{DISPLAY_LIMIT}</span> of{' '}
-          <span className="font-mono">{totalCount}</span> players. Search to find specific players.
-        </p>
+        <div className="flex flex-col items-center gap-2 pt-2">
+          <button
+            onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
+            className={cn(
+              "w-full max-w-xs h-11 flex items-center justify-center gap-1.5",
+              "rounded-xl border border-border bg-card",
+              "text-sm font-medium text-foreground",
+              "hover:bg-muted/50 active:scale-[0.98] transition-all"
+            )}
+          >
+            Show {Math.min(PAGE_SIZE, totalCount - visibleCount)} more players
+            <ChevronDown className="w-4 h-4" />
+          </button>
+          <p className="text-[11px] text-muted-foreground">
+            Showing {visibleCount} of {totalCount} players
+          </p>
+        </div>
       )}
     </div>
   );

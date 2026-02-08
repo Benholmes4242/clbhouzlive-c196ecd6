@@ -8553,6 +8553,7 @@ export type Database = {
           raw_data: Json | null
           residence: string | null
           sr_id: string
+          tour_codes: string[] | null
           turned_pro: number | null
           updated_at: string | null
           weight: string | null
@@ -8582,6 +8583,7 @@ export type Database = {
           raw_data?: Json | null
           residence?: string | null
           sr_id: string
+          tour_codes?: string[] | null
           turned_pro?: number | null
           updated_at?: string | null
           weight?: string | null
@@ -8611,6 +8613,7 @@ export type Database = {
           raw_data?: Json | null
           residence?: string | null
           sr_id?: string
+          tour_codes?: string[] | null
           turned_pro?: number | null
           updated_at?: string | null
           weight?: string | null
