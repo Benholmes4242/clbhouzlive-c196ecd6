@@ -145,12 +145,12 @@ function TableSkeletonRow({ index }: { index: number }) {
         </div>
       </div>
       <div className="flex gap-2">
-        {[1, 2, 3].map(i => (
+        {[1, 2].map(i => (
           <div 
             key={i}
             className="h-4 rounded"
             style={{
-              width: i === 3 ? '48px' : '64px',
+              width: '64px',
               background: 'linear-gradient(90deg, #F1F3F5 25%, #E5E7EB 50%, #F1F3F5 75%)',
               backgroundSize: '200% 100%',
               animation: 'shimmer 1.5s infinite linear',
@@ -223,7 +223,7 @@ interface CompactMoverCardProps {
 function CompactMoverCard({ entry, index, onTap }: CompactMoverCardProps) {
   const isUp = entry.rankChange > 0;
   const badgeStyle = getMovementBadgeStyle(entry.rankChange);
-  const initials = `${entry.firstName?.[0] ?? ''}${entry.lastName?.[0] ?? ''}`.toUpperCase() || '?';
+  const initials = `${entry.firstName?.[0] ?? ''}${entry.lastName?.[0] ?? ''}`.toUpperCase() || 'N/A';
 
   return (
     <motion.button
@@ -649,20 +649,6 @@ export function UnifiedWorldRankings() {
             >
               Total Pts
             </div>
-            <div 
-              style={{ 
-                width: '48px', 
-                flexShrink: 0, 
-                textAlign: 'right',
-                fontSize: '10px', 
-                fontWeight: 600, 
-                letterSpacing: '0.8px', 
-                textTransform: 'uppercase', 
-                color: 'rgba(0, 0, 0, 0.3)',
-              }}
-            >
-              Events
-            </div>
           </div>
           
           {/* Player Rows */}
@@ -840,19 +826,6 @@ export function UnifiedWorldRankings() {
                     </span>
                   </div>
 
-                  {/* Column 5: Events */}
-                  <div style={{ width: '48px', flexShrink: 0, textAlign: 'right' }}>
-                    <span 
-                      style={{ 
-                        fontFamily: "'JetBrains Mono', monospace",
-                        fontSize: '13px', 
-                        fontWeight: 500,
-                        color: 'rgba(0, 0, 0, 0.35)',
-                      }}
-                    >
-                      {entry.events_played ?? '—'}
-                    </span>
-                  </div>
                 </motion.div>
               );
             })}
