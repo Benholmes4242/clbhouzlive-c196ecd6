@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Squircle } from '@/components/ui/squircle';
-import { ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
+import { ExternalLink, ChevronDown } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
 import type { FriendCourseHit } from '@/hooks/useFriendsCourses';
 
 interface ActivityClusterProps {
@@ -70,12 +71,14 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
     setIsExpanded(!isExpanded);
   };
 
+  const scoreColor = communityRating && communityRating >= 9.0 ? 'text-amber-500' : 'text-foreground';
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2, delay: index * 0.03 }}
-      className="bg-card border border-border/60 rounded-xl overflow-hidden hover:shadow-md active:shadow-sm transition-shadow cursor-pointer group"
+      className="bg-card border border-border/60 rounded-xl overflow-hidden hover:shadow-md active:scale-[0.98] active:shadow-sm transition-all cursor-pointer group"
       onClick={handleCourseClick}
     >
       <div className="p-4">
@@ -88,7 +91,7 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
             </p>
             {/* Subline */}
             <p className="text-xs text-muted-foreground mt-0.5">
-              Most recent: <span className="text-slate-500">{mostRecentName}</span> · {formatTimeCompact(mostRecentPlayedAt)} ago
+              Most recent: <span className="text-muted-foreground">{mostRecentName}</span> · {formatTimeCompact(mostRecentPlayedAt)} ago
             </p>
           </div>
 
@@ -131,7 +134,7 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
             ))}
             {friends.length > 4 && (
               <div
-                className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 border-2 border-card shadow-sm text-xs font-medium text-slate-600"
+                className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-muted border-2 border-card shadow-sm text-xs font-medium text-muted-foreground"
                 style={{ zIndex: 5 }}
               >
                 +{friends.length - 4}
@@ -143,7 +146,7 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
           {communityRating && (
             <div className="flex items-center gap-1 w-14 justify-center">
               <ClubhouseLogo className="h-4 w-4" />
-              <span className="text-xs font-semibold text-foreground tabular-nums">{communityRating.toFixed(1)}</span>
+              <span className={cn("text-xs font-semibold tabular-nums", scoreColor)}>{communityRating.toFixed(1)}</span>
             </div>
           )}
         </div>
@@ -152,7 +155,7 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/40">
           <button
             onClick={handleCourseClick}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 transition-colors min-h-[36px]"
+            className="flex items-center gap-1.5 min-h-[44px] px-4 py-2 rounded-full text-xs font-medium text-primary bg-primary/5 border border-primary/15 hover:bg-primary/10 active:scale-[0.97] transition-all"
           >
             <ExternalLink className="w-3.5 h-3.5" />
             View course
@@ -161,7 +164,7 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
           {friends.length > 1 && (
             <button
               onClick={toggleExpand}
-              className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-700 transition-colors px-2 py-1.5 min-h-[36px] rounded-md hover:bg-slate-100"
+              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground min-h-[44px] px-3 py-2 rounded-md hover:bg-muted active:scale-[0.97] transition-all"
             >
               {isExpanded ? 'Hide' : 'Show friends'}
               <motion.div
@@ -214,7 +217,10 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
                       {friend.rating ? (
                         <>
                           <ClubhouseLogo size="xs" />
-                          <span className="text-sm font-semibold text-foreground tabular-nums">{friend.rating.toFixed(1)}</span>
+                          <span className={cn(
+                            "text-sm font-semibold tabular-nums",
+                            friend.rating >= 9.0 ? 'text-amber-500' : 'text-foreground'
+                          )}>{friend.rating.toFixed(1)}</span>
                         </>
                       ) : (
                         <span className="text-xs text-muted-foreground">—</span>

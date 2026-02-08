@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 interface FriendsSnapshotCardProps {
   timeframe: string;
@@ -58,7 +59,7 @@ const StatCell: React.FC<StatCellProps> = ({ label, value, hasRightDivider, inde
     className="text-center relative group cursor-default"
   >
     {/* Hover effect */}
-    <div className="absolute inset-0 -m-2 rounded-lg bg-slate-100/0 group-hover:bg-slate-100/50 transition-colors duration-200" />
+    <div className="absolute inset-0 -m-2 rounded-lg bg-muted/0 group-hover:bg-muted/50 transition-colors duration-200" />
     <div className="relative">
       <div className="text-[10px] uppercase tracking-[0.12em] font-medium text-muted-foreground/75">
         {label}
@@ -69,7 +70,7 @@ const StatCell: React.FC<StatCellProps> = ({ label, value, hasRightDivider, inde
     </div>
     {/* Vertical divider */}
     {hasRightDivider && (
-      <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-px bg-slate-200/60" />
+      <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-px bg-border/60" />
     )}
   </motion.div>
 );
@@ -98,12 +99,14 @@ const FriendsSnapshotCard: React.FC<FriendsSnapshotCardProps> = ({
     }
   };
 
+  const playedColor = userPlayedCount === 0 ? 'text-amber-500' : 'text-foreground';
+
   return (
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="rounded-xl overflow-hidden"
+      className="rounded-xl overflow-hidden border border-border/60 shadow-sm"
     >
       {/* Stats Grid - 2×2 with dividers and premium hierarchy */}
       <div className="relative bg-gradient-to-br from-primary/[0.04] to-primary/[0.02] px-4 py-5">
@@ -123,7 +126,7 @@ const FriendsSnapshotCard: React.FC<FriendsSnapshotCardProps> = ({
 
           {/* Horizontal divider - centered */}
           <div className="col-span-2 flex justify-center my-1">
-            <div className="h-px w-[calc(100%-2rem)] bg-slate-200/60" />
+            <div className="h-px w-[calc(100%-2rem)] bg-border/60" />
           </div>
 
           {/* Row 2 */}
@@ -151,10 +154,10 @@ const FriendsSnapshotCard: React.FC<FriendsSnapshotCardProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.3 }}
-            className="mt-4 pt-3 border-t border-slate-200/60"
+            className="mt-4 pt-3 border-t border-border/60"
           >
-            <p className="text-sm text-center text-slate-600">
-              You've played <span className="font-bold text-foreground tabular-nums">{animatedUserPlayed}</span> of the <span className="font-bold text-foreground tabular-nums">{animatedCourses}</span> courses your friends played
+            <p className="text-sm text-center text-muted-foreground">
+              You've played <span className={cn("font-bold tabular-nums", playedColor)}>{animatedUserPlayed}</span> of the <span className="font-bold text-foreground tabular-nums">{animatedCourses}</span> courses your friends played
             </p>
           </motion.div>
         )}

@@ -47,15 +47,16 @@ const FriendsHeroCourseCard: React.FC<FriendsHeroCourseCardProps> = ({ course, f
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="relative overflow-hidden rounded-none hover:shadow-lg transition-all duration-200 cursor-pointer bg-card border border-border/60 shadow-md group"
+      className="relative overflow-hidden rounded-none hover:shadow-lg active:scale-[0.98] transition-all duration-200 cursor-pointer bg-card border border-border/60 shadow-md group"
       onClick={() => navigate(`/courses/${course.course_id}`)}
     >
-      {/* Course Image - 6% taller aspect ratio */}
+      {/* Course Image */}
       {course.thumbnail_url && (
         <div className="relative w-full aspect-[1.77/1] overflow-hidden">
           <img
             src={course.thumbnail_url}
             alt={course.course_name}
+            loading="lazy"
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
             onError={(e) => {
               e.currentTarget.src = '/placeholder.svg';
@@ -79,7 +80,7 @@ const FriendsHeroCourseCard: React.FC<FriendsHeroCourseCardProps> = ({ course, f
         </div>
       )}
       
-      {/* Course Info - 12px internal stack */}
+      {/* Course Info */}
       <div className="px-4 py-3 space-y-3">
         {/* Course name with highlight pill on same line */}
         <div className="flex items-start justify-between gap-3">
@@ -140,7 +141,7 @@ const FriendsHeroCourseCard: React.FC<FriendsHeroCourseCardProps> = ({ course, f
             ))}
             {extraCount > 0 && (
               <div 
-                className="relative flex items-center justify-center w-9 h-9 rounded-lg bg-slate-100 border-2 border-card shadow-sm text-xs font-medium text-slate-600"
+                className="relative flex items-center justify-center w-9 h-9 rounded-lg bg-muted border-2 border-card shadow-sm text-xs font-medium text-muted-foreground"
                 style={{ zIndex: 6 }}
               >
                 +{extraCount}

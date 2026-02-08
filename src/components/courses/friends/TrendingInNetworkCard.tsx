@@ -27,7 +27,7 @@ const TrendingInNetworkCard: React.FC<TrendingInNetworkCardProps> = ({ courses }
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: 0.15 }}
     >
-      <Card className="bg-card border border-slate-200/80 rounded-xl shadow-sm overflow-hidden">
+      <Card className="bg-card border border-border/60 rounded-xl shadow-sm overflow-hidden">
         {/* Header */}
         <div className="px-4 py-3 border-b border-border/60">
           <div className="flex items-center gap-2.5">
@@ -50,7 +50,7 @@ const TrendingInNetworkCard: React.FC<TrendingInNetworkCardProps> = ({ courses }
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.2, delay: 0.1 + index * 0.05 }}
               onClick={() => navigate(`/courses/${course.course_id}`)}
-              className={`px-4 py-3.5 flex items-center gap-3 hover:bg-muted/40 active:bg-muted/60 transition-colors cursor-pointer ${
+              className={`px-4 py-3.5 flex items-center gap-3 hover:bg-muted/40 active:bg-muted/60 active:scale-[0.98] transition-all cursor-pointer ${
                 index !== trendingCourses.length - 1 ? 'border-b border-border/40' : ''
               }`}
             >
@@ -77,8 +77,8 @@ const TrendingInNetworkCard: React.FC<TrendingInNetworkCardProps> = ({ courses }
                 </p>
               </div>
 
-              {/* Friends count pill - neutral style matching other badges */}
-              <span className="shrink-0 self-center inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-700">
+              {/* Friends count pill */}
+              <span className="shrink-0 self-center inline-flex items-center rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-medium text-foreground">
                 {course.total_friends_played} friend{course.total_friends_played !== 1 ? 's' : ''}
               </span>
             </motion.div>
