@@ -31,20 +31,20 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId }) => {
       }));
   }, [friends]);
 
-  // Loading state - no card wrapper
+  // Loading state
   if (isLoading) {
     return (
       <section>
-        <h2 className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500 mb-4">
+        <h2 className="text-sm font-semibold text-muted-foreground mb-4">
           Friends Leaderboard
         </h2>
         <div className="animate-pulse space-y-3">
           {[1, 2, 3].map(i => (
             <div key={i} className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-slate-200/60 rounded-lg" />
-              <div className="w-8 h-8 bg-slate-200/60 rounded-full" />
-              <div className="flex-1 h-4 bg-slate-200/60 rounded" />
-              <div className="w-8 h-4 bg-slate-200/60 rounded" />
+              <div className="w-8 h-8 bg-muted rounded-lg" />
+              <div className="w-8 h-8 bg-muted rounded-full" />
+              <div className="flex-1 h-4 bg-muted rounded" />
+              <div className="w-8 h-4 bg-muted rounded" />
             </div>
           ))}
         </div>
@@ -57,26 +57,26 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId }) => {
     return null;
   }
 
-  // Empty state - no card wrapper
+  // Empty state
   if (rankedFriends.length === 0) {
     return (
       <section>
-        <h2 className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500 mb-4">
+        <h2 className="text-sm font-semibold text-muted-foreground mb-4">
           Friends Leaderboard
         </h2>
         <div className="text-center py-6">
-          <div className="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
-            <UserPlus className="w-7 h-7 text-[#64748b]" />
+          <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+            <UserPlus className="w-7 h-7 text-muted-foreground" />
           </div>
-          <h3 className="text-base font-bold text-[#1e293b] mb-2">
+          <h3 className="text-base font-bold text-foreground mb-2">
             Add friends to see how you compare!
           </h3>
-          <p className="text-sm text-[#64748b] mb-4 max-w-[280px] mx-auto">
+          <p className="text-sm text-muted-foreground mb-4 max-w-[280px] mx-auto">
             Connect with other golfers to track their Top 100 journey alongside yours
           </p>
           <button
             onClick={() => navigate('/discover')}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-[#334E3D] text-white hover:bg-[#2a4033] transition-colors"
+            className="inline-flex items-center gap-2 px-4 min-h-[44px] rounded-full text-sm font-semibold bg-[#334E3D] text-white hover:bg-[#2a4033] transition-colors active:scale-[0.98]"
           >
             <Users className="w-4 h-4" />
             Find Golfers
@@ -99,13 +99,13 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId }) => {
       case 3:
         return { bg: 'rgba(205, 127, 50, 0.15)', border: 'rgba(205, 127, 50, 0.3)', color: '#CD7F32' };
       default:
-        return { bg: 'rgba(148, 163, 184, 0.1)', border: 'rgba(148, 163, 184, 0.2)', color: '#64748b' };
+        return { bg: 'rgba(148, 163, 184, 0.1)', border: 'rgba(148, 163, 184, 0.2)', color: 'hsl(var(--muted-foreground))' };
     }
   };
 
   return (
     <section>
-      <h2 className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500 mb-4">
+      <h2 className="text-sm font-semibold text-muted-foreground mb-4">
         Friends Leaderboard
       </h2>
       
@@ -122,7 +122,7 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId }) => {
             return (
               <motion.div
                 key={entry.id}
-                className="flex items-center gap-3 p-2.5 rounded-xl"
+                className="flex items-center gap-3 p-2.5 rounded-xl min-h-[44px] active:opacity-80 transition-opacity"
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
@@ -139,8 +139,7 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId }) => {
                     <Medal className="w-4 h-4" style={{ color: rankStyle.color }} />
                   ) : (
                     <span 
-                      className="text-xs font-bold"
-                      style={{ color: rankStyle.color }}
+                      className="text-xs font-bold text-muted-foreground"
                     >
                       {entry.rank}
                     </span>
@@ -157,7 +156,7 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId }) => {
 
                 {/* Name */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold truncate text-[#1e293b]">
+                  <p className="text-sm font-semibold truncate text-foreground">
                     {entry.displayName}
                   </p>
                 </div>
@@ -165,7 +164,7 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId }) => {
                 {/* Score */}
                 <div className="flex items-center gap-1.5 flex-shrink-0">
                   <Trophy className="w-4 h-4 text-[#C1A84C]" />
-                  <span className="text-sm font-bold text-[#1e293b]">
+                  <span className="text-sm font-bold text-foreground">
                     {entry.totalPlayed}
                   </span>
                 </div>
@@ -176,16 +175,16 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId }) => {
 
         {/* Remaining entries (4-10) - compact list */}
         {remaining.length > 0 && (
-          <div className="border-t border-slate-200/60 pt-3 mt-3 space-y-1">
+          <div className="border-t border-border pt-3 mt-3 space-y-1">
             {remaining.map((entry, index) => (
               <motion.div
                 key={entry.id}
-                className="flex items-center gap-3 py-1.5 px-2"
+                className="flex items-center gap-3 py-1.5 px-2 min-h-[44px] active:opacity-80 transition-opacity"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.15 + index * 0.03 }}
               >
-                <span className="w-6 text-xs font-medium text-[#94a3b8] text-center">
+                <span className="w-6 text-xs font-medium text-muted-foreground text-center">
                   {entry.rank}
                 </span>
                 <SquircleAvatar
@@ -194,10 +193,10 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId }) => {
                   alt={entry.displayName}
                   fallback={entry.displayName.charAt(0).toUpperCase()}
                 />
-                <span className="flex-1 text-sm truncate text-[#64748b]">
+                <span className="flex-1 text-sm truncate text-muted-foreground">
                   {entry.displayName}
                 </span>
-                <span className="text-sm font-medium text-[#64748b]">
+                <span className="text-sm font-medium text-muted-foreground">
                   {entry.totalPlayed}
                 </span>
               </motion.div>

@@ -25,15 +25,15 @@ export const QuestEmptyState: React.FC<QuestEmptyStateProps> = ({
   className,
 }) => (
   <div className={cn("flex flex-col items-center justify-center py-12 px-6 text-center", className)}>
-    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center mb-4 border border-[#e2e8f0]">
+    <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4 border border-border">
       {icon}
     </div>
-    <h3 className="text-lg font-semibold text-[#1e293b] mb-2">{title}</h3>
-    <p className="text-sm text-[#64748b] mb-6 max-w-xs">{description}</p>
+    <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>
+    <p className="text-sm text-muted-foreground mb-6 max-w-xs">{description}</p>
     {action && (
       <button
         onClick={action.onClick}
-        className="px-6 py-2.5 bg-[#F7931E] text-white font-medium rounded-full hover:bg-[#E8820D] transition-colors shadow-sm"
+        className="px-6 min-h-[44px] bg-[#F7931E] text-white font-medium rounded-full hover:bg-[#E8820D] transition-colors shadow-sm active:scale-[0.98]"
       >
         {action.label}
       </button>

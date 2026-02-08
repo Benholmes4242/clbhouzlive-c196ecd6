@@ -1,70 +1,44 @@
 /**
- * Quest Light Theme - Aligned with Hub Design System
- * Premium cinematic polish for gamified progression
+ * Quest Light Theme - Brand accent colors only
+ * Semantic tokens (text, card, border, muted) are handled by the app's design system.
+ * This file only defines quest-specific brand accents and animation utilities.
  */
 
 .quest-theme-light {
-  /* Page background - matches Hub design system */
-  --quest-page: #F8FAFC;
-  --quest-page-gradient: linear-gradient(180deg, #F8FAFC 0%, #F8FAFC 100%);
-
-  /* Card surfaces - matches Hub design system */
-  --quest-card: #FFFFFF;
-  --quest-card-border: #e2e8f0;
-  --quest-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  --quest-card-2: #F9FAFB;
-  --quest-surface: #FFFFFF;
-  --quest-surface-strong: rgba(255, 255, 255, 0.98);
-  --quest-surface-muted: #F9FAFB;
-  --quest-glass: rgba(255, 255, 255, 0.85);
-  --quest-glass-border: rgba(255, 255, 255, 0.5);
-
-  /* Shadows - subtle and refined */
-  --quest-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  --quest-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --quest-shadow-glow: 0 4px 16px rgba(210, 180, 97, 0.1);
-  --quest-shadow-lift: 0 4px 12px rgba(0, 0, 0, 0.08);
-
-  /* Strokes + dividers - matches Hub design system */
-  --quest-stroke: #e2e8f0;
-  --quest-stroke-strong: #cbd5e1;
-  --quest-hairline: #f1f5f9;
-  --quest-divider: #e2e8f0;
-
-  /* Text - matches Hub design system */
-  --quest-text-primary: #1e293b;
-  --quest-text-secondary: #64748b;
-  --quest-text-tertiary: #94a3b8;
-
-  /* Pills/chips - matches Hub design system */
-  --quest-pill-inactive: #e2e8f0;
-  --quest-pill-hover: #cbd5e1;
-  --quest-pill-active: #FFFFFF;
-  --quest-chip-bg: #e2e8f0;
-  --quest-chip-stroke: #e2e8f0;
-  --quest-chip-active-bg: rgba(31, 36, 40, 0.06);
-
-  /* Progress track - matches Hub design system */
-  --quest-track: #e2e8f0;
-  --quest-track-2: #f1f5f9;
-
   /* Brand accents - Modern Country Club palette */
   --quest-accent-primary: #F7931E;
   --quest-accent-green: #334E3D;
   --quest-accent-gold: #C1A84C;
   --quest-accent-gold-light: rgba(193, 168, 76, 0.12);
 
+  /* Shadows - quest-specific glow effects */
+  --quest-shadow-glow: 0 4px 16px rgba(210, 180, 97, 0.1);
+  --quest-shadow-lift: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  /* Legacy aliases — map to app semantic tokens for backward compat.
+     New code should use Tailwind classes (text-foreground, bg-card, etc.) instead. */
+  --quest-text-primary: hsl(var(--foreground));
+  --quest-text-secondary: hsl(var(--muted-foreground));
+  --quest-text-tertiary: hsl(var(--muted-foreground));
+  --quest-card: hsl(var(--card));
+  --quest-track: hsl(var(--muted));
+  --quest-stroke: hsl(var(--border));
+
+  /* Quest-specific chip/pill styling (brand-tinted) */
+  --quest-chip-bg: hsl(var(--muted));
+  --quest-chip-stroke: hsl(var(--border));
+
   /* Surface slate for buttons */
   --surface-slate: #475569;
 
   /* Achievement card overrides for light theme */
   --achievement-card-bg: rgba(31, 36, 40, 0.03);
-  --achievement-card-border: #e2e8f0;
+  --achievement-card-border: hsl(var(--border));
   --achievement-ghost-overlay: rgba(31, 36, 40, 0.04);
 
   /* Apply to page */
-  background: var(--quest-page);
-  color: var(--quest-text-primary);
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
   min-height: 100vh;
 }
 
@@ -80,70 +54,68 @@
 
 /* Premium quest card with subtle shadow */
 .quest-theme-light .quest-card {
-  background: var(--quest-card);
-  border: 1px solid var(--quest-card-border);
-  box-shadow: var(--quest-shadow);
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   border-radius: 16px;
 }
 
 .quest-theme-light .quest-card-glass {
-  background: var(--quest-glass);
-  border: 1px solid var(--quest-glass-border);
-  box-shadow: var(--quest-shadow-sm);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   border-radius: 16px;
   backdrop-filter: blur(8px);
 }
 
-/* Quest section titles - matches Hub design system */
+/* Quest section titles */
 .quest-theme-light .quest-section-title {
-  color: var(--quest-text-secondary);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  font-weight: 700;
-  font-size: 11px;
+  color: hsl(var(--muted-foreground));
+  font-weight: 600;
+  font-size: 14px;
 }
 
 /* Section divider */
 .quest-theme-light .quest-section-divider {
   height: 1px;
-  background: var(--quest-stroke);
+  background: hsl(var(--border));
   margin: 2rem 0;
 }
 
 /* Quest status pills */
 .quest-theme-light .quest-status-pill {
-  background: var(--quest-pill-inactive);
-  color: var(--quest-text-secondary);
-  border: 1px solid var(--quest-stroke);
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+  border: 1px solid hsl(var(--border));
   font-weight: 500;
   transition: all 0.15s ease;
 }
 
 .quest-theme-light .quest-status-pill:hover {
-  background: var(--quest-pill-hover);
+  background: hsl(var(--accent));
 }
 
 .quest-theme-light .quest-status-pill.is-active {
-  background: var(--quest-pill-active);
-  color: var(--quest-text-primary);
+  background: hsl(var(--card));
+  color: hsl(var(--foreground));
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .quest-theme-light .quest-status-pill.is-in-progress {
   background: rgba(247, 147, 30, 0.12);
   border-color: rgba(247, 147, 30, 0.2);
-  color: var(--quest-text-primary);
+  color: hsl(var(--foreground));
 }
 
 .quest-theme-light .quest-status-pill.is-unlocked {
   background: rgba(51, 78, 61, 0.1);
   border-color: rgba(51, 78, 61, 0.2);
-  color: var(--quest-text-primary);
+  color: hsl(var(--foreground));
 }
 
 /* Quest progress elements */
 .quest-theme-light .quest-progress-track {
-  background: var(--quest-track);
+  background: hsl(var(--muted));
   border-radius: 999px;
   overflow: hidden;
 }
@@ -188,7 +160,7 @@
 }
 
 .quest-theme-light ::-webkit-scrollbar-thumb {
-  background: var(--quest-stroke);
+  background: hsl(var(--border));
   border-radius: 2px;
 }
 

@@ -112,7 +112,7 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
 
       {/* HORIZONTAL LAYOUT: Badge | Ring | Stats */}
       <motion.div 
-        className="flex items-center justify-between bg-white rounded-2xl p-4 border border-slate-200/60 mb-4"
+        className="flex items-center justify-between bg-card rounded-2xl p-4 border border-border mb-4"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
@@ -133,6 +133,7 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
               <img
                 src={currentBadgeImage}
                 alt={tierName}
+                decoding="async"
                 className="relative w-16 h-20 object-contain"
               />
             </div>
@@ -167,7 +168,7 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
               strokeWidth={6}
               animated={true}
             />
-            <span className="text-xs text-slate-500 mt-1">
+            <span className="text-xs text-muted-foreground mt-1">
               to {nextMilestone.shortLabel}
             </span>
           </div>
@@ -179,24 +180,21 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
             >
               <Sparkles className="w-8 h-8" style={{ color: tierColor }} />
             </div>
-            <span className="text-xs text-slate-500 mt-1">Complete!</span>
+            <span className="text-xs text-muted-foreground mt-1">Complete!</span>
           </div>
         )}
 
         {/* Right: Count */}
         <div className="text-right">
           <div className="flex items-baseline justify-end gap-0.5">
-            <span
-              className="text-4xl font-bold tracking-tight"
-              style={{ color: '#1e293b' }}
-            >
+            <span className="text-4xl font-bold tracking-tight text-foreground">
               {totalPlayed}
             </span>
-            <span className="text-lg font-medium text-slate-400">
+            <span className="text-lg font-medium text-muted-foreground/60">
               /{target}
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-muted-foreground mt-0.5">
             Courses Played
           </p>
         </div>
@@ -209,12 +207,7 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 }}
       >
-        <div
-          className="h-2 rounded-full overflow-hidden"
-          style={{ 
-            background: 'var(--quest-track, #e2e8f0)',
-          }}
-        >
+        <div className="h-2 rounded-full overflow-hidden bg-muted">
           <motion.div
             className="h-full rounded-full"
             style={{
@@ -228,8 +221,8 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
           />
         </div>
         {nextMilestone && (
-          <p className="text-xs text-slate-500 mt-1.5 text-center">
-            <span className="font-medium text-slate-700">{nextMilestone.threshold} Club</span> ({remaining} to go)
+          <p className="text-xs text-muted-foreground mt-1.5 text-center">
+            <span className="font-medium text-foreground">{nextMilestone.threshold} Club</span> ({remaining} to go)
           </p>
         )}
       </motion.div>
