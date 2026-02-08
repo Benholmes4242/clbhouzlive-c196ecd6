@@ -235,8 +235,7 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
     ? headerHeight + 12 
     : headerHeight + (availableHeight - currentHeight) + dragOffset;
 
-  // Theme colors — explicit branching required because sheet is portalled
-  // and CSS variables may not match the sheet's visual context
+  // Theme colors — CSS variable–based, auto-resolves per theme
   const colors = {
     bg: useLightTheme 
       ? 'linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background)) 100%)'
@@ -245,15 +244,15 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
       ? '0 -8px 40px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.9)'
       : '0 -8px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06)',
     border: useLightTheme ? 'hsl(var(--border) / 0.3)' : 'rgba(255,255,255,0.06)',
-    text: useLightTheme ? 'hsl(var(--foreground))' : 'rgba(255,255,255,0.92)',
-    textMuted: useLightTheme ? 'hsl(var(--muted-foreground))' : 'rgba(255,255,255,0.64)',
-    sectionLabel: useLightTheme ? 'hsl(var(--muted-foreground) / 0.6)' : 'rgba(255,255,255,0.40)',
+    text: 'hsl(var(--foreground))',
+    textMuted: 'hsl(var(--muted-foreground))',
+    sectionLabel: 'hsl(var(--muted-foreground) / 0.6)',
     cardBg: useLightTheme ? 'hsl(var(--card))' : 'rgba(255,255,255,0.05)',
     cardBorder: useLightTheme ? 'hsl(var(--border) / 0.3)' : 'rgba(255,255,255,0.06)',
     grabHandle: useLightTheme ? 'rgba(0,0,0,0.20)' : 'rgba(255,255,255,0.30)',
     closeBg: useLightTheme ? 'hsl(var(--card))' : 'rgba(255,255,255,0.08)',
     closeHover: useLightTheme ? 'hsl(var(--muted))' : 'rgba(255,255,255,0.12)',
-    closeIcon: useLightTheme ? 'hsl(var(--muted-foreground))' : 'rgba(255,255,255,0.64)',
+    closeIcon: 'hsl(var(--muted-foreground))',
   };
 
   // Sheet content padding constant for alignment
@@ -543,7 +542,7 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
                     style={{
                       background: useLightTheme ? 'hsl(var(--muted) / 0.5)' : 'rgba(255,255,255,0.06)',
                       border: `1px solid ${useLightTheme ? 'hsl(var(--border) / 0.3)' : 'rgba(255,255,255,0.06)'}`,
-                      color: useLightTheme ? 'hsl(var(--foreground))' : 'rgba(255,255,255,0.92)',
+                      color: 'hsl(var(--foreground))',
                     }}
                   >
                     Cancel
@@ -595,8 +594,8 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
   useLightTheme,
 }) => {
   const colors = {
-    text: useLightTheme ? 'hsl(var(--foreground))' : 'rgba(255,255,255,0.92)',
-    textMuted: useLightTheme ? 'hsl(var(--muted-foreground))' : 'rgba(255,255,255,0.64)',
+    text: 'hsl(var(--foreground))',
+    textMuted: 'hsl(var(--muted-foreground))',
     cardBg: useLightTheme ? 'hsl(var(--card))' : 'rgba(255,255,255,0.06)',
     cardBorder: useLightTheme ? 'hsl(var(--border) / 0.3)' : 'rgba(255,255,255,0.06)',
     avatarBg: useLightTheme ? 'hsl(var(--card))' : 'rgba(255,255,255,0.1)',
@@ -680,7 +679,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
             >
               <Check 
                 className="w-[10px] h-[10px]" 
-                style={{ color: useLightTheme ? 'hsl(var(--foreground))' : 'rgba(255,255,255,0.92)' }} 
+                style={{ color: 'hsl(var(--foreground))' }} 
               />
             </div>
           )}
@@ -728,7 +727,7 @@ const QuickActionButton: React.FC<QuickActionButtonProps> = ({
         ? 'hsl(var(--card))'
         : 'linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
       border: `1px solid ${useLightTheme ? 'hsl(var(--border) / 0.3)' : 'rgba(255,255,255,0.06)'}`,
-      color: useLightTheme ? 'hsl(var(--foreground))' : 'rgba(255,255,255,0.92)',
+      color: 'hsl(var(--foreground))',
       height: 56,
     }}
   >
@@ -792,7 +791,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, children, useLightThem
       <div className="flex items-center gap-2 mb-2 px-3">
         <div 
           className="text-[11px] font-medium uppercase tracking-wider"
-          style={{ color: useLightTheme ? 'hsl(var(--muted-foreground) / 0.6)' : 'rgba(255,255,255,0.40)' }}
+          style={{ color: 'hsl(var(--muted-foreground) / 0.6)' }}
         >
           {title}
         </div>
@@ -837,7 +836,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
       height: 52,
       color: danger 
         ? 'hsl(0 84% 60%)' 
-        : (useLightTheme ? 'hsl(var(--foreground))' : 'rgba(255,255,255,0.92)'),
+        : 'hsl(var(--foreground))',
     }}
   >
     {/* Icon container with background */}
@@ -888,7 +887,7 @@ const AdminMenuItem: React.FC<AdminMenuItemProps> = ({
         ? 'linear-gradient(135deg, rgba(251, 191, 36, 0.08) 0%, rgba(245, 158, 11, 0.08) 100%)'
         : 'linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.06) 100%)',
       border: '1px solid rgba(251, 191, 36, 0.25)',
-      color: useLightTheme ? 'hsl(var(--foreground))' : 'rgba(255,255,255,0.92)',
+      color: 'hsl(var(--foreground))',
     }}
   >
     {/* Icon container with gold gradient */}
@@ -905,7 +904,7 @@ const AdminMenuItem: React.FC<AdminMenuItemProps> = ({
       <span className="text-[15px] font-semibold block">{label}</span>
       <span 
         className="text-[11px]"
-        style={{ color: useLightTheme ? 'hsl(var(--muted-foreground))' : 'rgba(255,255,255,0.64)' }}
+        style={{ color: 'hsl(var(--muted-foreground))' }}
       >
         Manage site settings
       </span>
