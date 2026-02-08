@@ -1,6 +1,7 @@
 /**
- * HubEchoCardPolished - A* Polish
- * Warm gradient, golf-themed icons, pulse animation, tap states
+ * HubEchoCardPolished - Semantic token migration + tap target fix
+ * Echo gradient kept intentionally. Text colors use semantic tokens.
+ * Send/Mic buttons increased to 44px (w-11 h-11)
  */
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
@@ -19,6 +20,9 @@ interface HubEchoCardPolishedProps {
   className?: string;
 }
 
+// Echo accent — intentional brand color
+const ECHO_ACCENT = '#FF9500';
+
 // Rotating prompts with unique icons
 const WHISPER_PROMPTS = [
   { text: "Check today's weather in my location", icon: 'compass' },
@@ -34,7 +38,7 @@ const WHISPER_PROMPTS = [
 ];
 
 function PromptIcon({ type }: { type: string }) {
-  const style = { color: '#FF9500' };
+  const style = { color: ECHO_ACCENT };
   const cls = "w-4 h-4 flex-shrink-0";
   
   switch (type) {
@@ -90,13 +94,13 @@ export function HubEchoCardPolished({ onOpenEcho, expandable = false, className 
       className={cn("rounded-[18px] overflow-hidden flex flex-col", className)}
       style={{ 
         background: HUB_COLORS.echoBgGradient,
-        boxShadow: HUB_COLORS.cardShadow,
+        boxShadow: 'var(--shadow-sm, 0 1px 2px rgba(0,0,0,0.05))',
       }}
     >
       {/* Header row */}
       <button
         onClick={handleHeaderClick}
-        className="flex-none w-full flex items-center justify-between px-4 pt-4 pb-3 transition-all active:opacity-80"
+        className="flex-none w-full flex items-center justify-between px-4 pt-4 pb-3 transition-all active:scale-[0.98] active:opacity-90"
         role="button"
         aria-label="Open Echo"
       >
@@ -125,14 +129,14 @@ export function HubEchoCardPolished({ onOpenEcho, expandable = false, className 
             </div>
           </div>
           <div className="text-left">
-            <span className="text-[1.0625rem] font-semibold block" style={{ color: HUB_COLORS.textPrimary }}>Echo</span>
-            <span className="text-[0.8125rem]" style={{ color: HUB_COLORS.textSecondary }}>Your personal caddie</span>
+            <span className="text-[1.0625rem] font-semibold block text-foreground">Echo</span>
+            <span className="text-[0.8125rem] text-muted-foreground">Your personal caddie</span>
           </div>
         </div>
-        <ChevronRight className="w-5 h-5" style={{ color: HUB_COLORS.chevron }} />
+        <ChevronRight className="w-5 h-5 text-muted-foreground/40" />
       </button>
 
-      {/* Suggestion prompts with unique icons and tap states */}
+      {/* Suggestion prompts */}
       <div className="flex-1 flex flex-col justify-center gap-2 min-h-0 px-4">
         {shuffledPrompts.slice(0, 3).map((prompt, i) => (
           <button
@@ -141,22 +145,22 @@ export function HubEchoCardPolished({ onOpenEcho, expandable = false, className 
               haptic('light');
               onOpenEcho(prompt.text);
             }}
-            className="px-4 py-3 bg-white/60 rounded-xl flex items-center gap-3 w-full transition-all duration-150 active:scale-[0.98] active:bg-white/80"
+            className="px-4 py-3 bg-card/60 rounded-xl flex items-center gap-3 w-full transition-all duration-150 active:scale-[0.98] active:bg-card/80"
             aria-label={`Ask Echo: ${prompt.text}`}
           >
             <PromptIcon type={prompt.icon} />
-            <span className="flex-1 text-[0.875rem] text-left leading-snug line-clamp-1" style={{ color: HUB_COLORS.textPrimary }}>
+            <span className="flex-1 text-[0.875rem] text-left leading-snug line-clamp-1 text-foreground">
               {prompt.text}
             </span>
-            <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: HUB_COLORS.chevron }} />
+            <ChevronRight className="w-4 h-4 flex-shrink-0 text-muted-foreground/40" />
           </button>
         ))}
       </div>
 
-      {/* Input bar with extra top spacing and border */}
+      {/* Input bar */}
       <div className="flex-none px-4 pb-4 pt-5">
         <div 
-          className="flex items-center gap-2 h-[46px] bg-white rounded-full px-4 shadow-sm"
+          className="flex items-center gap-2 h-[46px] bg-card rounded-full px-4 shadow-sm"
           style={{ border: `1px solid ${HUB_COLORS.echoInputBorder}` }}
         >
           <input
@@ -166,13 +170,12 @@ export function HubEchoCardPolished({ onOpenEcho, expandable = false, className 
             onKeyDown={handleKeyDown}
             placeholder="Ask Echo anything..."
             aria-label="Type a question for Echo"
-            className="flex-1 bg-transparent outline-none text-[0.9375rem]"
-            style={{ color: HUB_COLORS.textPrimary }}
+            className="flex-1 bg-transparent outline-none text-[0.9375rem] text-foreground placeholder:text-muted-foreground"
           />
           {hasText ? (
             <button
               onClick={handleSubmit}
-              className="w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-95"
+              className="w-11 h-11 -mr-2 rounded-full flex items-center justify-center transition-all active:scale-95"
               style={{ backgroundColor: HUB_COLORS.echoOrb }}
               aria-label="Send message"
             >
@@ -189,21 +192,21 @@ export function HubEchoCardPolished({ onOpenEcho, expandable = false, className 
                 }
               }}
               className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-95",
+                "w-11 h-11 -mr-2 rounded-full flex items-center justify-center transition-all active:scale-95",
                 isListening ? "bg-red-500 animate-pulse" : "bg-transparent"
               )}
               aria-label={isListening ? "Stop listening" : "Voice input"}
             >
-              <Mic className={cn("w-5 h-5", isListening ? "text-white" : "")} style={isListening ? {} : { color: HUB_COLORS.textSecondary }} />
+              <Mic className={cn("w-5 h-5", isListening ? "text-white" : "text-muted-foreground")} />
             </button>
           ) : (
             <button
               onClick={handleSubmit}
               disabled
-              className="w-8 h-8 rounded-full flex items-center justify-center bg-transparent opacity-50"
+              className="w-11 h-11 -mr-2 rounded-full flex items-center justify-center bg-transparent opacity-50"
               aria-label="Send message"
             >
-              <ArrowUp className="w-4 h-4" style={{ color: HUB_COLORS.textSecondary }} />
+              <ArrowUp className="w-4 h-4 text-muted-foreground" />
             </button>
           )}
         </div>
