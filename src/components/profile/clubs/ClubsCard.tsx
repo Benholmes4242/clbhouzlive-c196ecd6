@@ -50,8 +50,8 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
           whileTap={{ scale: 0.985 }}
           transition={{ duration: 0.1 }}
           className={cn(
-            'inline-flex items-center gap-1.5 text-sm font-medium text-slate-600',
-            'hover:text-slate-900 hover:underline hover:decoration-slate-400 transition-all'
+            'inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground',
+            'hover:text-foreground hover:underline hover:decoration-muted-foreground transition-all'
           )}
         >
           <Plus className="w-4 h-4" />
@@ -95,7 +95,7 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
           <motion.button
             onClick={onEditClick}
             whileTap={{ scale: 0.95 }}
-            className="p-2 -m-0.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100/60 transition-colors"
+            className="p-2 -m-0.5 rounded-full text-muted-foreground/60 hover:text-foreground hover:bg-muted transition-colors"
             aria-label="Edit clubs"
           >
             <Pencil className="w-4 h-4" strokeWidth={2} />
@@ -118,17 +118,17 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
 
       {/* Secondary Clubs - reduced spacing between entries */}
       {displayedSecondary.length > 0 && (
-        <div className="mt-3 pt-2.5 border-t border-slate-200/60">
-          <p className="text-xs font-medium text-slate-500 mb-2">Also plays at</p>
+        <div className="mt-3 pt-2.5 border-t border-border">
+          <p className="text-xs font-medium text-muted-foreground mb-2">Also plays at</p>
           {/* Reduced gap: space-y-1.5 → space-y-1 (8px between entries) */}
           <div className="space-y-1">
             {displayedSecondary.map(club => (
-              <p key={club.id} className="text-sm font-medium text-slate-900 truncate">
+              <p key={club.id} className="text-sm font-medium text-foreground truncate">
                 {club.name}
               </p>
             ))}
             {remainingCount > 0 && (
-              <button className="text-xs text-slate-500 hover:text-slate-700 hover:underline transition-colors">
+              <button className="text-xs text-muted-foreground hover:text-foreground hover:underline transition-colors">
                 + {remainingCount} more
               </button>
             )}
