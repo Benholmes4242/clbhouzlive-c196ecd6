@@ -21,10 +21,12 @@ interface CourseLocationPillsProps {
   course: Course;
 }
 
+const pillClass =
+  "inline-flex items-center px-3 py-2 min-h-[44px] rounded-full bg-card border border-border/60 hover:bg-muted transition-colors active:scale-[0.98] text-foreground";
+
 const CourseLocationPills: React.FC<CourseLocationPillsProps> = ({ course }) => {
   const navigate = useNavigate();
 
-  // Derive region / subregion / area for the current course
   const primaryRegionKey: PrimaryRegionKey = 
     (course.sub_country ? getRegionFromSubregion(course.sub_country) : null) ||
     dbValueToRegionKey(course.region || course.country);
@@ -35,13 +37,12 @@ const CourseLocationPills: React.FC<CourseLocationPillsProps> = ({ course }) => 
   const subCountryLabel: string | null = course.sub_country || null;
   const localAreaLabel: string | null = course.local_area || null;
 
-  // Normalised keys for URLs
   const subKey = subCountryLabel ? normalizeLabel(subCountryLabel) : null;
 
   if (!primaryRegionLabel) return null;
 
   return (
-    <div className="px-4 pt-3 pb-0 bg-slate-100">
+    <div className="px-4 pt-3 pb-0 bg-muted">
       <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
         {/* Level 1 – Primary region */}
         <button
@@ -53,7 +54,7 @@ const CourseLocationPills: React.FC<CourseLocationPillsProps> = ({ course }) => 
             });
             navigate(`/courses?${params.toString()}`);
           }}
-          className="inline-flex items-center px-3 py-1 rounded-full bg-white border border-border/60 hover:bg-surface-card transition-colors"
+          className={pillClass}
         >
           {primaryRegionLabel}
         </button>
@@ -72,7 +73,7 @@ const CourseLocationPills: React.FC<CourseLocationPillsProps> = ({ course }) => 
                 });
                 navigate(`/courses?${params.toString()}`);
               }}
-              className="inline-flex items-center px-3 py-1 rounded-full bg-white border border-border/60 hover:bg-surface-card transition-colors"
+              className={pillClass}
             >
               {subCountryLabel}
             </button>
@@ -94,7 +95,7 @@ const CourseLocationPills: React.FC<CourseLocationPillsProps> = ({ course }) => 
                 });
                 navigate(`/courses?${params.toString()}`);
               }}
-              className="inline-flex items-center px-3 py-1 rounded-full bg-white border border-border/60 hover:bg-surface-card transition-colors"
+              className={pillClass}
             >
               {localAreaLabel}
             </button>

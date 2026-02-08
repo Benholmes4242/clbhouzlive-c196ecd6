@@ -17,7 +17,7 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
 
   if (isLoading) {
     return (
-      <div className="bg-gradient-to-br from-amber-50 to-white rounded-2xl border border-amber-100 p-5 overflow-hidden relative">
+      <div className="bg-gradient-to-br from-amber-50 to-card rounded-2xl border border-amber-100 p-5 overflow-hidden relative">
         <div className="mb-1 h-4 w-32 animate-pulse rounded bg-amber-100/50" />
         <div className="mb-2 h-3 w-56 animate-pulse rounded bg-amber-100/50" />
         <div className="flex gap-2">
@@ -39,7 +39,7 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
   const listCount = data.list_memberships.length;
 
   return (
-    <div className="bg-gradient-to-br from-amber-50 to-white rounded-2xl border border-amber-100 p-5 overflow-hidden relative">
+    <div className="bg-gradient-to-br from-amber-50 to-card rounded-2xl border border-amber-100 p-5 overflow-hidden relative">
       {/* Subtle decorative element */}
       <div className="absolute -right-4 -top-4 w-24 h-24 bg-amber-100/50 rounded-full blur-2xl" />
       
@@ -49,8 +49,8 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
             <Trophy className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h3 className="font-semibold text-gray-900">Top 100 Spotlight</h3>
-            <p className="text-xs text-gray-500">
+            <h3 className="font-semibold text-foreground">Top 100 Spotlight</h3>
+            <p className="text-xs text-muted-foreground">
               Appears in {listCount} prestigious {listCount === 1 ? 'list' : 'lists'}
             </p>
           </div>
@@ -62,7 +62,7 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
               key={list.list_slug}
               type="button"
               onClick={() => handleChipTap(list.list_slug)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-amber-200 text-sm font-medium text-gray-700 hover:border-amber-300 hover:bg-amber-50 transition-colors active:scale-[0.97]"
+              className="inline-flex items-center gap-1.5 px-3 py-2.5 min-h-[44px] rounded-full bg-card border border-amber-200 text-sm font-medium text-foreground hover:border-amber-300 hover:bg-amber-50 transition-colors active:scale-[0.97]"
             >
               {list.list_name}
             </button>

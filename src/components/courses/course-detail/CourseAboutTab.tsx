@@ -1,4 +1,4 @@
-import React, { useState } from 'react'; // v4 - Phase 5: Reviews, Memory & Planning
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
@@ -18,6 +18,7 @@ import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
 import CourseLocationPills from './CourseLocationPills';
 import CourseExploreLinks from './CourseExploreLinks';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
+import { SectionHeading } from './SectionHeading';
 
 import { CourseTop100Summary } from './CourseTop100Summary';
 import { formatCourseLocation } from '@/utils/courseLocation';
@@ -69,7 +70,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Fetch coordinates (with geocoding fallback)
   const { coords, loading: coordsLoading } = useCourseCoordinates({
     courseId: course.id,
     latitude: course.latitude,
@@ -80,13 +80,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
     region: course.region,
   });
 
-  // Fetch rating aggregates using the new hook
   const { data: ratingAggregates } = useCourseRatingAggregates(course.id);
-  
-  // Fetch rating distribution for tier bars
   const { data: distribution } = useCourseRatingDistribution(course.id);
-  
-  // Fetch user's rating if logged in
   const { data: userRating } = useUserCourseRating(course.id, user?.id);
 
   const handleWebsiteClick = () => {
@@ -95,7 +90,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
     }
   };
 
-  // Truncate description for preview
   const truncateDescription = (text: string, wordLimit: number) => {
     const words = text.split(' ');
     if (words.length <= wordLimit) return text;
@@ -119,8 +113,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
     navigate(`/courses/${course.id}/rate`);
   };
 
-
-  // B1: Contextual button label
   const rateButtonLabel = userRating ? 'Edit Your Rating' : 'Rate this course';
   const rateButtonHelper = userRating 
     ? 'Update your community score & breakdown' 
@@ -128,11 +120,11 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
   return (
     <div className="animate-in fade-in duration-200">
-      {/* 1. Location Pills - Navigation context at top */}
+      {/* 1. Location Pills */}
       <CourseLocationPills course={course} />
 
-      {/* 2. Community Rating Section - Priority content */}
-      <section className="px-4 pt-3 pb-5 bg-slate-100 md:px-6 md:pt-4 space-y-5">
+      {/* 2. Community Rating Section */}
+      <section className="px-4 pt-3 pb-5 bg-muted md:px-6 md:pt-4 space-y-5">
         <CommunityScoreCard
           courseId={course.id}
           courseName={course.name}
@@ -143,57 +135,63 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           onSeeAllReviews={() => onTabChange?.('reviews')}
         />
 
-        {/* Edit/Rate button with helper text - only for users who've already rated */}
+        {/* Edit/Rate button */}
         {userRating && (
           <div className="space-y-2">
             <Button 
               onClick={handleRateClick}
-              className="w-full justify-center h-11 rounded-sq-sm bg-[#F8FAFC] text-slate-700 border-0 hover:bg-slate-200"
+              className="w-full justify-center h-11 rounded-sq-sm bg-muted text-foreground border-0 hover:bg-secondary active:scale-[0.98]"
               variant="outline"
             >
               {rateButtonLabel}
             </Button>
-            <p className="text-xs text-slate-500 text-center">
+            <p className="text-xs text-muted-foreground text-center">
               {rateButtonHelper}
             </p>
           </div>
         )}
       </section>
 
-      {/* 2. Your Journey Section - Personal actions near top */}
+      {/* Spacer */}
+      <div className="h-3 bg-muted" />
+
+      {/* 3. Your Journey Section */}
       {user && (
         <PersonalSection courseId={course.id} courseName={course.name} />
       )}
 
-      {/* 3. Friends Who've Played - Social proof near actions */}
-      <section className="px-4 pt-4 pb-4 bg-slate-100 md:px-6">
+      {/* Spacer */}
+      <div className="h-3 bg-muted" />
+
+      {/* 4. Friends Who've Played */}
+      <section className="px-4 pt-4 pb-4 bg-muted md:px-6">
         <CourseFriendsStrip courseId={course.id} courseName={course.name} />
       </section>
 
-      {/* 4. About Section with improved typography */}
+      {/* Spacer */}
+      <div className="h-3 bg-muted" />
+
+      {/* 5. About Section */}
       {course.description && (
-        <section className="pt-8 pb-6 bg-slate-50 space-y-4 md:pt-10">
-          <div className="px-5 flex items-center gap-2">
-            <div className="w-8 h-0.5 bg-gradient-to-r from-amber-400 to-transparent rounded-full" />
-            <h2 className="text-lg md:text-xl font-semibold text-gray-900">About</h2>
+        <section className="pt-8 pb-6 bg-muted space-y-4 md:pt-10">
+          <div className="px-5">
+            <SectionHeading title="About" />
           </div>
           <div className="px-5 relative">
             <div 
-              className={`text-base md:text-lg leading-relaxed text-gray-700 ${
+              className={`text-base md:text-lg leading-relaxed text-muted-foreground ${
                 !showFullDescription && shouldShowReadMore ? 'relative' : ''
               }`}
             >
               {formatDescription(displayDescription)}
-              {/* Fade gradient overlay when collapsed */}
               {!showFullDescription && shouldShowReadMore && (
-                <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-slate-50 to-transparent pointer-events-none" />
+                <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-[hsl(var(--muted))] to-transparent pointer-events-none" />
               )}
             </div>
-            {/* Read more/Show less affordance */}
             {shouldShowReadMore && (
               <button
                 onClick={() => setShowFullDescription(!showFullDescription)}
-                className="flex items-center gap-1.5 mt-3 text-base font-medium text-slate-600 hover:text-slate-900 active:opacity-70 transition-colors"
+                className="flex items-center gap-1.5 mt-3 min-h-[44px] text-base font-medium text-muted-foreground hover:text-foreground active:scale-[0.98] transition-all"
               >
                 <span>{showFullDescription ? 'Show less' : 'Read more'}</span>
                 {showFullDescription ? (
@@ -207,9 +205,12 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         </section>
       )}
 
-      {/* 5. Top 100 Spotlight (shows if course is in any Top 100 list) */}
+      {/* Spacer */}
+      <div className="h-3 bg-muted" />
+
+      {/* 6. Top 100 Spotlight */}
       {course.id && (
-        <section className="px-4 pt-5 pb-5 bg-slate-50 md:px-6">
+        <section className="px-4 pt-5 pb-5 bg-muted md:px-6">
           <CourseTop100Spotlight
             courseId={course.id}
             courseName={course.name}
@@ -217,19 +218,21 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         </section>
       )}
 
-      {/* 6. Top 100 mini-journey summary */}
+      {/* 7. Top 100 mini-journey summary */}
       <CourseTop100Summary />
 
-      {/* 7. Location Section */}
-      <section className="pt-6 pb-5 bg-slate-100 md:pt-8">
+      {/* Spacer */}
+      <div className="h-3 bg-muted" />
+
+      {/* 8. Location Section */}
+      <section className="pt-6 pb-5 bg-muted md:pt-8">
         <div className="px-5 mb-4">
-          <h2 className="text-lg md:text-xl font-semibold">Location</h2>
+          <SectionHeading title="Location" />
         </div>
         
-        {/* Map card - unified with Business profile */}
         {coordsLoading && (
           <div className="px-5 md:px-4">
-            <div className="w-full h-[200px] bg-surface-alt animate-pulse rounded-sq-md border border-slate-200" />
+            <div className="w-full h-[200px] bg-muted animate-pulse rounded-sq-md border border-border" />
           </div>
         )}
 
@@ -253,36 +256,45 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         )}
       </section>
 
-      {/* 8. CTA for users who haven't rated yet */}
+      {/* Spacer */}
+      <div className="h-3 bg-muted" />
+
+      {/* 9. CTA for users who haven't rated yet */}
       {user && !userRating && ratingAggregates && ratingAggregates.review_count > 0 && (
-        <section className="px-4 pt-5 pb-5 bg-slate-100 md:pt-6">
-          <h3 className="text-lg font-semibold mb-1">How do you rate this course?</h3>
-          <p className="text-base text-slate-500 mb-3">
+        <section className="px-4 pt-5 pb-5 bg-muted md:pt-6">
+          <h3 className="text-lg font-semibold text-foreground mb-1">How do you rate this course?</h3>
+          <p className="text-base text-muted-foreground mb-3">
             Add your rating to see how it compares with the clbhouz community.
           </p>
-          <Button onClick={handleRateClick} className="w-full bg-[#F8FAFC] text-slate-700 border-0 hover:bg-slate-200" variant="outline">
+          <Button onClick={handleRateClick} className="w-full bg-muted text-foreground border-0 hover:bg-secondary active:scale-[0.98]" variant="outline">
             Rate this course
           </Button>
         </section>
       )}
 
-      {/* 9. Media Section */}
-      <section className="pt-6 pb-5 bg-slate-50 space-y-3 md:pt-8">
+      {/* Spacer */}
+      <div className="h-3 bg-muted" />
+
+      {/* 10. Media Section */}
+      <section className="pt-6 pb-5 bg-muted space-y-3 md:pt-8">
         <AboutMediaStrip 
           clubId={course.id} 
           onSeeAllClick={() => onTabChange?.('media')}
         />
       </section>
 
-      {/* 10. Explore More Links - Exit points at bottom */}
+      {/* Spacer */}
+      <div className="h-3 bg-muted" />
+
+      {/* 11. Explore More Links */}
       <CourseExploreLinks course={course} />
 
-      {/* 11. Visit Website - at bottom */}
+      {/* 12. Visit Website */}
       {course.website_url && (
-        <section className="px-4 pt-2 pb-4 bg-slate-100">
+        <section className="px-4 pt-2 pb-4 bg-muted">
           <Button
             onClick={handleWebsiteClick}
-            className="w-full flex items-center justify-center gap-2 h-11 rounded-lg bg-[#F8FAFC] text-slate-700 border-0 hover:bg-slate-200"
+            className="w-full flex items-center justify-center gap-2 h-11 rounded-lg bg-card text-foreground border border-border/60 hover:bg-muted active:scale-[0.98]"
             variant="outline"
           >
             <ExternalLink className="h-4 w-4" />

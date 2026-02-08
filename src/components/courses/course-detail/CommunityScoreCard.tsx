@@ -17,10 +17,8 @@ interface CommunityScoreCardProps {
   onSeeAllReviews?: () => void;
 }
 
-// A3: Always show 1 decimal for consistency + tabular numerals
 const formatScore = (score: number) => score.toFixed(1);
 
-// Get tier label from score
 const getTierLabel = (score: number): string => {
   if (score >= 9) return 'Outstanding';
   if (score >= 8) return 'Excellent';
@@ -41,7 +39,6 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   const communityAverage = ratingAggregates?.avg_overall_score || 0;
   const tierLabel = getTierLabel(communityAverage);
   
-  // Animation state for circular progress
   const [isVisible, setIsVisible] = useState(false);
   
   useEffect(() => {
@@ -49,20 +46,20 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
     return () => clearTimeout(timer);
   }, []);
 
-  // Empty state - no ratings yet
+  // Empty state
   if (totalRatings === 0) {
     return (
-      <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-100 p-6 text-center">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-          <Star className="w-8 h-8 text-gray-300" />
+      <div className="bg-gradient-to-br from-muted to-card rounded-2xl border border-border p-6 text-center">
+        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+          <Star className="w-8 h-8 text-muted-foreground/40" />
         </div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-1">No ratings yet</h3>
-        <p className="text-sm text-gray-500 mb-4">
+        <h3 className="text-lg font-semibold text-foreground mb-1">No ratings yet</h3>
+        <p className="text-sm text-muted-foreground mb-4">
           Be the first to share your experience{courseName ? ` at ${courseName}` : ''}.
         </p>
         <Button
           onClick={onRateClick}
-          className="px-5 py-2.5 bg-[#e2e8f0] text-slate-800 text-sm font-medium rounded-full hover:bg-[#cbd5e1] transition-colors shadow-sm"
+          className="px-5 py-2.5 bg-secondary text-foreground text-sm font-medium rounded-full hover:bg-secondary/80 transition-colors shadow-sm active:scale-[0.98]"
         >
           Rate this course
         </Button>
@@ -70,10 +67,9 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
     );
   }
 
-  // Check if only the user has rated
   const onlyUserHasRated = totalRatings === 1 && userRating;
 
-  // Calculate comparison message
+  // Comparison message
   let comparisonMessage: React.ReactNode = null;
   if (!onlyUserHasRated && userRating && communityAverage) {
     const diffRaw = userRating.rating - communityAverage;
@@ -116,7 +112,6 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
     }
   }
 
-  // Build category data
   const categories = [
     { id: 'design', label: 'Design', score: ratingAggregates?.avg_design_score },
     { id: 'condition', label: 'Condition', score: ratingAggregates?.avg_condition_score },
@@ -124,7 +119,6 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
     { id: 'facilities', label: 'Facilities', score: ratingAggregates?.avg_facilities_score },
   ].filter((cat) => cat.score !== null && cat.score !== undefined);
 
-  // Check if we have distribution data
   const hasDistribution = distribution && (
     distribution.outstanding > 0 ||
     distribution.excellent > 0 ||
@@ -133,63 +127,46 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
     distribution.fair > 0
   );
 
-  // Community Highlights - derive from highest scoring categories
   const getCommunityHighlights = () => {
     if (categories.length === 0) return null;
-    
     const sorted = [...categories]
-      .filter(c => c.score && c.score >= 9.0) // 9/10 threshold for highlights (matches Outstanding)
+      .filter(c => c.score && c.score >= 9.0)
       .sort((a, b) => (b.score || 0) - (a.score || 0));
-    // Show all qualifying highlights (no limit since we only show 9+ scores)
-    
     if (sorted.length === 0) return null;
     return sorted.map(c => c.label);
   };
 
   const highlights = getCommunityHighlights();
 
-  // Calculate stroke dasharray for circular progress
-  const circumference = 2 * Math.PI * 42; // radius = 42
+  const circumference = 2 * Math.PI * 42;
   const progress = isVisible ? (communityAverage / 10) * circumference : 0;
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+    <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
       {/* Header */}
       <div className="p-5 pb-4">
         <div className="flex items-start justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Community Rating</h3>
-            <p className="text-sm text-gray-500 mt-0.5">
+            <h3 className="text-lg font-semibold text-foreground">Community Rating</h3>
+            <p className="text-sm text-muted-foreground mt-0.5">
               Based on {totalRatings} {totalRatings === 1 ? 'rating' : 'ratings'}
             </p>
             {onlyUserHasRated && (
-              <p className="mt-2 text-sm text-gray-500">
+              <p className="mt-2 text-sm text-muted-foreground">
                 Only you have rated this course so far.
               </p>
             )}
           </div>
           
-          {/* Large animated score ring - amber for Outstanding (9+), grey otherwise */}
+          {/* Large animated score ring */}
           <div className="flex flex-col items-center">
-            {/* Ring container - relative for absolute centering of number */}
             <div className="relative w-24 h-24">
               <svg className="w-24 h-24 -rotate-90">
+                <circle cx="48" cy="48" r="42" fill="none" stroke="hsl(var(--border))" strokeWidth="8" />
                 <circle 
-                  cx="48" 
-                  cy="48" 
-                  r="42" 
-                  fill="none" 
-                  stroke="#f3f4f6" 
-                  strokeWidth="8" 
-                />
-                <circle 
-                  cx="48" 
-                  cy="48" 
-                  r="42" 
-                  fill="none" 
+                  cx="48" cy="48" r="42" fill="none" 
                   stroke="url(#communityScoreGradient)" 
-                  strokeWidth="8"
-                  strokeLinecap="round"
+                  strokeWidth="8" strokeLinecap="round"
                   strokeDasharray={`${progress} ${circumference}`}
                   className="transition-all duration-1000 ease-out"
                 />
@@ -209,20 +186,16 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                   </linearGradient>
                 </defs>
               </svg>
-              {/* Centered score - absolute within ring container only */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-3xl font-bold text-gray-900 tabular-nums leading-none">
+                <span className="text-3xl font-bold text-foreground tabular-nums leading-none">
                   {formatScore(communityAverage)}
                 </span>
               </div>
             </div>
-           {/* Tier label - below the ring with solid colors */}
             <span 
               className={cn(
                 "mt-2 text-base font-semibold uppercase tracking-wide",
-                communityAverage >= 9 
-                 ? "text-[#d97706]" 
-                 : "text-[#6b7280]"
+                communityAverage >= 9 ? "text-[#d97706]" : "text-muted-foreground"
               )}
             >
               {tierLabel}
@@ -234,14 +207,14 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
       {/* Highlights */}
       {highlights && highlights.length > 0 && (
         <div className="px-5 pb-4">
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
             Highlights
           </p>
           <div className="flex flex-wrap gap-2">
             {highlights.map(h => (
               <span 
                 key={h}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#F8FAFC] text-xs font-medium text-gray-700"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-muted text-xs font-medium text-muted-foreground"
               >
                 <Sparkles className="w-3 h-3 text-amber-500" />
                 {h}
@@ -260,17 +233,16 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
 
       {/* Distribution */}
       {hasDistribution && (
-        <div className="border-t border-gray-100 p-5">
+        <div className="border-t border-border p-5">
           <RatingTierDistribution distribution={distribution} />
         </div>
       )}
 
-     {/* Category breakdown - Amber bars only for Outstanding (9+), Gray otherwise */}
+      {/* Category breakdown */}
       {categories.length > 0 && (
-        <div className="border-t border-gray-100 p-5 grid grid-cols-2 gap-4">
+        <div className="border-t border-border p-5 grid grid-cols-2 gap-4">
           {categories.map((cat) => {
             const score = cat.score || 0;
-            // Determine bar color based on individual category score (9+ = Outstanding)
             const isOutstandingCat = score >= 9;
             const barColorClass = isOutstandingCat 
              ? 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]' 
@@ -279,10 +251,10 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
             return (
               <div key={cat.id} className="space-y-1.5">
                 <div className="flex justify-between text-xs">
-                  <span className="text-gray-500">{cat.label}</span>
-                  <span className="font-semibold text-gray-700 tabular-nums">{formatScore(score)}</span>
+                  <span className="text-muted-foreground">{cat.label}</span>
+                  <span className="font-semibold text-foreground tabular-nums">{formatScore(score)}</span>
                 </div>
-                <div className="h-2 bg-[#e5e7eb] rounded-full overflow-hidden">
+                <div className="h-2 bg-secondary rounded-full overflow-hidden">
                   <div 
                     className={`h-full ${barColorClass} rounded-full transition-all duration-700`}
                     style={{ width: `${(score / 10) * 100}%` }}
@@ -299,7 +271,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         <button 
           type="button"
           onClick={onSeeAllReviews}
-          className="w-full p-4 border-t border-gray-100 flex items-center justify-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors active:scale-[0.98]"
+          className="w-full p-4 border-t border-border flex items-center justify-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors active:scale-[0.98]"
         >
           See all reviews
           <ChevronRight className="w-4 h-4" />

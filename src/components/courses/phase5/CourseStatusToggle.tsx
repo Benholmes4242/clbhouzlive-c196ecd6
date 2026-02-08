@@ -1,9 +1,6 @@
 /**
  * CourseStatusToggle - Personal status toggle (Played / Want to Play)
- * Simplified: Wishlist removed, only Played and Want to Play remain
- * Includes journey tooltip when no status is set
- * 
- * NEW: Played button matches user's rating color (Gray/Amber)
+ * Played button matches user's rating color (Gray/Amber)
  */
 import React from 'react';
 import { Check, Bookmark, Loader2, Sparkles, Map } from 'lucide-react';
@@ -60,25 +57,18 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
   }
 
   const handlePlayedClick = () => {
-    // Navigate to rate page
     navigate(`/courses/${courseId}/rate`);
   };
 
   const handleWantToPlayClick = async () => {
-    if (status.status === 'played') return; // Disable if played
+    if (status.status === 'played') return;
     
     if (status.status === 'want_to_play') {
       await setWantToPlay(false);
-      toast({
-        description: "Removed from Want to Play",
-        duration: 2000,
-      });
+      toast({ description: "Removed from Want to Play", duration: 2000 });
     } else {
       await setWantToPlay(true);
-      toast({
-        description: "Added to Want to Play",
-        duration: 2000,
-      });
+      toast({ description: "Added to Want to Play", duration: 2000 });
     }
   };
 
@@ -86,7 +76,6 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
   const isWantToPlay = status.status === 'want_to_play';
   const hasNoSelection = status.status === 'none';
   
-  // Get rating-based colors for played button
   const scoreTier = userRating ? getScoreTier(userRating) : null;
   const isOutstanding = scoreTier?.isOutstanding ?? false;
   
@@ -96,9 +85,8 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
 
   return (
     <div className={cn("space-y-3", className)}>
-      {/* Status pills - premium styling */}
       <div className="flex flex-wrap gap-2">
-        {/* Played button - color matches user's rating tier */}
+        {/* Played button */}
         <button
           onClick={handlePlayedClick}
           disabled={isUpdating}
@@ -106,14 +94,14 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
             "flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all active:scale-95",
             isPlayed
               ? `${playedBgColor} text-white shadow-md ${playedShadowColor}`
-              : "bg-[#F8FAFC] text-gray-600 hover:bg-slate-100"
+              : "bg-muted text-muted-foreground hover:bg-secondary"
           )}
         >
           {isPlayed && <Check className="h-4 w-4" />}
           <span>{isPlayed ? 'Played' : 'Mark Played'}</span>
         </button>
 
-        {/* Want to Play - amber accent when active */}
+        {/* Want to Play */}
         <button
           onClick={handleWantToPlayClick}
           disabled={isUpdating || isPlayed}
@@ -122,7 +110,7 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
             isPlayed && "opacity-40 cursor-not-allowed",
             isWantToPlay
               ? "bg-amber-100 text-amber-700 border-2 border-amber-300 shadow-sm"
-              : "bg-[#F8FAFC] text-gray-600 hover:bg-slate-100"
+              : "bg-muted text-muted-foreground hover:bg-secondary"
           )}
         >
           {isUpdating ? (
@@ -134,17 +122,17 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
         </button>
       </div>
 
-      {/* Journey tooltip - only shown when no status is set */}
+      {/* Journey tooltip */}
       {hasNoSelection && (
-        <div className="flex items-start gap-2 text-xs text-slate-400">
+        <div className="flex items-start gap-2 text-xs text-muted-foreground">
           <Sparkles className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
           <p>
             Every course you mark becomes part of your journey — view them anytime on your{' '}
-            <Link to="/courses?tab=top100" className="text-slate-500 underline underline-offset-2 hover:text-slate-700">
+            <Link to="/courses?tab=top100" className="text-muted-foreground underline underline-offset-2 hover:text-foreground">
               map
             </Link>{' '}
             or{' '}
-            <Link to="/journey" className="text-slate-500 underline underline-offset-2 hover:text-slate-700">
+            <Link to="/journey" className="text-muted-foreground underline underline-offset-2 hover:text-foreground">
               journey page
             </Link>.
           </p>

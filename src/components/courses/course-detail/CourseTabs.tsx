@@ -18,7 +18,7 @@ const tabs: { id: CourseTabId; label: string }[] = [
 
 /**
  * Course detail tabs with segmented control styling
- * Light blue track with white active button (matches profile page)
+ * Semantic tokens, 44pt targets, active feedback
  */
 export function CourseTabs({ activeTab, onChange, reviewCount, mediaCount }: CourseTabsProps) {
   const getLabel = (tab: { id: CourseTabId; label: string }) => {
@@ -32,11 +32,8 @@ export function CourseTabs({ activeTab, onChange, reviewCount, mediaCount }: Cou
   };
 
   return (
-    <section className="px-4 py-3 bg-slate-50">
-      <div 
-        className="flex items-stretch rounded-xl overflow-hidden"
-        style={{ background: '#e2e8f0' }}
-      >
+    <section className="px-4 py-3 bg-muted">
+      <div className="flex items-stretch rounded-xl overflow-hidden bg-secondary">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
@@ -44,10 +41,10 @@ export function CourseTabs({ activeTab, onChange, reviewCount, mediaCount }: Cou
               key={tab.id}
               onClick={() => onChange(tab.id)}
               className={cn(
-                "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px]",
+                "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98]",
                 isActive 
-                  ? "bg-white text-slate-800 shadow-sm m-1 rounded-lg" 
-                  : "text-slate-500 hover:text-slate-700"
+                  ? "bg-card text-foreground shadow-sm m-1 rounded-lg" 
+                  : "text-muted-foreground hover:text-foreground rounded-lg active:bg-card/50"
               )}
             >
               {getLabel(tab)}
