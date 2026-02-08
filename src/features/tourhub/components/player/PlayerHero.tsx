@@ -64,7 +64,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
   }, [player.full_name]);
 
   return (
-    <div ref={heroRef} className="relative w-full overflow-hidden" style={{ height: 'clamp(320px, 60vh, 480px)' }}>
+    <div ref={heroRef} className="relative w-full overflow-hidden" style={{ height: 'calc(clamp(320px, 60vh, 480px) + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}>
       {/* Hero Image or Fallback Gradient */}
       {heroPhotoUrl ? (
         <motion.img
@@ -92,7 +92,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
         onClick={handleBack}
         className="absolute z-10 flex items-center gap-2 px-3 py-2 rounded-full"
         style={{
-          top: 'max(env(safe-area-inset-top, 0px), 12px)',
+          top: 'calc(max(var(--sat, env(safe-area-inset-top, 0px)), 47px) + 4px)',
           left: '16px',
           background: 'rgba(0,0,0,0.3)',
           backdropFilter: 'blur(12px)',
@@ -110,7 +110,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
         onClick={handleShare}
         className="absolute z-10 flex items-center justify-center w-9 h-9 rounded-full"
         style={{
-          top: 'max(env(safe-area-inset-top, 0px), 12px)',
+          top: 'calc(max(var(--sat, env(safe-area-inset-top, 0px)), 47px) + 4px)',
           right: '16px',
           background: 'rgba(0,0,0,0.3)',
           backdropFilter: 'blur(12px)',
