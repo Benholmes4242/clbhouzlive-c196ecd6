@@ -1,6 +1,6 @@
 /**
  * TrophyCase - Apple-level polish for earned milestones/regions
- * V3: Large badges (80-100px), club names below, no overlays, clean minimal design
+ * V4: Shows all milestones with progress, visual differentiation for earned/next/locked
  */
 
 import React, { useState, useMemo } from 'react';
@@ -101,17 +101,21 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
     }));
   }, [totalPlayed]);
 
-  const unlockedMilestones = milestones.filter(m => m.isUnlocked);
-  const nextMilestone = milestones.find(m => !m.isUnlocked);
+  // Find last earned index (compatible without ES2023)
+  let lastEarnedIndex = -1;
+  for (let i = milestones.length - 1; i >= 0; i--) {
+    if (milestones[i].isUnlocked) { lastEarnedIndex = i; break; }
+  }
+  const nextMilestoneIndex = milestones.findIndex(m => !m.isUnlocked);
   
-  // Only show earned + next to unlock
+  // Show earned + next 3 locked milestones (or all if few remain)
   const visibleMilestones = useMemo(() => {
-    const visible = [...unlockedMilestones];
-    if (nextMilestone) {
-      visible.push(nextMilestone);
-    }
-    return visible;
-  }, [unlockedMilestones, nextMilestone]);
+    return milestones.filter((m, i) => {
+      if (m.isUnlocked) return true;
+      // Show next 3 locked milestones after the last earned
+      return i <= lastEarnedIndex + 3;
+    });
+  }, [milestones, lastEarnedIndex]);
   
   // Get region data with unlock status
   const regions = useMemo(() => {
@@ -159,7 +163,7 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
         </div>
       </div>
 
-      {/* Badge grid - V3: Large badges with club names, no containers */}
+      {/* Badge grid */}
       <AnimatePresence mode="wait">
         {showMilestones ? (
           !hasAnyMilestones ? (
@@ -182,41 +186,69 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
-              {visibleMilestones.map((m, index) => (
-                <motion.button
-                  key={m.threshold}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.05, duration: 0.3 }}
-                  onClick={() => onBadgeClick?.({ type: 'milestone', id: String(m.threshold), threshold: m.threshold })}
-                  className="flex flex-col items-center group active:scale-[0.97]"
-                >
-                  {/* Large badge image - 88px for visibility */}
-                  <div className="relative mb-2">
-                    <img
-                      src={BADGE_IMAGES[m.threshold]}
-                      alt={m.name}
-                      loading="lazy"
-                      decoding="async"
-                      className={cn(
-                        "w-[88px] h-[110px] object-contain transition-transform duration-200 group-hover:scale-105",
-                        !m.isUnlocked && "opacity-40 grayscale-[60%]"
+              {visibleMilestones.map((m, index) => {
+                const isNext = index === nextMilestoneIndex;
+                const remaining = m.threshold - totalPlayed;
+
+                return (
+                  <motion.button
+                    key={m.threshold}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: index * 0.05, duration: 0.3 }}
+                    onClick={() => onBadgeClick?.({ type: 'milestone', id: String(m.threshold), threshold: m.threshold })}
+                    className="flex flex-col items-center group active:scale-[0.97]"
+                  >
+                    {/* Badge with visual state differentiation */}
+                    <div className="relative mb-2">
+                      {/* Earned: subtle glow */}
+                      {m.isUnlocked && (
+                        <div className="absolute inset-0 rounded-full bg-amber-400/15 blur-md scale-110" />
                       )}
-                    />
-                  </div>
-                  {/* Club name below */}
-                  <span className={cn(
-                    "text-xs font-semibold text-center transition-colors",
-                    m.isUnlocked ? "text-foreground" : "text-muted-foreground"
-                  )}>
-                    {m.name}
-                  </span>
-                </motion.button>
-              ))}
+                      {/* Next up: pulsing amber ring */}
+                      {isNext && !m.isUnlocked && (
+                        <div className="absolute inset-[-4px] rounded-full border-2 border-amber-400/60 animate-pulse" />
+                      )}
+                      <img
+                        src={BADGE_IMAGES[m.threshold]}
+                        alt={m.name}
+                        loading="lazy"
+                        decoding="async"
+                        className={cn(
+                          "object-contain transition-transform duration-200 group-hover:scale-105",
+                          m.isUnlocked 
+                            ? "w-[88px] h-[110px] drop-shadow-md" 
+                            : isNext 
+                              ? "w-[88px] h-[110px] opacity-75 grayscale-[30%]"
+                              : "w-[72px] h-[90px] opacity-40 grayscale-[60%]"
+                        )}
+                      />
+                    </div>
+                    {/* Club name */}
+                    <span className={cn(
+                      "text-xs font-semibold text-center transition-colors",
+                      m.isUnlocked ? "text-foreground" : "text-muted-foreground"
+                    )}>
+                      {m.name}
+                    </span>
+                    {/* Progress text under locked badges */}
+                    {!m.isUnlocked && isNext && (
+                      <span className="text-xs text-amber-600 font-semibold tabular-nums mt-0.5">
+                        {remaining} away!
+                      </span>
+                    )}
+                    {!m.isUnlocked && !isNext && (
+                      <span className="text-xs text-muted-foreground tabular-nums mt-0.5">
+                        {totalPlayed}/{m.threshold} played
+                      </span>
+                    )}
+                  </motion.button>
+                );
+              })}
             </motion.div>
           )
         ) : (
-          // Regions view - V3: Large badges with region names, no containers
+          // Regions view
           <motion.div
             key="regions"
             className="flex flex-wrap justify-center gap-6"
@@ -238,8 +270,11 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
                   onClick={() => onBadgeClick?.({ type: 'region', id: r.id })}
                   className="flex flex-col items-center group active:scale-[0.97]"
                 >
-                  {/* Large region badge - 88px */}
+                  {/* Region badge */}
                   <div className="relative mb-2">
+                    {r.isUnlocked && (
+                      <div className="absolute inset-0 rounded-full bg-emerald-400/15 blur-md scale-110" />
+                    )}
                     <img
                       src={badgeImage}
                       alt={regionName}
@@ -259,6 +294,12 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
                   )}>
                     {regionName}
                   </span>
+                  {/* Progress count */}
+                  {!r.isUnlocked && (
+                    <span className="text-xs text-muted-foreground tabular-nums mt-0.5">
+                      {r.played}/{r.total} played
+                    </span>
+                  )}
                 </motion.button>
               );
             })}

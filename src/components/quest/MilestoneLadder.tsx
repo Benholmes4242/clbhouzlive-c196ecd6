@@ -1,14 +1,13 @@
 /**
  * MilestoneLadder - Apple-level polish vertical timeline
- * V3: Badge chips on left (60-70px), connecting line, text on right
- * Clean design without checkmark overlays
+ * V5: Collapsible distant milestones, earned checkmarks, progress counts, regional chevrons
  */
 
-import React, { useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Flag, Crown } from 'lucide-react';
+import { Flag, Crown, Check, ChevronDown, ChevronRight } from 'lucide-react';
 import { MILESTONE_TIER_META } from '@/config/achievements';
 import { getRingColorForThreshold } from '@/lib/globalAchievementMilestoneSystem';
 import { MILESTONE_TAGLINES, REGION_TAGLINES, REGION_FULL_NAMES } from '@/config/achievementTaglines';
@@ -97,9 +96,9 @@ interface MilestoneNodeProps {
   onClick?: () => void;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════════════════
-// MILESTONE NODE - V4: Larger badges (88px), subtle line between (not through) badges
-// ═══════════════════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════════
+// MILESTONE NODE
+// ═══════════════════════════════════════════════════════════════════════════════
 
 const MilestoneNode: React.FC<MilestoneNodeProps> = ({
   milestone,
@@ -124,7 +123,7 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05, duration: 0.3 }}
     >
-      {/* Connecting line - subtle grey, centered exactly between badges */}
+      {/* Connecting line */}
       {!isLast && (
         <div
           className="absolute w-0.5 z-0 bg-border"
@@ -136,7 +135,7 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
         />
       )}
 
-      {/* Badge image (88px) - left side, matching Trophy Case */}
+      {/* Badge image - left side */}
       <button
         onClick={onClick}
         className="relative z-10 flex-shrink-0 active:opacity-80"
@@ -156,6 +155,12 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
               !milestone.isUnlocked && "opacity-40 grayscale-[60%]"
             )}
           />
+          {/* Earned checkmark overlay */}
+          {milestone.isUnlocked && (
+            <div className="absolute -right-1 -bottom-1 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center border-2 border-white">
+              <Check className="w-3 h-3 text-white" />
+            </div>
+          )}
         </motion.div>
       </button>
 
@@ -166,7 +171,7 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
       >
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
-            {/* Club name - primary title */}
+            {/* Club name */}
             <h3 className={cn(
               "font-bold text-base",
               milestone.isUnlocked ? "text-foreground" : "text-muted-foreground"
@@ -199,6 +204,13 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
                 </span>
               </div>
             )}
+
+            {/* Progress count for non-current locked milestones */}
+            {!milestone.isUnlocked && !isCurrent && (
+              <p className="text-xs text-muted-foreground/60 tabular-nums mt-1">
+                {totalPlayed} of {milestone.threshold} played
+              </p>
+            )}
           </div>
           
           {/* Status badge */}
@@ -225,9 +237,9 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
   );
 };
 
-// ═══════════════════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════════
 // BUILD MILESTONES
-// ═══════════════════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════════
 
 function buildMilestoneItems(totalPlayed: number): MilestoneItem[] {
   return MILESTONE_TIER_META.map(meta => ({
@@ -267,9 +279,9 @@ function buildRegionCompletionItems(regions: RegionCompletionData[]): MilestoneI
   return items;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════════════════
-// REGIONAL NODE - V4: Larger badge (80px), matches Journey Map style
-// ═══════════════════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════════
+// REGIONAL NODE - with chevron affordance
+// ═══════════════════════════════════════════════════════════════════════════════
 
 interface RegionalNodeProps {
   milestone: MilestoneItem;
@@ -286,13 +298,16 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ milestone, index, onClick }
 
   return (
     <motion.button
-      className="w-full flex items-center gap-5 py-4 min-h-[44px] text-left active:opacity-80"
+      className={cn(
+        "w-full flex items-center gap-5 py-4 min-h-[44px] text-left active:opacity-80",
+        (milestone.played || 0) === 0 && "opacity-60"
+      )}
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.3 + index * 0.05 }}
       onClick={onClick}
     >
-      {/* Region badge image (80px) - matching Journey Map */}
+      {/* Region badge image */}
       <motion.div
         whileHover={{ scale: 1.05 }}
         className="relative flex-shrink-0"
@@ -307,6 +322,12 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ milestone, index, onClick }
             !milestone.isUnlocked && "opacity-40 grayscale-[60%]"
           )}
         />
+        {/* Earned checkmark */}
+        {milestone.isUnlocked && (
+          <div className="absolute -right-1 -bottom-1 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center border-2 border-white">
+            <Check className="w-3 h-3 text-white" />
+          </div>
+        )}
       </motion.div>
       
       {/* Content */}
@@ -347,21 +368,24 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ milestone, index, onClick }
             )}
           </div>
           
-          {/* Status */}
-          {milestone.isUnlocked && (
-            <span className="text-sm font-semibold text-[#334E3D] flex-shrink-0">
-              Complete
-            </span>
-          )}
+          {/* Status + chevron */}
+          <div className="flex items-center gap-1 flex-shrink-0 pt-0.5">
+            {milestone.isUnlocked && (
+              <span className="text-sm font-semibold text-[#334E3D]">
+                Complete
+              </span>
+            )}
+            <ChevronRight className="w-4 h-4 text-muted-foreground/40 mt-0.5" />
+          </div>
         </div>
       </div>
     </motion.button>
   );
 };
 
-// ═══════════════════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════════
 // MILESTONE LADDER COMPONENT
-// ═══════════════════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════════
 
 export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
   totalPlayed,
@@ -369,6 +393,7 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
   regionCompletions = [],
 }) => {
   const navigate = useNavigate();
+  const [showAllMilestones, setShowAllMilestones] = useState(false);
   
   const coreMilestones = useMemo(() => buildMilestoneItems(totalPlayed), [totalPlayed]);
   const regionMilestones = useMemo(() => 
@@ -378,6 +403,19 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
 
   const currentMilestoneIndex = coreMilestones.findIndex(m => !m.isUnlocked);
   const coreComplete = coreMilestones.every(m => m.isUnlocked);
+
+  // Collapse: show earned + next 2 locked, then collapse the rest
+  const { visibleMilestones, hiddenCount } = useMemo(() => {
+    if (showAllMilestones || coreComplete) {
+      return { visibleMilestones: coreMilestones, hiddenCount: 0 };
+    }
+    
+    const maxVisible = currentMilestoneIndex >= 0 ? currentMilestoneIndex + 2 : coreMilestones.length;
+    const visible = coreMilestones.slice(0, Math.min(maxVisible + 1, coreMilestones.length));
+    const hidden = coreMilestones.length - visible.length;
+    
+    return { visibleMilestones: visible, hiddenCount: hidden };
+  }, [coreMilestones, showAllMilestones, coreComplete, currentMilestoneIndex]);
 
   // Empty state
   if (totalPlayed === 0 && coreMilestones.length > 0) {
@@ -398,18 +436,29 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
     <div className="relative">
       {/* Core milestones */}
       <div className="space-y-0">
-        {coreMilestones.map((milestone, index) => (
+        {visibleMilestones.map((milestone, index) => (
           <MilestoneNode
             key={milestone.id}
             milestone={milestone}
             isCurrent={index === currentMilestoneIndex}
-            isLast={index === coreMilestones.length - 1}
+            isLast={index === visibleMilestones.length - 1 && hiddenCount === 0}
             totalPlayed={totalPlayed}
             index={index}
             onClick={() => onMilestoneClick?.(milestone)}
           />
         ))}
       </div>
+
+      {/* Show more button for collapsed milestones */}
+      {hiddenCount > 0 && (
+        <button
+          onClick={() => setShowAllMilestones(true)}
+          className="flex items-center gap-2 py-3 pl-[108px] text-sm font-medium text-muted-foreground hover:text-foreground min-h-[44px] active:scale-[0.98] transition-colors"
+        >
+          <ChevronDown className="w-4 h-4" />
+          Show {hiddenCount} more milestone{hiddenCount > 1 ? 's' : ''}
+        </button>
+      )}
 
       {/* Mastery Track Section */}
       {regionMilestones.length > 0 && (

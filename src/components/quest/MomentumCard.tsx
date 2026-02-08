@@ -156,11 +156,7 @@ export const MomentumCard: React.FC<MomentumCardProps> = ({
         ) : (
           <div className="flex items-center gap-3 py-2">
             <div 
-              className="w-9 h-9 rounded-xl flex items-center justify-center"
-              style={{
-                background: 'var(--quest-chip-bg)',
-                border: '1px solid var(--quest-stroke)',
-              }}
+              className="w-9 h-9 rounded-xl flex items-center justify-center bg-muted border border-border"
             >
               <Flame className="w-4 h-4 text-muted-foreground" />
             </div>
