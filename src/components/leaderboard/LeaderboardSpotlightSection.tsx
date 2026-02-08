@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Info, ChevronRight, TrendingUp, Star, Trophy } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useLeaderboardSpotlight, SpotlightType } from '@/hooks/useLeaderboardSpotlight';
-import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
+
 import { Skeleton } from '@/components/ui/skeleton';
 import { getProfilePathById } from '@/lib/profileRoutes';
 
@@ -95,7 +95,7 @@ export function LeaderboardSpotlightSection() {
                   src={player.avatar_url}
                   alt={player.display_name}
                   fallback={initials}
-                  ringColor={getRingColorForTotalPlayed(0)}
+                  thinRing
                 />
               </div>
 

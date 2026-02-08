@@ -7,7 +7,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Target, ChevronRight } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getRingColorForTotalPlayed } from '@/lib/clbhouzAchievementPalette';
+
 import { cn } from '@/lib/utils';
 
 export interface RivalPlayer {
@@ -38,7 +38,7 @@ function RivalRow({
   gap?: number;
   onClick?: () => void;
 }) {
-  const ringColor = getRingColorForTotalPlayed(player.total_top100_played);
+  
   const initials = player.display_name
     ?.split(' ')
     .map((n: string) => n[0])
@@ -82,21 +82,14 @@ function RivalRow({
         </span>
       </div>
 
-      {/* Avatar with subtle shadow */}
+      {/* Avatar */}
       <div className="relative flex-shrink-0">
-        <div 
-          className={cn(
-            "absolute -inset-0.5 rounded-[12px] opacity-0 blur-sm transition-opacity",
-            !isCurrent && "group-hover:opacity-30"
-          )}
-          style={{ backgroundColor: ringColor }}
-        />
         <SquircleAvatar
           size={isCurrent ? 44 : 40}
           src={player.avatar_url}
           alt={player.display_name}
           fallback={initials}
-          ringColor={ringColor}
+          thinRing
         />
       </div>
 

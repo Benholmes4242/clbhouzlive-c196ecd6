@@ -12,7 +12,7 @@ import { LeaderboardSegmentedControl, LeaderboardSegment } from './LeaderboardSe
 import { LeaderboardPlayerRow } from './LeaderboardPlayerRow';
 import { LeaderboardEmptyState } from './LeaderboardEmptyState';
 import { getTop100Club } from '@/lib/top100Club';
-import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
+
 import {
   USE_MOCK_LEADERBOARD_DATA,
   MOCK_CURRENT_USER_RANK,

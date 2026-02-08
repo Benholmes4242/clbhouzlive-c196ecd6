@@ -235,6 +235,7 @@ export function CoursesLeaderboardView() {
                       src={round.user_profiles?.profile_photo_url}
                       alt={round.user_profiles?.display_name}
                       fallback={(round.user_profiles?.display_name?.[0] || '?').toUpperCase()}
+                      thinRing
                     />
                     <span className="text-xs text-muted-foreground truncate flex-1">
                       {round.user_profiles?.display_name}
