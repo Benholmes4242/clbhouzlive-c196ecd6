@@ -11,6 +11,8 @@ export { GolfGrapevine } from './GolfGrapevine';
 // Apple-grade polished components
 export { HubMessagesCardPolished } from './HubMessagesCardPolished';
 export { HubEchoCardPolished } from './HubEchoCardPolished';
+export { HubAtAGlanceCard } from './HubAtAGlanceCard';
+export { HubQuickActions } from './HubQuickActions';
 
 export { 
   HubPageSkeleton, 
