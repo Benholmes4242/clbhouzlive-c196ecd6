@@ -1,5 +1,4 @@
 import React from 'react';
-import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { cn } from '@/lib/utils';
 
 interface CourseCommunityRatingProps {
@@ -9,7 +8,7 @@ interface CourseCommunityRatingProps {
 }
 
 /**
- * Displays the community rating with the Clubhouse logo.
+ * Displays the community rating score.
  * This is the SINGLE source of truth for rating display in course cards.
  * 
  * Rating tier colors:
@@ -21,26 +20,19 @@ export const CourseCommunityRating: React.FC<CourseCommunityRatingProps> = ({
   className = '',
   size = 'md',
 }) => {
-  const sizeClasses = {
-    sm: 'h-3.5 w-3.5',
-    md: 'h-4 w-4',
-    lg: 'h-[19px] w-[19px]',
-  }[size];
-  
   const textClasses = {
-    sm: 'text-[11px]',
-    md: 'text-xs',
-    lg: 'text-[14px]',
+    sm: 'text-xs',
+    md: 'text-sm',
+    lg: 'text-base',
   }[size];
 
   const isOutstanding = rating >= 9.0;
 
   return (
-    <div className={`flex items-center gap-1 flex-shrink-0 ${className}`}>
-      <ClubhouseLogo className={sizeClasses} />
+    <div className={`flex items-center flex-shrink-0 ${className}`}>
       <span className={cn(
         textClasses,
-        'font-semibold',
+        'font-semibold tabular-nums',
         isOutstanding ? 'text-amber-500' : 'text-foreground'
       )}>
         {rating.toFixed(1)}
