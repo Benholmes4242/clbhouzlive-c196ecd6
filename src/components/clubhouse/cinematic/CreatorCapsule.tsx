@@ -83,6 +83,9 @@ interface CreatorCapsuleProps {
   reviewData?: ExtractedReviewData;
   /** Callback when review capsule is tapped */
   onReviewTap?: () => void;
+
+  /** Optional slot rendered centered above the capsule (e.g. media navigation dots) */
+  dotsSlot?: React.ReactNode;
 }
 
 export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
@@ -101,6 +104,8 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   isReview = false,
   reviewData,
   onReviewTap,
+  // Dots slot
+  dotsSlot,
 }) => {
   
   const [isExpanded, setIsExpanded] = useState(false);
@@ -406,6 +411,12 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             : 'calc(30px + 80px)',
         }}
       >
+        {/* Media navigation dots - centered above capsule */}
+        {dotsSlot && (
+          <div className="flex justify-center mb-3 pointer-events-auto">
+            {dotsSlot}
+          </div>
+        )}
         <motion.div
           layout
           transition={{ layout: { duration: 0.2, ease: 'easeOut' } }}

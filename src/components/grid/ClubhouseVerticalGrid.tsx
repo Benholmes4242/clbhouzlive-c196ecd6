@@ -1122,20 +1122,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           />
                         )}
                         
-                        {/* Multi-media navigation dots for non-review posts */}
-                        {hasMultipleMedia && !isReviewPost(item) && (
-                          <MediaNavigationDots
-                            mediaCount={mediaItems.length}
-                            currentIndex={currentMediaIndex}
-                            onJump={(index) => {
-                              setMediaIndices(prev => ({
-                                ...prev,
-                                [item.id]: index
-                              }));
-                            }}
-                            bottomOffset="calc(157px - var(--bottom-nav-height, 64px))"
-                          />
-                        )}
+                        {/* Navigation dots moved to CreatorCapsule dotsSlot */}
                         
                         <div 
                           className="absolute bottom-0 left-0 right-0 pointer-events-none z-10"
@@ -1406,6 +1393,10 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
           }
         };
         
+        const mediaItems = currentPost.media || [];
+        const hasMultipleMedia = mediaItems.length > 1;
+        const currentMediaIdx = mediaIndices[currentPost.id] || 0;
+
         return (
           <CreatorCapsule
             user={{
@@ -1433,6 +1424,25 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
             isReview={isReview}
             reviewData={reviewData}
             onReviewTap={handleReviewTap}
+            // Media dots - centered above capsule
+            dotsSlot={hasMultipleMedia && !isReview ? (
+              <div className="flex items-center gap-2" role="tablist" aria-label="Media pagination">
+                {Array.from({ length: mediaItems.length }).map((_, i) => (
+                  <button
+                    key={i}
+                    role="tab"
+                    aria-selected={i === currentMediaIdx}
+                    aria-label={`Go to media ${i + 1}`}
+                    onClick={() => setMediaIndices(prev => ({ ...prev, [currentPost.id]: i }))}
+                    className={`h-1.5 rounded-full transition-all duration-200 ease-out ${
+                      i === currentMediaIdx
+                        ? 'w-5 bg-white'
+                        : 'w-1.5 bg-white/60'
+                    }`}
+                  />
+                ))}
+              </div>
+            ) : undefined}
           />
         );
       })()}
