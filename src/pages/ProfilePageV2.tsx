@@ -17,7 +17,7 @@ import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
 import { useFollow } from '@/hooks/useFollow';
 import { useFriendship } from '@/hooks/useFriendship';
 import { supabase } from '@/integrations/supabase/client';
-import { Trophy, ChevronRight, MoreHorizontal, Send, UserPlus, Check, ExternalLink, Loader2, ArrowLeft } from 'lucide-react';
+import { Trophy, ChevronRight, MoreHorizontal, Send, UserPlus, Check, ExternalLink, Loader2, ArrowLeft, Pencil, Camera } from 'lucide-react';
 import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
@@ -45,8 +45,8 @@ import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
 import { ProfileTouchDebugProvider, useProfileTouchDebug } from '@/components/profile/debug/ProfileTouchDebugProvider';
 import { ProfileTouchDebugPanel } from '@/components/profile/debug/ProfileTouchDebugPanel';
 
-// Background color - matches course details page (slate-50)
-const BG_COLOR = '#f8fafc'; // slate-50
+// Background color - uses CSS variable for theme support
+const BG_COLOR = 'hsl(var(--background))';
 
 // UUID v4 detection regex
 const isUuid = (v: string) =>
@@ -252,8 +252,8 @@ const ProfilePageV2Content: React.FC = () => {
 
   if (authLoading || profileLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: BG_COLOR }}>
-        <div className="w-8 h-8 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-8 h-8 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
       </div>
     );
   }
@@ -261,20 +261,20 @@ const ProfilePageV2Content: React.FC = () => {
   // Show "Profile unavailable" for deleted or not found profiles
   if (isProfileDeleted || profileNotFound) {
     return (
-      <PageRoot className="min-h-screen" style={{ background: BG_COLOR }} immersiveStatusBar>
+      <PageRoot className="min-h-screen bg-background" immersiveStatusBar>
         <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center">
-          <div className="w-20 h-20 bg-slate-200 rounded-full flex items-center justify-center mb-6">
-            <span className="text-3xl text-slate-400">?</span>
+          <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mb-6">
+            <span className="text-3xl text-muted-foreground">?</span>
           </div>
-          <h1 className="text-2xl font-semibold text-slate-800 mb-2">
+          <h1 className="text-2xl font-semibold text-foreground mb-2">
             Profile unavailable
           </h1>
-          <p className="text-slate-500 mb-6 max-w-sm">
+          <p className="text-muted-foreground mb-6 max-w-sm">
             This profile doesn't exist or is no longer available.
           </p>
           <button
             onClick={() => navigate(-1)}
-            className="px-6 py-2 bg-slate-800 text-white rounded-full text-sm font-medium hover:bg-slate-700 transition-colors"
+            className="px-6 py-2 bg-foreground text-background rounded-full text-sm font-medium hover:opacity-90 transition-colors"
           >
             Go back
           </button>
@@ -357,7 +357,17 @@ const ProfilePageV2Content: React.FC = () => {
               className="w-full h-full object-cover object-bottom"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-slate-300 to-slate-400" />
+            <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/40" />
+          )}
+          {/* Cover photo edit affordance — self-profile only */}
+          {isSelf && (
+            <button
+              onClick={() => navigate('/edit-profile')}
+              className="absolute bottom-3 right-3 h-9 w-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center active:scale-[0.95] z-10 pointer-events-auto transition-transform"
+              aria-label="Change cover photo"
+            >
+              <Camera className="w-4 h-4 text-white" />
+            </button>
           )}
         </div>
 
@@ -365,7 +375,7 @@ const ProfilePageV2Content: React.FC = () => {
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-10 pointer-events-auto"
+          className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-full bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-all z-10 pointer-events-auto active:scale-[0.95]"
           style={{ top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
           aria-label="Back"
         >
@@ -392,10 +402,9 @@ const ProfilePageV2Content: React.FC = () => {
           aria-label="View profile photo"
         >
           <div className="relative w-[124px] h-[124px]">
-            {/* 2px bluey-grey ring (matches background) */}
+            {/* 2px ring (matches background) */}
             <div
-              className="clbhouz-squircle absolute inset-0"
-              style={{ background: BG_COLOR }}
+              className="clbhouz-squircle absolute inset-0 bg-background"
             />
 
             {/* Avatar */}
@@ -413,11 +422,21 @@ const ProfilePageV2Content: React.FC = () => {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-slate-200 flex items-center justify-center text-3xl font-bold text-slate-600">
+                <div className="w-full h-full bg-muted flex items-center justify-center text-3xl font-bold text-muted-foreground">
                   {displayName.charAt(0)}
                 </div>
               )}
             </div>
+            {/* Avatar edit affordance — self-profile only */}
+            {isSelf && (
+              <button
+                onClick={(e) => { e.stopPropagation(); navigate('/edit-profile'); }}
+                className="absolute bottom-0 right-0 h-7 w-7 rounded-full bg-foreground flex items-center justify-center border-2 border-card active:scale-[0.95] z-30 pointer-events-auto transition-transform"
+                aria-label="Change profile photo"
+              >
+                <Camera className="w-3.5 h-3.5 text-background" />
+              </button>
+            )}
           </div>
         </button>
 
@@ -427,7 +446,7 @@ const ProfilePageV2Content: React.FC = () => {
           {/* HCP pill - white, bigger size */}
           {profile?.eg_handicap_index != null && (
             <span 
-              className="px-4 py-1.5 text-sm font-semibold rounded-full text-[#0F0F0F] flex items-center justify-center"
+             className="px-4 py-1.5 text-sm font-semibold rounded-full text-foreground flex items-center justify-center"
               style={{ 
                 background: '#FFFFFF',
                 boxShadow: '0 2px 8px rgba(31, 36, 40, 0.08)'
@@ -456,7 +475,7 @@ const ProfilePageV2Content: React.FC = () => {
       {/* z-10 ensures content is above hero's z-1, pointer-events-auto ensures tappability */}
       <div className="pt-[68px] px-5 text-left relative z-10 pointer-events-auto">
         {/* Name - smaller, more bold */}
-        <h1 className="text-[28px] font-semibold text-[#0F0F0F]">
+        <h1 className="text-[28px] font-semibold text-foreground">
           {displayName}
         </h1>
       </div>
@@ -465,59 +484,39 @@ const ProfilePageV2Content: React.FC = () => {
       {/* relative z-10 ensures buttons are above hero overlay */}
       <div className="mt-3 px-5 flex items-center gap-2 relative z-10 pointer-events-auto">
         {isSelf ? (
-          <>
-            {/* Self: Disabled Follow button */}
-            <button 
-              className="h-9 flex-1 rounded-full text-sm font-semibold text-white/60 flex items-center justify-center cursor-not-allowed"
-              style={{ background: '#94a3b8' }}
-              disabled
+          /* ── Self-profile: prominent Edit Profile + overflow menu ── */
+          <div className="flex items-center gap-3 w-full">
+            <button
+              onClick={() => navigate('/edit-profile')}
+              className="flex-1 h-11 rounded-full bg-muted text-foreground font-medium text-sm flex items-center justify-center gap-2 border border-border active:scale-[0.98] transition-transform"
             >
-              Follow
+              <Pencil className="w-4 h-4" />
+              Edit Profile
             </button>
-            
-            {/* Self: Disabled Friend Request button */}
-            <button 
-              className="h-9 flex-1 rounded-full text-sm font-semibold text-slate-400 flex items-center justify-center gap-1.5 cursor-not-allowed"
-              style={{
-                background: '#f1f5f9',
-                border: '1px solid #E0E0E0'
-              }}
-              disabled
-            >
-              <UserPlus className="w-3.5 h-3.5" />
-              Add Friend
-            </button>
-            
-            {/* Self: Three dots with Edit Profile */}
             <DropdownMenu onOpenChange={(open) => {
-              if (!open) {
-                // Blur the trigger button when menu closes to remove focus ring
-                (document.activeElement as HTMLElement)?.blur();
-              }
+              if (!open) (document.activeElement as HTMLElement)?.blur();
             }}>
               <DropdownMenuTrigger asChild>
                 <button 
-                  className="w-9 h-9 flex-shrink-0 rounded-full flex items-center justify-center focus:outline-none focus-visible:outline-none active:outline-none"
-                  style={{
-                    background: '#fff',
-                    border: '1px solid #E0E0E0'
-                  }}
+                  className="w-11 h-11 flex-shrink-0 rounded-full bg-muted flex items-center justify-center border border-border focus:outline-none active:scale-[0.95] transition-transform"
                 >
-                  <MoreHorizontal className="w-4 h-4 text-[#0F0F0F]" />
+                  <MoreHorizontal className="w-5 h-5 text-foreground" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={() => navigate('/edit-profile')}>
-                  Edit Profile
+                <DropdownMenuItem onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                }}>
+                  Copy Link
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </>
+          </div>
         ) : (
+          /* ── Other user: Follow + Add Friend ── */
           <>
-            {/* Other: Active Follow button */}
             <button 
-              className="h-9 flex-1 rounded-full text-sm font-semibold text-white flex items-center justify-center gap-1.5 disabled:opacity-60"
+              className="h-11 flex-1 rounded-full text-sm font-semibold text-white flex items-center justify-center gap-1.5 disabled:opacity-60 active:scale-[0.98] transition-transform"
               style={{ background: isFollowing === 'following' ? '#334155' : '#64748b' }}
               onClick={toggleFollow}
               disabled={followBusy || isFollowing === 'unknown'}
@@ -534,13 +533,11 @@ const ProfilePageV2Content: React.FC = () => {
               )}
             </button>
             
-            {/* Other: Friend Request button (replaces Message) */}
             <button 
-              className="h-9 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 disabled:opacity-60"
+              className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 disabled:opacity-60 active:scale-[0.98] transition-transform border border-border"
               style={{
-                background: friendshipStatus === 'friends' ? '#dcfce7' : '#fff',
-                border: '1px solid #E0E0E0',
-                color: friendshipStatus === 'friends' ? '#166534' : '#0F0F0F'
+                background: friendshipStatus === 'friends' ? '#dcfce7' : undefined,
+                color: friendshipStatus === 'friends' ? '#166534' : undefined
               }}
               onClick={handleFriendAction}
               disabled={friendshipUpdating || friendshipStatus === 'friends'}
@@ -561,8 +558,6 @@ const ProfilePageV2Content: React.FC = () => {
                 </>
               )}
             </button>
-            
-            {/* Other: No three dots menu */}
           </>
         )}
       </div>
@@ -582,18 +577,18 @@ const ProfilePageV2Content: React.FC = () => {
           {/* Posts */}
           <motion.button
             onClick={() => setActiveMiniNav('posts')}
-            className="pb-3 flex items-center gap-2"
+            className="pb-3 flex items-center gap-2 min-h-[44px] rounded-lg active:scale-[0.97] transition-transform"
             variants={{
               hidden: { opacity: 0, y: 4 },
               show: { opacity: 1, y: 0, transition: { duration: 0.22, ease: 'easeOut' } }
             }}
           >
-            <span className="text-sm text-slate-500">Posts</span>
+            <span className="text-sm text-muted-foreground">Posts</span>
             <AnimatedNumber 
               value={postsCount} 
               isLoading={postsCountLoading}
               minCh={2}
-              className="text-base font-semibold text-[#0F0F0F]"
+              className="text-base font-semibold text-foreground"
             />
           </motion.button>
           
@@ -603,18 +598,18 @@ const ProfilePageV2Content: React.FC = () => {
               setActiveMiniNav('followers');
               navigate(`/profile/${username}/followers`);
             }}
-            className="pb-3 flex items-center gap-2"
+            className="pb-3 flex items-center gap-2 min-h-[44px] rounded-lg active:scale-[0.97] transition-transform"
             variants={{
               hidden: { opacity: 0, y: 4 },
               show: { opacity: 1, y: 0, transition: { duration: 0.22, ease: 'easeOut' } }
             }}
           >
-            <span className="text-sm text-slate-500">Followers</span>
+            <span className="text-sm text-muted-foreground">Followers</span>
             <AnimatedNumber 
               value={followersCount} 
               isLoading={statsLoading} 
               minCh={2}
-              className="text-base font-semibold text-[#0F0F0F]"
+              className="text-base font-semibold text-foreground"
             />
           </motion.button>
           
@@ -625,18 +620,18 @@ const ProfilePageV2Content: React.FC = () => {
                 setActiveMiniNav('friends');
                 navigate(`/profile/${username}/friends`);
               }}
-              className="pb-3 flex items-center gap-2"
+              className="pb-3 flex items-center gap-2 min-h-[44px] rounded-lg active:scale-[0.97] transition-transform"
               variants={{
                 hidden: { opacity: 0, y: 4 },
                 show: { opacity: 1, y: 0, transition: { duration: 0.22, ease: 'easeOut' } }
               }}
             >
-              <span className="text-sm text-slate-500">Friends</span>
+              <span className="text-sm text-muted-foreground">Friends</span>
               <AnimatedNumber 
                 value={friendsCount} 
                 isLoading={statsLoading} 
                 minCh={2}
-                className="text-base font-semibold text-[#0F0F0F]"
+                className="text-base font-semibold text-foreground"
               />
             </motion.button>
           )}
@@ -645,11 +640,11 @@ const ProfilePageV2Content: React.FC = () => {
 
       {/* White content sheet */}
       {/* relative z-10 ensures white sheet and all content is above hero overlay */}
-      <div className="bg-white pt-4 pb-32 min-h-[60vh] relative z-10 pointer-events-auto">
+      <div className="bg-card pt-4 pb-32 min-h-[60vh] relative z-10 pointer-events-auto">
         {/* About section - removed "About" heading, just the bio text */}
         {/* mb-5 → mb-4 (16px from about text to clubs divider) */}
         <section className="px-5 mb-4">
-          <p className="text-base text-[#0F0F0F] leading-relaxed whitespace-pre-wrap" style={{ overflowWrap: 'anywhere' }}>
+          <p className="text-base text-foreground leading-relaxed whitespace-pre-wrap" style={{ overflowWrap: 'anywhere' }}>
             {profile?.bio || 'Passionate golfer with a love for links courses. Always working to improve my game and explore new courses.'}
           </p>
           
@@ -662,11 +657,7 @@ const ProfilePageV2Content: React.FC = () => {
                   href={ensureProtocol(website)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-slate-600 hover:text-slate-800 transition-colors"
-                  style={{
-                    background: '#f1f5f9',
-                    border: '1px solid #e2e8f0'
-                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-muted-foreground hover:text-foreground bg-muted border border-border transition-colors"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                   {formatUrlForDisplay(website)}
@@ -678,7 +669,7 @@ const ProfilePageV2Content: React.FC = () => {
 
         {/* Divider above Clubs section */}
         <div className="px-5 mb-3">
-          <div className="border-t border-slate-200" />
+          <div className="border-t border-border" />
         </div>
 
         {/* Clubs section - directly on page background without card */}
@@ -717,9 +708,8 @@ const ProfilePageV2Content: React.FC = () => {
           }}
         >
           <div 
-            className="flex items-stretch rounded-xl overflow-hidden"
+            className="flex items-stretch rounded-xl overflow-hidden bg-muted"
             style={{ 
-              background: '#e2e8f0',
               touchAction: 'auto',
               pointerEvents: 'auto'
             }}
@@ -744,8 +734,8 @@ const ProfilePageV2Content: React.FC = () => {
                   className={cn(
                     "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px]",
                     isActive 
-                      ? "bg-white text-slate-800 shadow-sm m-1 rounded-lg" 
-                      : "text-slate-500 hover:text-slate-700"
+                      ? "bg-card text-foreground shadow-sm m-1 rounded-lg" 
+                      : "text-muted-foreground hover:text-foreground"
                   )}
                   style={{ touchAction: 'auto' }}
                 >
