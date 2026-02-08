@@ -4,8 +4,6 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ThumbButton } from '@/components/common/ThumbButton';
 import { ExpandableText } from '@/components/common/ExpandableText';
 import { ReviewMediaStrip, ReviewMediaItem } from './ReviewMediaStrip';
-import { Play } from 'lucide-react';
-import { useTierStyles } from '@/hooks/useTierStyles';
 
 interface Review {
   id: string;
@@ -78,7 +76,6 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
     review;
 
   const votingDisabled = disabled || isMock || false;
-  const tierStyles = useTierStyles(score);
 
   // Build category scores
   const categories = [
@@ -92,8 +89,8 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
     <article
       data-review-id={review.id}
       className={cn(
-        'bg-white rounded-2xl border p-5 transition-all',
-        isMine ? 'border-green-200 ring-1 ring-green-100' : 'border-gray-100',
+        'bg-card rounded-2xl border p-5 transition-all',
+        isMine ? 'border-green-200 ring-1 ring-green-100' : 'border-border',
         isHighlighted && 'animate-soft-pulse'
       )}
     >
@@ -110,7 +107,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
                 fallback={user.initials}
               />
             ) : (
-              <div className="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center text-sm font-semibold text-gray-700">
+              <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-sm font-semibold text-foreground">
                 {user.initials}
               </div>
             )}
@@ -118,14 +115,14 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
 
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-gray-900">{user.name}</span>
+              <span className="font-semibold text-foreground">{user.name}</span>
               {isMine && (
                 <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">
                   You
                 </span>
               )}
             </div>
-            <span className="text-sm text-gray-500">{formatDate(createdAt)}</span>
+            <span className="text-sm text-muted-foreground">{formatDate(createdAt)}</span>
           </div>
         </div>
 
@@ -146,38 +143,21 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
           <ExpandableText 
             text={text} 
             lines={4} 
-            className="text-gray-600 leading-relaxed"
+            className="text-muted-foreground leading-relaxed"
           />
         </div>
       )}
 
-      {/* Media strip */}
+      {/* Media strip - shared component */}
       {media && media.length > 0 && onMediaClick && (
-        <div className="flex gap-2 mb-4 overflow-x-auto -mx-5 px-5 pb-2">
-          {media.map((item, i) => (
-            <div
-              key={item.id}
-              onClick={() => onMediaClick(i)}
-              className="relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden cursor-pointer ring-1 ring-black/5 hover:ring-black/10 transition-all active:scale-[0.97]"
-            >
-              <img 
-                src={item.poster_url || item.media_url} 
-                alt=""
-                className="w-full h-full object-cover" 
-              />
-              {item.media_type === 'video' && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                  <Play className="w-4 h-4 text-white" fill="currentColor" />
-                </div>
-              )}
-            </div>
-          ))}
+        <div className="mb-4">
+          <ReviewMediaStrip media={media} onMediaClick={onMediaClick} variant="compact" />
         </div>
       )}
 
       {/* Category breakdown - brand color bars for scores 9+ (per category) */}
       {categories.length > 0 && (
-        <div className="grid grid-cols-2 gap-x-6 gap-y-2 mb-4 py-3 border-y border-gray-100">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-2 mb-4 py-3 border-y border-border">
           {categories.map(cat => {
             // Determine bar color based on individual category score (9+ = Outstanding)
             const isOutstandingCat = (cat.value || 0) >= 9;
@@ -187,15 +167,15 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
             
             return (
               <div key={cat.key} className="flex items-center justify-between">
-                <span className="text-xs text-gray-500">{categoryLabels[cat.key]}</span>
+                <span className="text-xs text-muted-foreground">{categoryLabels[cat.key]}</span>
                 <div className="flex items-center gap-2">
-                  <div className="w-16 h-1.5 bg-[#e5e7eb] rounded-full overflow-hidden">
+                  <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
                     <div 
                       className={`h-full ${barColorClass} rounded-full`}
                       style={{ width: `${((cat.value || 0) / 10) * 100}%` }}
                     />
                   </div>
-                  <span className="text-xs font-medium text-gray-700 w-6 tabular-nums">
+                  <span className="text-xs font-medium text-foreground w-6 tabular-nums">
                     {(cat.value || 0).toFixed(1)}
                   </span>
                 </div>

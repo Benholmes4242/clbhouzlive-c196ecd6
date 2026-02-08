@@ -14,21 +14,21 @@ export const WriteReviewPrompt: React.FC<WriteReviewPromptProps> = ({
   onRateClick,
 }) => {
   return (
-    <div className="rounded-sq-md border border-slate-200 bg-white px-4 py-4 shadow-sm">
+    <div className="rounded-sq-md border border-border bg-card px-4 py-4 shadow-sm">
       <div className="flex items-start gap-3">
         <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-50">
           <Star className="h-5 w-5 text-amber-500" />
         </div>
         <div className="flex-1">
-          <p className="text-sm font-semibold text-slate-900">Played here?</p>
-          <p className="mt-0.5 text-xs text-slate-500">
+          <p className="text-sm font-semibold text-foreground">Played here?</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
             Rate this course to help the community.
           </p>
           <Button
             type="button"
             variant="outline"
             size="sm"
-            className="mt-3 h-9"
+            className="mt-3 h-9 active:scale-[0.98] transition-transform"
             onClick={onRateClick}
           >
             Rate this course
