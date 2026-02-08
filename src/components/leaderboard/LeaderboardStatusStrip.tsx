@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-
+import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { getTop100Club, getNextTop100Club } from '@/lib/top100Club';
 
 interface LeaderboardStatusStripProps {
@@ -39,7 +39,7 @@ export function LeaderboardStatusStrip({ user }: LeaderboardStatusStripProps) {
   const navigate = useNavigate();
   const club = getTop100Club(user.total_top100_played);
   const nextClub = getNextTop100Club(user.total_top100_played);
-  
+  const ringColor = getRingColorForTotalPlayed(user.total_top100_played);
 
   const initials = user.display_name
     ?.split(' ')
@@ -72,7 +72,7 @@ export function LeaderboardStatusStrip({ user }: LeaderboardStatusStripProps) {
               src={user.avatar_url}
               alt={user.display_name}
               fallback={initials}
-              thinRing
+              ringColor={ringColor}
             />
           </div>
 

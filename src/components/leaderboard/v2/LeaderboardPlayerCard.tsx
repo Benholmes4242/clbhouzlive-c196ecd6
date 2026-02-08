@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { TrendingUp, Award, Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-
+import { getRingColorForTotalPlayed } from '@/lib/clbhouzAchievementPalette';
 import { getTop100Club } from '@/lib/top100Club';
 import { cn } from '@/lib/utils';
 
@@ -74,7 +74,7 @@ export function LeaderboardPlayerCard({
 }: LeaderboardPlayerCardProps) {
   const navigate = useNavigate();
   const club = getTop100Club(player.total_top100_played);
-  
+  const ringColor = getRingColorForTotalPlayed(player.total_top100_played);
   
   const isTop3 = player.rank >= 1 && player.rank <= 3;
   const medalStyle = MEDAL_STYLES[player.rank];
@@ -113,14 +113,32 @@ export function LeaderboardPlayerCard({
         isTop3 && medalStyle?.rowBg,
       )}
     >
-      {/* Avatar */}
+      {/* Avatar with ring */}
       <div className="relative flex-shrink-0">
+        {/* Glow effect for top 3 */}
+        {isTop3 && (
+          <motion.div 
+            className="absolute -inset-1.5 rounded-[18px] -z-10 blur-md opacity-40"
+            style={{ backgroundColor: ringColor }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 0.4, scale: 1 }}
+            transition={{ duration: 0.4 }}
+          />
+        )}
+        {/* Hover glow for non-top3 */}
+        <div 
+          className={cn(
+            "absolute -inset-0.5 rounded-[14px] -z-10 blur-sm opacity-0 transition-opacity",
+            !isTop3 && "group-hover:opacity-30"
+          )}
+          style={{ backgroundColor: ringColor }}
+        />
         <SquircleAvatar
           size={isTop3 ? 52 : 44}
           src={player.avatar_url}
           alt={player.display_name}
           fallback={initials}
-          thinRing
+          ringColor={ringColor}
         />
       </div>
 

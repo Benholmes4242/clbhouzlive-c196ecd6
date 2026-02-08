@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-
+import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { getTop100Club } from '@/lib/top100Club';
 import { cn } from '@/lib/utils';
 
@@ -27,7 +27,7 @@ const MEDAL_STYLES: Record<number, { bg: string; border: string; text: string }>
 export function LeaderboardPlayerRow({ entry, isCurrentUser = false }: LeaderboardPlayerRowProps) {
   const navigate = useNavigate();
   const club = getTop100Club(entry.total_top100_played);
-  
+  const ringColor = getRingColorForTotalPlayed(entry.total_top100_played);
 
   const initials = entry.display_name
     ?.split(' ')
@@ -55,6 +55,7 @@ export function LeaderboardPlayerRow({ entry, isCurrentUser = false }: Leaderboa
         src={entry.avatar_url}
         alt={entry.display_name}
         fallback={initials}
+        ringColor={ringColor}
         thinRing
         className="flex-shrink-0"
       />

@@ -59,7 +59,7 @@ export function RivalPreviewSheet({
               src={player.avatar_url}
               alt={player.display_name}
               fallback={initials}
-              thinRing
+              ringColor={ringColor}
             />
 
             {/* Info */}

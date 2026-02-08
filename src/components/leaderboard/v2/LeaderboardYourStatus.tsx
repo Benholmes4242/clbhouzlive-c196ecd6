@@ -110,12 +110,16 @@ export function LeaderboardYourStatus({
         <div className="flex items-start gap-3.5">
           {/* Avatar with XP ring and shadow */}
           <div className="relative flex-shrink-0">
+            <div 
+              className="absolute -inset-0.5 rounded-[14px] opacity-30 blur-sm"
+              style={{ backgroundColor: ringColor }}
+            />
             <SquircleAvatar
               size={56}
               src={user.avatar_url}
               alt={user.display_name}
               fallback={initials}
-              thinRing
+              ringColor={ringColor}
             />
           </div>
 
