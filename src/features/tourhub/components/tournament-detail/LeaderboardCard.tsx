@@ -2,11 +2,12 @@
  * LeaderboardCard - Premium leaderboard display (overview compact mode)
  * 
  * Features:
+ * - Glass card treatment
  * - Podium-style top 3 with metallic accents
  * - Clean row design with position badges
  * - Score to par color coding (PGA convention)
  * - Player avatars with linking
- * - Semantic token compliance
+ * - Section entrance animation (whileInView)
  */
 
 import { Link } from 'react-router-dom';
@@ -174,6 +175,14 @@ function LeaderboardRow({
   );
 }
 
+const glassCardStyle = {
+  background: 'rgba(255, 255, 255, 0.7)',
+  backdropFilter: 'blur(8px)',
+  border: '1px solid rgba(255, 255, 255, 0.5)',
+  borderRadius: '20px',
+  boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04)',
+};
+
 export function LeaderboardCard({ 
   entries, 
   headshotMap, 
@@ -186,10 +195,17 @@ export function LeaderboardCard({
   const hasMore = limit > 0 && entries.length > limit;
   
   return (
-    <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+    <motion.div 
+      className="overflow-hidden"
+      style={glassCardStyle}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-40px' }}
+      transition={{ duration: 0.35 }}
+    >
       {/* Header */}
       {showHeader && (
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border/60">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border/40">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
               <Trophy className="w-4 h-4 text-amber-600" />
@@ -210,7 +226,7 @@ export function LeaderboardCard({
       )}
       
       {/* Leaderboard rows */}
-      <div className="divide-y divide-border/50">
+      <div className="divide-y divide-border/30">
         {displayEntries.map((entry, index) => (
           <LeaderboardRow
             key={entry.id}
@@ -231,6 +247,6 @@ export function LeaderboardCard({
           <ChevronRight className="w-4 h-4" />
         </button>
       )}
-    </div>
+    </motion.div>
   );
 }

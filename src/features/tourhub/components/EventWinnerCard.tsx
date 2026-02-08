@@ -1,9 +1,16 @@
 /**
  * EventWinnerCard - Display tournament winner with premium styling
+ * 
+ * Features:
+ * - Glass card treatment
+ * - Tap feedback on Link wrapper
+ * - Semantic token compliance (no hardcoded slates)
+ * - Section entrance animation (whileInView)
  */
 
 import { Trophy } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useEventWinner } from '../hooks/useEventWinner';
 import { PlayerAvatar } from './PlayerAvatar';
@@ -27,6 +34,13 @@ function formatEarnings(money: number | null | undefined): string {
   }
   return `$${money.toLocaleString()}`;
 }
+
+const sectionEntrance = {
+  initial: { opacity: 0, y: 20 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: '-40px' as const },
+  transition: { duration: 0.35 },
+};
 
 export function EventWinnerCard({ tournamentId, className }: EventWinnerCardProps) {
   const { data: winner, isLoading } = useEventWinner(tournamentId);
@@ -52,7 +66,7 @@ export function EventWinnerCard({ tournamentId, className }: EventWinnerCardProp
   // Premium pending state when no winner data yet
   if (!winner) {
     return (
-      <div className={cn("", className)}>
+      <motion.div className={cn("", className)} {...sectionEntrance}>
         <div className="flex items-center gap-2 mb-3">
           <Trophy className="w-4 h-4 text-amber-500" />
           <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -60,27 +74,27 @@ export function EventWinnerCard({ tournamentId, className }: EventWinnerCardProp
           </span>
         </div>
         
-        <div className="p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/30 dark:from-slate-100/10 dark:to-slate-200/5 rounded-xl border border-slate-600/20 dark:border-slate-400/20">
+        <div className="p-6 bg-gradient-to-br from-foreground/50 to-foreground/30 rounded-xl border border-foreground/20">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-slate-700/30 dark:bg-slate-300/20 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-foreground/30 flex items-center justify-center">
               <Trophy className="w-8 h-8 text-amber-500/60" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-foreground/80">Champion unlocking soon</h3>
-              <p className="text-sm text-muted-foreground mt-0.5">
+              <h3 className="font-semibold text-white/80">Champion unlocking soon</h3>
+              <p className="text-sm text-white/50 mt-0.5">
                 Official results will appear once the event concludes
               </p>
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     );
   }
   
   // Winner exists but no player linked (pending data)
   if (!winner.player) {
     return (
-      <div className={cn("", className)}>
+      <motion.div className={cn("", className)} {...sectionEntrance}>
         <div className="flex items-center gap-2 mb-3">
           <Trophy className="w-4 h-4 text-amber-500" />
           <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -101,13 +115,13 @@ export function EventWinnerCard({ tournamentId, className }: EventWinnerCardProp
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     );
   }
   
   // Full winner display with player linked
   return (
-    <div className={cn("", className)}>
+    <motion.div className={cn("", className)} {...sectionEntrance}>
       <div className="flex items-center gap-2 mb-3">
         <Trophy className="w-4 h-4 text-amber-500" />
         <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -117,7 +131,7 @@ export function EventWinnerCard({ tournamentId, className }: EventWinnerCardProp
       
       <Link 
         to={`/tourhub/player/${winner.player.id}`}
-        className="group block"
+        className="group block active:scale-[0.98] transition-transform"
       >
         <div className="relative overflow-hidden p-5 bg-gradient-to-br from-amber-500/15 via-amber-500/10 to-amber-600/5 rounded-xl border-2 border-amber-500/30 transition-all group-hover:border-amber-500/50 group-hover:shadow-lg group-hover:shadow-amber-500/10">
           {/* Subtle gold shimmer effect */}
@@ -180,7 +194,7 @@ export function EventWinnerCard({ tournamentId, className }: EventWinnerCardProp
           )}
         </div>
       </Link>
-    </div>
+    </motion.div>
   );
 }
 

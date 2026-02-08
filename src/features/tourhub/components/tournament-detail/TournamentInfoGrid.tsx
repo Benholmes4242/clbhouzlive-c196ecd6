@@ -1,6 +1,6 @@
 /**
  * TournamentInfoGrid - Bloomberg-style details grid
- * Semantic token compliant, with additional fields
+ * Glass card treatment, section entrance animation
  */
 
 import { DollarSign, Trophy, Users, Calendar, Award, Crosshair, Star } from 'lucide-react';
@@ -18,6 +18,14 @@ interface InfoItem {
   label: string;
   value: string;
 }
+
+const glassCardStyle = {
+  background: 'rgba(255, 255, 255, 0.7)',
+  backdropFilter: 'blur(8px)',
+  border: '1px solid rgba(255, 255, 255, 0.5)',
+  borderRadius: '20px',
+  boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04)',
+};
 
 export function TournamentInfoGrid({ tournament, fieldSize }: TournamentInfoGridProps) {
   const items: InfoItem[] = [];
@@ -81,13 +89,15 @@ export function TournamentInfoGrid({ tournament, fieldSize }: TournamentInfoGrid
   
   return (
     <motion.div 
-      className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.1, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      className="overflow-hidden"
+      style={glassCardStyle}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-40px' }}
+      transition={{ duration: 0.35 }}
     >
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-border/60">
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-border/40">
         <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
           <Award className="w-4 h-4 text-primary" />
         </div>
@@ -95,7 +105,7 @@ export function TournamentInfoGrid({ tournament, fieldSize }: TournamentInfoGrid
       </div>
       
       {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-border/50">
+      <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-border/30">
         {items.map((item) => (
           <div 
             key={item.label}

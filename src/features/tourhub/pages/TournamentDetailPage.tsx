@@ -109,6 +109,17 @@ export function TournamentDetailPage() {
     }
   }, [tournament, isUpcoming]);
 
+  // Current leader info for live status bar
+  const leader = useMemo(() => {
+    if (!isLive || !leaderboard?.length) return null;
+    const first = leaderboard[0] as any;
+    const name = first?.player?.full_name;
+    const score = first?.score;
+    if (!name) return null;
+    const scoreStr = score === 0 ? 'E' : score < 0 ? String(score) : score > 0 ? `+${score}` : null;
+    return { name, score: scoreStr };
+  }, [isLive, leaderboard]);
+
   // Loading state
   if (isLoading) {
     return (
@@ -259,6 +270,8 @@ export function TournamentDetailPage() {
               lastUpdatedText={lastUpdatedText}
               isRefreshing={isRefreshing}
               onRefresh={refresh}
+              leaderName={leader?.name}
+              leaderScore={leader?.score}
               className="mb-4"
             />
           )}
