@@ -2,47 +2,58 @@
  * TournamentDetailTabs - Premium segmented tab control
  * 
  * Features:
- * - Animated sliding indicator
- * - Icon + label tabs
- * - Mobile-friendly scrollable
+ * - Text-only labels (no icons)
+ * - Spring-animated sliding indicator
+ * - LIVE pulsing dot on Leaderboard tab
+ * - Summary tab hidden for non-completed tournaments
  * - Tap feedback
+ * - Horizontal scroll on narrow screens
  */
 
 import { useRef, useState, useEffect } from 'react';
-import { BarChart3, Trophy, FileText, Clock, Target } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 export type TournamentTab = 'overview' | 'leaderboard' | 'summary' | 'tee-times' | 'hole-stats';
 
-interface Tab {
+interface TabConfig {
   value: TournamentTab;
   label: string;
-  icon: React.ReactNode;
 }
 
-const tabs: Tab[] = [
-  { value: 'overview', label: 'Overview', icon: <BarChart3 className="w-4 h-4" /> },
-  { value: 'leaderboard', label: 'Leaderboard', icon: <Trophy className="w-4 h-4" /> },
-  { value: 'summary', label: 'Summary', icon: <FileText className="w-4 h-4" /> },
-  { value: 'tee-times', label: 'Tee Times', icon: <Clock className="w-4 h-4" /> },
-  { value: 'hole-stats', label: 'Hole Stats', icon: <Target className="w-4 h-4" /> },
+const ALL_TABS: TabConfig[] = [
+  { value: 'overview', label: 'Overview' },
+  { value: 'leaderboard', label: 'Leaderboard' },
+  { value: 'summary', label: 'Summary' },
+  { value: 'tee-times', label: 'Tee Times' },
+  { value: 'hole-stats', label: 'Holes' },
 ];
 
 interface TournamentDetailTabsProps {
   activeTab: TournamentTab;
   onTabChange: (tab: TournamentTab) => void;
   className?: string;
+  /** Tournament status — used for contextual badges */
+  tournamentStatus?: string;
 }
 
-export function TournamentDetailTabs({ activeTab, onTabChange, className }: TournamentDetailTabsProps) {
+export function TournamentDetailTabs({ activeTab, onTabChange, className, tournamentStatus }: TournamentDetailTabsProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
+
+  const isLive = tournamentStatus === 'inprogress';
+  const isCompleted = tournamentStatus === 'closed';
+
+  // Filter tabs: hide Summary for non-completed tournaments
+  const visibleTabs = ALL_TABS.filter(tab => {
+    if (tab.value === 'summary' && !isCompleted) return false;
+    return true;
+  });
 
   // Calculate indicator position
   useEffect(() => {
     if (!containerRef.current) return;
-    const activeIndex = tabs.findIndex(t => t.value === activeTab);
+    const activeIndex = visibleTabs.findIndex(t => t.value === activeTab);
     const buttons = containerRef.current.querySelectorAll('button');
     const activeButton = buttons[activeIndex] as HTMLButtonElement;
     
@@ -52,14 +63,14 @@ export function TournamentDetailTabs({ activeTab, onTabChange, className }: Tour
         width: activeButton.offsetWidth,
       });
     }
-  }, [activeTab]);
+  }, [activeTab, visibleTabs.length]);
 
   return (
     <div className={cn("relative", className)}>
       {/* Scrollable container */}
       <div 
         ref={containerRef}
-        className="relative flex items-stretch rounded-xl overflow-x-auto scrollbar-hide p-1 bg-muted/60"
+        className="relative flex items-stretch rounded-xl overflow-x-auto scrollbar-hide p-1 bg-muted/60 scroll-snap-x"
       >
         {/* Animated sliding indicator */}
         <motion.div
@@ -72,7 +83,7 @@ export function TournamentDetailTabs({ activeTab, onTabChange, className }: Tour
         />
 
         {/* Tab buttons */}
-        {tabs.map((tab) => {
+        {visibleTabs.map((tab) => {
           const isActive = activeTab === tab.value;
 
           return (
@@ -80,15 +91,22 @@ export function TournamentDetailTabs({ activeTab, onTabChange, className }: Tour
               key={tab.value}
               onClick={() => onTabChange(tab.value)}
               className={cn(
-                "relative z-10 flex items-center gap-1.5 px-4 py-2.5 text-[13px] font-semibold transition-colors duration-200 whitespace-nowrap",
-                "min-h-[44px] rounded-lg shrink-0 active:scale-[0.95] transition-transform",
+                "relative z-10 flex items-center justify-center gap-1.5 px-4 py-2.5 text-sm font-medium transition-colors duration-200 whitespace-nowrap",
+                "min-h-[44px] rounded-lg shrink-0 active:scale-[0.95] transition-transform scroll-snap-start",
                 isActive 
-                  ? "text-foreground" 
+                  ? "text-foreground font-semibold" 
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              {tab.icon}
-              <span className="hidden sm:inline">{tab.label}</span>
+              {tab.label}
+              
+              {/* LIVE pulsing dot on Leaderboard tab */}
+              {isLive && tab.value === 'leaderboard' && (
+                <span className="relative flex h-2 w-2 ml-0.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+                </span>
+              )}
             </button>
           );
         })}
