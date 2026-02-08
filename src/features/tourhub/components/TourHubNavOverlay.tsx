@@ -323,7 +323,7 @@ export function TourHubNavOverlay({
             </div>
             
             {/* Header with glass close button */}
-            <div className="flex items-center justify-between px-5 pt-safe-top py-4">
+            <div className="flex items-center justify-between px-5 py-4" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}>
               <motion.button
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
