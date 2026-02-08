@@ -35,22 +35,22 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
   if (coursesPlayed === 0) {
     return (
       <div className={cn(
-        "bg-white rounded-2xl border border-[#e2e8f0] p-8 shadow-[0_1px_3px_rgba(0,0,0,0.05)]",
+        "bg-card rounded-2xl border border-border p-8 shadow-[0_1px_3px_rgba(0,0,0,0.05)]",
         className
       )}>
         <div className="flex flex-col items-center justify-center text-center">
           {/* Icon */}
-          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center mb-4">
-            <MapPin className="w-6 h-6 text-[#64748b]" />
+          <div className="w-14 h-14 rounded-full bg-muted border border-border flex items-center justify-center mb-4">
+            <MapPin className="w-6 h-6 text-muted-foreground" />
           </div>
           
           {/* Title */}
-          <h3 className="text-base font-semibold text-[#1e293b] mb-1">
+          <h3 className="text-base font-semibold text-foreground mb-1">
             {isOwnProfile ? "Start Building Your Legacy" : "No Courses Played Yet"}
           </h3>
           
           {/* Description */}
-          <p className="text-sm text-[#64748b] mb-5 max-w-xs">
+          <p className="text-sm text-muted-foreground mb-5 max-w-xs">
             {isOwnProfile 
               ? "Play and rate courses to track your golf journey"
               : "This golfer hasn't logged any courses yet."}
@@ -60,7 +60,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
           {isOwnProfile && (
             <button
               onClick={() => navigate('/courses')}
-              className="px-5 py-2 bg-[#1e293b] text-white text-sm font-medium rounded-full hover:bg-[#334155] transition-colors"
+              className="px-5 py-2 bg-foreground text-background text-sm font-medium rounded-full hover:bg-foreground/90 transition-colors min-h-[44px] active:scale-[0.98]"
             >
               Find Courses
             </button>
@@ -76,13 +76,13 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       className={cn(
-        "bg-white rounded-2xl border border-[#e2e8f0] p-6 shadow-[0_1px_3px_rgba(0,0,0,0.05)]",
+        "bg-card rounded-2xl border border-border p-6 shadow-[0_1px_3px_rgba(0,0,0,0.05)]",
         className
       )}
     >
       {/* Header */}
       <div className="text-center mb-1">
-        <p className="text-xs font-medium text-[#64748b] uppercase tracking-wide">
+        <p className="text-sm font-semibold text-muted-foreground tracking-normal">
           {isOwnProfile ? "Your Course Legacy" : `${displayName || "Their"}'s Course Legacy`}
         </p>
       </div>
@@ -91,9 +91,9 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
       <div className="text-center mb-6">
         <AnimatedNumber 
           value={coursesPlayed}
-          className="text-5xl font-bold text-[#1e293b] tracking-tight"
+          className="text-5xl font-bold text-foreground tracking-tight"
         />
-        <p className="text-sm text-[#64748b] mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           Courses Played
         </p>
       </div>
@@ -103,15 +103,15 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
         {/* Countries */}
         {countriesPlayed > 0 && (
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center">
-              <Globe className="w-4 h-4 text-[#64748b]" />
+            <div className="w-9 h-9 rounded-full bg-muted border border-border flex items-center justify-center">
+              <Globe className="w-4 h-4 text-muted-foreground" />
             </div>
             <div>
               <AnimatedNumber 
                 value={countriesPlayed} 
-                className="text-lg font-semibold text-[#1e293b] leading-tight"
+                className="text-lg font-semibold text-foreground leading-tight"
               />
-              <p className="text-xs text-[#64748b]">
+              <p className="text-xs text-muted-foreground">
                 {countriesPlayed === 1 ? 'country' : 'countries'}
               </p>
             </div>
@@ -122,13 +122,13 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
         {avgRating !== null && avgRating > 0 && (
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200/60 flex items-center justify-center">
-              <Star className="w-4 h-4" style={{ color: '#F59E0B' }} />
+              <Star className="w-4 h-4 text-amber-500" />
             </div>
             <div>
-              <p className="text-lg font-semibold text-[#1e293b] leading-tight">
+              <p className="text-lg font-semibold text-foreground leading-tight">
                 {avgRating.toFixed(1)}
               </p>
-              <p className="text-xs text-[#64748b]">avg rating</p>
+              <p className="text-xs text-muted-foreground">Avg Rating</p>
             </div>
           </div>
         )}

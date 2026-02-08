@@ -1,7 +1,7 @@
 /**
  * TieredCourseCard - Visual hierarchy cards for All Courses Played
  * 
-  * Updated with Chartreus gold (#C1A84C) for Top 100 courses.
+ * Updated with Chartreus gold (#C1A84C) for Top 100 courses.
  */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -30,7 +30,7 @@ interface TieredCourseCardProps {
 
 /**
  * Tiered course card with clear visual hierarchy:
-  * - Top 100: Larger cards with Chartreus accent (#C1A84C), trophy icon, strong visual weight
+ * - Top 100: Larger cards with Chartreus accent (#C1A84C), trophy icon, strong visual weight
  * - Non-Top-100: Slightly smaller, muted styling - still readable
  */
 export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
@@ -61,13 +61,12 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
       <motion.div
         onClick={handleClick}
         whileTap={{ scale: 0.98 }}
-        className="relative bg-white rounded-xl overflow-hidden cursor-pointer hover:shadow-md transition-all group"
-       style={{ borderWidth: 1, borderStyle: 'solid', borderColor: 'rgba(193, 168, 76, 0.3)' }}
+        className="relative bg-card rounded-xl overflow-hidden cursor-pointer hover:shadow-md transition-all group border border-amber-400/30"
       >
-       {/* Trophy Chartreus accent line - prominent 2px */}
+        {/* Trophy Chartreus accent line - prominent 2px */}
         <div 
           className="absolute top-0 left-0 right-0 h-[2px]" 
-         style={{ background: 'linear-gradient(90deg, rgba(193, 168, 76, 0.4) 0%, #C1A84C 50%, rgba(193, 168, 76, 0.4) 100%)' }} 
+          style={{ background: 'linear-gradient(90deg, rgba(193, 168, 76, 0.4) 0%, #C1A84C 50%, rgba(193, 168, 76, 0.4) 100%)' }} 
         />
         
         <div className="flex">
@@ -77,15 +76,17 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
               <img
                 src={course.thumbnail_image}
                 alt={course.name}
+                loading="lazy"
+                decoding="async"
                 className="w-24 h-[88px] object-cover transition-transform duration-300 group-hover:scale-105"
               />
             ) : (
               <div className="w-24 h-[88px] bg-gradient-to-br from-muted to-muted/50" />
             )}
-           {/* Top 100 icon overlay - Chartreus */}
+            {/* Top 100 icon overlay - Chartreus */}
             <div 
               className="absolute top-2 left-2 w-6 h-6 rounded-full flex items-center justify-center shadow-sm"
-             style={{ backgroundColor: 'rgba(193, 168, 76, 0.95)' }}
+              style={{ backgroundColor: 'rgba(193, 168, 76, 0.95)' }}
             >
               <Trophy className="w-3 h-3 text-white" />
             </div>
@@ -123,8 +124,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
             ) : isOwnProfile ? (
               <button 
                 onClick={handleRateClick}
-                className="text-[11px] font-medium hover:underline whitespace-nowrap"
-                style={{ color: '#F59E0B' }}
+                className="text-[11px] font-medium text-amber-500 hover:underline whitespace-nowrap"
               >
                 Review
               </button>
@@ -142,7 +142,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
       <motion.div
         onClick={handleClick}
         whileTap={{ scale: 0.98 }}
-        className="bg-white rounded-xl border border-[#e2e8f0] overflow-hidden cursor-pointer hover:border-[#cbd5e1] transition-colors"
+        className="bg-card rounded-xl border border-border overflow-hidden cursor-pointer hover:border-border transition-colors"
       >
         <div className="flex">
           {/* Thumbnail - smaller, muted */}
@@ -150,6 +150,8 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
             <img
               src={course.thumbnail_image}
               alt={course.name}
+              loading="lazy"
+              decoding="async"
               className="w-16 h-[68px] object-cover flex-shrink-0 opacity-80"
             />
           ) : (
@@ -196,7 +198,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
     <motion.div
       onClick={handleClick}
       whileTap={{ scale: 0.98 }}
-      className="bg-white rounded-xl border border-[#e2e8f0] overflow-hidden cursor-pointer hover:border-[#cbd5e1] transition-colors"
+      className="bg-card rounded-xl border border-border overflow-hidden cursor-pointer hover:border-border transition-colors"
     >
       <div className="flex">
         {/* Thumbnail - standard size (~85% of Top 100) */}
@@ -204,6 +206,8 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
           <img
             src={course.thumbnail_image}
             alt={course.name}
+            loading="lazy"
+            decoding="async"
             className="w-[72px] h-[76px] object-cover flex-shrink-0"
           />
         ) : (
