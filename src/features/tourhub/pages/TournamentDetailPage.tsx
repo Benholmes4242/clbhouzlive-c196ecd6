@@ -280,6 +280,7 @@ export function TournamentDetailPage() {
           <TournamentDetailTabs 
             activeTab={activeTab} 
             onTabChange={handleTabChange}
+            tournamentStatus={tournament.status}
             className="mb-2"
           />
         </motion.div>
