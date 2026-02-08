@@ -60,7 +60,7 @@ export const MediaGridItem = memo(function MediaGridItem({ item, onClick, overfl
       {isVideo && (
         <>
           {/* Play icon - bottom left, matching explore/discover pages */}
-          <VideoPlayIndicator size="md" />
+          <VideoPlayIndicator size="lg" />
 
           {/* Duration badge - bottom right, only show if valid duration */}
           {durationText && (

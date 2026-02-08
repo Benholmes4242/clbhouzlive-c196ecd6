@@ -4,7 +4,7 @@
  * 
  * Usage:
  * - Bottom-left positioned inside thumbnail container
- * - 16x16 container with 8x8 icon
+ * - Configurable sizes: sm (16px), md (20px), lg (28px)
  * - Black/60 background with backdrop blur
  * - White filled play icon
  */
@@ -13,30 +13,30 @@ import { cn } from '@/lib/utils';
 
 interface VideoPlayIndicatorProps {
   className?: string;
-  size?: 'sm' | 'md';
+  size?: 'sm' | 'md' | 'lg';
 }
+
+const sizeClasses = {
+  sm: { container: 'w-4 h-4', icon: 'w-2 h-2' },
+  md: { container: 'w-5 h-5', icon: 'w-2.5 h-2.5' },
+  lg: { container: 'w-7 h-7', icon: 'w-3.5 h-3.5' },
+};
 
 export const VideoPlayIndicator = ({ 
   className,
   size = 'sm'
 }: VideoPlayIndicatorProps) => {
-  const sizeClasses = size === 'sm' 
-    ? 'w-4 h-4' 
-    : 'w-5 h-5';
-  
-  const iconClasses = size === 'sm'
-    ? 'w-2 h-2'
-    : 'w-2.5 h-2.5';
+  const classes = sizeClasses[size];
 
   return (
     <div 
       className={cn(
         "absolute bottom-1 left-1 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center z-10",
-        sizeClasses,
+        classes.container,
         className
       )}
     >
-      <Play className={cn("text-white fill-white", iconClasses)} />
+      <Play className={cn("text-white fill-white", classes.icon)} />
     </div>
   );
 };

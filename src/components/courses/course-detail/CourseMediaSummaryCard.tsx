@@ -21,24 +21,25 @@ export const CourseMediaSummaryCard: React.FC<CourseMediaSummaryCardProps> = ({
     <section className="px-4 pt-6">
       {/* Header row with title + Add media CTA */}
       <div className="flex items-start justify-between gap-3">
-        <div className="space-y-1">
-          {/* Title */}
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-            Course Media
-          </p>
+        <div className="space-y-2">
+          {/* Heading with amber accent bar — matches About tab SectionHeading */}
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-0.5 bg-gradient-to-r from-amber-400 to-transparent" />
+            <h2 className="text-lg font-semibold text-foreground">Course Media</h2>
+          </div>
 
           {/* Counts */}
-          <p className="text-sm text-gray-600">
-            <span className="font-semibold text-gray-900 tabular-nums">{photoCount}</span>
+          <p className="text-sm text-muted-foreground">
+            <span className="font-semibold text-foreground tabular-nums">{photoCount}</span>
             {' '}{photoCount === 1 ? 'photo' : 'photos'}
             {' · '}
-            <span className="font-semibold text-gray-900 tabular-nums">{videoCount}</span>
+            <span className="font-semibold text-foreground tabular-nums">{videoCount}</span>
             {' '}{videoCount === 1 ? 'video' : 'videos'}
           </p>
 
           {/* Contributors */}
           {contributorsCount > 0 && (
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-muted-foreground">
               Shared by {contributorsCount} {contributorsCount === 1 ? 'golfer' : 'golfers'}
             </p>
           )}
@@ -49,7 +50,7 @@ export const CourseMediaSummaryCard: React.FC<CourseMediaSummaryCardProps> = ({
           <button
             type="button"
             onClick={onAddMedia}
-            className="flex items-center gap-2 px-4 py-2 bg-[#F8FAFC] text-gray-700 text-sm font-medium rounded-full hover:bg-gray-100 transition-colors shadow-sm ring-1 ring-gray-200 active:scale-[0.97]"
+            className="flex items-center gap-2 px-4 py-2 bg-muted text-foreground text-sm font-medium rounded-full hover:bg-muted/80 transition-colors shadow-sm ring-1 ring-border active:scale-[0.97] min-h-[44px]"
           >
             <Plus className="h-4 w-4" />
             Add media
