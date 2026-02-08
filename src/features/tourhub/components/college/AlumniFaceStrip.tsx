@@ -1,0 +1,97 @@
+/**
+ * AlumniFaceStrip - Horizontal strip of alumni headshots.
+ * Overlaps the hero by 20px for visual impact.
+ * Tappable → navigates to the college detail page.
+ */
+
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { ChevronRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import type { AlumniFace } from '../../hooks/useBatchCollegeAlumni';
+
+interface AlumniFaceStripProps {
+  alumni: AlumniFace[];
+  collegeName: string;
+  collegeSlug: string;
+  totalAlumniCount: number;
+  className?: string;
+}
+
+const MAX_VISIBLE = 5;
+
+export function AlumniFaceStrip({ alumni, collegeName, collegeSlug, totalAlumniCount, className }: AlumniFaceStripProps) {
+  if (!alumni.length) return null;
+
+  const visible = alumni.slice(0, MAX_VISIBLE);
+  const overflow = totalAlumniCount - MAX_VISIBLE;
+  const namePreview = visible
+    .map(a => a.full_name.split(' ').pop())
+    .slice(0, 4)
+    .join(', ');
+
+  return (
+    <motion.div
+      initial={{ y: 20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.4, delay: 0.4 }}
+      className={cn('px-4', className)}
+      style={{ marginTop: -20 }}
+    >
+      <Link
+        to={`/tourhub/college-golf/${collegeSlug}`}
+        className={cn(
+          'flex items-center gap-3 px-4 py-3 rounded-2xl',
+          'bg-card/90 backdrop-blur-xl',
+          'border border-border/40',
+          'shadow-lg shadow-black/5',
+          'hover:border-primary/30 transition-all duration-200',
+          'active:scale-[0.99] group'
+        )}
+      >
+        {/* Stacked headshots */}
+        <div className="flex items-center -space-x-2.5 shrink-0">
+          {visible.map((alum, i) => (
+            <div
+              key={alum.id}
+              className="w-9 h-9 rounded-full border-2 border-card overflow-hidden bg-muted shadow-sm"
+              style={{ zIndex: MAX_VISIBLE - i }}
+            >
+              {alum.photo_url ? (
+                <img
+                  src={alum.photo_url}
+                  alt={alum.full_name}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-muted text-[10px] font-bold text-muted-foreground">
+                  {alum.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                </div>
+              )}
+            </div>
+          ))}
+          {overflow > 0 && (
+            <div className="w-9 h-9 rounded-full border-2 border-card bg-muted flex items-center justify-center shadow-sm">
+              <span className="text-[10px] font-bold text-muted-foreground">
+                +{overflow}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Text */}
+        <div className="flex-1 min-w-0">
+          <p className="text-xs text-muted-foreground truncate">
+            {namePreview} …
+          </p>
+          <p className="text-[11px] text-muted-foreground/60 mt-0.5">
+            {totalAlumniCount} alumni on tour this season
+          </p>
+        </div>
+
+        <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary transition-colors shrink-0" />
+      </Link>
+    </motion.div>
+  );
+}
