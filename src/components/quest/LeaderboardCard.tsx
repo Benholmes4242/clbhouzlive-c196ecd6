@@ -1,6 +1,6 @@
 /**
  * LeaderboardCard - Friends Leaderboard for Quest page
- * V3: Shows only users the current user follows, with friendly empty state
+ * V4: Includes current user ("You") row with highlight
  */
 
 import React, { useMemo } from 'react';
@@ -8,28 +8,47 @@ import { motion } from 'framer-motion';
 import { Trophy, Medal, Users, UserPlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useFriendsLeaderboard } from '@/hooks/useFriendsLeaderboard';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { cn } from '@/lib/utils';
 
 interface LeaderboardCardProps {
   userId: string | undefined;
+  totalPlayed?: number;
 }
 
-export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId }) => {
+export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalPlayed = 0 }) => {
   const navigate = useNavigate();
+  const { user } = useSupabaseSession();
   const { data: friends = [], isLoading, isError } = useFriendsLeaderboard(userId);
 
-  // Sort friends by courses played and add ranks
-  const rankedFriends = useMemo(() => {
-    return [...friends]
-      .sort((a, b) => b.coursesPlayed - a.coursesPlayed)
-      .map((friend, index) => ({
-        ...friend,
-        rank: index + 1,
+  // Sort friends + current user by courses played and add ranks
+  const rankedEntries = useMemo(() => {
+    const entries = [
+      ...friends.map(friend => ({
+        id: friend.id || '',
         displayName: friend.display_name || friend.username || 'Golfer',
         avatarUrl: friend.profile_photo_url || null,
         totalPlayed: friend.coursesPlayed,
-      }));
-  }, [friends]);
+        isCurrentUser: false,
+      })),
+    ];
+
+    // Insert current user
+    if (user?.id) {
+      entries.push({
+        id: user.id,
+        displayName: 'You',
+        avatarUrl: null,
+        totalPlayed,
+        isCurrentUser: true,
+      });
+    }
+
+    return entries
+      .sort((a, b) => b.totalPlayed - a.totalPlayed)
+      .map((entry, index) => ({ ...entry, rank: index + 1 }));
+  }, [friends, user?.id, totalPlayed]);
 
   // Loading state
   if (isLoading) {
@@ -57,8 +76,8 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId }) => {
     return null;
   }
 
-  // Empty state
-  if (rankedFriends.length === 0) {
+  // Empty state (only current user, no friends)
+  if (friends.length === 0) {
     return (
       <section>
         <h2 className="text-sm font-semibold text-muted-foreground mb-4">
@@ -86,8 +105,8 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId }) => {
     );
   }
 
-  const top3 = rankedFriends.slice(0, 3);
-  const remaining = rankedFriends.slice(3, 10);
+  const top3 = rankedEntries.slice(0, 3);
+  const remaining = rankedEntries.slice(3, 10);
 
   // Rank medal colors
   const getRankStyle = (rank: number) => {
@@ -122,7 +141,10 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId }) => {
             return (
               <motion.div
                 key={entry.id}
-                className="flex items-center gap-3 p-2.5 rounded-xl min-h-[44px] active:opacity-80 transition-opacity"
+                className={cn(
+                  "flex items-center gap-3 p-2.5 rounded-xl min-h-[44px] active:opacity-80 transition-opacity",
+                  entry.isCurrentUser && "bg-amber-50 border border-amber-200/60"
+                )}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
@@ -138,9 +160,7 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId }) => {
                   {entry.rank <= 3 ? (
                     <Medal className="w-4 h-4" style={{ color: rankStyle.color }} />
                   ) : (
-                    <span 
-                      className="text-xs font-bold text-muted-foreground"
-                    >
+                    <span className="text-xs font-bold text-muted-foreground">
                       {entry.rank}
                     </span>
                   )}
@@ -156,7 +176,10 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId }) => {
 
                 {/* Name */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold truncate text-foreground">
+                  <p className={cn(
+                    "text-sm font-semibold truncate text-foreground",
+                    entry.isCurrentUser && "text-amber-700"
+                  )}>
                     {entry.displayName}
                   </p>
                 </div>
@@ -179,7 +202,10 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId }) => {
             {remaining.map((entry, index) => (
               <motion.div
                 key={entry.id}
-                className="flex items-center gap-3 py-1.5 px-2 min-h-[44px] active:opacity-80 transition-opacity"
+                className={cn(
+                  "flex items-center gap-3 py-1.5 px-2 min-h-[44px] active:opacity-80 transition-opacity rounded-lg",
+                  entry.isCurrentUser && "bg-amber-50 border border-amber-200/60"
+                )}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.15 + index * 0.03 }}
@@ -193,7 +219,10 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId }) => {
                   alt={entry.displayName}
                   fallback={entry.displayName.charAt(0).toUpperCase()}
                 />
-                <span className="flex-1 text-sm truncate text-muted-foreground">
+                <span className={cn(
+                  "flex-1 text-sm truncate text-muted-foreground",
+                  entry.isCurrentUser && "text-amber-700 font-semibold"
+                )}>
                   {entry.displayName}
                 </span>
                 <span className="text-sm font-medium text-muted-foreground">

@@ -15,22 +15,6 @@
   --quest-shadow-glow: 0 4px 16px rgba(210, 180, 97, 0.1);
   --quest-shadow-lift: 0 4px 12px rgba(0, 0, 0, 0.08);
 
-  /* Legacy aliases — map to app semantic tokens for backward compat.
-     New code should use Tailwind classes (text-foreground, bg-card, etc.) instead. */
-  --quest-text-primary: hsl(var(--foreground));
-  --quest-text-secondary: hsl(var(--muted-foreground));
-  --quest-text-tertiary: hsl(var(--muted-foreground));
-  --quest-card: hsl(var(--card));
-  --quest-track: hsl(var(--muted));
-  --quest-stroke: hsl(var(--border));
-
-  /* Quest-specific chip/pill styling (brand-tinted) */
-  --quest-chip-bg: hsl(var(--muted));
-  --quest-chip-stroke: hsl(var(--border));
-
-  /* Surface slate for buttons */
-  --surface-slate: #475569;
-
   /* Achievement card overrides for light theme */
   --achievement-card-bg: rgba(31, 36, 40, 0.03);
   --achievement-card-border: hsl(var(--border));

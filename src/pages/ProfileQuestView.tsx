@@ -4,11 +4,10 @@
  * Trophy Room aesthetic with:
  * 1. Trophy Room Hero (animated, tier chip, Continue Journey CTA)
  * 2. Trophy Case (2-row grid with Milestones/Regions toggle)
- * 3. Next target (forward momentum)
- * 4. Journey Map = Milestone ladder (5→400 Club) + Mastery Track chapter
- * 5. Journey Summary = Regional list progress (GB&I / Europe / USA / Worldwide)
- * 6. Recently Added (grounded in real activity)
- * 7. Badge Detail Sheet (tap any badge for cinematic detail)
+ * 3. Journey Map = Milestone ladder (5→400 Club) + Mastery Track chapter
+ * 4. Journey Summary = Regional list progress (GB&I / Europe / USA / Worldwide)
+ * 5. Recently Added (grounded in real activity)
+ * 6. Badge Detail Sheet (tap any badge for cinematic detail)
  */
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
@@ -32,7 +31,6 @@ import { TrophyCase } from '@/components/quest/TrophyCase';
 import { UnifiedAchievementSheet, type AchievementData } from '@/components/top100/UnifiedAchievementSheet';
 
 // Existing Quest components
-import { NextTargetCard } from '@/components/profile-v2/NextTargetCard';
 import { MilestoneLadder } from '@/components/quest/MilestoneLadder';
 import { type RegionProgress } from '@/components/quest/RegionalJourneySummary';
 import { RecentlyAddedSection } from '@/components/quest/RecentlyAddedSection';
@@ -245,6 +243,7 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
             hasPremiumAccent={rewards.hasPremiumAccent}
             onContinueJourney={handleContinueJourney}
             regionProgress={regionProgress}
+            isOwnProfile={isOwnProfile}
           />
         </section>
 
@@ -278,27 +277,31 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
           />
         </section>
 
-        {/* Section 5: Regional Progress - REMOVED (duplicate of Mastery Track) */}
+        {/* Section 6: Momentum — own profile only */}
+        {isOwnProfile && (
+          <section className="px-4 mb-10">
+            <MomentumCard recentlyPlayed={recentCourses} />
+          </section>
+        )}
 
-        {/* Section 6: Momentum */}
-        <section className="px-4 mb-10">
-          <MomentumCard recentlyPlayed={recentCourses} />
-        </section>
+        {/* Section 7: Friends Leaderboard — own profile only */}
+        {isOwnProfile && (
+          <section className="px-4 mb-10">
+            <div className="bg-card rounded-2xl p-4 border border-border">
+              <LeaderboardCard userId={targetUserId} totalPlayed={totalPlayed} />
+            </div>
+          </section>
+        )}
 
-        {/* Section 7: Friends Leaderboard - in card */}
-        <section className="px-4 mb-10">
-          <div className="bg-card rounded-2xl p-4 border border-border">
-            <LeaderboardCard userId={targetUserId} />
-          </div>
-        </section>
-
-        {/* Section 8: Recently Added */}
-        <section className="px-4 pb-10">
-          <RecentlyAddedSection
-            courses={recentCourses}
-            hasGoldTrim={rewards.hasGoldTrim}
-          />
-        </section>
+        {/* Section 8: Recently Added — own profile only */}
+        {isOwnProfile && (
+          <section className="px-4 pb-10">
+            <RecentlyAddedSection
+              courses={recentCourses}
+              hasGoldTrim={rewards.hasGoldTrim}
+            />
+          </section>
+        )}
       </div>
 
       {/* Region List Sheet */}
