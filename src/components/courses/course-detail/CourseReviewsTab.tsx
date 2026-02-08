@@ -7,13 +7,12 @@ import { useToast } from '@/hooks/use-toast';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useCourseReviews, type ReviewsSortBy, type CourseReview, type ReviewMediaItem } from '@/hooks/useCourseReviews';
 import { ReviewBlockFlat } from '../review/ReviewBlockFlat';
-import { CourseReviewsSummary } from '../review/CourseReviewsSummary';
 import { RatingFilterChips, RatingFilterValue } from '../review/RatingFilterChips';
 import { WriteReviewPrompt } from '../review/WriteReviewPrompt';
 import { SegmentedTabOption } from '@/components/ui/SegmentedTabs';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, X } from 'lucide-react';
-import ClubhouseLogo from '@/components/ui/clubhouse-logo';
+import { Search, X, Pencil } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { 
   SHOW_MOCK_REVIEWS, 
   ENABLE_MOCK_TOP100_REVIEWS, 
@@ -299,45 +298,6 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     : (ratingAggregates?.review_count ?? 0);
   const hasRatings = ratingCount > 0;
 
-  // Calculate distribution using System-2 unified rating bands
-  const calculateDistribution = () => {
-    // Return mock distribution for Cypress Point when enabled
-    if (isMockCypressPoint) {
-      return MOCK_CYPRESS_POINT_REVIEWS.distribution;
-    }
-
-    const dist = { outstanding: 0, excellent: 0, veryGood: 0, good: 0, fair: 0 };
-    reviews.forEach(r => {
-      const tierData = getScoreTier(r.rating);
-      dist[tierData.tier]++;
-    });
-    return dist;
-  };
-
-  // Calculate category averages
-  const calculateCategoryAverages = () => {
-    // Return mock category averages for Cypress Point when enabled
-    if (isMockCypressPoint) {
-      return MOCK_CYPRESS_POINT_REVIEWS.categoryAverages;
-    }
-
-    const categories = { design: 0, condition: 0, clubhouse: 0, facilities: 0 };
-    const counts = { design: 0, condition: 0, clubhouse: 0, facilities: 0 };
-
-    reviews.forEach(r => {
-      if (r.design_score) { categories.design += r.design_score; counts.design++; }
-      if (r.condition_score) { categories.condition += r.condition_score; counts.condition++; }
-      if (r.clubhouse_score) { categories.clubhouse += r.clubhouse_score; counts.clubhouse++; }
-      if (r.facilities_score) { categories.facilities += r.facilities_score; counts.facilities++; }
-    });
-
-    return {
-      design: counts.design > 0 ? categories.design / counts.design : null,
-      condition: counts.condition > 0 ? categories.condition / counts.condition : null,
-      clubhouse: counts.clubhouse > 0 ? categories.clubhouse / counts.clubhouse : null,
-      facilities: counts.facilities > 0 ? categories.facilities / counts.facilities : null,
-    };
-  };
 
   // Transform reviews into ReviewBlockFlat format
   const transformReview = (review: ReviewData, isHighlighted = false) => {
@@ -373,24 +333,23 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     return (
       <div className="flex flex-col">
         {/* Skeleton header */}
-        <section className="px-4 pt-4 pb-3 bg-slate-50">
-          <div className="rounded-2xl bg-white shadow-sm px-4 py-4 animate-pulse">
-            <div className="h-4 bg-slate-200 rounded w-1/3 mb-2" />
-            <div className="h-6 bg-slate-200 rounded w-1/4 mb-1" />
-            <div className="h-3 bg-slate-200 rounded w-1/2" />
+        <section className="px-4 py-3 bg-muted">
+          <div className="flex items-center gap-3 animate-pulse">
+            <div className="h-7 bg-muted-foreground/10 rounded w-16" />
+            <div className="h-4 bg-muted-foreground/10 rounded w-24" />
           </div>
         </section>
 
         {/* Skeleton reviews */}
-        <section className="px-4 pt-3 pb-4 bg-slate-100 space-y-3">
+        <section className="px-4 pt-3 pb-4 bg-muted space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="rounded-2xl bg-white shadow-sm px-4 py-3 animate-pulse">
+            <div key={i} className="rounded-2xl bg-card shadow-sm px-4 py-3 animate-pulse">
               <div className="flex gap-3">
-                <div className="w-10 h-10 bg-slate-200 rounded-lg" />
+                <div className="w-10 h-10 bg-muted rounded-lg" />
                 <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-slate-200 rounded w-1/3" />
-                  <div className="h-3 bg-slate-200 rounded w-1/4" />
-                  <div className="h-4 bg-slate-200 rounded w-full" />
+                  <div className="h-4 bg-muted rounded w-1/3" />
+                  <div className="h-3 bg-muted rounded w-1/4" />
+                  <div className="h-4 bg-muted rounded w-full" />
                 </div>
               </div>
             </div>
@@ -404,19 +363,22 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   if (!hasRatings) {
     return (
       <div className="flex flex-col">
-        <section className="px-4 pt-6 pb-5 bg-slate-100">
-          <div className="rounded-sq-md border border-slate-200 bg-white px-4 py-6 text-center">
-            <p className="text-base font-semibold text-slate-900">No reviews yet</p>
-            <p className="mt-1 text-sm text-slate-500">
+        <section className="px-4 pt-4 pb-5 bg-muted">
+          <div className="rounded-sq-md border border-border bg-card px-4 py-6 text-center">
+            <p className="text-base font-semibold text-foreground">No reviews yet</p>
+            <p className="mt-1 text-sm text-muted-foreground">
               Be the first to share your experience at {courseName}.
             </p>
             <button
               type="button"
-              className="mt-4 w-full h-11 rounded-sq-pill inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium bg-[#F8FAFC] text-slate-700 transition hover:bg-slate-200 active:scale-[0.98]"
+              className="mt-4 w-full h-11 rounded-sq-pill inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium bg-muted text-foreground transition hover:bg-muted/80 active:scale-[0.98]"
               onClick={handleRateClick}
             >
               Write the first review
             </button>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Reviews help other golfers discover great courses
+            </p>
           </div>
         </section>
       </div>
@@ -425,65 +387,75 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   return (
     <div className="flex flex-col">
-      {/* Section 1 – Summary header (flattened on background) */}
-      <section className="px-5 pt-4 pb-4 bg-slate-50 sm:pt-5">
-        {/* Section label with Clubhouse logo */}
-        <div className="flex items-center justify-center gap-1.5 mb-4">
-          <ClubhouseLogo size="xs" className="opacity-70" />
-          <p className="text-sm font-semibold tracking-[0.14em] text-slate-500">
-            Community Rating
-          </p>
+      {/* Compact rating context */}
+      <section className="px-4 py-3 bg-muted">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5">
+              <span className="text-2xl font-semibold text-foreground tabular-nums">
+                {communityScore.toFixed(1)}
+              </span>
+              <span className={cn(
+                "text-sm font-medium uppercase",
+                communityScore >= 9 ? "text-[#d97706]" : "text-muted-foreground"
+              )}>
+                {getScoreTier(communityScore).label}
+              </span>
+            </div>
+            <span className="text-sm text-muted-foreground">
+              · {ratingCount} {ratingCount === 1 ? 'rating' : 'ratings'}
+            </span>
+          </div>
+          {myReview && (
+            <button
+              onClick={handleRateClick}
+              className="flex items-center gap-1.5 text-sm text-muted-foreground active:scale-[0.98] transition-transform min-h-[44px] px-3"
+            >
+              <Pencil className="w-3.5 h-3.5" />
+              Edit yours
+            </button>
+          )}
         </div>
-
-        <CourseReviewsSummary
-          averageRating={communityScore}
-          reviewCount={ratingCount}
-          distribution={calculateDistribution()}
-          categoryAverages={calculateCategoryAverages()}
-          userScore={myReview?.rating}
-          userHasRating={!!myReview}
-          onRateCourse={handleRateClick}
-        />
       </section>
 
-      {/* Section 2 – Search bar (24px from summary) */}
-      <section className="px-4 pt-6 pb-5 bg-slate-100">
+      {/* Section 2 – Search bar */}
+      <section className="px-4 pt-4 pb-4 bg-muted">
         <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search reviews (name or keywords)"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-11 pl-10 pr-10 border border-slate-200 bg-white text-base placeholder:text-[15px] placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-300/70 focus:ring-offset-1 focus:border-slate-600 shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition rounded-sq-sm"
+            className="w-full h-11 pl-10 pr-10 border border-border bg-card text-base placeholder:text-[15px] placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-border focus:ring-offset-1 focus:border-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition rounded-sq-sm"
           />
           {/* Clear button */}
           {searchQuery && (
             <button
               type="button"
               onClick={handleClearSearch}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-slate-100 transition-colors"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-muted transition-colors"
               aria-label="Clear search"
             >
-              <X className="h-4 w-4 text-slate-400" />
+              <X className="h-4 w-4 text-muted-foreground" />
             </button>
           )}
         </div>
       </section>
 
       {/* Section 3 – Sort & Filter controls (16px from search) */}
-      <div className="px-5 pt-1 pb-4 bg-slate-100">
-        <p className="mb-4 text-xs font-semibold tracking-[0.08em] text-slate-500">
+      <div className="px-5 pt-1 pb-4 bg-muted">
+        <p className="mb-4 text-xs font-semibold tracking-[0.08em] text-muted-foreground">
           Sort &amp; filter
         </p>
-        {/* Sort tabs - underline style matching main tabs */}
+        {/* Sort tabs */}
         <Tabs value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)} className="w-full">
           <TabsList className="bg-transparent border-0 px-0 py-0 gap-0 w-full flex justify-center">
             {sortOptions.map((option) => (
               <TabsTrigger
                 key={option.value}
                 value={option.value}
-                className="relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]"
+                className="relative text-sm px-3 py-2.5 font-medium min-h-[44px] bg-transparent border-0 shadow-none rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all duration-200 ease-out active:scale-[0.98] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]"
               >
                 {option.label}
               </TabsTrigger>
@@ -491,7 +463,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           </TabsList>
         </Tabs>
         
-        {/* Rating filter chips (Upgrade B) - 12px below sort pills */}
+        {/* Rating filter chips */}
         <div className="mt-3">
           <RatingFilterChips 
             value={ratingFilter}
@@ -500,9 +472,9 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         </div>
       </div>
 
-      {/* Section 4 – Reviews list (24px from filters) */}
-      <section className="px-4 pt-6 pb-4 bg-slate-50">
-        {/* Upgrade C: "Write a review" prompt - only for non-reviewers */}
+      {/* Section 4 – Reviews list */}
+      <section className="px-4 pt-6 pb-4 bg-muted">
+        {/* Write a review prompt - only for non-reviewers */}
         {!myReview && (
           <div className="mb-4">
             <WriteReviewPrompt onRateClick={handleRateClick} />
@@ -512,7 +484,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         {/* Your review section */}
         {filteredMyReview && (
           <div className="mb-4">
-            <p className="mb-3 text-xs font-medium tracking-wide text-slate-500">
+            <p className="mb-3 text-xs font-medium tracking-wide text-muted-foreground">
               Your review
             </p>
             <ReviewBlockFlat
@@ -554,14 +526,14 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         {/* No results message for search/filter */}
         {(searchQuery || ratingFilter) && filteredReviews.length === 0 && (
           <div className="text-center py-8">
-            <p className="text-sm text-slate-500">No reviews match your criteria.</p>
+            <p className="text-sm text-muted-foreground">No reviews match your criteria.</p>
             <button
               type="button"
               onClick={() => {
                 setSearchQuery('');
                 setRatingFilter(null);
               }}
-              className="mt-2 text-sm font-medium text-slate-600 hover:text-slate-900 underline"
+              className="mt-2 text-sm font-medium text-foreground hover:text-foreground/80 underline active:scale-[0.98] transition-transform"
             >
               Clear filters
             </button>
@@ -569,20 +541,20 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         )}
       </section>
 
-      {/* Section 5 – End message (improved) */}
+      {/* Section 5 – End message */}
       {filteredReviews.length > 0 && !searchQuery && !ratingFilter && (
-        <section className="px-4 pt-4 pb-6 bg-slate-100">
+        <section className="px-4 pt-4 pb-6 bg-muted">
           <div className="text-center">
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-muted-foreground">
               No more reviews yet.
             </p>
             {!myReview && (
               <button
                 type="button"
                 onClick={handleRateClick}
-                className="mt-2 text-sm font-medium text-slate-700 hover:text-slate-900 underline"
+                className="mt-2 text-sm font-medium text-foreground hover:text-foreground/80 underline active:scale-[0.98] transition-transform min-h-[44px] inline-flex items-center"
               >
-                Be the first to add one
+                Share your experience
               </button>
             )}
           </div>
