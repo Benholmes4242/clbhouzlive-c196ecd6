@@ -41,13 +41,12 @@ export async function checkContentExists(type: string, id: string): Promise<bool
 }
 
 // ⚡ DEV FLAG: Mock notifications for testing (auto-disabled in production)
-export type ActivityTabId = 'all' | 'friends' | 'reviews' | 'messages' | 'system';
+export type ActivityTabId = 'all' | 'friends' | 'messages' | 'system';
  // Note: 'messages' tab is being deprecated - messages now have their own separate system
 
 export const ACTIVITY_TABS: { id: ActivityTabId; label: string }[] = [
   { id: 'all', label: 'All' },
   { id: 'friends', label: 'Friends' },
-  { id: 'reviews', label: 'Reviews' },
   // Messages tab removed - messages are handled by separate messaging system
 ];
 
@@ -171,11 +170,10 @@ export interface ActivityCounts {
   new: number;
   mentions: number;
   friends: number;
-  reviews: number;
   messages: number;
 }
 
-export type ChipFilterKind = 'new' | 'mentions' | 'friends' | 'reviews' | 'messages' | null;
+export type ChipFilterKind = 'new' | 'mentions' | 'friends' | 'messages' | null;
 
 // Types that count as mentions
 const MENTION_TYPES = new Set(['mention', 'mention_post', 'tag', 'comment_mention']);
@@ -350,7 +348,6 @@ function computeCounts(items: ActivityNotification[]): ActivityCounts {
     new: items.filter(i => i.is_unread).length,
     mentions: items.filter(i => i.is_mention && i.is_unread).length,
     friends: items.filter(i => i.is_from_friend && i.is_unread).length,
-    reviews: items.filter(i => i.is_review && i.is_unread).length,
     messages: items.filter(i => i.is_message && i.is_unread).length,
   };
 }
@@ -366,8 +363,6 @@ export function applyChipFilter(items: ActivityNotification[], filter: ChipFilte
       return items.filter(i => i.is_mention);
     case 'friends':
       return items.filter(i => i.is_from_friend);
-    case 'reviews':
-      return items.filter(i => i.is_review);
     case 'messages':
       return items.filter(i => i.is_message);
     default:
@@ -557,7 +552,7 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
       if (!user?.id) {
         return {
           buckets: { new: [], today: [], yesterday: [], thisWeek: [], earlier: [] },
-          counts: { new: 0, mentions: 0, friends: 0, reviews: 0, messages: 0 },
+          counts: { new: 0, mentions: 0, friends: 0, messages: 0 },
           allItems: [],
         };
       }
@@ -741,12 +736,6 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
         case 'friends':
           // Only items from users who are accepted friends
           filtered = enrichedNotifications.filter(n => n.is_from_friend && n.actor_type === 'user');
-          break;
-        case 'reviews':
-          // Only friend course review notifications
-          filtered = enrichedNotifications.filter(n => 
-            n.type === 'friend_course_review' || n.type === 'course_review'
-          );
           break;
         case 'messages':
           // Messages tab deprecated - return empty array

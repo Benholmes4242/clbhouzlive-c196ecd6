@@ -1,5 +1,6 @@
 import React from 'react';
-import { Heart, MessageCircle, UserPlus, Users, Bell, Mail, Trophy, Building2, X, ShieldOff, MessageSquare, Clock, CalendarDays, MapPin, CheckCircle2, UserCheck, Flag } from 'lucide-react';
+import { Heart, MessageCircle, UserPlus, Users, Bell, Mail, Trophy, Building2, X, ShieldOff, MessageSquare, Clock, CalendarDays, MapPin, CheckCircle2, UserCheck } from 'lucide-react';
+import { FiMapPin } from 'react-icons/fi';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
@@ -148,7 +149,7 @@ function getNotificationBadgeIcon(type: string) {
     // Friend course review
     case 'friend_course_review':
     case 'course_review':
-      return <Flag className={cn(iconClass, "text-emerald-500")} />;
+      return <FiMapPin className={cn(iconClass, "text-emerald-500")} />;
     default:
       return <Bell className={cn(iconClass, "text-muted-foreground")} />;
   }
@@ -250,6 +251,18 @@ function renderNotificationText(notification: ActivityNotification): string {
       return GOLFER_VERIFICATION_COPY.rejected.title;
     case 'golfer_verification_removed':
       return GOLFER_VERIFICATION_COPY.removed.title;
+    // Friend course review — descriptive text from data payload
+    case 'friend_course_review': {
+      const courseName = notification.data?.course_name;
+      const rating = notification.data?.rating;
+      if (courseName) {
+        const truncatedName = courseName.length > 30 ? courseName.slice(0, 30) + '…' : courseName;
+        return rating != null
+          ? `reviewed ${truncatedName} and rated it ${rating}`
+          : `reviewed ${truncatedName}`;
+      }
+      return 'reviewed a course';
+    }
     default:
       return title || message || 'New notification';
   }

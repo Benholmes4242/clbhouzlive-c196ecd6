@@ -1,11 +1,11 @@
 import React from 'react';
-import { Bell, AtSign, Users, Star, Mail } from 'lucide-react';
+import { Bell, AtSign, Users, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ActivityCounts } from '@/hooks/useActivityFeed';
 
 interface AtAGlanceChipsProps {
   counts: ActivityCounts;
-  onChipClick: (kind: 'new' | 'mentions' | 'friends' | 'reviews' | 'messages') => void;
+  onChipClick: (kind: 'new' | 'mentions' | 'friends' | 'messages') => void;
   activeFilter?: string | null;
   sessionNewCount?: number | null;
 }
@@ -14,7 +14,6 @@ const CHIP_CONFIG = [
   { key: 'new' as const, label: 'New', icon: Bell, countKey: 'new' as const },
   { key: 'mentions' as const, label: 'Mentions', icon: AtSign, countKey: 'mentions' as const },
   { key: 'friends' as const, label: 'Friends', icon: Users, countKey: 'friends' as const },
-  { key: 'reviews' as const, label: 'Reviews', icon: Star, countKey: 'reviews' as const },
   { key: 'messages' as const, label: 'Messages', icon: Mail, countKey: 'messages' as const },
 ];
 
