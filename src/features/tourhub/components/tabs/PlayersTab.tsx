@@ -1,12 +1,18 @@
 /**
- * PlayersTab - Complete redesign orchestrator.
+ * PlayersTab - Complete redesign orchestrator (Phases 1–4).
  * 
  * Features:
  * - Immersive #1 player hero (adapts per tour)
+ * - Sticky toolbar: search + tour filter + category filter
  * - Tour filter pills with dynamic counts
  * - Category filter tabs (Field, Elite, On Tour, Rising)
  * - Debounced search within active tour
  * - Load More pagination (50 per batch)
+ * - Glass card container for player list
+ * - Staggered row entrance animations
+ * - Rank change indicators for Elite tab
+ * - AnimatePresence on content transitions
+ * - Batch headshot loading
  * - Dynamic descriptions per tour
  * - URL persistence (?tab=players&tour=pga&tier=elite)
  */
@@ -19,6 +25,7 @@ import { cn } from '@/lib/utils';
 import { useTourPlayers, type TourPlayer } from '../../hooks/useTourHubData';
 import { useElitePlayers, type ElitePlayer } from '../../hooks/useElitePlayers';
 import { useActivePlayers } from '../../hooks/useActivePlayers';
+import { usePlayerHeadshots } from '../../hooks/usePlayerMedia';
 import { PlayersHero } from '../players/PlayersHero';
 import { PlayersTourFilter, type PlayerTourCode, TOUR_LABELS } from '../players/PlayersTourFilter';
 import { PlayerFilterTabs, type PlayerTierType } from '../players/PlayerFilterTabs';
@@ -78,7 +85,7 @@ export function PlayersTab() {
     }
     params.set('tab', 'players');
     setSearchParams(params, { replace: true });
-    setVisibleCount(PAGE_SIZE); // Reset pagination on tour change
+    setVisibleCount(PAGE_SIZE);
   }, [searchParams, setSearchParams]);
 
   // Tier from URL
@@ -92,7 +99,7 @@ export function PlayersTab() {
     }
     params.set('tab', 'players');
     setSearchParams(params, { replace: true });
-    setVisibleCount(PAGE_SIZE); // Reset pagination on tier change
+    setVisibleCount(PAGE_SIZE);
   }, [searchParams, setSearchParams]);
 
   // Data hooks
@@ -135,9 +142,7 @@ export function PlayersTab() {
       return elitePlayers.slice(0, 5);
     }
 
-    // Filter elite players to those on the active tour
     const tourElite = elitePlayers.filter(ep => {
-      // Match against allPlayers tour_codes
       const player = allPlayers?.find(p => p.id === ep.playerId);
       return player?.tour_codes?.includes(activeTour);
     });
@@ -162,6 +167,7 @@ export function PlayersTab() {
       photoUrl: string | null;
       pgaTourId: string | null;
       rank?: number;
+      rankChange?: number | null;
       statValue?: string;
       statLabel?: string;
       variant: 'default' | 'ranked';
@@ -170,7 +176,6 @@ export function PlayersTab() {
     switch (tier) {
       case 'elite': {
         if (!elitePlayers) break;
-        // Filter elite by tour membership
         let filtered = elitePlayers;
         if (activeTour !== 'all') {
           filtered = filtered.filter(ep => {
@@ -187,6 +192,7 @@ export function PlayersTab() {
           photoUrl: p.photoUrl,
           pgaTourId: p.pgaTourId,
           rank: p.worldRank,
+          rankChange: p.rankChange,
           statValue: p.avgPoints != null ? p.avgPoints.toFixed(2) : undefined,
           statLabel: 'avg pts',
           variant: 'ranked' as const,
@@ -236,7 +242,6 @@ export function PlayersTab() {
         break;
       }
       default: {
-        // field — use tour-filtered players
         const filtered = tourFilteredPlayers
           .filter(p => matchesSearch(p.full_name, p.country))
           .sort((a, b) => a.full_name.localeCompare(b.full_name));
@@ -261,7 +266,6 @@ export function PlayersTab() {
     const currentYear = new Date().getFullYear();
     const fieldCount = tourFilteredPlayers.length;
 
-    // Elite filtered by tour
     let eliteCount = elitePlayers?.length || 0;
     if (activeTour !== 'all' && elitePlayers && allPlayers) {
       eliteCount = elitePlayers.filter(ep => {
@@ -270,7 +274,6 @@ export function PlayersTab() {
       }).length;
     }
 
-    // Active filtered by tour
     let activeCount = activePlayers?.length || 0;
     if (activeTour !== 'all' && activePlayers && allPlayers) {
       activeCount = activePlayers.filter(ap => {
@@ -291,6 +294,16 @@ export function PlayersTab() {
   const showHero = tier === 'field' && !debouncedSearch;
   const isLoading = tier === 'elite' ? eliteLoading : tier === 'active' ? activeLoading : allLoading;
 
+  // ─── Batch headshot loading ───
+  const visiblePlayerIds = useMemo(
+    () => displayRows.map(r => r.id),
+    [displayRows]
+  );
+  const { data: headshotMap } = usePlayerHeadshots(visiblePlayerIds);
+
+  // Content animation key — changes trigger AnimatePresence crossfade
+  const contentKey = `${tier}-${activeTour}-${debouncedSearch}`;
+
   // Loading skeleton
   if (isLoading && totalCount === 0) {
     return (
@@ -309,59 +322,69 @@ export function PlayersTab() {
   }
 
   return (
-    <div className="space-y-4 py-6">
+    <div className="space-y-0 pb-6">
       {/* Immersive Hero */}
       {showHero && heroPlayers.length > 0 && (
         <PlayersHero players={heroPlayers} activeTour={activeTour} />
       )}
 
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <input
-          type="text"
-          placeholder="Search players, countries..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className={cn(
-            "w-full h-12 pl-11 pr-10",
-            "bg-card/80 border border-border",
-            "rounded-xl text-sm text-foreground placeholder:text-muted-foreground",
-            "focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30",
-            "transition-all"
-          )}
+      {/* Sticky filter toolbar */}
+      <div className={cn(
+        "sticky top-0 z-20",
+        "bg-background/95 backdrop-blur-sm",
+        "-mx-4 px-4 pt-4 pb-2 space-y-2",
+        "border-b border-transparent",
+        // When stuck, add subtle bottom border
+        "[&:has(+*)]:border-b-border/10"
+      )}>
+        {/* Search */}
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Search players, countries..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className={cn(
+              "w-full h-12 pl-11 pr-10",
+              "bg-card/80 border border-border",
+              "rounded-xl text-sm text-foreground placeholder:text-muted-foreground",
+              "focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30",
+              "transition-all"
+            )}
+          />
+          <AnimatePresence>
+            {search && (
+              <motion.button
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                onClick={() => setSearch('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full bg-muted hover:bg-muted/80 active:scale-[0.9] transition-transform"
+              >
+                <X className="w-3.5 h-3.5 text-muted-foreground" />
+              </motion.button>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Tour filter pills */}
+        <PlayersTourFilter
+          activeTour={activeTour}
+          onTourChange={setActiveTour}
+          tourCounts={tourCounts}
         />
-        <AnimatePresence>
-          {search && (
-            <motion.button
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              onClick={() => setSearch('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full bg-muted hover:bg-muted/80 active:scale-[0.9] transition-transform"
-            >
-              <X className="w-3.5 h-3.5 text-muted-foreground" />
-            </motion.button>
-          )}
-        </AnimatePresence>
+
+        {/* Category filter tabs */}
+        <PlayerFilterTabs
+          activeFilter={tier}
+          onFilterChange={setTier}
+          counts={counts}
+        />
       </div>
 
-      {/* Tour filter pills */}
-      <PlayersTourFilter
-        activeTour={activeTour}
-        onTourChange={setActiveTour}
-        tourCounts={tourCounts}
-      />
-
-      {/* Category filter tabs */}
-      <PlayerFilterTabs
-        activeFilter={tier}
-        onFilterChange={setTier}
-        counts={counts}
-      />
-
       {/* Context line */}
-      <div className="flex items-center justify-between px-1">
+      <div className="flex items-center justify-between px-1 pt-3 pb-1">
         <p className="text-sm text-muted-foreground">
           {getTierDescription(tier, activeTour)}
         </p>
@@ -370,41 +393,61 @@ export function PlayersTab() {
         </p>
       </div>
 
-      {/* Player list */}
+      {/* Player list with AnimatePresence crossfade */}
       <div ref={listRef}>
-        {displayRows.length > 0 ? (
-          <div className="bg-card rounded-2xl border border-border/50 overflow-hidden">
-            {displayRows.map((row) => (
-              <PlayerListRow
-                key={row.id}
-                player={{
-                  id: row.id,
-                  fullName: row.fullName,
-                  country: row.country,
-                  countryCode: row.countryCode,
-                  photoUrl: row.photoUrl,
-                  pgaTourId: row.pgaTourId,
-                }}
-                rank={row.rank}
-                statValue={row.statValue}
-                statLabel={row.statLabel}
-                variant={row.variant}
-              />
-            ))}
-          </div>
-        ) : (
-          <PlayersEmptyState />
-        )}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={contentKey}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {displayRows.length > 0 ? (
+              <div
+                className={cn(
+                  "rounded-2xl overflow-hidden",
+                  "border border-border/40",
+                  "bg-card/70 backdrop-blur-md",
+                  "shadow-[0_2px_12px_rgba(0,0,0,0.04)]"
+                )}
+              >
+                {displayRows.map((row, index) => (
+                  <PlayerListRow
+                    key={row.id}
+                    player={{
+                      id: row.id,
+                      fullName: row.fullName,
+                      country: row.country,
+                      countryCode: row.countryCode,
+                      photoUrl: row.photoUrl,
+                      pgaTourId: row.pgaTourId,
+                    }}
+                    rank={row.rank}
+                    rankChange={row.rankChange}
+                    statValue={row.statValue}
+                    statLabel={row.statLabel}
+                    variant={row.variant}
+                    batchHeadshotUrl={headshotMap?.get(row.id)}
+                    index={index}
+                  />
+                ))}
+              </div>
+            ) : (
+              <PlayersEmptyState />
+            )}
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       {/* Load More button */}
       {hasMore && (
-        <div className="flex flex-col items-center gap-2 pt-2">
+        <div className="flex flex-col items-center gap-2 pt-4">
           <button
             onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
             className={cn(
               "w-full max-w-xs h-11 flex items-center justify-center gap-1.5",
-              "rounded-xl border border-border bg-card",
+              "rounded-xl border border-border bg-card/70 backdrop-blur-sm",
               "text-sm font-medium text-foreground",
               "hover:bg-muted/50 active:scale-[0.98] transition-all"
             )}
