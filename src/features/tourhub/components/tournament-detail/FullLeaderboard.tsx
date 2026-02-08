@@ -2,19 +2,21 @@
  * FullLeaderboard - Expanded tournament leaderboard with round scores
  * 
  * Features:
+ * - Glassmorphic card container
  * - Column headers (POS, PLAYER, R1-R4, TOTAL, TO PAR)
- * - Round filter selector
- * - Player search
- * - Cut line separator
+ * - Round filter selector with spring animation
+ * - Player search with glass input
+ * - Cut line separator with accent styling
  * - MC/WD handling
  * - JetBrains Mono for scores
+ * - Staggered row entrance animations
  * - Semantic token compliant
  */
 
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, ChevronRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Search, ChevronRight, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { RoundSelector } from './RoundSelector';
@@ -76,7 +78,7 @@ function ScoreToPar({ score, className }: { score: number | null; className?: st
   );
 }
 
-// Position badge
+// Position badge with podium gradients
 function PositionBadge({ position, tied, isMissedCut, status }: {
   position: number;
   tied?: boolean;
@@ -101,6 +103,18 @@ function PositionBadge({ position, tied, isMissedCut, status }: {
     </div>
   );
 }
+
+// Stagger animation for rows
+const rowVariants = {
+  hidden: { opacity: 0 },
+  visible: (i: number) => ({
+    opacity: 1,
+    transition: {
+      delay: Math.min(i * 0.02, 0.6),
+      duration: 0.25,
+    },
+  }),
+};
 
 export function FullLeaderboard({
   entries,
@@ -183,64 +197,82 @@ export function FullLeaderboard({
         />
       )}
 
-      {/* Search input */}
+      {/* Search input — glassmorphic */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
         <input
           type="text"
           placeholder="Search players..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+          className={cn(
+            "w-full pl-10 pr-10 py-3 rounded-xl text-sm text-foreground placeholder:text-muted-foreground/60",
+            "bg-card/80 backdrop-blur-sm border border-border/50",
+            "focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30",
+            "transition-all duration-200"
+          )}
         />
+        <AnimatePresence>
+          {searchQuery && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-muted flex items-center justify-center hover:bg-muted-foreground/20 transition-colors"
+            >
+              <X className="w-3 h-3 text-muted-foreground" />
+            </motion.button>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Leaderboard table */}
-      <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+      {/* Leaderboard table — glassmorphic container */}
+      <div className="rounded-2xl border border-border/40 shadow-sm overflow-hidden bg-card/80 backdrop-blur-sm">
         {/* Column headers */}
-        <div className="flex items-center gap-2 px-3 py-2.5 border-b border-border/60 bg-muted/30">
+        <div className="flex items-center gap-2 px-3 py-2.5 border-b border-border/40 bg-muted/20">
           <div className="w-8 shrink-0 text-center">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Pos</span>
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">Pos</span>
           </div>
           <div className="w-8 shrink-0" /> {/* Avatar space */}
           <div className="flex-1 min-w-0">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Player</span>
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">Player</span>
           </div>
           {showRoundColumns && (
             <>
               <div className="w-9 text-center hidden sm:block">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">R1</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">R1</span>
               </div>
               <div className="w-9 text-center hidden sm:block">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">R2</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">R2</span>
               </div>
               <div className="w-9 text-center hidden sm:block">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">R3</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">R3</span>
               </div>
               <div className="w-9 text-center hidden sm:block">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">R4</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">R4</span>
               </div>
               <div className="w-12 text-center hidden sm:block">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Total</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">Total</span>
               </div>
             </>
           )}
           <div className="w-12 text-center">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
               {selectedRound === 'Overall' ? 'To Par' : 'Score'}
             </span>
           </div>
           {/* Thru column for live */}
           {tournamentStatus === 'inprogress' && (
             <div className="w-10 text-center">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Thru</span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">Thru</span>
             </div>
           )}
           <div className="w-4 shrink-0" /> {/* Chevron space */}
         </div>
 
         {/* Player rows */}
-        <div className="divide-y divide-border/30">
+        <div className="divide-y divide-border/20">
           {sortedEntries.map((entry, index) => {
             const isMissedCut = entry.status === 'MC' || entry.status === 'CUT';
             const isWD = entry.status === 'WD';
@@ -252,13 +284,19 @@ export function FullLeaderboard({
               : null;
 
             return (
-              <div key={entry.id}>
+              <motion.div
+                key={entry.id}
+                custom={index}
+                variants={rowVariants}
+                initial="hidden"
+                animate="visible"
+              >
                 <Link
                   to={`/tourhub/player/${entry.player?.id}`}
                   className={cn(
                     "flex items-center gap-2 px-3 py-2.5 transition-all duration-200",
-                    "hover:bg-muted/50 active:scale-[0.995]",
-                    isTop3 && "bg-amber-50/30",
+                    "hover:bg-muted/40 active:scale-[0.995]",
+                    isTop3 && "bg-amber-50/20 dark:bg-amber-900/5",
                     (isMissedCut || isWD) && "opacity-50",
                   )}
                 >
@@ -340,27 +378,27 @@ export function FullLeaderboard({
                   )}
 
                   {/* Chevron */}
-                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0" />
+                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/30 shrink-0" />
                 </Link>
 
                 {/* Cut line separator */}
                 {showCutLine && (
-                  <div className="flex items-center gap-3 px-4 py-1.5 bg-muted/50">
-                    <div className="flex-1 border-t border-dashed border-muted-foreground/30" />
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  <div className="flex items-center gap-3 px-4 py-2 bg-destructive/5">
+                    <div className="flex-1 border-t border-dashed border-destructive/30" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-destructive/60">
                       Projected Cut
                     </span>
-                    <div className="flex-1 border-t border-dashed border-muted-foreground/30" />
+                    <div className="flex-1 border-t border-dashed border-destructive/30" />
                   </div>
                 )}
-              </div>
+              </motion.div>
             );
           })}
         </div>
 
-        {/* Results count */}
-        <div className="px-4 py-2.5 border-t border-border/60 bg-muted/20">
-          <span className="text-[11px] text-muted-foreground">
+        {/* Results count footer */}
+        <div className="px-4 py-2.5 border-t border-border/30 bg-muted/10">
+          <span className="text-[11px] text-muted-foreground/60">
             {sortedEntries.length} player{sortedEntries.length !== 1 ? 's' : ''}
             {searchQuery && ` matching "${searchQuery}"`}
           </span>
