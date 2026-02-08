@@ -7,6 +7,7 @@ export interface FriendCourseActivity {
   last_played_at?: string;
   has_review: boolean;
   has_rating: boolean;
+  rating_value: number | null;
   profile: {
     id: string;
     username: string;
@@ -64,6 +65,7 @@ export function useFriendsWhoPlayedCourse(userId: string | undefined, courseId: 
           last_played_at: r.created_at,
           has_review: !!r.review,
           has_rating: r.rating != null,
+          rating_value: r.rating ?? null,
           profile: r.user_profiles,
         }))
         .filter((a: any) => a.profile) as FriendCourseActivity[];
