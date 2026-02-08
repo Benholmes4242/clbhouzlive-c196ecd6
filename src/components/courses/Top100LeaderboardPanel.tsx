@@ -45,27 +45,27 @@ const Top100LeaderboardPanel = () => {
       <Tabs value={view} onValueChange={handleViewChange} className="w-full">
         <div className="px-3">
           {/* Two-line tab labels with Apple-style polish */}
-          <div className="flex gap-2 p-1 bg-[#e2e8f0] rounded-xl">
+          <div className="flex gap-2 p-1 bg-muted rounded-xl">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => handleViewChange(tab.id)}
                 className={cn(
-                  'flex-1 py-2 px-2 rounded-lg text-center transition-all duration-200',
+                  'flex-1 py-2 px-2 rounded-lg text-center transition-all duration-200 active:scale-[0.97]',
                   view === tab.id
-                    ? 'bg-white shadow-sm border border-gray-200'
-                    : 'text-gray-500 hover:bg-white/50'
+                    ? 'bg-card shadow-sm border border-border'
+                    : 'text-muted-foreground hover:bg-card/50'
                 )}
               >
                 <span className={cn(
                   'block text-[11px] font-semibold leading-tight',
-                  view === tab.id ? 'text-gray-900' : 'text-gray-500'
+                  view === tab.id ? 'text-foreground' : 'text-muted-foreground'
                 )}>
                   {tab.line1}
                 </span>
                 <span className={cn(
                   'block text-[11px] font-medium leading-tight',
-                  view === tab.id ? 'text-gray-900' : 'text-gray-500'
+                  view === tab.id ? 'text-foreground' : 'text-muted-foreground'
                 )}>
                   {tab.line2}
                 </span>

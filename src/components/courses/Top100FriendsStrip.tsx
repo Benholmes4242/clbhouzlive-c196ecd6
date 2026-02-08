@@ -42,10 +42,10 @@ export const Top100FriendsStrip: React.FC = () => {
   return (
     <div
       onClick={handleClick}
-      className="mt-4 flex items-center justify-between cursor-pointer transition-opacity hover:opacity-80"
+      className="mt-4 flex items-center justify-between cursor-pointer transition-opacity hover:opacity-80 active:scale-[0.97] transition-transform"
     >
       <div className="flex flex-col min-w-0 flex-1">
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-muted-foreground">
           {label}
         </p>
       </div>
@@ -72,10 +72,10 @@ export const Top100FriendsStrip: React.FC = () => {
             ) : (
               <div
                 key={friend.user_id}
-                className="w-9 h-9 flex items-center justify-center bg-slate-100 text-slate-600 text-[11px] font-semibold shrink-0"
+                className="w-9 h-9 flex items-center justify-center bg-muted text-muted-foreground text-[11px] font-semibold shrink-0"
                 style={{
                   borderRadius: '34%',
-                  border: ringColor ? `2px solid ${ringColor}` : '2px solid #D1D5DB',
+                  border: ringColor ? `2px solid ${ringColor}` : '2px solid hsl(var(--border))',
                 }}
               >
                 {initial}
@@ -85,14 +85,14 @@ export const Top100FriendsStrip: React.FC = () => {
 
           {overflowCount > 0 && (
             <div 
-              className="flex h-9 w-9 items-center justify-center bg-slate-100 text-[11px] font-semibold text-slate-600 shrink-0"
-              style={{ borderRadius: '34%', border: '2px solid #D1D5DB' }}
+              className="flex h-9 w-9 items-center justify-center bg-muted text-[11px] font-semibold text-muted-foreground shrink-0"
+              style={{ borderRadius: '34%', border: '2px solid hsl(var(--border))' }}
             >
               +{overflowCount}
             </div>
           )}
         </div>
-        <ChevronRight className="h-4 w-4 text-slate-400 shrink-0" />
+        <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
       </div>
     </div>
   );
