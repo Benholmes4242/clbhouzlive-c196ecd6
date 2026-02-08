@@ -204,8 +204,8 @@ const ManualHandicapModal: React.FC<ManualHandicapModalProps> = (props) => {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[400px] p-0 gap-0 rounded-2xl overflow-hidden">
         {/* Header */}
-        <DialogHeader className="px-6 py-4 border-b border-[#e2e8f0]">
-          <DialogTitle className="text-lg font-semibold text-[#1e293b]">
+        <DialogHeader className="px-6 py-4 border-b border-border">
+          <DialogTitle className="text-lg font-semibold text-foreground">
             {isEditing ? 'Edit Handicap' : 'Add Handicap'}
           </DialogTitle>
         </DialogHeader>
@@ -214,7 +214,7 @@ const ManualHandicapModal: React.FC<ManualHandicapModalProps> = (props) => {
         <div className="px-6 py-5 space-y-4">
           {/* Plus/Standard Toggle */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-[#1e293b]">
+            <label className="text-sm font-medium text-foreground">
               Handicap Type
             </label>
             <div className="flex gap-2">
@@ -222,35 +222,35 @@ const ManualHandicapModal: React.FC<ManualHandicapModalProps> = (props) => {
                 type="button"
                 onClick={() => setIsPlusHandicap(false)}
                 className={cn(
-                  'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg border-2 transition-all',
+                  'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg border-2 transition-all min-h-[44px] active:scale-[0.98]',
                   !isPlusHandicap 
                     ? 'border-[#334E3D] bg-[#334E3D]/5 text-[#334E3D]' 
-                    : 'border-slate-200 text-slate-500 hover:border-slate-300'
+                    : 'border-border text-muted-foreground hover:border-border'
                 )}
               >
                 <span className="text-sm font-medium">Standard</span>
-                <span className="text-xs text-slate-400">(0 - 54)</span>
+                <span className="text-xs text-muted-foreground/60">(0 - 54)</span>
               </button>
               <button
                 type="button"
                 onClick={() => setIsPlusHandicap(true)}
                 className={cn(
-                  'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg border-2 transition-all',
+                  'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg border-2 transition-all min-h-[44px] active:scale-[0.98]',
                   isPlusHandicap 
                     ? 'border-[#C1A84C] bg-[#C1A84C]/5 text-[#C1A84C]' 
-                    : 'border-slate-200 text-slate-500 hover:border-slate-300'
+                    : 'border-border text-muted-foreground hover:border-border'
                 )}
               >
                 <Plus className="h-3.5 w-3.5" />
                 <span className="text-sm font-medium">Plus</span>
-                <span className="text-xs text-slate-400">(+0.1 - +10)</span>
+                <span className="text-xs text-muted-foreground/60">(+0.1 - +10)</span>
               </button>
             </div>
           </div>
 
           {/* Handicap Value Input */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-[#1e293b]">
+            <label className="text-sm font-medium text-foreground">
               Handicap Index
             </label>
             <div className="relative">
@@ -276,8 +276,8 @@ const ManualHandicapModal: React.FC<ManualHandicapModalProps> = (props) => {
               />
             </div>
             {displayPreview && (
-              <p className="text-xs text-[#64748b]">
-                Will display as: <span className="font-semibold text-[#1e293b]">{displayPreview}</span>
+              <p className="text-xs text-muted-foreground">
+                Will display as: <span className="font-semibold text-foreground">{displayPreview}</span>
               </p>
             )}
           </div>
@@ -285,7 +285,7 @@ const ManualHandicapModal: React.FC<ManualHandicapModalProps> = (props) => {
           {/* Home Club field - only for legacy interface */}
           {showHomeClubField && (
             <div className="space-y-2">
-              <label className="text-sm font-medium text-[#1e293b]">
+              <label className="text-sm font-medium text-foreground">
                 Home Club
               </label>
               <Input
@@ -300,7 +300,7 @@ const ManualHandicapModal: React.FC<ManualHandicapModalProps> = (props) => {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 bg-[#f8fafc] border-t border-[#e2e8f0]">
+        <div className="px-6 py-4 bg-muted border-t border-border">
           <div className="flex items-center justify-between">
             <div>
               {/* Clear button - only show if editing and using new interface */}
@@ -310,7 +310,7 @@ const ManualHandicapModal: React.FC<ManualHandicapModalProps> = (props) => {
                   size="sm"
                   onClick={handleClear}
                   disabled={isSaving || isClearing}
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50 gap-1.5"
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50 gap-1.5 min-h-[44px] active:scale-[0.95]"
                 >
                   <Trash2 className="h-4 w-4" />
                   Clear
@@ -324,7 +324,7 @@ const ManualHandicapModal: React.FC<ManualHandicapModalProps> = (props) => {
                 variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={isSaving || isClearing}
-                className="rounded-full px-5"
+                className="rounded-full px-5 min-h-[44px] active:scale-[0.98]"
               >
                 Cancel
               </Button>
@@ -333,7 +333,7 @@ const ManualHandicapModal: React.FC<ManualHandicapModalProps> = (props) => {
               <Button
                 onClick={handleSave}
                 disabled={isSaving || isClearing || (!showHomeClubField && value.trim() === '' && !isEditing)}
-                className="rounded-full px-5 bg-[#e2e8f0] hover:bg-[#cbd5e1] text-[#1e293b]"
+                className="rounded-full px-5 bg-secondary hover:bg-secondary/80 text-foreground min-h-[44px] active:scale-[0.98]"
               >
                 {isSaving ? 'Saving...' : 'Save'}
               </Button>
