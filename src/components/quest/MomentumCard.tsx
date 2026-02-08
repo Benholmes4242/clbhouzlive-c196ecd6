@@ -95,10 +95,10 @@ export const MomentumCard: React.FC<MomentumCardProps> = ({
 
   return (
     <section>
-      {/* Section header - mb-4 */}
-      <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">Momentum</h2>
+      {/* Section header */}
+      <h2 className="text-sm font-semibold text-muted-foreground mb-4">Momentum</h2>
       
-      {/* Icon + stat rows - gap-3 */}
+      {/* Icon + stat rows */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -118,16 +118,10 @@ export const MomentumCard: React.FC<MomentumCardProps> = ({
                 <Calendar className="w-4 h-4" style={{ color: 'var(--quest-accent-green)' }} />
               </div>
               <div className="flex-1">
-                <p 
-                  className="text-xs font-medium"
-                  style={{ color: 'var(--quest-text-tertiary)' }}
-                >
+                <p className="text-xs font-medium text-muted-foreground">
                   Last course logged
                 </p>
-                <p 
-                  className="text-sm font-semibold"
-                  style={{ color: 'var(--quest-text-primary)' }}
-                >
+                <p className="text-sm font-semibold text-foreground">
                   {formatLastDate(lastCourseDate)}
                 </p>
               </div>
@@ -145,26 +139,17 @@ export const MomentumCard: React.FC<MomentumCardProps> = ({
                 <TrendingUp className="w-4 h-4" style={{ color: 'var(--quest-accent-gold)' }} />
               </div>
               <div className="flex-1">
-                <p 
-                  className="text-xs font-medium"
-                  style={{ color: 'var(--quest-text-tertiary)' }}
-                >
+                <p className="text-xs font-medium text-muted-foreground">
                   Courses logged this month
                 </p>
-                <p 
-                  className="text-sm font-semibold"
-                  style={{ color: 'var(--quest-text-primary)' }}
-                >
+                <p className="text-sm font-semibold text-foreground">
                   {thisMonthCount}
                 </p>
               </div>
             </div>
 
-            {/* Encouragement copy - mt-2 */}
-            <p 
-              className="text-xs mt-2"
-              style={{ color: 'var(--quest-text-tertiary)' }}
-            >
+            {/* Encouragement copy */}
+            <p className="text-xs mt-2 text-muted-foreground">
               Keep building your journey.
             </p>
           </div>
@@ -177,12 +162,9 @@ export const MomentumCard: React.FC<MomentumCardProps> = ({
                 border: '1px solid var(--quest-stroke)',
               }}
             >
-              <Flame className="w-4 h-4" style={{ color: 'var(--quest-text-tertiary)' }} />
+              <Flame className="w-4 h-4 text-muted-foreground" />
             </div>
-            <p 
-              className="text-sm"
-              style={{ color: 'var(--quest-text-tertiary)' }}
-            >
+            <p className="text-sm text-muted-foreground">
               Log your first Top 100 course to start momentum.
             </p>
           </div>

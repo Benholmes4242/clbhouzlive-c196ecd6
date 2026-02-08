@@ -128,19 +128,19 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
     <section>
       {/* Section header with toggle */}
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500">
+        <h2 className="text-sm font-semibold text-muted-foreground">
           Trophy Case
         </h2>
         
         {/* Hub-style toggle bar */}
-        <div className="inline-flex items-center gap-1 p-1 bg-[#e2e8f0]/50 rounded-full border border-slate-200/50">
+        <div className="inline-flex items-center gap-1 p-1 bg-muted/50 rounded-full border border-border/50">
           <button
             onClick={() => setFilter('milestones')}
             className={cn(
-              "px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-200",
+              "px-3 min-h-[44px] text-xs font-medium rounded-full transition-all duration-200 active:scale-[0.98]",
               filter === 'milestones'
-                ? "bg-white text-[#1e293b] shadow-sm"
-                : "text-[#64748b] hover:text-[#1e293b]"
+                ? "bg-card text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
             )}
           >
             Milestones
@@ -148,10 +148,10 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
           <button
             onClick={() => setFilter('regions')}
             className={cn(
-              "px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-200",
+              "px-3 min-h-[44px] text-xs font-medium rounded-full transition-all duration-200 active:scale-[0.98]",
               filter === 'regions'
-                ? "bg-white text-[#1e293b] shadow-sm"
-                : "text-[#64748b] hover:text-[#1e293b]"
+                ? "bg-card text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
             )}
           >
             Regions
@@ -165,7 +165,7 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
           !hasAnyMilestones ? (
             <QuestEmptyState
               key="milestones-empty"
-              icon={<Trophy className="w-7 h-7 text-[#64748b]" />}
+              icon={<Trophy className="w-7 h-7 text-muted-foreground" />}
               title="Start Your Collection"
               description="Play Top 100 courses to unlock achievement badges"
               action={{
@@ -189,13 +189,15 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.05, duration: 0.3 }}
                   onClick={() => onBadgeClick?.({ type: 'milestone', id: String(m.threshold), threshold: m.threshold })}
-                  className="flex flex-col items-center group"
+                  className="flex flex-col items-center group active:scale-[0.97]"
                 >
                   {/* Large badge image - 88px for visibility */}
                   <div className="relative mb-2">
                     <img
                       src={BADGE_IMAGES[m.threshold]}
                       alt={m.name}
+                      loading="lazy"
+                      decoding="async"
                       className={cn(
                         "w-[88px] h-[110px] object-contain transition-transform duration-200 group-hover:scale-105",
                         !m.isUnlocked && "opacity-40 grayscale-[60%]"
@@ -205,7 +207,7 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
                   {/* Club name below */}
                   <span className={cn(
                     "text-xs font-semibold text-center transition-colors",
-                    m.isUnlocked ? "text-[#1e293b]" : "text-[#94a3b8]"
+                    m.isUnlocked ? "text-foreground" : "text-muted-foreground"
                   )}>
                     {m.name}
                   </span>
@@ -234,13 +236,15 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.05, duration: 0.3 }}
                   onClick={() => onBadgeClick?.({ type: 'region', id: r.id })}
-                  className="flex flex-col items-center group"
+                  className="flex flex-col items-center group active:scale-[0.97]"
                 >
                   {/* Large region badge - 88px */}
                   <div className="relative mb-2">
                     <img
                       src={badgeImage}
                       alt={regionName}
+                      loading="lazy"
+                      decoding="async"
                       className={cn(
                         "w-[88px] h-[88px] object-contain transition-transform duration-200 group-hover:scale-105",
                         !r.isUnlocked && "opacity-40 grayscale-[60%]"
@@ -251,7 +255,7 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
                   {/* Region name */}
                   <span className={cn(
                     "text-xs font-semibold text-center transition-colors max-w-[100px]",
-                    r.isUnlocked ? "text-[#1e293b]" : "text-[#94a3b8]"
+                    r.isUnlocked ? "text-foreground" : "text-muted-foreground"
                   )}>
                     {regionName}
                   </span>

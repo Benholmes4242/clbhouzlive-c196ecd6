@@ -26,7 +26,7 @@ const RecentCourseRow: React.FC<{
 }> = ({ course, onClick }) => (
   <button
     onClick={onClick}
-    className="w-full flex items-center gap-3 py-3 text-left transition-colors hover:bg-black/[0.02]"
+    className="w-full flex items-center gap-3 py-3 min-h-[44px] text-left transition-opacity active:opacity-80 hover:bg-black/[0.02]"
   >
     <div
       className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -38,15 +38,15 @@ const RecentCourseRow: React.FC<{
       <Trophy className="w-4 h-4" style={{ color: 'var(--quest-accent-gold)' }} />
     </div>
     <div className="flex-1 min-w-0">
-      <p className="text-sm font-medium truncate" style={{ color: 'var(--quest-text-primary)' }}>
+      <p className="text-sm font-medium truncate text-foreground">
         {course.name}
       </p>
-      <p className="text-xs" style={{ color: 'var(--quest-text-tertiary)' }}>
+      <p className="text-xs text-muted-foreground">
         {course.region}
       </p>
     </div>
     {course.dateAdded && (
-      <span className="text-xs flex-shrink-0" style={{ color: 'var(--quest-text-tertiary)' }}>
+      <span className="text-xs flex-shrink-0 text-muted-foreground">
         {course.dateAdded}
       </span>
     )}
@@ -64,8 +64,8 @@ export const RecentlyAddedSection: React.FC<RecentlyAddedSectionProps> = ({
 
   return (
     <section>
-      {/* Section header - mb-4 */}
-      <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">
+      {/* Section header */}
+      <h2 className="text-sm font-semibold text-muted-foreground mb-4">
         Recently Added
       </h2>
 
@@ -84,7 +84,7 @@ export const RecentlyAddedSection: React.FC<RecentlyAddedSectionProps> = ({
               }}
             />
             {index < courses.length - 1 && (
-              <div className="h-px bg-slate-200/60" />
+              <div className="h-px bg-border" />
             )}
           </React.Fragment>
         ))}

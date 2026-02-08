@@ -127,12 +127,11 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
       {/* Connecting line - subtle grey, centered exactly between badges */}
       {!isLast && (
         <div
-          className="absolute w-0.5 z-0"
+          className="absolute w-0.5 z-0 bg-border"
           style={{
-            left: '44px', // Center of 88px badge
-            top: '126px', // Badge (110px) + top padding (16px) = 126px, starts at badge bottom
-            height: '16px', // Short connector that bridges the py-4 gap (32px total, line is centered 16px)
-            backgroundColor: '#E2E8F0', // Subtle light grey
+            left: '44px',
+            top: '126px',
+            height: '16px',
           }}
         />
       )}
@@ -140,7 +139,7 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
       {/* Badge image (88px) - left side, matching Trophy Case */}
       <button
         onClick={onClick}
-        className="relative z-10 flex-shrink-0"
+        className="relative z-10 flex-shrink-0 active:opacity-80"
       >
         <motion.div
           whileHover={{ scale: 1.05 }}
@@ -150,6 +149,8 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
           <img
             src={badgeImage}
             alt={clubName}
+            loading="lazy"
+            decoding="async"
             className={cn(
               "w-[88px] h-[110px] object-contain",
               !milestone.isUnlocked && "opacity-40 grayscale-[60%]"
@@ -160,7 +161,7 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
 
       {/* Text content - right side */}
       <button
-        className="flex-1 min-w-0 text-left pt-2"
+        className="flex-1 min-w-0 text-left pt-2 active:opacity-80"
         onClick={onClick}
       >
         <div className="flex items-start justify-between gap-2">
@@ -168,7 +169,7 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
             {/* Club name - primary title */}
             <h3 className={cn(
               "font-bold text-base",
-              milestone.isUnlocked ? "text-[#1e293b]" : "text-[#94a3b8]"
+              milestone.isUnlocked ? "text-foreground" : "text-muted-foreground"
             )}>
               {clubName}
             </h3>
@@ -176,7 +177,7 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
             {/* Achievement description */}
             <p className={cn(
               "text-sm mt-0.5",
-              milestone.isUnlocked ? "text-[#64748b]" : "text-[#cbd5e1]"
+              milestone.isUnlocked ? "text-muted-foreground" : "text-muted-foreground/40"
             )}>
               {`${milestone.threshold} Top 100 courses played`}
             </p>
@@ -193,7 +194,7 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
                     transition={{ duration: 0.5, delay: 0.2 }}
                   />
                 </div>
-                <span className="text-xs text-[#64748b] tabular-nums">
+                <span className="text-xs text-muted-foreground tabular-nums">
                   {totalPlayed}/{milestone.threshold}
                 </span>
               </div>
@@ -285,7 +286,7 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ milestone, index, onClick }
 
   return (
     <motion.button
-      className="w-full flex items-center gap-5 py-4 text-left"
+      className="w-full flex items-center gap-5 py-4 min-h-[44px] text-left active:opacity-80"
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.3 + index * 0.05 }}
@@ -299,6 +300,8 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ milestone, index, onClick }
         <img
           src={badgeImage}
           alt={milestone.name}
+          loading="lazy"
+          decoding="async"
           className={cn(
             "w-20 h-20 object-contain",
             !milestone.isUnlocked && "opacity-40 grayscale-[60%]"
@@ -313,7 +316,7 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ milestone, index, onClick }
             {/* Region name */}
             <h4 className={cn(
               "font-bold text-base",
-              milestone.isUnlocked ? "text-[#1e293b]" : "text-[#94a3b8]"
+              milestone.isUnlocked ? "text-foreground" : "text-muted-foreground"
             )}>
               {milestone.name}
             </h4>
@@ -321,7 +324,7 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ milestone, index, onClick }
             {/* Description */}
             <p className={cn(
               "text-sm mt-0.5",
-              milestone.isUnlocked ? "text-[#64748b]" : "text-[#cbd5e1]"
+              milestone.isUnlocked ? "text-muted-foreground" : "text-muted-foreground/40"
             )}>
               {milestone.tierName}
             </p>
@@ -337,7 +340,7 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ milestone, index, onClick }
                     transition={{ duration: 0.5, delay: 0.3 }}
                   />
                 </div>
-                <span className="text-xs text-[#64748b] tabular-nums">
+                <span className="text-xs text-muted-foreground tabular-nums">
                   {milestone.played}/{milestone.total}
                 </span>
               </div>
@@ -380,7 +383,7 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
   if (totalPlayed === 0 && coreMilestones.length > 0) {
     return (
       <QuestEmptyState
-        icon={<Flag className="w-8 h-8 text-[#64748b]" />}
+        icon={<Flag className="w-8 h-8 text-muted-foreground" />}
         title="Begin Your Journey"
         description="Log your first Top 100 course to start climbing the milestone ladder"
         action={{
@@ -411,7 +414,7 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
       {/* Mastery Track Section */}
       {regionMilestones.length > 0 && (
         <motion.div 
-          className="relative mt-8 pt-6 border-t border-slate-100"
+          className="relative mt-8 pt-6 border-t border-border/60"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
@@ -426,11 +429,11 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
           >
             <div className="flex items-center gap-2 mb-1">
               <Crown className="w-4 h-4 text-[#C1A84C]" />
-              <span className="text-xs font-bold uppercase tracking-wider text-[#8B7635]">
+              <span className="text-sm font-semibold text-foreground">
                 Mastery Track
               </span>
             </div>
-            <p className="text-sm text-[#64748b]">
+            <p className="text-sm text-muted-foreground">
               {coreComplete 
                 ? 'Complete each regional Top 100 list to achieve mastery' 
                 : 'Complete the Grand Slam Club to unlock regional mastery challenges'}

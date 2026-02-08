@@ -234,7 +234,7 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
   }
 
   return (
-    <PageRoot className="min-h-screen bg-[#F8FAFC]">
+    <PageRoot className="min-h-screen bg-background">
       {/* Content - generous spacing (24-32px gaps) for Apple-level polish */}
       <div className="relative pb-10 pt-4">
         {/* Section 1: Trophy Room Hero */}
@@ -260,9 +260,9 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
 
         {/* Section 4: Journey Map - directly on page background */}
         <section className="px-4 mb-10" ref={journeyMapRef}>
-          <h2 className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500 mb-4">Journey Map</h2>
+          <h2 className="text-sm font-semibold text-muted-foreground mb-4">Journey Map</h2>
           {showJourneyHint && (
-            <p className="text-sm mb-3 text-slate-400 transition-opacity duration-500">
+            <p className="text-sm mb-3 text-muted-foreground/60 transition-opacity duration-500">
               Your journey unfolds here
             </p>
           )}
@@ -287,7 +287,7 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
 
         {/* Section 7: Friends Leaderboard - in card */}
         <section className="px-4 mb-10">
-          <div className="bg-white rounded-2xl p-4 border border-slate-200/60">
+          <div className="bg-card rounded-2xl p-4 border border-border">
             <LeaderboardCard userId={targetUserId} />
           </div>
         </section>
