@@ -2,11 +2,12 @@
  * Resolve player photo URLs to full URLs
  * 
  * Priority:
- *   1. Cloudinary CDN (if pga_tour_id provided) - stable, no rate limits
- *   2. SportRadar API URLs: routed through image-proxy edge function
- *   3. Relative paths like /player-headshots/scottie-scheffler.png
- *   4. Supabase Storage URLs: returned as-is
- *   5. null (triggers initials fallback in components)
+ *   1. R2 CDN (manually uploaded headshots) - always takes precedence
+ *   2. Cloudinary CDN (if pga_tour_id provided) - stable, no rate limits
+ *   3. SportRadar API URLs: routed through image-proxy edge function
+ *   4. Relative paths like /player-headshots/scottie-scheffler.png
+ *   5. Supabase Storage URLs: returned as-is
+ *   6. null (triggers initials fallback in components)
  * 
  * Skips ui-avatars.com URLs (initials generators, not real photos)
  */
@@ -15,13 +16,18 @@ const SUPABASE_URL = 'https://ybxkehyomcakqjvuhnna.supabase.co';
 
 /**
  * Generate a stable PGA Tour Cloudinary headshot URL from a PGA Tour player ID.
- * This bypasses SportRadar rate limits entirely.
+ * Supports 'thumb' for list/card usage and 'hero' for full-bleed hero images.
  * 
  * @param pgaTourId - The official PGA Tour player ID (e.g., "46046" for Scottie Scheffler)
+ * @param size - 'thumb' (440×400 actual) or 'hero' (1600×1200 actual)
  * @returns Cloudinary URL for the player's headshot
  */
-export function getPgaTourHeadshotUrl(pgaTourId: string): string {
-  return `https://pga-tour-res.cloudinary.com/image/upload/c_fill,g_face:center,q_auto,f_auto,dpr_2.0,h_220,w_200,d_stub:default_avatar_light.webp/headshots_${pgaTourId}`;
+export function getPgaTourHeadshotUrl(pgaTourId: string, size: 'thumb' | 'hero' = 'thumb'): string {
+  const params = size === 'hero'
+    ? 'c_fill,g_face:center,q_auto,f_auto,dpr_2.0,h_800,w_600'
+    : 'c_fill,g_face:center,q_auto,f_auto,dpr_2.0,h_220,w_200';
+  
+  return `https://pga-tour-res.cloudinary.com/image/upload/${params},d_stub:default_avatar_light.webp/headshots_${pgaTourId}`;
 }
 
 /**
@@ -29,11 +35,13 @@ export function getPgaTourHeadshotUrl(pgaTourId: string): string {
  * 
  * @param photoUrl - The photo_url from sr_players table
  * @param pgaTourId - Optional pga_tour_id for Cloudinary resolution (preferred)
+ * @param size - 'thumb' for list/card or 'hero' for full-bleed hero images
  * @returns Resolved photo URL or null
  */
 export function resolvePhotoUrl(
   photoUrl: string | null | undefined,
-  pgaTourId?: string | null
+  pgaTourId?: string | null,
+  size: 'thumb' | 'hero' = 'thumb'
 ): string | null {
   // Priority 1: Manually uploaded R2 images ALWAYS take precedence
   // These are curated/corrected headshots uploaded via admin tool
@@ -43,7 +51,7 @@ export function resolvePhotoUrl(
 
   // Priority 2: Use Cloudinary if pga_tour_id exists
   if (pgaTourId) {
-    return getPgaTourHeadshotUrl(pgaTourId);
+    return getPgaTourHeadshotUrl(pgaTourId, size);
   }
 
   // Priority 3+: Handle other photo_url formats

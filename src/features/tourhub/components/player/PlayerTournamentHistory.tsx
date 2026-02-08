@@ -1,6 +1,6 @@
 /**
- * PlayerTournamentHistory - Recent tournaments with show more,
- * PGA score colors, tap feedback, and font-mono scores.
+ * PlayerTournamentHistory - Timeline layout with position badges,
+ * vertical line, color-coded results, glass card treatment.
  */
 
 import { useState } from 'react';
@@ -10,6 +10,29 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { usePlayerResults, formatPosition, formatScore, formatMoney } from '../../hooks/usePlayerResults';
 import { TOUR_COLORS } from '../../constants/colors';
+
+const GLASS_CARD_STYLE = {
+  background: 'rgba(255, 255, 255, 0.7)',
+  backdropFilter: 'blur(8px)',
+  WebkitBackdropFilter: 'blur(8px)',
+  border: '1px solid rgba(255, 255, 255, 0.5)',
+  boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04)',
+};
+
+function getPositionStyle(pos: string, position: number | null) {
+  const isWin = pos === '1st' || pos === 'T1st';
+  const isTop5 = !isWin && position !== null && position <= 5;
+  const isTop10 = !isWin && !isTop5 && position !== null && position <= 10;
+  const isTop25 = !isWin && !isTop5 && !isTop10 && position !== null && position <= 25;
+  const isCut = pos === 'MC' || pos === 'WD' || pos === 'DQ';
+
+  if (isWin) return 'bg-amber-500/20 text-amber-600';
+  if (isTop5) return 'bg-emerald-500/10 text-emerald-600';
+  if (isTop10) return 'bg-blue-500/10 text-blue-600';
+  if (isCut) return 'bg-red-500/8 text-red-500';
+  if (isTop25) return 'bg-muted text-muted-foreground';
+  return 'bg-muted/30 text-foreground';
+}
 
 interface PlayerTournamentHistoryProps {
   playerId: string;
@@ -24,7 +47,7 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
   const hasMore = (allResults?.length ?? 0) > INITIAL_LIMIT;
 
   return (
-    <div className="bg-card rounded-xl border border-border/50 p-6">
+    <div className="rounded-[20px] p-6" style={GLASS_CARD_STYLE}>
       <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2 pl-3 border-l-3 border-primary">
         <Activity className="w-5 h-5 text-primary" />
         Recent Tournaments
@@ -38,38 +61,35 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
         </div>
       ) : results && results.length > 0 ? (
         <>
-          <div className="space-y-2">
-            {results.map((result) => {
+          <div className="space-y-0">
+            {results.map((result, index) => {
               const pos = formatPosition(result.position, result.position_tied, result.status);
               const score = result.score;
               const scoreStr = formatScore(result.score);
               const isWin = pos === '1st' || pos === 'T1st';
-              const isTop10 = !isWin && (result.position !== null && result.position <= 10);
-              const isCut = pos === 'MC' || pos === 'WD' || pos === 'DQ';
+              const isLast = index === results.length - 1;
 
               return (
                 <Link
                   key={result.id}
                   to={`/tourhub/tournament/${result.tournament_id}`}
-                  className={cn(
-                    "flex items-center gap-4 py-3 px-3 rounded-lg",
-                    "bg-card/50 border border-border/30",
-                    "hover:border-primary/40 hover:bg-card transition-all duration-200",
-                    "active:scale-[0.98] group"
-                  )}
+                  className="flex gap-3 group active:scale-[0.98] transition-transform"
                 >
-                  {/* Position badge */}
-                  <div className={cn(
-                    "w-12 h-12 rounded-lg flex items-center justify-center text-sm font-bold font-mono shrink-0",
-                    isWin ? "bg-amber-500/20 text-amber-500" :
-                    isTop10 ? "bg-emerald-500/10 text-emerald-500" :
-                    isCut ? "bg-muted/50 text-muted-foreground" :
-                    "bg-muted/30 text-foreground"
-                  )}>
-                    {pos}
+                  {/* Left: Position badge + vertical line */}
+                  <div className="flex flex-col items-center">
+                    <div className={cn(
+                      "w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold font-mono shrink-0",
+                      getPositionStyle(pos, result.position)
+                    )}>
+                      {isWin ? '🏆' : pos}
+                    </div>
+                    {!isLast && (
+                      <div className="w-px flex-1 bg-border/50 mt-2 mb-1" />
+                    )}
                   </div>
 
-                  <div className="flex-1 min-w-0">
+                  {/* Right: Tournament info */}
+                  <div className="flex-1 min-w-0 pb-4">
                     <p className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">
                       {result.tournament_name}
                     </p>
@@ -78,26 +98,25 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
                         ? format(new Date(result.tournament_end_date), 'MMM d, yyyy')
                         : '—'}
                     </p>
-                  </div>
-
-                  <div className="text-right shrink-0">
-                    <p
-                      className="text-sm font-bold font-mono"
-                      style={{
-                        color: score !== null && score < 0
-                          ? TOUR_COLORS.scoreUnderPar
-                          : score !== null && score > 0
-                            ? TOUR_COLORS.scoreOverPar
-                            : TOUR_COLORS.scoreEven,
-                      }}
-                    >
-                      {scoreStr}
-                    </p>
-                    {result.money !== null && result.money > 0 && (
-                      <p className="text-xs text-emerald-500 font-mono mt-0.5">
-                        {formatMoney(result.money)}
-                      </p>
-                    )}
+                    <div className="flex items-center gap-3 mt-1">
+                      <span
+                        className="text-sm font-bold font-mono"
+                        style={{
+                          color: score !== null && score < 0
+                            ? TOUR_COLORS.scoreUnderPar
+                            : score !== null && score > 0
+                              ? TOUR_COLORS.scoreOverPar
+                              : TOUR_COLORS.scoreEven,
+                        }}
+                      >
+                        {scoreStr}
+                      </span>
+                      {result.money !== null && result.money > 0 && (
+                        <span className="text-xs text-emerald-500 font-mono">
+                          {formatMoney(result.money)}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </Link>
               );

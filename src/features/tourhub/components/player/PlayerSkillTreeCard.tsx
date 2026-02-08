@@ -1,12 +1,12 @@
 /**
- * PlayerSkillTreeCard - RPG-style skill visualization for player profiles
- * 
- * Displays a player's 5-attribute skill build with animated level bars,
- * attribute breakdown, and a radar chart visualization.
+ * PlayerSkillTreeCard - RPG-style skill visualization
+ * Scroll-triggered animations, larger radar chart with gradient fill,
+ * bigger overall badge with glow, glass card treatment.
  */
 
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 import { motion } from 'framer-motion';
+import { useInView } from 'react-intersection-observer';
 import { Zap, Target, Flame, Shield, Activity } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
@@ -16,7 +16,14 @@ import {
   type SkillAttribute,
 } from '../../hooks/usePlayerSkillTree';
 
-// Lucide icon map for each skill
+const GLASS_CARD_STYLE = {
+  background: 'rgba(255, 255, 255, 0.7)',
+  backdropFilter: 'blur(8px)',
+  WebkitBackdropFilter: 'blur(8px)',
+  border: '1px solid rgba(255, 255, 255, 0.5)',
+  boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04)',
+};
+
 const SKILL_ICONS: Record<SkillAttributeKey, React.ElementType> = {
   power: Zap,
   precision: Target,
@@ -41,7 +48,7 @@ const springSnappy = {
 };
 
 /** Animated Level Bar - 10 blocks with stagger */
-const LevelBar = memo(({ level, gradient, delay = 0 }: { level: number; gradient: string; delay?: number }) => (
+const LevelBar = memo(({ level, gradient, delay = 0, animate = true }: { level: number; gradient: string; delay?: number; animate?: boolean }) => (
   <div className="flex gap-0.5 flex-1">
     {Array.from({ length: 10 }).map((_, index) => (
       <motion.div
@@ -50,8 +57,8 @@ const LevelBar = memo(({ level, gradient, delay = 0 }: { level: number; gradient
           "flex-1 h-3 rounded-sm",
           index < level ? `bg-gradient-to-r ${gradient}` : "bg-muted/30"
         )}
-        initial={{ scaleX: 0 }}
-        animate={{ scaleX: 1 }}
+        initial={animate ? { scaleX: 0 } : false}
+        animate={animate ? { scaleX: 1 } : undefined}
         transition={{ ...springSnappy, delay: delay + (index * 0.03) }}
         style={{ originX: 0 }}
       />
@@ -61,7 +68,7 @@ const LevelBar = memo(({ level, gradient, delay = 0 }: { level: number; gradient
 LevelBar.displayName = 'LevelBar';
 
 /** Single Attribute Row */
-const AttributeRow = memo(({ attribute, isStrongest, delay = 0 }: { attribute: SkillAttribute; isStrongest: boolean; delay?: number }) => {
+const AttributeRow = memo(({ attribute, isStrongest, delay = 0, animate = true }: { attribute: SkillAttribute; isStrongest: boolean; delay?: number; animate?: boolean }) => {
   const config = SKILL_ATTRIBUTES[attribute.key];
   const Icon = SKILL_ICONS[attribute.key];
 
@@ -71,8 +78,8 @@ const AttributeRow = memo(({ attribute, isStrongest, delay = 0 }: { attribute: S
         "flex items-center gap-3 py-3 px-3 rounded-xl transition-colors",
         isStrongest && "bg-gradient-to-r from-amber-500/10 to-transparent border border-amber-500/20"
       )}
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
+      initial={animate ? { opacity: 0, x: -20 } : false}
+      animate={animate ? { opacity: 1, x: 0 } : undefined}
       transition={{ ...springSnappy, delay }}
     >
       <div className="flex items-center gap-2 w-28 shrink-0">
@@ -87,6 +94,7 @@ const AttributeRow = memo(({ attribute, isStrongest, delay = 0 }: { attribute: S
         level={attribute.level}
         gradient={isStrongest ? "from-amber-500 to-amber-400" : config.gradient}
         delay={delay}
+        animate={animate}
       />
       <div className={cn("w-12 text-right", isStrongest ? "text-amber-600" : config.color)}>
         <span className="text-sm font-bold font-mono">Lv.{attribute.level}</span>
@@ -101,19 +109,27 @@ const AttributeRow = memo(({ attribute, isStrongest, delay = 0 }: { attribute: S
 });
 AttributeRow.displayName = 'AttributeRow';
 
-/** Overall Level Badge */
-const OverallLevelBadge = memo(({ level }: { level: number }) => {
+/** Overall Level Badge — larger (64px) with glow */
+const OverallLevelBadge = memo(({ level, animate = true }: { level: number; animate?: boolean }) => {
   const getTier = (lvl: number) => {
-    if (lvl >= 9) return { name: 'Elite', color: 'text-amber-500', gradient: 'from-amber-500 to-yellow-400' };
-    if (lvl >= 7) return { name: 'Champion', color: 'text-purple-500', gradient: 'from-purple-500 to-violet-400' };
-    if (lvl >= 5) return { name: 'Contender', color: 'text-blue-500', gradient: 'from-blue-500 to-cyan-400' };
-    return { name: 'Rising', color: 'text-emerald-500', gradient: 'from-emerald-500 to-green-400' };
+    if (lvl >= 9) return { name: 'Elite', color: 'text-amber-500', gradient: 'from-amber-500 to-yellow-400', glow: '0 0 20px rgba(245,158,11,0.3)' };
+    if (lvl >= 7) return { name: 'Champion', color: 'text-purple-500', gradient: 'from-purple-500 to-violet-400', glow: '0 0 20px rgba(168,85,247,0.3)' };
+    if (lvl >= 5) return { name: 'Contender', color: 'text-blue-500', gradient: 'from-blue-500 to-cyan-400', glow: '0 0 20px rgba(59,130,246,0.3)' };
+    return { name: 'Rising', color: 'text-emerald-500', gradient: 'from-emerald-500 to-green-400', glow: '0 0 20px rgba(16,185,129,0.3)' };
   };
   const tier = getTier(level);
 
   return (
-    <motion.div className="flex items-center gap-3" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={springSnappy}>
-      <div className={cn("w-16 h-16 rounded-2xl bg-gradient-to-br flex flex-col items-center justify-center", tier.gradient)}>
+    <motion.div
+      className="flex items-center gap-3"
+      initial={animate ? { scale: 0.8, opacity: 0 } : false}
+      animate={animate ? { scale: 1, opacity: 1 } : undefined}
+      transition={springSnappy}
+    >
+      <div
+        className={cn("w-16 h-16 rounded-2xl bg-gradient-to-br flex flex-col items-center justify-center", tier.gradient)}
+        style={{ boxShadow: tier.glow }}
+      >
         <span className="text-white/80 text-[10px] uppercase tracking-wide font-medium">Overall</span>
         <span className="text-white text-2xl font-bold font-mono">{level}</span>
       </div>
@@ -126,21 +142,20 @@ const OverallLevelBadge = memo(({ level }: { level: number }) => {
 });
 OverallLevelBadge.displayName = 'OverallLevelBadge';
 
-/** SVG Radar / Spider Chart */
-function SkillRadarChart({ attributes }: { attributes: SkillAttribute[] }) {
-  const SIZE = 200;
+/** SVG Radar / Spider Chart — larger with gradient fill */
+function SkillRadarChart({ attributes, animate = true }: { attributes: SkillAttribute[]; animate?: boolean }) {
+  const SIZE = 280;
   const CENTER = SIZE / 2;
-  const RADIUS = 75;
-  const LABEL_RADIUS = RADIUS + 20;
+  const RADIUS = 100;
+  const LABEL_RADIUS = RADIUS + 24;
   const LEVELS = 10;
 
-  // Ensure we have all 5 attributes in the correct order
   const orderedKeys: SkillAttributeKey[] = ['power', 'precision', 'scoring', 'recovery', 'consistency'];
   const ordered = orderedKeys.map(key => attributes.find(a => a.key === key) || { key, level: 0 } as SkillAttribute);
   const count = ordered.length;
 
   const angleStep = (2 * Math.PI) / count;
-  const startAngle = -Math.PI / 2; // Start from top
+  const startAngle = -Math.PI / 2;
 
   const getPoint = (index: number, level: number) => {
     const angle = startAngle + index * angleStep;
@@ -148,7 +163,6 @@ function SkillRadarChart({ attributes }: { attributes: SkillAttribute[] }) {
     return { x: CENTER + r * Math.cos(angle), y: CENTER + r * Math.sin(angle) };
   };
 
-  // Grid rings
   const gridRings = [2, 4, 6, 8, 10].map(level => {
     const points = Array.from({ length: count }).map((_, i) => {
       const p = getPoint(i, level);
@@ -157,19 +171,16 @@ function SkillRadarChart({ attributes }: { attributes: SkillAttribute[] }) {
     return <polygon key={level} points={points} fill="none" stroke="hsl(var(--border))" strokeWidth="0.5" opacity="0.4" />;
   });
 
-  // Axis lines
   const axisLines = Array.from({ length: count }).map((_, i) => {
     const p = getPoint(i, LEVELS);
     return <line key={i} x1={CENTER} y1={CENTER} x2={p.x} y2={p.y} stroke="hsl(var(--border))" strokeWidth="0.5" opacity="0.3" />;
   });
 
-  // Data polygon
   const dataPoints = ordered.map((attr, i) => {
     const p = getPoint(i, attr.level);
     return `${p.x},${p.y}`;
   }).join(' ');
 
-  // Labels
   const labels = ordered.map((attr, i) => {
     const angle = startAngle + i * angleStep;
     const x = CENTER + LABEL_RADIUS * Math.cos(angle);
@@ -182,7 +193,7 @@ function SkillRadarChart({ attributes }: { attributes: SkillAttribute[] }) {
         y={y}
         textAnchor="middle"
         dominantBaseline="central"
-        className="fill-muted-foreground text-[9px] font-medium"
+        className="fill-muted-foreground text-[10px] font-medium"
       >
         {config.name}
       </text>
@@ -190,16 +201,22 @@ function SkillRadarChart({ attributes }: { attributes: SkillAttribute[] }) {
   });
 
   return (
-    <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="w-full max-w-[240px] mx-auto">
+    <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="w-full max-w-[280px] mx-auto">
+      <defs>
+        <linearGradient id="skill-fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="rgba(245,158,11,0.25)" />
+          <stop offset="100%" stopColor="rgba(245,158,11,0.05)" />
+        </linearGradient>
+      </defs>
       {gridRings}
       {axisLines}
       <motion.polygon
         points={dataPoints}
-        fill="hsl(var(--primary) / 0.15)"
-        stroke="hsl(var(--primary))"
+        fill="url(#skill-fill)"
+        stroke="#F59E0B"
         strokeWidth="1.5"
-        initial={{ opacity: 0, scale: 0.5 }}
-        animate={{ opacity: 1, scale: 1 }}
+        initial={animate ? { opacity: 0, scale: 0.5 } : false}
+        animate={animate ? { opacity: 1, scale: 1 } : undefined}
         transition={{ duration: 0.5, delay: 0.3 }}
         style={{ transformOrigin: `${CENTER}px ${CENTER}px` }}
       />
@@ -210,10 +227,12 @@ function SkillRadarChart({ attributes }: { attributes: SkillAttribute[] }) {
             key={attr.key}
             cx={p.x}
             cy={p.y}
-            r="3"
-            fill="hsl(var(--primary))"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
+            r="4"
+            fill="#F59E0B"
+            stroke="white"
+            strokeWidth="1.5"
+            initial={animate ? { scale: 0 } : false}
+            animate={animate ? { scale: 1 } : undefined}
             transition={{ delay: 0.5 + i * 0.1 }}
           />
         );
@@ -260,10 +279,11 @@ function SkillTreeEmpty() {
 
 export function PlayerSkillTreeCard({ playerId }: { playerId: string }) {
   const { data: skillTree, isLoading, error } = usePlayerSkillTree(playerId);
+  const { ref, inView } = useInView({ threshold: 0.2, triggerOnce: true });
 
   if (isLoading) {
     return (
-      <div className="bg-card rounded-xl border border-border/50 p-6">
+      <div className="rounded-[20px] p-6" style={GLASS_CARD_STYLE}>
         <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2 pl-3 border-l-3 border-primary">
           <Activity className="w-5 h-5 text-primary" />
           Skill Build
@@ -275,7 +295,7 @@ export function PlayerSkillTreeCard({ playerId }: { playerId: string }) {
 
   if (error || !skillTree || skillTree.attributes.length === 0) {
     return (
-      <div className="bg-card rounded-xl border border-border/50 p-6">
+      <div className="rounded-[20px] p-6" style={GLASS_CARD_STYLE}>
         <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2 pl-3 border-l-3 border-primary">
           <Activity className="w-5 h-5 text-primary" />
           Skill Build
@@ -286,18 +306,18 @@ export function PlayerSkillTreeCard({ playerId }: { playerId: string }) {
   }
 
   return (
-    <div className="bg-card rounded-xl border border-border/50 p-6">
+    <div ref={ref} className="rounded-[20px] p-6" style={GLASS_CARD_STYLE}>
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold text-foreground flex items-center gap-2 pl-3 border-l-3 border-primary">
           <Activity className="w-5 h-5 text-primary" />
           Skill Build
         </h2>
-        <OverallLevelBadge level={skillTree.overallLevel} />
+        <OverallLevelBadge level={skillTree.overallLevel} animate={inView} />
       </div>
 
       {/* Strongest Attribute Callout */}
-      {skillTree.strongestAttribute && (
+      {inView && skillTree.strongestAttribute && (
         <motion.div
           className="mb-4 px-4 py-3 rounded-xl bg-gradient-to-r from-amber-500/10 to-transparent border border-amber-500/20"
           initial={{ opacity: 0, y: 10 }}
@@ -316,21 +336,22 @@ export function PlayerSkillTreeCard({ playerId }: { playerId: string }) {
         </motion.div>
       )}
 
-      {/* Attribute Rows */}
+      {/* Attribute Rows — only animate when in view */}
       <div className="space-y-1">
         {skillTree.attributes.map((attr, index) => (
           <AttributeRow
             key={attr.key}
             attribute={attr}
             isStrongest={attr.key === skillTree.strongestAttribute}
-            delay={0.1 + index * 0.05}
+            delay={inView ? 0.1 + index * 0.05 : 0}
+            animate={inView}
           />
         ))}
       </div>
 
       {/* Radar Chart */}
       <div className="mt-6 pt-4 border-t border-border/30">
-        <SkillRadarChart attributes={skillTree.attributes} />
+        <SkillRadarChart attributes={skillTree.attributes} animate={inView} />
       </div>
 
       {/* Legend */}
