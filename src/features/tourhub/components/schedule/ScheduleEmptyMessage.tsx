@@ -2,8 +2,8 @@
  * ScheduleEmptyMessage - Cinematic empty states (Apple-grade)
  * 
  * Features:
- * - Glassmorphic container
- * - Animated icons
+ * - Glassmorphic container using design system tokens
+ * - Animated icons with semantic accent colors
  * - Clear call-to-action
  */
 
@@ -30,23 +30,23 @@ export function ScheduleEmptyMessage({
       message: nextTournamentName 
         ? `Check back soon — next up is ${nextTournamentName}` 
         : 'No live tournaments right now. Check back soon!',
-      iconBg: 'from-emerald-500 to-teal-500',
+      iconClassName: 'bg-accent text-accent-foreground',
     },
     'no-results': {
       icon: <Calendar className="w-6 h-6" />,
       title: 'No Matches',
       message: 'No tournaments match your search or filter.',
-      iconBg: 'from-slate-500 to-slate-600',
+      iconClassName: 'bg-muted text-muted-foreground',
     },
     'season-complete': {
       icon: <Trophy className="w-6 h-6" />,
       title: 'Season Complete',
       message: null,
-      iconBg: 'from-amber-500 to-orange-500',
+      iconClassName: 'bg-primary text-primary-foreground',
     },
   };
 
-  const { icon, title, message, iconBg } = content[variant];
+  const { icon, title, message, iconClassName } = content[variant];
 
   return (
     <motion.div 
@@ -62,8 +62,8 @@ export function ScheduleEmptyMessage({
       {/* Animated icon container */}
       <motion.div 
         className={cn(
-          "w-14 h-14 rounded-2xl flex items-center justify-center text-white bg-gradient-to-br shadow-lg",
-          iconBg
+          "w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg",
+          iconClassName
         )}
         initial={{ rotate: -10, scale: 0.8 }}
         animate={{ rotate: 0, scale: 1 }}
