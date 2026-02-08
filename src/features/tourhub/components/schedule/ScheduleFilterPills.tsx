@@ -105,18 +105,21 @@ export function ScheduleFilterPills({
               <span className="flex items-center justify-center gap-1.5">
                 {option.label}
                 
-                {/* Live indicator dot */}
-                {option.hasLiveIndicator && showLiveDot && (
-                  <span className="relative flex h-2 w-2">
-                    <span className={cn(
-                      "absolute inline-flex h-full w-full rounded-full opacity-75",
-                      isActive ? "animate-ping bg-red-500" : "bg-red-400"
-                    )} />
-                    <span className={cn(
-                      "relative inline-flex rounded-full h-2 w-2",
-                      isActive ? "bg-red-500" : "bg-red-400"
-                    )} />
-                  </span>
+                {/* Live count + indicator */}
+                {option.hasLiveIndicator && counts.live > 0 && (
+                  <>
+                    <span className="text-[11px]">({counts.live})</span>
+                    <span className="relative flex h-2 w-2">
+                      <span className={cn(
+                        "absolute inline-flex h-full w-full rounded-full opacity-75",
+                        isActive ? "animate-ping bg-red-500" : "bg-red-400"
+                      )} />
+                      <span className={cn(
+                        "relative inline-flex rounded-full h-2 w-2",
+                        isActive ? "bg-red-500" : "bg-red-400"
+                      )} />
+                    </span>
+                  </>
                 )}
               </span>
             </button>

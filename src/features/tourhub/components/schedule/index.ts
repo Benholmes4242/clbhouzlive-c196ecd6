@@ -8,3 +8,4 @@ export { ScheduleTournamentCard, prefetchTournamentImages } from './ScheduleTour
 export { ScheduleMonthHeader } from './ScheduleMonthHeader';
 export { ScheduleEmptyMessage } from './ScheduleEmptyMessage';
 export { ScheduleHeroCard, getFeaturedTournament } from './ScheduleHeroCard';
+export { ScheduleTourFilter, type TourFilterCode } from './ScheduleTourFilter';

@@ -89,10 +89,10 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
       to={`/tourhub/tournament/${tournament.id}`}
       className="group block relative overflow-hidden active:scale-[0.98] transition-transform"
     >
-      {/* Premium hero container - full bleed */}
+      {/* Premium hero container - full bleed, 320px height */}
       <motion.div 
         className="relative overflow-hidden"
-        style={{ height: '280px' }}
+        style={{ height: '320px' }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
@@ -108,6 +108,8 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
             src={imageUrl}
             alt={tournament.venue_name || tournament.name}
             className="w-full h-full object-cover"
+            loading="eager"
+            fetchPriority="high"
           />
         </motion.div>
         
@@ -123,8 +125,23 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
         />
 
         {/* Status Badge - top left */}
-        <div className="absolute top-4 left-4 z-10">
+        <div className="absolute top-4 left-4 z-10 flex flex-col gap-1.5">
           <HeroStatusBadge type={type} />
+          {/* Tour badge */}
+          {tournament.tour_full_name && (
+            <span 
+              className="inline-flex w-fit items-center text-[10px] font-bold uppercase tracking-wider text-white/85"
+              style={{
+                padding: '4px 10px',
+                borderRadius: '8px',
+                background: 'rgba(0, 0, 0, 0.45)',
+                backdropFilter: 'blur(8px)',
+                letterSpacing: '0.6px',
+              }}
+            >
+              {tournament.tour_full_name}
+            </span>
+          )}
         </div>
 
         {/* Tap affordance - glassmorphic circle */}
