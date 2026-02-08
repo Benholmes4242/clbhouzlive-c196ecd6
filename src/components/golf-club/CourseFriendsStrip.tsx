@@ -23,10 +23,41 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
   const visibleFriends = friends.slice(0, 3);
   const overflowCount = Math.max(0, totalFriends - visibleFriends.length);
 
-  const label =
-    totalFriends === 1
-      ? '1 friend has logged a round here'
-      : `${totalFriends} friends have logged a round here`;
+  // Compute friends' average score
+  const friendsWithScores = friends.filter(f => f.rating_value != null);
+  const friendsAvgScore = friendsWithScores.length > 0
+    ? (friendsWithScores.reduce((sum, f) => sum + (f.rating_value ?? 0), 0) / friendsWithScores.length).toFixed(1)
+    : null;
+
+  const subtitle = (() => {
+    const countText = `${totalFriends} ${totalFriends === 1 ? 'friend' : 'friends'} played`;
+
+    if (!friendsWithScores.length) {
+      return <>{countText} here</>;
+    }
+
+    if (friendsWithScores.length === 1) {
+      return (
+        <>
+          {countText}
+          <span className="mx-1.5 text-muted-foreground/40">·</span>
+          <span className="text-foreground font-medium">
+            Rated {friendsWithScores[0].rating_value!.toFixed(1)}
+          </span>
+        </>
+      );
+    }
+
+    return (
+      <>
+        {countText}
+        <span className="mx-1.5 text-muted-foreground/40">·</span>
+        <span className="text-foreground font-medium">
+          Avg {friendsAvgScore}
+        </span>
+      </>
+    );
+  })();
 
   return (
     <button
@@ -39,7 +70,7 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
           Friends who've played here
         </span>
         <span className="text-sm text-muted-foreground mt-1">
-          {label}
+          {subtitle}
         </span>
       </div>
 

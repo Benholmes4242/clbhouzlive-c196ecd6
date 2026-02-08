@@ -1,5 +1,7 @@
 import React from 'react';
 import { useTop100CourseInsights } from '@/hooks/useTop100CourseInsights';
+import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Trophy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -13,6 +15,8 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
   courseName,
 }) => {
   const { data, isLoading } = useTop100CourseInsights(courseId);
+  const { user } = useSupabaseSession();
+  const { data: top100Progress } = useTop100ProgressForUser(user?.id);
   const navigate = useNavigate();
 
   if (isLoading) {
@@ -38,6 +42,22 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
 
   const listCount = data.list_memberships.length;
 
+  // Build a map from list slug to progress data
+  const progressBySlug = new Map(
+    (top100Progress?.lists ?? []).map(l => [l.listSlug, l])
+  );
+
+  // Find the best progress (highest completion %) for the progress bar
+  const relevantProgress = data.list_memberships
+    .map(m => progressBySlug.get(m.list_slug))
+    .filter((p): p is NonNullable<typeof p> => !!p && p.total > 0);
+
+  const bestProgress = relevantProgress.length > 0
+    ? relevantProgress.reduce((best, current) =>
+        (current.played / current.total) > (best.played / best.total) ? current : best
+      )
+    : null;
+
   return (
     <div className="bg-gradient-to-br from-amber-50 to-card rounded-2xl border border-amber-100 p-5 overflow-hidden relative">
       {/* Subtle decorative element */}
@@ -57,17 +77,49 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
         </div>
         
         <div className="flex flex-wrap gap-2">
-          {data.list_memberships.map((list) => (
-            <button
-              key={list.list_slug}
-              type="button"
-              onClick={() => handleChipTap(list.list_slug)}
-              className="inline-flex items-center gap-1.5 px-3 py-2.5 min-h-[44px] rounded-full bg-card border border-amber-200 text-sm font-medium text-foreground hover:border-amber-300 hover:bg-amber-50 transition-colors active:scale-[0.97]"
-            >
-              {list.list_name}
-            </button>
-          ))}
+          {data.list_memberships.map((list) => {
+            const progress = progressBySlug.get(list.list_slug);
+
+            return (
+              <button
+                key={list.list_slug}
+                type="button"
+                onClick={() => handleChipTap(list.list_slug)}
+                className="inline-flex items-center gap-1.5 px-3 py-2.5 min-h-[44px] rounded-full bg-card border border-amber-200 text-sm font-medium text-foreground hover:border-amber-300 hover:bg-amber-50 transition-colors active:scale-[0.97]"
+              >
+                <span>{list.list_name}</span>
+                {progress && progress.played > 0 && (
+                  <>
+                    <span className="text-amber-300">·</span>
+                    <span className="text-amber-600 tabular-nums">
+                      {progress.played}/{progress.total}
+                    </span>
+                  </>
+                )}
+              </button>
+            );
+          })}
         </div>
+
+        {/* Progress bar for best list */}
+        {bestProgress && bestProgress.played > 0 && (
+          <div className="mt-3 pt-3 border-t border-amber-100">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-xs text-muted-foreground">
+                Your Top 100 Journey
+              </span>
+              <span className="text-xs font-medium text-amber-600 tabular-nums">
+                {bestProgress.played} of {bestProgress.total} played
+              </span>
+            </div>
+            <div className="h-1.5 rounded-full bg-amber-100 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-500"
+                style={{ width: `${(bestProgress.played / bestProgress.total) * 100}%` }}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
