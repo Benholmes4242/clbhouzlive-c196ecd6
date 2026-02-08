@@ -25,18 +25,15 @@ export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
   '/messages/', // Chat view has its own header
   '/profile/', // User profile pages - immersive full-bleed hero
   '/top100/', // Individual region top 100 pages - immersive layout
+  '/tourhub', // Tour Hub - all tabs & sub-pages are fully immersive
+  '/tour', // Tour Hub alias
 ] as const;
 
 /**
  * Special routes that are conditionally excluded based on query params
- * Tour Hub Overview should be headerless for immersive hero experience
+ * Currently no conditional exclusions — Tour Hub is fully excluded via prefix.
  */
-export function isConditionallyExcluded(pathname: string, searchParams: URLSearchParams): boolean {
-  // Tour Hub Overview: /tourhub with no tab or tab=overview
-  if (pathname === '/tourhub' || pathname === '/tour') {
-    const tab = searchParams.get('tab');
-    return !tab || tab === 'overview';
-  }
+export function isConditionallyExcluded(_pathname: string, _searchParams: URLSearchParams): boolean {
   return false;
 }
 
