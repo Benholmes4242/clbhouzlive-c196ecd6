@@ -1,6 +1,7 @@
 /**
  * Leaders tab category definitions.
  * Single source of truth for all 12 stat categories.
+ * Includes descriptions, tour averages, and accent colors for the immersive hero.
  */
 
 import {
@@ -26,8 +27,12 @@ export interface LeaderCategory {
   shortLabel: string;
   section: 'performance' | 'stats';
   icon: LucideIcon;
+  emoji: string;
   sortDirection: 'asc' | 'desc';
   unit: string;
+  description: string;
+  tourAverage: string;
+  accentColor: string;
   accessor: (stats: TourPlayerStatistics) => number | null;
   format: (value: number) => string;
 }
@@ -40,8 +45,12 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     shortLabel: 'World',
     section: 'performance',
     icon: Globe,
+    emoji: '🌍',
     sortDirection: 'asc',
     unit: '',
+    description: 'Official World Golf Ranking based on rolling average points from tournament results.',
+    tourAverage: '—',
+    accentColor: '#B8860B',
     accessor: (s) => s.world_rank,
     format: (v) => `#${v}`,
   },
@@ -51,8 +60,12 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     shortLabel: 'Events',
     section: 'performance',
     icon: Calendar,
+    emoji: '📅',
     sortDirection: 'desc',
     unit: 'events',
+    description: 'Total number of tournament starts this season.',
+    tourAverage: '24',
+    accentColor: '#3478F6',
     accessor: (s) => s.events_played,
     format: (v) => `${v}`,
   },
@@ -62,8 +75,12 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     shortLabel: 'Cuts',
     section: 'performance',
     icon: Scissors,
+    emoji: '✂️',
     sortDirection: 'desc',
     unit: 'cuts',
+    description: 'Number of times the player made the cut and played the weekend rounds.',
+    tourAverage: '16',
+    accentColor: '#16A34A',
     accessor: (s) => s.cuts_made,
     format: (v) => `${v}`,
   },
@@ -73,8 +90,12 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     shortLabel: 'Top 10s',
     section: 'performance',
     icon: Trophy,
+    emoji: '🏆',
     sortDirection: 'desc',
     unit: '',
+    description: 'Number of top-10 finishes in stroke play events this season.',
+    tourAverage: '2',
+    accentColor: '#B8860B',
     accessor: (s) => s.top_10s,
     format: (v) => `${v}`,
   },
@@ -84,8 +105,12 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     shortLabel: 'Earnings',
     section: 'performance',
     icon: DollarSign,
+    emoji: '💰',
     sortDirection: 'desc',
     unit: '',
+    description: 'Total prize money earned this season across all events.',
+    tourAverage: '$1.8M',
+    accentColor: '#16A34A',
     accessor: (s) => s.earnings,
     format: (v) =>
       v >= 1_000_000
@@ -100,8 +125,12 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     shortLabel: 'Scoring',
     section: 'stats',
     icon: Gauge,
+    emoji: '⚾',
     sortDirection: 'asc',
     unit: 'avg',
+    description: 'Average score per round. Lower is better.',
+    tourAverage: '71.2',
+    accentColor: '#FF9500',
     accessor: (s) => s.scoring_average,
     format: (v) => v.toFixed(3),
   },
@@ -111,10 +140,14 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     shortLabel: 'Distance',
     section: 'stats',
     icon: Zap,
+    emoji: '⚡',
     sortDirection: 'desc',
     unit: 'yds',
+    description: 'Average driving distance off the tee in yards.',
+    tourAverage: '296.4 yds',
+    accentColor: '#16A34A',
     accessor: (s) => s.driving_distance,
-    format: (v) => `${v.toFixed(1)} yds`,
+    format: (v) => `${v.toFixed(1)}`,
   },
   {
     key: 'drive_acc',
@@ -122,8 +155,12 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     shortLabel: 'Accuracy',
     section: 'stats',
     icon: Crosshair,
+    emoji: '🎯',
     sortDirection: 'desc',
     unit: '%',
+    description: 'Percentage of tee shots landing in the fairway.',
+    tourAverage: '60.5%',
+    accentColor: '#3478F6',
     accessor: (s) => s.driving_accuracy,
     format: (v) => `${v.toFixed(1)}%`,
   },
@@ -133,8 +170,12 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     shortLabel: 'GIR',
     section: 'stats',
     icon: Circle,
+    emoji: '🟢',
     sortDirection: 'desc',
     unit: '%',
+    description: 'Percentage of greens hit in regulation (on the green in par minus 2 strokes).',
+    tourAverage: '65.0%',
+    accentColor: '#16A34A',
     accessor: (s) => s.greens_in_reg,
     format: (v) => `${v.toFixed(1)}%`,
   },
@@ -144,8 +185,12 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     shortLabel: 'Putting',
     section: 'stats',
     icon: Flag,
+    emoji: '🏌️',
     sortDirection: 'asc',
     unit: 'avg',
+    description: 'Average number of putts per green hit in regulation. Lower is better.',
+    tourAverage: '1.790',
+    accentColor: '#8B5CF6',
     accessor: (s) => s.putting_average,
     format: (v) => v.toFixed(3),
   },
@@ -155,8 +200,12 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     shortLabel: 'Sand',
     section: 'stats',
     icon: Sun,
+    emoji: '⛱️',
     sortDirection: 'desc',
     unit: '%',
+    description: 'Percentage of up-and-downs from greenside bunkers. Higher is better.',
+    tourAverage: '49.5%',
+    accentColor: '#FF9500',
     accessor: (s) => s.sand_saves,
     format: (v) => `${v.toFixed(1)}%`,
   },
@@ -166,8 +215,12 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     shortLabel: 'Scramble',
     section: 'stats',
     icon: RefreshCw,
+    emoji: '🔄',
     sortDirection: 'desc',
     unit: '%',
+    description: 'Percentage of times a player saves par or better after missing the green in regulation.',
+    tourAverage: '56.8%',
+    accentColor: '#FF9500',
     accessor: (s) => s.scrambling,
     format: (v) => `${v.toFixed(1)}%`,
   },

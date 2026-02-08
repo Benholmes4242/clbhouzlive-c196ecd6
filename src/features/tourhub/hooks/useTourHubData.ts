@@ -352,11 +352,12 @@ function extractRawStats(rawData: { statistics?: RawStatistics } | null): Partia
 }
 
 // Hook: Get player statistics with player info joined
+// Includes season fallback: if requested season has 0 rows, uses most recent season with data
 export function useTourPlayerStatistics(seasonId?: string) {
   return useQuery({
     queryKey: ['tourhub', 'player-statistics', seasonId],
     queryFn: async () => {
-      // First get statistics
+      // First get statistics for the requested season
       let query = supabase
         .from('sr_player_statistics')
         .select('*');
@@ -365,11 +366,34 @@ export function useTourPlayerStatistics(seasonId?: string) {
         query = query.eq('season_id', seasonId);
       }
       
-      const { data: stats, error: statsError } = await query;
+      let { data: stats, error: statsError } = await query;
       
       if (statsError) {
         console.error('Error fetching player statistics:', statsError);
         return [];
+      }
+      
+      // Season fallback: if 0 rows for requested season, find most recent season with data
+      if ((!stats || stats.length === 0) && seasonId) {
+        console.log('[useTourPlayerStatistics] No stats for season', seasonId, '— trying fallback');
+        const { data: fallbackRow } = await supabase
+          .from('sr_player_statistics')
+          .select('season_id')
+          .order('updated_at', { ascending: false })
+          .limit(1);
+        
+        if (fallbackRow?.length && fallbackRow[0].season_id !== seasonId) {
+          const fallbackSeasonId = fallbackRow[0].season_id;
+          console.log('[useTourPlayerStatistics] Falling back to season', fallbackSeasonId);
+          const { data: fallbackStats, error: fallbackError } = await supabase
+            .from('sr_player_statistics')
+            .select('*')
+            .eq('season_id', fallbackSeasonId);
+          
+          if (!fallbackError && fallbackStats?.length) {
+            stats = fallbackStats;
+          }
+        }
       }
       
       if (!stats || stats.length === 0) return [];
