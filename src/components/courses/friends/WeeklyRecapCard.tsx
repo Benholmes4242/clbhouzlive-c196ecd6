@@ -97,7 +97,7 @@ const WeeklyRecapCard: React.FC<WeeklyRecapCardProps> = ({ recent, courses, time
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: 0.2 }}
-      className="rounded-xl overflow-hidden bg-gradient-to-br from-primary/[0.04] to-primary/[0.02]"
+      className="rounded-xl overflow-hidden border border-border/60 shadow-sm bg-gradient-to-br from-primary/[0.04] to-primary/[0.02]"
     >
       {/* Header */}
       <div className="px-4 py-3 border-b border-border/40">
@@ -125,7 +125,7 @@ const WeeklyRecapCard: React.FC<WeeklyRecapCardProps> = ({ recent, courses, time
             Rounds
           </p>
         </motion.div>
-        <div className="h-6 w-px bg-slate-200/60" />
+        <div className="h-6 w-px bg-border/60" />
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -145,7 +145,7 @@ const WeeklyRecapCard: React.FC<WeeklyRecapCardProps> = ({ recent, courses, time
         {mostActiveFriend && (
           <button
             onClick={handleFriendClick}
-            className="w-full flex items-center gap-2 py-1 px-1 -mx-1 rounded-md hover:bg-slate-100/60 transition-colors text-left"
+            className="w-full flex items-center gap-2 py-2.5 px-2 -mx-2 rounded-lg hover:bg-muted/60 active:scale-[0.97] transition-all text-left"
           >
             <Squircle width={20} height={20} className="shrink-0">
               <img
@@ -157,7 +157,7 @@ const WeeklyRecapCard: React.FC<WeeklyRecapCardProps> = ({ recent, courses, time
                 }}
               />
             </Squircle>
-            <p className="text-xs text-slate-600">
+            <p className="text-xs text-muted-foreground">
               Most active:{' '}
               <span className="font-semibold text-foreground hover:underline">{mostActiveFriend.name}</span>
               <span className="text-muted-foreground"> · {mostActiveFriend.rounds} rounds</span>
@@ -169,12 +169,12 @@ const WeeklyRecapCard: React.FC<WeeklyRecapCardProps> = ({ recent, courses, time
         {topCourse && topCourse.friendCount >= 2 && (
           <button
             onClick={handleCourseClick}
-            className="w-full flex items-center gap-2 py-1 px-1 -mx-1 rounded-md hover:bg-slate-100/60 transition-colors text-left"
+            className="w-full flex items-center gap-2 py-2.5 px-2 -mx-2 rounded-lg hover:bg-muted/60 active:scale-[0.97] transition-all text-left"
           >
             <div className="flex items-center justify-center w-5 h-5 rounded-md bg-amber-50/60 border border-amber-200/40">
               <TrendingUp className="w-2.5 h-2.5 text-amber-600" />
             </div>
-            <p className="text-xs text-slate-600">
+            <p className="text-xs text-muted-foreground">
               Top course:{' '}
               <span className="font-semibold text-foreground hover:underline">{topCourse.name}</span>
               <span className="text-muted-foreground"> · played by {topCourse.friendCount}</span>

@@ -274,15 +274,15 @@ const FriendsCoursesPanel: React.FC = () => {
           <Select value={timeframe} onValueChange={(value) => setTimeframe(value as Timeframe)}>
             <SelectTrigger 
               aria-label="Select time period"
-              className={`h-11 w-full rounded-sq-sm bg-white justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e2e8f0] focus-visible:border-[#e2e8f0] data-[state=open]:ring-0 transition-all duration-150 ${
+              className={`h-11 w-full rounded-sq-sm bg-card justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-border focus-visible:border-border data-[state=open]:ring-0 active:scale-[0.98] transition-all duration-150 ${
                 timeframe !== '30d' 
-                  ? 'border-[#e2e8f0] ring-1 ring-[#e2e8f0] text-[#1e293b]' 
-                  : 'border-slate-200'
+                  ? 'border-border ring-1 ring-border text-foreground' 
+                  : 'border-border'
               }`}
             >
               <SelectValue placeholder="Last 30 days" />
             </SelectTrigger>
-            <SelectContent className="bg-white border-slate-200 z-50 rounded-sq-sm shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
+            <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
               <SelectItem value="7d">Last 7 days</SelectItem>
               <SelectItem value="30d">Last 30 days</SelectItem>
               <SelectItem value="90d">Last 90 days</SelectItem>
@@ -297,15 +297,15 @@ const FriendsCoursesPanel: React.FC = () => {
           <Select value={courseFilter} onValueChange={(value) => setCourseFilter(value as CourseFilter)}>
             <SelectTrigger 
               aria-label="Filter courses"
-              className={`h-11 w-full rounded-sq-sm bg-white justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e2e8f0] focus-visible:border-[#e2e8f0] data-[state=open]:ring-0 transition-all duration-150 ${
+              className={`h-11 w-full rounded-sq-sm bg-card justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-border focus-visible:border-border data-[state=open]:ring-0 active:scale-[0.98] transition-all duration-150 ${
                 courseFilter !== 'all' 
-                  ? 'border-[#e2e8f0] ring-1 ring-[#e2e8f0] text-[#1e293b]' 
-                  : 'border-slate-200'
+                  ? 'border-border ring-1 ring-border text-foreground' 
+                  : 'border-border'
               }`}
             >
               <SelectValue placeholder="All courses" />
             </SelectTrigger>
-            <SelectContent className="bg-white border-slate-200 z-50 rounded-sq-sm shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
+            <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
               <SelectItem value="all">All courses</SelectItem>
               <SelectItem value="new">New this period</SelectItem>
               <SelectItem value="most_played">Most played</SelectItem>

@@ -40,7 +40,7 @@ const FriendsActivityCard: React.FC<FriendsActivityCardProps> = ({ leaderboard, 
     }
     if (rank === 2) {
       return (
-        <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-1.5 py-px text-[10px] font-semibold text-slate-600">
+        <span className="inline-flex items-center rounded-full border border-border bg-muted/50 px-1.5 py-px text-[10px] font-semibold text-muted-foreground">
           #{rank}
         </span>
       );
@@ -75,7 +75,7 @@ const FriendsActivityCard: React.FC<FriendsActivityCardProps> = ({ leaderboard, 
         {/* Header - Tighter padding */}
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="w-full px-4 py-3 flex items-center justify-between hover:bg-muted/30 transition-colors min-h-[56px] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
+          className="w-full px-4 py-3 flex items-center justify-between hover:bg-muted/30 active:scale-[0.98] transition-all min-h-[56px] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
           aria-expanded={isExpanded}
           aria-controls="leaderboard-list"
         >
@@ -91,7 +91,7 @@ const FriendsActivityCard: React.FC<FriendsActivityCardProps> = ({ leaderboard, 
 
           <div className="flex items-center gap-2">
             <span 
-              className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-medium text-slate-600"
+              className="inline-flex items-center rounded-full border border-border bg-muted/50 px-2 py-0.5 text-[10px] font-medium text-muted-foreground"
               aria-label={`Showing top ${Math.min(10, trimmedLeaderboard.length)} players`}
             >
               Top {Math.min(10, trimmedLeaderboard.length)}
@@ -120,7 +120,7 @@ const FriendsActivityCard: React.FC<FriendsActivityCardProps> = ({ leaderboard, 
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.2, delay: isExpanded ? index * 0.02 : 0 }}
                 onClick={() => navigate(`/profile/${entry.friendId}`)}
-                className="px-4 py-2.5 flex items-center justify-between hover:bg-muted/40 active:bg-muted/60 transition-colors cursor-pointer border-b last:border-b-0 border-border/40"
+                className="px-4 py-2.5 flex items-center justify-between hover:bg-muted/40 active:bg-muted/60 active:scale-[0.98] transition-all cursor-pointer border-b last:border-b-0 border-border/40"
               >
                 <div className="flex items-center gap-2.5 flex-1 min-w-0">
                   <Squircle width={36} height={36} className="shrink-0 ring-1 ring-border/30">
@@ -151,10 +151,10 @@ const FriendsActivityCard: React.FC<FriendsActivityCardProps> = ({ leaderboard, 
         {/* Show more indicator - with divider */}
         {!isExpanded && trimmedLeaderboard.length > 3 && (
           <>
-            <div className="mx-4 h-px bg-slate-200/60" />
+            <div className="mx-4 h-px bg-border/60" />
             <button 
               onClick={() => setIsExpanded(true)}
-              className="w-full px-4 py-2.5 text-center hover:bg-muted/30 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
+              className="w-full px-4 py-2.5 text-center hover:bg-muted/30 active:scale-[0.97] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
             >
               <p className="text-[11px] text-primary font-medium">
                 +{trimmedLeaderboard.length - 3} more player{trimmedLeaderboard.length - 3 !== 1 ? 's' : ''}

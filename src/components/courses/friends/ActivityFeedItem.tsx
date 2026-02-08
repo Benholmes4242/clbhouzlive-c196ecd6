@@ -35,7 +35,7 @@ const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2, delay: index * 0.03 }}
-      className="bg-card/60 border border-border/50 rounded-xl p-3.5 hover:shadow-md active:shadow-sm transition-shadow cursor-pointer group"
+      className="bg-card/60 border border-border/50 rounded-xl p-3.5 hover:shadow-md active:scale-[0.98] active:shadow-sm transition-all cursor-pointer group"
       onClick={handleCourseClick}
     >
       <div className="flex gap-3">
@@ -104,7 +104,7 @@ const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({
       <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/40">
         <button
           onClick={handleCourseClick}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 transition-colors min-h-[36px]"
+          className="flex items-center gap-1.5 min-h-[44px] px-4 py-2 rounded-full text-xs font-medium text-primary bg-primary/5 border border-primary/15 hover:bg-primary/10 active:scale-[0.97] transition-all"
         >
           <ExternalLink className="w-3.5 h-3.5" />
           View course
