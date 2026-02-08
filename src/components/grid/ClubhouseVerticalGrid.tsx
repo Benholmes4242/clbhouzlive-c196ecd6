@@ -1133,7 +1133,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                                 [item.id]: index
                               }));
                             }}
-                            bottomOffset="calc(30px + 80px + 65px + 12px)"
+                            bottomOffset="calc(157px - var(--bottom-nav-height, 64px))"
                           />
                         )}
                         
