@@ -2,7 +2,8 @@
  * TournamentDetailPage - Cinematic tournament detail experience
  * 
  * Features:
- * - Immersive full-bleed hero with Ken Burns
+ * - Immersive full-bleed hero with Ken Burns + parallax
+ * - Glass back button on hero
  * - Premium glassmorphic cards
  * - Animated tab navigation (sticky)
  * - Live/Final/Upcoming status bars
@@ -12,7 +13,7 @@
 
 import { useState, useMemo } from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Globe } from 'lucide-react';
+import { Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
 import { TourHubShell } from '../components/TourHubShell';
@@ -111,13 +112,12 @@ export function TournamentDetailPage() {
   // Loading state
   if (isLoading) {
     return (
-      <TourHubShell>
+      <TourHubShell immersive>
         <div className="animate-pulse">
           <div 
             className="-mx-4 sm:-mx-6 lg:-mx-8"
             style={{ 
-              marginTop: '-55px',
-              height: 'calc(340px + 55px)',
+              minHeight: 'calc(45vh + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
               background: 'linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--background)) 50%, hsl(var(--muted)) 75%)',
               backgroundSize: '200% 100%',
               animation: 'shimmer 1.5s infinite',
@@ -137,12 +137,6 @@ export function TournamentDetailPage() {
     return (
       <TourHubShell>
         <div className="pt-6 px-4">
-          <Link 
-            to="/tourhub?tab=schedule" 
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 mb-8 active:opacity-70 transition-opacity"
-          >
-            <ArrowLeft className="w-4 h-4" /> Back to Schedule
-          </Link>
           <div className="flex items-center justify-center py-20">
             <div className="text-center space-y-4">
               <h3 className="text-lg font-semibold text-foreground">Tournament Not Found</h3>
@@ -250,51 +244,38 @@ export function TournamentDetailPage() {
   };
   
   return (
-    <TourHubShell>
+    <TourHubShell immersive>
       <TournamentHero 
         tournament={tournament} 
         imageUrl={heroImageUrl}
       />
       
       <div className="px-4 sm:px-6 lg:px-8 pb-24">
-        {/* Back navigation */}
-        <motion.div
-          className="py-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-        >
-          <Link 
-            to="/tourhub?tab=schedule" 
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors active:opacity-70"
-          >
-            <ArrowLeft className="w-4 h-4" /> Back to Schedule
-          </Link>
-        </motion.div>
-        
         {/* Status bar — live, final, or upcoming */}
-        {isLive && (
-          <StatusBar
-            variant="live"
-            lastUpdatedText={lastUpdatedText}
-            isRefreshing={isRefreshing}
-            onRefresh={refresh}
-            className="mb-4"
-          />
-        )}
-        {isCompleted && (
-          <StatusBar variant="final" className="mb-4" />
-        )}
-        {isUpcoming && (
-          <StatusBar variant="upcoming" countdownText={countdownText} className="mb-4" />
-        )}
+        <div className="pt-4">
+          {isLive && (
+            <StatusBar
+              variant="live"
+              lastUpdatedText={lastUpdatedText}
+              isRefreshing={isRefreshing}
+              onRefresh={refresh}
+              className="mb-4"
+            />
+          )}
+          {isCompleted && (
+            <StatusBar variant="final" className="mb-4" />
+          )}
+          {isUpcoming && (
+            <StatusBar variant="upcoming" countdownText={countdownText} className="mb-4" />
+          )}
+        </div>
         
         {/* Sticky Tabs */}
         <motion.div
           className="sticky top-0 z-20 -mx-4 px-4 py-2 bg-background/95 backdrop-blur-sm"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35, duration: 0.3 }}
+          transition={{ delay: 0.55, duration: 0.3 }}
         >
           <TournamentDetailTabs 
             activeTab={activeTab} 
