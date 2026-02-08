@@ -140,7 +140,7 @@ export const MapProgressOrb: React.FC<MapProgressOrbProps> = ({
               setIsExpanded(false);
               clearAutoCollapseTimer();
             }}
-            className="absolute top-2 right-2 p-1 text-white/50 hover:text-white/80"
+            className="absolute top-1.5 right-1.5 p-2.5 text-white/50 hover:text-white/80 active:scale-[0.9] transition-transform rounded-full"
           >
             <X className="h-3 w-3" />
           </button>
@@ -184,7 +184,7 @@ export const MapProgressOrb: React.FC<MapProgressOrbProps> = ({
               className={cn(
                 'w-full flex items-center justify-center gap-1',
                 'px-2.5 py-1.5 rounded-lg',
-                'bg-white/90 text-slate-900 text-[10px] font-medium',
+                'bg-white/90 text-foreground text-[10px] font-medium',
                 'hover:bg-white active:scale-[0.98]',
                 'transition-all duration-150'
               )}

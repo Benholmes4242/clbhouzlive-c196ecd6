@@ -9,7 +9,7 @@ import {
   Top100MapCourse,
   CourseJourneyStatus,
 } from '@/hooks/useTop100MapCourses';
-import { RotateCcw } from 'lucide-react';
+import { ArrowLeft, RotateCcw } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { cn } from '@/lib/utils';
 import { MapCourseSheet, MapProgressOrb } from './map';
@@ -462,9 +462,9 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 
   if (!MAP_CONFIG.TOKEN) {
     return (
-      <div className="rounded-sq-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center text-sm text-slate-600">
+      <div className="rounded-sq-lg border border-dashed border-border bg-muted px-4 py-6 text-center text-sm text-muted-foreground">
         <p className="font-semibold">Map Temporarily Unavailable</p>
-        <p className="mt-1 text-xs text-slate-500">
+        <p className="mt-1 text-xs text-muted-foreground">
           The interactive map feature is currently unavailable.
         </p>
       </div>
@@ -480,7 +480,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
       <div className={cn(
         'relative overflow-hidden',
         fullHeight ? 'absolute inset-0' : 'rounded-sq-lg',
-        'bg-slate-100 dark:bg-slate-900'
+        'bg-muted dark:bg-background'
       )}>
         <div
           ref={mapContainerRef}
@@ -493,23 +493,35 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 
         {/* Loading overlay with shimmer */}
         {(isLoading || !mapLoaded) && (
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-sm">
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-muted/80 dark:bg-background/80 backdrop-blur-sm">
             <div className="flex flex-col items-center gap-3">
-              <div className="w-8 h-8 rounded-full border-2 border-slate-300 border-t-slate-600 animate-spin" />
-              <span className="text-xs text-slate-500 font-medium">Loading map...</span>
+              <div className="w-8 h-8 rounded-full border-2 border-border border-t-muted-foreground animate-spin" />
+              <span className="text-xs text-muted-foreground font-medium">Loading map...</span>
             </div>
           </div>
+        )}
+
+        {/* Close / Back button - top-left, safe area aware */}
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="fixed left-4 z-40 w-11 h-11 flex items-center justify-center glass-card rounded-xl active:scale-[0.95] transition-transform"
+            style={{ top: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+            aria-label="Close map"
+          >
+            <ArrowLeft className="w-5 h-5 text-white" />
+          </button>
         )}
 
         {/* Top overlay zone - Legend as premium glass pills (with safe area for notch) */}
         <div className="pointer-events-none absolute top-0 left-0 right-0 z-20 px-3 pt-[max(env(safe-area-inset-top,0px),47px)]">
           <div 
-            className="pointer-events-auto flex items-center gap-1.5 w-fit"
+            className="pointer-events-auto flex items-center gap-1.5 w-fit ml-auto"
             role="group"
             aria-label="Map legend"
           >
             <div className="glass-card flex items-center gap-1.5 px-2.5 py-1.5 rounded-full">
-              <span className="inline-block h-2.5 w-2.5 rounded-full bg-slate-900 dark:bg-slate-200 shadow-sm" aria-hidden="true" />
+              <span className="inline-block h-2.5 w-2.5 rounded-full bg-foreground shadow-sm" aria-hidden="true" />
               <span className="text-[10px] font-medium text-white/90">Played</span>
             </div>
             <div className="glass-card flex items-center gap-1.5 px-2.5 py-1.5 rounded-full">
@@ -546,11 +558,11 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
               <button
                 onClick={() => mapRef.current?.zoomIn({ duration: 300 })}
                 className={cn(
-                  'flex items-center justify-center w-10 h-10',
+                  'flex items-center justify-center w-11 h-11',
                   'text-white/80',
                   'hover:bg-white/10',
-                  'active:bg-white/20',
-                  'transition-colors duration-150',
+                  'active:bg-white/20 active:scale-[0.92]',
+                  'transition-all duration-150',
                   'border-b border-white/10'
                 )}
                 aria-label="Zoom in"
@@ -563,11 +575,11 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
               <button
                 onClick={() => mapRef.current?.zoomOut({ duration: 300 })}
                 className={cn(
-                  'flex items-center justify-center w-10 h-10',
+                  'flex items-center justify-center w-11 h-11',
                   'text-white/80',
                   'hover:bg-white/10',
-                  'active:bg-white/20',
-                  'transition-colors duration-150'
+                  'active:bg-white/20 active:scale-[0.92]',
+                  'transition-all duration-150'
                 )}
                 aria-label="Zoom out"
               >
@@ -580,7 +592,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             {/* Reset view button */}
             <button
               onClick={handleResetView}
-              className="glass-card flex items-center justify-center w-10 h-10 rounded-xl text-white/70 hover:bg-white/10 active:bg-white/20 transition-all duration-150"
+              className="glass-card flex items-center justify-center w-11 h-11 rounded-xl text-white/70 hover:bg-white/10 active:bg-white/20 active:scale-[0.92] transition-all duration-150"
               aria-label="Reset map view"
             >
               <RotateCcw className="h-4 w-4" aria-hidden="true" />
@@ -612,33 +624,33 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
       <div 
         className="fixed bottom-0 left-0 right-0 z-30 rounded-t-3xl px-5 pt-4 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
         style={{
-          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.10) 100%)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.25)',
+          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.14) 50%, rgba(255, 255, 255, 0.18) 100%)',
+          backdropFilter: 'blur(28px) saturate(1.6)',
+          WebkitBackdropFilter: 'blur(28px) saturate(1.6)',
+          border: '1px solid rgba(255, 255, 255, 0.35)',
           borderBottom: 'none',
           boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
         }}
       >
         <div className="space-y-3">
-          {/* Progress bar - orange/amber gradient on glass */}
+          {/* Progress bar - orange accent on glass */}
           <div className="relative">
             <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
               {/* Glow behind */}
               <div 
                 className="absolute inset-0 rounded-full blur-sm opacity-60"
                 style={{
-                  background: `linear-gradient(90deg, hsl(var(--tab-orange)), hsl(38, 95%, 60%))`,
+                  background: 'hsl(var(--tab-orange))',
                   width: `${progressPercent}%`,
                   transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
                 }}
               />
-              {/* Main bar - orange gradient */}
+              {/* Main bar */}
               <div 
                 className="h-full rounded-full relative z-10 transition-all duration-700 ease-out"
                 style={{ 
                   width: `${progressPercent}%`,
-                  background: 'linear-gradient(90deg, hsl(var(--tab-orange)), hsl(38, 95%, 60%))'
+                  background: 'hsl(var(--tab-orange))'
                 }}
               />
             </div>
@@ -665,10 +677,11 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                   aria-pressed={isActive}
                   aria-label={`Show ${labels[filter].toLowerCase()} courses`}
                   className={cn(
-                    'flex-1 px-3 py-2 rounded-lg text-xs font-medium',
+                    'flex-1 px-3 py-2.5 rounded-lg text-xs font-medium',
                     'transition-all duration-200',
+                    'active:scale-[0.96]',
                     isActive
-                      ? 'bg-white/90 text-slate-900 shadow-sm'
+                      ? 'bg-white/90 text-foreground shadow-sm'
                       : 'text-white/70 hover:text-white hover:bg-white/10'
                   )}
                 >
@@ -694,10 +707,11 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                   aria-pressed={isActive}
                   aria-label={`Show ${labels[regionScope]} Top 100`}
                   className={cn(
-                    'flex-1 px-3 py-2 rounded-lg text-xs font-medium',
+                    'flex-1 px-3 py-2.5 rounded-lg text-xs font-medium',
                     'transition-all duration-200 border',
+                    'active:scale-[0.96]',
                     isActive
-                      ? 'bg-white/90 text-slate-900 border-white/50 shadow-sm'
+                      ? 'bg-white/90 text-foreground border-white/50 shadow-sm'
                       : 'bg-white/10 border-white/20 text-white/70 hover:border-white/40 hover:bg-white/20 hover:text-white'
                   )}
                 >
