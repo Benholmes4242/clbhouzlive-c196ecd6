@@ -16,17 +16,17 @@ const ReviewText: React.FC<{ text: string }> = ({ text }) => {
   const needsClamp = text.length > 180;
   
   return (
-    <div className="pt-4 border-t border-gray-100">
+    <div className="pt-4 border-t border-border">
       <p className={cn(
-        "text-sm text-gray-600 leading-relaxed italic whitespace-pre-wrap",
-        !expanded && needsClamp && "line-clamp-3"
+        "text-sm text-muted-foreground leading-relaxed italic whitespace-pre-wrap",
+        !expanded && needsClamp && "line-clamp-4"
       )}>
         "{text}"
       </p>
       {needsClamp && (
         <button
           onClick={() => setExpanded(!expanded)}
-          className="mt-1.5 text-xs font-medium text-gray-500 hover:text-gray-700 transition-colors"
+          className="mt-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors active:scale-[0.98] min-h-[44px] flex items-center"
         >
           {expanded ? 'Show less' : 'Read more'}
         </button>
@@ -47,21 +47,13 @@ const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 8
     <div className="relative" style={{ width: size, height: size }}>
       <svg className="w-full h-full -rotate-90">
         <circle 
-          cx={size / 2} 
-          cy={size / 2} 
-          r={radius} 
-          fill="none" 
-          stroke="#f3f4f6" 
-          strokeWidth="6" 
+          cx={size / 2} cy={size / 2} r={radius} 
+          fill="none" stroke="hsl(var(--border))" strokeWidth="6" 
         />
         <circle 
-          cx={size / 2} 
-          cy={size / 2} 
-          r={radius} 
-          fill="none" 
-          stroke={`url(#${gradientId})`}
-          strokeWidth="6"
-          strokeLinecap="round"
+          cx={size / 2} cy={size / 2} r={radius} 
+          fill="none" stroke={`url(#${gradientId})`}
+          strokeWidth="6" strokeLinecap="round"
           strokeDasharray={`${progress} ${circumference}`}
           className="transition-all duration-700 ease-out"
         />
@@ -73,7 +65,7 @@ const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 8
         </defs>
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-2xl font-bold text-gray-900">{score.toFixed(1)}</span>
+        <span className="text-2xl font-bold text-foreground">{score.toFixed(1)}</span>
       </div>
     </div>
   );
@@ -96,11 +88,9 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
     navigate(`/courses/${courseId}/rate`);
   };
 
-  // Format the date with "Played on" prefix
   const dateValue = rating.updated_at || rating.created_at;
   const dateLabel = format(new Date(dateValue), 'MMM d, yyyy');
 
-  // Build category data
   const categories = [
     { label: 'Design', score: rating.design_score },
     { label: 'Condition', score: rating.condition_score },
@@ -110,21 +100,21 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
 
   return (
     <div className={cn(
-      "bg-gradient-to-br from-white to-gray-50/50 rounded-2xl border border-gray-100 shadow-sm overflow-hidden",
+      "bg-gradient-to-br from-card to-muted/50 rounded-2xl border border-border shadow-sm overflow-hidden",
       className
     )}>
       {/* Header with date */}
       <div className="flex items-center justify-between px-5 pt-5 pb-3">
         <div>
-          <h3 className="text-base font-semibold text-gray-900">Your Rating</h3>
-          <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-1.5">
+          <h3 className="text-base font-semibold text-foreground">Your Rating</h3>
+          <p className="text-sm text-muted-foreground mt-0.5 flex items-center gap-1.5">
             <Calendar className="w-3.5 h-3.5" />
             Played on {dateLabel}
           </p>
         </div>
         <button 
           onClick={handleEditClick}
-          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors active:scale-95"
+          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors active:scale-[0.98] min-h-[44px] min-w-[44px] justify-center"
         >
           <Pencil className="w-4 h-4" />
           Edit
@@ -135,11 +125,10 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
       <div className="flex items-center gap-6 px-5 pb-4">
         <ScoreRing score={rating.rating} size={80} />
         
-        {/* Category breakdown as mini bars - amber gradient only for Outstanding (9+) */}
+        {/* Category breakdown as mini bars */}
         {categories.length > 0 && (
           <div className="flex-1 grid grid-cols-2 gap-x-4 gap-y-2">
             {categories.map(cat => {
-              // UNIFIED: Determine bar color based on INDIVIDUAL category score (9+ = Outstanding)
               const isOutstanding = cat.score >= 9;
               const barColorClass = isOutstanding 
                ? 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]' 
@@ -148,10 +137,10 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
               return (
                 <div key={cat.label} className="space-y-1">
                   <div className="flex justify-between text-xs">
-                    <span className="text-gray-500">{cat.label}</span>
-                    <span className="font-medium text-gray-700">{cat.score.toFixed(1)}</span>
+                    <span className="text-muted-foreground">{cat.label}</span>
+                    <span className="font-medium text-foreground">{cat.score.toFixed(1)}</span>
                   </div>
-                  <div className="h-1.5 bg-[#e5e7eb] rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
                     <div 
                       className={`h-full ${barColorClass} rounded-full transition-all duration-500`}
                       style={{ width: `${(cat.score / 10) * 100}%` }}

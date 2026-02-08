@@ -4,10 +4,10 @@
  */
 import React from 'react';
 import { Camera } from 'lucide-react';
-import { VideoPlayIndicator } from '@/components/ui/VideoPlayIndicator';
 import { cn } from '@/lib/utils';
 import { useUserCourseMoments } from '@/hooks/useUserCourseMoments';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useNavigate } from 'react-router-dom';
 
 interface CourseMomentsProps {
   courseId: string;
@@ -21,6 +21,7 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
   className,
 }) => {
   const { data: moments, isLoading } = useUserCourseMoments(courseId);
+  const navigate = useNavigate();
 
   if (isLoading) {
     return (
@@ -41,13 +42,17 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
     return null; // Don't show empty state, just hide
   }
 
+  const handleAddMoment = () => {
+    navigate(`/courses/${courseId}/rate`);
+  };
+
   return (
     <div className={cn("space-y-3", className)}>
       {/* Header */}
       <div className="flex items-center gap-2">
-        <Camera className="h-4 w-4 text-gray-400" />
-        <h4 className="text-base font-semibold text-gray-900">Your Moments</h4>
-        <span className="text-sm text-gray-400">({moments.length})</span>
+        <Camera className="h-4 w-4 text-muted-foreground" />
+        <h4 className="text-base font-semibold text-foreground">Your Moments</h4>
+        <span className="text-sm text-muted-foreground">({moments.length})</span>
       </div>
 
       {/* Gallery-style carousel */}
@@ -57,7 +62,7 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
             key={moment.id}
             className={cn(
               "relative flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden",
-              "shadow-sm hover:shadow-md transition-shadow cursor-pointer",
+              "shadow-sm hover:shadow-md transition-shadow cursor-pointer active:scale-[0.98]",
               "ring-1 ring-black/5"
             )}
           >
@@ -71,7 +76,7 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
                 />
                 <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                   <div className="w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center">
-                    <svg className="w-4 h-4 text-gray-900 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-foreground ml-0.5" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M8 5v14l11-7z" />
                     </svg>
                   </div>
@@ -98,8 +103,11 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
         )}
 
         {/* Add moment button at end */}
-        <button className="flex-shrink-0 w-20 h-20 rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center hover:border-gray-300 hover:bg-gray-50 transition-colors">
-          <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <button
+          onClick={handleAddMoment}
+          className="flex-shrink-0 w-20 h-20 rounded-xl border-2 border-dashed border-border flex items-center justify-center hover:border-muted-foreground hover:bg-muted transition-colors active:scale-[0.98]"
+        >
+          <svg className="w-5 h-5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
         </button>

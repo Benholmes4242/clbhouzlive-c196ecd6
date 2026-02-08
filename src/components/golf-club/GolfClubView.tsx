@@ -102,10 +102,10 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   }
 
   return (
-    <div className={isInModal ? "w-full" : "min-h-screen w-full bg-slate-50"}>
+      <div className={isInModal ? "w-full" : "min-h-screen w-full bg-muted"}>
       {/* Hero Image - bleeds into safe area */}
       <div 
-        className="relative overflow-hidden bg-slate-50"
+        className="relative overflow-hidden bg-muted"
         style={{
           height: 'calc(16rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
           marginTop: 0,
@@ -129,7 +129,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-10"
+            className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 active:scale-95 transition-all z-10"
             style={{ top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
             aria-label="Back"
           >
@@ -141,7 +141,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         {isInModal && onClose && (
           <button
             onClick={onClose}
-            className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-10"
+            className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 active:scale-95 transition-all z-10"
             style={{ top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
             aria-label="Go back"
           >
@@ -175,7 +175,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       <CourseTabs activeTab={activeTab as any} onChange={handleTabChange as any} />
 
       {/* Phase 3: Keep-mounted tabs - render all visited tabs, hide inactive */}
-      <div className="course-hero-wrapper bg-slate-50">
+      <div className="course-hero-wrapper bg-muted">
         <Tabs value={activeTab} onValueChange={handleTabChange}>
           {/* About Tab - always rendered */}
           <TabsContent 

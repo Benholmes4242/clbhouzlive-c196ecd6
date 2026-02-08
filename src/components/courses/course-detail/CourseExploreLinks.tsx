@@ -7,6 +7,7 @@ import {
   getRegionFromSubregion,
   type PrimaryRegionKey,
 } from '@/constants/courseRegions';
+import { SectionHeading } from './SectionHeading';
 
 interface Course {
   id: string;
@@ -30,7 +31,6 @@ interface CourseExploreLinksProps {
 const CourseExploreLinks: React.FC<CourseExploreLinksProps> = ({ course }) => {
   const navigate = useNavigate();
 
-  // Derive region / subregion for the current course
   const primaryRegionKey: PrimaryRegionKey = 
     (course.sub_country ? getRegionFromSubregion(course.sub_country) : null) ||
     dbValueToRegionKey(course.region || course.country);
@@ -38,16 +38,15 @@ const CourseExploreLinks: React.FC<CourseExploreLinksProps> = ({ course }) => {
   const subCountryLabel: string | null = course.sub_country || null;
   const subKey = subCountryLabel ? normalizeLabel(subCountryLabel) : null;
 
-  // Derive primary Top 100 list for the CTA
   const membership = course.course_top100_memberships?.[0];
   const primaryListSlug = membership?.top100_lists?.slug ?? 'global-top-100';
   const primaryListName = membership?.top100_lists?.name ?? 'Worldwide';
 
   return (
-    <div className="px-4 pt-4 pb-2 bg-slate-100">
-      <h2 className="text-lg font-semibold mb-3">
-        Explore More
-      </h2>
+    <div className="px-4 pt-4 pb-2 bg-muted">
+      <div className="mb-3">
+        <SectionHeading title="Explore More" />
+      </div>
       
       <div className="space-y-2">
         {/* Sub-country filter */}
@@ -62,7 +61,7 @@ const CourseExploreLinks: React.FC<CourseExploreLinksProps> = ({ course }) => {
               });
               navigate(`/courses?${params.toString()}`);
             }}
-            className="w-full flex items-center justify-between px-0 pb-2 text-base group hover:opacity-70 transition-opacity"
+            className="w-full flex items-center justify-between px-0 py-3 min-h-[44px] text-base text-foreground group hover:opacity-70 transition-opacity active:scale-[0.98]"
           >
             <span>
               Explore more <span className="font-semibold">{subCountryLabel}</span> courses
@@ -80,7 +79,6 @@ const CourseExploreLinks: React.FC<CourseExploreLinksProps> = ({ course }) => {
         <button
           type="button"
           onClick={() => {
-            // Normalize database list slug to UI-expected format
             const normalizeListSlug = (dbSlug: string): string => {
               const slug = dbSlug.toLowerCase();
               if (slug.includes('gb-i') || slug.includes('britain') || slug.includes('ireland')) return 'gb-i';
@@ -97,7 +95,7 @@ const CourseExploreLinks: React.FC<CourseExploreLinksProps> = ({ course }) => {
             });
             navigate(`/courses?${params.toString()}`);
           }}
-          className="w-full flex items-center justify-between px-0 pt-2 pb-2 text-base group hover:opacity-70 transition-opacity"
+          className="w-full flex items-center justify-between px-0 py-3 min-h-[44px] text-base text-foreground group hover:opacity-70 transition-opacity active:scale-[0.98]"
         >
           <span>
             Explore <span className="font-semibold">{primaryListName.includes('Top 100') ? primaryListName : `${primaryListName} Top 100`}</span>
