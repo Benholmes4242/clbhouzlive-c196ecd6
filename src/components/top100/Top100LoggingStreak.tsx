@@ -124,7 +124,7 @@ export const Top100LoggingStreak: React.FC<Top100LoggingStreakProps> = ({
           <button
             type="button"
             onClick={onLogRound}
-            className="text-xs font-medium text-primary hover:underline whitespace-nowrap"
+            className="text-xs font-medium text-primary hover:underline whitespace-nowrap py-2.5 px-3 -mr-3 rounded-lg active:scale-[0.97] transition-transform"
           >
             Log now
           </button>

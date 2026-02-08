@@ -183,7 +183,7 @@ const MilestoneRow: React.FC<MilestoneRowProps> = ({
             left: '40px', // Center of 80px badge
             top: '96px', // Badge bottom
             height: '12px',
-            backgroundColor: '#E2E8F0',
+            backgroundColor: 'hsl(var(--border))',
           }}
         />
       )}
@@ -218,7 +218,7 @@ const MilestoneRow: React.FC<MilestoneRowProps> = ({
             {/* Club name */}
             <h3 className={cn(
               "font-bold text-base",
-              milestone.isUnlocked ? "text-[#1e293b]" : "text-[#94a3b8]"
+              milestone.isUnlocked ? "text-foreground" : "text-muted-foreground"
             )}>
               {milestone.name}
             </h3>
@@ -226,7 +226,7 @@ const MilestoneRow: React.FC<MilestoneRowProps> = ({
             {/* Description */}
             <p className={cn(
               "text-sm mt-0.5",
-              milestone.isUnlocked ? "text-[#64748b]" : "text-[#cbd5e1]"
+              milestone.isUnlocked ? "text-muted-foreground" : "text-muted-foreground/40"
             )}>
               {`${milestone.threshold} Top 100 courses played`}
             </p>
@@ -234,7 +234,7 @@ const MilestoneRow: React.FC<MilestoneRowProps> = ({
             {/* Progress bar for current target */}
             {isCurrent && !milestone.isUnlocked && (
               <div className="flex items-center gap-2 mt-3">
-                <div className="flex-1 h-1.5 bg-[#E5D0A1]/30 rounded-full overflow-hidden">
+                <div className="flex-1 h-1.5 bg-muted/50 rounded-full overflow-hidden">
                   <motion.div 
                     className="h-full rounded-full"
                     style={{ backgroundColor: tierColor }}
@@ -243,7 +243,7 @@ const MilestoneRow: React.FC<MilestoneRowProps> = ({
                     transition={{ duration: 0.5, delay: 0.2 }}
                   />
                 </div>
-                <span className="text-xs text-[#64748b] tabular-nums">
+                <span className="text-xs text-muted-foreground tabular-nums">
                   {totalPlayed}/{milestone.threshold}
                 </span>
               </div>

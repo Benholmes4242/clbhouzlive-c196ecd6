@@ -114,7 +114,7 @@ export const Top100ProgressTimeline: React.FC<Top100ProgressTimelineProps> = ({
                   'hover:opacity-90 active:scale-[0.97] transition-all duration-200',
                   isActive
                     ? 'shadow-sm'
-                    : 'bg-slate-200/60 hover:bg-slate-200/80'
+                    : 'bg-muted/60 hover:bg-muted/80'
                 )}
                 style={{ 
                   height: `${heightPercent}%`,

@@ -230,7 +230,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
           SECTION A: HERO / IDENTITY - section band, no card
           Background: bg-slate-50, pt-8 pb-10
           ============================================ */}
-      <section className="bg-slate-50 pt-8 pb-10">
+      <section className="bg-muted/30 pt-8 pb-10">
         <Top100ProgressHero
           displayName={displayName}
           avatarUrl={avatarUrl}
@@ -252,8 +252,8 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
           SECTION C: MOMENTUM (2026 Progress + Streak)
           Combined section - bg-white, px-4 py-6
           ============================================ */}
-      <section className="bg-white px-4 py-6 border-t border-slate-200/60">
-        <h3 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">
+      <section className="bg-card px-4 py-6 border-t border-border/60">
+        <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-4">
           Momentum
         </h3>
         <div className="space-y-4">
@@ -278,7 +278,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
           SECTION D: ACHIEVEMENTS (CELEBRATION LAYER)
           Divider above, mt-10
           ============================================ */}
-      <section className="mt-10 border-t border-slate-200/60 pt-6">
+      <section className="mt-10 border-t border-border/60 pt-6">
         {/* D.1 Milestone Achievements Carousel */}
         <div className="mb-5">
           <Top100MilestonesCarousel 
@@ -295,7 +295,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
               <button
                 type="button"
                 onClick={() => openMilestoneSheet(data.next_milestone!.threshold)}
-                className="w-full max-w-sm bg-white border border-slate-200/60 rounded-full py-2 px-4 flex flex-col gap-1.5 hover:bg-slate-50 active:scale-[0.98] transition-all"
+                className="w-full max-w-sm bg-card border border-border/60 rounded-full py-2 px-4 flex flex-col gap-1.5 hover:bg-muted/30 active:scale-[0.98] transition-all"
               >
                 <p className="text-xs sm:text-sm font-medium text-center text-foreground whitespace-nowrap">
                   <span className="font-semibold">
@@ -306,7 +306,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
                   </span>
                 </p>
                 {/* Micro progress bar */}
-                <div className="h-1.5 rounded-full bg-slate-200 overflow-hidden">
+                <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                   <div
                     className="h-full rounded-full transition-all"
                     style={{ width: `${nextMilestoneProgress}%`, backgroundColor: nextTierColor }}
@@ -336,7 +336,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
           Most recent earned + next to unlock
           ============================================ */}
       <section className="mt-10 px-4">
-        <h2 className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500 mb-4">Journey Map</h2>
+        <h2 className="text-xs font-bold uppercase tracking-[0.08em] text-muted-foreground mb-4">Journey Map</h2>
         <SimplifiedMilestoneLadder
           totalPlayed={data.totalTop100Played}
           onMilestoneClick={openMilestoneSheet}
@@ -364,7 +364,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
           SECTION H: RECENT TOP 100 ROUNDS
           Divider above, pt-8
           ============================================ */}
-      <section className="border-t border-slate-200/60 pt-8 -mx-4 sm:mx-0">
+      <section className="border-t border-border/60 pt-8 -mx-4 sm:mx-0">
         <Top100RecentRoundsCarousel
           rounds={data.recent_rounds}
           isOwnProfile={isOwnProfile}

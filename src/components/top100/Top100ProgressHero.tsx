@@ -48,7 +48,7 @@ function CenteredHeroAvatar({
         {/* Subtle shadow for depth */}
         <div 
           className="absolute inset-0 rounded-sq-md blur-xl opacity-20"
-          style={{ backgroundColor: '#94a3b8' }}
+            style={{ backgroundColor: 'hsl(var(--muted-foreground))' }}
         />
         <SquircleAvatar
           size={136}
@@ -120,7 +120,7 @@ function HeroWithMilestoneRow({
           {/* Subtle glow behind avatar */}
           <div 
             className="absolute inset-2 rounded-sq-md blur-xl opacity-15 transition-opacity"
-            style={{ backgroundColor: '#94a3b8' }}
+            style={{ backgroundColor: 'hsl(var(--muted-foreground))' }}
           />
           <SquircleAvatar
             size={140}

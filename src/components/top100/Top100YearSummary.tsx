@@ -29,7 +29,7 @@ function StatItem({
   const deltaPrefix = delta && delta > 0 ? '+' : '';
   
   return (
-    <div className="text-center flex flex-col items-center gap-1 group cursor-default transition-colors hover:bg-slate-50/50 rounded-lg py-1 -my-1">
+    <div className="text-center flex flex-col items-center gap-1 group cursor-default transition-colors hover:bg-muted/30 rounded-lg py-1 -my-1">
       {/* Icon - consistent muted color with hover state */}
       <Icon className="w-3.5 h-3.5 text-muted-foreground/50 group-hover:text-muted-foreground/70 transition-colors" />
       <p className="text-sm font-semibold leading-tight text-foreground tabular-nums">
@@ -61,7 +61,7 @@ export function Top100YearSummary({
   return (
     <section>
       {/* Stats Row - card with subtle dividers between columns */}
-      <div className="bg-white border border-slate-200/60 rounded-2xl p-5 min-h-[72px] shadow-sm">
+      <div className="bg-card border border-border/60 rounded-2xl p-5 min-h-[72px] shadow-sm">
         <div className="grid grid-cols-4 gap-0">
           {/* Year */}
           <div className="relative">
@@ -72,7 +72,7 @@ export function Top100YearSummary({
               delta={yearDelta}
             />
             {/* Subtle divider */}
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-px bg-slate-200/60" />
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-px bg-border/60" />
           </div>
           
           {/* Regions */}
@@ -83,7 +83,7 @@ export function Top100YearSummary({
               label="Regions"
               delta={regionsDelta}
             />
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-px bg-slate-200/60" />
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-px bg-border/60" />
           </div>
           
           {/* New */}
@@ -94,7 +94,7 @@ export function Top100YearSummary({
               label="New"
               delta={newCoursesDelta}
             />
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-px bg-slate-200/60" />
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-px bg-border/60" />
           </div>
           
           {/* Avg rating - no divider after last */}

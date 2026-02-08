@@ -130,10 +130,10 @@ export function Top100MilestonesCarousel({
   return (
     <section className="space-y-2 mt-6">
       {/* Section header - consistent styling */}
-      <h3 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-2 px-4">
+      <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-2 px-4">
         Achievements
       </h3>
-      <p className="text-xs font-medium uppercase tracking-wide text-slate-400 mb-3 px-4">
+      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground/60 mb-3 px-4">
         Milestone achievements (all lists)
       </p>
 
@@ -161,7 +161,7 @@ export function Top100MilestonesCarousel({
               >
                 <button
                   onClick={onMilestoneClick ? () => onMilestoneClick(milestone) : undefined}
-                  className="flex flex-col items-center min-w-[80px] gap-1 focus:outline-none"
+                  className="flex flex-col items-center min-w-[80px] gap-1 focus:outline-none active:scale-[0.95] transition-transform"
                 >
                   {/* Badge image (70-80px) with visual states */}
                   <div className="relative">
@@ -200,7 +200,7 @@ export function Top100MilestonesCarousel({
       {/* Progress line - gradient fill with glow */}
       <div className="mx-4 mt-4">
         <div 
-          className="h-1.5 rounded-full bg-slate-200/80 overflow-hidden"
+          className="h-1.5 rounded-full bg-muted/80 overflow-hidden"
           role="progressbar"
           aria-valuenow={Math.round(progressPct)}
           aria-valuemin={0}
