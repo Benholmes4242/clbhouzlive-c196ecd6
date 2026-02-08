@@ -197,7 +197,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
     }
     return { 
       text: 'Not Played', 
-      className: 'bg-white/95 text-slate-600 dark:bg-slate-800/95 dark:text-slate-300 shadow-sm' 
+      className: 'bg-white/95 text-muted-foreground dark:bg-muted/95 dark:text-muted-foreground shadow-sm' 
     };
   };
 
@@ -260,10 +260,10 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
         <button
           onClick={() => setSheetState(sheetState === 'full' ? 'half' : 'full')}
           className={cn(
-            'absolute top-2.5 right-3 p-2 rounded-full',
+            'absolute top-2.5 right-3 p-2.5 rounded-full',
             'text-white/60 hover:text-white/90',
             'hover:bg-white/10',
-            'transition-colors duration-150'
+            'active:scale-[0.95] transition-all duration-150'
           )}
           aria-label={sheetState === 'full' ? 'Collapse sheet' : 'Expand sheet'}
         >
@@ -283,7 +283,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
               <>
                 {/* Blur-up placeholder */}
                 {!imageLoaded && (
-                  <div className="absolute inset-0 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 animate-pulse" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted/80 dark:from-muted dark:to-muted/80 animate-pulse" />
                 )}
                 <img
                   src={thumbnailImage}
@@ -366,7 +366,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                   className={cn(
                     'w-full h-11',
                     'bg-white/95 hover:bg-white',
-                    'text-slate-900',
+                    'text-foreground',
                     'font-medium shadow-lg',
                     'active:scale-[0.98] transition-all duration-150'
                   )}
@@ -382,7 +382,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                     <Button
                       variant="outline"
                       className={cn(
-                        'flex-1 h-10',
+                        'flex-1 h-11',
                         'border-white/30 bg-white/10 text-white',
                         'hover:bg-white/20 hover:border-white/40',
                         'active:scale-[0.98] transition-all duration-150'
@@ -397,7 +397,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                     <Button
                       variant={isWantToPlay ? 'default' : 'outline'}
                       className={cn(
-                        "flex-1 h-10 transition-all duration-200",
+                        "flex-1 h-11 transition-all duration-200",
                         isWantToPlay 
                           ? 'bg-[#F7931E] hover:bg-[#F7931E]/90 text-white shadow-[0_2px_8px_rgba(247,147,30,0.25)]' 
                           : 'border-white/30 bg-white/10 text-white hover:bg-white/20 hover:border-white/40',
