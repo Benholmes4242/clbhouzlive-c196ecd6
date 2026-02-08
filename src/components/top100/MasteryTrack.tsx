@@ -77,7 +77,7 @@ export const MasteryTrack: React.FC<MasteryTrackProps> = ({
             Mastery Track
           </span>
         </div>
-        <p className="text-sm text-[#64748b]">
+        <p className="text-sm text-muted-foreground">
           {coreComplete 
             ? 'Complete each regional Top 100 list to achieve mastery' 
             : 'Complete the Grand Slam Club to unlock regional mastery challenges'}
@@ -115,7 +115,7 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ region, index, onClick }) =
 
   return (
     <motion.button
-      className="w-full flex items-center gap-5 py-4 text-left"
+      className="w-full flex items-center gap-5 py-4 text-left active:scale-[0.98] transition-transform"
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.3 + index * 0.05 }}
@@ -143,7 +143,7 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ region, index, onClick }) =
             {/* Region name */}
             <h4 className={cn(
               "font-bold text-base",
-              isComplete ? "text-[#1e293b]" : "text-[#94a3b8]"
+              isComplete ? "text-foreground" : "text-muted-foreground"
             )}>
               {fullName}
             </h4>
@@ -151,7 +151,7 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ region, index, onClick }) =
             {/* Description/tagline */}
             <p className={cn(
               "text-sm mt-0.5",
-              isComplete ? "text-[#64748b]" : "text-[#cbd5e1]"
+              isComplete ? "text-muted-foreground" : "text-muted-foreground/40"
             )}>
               {tagline}
             </p>
@@ -159,7 +159,7 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ region, index, onClick }) =
             {/* Progress bar - always show for incomplete */}
             {!isComplete && (
               <div className="flex items-center gap-2 mt-3">
-                <div className="flex-1 h-1.5 bg-[#E5D0A1]/20 rounded-full overflow-hidden">
+                <div className="flex-1 h-1.5 bg-muted/40 rounded-full overflow-hidden">
                   <motion.div 
                     className="h-full rounded-full bg-[#334E3D]"
                     initial={{ width: 0 }}
@@ -167,7 +167,7 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ region, index, onClick }) =
                     transition={{ duration: 0.5, delay: 0.3 }}
                   />
                 </div>
-                <span className="text-xs text-[#64748b] tabular-nums">
+                <span className="text-xs text-muted-foreground tabular-nums">
                   {region.played}/{region.total}
                 </span>
               </div>

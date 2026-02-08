@@ -102,7 +102,7 @@ export function Top100RecentRoundsCarousel({
     <section className={cn("w-full px-4", className)}>
       {/* Section header - consistent styling */}
       <div className="mb-4">
-        <h3 className="text-xs font-semibold uppercase tracking-widest text-slate-500">
+        <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
           Recent Top 100 rounds
         </h3>
       </div>
@@ -141,10 +141,10 @@ export function Top100RecentRoundsCarousel({
               onClick={() => api?.scrollPrev()}
               disabled={current === 0}
               className={cn(
-                'h-8 w-8 rounded-full flex items-center justify-center transition-all duration-200',
+                'h-10 w-10 rounded-full flex items-center justify-center transition-all duration-200',
                 current === 0
-                  ? 'bg-slate-100 text-slate-300 cursor-not-allowed'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-foreground active:scale-95'
+                  ? 'bg-muted text-muted-foreground/30 cursor-not-allowed'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground active:scale-95'
               )}
               aria-label="Previous round"
             >
@@ -159,8 +159,8 @@ export function Top100RecentRoundsCarousel({
                   className={cn(
                     'h-1.5 rounded-full transition-all duration-200',
                     idx === current
-                      ? 'w-5 bg-slate-500'
-                      : 'w-2 bg-slate-300'
+                      ? 'w-5 bg-foreground/50'
+                      : 'w-2 bg-foreground/15'
                   )}
                 />
               ))}
@@ -171,10 +171,10 @@ export function Top100RecentRoundsCarousel({
               onClick={() => api?.scrollNext()}
               disabled={current === count - 1}
               className={cn(
-                'h-8 w-8 rounded-full flex items-center justify-center transition-all duration-200',
+                'h-10 w-10 rounded-full flex items-center justify-center transition-all duration-200',
                 current === count - 1
-                  ? 'bg-slate-100 text-slate-300 cursor-not-allowed'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-foreground active:scale-95'
+                  ? 'bg-muted text-muted-foreground/30 cursor-not-allowed'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground active:scale-95'
               )}
               aria-label="Next round"
             >
@@ -191,7 +191,7 @@ export function Top100RecentRoundsCarousel({
             variant="outline"
             size="sm"
             onClick={onAddRound}
-            className="w-full rounded-full border-dashed border-slate-300 hover:border-slate-400 hover:bg-slate-50 transition-colors"
+            className="w-full rounded-full border-dashed border-border hover:border-border/80 hover:bg-muted/30 transition-colors"
           >
             <Plus className="w-4 h-4 mr-1.5" />
             Add another Top 100 round
