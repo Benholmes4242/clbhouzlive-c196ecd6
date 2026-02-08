@@ -6,10 +6,11 @@
  * MODULE ORDER (Updated):
  * 1. Hero Carousel (Featured/Latest Tournaments)
  * 2. Live Right Now (Conditional - only shows when live action)
- * 3. Tournament Insights (AI Predictions - differentiator)
- * 4. Tournament Schedule (Moved up for user priority)
+ * 3. Tournament Schedule (Moved up for user priority)
+ * 4. Tournament Insights (AI Predictions - differentiator)
  * 5. Unified World Rankings (Movers + OWGR Table combined)
  * 6. Season Leaderboards (Statistical category leaders)
+ * 7. College Golf Rankings (NEW - preview of college leaderboard)
  */
 
 import { useLayoutEffect } from 'react';
@@ -20,6 +21,7 @@ import {
   UnifiedWorldRankings,
   ScheduleModule,
 } from '../overview-v3';
+import { CollegeRankingsPreview } from '../overview-v3/CollegeRankingsPreview';
 import { SeasonLeaderboards } from '../overview-v3/SeasonLeaderboards';
 import { TournamentInsights } from '../tournament-insights';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
@@ -66,12 +68,12 @@ export function OverviewPageV3() {
         <HeroCarousel hasHeader={false} />
       </div>
 
-      {/* Content sections */}
+      {/* Content sections — consistent 40px vertical rhythm between major sections */}
       <div 
         id="content-below-hero"
         className="relative z-10"
       >
-        <div className="bg-background pt-4">
+        <div className="bg-background pt-4" style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
           {/* 2. Live Right Now (conditional - hides if no live) */}
           <LiveRightNow />
 
@@ -86,6 +88,9 @@ export function OverviewPageV3() {
 
           {/* 6. Season Leaderboards */}
           <SeasonLeaderboards />
+
+          {/* 7. College Golf Rankings (NEW) */}
+          <CollegeRankingsPreview />
 
         </div>
       </div>

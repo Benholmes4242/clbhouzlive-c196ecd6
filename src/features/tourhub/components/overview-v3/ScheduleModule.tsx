@@ -206,7 +206,7 @@ export function ScheduleModule() {
   
   if (isLoading) {
     return (
-      <section style={{ paddingTop: '32px', paddingBottom: '16px' }}>
+      <section style={{ paddingTop: '40px', paddingBottom: '16px' }}>
         {/* Header skeleton */}
         <div className="flex items-center justify-between px-4 mb-4">
           <div className="flex items-center gap-2.5">
@@ -264,7 +264,7 @@ export function ScheduleModule() {
   
   return (
     <motion.section 
-      style={{ paddingTop: '32px', paddingBottom: '16px' }}
+      style={{ paddingTop: '40px', paddingBottom: '16px' }}
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
