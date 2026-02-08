@@ -47,10 +47,10 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
   // Use adaptive text color for profile page, fallback to existing logic for other pages
   const shouldUseDarkText = useAdaptiveTextColor(navigationRef);
   
-  // Icon color based on theme
+  // Icon color based on theme — semantic tokens
   const getIconColorClass = () => {
     if (useLightTheme) {
-      return 'text-slate-600 hover:text-slate-800 transition-colors';
+      return 'text-muted-foreground hover:text-foreground transition-colors';
     }
     return 'text-white/70 hover:text-white transition-colors';
   };
@@ -182,17 +182,17 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
   if (!user) {
     return (
       <div ref={navigationRef} className="flex items-center space-x-1 md:space-x-4">
-        <Button data-action="profile" variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())} onClick={handleProfileClick}>
+        <Button data-action="profile" variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 transition-colors active:scale-[0.95]", getIconColorClass())} onClick={handleProfileClick}>
           <User className="h-5 w-5" />
         </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button data-action="settings" variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())}>
+            <Button data-action="settings" variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 transition-colors active:scale-[0.95]", getIconColorClass())}>
               <Settings className="h-5 w-5" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48 mr-2">
+          <DropdownMenuContent align="end" className="w-48 mr-2 bg-card border-border shadow-lg">
             <DropdownMenuItem onClick={() => navigate('/settings')}>
               Settings
             </DropdownMenuItem>
@@ -215,11 +215,11 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button data-action="profile" variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())}>
+          <Button data-action="profile" variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 transition-colors active:scale-[0.95]", getIconColorClass())}>
             <User className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48 mr-2 bg-white border shadow-lg z-50 max-h-none overflow-visible">
+        <DropdownMenuContent align="end" className="w-48 mr-2 bg-card border-border shadow-lg z-50 max-h-none overflow-visible">
           <DropdownMenuItem 
             onClick={handleProfileClick}
             onMouseEnter={prefetchHandlers.onMouseEnter}
@@ -248,11 +248,11 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
       </DropdownMenu>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button data-action="settings" variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())}>
+          <Button data-action="settings" variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 transition-colors active:scale-[0.95]", getIconColorClass())}>
             <Settings className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48 mr-2">
+        <DropdownMenuContent align="end" className="w-48 mr-2 bg-card border-border shadow-lg">
           <DropdownMenuItem onClick={() => navigate('/settings')}>
             Settings
           </DropdownMenuItem>

@@ -168,9 +168,9 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   };
 
   // Theme-specific styling - using CSS variables
-  const LIGHT_BG = 'hsl(210 40% 98% / 0.95)';
+  const LIGHT_BG = 'hsl(var(--background) / 0.95)';
   const LIGHT_DIM_BG = 'transparent'; // Fully transparent when dimmed on light pages
-  const LIGHT_BORDER = 'hsl(215 25% 27% / 0.2)'; // slate-800/20 equivalent
+  const LIGHT_BORDER = 'hsl(var(--border) / 0.5)';
   const DIM_BG = 'hsl(var(--clubhouse-dim-bg-header))';
   const DIM_BORDER = 'hsl(var(--clubhouse-border))';
   const STANDARD_BG = 'hsl(var(--clubhouse-bg-header))';
@@ -234,12 +234,12 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           className="mx-auto flex items-center px-3 sm:px-4 max-w-5xl"
           style={{ height: `${contentHeight}px` }}
         >
-          {/* Left section: Back Button, Tour Menu Icon, or Logo (fixed width) */}
-          <div className="w-10 flex-shrink-0">
+          {/* Left section: Back Button, Tour Menu Icon, or Logo (fixed width, 44px tap target) */}
+          <div className="w-11 flex-shrink-0">
             <button
               type="button"
               className={cn(
-                "flex items-center gap-2 bg-transparent border-0 transition-transform",
+                "flex items-center gap-2 bg-transparent border-0 transition-transform min-h-[44px]",
                 isClubhouseRoute && !isBackArrowRoute ? "pointer-events-none" : "cursor-pointer active:scale-[0.98]"
               )}
               onClick={handleLogoClick}
@@ -250,7 +250,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                 <ArrowLeft 
                   className={cn(
                     "transition-opacity duration-300 h-6 w-6",
-                    hideBrand ? "opacity-0" : shouldDim ? "opacity-55" : "text-slate-800"
+                    hideBrand ? "opacity-0" : shouldDim ? "opacity-55" : "text-foreground"
                   )}
                 />
               ) : isTourRoute ? (
@@ -260,7 +260,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                       "transition-opacity duration-300",
                       dimmablePage === 'tourhub-overview' 
                         ? "text-white/90"
-                        : shouldDim ? "opacity-55" : "text-slate-800"
+                        : shouldDim ? "opacity-55" : "text-foreground"
                     )}
                     size={28} 
                   />
@@ -310,15 +310,15 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                       navigate(item.path);
                     }}
                     className={cn(
-                      "px-3 py-1.5 text-sm font-medium rounded-sq-sm transition-colors duration-300",
+                      "px-3 py-1.5 text-sm font-medium rounded-sq-sm transition-all duration-300 active:scale-[0.97]",
                       useLightTheme 
                         ? isActive 
                           ? shouldDim 
-                            ? "bg-slate-100/20" 
-                            : "text-slate-800 bg-slate-100/80" 
+                            ? "bg-muted/20" 
+                            : "text-foreground bg-muted/80" 
                           : shouldDim
-                            ? "hover:bg-slate-50/20"
-                            : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+                            ? "hover:bg-muted/20"
+                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                         : isActive 
                           ? isDarkDimmed 
                             ? "bg-white/5" 
@@ -329,7 +329,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                     )}
                     style={useLightTheme ? {
                       color: shouldDim 
-                        ? (isActive ? 'rgba(15, 23, 42, 0.78)' : 'rgba(15, 23, 42, 0.55)')
+                        ? (isActive ? 'hsl(var(--foreground) / 0.78)' : 'hsl(var(--foreground) / 0.55)')
                         : undefined
                     } : !useLightTheme ? {
                       color: isDarkDimmed 
@@ -346,17 +346,17 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
 
           {/* Right section: Search + Identity pill (fixed width) */}
           <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-            {/* Search Button */}
+            {/* Search Button — 44px tap target */}
             <Button
               variant="ghost"
               size="icon"
               className={cn(
                 "p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-all",
-                "h-9 w-9", // Standardized search button size
+                "h-11 w-11",
                 useLightTheme
                   ? shouldDim 
-                    ? "text-slate-600 hover:text-slate-800 hover:bg-slate-50/30"
-                    : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+                    ? "text-muted-foreground hover:text-foreground hover:bg-muted/30"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   : isDarkDimmed 
                     ? "hover:bg-[hsl(var(--clubhouse-hover-bg))]" 
                     : "hover:bg-[hsl(var(--clubhouse-active-bg))]"
