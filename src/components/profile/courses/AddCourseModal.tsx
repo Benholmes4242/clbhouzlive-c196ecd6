@@ -57,15 +57,15 @@ interface CourseWithRating {
   has_rating: boolean;
 }
 
- // Position badge colors - Chartreus gold for #1
+// Position badge colors - Chartreus gold for #1
 const getPositionBadgeStyle = (position: number): { bg: string; text: string; shadow?: string } => {
   switch (position) {
     case 1:
-       // Gold - Chartreus
+      // Gold - Chartreus
       return { 
-         bg: '#C1A84C', 
+        bg: '#C1A84C', 
         text: '#FFFFFF',
-         shadow: '0 2px 8px rgba(193, 168, 76, 0.4)'
+        shadow: '0 2px 8px rgba(193, 168, 76, 0.4)'
       };
     case 2:
       // Silver
@@ -185,7 +185,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
         <button
           onClick={() => onMoveUp(index)}
           disabled={index === 0 || isReordering}
-          className="p-1 rounded hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed"
+          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.95]"
           aria-label="Move up"
         >
           <ChevronUp className="w-4 h-4 text-muted-foreground" />
@@ -193,7 +193,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
         <button
           onClick={() => onMoveDown(index)}
           disabled={index === totalItems - 1 || isReordering}
-          className="p-1 rounded hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed"
+          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.95]"
           aria-label="Move down"
         >
           <ChevronDown className="w-4 h-4 text-muted-foreground" />
@@ -204,7 +204,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
       <button
         onClick={() => onRemove(course.course_id)}
         disabled={isRemoving}
-        className="p-2 rounded-lg hover:bg-destructive/10 text-destructive/70 hover:text-destructive transition-colors disabled:opacity-50"
+        className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-destructive/10 text-destructive/70 hover:text-destructive transition-colors disabled:opacity-50 active:scale-[0.95]"
         aria-label="Remove from Top 10"
       >
         <Trash2 className="w-4 h-4" />
@@ -392,7 +392,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
         </div>
         <button
           onClick={onClose}
-          className="p-2 -mr-2 rounded-full hover:bg-muted/50 transition-colors"
+          className="min-h-[44px] min-w-[44px] flex items-center justify-center -mr-2 rounded-full hover:bg-muted/50 transition-colors active:scale-[0.95]"
           aria-label="Close"
         >
           <X className="w-5 h-5 text-muted-foreground" />
@@ -402,16 +402,15 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
       {/* Tab Toggle - Hub Style */}
       <div className="px-5 pb-4">
         <div 
-          className="inline-flex items-center gap-1 p-1 rounded-full w-full"
-          style={{ background: '#e2e8f0' }}
+          className="inline-flex items-center gap-1 p-1 rounded-full w-full bg-muted"
         >
           <button
             onClick={() => setActiveTab('manage')}
             className={cn(
-              "flex-1 px-4 py-2 text-sm font-medium rounded-full transition-all duration-150",
+              "flex-1 px-4 py-2 text-sm font-medium rounded-full transition-all duration-150 active:scale-[0.98]",
               activeTab === 'manage'
-                ? "bg-white text-[#1e293b] shadow-sm"
-                : "text-[#64748b] hover:text-[#1e293b]"
+                ? "bg-card text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
             )}
           >
             Manage ({topTen.length}/10)
@@ -419,10 +418,10 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
           <button
             onClick={() => setActiveTab('add')}
             className={cn(
-              "flex-1 px-4 py-2 text-sm font-medium rounded-full transition-all duration-150",
+              "flex-1 px-4 py-2 text-sm font-medium rounded-full transition-all duration-150 active:scale-[0.98]",
               activeTab === 'add'
-                ? "bg-white text-[#1e293b] shadow-sm"
-                : "text-[#64748b] hover:text-[#1e293b]"
+                ? "bg-card text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
             )}
           >
             Add Course
@@ -509,6 +508,8 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                       <img
                         src={preSelectedCourse.thumbnail_image}
                         alt={preSelectedCourse.name}
+                        loading="lazy"
+                        decoding="async"
                         className="w-14 h-14 object-cover rounded-lg flex-shrink-0"
                       />
                     )}
@@ -521,7 +522,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                     <Button
                       size="sm"
                       onClick={() => handleAddCourse(preSelectedCourse.id)}
-                      className="flex-shrink-0 gap-1.5"
+                      className="flex-shrink-0 gap-1.5 active:scale-[0.95]"
                     >
                       <Plus className="w-4 h-4" />
                       <span>Add</span>
@@ -601,6 +602,8 @@ const CourseRow: React.FC<CourseRowProps> = ({
       <img
         src={course.thumbnail_image}
         alt={course.name}
+        loading="lazy"
+        decoding="async"
         className="w-14 h-14 object-cover rounded-lg flex-shrink-0"
       />
     )}
@@ -622,7 +625,7 @@ const CourseRow: React.FC<CourseRowProps> = ({
       size="sm"
       variant={isSecondary ? "outline" : "default"}
       onClick={onAction}
-      className="flex-shrink-0 gap-1.5"
+      className="flex-shrink-0 gap-1.5 active:scale-[0.95]"
     >
       {actionIcon}
       <span className="hidden sm:inline">{actionLabel}</span>

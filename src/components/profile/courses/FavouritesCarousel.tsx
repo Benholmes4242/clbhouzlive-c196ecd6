@@ -126,10 +126,10 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
         {/* Header skeleton */}
         <div className="px-4 pb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-slate-200 animate-pulse" />
+            <div className="w-10 h-10 rounded-full bg-muted animate-pulse" />
             <div>
-              <div className="h-5 w-36 bg-slate-200 rounded mb-1.5 animate-pulse" />
-              <div className="h-4 w-28 bg-slate-200 rounded animate-pulse" />
+              <div className="h-5 w-36 bg-muted rounded mb-1.5 animate-pulse" />
+              <div className="h-4 w-28 bg-muted rounded animate-pulse" />
             </div>
           </div>
         </div>
@@ -138,7 +138,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
           {[1, 2].map((i) => (
              <div 
               key={i} 
-              className="flex-shrink-0 w-[227px] h-[292px] bg-slate-200 rounded-[22px] animate-pulse" 
+              className="flex-shrink-0 w-[227px] h-[292px] bg-muted rounded-[22px] animate-pulse" 
             />
           ))}
         </div>
@@ -177,15 +177,11 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
         {/* Empty Content Card */}
         <div className="px-4">
           <div 
-            className="relative w-full max-w-[320px] h-[280px] rounded-[24px] flex items-center justify-center mx-auto"
-            style={{
-              background: 'linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%)',
-              border: '2px dashed #E5E7EB',
-            }}
+            className="relative w-full max-w-[320px] h-[280px] rounded-[24px] flex items-center justify-center mx-auto bg-muted border-2 border-dashed border-border"
           >
             <div className="text-center p-6">
-              <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
-                <Trophy className="w-7 h-7 text-slate-300" />
+              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+                <Trophy className="w-7 h-7 text-muted-foreground/40" />
               </div>
               
               <h3 className="text-base font-semibold text-foreground mb-1">
@@ -201,7 +197,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
               {isOwnProfile && onManage && (
                 <button
                   onClick={onManage}
-                  className="px-6 py-2.5 bg-gradient-to-r from-amber-400 to-amber-500 text-white text-sm font-medium rounded-full hover:from-amber-500 hover:to-amber-600 transition-all shadow-sm"
+                  className="px-6 py-2.5 bg-gradient-to-r from-amber-400 to-amber-500 text-white text-sm font-medium rounded-full hover:from-amber-500 hover:to-amber-600 transition-all shadow-sm min-h-[44px] active:scale-[0.98]"
                 >
                   Start Building
                 </button>
@@ -242,7 +238,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
           {isOwnProfile && onManage && (
             <button 
               onClick={onManage}
-              className="text-sm font-medium text-amber-600"
+              className="text-sm font-medium text-amber-600 min-h-[44px] flex items-center active:scale-[0.98]"
             >
               Manage
             </button>
@@ -281,14 +277,10 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
               <div 
                 key={`empty-${index}`}
                 onClick={onManage}
-                className="relative w-[227px] h-[292px] rounded-[22px] flex-shrink-0 snap-center flex items-center justify-center cursor-pointer transition-transform duration-200 hover:scale-[0.99] active:scale-[0.97]"
-                style={{
-                  background: 'linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%)',
-                  border: '2px dashed #E5E7EB',
-                }}
+                className="relative w-[227px] h-[292px] rounded-[22px] flex-shrink-0 snap-center flex items-center justify-center cursor-pointer transition-transform duration-200 hover:scale-[0.99] active:scale-[0.97] bg-muted border-2 border-dashed border-border"
               >
                 <div className="text-center p-6">
-                  <Plus className="w-8 h-8 text-slate-300 mx-auto mb-3" />
+                  <Plus className="w-8 h-8 text-muted-foreground/40 mx-auto mb-3" />
                   <p className="text-muted-foreground text-sm">
                     Add #{courseCount + index + 1}
                   </p>
@@ -302,9 +294,9 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
       {/* Minimal scroll indicator */}
       {courseCount > 1 && (
         <div className="flex justify-center mt-4">
-          <div className="h-1 w-16 rounded-full bg-slate-200 overflow-hidden">
+          <div className="h-1 w-16 rounded-full bg-muted overflow-hidden">
             <div 
-              className="h-full bg-slate-800 rounded-full transition-all duration-300"
+              className="h-full bg-foreground rounded-full transition-all duration-300"
               style={{ width: `${Math.max(10, scrollProgress * 100)}%` }}
             />
           </div>
@@ -316,7 +308,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
         <div className="pt-4 px-4">
           <button
             onClick={handleShare}
-            className="w-full py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground bg-background hover:bg-muted rounded-xl border border-border shadow-sm transition-colors flex items-center justify-center gap-2"
+            className="w-full py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground bg-background hover:bg-muted rounded-xl border border-border shadow-sm transition-colors flex items-center justify-center gap-2 min-h-[44px] active:scale-[0.98]"
           >
             <Share2 className="w-4 h-4" />
             Share your Top 10
