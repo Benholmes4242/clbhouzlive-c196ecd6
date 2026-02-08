@@ -10,11 +10,7 @@ interface ProgressRingProps {
 
 /**
  * ProgressRing - Circular progress indicator with days countdown in center
- * 
- * Features:
- * - SVG-based ring with animated progress
- * - Days remaining displayed in center
- * - Uses season theme color from database
+ * Uses semantic tokens for track and text colors.
  */
 export const ProgressRing: React.FC<ProgressRingProps> = ({ 
   progress, 
@@ -36,7 +32,7 @@ export const ProgressRing: React.FC<ProgressRingProps> = ({
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="#E5E7EB"
+          stroke="hsl(var(--muted))"
           strokeWidth={strokeWidth}
         />
         {/* Progress circle */}
@@ -55,7 +51,7 @@ export const ProgressRing: React.FC<ProgressRingProps> = ({
       </svg>
       {/* Days remaining in center */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-xs font-semibold text-gray-700">{daysLeft}</span>
+        <span className="text-xs font-semibold text-foreground">{daysLeft}</span>
       </div>
     </div>
   );

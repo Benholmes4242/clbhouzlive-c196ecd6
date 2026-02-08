@@ -51,10 +51,10 @@ export function ChampionshipFilters({
           <button
             onClick={() => onDivisionFilterChange('all')}
             className={cn(
-              'flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-full border transition-colors',
+              'flex-shrink-0 px-3.5 py-2 text-xs font-medium rounded-full border transition-colors active:scale-[0.95]',
               divisionFilter === 'all'
-                ? 'bg-gray-900 text-white border-gray-900'
-                : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
+                ? 'bg-foreground text-background border-foreground'
+                : 'bg-card text-muted-foreground border-border hover:border-border/80'
             )}
           >
             All Divisions
@@ -64,10 +64,10 @@ export function ChampionshipFilters({
               key={division.id}
               onClick={() => onDivisionFilterChange(division.slug)}
               className={cn(
-                'flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-full border transition-colors',
+                'flex-shrink-0 px-3.5 py-2 text-xs font-medium rounded-full border transition-colors active:scale-[0.95]',
                 divisionFilter === division.slug
                   ? 'text-white border-transparent'
-                  : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
+                  : 'bg-card text-muted-foreground border-border hover:border-border/80'
               )}
               style={divisionFilter === division.slug ? { backgroundColor: division.color_hex } : undefined}
             >

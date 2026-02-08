@@ -19,11 +19,6 @@ interface SeasonStatusPanelProps {
 
 /**
  * SeasonStatusPanel - Container component for the Season Status UI
- * 
- * Contains:
- * - ActiveSeasonCard (hero card with integrated season selector)
- * 
- * The season chips are now integrated into the card footer.
  */
 export const SeasonStatusPanel: React.FC<SeasonStatusPanelProps> = ({
   currentSeasonId,
@@ -49,13 +44,13 @@ export const SeasonStatusPanel: React.FC<SeasonStatusPanelProps> = ({
   if (isError) {
     return (
       <div className={cn('px-4', className)}>
-        <div className="rounded-2xl bg-gray-50 p-6">
+        <div className="rounded-2xl bg-muted/50 p-6">
           <div className="flex flex-col items-center justify-center text-center gap-3">
-            <AlertCircle className="w-8 h-8 text-gray-400" />
-            <p className="text-sm text-gray-500">Unable to load season data</p>
+            <AlertCircle className="w-8 h-8 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">Unable to load season data</p>
             <button
               onClick={onRetry}
-              className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:underline"
+              className="flex items-center gap-2 text-sm font-medium text-foreground hover:underline"
             >
               <RefreshCw className="w-4 h-4" />
               Tap to retry
@@ -68,7 +63,6 @@ export const SeasonStatusPanel: React.FC<SeasonStatusPanelProps> = ({
 
   return (
     <div className={cn('px-4 pt-2', className)}>
-      {/* Hero Card with integrated season selector */}
       <ActiveSeasonCard
         seasonId={currentSeasonId}
         daysRemaining={daysRemaining}

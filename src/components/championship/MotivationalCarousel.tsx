@@ -15,7 +15,7 @@ interface MotivationalMessage {
   iconColor: string;
   message: string;
   subMessage?: string;
-  priority: number; // Higher = more important, shown first
+  priority: number;
 }
 
 interface Props {
@@ -53,7 +53,7 @@ export const MotivationalCarousel: React.FC<Props> = ({
     messages.push({
       id: 'top3',
       icon: Award,
-      iconColor: '#C1A84C', // Golf Chartreus
+      iconColor: '#C1A84C',
       message: currentRank === 1 
         ? "You're leading the pack! 👑" 
         : `You're #${currentRank}! Just ${currentRank - 1} spot${currentRank > 2 ? 's' : ''} from the top`,
@@ -61,12 +61,11 @@ export const MotivationalCarousel: React.FC<Props> = ({
       priority: 100,
     });
   }
-  // Top 10 message - Golf Emerald
   else if (isInTop10 && currentRank) {
     messages.push({
       id: 'top10',
       icon: TrendingUp,
-      iconColor: '#334E3D', // Golf Emerald
+      iconColor: '#334E3D',
       message: `You're #${currentRank} — in the top 10!`,
       subMessage: coursesToNextRank 
         ? `${coursesToNextRank} course${coursesToNextRank > 1 ? 's' : ''} to climb higher`
@@ -75,72 +74,66 @@ export const MotivationalCarousel: React.FC<Props> = ({
     });
   }
 
-  // Friend ahead message - Golf Sky Blue
   if (friendAhead) {
     messages.push({
       id: 'friend-ahead',
       icon: Users,
-      iconColor: '#B8C6C9', // Golf Sky Blue
+      iconColor: '#B8C6C9',
       message: `${friendAhead.name} is ${friendAhead.coursesAhead} course${friendAhead.coursesAhead > 1 ? 's' : ''} ahead`,
       subMessage: 'Complete more courses to catch up!',
       priority: 80,
     });
   }
 
-  // Friend behind message - Golf Emerald
   if (friendBehind) {
     messages.push({
       id: 'friend-behind',
       icon: Users,
-      iconColor: '#334E3D', // Golf Emerald
+      iconColor: '#334E3D',
       message: `You're ${friendBehind.coursesBehind} course${friendBehind.coursesBehind > 1 ? 's' : ''} ahead of ${friendBehind.name}`,
       subMessage: 'Stay ahead — keep logging courses!',
       priority: 70,
     });
   }
 
-  // Rival message - Golf Chartreus (competitive but refined)
   if (rivalAhead) {
     messages.push({
       id: 'rival',
       icon: Target,
-      iconColor: '#C1A84C', // Golf Chartreus
+      iconColor: '#C1A84C',
       message: `Your rival ${rivalAhead.name} is #${rivalAhead.rank}`,
       subMessage: `${rivalAhead.coursesAhead} course${rivalAhead.coursesAhead > 1 ? 's' : ''} to overtake them`,
       priority: 85,
     });
   }
 
-  // Streak message - Golf Pale Lime
   if (streak && streak >= 3) {
     messages.push({
       id: 'streak',
       icon: Flame,
-      iconColor: '#E5D0A1', // Golf Pale Lime
+      iconColor: '#E5D0A1',
       message: `${streak}-day streak! 🔥`,
       subMessage: 'Keep it going — play tomorrow!',
       priority: 60,
     });
   }
 
-  // Close to next rank - Golf Emerald
   if (coursesToNextRank && coursesToNextRank <= 2 && !isInTop10) {
     messages.push({
       id: 'close-to-rank',
       icon: Sparkles,
-      iconColor: '#334E3D', // Golf Emerald
+      iconColor: '#334E3D',
       message: `Just ${coursesToNextRank} course${coursesToNextRank > 1 ? 's' : ''} to move up!`,
       subMessage: "You're so close to the next rank",
       priority: 75,
     });
   }
 
-  // Generic encouragement (fallback) - Golf Emerald
   if (messages.length === 0) {
     messages.push({
       id: 'generic',
       icon: TrendingUp,
-      iconColor: '#334E3D', // Golf Emerald
+      iconColor: '#334E3D',
       message: currentRank 
         ? `You're #${currentRank} of ${totalPlayers} players`
         : 'Log courses to join the leaderboard!',
@@ -149,10 +142,8 @@ export const MotivationalCarousel: React.FC<Props> = ({
     });
   }
 
-  // Sort by priority (highest first)
   const sortedMessages = messages.sort((a, b) => b.priority - a.priority);
 
-  // Auto-rotate carousel every 5 seconds
   useEffect(() => {
     if (sortedMessages.length <= 1) return;
     
@@ -173,7 +164,7 @@ export const MotivationalCarousel: React.FC<Props> = ({
       className={cn(
         'relative overflow-hidden rounded-2xl',
         'backdrop-blur-xl',
-        'border border-white/50',
+        'border border-border/30',
         'shadow-[0_4px_24px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(255,255,255,0.8)]',
         'p-4'
       )}
@@ -207,17 +198,17 @@ export const MotivationalCarousel: React.FC<Props> = ({
 
         {/* Text content */}
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-[#1e293b] truncate">
+          <p className="text-sm font-semibold text-foreground truncate">
             {currentMessage.message}
           </p>
           {currentMessage.subMessage && (
-            <p className="text-xs text-[#64748b] truncate mt-0.5">
+            <p className="text-xs text-muted-foreground truncate mt-0.5">
               {currentMessage.subMessage}
             </p>
           )}
         </div>
 
-        {/* Carousel indicator dots - with expanded touch targets */}
+        {/* Carousel indicator dots */}
         {sortedMessages.length > 1 && (
           <div className="flex items-center gap-1">
             {sortedMessages.map((_, idx) => (
@@ -230,8 +221,8 @@ export const MotivationalCarousel: React.FC<Props> = ({
                 <div className={cn(
                   'w-2.5 h-2.5 rounded-full transition-all duration-300',
                   idx === currentIndex 
-                    ? 'bg-[#1e293b] w-4' 
-                    : 'bg-[#CBD5E1] hover:bg-[#94A3B8]'
+                    ? 'bg-foreground w-4' 
+                    : 'bg-muted-foreground/30 hover:bg-muted-foreground/50'
                 )} />
               </button>
             ))}

@@ -51,7 +51,7 @@ const Top100LeaderboardPanel = () => {
                 key={tab.id}
                 onClick={() => handleViewChange(tab.id)}
                 className={cn(
-                  'flex-1 py-2 px-2 rounded-lg text-center transition-all duration-200 active:scale-[0.97]',
+                  'flex-1 py-2.5 px-2 rounded-lg text-center transition-all duration-200 active:scale-[0.97]',
                   view === tab.id
                     ? 'bg-card shadow-sm border border-border'
                     : 'text-muted-foreground hover:bg-card/50'
