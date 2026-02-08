@@ -23,11 +23,6 @@ interface Props {
 
 /**
  * DivisionProgressPreview - Collapsible division progress section
- * 
- * Features:
- * - Uses database colors for divisions
- * - Gradient progress bar
- * - Clean Apple-style layout
  */
 export const DivisionProgressPreview: React.FC<Props> = ({
   currentDivision,
@@ -52,10 +47,10 @@ export const DivisionProgressPreview: React.FC<Props> = ({
   const progressPercent = calculateProgress();
 
   return (
-    <div className="bg-gray-50 rounded-xl overflow-hidden">
+    <div className="bg-muted/50 rounded-xl overflow-hidden">
       <button
         onClick={onToggle}
-        className="w-full p-4 transition-colors hover:bg-gray-100/50"
+        className="w-full p-4 transition-colors hover:bg-muted/50 active:scale-[0.98]"
       >
         {/* Top row: Current → Progress → Next */}
         <div className="flex items-center justify-between mb-3">
@@ -71,7 +66,7 @@ export const DivisionProgressPreview: React.FC<Props> = ({
             >
               {currentDivision.name}
             </span>
-            <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wide bg-gray-200 px-1.5 py-0.5 rounded">
+            <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide bg-muted px-1.5 py-0.5 rounded">
               Current
             </span>
           </div>
@@ -85,7 +80,7 @@ export const DivisionProgressPreview: React.FC<Props> = ({
               >
                 {nextDivision.name}
               </span>
-              <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">
+              <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
                 {coursesToNext} to go
               </span>
             </div>
@@ -104,7 +99,7 @@ export const DivisionProgressPreview: React.FC<Props> = ({
 
         {/* Progress bar with gradient using database colors */}
         {nextDivision && (
-          <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden mb-3">
+          <div className="h-1.5 bg-muted rounded-full overflow-hidden mb-3">
             <div 
               className="h-full rounded-full transition-all duration-500"
               style={{ 
@@ -119,13 +114,13 @@ export const DivisionProgressPreview: React.FC<Props> = ({
         <div className="flex items-center justify-center gap-2">
           {isExpanded ? (
             <>
-              <ChevronUp className="w-4 h-4 text-gray-400" />
-              <span className="text-xs text-gray-500">Hide Division Ladder</span>
+              <ChevronUp className="w-4 h-4 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">Hide Division Ladder</span>
             </>
           ) : (
             <>
-              <ChevronDown className="w-4 h-4 text-gray-400" />
-              <span className="text-xs text-gray-500">
+              <ChevronDown className="w-4 h-4 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">
                 View all {totalDivisions} divisions
               </span>
             </>

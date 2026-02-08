@@ -19,8 +19,8 @@ interface PillToggleProps {
  * 
  * Features:
  * - Rounded-full pill container
- * - White active button with shadow
- * - Smooth transitions
+ * - Active button with shadow
+ * - Smooth transitions + tap feedback
  */
 export const PillToggle: React.FC<PillToggleProps> = ({ 
   options, 
@@ -30,21 +30,21 @@ export const PillToggle: React.FC<PillToggleProps> = ({
   className,
 }) => {
   const baseClasses = size === 'small' 
-    ? 'px-3 py-1.5 text-xs' 
-    : 'px-4 py-2 text-sm';
+    ? 'px-3 py-2 text-xs' 
+    : 'px-4 py-2.5 text-sm';
   
   return (
-    <div className={cn('inline-flex bg-gray-100 rounded-full p-1', className)}>
+    <div className={cn('inline-flex bg-muted rounded-full p-1', className)}>
       {options.map((option) => (
         <button
           key={option.id}
           onClick={() => onSelect(option.id)}
           className={cn(
             baseClasses,
-            'font-medium rounded-full transition-all duration-200 ease-out whitespace-nowrap',
+            'font-medium rounded-full transition-all duration-200 ease-out whitespace-nowrap active:scale-[0.97]',
             selected === option.id 
-              ? 'bg-white text-gray-900 shadow-sm' 
-              : 'text-gray-500 hover:text-gray-700'
+              ? 'bg-card text-foreground shadow-sm' 
+              : 'text-muted-foreground hover:text-foreground'
           )}
         >
           {option.label}

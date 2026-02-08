@@ -19,11 +19,6 @@ interface ActiveSeasonCardProps {
 
 /**
  * ActiveSeasonCard - Hero card with integrated season selector footer
- * 
- * Specs:
- * - Progress ring with days countdown
- * - Season info and status
- * - Integrated season selector in footer
  */
 export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
   seasonId,
@@ -70,7 +65,7 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
   return (
     <div
       className={cn(
-        'rounded-2xl bg-white shadow-sm border border-gray-100 overflow-hidden',
+        'rounded-2xl bg-card shadow-sm border border-border overflow-hidden',
         className
       )}
     >
@@ -88,11 +83,11 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
             />
           </div>
           
-          {/* Season Info - reorganized for full-width name */}
+          {/* Season Info */}
           <div className="flex-1 min-w-0">
             {/* Top row: Label + Active badge */}
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 Current Season
               </span>
               <div className="flex items-center gap-1.5">
@@ -100,19 +95,19 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
                   className="w-2 h-2 rounded-full" 
                   style={{ backgroundColor: config.themeColor }}
                 />
-                <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                   Active
                 </span>
               </div>
             </div>
             
-            {/* Season name - full width, no truncation */}
-            <h3 className="text-base font-semibold text-gray-900 leading-tight">
+            {/* Season name */}
+            <h3 className="text-base font-semibold text-foreground leading-tight">
               {config.title}
             </h3>
             
             {/* Tagline */}
-            <p className="text-sm text-gray-500 mt-0.5">
+            <p className="text-sm text-muted-foreground mt-0.5">
               {config.subtitle}
             </p>
           </div>
@@ -120,7 +115,7 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
       </div>
       
       {/* Integrated Season Selector */}
-      <div className="border-t border-gray-100 bg-gray-50/50">
+      <div className="border-t border-border bg-muted/50">
         <div className="flex">
           {SEASON_ORDER.map((id, index) => {
             const seasonConfig = getSeasonConfig(id);
@@ -128,7 +123,6 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
             const state = getSeasonState(id);
             const isLocked = state === 'locked';
             const isActive = state === 'active';
-            const data = seasonData[id];
             
             return (
               <button
@@ -137,10 +131,10 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
                 disabled={isLocked}
                 className={cn(
                   'flex-1 py-3 px-2 flex flex-col items-center gap-1.5',
-                  'transition-all duration-200',
-                  index !== SEASON_ORDER.length - 1 && 'border-r border-gray-100',
+                  'transition-all duration-200 active:scale-[0.97]',
+                  index !== SEASON_ORDER.length - 1 && 'border-r border-border',
                   isLocked && 'cursor-not-allowed',
-                  !isLocked && !isActive && 'hover:bg-gray-100/50'
+                  !isLocked && !isActive && 'hover:bg-muted/50'
                 )}
                 style={{
                   backgroundColor: isActive ? `${seasonConfig.themeColor}15` : undefined
@@ -149,14 +143,14 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
                 {/* Season Icon */}
                 <SeasonIcon 
                   className={cn('w-5 h-5', isLocked && 'opacity-30')}
-                  style={{ color: isActive ? seasonConfig.themeColor : isLocked ? '#9CA3AF' : '#6B7280' }}
+                  style={{ color: isActive ? seasonConfig.themeColor : isLocked ? 'hsl(var(--muted-foreground) / 0.4)' : 'hsl(var(--muted-foreground))' }}
                 />
                 
                 {/* Season Label */}
                 <span 
                   className={cn(
                     'text-[10px] font-medium leading-tight text-center',
-                    isLocked ? 'text-gray-300' : 'text-gray-500'
+                    isLocked ? 'text-muted-foreground/40' : 'text-muted-foreground'
                   )}
                   style={{ 
                     color: isActive ? seasonConfig.themeColor : undefined 
@@ -167,7 +161,7 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
                 
                 {/* Lock icon for locked seasons */}
                 {isLocked && (
-                  <Lock className="w-3 h-3 text-gray-300" />
+                  <Lock className="w-3 h-3 text-muted-foreground/40" />
                 )}
               </button>
             );

@@ -115,6 +115,7 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
     <motion.div
       className="flex flex-col items-center cursor-pointer relative flex-1"
       onClick={onClick}
+      whileTap={{ scale: 0.97 }}
       initial={{ opacity: 0, scale: 0.95, y: 10 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{
@@ -254,7 +255,7 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
           height: config.platformHeight,
           backgroundColor: position === 1 
             ? 'rgba(193, 168, 76, 0.15)' // Chartreus gold 15% opacity
-            : 'rgba(0, 0, 0, 0.05)',
+            : 'hsl(var(--muted))',
         }}
       />
     </motion.div>

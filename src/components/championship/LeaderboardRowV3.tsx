@@ -13,35 +13,30 @@ interface LeaderboardRowV3Props {
   onClick?: () => void;
 }
 
-// Modern Country Club palette for ranks
+// Modern Country Club palette for ranks — intentional brand colors
 const getRankColor = (r: number) => {
   if (r === 1) return '#C1A84C'; // Chartreus Gold
   if (r === 2) return '#B8C6C9'; // Sky Blue Silver
   if (r === 3) return '#8B7355'; // Warm Bronze
-  return '#E5E7EB'; // gray-200 for others
+  return 'hsl(var(--muted))';
 };
 
 const getRankTextColor = (r: number) => {
   if (r <= 3) return '#FFFFFF';
-  return '#6B7280'; // gray-500
+  return 'hsl(var(--muted-foreground))';
 };
 
-const getCoursesColor = (r: number) => {
-  if (r === 1) return 'text-[#C1A84C]'; // Chartreus Gold
-  if (r === 2) return 'text-[#B8C6C9]'; // Sky Blue Silver
-  if (r === 3) return 'text-[#8B7355]'; // Warm Bronze
-  return 'text-amber-500'; // Default amber for others
+// Podium positions keep their metallic color; rank 4+ uses foreground (not amber)
+const getCoursesColor = (r: number, isCurrentUser: boolean) => {
+  if (isCurrentUser) return 'text-amber-600';
+  if (r === 1) return 'text-[#C1A84C]';
+  if (r === 2) return 'text-[#B8C6C9]';
+  if (r === 3) return 'text-[#8B7355]';
+  return 'text-foreground';
 };
 
 /**
  * LeaderboardRowV3 - Polished leaderboard row with Apple-grade styling
- * 
- * Features:
- * - Rank badge (filled for top 3, subtle for others)
- * - SquircleAvatar with ring for top 3
- * - Name + Club stacked
- * - Large bold course number on right
- * - Current user highlight with amber accent
  */
 export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
   rank,
@@ -57,10 +52,14 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
 
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-label={`View ${name}'s profile`}
       onClick={onClick}
+      onKeyDown={(e) => e.key === 'Enter' && onClick?.()}
       className={cn(
         "flex items-center gap-3 p-3 rounded-xl transition-all duration-200 cursor-pointer",
-        "hover:bg-gray-50",
+        "hover:bg-muted/50 active:scale-[0.98]",
         isCurrentUser && "bg-amber-50 border border-amber-200"
       )}
     >
@@ -76,7 +75,7 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
       </div>
 
       {/* Avatar with ring for top 3 */}
-      <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-gray-100">
+      <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-border">
         <SquircleAvatar
           src={avatarUrl}
           size={40}
@@ -91,19 +90,19 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
       <div className="flex-1 min-w-0">
         <p className={cn(
           "text-sm font-semibold truncate",
-          isCurrentUser ? "text-amber-900" : "text-gray-900"
+          isCurrentUser ? "text-amber-900" : "text-foreground"
         )}>
           {name}
         </p>
         {homeClubName && (
-          <p className="text-xs text-gray-500 truncate">{homeClubName}</p>
+          <p className="text-xs text-muted-foreground truncate">{homeClubName}</p>
         )}
       </div>
 
       {/* Score */}
       <div className={cn(
         "text-3xl font-bold flex-shrink-0",
-        isCurrentUser ? "text-amber-600" : getCoursesColor(rank)
+        getCoursesColor(rank, isCurrentUser)
       )}>
         {courses}
       </div>

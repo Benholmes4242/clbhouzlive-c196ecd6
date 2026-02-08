@@ -546,13 +546,13 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           <button
             onClick={() => fetchNextPage()}
             disabled={leaderboardLoading}
-            className="w-full py-4 text-sm text-primary font-medium hover:bg-muted/30 transition-colors rounded-xl"
+            className="w-full py-4 text-sm text-primary font-medium hover:bg-muted/30 active:scale-[0.98] transition-all rounded-xl"
           >
             {leaderboardLoading ? 'Loading...' : 'Load more'}
           </button>
         ) : entries.length > 0 ? (
           /* 10. End of List */
-          <p className="text-center text-sm text-gray-400 py-4">
+          <p className="text-center text-sm text-muted-foreground py-4">
             You've reached the end
           </p>
         ) : null}
@@ -586,9 +586,9 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         className={cn(
           "fixed bottom-24 right-4 z-40 w-12 h-12 rounded-full",
-          "bg-gray-700 text-white shadow-lg",
+          "bg-foreground/80 text-background shadow-lg backdrop-blur-sm",
           "flex items-center justify-center",
-          "transition-all duration-300 ease-out",
+          "transition-all duration-300 ease-out active:scale-[0.95]",
           showScrollTop 
             ? "opacity-100 translate-y-0" 
             : "opacity-0 translate-y-4 pointer-events-none"
