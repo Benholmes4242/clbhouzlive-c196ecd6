@@ -45,7 +45,7 @@ const SeasonLeaderboardsSkeleton = memo(function SeasonLeaderboardsSkeleton() {
   };
 
   return (
-    <section style={{ paddingTop: '20px', paddingBottom: '16px' }}>
+    <section style={{ paddingTop: '40px', paddingBottom: '16px' }}>
       <style>{animationStyles}</style>
       
       {/* Header */}
@@ -92,7 +92,7 @@ const SeasonLeaderboardsSkeleton = memo(function SeasonLeaderboardsSkeleton() {
 // Empty state
 const SeasonLeaderboardsEmpty = memo(function SeasonLeaderboardsEmpty() {
   return (
-    <section style={{ paddingTop: '20px', paddingBottom: '16px' }}>
+    <section style={{ paddingTop: '40px', paddingBottom: '16px' }}>
       <div className="px-4">
         <p 
           className="m-0"
@@ -104,7 +104,7 @@ const SeasonLeaderboardsEmpty = memo(function SeasonLeaderboardsEmpty() {
             letterSpacing: '1.2px',
           }}
         >
-          2025 Season
+          Season
         </p>
         <h2 
           className="m-0 mt-1"
@@ -195,7 +195,7 @@ export function SeasonLeaderboards() {
   const IconComponent = CATEGORY_ICONS[activeCategory];
 
   return (
-    <section style={{ paddingTop: '24px', paddingBottom: '16px' }}>
+    <section style={{ paddingTop: '40px', paddingBottom: '16px' }}>
       <style>{animationStyles}</style>
       
       {/* Section Header */}
