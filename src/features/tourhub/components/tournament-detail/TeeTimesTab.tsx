@@ -5,6 +5,8 @@
  * - Round selector
  * - Grouped tee time cards with player details
  * - Starting hole indicator
+ * - Glassmorphic card treatment
+ * - Staggered entrance animations
  * - Loading skeleton and empty state
  */
 
@@ -29,7 +31,7 @@ function TeeTimesSkeleton() {
     <div className="space-y-4 animate-pulse">
       <div className="h-11 bg-muted rounded-[14px]" />
       {[1, 2, 3].map(i => (
-        <div key={i} className="bg-card rounded-2xl border border-border p-4 space-y-3">
+        <div key={i} className="bg-card/60 rounded-2xl border border-border/30 p-4 space-y-3">
           <div className="h-4 w-24 bg-muted rounded" />
           <div className="space-y-2">
             <div className="h-10 bg-muted rounded-xl" />
@@ -161,7 +163,7 @@ export function TeeTimesTab({ tournamentId }: TeeTimesTabProps) {
         {groups.map((group, groupIdx) => (
           <motion.div
             key={`${group.teeTime}-${groupIdx}`}
-            className="bg-card rounded-2xl border border-border p-4"
+            className="bg-card/80 backdrop-blur-sm rounded-2xl border border-border/30 p-4 active:scale-[0.995] transition-transform"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: groupIdx * 0.03, duration: 0.3 }}
@@ -174,13 +176,13 @@ export function TeeTimesTab({ tournamentId }: TeeTimesTabProps) {
                   {format(new Date(group.teeTime), 'h:mm a')}
                 </span>
               </div>
-              <span className="text-[10px] font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+              <span className="text-[10px] font-medium text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-full">
                 Hole {group.startingHole}
               </span>
             </div>
 
             {/* Players */}
-            <div className="space-y-0 divide-y divide-border/50">
+            <div className="space-y-0 divide-y divide-border/20">
               {group.players.map((player, playerIdx) => (
                 <div
                   key={player.id || playerIdx}

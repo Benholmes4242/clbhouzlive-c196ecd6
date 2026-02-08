@@ -3,10 +3,11 @@
  * 
  * Features:
  * - Round selector with Overall option
- * - Toughest holes strip
+ * - Toughest holes strip (glassmorphic)
  * - Summary stats row
  * - 18 hole cards with scoring distribution bars
  * - Difficulty-based color coding
+ * - Staggered entrance animations
  */
 
 import { useState, useMemo } from 'react';
@@ -81,7 +82,7 @@ function HoleStatsEmpty() {
 
 // Difficulty color logic
 function getDifficultyColor(rank: number, total: number) {
-  if (rank <= 3) return 'bg-red-500 text-white';
+  if (rank <= 3) return 'bg-destructive text-destructive-foreground';
   if (rank <= 6) return 'bg-orange-400 text-white';
   if (rank > total - 3) return 'bg-green-500 text-white';
   return 'bg-muted text-foreground';
@@ -95,9 +96,9 @@ function ScoringBar({ hole }: { hole: ProcessedHole }) {
   const segments = [
     { count: hole.eagles, color: 'bg-amber-400', label: 'Eagles' },
     { count: hole.birdies, color: 'bg-green-500', label: 'Birdies' },
-    { count: hole.pars, color: 'bg-slate-300', label: 'Pars' },
+    { count: hole.pars, color: 'bg-muted-foreground/30', label: 'Pars' },
     { count: hole.bogeys, color: 'bg-orange-400', label: 'Bogeys' },
-    { count: hole.doubleBogeys + hole.other, color: 'bg-red-500', label: 'Double+' },
+    { count: hole.doubleBogeys + hole.other, color: 'bg-destructive', label: 'Double+' },
   ].filter(s => s.count > 0);
 
   return (
@@ -232,7 +233,12 @@ export function HoleStatsTab({ tournamentId }: HoleStatsTabProps) {
 
       {/* Toughest holes strip */}
       {toughestHoles.length > 0 && (
-        <div className="bg-card rounded-2xl border border-border p-4">
+        <motion.div
+          className="bg-card/80 backdrop-blur-sm rounded-2xl border border-border/30 p-4"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35 }}
+        >
           <h4 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-3">
             Toughest Holes
           </h4>
@@ -240,9 +246,9 @@ export function HoleStatsTab({ tournamentId }: HoleStatsTabProps) {
             {toughestHoles.map((hole, idx) => (
               <div
                 key={hole.holeNumber}
-                className="flex-1 bg-red-50 border border-red-100 rounded-xl p-3 text-center"
+                className="flex-1 bg-destructive/5 border border-destructive/10 rounded-xl p-3 text-center"
               >
-                <div className="text-xs font-bold text-red-700 mb-1">
+                <div className="text-xs font-bold text-destructive/80 mb-1">
                   #{idx + 1}
                 </div>
                 <div className="text-lg font-bold text-foreground score-mono">
@@ -251,19 +257,24 @@ export function HoleStatsTab({ tournamentId }: HoleStatsTabProps) {
                 <div className="text-xs text-muted-foreground">
                   Par {hole.par} • Avg {hole.scoringAverage.toFixed(2)}
                 </div>
-                <div className="text-xs font-semibold text-red-600 mt-1 score-mono">
+                <div className="text-xs font-semibold text-destructive mt-1 score-mono">
                   +{hole.avgDiff.toFixed(2)}
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* Summary stats */}
       {summary && (
         <div className="grid grid-cols-3 gap-3">
-          <div className="bg-card rounded-xl border border-border p-3 text-center">
+          <motion.div
+            className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/30 p-3 text-center"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05, duration: 0.3 }}
+          >
             <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground mb-1">
               Course Avg
             </div>
@@ -271,8 +282,13 @@ export function HoleStatsTab({ tournamentId }: HoleStatsTabProps) {
               {summary.avgScore.toFixed(1)}
             </div>
             <div className="text-[10px] text-muted-foreground">Par {summary.totalPar}</div>
-          </div>
-          <div className="bg-card rounded-xl border border-border p-3 text-center">
+          </motion.div>
+          <motion.div
+            className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/30 p-3 text-center"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.3 }}
+          >
             <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground mb-1">
               Birdies
             </div>
@@ -280,15 +296,20 @@ export function HoleStatsTab({ tournamentId }: HoleStatsTabProps) {
               {summary.totalBirdies}
             </div>
             <div className="text-[10px] text-muted-foreground">{summary.totalEagles} eagles</div>
-          </div>
-          <div className="bg-card rounded-xl border border-border p-3 text-center">
+          </motion.div>
+          <motion.div
+            className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/30 p-3 text-center"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, duration: 0.3 }}
+          >
             <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground mb-1">
               Bogeys
             </div>
             <div className="text-lg font-bold text-orange-500 score-mono">
               {summary.totalBogeys}
             </div>
-          </div>
+          </motion.div>
         </div>
       )}
 
@@ -297,7 +318,7 @@ export function HoleStatsTab({ tournamentId }: HoleStatsTabProps) {
         {processedHoles.map((hole, idx) => (
           <motion.div
             key={hole.holeNumber}
-            className="bg-card rounded-xl border border-border p-3"
+            className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/30 p-3"
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.02, duration: 0.25 }}
@@ -331,7 +352,7 @@ export function HoleStatsTab({ tournamentId }: HoleStatsTabProps) {
                       <div
                         className={cn(
                           "absolute top-0 h-full rounded-full",
-                          hole.avgDiff > 0 ? "bg-red-400 left-1/2" : "bg-green-400 right-1/2"
+                          hole.avgDiff > 0 ? "bg-destructive/60 left-1/2" : "bg-green-400 right-1/2"
                         )}
                         style={{
                           width: `${Math.min(Math.abs(hole.avgDiff) * 50, 50)}%`,
@@ -352,7 +373,7 @@ export function HoleStatsTab({ tournamentId }: HoleStatsTabProps) {
               {/* Difficulty indicator */}
               <div className="shrink-0 text-right">
                 {hole.avgDiff > 0 ? (
-                  <div className="flex items-center gap-0.5 text-red-500">
+                  <div className="flex items-center gap-0.5 text-destructive">
                     <TrendingUp className="w-3.5 h-3.5" />
                     <span className="score-mono text-xs font-semibold">+{hole.avgDiff.toFixed(2)}</span>
                   </div>

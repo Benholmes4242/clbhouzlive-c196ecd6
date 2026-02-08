@@ -7,6 +7,7 @@
  * - Field statistics (birdies, eagles, bogeys distribution)
  * - Final top 10 compact table
  * - Live round summary (for live tournaments)
+ * - Glassmorphic card treatment
  * - Empty state for upcoming
  */
 
@@ -100,14 +101,14 @@ function WinnerCard({ winner, runnerUp, headshotMap }: {
 
   return (
     <motion.div
-      className="bg-card rounded-2xl border border-amber-200 shadow-sm overflow-hidden"
-      style={{ background: 'linear-gradient(135deg, hsl(var(--card)) 60%, #FFFDF5 100%)' }}
+      className="bg-card/80 backdrop-blur-sm rounded-2xl border border-amber-200/60 shadow-sm overflow-hidden"
+      style={{ background: 'linear-gradient(135deg, hsl(var(--card) / 0.85) 60%, rgba(255, 253, 245, 0.6) 100%)' }}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-amber-100">
-        <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-amber-100/40">
+        <div className="w-8 h-8 rounded-lg bg-amber-50/80 flex items-center justify-center">
           <Trophy className="w-4 h-4 text-amber-600" />
         </div>
         <h3 className="font-semibold text-foreground">Champion</h3>
@@ -143,7 +144,7 @@ function WinnerCard({ winner, runnerUp, headshotMap }: {
         </div>
 
         {/* Stats row */}
-        <div className="flex flex-wrap gap-3 mt-4 pt-3 border-t border-border/50">
+        <div className="flex flex-wrap gap-3 mt-4 pt-3 border-t border-border/30">
           {/* Round scores */}
           {[winner.round_1, winner.round_2, winner.round_3, winner.round_4].some(Boolean) && (
             <div className="flex items-center gap-1.5">
@@ -220,12 +221,12 @@ export function SummaryTab({
       {/* Round-by-round scoring summary */}
       {scoringStats && scoringStats.rounds.length > 0 && (
         <motion.div
-          className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden"
+          className="bg-card/80 backdrop-blur-sm rounded-2xl border border-border/30 shadow-sm overflow-hidden"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.4 }}
         >
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-border/60">
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-border/20">
             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
               <TrendingUp className="w-4 h-4 text-primary" />
             </div>
@@ -233,7 +234,7 @@ export function SummaryTab({
           </div>
 
           {/* Column headers */}
-          <div className="grid grid-cols-5 gap-2 px-4 py-2 border-b border-border/30 bg-muted/20">
+          <div className="grid grid-cols-5 gap-2 px-4 py-2 border-b border-border/20 bg-muted/20">
             <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Round</span>
             <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground text-center">Low</span>
             <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground text-center">Avg</span>
@@ -241,7 +242,7 @@ export function SummaryTab({
             <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground text-center">Bogeys</span>
           </div>
 
-          <div className="divide-y divide-border/30">
+          <div className="divide-y divide-border/20">
             {scoringStats.rounds.map(round => (
               <div key={round.round} className="grid grid-cols-5 gap-2 px-4 py-2.5 items-center">
                 <span className="text-sm font-semibold text-foreground">R{round.round}</span>
@@ -258,12 +259,12 @@ export function SummaryTab({
       {/* Field statistics */}
       {scoringStats && (
         <motion.div
-          className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden"
+          className="bg-card/80 backdrop-blur-sm rounded-2xl border border-border/30 shadow-sm overflow-hidden"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.4 }}
         >
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-border/60">
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-border/20">
             <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
               <Award className="w-4 h-4 text-muted-foreground" />
             </div>
@@ -280,9 +281,9 @@ export function SummaryTab({
               const segments = [
                 { label: 'Eagles', count: t.eagles, color: 'bg-amber-400', pct: (t.eagles / total * 100).toFixed(1) },
                 { label: 'Birdies', count: t.birdies, color: 'bg-green-500', pct: (t.birdies / total * 100).toFixed(1) },
-                { label: 'Pars', count: t.pars, color: 'bg-slate-300', pct: (t.pars / total * 100).toFixed(1) },
+                { label: 'Pars', count: t.pars, color: 'bg-muted-foreground/30', pct: (t.pars / total * 100).toFixed(1) },
                 { label: 'Bogeys', count: t.bogeys, color: 'bg-orange-400', pct: (t.bogeys / total * 100).toFixed(1) },
-                { label: 'Double+', count: t.doubleBogeys, color: 'bg-red-500', pct: (t.doubleBogeys / total * 100).toFixed(1) },
+                { label: 'Double+', count: t.doubleBogeys, color: 'bg-destructive', pct: (t.doubleBogeys / total * 100).toFixed(1) },
               ];
 
               return (
@@ -315,28 +316,31 @@ export function SummaryTab({
       {/* Final Top 10 (completed) */}
       {isCompleted && top10.length > 0 && (
         <motion.div
-          className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden"
+          className="bg-card/80 backdrop-blur-sm rounded-2xl border border-border/30 shadow-sm overflow-hidden"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.4 }}
         >
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-border/60">
-            <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-border/20">
+            <div className="w-8 h-8 rounded-lg bg-amber-50/80 flex items-center justify-center">
               <Trophy className="w-4 h-4 text-amber-600" />
             </div>
             <h3 className="font-semibold text-foreground">Final Top 10</h3>
           </div>
 
-          <div className="divide-y divide-border/30">
+          <div className="divide-y divide-border/20">
             {top10.map((entry: any, idx: number) => {
               const isWinner = entry.position === 1;
               return (
-                <div
+                <motion.div
                   key={entry.id}
                   className={cn(
                     "flex items-center gap-3 px-4 py-2.5",
-                    isWinner && "bg-amber-50/30"
+                    isWinner && "bg-amber-50/20"
                   )}
+                  initial={{ opacity: 0, x: -4 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 + idx * 0.03, duration: 0.25 }}
                 >
                   <span className={cn(
                     "w-7 text-center text-xs font-bold score-mono",
@@ -360,7 +364,7 @@ export function SummaryTab({
                       ${(entry.money / 1000).toFixed(0)}K
                     </span>
                   )}
-                </div>
+                </motion.div>
               );
             })}
           </div>
@@ -370,12 +374,12 @@ export function SummaryTab({
       {/* Live round summary */}
       {isLive && !isCompleted && scoringStats && scoringStats.rounds.length > 0 && (
         <motion.div
-          className="bg-card rounded-2xl border border-emerald-100 shadow-sm overflow-hidden"
+          className="bg-card/80 backdrop-blur-sm rounded-2xl border border-emerald-200/40 shadow-sm overflow-hidden"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.4 }}
         >
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-emerald-100">
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-emerald-100/30">
             <div className="flex items-center gap-1.5">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
