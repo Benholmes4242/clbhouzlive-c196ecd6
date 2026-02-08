@@ -19,16 +19,16 @@ export const JourneyInsightCard: React.FC<JourneyInsightCardProps> = ({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="mx-4 my-4 px-5 py-5 rounded-sq-lg bg-gradient-to-br from-slate-50 to-slate-100/80 border border-slate-200/60 shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
+      className="mx-4 my-4 px-5 py-5 rounded-sq-lg bg-gradient-to-br from-muted/50 to-muted/80 border border-border/60 shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
     >
       {/* Subtle accent line */}
       <div className="w-8 h-0.5 bg-amber-400/60 rounded-full mb-3" />
       
-      <p className="text-[15px] font-semibold text-slate-800 leading-relaxed">
+      <p className="text-[15px] font-semibold text-foreground leading-relaxed">
         {insight}
       </p>
       {subtext && (
-        <p className="mt-1.5 text-sm text-slate-500">
+        <p className="mt-1.5 text-sm text-muted-foreground">
           {subtext}
         </p>
       )}

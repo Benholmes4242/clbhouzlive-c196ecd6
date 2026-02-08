@@ -28,7 +28,7 @@ const TOKEN_HEIGHT = TOKEN_SIZE * 1.05; // SquircleAvatar uses aspectRatio: 1 / 
 const TOKEN_LABEL_HEIGHT = 22;
 const SQUIRCLE_RADIUS = '34%'; // SDS squircle border-radius
 const SQUIRCLE_RADIUS_PERCENT = 0.34; // Numeric version for SVG calculations
-const RING_TRACK_COLOR = 'rgba(15,23,42,0.12)';
+const RING_TRACK_COLOR = 'hsl(var(--border))';
 
 /**
  * Calculate the perimeter of a rounded rectangle (squircle with border-radius)
@@ -107,12 +107,12 @@ export const Top100ListMilestoneRail: React.FC<Top100ListMilestoneRailProps> = (
     <section>
       {/* Header - small caps styling with animated arrow */}
       <div className="px-4 flex items-center justify-between mb-4">
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-400">
+        <h2 className="text-[11px] font-semibold uppercase tracking-[0.1em] text-muted-foreground/60">
           Your Milestones
         </h2>
         <motion.button
           onClick={handleTileClick}
-          className="text-[11px] font-medium text-slate-400 hover:text-slate-600 transition-colors flex items-center gap-0.5 group"
+          className="text-[11px] font-medium text-muted-foreground/60 hover:text-muted-foreground transition-colors flex items-center gap-0.5 group py-2 px-2 -mr-2 rounded-lg active:scale-[0.97]"
           whileHover={{ x: 2 }}
         >
           See all
@@ -157,7 +157,7 @@ export const Top100ListMilestoneRail: React.FC<Top100ListMilestoneRailProps> = (
         <div 
           className="absolute right-0 top-0 bottom-2 w-10 pointer-events-none"
           style={{
-            background: 'linear-gradient(to right, transparent, rgba(248,250,252,0.95))',
+            background: 'linear-gradient(to right, transparent, hsl(var(--background) / 0.95))',
           }}
         />
       </div>
@@ -332,11 +332,7 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
             {showCompletionHero ? (
               <Trophy className="w-6 h-6" style={{ color: theme.ringColor }} />
             ) : (
-              <span className={`text-xl font-bold ${
-                isNextUp 
-                  ? 'text-slate-800' 
-                  : 'text-slate-700'
-              }`}>
+              <span className={`text-xl font-bold text-foreground`}>
                 {threshold}
               </span>
             )}
@@ -349,10 +345,10 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
         showCompletionHero
           ? 'text-amber-700/80'
           : isNextUp 
-            ? 'text-slate-600' 
+            ? 'text-muted-foreground' 
             : isUnlocked 
-              ? 'text-slate-500' 
-              : 'text-slate-400'
+              ? 'text-muted-foreground' 
+              : 'text-muted-foreground/50'
       }`}>
         {isNextUp && aspirationalCopy
           ? aspirationalCopy
@@ -411,21 +407,21 @@ const GhostTile: React.FC<GhostTileProps> = ({ onClick }) => {
           width: TOKEN_SIZE, 
           height: TOKEN_HEIGHT,
           borderRadius: SQUIRCLE_RADIUS,
-          border: `2px solid ${RING_TRACK_COLOR}`,
+          border: `2px solid hsl(var(--border))`,
           boxSizing: 'border-box',
-          background: 'rgba(255,255,255,0.6)',
+          background: 'hsl(var(--card) / 0.6)',
         }}
       >
         {/* Padlock icon in center */}
-        <GiPadlock className="w-5 h-5 text-slate-400" />
+        <GiPadlock className="w-5 h-5 text-muted-foreground/50" />
       </div>
 
       {/* Copy below token */}
       <div className="flex flex-col items-center mt-1">
-        <span className="text-[10px] font-medium text-slate-500">
+        <span className="text-[10px] font-medium text-muted-foreground">
           More ahead
         </span>
-        <span className="text-[9px] text-slate-400">
+        <span className="text-[9px] text-muted-foreground/50">
           Keep going
         </span>
       </div>

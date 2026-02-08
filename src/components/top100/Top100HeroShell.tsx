@@ -52,7 +52,7 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
     <>
       {/* HERO IMAGE SECTION - full-bleed immersive, extends behind notch */}
       <div 
-        className="relative overflow-hidden bg-slate-50"
+        className="relative overflow-hidden bg-background"
         style={{
           height: 'calc(16rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
           marginTop: 0,
@@ -63,7 +63,7 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
             <>
               {/* Blur placeholder while loading */}
               <div 
-                className={`absolute inset-0 bg-slate-700 transition-opacity duration-500 ${
+                className={`absolute inset-0 bg-foreground/70 transition-opacity duration-500 ${
                   imageLoaded ? 'opacity-0' : 'opacity-100'
                 }`}
               />
@@ -86,14 +86,14 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
               <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
             </>
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-slate-700 to-slate-900" />
+            <div className="w-full h-full bg-gradient-to-br from-foreground/70 to-foreground" />
           )}
           
-          {/* Glass back button - positioned below safe area */}
+          {/* Glass back button - positioned below safe area, 44px tap target */}
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-10"
+            className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 active:scale-[0.92] transition-all z-10"
             style={{ top: 'calc(1rem + max(env(safe-area-inset-top, 0px), 47px))' }}
             aria-label="Back"
           >
@@ -113,21 +113,21 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
           </motion.div>
       </div>
 
-      {/* PROGRESS SECTION - on page background with slate text */}
+      {/* PROGRESS SECTION - on page background with semantic text */}
       {showProgress && (
-        <div className="w-full px-4 py-4 bg-slate-50">
+        <div className="w-full px-4 py-4 bg-muted/30">
           {/* Top row: X / total (primary) + % complete (secondary) */}
           <div className="flex items-baseline justify-between gap-4">
-            <div className="text-slate-800">
+            <div className="text-foreground">
               <AnimatedNumber 
                 value={playedCount}
                 minCh={1}
                 className="text-3xl font-semibold leading-none tabular-nums"
               />
-              <span className="text-slate-500 text-lg ml-0.5 font-light">/{totalCount}</span>
+              <span className="text-muted-foreground text-lg ml-0.5 font-light">/{totalCount}</span>
             </div>
 
-            <div className="flex items-baseline gap-1.5 text-slate-800">
+            <div className="flex items-baseline gap-1.5 text-foreground">
               <AnimatedNumber 
                 value={Math.round(percent)}
                 suffix="%"
@@ -135,7 +135,7 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
                 delay={0.1}
                 className="text-lg font-semibold tabular-nums"
               />
-              <span className="text-[11px] text-slate-500 font-medium">
+              <span className="text-[11px] text-muted-foreground font-medium">
                 complete
               </span>
             </div>
@@ -143,7 +143,14 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
 
           {/* Progress bar - uses regional accent color with glow */}
           <div className="mt-2.5">
-            <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
+            <div 
+              className="h-2 w-full bg-muted rounded-full overflow-hidden"
+              role="progressbar"
+              aria-valuenow={Math.round(percent)}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={`${playedCount} of ${totalCount} courses complete`}
+            >
               <motion.div
                 className="h-full rounded-full"
                 initial={{ width: 0 }}
