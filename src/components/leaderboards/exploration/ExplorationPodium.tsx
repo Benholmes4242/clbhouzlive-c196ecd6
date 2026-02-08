@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Plane, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ExplorationLeaderboardEntry, ExplorationMetric } from '@/types/leaderboards';
@@ -134,10 +135,10 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
       {/* Airplane with clouds and jet stream - positioned above podium */}
       <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
         {/* Cloud elements - spaced out around plane */}
-        <div className="absolute -left-6 top-0 w-4 h-2.5 bg-slate-200/80 rounded-full blur-[2px]" />
-        <div className="absolute -left-3 top-4 w-3 h-2 bg-slate-300/60 rounded-full blur-[1px]" />
-        <div className="absolute right-7 top--1 w-3 h-2 bg-slate-200/70 rounded-full blur-[2px]" />
-        <div className="absolute right-4 top-3 w-2.5 h-1.5 bg-slate-300/50 rounded-full blur-[1px]" />
+        <div className="absolute -left-6 top-0 w-4 h-2.5 bg-muted/80 rounded-full blur-[2px]" />
+        <div className="absolute -left-3 top-4 w-3 h-2 bg-muted-foreground/20 rounded-full blur-[1px]" />
+        <div className="absolute right-7 top--1 w-3 h-2 bg-muted/70 rounded-full blur-[2px]" />
+        <div className="absolute right-4 top-3 w-2.5 h-1.5 bg-muted-foreground/15 rounded-full blur-[1px]" />
         
         {/* Jet stream trails - behind plane */}
         <div 
@@ -183,10 +184,14 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
           const avatarFallback = entry.display_name?.charAt(0) || '?';
 
           return (
-            <Link
+            <motion.div
               key={entry.user_id}
+              whileTap={{ scale: 0.97 }}
+              className="flex-1"
+            >
+            <Link
               to={`/profile/${entry.user_id}`}
-              className="flex flex-col items-center flex-1"
+              className="flex flex-col items-center"
             >
               {/* Position badge (above avatar for 2nd and 3rd) */}
               {position !== 1 && (
@@ -308,7 +313,7 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
                       </span>
                     ))}
                     {entry.continent_list.length > 3 && (
-                      <span className="text-[8px] text-slate-400">
+                      <span className="text-[8px] text-muted-foreground">
                         +{entry.continent_list.length - 3}
                       </span>
                     )}
@@ -316,6 +321,7 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
                 )}
               </div>
             </Link>
+            </motion.div>
           );
         })}
       </div>

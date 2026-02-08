@@ -232,10 +232,10 @@ const COLORS = {
   playedFillHover: '#7A8C68',
   playedStroke: '#FFFFFF',
   playedOpacity: 1,
-  notPlayedFill: '#E5E7EB',
-  notPlayedStroke: '#D1D5DB',
+  notPlayedFill: 'hsl(var(--muted))',
+  notPlayedStroke: 'hsl(var(--border))',
   notPlayedOpacity: 0.45,
-  disabledFill: '#9CA3AF',
+  disabledFill: 'hsl(var(--muted-foreground))',
   disabledStroke: 'transparent',
   disabledOpacity: 0.25,
   // Countries view: slightly more saturated for individual countries

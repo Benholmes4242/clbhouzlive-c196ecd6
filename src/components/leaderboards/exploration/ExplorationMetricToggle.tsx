@@ -20,16 +20,16 @@ export function ExplorationMetricToggle({
 }: ExplorationMetricToggleProps) {
   return (
     <div className="flex justify-center">
-      <div className="inline-flex bg-gray-100 rounded-full p-0.5">
+      <div className="inline-flex bg-muted rounded-full p-0.5">
         {metricOptions.map((option) => (
           <button
             key={option.id}
             onClick={() => onChange(option.id)}
             className={cn(
-              'px-4 py-1.5 text-xs font-medium rounded-full transition-all duration-200 ease-out whitespace-nowrap',
+              'px-4 py-2 text-xs font-medium rounded-full transition-all duration-200 ease-out whitespace-nowrap active:scale-[0.97] transition-transform',
               value === option.id 
-                ? 'bg-white text-gray-900 shadow-sm' 
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-card text-foreground shadow-sm' 
+                : 'text-muted-foreground hover:text-foreground'
             )}
           >
             {option.label}
