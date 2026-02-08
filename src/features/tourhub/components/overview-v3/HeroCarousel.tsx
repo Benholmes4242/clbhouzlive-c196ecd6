@@ -77,6 +77,8 @@ interface LeaderboardRowProps {
 
 function MiniLeaderboardRow({ leader, isFirst }: LeaderboardRowProps) {
   const abbreviatedName = `${leader.player.firstName[0]}. ${leader.player.lastName}`;
+  const photoUrl = resolvePhotoUrl(leader.player.photoUrl ?? null, null);
+  const initials = `${leader.player.firstName[0]}${leader.player.lastName[0]}`.toUpperCase();
   
   return (
     <div className={cn("leaderboard-row flex items-center justify-between", !isFirst && "border-t border-white/[0.04]")}>
@@ -84,7 +86,22 @@ function MiniLeaderboardRow({ leader, isFirst }: LeaderboardRowProps) {
         <span className="leaderboard-position flex-shrink-0">
           {leader.position}
         </span>
-        <span className="leaderboard-name truncate">
+        {/* Player headshot - tiny 20px circle */}
+        <div className="w-5 h-5 rounded-full overflow-hidden flex-shrink-0 border border-white/10">
+          {photoUrl ? (
+            <img
+              src={photoUrl}
+              alt={abbreviatedName}
+              className="w-full h-full object-cover object-top"
+              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-white/10">
+              <span style={{ fontSize: '7px', fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>{initials}</span>
+            </div>
+          )}
+        </div>
+        <span className={cn("leaderboard-name truncate", isFirst && "font-bold")}>
           {abbreviatedName}
         </span>
       </div>
@@ -436,13 +453,13 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   const touchStartRef = React.useRef<{ x: number; y: number; time: number } | null>(null);
   const touchMoveRef = React.useRef<number>(0);
 
-  // Auto-advance every 6 seconds
+  // Auto-advance every 8 seconds (spec: 8s idle, 5s resume after touch)
   useEffect(() => {
     if (slides.length <= 1 || isPaused) return;
     
     const interval = setInterval(() => {
       setCurrentIndex(prev => (prev + 1) % slides.length);
-    }, 6000);
+    }, 8000);
 
     return () => clearInterval(interval);
   }, [slides.length, isPaused]);
@@ -484,8 +501,8 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     touchStartRef.current = null;
     touchMoveRef.current = 0;
     
-    // Resume auto-advance after 6s
-    setTimeout(() => setIsPaused(false), 6000);
+    // Resume auto-advance after 5s (spec: 5s after last interaction)
+    setTimeout(() => setIsPaused(false), 5000);
   };
 
   if (isLoading) {
