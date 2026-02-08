@@ -45,7 +45,7 @@ export function LeaderboardRow({
     <Link
       to={`/profile/${userId}`}
       className={cn(
-        'w-full py-3 flex items-center gap-3 transition-colors relative',
+        'w-full py-3 flex items-center gap-3 transition-colors transition-transform relative active:scale-[0.98]',
         isCurrentUser && 'bg-primary/5 pl-3 pr-4',
         !isCurrentUser && 'px-4',
         'hover:bg-muted/20 active:bg-muted/30'

@@ -41,17 +41,17 @@ export function GlobalGolfersMapStatsRow({
           "rounded-2xl px-4 py-3 text-left transition-all duration-200",
           "active:scale-[0.98] cursor-pointer",
           isContinentsActive
-            ? "bg-white border-2 border-[#8B9D77] shadow-md"
-            : "bg-white/80 border border-zinc-200/50 shadow-sm"
+            ? "bg-card border-2 border-[#8B9D77] shadow-md"
+            : "bg-card/80 border border-border/50 shadow-sm"
         )}
       >
-        <div className="text-sm font-semibold text-zinc-800">Continents</div>
-        <div className="mt-1 text-xs text-zinc-500">
+        <div className="text-sm font-semibold text-foreground">Continents</div>
+        <div className="mt-1 text-xs text-muted-foreground">
           {continentsPlayed} of {continentsTotal} completed
         </div>
         
         {/* Progress Bar */}
-        <div className="mt-2 h-2 w-full rounded-full bg-zinc-200 overflow-hidden">
+        <div className="mt-2 h-2 w-full rounded-full bg-muted overflow-hidden">
           <div
             className="h-full rounded-full bg-[#8B9D77] transition-all duration-300"
             style={{ width: `${progressPct}%` }}
@@ -68,12 +68,12 @@ export function GlobalGolfersMapStatsRow({
           "rounded-2xl px-4 py-3 text-left transition-all duration-200",
           "active:scale-[0.98] cursor-pointer",
           isCountriesActive
-            ? "bg-white border-2 border-[#8B9D77] shadow-md"
-            : "bg-white/80 border border-zinc-200/50 shadow-sm"
+            ? "bg-card border-2 border-[#8B9D77] shadow-md"
+            : "bg-card/80 border border-border/50 shadow-sm"
         )}
       >
-        <div className="text-sm font-semibold text-zinc-800">Countries</div>
-        <div className="mt-1 text-xs text-zinc-500">
+        <div className="text-sm font-semibold text-foreground">Countries</div>
+        <div className="mt-1 text-xs text-muted-foreground">
           {countriesPlayed} explored
         </div>
       </button>

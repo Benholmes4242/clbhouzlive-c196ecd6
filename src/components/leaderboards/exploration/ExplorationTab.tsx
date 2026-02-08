@@ -125,7 +125,7 @@ export function ExplorationTab() {
       case 3:
         return 'text-[#8B7355]';
       default:
-        return 'text-[#14B8A6]';
+        return 'text-foreground';
     }
   };
 
@@ -231,7 +231,7 @@ export function ExplorationTab() {
           )}
 
           {/* End indicator */}
-          <p className="text-center text-sm text-gray-400 py-4">
+          <p className="text-center text-sm text-muted-foreground py-4">
             You've reached the end
           </p>
         </>
@@ -242,9 +242,9 @@ export function ExplorationTab() {
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         className={cn(
           "fixed bottom-24 right-4 z-40 w-12 h-12 rounded-full",
-          "bg-gray-700 text-white shadow-lg",
+          "bg-foreground/80 text-background shadow-lg backdrop-blur-sm",
           "flex items-center justify-center",
-          "transition-all duration-300 ease-out",
+          "transition-all duration-300 ease-out active:scale-[0.95]",
           showScrollTop 
             ? "opacity-100 translate-y-0" 
             : "opacity-0 translate-y-4 pointer-events-none"
