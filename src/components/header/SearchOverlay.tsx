@@ -206,7 +206,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
       transition={{ duration: 0.2 }}
       className="fixed inset-0 z-[80] flex flex-col min-h-0 h-full"
       style={{
-        background: useLightTheme ? 'rgba(248, 250, 252, 0.98)' : 'rgba(10, 10, 10, 0.98)',
+        background: useLightTheme ? 'hsl(var(--background) / 0.98)' : 'rgba(10, 10, 10, 0.98)',
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
         paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
@@ -215,18 +215,18 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
       {/* Search bar at top - Enhanced */}
       <div className={cn(
         "flex-shrink-0 px-4 pt-4 pb-3 border-b",
-        useLightTheme ? "border-slate-200/60" : "border-white/6"
+        useLightTheme ? "border-border/60" : "border-white/6"
       )}>
         <div className="max-w-2xl mx-auto">
           <div className={cn(
             "relative flex items-center gap-3 h-12 px-4 rounded-xl border transition-all",
             useLightTheme 
-              ? "bg-slate-50 border-slate-200 focus-within:border-slate-300 focus-within:bg-white focus-within:ring-2 focus-within:ring-slate-300/50" 
+              ? "bg-muted/50 border-border focus-within:border-border/80 focus-within:bg-background focus-within:ring-2 focus-within:ring-ring/30" 
               : "bg-white/8 border-white/10 focus-within:border-white/20 focus-within:ring-2 focus-within:ring-white/10"
           )}>
             <Search className={cn(
               "h-5 w-5 flex-shrink-0",
-              useLightTheme ? "text-slate-400" : "text-white/50"
+              useLightTheme ? "text-muted-foreground/60" : "text-white/50"
             )} />
             <input
               ref={inputRef}
@@ -241,7 +241,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
               className={cn(
                 "flex-1 bg-transparent border-none outline-none text-base",
                 useLightTheme 
-                  ? "text-slate-800 placeholder:text-slate-400" 
+                  ? "text-foreground placeholder:text-muted-foreground/60" 
                   : "text-white placeholder:text-white/40"
               )}
               autoComplete="off"
@@ -252,13 +252,13 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                 onClick={() => setQuery('')}
                 className={cn(
                   "flex-shrink-0 p-2.5 rounded-full transition-all active:scale-[0.9]",
-                  useLightTheme ? "hover:bg-slate-100 bg-slate-200/50" : "hover:bg-white/15 bg-white/10"
+                  useLightTheme ? "hover:bg-muted bg-muted/50" : "hover:bg-white/15 bg-white/10"
                 )}
                 aria-label="Clear search"
               >
                 <X className={cn(
                   "h-3.5 w-3.5",
-                  useLightTheme ? "text-slate-500" : "text-white/60"
+                  useLightTheme ? "text-muted-foreground" : "text-white/60"
                 )} />
               </button>
             )}
@@ -267,7 +267,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
               className={cn(
                 "flex-shrink-0 px-3 py-3 text-sm font-medium rounded-full transition-all active:scale-[0.97]",
                 useLightTheme 
-                  ? "text-slate-500 hover:text-slate-700 hover:bg-slate-100" 
+                  ? "text-muted-foreground hover:text-foreground hover:bg-muted" 
                   : "text-white/50 hover:text-white/70 hover:bg-white/10"
               )}
             >
@@ -278,7 +278,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
           {!query && (
             <p className={cn(
               "text-xs mt-2 px-1",
-              useLightTheme ? "text-slate-400" : "text-white/30"
+              useLightTheme ? "text-muted-foreground/60" : "text-white/30"
             )}>
               Try "Pebble Beach", "@username", or "Augusta"
             </p>
@@ -300,16 +300,16 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                 <div key={i} className="flex items-center gap-4 p-3 rounded-sq-md animate-pulse">
                   <div className={cn(
                     "w-10 h-10 rounded-full",
-                    useLightTheme ? "bg-slate-200" : "bg-white/10"
+                    useLightTheme ? "bg-muted" : "bg-white/10"
                   )} />
                   <div className="flex-1 space-y-2">
                     <div className={cn(
                       "w-32 h-4 rounded",
-                      useLightTheme ? "bg-slate-200" : "bg-white/10"
+                      useLightTheme ? "bg-muted" : "bg-white/10"
                     )} />
                     <div className={cn(
                       "w-24 h-3 rounded",
-                      useLightTheme ? "bg-slate-100" : "bg-white/5"
+                      useLightTheme ? "bg-muted/50" : "bg-white/5"
                     )} />
                   </div>
                 </div>
@@ -322,20 +322,20 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
             <div className="py-16 text-center px-6">
               <div className={cn(
                 "w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center",
-                useLightTheme ? "bg-slate-100" : "bg-white/5"
+                useLightTheme ? "bg-muted" : "bg-white/5"
               )}>
                 <Search className={cn(
                   "h-10 w-10",
-                  useLightTheme ? "text-slate-300" : "text-white/20"
+                  useLightTheme ? "text-muted-foreground/30" : "text-white/20"
                 )} />
               </div>
               <h3 className={cn(
                 "text-lg font-semibold mb-2",
-                useLightTheme ? "text-slate-800" : "text-white"
+                useLightTheme ? "text-foreground" : "text-white"
               )}>No results found</h3>
               <p className={cn(
                 "text-sm max-w-sm mx-auto",
-                useLightTheme ? "text-slate-500" : "text-white/50"
+                useLightTheme ? "text-muted-foreground" : "text-white/50"
               )}>
                 We couldn't find any matches for "{query}". Try searching for a different course, player, or business.
               </p>
@@ -343,7 +343,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
               <div className="mt-6 space-y-2">
                 <p className={cn(
                   "text-xs font-semibold uppercase tracking-wide",
-                  useLightTheme ? "text-slate-500" : "text-white/40"
+                  useLightTheme ? "text-muted-foreground" : "text-white/40"
                 )}>Try searching for:</p>
                 <div className="flex flex-wrap gap-2 justify-center">
                   {['Pebble Beach', 'St Andrews', 'Augusta'].map(term => (
@@ -353,7 +353,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                       className={cn(
                         "px-3 py-1.5 rounded-full text-sm transition-colors",
                         useLightTheme 
-                          ? "bg-slate-100 hover:bg-slate-200 text-slate-700"
+                          ? "bg-muted hover:bg-muted/80 text-foreground"
                           : "bg-white/10 hover:bg-white/15 text-white/70"
                       )}
                     >
@@ -374,7 +374,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                   <div className={cn(
                     "flex items-center gap-2.5 px-3 py-2.5 mb-1 sticky top-0 z-[2] backdrop-blur-md rounded-lg",
                     useLightTheme 
-                      ? "bg-[rgba(248,250,252,0.95)]" 
+                      ? "bg-background/95" 
                       : "bg-[rgba(10,10,10,0.95)]"
                   )}>
                     <div className={cn(
@@ -388,7 +388,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                     </div>
                     <span className={cn(
                       "text-xs font-bold uppercase tracking-wide",
-                      useLightTheme ? "text-slate-700" : "text-white/70"
+                      useLightTheme ? "text-foreground" : "text-white/70"
                     )}>People</span>
                   </div>
                   <div className="space-y-1">
@@ -413,7 +413,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                   <div className={cn(
                     "flex items-center gap-2.5 px-3 py-2.5 mb-1 sticky top-0 z-[2] backdrop-blur-md rounded-lg",
                     useLightTheme 
-                      ? "bg-[rgba(248,250,252,0.95)]" 
+                      ? "bg-background/95" 
                       : "bg-[rgba(10,10,10,0.95)]"
                   )}>
                     <div className={cn(
@@ -427,7 +427,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                     </div>
                     <span className={cn(
                       "text-xs font-bold uppercase tracking-wide",
-                      useLightTheme ? "text-slate-700" : "text-white/70"
+                      useLightTheme ? "text-foreground" : "text-white/70"
                     )}>Clubs & Courses</span>
                   </div>
                   <div className="space-y-1">
@@ -452,7 +452,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                   <div className={cn(
                     "flex items-center gap-2.5 px-3 py-2.5 mb-1 sticky top-0 z-[2] backdrop-blur-md rounded-lg",
                     useLightTheme 
-                      ? "bg-[rgba(248,250,252,0.95)]" 
+                      ? "bg-background/95" 
                       : "bg-[rgba(10,10,10,0.95)]"
                   )}>
                     <div className={cn(
@@ -466,7 +466,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                     </div>
                     <span className={cn(
                       "text-xs font-bold uppercase tracking-wide",
-                      useLightTheme ? "text-slate-700" : "text-white/70"
+                      useLightTheme ? "text-foreground" : "text-white/70"
                     )}>Business Profiles</span>
                   </div>
                   <div className="space-y-1">
@@ -497,25 +497,23 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                     <div className="flex items-center gap-2.5">
                       <div className={cn(
                         "w-6 h-6 rounded-md flex items-center justify-center",
-                        useLightTheme ? "bg-slate-100" : "bg-white/10"
+                        useLightTheme ? "bg-muted" : "bg-white/10"
                       )}>
                         <Clock className={cn(
                           "h-3.5 w-3.5",
-                          useLightTheme ? "text-slate-500" : "text-white/50"
+                          useLightTheme ? "text-muted-foreground" : "text-white/50"
                         )} />
                       </div>
                       <span className={cn(
                         "text-xs font-bold uppercase tracking-wide",
-                        useLightTheme ? "text-slate-700" : "text-white/70"
+                        useLightTheme ? "text-foreground" : "text-white/70"
                       )}>Recent</span>
                     </div>
                     <button
                       onClick={clearRecentSearches}
                       className={cn(
                         "py-3 px-2 text-xs font-medium transition-all active:scale-[0.97]",
-                        useLightTheme 
-                          ? "text-primary hover:text-primary/80" 
-                          : "text-primary hover:text-primary/80"
+                        "text-primary hover:text-primary/80"
                       )}
                     >
                       Clear all
@@ -529,7 +527,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                         className={cn(
                           "px-4 py-2.5 text-sm font-medium rounded-full transition-all active:scale-[0.97]",
                           useLightTheme 
-                            ? "bg-slate-100 hover:bg-slate-200 text-slate-700 hover:shadow-sm" 
+                            ? "bg-muted hover:bg-muted/80 text-foreground hover:shadow-sm" 
                             : "bg-white/10 hover:bg-white/15 text-white/80"
                         )}
                       >
@@ -553,12 +551,12 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                       </div>
                       <span className={cn(
                         "text-xs font-bold uppercase tracking-wide",
-                        useLightTheme ? "text-slate-700" : "text-white/70"
+                        useLightTheme ? "text-foreground" : "text-white/70"
                       )}>Today's Picks</span>
                     </div>
                     <div className={cn(
                       "flex items-center gap-1 text-[10px]",
-                      useLightTheme ? "text-slate-400" : "text-white/30"
+                      useLightTheme ? "text-muted-foreground/60" : "text-white/30"
                     )}>
                       <RefreshCw className="w-2.5 h-2.5" />
                       <span>Updates daily</span>
@@ -646,8 +644,8 @@ const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, g
         };
       default:
         return {
-          gradient: useLightTheme ? 'from-slate-400 to-slate-500' : 'from-white/40 to-white/60',
-          badge: useLightTheme ? 'bg-slate-100 text-slate-600' : 'bg-white/10 text-white/60',
+          gradient: useLightTheme ? 'from-muted-foreground/40 to-muted-foreground/60' : 'from-white/40 to-white/60',
+          badge: useLightTheme ? 'bg-muted text-muted-foreground' : 'bg-white/10 text-white/60',
           label: ''
         };
     }
@@ -670,7 +668,7 @@ const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, g
       className={cn(
         "w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left group active:scale-[0.99] bg-transparent active:bg-white/5",
         useLightTheme 
-          ? isActive ? "bg-slate-100 ring-1 ring-slate-200" : "hover:bg-slate-50 active:bg-slate-100"
+          ? isActive ? "bg-muted ring-1 ring-border" : "hover:bg-muted/50 active:bg-muted"
           : isActive ? "bg-white/10 ring-1 ring-white/10" : ""
       )}
     >
@@ -679,7 +677,7 @@ const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, g
         <div className={cn(
           "w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden border-2 transition-colors",
           useLightTheme 
-            ? "bg-slate-100 border-slate-200 group-hover:border-slate-300" 
+            ? "bg-muted border-border group-hover:border-border/80" 
             : "bg-white/8 border-white/10 group-hover:border-white/20"
         )}>
           {item.image ? (
@@ -710,7 +708,7 @@ const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, g
           <div className={cn(
             "absolute bottom-[-4px] left-[-4px] w-5 h-5 rounded-full flex items-center justify-center border-2",
             useLightTheme 
-              ? "bg-purple-500 border-white" 
+              ? "bg-purple-500 border-background" 
               : "bg-purple-500 border-black/80"
           )}>
             <Building className="w-2.5 h-2.5 text-white" />
@@ -723,7 +721,7 @@ const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, g
         <div className={cn(
           "text-base font-semibold truncate transition-colors",
           useLightTheme 
-            ? "text-slate-800 group-hover:text-primary" 
+            ? "text-foreground group-hover:text-primary" 
             : "text-white group-hover:text-primary"
         )}>
           {highlightText(item.title)}
@@ -732,12 +730,12 @@ const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, g
           {item.type === 'course' && (
             <MapPin className={cn(
               "w-3 h-3 flex-shrink-0",
-              useLightTheme ? "text-slate-400" : "text-white/40"
+              useLightTheme ? "text-muted-foreground/50" : "text-white/40"
             )} />
           )}
           <span className={cn(
             "text-xs truncate",
-            useLightTheme ? "text-slate-500" : "text-white/50"
+            useLightTheme ? "text-muted-foreground" : "text-white/50"
           )}>{subtitleWithoutRanking}</span>
         </div>
       </div>
@@ -746,7 +744,7 @@ const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, g
       <ChevronRight className={cn(
         "h-5 w-5 flex-shrink-0 transition-colors",
         useLightTheme 
-          ? "text-slate-300 group-hover:text-slate-400" 
+          ? "text-muted-foreground/30 group-hover:text-muted-foreground/50" 
           : "text-white/20 group-hover:text-white/40"
       )} />
     </button>

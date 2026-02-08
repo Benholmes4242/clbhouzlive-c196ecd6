@@ -44,12 +44,12 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
           <div 
             className={cn(
               "h-7 w-7 animate-pulse rounded-lg",
-              useLightTheme ? "bg-slate-100" : "bg-white/10"
+              useLightTheme ? "bg-muted" : "bg-white/10"
             )} 
           />
           <div className={cn(
             "h-3 w-16 rounded animate-pulse",
-            useLightTheme ? "bg-slate-100" : "bg-white/10"
+            useLightTheme ? "bg-muted" : "bg-white/10"
           )} />
         </div>
       );
@@ -111,7 +111,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
             <span 
               className={cn(
                 "absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-orange-500",
-                useLightTheme ? "ring-[1.5px] ring-slate-50" : "ring-[1.5px] ring-black"
+                useLightTheme ? "ring-[1.5px] ring-background" : "ring-[1.5px] ring-black"
               )}
               aria-label="Unread notifications"
             />
@@ -122,7 +122,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
             <span 
               className={cn(
                 "absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-500",
-                useLightTheme ? "ring-[1.5px] ring-slate-50" : "ring-[1.5px] ring-black"
+                useLightTheme ? "ring-[1.5px] ring-background" : "ring-[1.5px] ring-black"
               )}
               aria-label="Unread messages"
             />
@@ -132,7 +132,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
         {/* Name */}
         <span className={cn(
           "text-sm font-medium truncate max-w-[120px] leading-none",
-          useLightTheme ? "text-slate-700" : "text-white"
+          useLightTheme ? "text-foreground" : "text-white"
         )}>
           {activeActor.name}
         </span>
@@ -141,7 +141,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
         <ChevronDown 
           className={cn(
             "h-3 w-3 flex-shrink-0 transition-transform duration-200",
-            useLightTheme ? "text-slate-400" : "text-white/50",
+            useLightTheme ? "text-muted-foreground" : "text-white/50",
             isOpen && "rotate-180"
           )} 
         />

@@ -235,24 +235,24 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
     ? headerHeight + 12 
     : headerHeight + (availableHeight - currentHeight) + dragOffset;
 
-  // Theme colors
+  // Theme colors — CSS variable–based, auto-resolves per theme
   const colors = {
     bg: useLightTheme 
-      ? 'linear-gradient(180deg, #F8FAFC 0%, #F8FAFC 100%)'
+      ? 'linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background)) 100%)'
       : 'linear-gradient(180deg, rgba(28,28,30,0.96) 0%, rgba(18,18,20,0.98) 100%)',
     shadow: useLightTheme
       ? '0 -8px 40px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.9)'
       : '0 -8px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06)',
-    border: useLightTheme ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)',
-    text: useLightTheme ? '#1a1a1a' : '#ffffff',
-    textMuted: useLightTheme ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)',
-    sectionLabel: useLightTheme ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.4)',
-    cardBg: useLightTheme ? '#ffffff' : 'rgba(255,255,255,0.05)',
-    cardBorder: useLightTheme ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)',
-    grabHandle: useLightTheme ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.25)',
-    closeBg: useLightTheme ? '#ffffff' : 'rgba(255,255,255,0.08)',
-    closeHover: useLightTheme ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.12)',
-    closeIcon: useLightTheme ? '#666' : '#999',
+    border: useLightTheme ? 'hsl(var(--border) / 0.3)' : 'rgba(255,255,255,0.06)',
+    text: 'hsl(var(--foreground))',
+    textMuted: 'hsl(var(--muted-foreground))',
+    sectionLabel: 'hsl(var(--muted-foreground) / 0.6)',
+    cardBg: useLightTheme ? 'hsl(var(--card))' : 'rgba(255,255,255,0.05)',
+    cardBorder: useLightTheme ? 'hsl(var(--border) / 0.3)' : 'rgba(255,255,255,0.06)',
+    grabHandle: useLightTheme ? 'rgba(0,0,0,0.20)' : 'rgba(255,255,255,0.30)',
+    closeBg: useLightTheme ? 'hsl(var(--card))' : 'rgba(255,255,255,0.08)',
+    closeHover: useLightTheme ? 'hsl(var(--muted))' : 'rgba(255,255,255,0.12)',
+    closeIcon: 'hsl(var(--muted-foreground))',
   };
 
   // Sheet content padding constant for alignment
@@ -316,7 +316,7 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
         <div className="flex flex-col items-center pt-2.5 pb-1">
           <div 
             className="w-9 h-1 rounded-full"
-            style={{ background: useLightTheme ? 'rgba(0,0,0,0.20)' : 'rgba(255,255,255,0.30)' }}
+            style={{ background: colors.grabHandle }}
           />
         </div>
 
@@ -357,10 +357,10 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
             </div>
           </div>
           
-          {/* Close button - glass circle */}
+          {/* Close button - glass circle with tap feedback */}
           <button
             onClick={handleClose}
-            className="w-11 h-11 rounded-full flex items-center justify-center transition-colors flex-shrink-0"
+            className="w-11 h-11 rounded-full flex items-center justify-center transition-all flex-shrink-0 active:scale-[0.95]"
             style={{
               background: colors.closeBg,
               border: `1px solid ${colors.cardBorder}`,
@@ -426,7 +426,7 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
                   padding: '10px 12px',
                   minWidth: 130,
                   background: colors.cardBg,
-                  border: `1.5px dashed ${useLightTheme ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.18)'}`,
+                  border: `1.5px dashed ${useLightTheme ? 'hsl(var(--border))' : 'rgba(255,255,255,0.18)'}`,
                   opacity: 0.85,
                   borderRadius: 14,
                 }}
@@ -525,9 +525,9 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
                 onClick={() => setShowLogoutConfirm(true)}
                 className="w-full flex items-center gap-4 px-4 py-4 rounded-[14px] transition-all active:scale-[0.98]"
                 style={{
-                  background: 'rgba(255, 91, 91, 0.06)',
-                  border: '1px solid rgba(255, 91, 91, 0.14)',
-                  color: '#ef4444',
+                  background: 'hsl(0 84% 60% / 0.06)',
+                  border: '1px solid hsl(0 84% 60% / 0.14)',
+                  color: 'hsl(0 84% 60%)',
                 }}
               >
                 <LogOut className="w-5 h-5" />
@@ -540,9 +540,9 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
                     onClick={() => setShowLogoutConfirm(false)}
                     className="flex-1 py-3 rounded-[14px] text-sm font-medium active:scale-[0.97] transition-transform"
                     style={{
-                      background: useLightTheme ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.06)',
-                      border: `1px solid ${useLightTheme ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)'}`,
-                      color: useLightTheme ? '#1a1a1a' : '#ffffff',
+                      background: useLightTheme ? 'hsl(var(--muted) / 0.5)' : 'rgba(255,255,255,0.06)',
+                      border: `1px solid ${useLightTheme ? 'hsl(var(--border) / 0.3)' : 'rgba(255,255,255,0.06)'}`,
+                      color: 'hsl(var(--foreground))',
                     }}
                   >
                     Cancel
@@ -551,9 +551,9 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
                     onClick={() => handleNavigate('/logout')}
                     className="flex-1 py-3 rounded-[14px] text-sm font-medium active:scale-[0.97] transition-transform"
                     style={{
-                      background: 'rgba(255, 91, 91, 0.12)',
-                      border: '1px solid rgba(255, 91, 91, 0.2)',
-                      color: '#ef4444',
+                      background: 'hsl(0 84% 60% / 0.12)',
+                      border: '1px solid hsl(0 84% 60% / 0.2)',
+                      color: 'hsl(0 84% 60%)',
                     }}
                   >
                     Log out
@@ -594,19 +594,19 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
   useLightTheme,
 }) => {
   const colors = {
-    text: useLightTheme ? '#1a1a1a' : '#ffffff',
-    textMuted: useLightTheme ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.70)',
-    cardBg: useLightTheme ? '#ffffff' : 'rgba(255,255,255,0.06)',
-    cardBorder: useLightTheme ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)',
-    avatarBg: useLightTheme ? '#ffffff' : 'rgba(255,255,255,0.1)',
+    text: 'hsl(var(--foreground))',
+    textMuted: 'hsl(var(--muted-foreground))',
+    cardBg: useLightTheme ? 'hsl(var(--card))' : 'rgba(255,255,255,0.06)',
+    cardBorder: useLightTheme ? 'hsl(var(--border) / 0.3)' : 'rgba(255,255,255,0.06)',
+    avatarBg: useLightTheme ? 'hsl(var(--card))' : 'rgba(255,255,255,0.1)',
   };
 
   // Frosted white active state (no blue glow)
   const activeCardBg = useLightTheme 
-    ? 'rgba(0,0,0,0.08)' 
+    ? 'hsl(var(--muted))' 
     : 'rgba(255,255,255,0.10)';
   const activeCardBorder = useLightTheme 
-    ? 'rgba(0,0,0,0.14)' 
+    ? 'hsl(var(--border))' 
     : 'rgba(255,255,255,0.18)';
 
   return (
@@ -672,14 +672,14 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
             <div 
               className="flex-shrink-0 w-[16px] h-[16px] rounded-full flex items-center justify-center"
               style={{ 
-                background: useLightTheme ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.18)',
-                border: `1px solid ${useLightTheme ? 'rgba(0,0,0,0.10)' : 'rgba(255,255,255,0.28)'}`,
+                background: useLightTheme ? 'hsl(var(--muted))' : 'rgba(255,255,255,0.18)',
+                border: `1px solid ${useLightTheme ? 'hsl(var(--border))' : 'rgba(255,255,255,0.28)'}`,
                 backdropFilter: 'blur(10px)',
               }}
             >
               <Check 
                 className="w-[10px] h-[10px]" 
-                style={{ color: useLightTheme ? '#1a1a1a' : 'rgba(255,255,255,0.95)' }} 
+                style={{ color: 'hsl(var(--foreground))' }} 
               />
             </div>
           )}
@@ -724,10 +724,10 @@ const QuickActionButton: React.FC<QuickActionButtonProps> = ({
     className="flex flex-col items-center justify-center gap-1.5 py-3.5 rounded-[14px] transition-all active:scale-[0.98]"
     style={{
       background: useLightTheme 
-        ? '#ffffff'
+        ? 'hsl(var(--card))'
         : 'linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
-      border: `1px solid ${useLightTheme ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)'}`,
-      color: useLightTheme ? '#1a1a1a' : '#ffffff',
+      border: `1px solid ${useLightTheme ? 'hsl(var(--border) / 0.3)' : 'rgba(255,255,255,0.06)'}`,
+      color: 'hsl(var(--foreground))',
       height: 56,
     }}
   >
@@ -737,9 +737,8 @@ const QuickActionButton: React.FC<QuickActionButtonProps> = ({
         badgeCount && badgeCount > 0 ? (
           <span 
             className={cn(
-              "absolute -top-1.5 -right-2.5 min-w-[16px] h-4 px-1 rounded-full text-[10px] font-bold text-white flex items-center justify-center",
-              badgeColor === 'green' ? "bg-[#10b981]" : "bg-orange-500",
-              useLightTheme ? "ring-[1.5px] ring-white" : "ring-[1.5px] ring-[#1c1c1e]"
+              "absolute -top-1.5 -right-2.5 min-w-[16px] h-4 px-1 rounded-full text-[10px] font-bold text-white flex items-center justify-center ring-[1.5px] ring-background",
+              badgeColor === 'green' ? "bg-emerald-500" : "bg-orange-500",
             )}
             aria-label={badgeColor === 'green' ? 'Unread messages' : 'Unread notifications'}
           >
@@ -748,9 +747,8 @@ const QuickActionButton: React.FC<QuickActionButtonProps> = ({
         ) : (
           <span 
             className={cn(
-              "absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full",
-              badgeColor === 'green' ? "bg-[#10b981]" : "bg-orange-500",
-              useLightTheme ? "ring-[1.5px] ring-white" : "ring-[1.5px] ring-[#1c1c1e]"
+              "absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full ring-[1.5px] ring-background",
+              badgeColor === 'green' ? "bg-emerald-500" : "bg-orange-500",
             )}
             aria-label={badgeColor === 'green' ? 'Unread messages' : 'Unread notifications'}
           />
@@ -773,7 +771,7 @@ interface DividerProps {
 const Divider: React.FC<DividerProps> = ({ useLightTheme }) => (
   <div 
     className="mx-4 h-px"
-    style={{ background: useLightTheme ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)' }}
+    style={{ background: useLightTheme ? 'hsl(var(--border) / 0.3)' : 'rgba(255,255,255,0.06)' }}
   />
 );
 
@@ -793,7 +791,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, children, useLightThem
       <div className="flex items-center gap-2 mb-2 px-3">
         <div 
           className="text-[11px] font-medium uppercase tracking-wider"
-          style={{ color: useLightTheme ? 'rgba(0,0,0,0.45)' : 'rgba(255,255,255,0.45)' }}
+          style={{ color: 'hsl(var(--muted-foreground) / 0.6)' }}
         >
           {title}
         </div>
@@ -831,14 +829,14 @@ const MenuItem: React.FC<MenuItemProps> = ({
       "w-full flex items-center gap-3 px-3 py-3 rounded-[12px] transition-all",
       "active:scale-[0.98]",
       useLightTheme 
-        ? "hover:bg-slate-100/80" 
+        ? "hover:bg-muted/80" 
         : "hover:bg-white/5"
     )}
     style={{
       height: 52,
       color: danger 
-        ? '#ef4444' 
-        : (useLightTheme ? '#1a1a1a' : '#ffffff'),
+        ? 'hsl(0 84% 60%)' 
+        : 'hsl(var(--foreground))',
     }}
   >
     {/* Icon container with background */}
@@ -846,8 +844,8 @@ const MenuItem: React.FC<MenuItemProps> = ({
       className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors"
       style={{
         background: danger 
-          ? 'rgba(239, 68, 68, 0.1)'
-          : (useLightTheme ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.06)'),
+          ? 'hsl(0 84% 60% / 0.1)'
+          : (useLightTheme ? 'hsl(var(--muted) / 0.5)' : 'rgba(255,255,255,0.06)'),
       }}
     >
       <span style={{ opacity: danger ? 1 : 0.7 }}>{icon}</span>
@@ -889,7 +887,7 @@ const AdminMenuItem: React.FC<AdminMenuItemProps> = ({
         ? 'linear-gradient(135deg, rgba(251, 191, 36, 0.08) 0%, rgba(245, 158, 11, 0.08) 100%)'
         : 'linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.06) 100%)',
       border: '1px solid rgba(251, 191, 36, 0.25)',
-      color: useLightTheme ? '#1a1a1a' : '#ffffff',
+      color: 'hsl(var(--foreground))',
     }}
   >
     {/* Icon container with gold gradient */}
@@ -906,7 +904,7 @@ const AdminMenuItem: React.FC<AdminMenuItemProps> = ({
       <span className="text-[15px] font-semibold block">{label}</span>
       <span 
         className="text-[11px]"
-        style={{ color: useLightTheme ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)' }}
+        style={{ color: 'hsl(var(--muted-foreground))' }}
       >
         Manage site settings
       </span>

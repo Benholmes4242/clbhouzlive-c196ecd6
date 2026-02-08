@@ -252,9 +252,9 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
       <div 
         className={cn(
           "px-4 py-4 border-b flex-shrink-0",
-          useLightTheme ? "border-slate-200/80" : "border-white/8"
+          useLightTheme ? "border-border/80" : "border-white/8"
         )}
-        style={{ background: useLightTheme ? 'rgba(0, 0, 0, 0.02)' : 'rgba(255, 255, 255, 0.04)' }}
+        style={{ background: useLightTheme ? 'hsl(var(--muted) / 0.3)' : 'rgba(255, 255, 255, 0.04)' }}
       >
         <div className="flex items-center gap-3">
           <SquircleAvatar
@@ -267,24 +267,24 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
           <div className="flex flex-col min-w-0 flex-1">
             <span className={cn(
               "text-sm font-semibold truncate",
-              useLightTheme ? "text-slate-800" : "text-white"
+              useLightTheme ? "text-foreground" : "text-white"
             )}>
               {displayName}
             </span>
             <span className={cn(
               "text-xs truncate",
-              useLightTheme ? "text-slate-500" : "text-white/50"
+              useLightTheme ? "text-muted-foreground" : "text-white/50"
             )}>
               {email}
             </span>
             <span className={cn(
               "mt-0.5 text-[11px]",
-              useLightTheme ? "text-slate-400" : "text-white/40"
+              useLightTheme ? "text-muted-foreground/60" : "text-white/40"
             )}>
               {postingAsCopy.headerPill.label}{' '}
               <span className={cn(
                 "font-medium",
-                useLightTheme ? "text-slate-600" : "text-white/60"
+                useLightTheme ? "text-muted-foreground" : "text-white/60"
               )}>
                 {activeActor?.name}
               </span>
@@ -303,13 +303,13 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
           <div className="px-2 mb-1">
             <span className={cn(
               "text-[11px] font-medium uppercase tracking-wider",
-              useLightTheme ? "text-slate-400" : "text-white/45"
+              useLightTheme ? "text-muted-foreground/60" : "text-white/45"
             )}>
               {postingAsCopy.dropdown.sectionTitle}
             </span>
             <p className={cn(
               "text-[10px] mt-0.5",
-              useLightTheme ? "text-slate-400" : "text-white/30"
+              useLightTheme ? "text-muted-foreground/60" : "text-white/30"
             )}>
               {postingAsCopy.dropdown.helper}
             </p>
@@ -338,8 +338,8 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
                       "transition-all duration-150 active:scale-[0.98]",
                       useLightTheme 
                         ? isActive 
-                          ? "bg-slate-100 border border-slate-200" 
-                          : "hover:bg-slate-50 border border-transparent"
+                          ? "bg-muted border border-border" 
+                          : "hover:bg-muted/50 border border-transparent"
                         : isActive 
                           ? "bg-white/10 border border-white/12" 
                           : "hover:bg-white/5 border border-transparent"
@@ -356,17 +356,17 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
                       <div className="flex items-center gap-1.5">
                         <span className={cn(
                           "text-xs font-medium truncate",
-                          useLightTheme ? "text-slate-700" : "text-white"
+                          useLightTheme ? "text-foreground" : "text-white"
                         )}>
                           {actor.name}
                         </span>
                         {actor.type === 'business' ? (
-                          <Building2 className={cn("h-3 w-3 flex-shrink-0", useLightTheme ? "text-slate-400" : "text-white/40")} />
+                          <Building2 className={cn("h-3 w-3 flex-shrink-0", useLightTheme ? "text-muted-foreground" : "text-white/40")} />
                         ) : (
-                          <User className={cn("h-3 w-3 flex-shrink-0", useLightTheme ? "text-slate-400" : "text-white/40")} />
+                          <User className={cn("h-3 w-3 flex-shrink-0", useLightTheme ? "text-muted-foreground" : "text-white/40")} />
                         )}
                       </div>
-                      <span className={cn("text-[10px]", useLightTheme ? "text-slate-400" : "text-white/40")}>
+                      <span className={cn("text-[10px]", useLightTheme ? "text-muted-foreground/60" : "text-white/40")}>
                         {actor.type === 'personal' ? postingAsCopy.actorLabels.personal 
                           : postingAsCopy.actorLabels.business}
                       </span>
@@ -384,7 +384,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
                   {/* Business Section */}
                   {businessActors.length > 0 && (
                     <>
-                      <div className={cn("pt-2 pb-1 px-2", useLightTheme ? "text-slate-400" : "text-white/40")}>
+                      <div className={cn("pt-2 pb-1 px-2", useLightTheme ? "text-muted-foreground" : "text-white/40")}>
                         <span className="text-[10px] uppercase tracking-wider font-medium">{postingAsCopy.sectionLabels.businesses}</span>
                       </div>
                       {businessActors.map(renderActorButton)}
@@ -406,7 +406,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
         {/* Divider */}
         <div className={cn(
           "border-t mx-3",
-          useLightTheme ? "border-slate-100" : "border-white/6"
+          useLightTheme ? "border-border/60" : "border-white/6"
         )} />
         
         {/* Core action items */}
@@ -418,7 +418,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
             onClick={() => handleNavigate('/messages')}
             useLightTheme={useLightTheme}
             trailing={unreadMessageCount > 0 && (
-              <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-[#2A9D5C] text-white text-[10px] font-bold flex items-center justify-center">
+              <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-emerald-500 text-white text-[10px] font-bold flex items-center justify-center">
                 {unreadMessageCount > 99 ? '99+' : unreadMessageCount}
               </span>
             )}
@@ -501,7 +501,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
         <div className="px-3 pt-1 pb-3">
           <div className={cn(
             "border-t pt-2",
-            useLightTheme ? "border-slate-100" : "border-white/6"
+            useLightTheme ? "border-border/60" : "border-white/6"
           )}>
             <button
               onClick={() => {
@@ -552,11 +552,11 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
             maxHeight: 'calc(100vh - 24px)',
             borderRadius: '20px',
             overflow: 'hidden',
-            background: useLightTheme ? '#F8FAFC' : 'rgba(16, 16, 16, 0.96)',
+            background: useLightTheme ? 'hsl(var(--background))' : 'rgba(16, 16, 16, 0.96)',
             backdropFilter: 'blur(40px) saturate(150%)',
             WebkitBackdropFilter: 'blur(40px) saturate(150%)',
             boxShadow: useLightTheme 
-              ? '0 24px 60px rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(0, 0, 0, 0.06)'
+              ? '0 24px 60px rgba(0, 0, 0, 0.15), inset 0 0 0 1px hsl(var(--border) / 0.3)'
               : '0 24px 60px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.08)',
           }}
         >
@@ -583,14 +583,14 @@ const MenuRow: React.FC<MenuRowProps> = ({ icon, label, onClick, trailing, useLi
     className={cn(
       "flex w-full items-center justify-between rounded-sq-md px-3 h-11",
       "transition-colors active:scale-[0.98]",
-      useLightTheme ? "hover:bg-slate-50" : "hover:bg-white/5"
+      useLightTheme ? "hover:bg-muted/50" : "hover:bg-white/5"
     )}
   >
     <span className="flex items-center gap-2.5">
-      <span className={useLightTheme ? "text-slate-500" : "text-white/50"}>{icon}</span>
+      <span className={useLightTheme ? "text-muted-foreground" : "text-white/50"}>{icon}</span>
       <span className={cn(
         "text-sm",
-        useLightTheme ? "text-slate-700" : "text-white/80"
+        useLightTheme ? "text-foreground" : "text-white/80"
       )}>{label}</span>
     </span>
     {trailing}
