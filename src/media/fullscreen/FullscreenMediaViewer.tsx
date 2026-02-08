@@ -250,8 +250,8 @@ export const FullscreenMediaViewer: React.FC<FullscreenMediaViewerProps> = ({
           {/* Close button - left */}
           <button
             onClick={viewer.close}
-            className="absolute left-4 z-[10001] w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center"
-            style={{ top: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}
+            className="absolute left-4 z-[10001] w-11 h-11 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center"
+            style={{ top: 'max(env(safe-area-inset-top, 0px), 47px)' }}
             aria-label="Close"
           >
             <X className="w-5 h-5 text-white" />
@@ -261,7 +261,7 @@ export const FullscreenMediaViewer: React.FC<FullscreenMediaViewerProps> = ({
           {isOwnPost && (onEdit || onDelete) && (
             <div 
               className="absolute right-4 z-[10001]"
-              style={{ top: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}
+              style={{ top: 'max(env(safe-area-inset-top, 0px), 47px)' }}
             >
               <PostOptionsMenu
                 onEdit={onEdit ? handleEdit : undefined}
