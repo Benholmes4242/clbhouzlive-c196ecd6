@@ -54,7 +54,7 @@ export const YourNetworkSection: React.FC<YourNetworkSectionProps> = ({ classNam
         </h2>
         <button
           onClick={handleViewAll}
-          className="text-sm text-slate-600 font-medium hover:text-slate-800 transition-colors"
+          className="py-2.5 px-1 text-sm text-muted-foreground font-medium hover:text-foreground active:scale-[0.97] transition-all"
         >
           View all ›
         </button>

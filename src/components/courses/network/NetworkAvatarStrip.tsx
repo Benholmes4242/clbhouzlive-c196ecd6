@@ -58,7 +58,7 @@ export const NetworkAvatarStrip: React.FC<NetworkAvatarStripProps> = ({
           <button
             key={friend.id}
             onClick={() => handleAvatarClick(friend.id)}
-            className="flex-shrink-0 transition-transform duration-100 ease-out active:scale-95 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-slate-300 rounded-[34%]"
+            className="flex-shrink-0 transition-transform duration-100 ease-out active:scale-95 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-border rounded-[34%]"
             aria-label={`View ${friend.display_name || friend.username}'s profile`}
           >
             <SquircleAvatar
@@ -74,7 +74,7 @@ export const NetworkAvatarStrip: React.FC<NetworkAvatarStripProps> = ({
         {/* Overflow indicator */}
         {remainingCount > 0 && (
           <div 
-            className="flex-shrink-0 flex items-center justify-center bg-slate-100 text-slate-600 font-medium text-sm"
+            className="flex-shrink-0 flex items-center justify-center bg-muted text-muted-foreground font-medium text-sm"
             style={{
               width: '47px',
               aspectRatio: '1 / 1.05',

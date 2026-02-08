@@ -64,7 +64,7 @@ export const NetworkHighlightCarousel: React.FC<NetworkHighlightCarouselProps> =
             <button
               key={highlight.course_id}
               onClick={() => handleCourseClick(highlight.course_id)}
-              className="flex-shrink-0 relative overflow-hidden rounded-xl transition-all duration-200 hover:brightness-105 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-slate-300"
+              className="flex-shrink-0 relative overflow-hidden rounded-xl transition-all duration-200 hover:brightness-105 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-border"
               style={{
                 width: '280px',
                 height: '160px',

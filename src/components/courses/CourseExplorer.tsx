@@ -398,7 +398,7 @@ const CourseExplorer = () => {
           placeholder="Search by name, county or area…"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10 pr-10 h-11 rounded-sq-sm bg-white border border-slate-200 shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 transition-all duration-150 text-base placeholder:text-[15px]"
+          className="pl-10 pr-10 h-11 rounded-sq-sm bg-card border border-border shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border transition-all duration-150 text-base placeholder:text-[15px]"
           aria-label="Search golf courses"
           role="searchbox"
         />
@@ -410,7 +410,7 @@ const CourseExplorer = () => {
         {searchTerm && (
           <button
             onClick={() => setSearchTerm('')}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 text-muted-foreground hover:text-foreground transition-colors"
             aria-label="Clear search"
           >
             <X className="h-4 w-4" />
@@ -427,10 +427,10 @@ const CourseExplorer = () => {
             setSelectedSubregion('all');
           }}>
             <SelectTrigger 
-              className={`h-11 w-full rounded-sq-sm bg-white justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e2e8f0] focus-visible:border-[#e2e8f0] data-[state=open]:ring-0 transition-all duration-150 ${
+              className={`h-11 w-full rounded-sq-sm bg-card justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-border focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98] ${
                 selectedRegion !== PRIMARY_REGIONS.ALL 
-                  ? 'border-[#e2e8f0] ring-1 ring-[#e2e8f0] text-[#1e293b]' 
-                  : 'border-slate-200'
+                  ? 'border-border ring-1 ring-border text-foreground' 
+                  : 'border-border'
               }`}
               aria-label="Select region"
             >
@@ -439,7 +439,7 @@ const CourseExplorer = () => {
                 <SelectValue placeholder="All Regions" />
               </div>
             </SelectTrigger>
-            <SelectContent className="bg-white border-slate-200 z-50 rounded-sq-sm shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
+            <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
               {regionOptions.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
@@ -457,16 +457,16 @@ const CourseExplorer = () => {
             disabled={selectedRegion === PRIMARY_REGIONS.ALL || !SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.length}
           >
             <SelectTrigger 
-              className={`h-11 w-full rounded-sq-sm bg-white justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e2e8f0] focus-visible:border-[#e2e8f0] data-[state=open]:ring-0 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed ${
+              className={`h-11 w-full rounded-sq-sm bg-card justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-border focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed ${
                 selectedSubregion !== 'all' 
-                  ? 'border-[#e2e8f0] ring-1 ring-[#e2e8f0] text-[#1e293b]' 
-                  : 'border-slate-200'
+                  ? 'border-border ring-1 ring-border text-foreground' 
+                  : 'border-border'
               }`}
               aria-label="Select sub-region"
             >
               <SelectValue placeholder={selectedRegion === PRIMARY_REGIONS.ALL ? "Choose a region first" : "All sub-regions"} />
             </SelectTrigger>
-            <SelectContent className="bg-white border-slate-200 z-50 rounded-sq-sm shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
+            <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
               <SelectItem value="all">All sub-regions</SelectItem>
               {selectedRegion !== PRIMARY_REGIONS.ALL && SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.map((s) => (
                 <SelectItem key={s} value={normalizeLabel(s)}>
@@ -504,7 +504,7 @@ const CourseExplorer = () => {
             onChange={(v) => setSortOption(v as SortOption)}
             options={sortOptions}
             ariaLabel="Sort courses"
-            triggerClassName="h-9 text-[11px]"
+            triggerClassName="h-11 text-[11px] active:scale-[0.98]"
           />
         </div>
       )}
@@ -547,10 +547,9 @@ const CourseExplorer = () => {
                 <div className="flex flex-col items-center gap-3 pt-6">
                   <Button
                     variant="outline"
-                    size="sm"
                     onClick={loadMore}
                     disabled={isLoadingMore}
-                    className="w-full max-w-xs gap-1.5 transition-all duration-150 hover:shadow-sm active:scale-[0.98]"
+                    className="w-full max-w-xs h-11 gap-1.5 transition-all duration-150 hover:shadow-sm active:scale-[0.98]"
                   >
                     {isLoadingMore ? (
                       <>
