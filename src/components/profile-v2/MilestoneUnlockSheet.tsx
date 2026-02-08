@@ -1,28 +1,18 @@
 /**
  * MilestoneUnlockSheet - Premium celebration for milestone unlocks
- * Phase 2: Enhanced with bigger badge, confetti, and stronger "earned" feeling
- * Phase 5: Tier-colored confetti, badge scale animation, enhanced celebrations
+ * Uses shared badge config for images and names.
  */
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { Trophy, Share2, ChevronRight, Sparkles, X, Award } from 'lucide-react';
+import { Trophy, Share2, ChevronRight, Sparkles, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Confetti from 'react-confetti';
-import { ACHIEVEMENT_MILESTONES, MILESTONE_TIER_META } from '@/config/achievements';
+import { MILESTONE_TIER_META } from '@/config/achievements';
 import { CLBHOUZ_ACHIEVEMENT_PALETTE, MILESTONE_PALETTE_MAP } from '@/lib/clbhouzAchievementPalette';
 import { haptic } from '@/utils/haptics';
-
-// Import badge images for celebration display
-import rookieBadgeImage from '@/assets/badges/rookie-badge.png';
-import fairwayBadgeImage from '@/assets/badges/fairway-badge.png';
-import foundersBadgeImage from '@/assets/badges/founders-badge.png';
-import heritageBadgeImage from '@/assets/badges/heritage-badge.png';
-import centuryBadgeImage from '@/assets/badges/century-badge.png';
-import eliteBadgeImage from '@/assets/badges/elite-badge.png';
-import legendaryBadgeImage from '@/assets/badges/legendary-badge.png';
-import grandslamBadgeImage from '@/assets/badges/grandslam-badge.png';
+import { MILESTONE_BADGE_IMAGES, MILESTONE_NAMES } from '@/config/badgeImages';
 
 interface MilestoneUnlockSheetProps {
   totalPlayed: number;
@@ -43,28 +33,16 @@ interface Milestone {
 
 const STORAGE_KEY = 'quest-milestones-seen';
 
-// Badge image mapping
-const BADGE_IMAGES: Record<number, string> = {
-  5: rookieBadgeImage,
-  10: fairwayBadgeImage,
-  20: foundersBadgeImage,
-  50: heritageBadgeImage,
-  100: centuryBadgeImage,
-  200: eliteBadgeImage,
-  300: legendaryBadgeImage,
-  400: grandslamBadgeImage,
-};
-
 // Phase 5: Tier-specific confetti color palettes
 const TIER_CONFETTI_COLORS: Record<number, string[]> = {
-  5: ['#D4A574', '#C08050', '#E8C4A0', '#B8860B'],     // Copper/Bronze
-  10: ['#94A3B8', '#64748B', '#CBD5E1', '#E2E8F0'],   // Silver/Slate
-  20: ['#F0C850', '#D4AF37', '#FFD700', '#E8C96A'],   // Classic Gold
-  50: ['#64748B', '#475569', '#94A3B8', '#334155'],   // Steel Blue
-  100: ['#1E1E1E', '#D4AF37', '#F0C850', '#FFD700'],  // Black & Gold
-  200: ['#A8A29E', '#78716C', '#D6D3D1', '#57534E'],  // Warm Stone
-  300: ['#8B5CF6', '#7C3AED', '#A78BFA', '#C4B5FD'],  // Royal Violet
-  400: ['#FBBF24', '#F59E0B', '#FCD34D', '#D97706'],  // Radiant Amber
+  5: ['#D4A574', '#C08050', '#E8C4A0', '#B8860B'],
+  10: ['#94A3B8', '#64748B', '#CBD5E1', '#E2E8F0'],
+  20: ['#F0C850', '#D4AF37', '#FFD700', '#E8C96A'],
+  50: ['#64748B', '#475569', '#94A3B8', '#334155'],
+  100: ['#1E1E1E', '#D4AF37', '#F0C850', '#FFD700'],
+  200: ['#A8A29E', '#78716C', '#D6D3D1', '#57534E'],
+  300: ['#8B5CF6', '#7C3AED', '#A78BFA', '#C4B5FD'],
+  400: ['#FBBF24', '#F59E0B', '#FCD34D', '#D97706'],
 };
 
 // Build milestones from single source of truth
@@ -74,14 +52,14 @@ const MILESTONES: Milestone[] = MILESTONE_TIER_META.map(meta => {
   
   return {
     id: `${meta.threshold}-club`,
-    name: `${meta.threshold} Club`,
+    name: MILESTONE_NAMES[meta.threshold] || `${meta.threshold} Club`,
     threshold: meta.threshold,
     description: meta.threshold === 100 
       ? 'You have completed the Top 100 Quest'
       : `You have played ${meta.threshold} Top 100 courses`,
     tierName: meta.tierName,
     accentColor,
-    badgeImage: BADGE_IMAGES[meta.threshold],
+    badgeImage: MILESTONE_BADGE_IMAGES[meta.threshold],
   };
 });
 
@@ -116,7 +94,6 @@ function isSnoozeActive(): boolean {
 
 function activateSnooze(): void {
   try {
-    // Snooze for 7 days
     const snoozeUntil = Date.now() + (7 * 24 * 60 * 60 * 1000);
     localStorage.setItem(SNOOZE_STORAGE_KEY, snoozeUntil.toString());
   } catch {
@@ -134,29 +111,23 @@ export const MilestoneUnlockSheet: React.FC<MilestoneUnlockSheetProps> = ({
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
-    // Get window size for confetti
     setWindowSize({ width: window.innerWidth, height: window.innerHeight });
   }, []);
 
   useEffect(() => {
-    // Check if snoozed - don't show unlocks
     if (isSnoozeActive()) return;
     
-    // Find newly unlocked milestone
     const seen = getSeenMilestones();
     
     for (const milestone of MILESTONES) {
       if (totalPlayed >= milestone.threshold && !seen.has(milestone.id)) {
         setUnlockedMilestone(milestone);
-        // Phase 5: Trigger haptic immediately on unlock detection
         haptic('medium');
-        // Animate progress bar and confetti
         setTimeout(() => {
           setProgress(100);
           setShowConfetti(true);
-          haptic('heavy'); // Strong haptic at celebration peak
+          haptic('heavy');
         }, 300);
-        // Stop confetti after 3 seconds
         setTimeout(() => setShowConfetti(false), 3500);
         break;
       }
@@ -190,20 +161,18 @@ export const MilestoneUnlockSheet: React.FC<MilestoneUnlockSheetProps> = ({
   if (!unlockedMilestone) return null;
 
   const accentColor = unlockedMilestone.accentColor;
-  // Phase 5: Use tier-specific confetti colors
   const confettiColors = TIER_CONFETTI_COLORS[unlockedMilestone.threshold] || [accentColor, '#D2B461', '#88B67B', '#5B9E55'];
 
   return (
     <Sheet open={!!unlockedMilestone} onOpenChange={handleClose}>
       <SheetContent
         side="bottom"
-        className="rounded-t-3xl border-t overflow-hidden"
+        className="rounded-t-3xl border-t overflow-hidden bg-gradient-to-b from-card to-background"
         style={{
-          background: 'linear-gradient(180deg, #FFFFFF 0%, #F9FAFB 100%)',
-          borderColor: 'var(--quest-stroke)',
+          borderColor: 'hsl(var(--border))',
         }}
       >
-        {/* Phase 5: Tier-colored confetti */}
+        {/* Tier-colored confetti */}
         {showConfetti && (
           <Confetti
             width={windowSize.width}
@@ -216,11 +185,10 @@ export const MilestoneUnlockSheet: React.FC<MilestoneUnlockSheetProps> = ({
           />
         )}
 
-        {/* Not now button - top left */}
+        {/* Not now button — 44px tap target */}
         <button
           onClick={handleNotNow}
-          className="absolute top-4 left-4 flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full transition-colors hover:bg-black/5 z-20"
-          style={{ color: 'var(--quest-text-tertiary)' }}
+          className="absolute top-4 left-4 flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full transition-colors hover:bg-muted min-h-[44px] active:scale-[0.98] z-20 text-muted-foreground/60"
         >
           <X className="w-3.5 h-3.5" />
           Not now
@@ -235,7 +203,7 @@ export const MilestoneUnlockSheet: React.FC<MilestoneUnlockSheetProps> = ({
             }}
           />
 
-          {/* Phase 5: Enhanced badge display with scale animation */}
+          {/* Enhanced badge display with scale animation */}
           <motion.div 
             className="flex justify-center mb-6 relative"
             initial={{ scale: 0.8, opacity: 0, y: 10 }}
@@ -313,22 +281,13 @@ export const MilestoneUnlockSheet: React.FC<MilestoneUnlockSheetProps> = ({
             >
               Milestone Unlocked
             </p>
-            <h2
-              className="text-3xl font-bold mb-1"
-              style={{ color: 'var(--quest-text-primary)' }}
-            >
+            <h2 className="text-3xl font-bold mb-1 text-foreground">
               {unlockedMilestone.name}
             </h2>
-            <p
-              className="text-sm font-medium mb-1"
-              style={{ color: 'var(--quest-text-secondary)' }}
-            >
+            <p className="text-sm font-medium mb-1 text-muted-foreground">
               {unlockedMilestone.tierName}
             </p>
-            <p
-              className="text-sm mb-6"
-              style={{ color: 'var(--quest-text-tertiary)' }}
-            >
+            <p className="text-sm mb-6 text-muted-foreground/60">
               {unlockedMilestone.description}
             </p>
           </motion.div>
@@ -341,9 +300,8 @@ export const MilestoneUnlockSheet: React.FC<MilestoneUnlockSheetProps> = ({
             transition={{ delay: 0.5 }}
           >
             <div
-              className="h-3 rounded-full overflow-hidden"
+              className="h-3 rounded-full overflow-hidden bg-muted"
               style={{ 
-                background: 'var(--quest-track)',
                 boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.08)',
               }}
             >
@@ -359,7 +317,7 @@ export const MilestoneUnlockSheet: React.FC<MilestoneUnlockSheetProps> = ({
               />
             </div>
             <div className="flex justify-between mt-2">
-              <span className="text-xs font-medium" style={{ color: 'var(--quest-text-tertiary)' }}>
+              <span className="text-xs font-medium text-muted-foreground/60">
                 Progress
               </span>
               <span className="text-xs font-bold" style={{ color: accentColor }}>
@@ -397,19 +355,14 @@ export const MilestoneUnlockSheet: React.FC<MilestoneUnlockSheetProps> = ({
           >
             <Button
               variant="outline"
-              className="flex-1 h-12"
+              className="flex-1 h-12 min-h-[44px] active:scale-[0.98] transition-transform bg-card border-border text-foreground"
               onClick={handleShare}
-              style={{
-                background: 'var(--quest-card)',
-                borderColor: 'var(--quest-stroke)',
-                color: 'var(--quest-text-primary)',
-              }}
             >
               <Share2 className="w-4 h-4 mr-2" />
               Share
             </Button>
             <Button
-              className="flex-1 h-12 font-semibold"
+              className="flex-1 h-12 min-h-[44px] font-semibold active:scale-[0.98] transition-transform"
               onClick={handleClose}
               style={{
                 background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}DD 100%)`,
