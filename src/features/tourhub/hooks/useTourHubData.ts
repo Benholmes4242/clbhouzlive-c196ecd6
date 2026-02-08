@@ -28,6 +28,10 @@ export interface TourTournament {
   venue_par: number | null;
   venue_yardage: number | null;
   defending_champion: string | null;
+  /** Tour code from sr_seasons.tour_name (e.g. 'pga', 'EURO', 'LIV') */
+  tour_code: string | null;
+  /** Full tour label from sr_seasons.tour_full_name (e.g. 'PGA Tour') */
+  tour_full_name: string | null;
 }
 
 export interface TourPlayer {
@@ -188,10 +192,10 @@ export function useTourTournaments(seasonId?: string) {
   return useQuery({
     queryKey: ['tourhub', 'tournaments', seasonId || 'all'],
     queryFn: async () => {
-      // Get tournaments - if no seasonId, get all recent tournaments
+      // Get tournaments with season join for tour info
       let query = supabase
         .from('sr_tournaments')
-        .select('*')
+        .select('*, season:sr_seasons(tour_name, tour_full_name)')
         .order('start_date', { ascending: true });
       
       // Only filter by season if explicitly provided AND we want season-specific
@@ -229,7 +233,14 @@ export function useTourTournaments(seasonId?: string) {
         return [];
       }
       console.log('[useTourTournaments] Loaded tournaments:', data?.length || 0);
-      return (data || []) as TourTournament[];
+      
+      // Enrich tournaments with tour info from joined season
+      return (data || []).map((t: any) => ({
+        ...t,
+        tour_code: t.season?.tour_name || null,
+        tour_full_name: t.season?.tour_full_name || null,
+        season: undefined, // Remove the nested object
+      })) as TourTournament[];
     },
     enabled: true,
     staleTime: 5 * 60 * 1000,
@@ -243,7 +254,7 @@ export function useTourTournament(tournamentId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('sr_tournaments')
-        .select('*')
+        .select('*, season:sr_seasons(tour_name, tour_full_name)')
         .eq('id', tournamentId)
         .single();
       
@@ -251,7 +262,13 @@ export function useTourTournament(tournamentId: string) {
         console.error('Error fetching tournament:', error);
         return null;
       }
-      return data as TourTournament;
+      const t = data as any;
+      return {
+        ...t,
+        tour_code: t.season?.tour_name || null,
+        tour_full_name: t.season?.tour_full_name || null,
+        season: undefined,
+      } as TourTournament;
     },
     enabled: !!tournamentId,
     staleTime: 5 * 60 * 1000,

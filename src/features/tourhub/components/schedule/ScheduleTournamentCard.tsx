@@ -30,6 +30,8 @@ interface ScheduleTournamentCardProps {
   compact?: boolean;
   /** Leader/winner data from useTournamentLeadersWinners */
   leaderWinner?: TournamentLeaderWinner;
+  /** Pre-resolved image URL from batch hook (skips per-card lookup) */
+  batchImageUrl?: string | null;
 }
 
 /**
@@ -121,7 +123,7 @@ function isSeasonTournament(t: TourTournament | SeasonTournament): t is SeasonTo
   return 'startDate' in t;
 }
 
-export function ScheduleTournamentCard({ tournament, className, compact = false, leaderWinner }: ScheduleTournamentCardProps) {
+export function ScheduleTournamentCard({ tournament, className, compact = false, leaderWinner, batchImageUrl }: ScheduleTournamentCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null);
   
@@ -147,16 +149,16 @@ export function ScheduleTournamentCard({ tournament, className, compact = false,
   const hasLeaderWinnerData = leaderWinner && isFinal;
   const hasLeaderData = leaderWinner && isLive;
   
-  // Resolve course image
+  // Resolve course image — use batch URL if provided, else fallback to single lookup
   const { courseImage } = useSingleCourseImage(
-    venueName ? {
+    !batchImageUrl && venueName ? {
       venueName: venueName,
       city: venueCity,
       country: venueCountry,
     } : null
   );
 
-  const imageUrl = courseImage?.imageUrl || getCourseImage({ id: tournament.id });
+  const imageUrl = batchImageUrl || courseImage?.imageUrl || getCourseImage({ id: tournament.id });
   
   // Reset loading state when image URL changes
   useEffect(() => {
@@ -235,6 +237,25 @@ export function ScheduleTournamentCard({ tournament, className, compact = false,
           }}
         />
         
+        {/* Tour Badge - Top Left */}
+        {'tour_full_name' in tournament && (tournament as TourTournament).tour_full_name && (
+          <div className="absolute top-2.5 left-2.5 z-10">
+            <span 
+              className="inline-flex items-center text-[9px] font-bold uppercase tracking-wider text-white/85"
+              style={{
+                padding: '3px 8px',
+                borderRadius: '6px',
+                background: 'rgba(0, 0, 0, 0.55)',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+                letterSpacing: '0.6px',
+              }}
+            >
+              {(tournament as TourTournament).tour_full_name}
+            </span>
+          </div>
+        )}
+
         {/* Status Badge - Top Right - Unified dark glass */}
         <div className="absolute top-2.5 right-2.5 z-10">
           <StatusBadge status={tournament.status} />
