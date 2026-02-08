@@ -63,7 +63,7 @@ const Top100Hub = () => {
   const handleMapModalClose = (open: boolean) => {
     if (!open) {
       setIsMapModalOpen(false);
-      setViewMode('list'); // snap toggle back to List when closing
+      setViewMode('list');
     }
   };
 
@@ -112,16 +112,16 @@ const Top100Hub = () => {
 
           {/* Tabs: Courses | My Progress - Pill toggle style */}
           <Tabs value={activeTab} onValueChange={(v) => handleTabChange(v as ValidTab)} className="w-full">
-            <TabsList className="flex p-1 rounded-xl overflow-hidden bg-[#e2e8f0] mb-block">
+            <TabsList className="flex p-1 rounded-xl overflow-hidden bg-muted mb-block">
               <TabsTrigger 
                 value="courses" 
-                className="flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all duration-150 data-[state=active]:m-1 data-[state=active]:bg-white data-[state=active]:text-[#1e293b] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#e2e8f0] data-[state=inactive]:text-[#64748b] data-[state=inactive]:hover:text-[#1e293b] data-[state=inactive]:hover:bg-white/50 data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none"
+                className="flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all duration-150 active:scale-[0.97] data-[state=active]:m-1 data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-border data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:text-foreground data-[state=inactive]:hover:bg-card/50 data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none"
               >
                 Courses
               </TabsTrigger>
               <TabsTrigger 
                 value="my-progress" 
-                className="flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all duration-150 data-[state=active]:m-1 data-[state=active]:bg-white data-[state=active]:text-[#1e293b] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#e2e8f0] data-[state=inactive]:text-[#64748b] data-[state=inactive]:hover:text-[#1e293b] data-[state=inactive]:hover:bg-white/50 data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none"
+                className="flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all duration-150 active:scale-[0.97] data-[state=active]:m-1 data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-border data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:text-foreground data-[state=inactive]:hover:bg-card/50 data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none"
               >
                 My Progress
               </TabsTrigger>
@@ -133,7 +133,6 @@ const Top100Hub = () => {
                 const totalRated = progress.total_top100_rated ?? progress.total_played_top100 ?? 0;
                 const listsWithProgress = listSummaries?.filter(list => list.played_count > 0) || [];
                 const listsCount = listsWithProgress.length;
-                // Sum actual course counts from lists user has progress in
                 const totalCourses = listsWithProgress.reduce((sum, list) => sum + (list.total_courses || 0), 0);
                 
                 if (totalRated === 0) return null;
@@ -149,15 +148,15 @@ const Top100Hub = () => {
               
               {/* View Mode Toggle - Pill toggle style */}
               <div className="flex justify-center py-3">
-                <div className="flex p-1 rounded-xl overflow-hidden bg-[#e2e8f0]">
+                <div className="flex p-1 rounded-xl overflow-hidden bg-muted">
                   <button
                     type="button"
                     onClick={handleListClick}
                     className={cn(
-                      'inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150',
+                      'inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 active:scale-[0.97]',
                       viewMode === 'list'
-                        ? 'm-1 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
-                        : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50'
+                        ? 'm-1 bg-card text-foreground shadow-sm border border-border'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-card/50'
                     )}
                   >
                     <List className="h-3.5 w-3.5" />
@@ -168,10 +167,10 @@ const Top100Hub = () => {
                     type="button"
                     onClick={handleMapClick}
                     className={cn(
-                      'inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150',
+                      'inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 active:scale-[0.97]',
                       viewMode === 'map'
-                        ? 'm-1 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
-                        : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50'
+                        ? 'm-1 bg-card text-foreground shadow-sm border border-border'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-card/50'
                     )}
                   >
                     <MapIcon className="h-3.5 w-3.5" />
@@ -188,7 +187,6 @@ const Top100Hub = () => {
                   </div>
                 ) : (
                   (() => {
-                    // Track used phrases to avoid duplicates in viewport
                     const usedPhrases = new Set<string>();
                     return listSummaries?.map((list) => {
                       const card = (

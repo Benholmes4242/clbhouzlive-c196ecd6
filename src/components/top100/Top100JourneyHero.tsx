@@ -76,7 +76,7 @@ const ProgressRing: React.FC<ProgressRingProps> = ({
           fill="none"
           stroke="currentColor"
           strokeWidth={strokeWidth}
-          className="text-slate-200"
+          className="text-muted"
         />
         {/* Progress arc - Outstanding gradient */}
         <circle
@@ -102,12 +102,6 @@ const ProgressRing: React.FC<ProgressRingProps> = ({
 
 /**
  * Top100JourneyHero - Premium hero module for Top 100 journey entry point
- * 
- * Features:
- * - Frosted glass container
- * - Circular progress ring with animated fill
- * - Journey-first messaging (not achievements-first)
- * - Prominent CTA to journey view
  */
 export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
   completedCourses,
@@ -132,12 +126,12 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
         className={cn(
           'relative w-full p-4',
           'rounded-2xl',
-          'bg-white/92 backdrop-blur-sm',
-          'border border-black/[0.06]',
+          'bg-card/92 backdrop-blur-sm',
+          'border border-border/60',
           'shadow-sm',
           'text-left',
           'cursor-pointer',
-          'hover:bg-white/95 hover:shadow-md',
+          'hover:bg-card/95 hover:shadow-md',
           'active:scale-[0.99]',
           'transition-all duration-200'
         )}
@@ -181,11 +175,11 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
           <span
             className={cn(
               'inline-flex items-center gap-1',
-              'px-4 py-2',
+              'px-4 py-2.5',
               'text-sm font-medium',
-              'bg-[#e2e8f0] text-slate-700',
+              'bg-muted text-foreground',
               'rounded-lg',
-              'hover:bg-slate-300',
+              'hover:bg-muted/80',
               'transition-all duration-150',
               'whitespace-nowrap'
             )}

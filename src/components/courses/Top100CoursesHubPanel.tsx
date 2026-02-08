@@ -109,7 +109,6 @@ const Top100CoursesHubPanel = () => {
     return [...courses].sort((a, b) => {
       switch (sortOption) {
         case 'user_rating':
-          // Sort by community average rating - highest rated first, unrated last
           const ratingA = a.average_rating ?? -1;
           const ratingB = b.average_rating ?? -1;
           return ratingB - ratingA;
@@ -181,7 +180,6 @@ const Top100CoursesHubPanel = () => {
         { value: 'europe', label: 'Europe Top 100' },
       ];
 
-  // TODO: Add 'friends_rated' sort option when friends rating data is available
   const sortOptions: AppSelectOption<Top100SortOption>[] = [
     { value: 'official', label: 'Official ranking' },
     { value: 'user_rating', label: 'User rating' },
@@ -229,13 +227,14 @@ const Top100CoursesHubPanel = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search within this Top 100 list"
             aria-label="Search within Top 100 list"
-            className="pl-10 pr-10 h-11 bg-card border border-border/60 rounded-sq-sm shadow-[0_1px_3px_rgba(0,0,0,0.06)] text-base focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 focus-visible:outline-none"
+            className="pl-10 pr-10 h-11 bg-card border border-border/60 rounded-sq-sm shadow-[0_1px_3px_rgba(0,0,0,0.06)] text-base focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border focus-visible:outline-none"
           />
           {searchTerm && (
             <button
               type="button"
               onClick={() => setSearchTerm('')}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-2.5 rounded-full text-muted-foreground hover:text-foreground active:scale-[0.9] transition-transform"
+              aria-label="Clear search"
             >
               <X className="h-4 w-4" />
             </button>
@@ -249,15 +248,16 @@ const Top100CoursesHubPanel = () => {
             <Select value={selectedList} onValueChange={setSelectedList}>
               <SelectTrigger 
                 aria-label="Select Top 100 list" 
-                className={`h-11 w-full rounded-sq-sm bg-white justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-0 transition-all duration-150 ${
+                className={cn(
+                  'h-11 w-full rounded-sq-sm bg-card justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98]',
                   selectedList !== 'global' 
                     ? 'border-primary/40 ring-1 ring-primary/20 text-foreground' 
-                    : 'border-slate-200'
-                }`}
+                    : 'border-border'
+                )}
               >
                 <SelectValue placeholder="Global Top 100" />
               </SelectTrigger>
-              <SelectContent className="bg-white border-slate-200 z-50 rounded-sq-sm shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
+              <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
                 {listOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
@@ -272,15 +272,16 @@ const Top100CoursesHubPanel = () => {
             <Select value={sortOption} onValueChange={(v) => setSortOption(v as Top100SortOption)}>
               <SelectTrigger 
                 aria-label="Sort courses" 
-                className={`h-11 w-full rounded-sq-sm bg-white justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-0 transition-all duration-150 ${
+                className={cn(
+                  'h-11 w-full rounded-sq-sm bg-card justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98]',
                   sortOption !== 'official' 
                     ? 'border-primary/40 ring-1 ring-primary/20 text-foreground' 
-                    : 'border-slate-200'
-                }`}
+                    : 'border-border'
+                )}
               >
                 <SelectValue placeholder="Official ranking" />
               </SelectTrigger>
-              <SelectContent className="bg-white border-slate-200 z-50 rounded-sq-sm shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
+              <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
                 {sortOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
@@ -313,11 +314,11 @@ const Top100CoursesHubPanel = () => {
       ) : displayedCourses.length === 0 ? (
         /* Empty state - friendly with search-specific messaging */
         <div className="flex flex-col items-center justify-center py-16 text-center gap-4 animate-fade-in">
-          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-slate-100 to-slate-50 border border-slate-200/60 flex items-center justify-center shadow-sm">
+          <div className="w-14 h-14 rounded-full bg-muted/50 border border-border/60 flex items-center justify-center shadow-sm">
             {searchTerm ? (
-              <Search className="w-5 h-5 text-slate-400" />
+              <Search className="w-5 h-5 text-muted-foreground" />
             ) : (
-              <Award className="w-5 h-5 text-slate-400" />
+              <Award className="w-5 h-5 text-muted-foreground" />
             )}
           </div>
           <div className="space-y-1">
@@ -333,15 +334,14 @@ const Top100CoursesHubPanel = () => {
           {searchTerm ? (
             <Button 
               variant="outline" 
-              size="sm" 
               onClick={() => setSearchTerm('')}
-              className="mt-1 gap-1.5"
+              className="mt-1 gap-1.5 h-11 active:scale-[0.97] transition-transform"
             >
               <X className="h-3.5 w-3.5" />
               Clear search
             </Button>
           ) : (
-            <Button variant="outline" size="sm" onClick={handleResetFilters} className="mt-1">
+            <Button variant="outline" onClick={handleResetFilters} className="mt-1 h-11 active:scale-[0.97] transition-transform">
               Reset filters
             </Button>
           )}
@@ -357,10 +357,9 @@ const Top100CoursesHubPanel = () => {
                 <div className="flex flex-col items-center gap-2 pt-4">
                   <Button
                     variant="outline"
-                    size="sm"
                     onClick={loadMore}
                     disabled={isLoadingMore}
-                    className="w-full max-w-xs gap-1.5 transition-all duration-200 hover:shadow-sm hover:border-border active:scale-[0.98]"
+                    className="h-11 w-full max-w-xs gap-1.5 transition-all duration-200 hover:shadow-sm hover:border-border active:scale-[0.98]"
                   >
                     {isLoadingMore ? (
                       <>
