@@ -1133,7 +1133,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                                 [item.id]: index
                               }));
                             }}
-                            bottomOffset="calc(var(--bottom-nav-height, 64px) + 166px)"
+                            bottomOffset="calc(30px + 80px + 65px + 12px)"
                           />
                         )}
                         
@@ -1157,6 +1157,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                       {/* Left arrow - vertically centered in content area */}
                       {currentMediaIndex > 0 && (
                         <motion.button
+                          key="chevron-left"
                           whileTap={{ scale: 0.93 }}
                           transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                           data-control="media-nav"
@@ -1165,7 +1166,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           style={{
                             width: 44, height: 44,
                             top: '45%',
-                            transform: 'translateY(-50%)',
+                            y: '-50%',
                             background: 'rgba(0, 0, 0, 0.35)',
                             backdropFilter: 'blur(20px)',
                             WebkitBackdropFilter: 'blur(20px)',
@@ -1179,6 +1180,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                       {/* Right arrow - only for non-review posts (review posts use CinematicActionRail) */}
                       {!isReviewItem && currentMediaIndex < mediaItems.length - 1 && (
                         <motion.button
+                          key="chevron-right"
                           whileTap={{ scale: 0.93 }}
                           transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                           data-control="media-nav"
@@ -1187,7 +1189,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           style={{
                             width: 44, height: 44,
                             top: '45%',
-                            transform: 'translateY(-50%)',
+                            y: '-50%',
                             background: 'rgba(0, 0, 0, 0.35)',
                             backdropFilter: 'blur(20px)',
                             WebkitBackdropFilter: 'blur(20px)',
