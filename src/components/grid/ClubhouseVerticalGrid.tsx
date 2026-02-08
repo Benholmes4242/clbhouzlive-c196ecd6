@@ -1436,8 +1436,8 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                     onClick={() => setMediaIndices(prev => ({ ...prev, [currentPost.id]: i }))}
                     className={`h-1.5 rounded-full transition-all duration-200 ease-out ${
                       i === currentMediaIdx
-                        ? 'w-5 bg-white'
-                        : 'w-1.5 bg-white/60'
+                        ? 'w-5 bg-white/50'
+                        : 'w-1.5 bg-white/25'
                     }`}
                   />
                 ))}
