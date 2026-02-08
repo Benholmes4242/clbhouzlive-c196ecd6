@@ -43,6 +43,7 @@ const SORT_OPTIONS: { value: Top100SortMode; label: string; requiresReviewData?:
  * - Smooth transitions between states
  * - Better visual hierarchy
  * - Animated chevron on dropdown open
+ * - Semantic design tokens throughout
  */
 export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
   activeFilter,
@@ -68,8 +69,8 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
     <motion.div 
       className={`px-4 py-3 transition-all duration-200 ${
         isSticky 
-          ? 'bg-slate-50/98 backdrop-blur-md border-b border-slate-200/80 shadow-sm' 
-          : 'bg-slate-50 border-b border-slate-200/60'
+          ? 'bg-muted/98 backdrop-blur-md border-b border-border/80 shadow-sm' 
+          : 'bg-muted/50 border-b border-border/60'
       }`}
       initial={false}
       animate={{ 
@@ -82,13 +83,13 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="flex items-center justify-between w-44 px-3 py-2.5 rounded-sq-sm bg-white border border-slate-200 hover:border-[#e2e8f0] hover:shadow-sm transition-all duration-150 text-sm font-medium text-[#1e293b] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e2e8f0]"
+              className="flex items-center justify-between w-44 px-3 py-2.5 rounded-sq-sm bg-card border border-border hover:border-border hover:shadow-sm transition-all duration-150 text-sm font-medium text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-border active:scale-[0.98]"
             >
               <span className="truncate">{currentFilterLabel}</span>
-              <ChevronDown className="w-4 h-4 text-[#64748b] flex-shrink-0 ml-1" />
+              <ChevronDown className="w-4 h-4 text-muted-foreground flex-shrink-0 ml-1" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="min-w-[180px] bg-white border-[#e2e8f0] shadow-lg z-50">
+          <DropdownMenuContent align="start" className="min-w-[180px] bg-card border-border shadow-lg z-50">
             {FILTER_OPTIONS.map((option) => {
               const isActive = activeFilter === option.value;
               return (
@@ -97,14 +98,14 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
                   onClick={() => onFilterChange(option.value)}
                   className={`cursor-pointer transition-colors duration-100 ${
                     isActive 
-                      ? 'bg-[#f8fafc] border border-[#e2e8f0] text-[#1e293b] font-medium' 
-                      : 'text-[#64748b] hover:bg-[#f8fafc]'
+                      ? 'bg-muted/50 border border-border text-foreground font-medium' 
+                      : 'text-muted-foreground hover:bg-muted/50'
                   }`}
                 >
                   <span className="flex items-center gap-2">
                     {option.label}
                     {counts[option.value] !== undefined && counts[option.value]! > 0 && (
-                      <span className={`text-[11px] ${isActive ? 'text-[#64748b]' : 'text-[#94a3b8]'}`}>
+                      <span className={`text-[11px] ${isActive ? 'text-muted-foreground' : 'text-muted-foreground/60'}`}>
                         ({counts[option.value]})
                       </span>
                     )}
@@ -119,13 +120,13 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="flex items-center justify-between w-44 px-3 py-2.5 rounded-sq-sm bg-white border border-slate-200 hover:border-[#e2e8f0] hover:shadow-sm transition-all duration-150 text-sm font-medium text-[#1e293b] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e2e8f0]"
+              className="flex items-center justify-between w-44 px-3 py-2.5 rounded-sq-sm bg-card border border-border hover:border-border hover:shadow-sm transition-all duration-150 text-sm font-medium text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-border active:scale-[0.98]"
             >
               <span className="truncate">{currentSortLabel}</span>
-              <ChevronDown className="w-4 h-4 text-[#64748b] flex-shrink-0 ml-1" />
+              <ChevronDown className="w-4 h-4 text-muted-foreground flex-shrink-0 ml-1" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="min-w-[180px] bg-white border-[#e2e8f0] shadow-lg z-50">
+          <DropdownMenuContent align="start" className="min-w-[180px] bg-card border-border shadow-lg z-50">
             {availableSortOptions.map((option) => {
               const isActive = activeSort === option.value;
               // When Played/Unplayed: only rating_high is enabled
@@ -141,10 +142,10 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
                   }}
                   className={`transition-colors duration-100 ${
                     isDisabled
-                      ? 'text-[#94a3b8] cursor-not-allowed'
+                      ? 'text-muted-foreground/60 cursor-not-allowed'
                       : isActive 
-                        ? 'bg-[#f8fafc] border border-[#e2e8f0] text-[#1e293b] font-medium cursor-pointer' 
-                        : 'text-[#64748b] hover:bg-[#f8fafc] cursor-pointer'
+                        ? 'bg-muted/50 border border-border text-foreground font-medium cursor-pointer' 
+                        : 'text-muted-foreground hover:bg-muted/50 cursor-pointer'
                   }`}
                   disabled={isDisabled}
                 >

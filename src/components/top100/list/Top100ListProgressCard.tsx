@@ -23,6 +23,7 @@ interface Top100ListProgressCardProps {
  * - Milestone icon
  * - Hover/press states
  * - Bold milestone number
+ * - Semantic design tokens
  */
 export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
   playedCount,
@@ -63,7 +64,7 @@ export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
               <Trophy className="w-5 h-5" style={{ color: theme.ringColor }} />
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-slate-900">
+              <p className="text-sm font-semibold text-foreground">
                 Completed
               </p>
               <p className="text-xs mt-0.5" style={{ color: theme.ringColor }}>
@@ -75,7 +76,7 @@ export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
             <p className="text-xs font-medium italic whitespace-nowrap" style={{ color: theme.ringColor }}>
               {statusCopy}
             </p>
-            <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
+            <ChevronRight className="w-4 h-4 text-muted-foreground/60 group-hover:text-muted-foreground transition-colors" />
           </div>
         </div>
       </motion.button>
@@ -85,29 +86,29 @@ export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
   return (
     <motion.button
       onClick={handleClick}
-      className="mx-4 mt-4 w-[calc(100%-2rem)] text-left px-4 py-3.5 rounded-sq-md bg-white border border-slate-200 shadow-sm transition-all duration-150 group hover:border-slate-300 hover:shadow-md"
+      className="mx-4 mt-4 w-[calc(100%-2rem)] text-left px-4 py-3.5 rounded-sq-md bg-card border border-border shadow-sm transition-all duration-150 group hover:border-border hover:shadow-md"
       whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.99 }}
     >
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
-            <Target className="w-5 h-5 text-slate-600" />
+          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+            <Target className="w-5 h-5 text-muted-foreground" />
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-slate-900">
+            <p className="text-sm font-semibold text-foreground">
               Next milestone: <span className="text-lg tabular-nums"><AnimatedNumber value={nextMilestone ?? 0} minCh={1} /></span>
             </p>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-muted-foreground mt-0.5">
               <AnimatedNumber value={toGo} minCh={1} delay={0.05} /> course{toGo !== 1 ? 's' : ''} to go
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <p className="text-xs font-medium text-slate-500 italic whitespace-nowrap">
+          <p className="text-xs font-medium text-muted-foreground italic whitespace-nowrap">
             {statusCopy}
           </p>
-          <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
+          <ChevronRight className="w-4 h-4 text-muted-foreground/60 group-hover:text-muted-foreground transition-colors" />
         </div>
       </div>
     </motion.button>
