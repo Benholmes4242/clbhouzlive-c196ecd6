@@ -1,43 +1,16 @@
 /**
- * PlayerHero - Premium profile header with SquircleAvatar,
- * country flag emoji, rank badges, and clean stat boxes.
+ * PlayerHero - Immersive full-bleed hero with gradient scrim,
+ * overlaid player identity, glass rank pills, and Ken Burns animation.
  */
 
-import { Globe } from 'lucide-react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { ArrowLeft, Share2, Globe } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useRef, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
-
-interface HeroStatProps {
-  label: string;
-  value: string | number | null;
-  highlight?: boolean;
-}
-
-function HeroStat({ label, value, highlight = false }: HeroStatProps) {
-  const hasValue = value !== null && value !== '—' && value !== undefined;
-
-  return (
-    <div className={cn(
-      "text-center px-3 py-4 rounded-xl transition-all",
-      highlight && hasValue
-        ? "bg-amber-500/10 border border-amber-500/20"
-        : "bg-muted/40 border border-border/50"
-    )}>
-      <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1.5">
-        {label}
-      </span>
-      <span className={cn(
-        "text-xl font-bold font-mono block",
-        hasValue ? (highlight ? "text-amber-500" : "text-foreground") : "text-muted-foreground"
-      )}>
-        {hasValue ? value : '—'}
-      </span>
-    </div>
-  );
-}
 
 interface PlayerHeroProps {
   player: TourPlayer;
@@ -45,7 +18,11 @@ interface PlayerHeroProps {
 }
 
 export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
-  const photoUrl = resolvePhotoUrl(player.photo_url, player.pga_tour_id);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const heroRef = useRef<HTMLDivElement>(null);
+
+  const heroPhotoUrl = resolvePhotoUrl(player.photo_url, player.pga_tour_id, 'hero');
 
   const initials = player.full_name
     .split(' ')
@@ -62,97 +39,168 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
   const countryDisplay = player.country ? titleCaseCountry(player.country) : null;
   const isWorldNo1 = playerStats?.world_rank === 1;
 
+  // Parallax on scroll
+  const { scrollY } = useScroll();
+  const imageY = useTransform(scrollY, [0, 400], [0, 80]);
+
+  const handleBack = useCallback(() => {
+    // If we have history, go back — otherwise fallback to players tab
+    if (location.key !== 'default') {
+      navigate(-1);
+    } else {
+      navigate('/tourhub?tab=players');
+    }
+  }, [navigate, location.key]);
+
+  const handleShare = useCallback(async () => {
+    try {
+      await navigator.share({
+        title: player.full_name,
+        url: window.location.href,
+      });
+    } catch {
+      // User cancelled or not supported — silently ignore
+    }
+  }, [player.full_name]);
+
   return (
-    <div className={cn(
-      "relative rounded-2xl overflow-hidden bg-card border shadow-sm",
-      isWorldNo1 ? "border-amber-300/60" : "border-border/50"
-    )}>
-      {/* World #1 top accent bar */}
-      {isWorldNo1 && (
-        <div className="h-1 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-400" />
+    <div ref={heroRef} className="relative w-full overflow-hidden" style={{ height: 'clamp(320px, 60vh, 480px)' }}>
+      {/* Hero Image or Fallback Gradient */}
+      {heroPhotoUrl ? (
+        <motion.img
+          src={heroPhotoUrl}
+          alt={player.full_name}
+          className="absolute inset-0 w-full h-full object-cover object-top"
+          loading="eager"
+          fetchPriority="high"
+          initial={{ scale: 1.06 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 10, ease: 'linear' }}
+          style={{ y: imageY }}
+        />
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-800 via-emerald-900 to-slate-900 flex items-center justify-center">
+          <span className="text-white/20 text-8xl font-bold font-mono select-none">{initials}</span>
+        </div>
       )}
 
-      <div className="relative px-6 py-8">
-        {/* Avatar + Name row */}
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 mb-6">
-          <div className="flex items-center gap-5">
-            <SquircleAvatar
-              src={photoUrl}
-              alt={player.full_name}
-              fallback={initials}
-              size="2xl"
-              enableGlow={isWorldNo1}
-              hideRing
-            />
+      {/* Gradient scrim */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10" />
 
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-1.5">
-                {player.full_name}
-              </h1>
+      {/* Glass Back button — top left */}
+      <motion.button
+        onClick={handleBack}
+        className="absolute z-10 flex items-center gap-2 px-3 py-2 rounded-full"
+        style={{
+          top: 'max(env(safe-area-inset-top, 0px), 12px)',
+          left: '16px',
+          background: 'rgba(0,0,0,0.3)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(255,255,255,0.15)',
+        }}
+        whileTap={{ scale: 0.95 }}
+      >
+        <ArrowLeft className="w-4 h-4 text-white" />
+        <span className="text-white text-sm font-medium">Back</span>
+      </motion.button>
 
-              <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                {countryDisplay && (
-                  <span className="flex items-center gap-1.5">
-                    {flag ? (
-                      <span className="text-lg leading-none">{flag}</span>
-                    ) : (
-                      <Globe className="w-4 h-4" />
-                    )}
-                    {countryDisplay}
-                  </span>
-                )}
-                {age && (
-                  <>
-                    <span className="text-border">•</span>
-                    <span>Age {age}</span>
-                  </>
-                )}
-              </div>
+      {/* Share button — top right */}
+      <motion.button
+        onClick={handleShare}
+        className="absolute z-10 flex items-center justify-center w-9 h-9 rounded-full"
+        style={{
+          top: 'max(env(safe-area-inset-top, 0px), 12px)',
+          right: '16px',
+          background: 'rgba(0,0,0,0.3)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(255,255,255,0.15)',
+        }}
+        whileTap={{ scale: 0.9 }}
+      >
+        <Share2 className="w-4 h-4 text-white" />
+      </motion.button>
 
-              {/* Rank pills */}
-              <div className="flex flex-wrap gap-2 mt-2.5">
-                {playerStats?.world_rank && playerStats.world_rank > 0 && (
-                  <span className={cn(
-                    "inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold border",
-                    isWorldNo1
-                      ? "bg-amber-50 border-amber-200 text-amber-700"
-                      : "bg-primary/5 border-primary/20 text-primary"
-                  )}>
-                    #{playerStats.world_rank} World
-                  </span>
-                )}
-                {playerStats?.fedex_rank && playerStats.fedex_rank > 0 && (
-                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-primary/5 border border-primary/20 text-primary">
-                    #{playerStats.fedex_rank} FedEx
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
+      {/* Overlay Content — bottom of hero */}
+      <motion.div
+        className="absolute bottom-0 left-0 right-0 px-5 pb-8 z-10"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+      >
+        {/* Player Name */}
+        <h1 className="text-3xl font-bold text-white mb-1.5 leading-tight">
+          {player.full_name}
+        </h1>
+
+        {/* Country + Age */}
+        <div className="flex items-center gap-2 text-sm text-white/80 mb-3">
+          {countryDisplay && (
+            <span className="flex items-center gap-1.5">
+              {flag ? (
+                <span className="text-lg leading-none">{flag}</span>
+              ) : (
+                <Globe className="w-4 h-4" />
+              )}
+              {countryDisplay}
+            </span>
+          )}
+          {age && (
+            <>
+              <span className="text-white/40">•</span>
+              <span>Age {age}</span>
+            </>
+          )}
         </div>
 
-        {/* Stats strip */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <HeroStat
-            label="World Rank"
-            value={playerStats?.world_rank && playerStats.world_rank > 0 ? `#${playerStats.world_rank}` : null}
-            highlight={isWorldNo1}
-          />
-          <HeroStat
-            label="FedEx Rank"
-            value={playerStats?.fedex_rank && playerStats.fedex_rank > 0 ? `#${playerStats.fedex_rank}` : null}
-          />
-          <HeroStat
-            label="Season Wins"
-            value={playerStats?.wins != null ? playerStats.wins : null}
-            highlight={!!(playerStats?.wins && playerStats.wins > 0)}
-          />
-          <HeroStat
-            label="Events"
-            value={playerStats?.events_played ?? null}
-          />
+        {/* Glass Rank Pills */}
+        <div className="flex flex-wrap gap-2">
+          {playerStats?.world_rank && playerStats.world_rank > 0 && (
+            <motion.span
+              className={cn(
+                "inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold text-white",
+              )}
+              style={{
+                background: 'rgba(255,255,255,0.15)',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                ...(isWorldNo1 ? {
+                  boxShadow: '0 0 12px rgba(245,158,11,0.4)',
+                  borderColor: 'rgba(245,158,11,0.5)',
+                } : {}),
+              }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35, duration: 0.3 }}
+            >
+              #{playerStats.world_rank} World
+            </motion.span>
+          )}
+          {playerStats?.fedex_rank && playerStats.fedex_rank > 0 && (
+            <motion.span
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold text-white"
+              style={{
+                background: 'rgba(255,255,255,0.15)',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+                border: '1px solid rgba(255,255,255,0.2)',
+              }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.3 }}
+            >
+              #{playerStats.fedex_rank} FedEx
+            </motion.span>
+          )}
         </div>
-      </div>
+      </motion.div>
+
+      {/* World #1 gold shimmer at bottom edge */}
+      {isWorldNo1 && (
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-400" />
+      )}
     </div>
   );
 }

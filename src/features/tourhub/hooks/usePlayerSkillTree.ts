@@ -324,7 +324,7 @@ export function usePlayerSkillTree(playerId: string) {
         overallLevel,
       };
     },
-    staleTime: 1000 * 60 * 10, // 10 minutes
+    staleTime: 1000 * 60 * 30, // 30 minutes — rankings don't change frequently
     enabled: !!playerId,
   });
 }

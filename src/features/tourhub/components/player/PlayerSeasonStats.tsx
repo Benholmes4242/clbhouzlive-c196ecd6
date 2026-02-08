@@ -1,12 +1,12 @@
 /**
- * PlayerSeasonStats - Tabbed season statistics display
- * Tabs: Overview | Ball Striking | Short Game | Strokes Gained
+ * PlayerSeasonStats - Tabbed season statistics with glass card,
+ * animated progress bars, layoutId tab underline, and SG tour avg line.
  */
 
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingUp, Trophy, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { RoundSelector } from '../tournament-detail/RoundSelector';
 import type { TourPlayerStatistics } from '../../hooks/useTourHubData';
 
 // Helpers
@@ -27,14 +27,24 @@ function fmt(value: number | null | undefined, type?: 'decimal' | 'percent' | 'y
   }
 }
 
+// Glass card shared style
+const GLASS_CARD_STYLE = {
+  background: 'rgba(255, 255, 255, 0.7)',
+  backdropFilter: 'blur(8px)',
+  WebkitBackdropFilter: 'blur(8px)',
+  border: '1px solid rgba(255, 255, 255, 0.5)',
+  boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04)',
+};
+
 interface StatRowProps {
   label: string;
   value: string;
   trend?: 'positive' | 'negative' | null;
-  barPercent?: number; // 0-100 for visual bar
+  barPercent?: number;
+  barIndex?: number;
 }
 
-function StatRow({ label, value, trend, barPercent }: StatRowProps) {
+function StatRow({ label, value, trend, barPercent, barIndex = 0 }: StatRowProps) {
   const hasValue = value !== '—';
   return (
     <div className="py-3 border-b border-border/20 last:border-0">
@@ -53,14 +63,20 @@ function StatRow({ label, value, trend, barPercent }: StatRowProps) {
       </div>
       {barPercent !== undefined && hasValue && (
         <div className="mt-1.5 h-1.5 bg-muted/30 rounded-full overflow-hidden">
-          <div
+          <motion.div
             className={cn(
-              "h-full rounded-full transition-all duration-500",
+              "h-full rounded-full",
               trend === 'positive' ? "bg-emerald-500/70" :
               trend === 'negative' ? "bg-red-500/70" :
               "bg-primary/50"
             )}
-            style={{ width: `${Math.min(100, Math.max(0, barPercent))}%` }}
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.6, delay: barIndex * 0.1, ease: 'easeOut' }}
+            style={{
+              width: `${Math.min(100, Math.max(0, barPercent))}%`,
+              originX: 0,
+            }}
           />
         </div>
       )}
@@ -75,7 +91,7 @@ interface SGBarProps {
 
 function SGBar({ label, value }: SGBarProps) {
   if (value === null || value === undefined) return null;
-  const maxWidth = 60; // percent of bar width
+  const maxWidth = 60;
   const barWidth = Math.min(maxWidth, Math.abs(value) * 15);
   const isPositive = value >= 0;
 
@@ -91,17 +107,26 @@ function SGBar({ label, value }: SGBarProps) {
         </span>
       </div>
       <div className="relative h-2 bg-muted/20 rounded-full overflow-hidden">
-        {/* Center line */}
-        <div className="absolute left-1/2 top-0 bottom-0 w-px bg-border/60" />
+        {/* Center line (Tour Average = 0) */}
+        <div className="absolute left-1/2 top-0 bottom-0 w-px bg-border/60 z-10" />
+        {/* Tour Avg label */}
+        <span className="absolute left-1/2 -top-4 -translate-x-1/2 text-[8px] text-muted-foreground/60 font-medium">
+          Tour Avg
+        </span>
         {/* Bar */}
-        <div
+        <motion.div
           className={cn(
-            "absolute top-0 bottom-0 rounded-full transition-all duration-500",
+            "absolute top-0 bottom-0 rounded-full",
             isPositive ? "bg-emerald-500/70" : "bg-red-500/70"
           )}
+          initial={{ width: 0 }}
+          animate={{
+            width: `${barWidth}%`,
+            left: isPositive ? '50%' : `${50 - barWidth}%`,
+          }}
+          transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
           style={{
             left: isPositive ? '50%' : `${50 - barWidth}%`,
-            width: `${barWidth}%`,
           }}
         />
       </div>
@@ -126,18 +151,37 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
     ? (playerStats.top_25s / playerStats.events_played) * 100 : undefined;
 
   return (
-    <div className="bg-card rounded-xl border border-border/50 p-6">
+    <div className="rounded-[20px] p-6" style={GLASS_CARD_STYLE}>
       <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2 pl-3 border-l-3 border-primary">
         <TrendingUp className="w-5 h-5 text-primary" />
         Season Performance
       </h2>
 
-      <RoundSelector
-        rounds={TABS}
-        activeRound={activeTab}
-        onRoundChange={setActiveTab}
-        className="mb-5"
-      />
+      {/* Tab bar with animated underline */}
+      <div className="flex border-b border-border/30 mb-5">
+        {TABS.map((tab) => {
+          const isActive = activeTab === tab;
+          return (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={cn(
+                "relative flex-1 py-2.5 text-sm text-center transition-colors active:scale-[0.95]",
+                isActive ? "font-semibold text-foreground" : "font-medium text-muted-foreground"
+              )}
+            >
+              {tab}
+              {isActive && (
+                <motion.div
+                  layoutId="season-tab"
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-full"
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                />
+              )}
+            </button>
+          );
+        })}
+      </div>
 
       {activeTab === 'Overview' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
@@ -151,10 +195,11 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
               ? `${playerStats.cuts_made}/${playerStats.events_played}`
               : fmt(playerStats.cuts_made)}
               barPercent={cutsRatio}
+              barIndex={0}
             />
             <StatRow label="Wins" value={fmt(playerStats.wins)} />
-            <StatRow label="Top 10s" value={fmt(playerStats.top_10s)} barPercent={top10Ratio} />
-            <StatRow label="Top 25s" value={fmt(playerStats.top_25s)} barPercent={top25Ratio} />
+            <StatRow label="Top 10s" value={fmt(playerStats.top_10s)} barPercent={top10Ratio} barIndex={1} />
+            <StatRow label="Top 25s" value={fmt(playerStats.top_25s)} barPercent={top25Ratio} barIndex={2} />
           </div>
           <div>
             <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2 font-medium flex items-center gap-1.5">
@@ -191,9 +236,8 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
       )}
 
       {activeTab === 'Strokes Gained' && (
-        <div>
+        <div className="pt-2">
           <SGBar label="SG: Total" value={playerStats.strokes_gained_total} />
-          {/* SG: Putting from raw_data if available */}
           <SGBar label="SG: Putting" value={(playerStats as any).strokes_gained_putting ?? null} />
           <SGBar label="SG: Tee to Green" value={(playerStats as any).strokes_gained_tee_green ?? null} />
           {!playerStats.strokes_gained_total && (
