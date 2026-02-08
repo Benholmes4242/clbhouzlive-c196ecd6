@@ -55,7 +55,7 @@ export function Top100ProgressSummary({ ratedCount, listCount, totalCourses, isL
 
       {/* Progress bar - animated fill with gradient and glow */}
       <div className="w-full max-w-[400px] relative">
-        <div className="relative h-2.5 bg-muted/60 dark:bg-slate-800/60 rounded-full overflow-hidden">
+        <div className="relative h-2.5 bg-muted/60 dark:bg-muted rounded-full overflow-hidden">
           {/* Glow effect behind progress */}
           <div 
             className="absolute inset-0 rounded-full blur-md opacity-40"

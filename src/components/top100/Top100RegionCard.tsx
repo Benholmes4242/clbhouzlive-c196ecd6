@@ -62,9 +62,11 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
 
   return (
     <div
+      role="button"
+      aria-label={`View ${displayLabel} courses`}
       className={cn(
         'group relative overflow-hidden',
-        'bg-slate-900 text-white',
+        'bg-foreground text-white',
         isHero ? [
           // Full-width hero: no rounded corners, negative margins to break out of gutters
           'rounded-none -mx-4',
@@ -101,7 +103,7 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
           )} />
         </>
       ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900" />
+        <div className="absolute inset-0 bg-gradient-to-br from-foreground/80 to-foreground" />
       )}
 
       {/* Back button - only in hero variant */}
@@ -180,7 +182,7 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
                   size="sm"
                   className={cn(
                     'rounded-sq-sm px-4 py-1.5 text-xs font-medium',
-                    'bg-white/95 backdrop-blur-sm text-slate-900',
+                    'bg-white/95 backdrop-blur-sm text-foreground',
                     'border border-white/20 shadow-sm',
                     'hover:bg-white hover:shadow-md',
                     'active:scale-[0.97] transition-all duration-150'
