@@ -53,6 +53,7 @@ export interface TourPlayer {
   weight: string | null;
   pga_tour_id: string | null;
   handedness: string | null;
+  tour_codes: string[] | null;
 }
 
 // Raw data structure from SportsRadar
@@ -282,7 +283,7 @@ export function useTourPlayers(search?: string) {
     queryFn: async () => {
       let query = supabase
         .from('sr_players')
-        .select('*')
+        .select('id, sr_id, first_name, last_name, full_name, birth_date, birth_place, residence, college, college_normalized, turned_pro, country, country_code, photo_url, height, weight, pga_tour_id, handedness, tour_codes')
         .order('full_name', { ascending: true });
       
       if (search && search.length >= 2) {
