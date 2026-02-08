@@ -79,13 +79,13 @@ const ScrollToTopGlass = () => {
         aria-label="Back to top"
         className="
           pointer-events-auto
-          h-9
-          w-9
+          h-11
+          w-11
           rounded-full
           flex
           items-center
           justify-center
-          bg-slate-900/80
+          bg-foreground/80
           backdrop-blur-md
           border
           border-white/15
