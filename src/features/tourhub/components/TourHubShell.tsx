@@ -6,9 +6,11 @@ import { useEffect } from 'react';
 
 interface TourHubShellProps {
   children: ReactNode;
+  /** Enable immersive full-bleed mode (hero behind status bar) */
+  immersive?: boolean;
 }
 
-export function TourHubShell({ children }: TourHubShellProps) {
+export function TourHubShell({ children, immersive = false }: TourHubShellProps) {
   const { setVariant } = useHeader();
   const [searchParams] = useSearchParams();
   
@@ -21,6 +23,21 @@ export function TourHubShell({ children }: TourHubShellProps) {
     setVariant('solid-light');
     return () => setVariant('solid-light');
   }, [setVariant]);
+
+  // Immersive mode: tournament detail pages with full-bleed hero
+  if (immersive) {
+    return (
+      <PageRoot 
+        className="min-h-screen w-full bg-background"
+        immersive
+        immersiveStatusBar
+      >
+        <div className="w-full max-w-5xl mx-auto">
+          {children}
+        </div>
+      </PageRoot>
+    );
+  }
 
   // Overview tab: No wrapper constraints - hero bleeds edge-to-edge
   // immersiveStatusBar=true lets OverviewPageV3 control the transparent status bar

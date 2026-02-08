@@ -2,8 +2,11 @@
  * TournamentHero - Cinematic immersive hero for tournament detail
  * 
  * Features:
- * - Full-bleed 340px immersive container
- * - Ken Burns animation (scale 1.08)
+ * - Full-bleed viewport-relative immersive container
+ * - Ken Burns animation (scale 1.06)
+ * - Parallax scroll effect
+ * - Glass back button (top-left)
+ * - LIVE badge (top-right)
  * - Premium glassmorphism status badges
  * - Gradient scrim overlays
  * - Floating metadata pills
@@ -11,8 +14,9 @@
  */
 
 import { format } from 'date-fns';
-import { MapPin, Calendar, DollarSign, Flag, Ruler, Zap, Trophy, Clock } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { MapPin, Calendar, DollarSign, Flag, Ruler, Zap, Trophy, Clock, ArrowLeft } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import type { TourTournament } from '../../hooks/useTourHubData';
 
@@ -91,35 +95,47 @@ function HeroPill({ children, className }: { children: React.ReactNode; classNam
 }
 
 export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
+  const navigate = useNavigate();
+  const { scrollY } = useScroll();
+  const imageY = useTransform(scrollY, [0, 400], [0, 60]);
+
   const formattedPurse = tournament.purse 
     ? `$${(tournament.purse / 1_000_000).toFixed(1)}M`
     : null;
 
   return (
-    <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 overflow-hidden" style={{ marginTop: '-55px' }}>
+    <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 overflow-hidden">
       {/* Background container with Ken Burns */}
       <motion.div 
         className="relative overflow-hidden"
-        style={{ height: 'calc(340px + 55px)' }}
+        style={{ minHeight: 'calc(45vh + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       >
-        {/* Background image with Ken Burns animation */}
+        {/* Background image with Ken Burns + parallax */}
         <motion.div
           className="absolute inset-0"
-          initial={{ scale: 1.05 }}
+          initial={{ scale: 1.06 }}
           animate={{ scale: 1 }}
-          transition={{ duration: 20, ease: 'linear' }}
+          transition={{ duration: 15, ease: 'linear' }}
+          style={{ y: imageY }}
         >
           {imageUrl ? (
             <img 
               src={imageUrl}
               alt={tournament.venue_name || tournament.name}
               className="w-full h-full object-cover"
+              loading="eager"
+              fetchPriority="high"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900" />
+            <div 
+              className="w-full h-full" 
+              style={{
+                background: 'linear-gradient(135deg, hsl(var(--foreground)) 0%, hsl(220, 30%, 20%) 50%, hsl(var(--foreground)) 100%)',
+              }}
+            />
           )}
         </motion.div>
         
@@ -142,10 +158,29 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
           }}
         />
 
-        {/* Status Badge - positioned below header */}
+        {/* Glass Back Button - top-left */}
+        <motion.button
+          onClick={() => navigate(-1)}
+          className="absolute left-4 z-20 flex items-center gap-2 px-3 py-2 rounded-full"
+          style={{
+            top: 'calc(max(var(--sat, env(safe-area-inset-top, 0px)), 47px) + 8px)',
+            background: 'rgba(0,0,0,0.3)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255,255,255,0.15)',
+          }}
+          whileTap={{ scale: 0.95 }}
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.15, duration: 0.4 }}
+        >
+          <ArrowLeft className="w-4 h-4 text-white" />
+          <span className="text-white text-sm font-medium">Back</span>
+        </motion.button>
+
+        {/* Status Badge - top-right */}
         <motion.div 
-          className="absolute left-4 z-10"
-          style={{ top: 'calc(55px + 16px)' }}
+          className="absolute right-4 z-10"
+          style={{ top: 'calc(max(var(--sat, env(safe-area-inset-top, 0px)), 47px) + 8px)' }}
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.4 }}
@@ -168,9 +203,9 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
               WebkitBoxOrient: 'vertical',
               overflow: 'hidden',
             }}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ delay: 0.2, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           >
             {tournament.name}
           </motion.h1>
@@ -180,7 +215,7 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
             className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ delay: 0.3, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           >
             <span 
               className="flex items-center gap-1.5 text-sm font-medium text-white"
@@ -201,12 +236,12 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
             )}
           </motion.div>
 
-          {/* Glassmorphic metadata pills - standardized */}
+          {/* Glassmorphic metadata pills - staggered */}
           <motion.div 
             className="flex flex-wrap items-center gap-2"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ delay: 0.4, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           >
             {formattedPurse && (
               <HeroPill>
