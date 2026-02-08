@@ -17,7 +17,7 @@ import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
 import { useFollow } from '@/hooks/useFollow';
 import { useFriendship } from '@/hooks/useFriendship';
 import { supabase } from '@/integrations/supabase/client';
-import { Trophy, ChevronRight, MoreHorizontal, Send, UserPlus, Check, ExternalLink, Loader2, ArrowLeft, Pencil, Camera } from 'lucide-react';
+import { Trophy, ChevronRight, ChevronDown, MoreHorizontal, Send, UserPlus, Check, ExternalLink, Loader2, ArrowLeft, Pencil, Camera } from 'lucide-react';
 import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
@@ -148,6 +148,7 @@ const ProfilePageV2Content: React.FC = () => {
   }, [isSelf, profileUserId, ensureInitial]);
   
   const [activeSection, setActiveSection] = useState('activity');
+  const [bioExpanded, setBioExpanded] = useState(false);
   const [activeMiniNav, setActiveMiniNav] = useState('posts');
   const [followersCount, setFollowersCount] = useState<number | null>(null);
   const [followingCount, setFollowingCount] = useState<number | null>(null);
@@ -644,9 +645,24 @@ const ProfilePageV2Content: React.FC = () => {
         {/* About section - removed "About" heading, just the bio text */}
         {/* mb-5 → mb-4 (16px from about text to clubs divider) */}
         <section className="px-5 mb-4">
-          <p className="text-base text-foreground leading-relaxed whitespace-pre-wrap" style={{ overflowWrap: 'anywhere' }}>
+          <div 
+            className={cn(
+              "text-base text-foreground leading-relaxed whitespace-pre-wrap",
+              !bioExpanded && "line-clamp-6"
+            )} 
+            style={{ overflowWrap: 'anywhere' }}
+          >
             {profile?.bio || 'Passionate golfer with a love for links courses. Always working to improve my game and explore new courses.'}
-          </p>
+          </div>
+          {profile?.bio && profile.bio.split('\n').length > 4 && !bioExpanded && (
+            <button 
+              onClick={() => setBioExpanded(true)}
+              className="text-sm text-muted-foreground mt-1 min-h-[44px] flex items-center active:scale-[0.98]"
+            >
+              Read more
+              <ChevronDown className="w-4 h-4 ml-1" />
+            </button>
+          )}
           
           {/* Websites as pills - directly under bio */}
           {websites.length > 0 && (
@@ -657,7 +673,7 @@ const ProfilePageV2Content: React.FC = () => {
                   href={ensureProtocol(website)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-muted-foreground hover:text-foreground bg-muted border border-border transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-muted border border-border px-3 min-h-[44px] text-sm font-medium text-muted-foreground hover:text-foreground transition-colors active:scale-[0.98]"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                   {formatUrlForDisplay(website)}
@@ -693,18 +709,10 @@ const ProfilePageV2Content: React.FC = () => {
         {/* Explicit touch-action and z-index to ensure tappability on mobile */}
         <section 
           className="px-4 py-2 relative"
-          data-debug-id="profile-tabs-row"
           style={{ 
             touchAction: 'auto',
             pointerEvents: 'auto',
             zIndex: 20
-          }}
-          onPointerDown={(e) => {
-            logPoint('tabs_row.pointerdown', { x: e.clientX, y: e.clientY });
-          }}
-          onTouchStart={(e) => {
-            const t = e.touches?.[0];
-            logPoint('tabs_row.pointerdown', { x: t?.clientX, y: t?.clientY, via: 'touchstart' });
           }}
         >
           <div 
@@ -719,20 +727,9 @@ const ProfilePageV2Content: React.FC = () => {
               return (
                 <button
                   key={tab.id}
-                  data-debug-id={`profile-tab-${tab.id}`}
-                  onPointerDown={(e) => {
-                    logPoint('tabs_row.pointerdown', { tabId: tab.id, x: e.clientX, y: e.clientY });
-                  }}
-                  onTouchStart={(e) => {
-                    const t = e.touches?.[0];
-                    logPoint('tabs_row.pointerdown', { tabId: tab.id, x: t?.clientX, y: t?.clientY, via: 'touchstart' });
-                  }}
-                  onClick={() => {
-                    logPoint('tabs_row.click', { tabId: tab.id });
-                    setActiveSection(tab.id);
-                  }}
+                  onClick={() => setActiveSection(tab.id)}
                   className={cn(
-                    "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px]",
+                    "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98]",
                     isActive 
                       ? "bg-card text-foreground shadow-sm m-1 rounded-lg" 
                       : "text-muted-foreground hover:text-foreground"
