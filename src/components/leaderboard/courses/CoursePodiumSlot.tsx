@@ -106,8 +106,9 @@ export const CoursePodiumSlot: React.FC<Props> = ({
   };
   
   return (
-    <button
+    <motion.button
       onClick={onClick}
+      whileTap={{ scale: 0.97 }}
       className="relative flex flex-col items-center transition-all"
       style={containerStyle}
     >
@@ -151,8 +152,8 @@ export const CoursePodiumSlot: React.FC<Props> = ({
           className={cn(
             'relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-md',
             rank === 1 && 'ring-2 ring-[#C1A84C] ring-offset-2',
-            rank === 2 && 'ring-1 ring-gray-200',
-            rank === 3 && 'ring-1 ring-gray-200'
+            rank === 2 && 'ring-1 ring-border',
+            rank === 3 && 'ring-1 ring-border'
           )}
         >
           {course.thumbnail_url ? (
@@ -160,10 +161,11 @@ export const CoursePodiumSlot: React.FC<Props> = ({
               src={course.thumbnail_url}
               alt={course.course_name}
               className="w-full h-full object-cover"
+              loading="lazy"
             />
           ) : (
-            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-              <span className="text-gray-400 text-xs">No image</span>
+            <div className="w-full h-full bg-muted flex items-center justify-center">
+              <span className="text-muted-foreground text-xs">No image</span>
             </div>
           )}
         </div>
@@ -184,13 +186,13 @@ export const CoursePodiumSlot: React.FC<Props> = ({
       {/* Course info */}
       <div className={cn('mt-3 text-center w-full', isCenter ? 'max-w-28' : 'max-w-20')}>
         <p className={cn(
-          'font-semibold text-gray-900 line-clamp-2 leading-tight',
+          'font-semibold text-foreground line-clamp-2 leading-tight',
           isCenter ? 'text-sm' : 'text-xs'
         )}>
           {course.course_name}
         </p>
         <p className={cn(
-          'text-gray-500 mt-0.5 truncate',
+          'text-muted-foreground mt-0.5 truncate',
           isCenter ? 'text-xs' : 'text-[10px]'
         )}>
           {location}
@@ -199,6 +201,6 @@ export const CoursePodiumSlot: React.FC<Props> = ({
           {getMetricDisplay()}
         </div>
       </div>
-    </button>
+    </motion.button>
   );
 };

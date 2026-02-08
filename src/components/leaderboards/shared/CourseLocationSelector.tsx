@@ -93,13 +93,13 @@ export const CourseLocationSelector: React.FC<CourseLocationSelectorProps> = ({
         value={selectedRegion || ''}
         onValueChange={handleRegionChange}
       >
-        <SelectTrigger className="flex-1 min-h-[44px] bg-white border-[#e2e8f0]">
+        <SelectTrigger className="flex-1 min-h-[44px] bg-card border-border active:scale-[0.98] transition-transform">
           <div className="flex items-center gap-2">
             <MapPin className="w-4 h-4 text-muted-foreground" />
             <SelectValue placeholder="All Regions" />
           </div>
         </SelectTrigger>
-        <SelectContent className="bg-white z-50 max-h-[300px]">
+        <SelectContent className="bg-card z-50 max-h-[300px]">
           <SelectItem value="__all__" className="cursor-pointer">
             All Regions
           </SelectItem>
@@ -124,13 +124,13 @@ export const CourseLocationSelector: React.FC<CourseLocationSelectorProps> = ({
         disabled={!selectedRegion}
       >
         <SelectTrigger 
-          className={`flex-1 min-h-[44px] bg-white border-[#e2e8f0] ${
+          className={`flex-1 min-h-[44px] bg-card border-border active:scale-[0.98] transition-transform ${
             !selectedRegion ? 'opacity-50 cursor-not-allowed' : ''
           }`}
         >
           <SelectValue placeholder="All sub-regions" />
         </SelectTrigger>
-        <SelectContent className="bg-white z-50 max-h-[300px]">
+        <SelectContent className="bg-card z-50 max-h-[300px]">
           <SelectItem value="__all__" className="cursor-pointer">
             All sub-regions
           </SelectItem>
