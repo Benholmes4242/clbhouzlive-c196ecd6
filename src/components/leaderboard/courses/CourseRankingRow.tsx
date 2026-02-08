@@ -37,7 +37,7 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, onClick 
     if (rank === 2) return 'bg-[#B8C6C9] text-white'; // Sky Blue Silver
     if (rank === 3) return 'bg-[#8B7355] text-white'; // Warm Bronze
     if (isTop10) return 'bg-[#C1A84C]/10 text-[#C1A84C]'; // Gold tint for top 10
-    return 'bg-slate-100 text-slate-600';
+    return 'bg-muted text-muted-foreground';
   };
 
   const getUserHistory = () => {
@@ -52,9 +52,10 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, onClick 
   return (
     <button
       onClick={onClick}
+      aria-label={`View ${course.course_name}`}
       className={cn(
-        'w-full flex items-center gap-3 py-3 px-4 border-b border-gray-100 text-left',
-        'hover:bg-gray-50 transition-colors'
+        'w-full flex items-center gap-3 py-3 px-4 border-b border-border text-left',
+        'hover:bg-muted/50 transition-colors active:scale-[0.98] transition-transform'
       )}
     >
       {/* Rank */}
@@ -69,26 +70,27 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, onClick 
       </div>
 
       {/* Course thumbnail */}
-      <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
+      <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-muted">
         {course.thumbnail_url ? (
           <img
             src={course.thumbnail_url}
             alt={course.course_name}
             className="w-full h-full object-cover"
+            loading="lazy"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <span className="text-gray-300 text-[8px]">No img</span>
+            <span className="text-muted-foreground text-[8px]">No img</span>
           </div>
         )}
       </div>
 
       {/* Course info */}
       <div className="flex-1 min-w-0">
-        <h4 className="font-semibold text-sm text-gray-900 truncate">
+        <h4 className="font-semibold text-sm text-foreground truncate">
           {course.course_name}
         </h4>
-        <p className="text-xs text-gray-500 truncate">
+        <p className="text-xs text-muted-foreground truncate">
           {location}
         </p>
 
@@ -104,10 +106,10 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, onClick 
               {/* Play count FIRST for Most Played */}
               <span className="flex items-center gap-0.5">
                 <Star className="w-3 h-3 text-[#C1A84C] fill-[#C1A84C]" />
-                <span className="text-gray-600">{course.avg_rating?.toFixed(1) || '-'}</span>
+                <span className="text-muted-foreground">{course.avg_rating?.toFixed(1) || '-'}</span>
               </span>
-              <span className="text-gray-300">•</span>
-              <span className="font-medium text-gray-700">
+              <span className="text-muted-foreground/30">•</span>
+              <span className="font-medium text-foreground">
                 Played by {course.unique_players || course.times_played}
               </span>
             </>
@@ -116,14 +118,14 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, onClick 
               {/* Rating FIRST for Highest Rated / Trending */}
               <span className="flex items-center gap-0.5">
                 <Star className="w-3 h-3 text-[#C1A84C] fill-[#C1A84C]" />
-                <span className="font-medium text-gray-600">{course.avg_rating?.toFixed(1) || '-'}</span>
+                <span className="font-medium text-muted-foreground">{course.avg_rating?.toFixed(1) || '-'}</span>
               </span>
-              <span className="text-gray-300">•</span>
-              <span className="text-gray-400">Played by {course.unique_players || course.times_played}</span>
+              <span className="text-muted-foreground/30">•</span>
+              <span className="text-muted-foreground">Played by {course.unique_players || course.times_played}</span>
             </>
           )}
-          <span className="text-gray-300">•</span>
-          <span className={course.current_user_played ? 'text-emerald-600 font-medium' : 'text-gray-400'}>
+          <span className="text-muted-foreground/30">•</span>
+          <span className={course.current_user_played ? 'text-emerald-600 font-medium' : 'text-muted-foreground'}>
             {getUserHistory()}
           </span>
         </div>

@@ -159,7 +159,7 @@ export function CoursesLeaderboardView() {
         </div>
         <div className="space-y-0">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-            <div key={i} className="flex items-center gap-3 py-3 px-4 border-b border-slate-100">
+            <div key={i} className="flex items-center gap-3 py-3 px-4 border-b border-border">
               <Skeleton className="w-8 h-8 rounded-full" />
               <Skeleton className="w-14 h-10 rounded-lg" />
               <div className="flex-1 space-y-2">
@@ -196,7 +196,7 @@ export function CoursesLeaderboardView() {
         </section>
       ) : circleRecentRounds && circleRecentRounds.length > 0 ? (
         <section className="space-y-3 -mx-4 mt-4">
-          <h3 className="text-sm font-semibold text-gray-900 px-4">
+          <h3 className="text-sm font-semibold text-foreground px-4">
             Recently Played by Your Circle
           </h3>
           <div className="overflow-x-auto pb-2 px-4 scrollbar-hide">
@@ -205,7 +205,7 @@ export function CoursesLeaderboardView() {
                 <button
                   key={round.id}
                   onClick={() => navigate(`/courses/${round.course_id}`)}
-                  className="w-40 flex-shrink-0 text-left group"
+                  className="w-40 flex-shrink-0 text-left group active:scale-[0.97] transition-transform"
                 >
                   {/* Course Image */}
                   <div className="relative aspect-[4/3] rounded-xl overflow-hidden mb-2 shadow-sm group-hover:shadow-md transition-shadow">
@@ -214,16 +214,17 @@ export function CoursesLeaderboardView() {
                         src={round.golf_courses.thumbnail_image}
                         alt={round.golf_courses.name}
                         className="w-full h-full object-cover"
+                        loading="lazy"
                       />
                     ) : (
-                      <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                        <span className="text-gray-300 text-xs">No image</span>
+                      <div className="w-full h-full bg-muted flex items-center justify-center">
+                        <span className="text-muted-foreground text-xs">No image</span>
                       </div>
                     )}
                   </div>
                   
                   {/* Course Name */}
-                  <h4 className="text-sm font-semibold text-gray-900 truncate leading-tight">
+                  <h4 className="text-sm font-semibold text-foreground truncate leading-tight">
                     {round.golf_courses?.name}
                   </h4>
                   
@@ -235,20 +236,20 @@ export function CoursesLeaderboardView() {
                       alt={round.user_profiles?.display_name}
                       fallback={(round.user_profiles?.display_name?.[0] || '?').toUpperCase()}
                     />
-                    <span className="text-xs text-gray-500 truncate flex-1">
+                    <span className="text-xs text-muted-foreground truncate flex-1">
                       {round.user_profiles?.display_name}
                     </span>
                   </div>
                   
                   {/* Time and Rating */}
                   <div className="flex items-center justify-between mt-1">
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-muted-foreground">
                       {formatDistanceToNow(new Date(round.created_at), { addSuffix: false })} ago
                     </span>
                     {round.rating && (
                       <div className="flex items-center gap-0.5">
                         <Star className="w-3 h-3 text-[#C1A84C] fill-[#C1A84C]" />
-                        <span className="text-xs font-medium text-[#C1A84C]">
+                        <span className={cn('text-xs font-medium', round.rating >= 9.0 ? 'text-amber-500' : 'text-foreground')}>
                           {round.rating.toFixed(1)}
                         </span>
                       </div>
@@ -266,7 +267,7 @@ export function CoursesLeaderboardView() {
                 key={index}
                 className={cn(
                   'w-1.5 h-1.5 rounded-full transition-colors',
-                  index === 0 ? 'bg-gray-400' : 'bg-gray-200'
+                  index === 0 ? 'bg-foreground' : 'bg-muted-foreground/30'
                 )}
               />
             ))}
@@ -299,8 +300,8 @@ export function CoursesLeaderboardView() {
       {/* Course Rankings Section */}
       <section className="space-y-4 -mx-4">
         <div className="space-y-1 px-4 pt-2">
-          <h2 className="text-lg font-semibold text-gray-900">Course Rankings</h2>
-          <p className="text-sm text-gray-500">
+          <h2 className="text-lg font-semibold text-foreground">Course Rankings</h2>
+          <p className="text-sm text-muted-foreground">
             {sort === 'most_played' && "The world's greatest golf courses by total rounds logged"}
             {sort === 'highest_rated' && "The world's greatest golf courses by community rating"}
             {sort === 'rising' && "The world's greatest golf courses trending lately"}
@@ -399,9 +400,9 @@ export function CoursesLeaderboardView() {
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         className={cn(
           "fixed bottom-24 right-4 z-40 w-12 h-12 rounded-full",
-          "bg-gray-700 text-white shadow-lg",
+          "bg-foreground/80 text-background backdrop-blur-sm shadow-lg",
           "flex items-center justify-center",
-          "transition-all duration-300 ease-out",
+          "transition-all duration-300 ease-out active:scale-[0.95]",
           showScrollTop 
             ? "opacity-100 translate-y-0" 
             : "opacity-0 translate-y-4 pointer-events-none"

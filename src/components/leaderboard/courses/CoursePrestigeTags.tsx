@@ -26,7 +26,7 @@ export const CoursePrestigeTags: React.FC<Props> = ({ tags }) => {
           key={tag}
           className={cn(
             'px-1.5 py-0.5 rounded text-[9px] font-medium',
-            tagStyles[tag] || 'bg-slate-100 text-slate-600'
+            tagStyles[tag] || 'bg-muted text-muted-foreground'
           )}
         >
           {tag}

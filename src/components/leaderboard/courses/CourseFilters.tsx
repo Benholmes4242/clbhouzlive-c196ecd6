@@ -45,16 +45,16 @@ export const CourseFilters: React.FC<Props> = ({
     <div className="px-4 py-4 space-y-3">
       {/* PRIMARY: Sort tabs - Matching main leaderboard tab style */}
       <div className="flex justify-center">
-        <div className="inline-flex p-1 rounded-xl bg-[#e2e8f0]">
+      <div className="inline-flex p-1 rounded-xl bg-muted">
           {sortOptions.map((option) => (
             <button
               key={option.value}
               onClick={() => onSortChange(option.value)}
               className={cn(
-                'px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 whitespace-nowrap',
+                'px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 whitespace-nowrap active:scale-[0.97] transition-transform',
                 sort === option.value 
-                  ? 'm-0.5 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]' 
-                  : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50'
+                  ? 'm-0.5 bg-card text-foreground shadow-sm border border-border' 
+                  : 'text-muted-foreground hover:text-foreground hover:bg-card/50'
               )}
             >
               {option.label}
