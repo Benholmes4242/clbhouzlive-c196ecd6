@@ -479,6 +479,10 @@ export default {
 					'50%': { transform: 'scale(1.2) rotate(4deg)', opacity: '1' },
 					'75%': { transform: 'scale(1.1) rotate(-2deg)' }
 				},
+				'flame': {
+					'0%, 100%': { transform: 'scale(1) rotate(-2deg)' },
+					'50%': { transform: 'scale(1.15) rotate(2deg)' }
+				},
 				'pulse-subtle': {
 					'0%, 100%': { boxShadow: '0 0 20px rgba(16, 185, 129, 0.1)' },
 					'50%': { boxShadow: '0 0 40px rgba(16, 185, 129, 0.2)' }
@@ -545,6 +549,7 @@ export default {
 				'flame-small': 'flame-small 1.5s ease-in-out infinite',
 				'flame-medium': 'flame-medium 1.2s ease-in-out infinite',
 				'flame-large': 'flame-large 1s ease-in-out infinite',
+				'flame': 'flame 1.2s ease-in-out infinite',
 				'pulse-subtle': 'pulse-subtle 3s ease-in-out infinite',
 				'slide-in-rank': 'slide-in-rank 0.3s ease-out',
 				'bounce-in': 'bounce-in 0.4s ease-out',
