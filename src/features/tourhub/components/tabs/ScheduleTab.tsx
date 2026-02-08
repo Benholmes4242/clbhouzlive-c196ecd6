@@ -271,7 +271,7 @@ export function ScheduleTab() {
   }, [tournaments, filter, activeTour, search, heroItems]);
 
   // Group by month with sort order based on filter
-  const monthGroups = useMemo((): MonthGroup[] => {
+  const monthGroups = useMemo((): (MonthGroup & { tourBreakdown: Record<string, number> })[] => {
     if (!filteredResults.length) return [];
 
     const groups = new Map<string, TourTournament[]>();
@@ -297,11 +297,22 @@ export function ScheduleTab() {
       entries.sort(([a], [b]) => a.localeCompare(b));
     }
 
-    return entries.map(([monthKey, tournaments]) => ({
-      monthKey,
-      monthLabel: format(new Date(tournaments[0].start_date), 'MMMM yyyy').toUpperCase(),
-      tournaments,
-    }));
+    return entries.map(([monthKey, tournaments]) => {
+      // Compute tour breakdown for this month
+      const tourBreakdown: Record<string, number> = {};
+      for (const t of tournaments) {
+        if (t.tour_code) {
+          tourBreakdown[t.tour_code] = (tourBreakdown[t.tour_code] || 0) + 1;
+        }
+      }
+
+      return {
+        monthKey,
+        monthLabel: format(new Date(tournaments[0].start_date), 'MMMM yyyy').toUpperCase(),
+        tournaments,
+        tourBreakdown,
+      };
+    });
   }, [filteredResults, filter]);
 
   // Scroll to current month on load (only for 'all' or 'upcoming' with no search)
@@ -516,6 +527,7 @@ export function ScheduleTab() {
                 <ScheduleMonthHeader 
                   monthLabel={group.monthLabel}
                   eventCount={group.tournaments.length}
+                  tourBreakdown={group.tourBreakdown}
                 />
 
                 {/* Tournament Cards - Full width with spacing + InView entrance */}
