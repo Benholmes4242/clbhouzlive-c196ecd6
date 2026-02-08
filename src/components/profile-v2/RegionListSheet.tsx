@@ -1,11 +1,13 @@
 /**
  * RegionListSheet - Simple list view for region courses
+ * NOTE: Uses DEMO_COURSES placeholder data — backend integration pending.
  */
 
 import React, { useState, useMemo } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Search, MapPin, CheckCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface RegionData {
   id: string;
@@ -27,7 +29,7 @@ interface RegionListSheetProps {
   onClose: () => void;
 }
 
-// Demo courses for each region
+// Demo courses for each region (TODO: replace with real data hook)
 const DEMO_COURSES: Record<string, Course[]> = {
   gbi: [
     { id: '1', name: 'Royal County Down', location: 'Northern Ireland', isPlayed: true },
@@ -60,7 +62,7 @@ const DEMO_COURSES: Record<string, Course[]> = {
   ],
 };
 
-// Filter pill component
+// Filter pill component — semantic tokens, 44px tap target
 const FilterPill: React.FC<{
   label: string;
   isActive: boolean;
@@ -68,34 +70,28 @@ const FilterPill: React.FC<{
 }> = ({ label, isActive, onClick }) => (
   <button
     onClick={onClick}
-    className="px-3 py-1.5 rounded-full text-xs font-medium transition-colors"
-    style={{
-      background: isActive ? '#ffffff' : '#f1f5f9',
-      color: isActive ? '#1e293b' : '#64748b',
-      border: '1px solid',
-      borderColor: isActive ? '#e2e8f0' : 'transparent',
-      boxShadow: isActive ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
-    }}
+    className={cn(
+      'px-4 py-2 rounded-full text-xs font-medium transition-all min-h-[44px] active:scale-[0.98]',
+      isActive
+        ? 'bg-card text-foreground border border-border shadow-sm'
+        : 'bg-muted text-muted-foreground border border-transparent'
+    )}
   >
     {label}
   </button>
 );
 
-// Course row component
+// Course row component — semantic tokens
 const CourseRow: React.FC<{ course: Course }> = ({ course }) => (
-  <div
-    className="flex items-center gap-3 py-3 border-b border-[#e2e8f0]"
-  >
-    <div
-      className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-[#f1f5f9]"
-    >
-      <MapPin className="w-4 h-4 text-[#64748b]" />
+  <div className="flex items-center gap-3 py-3 border-b border-border">
+    <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-muted">
+      <MapPin className="w-4 h-4 text-muted-foreground" />
     </div>
     <div className="flex-1 min-w-0">
-      <p className="text-sm font-medium truncate text-[#1e293b]">
+      <p className="text-sm font-medium truncate text-foreground">
         {course.name}
       </p>
-      <p className="text-xs text-[#94a3b8]">
+      <p className="text-xs text-muted-foreground">
         {course.location}
       </p>
     </div>
@@ -112,17 +108,14 @@ export const RegionListSheet: React.FC<RegionListSheetProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<'all' | 'played' | 'unplayed'>('all');
 
-  // Get courses for this region
   const courses = useMemo(() => {
     if (!region) return [];
     return DEMO_COURSES[region.id] ?? [];
   }, [region]);
 
-  // Filter courses
   const filteredCourses = useMemo(() => {
     let result = courses;
 
-    // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       result = result.filter(
@@ -132,7 +125,6 @@ export const RegionListSheet: React.FC<RegionListSheetProps> = ({
       );
     }
 
-    // Status filter
     if (filter === 'played') {
       result = result.filter((c) => c.isPlayed);
     } else if (filter === 'unplayed') {
@@ -146,36 +138,30 @@ export const RegionListSheet: React.FC<RegionListSheetProps> = ({
     <Sheet open={!!region} onOpenChange={() => onClose()}>
       <SheetContent
         side="bottom"
-        className="rounded-t-3xl border-t h-[90svh]"
-        style={{
-          background: '#ffffff',
-          borderColor: '#e2e8f0',
-        }}
+        className="rounded-t-3xl border-t border-border h-[90svh] bg-card"
       >
         {region && (
           <div className="flex flex-col h-full">
             {/* Handle bar */}
-            <div className="w-10 h-1 bg-[#e2e8f0] rounded-full mx-auto mb-4 flex-shrink-0" />
+            <div className="w-10 h-1 bg-muted-foreground/30 rounded-full mx-auto mb-4 flex-shrink-0" />
             
             <SheetHeader className="pb-4">
-              <SheetTitle className="text-[#1e293b]">
+              <SheetTitle className="text-foreground">
                 {region.name}
               </SheetTitle>
-              <p className="text-sm text-[#64748b]">
+              <p className="text-sm text-muted-foreground">
                 {region.played} of {region.total} courses played
               </p>
             </SheetHeader>
 
             {/* Search */}
             <div className="relative mb-4">
-              <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]"
-              />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Search courses..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 bg-white border-[#e2e8f0] text-[#1e293b] placeholder:text-[#94a3b8] focus:ring-2 focus:ring-[#e2e8f0] focus:border-[#e2e8f0]"
+                className="pl-9 bg-card border-border text-foreground placeholder:text-muted-foreground"
               />
             </div>
 
@@ -206,7 +192,7 @@ export const RegionListSheet: React.FC<RegionListSheetProps> = ({
                 ))
               ) : (
                 <div className="py-12 text-center">
-                  <p className="text-[#94a3b8]">
+                  <p className="text-muted-foreground">
                     No courses found
                   </p>
                 </div>
