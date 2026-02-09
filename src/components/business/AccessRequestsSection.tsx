@@ -231,21 +231,9 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
           )}
         </div>
 
-        {/* Empty state */}
+        {/* Compact empty state — single line */}
         {!hasRequests && (
-          <div className="flex flex-col items-center justify-center py-10 px-4">
-            {/* Icon in gradient circle */}
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center mb-3">
-              <UserPlus className="w-6 h-6 text-[#64748b]" />
-            </div>
-            
-            <h3 className="text-[15px] font-semibold text-[#1e293b] mb-1 text-center">
-              No access requests
-            </h3>
-            <p className="text-[13px] text-[#64748b] text-center max-w-[260px]">
-              Requests to join this business will appear here.
-            </p>
-          </div>
+          <p className="text-[13px] text-muted-foreground">None</p>
         )}
 
         {/* Request cards */}

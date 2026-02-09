@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Briefcase } from 'lucide-react';
+import { Users, Briefcase, ChevronRight } from 'lucide-react';
 import { useBusinessTeamMembers, TeamMember } from '@/hooks/useBusinessTeamMembers';
 import { useBusinessClubMembers } from '@/hooks/useBusinessClubMembers';
 import { ManageTeamModal } from './ManageTeamModal';
 import { SegmentedTabs } from './people/SegmentedTabs';
-import { PeopleList } from './people/PeopleList';
 import { PersonRow } from './people/PersonRow';
 import { TeamRow } from './people/TeamRow';
 import { EmptyState } from './people/EmptyState';
@@ -40,7 +39,6 @@ export function PeopleTab({
   const [activeSubTab, setActiveSubTab] = useState<SubTab>(isGolfClub ? 'members' : 'team');
 
   useEffect(() => {
-    // For golf clubs: if Members is empty and Team exists, default to Team
     if (isGolfClub && !membersLoading && !teamLoading) {
       if (clubMembers.length === 0 && teamMembers.length > 0) {
         setActiveSubTab('team');
@@ -54,44 +52,35 @@ export function PeopleTab({
     navigate(`/profile/${userId}`);
   };
 
-  // Sort team members: Owner → Admin/Manager → Team
+  // Sort team members
   const sortedTeamMembers = useMemo(() => {
     const roleOrder: Record<string, number> = {
-      owner: 0,
-      primary_manager: 1,
-      admin: 2,
-      manager: 3,
-      director: 4,
-      coach: 5,
-      staff: 6,
-      team: 7,
+      owner: 0, primary_manager: 1, admin: 2, manager: 3,
+      director: 4, coach: 5, staff: 6, team: 7,
     };
     return [...teamMembers].sort((a, b) => {
       const orderA = roleOrder[a.role] ?? 10;
       const orderB = roleOrder[b.role] ?? 10;
       if (orderA !== orderB) return orderA - orderB;
-      // Then by name
       const nameA = a.profile?.display_name || a.profile?.username || '';
       const nameB = b.profile?.display_name || b.profile?.username || '';
       return nameA.localeCompare(nameB);
     });
   }, [teamMembers]);
 
-  // Sort club members: verified first, then by name
+  // Sort club members
   const sortedClubMembers = useMemo(() => {
     return [...clubMembers].sort((a, b) => {
-      // Verified first
       if (a.is_verified_golfer !== b.is_verified_golfer) {
         return a.is_verified_golfer ? -1 : 1;
       }
-      // Then by name
       const nameA = a.display_name || a.username || '';
       const nameB = b.display_name || b.username || '';
       return nameA.localeCompare(nameB);
     });
   }, [clubMembers]);
 
-  // Build tabs array - only show Members tab for Golf Clubs
+  // Build tabs array
   const tabs = isGolfClub
     ? [
         { id: 'members', label: 'Members', count: clubMembers.length },
@@ -102,20 +91,10 @@ export function PeopleTab({
       ];
 
   return (
-    <div 
-      className="-mx-5 px-0"
-      style={{
-        background: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)',
-      }}
-    >
+    <div className="-mx-5 px-0 bg-muted">
       {/* Header + tabs - white card */}
       <div className="bg-white max-w-full px-4">
-        {/* Header */}
-        <div className="pt-4 pb-1">
-          <h2 className="text-lg font-semibold text-foreground text-center">People</h2>
-        </div>
-
-        {/* Centered Segmented Tabs */}
+        {/* Centered Segmented Tabs (golf clubs only) */}
         {isGolfClub && (
           <SegmentedTabs
             tabs={tabs}
@@ -125,12 +104,24 @@ export function PeopleTab({
         )}
       </div>
 
+      {/* Manage team entry point for owners */}
+      {canManage && activeSubTab === 'team' && !isLoading && (
+        <button
+          type="button"
+          onClick={() => setManageModalOpen(true)}
+          className="w-full flex items-center justify-between px-4 min-h-[44px] bg-white mt-2 active:opacity-70 transition-opacity"
+        >
+          <span className="text-sm text-muted-foreground font-medium">Manage team</span>
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        </button>
+      )}
+
       {/* Loading skeleton */}
       {isLoading && (
         <div className="px-4 py-4 space-y-3 bg-white mt-3">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="flex items-center gap-3 animate-pulse">
-              <div className="w-12 h-12 rounded-sq-md bg-muted" />
+              <div className="w-16 h-16 rounded-sq-md bg-muted" />
               <div className="flex-1 space-y-2">
                 <div className="w-32 h-4 bg-muted rounded" />
                 <div className="w-24 h-3 bg-muted rounded" />
@@ -157,6 +148,7 @@ export function PeopleTab({
                   profilePhotoUrl={profile.profile_photo_url}
                   isVerified={profile.is_verified_golfer}
                   role={member.role}
+                  displayTitle={member.display_title}
                   canManage={canManage}
                   onProfileClick={() => handleProfileClick(profile.id)}
                   onEditAccess={canManage ? () => setEditingMember(member) : undefined}
@@ -166,7 +158,7 @@ export function PeopleTab({
           </div>
         ) : (
           <EmptyState
-            icon={<Briefcase className="h-7 w-7 text-[#64748b]" />}
+            icon={<Briefcase className="h-7 w-7 text-muted-foreground" />}
             title="No team yet"
             description="Add the people who represent this business on Clbhouz."
             showActionButton={canManage}
@@ -198,7 +190,7 @@ export function PeopleTab({
           </div>
         ) : (
           <EmptyState
-            icon={<Users className="h-7 w-7 text-[#64748b]" />}
+            icon={<Users className="h-7 w-7 text-muted-foreground" />}
             title="No members yet"
             description="Golfers who set this as their home club will appear here automatically."
             secondaryDescription="Share your club page so members can find you."

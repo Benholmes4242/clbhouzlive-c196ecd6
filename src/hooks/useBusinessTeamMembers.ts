@@ -5,6 +5,7 @@ export interface TeamMember {
   id: string;
   role: 'owner' | 'director' | 'admin' | 'coach' | 'staff';
   created_at: string;
+  display_title: string | null;
   profile: {
     id: string;
     display_name: string | null;
@@ -35,6 +36,7 @@ export function useBusinessTeamMembers(businessId: string | undefined) {
           id,
           role,
           created_at,
+          display_title,
           user_profiles:user_profile_id (
             id,
             display_name,
@@ -55,6 +57,7 @@ export function useBusinessTeamMembers(businessId: string | undefined) {
         id: row.id,
         role: row.role,
         created_at: row.created_at,
+        display_title: row.display_title ?? null,
         profile: row.user_profiles,
       }));
 

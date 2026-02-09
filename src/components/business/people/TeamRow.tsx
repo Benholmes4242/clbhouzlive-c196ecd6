@@ -1,16 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { ChevronRight, MoreVertical } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
+import { ROLE_LABELS } from '@/hooks/useTeamManagement';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-
-type TeamRole = 'owner' | 'admin' | 'director' | 'coach' | 'staff' | 'team' | 'manager' | 'primary_manager';
 
 interface TeamRowProps {
   id: string;
@@ -19,35 +18,12 @@ interface TeamRowProps {
   profilePhotoUrl: string | null;
   isVerified?: boolean;
   role: string;
+  displayTitle?: string | null;
   canManage?: boolean;
   onProfileClick: () => void;
   onEditAccess?: () => void;
   onRemove?: () => void;
 }
-
-// Role display labels
-const ROLE_LABELS: Record<string, string> = {
-  owner: 'Owner',
-  primary_manager: 'Primary Manager',
-  director: 'Director',
-  admin: 'Admin',
-  manager: 'Manager',
-  coach: 'Coach',
-  staff: 'Team',
-  team: 'Team',
-};
-
-// Role pill styles
-const roleStyles: Record<string, string> = {
-  owner: 'bg-amber-500/10 text-amber-700 border-amber-500/20',
-  primary_manager: 'bg-amber-500/10 text-amber-700 border-amber-500/20',
-  director: 'bg-purple-500/10 text-purple-700 border-purple-500/20',
-  admin: 'bg-sky-500/10 text-sky-700 border-sky-500/20',
-  manager: 'bg-sky-500/10 text-sky-700 border-sky-500/20',
-  coach: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20',
-  staff: 'bg-muted text-foreground/70 border-border/60',
-  team: 'bg-muted text-foreground/70 border-border/60',
-};
 
 export function TeamRow({
   displayName,
@@ -55,6 +31,7 @@ export function TeamRow({
   profilePhotoUrl,
   isVerified = false,
   role,
+  displayTitle,
   canManage = false,
   onProfileClick,
   onEditAccess,
@@ -62,22 +39,22 @@ export function TeamRow({
 }: TeamRowProps) {
   const name = displayName || username || 'Unknown';
   const roleLabel = ROLE_LABELS[role] || 'Team';
-  const pillStyle = roleStyles[role] || roleStyles.team;
+  const hasCustomTitle = !!displayTitle?.trim();
 
   return (
-    <div className="w-full flex items-center gap-3 px-4 py-3 bg-white hover:bg-muted/30 transition-colors">
+    <div className="w-full flex items-center gap-3 px-4 py-3 bg-white hover:bg-muted/30 active:scale-[0.98] transition-all">
       {/* Clickable profile area */}
       <button
         type="button"
         onClick={onProfileClick}
         className="flex items-center gap-3 flex-1 min-w-0 text-left"
       >
-        {/* Avatar */}
-        <div className="h-12 w-12 rounded-sq-md overflow-hidden bg-muted flex items-center justify-center shrink-0">
+        {/* Avatar — 64px for premium showcase */}
+        <div className="h-16 w-16 rounded-sq-md overflow-hidden bg-muted flex items-center justify-center shrink-0">
           <SquircleAvatar
             src={profilePhotoUrl}
             alt={name}
-            size={48}
+            size={64}
           />
         </div>
 
@@ -89,14 +66,15 @@ export function TeamRow({
             {isVerified && <VerifiedBadge size="sm" />}
           </div>
 
-          {/* Line 2: Role pill */}
-          <div className="mt-1">
-            <span className={cn(
-              "text-xs px-2 py-0.5 rounded-full border inline-flex",
-              pillStyle
-            )}>
-              {roleLabel}
-            </span>
+          {/* Line 2: Custom title OR role pill */}
+          <div className="mt-0.5">
+            {hasCustomTitle ? (
+              <span className="text-sm text-muted-foreground">{displayTitle}</span>
+            ) : (
+              <span className="text-xs px-2 py-0.5 rounded-full border inline-flex bg-muted text-muted-foreground border-border/60">
+                {roleLabel}
+              </span>
+            )}
           </div>
         </div>
       </button>
@@ -108,7 +86,7 @@ export function TeamRow({
             <button
               type="button"
               onClick={(e) => e.stopPropagation()}
-              className="p-2 rounded-md hover:bg-muted/50 text-muted-foreground"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md hover:bg-muted/50 text-muted-foreground"
               aria-label="More options"
             >
               <MoreVertical className="h-4 w-4" />
@@ -121,7 +99,7 @@ export function TeamRow({
               </DropdownMenuItem>
             )}
             {onRemove && role !== 'owner' && (
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={onRemove}
                 className="text-destructive focus:text-destructive"
               >
