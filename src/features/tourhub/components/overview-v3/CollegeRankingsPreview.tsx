@@ -7,7 +7,7 @@
  * One dominant hero. Two challengers. Depth on intent.
  */
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRight, Trophy, GraduationCap, DollarSign, Users } from 'lucide-react';
@@ -40,7 +40,50 @@ function CollegePreviewSkeleton() {
 }
 
 // ============================================================================
-// PIPELINE ALUMNI STRIP
+// PIPELINE ALUMNI AVATAR (with proper photo resolution)
+// ============================================================================
+
+function AlumniAvatar({ alum }: { alum: AlumniFace }) {
+  const photoUrl = resolvePhotoUrl(alum.photo_url, alum.pga_tour_id);
+  const initials = alum.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  const [imgError, setImgError] = useState(false);
+
+  const showPhoto = photoUrl && !imgError;
+
+  return (
+    <div
+      className="rounded-full overflow-hidden flex-shrink-0"
+      style={{
+        width: '34px',
+        height: '34px',
+        border: '2px solid rgba(255,255,255,0.7)',
+        boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
+      }}
+    >
+      {showPhoto ? (
+        <img
+          src={photoUrl}
+          alt={alum.full_name}
+          className="w-full h-full object-cover object-top"
+          loading="lazy"
+          onError={() => setImgError(true)}
+        />
+      ) : (
+        <div
+          className="w-full h-full flex items-center justify-center"
+          style={{ background: 'rgba(255,255,255,0.2)' }}
+        >
+          <span style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.8)' }}>
+            {initials}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============================================================================
+// PIPELINE STRIP
 // ============================================================================
 
 function PipelineStrip({ alumni }: { alumni: AlumniFace[] }) {
@@ -50,55 +93,36 @@ function PipelineStrip({ alumni }: { alumni: AlumniFace[] }) {
   const overflow = alumni.length - displayCount;
 
   return (
-    <div style={{ marginTop: '16px' }}>
-      {/* Label */}
+    <div style={{ marginTop: '14px' }}>
       <p
         className="m-0"
         style={{
-          fontSize: '10px',
+          fontSize: '9px',
           fontWeight: 600,
           letterSpacing: '1px',
           textTransform: 'uppercase',
-          color: 'rgba(255,255,255,0.45)',
+          color: 'rgba(255,255,255,0.4)',
           marginBottom: '8px',
         }}
       >
         Pipeline to the Tour
       </p>
 
-      {/* Avatar row */}
       <div className="flex items-center">
-        <div className="flex -space-x-2">
-          {alumni.slice(0, displayCount).map((alum) => {
-            const photoUrl = resolvePhotoUrl(alum.photo_url, null);
-            const initials = alum.full_name.split(' ').map(n => n[0]).join('').toUpperCase();
-
-            return (
-              <div
-                key={alum.id}
-                className="rounded-full overflow-hidden border-2 border-white/30 flex-shrink-0"
-                style={{ width: '30px', height: '30px', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }}
-              >
-                {photoUrl ? (
-                  <img
-                    src={photoUrl}
-                    alt={alum.full_name}
-                    className="w-full h-full object-cover object-top"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-white/20 text-white text-[9px] font-bold">
-                    {initials}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+        <div className="flex" style={{ marginLeft: '0' }}>
+          {alumni.slice(0, displayCount).map((alum, idx) => (
+            <div
+              key={alum.id}
+              style={{ marginLeft: idx === 0 ? '0' : '-8px', zIndex: displayCount - idx }}
+            >
+              <AlumniAvatar alum={alum} />
+            </div>
+          ))}
         </div>
         {overflow > 0 && (
           <span
             className="ml-2 font-semibold"
-            style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)' }}
+            style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)' }}
           >
             +{overflow} more
           </span>
@@ -109,7 +133,7 @@ function PipelineStrip({ alumni }: { alumni: AlumniFace[] }) {
 }
 
 // ============================================================================
-// #1 COLLEGE HERO CARD — "The Reigning Dynasty"
+// #1 COLLEGE HERO CARD
 // ============================================================================
 
 function HeroCollegeCard({
@@ -150,28 +174,31 @@ function HeroCollegeCard({
         />
 
         <div className="relative">
-          {/* #1 THIS SEASON badge */}
-          <div className="flex items-center gap-2 mb-3">
-            <div
-              className="w-7 h-7 rounded-lg flex items-center justify-center"
-              style={{
-                background: 'linear-gradient(135deg, rgba(255,184,0,0.25) 0%, rgba(255,140,0,0.15) 100%)',
-                border: '1px solid rgba(255,184,0,0.3)',
-              }}
-            >
-              <Trophy className="w-3.5 h-3.5" style={{ color: '#FFB800' }} />
+          {/* #1 THIS SEASON badge — refined */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <div
+                className="w-6 h-6 rounded-md flex items-center justify-center"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255,184,0,0.2) 0%, rgba(255,140,0,0.12) 100%)',
+                  border: '1px solid rgba(255,184,0,0.25)',
+                }}
+              >
+                <Trophy className="w-3 h-3" style={{ color: '#FFB800' }} />
+              </div>
+              <span
+                style={{
+                  fontSize: '10px',
+                  fontWeight: 700,
+                  letterSpacing: '1.2px',
+                  textTransform: 'uppercase',
+                  color: 'rgba(255,255,255,0.45)',
+                }}
+              >
+                #1 This Season
+              </span>
             </div>
-            <span
-              style={{
-                fontSize: '10px',
-                fontWeight: 700,
-                letterSpacing: '1.2px',
-                textTransform: 'uppercase',
-                color: 'rgba(255,255,255,0.5)',
-              }}
-            >
-              #1 This Season
-            </span>
+            <ChevronRight className="w-4 h-4 text-white/20" />
           </div>
 
           {/* College name + logo */}
@@ -180,7 +207,7 @@ function HeroCollegeCard({
               <img
                 src={media.logo_url}
                 alt={displayName}
-                className="w-12 h-12 object-contain flex-shrink-0"
+                className="w-11 h-11 object-contain flex-shrink-0"
                 style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}
               />
             )}
@@ -192,19 +219,19 @@ function HeroCollegeCard({
             </h3>
           </div>
 
-          {/* ═══ THREE STAT PILLARS ═══ */}
+          {/* THREE STAT PILLARS with faint dividers */}
           <div
-            className="grid grid-cols-3 gap-3"
+            className="grid grid-cols-3"
             style={{
               background: 'rgba(0,0,0,0.12)',
               borderRadius: '12px',
-              padding: '12px',
+              padding: '12px 0',
             }}
           >
             {/* Tour Earnings */}
-            <div className="text-center">
-              <DollarSign className="w-3.5 h-3.5 mx-auto mb-1" style={{ color: 'rgba(255,255,255,0.5)' }} />
-              <p className="m-0 text-white/50" style={{ fontSize: '9px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+            <div className="text-center" style={{ borderRight: '1px solid rgba(255,255,255,0.1)' }}>
+              <DollarSign className="w-3 h-3 mx-auto mb-1" style={{ color: 'rgba(255,255,255,0.4)' }} />
+              <p className="m-0" style={{ fontSize: '9px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)' }}>
                 Earnings
               </p>
               <p className="m-0 text-white font-bold" style={{ fontSize: '15px', fontFamily: "'JetBrains Mono', monospace", marginTop: '2px' }}>
@@ -213,9 +240,9 @@ function HeroCollegeCard({
             </div>
 
             {/* Season Wins */}
-            <div className="text-center">
-              <Trophy className="w-3.5 h-3.5 mx-auto mb-1" style={{ color: 'rgba(255,255,255,0.5)' }} />
-              <p className="m-0 text-white/50" style={{ fontSize: '9px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+            <div className="text-center" style={{ borderRight: '1px solid rgba(255,255,255,0.1)' }}>
+              <Trophy className="w-3 h-3 mx-auto mb-1" style={{ color: 'rgba(255,255,255,0.4)' }} />
+              <p className="m-0" style={{ fontSize: '9px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)' }}>
                 Wins
               </p>
               <p className="m-0 text-white font-bold" style={{ fontSize: '15px', fontFamily: "'JetBrains Mono', monospace", marginTop: '2px' }}>
@@ -225,8 +252,8 @@ function HeroCollegeCard({
 
             {/* Alumni on Tour */}
             <div className="text-center">
-              <Users className="w-3.5 h-3.5 mx-auto mb-1" style={{ color: 'rgba(255,255,255,0.5)' }} />
-              <p className="m-0 text-white/50" style={{ fontSize: '9px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+              <Users className="w-3 h-3 mx-auto mb-1" style={{ color: 'rgba(255,255,255,0.4)' }} />
+              <p className="m-0" style={{ fontSize: '9px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)' }}>
                 Alumni
               </p>
               <p className="m-0 text-white font-bold" style={{ fontSize: '15px', fontFamily: "'JetBrains Mono', monospace", marginTop: '2px' }}>
@@ -238,42 +265,37 @@ function HeroCollegeCard({
           {/* Pipeline to the Tour */}
           <PipelineStrip alumni={alumni} />
         </div>
-
-        {/* Chevron hint */}
-        <ChevronRight className="absolute top-5 right-5 w-4 h-4 text-white/25" />
       </div>
     </motion.button>
   );
 }
 
 // ============================================================================
-// CHASER CARD (#2, #3)
+// CHASER CARD (#2, #3) — Horizontal split: logo left, stats right
 // ============================================================================
 
 function ChaserCard({
   stats,
   media,
   rank,
+  leaderStats,
   index,
 }: {
   stats: CollegeSeasonStats;
   media: CollegeMedia | undefined;
   rank: number;
+  leaderStats: CollegeSeasonStats;
   index: number;
 }) {
   const navigate = useNavigate();
   const displayName = media?.short_name || media?.college_name || stats.normalized_name;
 
-  const badgeColors: Record<number, { background: string }> = {
-    2: { background: 'linear-gradient(135deg, #C0C0C0 0%, #9A9A9A 100%)' },
-    3: { background: 'linear-gradient(135deg, #CD7F32 0%, #A0622E 100%)' },
-  };
-  const badge = badgeColors[rank] || { background: 'rgba(0,0,0,0.1)' };
-
-  // Pick the strongest single stat
-  const primaryStat = stats.wins_total >= 2
-    ? { label: 'Wins', value: String(stats.wins_total) }
-    : { label: 'Earnings', value: formatCurrency(stats.earnings_total) };
+  // Gap to leader
+  const earningsGap = stats.earnings_total - leaderStats.earnings_total;
+  const winsGap = stats.wins_total - leaderStats.wins_total;
+  const gapText = winsGap < 0
+    ? `${winsGap} wins to #1`
+    : `${earningsGap < 0 ? formatCurrency(earningsGap) : '$0'} to #1`;
 
   return (
     <motion.button
@@ -282,7 +304,7 @@ function ChaserCard({
       style={{
         width: 'calc(50% - 6px)',
         minWidth: '155px',
-        padding: '14px',
+        padding: '12px',
         background: '#FFFFFF',
         borderRadius: '14px',
         border: '1px solid rgba(0,0,0,0.06)',
@@ -293,44 +315,54 @@ function ChaserCard({
       viewport={{ once: true }}
       transition={{ duration: 0.4, delay: 0.1 + index * 0.08, ease: [0.16, 1, 0.3, 1] }}
     >
-      {/* Badge + Logo */}
-      <div className="flex items-center gap-2.5 mb-2.5">
-        <div
-          className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0"
-          style={{ background: badge.background }}
-        >
-          <span style={{ fontSize: '10px', fontWeight: 700, color: '#FFFFFF' }}>{rank}</span>
+      {/* Horizontal split: Logo left, info right */}
+      <div className="flex" style={{ gap: '10px' }}>
+        {/* LEFT: Logo */}
+        <div className="flex-shrink-0 flex items-start" style={{ paddingTop: '2px' }}>
+          {media?.logo_url ? (
+            <img
+              src={media.logo_url}
+              alt={displayName}
+              className="object-contain flex-shrink-0"
+              style={{ width: '48px', height: '48px' }}
+            />
+          ) : (
+            <div
+              className="flex items-center justify-center rounded-xl bg-muted flex-shrink-0"
+              style={{ width: '48px', height: '48px' }}
+            >
+              <GraduationCap className="w-5 h-5 text-muted-foreground" />
+            </div>
+          )}
         </div>
-        {media?.logo_url && (
-          <img
-            src={media.logo_url}
-            alt={displayName}
-            className="w-7 h-7 object-contain flex-shrink-0"
-          />
-        )}
-      </div>
 
-      {/* Name */}
-      <h4 className="text-foreground truncate m-0" style={{ fontSize: '14px', fontWeight: 600, marginBottom: '4px' }}>
-        {displayName}
-      </h4>
+        {/* RIGHT: Name, stats, gap */}
+        <div className="flex-1 min-w-0">
+          {/* Rank + Name */}
+          <div className="flex items-center" style={{ gap: '4px' }}>
+            <span className="text-muted-foreground" style={{ fontSize: '11px', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
+              #{rank}
+            </span>
+            <span className="text-muted-foreground" style={{ fontSize: '11px' }}>·</span>
+            <span className="truncate text-foreground" style={{ fontSize: '13px', fontWeight: 700 }}>
+              {displayName}
+            </span>
+          </div>
 
-      {/* One defining stat */}
-      <div className="flex items-baseline gap-1">
-        <span
-          style={{
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: '16px',
-            fontWeight: 700,
-            color: 'hsl(var(--foreground))',
-          }}
-        >
-          {primaryStat.value}
-        </span>
+          {/* All three stats inline */}
+          <p className="m-0 text-muted-foreground truncate" style={{ fontSize: '11px', fontWeight: 500, marginTop: '4px' }}>
+            {stats.wins_total} Wins · {formatCurrency(stats.earnings_total)}
+          </p>
+          <p className="m-0 text-muted-foreground" style={{ fontSize: '10px', fontWeight: 500, marginTop: '1px' }}>
+            {stats.player_count} Alumni on Tour
+          </p>
+
+          {/* Gap to leader */}
+          <p className="m-0" style={{ fontSize: '10px', fontWeight: 500, marginTop: '4px', color: 'rgba(0,0,0,0.35)', fontVariantNumeric: 'tabular-nums' }}>
+            {gapText}
+          </p>
+        </div>
       </div>
-      <p className="m-0 text-muted-foreground" style={{ fontSize: '10px', fontWeight: 500, marginTop: '1px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-        {primaryStat.label}
-      </p>
     </motion.button>
   );
 }
@@ -339,8 +371,7 @@ function ChaserCard({
 // NARRATIVE CONTEXT STRIP
 // ============================================================================
 
-function NarrativeStrip({ topCollege, allStats }: { topCollege: CollegeSeasonStats; allStats: CollegeSeasonStats[] }) {
-  // Generate dynamic editorial line
+function NarrativeStrip({ topCollege }: { topCollege: CollegeSeasonStats }) {
   const narrative = useMemo(() => {
     const name = topCollege.normalized_name
       .split(' ')
@@ -354,17 +385,21 @@ function NarrativeStrip({ topCollege, allStats }: { topCollege: CollegeSeasonSta
   }, [topCollege]);
 
   return (
-    <p
-      className="m-0 text-muted-foreground"
+    <div
+      className="rounded-md"
       style={{
-        fontSize: '12px',
-        fontWeight: 500,
-        fontStyle: 'italic',
-        padding: '0',
+        borderLeft: '2px solid hsl(142 76% 36% / 0.25)',
+        background: 'hsl(142 76% 36% / 0.03)',
+        padding: '8px 10px',
       }}
     >
-      {narrative}
-    </p>
+      <p
+        className="m-0 text-muted-foreground"
+        style={{ fontSize: '12px', fontWeight: 500, fontStyle: 'italic', lineHeight: 1.4 }}
+      >
+        {narrative}
+      </p>
+    </div>
   );
 }
 
@@ -404,7 +439,7 @@ export function CollegeRankingsPreview() {
 
   return (
     <section style={{ paddingTop: '40px', paddingBottom: '8px' }}>
-      {/* ═══ SECTION HEADER ═══ */}
+      {/* SECTION HEADER */}
       <motion.div
         className="flex items-end justify-between px-4 mb-1"
         initial={{ opacity: 0, y: 12 }}
@@ -413,50 +448,44 @@ export function CollegeRankingsPreview() {
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       >
         <div>
-          <div className="flex items-center gap-2.5">
-            <div
-              className="w-7 h-7 rounded-lg flex items-center justify-center"
-              style={{
-                background: 'rgba(34, 197, 94, 0.08)',
-                border: '1px solid rgba(34, 197, 94, 0.15)',
-              }}
-            >
-              <GraduationCap className="w-3.5 h-3.5" style={{ color: '#16A34A' }} />
-            </div>
+          <div className="flex items-center gap-2">
+            <GraduationCap className="w-4 h-4 text-muted-foreground" style={{ marginBottom: '-1px' }} />
             <h2
               className="text-foreground m-0"
-              style={{ fontSize: '20px', fontWeight: 700, letterSpacing: '-0.3px' }}
+              style={{ fontSize: '16px', fontWeight: 600, letterSpacing: '-0.2px' }}
             >
               College Golf Rankings
             </h2>
           </div>
-          <p className="m-0 text-muted-foreground" style={{ fontSize: '12px', marginTop: '4px', marginLeft: '36px' }}>
+          <p className="m-0 text-muted-foreground" style={{ fontSize: '11px', marginTop: '3px', marginLeft: '24px' }}>
             See how your college stacks up on tour
           </p>
         </div>
         <button
           onClick={() => navigate('/tourhub/college')}
           className="flex items-center gap-0.5 group transition-all duration-300 bg-transparent border-none cursor-pointer"
-          style={{ color: 'rgba(0,0,0,0.35)', fontSize: '13px', fontWeight: 600 }}
+          style={{ color: 'rgba(0,0,0,0.35)', fontSize: '10px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}
         >
           View All
-          <ChevronRight size={14} className="transition-transform duration-300 group-hover:translate-x-0.5" />
+          <ChevronRight size={12} className="opacity-60" />
         </button>
       </motion.div>
 
-      {/* ═══ EDITORIAL CONTEXT STRIP ═══ */}
+      {/* Hairline divider */}
+      <div className="mx-4 mb-3" style={{ borderBottom: '1px solid hsl(var(--border) / 0.1)' }} />
+
+      {/* NARRATIVE STRIP — editorial pull-quote style */}
       <motion.div
         className="px-4 mb-4"
-        style={{ marginTop: '8px' }}
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.4, delay: 0.05 }}
       >
-        <NarrativeStrip topCollege={topCollege} allStats={allStats || []} />
+        <NarrativeStrip topCollege={topCollege} />
       </motion.div>
 
-      {/* ═══ #1 COLLEGE HERO ═══ */}
+      {/* #1 COLLEGE HERO */}
       <div className="px-4">
         <HeroCollegeCard
           stats={topCollege}
@@ -465,9 +494,9 @@ export function CollegeRankingsPreview() {
         />
       </div>
 
-      {/* ═══ THE CHASERS (#2 & #3) ═══ */}
+      {/* THE CHASERS (#2 & #3) */}
       {chasers.length > 0 && (
-        <div className="px-4" style={{ marginTop: '12px' }}>
+        <div className="px-4" style={{ marginTop: '16px' }}>
           <p
             className="m-0 text-muted-foreground"
             style={{
@@ -481,12 +510,13 @@ export function CollegeRankingsPreview() {
             The Chasers
           </p>
           <div className="flex" style={{ gap: '12px' }}>
-            {chasers.map((stats, idx) => (
+            {chasers.map((s, idx) => (
               <ChaserCard
-                key={stats.id}
-                stats={stats}
-                media={collegeMap?.get(stats.normalized_name)}
+                key={s.id}
+                stats={s}
+                media={collegeMap?.get(s.normalized_name)}
                 rank={idx + 2}
+                leaderStats={topCollege}
                 index={idx}
               />
             ))}
@@ -494,7 +524,7 @@ export function CollegeRankingsPreview() {
         </div>
       )}
 
-      {/* ═══ CTA — TEXT-ONLY ═══ */}
+      {/* CTA — TEXT-ONLY */}
       <div className="px-4" style={{ marginTop: '16px' }}>
         <button
           onClick={() => navigate('/tourhub/college')}
