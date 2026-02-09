@@ -57,17 +57,20 @@ export const UserListPage: React.FC<UserListPageProps> = ({
   const { user } = useSupabaseSession();
   const [searchInput, setSearchInput] = useState('');
   const debouncedSearch = useDebounce(searchInput, 300);
+  // Track IDs optimistically removed (e.g. after unfriend)
+  const [removedIds, setRemovedIds] = useState<Set<string>>(new Set());
 
-  // Filter users client-side based on search
+  // Filter users client-side based on search and optimistic removals
   const filteredUsers = useMemo(() => {
-    if (!debouncedSearch.trim()) return users;
+    let result = users.filter(u => !removedIds.has(u.id));
+    if (!debouncedSearch.trim()) return result;
     const query = debouncedSearch.toLowerCase();
-    return users.filter(u =>
+    return result.filter(u =>
       u.displayName.toLowerCase().includes(query) ||
       u.username.toLowerCase().includes(query) ||
       (u.homeClub && u.homeClub.toLowerCase().includes(query))
     );
-  }, [users, debouncedSearch]);
+  }, [users, debouncedSearch, removedIds]);
 
   const handleBack = () => {
     if (backPath) {
@@ -83,8 +86,12 @@ export const UserListPage: React.FC<UserListPageProps> = ({
     setSearchInput('');
   };
 
-  const displayTotal = totalCount ?? users.length;
+  const displayTotal = Math.max(0, (totalCount ?? users.length) - removedIds.size);
   const isSearching = debouncedSearch.trim().length > 0;
+
+  const handleUserRemoved = (userId: string) => {
+    setRemovedIds(prev => new Set(prev).add(userId));
+  };
 
   // Get mode display name for messages
   const modeDisplayName = mode === 'followers' ? 'followers' : mode === 'following' ? 'following' : 'friends';
@@ -291,6 +298,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
               onLoadMore={onLoadMore}
               displayTotal={displayTotal}
               showStatus={!isSearching}
+              onUserRemoved={handleUserRemoved}
             />
           )}
         </div>
@@ -312,6 +320,7 @@ interface InfiniteUserListProps {
   onLoadMore?: () => void;
   displayTotal: number;
   showStatus: boolean;
+  onUserRemoved?: (userId: string) => void;
 }
 
 const InfiniteUserList: React.FC<InfiniteUserListProps> = ({
@@ -323,6 +332,7 @@ const InfiniteUserList: React.FC<InfiniteUserListProps> = ({
   onLoadMore,
   displayTotal,
   showStatus,
+  onUserRemoved,
 }) => {
   const sentinelRef = useRef<HTMLDivElement>(null);
   const loadMoreLockRef = useRef(false);
@@ -365,6 +375,7 @@ const InfiniteUserList: React.FC<InfiniteUserListProps> = ({
             user={socialUser}
             currentUserId={currentUserId}
             mode={mode}
+            onUserRemoved={onUserRemoved}
           />
         ))}
       </div>
@@ -392,9 +403,10 @@ interface UserRowFlatProps {
   user: SocialUser;
   currentUserId?: string;
   mode: ListMode;
+  onUserRemoved?: (userId: string) => void;
 }
 
-const UserRowFlat: React.FC<UserRowFlatProps> = ({ user, currentUserId, mode }) => {
+const UserRowFlat: React.FC<UserRowFlatProps> = ({ user, currentUserId, mode, onUserRemoved }) => {
   const navigate = useNavigate();
   const isSelf = currentUserId === user.id;
 
@@ -452,10 +464,10 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({ user, currentUserId, mode }) 
         setOptimisticFriend('none');
       }
     } else if (friendStatus === 'friends' && mode === 'friends') {
-      // Unfriend action for friends page
+      // Unfriend action for friends page — optimistically remove row
       const success = await unfriend(user.id);
       if (success) {
-        setOptimisticFriend('none');
+        onUserRemoved?.(user.id);
       }
     }
   };
@@ -523,51 +535,53 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({ user, currentUserId, mode }) 
               )}
             </Button>
 
-            {/* Friend button - varies by mode and status */}
-            {mode === 'friends' && friendStatus === 'friends' ? (
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-9 flex-1 font-medium border-destructive/50 bg-transparent text-destructive hover:bg-destructive/10"
-                disabled={friendLoading}
-                onClick={handleFriendAction}
-                aria-label={`Unfriend ${user.displayName}`}
-              >
-                Unfriend
-              </Button>
-            ) : (
-              <Button
-                variant="outline"
-                size="sm"
-                className={cn(
-                  "h-9 flex-1 font-medium",
-                  friendStatus === 'friends'
-                    ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-600"
-                    : friendStatus === 'pending'
-                    ? "border-border bg-muted/50 text-muted-foreground"
-                    : "border-emerald-500/60 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
-                )}
-                disabled={friendLoading || friendStatus === 'friends' || friendStatus === 'pending'}
-                onClick={handleFriendAction}
-                aria-label={
-                  friendStatus === 'friends'
-                    ? `Already friends with ${user.displayName}`
-                    : friendStatus === 'pending'
-                    ? `Friend request pending for ${user.displayName}`
-                    : `Send friend request to ${user.displayName}`
-                }
-              >
-                {friendStatus === 'friends' ? (
-                  <>
-                    <Check className="w-3.5 h-3.5 mr-1.5" />
-                    Friends
-                  </>
-                ) : friendStatus === 'pending' ? (
-                  'Request sent'
-                ) : (
-                  'Add friend'
-                )}
-              </Button>
+            {/* Friend button - hidden for business profiles, varies by mode and status */}
+            {user.profileType === 'personal' && (
+              mode === 'friends' && friendStatus === 'friends' ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-9 flex-1 font-medium border-destructive/50 bg-transparent text-destructive hover:bg-destructive/10"
+                  disabled={friendLoading}
+                  onClick={handleFriendAction}
+                  aria-label={`Unfriend ${user.displayName}`}
+                >
+                  Unfriend
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "h-9 flex-1 font-medium",
+                    friendStatus === 'friends'
+                      ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-600"
+                      : friendStatus === 'pending'
+                      ? "border-border bg-muted/50 text-muted-foreground"
+                      : "border-emerald-500/60 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                  )}
+                  disabled={friendLoading || friendStatus === 'friends' || friendStatus === 'pending'}
+                  onClick={handleFriendAction}
+                  aria-label={
+                    friendStatus === 'friends'
+                      ? `Already friends with ${user.displayName}`
+                      : friendStatus === 'pending'
+                      ? `Friend request pending for ${user.displayName}`
+                      : `Send friend request to ${user.displayName}`
+                  }
+                >
+                  {friendStatus === 'friends' ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 mr-1.5" />
+                      Friends
+                    </>
+                  ) : friendStatus === 'pending' ? (
+                    'Request sent'
+                  ) : (
+                    'Add friend'
+                  )}
+                </Button>
+              )
             )}
           </div>
         )}
