@@ -1,11 +1,11 @@
 /**
  * LeaderHero - Cinematic Champion Spotlight Card
  * 
- * Full-width, softly elevated. Discipline-tinted gradient.
- * Think Apple Fitness hero cards, not gaming UI.
+ * Horizontal split: large avatar left, stats right.
+ * Think PGA Tour app / Sky Sports broadcast cards.
  */
 
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CountryFlag from '@/components/ui/country-flag';
 import type { LeaderboardPlayer } from './types';
@@ -27,13 +27,16 @@ export const LeaderHero = memo(function LeaderHero({ player, accentColor }: Lead
   const navigate = useNavigate();
   const photoUrl = player.photoUrl || (player.playerId ? getPgaTourHeadshotUrl(player.playerId) : null);
   const accent = CATEGORY_ACCENT_COLORS[accentColor];
+  const [imgError, setImgError] = useState(false);
+
+  const showPhoto = photoUrl && !imgError;
 
   return (
     <button
       onClick={() => navigate(`/tourhub/player/${player.playerId}`)}
       className="w-full text-left relative overflow-hidden active:scale-[0.99] transition-transform duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
       style={{
-        padding: '28px 24px',
+        padding: '20px',
         background: '#FFFFFF',
         borderRadius: '20px',
         border: '1px solid rgba(0,0,0,0.06)',
@@ -51,105 +54,68 @@ export const LeaderHero = memo(function LeaderHero({ player, accentColor }: Lead
         }}
       />
 
-      <div className="relative">
-        {/* Row 1: Avatar + Name + #1 badge */}
-        <div className="flex items-center" style={{ gap: '14px' }}>
-          {/* Avatar with subtle accent ring */}
-          <div className="relative flex-shrink-0">
-            <div
-              className="overflow-hidden"
-              style={{
-                width: '64px',
-                height: '64px',
-                borderRadius: '16px',
-                border: `2px solid ${accent.border}`,
-              }}
-            >
-              {photoUrl ? (
-                <img
-                  src={photoUrl}
-                  alt={player.playerName}
-                  className="w-full h-full object-cover"
-                  loading="eager"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    const fb = e.currentTarget.parentElement?.querySelector('.fallback-initials');
-                    if (fb) (fb as HTMLElement).style.display = 'flex';
-                  }}
-                />
-              ) : null}
+      {/* Horizontal split: Avatar left, Info right */}
+      <div className="relative flex" style={{ gap: '18px' }}>
+        {/* LEFT: Large cinematic avatar */}
+        <div className="flex-shrink-0">
+          <div
+            className="overflow-hidden"
+            style={{
+              width: '112px',
+              height: '112px',
+              borderRadius: '16px',
+              border: '1px solid rgba(0,0,0,0.06)',
+            }}
+          >
+            {showPhoto ? (
+              <img
+                src={photoUrl}
+                alt={player.playerName}
+                className="w-full h-full object-cover"
+                loading="eager"
+                onError={() => setImgError(true)}
+              />
+            ) : (
               <div
-                className="fallback-initials w-full h-full flex items-center justify-center"
+                className="w-full h-full flex items-center justify-center"
                 style={{
-                  display: photoUrl ? 'none' : 'flex',
                   background: `linear-gradient(135deg, ${accent.bgMedium} 0%, ${accent.bgLight} 100%)`,
                 }}
               >
-                <span style={{ fontSize: '20px', fontWeight: 700, color: accent.textMuted }}>
+                <span style={{ fontSize: '32px', fontWeight: 700, color: accent.textMuted }}>
                   {player.initials}
                 </span>
               </div>
-            </div>
-
-            {/* #1 badge */}
-            <div
-              className="absolute flex items-center justify-center"
-              style={{
-                top: '-6px',
-                right: '-6px',
-                width: '22px',
-                height: '22px',
-                borderRadius: '8px',
-                background: `linear-gradient(135deg, ${accent.primary} 0%, ${accent.primary}dd 100%)`,
-                border: '2px solid #FFFFFF',
-                boxShadow: `0 2px 4px ${accent.shadow}`,
-              }}
-            >
-              <span style={{ fontSize: '11px', fontWeight: 700, color: '#FFFFFF' }}>1</span>
-            </div>
-          </div>
-
-          {/* Name + Country */}
-          <div className="flex-1 min-w-0">
-            <span
-              className="block truncate text-foreground"
-              style={{ fontSize: '18px', fontWeight: 700, letterSpacing: '-0.01em' }}
-            >
-              {player.playerName}
-            </span>
-            <div className="flex items-center mt-1" style={{ gap: '4px' }}>
-              <div style={{ width: '14px', height: '10px', borderRadius: '1px' }}>
-                <CountryFlag country={player.countryCode} size="sm" />
-              </div>
-              <span className="text-muted-foreground" style={{ fontSize: '12px' }}>
-                {formatCountryName(player.countryCode)}
-              </span>
-            </div>
+            )}
           </div>
         </div>
 
-        {/* Row 2: Hero stat number with soft glow */}
-        <div className="flex items-baseline" style={{ marginTop: '20px', gap: '4px' }}>
-          {/* Very soft gradient glow behind number */}
-          <div
-            className="absolute pointer-events-none"
-            style={{
-              width: '160px',
-              height: '80px',
-              borderRadius: '50%',
-              background: `radial-gradient(ellipse, ${accent.bgLight} 0%, transparent 70%)`,
-              filter: 'blur(20px)',
-              left: '20px',
-              bottom: '30px',
-            }}
-          />
-          <div className="relative flex items-baseline" style={{ gap: '4px' }}>
+        {/* RIGHT: Name, country, stat, label */}
+        <div className="flex-1 min-w-0 flex flex-col justify-center">
+          {/* Player name */}
+          <span
+            className="block truncate text-foreground"
+            style={{ fontSize: '18px', fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.2 }}
+          >
+            {player.playerName}
+          </span>
+
+          {/* Country — flag + name inline */}
+          <div className="flex items-center mt-1" style={{ gap: '5px' }}>
+            <CountryFlag country={player.countryCode} size="sm" />
+            <span className="text-muted-foreground" style={{ fontSize: '12px', lineHeight: 1 }}>
+              {formatCountryName(player.countryCode)}
+            </span>
+          </div>
+
+          {/* Stat value */}
+          <div className="flex items-baseline" style={{ marginTop: '12px', gap: '4px' }}>
             <span
               style={{
                 fontFamily: "'JetBrains Mono', monospace",
-                fontSize: '52px',
+                fontSize: '36px',
                 fontWeight: 800,
-                letterSpacing: '-2px',
+                letterSpacing: '-1.5px',
                 lineHeight: 1,
                 color: accent.primary,
                 transition: 'color 0.3s ease',
@@ -160,29 +126,29 @@ export const LeaderHero = memo(function LeaderHero({ player, accentColor }: Lead
             {player.statUnit && (
               <span
                 className="text-muted-foreground"
-                style={{ fontSize: '18px', fontWeight: 500, marginLeft: '4px' }}
+                style={{ fontSize: '15px', fontWeight: 500, marginLeft: '2px' }}
               >
                 {player.statUnit}
               </span>
             )}
           </div>
-        </div>
 
-        {/* Row 3: "SEASON LEADER" label */}
-        <p
-          className="m-0"
-          style={{
-            marginTop: '8px',
-            fontSize: '10px',
-            fontWeight: 600,
-            letterSpacing: '1.2px',
-            textTransform: 'uppercase',
-            color: accent.textMuted,
-            transition: 'color 0.3s ease',
-          }}
-        >
-          Season Leader
-        </p>
+          {/* "SEASON LEADER" label */}
+          <p
+            className="m-0"
+            style={{
+              marginTop: '6px',
+              fontSize: '10px',
+              fontWeight: 600,
+              letterSpacing: '1.2px',
+              textTransform: 'uppercase' as const,
+              color: accent.textMuted,
+              transition: 'color 0.3s ease',
+            }}
+          >
+            Season Leader
+          </p>
+        </div>
       </div>
     </button>
   );
