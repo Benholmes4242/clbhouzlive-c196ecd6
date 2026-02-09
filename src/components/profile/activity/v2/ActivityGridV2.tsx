@@ -55,6 +55,18 @@ const ActivityGridV2Inner: React.FC<ActivityGridV2Props> = ({
   const gridRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
 
+  // P0: Timeout fallback for persistent skeleton — force ready after 3s
+  const [forceReady, setForceReady] = useState(false);
+
+  useEffect(() => {
+    if (items.length > 0 && !isFeedReady && !forceReady) {
+      const timeout = setTimeout(() => setForceReady(true), 3000);
+      return () => clearTimeout(timeout);
+    }
+  }, [items.length, isFeedReady, forceReady]);
+
+  const effectiveFeedReady = isFeedReady || forceReady;
+
   // Reduced motion preference
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   
@@ -196,17 +208,17 @@ const ActivityGridV2Inner: React.FC<ActivityGridV2Props> = ({
   const showBottomLoader = isFetchingNextPage || isPacingDelay;
 
   // Loading state - grey shimmer (Watch tab standard)
-  if ((isLoading && items.length === 0) || !isFeedReady) {
+  if ((isLoading && items.length === 0) || !effectiveFeedReady) {
     return (
       <div className="pb-4 px-[3px]">
         <div className="grid grid-cols-2 gap-[3px]">
           {[...Array(6)].map((_, i) => (
             <div 
               key={i} 
-              className="aspect-[3/4] bg-gray-200 overflow-hidden relative"
+              className="aspect-[3/4] bg-muted overflow-hidden relative"
             >
               <div 
-                className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent" 
+                className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-background/40 to-transparent" 
               />
             </div>
           ))}

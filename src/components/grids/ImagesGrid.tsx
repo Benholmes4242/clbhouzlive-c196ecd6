@@ -141,7 +141,7 @@ export function ImagesGrid({
       {!hasMore && posts.length > 0 && !isLoading && !isPacingDelay && (
         <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
           <div className="w-12 h-0.5 bg-muted/40 rounded-full mb-3" />
-          <p className="text-xs font-medium">You've seen all images</p>
+          <p className="text-xs font-medium">You're all caught up</p>
         </div>
       )}
     </div>

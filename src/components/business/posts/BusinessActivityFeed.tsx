@@ -37,6 +37,7 @@ import {
   ContentFilter,
   GridPost 
 } from '@/components/grids';
+import { ContentFilterPills, FilterOption } from '@/components/common/ContentFilterPills';
 
 // Fullscreen player integration
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
@@ -53,7 +54,7 @@ interface BusinessActivityFeedProps {
 type FeedTab = 'activity' | 'tagged';
 type FilterType = ContentFilter;
 
-const FILTER_OPTIONS: { key: FilterType; label: string }[] = [
+const FILTER_OPTIONS: FilterOption[] = [
   { key: 'all', label: 'All' },
   { key: 'longform', label: 'Long-form' },
   { key: 'shorts', label: 'Shorts' },
@@ -553,22 +554,14 @@ export function BusinessActivityFeed({
       {/* Controls container - only show when there are posts to filter */}
       {filteredPosts.length > 0 && (
         <div className="flex flex-col items-center gap-[10px] py-3">
-          {/* Filter pills */}
-          <div className="w-full max-w-[520px] mx-auto flex justify-center gap-2 px-4">
-            {FILTER_OPTIONS.map(({ key, label }) => (
-              <button
-                key={key}
-                onClick={() => setActiveFilter(key)}
-                className={cn(
-                  'flex-shrink-0 px-4 py-2.5 min-h-[44px] flex items-center rounded-full text-sm font-medium transition-colors active:scale-[0.95] transition-transform',
-                  activeFilter === key
-                    ? 'bg-foreground text-background'
-                    : 'bg-card text-foreground border border-border hover:bg-muted/50'
-                )}
-              >
-                {label}
-              </button>
-            ))}
+          {/* Filter pills - shared component */}
+          <div className="w-full max-w-[520px] mx-auto px-4">
+            <ContentFilterPills
+              filters={FILTER_OPTIONS}
+              activeFilter={activeFilter}
+              onFilterChange={(filter) => setActiveFilter(filter as FilterType)}
+              className="justify-center"
+            />
           </div>
 
           {/* Create post CTA - only on Activity tab for admins */}
