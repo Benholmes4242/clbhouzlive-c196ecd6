@@ -276,23 +276,17 @@ export function HubMessagesCardPolished({ conversations, userId, unreadCount, is
                 >
                   {/* Avatar */}
                   <div className="relative flex-shrink-0" aria-hidden="true">
-                    {conv.isGroup ? (
-                      <GroupAvatarCluster participants={conv.participants} />
-                    ) : (
-                      <>
-                        <SquircleAvatar
-                          size={56}
-                          src={conv.avatarUrl}
-                          alt={conv.name}
-                          fallback={conv.name.charAt(0).toUpperCase()}
-                          hideRing
-                        />
-                        {presenceStatus && (
-                          <div className="absolute -bottom-0.5 -right-0.5">
-                            <OnlineDot status={presenceStatus} />
-                          </div>
-                        )}
-                      </>
+                    <SquircleAvatar
+                      size={56}
+                      src={conv.isGroup ? (conv.avatarUrl || conv.participants?.[0]?.avatarUrl) : conv.avatarUrl}
+                      alt={conv.name}
+                      fallback={conv.name.charAt(0).toUpperCase()}
+                      hideRing
+                    />
+                    {!conv.isGroup && presenceStatus && (
+                      <div className="absolute -bottom-0.5 -right-0.5">
+                        <OnlineDot status={presenceStatus} />
+                      </div>
                     )}
                   </div>
                   
