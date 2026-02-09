@@ -11,10 +11,11 @@ import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useBusinessPostsCount } from '@/hooks/useBusinessPosts';
 import { useBusinessFollowersCount, useIsFollowingBusiness, useBusinessFollowMutation } from '@/hooks/useBusinessFollow';
+import { useBusinessImageUpload } from '@/hooks/useBusinessImageUpload';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   Phone, Globe, MapPin, MoreHorizontal, Check, ExternalLink, Loader2, 
-  ChevronRight, Share2, Link2, AlertCircle, ArrowLeft
+  ChevronRight, Share2, Link2, AlertCircle, ArrowLeft, Camera, Flag
 } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
@@ -24,6 +25,7 @@ import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { BusinessLocationCard } from '@/components/business/BusinessLocationCard';
+import { BusinessImageActionSheet } from '@/components/business/BusinessImageActionSheet';
 import { trackBusinessProfileVisit, trackBusinessAction } from '@/lib/businessAnalyticsTracking';
 import { getCityOnly, getCityCountry } from '@/lib/locationDisplay';
 import { toast } from 'sonner';
@@ -41,9 +43,6 @@ import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
 import { PeopleTab } from '@/components/business/PeopleTab';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
 import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
-
-// Background color - matches personal profile page (slate-50)
-const BG_COLOR = '#f8fafc';
 
 type BusinessTab = 'content' | 'golfers' | 'info';
 
@@ -64,8 +63,12 @@ const BusinessProfilePage: React.FC = () => {
   const { data: isFollowingStatus, isLoading: statusLoading } = useIsFollowingBusiness(business?.id, user?.id);
   const { follow, unfollow, isFollowing: followPending, isUnfollowing: unfollowPending } = useBusinessFollowMutation(business?.id || '', user?.id);
 
+  // Image upload hooks (P7: owner affordances)
+  const { uploadLogo, removeLogo, uploadCover, removeCover, uploadingLogo, uploadingCover } = useBusinessImageUpload(business?.id);
+  const [logoSheetOpen, setLogoSheetOpen] = useState(false);
+  const [coverSheetOpen, setCoverSheetOpen] = useState(false);
+
   const [activeTab, setActiveTab] = useState<BusinessTab>('content');
-  const [activeMiniNav, setActiveMiniNav] = useState('posts');
   const [bioExpanded, setBioExpanded] = useState(false);
   const [isBioClamped, setIsBioClamped] = useState(false);
   const [isAvatarLightboxOpen, setIsAvatarLightboxOpen] = useState(false);
@@ -94,8 +97,7 @@ const BusinessProfilePage: React.FC = () => {
     }
   }, [business?.id, user?.id]);
 
-
-  // Check if bio text is clamped (overflows 5 lines)
+  // Check if bio text is clamped (overflows 4 lines)
   useEffect(() => {
     const checkClamped = () => {
       if (bioRef.current) {
@@ -103,7 +105,6 @@ const BusinessProfilePage: React.FC = () => {
       }
     };
     checkClamped();
-    // Re-check on window resize
     window.addEventListener('resize', checkClamped);
     return () => window.removeEventListener('resize', checkClamped);
   }, [business?.description]);
@@ -125,16 +126,6 @@ const BusinessProfilePage: React.FC = () => {
     }
   };
 
-  const handleDirections = () => {
-    if (business?.location && business?.lat && business?.lng) {
-      trackBusinessAction(business.id, 'directions', user?.id);
-      window.open(
-        `https://www.google.com/maps/dir/?api=1&destination=${business.lat},${business.lng}`,
-        '_blank'
-      );
-    }
-  };
-
   const handleShare = async () => {
     const url = window.location.href;
     if (navigator.share) {
@@ -151,7 +142,6 @@ const BusinessProfilePage: React.FC = () => {
     await navigator.clipboard.writeText(window.location.href);
     toast.success('Link copied');
   };
-
 
   // Format URL for display
   const formatUrlForDisplay = (url: string): string => {
@@ -226,7 +216,7 @@ const BusinessProfilePage: React.FC = () => {
 
   if (error || !business) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4" style={{ background: BG_COLOR }}>
+      <div className="min-h-screen flex items-center justify-center p-4 bg-background">
         <div className="max-w-md text-center">
           <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
           <h1 className="text-2xl font-semibold mb-2">Business not found</h1>
@@ -242,10 +232,8 @@ const BusinessProfilePage: React.FC = () => {
   const heroUrl = business.cover_image_url || '';
 
   return (
-    <PageRoot className="min-h-screen" style={{ background: BG_COLOR }} immersiveStatusBar immersive>
+    <PageRoot className="min-h-screen bg-background" immersiveStatusBar immersive>
       {/* Hero Section - full-bleed immersive, extends behind notch */}
-      {/* pointer-events: none on container allows clicks to pass through to content below */}
-      {/* Children with pointer-events: auto remain interactive */}
       <div className="relative pointer-events-none" style={{ zIndex: 1 }}>
         {/* Hero Image Container - full-bleed behind notch */}
         <div className="relative w-full overflow-hidden" style={{ height: 'calc(200px + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}>
@@ -256,15 +244,29 @@ const BusinessProfilePage: React.FC = () => {
               className="w-full h-full object-cover object-center"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-slate-300 to-slate-400" />
+            <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/30" />
+          )}
+
+          {/* P7: Cover photo edit button for owners */}
+          {isOwner && (
+            <button
+              onClick={() => setCoverSheetOpen(true)}
+              className="absolute bottom-3 right-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm active:scale-[0.95] transition-transform z-10 pointer-events-auto"
+            >
+              {uploadingCover ? (
+                <Loader2 className="w-5 h-5 text-white animate-spin" />
+              ) : (
+                <Camera className="w-5 h-5 text-white" />
+              )}
+            </button>
           )}
         </div>
 
-        {/* Glass back button - positioned below safe area */}
+        {/* P1: Back button — h-11 w-11, rounded-full, active:scale */}
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-10 pointer-events-auto"
+          className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-full bg-black/20 backdrop-blur-sm active:scale-[0.95] transition-transform z-10 pointer-events-auto"
           style={{ top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
           aria-label="Back"
         >
@@ -272,54 +274,63 @@ const BusinessProfilePage: React.FC = () => {
         </button>
 
         {/* Avatar - squircle, left-aligned, positioned OUTSIDE the overflow-hidden container */}
-        <button
-          className="absolute left-5 z-20 cursor-pointer pointer-events-auto focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
-          style={{ bottom: '-62px' }}
-          onClick={() => setIsAvatarLightboxOpen(true)}
-          aria-label="View business logo"
-        >
-          <div className="relative w-[124px] h-[124px]">
-            {/* 2px background ring */}
-            <div
-              className="clbhouz-squircle absolute inset-0"
-              style={{ background: BG_COLOR }}
-            />
+        <div className="absolute left-5 z-20 pointer-events-auto" style={{ bottom: '-62px' }}>
+          <button
+            className="relative cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            onClick={() => setIsAvatarLightboxOpen(true)}
+            aria-label="View business logo"
+          >
+            <div className="relative w-[124px] h-[124px]">
+              {/* 2px background ring */}
+              <div className="clbhouz-squircle absolute inset-0 bg-background" />
 
-            {/* Avatar */}
-            <div
-              className="clbhouz-squircle absolute overflow-hidden"
-              style={{
-                inset: '2px',
-                boxShadow: '0 12px 30px rgba(15,15,15,0.22)',
-              }}
-            >
-              {business.logo_url ? (
-                <img
-                  src={business.logo_url}
-                  alt={business.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-slate-200 flex items-center justify-center text-3xl font-bold text-slate-600">
-                  {initials}
-                </div>
-              )}
+              {/* Avatar */}
+              <div
+                className="clbhouz-squircle absolute overflow-hidden"
+                style={{
+                  inset: '2px',
+                  boxShadow: '0 12px 30px rgba(15,15,15,0.22)',
+                }}
+              >
+                {business.logo_url ? (
+                  <img
+                    src={business.logo_url}
+                    alt={business.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-muted flex items-center justify-center text-3xl font-bold text-muted-foreground">
+                    {initials}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        </button>
+          </button>
 
-        {/* Pills row - right side, just below header photo (matching personal profile) */}
+          {/* P7: Avatar camera badge for owners */}
+          {isOwner && (
+            <button
+              onClick={(e) => { e.stopPropagation(); setLogoSheetOpen(true); }}
+              className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-card border border-border flex items-center justify-center shadow-sm active:scale-[0.95] transition-transform z-30"
+              aria-label="Change logo"
+            >
+              {uploadingLogo ? (
+                <Loader2 className="w-4 h-4 text-muted-foreground animate-spin" />
+              ) : (
+                <Camera className="w-4 h-4 text-muted-foreground" />
+              )}
+            </button>
+          )}
+        </div>
+
+        {/* Pills row - right side, just below header photo */}
         <div className="absolute right-5 z-20 flex items-center gap-2 pointer-events-auto" style={{ top: 'calc(200px + max(env(safe-area-inset-top, 0px), 47px) + 8px)' }}>
-          {/* Location pill - city only (white) */}
+          {/* Location pill - city only */}
           {(() => {
             const cityDisplay = getCityOnly({ city: business.city, region: business.region, country: business.country, location: business.location });
             return cityDisplay ? (
               <span 
-                className="px-4 py-1.5 text-sm font-semibold rounded-full text-[#0F0F0F] flex items-center gap-1.5"
-                style={{ 
-                  background: '#FFFFFF',
-                  boxShadow: '0 2px 8px rgba(31, 36, 40, 0.08)'
-                }}
+                className="px-4 py-1.5 text-sm font-semibold rounded-full bg-card text-foreground flex items-center gap-1.5 shadow-sm"
               >
                 <MapPin className="w-3.5 h-3.5" />
                 {cityDisplay}
@@ -345,34 +356,29 @@ const BusinessProfilePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Identity Stack - matching personal profile */}
-      {/* z-10 ensures content is above hero's z-1, pointer-events-auto ensures tappability */}
+      {/* Identity Stack */}
       <div className="pt-[68px] px-5 text-left relative z-10 pointer-events-auto">
         {/* Name + Verified */}
         <div className="flex items-center gap-1.5">
-          <h1 className="text-[28px] font-semibold text-[#0F0F0F]">
+          <h1 className="text-[28px] font-semibold text-foreground">
             {business.name}
           </h1>
           {business.is_verified && <VerifiedBadge size="lg" />}
         </div>
         
-        {/* Location - City + Country only (no mini map squircle) */}
-        {(() => {
-          const locationDisplay = getCityCountry({ city: business.city, region: business.region, country: business.country, location: business.location });
-          return locationDisplay ? (
-            <p className="mt-1 text-base font-medium text-slate-600">
-              {locationDisplay}
-            </p>
-          ) : null;
-        })()}
+        {/* P6: Location below name REMOVED — kept in pill and map only */}
       </div>
 
-      {/* Action Buttons - matching personal profile exactly */}
-      {/* relative z-10 ensures buttons are above hero overlay */}
+      {/* Action Buttons */}
       <div className="mt-3 px-5 flex items-center gap-2 relative z-10 pointer-events-auto">
-        {/* Follow button */}
+        {/* P1+P3: Follow button — h-11, matching personal profile gradient variant */}
         <button 
-          className="h-9 flex-1 rounded-full text-sm font-semibold text-white flex items-center justify-center gap-1.5 disabled:opacity-60 bg-slate-700"
+          className={cn(
+            "h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98] disabled:opacity-60",
+            isFollowing
+              ? "bg-muted text-foreground border border-border"
+              : "bg-card border border-foreground text-foreground"
+          )}
           onClick={handleFollowToggle}
           disabled={followBusy}
         >
@@ -388,76 +394,83 @@ const BusinessProfilePage: React.FC = () => {
           )}
         </button>
         
-        {/* Message button - hidden until messaging is implemented */}
-        
-        {/* Owner-only menu (⋯) */}
-        {isOwner && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button 
-                className="w-9 h-9 flex-shrink-0 rounded-full flex items-center justify-center"
-                style={{
-                  background: '#fff',
-                  border: '1px solid #E0E0E0'
-                }}
-              >
-                <MoreHorizontal className="w-4 h-4 text-[#0F0F0F]" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={() => navigate(`/business/${business.id}/edit`)}>
-                Edit business profile
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleShare}>
-                <Share2 className="h-4 w-4 mr-2" />
-                Share profile
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleCopyLink}>
-                <Link2 className="h-4 w-4 mr-2" />
-                Copy link
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+        {/* P0: Three-dot menu — renders for ALL users with role-based menu */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button 
+              className="min-h-[44px] min-w-[44px] flex-shrink-0 rounded-full flex items-center justify-center bg-card border border-border active:scale-[0.95] transition-transform"
+            >
+              <MoreHorizontal className="w-5 h-5 text-foreground" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            {isOwner ? (
+              <>
+                <DropdownMenuItem onClick={() => navigate(`/business/${business.id}/edit`)}>
+                  Edit business profile
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleShare}>
+                  <Share2 className="h-4 w-4 mr-2" />
+                  Share profile
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleCopyLink}>
+                  <Link2 className="h-4 w-4 mr-2" />
+                  Copy link
+                </DropdownMenuItem>
+              </>
+            ) : (
+              <>
+                <DropdownMenuItem onClick={handleShare}>
+                  <Share2 className="h-4 w-4 mr-2" />
+                  Share profile
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleCopyLink}>
+                  <Link2 className="h-4 w-4 mr-2" />
+                  Copy link
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  onClick={() => toast.info('Report submitted. Thank you.')}
+                  className="text-destructive"
+                >
+                  <Flag className="h-4 w-4 mr-2" />
+                  Report
+                </DropdownMenuItem>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
-      {/* Mini-nav row: Posts | Followers | Following - identical to personal profile */}
+      {/* P5: Stats row — display-only divs (removed dead activeMiniNav) */}
       <div className="mt-6 px-5">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center gap-6">
           {/* Posts */}
-          <button
-            onClick={() => setActiveMiniNav('posts')}
-            className="pb-3 flex items-center gap-2"
-          >
-            <span className="text-sm text-slate-500">Posts</span>
-            <span className="text-base font-semibold text-[#0F0F0F]">{postsCount}</span>
-          </button>
+          <div className="flex items-center gap-1.5 min-h-[44px]">
+            <span className="text-sm text-muted-foreground">Posts</span>
+            <span className="text-base font-semibold text-foreground">{postsCount}</span>
+          </div>
           
           {/* Followers */}
-          <button
-            onClick={() => setActiveMiniNav('followers')}
-            className="pb-3 flex items-center gap-2"
-          >
-            <span className="text-sm text-slate-500">Followers</span>
-            <span className="text-base font-semibold text-[#0F0F0F]">{followersCount}</span>
-          </button>
-          
-          {/* Following stat removed - businesses don't follow others yet */}
+          <div className="flex items-center gap-1.5 min-h-[44px]">
+            <span className="text-sm text-muted-foreground">Followers</span>
+            <span className="text-base font-semibold text-foreground">{followersCount}</span>
+          </div>
         </div>
       </div>
 
       {/* White content sheet */}
-      <div className="bg-white pt-5 pb-32 min-h-[60vh]">
-        {/* About section - identical to personal profile */}
+      <div className="bg-card pt-5 pb-32 min-h-[60vh]">
+        {/* About section */}
         <section className="px-5 mb-6">
-          <h3 className="text-xl font-semibold text-[#0F0F0F] mb-2">About</h3>
+          <h3 className="text-xl font-semibold text-foreground mb-2">About</h3>
           {bioText ? (
             <div>
               <p 
                 ref={bioRef}
                 className={cn(
-                  "text-base text-[#0F0F0F] leading-relaxed whitespace-pre-wrap",
+                  "text-base text-foreground leading-relaxed whitespace-pre-wrap",
                   !bioExpanded && "line-clamp-4"
                 )}
                 style={{ overflowWrap: 'anywhere' }}
@@ -467,18 +480,18 @@ const BusinessProfilePage: React.FC = () => {
               {(isBioClamped || bioExpanded) && (
                 <button
                   onClick={() => setBioExpanded(!bioExpanded)}
-                  className="text-sm font-medium mt-1 hover:underline text-slate-500"
+                  className="text-sm font-medium mt-1 hover:underline text-muted-foreground min-h-[44px] flex items-center active:scale-[0.98] transition-transform"
                 >
                   {bioExpanded ? 'Show less' : 'More'}
                 </button>
               )}
             </div>
           ) : (
-            <p className="text-base text-slate-400 italic">No description provided</p>
+            <p className="text-base text-muted-foreground italic">No description provided</p>
           )}
         </section>
 
-        {/* Business-specific section: Website, Call, Location (replaces Achievements) */}
+        {/* Business-specific section: Website, Call, Location */}
         <section className="px-5 mb-6">
           {/* Website pill */}
           {business.website && (
@@ -486,11 +499,7 @@ const BusinessProfilePage: React.FC = () => {
               href={ensureProtocol(business.website)}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-slate-600 hover:text-slate-800 transition-colors mr-2 mb-2"
-              style={{
-                background: '#f1f5f9',
-                border: '1px solid #e2e8f0'
-              }}
+              className="inline-flex items-center gap-1.5 rounded-full bg-muted border border-border px-3 min-h-[44px] text-sm font-medium text-foreground active:scale-[0.98] transition-transform mr-2 mb-2"
               onClick={() => trackBusinessAction(business.id, 'website', user?.id)}
             >
               <ExternalLink className="w-3.5 h-3.5" />
@@ -502,11 +511,7 @@ const BusinessProfilePage: React.FC = () => {
           {business.phone && (
             <button
               onClick={handleCall}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-slate-600 hover:text-slate-800 transition-colors mr-2 mb-2"
-              style={{
-                background: '#f1f5f9',
-                border: '1px solid #e2e8f0'
-              }}
+              className="inline-flex items-center gap-1.5 rounded-full bg-muted border border-border px-3 min-h-[44px] text-sm font-medium text-foreground active:scale-[0.98] transition-transform mr-2 mb-2"
             >
               <Phone className="w-3.5 h-3.5" />
               Call
@@ -529,12 +534,10 @@ const BusinessProfilePage: React.FC = () => {
           )}
         </section>
 
-        {/* Segmented control tabs - matches profile page exactly */}
-        {/* pointer-events-auto ensures tabs remain tappable regardless of parent stacking */}
+        {/* Segmented control tabs */}
         <section className="px-4 py-2 pointer-events-auto">
           <div 
-            className="flex items-stretch rounded-xl overflow-hidden pointer-events-auto"
-            style={{ background: '#e2e8f0' }}
+            className="flex items-stretch rounded-xl overflow-hidden bg-muted"
           >
             {tabs.map((tab) => {
               const isActive = activeTab === tab.id;
@@ -543,10 +546,10 @@ const BusinessProfilePage: React.FC = () => {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as BusinessTab)}
                   className={cn(
-                    "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px]",
+                    "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98]",
                     isActive 
-                      ? "bg-white text-[#1e293b] shadow-sm m-1 rounded-lg border border-[#e2e8f0]" 
-                      : "text-[#64748b] hover:text-[#1e293b]"
+                      ? "bg-card text-foreground shadow-sm m-1 rounded-lg border border-border" 
+                      : "text-muted-foreground hover:text-foreground"
                   )}
                 >
                   {tab.label}
@@ -573,6 +576,26 @@ const BusinessProfilePage: React.FC = () => {
         altText={`${business?.name} logo`}
         shape="squircle"
         fallbackInitial={initials}
+      />
+
+      {/* P7: Image Action Sheets for owner editing */}
+      <BusinessImageActionSheet
+        open={logoSheetOpen}
+        onOpenChange={setLogoSheetOpen}
+        type="logo"
+        hasImage={!!business.logo_url}
+        uploading={uploadingLogo}
+        onUpload={async (file) => { await uploadLogo(file); }}
+        onRemove={async () => { await removeLogo(); }}
+      />
+      <BusinessImageActionSheet
+        open={coverSheetOpen}
+        onOpenChange={setCoverSheetOpen}
+        type="cover"
+        hasImage={!!business.cover_image_url}
+        uploading={uploadingCover}
+        onUpload={async (file) => { await uploadCover(file); }}
+        onRemove={async () => { await removeCover(); }}
       />
     </PageRoot>
   );
