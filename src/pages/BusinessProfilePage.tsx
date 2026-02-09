@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { cn } from '@/lib/utils';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -573,6 +574,9 @@ const BusinessProfilePage: React.FC = () => {
 
       {/* Bottom Navigation Spacer */}
       <div className="h-20" />
+
+      {/* Scroll to top FAB */}
+      <ScrollToTopGlass />
 
       {/* Avatar Lightbox */}
       <AvatarLightbox
