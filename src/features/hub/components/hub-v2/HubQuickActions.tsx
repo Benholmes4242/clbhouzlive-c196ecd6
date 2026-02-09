@@ -1,6 +1,6 @@
 /**
  * HubQuickActions - Quick action buttons for Notifications + Profile
- * Layout: [Bell circle] [Profile avatar circle]
+ * Layout: [Bell squircle] [Profile avatar squircle]
  */
 
 import { useNavigate } from 'react-router-dom';
@@ -51,10 +51,11 @@ export function HubQuickActions({
 
   return (
     <div className="flex items-center gap-2.5">
-      {/* Notifications — circular container matching avatar size */}
+      {/* Notifications — squircle container matching avatar shape */}
       <button
         onClick={handleNotifications}
-        className="relative w-12 h-12 rounded-full bg-card border border-border/60 shadow-sm flex items-center justify-center active:scale-[0.93] transition-transform focus-visible:outline-none focus-visible:ring-2"
+        className="relative w-12 bg-card border border-border/60 shadow-sm flex items-center justify-center active:scale-[0.93] transition-transform focus-visible:outline-none focus-visible:ring-2 overflow-hidden"
+        style={{ aspectRatio: '1 / 1.05', borderRadius: '34%' }}
         aria-label={`Notifications${hasUnreadNotifications ? `, ${unreadNotificationCount} unread` : ''}`}
       >
         <Bell className="w-5 h-5 text-muted-foreground" />
