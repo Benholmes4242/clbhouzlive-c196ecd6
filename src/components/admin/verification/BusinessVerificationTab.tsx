@@ -281,11 +281,61 @@ const BusinessVerificationTab = () => {
       if (!result.success) throw new Error(result.error || 'Failed to submit review');
       return result;
     },
-    onSuccess: (result) => {
+    onSuccess: async (result) => {
+      const business = selectedRequest?.business;
       if (result.status === 'approved') {
         toast.success('Business verified successfully.');
+        // Notify business owners
+        if (business) {
+          try {
+            const { data: members } = await supabase
+              .from('business_members')
+              .select('user_profile_id')
+              .eq('business_id', business.id)
+              .in('role', ['owner', 'admin']);
+            if (members?.length) {
+              await supabase.from('notifications').insert(
+                members.map(m => ({
+                  user_id: m.user_profile_id,
+                  recipient_actor_id: m.user_profile_id,
+                  recipient_actor_type: 'personal' as const,
+                  type: 'business_verification_approved',
+                  entity_type: 'business',
+                  entity_id: business.id,
+                  title: 'Business verified',
+                  message: `Your business "${business.name}" has been verified`,
+                  data: { business_id: business.id, business_name: business.name } as any,
+                }))
+              );
+            }
+          } catch (e) { console.error('[Verification notification error]', e); }
+        }
       } else if (result.status === 'rejected') {
         toast.success('Verification request rejected.');
+        if (business) {
+          try {
+            const { data: members } = await supabase
+              .from('business_members')
+              .select('user_profile_id')
+              .eq('business_id', business.id)
+              .in('role', ['owner', 'admin']);
+            if (members?.length) {
+              await supabase.from('notifications').insert(
+                members.map(m => ({
+                  user_id: m.user_profile_id,
+                  recipient_actor_id: m.user_profile_id,
+                  recipient_actor_type: 'personal' as const,
+                  type: 'business_verification_rejected',
+                  entity_type: 'business',
+                  entity_id: business.id,
+                  title: 'Verification not approved',
+                  message: `Your verification request for "${business.name}" was not approved`,
+                  data: { business_id: business.id, business_name: business.name, reason: rejectReason || null } as any,
+                }))
+              );
+            }
+          } catch (e) { console.error('[Verification notification error]', e); }
+        }
       } else {
         toast.success(`Approval recorded (${result.approvals} of ${result.required})`);
       }
@@ -338,8 +388,33 @@ const BusinessVerificationTab = () => {
 
       return { success: true };
     },
-    onSuccess: () => {
+    onSuccess: async (_, variables) => {
       toast.success('Business force approved for demo purposes.');
+      // Notify business owners
+      try {
+        const business = selectedRequest?.business;
+        const businessName = business?.name || 'your business';
+        const { data: members } = await supabase
+          .from('business_members')
+          .select('user_profile_id')
+          .eq('business_id', variables.businessId)
+          .in('role', ['owner', 'admin']);
+        if (members?.length) {
+          await supabase.from('notifications').insert(
+            members.map(m => ({
+              user_id: m.user_profile_id,
+              recipient_actor_id: m.user_profile_id,
+              recipient_actor_type: 'personal' as const,
+              type: 'business_verification_approved',
+              entity_type: 'business',
+              entity_id: variables.businessId,
+              title: 'Business verified',
+              message: `Your business "${businessName}" has been verified`,
+              data: { business_id: variables.businessId, business_name: businessName } as any,
+            }))
+          );
+        }
+      } catch (e) { console.error('[Force approve notification error]', e); }
       queryClient.invalidateQueries({ queryKey: ['admin-business-verification-requests'] });
       queryClient.invalidateQueries({ queryKey: ['admin-business-verifications-pending-count'] });
       queryClient.invalidateQueries({ queryKey: ['admin-business-verification-all-reviews'] });
@@ -361,10 +436,35 @@ const BusinessVerificationTab = () => {
       if (error) throw error;
       return { success: true };
     },
-    onSuccess: (_, { businessId }) => {
+    onSuccess: async (_, { businessId, reason }) => {
       toast.success('Verification removed', {
         description: 'The business will need to request verification again.',
       });
+      // Notify business owners
+      try {
+        const business = selectedRequest?.business;
+        const businessName = business?.name || 'your business';
+        const { data: members } = await supabase
+          .from('business_members')
+          .select('user_profile_id')
+          .eq('business_id', businessId)
+          .in('role', ['owner', 'admin']);
+        if (members?.length) {
+          await supabase.from('notifications').insert(
+            members.map(m => ({
+              user_id: m.user_profile_id,
+              recipient_actor_id: m.user_profile_id,
+              recipient_actor_type: 'personal' as const,
+              type: 'business_verification_removed',
+              entity_type: 'business',
+              entity_id: businessId,
+              title: 'Verification revoked',
+              message: `Verification for "${businessName}" has been revoked`,
+              data: { business_id: businessId, business_name: businessName, reason: reason || null } as any,
+            }))
+          );
+        }
+      } catch (e) { console.error('[Revoke notification error]', e); }
       // Invalidate admin queries
       queryClient.invalidateQueries({ queryKey: ['admin-business-verification-requests'] });
       queryClient.invalidateQueries({ queryKey: ['admin-business-verifications-pending-count'] });

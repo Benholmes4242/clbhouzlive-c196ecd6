@@ -7156,6 +7156,54 @@ export type Database = {
           },
         ]
       }
+      review_responses: {
+        Row: {
+          business_id: string
+          created_at: string | null
+          id: string
+          is_deleted: boolean | null
+          responded_by: string
+          response_text: string
+          review_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          business_id: string
+          created_at?: string | null
+          id?: string
+          is_deleted?: boolean | null
+          responded_by: string
+          response_text: string
+          review_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          business_id?: string
+          created_at?: string | null
+          id?: string
+          is_deleted?: boolean | null
+          responded_by?: string
+          response_text?: string
+          review_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_responses_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_responses_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "course_ratings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       review_tags: {
         Row: {
           created_at: string | null
