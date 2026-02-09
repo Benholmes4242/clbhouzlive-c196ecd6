@@ -71,7 +71,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const isTourRoute = location.pathname.startsWith('/tour') || location.pathname.startsWith('/tourhub');
   const isEditProfileRoute = location.pathname === '/edit-profile';
   const isFriendsActivityRoute = location.pathname === '/friends-activity';
-  const isAchievementsRoute = location.pathname === '/achievements' || location.pathname === '/profile/quest';
+  const isAchievementsRoute = location.pathname === '/achievements' || location.pathname.startsWith('/achievements/') || location.pathname === '/profile/quest';
   const isMessagesRoute = location.pathname.startsWith('/messages');
   const isMessagesConversationRoute = location.pathname.startsWith('/messages/');
 

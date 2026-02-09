@@ -12,6 +12,7 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 
 import '@/styles/quest-theme.css';
 import { PageRoot } from '@/components/layout/PageRoot';
@@ -54,6 +55,8 @@ interface ProfileQuestViewProps {
   profileUserId?: string;
   /** First name of the profile user (for contextual taglines) */
   profileFirstName?: string;
+  /** Full display name (for header when viewing another user) */
+  profileDisplayName?: string;
   /** Whether viewing own profile (defaults to true) */
   isOwnProfile?: boolean;
 }
@@ -61,6 +64,7 @@ interface ProfileQuestViewProps {
 const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
   profileUserId,
   profileFirstName,
+  profileDisplayName,
   isOwnProfile = true,
 }) => {
   const navigate = useNavigate();
@@ -233,6 +237,23 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
 
   return (
     <PageRoot className="min-h-screen bg-background">
+      {/* Read-only header when viewing another user's quest */}
+      {!isOwnProfile && (
+        <header className="sticky top-0 z-50 flex items-center gap-3 px-4 h-14 bg-background/80 backdrop-blur-lg border-b border-border/60"
+          style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+        >
+          <button
+            onClick={() => navigate(-1)}
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full hover:bg-muted active:scale-[0.95] transition-transform"
+            aria-label="Go back"
+          >
+            <ArrowLeft className="w-5 h-5 text-foreground" />
+          </button>
+          <h1 className="text-[17px] font-semibold text-foreground truncate">
+            {profileDisplayName ? `${profileDisplayName}'s Journey` : 'Journey'}
+          </h1>
+        </header>
+      )}
       {/* Content - generous spacing (24-32px gaps) for Apple-level polish */}
       <div className="relative pb-10 pt-4">
         {/* Section 1: Trophy Room Hero */}

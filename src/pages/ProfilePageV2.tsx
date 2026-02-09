@@ -701,6 +701,7 @@ const ProfilePageV2Content: React.FC = () => {
           <ProfileAchievementsRail
             userId={profile.id}
             username={username}
+            isOwnProfile={isSelf}
             className="mb-4"
           />
         )}

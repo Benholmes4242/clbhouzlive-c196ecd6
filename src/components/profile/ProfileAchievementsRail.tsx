@@ -24,6 +24,7 @@ import usaBadgeImage from '@/assets/badges/usa-badge.png';
 interface ProfileAchievementsRailProps {
   userId: string;
   username: string;
+  isOwnProfile?: boolean;
   className?: string;
 }
 
@@ -119,6 +120,7 @@ function getGhostBadgeName(nudge: BadgeNudge): string {
 const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
   userId,
   username,
+  isOwnProfile = true,
   className,
 }) => {
   const navigate = useNavigate();
@@ -155,8 +157,8 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
   }, [achievements]);
 
   const handleViewAll = () => {
-    logPoint('achievements.view_all.click', { source: 'button' });
-    navigate('/achievements');
+    logPoint('achievements.view_all.click', { source: 'button', isOwnProfile });
+    navigate(isOwnProfile ? '/achievements' : `/achievements/${userId}`);
   };
 
   // Show nothing if loading or no achievements and no next badge

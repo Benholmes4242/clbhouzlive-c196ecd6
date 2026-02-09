@@ -392,6 +392,7 @@ function AppRoutes() {
         <Route path="/top100/:slug" element={<Suspense fallback={<CoursesListSkeleton />}><Top100List /></Suspense>} />
         <Route path="/achievementshub" element={<Suspense fallback={<AchievementsSkeleton />}><AchievementsHubPage /></Suspense>} />
         <Route path="/achievements" element={<Suspense fallback={<AchievementsSkeleton />}><AchievementsPage /></Suspense>} />
+        <Route path="/achievements/:userId" element={<Suspense fallback={<AchievementsSkeleton />}><AchievementsPage /></Suspense>} />
         <Route path="/admin-setup" element={<Suspense fallback={<GenericPageSkeleton />}><AdminSetupPage /></Suspense>} />
         
         {/* Admin routes wrapped with AdminLayout */}
