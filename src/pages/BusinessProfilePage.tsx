@@ -79,7 +79,7 @@ const BusinessProfilePage: React.FC = () => {
 
   // Compute follow state
   const isFollowing = isFollowingStatus === true;
-  const followBusy = followPending || unfollowPending || statusLoading;
+  const followBusy = statusLoading; // optimistic — no spinner during mutations
   
   const handleFollowToggle = () => {
     if (!user) return;
@@ -382,9 +382,7 @@ const BusinessProfilePage: React.FC = () => {
           onClick={handleFollowToggle}
           disabled={followBusy}
         >
-          {followBusy ? (
-            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-          ) : isFollowing ? (
+          {isFollowing ? (
             <>
               <Check className="w-3.5 h-3.5" />
               Following
@@ -443,20 +441,28 @@ const BusinessProfilePage: React.FC = () => {
         </DropdownMenu>
       </div>
 
-      {/* P5: Stats row — display-only divs (removed dead activeMiniNav) */}
+      {/* Stats row — tappable */}
       <div className="mt-6 px-5">
         <div className="flex items-center gap-6">
-          {/* Posts */}
-          <div className="flex items-center gap-1.5 min-h-[44px]">
+          {/* Posts — taps scroll to Activity tab */}
+          <button
+            type="button"
+            onClick={() => setActiveTab('content')}
+            className="flex items-center gap-1.5 min-h-[44px] cursor-pointer active:opacity-70 transition-opacity"
+          >
             <span className="text-sm text-muted-foreground">Posts</span>
             <span className="text-base font-semibold text-foreground">{postsCount}</span>
-          </div>
+          </button>
           
-          {/* Followers */}
-          <div className="flex items-center gap-1.5 min-h-[44px]">
+          {/* Followers — taps navigate to business followers list */}
+          <button
+            type="button"
+            onClick={() => navigate(`/business/${business.slug || business.id}/followers`)}
+            className="flex items-center gap-1.5 min-h-[44px] cursor-pointer active:opacity-70 transition-opacity"
+          >
             <span className="text-sm text-muted-foreground">Followers</span>
             <span className="text-base font-semibold text-foreground">{followersCount}</span>
-          </div>
+          </button>
         </div>
       </div>
 

@@ -51,53 +51,68 @@ export function useBusinessFollowMutation(businessId: string, userId: string | u
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
+  const statusKey = ['business-follow-status', businessId, userId];
+  const countKey = ['business-followers-count', businessId];
+
   const followMutation = useMutation({
     mutationFn: async () => {
       if (!userId) throw new Error('Must be logged in to follow');
-
       const { error } = await supabase
         .from('business_follows')
         .insert({ business_id: businessId, follower_id: userId });
-
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['business-follow-status', businessId, userId] });
-      queryClient.invalidateQueries({ queryKey: ['business-followers-count', businessId] });
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: statusKey });
+      await queryClient.cancelQueries({ queryKey: countKey });
+      const prevStatus = queryClient.getQueryData<boolean>(statusKey);
+      const prevCount = queryClient.getQueryData<number>(countKey);
+      queryClient.setQueryData(statusKey, true);
+      queryClient.setQueryData(countKey, (old: number | undefined) => (old ?? 0) + 1);
+      return { prevStatus, prevCount };
     },
-    onError: (error: Error) => {
-      console.error('Follow error:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to follow business. Please try again.',
-        variant: 'destructive',
-      });
+    onError: (_error, _vars, context) => {
+      if (context) {
+        queryClient.setQueryData(statusKey, context.prevStatus);
+        queryClient.setQueryData(countKey, context.prevCount);
+      }
+      toast({ title: 'Error', description: 'Failed to follow business.', variant: 'destructive' });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: statusKey });
+      queryClient.invalidateQueries({ queryKey: countKey });
     },
   });
 
   const unfollowMutation = useMutation({
     mutationFn: async () => {
       if (!userId) throw new Error('Must be logged in to unfollow');
-
       const { error } = await supabase
         .from('business_follows')
         .delete()
         .eq('business_id', businessId)
         .eq('follower_id', userId);
-
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['business-follow-status', businessId, userId] });
-      queryClient.invalidateQueries({ queryKey: ['business-followers-count', businessId] });
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: statusKey });
+      await queryClient.cancelQueries({ queryKey: countKey });
+      const prevStatus = queryClient.getQueryData<boolean>(statusKey);
+      const prevCount = queryClient.getQueryData<number>(countKey);
+      queryClient.setQueryData(statusKey, false);
+      queryClient.setQueryData(countKey, (old: number | undefined) => Math.max((old ?? 1) - 1, 0));
+      return { prevStatus, prevCount };
     },
-    onError: (error: Error) => {
-      console.error('Unfollow error:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to unfollow business. Please try again.',
-        variant: 'destructive',
-      });
+    onError: (_error, _vars, context) => {
+      if (context) {
+        queryClient.setQueryData(statusKey, context.prevStatus);
+        queryClient.setQueryData(countKey, context.prevCount);
+      }
+      toast({ title: 'Error', description: 'Failed to unfollow business.', variant: 'destructive' });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: statusKey });
+      queryClient.invalidateQueries({ queryKey: countKey });
     },
   });
 
