@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { usePaginatedFollowers } from '@/hooks/useSocialLists';
+import { usePaginatedFollowers, usePaginatedFollowing } from '@/hooks/useSocialLists';
 import { useUserByUsername } from '@/hooks/useUserByUsername';
 import { UserListPage } from '@/components/social/UserListPage';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -28,8 +28,22 @@ const FollowersListPage = () => {
     refetch,
   } = usePaginatedFollowers(profileUser?.id);
 
+  // Also fetch following for the tab
+  const {
+    data: followingData,
+    isLoading: followingLoading,
+    isFetchingNextPage: followingIsFetchingNextPage,
+    hasNextPage: followingHasNextPage,
+    fetchNextPage: followingFetchNextPage,
+    error: followingError,
+    refetch: followingRefetch,
+  } = usePaginatedFollowing(profileUser?.id);
+
   const followers = data?.pages.flatMap((page) => page.users) ?? [];
   const totalCount = data?.pages.reduce((acc, p) => acc + p.users.length, 0) ?? 0;
+
+  const following = followingData?.pages.flatMap((page) => page.users) ?? [];
+  const followingTotalCount = followingData?.pages.reduce((acc, p) => acc + p.users.length, 0) ?? 0;
 
   // Track list view
   useEffect(() => {
@@ -75,6 +89,16 @@ const FollowersListPage = () => {
       onRefetch={() => refetch()}
       backPath={`/profile/${profileUser.username}`}
       isOwnProfile={isOwnProfile}
+      profileUsername={profileUser.username}
+      // Following tab data
+      followingUsers={following}
+      followingTotalCount={followingTotalCount}
+      followingIsLoading={followingLoading}
+      followingError={followingError}
+      followingHasNextPage={followingHasNextPage}
+      followingIsFetchingNextPage={followingIsFetchingNextPage}
+      onFollowingLoadMore={() => followingFetchNextPage()}
+      onFollowingRefetch={() => followingRefetch()}
     />
   );
 };

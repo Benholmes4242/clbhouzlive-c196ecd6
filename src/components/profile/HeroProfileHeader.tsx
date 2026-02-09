@@ -229,7 +229,7 @@ const HeroProfileHeader = ({
 
   const handleOpenFollowing = useCallback(() => {
     if (!username) return;
-    navigate(`/profile/${username}/following`);
+    navigate(`/profile/${username}/followers?tab=following`);
   }, [username, navigate]);
 
   const handleOpenFriends = useCallback(() => {
