@@ -23,14 +23,14 @@ export function ProfileSuccessScreen({
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="fixed inset-0 z-[9999] bg-[#F8FAFC] flex flex-col items-center justify-center px-6 pt-safe pb-safe"
+      className="fixed inset-0 z-[9999] bg-background flex flex-col items-center justify-center px-6 pt-safe pb-safe"
     >
       {/* Success icon */}
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: 'spring', damping: 15, stiffness: 300, delay: 0.1 }}
-        className="w-20 h-20 rounded-full bg-[#e2e8f0] flex items-center justify-center mb-6"
+        className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-6"
       >
         <Check className="w-10 h-10 text-primary" strokeWidth={3} />
       </motion.div>
@@ -42,7 +42,7 @@ export function ProfileSuccessScreen({
         transition={{ delay: 0.2 }}
         className="text-center mb-8"
       >
-        <h1 className="text-2xl font-bold text-slate-900 mb-2">{title}</h1>
+        <h1 className="text-2xl font-bold text-foreground mb-2">{title}</h1>
         <p className="text-muted-foreground">{subtitle}</p>
       </motion.div>
 
@@ -66,7 +66,7 @@ export function ProfileSuccessScreen({
           variant="outline"
           size="lg"
           onClick={onDone}
-          className="w-full rounded-xl font-medium border-[#e2e8f0]"
+          className="w-full rounded-xl font-medium border-border"
         >
           Done
           <ArrowRight className="w-4 h-4 ml-2" />

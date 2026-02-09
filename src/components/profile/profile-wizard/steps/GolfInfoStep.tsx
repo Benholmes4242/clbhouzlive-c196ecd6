@@ -5,6 +5,12 @@ import { motion } from 'framer-motion';
 import { GolfInfoSection } from '@/components/profile/edit-v2/GolfInfoSection';
 import { VisibilityValue } from '@/components/profile/edit-v2/VisibilityDropdown';
 
+interface DeferredClub {
+  id: string;
+  name: string;
+  country: string | null;
+}
+
 interface GolfInfoStepProps {
   homeClub: string;
   homeClubId: string | null;
@@ -15,6 +21,11 @@ interface GolfInfoStepProps {
   additionalClubsVisibility: VisibilityValue;
   onChange: (field: string, value: string | null) => void;
   onVisibilityChange: (field: 'homeClubVisibility' | 'additionalClubsVisibility', value: VisibilityValue) => void;
+  // Deferred club operations
+  addedClubs: DeferredClub[];
+  removedClubIds: string[];
+  onAddClub: (club: DeferredClub) => void;
+  onRemoveClub: (clubId: string) => void;
 }
 
 export function GolfInfoStep({
@@ -27,6 +38,10 @@ export function GolfInfoStep({
   additionalClubsVisibility,
   onChange,
   onVisibilityChange,
+  addedClubs,
+  removedClubIds,
+  onAddClub,
+  onRemoveClub,
 }: GolfInfoStepProps) {
   return (
     <div className="h-full overflow-y-auto">
@@ -45,6 +60,10 @@ export function GolfInfoStep({
             additionalClubsVisibility={additionalClubsVisibility}
             onChange={onChange}
             onVisibilityChange={onVisibilityChange}
+            deferredAddedClubs={addedClubs}
+            deferredRemovedClubIds={removedClubIds}
+            onDeferredAddClub={onAddClub}
+            onDeferredRemoveClub={onRemoveClub}
           />
         </motion.div>
       </div>

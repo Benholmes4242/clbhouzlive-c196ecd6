@@ -21,7 +21,7 @@ export function ProfileWizardNavigation({
   const isLastStep = currentStep === totalSteps;
 
   return (
-    <div className="sticky bottom-0 z-10 bg-[#F8FAFC] border-t border-border/50 px-4 py-3 pb-safe">
+    <div className="sticky bottom-0 z-10 bg-background border-t border-border/50 px-4 py-3 pb-safe">
       <div className="flex items-center gap-3">
         {/* Back button - hidden on first step */}
         {!isFirstStep && (
@@ -30,7 +30,7 @@ export function ProfileWizardNavigation({
             size="lg"
             onClick={onBack}
             disabled={isSubmitting}
-            className="flex-1 rounded-xl border-[#e2e8f0] font-medium"
+            className="flex-1 min-h-[48px] rounded-full border-border bg-transparent text-foreground font-medium active:scale-[0.97] transition-transform"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
@@ -43,8 +43,11 @@ export function ProfileWizardNavigation({
           onClick={isLastStep ? onSubmit : onNext}
           disabled={!canProceed || isSubmitting}
           className={cn(
-            "flex-1 rounded-xl font-semibold transition-all",
+            "flex-1 min-h-[48px] rounded-full font-semibold active:scale-[0.97] transition-transform",
             isFirstStep && "w-full",
+            isLastStep
+              ? "bg-[#334E3D] hover:bg-[#334E3D]/90 text-white"
+              : "bg-foreground hover:bg-foreground/90 text-background",
             (!canProceed || isSubmitting) && "opacity-50"
           )}
         >

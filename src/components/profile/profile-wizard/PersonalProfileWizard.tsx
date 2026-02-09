@@ -37,6 +37,12 @@ import { ProfileSuccessScreen } from './ProfileSuccessScreen';
 const BIO_MAX_LENGTH = 300;
 const TOTAL_STEPS = 3;
 
+interface AdditionalClubChange {
+  id: string;
+  name: string;
+  country: string | null;
+}
+
 interface FormData {
   displayName: string;
   username: string;
@@ -53,6 +59,11 @@ interface FormData {
   headerPhoto: File | null;
   profilePhotoPreview: string | null;
   headerPhotoPreview: string | null;
+  removeProfilePhoto: boolean;
+  removeHeaderPhoto: boolean;
+  // Deferred additional club changes
+  addedClubs: AdditionalClubChange[];
+  removedClubIds: string[];
 }
 
 const createInitialFormData = (profile: any): FormData => ({
@@ -71,6 +82,10 @@ const createInitialFormData = (profile: any): FormData => ({
   headerPhoto: null,
   profilePhotoPreview: null,
   headerPhotoPreview: null,
+  removeProfilePhoto: false,
+  removeHeaderPhoto: false,
+  addedClubs: [],
+  removedClubIds: [],
 });
 
 export function PersonalProfileWizard() {
@@ -137,6 +152,10 @@ export function PersonalProfileWizard() {
     if (JSON.stringify(formData.websites) !== JSON.stringify(initialFormData.websites)) return true;
     if (formData.profilePhoto !== null) return true;
     if (formData.headerPhoto !== null) return true;
+    if (formData.removeProfilePhoto) return true;
+    if (formData.removeHeaderPhoto) return true;
+    if (formData.addedClubs.length > 0) return true;
+    if (formData.removedClubIds.length > 0) return true;
     return false;
   }, [formData, initialFormData]);
 
@@ -158,21 +177,64 @@ export function PersonalProfileWizard() {
 
   // Handle photo changes
   const handlePhotoChange = useCallback((type: 'profilePhoto' | 'headerPhoto', file: File | null) => {
+    const removeKey = type === 'profilePhoto' ? 'removeProfilePhoto' : 'removeHeaderPhoto';
+    const previewKey = type === 'profilePhoto' ? 'profilePhotoPreview' : 'headerPhotoPreview';
     if (file) {
       const previewUrl = URL.createObjectURL(file);
-      const previewKey = type === 'profilePhoto' ? 'profilePhotoPreview' : 'headerPhotoPreview';
       setFormData(prev => ({
         ...prev,
         [type]: file,
         [previewKey]: previewUrl,
+        [removeKey]: false,
       }));
     } else {
       setFormData(prev => ({
         ...prev,
         [type]: null,
-        [type === 'profilePhoto' ? 'profilePhotoPreview' : 'headerPhotoPreview']: null,
+        [previewKey]: null,
       }));
     }
+  }, []);
+
+  // Handle photo removal (sentinel)
+  const handlePhotoRemove = useCallback((type: 'profilePhoto' | 'headerPhoto') => {
+    const removeKey = type === 'profilePhoto' ? 'removeProfilePhoto' : 'removeHeaderPhoto';
+    const previewKey = type === 'profilePhoto' ? 'profilePhotoPreview' : 'headerPhotoPreview';
+    setFormData(prev => ({
+      ...prev,
+      [type]: null,
+      [previewKey]: null,
+      [removeKey]: true,
+    }));
+  }, []);
+
+  // Handle deferred additional club add
+  const handleAddClubDeferred = useCallback((club: { id: string; name: string; country: string | null }) => {
+    setFormData(prev => ({
+      ...prev,
+      addedClubs: [...prev.addedClubs, club],
+      // If it was previously marked for removal, un-remove it
+      removedClubIds: prev.removedClubIds.filter(id => id !== club.id),
+    }));
+  }, []);
+
+  // Handle deferred additional club remove
+  const handleRemoveClubDeferred = useCallback((clubId: string) => {
+    setFormData(prev => {
+      // If it was added in this session, just remove from addedClubs
+      const wasAddedThisSession = prev.addedClubs.some(c => c.id === clubId);
+      if (wasAddedThisSession) {
+        return {
+          ...prev,
+          addedClubs: prev.addedClubs.filter(c => c.id !== clubId),
+        };
+      }
+      // Otherwise mark for removal
+      return {
+        ...prev,
+        removedClubIds: [...prev.removedClubIds, clubId],
+      };
+    });
   }, []);
 
   // Normalize websites
@@ -270,8 +332,10 @@ export function PersonalProfileWizard() {
         updateData.username = formData.username;
       }
 
-      // Handle profile photo upload
-      if (formData.profilePhoto) {
+      // Handle profile photo upload or removal
+      if (formData.removeProfilePhoto) {
+        updateData.profile_photo_url = null;
+      } else if (formData.profilePhoto) {
         const fileExt = formData.profilePhoto.name.split('.').pop();
         const fileName = `${user.id}/profile-${Date.now()}.${fileExt}`;
         const uploadResult = await uploadToR2Only(formData.profilePhoto, 'clbhouz-profile-images', fileName);
@@ -279,8 +343,10 @@ export function PersonalProfileWizard() {
         updateData.profile_photo_url = uploadResult.publicUrl;
       }
 
-      // Handle header photo upload
-      if (formData.headerPhoto) {
+      // Handle header photo upload or removal
+      if (formData.removeHeaderPhoto) {
+        updateData.header_photo_url = null;
+      } else if (formData.headerPhoto) {
         const fileExt = formData.headerPhoto.name.split('.').pop();
         const fileName = `${user.id}/header-${Date.now()}.${fileExt}`;
         const uploadResult = await uploadToR2Only(formData.headerPhoto, 'clbhouz-profile-images', fileName);
@@ -294,6 +360,27 @@ export function PersonalProfileWizard() {
         .eq('id', user.id);
 
       if (error) throw error;
+
+      // Deferred additional club operations
+      if (formData.removedClubIds.length > 0) {
+        const { error: removeError } = await supabase
+          .from('user_home_clubs')
+          .delete()
+          .eq('user_profile_id', user.id)
+          .in('club_id', formData.removedClubIds);
+        if (removeError) console.error('Error removing clubs:', removeError);
+      }
+
+      if (formData.addedClubs.length > 0) {
+        const inserts = formData.addedClubs.map(club => ({
+          user_profile_id: user.id,
+          club_id: club.id,
+        }));
+        const { error: addError } = await supabase
+          .from('user_home_clubs')
+          .upsert(inserts as any, { onConflict: 'user_profile_id,club_id' });
+        if (addError) console.error('Error adding clubs:', addError);
+      }
 
       // Invalidate queries
       await queryClient.invalidateQueries({ queryKey: ['profile'] });
@@ -335,8 +422,8 @@ export function PersonalProfileWizard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#64748b]" />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -360,7 +447,7 @@ export function PersonalProfileWizard() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="fixed inset-0 z-[9999] bg-[#F8FAFC] flex flex-col overflow-hidden pt-safe pb-safe"
+        className="fixed inset-0 z-[9999] bg-background flex flex-col overflow-hidden pt-safe pb-safe"
         style={{ 
           touchAction: 'pan-y pinch-zoom',
           overscrollBehavior: 'contain',
@@ -393,12 +480,14 @@ export function PersonalProfileWizard() {
             >
               {step === 1 && (
                 <PhotosIdentityStep
-                  profilePhotoUrl={profile?.profile_photo_url}
-                  headerPhotoUrl={profile?.header_photo_url}
+                  profilePhotoUrl={formData.removeProfilePhoto ? null : profile?.profile_photo_url}
+                  headerPhotoUrl={formData.removeHeaderPhoto ? null : profile?.header_photo_url}
                   profilePhotoPreview={formData.profilePhotoPreview}
                   headerPhotoPreview={formData.headerPhotoPreview}
                   onProfilePhotoChange={(file) => handlePhotoChange('profilePhoto', file)}
                   onHeaderPhotoChange={(file) => handlePhotoChange('headerPhoto', file)}
+                  onProfilePhotoRemove={() => handlePhotoRemove('profilePhoto')}
+                  onHeaderPhotoRemove={() => handlePhotoRemove('headerPhoto')}
                   displayName={formData.displayName}
                   username={formData.username}
                   isUsernameSet={isUsernameSet}
@@ -416,6 +505,10 @@ export function PersonalProfileWizard() {
                   additionalClubsVisibility={formData.additionalClubsVisibility}
                   onChange={handleFieldChange}
                   onVisibilityChange={handleVisibilityChange}
+                  addedClubs={formData.addedClubs}
+                  removedClubIds={formData.removedClubIds}
+                  onAddClub={handleAddClubDeferred}
+                  onRemoveClub={handleRemoveClubDeferred}
                 />
               )}
               {step === 3 && (

@@ -14,6 +14,8 @@ interface PhotosIdentityStepProps {
   headerPhotoPreview?: string | null;
   onProfilePhotoChange: (file: File | null) => void;
   onHeaderPhotoChange: (file: File | null) => void;
+  onProfilePhotoRemove: () => void;
+  onHeaderPhotoRemove: () => void;
   
   // Identity state
   displayName: string;
@@ -29,6 +31,8 @@ export function PhotosIdentityStep({
   headerPhotoPreview,
   onProfilePhotoChange,
   onHeaderPhotoChange,
+  onProfilePhotoRemove,
+  onHeaderPhotoRemove,
   displayName,
   username,
   isUsernameSet,
@@ -44,7 +48,7 @@ export function PhotosIdentityStep({
           className="space-y-6"
         >
           <div>
-            <h2 className="text-sm font-semibold text-slate-900 mb-1">Your Photos</h2>
+            <h2 className="text-sm font-semibold text-foreground mb-1">Your Photos</h2>
             <p className="text-xs text-muted-foreground">Add a profile photo to help golfers recognise you</p>
           </div>
           
@@ -53,11 +57,13 @@ export function PhotosIdentityStep({
               currentUrl={profilePhotoUrl}
               previewUrl={profilePhotoPreview}
               onFileChange={onProfilePhotoChange}
+              onRemove={onProfilePhotoRemove}
             />
             <HeaderPhotoCard
               currentUrl={headerPhotoUrl}
               previewUrl={headerPhotoPreview}
               onFileChange={onHeaderPhotoChange}
+              onRemove={onHeaderPhotoRemove}
             />
           </div>
         </motion.div>

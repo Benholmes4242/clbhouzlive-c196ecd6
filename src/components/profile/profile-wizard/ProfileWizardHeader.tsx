@@ -16,7 +16,7 @@ export function ProfileWizardHeader({
   const isFirstStep = currentStep === 1;
 
   return (
-    <header className="sticky top-0 z-10 flex h-14 items-center justify-between border-b border-border/50 bg-[#F8FAFC]/80 backdrop-blur-md px-3">
+    <header className="sticky top-0 z-10 flex h-14 items-center justify-between border-b border-border/50 bg-background/80 backdrop-blur-md px-3">
       {/* Left: Back/Close button */}
       <div className="flex items-center min-w-[60px]">
         <Button
@@ -39,7 +39,7 @@ export function ProfileWizardHeader({
         <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
           Step {currentStep} of {totalSteps}
         </span>
-        <h1 className="text-base font-semibold text-slate-900">{title}</h1>
+        <h1 className="text-base font-semibold text-foreground">{title}</h1>
       </div>
       
       {/* Right: Spacer for balance */}

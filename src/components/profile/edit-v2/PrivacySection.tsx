@@ -27,19 +27,19 @@ export const PrivacySection: React.FC<PrivacySectionProps> = ({
         "flex items-center justify-between p-4 rounded-xl border transition-all",
         isPublic 
           ? "bg-primary/5 border-primary/20" 
-          : "bg-[#F8FAFC] border-[#e2e8f0]"
+          : "bg-card border-border"
       )}>
         <div className="flex items-center gap-3">
           {isPublic ? (
             <Globe className="w-5 h-5 text-primary" />
           ) : (
-            <Lock className="w-5 h-5 text-[#64748b]" />
+            <Lock className="w-5 h-5 text-muted-foreground" />
           )}
           <div className="space-y-0.5">
-            <Label htmlFor="public-profile" className="text-sm font-semibold text-[#1e293b] cursor-pointer">
+            <Label htmlFor="public-profile" className="text-sm font-semibold text-foreground cursor-pointer">
               {isPublic ? 'Public Profile' : 'Private Profile'}
             </Label>
-            <p className="text-xs text-[#64748b] max-w-xs">
+            <p className="text-xs text-muted-foreground max-w-xs">
               {isPublic 
                 ? 'Anyone on Clbhouz can view your posts and golf journey.'
                 : 'Only approved followers can see your profile.'
@@ -51,7 +51,7 @@ export const PrivacySection: React.FC<PrivacySectionProps> = ({
           id="public-profile"
           checked={isPublic}
           onCheckedChange={onChange}
-          className="data-[state=checked]:bg-primary data-[state=unchecked]:bg-[#e2e8f0]"
+          className="data-[state=checked]:bg-primary data-[state=unchecked]:bg-muted"
         />
       </div>
     </div>
