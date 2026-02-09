@@ -168,8 +168,12 @@ function TableSkeletonRow({ index }: { index: number }) {
 
 function RankBadge({ rank }: { rank: number }) {
   const getStyle = () => {
-    if (rank <= 3) {
-      return { background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)', color: 'white' };
+    if (rank === 1) {
+      return { background: 'linear-gradient(135deg, #FFB800 0%, #FF8C00 100%)', color: 'white' };
+    } else if (rank === 2) {
+      return { background: 'linear-gradient(135deg, #C0C0C0 0%, #9A9A9A 100%)', color: 'white' };
+    } else if (rank === 3) {
+      return { background: 'linear-gradient(135deg, #CD7F32 0%, #A0622E 100%)', color: 'white' };
     } else {
       return { background: '#E5E7EB', color: 'rgba(0, 0, 0, 0.5)' };
     }
