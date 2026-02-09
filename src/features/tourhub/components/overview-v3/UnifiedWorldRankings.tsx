@@ -301,20 +301,6 @@ export function UnifiedWorldRankings() {
       </p>
       <div className="border-b mb-4" style={{ borderColor: 'hsl(var(--border) / 0.1)' }} />
 
-      {/* ═══ 2. Narrative Strip — editorial pull-quote ═══ */}
-      {narrative && (
-        <div
-          className="mb-4 py-2 px-3 rounded-md"
-          style={{
-            borderLeft: '2px solid hsl(142 76% 36% / 0.25)',
-            background: 'hsl(142 76% 36% / 0.03)',
-          }}
-        >
-          <p className="text-[12px] text-muted-foreground italic leading-relaxed">
-            {narrative}
-          </p>
-        </div>
-      )}
 
       {/* ═══ 3. This Week's Momentum + Biggest Drops ═══ */}
       {hasMovers && (
