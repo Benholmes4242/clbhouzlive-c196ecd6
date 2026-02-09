@@ -5,7 +5,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -39,6 +39,7 @@ const TOTAL_STEPS = 3;
 
 export function BusinessProfileWizard() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const { user, loading: authLoading } = useSupabaseSession();
 
@@ -50,7 +51,9 @@ export function BusinessProfileWizard() {
   const [createdBusinessSlug, setCreatedBusinessSlug] = useState<string | null>(null);
 
   // Form state
-  const [category, setCategory] = useState('');
+  const [category, setCategory] = useState(
+    searchParams.get('category') === 'golf_club' ? 'Golf Club' : ''
+  );
   const [selectedClub, setSelectedClub] = useState<SelectedClub | null>(null);
   const [selectedCollege, setSelectedCollege] = useState<SelectedCollege | null>(null);
   const [businessName, setBusinessName] = useState('');
@@ -66,11 +69,31 @@ export function BusinessProfileWizard() {
   const [existingBusinessForClub, setExistingBusinessForClub] = useState<{id: string; name: string} | null>(null);
   const [showRequestAccessModal, setShowRequestAccessModal] = useState(false);
 
+  // Pre-fill from URL params (from "Claim this course" CTA)
+  const prefilledClubId = searchParams.get('clubId');
+  const prefilledClubName = searchParams.get('clubName');
+
   useEffect(() => {
     if (!authLoading && !user) {
       navigate('/auth');
     }
   }, [authLoading, user, navigate]);
+
+  // Auto-select club from URL params
+  useEffect(() => {
+    if (prefilledClubId && prefilledClubName && !selectedClub) {
+      setSelectedClub({
+        id: prefilledClubId,
+        name: prefilledClubName,
+        club_key: null,
+        country: null,
+        sub_country: null,
+        region: null,
+        latitude: null,
+        longitude: null,
+      } as SelectedClub);
+    }
+  }, [prefilledClubId, prefilledClubName]);
 
   const isGolfClubCategory = category === 'Golf Club';
   const isUniversityCategory = category === 'University / College';

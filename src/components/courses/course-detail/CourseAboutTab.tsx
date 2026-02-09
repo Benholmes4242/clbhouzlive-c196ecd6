@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useCourseClaim } from '@/hooks/useCourseClaim';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -28,6 +29,7 @@ import { PersonalSection } from '@/components/courses/phase5';
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
 import { useBusinessClaimForCourse } from '@/hooks/useBusinessClaimForCourse';
 import SuggestEditModal from './SuggestEditModal';
+import ClaimCourseCTA from './ClaimCourseCTA';
 
 interface Course {
   id: string;
@@ -46,6 +48,7 @@ interface Course {
   latitude?: number | null;
   longitude?: number | null;
   website_url?: string | null;
+  club_id?: string | null;
 }
 
 interface CourseAboutTabProps {
@@ -73,6 +76,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { data: businessClaim } = useBusinessClaimForCourse(course.id);
+  const { data: courseClaim } = useCourseClaim(course.id);
 
   const { coords, loading: coordsLoading } = useCourseCoordinates({
     courseId: course.id,
@@ -299,6 +303,17 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             Rate this course
           </Button>
         </section>
+      )}
+
+      {/* Spacer */}
+      <div className="h-3 bg-muted" />
+
+      {/* Claim This Course CTA - only for unclaimed courses with a club_id */}
+      {!courseClaim && course.club_id && (
+        <ClaimCourseCTA
+          clubId={course.club_id}
+          clubName={course.name}
+        />
       )}
 
       {/* Spacer */}

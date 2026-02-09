@@ -155,6 +155,9 @@ function getNotificationBadgeIcon(type: string) {
     // Business course review
     case 'business_course_review':
       return <Star className={cn(iconClass, "text-emerald-500")} fill="currentColor" />;
+    // Review response from business
+    case 'review_response':
+      return <MessageCircle className={cn(iconClass, "text-[#334E3D]")} />;
     default:
       return <Bell className={cn(iconClass, "text-muted-foreground")} />;
   }
@@ -1668,7 +1671,42 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
     }
 
     /**
-     * 26) DEFAULT – All other notification types (follow, like, comment, etc.)
+     * 26) REVIEW RESPONSE — Business responded to your course review
+     */
+    case 'review_response': {
+      const statusIcon = getNotificationBadgeIcon(type);
+      const businessName = data?.business_name || 'A business';
+      const courseName = data?.course_name || 'a course';
+
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <>
+              <span className={cn(showOrange ? "font-semibold" : "font-medium")}>{businessName}</span>{' '}
+              <span className="font-normal text-muted-foreground">responded to your review of {courseName}</span>
+            </>
+          }
+          meta={notification.time_ago}
+          actions={
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onClick(); }}
+              className={getNotificationButtonClass('primary')}
+            >
+              View response
+            </button>
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 27) DEFAULT – All other notification types (follow, like, comment, etc.)
      */
     default: {
       const statusIcon = getNotificationBadgeIcon(type);
