@@ -27,7 +27,7 @@ interface ActivityNotificationRowProps {
 }
 
 // Shared base pill class for unified styling - SDS corners
-const basePillClass = "inline-flex items-center justify-center rounded-sq-xs border px-3 h-7 text-xs font-medium transition-colors gap-1.5";
+const basePillClass = "inline-flex items-center justify-center rounded-sq-xs border px-3 h-9 text-xs font-medium transition-colors gap-1.5 active:scale-[0.93]";
 
 // Icon variants for different friend request states
 function getFriendBadgeIcon(isActive: boolean) {
@@ -60,18 +60,20 @@ function isBusinessEntityNotification(type: string): boolean {
 function getNotificationBadgeIcon(type: string) {
   const iconClass = "h-3 w-3";
   switch (type) {
+    // Fix 8: Updated colour system
     case 'like':
-      return <Heart className={cn(iconClass, "text-rose-500")} />;
+      return <Heart className={cn(iconClass, "text-[#F7931E]")} />;
     case 'comment':
+      return <MessageCircle className={cn(iconClass, "text-blue-500")} />;
     case 'mention':
     case 'tag':
-      return <MessageCircle className={cn(iconClass, "text-blue-500")} />;
+      return <MessageCircle className={cn(iconClass, "text-purple-500")} />;
     case 'follow':
-      return <Users className={cn(iconClass, "text-amber-500")} />;
+      return <UserPlus className={cn(iconClass, "text-blue-500")} />;
     case 'friend_request':
     case 'friend_accept':
-    case 'friend_accepted':  // Legacy support
-      return <UserPlus className={cn(iconClass, "text-emerald-500")} />;
+    case 'friend_accepted':
+      return <Users className={cn(iconClass, "text-green-500")} />;
     case 'friend_request_sent':
     case 'friend_declined':
     case 'friend_cancelled':
@@ -83,27 +85,27 @@ function getNotificationBadgeIcon(type: string) {
       return <Trophy className={cn(iconClass, "text-amber-500")} />;
     case 'club_update':
     case 'course_update':
-      return <Building2 className={cn(iconClass, "text-slate-500")} />;
-    // Business verification notifications - use unified VerifiedBadge for approved
+      return <Building2 className={cn(iconClass, "text-gray-500")} />;
+    // Business verification
     case 'business_verification_approved':
       return <VerifiedBadge size="sm" />;
     case 'business_verification_submitted':
     case 'business_verification_more_proof_requested':
       return <Clock className={cn(iconClass, "text-amber-500")} />;
     case 'business_verification_rejected':
-      return <Building2 className={cn(iconClass, "text-amber-500")} />;
+      return <Building2 className={cn(iconClass, "text-gray-500")} />;
     case 'business_verification_removed':
     case 'business_verification_revoked':
-      return <ShieldOff className={cn(iconClass, "text-red-500")} />;
-    // Business access notifications
+      return <ShieldOff className={cn(iconClass, "text-gray-500")} />;
+    // Business access
     case 'business_member_added':
     case 'business_access_approved':
-      return <Building2 className={cn(iconClass, "text-emerald-500")} />;
+      return <Building2 className={cn(iconClass, "text-gray-500")} />;
     case 'business_access_request':
-      return <UserPlus className={cn(iconClass, "text-amber-500")} />;
+      return <UserPlus className={cn(iconClass, "text-gray-500")} />;
     case 'business_access_declined':
       return <X className={cn(iconClass, "text-red-500")} />;
-    // Golfer verification notifications - use unified VerifiedBadge for approved
+    // Golfer verification
     case 'golfer_verification_approved':
       return <VerifiedBadge size="sm" />;
     case 'golfer_verification_invite':
@@ -384,7 +386,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
             }
             meta={notification.time_ago}
             actions={
-              <span className={cn(basePillClass, "border-emerald-500 bg-emerald-500/10 text-emerald-600 gap-1")}>
+              <span className={cn(basePillClass, "border-green-400 bg-green-50 text-green-600 gap-1")}>
                 <Users className="h-3 w-3" />
                 Accepted
               </span>
@@ -409,7 +411,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
             }
             meta={notification.time_ago}
             actions={
-              <span className={cn(basePillClass, "border-red-400 bg-red-500/5 text-red-500 gap-1")}>
+              <span className={cn(basePillClass, "border-red-300 bg-red-50 text-red-500 gap-1")}>
                 <X className="h-3 w-3" />
                 Declined
               </span>
@@ -467,11 +469,11 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
             </>
           }
           meta={notification.time_ago}
-          actions={
-            <span className={cn(basePillClass, "border-emerald-500 bg-emerald-500/10 text-emerald-600 gap-1")}>
-              <Users className="h-3 w-3" />
-              Friends
-            </span>
+            actions={
+              <span className={cn(basePillClass, "border-green-400 bg-green-50 text-green-600 gap-1")}>
+                <Users className="h-3 w-3" />
+                Friends
+              </span>
           }
           isSessionNew={isSessionNew}
         />
@@ -905,7 +907,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
      */
     case 'business_member_added': {
       const businessName = data?.business_name || 'a business';
-      const statusIcon = <Building2 className="h-3 w-3 text-emerald-500" />;
+      const statusIcon = <Building2 className="h-3 w-3 text-gray-500" />;
       
       return (
         <FlatRow
@@ -921,7 +923,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           subtext={`You've been added to ${businessName}.`}
           meta={notification.time_ago}
           actions={
-            <span className={cn(basePillClass, "border-emerald-500 bg-emerald-500/10 text-emerald-600")}>
+            <span className={cn(basePillClass, "border-gray-300 bg-gray-50 text-gray-600")}>
               <Building2 className="h-3 w-3" />
               Team member
             </span>
@@ -979,7 +981,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
     case 'business_access_approved': {
       const businessName = data?.business_name || 'the business';
       const roleGranted = data?.role_granted || data?.role || 'Team member';
-      const statusIcon = <Building2 className="h-3 w-3 text-emerald-500" />;
+      const statusIcon = <Building2 className="h-3 w-3 text-gray-500" />;
       
       return (
         <FlatRow
@@ -995,7 +997,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           subtext={`You now have access to ${businessName}.`}
           meta={notification.time_ago}
           actions={
-            <span className={cn(basePillClass, "border-emerald-500 bg-emerald-500/10 text-emerald-600")}>
+            <span className={cn(basePillClass, "border-gray-300 bg-gray-50 text-gray-600")}>
               <Building2 className="h-3 w-3" />
               {roleGranted}
             </span>

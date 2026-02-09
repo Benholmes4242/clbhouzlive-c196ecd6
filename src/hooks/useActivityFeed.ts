@@ -255,6 +255,14 @@ function getContextUrl(notification: any): string {
   if (entity_type === 'club' && entity_id) {
     return `/clubs/${entity_id}`;
   }
+  // Fix 7: business_member_added navigation
+  if (type === 'business_member_added' || type === 'business_access_approved') {
+    const dataObj = (typeof data === 'object' && data !== null && !Array.isArray(data)) 
+      ? (data as Record<string, any>) 
+      : {};
+    const businessSlug = dataObj.business_slug || dataObj.business_id || entity_id;
+    if (businessSlug) return `/business/${businessSlug}`;
+  }
   
   return '/';
 }
@@ -538,6 +546,24 @@ export interface ActivityFeedResult {
   allItems: ActivityNotification[];
 }
 
+// Fetch user's mute preferences for filtering (Fix 3)
+async function fetchMutePreferences(userId: string): Promise<{ mutedTypes: string[]; mutedUserIds: string[] }> {
+  const { data, error } = await supabase
+    .from('notification_preferences')
+    .select('muted_types, muted_user_ids')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (error || !data) {
+    return { mutedTypes: [], mutedUserIds: [] };
+  }
+
+  return {
+    mutedTypes: data.muted_types || [],
+    mutedUserIds: data.muted_user_ids || [],
+  };
+}
+
 export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind = null) => {
   const { user } = useSupabaseSession();
   const { data: userProfile } = useUserProfile(user?.id);
@@ -560,12 +586,18 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
       let enrichedNotifications: ActivityNotification[] = [];
       let followingUserIds = new Set<string>();
       let friendUserIds = new Set<string>();
+      let mutePrefs = { mutedTypes: [] as string[], mutedUserIds: [] as string[] };
 
       if (user?.id) {
-        // Fetch following list for is_from_following derivation
-        followingUserIds = await fetchFollowingUserIds(user.id);
-        // Fetch friend list for is_from_friend derivation
-        friendUserIds = await fetchFriendUserIds(user.id);
+        // Fetch following list, friend list, and mute preferences in parallel
+        const [followingIds, friendIds, fetchedMutePrefs] = await Promise.all([
+          fetchFollowingUserIds(user.id),
+          fetchFriendUserIds(user.id),
+          fetchMutePreferences(user.id),
+        ]);
+        followingUserIds = followingIds;
+        friendUserIds = friendIds;
+        mutePrefs = fetchedMutePrefs;
 
         // Fetch notifications (excluding soft-deleted)
         const { data: notifications, error } = await supabase
@@ -727,7 +759,15 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
         enrichedNotifications = [...enrichedNotifications, ...mockItems];
       }
 
-      // Calculate counts from ALL items (before any filtering)
+      // Fix 3: Apply mute preferences (client-side filtering)
+      if (mutePrefs.mutedTypes.length > 0 || mutePrefs.mutedUserIds.length > 0) {
+        enrichedNotifications = enrichedNotifications.filter(n =>
+          !mutePrefs.mutedTypes.includes(n.type as string) &&
+          !(n.actor_id && mutePrefs.mutedUserIds.includes(n.actor_id))
+        );
+      }
+
+      // Calculate counts from ALL items (after mute filtering, before tab filtering)
       const counts = computeCounts(enrichedNotifications);
 
       // Filter by tab

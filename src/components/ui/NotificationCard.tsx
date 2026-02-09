@@ -114,11 +114,11 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
         </div>
       </div>
 
-      {/* Kebab menu */}
+      {/* Kebab menu - Fix 9: 44pt tap target */}
       {onMenuClick && (
         <button
           type="button"
-          className="shrink-0 p-2 -mr-2 rounded-full hover:bg-muted/50 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          className="shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center -mr-2 rounded-full hover:bg-muted/50 active:opacity-60 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           onClick={(e) => {
             e.stopPropagation();
             onMenuClick();
@@ -137,24 +137,24 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
  * Use these classes to ensure consistent button styling across all notifications
  */
 export const notificationButtonStyles = {
-  // Base pill style
-  base: "inline-flex items-center justify-center rounded-sq-xs border px-3 h-7 text-xs font-medium transition-colors gap-1.5",
+  // Base pill style - Fix 9: h-9 for 36px visible, wrap in 44px tap area
+  base: "inline-flex items-center justify-center rounded-sq-xs border px-3 h-9 text-xs font-medium transition-colors gap-1.5 active:scale-[0.93]",
   
-  // Primary action (e.g., Accept)
-  primary: "border-emerald-500 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/15",
+  // Primary action (e.g., Accept) - Fix 8: green
+  primary: "border-green-500 bg-green-50 text-green-600 hover:bg-green-100",
   
   // Secondary/Ghost action (e.g., Decline)
   secondary: "border-border bg-background text-foreground/80 hover:bg-muted/50",
   
-  // Destructive action
-  destructive: "border-red-400 bg-red-500/5 text-red-500 hover:bg-red-500/10",
+  // Destructive action - Fix 8: red
+  destructive: "border-red-200 bg-red-50 text-red-500 hover:bg-red-100",
   
   // Support/Orange accent
   support: "border-primary bg-primary/10 text-primary hover:bg-primary/20",
   
   // Status pills (non-interactive)
-  statusSuccess: "border-emerald-500 bg-emerald-500/10 text-emerald-600",
-  statusError: "border-red-400 bg-red-500/5 text-red-500",
+  statusSuccess: "border-green-400 bg-green-50 text-green-600",
+  statusError: "border-red-300 bg-red-50 text-red-500",
   statusMuted: "border-border bg-muted text-muted-foreground",
   statusPending: "border-amber-500 bg-amber-500/10 text-amber-600",
 };
