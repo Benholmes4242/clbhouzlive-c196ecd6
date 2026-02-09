@@ -19,8 +19,8 @@ import {
   HeroCarousel,
   LiveRightNow,
   UnifiedWorldRankings,
-  ScheduleModule,
 } from '../overview-v3';
+import { WhatsComing } from '../overview-v3/WhatsComing';
 import { CollegeRankingsPreview } from '../overview-v3/CollegeRankingsPreview';
 import { SeasonLeaderboards } from '../overview-v3/SeasonLeaderboards';
 import { TournamentInsights } from '../tournament-insights';
@@ -77,8 +77,8 @@ export function OverviewPageV3() {
           {/* 2. Live Right Now (conditional - hides if no live) */}
           <LiveRightNow />
 
-          {/* 3. Tournament Schedule - moved up for user priority */}
-          <ScheduleModule />
+          {/* 3. What's Coming - upcoming tournaments across all tours */}
+          <WhatsComing />
 
           {/* 4. Tournament Insights - AI Predictions (CLBHOUZ Intelligence) */}
           <TournamentInsights />
