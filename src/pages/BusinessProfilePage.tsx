@@ -175,7 +175,7 @@ const BusinessProfilePage: React.FC = () => {
   const tabs = [
     { id: 'content', label: 'Activity' },
     { id: 'golfers', label: 'People' },
-    { id: 'info', label: 'Info' },
+    { id: 'info', label: 'About' },
   ];
 
   const getCurrentContent = () => {
@@ -203,7 +203,7 @@ const BusinessProfilePage: React.FC = () => {
         );
       case 'info':
         return (
-          <BusinessProfileInfo business={business!} />
+          <BusinessProfileInfo business={business!} canManage={membership?.canManage} />
         );
       default:
         return null;
