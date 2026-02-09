@@ -5,6 +5,7 @@ export interface AlumniFace {
   id: string;
   full_name: string;
   photo_url: string | null;
+  pga_tour_id: string | null;
   college_normalized: string;
 }
 
@@ -20,10 +21,10 @@ export function useBatchCollegeAlumni(collegeSlugs: string[], perCollege = 3) {
 
       const { data, error } = await supabase
         .from('sr_players')
-        .select('id, first_name, last_name, photo_url, college_normalized')
+        .select('id, first_name, last_name, photo_url, pga_tour_id, college_normalized')
         .in('college_normalized', collegeSlugs)
         .not('photo_url', 'is', null)
-        .limit(collegeSlugs.length * (perCollege + 2)); // slight over-fetch for grouping
+        .limit(collegeSlugs.length * (perCollege + 2));
 
       if (error) {
         console.error('[useBatchCollegeAlumni] Error:', error);
@@ -40,6 +41,7 @@ export function useBatchCollegeAlumni(collegeSlugs: string[], perCollege = 3) {
             id: p.id,
             full_name: `${p.first_name} ${p.last_name}`,
             photo_url: p.photo_url,
+            pga_tour_id: p.pga_tour_id || null,
             college_normalized: key,
           });
           grouped.set(key, list);
@@ -64,7 +66,7 @@ export function useHeroAlumni(normalizedName: string | undefined) {
 
       const { data, error } = await supabase
         .from('sr_players')
-        .select('id, first_name, last_name, photo_url, college_normalized')
+        .select('id, first_name, last_name, photo_url, pga_tour_id, college_normalized')
         .eq('college_normalized', normalizedName)
         .not('photo_url', 'is', null)
         .limit(8);
@@ -78,6 +80,7 @@ export function useHeroAlumni(normalizedName: string | undefined) {
         id: p.id,
         full_name: `${p.first_name} ${p.last_name}`,
         photo_url: p.photo_url,
+        pga_tour_id: p.pga_tour_id || null,
         college_normalized: p.college_normalized || '',
       })) as AlumniFace[];
     },
