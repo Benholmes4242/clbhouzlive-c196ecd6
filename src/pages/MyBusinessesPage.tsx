@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMyBusinesses } from '@/hooks/useMyBusinesses';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { CreateBusinessProfileIntroModal } from '@/components/profile/CreateBusinessProfileIntroModal';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { BusinessCommandCard } from '@/components/business/BusinessCommandCard';
@@ -15,6 +15,18 @@ const MyBusinessesPage = () => {
   const { data: businesses, isLoading } = useMyBusinesses(user?.id);
   const { activeActor } = useActiveActor();
   const [showCreateModal, setShowCreateModal] = useState(false);
+
+  // Fix 2: Sort businesses — active first, then alphabetical
+  const sortedBusinesses = useMemo(() => {
+    if (!businesses || businesses.length === 0) return [];
+    return [...businesses].sort((a, b) => {
+      const aIsActive = activeActor?.type === 'business' && activeActor?.id === a.business.id;
+      const bIsActive = activeActor?.type === 'business' && activeActor?.id === b.business.id;
+      if (aIsActive && !bIsActive) return -1;
+      if (!aIsActive && bIsActive) return 1;
+      return a.business.name.localeCompare(b.business.name);
+    });
+  }, [businesses, activeActor]);
 
   // Redirect to auth if not logged in
   if (!authLoading && !user) {
@@ -31,73 +43,63 @@ const MyBusinessesPage = () => {
     navigate('/business/intro');
   };
 
-  const hasBusinesses = businesses && businesses.length > 0;
+  const hasBusinesses = sortedBusinesses.length > 0;
 
   return (
-    <PageRoot className="min-h-screen bg-[#F8FAFC]">
-      {/* Header - sticky */}
-      <header className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-[#e2e8f0]">
+    <PageRoot className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border">
         <div className="mx-auto max-w-xl px-4 pt-3 pb-4">
-          {/* Back CTA */}
           <button
             onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-0.5 text-sm font-medium text-[#64748b] hover:text-[#1e293b] transition-colors mb-2"
+            className="inline-flex items-center gap-0.5 text-sm font-medium text-muted-foreground active:opacity-70 transition-opacity min-h-[44px]"
           >
             ‹ Back
           </button>
           
-          {/* Title stack - centered */}
-          <h1 className="text-xl font-semibold text-[#1e293b] text-center">Business profiles</h1>
-          <p className="text-sm text-[#64748b] mt-1 text-center">
+          <h1 className="text-2xl font-bold text-foreground text-center">Business profiles</h1>
+          <p className="text-sm text-muted-foreground mt-1 text-center">
             Manage the golf businesses you represent
           </p>
         </div>
       </header>
 
-      <main 
-        className="w-full"
-        style={{
-          background: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)',
-          minHeight: 'calc(100vh - 120px)',
-        }}
-      >
-        {/* Loading state - flat skeleton */}
+      <main className="w-full bg-background min-h-[calc(100vh-120px)]">
+        {/* Loading state */}
         {isLoading && (
-          <div className="flex flex-col gap-3 pt-3">
+          <div className="flex flex-col gap-4 pt-4 px-4 max-w-xl mx-auto">
             {[1, 2].map(i => (
               <motion.div 
                 key={i} 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-white"
+                className="bg-card border border-border rounded-2xl overflow-hidden"
               >
-                {/* Business row skeleton */}
-                <div className="flex items-start gap-3.5 px-4 py-3.5">
-                  <div className="h-11 w-11 rounded-full bg-muted animate-pulse" />
+                <div className="flex items-start gap-3.5 p-5">
+                  <div className="h-12 w-12 rounded-xl bg-muted animate-pulse" />
                   <div className="flex-1 space-y-2">
-                    <div className="h-4 w-2/3 rounded bg-muted animate-pulse" />
+                    <div className="h-5 w-2/3 rounded bg-muted animate-pulse" />
                     <div className="h-3 w-1/2 rounded bg-muted animate-pulse" />
                   </div>
                 </div>
-                <div className="h-px bg-border/20" />
-                
-                {/* Metrics skeleton */}
-                <div className="grid grid-cols-3 px-4 py-3.5">
-                  {[1, 2, 3].map(j => (
-                    <div key={j} className="flex flex-col items-center">
-                      <div className="h-5 w-8 bg-muted rounded animate-pulse mb-1" />
-                      <div className="h-3 w-12 bg-muted rounded animate-pulse" />
+                <div className="px-5 pb-3">
+                  <div className="bg-muted/50 rounded-xl p-3">
+                    <div className="grid grid-cols-3 gap-2">
+                      {[1, 2, 3].map(j => (
+                        <div key={j} className="flex flex-col items-center">
+                          <div className="h-5 w-8 bg-muted rounded animate-pulse mb-1" />
+                          <div className="h-3 w-12 bg-muted rounded animate-pulse" />
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  </div>
                 </div>
-                <div className="h-px bg-border/20" />
-                
-                {/* Actions skeleton */}
-                <div className="flex gap-3 px-4 py-3.5">
-                  <div className="h-9 flex-1 rounded-lg bg-[#e2e8f0] animate-pulse" />
-                  <div className="h-9 flex-1 rounded-lg bg-[#e2e8f0] animate-pulse" />
-                  <div className="h-9 flex-1 rounded-sq-sm bg-muted animate-pulse" />
+                <div className="h-px bg-border mx-5" />
+                <div className="flex gap-2 p-5 pt-3">
+                  <div className="h-11 flex-1 rounded-xl bg-muted animate-pulse" />
+                  <div className="h-11 flex-1 rounded-xl bg-muted animate-pulse" />
+                  <div className="h-11 flex-1 rounded-xl bg-muted animate-pulse" />
                 </div>
               </motion.div>
             ))}
@@ -106,20 +108,16 @@ const MyBusinessesPage = () => {
 
         {/* Empty state */}
         {!isLoading && !hasBusinesses && (
-          <div className="pt-3">
+          <div className="pt-4 px-4 max-w-xl mx-auto">
             <AddBusinessCard onClick={handleCreateBusiness} isFirst />
           </div>
         )}
 
-        {/* Business list - white cards with gap */}
+        {/* Business list */}
         {!isLoading && hasBusinesses && (
-          <div className="flex flex-col gap-3 pt-3">
-            {businesses.map((membership, index) => {
-              // Resilient Active pill logic:
-              // - If only 1 business → always show Active
-              // - If multiple businesses → show Active based on activeActor match
-              // - If no activeActor set → default to first business
-              const isSingleBusiness = businesses.length === 1;
+          <div className="flex flex-col gap-4 pt-4 px-4 max-w-xl mx-auto pb-8">
+            {sortedBusinesses.map((membership, index) => {
+              const isSingleBusiness = sortedBusinesses.length === 1;
               const hasActiveActor = activeActor?.type === 'business' && activeActor?.id;
               const isExactMatch = activeActor?.type === 'business' && activeActor?.id === membership.business.id;
               const isFirstBusiness = index === 0;
@@ -137,13 +135,11 @@ const MyBusinessesPage = () => {
               );
             })}
 
-            {/* Add another business row */}
             <AddBusinessCard onClick={handleCreateBusiness} />
           </div>
         )}
       </main>
 
-      {/* Create Business Modal */}
       <CreateBusinessProfileIntroModal
         open={showCreateModal}
         onClose={() => setShowCreateModal(false)}

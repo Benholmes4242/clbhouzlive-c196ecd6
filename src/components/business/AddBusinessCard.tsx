@@ -1,7 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Building2, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 interface AddBusinessCardProps {
   onClick: () => void;
@@ -18,61 +17,56 @@ export function AddBusinessCard({ onClick, isFirst = false }: AddBusinessCardPro
         transition={{ duration: 0.3, ease: 'easeOut' }}
         className="flex flex-col items-center justify-center py-20 px-6 text-center"
       >
-        {/* Icon in gradient circle - Hub standard */}
-        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center mb-4">
-          <Building2 className="w-7 h-7 text-[#64748b]" />
+        {/* Icon in brand amber circle */}
+        <div className="w-16 h-16 rounded-full bg-[#C1A84C]/10 flex items-center justify-center mb-4">
+          <Building2 className="w-7 h-7 text-[#C1A84C]" />
         </div>
         
-        {/* Title */}
-        <h3 className="text-base font-semibold text-[#1e293b] mb-1">
+        <h3 className="text-lg font-bold text-foreground mb-1">
           Create your first business profile
         </h3>
         
-        {/* Description */}
-        <p className="text-sm text-[#64748b] max-w-[280px] mb-6">
+        <p className="text-sm text-muted-foreground max-w-[280px] mb-6">
           Represent a golf club, coach, brand, or venue on clbhouz.
         </p>
         
-        {/* CTA Button */}
-        <Button onClick={onClick} size="lg" className="gap-2">
+        <button
+          onClick={onClick}
+          className="inline-flex items-center gap-2 bg-[#334E3D] text-white min-h-[48px] rounded-full px-8 text-sm font-medium active:scale-[0.97] transition-transform"
+        >
           <Plus className="h-4 w-4" />
           Create business profile
-        </Button>
+        </button>
       </motion.div>
     );
   }
 
-  // Add another row with gradient icon
+  // Add another row — dashed card
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.15, duration: 0.2, ease: 'easeOut' }}
     >
-      {/* Hairline divider above only */}
-      <div className="h-px bg-border/30" />
-      
       <button
         onClick={onClick}
-        className="w-full flex items-center gap-3.5 px-4 py-5 bg-white hover:bg-[#f8fafc] active:bg-muted/40 transition-colors"
+        className="w-full flex items-center gap-3.5 p-4 bg-card border border-dashed border-border rounded-2xl active:scale-[0.98] transition-transform min-h-[44px]"
       >
-        {/* Icon in gradient circle */}
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center flex-shrink-0">
-          <Plus className="w-5 h-5 text-[#64748b]" />
+        {/* Icon in muted circle */}
+        <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+          <Plus className="w-5 h-5 text-muted-foreground" />
         </div>
         
-        {/* Text */}
         <div className="flex-1 min-w-0 text-left">
-          <p className="text-sm font-medium text-[#1e293b]">
+          <p className="text-sm font-semibold text-foreground">
             Add another business
           </p>
-          <p className="text-xs text-[#64748b] mt-0.5">
+          <p className="text-xs text-muted-foreground mt-0.5">
             Manage multiple clubs, coaches, or golf brands
           </p>
         </div>
 
-        {/* Chevron */}
-        <ChevronRight className="w-5 h-5 text-[#94a3b8] flex-shrink-0" />
+        <ChevronRight className="w-5 h-5 text-muted-foreground flex-shrink-0" />
       </button>
     </motion.div>
   );
