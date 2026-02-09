@@ -496,7 +496,7 @@ export function SettingsPageV2() {
             <SettingsToggleRow
               icon={<EyeOff className="w-5 h-5" />}
               title="Hide personal profile"
-              subtitle="Only followers can view your full profile. Others see your creator content only."
+              subtitle="Only followers see your full profile."
               checked={creatorOnly}
               onCheckedChange={(checked) => {
                 if (!isCreator) {
@@ -747,13 +747,13 @@ export function SettingsPageV2() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-muted border-transparent text-foreground hover:bg-muted/80">
+            <AlertDialogCancel className="bg-transparent border border-border text-foreground hover:bg-muted/80 min-h-[48px] rounded-full active:scale-[0.97] transition-transform">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction 
               onClick={() => confirmCreatorOnly(true)}
               disabled={isUpdatingCreator}
-              className="bg-foreground text-background hover:bg-foreground/90"
+              className="bg-[#334E3D] text-white hover:bg-[#334E3D]/90 min-h-[48px] rounded-full active:scale-[0.97] transition-transform"
             >
               {isUpdatingCreator ? 'Enabling...' : 'Enable creator-only'}
             </AlertDialogAction>
@@ -773,13 +773,13 @@ export function SettingsPageV2() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-muted border-transparent text-foreground hover:bg-muted/80">
+            <AlertDialogCancel className="bg-transparent border border-border text-foreground hover:bg-muted/80 min-h-[48px] rounded-full active:scale-[0.97] transition-transform">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction 
               onClick={() => confirmCreatorOnly(false)}
               disabled={isUpdatingCreator}
-              className="bg-foreground text-background hover:bg-foreground/90"
+              className="bg-[#334E3D] text-white hover:bg-[#334E3D]/90 min-h-[48px] rounded-full active:scale-[0.97] transition-transform"
             >
               {isUpdatingCreator ? 'Updating...' : 'Show personal profile'}
             </AlertDialogAction>
@@ -879,7 +879,7 @@ export function SettingsPageV2() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-muted border-transparent text-foreground hover:bg-muted/80">
+            <AlertDialogCancel className="bg-transparent border border-border text-foreground hover:bg-muted/80 min-h-[48px] rounded-full active:scale-[0.97] transition-transform">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction 
@@ -888,7 +888,7 @@ export function SettingsPageV2() {
                 handleCreatorToggle(false);
               }}
               disabled={isUpdatingCreator}
-              className="bg-foreground text-background hover:bg-foreground/90"
+              className="bg-foreground text-background hover:bg-foreground/90 min-h-[48px] rounded-full active:scale-[0.97] transition-transform"
             >
               {isUpdatingCreator ? 'Disabling...' : 'Disable Creator Mode'}
             </AlertDialogAction>

@@ -27,9 +27,6 @@ interface PinnedPostsSectionProps {
 
 /**
  * Phase 3.2B: Pinned Posts Section for Creators
- * 
- * Displays up to 3 pinned posts at the top of the creator's content grid.
- * Owners can unpin posts directly from this section with confirmation.
  */
 export function PinnedPostsSection({ 
   posts, 
@@ -40,9 +37,7 @@ export function PinnedPostsSection({
 }: PinnedPostsSectionProps) {
   const [unpinConfirmId, setUnpinConfirmId] = useState<string | null>(null);
 
-  if (!posts || posts.length === 0) {
-    return null;
-  }
+  if (!posts || posts.length === 0) return null;
 
   const handleUnpinConfirm = () => {
     if (unpinConfirmId && onUnpinClick) {
@@ -56,7 +51,7 @@ export function PinnedPostsSection({
       <div className={className}>
         {/* Header */}
         <div className="flex items-center gap-2 mb-3">
-          <Pin className="h-3.5 w-3.5 text-[#F7931E]" />
+          <Pin className="h-3.5 w-3.5 text-[#C1A84C]" />
           <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
             Pinned
           </span>
@@ -68,14 +63,14 @@ export function PinnedPostsSection({
             <div key={post.id} className="relative flex-shrink-0">
               <button
                 onClick={() => onPostClick?.(post.id)}
-                className="block w-24 h-24 rounded-sq-md overflow-hidden bg-muted hover:opacity-90 transition-opacity"
-                style={{ border: '1px solid rgba(31,36,40,0.08)' }}
+                className="block w-24 h-24 rounded-xl overflow-hidden bg-muted active:opacity-90 transition-opacity border border-border"
               >
                 {post.thumbnailUrl ? (
                   <img 
                     src={post.thumbnailUrl} 
                     alt="Pinned post" 
                     className="w-full h-full object-cover"
+                    loading="lazy"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
@@ -84,15 +79,12 @@ export function PinnedPostsSection({
                 )}
                 
                 {/* Pinned indicator */}
-                <span 
-                  className="absolute bottom-1 left-1 flex items-center justify-center w-5 h-5 rounded-full"
-                  style={{ background: 'rgba(247, 147, 30, 0.9)' }}
-                >
+                <span className="absolute bottom-1 left-1 flex items-center justify-center w-5 h-5 rounded-full bg-[#C1A84C]/90">
                   <Pin className="h-2.5 w-2.5 text-white" />
                 </span>
               </button>
 
-              {/* Unpin button — always visible for owners, works on mobile */}
+              {/* Unpin button — always visible for owners */}
               {isOwner && onUnpinClick && (
                 <button
                   onClick={(e) => {
@@ -114,16 +106,21 @@ export function PinnedPostsSection({
 
       {/* Unpin confirmation dialog */}
       <AlertDialog open={!!unpinConfirmId} onOpenChange={(open) => !open && setUnpinConfirmId(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-card border-border">
           <AlertDialogHeader>
-            <AlertDialogTitle>Unpin this post?</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-foreground font-bold text-lg">Unpin this post?</AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground text-sm">
               This post will no longer appear in your pinned section.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleUnpinConfirm}>
+            <AlertDialogCancel className="bg-transparent border border-border text-foreground min-h-[48px] rounded-full active:scale-[0.97] transition-transform">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleUnpinConfirm}
+              className="bg-foreground text-background hover:bg-foreground/90 min-h-[48px] rounded-full active:scale-[0.97] transition-transform"
+            >
               Unpin
             </AlertDialogAction>
           </AlertDialogFooter>

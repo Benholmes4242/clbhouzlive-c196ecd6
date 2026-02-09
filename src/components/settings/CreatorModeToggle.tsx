@@ -279,28 +279,28 @@ export function CreatorModeToggle({ userId, isCreator, creatorOnly = false }: Cr
 
       {/* Creator-only confirmation modal */}
       <AlertDialog open={showCreatorOnlyConfirm} onOpenChange={setShowCreatorOnlyConfirm}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-card border-border">
           <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2">
+            <AlertDialogTitle className="flex items-center gap-2 text-foreground font-bold text-lg">
               <EyeOff className="h-5 w-5" />
               Hide your personal profile?
             </AlertDialogTitle>
-            <AlertDialogDescription className="space-y-3">
-              <p>
-                Your profile will be hidden from non-followers.
-              </p>
-              <p className="text-sm">
-                You can switch back at any time from Settings.
-              </p>
+            <AlertDialogDescription className="text-muted-foreground text-sm space-y-2">
+              <span className="block">Your profile will be hidden from non-followers.</span>
+              <span className="block text-muted-foreground/60 text-xs italic">You can switch back at any time from Settings.</span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setShowCreatorOnlyConfirm(false)}>
+            <AlertDialogCancel 
+              onClick={() => setShowCreatorOnlyConfirm(false)}
+              className="bg-transparent border border-border text-foreground min-h-[48px] rounded-full active:scale-[0.97] transition-transform"
+            >
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction 
               onClick={() => updateCreatorOnly(true)}
               disabled={isUpdating}
+              className="bg-[#334E3D] text-white hover:bg-[#334E3D]/90 min-h-[48px] rounded-full active:scale-[0.97] transition-transform"
             >
               {isUpdating ? 'Enabling...' : 'Enable creator-only'}
             </AlertDialogAction>

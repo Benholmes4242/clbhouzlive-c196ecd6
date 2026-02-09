@@ -10,20 +10,16 @@ interface CreatorBadgeProps {
  * Phase 3.2: Subtle Creator label pill
  * 
  * Displays a small "Creator" pill badge on creator profiles.
- * Keeps layout consistent with regular golfer profiles.
+ * Uses Lucide Sparkles icon for cross-platform consistency.
  */
 export function CreatorBadge({ className }: CreatorBadgeProps) {
   return (
     <span 
       className={cn(
-        'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium',
+        'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium shadow-sm',
+        'bg-[#C1A84C]/10 border border-[#C1A84C]/30 text-[#C1A84C]',
         className
       )}
-      style={{ 
-        background: 'rgba(247, 147, 30, 0.1)',
-        color: '#F7931E',
-        border: '1px solid rgba(247, 147, 30, 0.2)'
-      }}
     >
       <Sparkles className="h-2.5 w-2.5" />
       Creator
