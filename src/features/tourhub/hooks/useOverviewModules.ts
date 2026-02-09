@@ -274,7 +274,7 @@ export function useRankingMovers() {
     if (error) throw error;
 
     // Calculate movers with rank change >= 3
-    const movers = (data || [])
+    const allMovers = (data || [])
       .map((row: any) => {
         const rankChange = (row.prior_rank || row.rank) - row.rank; // Positive = moved up
         return {
@@ -290,11 +290,13 @@ export function useRankingMovers() {
           avgPoints: row.avg_points,
         } as RankingMover;
       })
-      .filter(m => Math.abs(m.rankChange) >= 3)
-      .sort((a, b) => Math.abs(b.rankChange) - Math.abs(a.rankChange)) // Biggest movers first
-      .slice(0, 8);
+      .filter(m => Math.abs(m.rankChange) >= 3);
 
-      return movers;
+      // Return top 8 upward + top 8 downward to ensure both strips have data
+      const upMovers = allMovers.filter(m => m.rankChange > 0).sort((a, b) => b.rankChange - a.rankChange).slice(0, 8);
+      const downMovers = allMovers.filter(m => m.rankChange < 0).sort((a, b) => a.rankChange - b.rankChange).slice(0, 8);
+
+      return [...upMovers, ...downMovers];
     },
     staleTime: 5 * 60 * 1000,
   });
