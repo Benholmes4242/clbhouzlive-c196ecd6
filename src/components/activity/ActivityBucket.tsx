@@ -35,20 +35,20 @@ export const ActivityBucket: React.FC<ActivityBucketProps> = ({
 
   return (
     <section className="w-full">
-      {/* Section label - Hub standard */}
+      {/* Section label - sticky header */}
       <div
         className={cn(
-          "max-w-[640px] mx-auto px-4 sm:px-5",
-          "py-2 bg-background border-y border-border"
+          "sticky top-0 z-10 px-4 sm:px-5",
+          "py-2 bg-muted/50 backdrop-blur-sm border-b border-border"
         )}
       >
-        <span className="text-[0.75rem] font-semibold tracking-wide text-muted-foreground">
+        <span className="text-sm font-semibold text-muted-foreground">
           {label}
         </span>
       </div>
 
-      {/* Notification rows - full bleed */}
-      <div role="list" aria-label="Notifications" className="divide-y divide-border/30">
+      {/* Notification rows with inset dividers */}
+      <div role="list" aria-label="Notifications" className="divide-y divide-border/40 [&>*+*]:border-t [&>*+*]:border-border/40">
         <AnimatePresence initial={false}>
           {items.map(item => (
             <motion.div

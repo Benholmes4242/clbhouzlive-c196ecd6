@@ -50,17 +50,17 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
     <div
       className={cn(
         "flex items-start gap-3 px-4 py-3 transition-colors",
-        // Light UI: consistent page background with orange tint when new
+        // Light UI: unread = faint brand orange wash, read = plain bg
         isNew 
-          ? "bg-primary/[0.04]" 
+          ? "bg-[#F7931E]/[0.04]" 
           : "bg-background hover:bg-muted/40",
         className
       )}
     >
-      {/* Unread dot indicator */}
+      {/* Unread dot indicator - brand orange */}
       <div className="w-2 shrink-0 flex items-start justify-center pt-5">
         {isNew && (
-          <span className="w-2 h-2 rounded-full bg-primary" />
+          <span className="w-2 h-2 rounded-full bg-[#F7931E]" />
         )}
       </div>
 
@@ -110,7 +110,7 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
           )}
           
           {/* Meta row: Timestamp */}
-          <p className="text-[0.75rem] text-muted-foreground/70 mt-1">{timestamp}</p>
+          <p className="text-xs text-muted-foreground mt-1">{timestamp}</p>
         </div>
       </div>
 

@@ -62,7 +62,7 @@ function getNotificationBadgeIcon(type: string) {
   switch (type) {
     // Fix 8: Updated colour system
     case 'like':
-      return <Heart className={cn(iconClass, "text-[#F7931E]")} />;
+      return <Heart className={cn(iconClass, "text-[#F7931E]")} fill="currentColor" />;
     case 'comment':
       return <MessageCircle className={cn(iconClass, "text-blue-500")} />;
     case 'mention':
@@ -203,7 +203,7 @@ function getActorAvatarUrl(notification: ActivityNotification): string | null {
   return notification.actor_avatar_url;
 }
 
-function renderNotificationText(notification: ActivityNotification): string {
+function renderNotificationText(notification: ActivityNotification): string | React.ReactNode {
   const { type, message, title } = notification;
   
   switch (type) {
@@ -253,15 +253,17 @@ function renderNotificationText(notification: ActivityNotification): string {
       return GOLFER_VERIFICATION_COPY.rejected.title;
     case 'golfer_verification_removed':
       return GOLFER_VERIFICATION_COPY.removed.title;
-    // Friend course review — descriptive text from data payload
-    case 'friend_course_review': {
+    // Friend course review — descriptive text with bold course name + rating
+    case 'friend_course_review':
+    case 'course_review': {
       const courseName = notification.data?.course_name;
       const rating = notification.data?.rating;
       if (courseName) {
         const truncatedName = courseName.length > 30 ? courseName.slice(0, 30) + '…' : courseName;
-        return rating != null
-          ? `reviewed ${truncatedName} and rated it ${rating}`
-          : `reviewed ${truncatedName}`;
+        if (rating != null) {
+          return <>reviewed <span className="font-semibold text-foreground">{truncatedName}</span> and rated it <span className="font-semibold text-foreground">{rating}</span></>;
+        }
+        return <>reviewed <span className="font-semibold text-foreground">{truncatedName}</span></>;
       }
       return 'reviewed a course';
     }
@@ -290,7 +292,7 @@ const AvatarWithBadge: React.FC<AvatarWithBadgeProps> = ({ notification, badgeIc
         fallback={displayName?.charAt(0) || '?'}
         ringColor={isSystemNotification ? undefined : getRingColorForTotalPlayed(notification.data?.actor_total_top100_played || 0)}
       />
-      <span className="absolute bottom-0 right-0 translate-x-1 translate-y-1 h-5 w-5 rounded-full bg-white/95 border border-black/5 shadow-sm backdrop-blur-[2px] flex items-center justify-center">
+      <span className="absolute -bottom-0.5 -right-0.5 h-5 w-5 rounded-full bg-background ring-2 ring-background shadow-sm flex items-center justify-center">
         {badgeIcon}
       </span>
     </div>
