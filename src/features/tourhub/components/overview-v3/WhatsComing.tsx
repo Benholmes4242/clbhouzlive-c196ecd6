@@ -1,15 +1,13 @@
 /**
- * WhatsComing - Upcoming tournament cards for the Overview tab
- * Replaces ScheduleModule on the overview page
- * Vertical stack of 4-6 upcoming events across all tours
+ * WhatsComing - Upcoming tournament list for the Overview tab
+ * Clean list layout matching reference: date block | context + name + venue | date
  */
 
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronRight, CalendarDays } from 'lucide-react';
+import { ChevronRight, MapPin } from 'lucide-react';
 import { useUpcomingTournaments } from '../../hooks/useUpcomingTournaments';
-import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { SeasonTournament } from '../../hooks/useSeasonTournaments';
 
@@ -21,115 +19,129 @@ const PLAYOFF_KEYWORDS = ['playoff', 'tour championship', 'fedexcup'];
 
 function getContextLabel(tournament: SeasonTournament): string {
   const nameLower = tournament.name.toLowerCase();
-
-  if (MAJOR_KEYWORDS.some((k) => nameLower.includes(k))) return 'Major Championship';
-  if (PLAYOFF_KEYWORDS.some((k) => nameLower.includes(k))) return 'Playoff Event';
-  if (SIGNATURE_KEYWORDS.some((k) => nameLower.includes(k))) return 'Signature Event';
-
-  return tournament.tourName || 'Tour Event';
+  if (MAJOR_KEYWORDS.some((k) => nameLower.includes(k))) return 'MAJOR CHAMPIONSHIP';
+  if (PLAYOFF_KEYWORDS.some((k) => nameLower.includes(k))) return 'PLAYOFF EVENT';
+  if (SIGNATURE_KEYWORDS.some((k) => nameLower.includes(k))) return 'SIGNATURE EVENT';
+  return 'TOUR EVENT';
 }
 
-// ============ Countdown Text ============
+// ============ Date formatting helpers ============
 
-function getCountdownText(startDate: string): string {
+function getMonthAbbr(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
+}
+
+function getDayNum(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  return String(d.getDate());
+}
+
+function getDateLabel(dateStr: string): string {
   const now = new Date();
   now.setHours(0, 0, 0, 0);
-  const start = new Date(startDate);
-  start.setHours(0, 0, 0, 0);
-
+  const start = new Date(dateStr + 'T00:00:00');
   const diffMs = start.getTime() - now.getTime();
   const diffDays = Math.round(diffMs / 86400000);
 
-  if (diffDays <= 0) return 'Starts today';
-  if (diffDays === 1) return 'Starts tomorrow';
-  if (diffDays <= 6) {
-    const dayName = start.toLocaleDateString('en-US', { weekday: 'long' });
-    return `Starts ${dayName}`;
-  }
-  if (diffDays <= 30) return `Starts in ${diffDays} days`;
+  if (diffDays <= 0) return 'Today';
+  if (diffDays === 1) return 'Tomorrow';
+  if (diffDays === 2) return 'In 2 days';
 
   return start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
-// ============ Single Event Card ============
+function getVenueString(tournament: SeasonTournament): string {
+  const parts: string[] = [];
+  if (tournament.venueName) parts.push(tournament.venueName);
+  if (tournament.venueCity) parts.push(tournament.venueCity);
+  return parts.join(' · ') || '';
+}
 
-function EventCard({ tournament, index }: { tournament: SeasonTournament; index: number }) {
+// ============ Single Event Row ============
+
+function EventRow({ tournament, index }: { tournament: SeasonTournament; index: number }) {
   const navigate = useNavigate();
-  const { data: venueImage } = useVenueImage(tournament.venueName, tournament.venueCity);
-  const imageUrl = venueImage?.imageUrl || getFallbackCourseImage(tournament.name);
   const contextLabel = getContextLabel(tournament);
-  const countdown = getCountdownText(tournament.startDate);
-  const isMajor = contextLabel === 'Major Championship';
+  const isSignature = contextLabel === 'SIGNATURE EVENT';
+  const isMajor = contextLabel === 'MAJOR CHAMPIONSHIP';
+  const venue = getVenueString(tournament);
+  const dateLabel = getDateLabel(tournament.startDate);
 
   return (
     <motion.button
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
-      className="w-full flex items-center gap-3.5 p-3 rounded-2xl bg-card border border-border/60 text-left transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2"
-      initial={{ opacity: 0, y: 12 }}
+      className="w-full flex items-center gap-3.5 px-4 py-3.5 bg-card rounded-2xl border border-border/50 text-left transition-all active:scale-[0.98]"
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{
-        duration: 0.45,
-        delay: 0.08 * index,
-        ease: [0.16, 1, 0.3, 1],
-      }}
+      transition={{ duration: 0.35, delay: 0.05 * index, ease: [0.16, 1, 0.3, 1] }}
     >
-      {/* Course thumbnail */}
-      <div
-        className="w-16 h-16 flex-shrink-0 rounded-xl overflow-hidden bg-muted"
-        style={{ aspectRatio: '1' }}
-      >
-        <img
-          src={imageUrl}
-          alt={tournament.venueName || tournament.name}
-          className="w-full h-full object-cover"
-          loading="lazy"
-        />
+      {/* Date block */}
+      <div className="flex-shrink-0 w-12 text-center">
+        <p className="text-muted-foreground uppercase leading-none" style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.02em' }}>
+          {getMonthAbbr(tournament.startDate)}
+        </p>
+        <p className="text-foreground leading-none mt-0.5" style={{ fontSize: '24px', fontWeight: 700 }}>
+          {getDayNum(tournament.startDate)}
+        </p>
       </div>
 
-      {/* Text content */}
+      {/* Content */}
       <div className="flex-1 min-w-0">
         <p
-          className="text-foreground truncate"
-          style={{ fontSize: '15px', fontWeight: 700, letterSpacing: '-0.2px' }}
-        >
-          {tournament.name}
-        </p>
-
-        <p
-          className="mt-0.5 truncate"
+          className="uppercase leading-none tracking-wide"
           style={{
-            fontSize: '12px',
-            fontWeight: 600,
-            color: isMajor ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground))',
+            fontSize: '10px',
+            fontWeight: 700,
+            letterSpacing: '0.05em',
+            color: isMajor
+              ? 'hsl(var(--primary))'
+              : isSignature
+                ? 'hsl(var(--primary))'
+                : 'hsl(var(--muted-foreground))',
           }}
         >
           {contextLabel}
         </p>
-
         <p
-          className="mt-0.5 text-muted-foreground"
-          style={{ fontSize: '12px', fontWeight: 500 }}
+          className="text-foreground truncate mt-1"
+          style={{ fontSize: '14px', fontWeight: 700, letterSpacing: '-0.15px' }}
         >
-          {countdown}
+          {tournament.name}
         </p>
+        {venue && (
+          <p className="flex items-center gap-1 mt-0.5 text-muted-foreground truncate" style={{ fontSize: '12px' }}>
+            <MapPin className="w-3 h-3 flex-shrink-0 opacity-60" />
+            <span className="truncate">{venue}</span>
+          </p>
+        )}
       </div>
 
-      <ChevronRight className="w-4 h-4 text-muted-foreground/40 flex-shrink-0" />
+      {/* Right date label */}
+      <div className="flex-shrink-0 text-right">
+        <p className="text-muted-foreground whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 500 }}>
+          {dateLabel}
+        </p>
+      </div>
     </motion.button>
   );
 }
 
 // ============ Skeleton ============
 
-function EventCardSkeleton() {
+function EventRowSkeleton() {
   return (
-    <div className="w-full flex items-center gap-3.5 p-3 rounded-2xl bg-card border border-border/60">
-      <Skeleton className="w-16 h-16 rounded-xl flex-shrink-0" />
-      <div className="flex-1 space-y-2">
+    <div className="w-full flex items-center gap-3.5 px-4 py-3.5 bg-card rounded-2xl border border-border/50">
+      <div className="flex-shrink-0 w-12 flex flex-col items-center gap-1">
+        <Skeleton className="h-3 w-8" />
+        <Skeleton className="h-6 w-7" />
+      </div>
+      <div className="flex-1 space-y-1.5">
+        <Skeleton className="h-2.5 w-20" />
         <Skeleton className="h-4 w-3/4" />
         <Skeleton className="h-3 w-1/2" />
-        <Skeleton className="h-3 w-1/3" />
       </div>
+      <Skeleton className="h-3 w-10 flex-shrink-0" />
     </div>
   );
 }
@@ -150,12 +162,12 @@ export function WhatsComing() {
   if (isLoading) {
     return (
       <section style={{ paddingTop: '40px', paddingBottom: '16px' }}>
-        <div className="flex items-center justify-between px-4 mb-4">
-          <Skeleton className="h-6 w-40" />
+        <div className="px-4 mb-3">
+          <Skeleton className="h-5 w-32" />
         </div>
-        <div className="flex flex-col gap-2.5 px-4">
+        <div className="flex flex-col gap-2 px-4">
           {[1, 2, 3, 4].map((i) => (
-            <EventCardSkeleton key={i} />
+            <EventRowSkeleton key={i} />
           ))}
         </div>
       </section>
@@ -167,35 +179,33 @@ export function WhatsComing() {
   return (
     <motion.section
       style={{ paddingTop: '40px', paddingBottom: '16px' }}
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-4 mb-4">
+      <div className="flex items-center justify-between px-4 mb-3">
         <h2
           className="text-foreground"
-          style={{ fontSize: '20px', fontWeight: 700, letterSpacing: '-0.3px' }}
+          style={{ fontSize: '18px', fontWeight: 700, letterSpacing: '-0.3px' }}
         >
           What's Coming
         </h2>
 
         <button
           onClick={() => navigate('/tourhub?tab=schedule')}
-          className="flex items-center gap-1 group transition-all duration-300 active:scale-95 text-muted-foreground"
+          className="flex items-center gap-0.5 text-muted-foreground transition-all active:scale-95"
           style={{ fontSize: '13px', fontWeight: 600 }}
         >
-          <span className="group-hover:text-primary transition-colors">
-            View Full Schedule
-          </span>
-          <ChevronRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-[3px] transition-all" />
+          <span>View Full Schedule</span>
+          <ChevronRight className="w-3.5 h-3.5 opacity-60" />
         </button>
       </div>
 
-      {/* Vertical card stack */}
-      <div className="flex flex-col gap-2.5 px-4">
+      {/* Event list */}
+      <div className="flex flex-col gap-2 px-4">
         {upcoming.map((tournament, index) => (
-          <EventCard key={tournament.id} tournament={tournament} index={index} />
+          <EventRow key={tournament.id} tournament={tournament} index={index} />
         ))}
       </div>
     </motion.section>
