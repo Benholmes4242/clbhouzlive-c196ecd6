@@ -1,285 +1,213 @@
 /**
- * WorldRankingsSection — Broadcast-grade OWGR leaderboard
- * 
- * Page-level section (no card wrapper). Features:
- * - Authority header with OWGR branding
- * - Narrative strip (editorial intelligence)
- * - Momentum pill strip (horizontal scroll)
- * - Tiered competitive ladder with velocity arrows
- * - Broadcast-style pagination
+ * WorldRankingsSection - Prestige treatment for world rankings
+ * Top 3 with medal glows (gold/silver/bronze), oversized rank, larger cards
+ * Remaining as refined list rows with more padding
  */
 
-import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, ChevronLeft, ChevronRight, Crown, TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import { useWorldRankingsOverview, type RankingEntry } from '../../hooks/useWorldRankingsOverview';
-import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
+import { ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { useTopWorldRanked, toTitleCase, getInitials } from '../../hooks/useWorldRankings';
 import { cn } from '@/lib/utils';
 
-const PLAYERS_PER_PAGE = 10;
+// Medal glow colors per spec
+const medalStyles = {
+  1: {
+    glow: 'shadow-[0_0_20px_rgba(251,191,36,0.4)]',
+    bg: 'bg-gradient-to-br from-amber-100 via-yellow-50 to-amber-100',
+    border: 'border-2 border-amber-400',
+    rankColor: 'text-amber-500',
+    avatarRing: 'ring-2 ring-amber-400',
+    avatarBg: 'bg-gradient-to-br from-amber-100 to-yellow-200',
+  },
+  2: {
+    glow: 'shadow-[0_0_16px_rgba(148,163,184,0.35)]',
+    bg: 'bg-gradient-to-br from-slate-100 via-slate-50 to-slate-100',
+    border: 'border-2 border-slate-300',
+    rankColor: 'text-slate-400',
+    avatarRing: 'ring-2 ring-slate-300',
+    avatarBg: 'bg-gradient-to-br from-slate-100 to-slate-200',
+  },
+  3: {
+    glow: 'shadow-[0_0_16px_rgba(180,83,9,0.3)]',
+    bg: 'bg-gradient-to-br from-orange-100 via-amber-50 to-orange-100',
+    border: 'border-2 border-amber-600/50',
+    rankColor: 'text-amber-700',
+    avatarRing: 'ring-2 ring-amber-600/50',
+    avatarBg: 'bg-gradient-to-br from-orange-100 to-amber-200',
+  },
+};
 
-function toTitleCase(str: string | null | undefined): string {
-  if (!str) return '';
-  return str.toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-}
-
-function getInitials(first: string, last: string): string {
-  return `${first[0] || ''}${last[0] || ''}`.toUpperCase();
-}
-
-// ─── Momentum Pill ───
-function MomentumPill({ entry }: { entry: RankingEntry }) {
-  const photoUrl = resolvePhotoUrl(entry.photoUrl, entry.pgaTourId);
-  const isRocket = entry.movement >= 30;
-
-  return (
-    <Link
-      to={`/tourhub/player/${entry.playerId}`}
-      className="flex items-center gap-2 px-3 py-2 rounded-full bg-muted/60 border border-border/50 flex-shrink-0 active:scale-[0.97] transition-transform"
-    >
-      <div className="w-7 h-7 rounded-full overflow-hidden bg-muted flex-shrink-0">
-        {photoUrl ? (
-          <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" loading="lazy" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-muted-foreground">
-            {getInitials(entry.firstName, entry.lastName)}
-          </div>
-        )}
-      </div>
-      <span className="text-sm font-semibold text-foreground whitespace-nowrap">{entry.lastName}</span>
-      <span className="text-xs text-muted-foreground font-mono">#{entry.rank}</span>
-      <span className="text-xs font-semibold text-emerald-700 font-mono flex items-center gap-0.5">
-        {isRocket && '🚀 '}↑ +{entry.movement}
-      </span>
-    </Link>
-  );
-}
-
-// ─── Ranking Row ───
-function RankingRow({ entry, no1AvgPoints }: { entry: RankingEntry; no1AvgPoints: number | null }) {
-  const photoUrl = resolvePhotoUrl(entry.photoUrl, entry.pgaTourId);
-  const isCrown = entry.tier === 'crown';
-  const isElite = entry.tier === 'elite';
-  const isContender = entry.tier === 'contender';
-
-  return (
-    <Link
-      to={`/tourhub/player/${entry.playerId}`}
-      className={cn(
-        "flex items-center gap-3 py-3 px-1 -mx-1 rounded-lg transition-all active:scale-[0.98]",
-        isCrown && "bg-amber-50/60",
-        isElite && "bg-muted/30",
-      )}
-    >
-      {/* Rank badge */}
-      <div className={cn(
-        "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 font-mono text-sm font-bold",
-        isCrown && "bg-amber-100 text-amber-700",
-        isElite && "bg-muted text-foreground",
-        isContender && "bg-muted/60 text-muted-foreground",
-        !isCrown && !isElite && !isContender && "text-muted-foreground",
-      )}>
-        {isCrown ? <Crown className="w-4 h-4 text-amber-600" /> : entry.rank}
-      </div>
-
-      {/* Avatar */}
-      <div className={cn(
-        "w-10 h-10 rounded-full overflow-hidden flex-shrink-0",
-        isCrown ? "ring-2 ring-amber-400/50" : "bg-muted",
-      )}>
-        {photoUrl ? (
-          <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" loading="lazy" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-muted">
-            <span className="text-xs font-bold text-muted-foreground">
-              {getInitials(entry.firstName, entry.lastName)}
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Name & Country */}
-      <div className="flex-1 min-w-0">
-        <p className={cn(
-          "text-sm truncate",
-          isCrown ? "font-bold text-foreground" : isElite ? "font-semibold text-foreground" : "font-medium text-foreground",
-        )}>
-          {entry.firstName} {entry.lastName}
-        </p>
-        <p className="text-xs text-muted-foreground">{toTitleCase(entry.country)}</p>
-      </div>
-
-      {/* Velocity arrow */}
-      <div className="flex-shrink-0 w-10 flex justify-center">
-        {entry.movement > 0 ? (
-          <span className="text-xs font-semibold text-emerald-700 font-mono flex items-center gap-0.5">
-            <TrendingUp className="w-3 h-3" />+{entry.movement}
-          </span>
-        ) : entry.movement < 0 ? (
-          <span className="text-xs font-semibold text-red-500/70 font-mono flex items-center gap-0.5">
-            <TrendingDown className="w-3 h-3" />{entry.movement}
-          </span>
-        ) : (
-          <Minus className="w-3 h-3 text-muted-foreground/40" />
-        )}
-      </div>
-
-      {/* Points (stacked) */}
-      <div className="flex-shrink-0 text-right min-w-[52px]">
-        {entry.avgPoints != null ? (
-          <>
-            <p className="text-sm font-bold text-foreground font-mono leading-tight">{entry.avgPoints.toFixed(2)}</p>
-            <p className="text-[10px] text-muted-foreground leading-tight">Avg Pts</p>
-          </>
-        ) : entry.totalPoints != null ? (
-          <>
-            <p className="text-sm font-bold text-foreground font-mono leading-tight">{entry.totalPoints.toFixed(1)}</p>
-            <p className="text-[10px] text-muted-foreground leading-tight">Total Pts</p>
-          </>
-        ) : (
-          <p className="text-xs text-muted-foreground">—</p>
-        )}
-      </div>
-    </Link>
-  );
-}
-
-// ─── Main Section ───
 export function WorldRankingsSection() {
-  const { data, isLoading } = useWorldRankingsOverview(20);
-  const [page, setPage] = useState(0);
-
-  const totalPages = useMemo(() => {
-    if (!data) return 1;
-    return Math.ceil(data.entries.length / PLAYERS_PER_PAGE);
-  }, [data]);
-
-  const visibleEntries = useMemo(() => {
-    if (!data) return [];
-    const start = page * PLAYERS_PER_PAGE;
-    return data.entries.slice(start, start + PLAYERS_PER_PAGE);
-  }, [data, page]);
+  const { data: topPlayers, isLoading } = useTopWorldRanked(10);
 
   if (isLoading) {
     return (
-      <section className="py-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-4 w-48 bg-muted rounded" />
-          <div className="h-3 w-64 bg-muted/60 rounded" />
-          <div className="flex gap-2 mt-4">
-            {[1, 2, 3].map(i => <div key={i} className="h-10 w-32 bg-muted rounded-full" />)}
-          </div>
-          <div className="space-y-2 mt-6">
-            {[1, 2, 3, 4, 5].map(i => <div key={i} className="h-14 bg-muted/40 rounded-lg" />)}
+      <section className="bg-slate-50 -mx-4 sm:-mx-6 px-4 sm:px-6 py-8">
+        <div className="animate-pulse">
+          <div className="h-4 w-40 bg-slate-200 rounded mb-6" />
+          <div className="flex gap-3">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="flex-shrink-0 w-[150px] h-[190px] bg-slate-100 rounded-xl" />
+            ))}
           </div>
         </div>
       </section>
     );
   }
 
-  if (!data || data.entries.length === 0) return null;
+  if (topPlayers.length === 0) return null;
+
+  const top3 = topPlayers.slice(0, 3);
+  const remaining = topPlayers.slice(3, 8);
 
   return (
-    <section className="py-2">
-      {/* ─── Authority Header ─── */}
-      <div className="flex items-center justify-between mb-1">
-        <h3 className="text-base font-semibold text-foreground">
-          Official World Golf Ranking
-        </h3>
-        <Link
-          to="/tourhub?tab=players"
-          className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors uppercase tracking-wide font-medium"
+    <section className="bg-slate-50 -mx-4 sm:-mx-6 px-4 sm:px-6 py-8">
+      {/* Header - matching Schedule page section headers */}
+      <div className="flex items-center justify-between mb-6">
+        <h3 
+          className="font-extrabold text-slate-800 uppercase"
+          style={{ fontSize: '13px', letterSpacing: '0.08em' }}
         >
-          View All <ArrowRight className="w-3 h-3" />
+          World Rankings
+        </h3>
+        <Link 
+          to="/tourhub?tab=players"
+          className="text-xs text-slate-500 hover:text-slate-700 flex items-center gap-1 transition-colors"
+        >
+          All Rankings <ArrowRight className="w-3 h-3" />
         </Link>
       </div>
-      <p className="text-xs text-muted-foreground mb-5">
-        Updated weekly · Official OWGR data
-      </p>
-      <div className="h-px bg-border/40 mb-5" />
+      
+      {/* Top 3 - Larger cards with medal glows */}
+      <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide">
+        {top3.map((player, index) => {
+          const rank = index + 1 as 1 | 2 | 3;
+          const style = medalStyles[rank];
+          
+          return (
+            <motion.div
+              key={player.playerId}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4, delay: index * 0.08 }}
+            >
+              <Link
+                to={`/tourhub/player/${player.playerId}`}
+                className="flex-shrink-0 w-[150px] group block"
+              >
+                <div 
+                  className={cn(
+                    "h-[200px] rounded-xl p-4 flex flex-col relative overflow-hidden",
+                    "bg-white transition-all duration-300",
+                    style.border,
+                    style.glow,
+                    "group-hover:shadow-lg"
+                  )}
+                >
+                  {/* Oversized rank number - low opacity background */}
+                  <span 
+                    className={cn(
+                      "absolute top-2 right-2 text-6xl font-black leading-none opacity-10",
+                      style.rankColor
+                    )}
+                  >
+                    {player.worldRank}
+                  </span>
+                  
+                  {/* Rank badge */}
+                  <span 
+                    className={cn(
+                      "text-2xl font-extrabold leading-none flex-shrink-0 z-10",
+                      style.rankColor
+                    )}
+                  >
+                    #{player.worldRank}
+                  </span>
+                  
+                  {/* Avatar - centered, larger */}
+                  <div className="flex-shrink-0 flex justify-center mt-3">
+                    <div 
+                      className={cn(
+                        "w-14 h-14 rounded-full flex items-center justify-center overflow-hidden",
+                        style.avatarRing,
+                        style.avatarBg
+                      )}
+                    >
+                      {player.photoUrl ? (
+                        <img 
+                          src={player.photoUrl}
+                          alt={player.playerName}
+                          className="w-full h-full rounded-full object-cover object-top"
+                        />
+                      ) : (
+                        <span className={cn("text-sm font-bold", style.rankColor)}>
+                          {getInitials(player.playerName)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
 
-      {/* ─── Narrative Strip ─── */}
-      {data.narrative && (
-        <p className="text-sm text-muted-foreground italic mb-5 leading-relaxed">
-          "{data.narrative}"
-        </p>
-      )}
+                  {/* Name */}
+                  <div className="flex-shrink-0 h-[40px] flex items-start justify-center mt-3">
+                    <p className="text-sm font-semibold text-foreground text-center leading-tight line-clamp-2">
+                      {player.playerName}
+                    </p>
+                  </div>
 
-      {/* ─── Momentum Strip ─── */}
-      {data.movers.length > 0 && (
-        <div className="mb-6">
-          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-            This Week's Momentum
-          </h4>
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
-            {data.movers.map(mover => (
-              <MomentumPill key={mover.playerId} entry={mover} />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ─── Competitive Ladder ─── */}
-      <div className="min-h-[560px]">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={page}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.12 }}
-            className="divide-y divide-border/30"
-          >
-            {visibleEntries.map((entry) => (
-              <RankingRow
-                key={entry.playerId}
-                entry={entry}
-                no1AvgPoints={data.no1AvgPoints}
-              />
-            ))}
-          </motion.div>
-        </AnimatePresence>
+                  {/* Country */}
+                  <p className="flex-shrink-0 text-[11px] text-muted-foreground text-center mt-auto">
+                    {toTitleCase(player.country) || 'Unknown'}
+                  </p>
+                </div>
+              </Link>
+            </motion.div>
+          );
+        })}
       </div>
 
-      {/* ─── Broadcast Pagination ─── */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-4 mt-4 pt-3">
-          <button
-            onClick={() => setPage(p => Math.max(0, p - 1))}
-            disabled={page === 0}
-            className="w-8 h-8 flex items-center justify-center rounded-full text-muted-foreground disabled:opacity-30 active:scale-[0.92] transition-all hover:bg-muted"
-            aria-label="Previous page"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-
-          <div className="flex items-center gap-1.5">
-            {Array.from({ length: totalPages }).map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setPage(i)}
-                className={cn(
-                  "w-2 h-2 rounded-full transition-all",
-                  i === page ? "bg-foreground scale-110" : "bg-muted-foreground/30 hover:bg-muted-foreground/50",
+      {/* Remaining Rankings - List rows with more padding */}
+      {remaining.length > 0 && (
+        <div className="mt-4 space-y-1">
+          {remaining.map((player, index) => (
+            <Link
+              key={player.playerId}
+              to={`/tourhub/player/${player.playerId}`}
+              className="flex items-center gap-3 py-3.5 px-3 -mx-3 rounded-lg transition-colors hover:bg-slate-100/80 group"
+            >
+              {/* Avatar - slightly larger */}
+              <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-100 flex-shrink-0">
+                {player.photoUrl ? (
+                  <img 
+                    src={player.photoUrl}
+                    alt={player.playerName}
+                    className="w-full h-full object-cover object-top"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <span className="text-xs font-bold text-slate-400">
+                      {getInitials(player.playerName)}
+                    </span>
+                  </div>
                 )}
-                aria-label={`Page ${i + 1}`}
-              />
-            ))}
-          </div>
-
-          <button
-            onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
-            disabled={page >= totalPages - 1}
-            className="w-8 h-8 flex items-center justify-center rounded-full text-muted-foreground disabled:opacity-30 active:scale-[0.92] transition-all hover:bg-muted"
-            aria-label="Next page"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-
-          <span className="text-[11px] text-muted-foreground font-mono ml-1">
-            {page * PLAYERS_PER_PAGE + 1}–{Math.min((page + 1) * PLAYERS_PER_PAGE, data.entries.length)} of {data.entries.length}
-          </span>
+              </div>
+              
+              {/* Name & Country */}
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-foreground text-sm truncate group-hover:text-primary transition-colors">
+                  {player.playerName}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {toTitleCase(player.country) || 'Unknown'}
+                </p>
+              </div>
+              
+              {/* Rank - right aligned, bold but quiet */}
+              <span className="text-base font-bold text-slate-300 flex-shrink-0">
+                #{player.worldRank}
+              </span>
+            </Link>
+          ))}
         </div>
       )}
     </section>
