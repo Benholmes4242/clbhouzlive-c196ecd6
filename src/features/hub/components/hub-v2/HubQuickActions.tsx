@@ -54,7 +54,8 @@ export function HubQuickActions({
       {/* Notifications — circular container matching avatar size */}
       <button
         onClick={handleNotifications}
-        className="relative w-12 h-12 rounded-full bg-card border border-border/60 shadow-sm flex items-center justify-center active:scale-[0.93] transition-transform focus-visible:outline-none focus-visible:ring-2"
+        className="relative w-12 h-12 bg-card border border-border/60 shadow-sm flex items-center justify-center active:scale-[0.93] transition-transform focus-visible:outline-none focus-visible:ring-2"
+        style={{ borderRadius: '34%' }}
         aria-label={`Notifications${hasUnreadNotifications ? `, ${unreadNotificationCount} unread` : ''}`}
       >
         <Bell className="w-5 h-5 text-muted-foreground" />
