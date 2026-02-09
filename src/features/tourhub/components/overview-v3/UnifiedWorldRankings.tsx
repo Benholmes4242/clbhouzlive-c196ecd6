@@ -8,7 +8,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, TrendingUp } from 'lucide-react';
+import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRankingMovers, useWorldRankingsFull } from '../../hooks/useOverviewModules';
 import CountryFlag from '@/components/ui/country-flag';
@@ -108,10 +108,11 @@ interface MomentumPillProps {
     rankChange: number;
   };
   index: number;
+  direction: 'up' | 'down';
   onTap: (playerId: string, rank: number) => void;
 }
 
-function MomentumPill({ entry, index, onTap }: MomentumPillProps) {
+function MomentumPill({ entry, index, direction, onTap }: MomentumPillProps) {
   const initials = `${entry.firstName?.[0] ?? ''}${entry.lastName?.[0] ?? ''}`.toUpperCase();
   const photoUrl = resolvePhotoUrl(entry.photoUrl, entry.pgaTourId);
   const [imgLoaded, setImgLoaded] = useState(false);
@@ -120,12 +121,15 @@ function MomentumPill({ entry, index, onTap }: MomentumPillProps) {
   const showPhoto = photoUrl && !imgError;
   const showInitials = !showPhoto || !imgLoaded;
 
+  const isUp = direction === 'up';
+  const absChange = Math.abs(entry.rankChange);
+
   return (
     <motion.button
       onClick={() => onTap(entry.playerId, entry.rank)}
-      className="flex-shrink-0 flex items-center gap-2 rounded-full border border-border/60 active:scale-[0.97] transition-transform"
+      className="flex-shrink-0 rounded-xl border border-border/60 active:scale-[0.97] transition-transform"
       style={{
-        padding: '5px 12px 5px 5px',
+        padding: '6px 10px',
         scrollSnapAlign: 'start',
         background: 'hsl(var(--muted) / 0.4)',
       }}
@@ -133,36 +137,41 @@ function MomentumPill({ entry, index, onTap }: MomentumPillProps) {
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.06, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
     >
-      {/* Avatar — photo only, initials only as true fallback */}
-      <div className="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 border border-border/40">
-        {showPhoto && (
-          <img
-            src={photoUrl}
-            alt={entry.lastName}
-            className="w-full h-full object-cover"
-            loading="lazy"
-            onLoad={() => setImgLoaded(true)}
-            onError={() => setImgError(true)}
-            style={{ display: imgLoaded ? 'block' : 'none' }}
-          />
-        )}
-        {showInitials && (
-          <div className="w-full h-full flex items-center justify-center bg-muted">
-            <span className="text-[10px] font-bold text-muted-foreground">{initials}</span>
-          </div>
-        )}
+      {/* Top line: Avatar + Surname + Rank */}
+      <div className="flex items-center gap-1.5">
+        {/* Avatar */}
+        <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 border border-border/40">
+          {showPhoto && (
+            <img
+              src={photoUrl}
+              alt={entry.lastName}
+              className="w-full h-full object-cover"
+              loading="lazy"
+              onLoad={() => setImgLoaded(true)}
+              onError={() => setImgError(true)}
+              style={{ display: imgLoaded ? 'block' : 'none' }}
+            />
+          )}
+          {showInitials && (
+            <div className="w-full h-full flex items-center justify-center bg-muted">
+              <span className="text-[9px] font-bold text-muted-foreground">{initials}</span>
+            </div>
+          )}
+        </div>
+
+        <span className="text-[12px] font-medium text-foreground whitespace-nowrap">{entry.lastName}</span>
+        <span className="text-[10px] text-muted-foreground font-mono">#{entry.rank}</span>
       </div>
 
-      {/* Surname */}
-      <span className="text-xs font-medium text-foreground whitespace-nowrap">{entry.lastName}</span>
-
-      {/* Rank (muted, smaller) */}
-      <span className="text-[10px] text-muted-foreground font-mono">#{entry.rank}</span>
-
-      {/* Movement — green arrow + number only, no emojis */}
-      <span className="text-[11px] font-bold text-emerald-700 whitespace-nowrap">
-        ↑ +{entry.rankChange}
-      </span>
+      {/* Bottom line: Movement arrow + number */}
+      <div className="flex items-center gap-0.5 mt-0.5 pl-[30px]">
+        <span className={cn(
+          'text-[11px] font-bold whitespace-nowrap',
+          isUp ? 'text-emerald-700' : 'text-red-500'
+        )}>
+          {isUp ? '↑' : '↓'} {isUp ? '+' : '−'}{absChange}
+        </span>
+      </div>
     </motion.button>
   );
 }
@@ -190,10 +199,15 @@ export function UnifiedWorldRankings() {
   const endIndex = Math.min(startIndex + PLAYERS_PER_PAGE, totalPlayers);
   const currentPagePlayers = rankings?.slice(startIndex, endIndex) || [];
 
-  const no1AvgPoints = rankings?.[0]?.avg_points ?? 0;
+  const no1TotalPoints = rankings?.[0]?.total_points ?? 0;
 
   const moverPlayerIds = useMemo(() => new Set(movers?.map(m => m.playerId) || []), [movers]);
   const upwardMovers = useMemo(() => (movers || []).filter(m => m.rankChange > 0), [movers]);
+  const downwardMovers = useMemo(() => {
+    const downs = (movers || []).filter(m => m.rankChange < 0);
+    // Sort by largest drop first (most negative rankChange)
+    return [...downs].sort((a, b) => a.rankChange - b.rankChange).slice(0, upwardMovers.length || 10);
+  }, [movers, upwardMovers.length]);
   const narrative = useMemo(() => generateNarrative(rankings, movers), [rankings, movers]);
 
   useEffect(() => {
@@ -302,21 +316,42 @@ export function UnifiedWorldRankings() {
         </div>
       )}
 
-      {/* ═══ 3. This Week's Momentum ═══ */}
+      {/* ═══ 3. This Week's Momentum + Biggest Drops ═══ */}
       {hasMovers && (
-        <div className="mb-5">
-          <div className="flex items-center gap-1.5 mb-2.5">
-            <TrendingUp className="w-3.5 h-3.5 text-emerald-700" />
-            <span className="text-[12px] font-semibold text-foreground">This Week's Momentum</span>
+        <div className="mb-5 space-y-4">
+          {/* Up movers */}
+          <div>
+            <div className="flex items-center gap-1.5 mb-2">
+              <TrendingUp className="w-3.5 h-3.5 text-emerald-700" />
+              <span className="text-[12px] font-semibold text-foreground">This Week's Momentum</span>
+            </div>
+            <div
+              className="flex gap-2 overflow-x-auto scrollbar-hide pb-1"
+              style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory' }}
+            >
+              {upwardMovers.map((entry, idx) => (
+                <MomentumPill key={entry.playerId} entry={entry} index={idx} direction="up" onTap={handleMoverTap} />
+              ))}
+            </div>
           </div>
-          <div
-            className="flex gap-2 overflow-x-auto scrollbar-hide pb-1"
-            style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory' }}
-          >
-            {upwardMovers.map((entry, idx) => (
-              <MomentumPill key={entry.playerId} entry={entry} index={idx} onTap={handleMoverTap} />
-            ))}
-          </div>
+
+          {/* Down movers */}
+          {downwardMovers.length > 0 && (
+            <div>
+              <div className="flex items-center gap-1.5 mb-2">
+                <TrendingDown className="w-3.5 h-3.5 text-red-500" />
+                <span className="text-[12px] font-semibold text-foreground">Biggest Drops</span>
+              </div>
+              <div
+                className="flex gap-2 overflow-x-auto scrollbar-hide pb-1"
+                style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory' }}
+              >
+                {downwardMovers.map((entry, idx) => (
+                  <MomentumPill key={entry.playerId} entry={entry} index={idx} direction="down" onTap={handleMoverTap} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -357,9 +392,9 @@ export function UnifiedWorldRankings() {
               const isElite = entry.rank >= 2 && entry.rank <= 3;
               const isContender = entry.rank >= 4 && entry.rank <= 10;
 
-              // Chase the Crown (ranks 2-5 only)
-              const showChase = entry.rank >= 2 && entry.rank <= 5 && no1AvgPoints > 0 && entry.avg_points;
-              const ptsToNo1 = showChase ? (no1AvgPoints - (entry.avg_points || 0)).toFixed(1) : null;
+              // Chase the Crown (ranks 2-5 only, based on TOTAL points)
+              const showChase = entry.rank >= 2 && entry.rank <= 5 && no1TotalPoints > 0 && entry.total_points;
+              const ptsToNo1 = showChase ? ((entry.total_points || 0) - no1TotalPoints).toFixed(1) : null;
 
               // Row background — subtle tier differentiation
               let rowBg = 'transparent';
@@ -455,10 +490,10 @@ export function UnifiedWorldRankings() {
                           ? entry.total_points.toLocaleString(undefined, { maximumFractionDigits: 1 })
                           : '—'}
                       </div>
-                      {/* Chase the Crown — ranks 2-5 only */}
+                      {/* Chase the Crown — ranks 2-5 only, based on total pts gap */}
                       {showChase && ptsToNo1 && (
                         <div className="text-[9px] text-muted-foreground/60 font-medium mt-0.5 whitespace-nowrap">
-                          −{ptsToNo1} to #1
+                          {ptsToNo1} to #1
                         </div>
                       )}
                     </div>
