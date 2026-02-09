@@ -264,7 +264,7 @@ const BusinessProfilePage: React.FC = () => {
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-10 pointer-events-auto"
+          className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/40 transition-all z-10 pointer-events-auto active:scale-[0.95]"
           style={{ top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
           aria-label="Back"
         >
@@ -360,7 +360,7 @@ const BusinessProfilePage: React.FC = () => {
         {(() => {
           const locationDisplay = getCityCountry({ city: business.city, region: business.region, country: business.country, location: business.location });
           return locationDisplay ? (
-            <p className="mt-1 text-base font-medium text-slate-600">
+            <p className="mt-1 text-base font-medium text-muted-foreground">
               {locationDisplay}
             </p>
           ) : null;
@@ -372,7 +372,7 @@ const BusinessProfilePage: React.FC = () => {
       <div className="mt-3 px-5 flex items-center gap-2 relative z-10 pointer-events-auto">
         {/* Follow button */}
         <button 
-          className="h-9 flex-1 rounded-full text-sm font-semibold text-white flex items-center justify-center gap-1.5 disabled:opacity-60 bg-slate-700"
+          className="h-11 flex-1 rounded-full text-sm font-semibold text-primary-foreground flex items-center justify-center gap-1.5 disabled:opacity-60 bg-primary transition-transform active:scale-[0.98]"
           onClick={handleFollowToggle}
           disabled={followBusy}
         >
@@ -395,13 +395,9 @@ const BusinessProfilePage: React.FC = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button 
-                className="w-9 h-9 flex-shrink-0 rounded-full flex items-center justify-center"
-                style={{
-                  background: '#fff',
-                  border: '1px solid #E0E0E0'
-                }}
+                className="min-w-11 min-h-11 w-11 h-11 flex-shrink-0 rounded-full flex items-center justify-center border border-border bg-background transition-transform active:scale-[0.95]"
               >
-                <MoreHorizontal className="w-4 h-4 text-[#0F0F0F]" />
+                <MoreHorizontal className="w-4 h-4 text-foreground" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
@@ -422,28 +418,26 @@ const BusinessProfilePage: React.FC = () => {
         )}
       </div>
 
-      {/* Mini-nav row: Posts | Followers | Following - identical to personal profile */}
+      {/* Mini-nav row: Posts | Followers - centered for two-stat layout */}
       <div className="mt-6 px-5">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-center gap-12">
           {/* Posts */}
           <button
             onClick={() => setActiveMiniNav('posts')}
-            className="pb-3 flex items-center gap-2"
+            className="min-h-11 pb-3 flex items-center gap-2 transition-transform active:scale-[0.97]"
           >
-            <span className="text-sm text-slate-500">Posts</span>
-            <span className="text-base font-semibold text-[#0F0F0F]">{postsCount}</span>
+            <span className="text-sm text-muted-foreground">Posts</span>
+            <span className="text-base font-semibold text-foreground">{postsCount}</span>
           </button>
           
           {/* Followers */}
           <button
             onClick={() => setActiveMiniNav('followers')}
-            className="pb-3 flex items-center gap-2"
+            className="min-h-11 pb-3 flex items-center gap-2 transition-transform active:scale-[0.97]"
           >
-            <span className="text-sm text-slate-500">Followers</span>
-            <span className="text-base font-semibold text-[#0F0F0F]">{followersCount}</span>
+            <span className="text-sm text-muted-foreground">Followers</span>
+            <span className="text-base font-semibold text-foreground">{followersCount}</span>
           </button>
-          
-          {/* Following stat removed - businesses don't follow others yet */}
         </div>
       </div>
 
@@ -467,7 +461,7 @@ const BusinessProfilePage: React.FC = () => {
               {(isBioClamped || bioExpanded) && (
                 <button
                   onClick={() => setBioExpanded(!bioExpanded)}
-                  className="text-sm font-medium mt-1 hover:underline text-slate-500"
+                  className="min-h-11 text-sm font-medium mt-1 hover:underline text-muted-foreground transition-transform active:scale-[0.97]"
                 >
                   {bioExpanded ? 'Show less' : 'More'}
                 </button>
@@ -486,11 +480,7 @@ const BusinessProfilePage: React.FC = () => {
               href={ensureProtocol(business.website)}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-slate-600 hover:text-slate-800 transition-colors mr-2 mb-2"
-              style={{
-                background: '#f1f5f9',
-                border: '1px solid #e2e8f0'
-              }}
+              className="inline-flex items-center gap-1.5 px-4 min-h-11 rounded-full text-sm font-medium text-foreground bg-muted border border-border hover:bg-muted/80 transition-all mr-2 mb-2 active:scale-[0.97]"
               onClick={() => trackBusinessAction(business.id, 'website', user?.id)}
             >
               <ExternalLink className="w-3.5 h-3.5" />
@@ -502,11 +492,7 @@ const BusinessProfilePage: React.FC = () => {
           {business.phone && (
             <button
               onClick={handleCall}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-slate-600 hover:text-slate-800 transition-colors mr-2 mb-2"
-              style={{
-                background: '#f1f5f9',
-                border: '1px solid #e2e8f0'
-              }}
+              className="inline-flex items-center gap-1.5 px-4 min-h-11 rounded-full text-sm font-medium text-foreground bg-muted border border-border hover:bg-muted/80 transition-all mr-2 mb-2 active:scale-[0.97]"
             >
               <Phone className="w-3.5 h-3.5" />
               Call
