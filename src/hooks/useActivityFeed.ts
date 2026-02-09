@@ -254,6 +254,11 @@ function getContextUrl(notification: any): string {
     const reviewId = data?.review_id || entity_id;
     return `/courses/${data.course_id}?tab=reviews&review=${reviewId}`;
   }
+  // Review response — deep link to course reviews tab with the review highlighted
+  if (type === 'review_response' && data?.course_id) {
+    const reviewId = data?.review_id || entity_id;
+    return `/courses/${data.course_id}?tab=reviews&review=${reviewId}`;
+  }
   if (entity_type === 'course' && entity_id) {
     return `/courses/${entity_id}`;
   }

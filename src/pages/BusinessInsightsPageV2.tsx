@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Eye, Users, MousePointerClick, UserPlus, Phone, Globe, MapPin, MessageSquare, TrendingUp, TrendingDown, Star } from 'lucide-react';
+import { ArrowLeft, Eye, Users, MousePointerClick, UserPlus, Phone, Globe, MapPin, MessageSquare, TrendingUp, TrendingDown, Star, MessageCircle } from 'lucide-react';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
+import { useBusinessReviewStats } from '@/hooks/useBusinessReviewStats';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -43,6 +44,149 @@ const MOCK_RATING_DISTRIBUTION = [
   { stars: 2, count: 2, percent: 2 },
   { stars: 1, count: 1, percent: 2 },
 ];
+
+// Reviews section component using real data
+const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate: (path: string) => void }) => {
+  const { data: reviewStats, isLoading } = useBusinessReviewStats(businessId);
+
+  if (isLoading) {
+    return (
+      <section className="bg-[rgba(7,10,18,0.98)] border border-white/[0.04] rounded-[18px] p-4 md:p-5">
+        <h3 className="text-[0.9rem] font-medium text-white mb-4">Reviews & reputation</h3>
+        <div className="flex items-center justify-center h-32">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#ff9f1c]" />
+        </div>
+      </section>
+    );
+  }
+
+  if (!reviewStats) {
+    return (
+      <section className="bg-[rgba(7,10,18,0.98)] border border-white/[0.04] rounded-[18px] p-4 md:p-5">
+        <h3 className="text-[0.9rem] font-medium text-white mb-4">Reviews & reputation</h3>
+        <p className="text-[0.8rem] text-white/55 text-center py-6">
+          No reviews yet. Once golfers review your courses, you'll see ratings and feedback here.
+        </p>
+      </section>
+    );
+  }
+
+  const maxCount = Math.max(...reviewStats.distribution.map(d => d.count), 1);
+
+  return (
+    <section className="bg-[rgba(7,10,18,0.98)] border border-white/[0.04] rounded-[18px] p-4 md:p-5 space-y-5">
+      <h3 className="text-[0.9rem] font-medium text-white mb-4">Reviews & reputation</h3>
+      
+      <div className="flex flex-col md:flex-row gap-6">
+        {/* Rating summary */}
+        <div className="text-center md:text-left flex-shrink-0">
+          <div className="flex items-baseline gap-1 justify-center md:justify-start">
+            <span className="text-[2rem] font-bold text-white">{reviewStats.avgRating}</span>
+            <span className="text-white/60">/ 10</span>
+          </div>
+          <p className="text-[0.8rem] text-white/60 mt-1">{reviewStats.totalReviews} review{reviewStats.totalReviews !== 1 ? 's' : ''}</p>
+          
+          {/* Trend */}
+          {reviewStats.recentReviews > 0 && (
+            <div className="mt-2 flex items-center gap-1 justify-center md:justify-start">
+              <span className={cn(
+                "text-xs font-medium",
+                reviewStats.reviewTrend >= 0 ? "text-[#4ade80]" : "text-[#f97373]"
+              )}>
+                {reviewStats.recentReviews} new this month
+              </span>
+              {reviewStats.reviewTrend !== 0 && (
+                <span className={cn(
+                  "text-xs",
+                  reviewStats.reviewTrend > 0 ? "text-[#4ade80]" : "text-[#f97373]"
+                )}>
+                  ({reviewStats.reviewTrend > 0 ? '+' : ''}{reviewStats.reviewTrend}%)
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Rating distribution (1-10) */}
+        <div className="flex-1 space-y-1">
+          {reviewStats.distribution.slice().reverse().map((item) => (
+            <div key={item.score} className="flex items-center gap-2">
+              <span className="text-xs text-white/60 w-5 text-right">{item.score}</span>
+              <div className="flex-1 h-2 bg-white/[0.06] rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-amber-400 rounded-full transition-all"
+                  style={{ width: `${(item.count / maxCount) * 100}%` }}
+                />
+              </div>
+              <span className="text-xs text-white/60 w-6 text-right">{item.count}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Sub-ratings */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {[
+          { label: 'Design', value: reviewStats.subRatings.design },
+          { label: 'Condition', value: reviewStats.subRatings.condition },
+          { label: 'Facilities', value: reviewStats.subRatings.facilities },
+          { label: 'Clubhouse', value: reviewStats.subRatings.clubhouse },
+        ].map(sr => (
+          <div key={sr.label} className="rounded-[10px] bg-white/[0.03] border border-white/[0.05] p-3 text-center">
+            <p className="text-lg font-semibold text-white">{sr.value ?? '—'}</p>
+            <p className="text-[0.7rem] text-white/55">{sr.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Action prompts */}
+      <div className="flex flex-col sm:flex-row gap-2">
+        {reviewStats.unrespondedCount > 0 && (
+          <div className="flex items-center gap-2 text-xs text-[#ff9f1c]">
+            <MessageCircle className="h-3.5 w-3.5" />
+            <span>{reviewStats.unrespondedCount} review{reviewStats.unrespondedCount !== 1 ? 's' : ''} awaiting your response</span>
+          </div>
+        )}
+      </div>
+
+      {/* Multi-course breakdown */}
+      {reviewStats.courses.length > 1 && (
+        <div className="space-y-2 pt-2 border-t border-white/[0.06]">
+          <h4 className="text-[0.8rem] font-medium text-white/70">Course breakdown</h4>
+          {reviewStats.courses.map(course => (
+            <button
+              key={course.id}
+              onClick={() => navigate(`/courses/${course.id}?tab=reviews`)}
+              className="w-full flex items-center justify-between py-2 px-3 rounded-[10px] hover:bg-white/[0.03] transition-colors text-left"
+            >
+              <div className="min-w-0">
+                <p className="text-[0.8rem] font-medium text-white truncate">{course.name}</p>
+                <p className="text-[0.7rem] text-white/55">
+                  {course.reviewCount} review{course.reviewCount !== 1 ? 's' : ''}
+                  {course.recentCount > 0 && ` · ${course.recentCount} new`}
+                </p>
+              </div>
+              <div className="flex items-center gap-1 flex-shrink-0">
+                <Star className="h-3 w-3 text-amber-400 fill-amber-400" />
+                <span className="text-sm font-medium text-white">{course.avgRating}</span>
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* View all reviews link */}
+      {reviewStats.courses.length > 0 && (
+        <button
+          onClick={() => navigate(`/courses/${reviewStats.courses[0].id}?tab=reviews`)}
+          className="text-[0.8rem] text-[#ff9f1c] hover:underline"
+        >
+          View all reviews ›
+        </button>
+      )}
+    </section>
+  );
+};
 
 // Stat Card Component - Dark theme
 const StatCard = ({ 
@@ -345,48 +489,8 @@ const BusinessInsightsPageV2 = () => {
           </div>
         </section>
 
-        {/* Reviews & Reputation */}
-        <section className="bg-[rgba(7,10,18,0.98)] border border-white/[0.04] rounded-[18px] p-4 md:p-5">
-          <h3 className="text-[0.9rem] font-medium text-white mb-4">Reviews & reputation</h3>
-          <div className="flex flex-col md:flex-row gap-6">
-            {/* Rating summary */}
-            <div className="text-center md:text-left">
-              <div className="flex items-baseline gap-1 justify-center md:justify-start">
-                <span className="text-[1.6rem] font-bold text-white">4.7</span>
-                <span className="text-white/60">/ 5</span>
-              </div>
-              <div className="flex items-center gap-1 justify-center md:justify-start mt-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star 
-                    key={star} 
-                    className={cn(
-                      "h-4 w-4",
-                      star <= 4 ? "text-amber-400 fill-amber-400" : "text-amber-400 fill-amber-400/50"
-                    )} 
-                  />
-                ))}
-              </div>
-              <p className="text-[0.8rem] text-white/60 mt-1">86 reviews</p>
-            </div>
-
-            {/* Rating distribution */}
-            <div className="flex-1 space-y-1.5">
-              {MOCK_RATING_DISTRIBUTION.map((item) => (
-                <div key={item.stars} className="flex items-center gap-2">
-                  <span className="text-xs text-white/60 w-3">{item.stars}</span>
-                  <Star className="h-3 w-3 text-amber-400 fill-amber-400" />
-                  <div className="flex-1 h-2 bg-white/[0.06] rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-amber-400 rounded-full transition-all"
-                      style={{ width: `${item.percent}%` }}
-                    />
-                  </div>
-                  <span className="text-xs text-white/60 w-8 text-right">{item.count}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        {/* Reviews & Reputation — Real Data */}
+        <ReviewsSection businessId={business.id} navigate={navigate} />
       </div>
     </PageRoot>
   );
