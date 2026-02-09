@@ -266,7 +266,7 @@ const BusinessProfilePage: React.FC = () => {
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-full bg-black/20 backdrop-blur-sm active:scale-[0.95] transition-transform z-10 pointer-events-auto"
+          className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 active:scale-95 transition-all z-10 pointer-events-auto"
           style={{ top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
           aria-label="Back"
         >
