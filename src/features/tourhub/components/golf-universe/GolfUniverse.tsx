@@ -29,7 +29,6 @@ import {
   MyGolfLayer,
 } from './components';
 import { useGolfUniverseData, useTourLens, useUserFollows } from './hooks';
-import { useTourOverviewData } from '../../hooks/useTourOverviewData';
 import { useCourseImageResolver } from '../../hooks/useCourseImageResolver';
 
 // Skeleton loading state
@@ -92,17 +91,8 @@ export function GolfUniverse() {
     isLoading,
   } = useGolfUniverseData(activeLens);
 
-  const { featuredCourses } = useTourOverviewData();
-  
-  // Build venues with actual location data (no hardcoded country)
-  const venues = useMemo(() => 
-    featuredCourses.map(c => ({
-      venueName: c.name,
-      city: c.location?.split(',')[0]?.trim(),
-      country: c.location?.split(',')[1]?.trim() || undefined,
-    })),
-    [featuredCourses]
-  );
+  // Venues from featured courses (deprecated - using empty array as useTourOverviewData was removed)
+  const venues: { venueName: string; city?: string; country?: string }[] = [];
   const { data: courseImages } = useCourseImageResolver(venues);
 
   const {
@@ -188,7 +178,7 @@ export function GolfUniverse() {
         <PlayerStack players={rankedPlayers} limit={10} />
 
         {/* 9. Venue Atlas */}
-        <VenueAtlas courses={featuredCourses} courseImages={courseImages} />
+        <VenueAtlas courses={[]} courseImages={courseImages} />
 
         {/* 10. Data Futures */}
         <DataFutures items={dataUnlocks} />

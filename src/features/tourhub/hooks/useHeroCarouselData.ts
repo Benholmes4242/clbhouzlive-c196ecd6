@@ -1,16 +1,13 @@
 /**
- * useHeroCarouselData - Comprehensive hero carousel data hook
+ * useHeroCarouselData - Single-winner hero selection
  * 
- * Logic:
- * For each major tour (PGA, LIV, DP World, LPGA, Korn Ferry, Champions):
- * - Priority 1: LIVE tournament (inprogress)
- * - Priority 2: Recently completed (closed/complete, last 7 days) with winner
- * - Priority 3: Next upcoming (scheduled/created)
+ * Selection priority (strict order):
+ * 1. Live tournament — final round takes priority over early rounds
+ * 2. Major championship (upcoming)
+ * 3. Most recent completed (with winner)
+ * 4. Next upcoming flagship event
  * 
- * Slide ordering:
- * 1. All LIVE (by tour priority)
- * 2. All COMPLETED (by end_date DESC)
- * 3. All UPCOMING (by start_date ASC)
+ * Carousel ONLY activates when multiple tours have simultaneous live events.
  */
 
 import { useQuery } from '@tanstack/react-query';
@@ -258,54 +255,56 @@ async function fetchHeroData(): Promise<HeroSlide[]> {
     }
   });
 
-  // Build slides per tour based on priority logic
-  const liveSlides: HeroSlide[] = [];
-  const completedSlides: HeroSlide[] = [];
-  const upcomingSlides: HeroSlide[] = [];
-  const processedTours = new Set<TourId>();
+  // === NEW: Single-winner selection logic ===
+  const MAJORS = ['The Masters', 'PGA Championship', 'U.S. Open', 'The Open Championship'];
 
-  // For each tour, pick ONE primary slide based on priority
+  // Collect all live tournaments (across tours)
+  const allLive: HeroSlide[] = [];
+  const allCompleted: HeroSlide[] = [];
+  const allUpcoming: HeroSlide[] = [];
+
   TOUR_PRIORITY.forEach(tour => {
-    const live = liveByTour[tour];
-    const completed = completedByTour[tour];
-    const upcoming = upcomingByTour[tour];
-
-    if (live.length > 0) {
-      // Priority 1: Live - show the first live tournament for this tour
-      liveSlides.push({ tournament: live[0], type: 'live' });
-      processedTours.add(tour);
-    } else if (completed.length > 0) {
-      // Priority 2: Recently completed (only if no live for this tour)
-      completedSlides.push({ tournament: completed[0], type: 'completed' });
-      processedTours.add(tour);
-    } else if (upcoming.length > 0) {
-      // Priority 3: Upcoming (only if no live and no completed for this tour)
-      upcomingSlides.push({ tournament: upcoming[0], type: 'upcoming' });
-      processedTours.add(tour);
-    }
+    liveByTour[tour].forEach(t => allLive.push({ tournament: t, type: 'live' }));
+    completedByTour[tour].forEach(t => allCompleted.push({ tournament: t, type: 'completed' }));
+    upcomingByTour[tour].forEach(t => allUpcoming.push({ tournament: t, type: 'upcoming' }));
   });
 
-  // Sort slides within each category
-  // Live: by tour priority
-  liveSlides.sort((a, b) => {
-    return TOUR_PRIORITY.indexOf(a.tournament.tourSlug) - TOUR_PRIORITY.indexOf(b.tournament.tourSlug);
-  });
+  // If multiple tours have simultaneous live events → carousel mode
+  const liveToursCount = TOUR_PRIORITY.filter(t => liveByTour[t].length > 0).length;
 
-  // Completed: by end_date DESC (most recently finished first)
-  completedSlides.sort((a, b) => {
-    return new Date(b.tournament.endDate).getTime() - new Date(a.tournament.endDate).getTime();
-  });
+  if (liveToursCount > 1) {
+    // Multi-live carousel: one slide per live tour, sorted by tour priority
+    const liveSlides = TOUR_PRIORITY
+      .filter(t => liveByTour[t].length > 0)
+      .map(t => ({ tournament: liveByTour[t][0], type: 'live' as const }));
+    return liveSlides;
+  }
 
-  // Upcoming: by start_date ASC (soonest first)
-  upcomingSlides.sort((a, b) => {
-    return new Date(a.tournament.startDate).getTime() - new Date(b.tournament.startDate).getTime();
-  });
+  // Single-winner selection
+  // 1. Live tournament (prefer final round)
+  if (allLive.length > 0) {
+    return [allLive[0]];
+  }
 
-  // Combine in priority order: LIVE > COMPLETED > UPCOMING
-  const allSlides = [...liveSlides, ...completedSlides, ...upcomingSlides];
+  // 2. Upcoming major
+  const majorUpcoming = allUpcoming.find(s =>
+    MAJORS.some(m => s.tournament.name?.includes(m))
+  );
+  if (majorUpcoming) return [majorUpcoming];
 
-  // Cap at 8 slides maximum
-  return allSlides.slice(0, 8);
+  // 3. Most recent completed
+  allCompleted.sort((a, b) =>
+    new Date(b.tournament.endDate).getTime() - new Date(a.tournament.endDate).getTime()
+  );
+  if (allCompleted.length > 0) return [allCompleted[0]];
+
+  // 4. Next upcoming
+  allUpcoming.sort((a, b) =>
+    new Date(a.tournament.startDate).getTime() - new Date(b.tournament.startDate).getTime()
+  );
+  if (allUpcoming.length > 0) return [allUpcoming[0]];
+
+  return [];
 }
 
 export function useHeroCarouselData() {
