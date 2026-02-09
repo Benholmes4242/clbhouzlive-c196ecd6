@@ -1,30 +1,23 @@
-// Overview V3 Components - World-class Tour Hub Overview
+// Overview V3 Components - Editorial Golf Intelligence Destination
 
-export { HeroCarousel } from './HeroCarousel';
-export { TourSwitcher } from './TourSwitcher';
-export { ThisWeekView } from './ThisWeekView';
-export { WorldRankingsShowcase } from './WorldRankingsShowcase';
-export { SeasonDashboardV3 } from './SeasonDashboardV3';
-export { TourBreakdown } from './TourBreakdown';
+// Primary modules (new architecture)
+export { PrimaryHero } from './PrimaryHero';
+export { TourIntelligenceSnapshot } from './TourIntelligenceSnapshot';
+export { MomentumIndex } from './MomentumIndex';
+export { TourTitles } from './TourTitles';
+export { CollegeRivalries } from './CollegeRivalries';
+export { WhatsComing } from './WhatsComing';
+export { DeepLinksStrip } from './DeepLinksStrip';
 
-// New Modules
+// Preserved modules (used on other pages)
 export { LiveRightNow } from './LiveRightNow';
-export { ComingUpNext } from './ComingUpNext';
-export { MoversThisWeek } from './MoversThisWeek';
-export { LiveGolfPulse } from './LiveGolfPulse';
-export { WorldRankingsModule } from './WorldRankingsModule';
-export { SeasonStatsShowcase } from './SeasonStatsShowcase';
-
-// Unified World Rankings (combines Movers + OWGR Table)
+export { ScheduleModule } from './ScheduleModule';
 export { UnifiedWorldRankings } from './UnifiedWorldRankings';
 
-// Gamified Tour Hub Modules
+// Legacy exports kept for other pages that may reference them
+export { HeroCarousel } from './HeroCarousel';
+export { TourSwitcher } from './TourSwitcher';
+export { WorldRankingsModule } from './WorldRankingsModule';
+export { SeasonStatsShowcase } from './SeasonStatsShowcase';
 export { PowerLadderModule } from './PowerLadderModule';
 export { LiveArenaHero } from './LiveArenaHero';
-// PredictionsModule moved to ../predictions/AIPredictionsModule
-
-// Unified Season Leaderboards (replaces SkillTreeModule + SeasonStatsCarousel)
-export { SeasonLeaderboards } from './SeasonLeaderboards';
-
-// Tournament Schedule
-export { ScheduleModule } from './ScheduleModule';

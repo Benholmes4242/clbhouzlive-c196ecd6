@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { TourHubShell } from '../components/TourHubShell';
-import { TourHubHeader } from '../components/TourHubHeader';
 import { TourHubNavOverlay } from '../components/TourHubNavOverlay';
 import type { TourHubTab } from '../components/TourHubTabs';
 // TourHubEmptyState available if needed for future tab variants
@@ -60,7 +59,6 @@ function TourHubMainPageInner() {
   
   return (
     <TourHubShell>
-      <TourHubHeader activeTab={activeTab} />
       
       <div className="pb-24">
         {renderTab()}

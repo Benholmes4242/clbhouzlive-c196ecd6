@@ -10,7 +10,16 @@
 import { memo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, ChevronRight, X } from 'lucide-react';
-import type { FeaturedCourse } from '../../../hooks/useTourOverviewData';
+// FeaturedCourse type inlined after useTourOverviewData removal
+interface FeaturedCourse {
+  id: string;
+  name: string;
+  location?: string;
+  imageUrl?: string;
+  par?: number;
+  yardage?: number;
+  tournamentName?: string;
+}
 
 interface VenueAtlasProps {
   courses: FeaturedCourse[];
