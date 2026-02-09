@@ -277,15 +277,85 @@ Deno.serve(async (req) => {
       deletionResults.caddie_logs = { deleted: 0, error: String(e) }
     }
 
-    // 17. Delete conversations
+    // 17. Delete conversation participants and clean up conversations
     try {
-      const { count } = await adminClient
-        .from('conversations')
+      // Remove user from all conversations
+      const { count: participantCount } = await adminClient
+        .from('conversation_participants')
         .delete({ count: 'exact' })
         .eq('user_id', user.id)
-      deletionResults.conversations = { deleted: count || 0 }
+
+      // Soft-delete conversations created by this user (leave them for other participants)
+      const { count: convCount } = await adminClient
+        .from('conversations')
+        .update({ deleted_at: deletedAt, deleted_by: user.id })
+        .eq('created_by', user.id)
+        .is('deleted_at', null)
+      
+      deletionResults.conversations = { deleted: (participantCount || 0) + (convCount || 0) }
     } catch (e) {
       deletionResults.conversations = { deleted: 0, error: String(e) }
+    }
+
+    // 17b. Delete friend relationships (both directions, all statuses including pending)
+    try {
+      const { count: asUser } = await adminClient
+        .from('user_friends')
+        .delete({ count: 'exact' })
+        .eq('user_id', user.id)
+      const { count: asFriend } = await adminClient
+        .from('user_friends')
+        .delete({ count: 'exact' })
+        .eq('friend_id', user.id)
+      deletionResults.user_friends = { deleted: (asUser || 0) + (asFriend || 0) }
+    } catch (e) {
+      deletionResults.user_friends = { deleted: 0, error: String(e) }
+    }
+
+    // 17c. Clean up business memberships and deactivate orphaned businesses
+    try {
+      // Find businesses where user is the sole owner
+      const { data: ownedBusinesses } = await adminClient
+        .from('business_members')
+        .select('business_id, role')
+        .eq('user_profile_id', user.id)
+        .eq('role', 'owner')
+
+      // Delete all memberships for this user
+      const { count: memberCount } = await adminClient
+        .from('business_members')
+        .delete({ count: 'exact' })
+        .eq('user_profile_id', user.id)
+
+      // For each owned business, check if other owners exist — if not, deactivate
+      let deactivatedCount = 0
+      if (ownedBusinesses && ownedBusinesses.length > 0) {
+        for (const biz of ownedBusinesses) {
+          const { data: remainingOwners } = await adminClient
+            .from('business_members')
+            .select('id')
+            .eq('business_id', biz.business_id)
+            .eq('role', 'owner')
+            .limit(1)
+
+          if (!remainingOwners || remainingOwners.length === 0) {
+            // No remaining owners — soft-delete the business
+            await adminClient
+              .from('business_accounts')
+              .update({ is_deleted: true, deleted_at: deletedAt })
+              .eq('id', biz.business_id)
+            deactivatedCount++
+          }
+        }
+      }
+
+      deletionResults.business_memberships = { deleted: (memberCount || 0) }
+      if (deactivatedCount > 0) {
+        deletionResults.orphaned_businesses_deactivated = { deleted: deactivatedCount }
+      }
+    } catch (e) {
+      console.error('[delete-account] Error cleaning up business memberships:', e)
+      deletionResults.business_memberships = { deleted: 0, error: String(e) }
     }
 
     // 18. Delete user badges

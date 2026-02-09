@@ -83,6 +83,8 @@ export function SettingsPageV2() {
 
   // Delete account state
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
+  const [showBusinessWarning, setShowBusinessWarning] = React.useState(false);
+  const [ownedBusinessNames, setOwnedBusinessNames] = React.useState<string[]>([]);
   const [deleteConfirmText, setDeleteConfirmText] = React.useState('');
   const [isDeleting, setIsDeleting] = React.useState(false);
 
@@ -347,6 +349,31 @@ export function SettingsPageV2() {
     }
   };
 
+  // Pre-check for owned businesses before showing delete confirmation
+  const handleDeleteAttempt = async () => {
+    if (!user) return;
+    try {
+      // Check if user owns any businesses
+      const { data: ownerships } = await supabase
+        .from('business_members')
+        .select('business_id, business_accounts!inner(name)')
+        .eq('user_profile_id', user.id)
+        .eq('role', 'owner');
+
+      if (ownerships && ownerships.length > 0) {
+        const names = ownerships.map((o: any) => o.business_accounts?.name || 'Unknown business');
+        setOwnedBusinessNames(names);
+        setShowBusinessWarning(true);
+      } else {
+        setShowDeleteConfirm(true);
+      }
+    } catch (err) {
+      console.error('[Settings] business check error:', err);
+      // Proceed to delete confirmation even if check fails
+      setShowDeleteConfirm(true);
+    }
+  };
+
   // Delete account
   const handleDeleteAccount = async () => {
     if (deleteConfirmText !== 'DELETE') {
@@ -469,7 +496,7 @@ export function SettingsPageV2() {
             <SettingsToggleRow
               icon={<EyeOff className="w-5 h-5" />}
               title="Hide personal profile"
-              subtitle="Hides your profile from non-followers."
+              subtitle="Only followers can view your full profile. Others see your creator content only."
               checked={creatorOnly}
               onCheckedChange={(checked) => {
                 if (!isCreator) {
@@ -485,7 +512,7 @@ export function SettingsPageV2() {
             <SettingsChevronRow
               icon={<ExternalLink className="w-5 h-5" />}
               title="View profile"
-              subtitle="Preview how others see you."
+              subtitle="View your profile."
               onClick={() => {
                 if (!isCreator) {
                   toast('Turn on Creator Mode to unlock this.', { duration: 2000 });
@@ -505,7 +532,7 @@ export function SettingsPageV2() {
           <SettingsToggleRow
             icon={<Eye className="w-5 h-5" />}
             title="Public profile"
-            subtitle="When off, you won't appear in search or recommendations."
+            subtitle="Appear in search results and recommendations. When off, only people with your link can find you."
             checked={isPublic}
             onCheckedChange={handlePublicToggle}
             disabled={isUpdatingPrivacy}
@@ -652,7 +679,7 @@ export function SettingsPageV2() {
             icon={<Trash2 className="w-5 h-5" />}
             title="Delete account"
             subtitle="Permanently remove your profile from Clbhouz."
-            onClick={() => setShowDeleteConfirm(true)}
+            onClick={handleDeleteAttempt}
             iconTheme="danger"
             isFirst
             isLast
@@ -750,6 +777,40 @@ export function SettingsPageV2() {
               className="bg-[#1F2428] text-white hover:bg-[#2A3038]"
             >
               {isUpdatingCreator ? 'Updating...' : 'Show personal profile'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Business ownership warning before delete */}
+      <AlertDialog open={showBusinessWarning} onOpenChange={setShowBusinessWarning}>
+        <AlertDialogContent className="bg-white border-[rgba(31,36,40,0.1)]">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-amber-600 flex items-center gap-2">
+              <Trash2 className="w-5 h-5" />
+              You own a business profile
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-[#5E666D] space-y-3">
+              <p>
+                You own <strong className="text-[#1F2428]">{ownedBusinessNames.join(', ')}</strong>. Deleting your account will deactivate {ownedBusinessNames.length === 1 ? 'this business' : 'these businesses'} if no other owner exists.
+              </p>
+              <p className="text-[12px] text-[#97A1AA]">
+                Consider transferring ownership first via Manage Team.
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-[#EDEFF2] border-transparent text-[#1F2428] hover:bg-[#E4E6E9]">
+              Transfer ownership first
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => {
+                setShowBusinessWarning(false);
+                setShowDeleteConfirm(true);
+              }}
+              className="bg-red-600 text-white hover:bg-red-700"
+            >
+              Delete anyway
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
