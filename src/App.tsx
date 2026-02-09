@@ -237,7 +237,7 @@ const MyBusinessesPage = lazy(() => import("./pages/MyBusinessesPage"));
 const BusinessCreatePage = lazy(() => import("./pages/BusinessCreatePage"));
 const BusinessIntroPage = lazy(() => import("./pages/BusinessIntroPage"));
 const BusinessManagePage = lazy(() => import("./pages/BusinessManagePage"));
-const BusinessEditPage = lazy(() => import("./pages/BusinessEditPage"));
+const BusinessEditWizard = lazy(() => import("./components/business/edit/BusinessEditWizard"));
 const BusinessProfileLiveSuccessPage = lazy(() => import("./pages/BusinessProfileLiveSuccessPage"));
 const BusinessVerificationAboutPage = lazy(() => import("./pages/BusinessVerificationAboutPage"));
 const BusinessVerificationRequestPage = lazy(() => import("./pages/BusinessVerificationRequestPage"));
@@ -376,7 +376,7 @@ function AppRoutes() {
         <Route path="/business/manage" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessManagePage /></Suspense>} />
         <Route path="/business/insights" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessInsightsPage /></Suspense>} />
         <Route path="/business/:id/insights" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessInsightsPageV2 /></Suspense>} />
-        <Route path="/business/:id/edit" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessEditPage /></Suspense>} />
+        <Route path="/business/:id/edit" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessEditWizard /></Suspense>} />
         <Route path="/business/success" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessProfileLiveSuccessPage /></Suspense>} />
         <Route path="/business/:id/verification/about" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessVerificationAboutPage /></Suspense>} />
         <Route path="/business/:id/verification/request" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessVerificationRequestPage /></Suspense>} />
