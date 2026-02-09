@@ -44,7 +44,7 @@ import { PeopleTab } from '@/components/business/PeopleTab';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
 import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
 
-type BusinessTab = 'content' | 'golfers' | 'info';
+type BusinessTab = 'content' | 'golfers' | 'about';
 
 const BusinessProfilePage: React.FC = () => {
   const navigate = useNavigate();
@@ -175,7 +175,7 @@ const BusinessProfilePage: React.FC = () => {
   const tabs = [
     { id: 'content', label: 'Activity' },
     { id: 'golfers', label: 'People' },
-    { id: 'info', label: 'Info' },
+    { id: 'about', label: 'About' },
   ];
 
   const getCurrentContent = () => {
@@ -201,7 +201,7 @@ const BusinessProfilePage: React.FC = () => {
             isOwner={membership?.role === 'owner'}
           />
         );
-      case 'info':
+      case 'about':
         return (
           <BusinessProfileInfo business={business!} />
         );
