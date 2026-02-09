@@ -1,6 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Pin, X } from 'lucide-react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface PinnedPost {
   id: string;
@@ -20,7 +29,7 @@ interface PinnedPostsSectionProps {
  * Phase 3.2B: Pinned Posts Section for Creators
  * 
  * Displays up to 3 pinned posts at the top of the creator's content grid.
- * Owners can unpin posts directly from this section.
+ * Owners can unpin posts directly from this section with confirmation.
  */
 export function PinnedPostsSection({ 
   posts, 
@@ -29,69 +38,98 @@ export function PinnedPostsSection({
   onUnpinClick,
   className 
 }: PinnedPostsSectionProps) {
-  // Don't render if no pinned posts
+  const [unpinConfirmId, setUnpinConfirmId] = useState<string | null>(null);
+
   if (!posts || posts.length === 0) {
     return null;
   }
 
+  const handleUnpinConfirm = () => {
+    if (unpinConfirmId && onUnpinClick) {
+      onUnpinClick(unpinConfirmId);
+    }
+    setUnpinConfirmId(null);
+  };
+
   return (
-    <div className={className}>
-      {/* Header */}
-      <div className="flex items-center gap-2 mb-3">
-        <Pin className="h-3.5 w-3.5 text-[#F7931E]" />
-        <span className="text-xs font-medium text-[#5E666D] uppercase tracking-wide">
-          Pinned
-        </span>
-      </div>
+    <>
+      <div className={className}>
+        {/* Header */}
+        <div className="flex items-center gap-2 mb-3">
+          <Pin className="h-3.5 w-3.5 text-[#F7931E]" />
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+            Pinned
+          </span>
+        </div>
 
-      {/* Pinned posts row */}
-      <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-        {posts.slice(0, 3).map((post) => (
-          <div key={post.id} className="relative flex-shrink-0 group">
-            <button
-              onClick={() => onPostClick?.(post.id)}
-              className="block w-24 h-24 rounded-sq-md overflow-hidden bg-[#EDEFF2] hover:opacity-90 transition-opacity"
-              style={{ border: '1px solid rgba(31,36,40,0.08)' }}
-            >
-              {post.thumbnailUrl ? (
-                <img 
-                  src={post.thumbnailUrl} 
-                  alt="Pinned post" 
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <Pin className="h-6 w-6 text-[#97A1AA]" />
-                </div>
-              )}
-              
-              {/* Pinned indicator */}
-              <span 
-                className="absolute bottom-1 left-1 flex items-center justify-center w-5 h-5 rounded-full"
-                style={{ background: 'rgba(247, 147, 30, 0.9)' }}
-              >
-                <Pin className="h-2.5 w-2.5 text-white" />
-              </span>
-            </button>
-
-            {/* Unpin button for owners */}
-            {isOwner && onUnpinClick && (
+        {/* Pinned posts row */}
+        <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+          {posts.slice(0, 3).map((post) => (
+            <div key={post.id} className="relative flex-shrink-0">
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onUnpinClick(post.id);
-                }}
-                className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-white shadow-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50"
+                onClick={() => onPostClick?.(post.id)}
+                className="block w-24 h-24 rounded-sq-md overflow-hidden bg-muted hover:opacity-90 transition-opacity"
                 style={{ border: '1px solid rgba(31,36,40,0.08)' }}
-                title="Unpin"
               >
-                <X className="h-3 w-3 text-[#5E666D]" />
+                {post.thumbnailUrl ? (
+                  <img 
+                    src={post.thumbnailUrl} 
+                    alt="Pinned post" 
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <Pin className="h-6 w-6 text-muted-foreground" />
+                  </div>
+                )}
+                
+                {/* Pinned indicator */}
+                <span 
+                  className="absolute bottom-1 left-1 flex items-center justify-center w-5 h-5 rounded-full"
+                  style={{ background: 'rgba(247, 147, 30, 0.9)' }}
+                >
+                  <Pin className="h-2.5 w-2.5 text-white" />
+                </span>
               </button>
-            )}
-          </div>
-        ))}
+
+              {/* Unpin button — always visible for owners, works on mobile */}
+              {isOwner && onUnpinClick && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setUnpinConfirmId(post.id);
+                  }}
+                  className="absolute top-1 right-1 w-7 h-7 min-h-[44px] min-w-[44px] -mt-2 -mr-2 flex items-center justify-center active:scale-[0.85] transition-transform"
+                  title="Unpin"
+                >
+                  <span className="w-7 h-7 rounded-full bg-black/60 flex items-center justify-center">
+                    <X className="h-3.5 w-3.5 text-white" />
+                  </span>
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+
+      {/* Unpin confirmation dialog */}
+      <AlertDialog open={!!unpinConfirmId} onOpenChange={(open) => !open && setUnpinConfirmId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unpin this post?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This post will no longer appear in your pinned section.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleUnpinConfirm}>
+              Unpin
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
 
