@@ -6,7 +6,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useCourseReviews, type ReviewsSortBy, type CourseReview, type ReviewMediaItem } from '@/hooks/useCourseReviews';
+import { useReviewResponses, useSubmitReviewResponse } from '@/hooks/useReviewResponses';
+import { useBusinessClaimForCourse } from '@/hooks/useBusinessClaimForCourse';
 import { ReviewBlockFlat } from '../review/ReviewBlockFlat';
+import { ResponseDisplay, ReplyForm } from '../review/ReviewResponseBlock';
 import { RatingFilterChips, RatingFilterValue } from '../review/RatingFilterChips';
 import { WriteReviewPrompt } from '../review/WriteReviewPrompt';
 import { SegmentedTabOption } from '@/components/ui/SegmentedTabs';
@@ -54,6 +57,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const location = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Business claim context + review responses
+  const { data: businessClaim } = useBusinessClaimForCourse(courseId);
+  const { data: reviewResponses } = useReviewResponses(courseId);
+  const submitResponseMutation = useSubmitReviewResponse(courseId);
 
   // Sorting, filtering, and search state
   const [sortBy, setSortBy] = useState<ReviewsSortBy>('recent');
@@ -498,6 +506,12 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                 }
               }}
             />
+            {/* Response for my review */}
+            {(() => {
+              const response = reviewResponses?.find(r => r.review_id === filteredMyReview.id);
+              if (response) return <ResponseDisplay response={response} />;
+              return null;
+            })()}
           </div>
         )}
 
@@ -506,18 +520,35 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           <div>
             {otherReviews.map((review) => {
               const isDeepLinked = review.id === highlightedReviewId;
+              const response = reviewResponses?.find(r => r.review_id === review.id);
+              const canReply = businessClaim?.isVerified && !response;
               return (
-                <ReviewBlockFlat
-                  key={review.id}
-                  review={transformReview(review, isDeepLinked)}
-                  isHighlighted={isDeepLinked}
-                  onToggleHelpful={handleToggleHelpful}
-                  onMediaClick={(index) => {
-                    if (review.media) {
-                      handleReviewMediaClick(review.media, index);
-                    }
-                  }}
-                />
+                <div key={review.id}>
+                  <ReviewBlockFlat
+                    review={transformReview(review, isDeepLinked)}
+                    isHighlighted={isDeepLinked}
+                    onToggleHelpful={handleToggleHelpful}
+                    onMediaClick={(index) => {
+                      if (review.media) {
+                        handleReviewMediaClick(review.media, index);
+                      }
+                    }}
+                  />
+                  {/* Existing response */}
+                  {response && <ResponseDisplay response={response} />}
+                  {/* Reply form for verified business owners */}
+                  {canReply && (
+                    <ReplyForm
+                      businessClaim={businessClaim}
+                      reviewId={review.id}
+                      onSubmit={(reviewId, businessId, text) =>
+                        submitResponseMutation.mutate({ reviewId, businessId, responseText: text })
+                      }
+                      isSubmitting={submitResponseMutation.isPending}
+                    />
+                  )}
+                  <div className="mb-3" />
+                </div>
               );
             })}
           </div>
