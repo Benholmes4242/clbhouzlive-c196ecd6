@@ -1,9 +1,8 @@
 /**
- * UnifiedWorldRankings v4 - Broadcast-Style OWGR Leaderboard
+ * UnifiedWorldRankings v5 — Broadcast-Quality OWGR Leaderboard
  * 
- * Design: Card-free, page-level section with PGA broadcast energy.
- * Features: Momentum pill strip, tiered hierarchy, Chase the Crown,
- * narrative strip, rank velocity arrows, broadcast pagination.
+ * Polish pass: Typography-led hierarchy, two-column stats,
+ * tier differentiation, editorial narrative strip, clean momentum pills.
  */
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
@@ -39,11 +38,8 @@ function generateNarrative(
 
   const no1 = rankings[0];
   const no1Name = no1?.player?.last_name || 'The leader';
-
-  // Check if #1 changed
   const no1Stable = no1?.rank_change === 0;
 
-  // Find biggest mover in top 10
   const topMovers = movers?.filter(m => m.rank <= 20 && m.rankChange > 0) || [];
   const biggestMover = topMovers[0];
 
@@ -69,33 +65,34 @@ function generateNarrative(
 function SkeletonPill() {
   return (
     <div className="flex-shrink-0 flex items-center gap-2 rounded-full bg-muted animate-pulse"
-      style={{ height: '40px', width: '150px' }}
+      style={{ height: '36px', width: '150px' }}
     />
   );
 }
 
-function SkeletonRow({ index }: { index: number }) {
+function SkeletonRow() {
   return (
     <div className="flex items-center py-3 px-0" style={{ minHeight: '60px' }}>
-      <div className="w-9 flex justify-center">
+      <div className="w-10 flex justify-center">
         <div className="h-4 w-5 rounded bg-muted animate-pulse" />
       </div>
       <div className="flex items-center gap-3 flex-1 min-w-0">
-        <div className="w-10 h-10 rounded-xl bg-muted animate-pulse flex-shrink-0" />
+        <div className="w-11 h-11 rounded-xl bg-muted animate-pulse flex-shrink-0" />
         <div className="flex-1 space-y-1.5">
           <div className="h-4 w-28 rounded bg-muted animate-pulse" />
           <div className="h-3 w-16 rounded bg-muted animate-pulse" />
         </div>
       </div>
-      <div className="w-16 flex justify-end">
-        <div className="h-4 w-12 rounded bg-muted animate-pulse" />
+      <div className="w-28 flex justify-end gap-4">
+        <div className="h-4 w-10 rounded bg-muted animate-pulse" />
+        <div className="h-4 w-10 rounded bg-muted animate-pulse" />
       </div>
     </div>
   );
 }
 
 // ============================================================================
-// MOMENTUM PILL — Compact, card-free
+// MOMENTUM PILL — Clean, no emojis, single baseline
 // ============================================================================
 
 interface MomentumPillProps {
@@ -117,108 +114,56 @@ interface MomentumPillProps {
 function MomentumPill({ entry, index, onTap }: MomentumPillProps) {
   const initials = `${entry.firstName?.[0] ?? ''}${entry.lastName?.[0] ?? ''}`.toUpperCase();
   const photoUrl = resolvePhotoUrl(entry.photoUrl, entry.pgaTourId);
-  const isRocket = entry.rankChange >= 30;
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [imgError, setImgError] = useState(false);
+
+  const showPhoto = photoUrl && !imgError;
+  const showInitials = !showPhoto || !imgLoaded;
 
   return (
     <motion.button
       onClick={() => onTap(entry.playerId, entry.rank)}
-      className="flex-shrink-0 flex items-center gap-2 rounded-full bg-muted/60 border border-border active:scale-[0.97] transition-transform"
-      style={{ padding: '6px 12px 6px 6px', scrollSnapAlign: 'start' }}
+      className="flex-shrink-0 flex items-center gap-2 rounded-full border border-border/60 active:scale-[0.97] transition-transform"
+      style={{
+        padding: '5px 12px 5px 5px',
+        scrollSnapAlign: 'start',
+        background: 'hsl(var(--muted) / 0.4)',
+      }}
       initial={{ opacity: 0, x: 16 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.06, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
     >
-      {/* Avatar */}
-      <div className="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 border border-border">
-        {photoUrl ? (
-          <img src={photoUrl} alt={entry.lastName} className="w-full h-full object-cover" loading="lazy" />
-        ) : (
+      {/* Avatar — photo only, initials only as true fallback */}
+      <div className="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 border border-border/40">
+        {showPhoto && (
+          <img
+            src={photoUrl}
+            alt={entry.lastName}
+            className="w-full h-full object-cover"
+            loading="lazy"
+            onLoad={() => setImgLoaded(true)}
+            onError={() => setImgError(true)}
+            style={{ display: imgLoaded ? 'block' : 'none' }}
+          />
+        )}
+        {showInitials && (
           <div className="w-full h-full flex items-center justify-center bg-muted">
             <span className="text-[10px] font-bold text-muted-foreground">{initials}</span>
           </div>
         )}
       </div>
 
-      {/* Name */}
-      <span className="text-xs font-semibold text-foreground whitespace-nowrap">{entry.lastName}</span>
+      {/* Surname */}
+      <span className="text-xs font-medium text-foreground whitespace-nowrap">{entry.lastName}</span>
 
-      {/* Rank (muted) */}
-      <span className="text-[11px] text-muted-foreground font-mono">#{entry.rank}</span>
+      {/* Rank (muted, smaller) */}
+      <span className="text-[10px] text-muted-foreground font-mono">#{entry.rank}</span>
 
-      {/* Movement badge */}
-      <span className="flex items-center gap-0.5 text-[11px] font-bold text-emerald-700">
-        {isRocket && <span className="text-[10px]">🚀</span>}
-        <span>↑{entry.rankChange}</span>
+      {/* Movement — green arrow + number only, no emojis */}
+      <span className="text-[11px] font-bold text-emerald-700 whitespace-nowrap">
+        ↑ +{entry.rankChange}
       </span>
     </motion.button>
-  );
-}
-
-// ============================================================================
-// RANK BADGE (tiered)
-// ============================================================================
-
-function RankBadge({ rank }: { rank: number }) {
-  // Crown tier
-  if (rank === 1) {
-    return (
-      <div className="absolute -top-1 -right-1 flex items-center justify-center"
-        style={{
-          width: '20px', height: '20px', borderRadius: '7px',
-          background: 'linear-gradient(135deg, #C1A84C 0%, #DAC06A 100%)',
-          color: 'white', fontSize: '10px', fontWeight: 700,
-          border: '1.5px solid white',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
-        }}
-      >
-        👑
-      </div>
-    );
-  }
-  // Elite tier (2-3)
-  if (rank <= 3) {
-    return (
-      <div className="absolute -top-1 -right-1 flex items-center justify-center"
-        style={{
-          width: '20px', height: '20px', borderRadius: '7px',
-          background: rank === 2
-            ? 'linear-gradient(135deg, #A5A5A5 0%, #C0C0C0 100%)'
-            : 'linear-gradient(135deg, #B08D57 0%, #CD9B5A 100%)',
-          color: 'white', fontSize: '10px', fontWeight: 700,
-          border: '1.5px solid white',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
-        }}
-      >
-        {rank}
-      </div>
-    );
-  }
-  // Contender tier (4-10) — slightly elevated
-  if (rank <= 10) {
-    return (
-      <div className="absolute -top-1 -right-1 flex items-center justify-center bg-[#C1A84C]/10 text-[#C1A84C]"
-        style={{
-          width: '20px', height: '20px', borderRadius: '7px',
-          fontSize: '10px', fontWeight: 700,
-          border: '1.5px solid white',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-        }}
-      >
-        {rank}
-      </div>
-    );
-  }
-  // Standard
-  return (
-    <div className="absolute -top-1 -right-1 flex items-center justify-center bg-muted text-muted-foreground"
-      style={{
-        width: '20px', height: '20px', borderRadius: '7px',
-        fontSize: '10px', fontWeight: 700,
-        border: '1.5px solid white',
-      }}
-    >
-      {rank}
-    </div>
   );
 }
 
@@ -245,17 +190,12 @@ export function UnifiedWorldRankings() {
   const endIndex = Math.min(startIndex + PLAYERS_PER_PAGE, totalPlayers);
   const currentPagePlayers = rankings?.slice(startIndex, endIndex) || [];
 
-  // No.1's avg points for "Chase the Crown"
   const no1AvgPoints = rankings?.[0]?.avg_points ?? 0;
 
   const moverPlayerIds = useMemo(() => new Set(movers?.map(m => m.playerId) || []), [movers]);
-
-  // Only upward movers for momentum strip
   const upwardMovers = useMemo(() => (movers || []).filter(m => m.rankChange > 0), [movers]);
-
   const narrative = useMemo(() => generateNarrative(rankings, movers), [rankings, movers]);
 
-  // Clear highlight
   useEffect(() => {
     if (highlightedPlayerId) {
       const timer = setTimeout(() => setHighlightedPlayerId(null), 1500);
@@ -281,7 +221,7 @@ export function UnifiedWorldRankings() {
     else rowRefs.current.delete(playerId);
   }, []);
 
-  // Dot pagination (max 6)
+  // Dot pagination
   const maxVisibleDots = 6;
   const getVisibleDotRange = () => {
     if (totalPages <= maxVisibleDots) return { start: 0, end: totalPages };
@@ -303,22 +243,17 @@ export function UnifiedWorldRankings() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       >
-        {/* Header skeleton */}
-        <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center justify-between mb-0.5">
           <div className="h-5 w-52 rounded bg-muted animate-pulse" />
           <div className="h-4 w-16 rounded bg-muted animate-pulse" />
         </div>
-        <div className="h-3 w-40 rounded bg-muted animate-pulse mb-4" />
-        <div className="border-b border-border/40 mb-5" />
-
-        {/* Momentum skeleton */}
+        <div className="h-3 w-40 rounded bg-muted animate-pulse mb-3" />
+        <div className="border-b border-border/10 mb-5" />
         <div className="h-4 w-36 rounded bg-muted animate-pulse mb-3" />
         <div className="flex gap-2 overflow-hidden mb-6">
           {[1, 2, 3, 4].map(i => <SkeletonPill key={i} />)}
         </div>
-
-        {/* Table skeleton */}
-        {[...Array(10)].map((_, i) => <SkeletonRow key={i} index={i} />)}
+        {[...Array(10)].map((_, i) => <SkeletonRow key={i} />)}
       </motion.section>
     );
   }
@@ -334,37 +269,45 @@ export function UnifiedWorldRankings() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
     >
-      {/* ── Section Header ── */}
-      <div className="flex items-center justify-between mb-1">
-        <h2 className="text-foreground text-[17px] font-semibold tracking-tight">
+      {/* ═══ 1. Section Header ═══ */}
+      <div className="flex items-start justify-between mb-0.5">
+        <h2 className="text-foreground text-[16px] font-medium tracking-tight leading-snug">
           Official World Golf Ranking
         </h2>
         <button
           onClick={() => navigate('/tourhub?tab=players')}
-          className="flex items-center gap-0.5 text-muted-foreground text-[11px] font-semibold uppercase tracking-wider active:scale-95 transition-transform"
+          className="flex items-center gap-0.5 text-muted-foreground text-[10px] font-semibold uppercase tracking-wider active:scale-95 transition-transform mt-1"
         >
           View All
           <ChevronRight className="w-3 h-3 opacity-60" />
         </button>
       </div>
-      <p className="text-[11px] text-muted-foreground mb-3">
+      <p className="text-[10px] text-muted-foreground leading-tight mb-2.5">
         Updated weekly · Official OWGR data
       </p>
-      <div className="border-b border-border/40 mb-5" />
+      <div className="border-b mb-4" style={{ borderColor: 'hsl(var(--border) / 0.1)' }} />
 
-      {/* ── Narrative Strip ── */}
+      {/* ═══ 2. Narrative Strip — editorial pull-quote ═══ */}
       {narrative && (
-        <p className="text-[13px] text-muted-foreground italic mb-5 leading-relaxed">
-          "{narrative}"
-        </p>
+        <div
+          className="mb-4 py-2 px-3 rounded-md"
+          style={{
+            borderLeft: '2px solid hsl(142 76% 36% / 0.25)',
+            background: 'hsl(142 76% 36% / 0.03)',
+          }}
+        >
+          <p className="text-[12px] text-muted-foreground italic leading-relaxed">
+            {narrative}
+          </p>
+        </div>
       )}
 
-      {/* ── This Week's Momentum ── */}
+      {/* ═══ 3. This Week's Momentum ═══ */}
       {hasMovers && (
-        <div className="mb-6">
-          <div className="flex items-center gap-1.5 mb-3">
+        <div className="mb-5">
+          <div className="flex items-center gap-1.5 mb-2.5">
             <TrendingUp className="w-3.5 h-3.5 text-emerald-700" />
-            <span className="text-[13px] font-semibold text-foreground">This Week's Momentum</span>
+            <span className="text-[12px] font-semibold text-foreground">This Week's Momentum</span>
           </div>
           <div
             className="flex gap-2 overflow-x-auto scrollbar-hide pb-1"
@@ -377,22 +320,25 @@ export function UnifiedWorldRankings() {
         </div>
       )}
 
-      {/* ── Leaderboard ── */}
+      {/* ═══ 4. Leaderboard ═══ */}
       <div>
-        {/* Table header */}
-        <div className="flex items-center pb-2 border-b border-border/40">
-          <div className="w-8 flex-shrink-0 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+        {/* Two-column stat headers */}
+        <div className="flex items-center pb-2" style={{ borderBottom: '1px solid hsl(var(--border) / 0.1)' }}>
+          <div className="w-10 flex-shrink-0 text-center text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
             #
           </div>
-          <div className="flex-1 min-w-0 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <div className="flex-1 min-w-0 text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
             Player
           </div>
-          <div className="w-[72px] flex-shrink-0 text-right text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <div className="w-16 flex-shrink-0 text-right text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
             Avg Pts
+          </div>
+          <div className="w-16 flex-shrink-0 text-right text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Total Pts
           </div>
         </div>
 
-        {/* Rows */}
+        {/* ═══ 5–8. Player Rows ═══ */}
         <AnimatePresence mode="wait">
           <motion.div
             key={currentPage}
@@ -411,132 +357,111 @@ export function UnifiedWorldRankings() {
               const isElite = entry.rank >= 2 && entry.rank <= 3;
               const isContender = entry.rank >= 4 && entry.rank <= 10;
 
-              // Chase the Crown (ranks 2-5)
+              // Chase the Crown (ranks 2-5 only)
               const showChase = entry.rank >= 2 && entry.rank <= 5 && no1AvgPoints > 0 && entry.avg_points;
               const ptsToNo1 = showChase ? (no1AvgPoints - (entry.avg_points || 0)).toFixed(1) : null;
 
-              // Row background
-              let rowBgClass = 'bg-transparent';
-              if (isCrown) rowBgClass = 'bg-[#C1A84C]/[0.04]';
-              if (isHighlighted) rowBgClass = 'bg-primary/[0.04]';
+              // Row background — subtle tier differentiation
+              let rowBg = 'transparent';
+              if (isCrown) rowBg = 'hsl(45 93% 47% / 0.04)';
+              if (isHighlighted) rowBg = 'hsl(var(--primary) / 0.04)';
 
               // Velocity arrow
               const rankChange = entry.rank_change;
+
+              // Avatar
+              const initials = `${entry.player.first_name?.[0] ?? ''}${entry.player.last_name?.[0] ?? ''}`.toUpperCase();
+              const photoUrl = entry.player.pga_tour_id
+                ? getPgaTourHeadshotUrl(entry.player.pga_tour_id)
+                : null;
 
               return (
                 <motion.div
                   key={entry.player.id}
                   ref={(el) => setRowRef(entry.player.id, el)}
-                  className={cn(
-                    'flex items-center cursor-pointer active:scale-[0.98] transition-transform',
-                    rowBgClass,
-                  )}
+                  className="flex items-center cursor-pointer active:scale-[0.98] transition-transform"
                   onClick={() => navigate(`/tourhub/player/${entry.player.id}`)}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: Math.min(index, 10) * 0.03, ease: [0.16, 1, 0.3, 1] }}
                   style={{
                     padding: '10px 0',
-                    minHeight: '58px',
-                    borderBottom: '1px solid hsl(var(--border) / 0.3)',
+                    minHeight: '60px',
+                    borderBottom: '1px solid hsl(var(--border) / 0.08)',
                     borderLeft: isMover ? '3px solid hsl(142 76% 36%)' : '3px solid transparent',
+                    background: rowBg,
                   }}
                 >
-                  {/* Rank + velocity */}
-                  <div className="w-8 flex-shrink-0 flex flex-col items-center gap-0.5">
+                  {/* ── Rank + velocity arrow ── */}
+                  <div className="w-10 flex-shrink-0 flex flex-col items-center gap-0.5">
                     <span className={cn(
-                      'text-xs font-bold font-mono',
-                      isCrown ? 'text-[#C1A84C]' :
+                      'text-sm font-bold font-mono',
+                      isCrown ? 'text-[#f59e0b]' :
                       isElite ? 'text-foreground' :
                       isContender ? 'text-foreground/80' :
                       'text-muted-foreground'
                     )}>
                       {entry.rank}
                     </span>
-                    {/* Velocity arrow */}
+                    {/* Bolder, larger velocity arrows */}
                     {rankChange > 0 ? (
-                      <span className="text-[9px] font-bold text-emerald-700">↑</span>
+                      <span className="text-[11px] font-extrabold text-emerald-700">↑</span>
                     ) : rankChange < 0 ? (
-                      <span className="text-[9px] font-bold text-red-500">↓</span>
+                      <span className="text-[11px] font-extrabold text-red-500">↓</span>
                     ) : (
-                      <span className="text-[9px] text-muted-foreground/40">—</span>
+                      <span className="text-[10px] text-muted-foreground/30 font-bold">—</span>
                     )}
                   </div>
 
-                  {/* Avatar + name */}
+                  {/* ── Avatar + name (no rank badge overlay) ── */}
                   <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                    <div className="relative flex-shrink-0">
-                      <div
-                        className="overflow-hidden border border-border/60"
-                        style={{ width: '38px', height: '38px', borderRadius: '11px' }}
-                      >
-                        {(() => {
-                          const initials = `${entry.player.first_name?.[0] ?? ''}${entry.player.last_name?.[0] ?? ''}`.toUpperCase();
-                          const photoUrl = entry.player.pga_tour_id
-                            ? getPgaTourHeadshotUrl(entry.player.pga_tour_id)
-                            : null;
-                          return (
-                            <div className="relative w-full h-full">
-                              <div className="absolute inset-0 flex items-center justify-center bg-muted">
-                                <span className="text-[11px] font-bold text-muted-foreground">{initials}</span>
-                              </div>
-                              {photoUrl && (
-                                <img
-                                  src={photoUrl}
-                                  alt={fullName}
-                                  className="relative z-10 w-full h-full object-cover"
-                                  loading="lazy"
-                                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                />
-                              )}
-                            </div>
-                          );
-                        })()}
-                      </div>
-                      <RankBadge rank={entry.rank} />
-                    </div>
+                    <PlayerAvatar photoUrl={photoUrl} initials={initials} fullName={fullName} />
 
                     <div className="min-w-0 flex-1">
                       <div
                         className={cn(
-                          'truncate text-[14px] font-semibold leading-tight',
-                          isCrown || isElite ? 'text-foreground' : 'text-foreground/90'
+                          'truncate text-[13px] leading-tight',
+                          isCrown || isElite ? 'font-semibold text-foreground' : 'font-medium text-foreground/90'
                         )}
                       >
                         {fullName}
                       </div>
+                      {/* Flag + country inline on same line */}
                       <div className="flex items-center gap-1 mt-0.5">
-                        <div style={{ width: '14px', height: '10px', borderRadius: '1px' }}>
-                          <CountryFlag country={entry.player.country} size="sm" />
-                        </div>
-                        <span className="text-[11px] text-muted-foreground truncate">
+                        <CountryFlag country={entry.player.country} size="sm" />
+                        <span className="text-[11px] text-muted-foreground truncate leading-none">
                           {formatCountryName(entry.player.country)}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Points — stacked */}
-                  <div className="w-[72px] flex-shrink-0 text-right">
-                    <div
-                      className={cn(
+                  {/* ── Two-column stats: Avg Pts | Total Pts ── */}
+                  <div className="flex items-start gap-0 flex-shrink-0">
+                    {/* Column 1: AVG PTS (primary, bold) */}
+                    <div className="w-16 text-right">
+                      <div className={cn(
                         'font-mono text-[13px] font-bold',
-                        isCrown ? 'text-[#C1A84C]' : 'text-foreground'
-                      )}
-                    >
-                      {entry.avg_points?.toFixed(2) ?? '—'}
-                    </div>
-                    <div className="font-mono text-[10px] text-muted-foreground mt-0.5">
-                      {entry.total_points
-                        ? entry.total_points.toLocaleString(undefined, { maximumFractionDigits: 1 })
-                        : '—'}
-                    </div>
-                    {/* Chase the Crown */}
-                    {showChase && ptsToNo1 && (
-                      <div className="text-[9px] text-muted-foreground/70 font-medium mt-0.5">
-                        −{ptsToNo1} to #1
+                        isCrown ? 'text-[#f59e0b]' : 'text-foreground'
+                      )}>
+                        {entry.avg_points?.toFixed(2) ?? '—'}
                       </div>
-                    )}
+                    </div>
+
+                    {/* Column 2: TOTAL PTS (secondary, muted) */}
+                    <div className="w-16 text-right">
+                      <div className="font-mono text-[12px] text-muted-foreground">
+                        {entry.total_points
+                          ? entry.total_points.toLocaleString(undefined, { maximumFractionDigits: 1 })
+                          : '—'}
+                      </div>
+                      {/* Chase the Crown — ranks 2-5 only */}
+                      {showChase && ptsToNo1 && (
+                        <div className="text-[9px] text-muted-foreground/60 font-medium mt-0.5 whitespace-nowrap">
+                          −{ptsToNo1} to #1
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </motion.div>
               );
@@ -545,19 +470,19 @@ export function UnifiedWorldRankings() {
         </AnimatePresence>
       </div>
 
-      {/* ── Broadcast Pagination ── */}
+      {/* ═══ 9. Pagination ═══ */}
       {totalPages > 1 && (
-        <div className="pt-4 pb-1">
-          <div className="flex items-center justify-center gap-4">
+        <div className="pt-3 pb-1">
+          <div className="flex items-center justify-center gap-3">
             <button
               onClick={goToPrevPage}
               disabled={currentPage === 0}
-              className="flex items-center justify-center w-8 h-8 rounded-lg border border-border bg-card active:scale-95 transition-all disabled:opacity-30 disabled:pointer-events-none"
+              className="flex items-center justify-center w-7 h-7 rounded-lg border border-border/60 bg-card active:scale-95 transition-all disabled:opacity-25 disabled:pointer-events-none"
             >
-              <ChevronLeft className="w-3.5 h-3.5 text-muted-foreground" />
+              <ChevronLeft className="w-3 h-3 text-muted-foreground" />
             </button>
 
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1">
               {Array.from({ length: dotRange.end - dotRange.start }).map((_, i) => {
                 const dotIndex = dotRange.start + i;
                 const isActive = dotIndex === currentPage;
@@ -567,12 +492,12 @@ export function UnifiedWorldRankings() {
                     onClick={() => setCurrentPage(dotIndex)}
                     className="transition-all duration-300"
                     style={{
-                      height: '5px',
-                      width: isActive ? '18px' : '5px',
-                      borderRadius: '3px',
+                      height: '4px',
+                      width: isActive ? '16px' : '4px',
+                      borderRadius: '2px',
                       background: isActive
                         ? 'hsl(var(--foreground))'
-                        : 'hsl(var(--muted-foreground) / 0.2)',
+                        : 'hsl(var(--muted-foreground) / 0.15)',
                     }}
                   />
                 );
@@ -582,17 +507,53 @@ export function UnifiedWorldRankings() {
             <button
               onClick={goToNextPage}
               disabled={currentPage === totalPages - 1}
-              className="flex items-center justify-center w-8 h-8 rounded-lg border border-border bg-card active:scale-95 transition-all disabled:opacity-30 disabled:pointer-events-none"
+              className="flex items-center justify-center w-7 h-7 rounded-lg border border-border/60 bg-card active:scale-95 transition-all disabled:opacity-25 disabled:pointer-events-none"
             >
-              <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
+              <ChevronRight className="w-3 h-3 text-muted-foreground" />
             </button>
           </div>
 
-          <p className="text-center text-[11px] font-medium text-muted-foreground/60 mt-2 font-mono">
+          <p className="text-center text-[10px] font-medium text-muted-foreground/50 mt-1.5 font-mono">
             {startIndex + 1}–{endIndex} of {totalPlayers}
           </p>
         </div>
       )}
     </motion.section>
+  );
+}
+
+// ============================================================================
+// PlayerAvatar — Photo only when loaded, initials as true fallback (no layering)
+// ============================================================================
+
+function PlayerAvatar({ photoUrl, initials, fullName }: { photoUrl: string | null; initials: string; fullName: string }) {
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [imgError, setImgError] = useState(false);
+
+  const showPhoto = photoUrl && !imgError;
+
+  return (
+    <div
+      className="overflow-hidden border border-border/50 flex-shrink-0"
+      style={{ width: '44px', height: '44px', borderRadius: '13px' }}
+    >
+      {showPhoto && (
+        <img
+          src={photoUrl}
+          alt={fullName}
+          className="w-full h-full object-cover"
+          loading="lazy"
+          onLoad={() => setImgLoaded(true)}
+          onError={() => setImgError(true)}
+          style={{ display: imgLoaded ? 'block' : 'none' }}
+        />
+      )}
+      {/* Show initials ONLY when no photo or photo hasn't loaded */}
+      {(!showPhoto || !imgLoaded) && (
+        <div className="w-full h-full flex items-center justify-center bg-muted">
+          <span className="text-xs font-bold text-muted-foreground">{initials}</span>
+        </div>
+      )}
+    </div>
   );
 }
