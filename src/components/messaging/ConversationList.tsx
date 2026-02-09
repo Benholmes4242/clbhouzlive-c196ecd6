@@ -307,7 +307,7 @@ export function ConversationList({
             {/* Avatar - Group icon or user photo */}
             <div className="relative flex-shrink-0">
               {isGroup && !avatarUrl ? (
-                <div className="w-14 h-14 rounded-full flex items-center justify-center bg-gradient-to-br from-purple-500 to-purple-600">
+                <div className="w-14 h-14 flex items-center justify-center bg-gradient-to-br from-purple-500 to-purple-600" style={{ borderRadius: '34%' }}>
                   <Users className="w-6 h-6 text-white" />
                 </div>
               ) : (
