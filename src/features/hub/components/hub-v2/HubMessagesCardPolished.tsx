@@ -5,7 +5,7 @@
  */
 
 import { useMemo, useEffect } from 'react';
-import { ChevronRight, MessageCircle, Users } from 'lucide-react';
+import { ChevronRight, MessageCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { usePresence, type PresenceStatus } from '@/hooks/usePresence';
 import { haptic } from '@/utils/haptics';
@@ -63,51 +63,17 @@ function OnlineDot({ status }: { status: PresenceStatus }) {
   );
 }
 
-// ============ Group Avatar (Stacked Mini Cluster) ============
+// ============ Group Avatar (Single SquircleAvatar — matches DM) ============
 
-function GroupAvatarCluster({ participants }: { participants?: ParticipantPreview[] }) {
-  const shown = participants?.slice(0, 3) || [];
-  
-  if (shown.length === 0) {
-    return (
-      <div 
-        className="w-14 h-14 rounded-full flex items-center justify-center bg-emerald-50 border border-emerald-200/30"
-      >
-        <Users className="w-6 h-6 text-emerald-600" />
-      </div>
-    );
-  }
-
+function GroupAvatarSingle({ name, avatarUrl }: { name: string; avatarUrl?: string }) {
   return (
-    <div className="relative w-14 h-14">
-      {shown.map((p, i) => {
-        const size = shown.length === 1 ? 56 : shown.length === 2 ? 36 : 30;
-        const positions = shown.length === 2
-          ? [{ top: 0, left: 0 }, { bottom: 0, right: 0 }]
-          : [{ top: 0, left: 8 }, { bottom: 2, left: 0 }, { bottom: 2, right: 0 }];
-        const pos = positions[i] || {};
-
-        return (
-          <div
-            key={p.id || i}
-            className="absolute rounded-full border-2 border-card overflow-hidden"
-            style={{ 
-              width: size, height: size,
-              ...pos,
-              zIndex: shown.length - i,
-            }}
-          >
-            <SquircleAvatar
-              size={size}
-              src={p.avatarUrl}
-              alt={p.displayName}
-              fallback={p.displayName.charAt(0).toUpperCase()}
-              hideRing
-            />
-          </div>
-        );
-      })}
-    </div>
+    <SquircleAvatar
+      size={56}
+      src={avatarUrl}
+      alt={name}
+      fallback={name.charAt(0).toUpperCase()}
+      hideRing
+    />
   );
 }
 
@@ -275,7 +241,7 @@ export function HubMessagesCardPolished({ conversations, userId, unreadCount, is
                   {/* Avatar */}
                   <div className="relative flex-shrink-0" aria-hidden="true">
                     {conv.isGroup ? (
-                      <GroupAvatarCluster participants={conv.participants} />
+                      <GroupAvatarSingle name={conv.name} avatarUrl={conv.avatarUrl} />
                     ) : (
                       <>
                         <SquircleAvatar
