@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bell, Users, Mail, Sparkles, CheckCircle2 } from 'lucide-react';
+import { BellOff, Users, Mail, Sparkles, CheckCircle2 } from 'lucide-react';
 import { ActivityTabId } from '@/hooks/useActivityFeed';
 
 interface ActivityEmptyStateProps {
@@ -7,11 +7,11 @@ interface ActivityEmptyStateProps {
   isAllCaughtUp?: boolean;
 }
 
-const TAB_EMPTY_STATES: Record<ActivityTabId, { icon: typeof Bell; title: string; description: string }> = {
+const TAB_EMPTY_STATES: Record<ActivityTabId, { icon: typeof BellOff; title: string; description: string }> = {
   all: {
-    icon: Bell,
-    title: 'No activity yet',
-    description: 'When golfers like, comment, follow or message you, updates will show here.',
+    icon: BellOff,
+    title: 'No notifications yet',
+    description: 'When friends interact with your content, you\'ll see it here.',
   },
   friends: {
     icon: Users,

@@ -14,7 +14,7 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { ActivityPageSkeleton } from '@/components/skeletons/ActivityPageSkeleton';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const ActivityPage: React.FC = () => {
@@ -303,10 +303,10 @@ const ActivityPage: React.FC = () => {
                 id={`activity-tab-${tab.id}`}
                 onClick={() => handleTabChange(tab.id)}
                 className={cn(
-                  "flex-shrink-0 px-4 py-2 text-[0.875rem] font-medium rounded-full transition-all duration-150 whitespace-nowrap",
+                  "flex-shrink-0 px-4 py-2.5 min-h-[44px] flex items-center text-sm font-medium rounded-full transition-all duration-150 whitespace-nowrap active:scale-[0.95]",
                   activeTab === tab.id
                     ? "bg-foreground text-background shadow-sm"
-                    : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80"
+                    : "bg-card text-foreground border border-border hover:bg-muted/50"
                 )}
               >
                 {tab.label}
@@ -365,12 +365,15 @@ const ActivityPage: React.FC = () => {
             {/* All caught up banner */}
             {isAllCaughtUp && (
               <div className="flex flex-col items-center py-6 px-4">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <div className="h-px w-8 bg-border" />
-                  <span className="text-[0.75rem] font-medium">You're all caught up</span>
-                  <div className="h-px w-8 bg-border" />
+                <div className="w-8 h-8 rounded-full bg-green-50 border border-green-200 flex items-center justify-center mb-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-500" />
                 </div>
-                <p className="text-[0.75rem] text-muted-foreground/70 mt-1">
+                <div className="flex items-center gap-3 mb-1">
+                  <div className="h-px w-10 bg-border" />
+                  <span className="text-sm font-semibold text-foreground">You're all caught up</span>
+                  <div className="h-px w-10 bg-border" />
+                </div>
+                <p className="text-xs text-muted-foreground">
                   No further new notifications.
                 </p>
               </div>
