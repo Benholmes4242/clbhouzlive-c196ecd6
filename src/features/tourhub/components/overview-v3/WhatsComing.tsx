@@ -19,10 +19,11 @@ const PLAYOFF_KEYWORDS = ['playoff', 'tour championship', 'fedexcup'];
 
 function getContextLabel(tournament: SeasonTournament): string {
   const nameLower = tournament.name.toLowerCase();
+  const tourPrefix = tournament.tourName?.toUpperCase() || 'TOUR';
   if (MAJOR_KEYWORDS.some((k) => nameLower.includes(k))) return 'MAJOR CHAMPIONSHIP';
   if (PLAYOFF_KEYWORDS.some((k) => nameLower.includes(k))) return 'PLAYOFF EVENT';
   if (SIGNATURE_KEYWORDS.some((k) => nameLower.includes(k))) return 'SIGNATURE EVENT';
-  return 'TOUR EVENT';
+  return `${tourPrefix} EVENT`;
 }
 
 // ============ Date formatting helpers ============
@@ -37,19 +38,6 @@ function getDayNum(dateStr: string): string {
   return String(d.getDate());
 }
 
-function getDateLabel(dateStr: string): string {
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-  const start = new Date(dateStr + 'T00:00:00');
-  const diffMs = start.getTime() - now.getTime();
-  const diffDays = Math.round(diffMs / 86400000);
-
-  if (diffDays <= 0) return 'Today';
-  if (diffDays === 1) return 'Tomorrow';
-  if (diffDays === 2) return 'In 2 days';
-
-  return start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-}
 
 function getVenueString(tournament: SeasonTournament): string {
   const parts: string[] = [];
@@ -66,12 +54,11 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
   const isSignature = contextLabel === 'SIGNATURE EVENT';
   const isMajor = contextLabel === 'MAJOR CHAMPIONSHIP';
   const venue = getVenueString(tournament);
-  const dateLabel = getDateLabel(tournament.startDate);
 
   return (
     <motion.button
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
-      className="w-full flex items-center gap-3.5 px-4 py-3.5 bg-card rounded-2xl border border-border/50 text-left transition-all active:scale-[0.98]"
+      className="w-full flex items-center gap-3 px-3.5 py-2.5 bg-card rounded-2xl border border-border/50 text-left transition-all active:scale-[0.98]"
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: 0.05 * index, ease: [0.16, 1, 0.3, 1] }}
@@ -104,24 +91,17 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
           {contextLabel}
         </p>
         <p
-          className="text-foreground truncate mt-1"
+          className="text-foreground mt-1"
           style={{ fontSize: '14px', fontWeight: 700, letterSpacing: '-0.15px' }}
         >
           {tournament.name}
         </p>
         {venue && (
-          <p className="flex items-center gap-1 mt-0.5 text-muted-foreground truncate" style={{ fontSize: '12px' }}>
+          <p className="flex items-center gap-1 mt-0.5 text-muted-foreground" style={{ fontSize: '12px' }}>
             <MapPin className="w-3 h-3 flex-shrink-0 opacity-60" />
-            <span className="truncate">{venue}</span>
+            <span className="line-clamp-1">{venue}</span>
           </p>
         )}
-      </div>
-
-      {/* Right date label */}
-      <div className="flex-shrink-0 text-right">
-        <p className="text-muted-foreground whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 500 }}>
-          {dateLabel}
-        </p>
       </div>
     </motion.button>
   );
@@ -131,7 +111,7 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
 
 function EventRowSkeleton() {
   return (
-    <div className="w-full flex items-center gap-3.5 px-4 py-3.5 bg-card rounded-2xl border border-border/50">
+    <div className="w-full flex items-center gap-3 px-3.5 py-2.5 bg-card rounded-2xl border border-border/50">
       <div className="flex-shrink-0 w-12 flex flex-col items-center gap-1">
         <Skeleton className="h-3 w-8" />
         <Skeleton className="h-6 w-7" />
@@ -141,7 +121,7 @@ function EventRowSkeleton() {
         <Skeleton className="h-4 w-3/4" />
         <Skeleton className="h-3 w-1/2" />
       </div>
-      <Skeleton className="h-3 w-10 flex-shrink-0" />
+      
     </div>
   );
 }
