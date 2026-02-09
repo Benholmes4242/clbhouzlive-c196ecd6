@@ -46,10 +46,10 @@ const BusinessIntroPage: React.FC = () => {
             <span>Back to profile</span>
           </button>
 
-          {/* Step indicator - muted, smaller */}
+          {/* Getting started label */}
           <div className="flex items-center justify-center gap-2">
             <span className="text-[10px] font-medium text-muted-foreground/70">
-              Step 1 of 2
+              Getting started
             </span>
           </div>
           
