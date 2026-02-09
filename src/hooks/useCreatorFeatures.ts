@@ -193,10 +193,10 @@ export function useCreatorFeatures(userId?: string) {
 
   return {
     isCreator: creatorData?.is_creator || false,
-    featuredPost,
+    featuredPost: featuredPost ?? null,
     pinnedPosts: pinnedPosts || [],
     isLoading,
-    setFeaturedPost: setFeaturedPost.mutate,
+    setFeaturedPost: (postId: string | null) => setFeaturedPost.mutate(postId),
     pinPost: pinPost.mutate,
     unpinPost: unpinPost.mutate,
     canPin: ((creatorData?.pinned_post_ids as string[] | undefined)?.length || 0) < 3,

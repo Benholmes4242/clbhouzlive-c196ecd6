@@ -6,7 +6,7 @@ import { CreatorBadge } from './CreatorBadge';
 import { CreatorAnalyticsCard } from './CreatorAnalyticsCard';
 import { useCreatorFeatures } from '@/hooks/useCreatorFeatures';
 import { PostPickerSheet } from './PostPickerSheet';
-import { Film } from 'lucide-react';
+import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 
 interface CreatorProfileSectionProps {
   userId: string;
@@ -19,9 +19,9 @@ interface CreatorProfileSectionProps {
  * 
  * Renders creator-specific features above the content grid:
  * - Creator badge
- * - Featured video slot
- * - Pinned posts
- * - Creator analytics (owner only)
+ * - Featured video slot (with playback, change, remove)
+ * - Pinned posts (with unpin confirmation)
+ * - Creator analytics (owner only, real data)
  */
 export function CreatorProfileSection({ 
   userId, 
@@ -43,6 +43,8 @@ export function CreatorProfileSection({
     canPin,
   } = useCreatorFeatures(userId);
 
+  const { openFullscreen } = useUnifiedFullscreen('profile', {});
+
   // Don't render for non-creators
   if (!isCreator || isLoading) {
     return null;
@@ -51,6 +53,23 @@ export function CreatorProfileSection({
   const handleEditFeatured = () => {
     setPickerMode('featured');
     setPickerOpen(true);
+  };
+
+  const handleRemoveFeatured = () => {
+    setFeaturedPost(null);
+  };
+
+  const handlePlayFeatured = () => {
+    if (!featuredPost) return;
+    // Open in fullscreen viewer by constructing a minimal media item
+    const mediaItem = {
+      id: featuredPost.id,
+      type: 'video' as const,
+      url: featuredPost.videoUrl || '',
+      posterUrl: featuredPost.thumbnailUrl,
+      creator: { id: userId },
+    };
+    openFullscreen([mediaItem], 0);
   };
 
   const handleAddPinned = () => {
@@ -68,8 +87,8 @@ export function CreatorProfileSection({
   };
 
   const handlePostClick = (postId: string) => {
-    // Navigate to post viewer - placeholder for now
-    console.log('Open post:', postId);
+    // Navigate to post deep link
+    navigate(`/post/${postId}`);
   };
 
   return (
@@ -85,6 +104,8 @@ export function CreatorProfileSection({
         posterUrl={featuredPost?.thumbnailUrl}
         isOwner={isOwnProfile}
         onEditClick={handleEditFeatured}
+        onRemoveClick={handleRemoveFeatured}
+        onPlayClick={handlePlayFeatured}
         className="mb-4"
       />
 
@@ -112,15 +133,6 @@ export function CreatorProfileSection({
       {isOwnProfile && (
         <CreatorAnalyticsCard userId={userId} className="mb-4" />
       )}
-
-      {/* View videos CTA */}
-      <button
-        onClick={() => navigate(`/profile/${userId}`)}
-        className="mb-4 w-full py-3 flex items-center justify-center gap-2 text-sm font-medium rounded-xl transition-colors bg-primary/10 hover:bg-primary/15 text-primary border border-primary/20"
-      >
-        <Film className="w-4 h-4" />
-        View videos
-      </button>
 
       {/* Post Picker Sheet */}
       <PostPickerSheet
