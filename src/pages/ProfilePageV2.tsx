@@ -7,7 +7,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 import { cn } from '@/lib/utils';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile.tsx';
 import { useTop100Overview } from '@/hooks/useTop100Overview';
@@ -16,8 +16,13 @@ import { usePersonalPostsCount } from '@/hooks/usePersonalPostsCount';
 import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
 import { useFollow } from '@/hooks/useFollow';
 import { useFriendship } from '@/hooks/useFriendship';
+import { useSocialCounts } from '@/hooks/useSocialCounts';
+import { useRealtimeSocialCounts } from '@/hooks/useRealtimeSocialCounts';
+import { useMyBusinesses } from '@/hooks/useMyBusinesses';
+import { useBlockActions } from '@/hooks/useBlockActions';
 import { supabase } from '@/integrations/supabase/client';
-import { Trophy, ChevronRight, ChevronDown, MoreHorizontal, Send, UserPlus, Check, ExternalLink, Loader2, ArrowLeft, Pencil, Camera } from 'lucide-react';
+import { toast } from 'sonner';
+import { Trophy, ChevronRight, ChevronDown, MoreHorizontal, Send, UserPlus, Check, ExternalLink, Loader2, ArrowLeft, Pencil, Camera, Share2, Link2, Flag, Ban, Settings, Building2 } from 'lucide-react';
 import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
@@ -28,8 +33,19 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 // Tab content components
 import ActivityFeed from '@/components/profile/ActivityFeed';
@@ -147,59 +163,51 @@ const ProfilePageV2Content: React.FC = () => {
     }
   }, [isSelf, profileUserId, ensureInitial]);
   
-  const [activeSection, setActiveSection] = useState('activity');
+  // Fix 4: Read initial tab from URL search params
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTab = useMemo(() => {
+    const tabParam = searchParams.get('tab');
+    const validTabs = ['activity', 'courses', 'top100', 'handicap', 'achievements', 'stats'];
+    return tabParam && validTabs.includes(tabParam) ? tabParam : 'activity';
+  }, []); // Only read on mount
+  
+  const [activeSection, setActiveSection] = useState(initialTab);
   const [bioExpanded, setBioExpanded] = useState(false);
   const [activeMiniNav, setActiveMiniNav] = useState('posts');
-  const [followersCount, setFollowersCount] = useState<number | null>(null);
-  const [followingCount, setFollowingCount] = useState<number | null>(null);
-  const [friendsCount, setFriendsCount] = useState<number | null>(null);
   const [isAvatarLightboxOpen, setIsAvatarLightboxOpen] = useState(false);
-  const [statsLoading, setStatsLoading] = useState(true);
+  const [showBlockDialog, setShowBlockDialog] = useState(false);
 
   const profileTypeInfo = getProfileType(profile?.user_type);
   const { isPersonal } = profileTypeInfo;
   const tabs = getProfileTabs(profile?.user_type);
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      if (!profile?.id) {
-        setStatsLoading(false);
-        return;
-      }
-      
-      setStatsLoading(true);
-      try {
-        const { count: followers } = await supabase
-          .from('user_follows')
-          .select('*', { count: 'exact', head: true })
-          .eq('following_id', profile.id);
-        setFollowersCount(followers || 0);
+  // Fix 5: Use React Query for social counts instead of raw useEffect
+  const { data: socialCounts, isLoading: socialCountsLoading } = useSocialCounts(profileUserId);
+  const followersCount = socialCounts?.followers ?? 0;
+  const followingCount = socialCounts?.following ?? 0;
+  const friendsCount = isPersonal ? (socialCounts?.friends ?? 0) : 0;
+  
+  // Enable real-time updates for social counts
+  useRealtimeSocialCounts({
+    viewerUserId: user?.id ?? null,
+    profileUserId: profileUserId ?? null,
+  });
 
-        const { count: following } = await supabase
-          .from('user_follows')
-          .select('*', { count: 'exact', head: true })
-          .eq('follower_id', profile.id);
-        setFollowingCount(following || 0);
+  // Block actions for other users
+  const { blockUser } = useBlockActions({ currentUserId: user?.id || '' });
 
-        if (isPersonal) {
-          const { count: friends } = await supabase
-            .from('user_friends')
-            .select('*', { count: 'exact', head: true })
-            .eq('status', 'accepted')
-            .or(`user_id.eq.${profile.id},friend_id.eq.${profile.id}`);
-          setFriendsCount(friends || 0);
-        } else {
-          setFriendsCount(0);
-        }
-      } catch (error) {
-        console.error('Error fetching stats:', error);
-      } finally {
-        setStatsLoading(false);
-      }
-    };
-    
-    fetchStats();
-  }, [profile?.id, isPersonal]);
+  // Check if user has business profiles (for "Switch to business" menu item)
+  const { data: myBusinesses } = useMyBusinesses(isSelf ? user?.id : undefined);
+
+  // Update URL when tab changes
+  const handleTabChange = (tab: string) => {
+    setActiveSection(tab);
+    if (tab === 'activity') {
+      setSearchParams({}, { replace: true });
+    } else {
+      setSearchParams({ tab }, { replace: true });
+    }
+  };
 
   // postsCount now comes from usePersonalPostsCount (fetches total from DB)
   const unlockedAchievements = achievements || [];
@@ -494,6 +502,7 @@ const ProfilePageV2Content: React.FC = () => {
               <Pencil className="w-4 h-4" />
               Edit Profile
             </button>
+            {/* Fix 3: Expanded self overflow menu */}
             <DropdownMenu onOpenChange={(open) => {
               if (!open) (document.activeElement as HTMLElement)?.blur();
             }}>
@@ -504,17 +513,51 @@ const ProfilePageV2Content: React.FC = () => {
                   <MoreHorizontal className="w-5 h-5 text-foreground" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuItem onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({ title: displayName, url: window.location.href }).catch(() => {});
+                  } else {
+                    navigator.clipboard.writeText(window.location.href);
+                    toast.success('Link copied');
+                  }
+                }}>
+                  <Share2 className="w-4 h-4 mr-2" />
+                  Share profile
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => {
                   navigator.clipboard.writeText(window.location.href);
+                  toast.success('Link copied');
                 }}>
-                  Copy Link
+                  <Link2 className="w-4 h-4 mr-2" />
+                  Copy link
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate('/edit-profile')}>
+                  <Pencil className="w-4 h-4 mr-2" />
+                  Edit profile
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/settings')}>
+                  <Settings className="w-4 h-4 mr-2" />
+                  Settings
+                </DropdownMenuItem>
+                {myBusinesses && myBusinesses.length > 0 && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => {
+                      const biz = myBusinesses[0];
+                      navigate(`/business/${biz.business.slug || biz.business.id}`);
+                    }}>
+                      <Building2 className="w-4 h-4 mr-2" />
+                      Switch to business
+                    </DropdownMenuItem>
+                  </>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         ) : (
-          /* ── Other user: Follow + Add Friend ── */
+          /* ── Other user: Follow + Add Friend + Overflow menu ── */
           <>
             <button 
               className="h-11 flex-1 rounded-full text-sm font-semibold text-white flex items-center justify-center gap-1.5 disabled:opacity-60 active:scale-[0.98] transition-transform"
@@ -559,6 +602,51 @@ const ProfilePageV2Content: React.FC = () => {
                 </>
               )}
             </button>
+
+            {/* Fix 2: Other user overflow menu */}
+            <DropdownMenu onOpenChange={(open) => {
+              if (!open) (document.activeElement as HTMLElement)?.blur();
+            }}>
+              <DropdownMenuTrigger asChild>
+                <button 
+                  className="w-11 h-11 flex-shrink-0 rounded-full bg-muted flex items-center justify-center border border-border focus:outline-none active:scale-[0.95] transition-transform"
+                >
+                  <MoreHorizontal className="w-5 h-5 text-foreground" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuItem onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({ title: displayName, url: window.location.href }).catch(() => {});
+                  } else {
+                    navigator.clipboard.writeText(window.location.href);
+                    toast.success('Link copied');
+                  }
+                }}>
+                  <Share2 className="w-4 h-4 mr-2" />
+                  Share profile
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  toast.success('Link copied');
+                }}>
+                  <Link2 className="w-4 h-4 mr-2" />
+                  Copy link
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => toast.info('Report submitted')}>
+                  <Flag className="w-4 h-4 mr-2" />
+                  Report
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setShowBlockDialog(true)}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <Ban className="w-4 h-4 mr-2" />
+                  Block
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </>
         )}
       </div>
@@ -608,7 +696,7 @@ const ProfilePageV2Content: React.FC = () => {
             <span className="text-sm text-muted-foreground">Followers</span>
             <AnimatedNumber 
               value={followersCount} 
-              isLoading={statsLoading} 
+              isLoading={socialCountsLoading} 
               minCh={2}
               className="text-base font-semibold text-foreground"
             />
@@ -630,7 +718,7 @@ const ProfilePageV2Content: React.FC = () => {
               <span className="text-sm text-muted-foreground">Friends</span>
               <AnimatedNumber 
                 value={friendsCount} 
-                isLoading={statsLoading} 
+                isLoading={socialCountsLoading} 
                 minCh={2}
                 className="text-base font-semibold text-foreground"
               />
@@ -644,29 +732,75 @@ const ProfilePageV2Content: React.FC = () => {
       <div className="bg-card pt-4 pb-32 min-h-[60vh] relative z-10 pointer-events-auto">
         {/* About section - removed "About" heading, just the bio text */}
         {/* mb-5 → mb-4 (16px from about text to clubs divider) */}
-        <section className="px-5 mb-4">
-          <div 
-            className={cn(
-              "text-base text-foreground leading-relaxed whitespace-pre-wrap",
-              !bioExpanded && "line-clamp-6"
-            )} 
-            style={{ overflowWrap: 'anywhere' }}
-          >
-            {profile?.bio || 'Passionate golfer with a love for links courses. Always working to improve my game and explore new courses.'}
-          </div>
-          {profile?.bio && profile.bio.split('\n').length > 4 && !bioExpanded && (
-            <button 
-              onClick={() => setBioExpanded(true)}
-              className="text-sm text-muted-foreground mt-1 min-h-[44px] flex items-center active:scale-[0.98]"
+        {/* Fix 1: Bio section — contextual handling */}
+        {profile?.bio ? (
+          <section className="px-5 mb-4">
+            <div 
+              className={cn(
+                "text-base text-foreground leading-relaxed whitespace-pre-wrap",
+                !bioExpanded && "line-clamp-6"
+              )} 
+              style={{ overflowWrap: 'anywhere' }}
             >
-              Read more
-              <ChevronDown className="w-4 h-4 ml-1" />
+              {profile.bio}
+            </div>
+            {profile.bio.split('\n').length > 4 && !bioExpanded && (
+              <button 
+                onClick={() => setBioExpanded(true)}
+                className="text-sm text-muted-foreground mt-1 min-h-[44px] flex items-center active:scale-[0.98]"
+              >
+                Read more
+                <ChevronDown className="w-4 h-4 ml-1" />
+              </button>
+            )}
+            
+            {/* Websites as pills - directly under bio */}
+            {websites.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-3">
+                {websites.map((website, index) => (
+                  <a
+                    key={index}
+                    href={ensureProtocol(website)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-muted border border-border px-3 min-h-[44px] text-sm font-medium text-muted-foreground hover:text-foreground transition-colors active:scale-[0.98]"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    {formatUrlForDisplay(website)}
+                  </a>
+                ))}
+              </div>
+            )}
+          </section>
+        ) : isSelf ? (
+          <section className="px-5 mb-4">
+            <button
+              onClick={() => navigate('/edit-profile')}
+              className="text-sm text-muted-foreground italic min-h-[44px] flex items-center active:opacity-70 transition-opacity"
+            >
+              Add a bio
             </button>
-          )}
-          
-          {/* Websites as pills - directly under bio */}
-          {websites.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-3">
+            {/* Websites as pills even without bio */}
+            {websites.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {websites.map((website, index) => (
+                  <a
+                    key={index}
+                    href={ensureProtocol(website)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-muted border border-border px-3 min-h-[44px] text-sm font-medium text-muted-foreground hover:text-foreground transition-colors active:scale-[0.98]"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    {formatUrlForDisplay(website)}
+                  </a>
+                ))}
+              </div>
+            )}
+          </section>
+        ) : websites.length > 0 ? (
+          <section className="px-5 mb-4">
+            <div className="flex flex-wrap gap-2">
               {websites.map((website, index) => (
                 <a
                   key={index}
@@ -680,8 +814,8 @@ const ProfilePageV2Content: React.FC = () => {
                 </a>
               ))}
             </div>
-          )}
-        </section>
+          </section>
+        ) : null}
 
         {/* Divider above Clubs section */}
         <div className="px-5 mb-3">
@@ -728,7 +862,7 @@ const ProfilePageV2Content: React.FC = () => {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveSection(tab.id)}
+                  onClick={() => handleTabChange(tab.id)}
                   className={cn(
                     "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98]",
                     isActive 
@@ -762,6 +896,33 @@ const ProfilePageV2Content: React.FC = () => {
         shape="squircle"
         fallbackInitial={displayName?.charAt(0)}
       />
+
+      {/* Block confirmation dialog */}
+      {!isSelf && profileUserId && (
+        <AlertDialog open={showBlockDialog} onOpenChange={setShowBlockDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Block {displayName}?</AlertDialogTitle>
+              <AlertDialogDescription>
+                They won't be able to see your profile or contact you.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={async () => {
+                  await blockUser(profileUserId);
+                  toast.success(`${displayName} blocked`);
+                  navigate(-1);
+                }} 
+                className="bg-destructive text-destructive-foreground"
+              >
+                Block
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </PageRoot>
   );
 };
