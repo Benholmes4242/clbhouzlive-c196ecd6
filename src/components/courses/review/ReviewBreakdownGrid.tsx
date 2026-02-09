@@ -1,5 +1,5 @@
 import React from 'react';
-import { RatingBar } from '@/components/ui/RatingBar';
+import { cn } from '@/lib/utils';
 
 interface BreakdownScores {
   design_score?: number | null;
@@ -35,18 +35,26 @@ export const ReviewBreakdownGrid: React.FC<ReviewBreakdownGridProps> = ({ scores
 
   return (
     <div className="mt-3 pt-3 border-t border-slate-100">
-      <div className="grid grid-cols-2 gap-x-4 gap-y-4">
+      <div className="space-y-2.5">
         {categories.map((cat) => (
-          <div key={cat.label} className="flex flex-col">
-            <span className="text-[11px] font-medium tracking-wide text-slate-600 mb-1">
+          <div key={cat.label} className="flex items-center gap-3">
+            <span className="w-[90px] min-w-[90px] text-[11px] font-medium tracking-wide text-slate-600">
               {cat.label}
             </span>
-            <div className="flex items-center gap-2">
-              <RatingBar value={cat.value || 0} />
-              <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap">
-                {formatScore(cat.value)}
-              </span>
+            <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+              <div
+                className={cn(
+                  'h-full rounded-full transition-all duration-300',
+                  (cat.value || 0) >= 9.0
+                    ? 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]'
+                    : 'bg-[#d1d5db]'
+                )}
+                style={{ width: `${((cat.value || 0) / 10) * 100}%` }}
+              />
             </div>
+            <span className="w-[32px] min-w-[32px] text-right text-[11px] font-semibold text-slate-700">
+              {formatScore(cat.value)}
+            </span>
           </div>
         ))}
       </div>
