@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, MessageCircle, UserPlus, Users, Bell, Mail, Trophy, Building2, X, ShieldOff, MessageSquare, Clock, CalendarDays, MapPin, CheckCircle2, UserCheck } from 'lucide-react';
+import { Heart, MessageCircle, UserPlus, Users, Bell, Mail, Trophy, Building2, X, ShieldOff, MessageSquare, Clock, CalendarDays, MapPin, CheckCircle2, UserCheck, Star } from 'lucide-react';
 import { FiMapPin } from 'react-icons/fi';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -152,6 +152,9 @@ function getNotificationBadgeIcon(type: string) {
     case 'friend_course_review':
     case 'course_review':
       return <FiMapPin className={cn(iconClass, "text-emerald-500")} />;
+    // Business course review
+    case 'business_course_review':
+      return <Star className={cn(iconClass, "text-emerald-500")} fill="currentColor" />;
     default:
       return <Bell className={cn(iconClass, "text-muted-foreground")} />;
   }
@@ -255,7 +258,8 @@ function renderNotificationText(notification: ActivityNotification): string | Re
       return GOLFER_VERIFICATION_COPY.removed.title;
     // Friend course review — descriptive text with bold course name + rating
     case 'friend_course_review':
-    case 'course_review': {
+    case 'course_review':
+    case 'business_course_review': {
       const courseName = notification.data?.course_name;
       const rating = notification.data?.rating;
       if (courseName) {
