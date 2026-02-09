@@ -119,14 +119,19 @@ export function CreatorProfileSection({
       />
 
       {/* Add pin button for owners with room for more pins */}
-      {isOwnProfile && canPin && pinnedPosts.length < 3 && (
-        <button
-          onClick={handleAddPinned}
-          className="mb-4 w-full py-2 flex items-center justify-center gap-2 text-xs text-[#F7931E] font-medium rounded-sq-sm hover:bg-[#F7931E]/5 transition-colors"
-          style={{ border: '1px dashed rgba(247, 147, 30, 0.3)' }}
-        >
-          + Pin another post ({3 - pinnedPosts.length} remaining)
-        </button>
+      {isOwnProfile && (
+        pinnedPosts.length < 3 ? (
+          <button
+            onClick={handleAddPinned}
+            className="mb-4 w-full min-h-[44px] py-2 flex items-center justify-center gap-2 text-sm text-[#C1A84C] font-medium rounded-xl border border-[#C1A84C]/40 bg-[#C1A84C]/5 active:scale-[0.98] transition-transform"
+          >
+            + Pin another post ({3 - pinnedPosts.length} remaining)
+          </button>
+        ) : (
+          <div className="mb-4 w-full min-h-[44px] py-2 flex items-center justify-center gap-2 text-sm text-muted-foreground font-medium rounded-xl border border-border bg-muted/30">
+            3 of 3 posts pinned
+          </div>
+        )
       )}
 
       {/* Creator Analytics - owner only */}
