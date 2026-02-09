@@ -4,6 +4,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ThumbButton } from '@/components/common/ThumbButton';
 import { ExpandableText } from '@/components/common/ExpandableText';
 import { ReviewMediaStrip, ReviewMediaItem } from './ReviewMediaStrip';
+import { RatingBreakdownGrid } from '../shared/RatingBreakdownGrid';
 
 interface Review {
   id: string;
@@ -155,33 +156,15 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
         </div>
       )}
 
-      {/* Category breakdown - brand color bars for scores 9+ (per category) */}
+      {/* Category breakdown */}
       {categories.length > 0 && (
-        <div className="grid grid-cols-2 gap-x-6 gap-y-2 mb-4 py-3 border-y border-border">
-          {categories.map(cat => {
-            // Determine bar color based on individual category score (9+ = Outstanding)
-            const isOutstandingCat = (cat.value || 0) >= 9;
-            const barColorClass = isOutstandingCat 
-              ? 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]' 
-              : 'bg-[#d1d5db]';
-            
-            return (
-              <div key={cat.key} className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">{categoryLabels[cat.key]}</span>
-                <div className="flex items-center gap-2">
-                  <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
-                    <div 
-                      className={`h-full ${barColorClass} rounded-full`}
-                      style={{ width: `${((cat.value || 0) / 10) * 100}%` }}
-                    />
-                  </div>
-                  <span className="text-xs font-medium text-foreground w-6 tabular-nums">
-                    {(cat.value || 0).toFixed(1)}
-                  </span>
-                </div>
-              </div>
-            );
-          })}
+        <div className="mb-4 py-3 border-y border-border">
+          <RatingBreakdownGrid
+            categories={categories.map(c => ({
+              label: categoryLabels[c.key],
+              value: c.value,
+            }))}
+          />
         </div>
       )}
 
