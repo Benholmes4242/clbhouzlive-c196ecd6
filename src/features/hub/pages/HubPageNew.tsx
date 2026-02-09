@@ -15,7 +15,7 @@ import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { WifiOff, RefreshCw, Sun, Moon, Sunrise, Sunset } from 'lucide-react';
+import { WifiOff, RefreshCw } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { haptic } from '@/utils/haptics';
 import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh';
@@ -29,15 +29,7 @@ import { HubQuickActions } from '../components/hub-v2/HubQuickActions';
 import { HubAtAGlanceCard } from '../components/hub-v2/HubAtAGlanceCard';
 import { HUB_COLORS } from '../constants/hubTheme';
 
-// ============ Greeting Icon Helper ============
-function GreetingIcon({ hour }: { hour: number }) {
-  const iconClass = "w-5 h-5";
-  
-  if (hour >= 5 && hour < 12) return <Sunrise className={iconClass + " text-muted-foreground"} />;
-  if (hour >= 12 && hour < 17) return <Sun className={iconClass + " text-muted-foreground"} />;
-  if (hour >= 17 && hour < 21) return <Sunset className={iconClass + " text-muted-foreground"} />;
-  return <Moon className={iconClass + " text-muted-foreground"} />;
-}
+// GreetingIcon removed per design update
 
 // ============ Animation Variants ============
 const getContainerVariants = (prefersReduced: boolean) => ({
@@ -146,10 +138,10 @@ export function HubPageNew() {
   const firstName = displayName.split(' ')[0];
 
   const getGreeting = useCallback(() => {
-    if (currentHour >= 5 && currentHour < 12) return 'Good morning';
-    if (currentHour >= 12 && currentHour < 17) return 'Good afternoon';
-    if (currentHour >= 17 && currentHour < 21) return 'Good evening';
-    return 'Good night';
+    if (currentHour >= 5 && currentHour < 12) return 'Morning';
+    if (currentHour >= 12 && currentHour < 17) return 'Afternoon';
+    if (currentHour >= 17 && currentHour < 21) return 'Evening';
+    return 'Night';
   }, [currentHour]);
   
   // Pull-to-refresh
@@ -280,9 +272,8 @@ export function HubPageNew() {
               {/* Greeting */}
               <div className="flex-1 min-w-0 mr-4">
                 <h1 className="text-[1.75rem] font-bold tracking-tight flex flex-col text-foreground" style={{ lineHeight: 1.2 }}>
-                  <span className="flex items-center gap-2">
+                  <span>
                     {getGreeting()},
-                    <GreetingIcon hour={currentHour} />
                   </span>
                   <motion.span 
                     className="truncate"
