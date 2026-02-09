@@ -1,17 +1,56 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Phone, Mail, Globe, MapPin, Building2, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BusinessProfile } from '@/hooks/useBusinessProfile';
 import { format } from 'date-fns';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface BusinessProfileInfoProps {
   business: BusinessProfile;
 }
 
-// Note: Highlights section removed - requires database table for real data
+/** Reusable info row with icon circle, value, and label */
+function InfoRow({ 
+  icon: Icon, 
+  value, 
+  label, 
+  onClick 
+}: { 
+  icon: React.ElementType; 
+  value: string; 
+  label: string; 
+  onClick?: () => void;
+}) {
+  const Wrapper = onClick ? 'button' : 'div';
+  return (
+    <Wrapper
+      {...(onClick ? { onClick } : {})}
+      className={`flex items-center gap-3 w-full text-left rounded-lg p-2.5 min-h-[44px] transition-colors ${
+        onClick ? 'active:scale-[0.98] transition-transform hover:bg-muted/60 cursor-pointer' : ''
+      }`}
+    >
+      <div className="h-11 w-11 rounded-full bg-muted border border-border flex items-center justify-center flex-shrink-0">
+        <Icon className="h-4 w-4 text-muted-foreground" />
+      </div>
+      <div>
+        <p className="text-sm font-medium text-foreground">{value}</p>
+        <p className="text-xs text-muted-foreground">{label}</p>
+      </div>
+    </Wrapper>
+  );
+}
 
 export function BusinessProfileInfo({ business }: BusinessProfileInfoProps) {
+  const [showFullDescription, setShowFullDescription] = useState(false);
+
+  const MAX_LINES = 3;
+  const MAX_CHARS = 180; // ~3 lines at typical width
+  const hasLongDescription = (business.description?.length ?? 0) > MAX_CHARS;
+  const displayDescription = showFullDescription
+    ? business.description
+    : business.description?.slice(0, MAX_CHARS);
+
   const handleCall = () => {
     if (business.phone) {
       window.location.href = `tel:${business.phone}`;
@@ -26,8 +65,8 @@ export function BusinessProfileInfo({ business }: BusinessProfileInfoProps) {
 
   const handleWebsite = () => {
     if (business.website) {
-      const url = business.website.startsWith('http') 
-        ? business.website 
+      const url = business.website.startsWith('http')
+        ? business.website
         : `https://${business.website}`;
       window.open(url, '_blank', 'noopener,noreferrer');
     }
@@ -40,152 +79,103 @@ export function BusinessProfileInfo({ business }: BusinessProfileInfoProps) {
     }
   };
 
-
   return (
-    <div 
-      className="-mx-5 px-0"
-      style={{
-        background: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)',
-      }}
-    >
+    <div className="-mx-5 px-0 bg-muted/40">
       <div className="flex flex-col gap-3">
-        {/* About - Full text without truncation */}
+        {/* About — no heading since the tab label "About" provides context */}
         {business.description && (
-          <section className="bg-white p-4 space-y-3">
-            <h2 className="text-base font-semibold text-[#1F2428]">About</h2>
-            <p className="text-sm text-[#5E666D] leading-[1.7] whitespace-pre-wrap">
-              {business.description}
-            </p>
+          <section className="bg-card p-4 space-y-2">
+            <div>
+              <p className="text-sm text-muted-foreground leading-[1.7] whitespace-pre-wrap">
+                {displayDescription}
+                {hasLongDescription && !showFullDescription && '...'}
+              </p>
+              {hasLongDescription && (
+                <AnimatePresence>
+                  <motion.button
+                    onClick={() => setShowFullDescription(!showFullDescription)}
+                    className="text-sm font-medium text-primary hover:underline mt-2 inline-block min-h-[44px] flex items-center active:opacity-70"
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {showFullDescription ? 'Show less' : 'Read more'}
+                  </motion.button>
+                </AnimatePresence>
+              )}
+            </div>
           </section>
         )}
 
         {/* Contact */}
-        <section className="bg-white p-4 space-y-3">
-          <h2 className="text-base font-semibold text-[#1F2428]">Contact</h2>
-          <div className="space-y-2">
+        <section className="bg-card p-4 space-y-3">
+          <h2 className="text-base font-semibold text-foreground">Contact</h2>
+          <div className="space-y-1">
             {business.phone && (
-              <button 
-                onClick={handleCall}
-                className="flex items-center gap-3 w-full text-left hover:bg-[#F4F5F7] rounded-sq-sm p-2.5 transition-colors"
-              >
-                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center">
-                  <Phone className="h-4 w-4 text-[#64748b]" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-[#1F2428]">{business.phone}</p>
-                  <p className="text-xs text-[#97A1AA]">Phone</p>
-                </div>
-              </button>
+              <InfoRow icon={Phone} value={business.phone} label="Phone" onClick={handleCall} />
             )}
-            
             {business.email && (
-              <button 
-                onClick={handleEmail}
-                className="flex items-center gap-3 w-full text-left hover:bg-[#F4F5F7] rounded-sq-sm p-2.5 transition-colors"
-              >
-                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center">
-                  <Mail className="h-4 w-4 text-[#64748b]" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-[#1F2428]">{business.email}</p>
-                  <p className="text-xs text-[#97A1AA]">Email</p>
-                </div>
-              </button>
+              <InfoRow icon={Mail} value={business.email} label="Email" onClick={handleEmail} />
             )}
-            
             {business.website && (
-              <button 
+              <InfoRow
+                icon={Globe}
+                value={business.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                label="Website"
                 onClick={handleWebsite}
-                className="flex items-center gap-3 w-full text-left hover:bg-[#F4F5F7] rounded-sq-sm p-2.5 transition-colors"
-              >
-                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center">
-                  <Globe className="h-4 w-4 text-[#64748b]" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-[#1F2428]">
-                    {business.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
-                  </p>
-                  <p className="text-xs text-[#97A1AA]">Website</p>
-                </div>
-              </button>
+              />
             )}
-
             {!business.phone && !business.email && !business.website && (
-              <p className="text-sm text-[#97A1AA] italic">No contact information available.</p>
+              <p className="text-sm text-muted-foreground italic">No contact information available.</p>
             )}
           </div>
         </section>
 
         {/* Location */}
-        <section className="bg-white p-4 space-y-3">
-          <h2 className="text-base font-semibold text-[#1F2428]">Location</h2>
+        <section className="bg-card p-4 space-y-3">
+          <h2 className="text-base font-semibold text-foreground">Location</h2>
           {business.location ? (
             <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center flex-shrink-0">
-                  <MapPin className="h-4 w-4 text-[#64748b]" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-[#1F2428]">{business.location}</p>
-                  <p className="text-xs text-[#97A1AA]">Address</p>
-                </div>
-              </div>
-              
-              <Button 
-                variant="outline" 
-                onClick={handleDirections} 
-                className="rounded-full w-full sm:w-auto text-[#1F2428] border-[#1F2428]/10 hover:bg-[#EDEFF2]"
+              <InfoRow icon={MapPin} value={business.location} label="Address" />
+
+              <Button
+                variant="outline"
+                onClick={handleDirections}
+                className="rounded-full w-full sm:w-auto text-foreground border-border hover:bg-muted min-h-[44px] active:scale-[0.97] transition-transform"
               >
                 <MapPin className="h-4 w-4 mr-2" />
                 Get directions
               </Button>
             </div>
           ) : (
-            <p className="text-sm text-[#97A1AA] italic">No location information available.</p>
+            <p className="text-sm text-muted-foreground italic">No location information available.</p>
           )}
         </section>
 
-
         {/* Business Details */}
-        <section className="bg-white p-4 space-y-3">
-          <h2 className="text-base font-semibold text-[#1F2428]">Business Details</h2>
-          <div className="space-y-2">
+        <section className="bg-card p-4 space-y-3 pb-8">
+          <h2 className="text-base font-semibold text-foreground">Business Details</h2>
+          <div className="space-y-1">
             {business.category && (
-              <div className="flex items-center gap-3 p-2.5">
-                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center">
-                  <Building2 className="h-4 w-4 text-[#64748b]" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-[#1F2428]">{business.category}</p>
-                  <p className="text-xs text-[#97A1AA]">Category</p>
-                </div>
-              </div>
+              <InfoRow icon={Building2} value={business.category} label="Category" />
             )}
-            
+
             {business.is_verified && (
-              <div className="flex items-center gap-3 p-2.5">
-                <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
+              <div className="flex items-center gap-3 p-2.5 min-h-[44px]">
+                <div className="h-11 w-11 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
                   <VerifiedBadge size="lg" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-[#1F2428]">Verified Business</p>
-                  <p className="text-xs text-[#97A1AA]">This business has been verified by clbhouz</p>
+                  <p className="text-sm font-medium text-foreground">Verified Business</p>
+                  <p className="text-xs text-muted-foreground">This business has been verified by clbhouz</p>
                 </div>
               </div>
             )}
-            
+
             {business.created_at && (
-              <div className="flex items-center gap-3 p-2.5">
-                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center">
-                  <Calendar className="h-4 w-4 text-[#64748b]" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-[#1F2428]">
-                    {format(new Date(business.created_at), 'MMMM yyyy')}
-                  </p>
-                  <p className="text-xs text-[#97A1AA]">Member since</p>
-                </div>
-              </div>
+              <InfoRow
+                icon={Calendar}
+                value={format(new Date(business.created_at), 'MMMM yyyy')}
+                label="Member since"
+              />
             )}
           </div>
         </section>
