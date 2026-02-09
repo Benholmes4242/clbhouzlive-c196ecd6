@@ -232,6 +232,7 @@ const BusinessDirectoryPage = lazy(() => import("./pages/BusinessDirectoryPage")
 const BusinessInsightsPage = lazy(() => import("./pages/BusinessInsightsPage"));
 const BusinessInsightsPageV2 = lazy(() => import("./pages/BusinessInsightsPageV2"));
 const BusinessProfilePage = lazy(() => import("./pages/BusinessProfilePage"));
+const BusinessFollowersPage = lazy(() => import("./pages/BusinessFollowersPage"));
 const MyBusinessesPage = lazy(() => import("./pages/MyBusinessesPage"));
 const BusinessCreatePage = lazy(() => import("./pages/BusinessCreatePage"));
 const BusinessIntroPage = lazy(() => import("./pages/BusinessIntroPage"));
@@ -386,6 +387,7 @@ function AppRoutes() {
         <Route path="/business/:businessId/team/invite" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessInvitePage /></Suspense>} />
         <Route path="/business/:businessId/manage-team" element={<Suspense fallback={<GenericPageSkeleton />}><ManageTeamPage /></Suspense>} />
         <Route path="/business/:businessId/activity" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessActivityPage /></Suspense>} />
+        <Route path="/business/:idOrSlug/followers" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessFollowersPage /></Suspense>} />
         <Route path="/business/:idOrSlug" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessProfilePage /></Suspense>} />
         
         <Route path="/top100" element={<Suspense fallback={<CoursesListSkeleton />}><Top100Hub /></Suspense>} />
