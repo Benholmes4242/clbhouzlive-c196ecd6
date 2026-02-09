@@ -278,7 +278,7 @@ export function HubMessagesCardPolished({ conversations, userId, unreadCount, is
                   <div className="relative flex-shrink-0" aria-hidden="true">
                     <SquircleAvatar
                       size={56}
-                      src={conv.isGroup ? (conv.avatarUrl || conv.participants?.[0]?.avatarUrl) : conv.avatarUrl}
+                      src={conv.avatarUrl}
                       alt={conv.name}
                       fallback={conv.name.charAt(0).toUpperCase()}
                       hideRing
