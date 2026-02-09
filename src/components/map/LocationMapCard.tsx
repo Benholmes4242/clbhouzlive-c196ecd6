@@ -51,7 +51,7 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
         role="button"
         tabIndex={0}
         key={`map-${lat}-${lng}`}
-        className="relative w-full rounded-sq-md overflow-hidden border border-border cursor-pointer group text-left active:scale-[0.99]"
+        className="relative w-full rounded-sq-md overflow-hidden border border-border shadow-sm cursor-pointer group text-left active:scale-[0.99]"
         onClick={() => setExpanded(true)}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
