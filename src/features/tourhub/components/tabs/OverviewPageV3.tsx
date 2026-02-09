@@ -1,29 +1,29 @@
 /**
- * OverviewPageV3 - Editorial Golf Intelligence Destination
+ * OverviewPageV3 - World-class Tour Hub Overview
+ * Full-bleed immersive hero that extends behind the iOS status bar
+ * NO header on this page - fully immersive experience
  * 
- * MODULE ORDER:
- * 1. PrimaryHero (single-winner, full-bleed)
- * 2. LiveRightNow (horizontal awareness strip)
- * 3. TourIntelligenceSnapshot ("What Wins Right Now")
- * 4. MomentumIndex (Surging / Stable / Sliding)
- * 5. TourTitles (gamified category leaders)
- * 6. CollegeRivalries (compact college rankings)
- * 7. WhatsComing (awareness schedule)
- * 8. DeepLinksStrip (navigation strip)
- * 
- * Hero preloads immediately. Modules 2-8 lazy-load after hero paint.
+ * MODULE ORDER (Updated):
+ * 1. Hero Carousel (Featured/Latest Tournaments)
+ * 2. Live Right Now (Conditional - only shows when live action)
+ * 3. Tournament Schedule (Moved up for user priority)
+ * 4. Tournament Insights (AI Predictions - differentiator)
+ * 5. Unified World Rankings (Movers + OWGR Table combined)
+ * 6. Season Leaderboards (Statistical category leaders)
+ * 7. College Golf Rankings (NEW - preview of college leaderboard)
  */
 
-import { useState, useLayoutEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import { motion } from 'framer-motion';
-import { PrimaryHero } from '../overview-v3/PrimaryHero';
-import { LiveRightNow } from '../overview-v3/LiveRightNow';
-import { TourIntelligenceSnapshot } from '../overview-v3/TourIntelligenceSnapshot';
-import { MomentumIndex } from '../overview-v3/MomentumIndex';
-import { TourTitles } from '../overview-v3/TourTitles';
-import { CollegeRivalries } from '../overview-v3/CollegeRivalries';
-import { WhatsComing } from '../overview-v3/WhatsComing';
-import { DeepLinksStrip } from '../overview-v3/DeepLinksStrip';
+import {
+  HeroCarousel,
+  LiveRightNow,
+  UnifiedWorldRankings,
+  ScheduleModule,
+} from '../overview-v3';
+import { CollegeRankingsPreview } from '../overview-v3/CollegeRankingsPreview';
+import { SeasonLeaderboards } from '../overview-v3/SeasonLeaderboards';
+import { TournamentInsights } from '../tournament-insights';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { usePreventOverscroll } from '@/hooks/usePreventOverscroll';
@@ -31,68 +31,69 @@ import { HERO_STYLES } from '../../constants/heroStyles';
 
 export function OverviewPageV3() {
   const { setDimmablePage, setIsLightDimmed } = useCinemaDimContext();
-  const [heroReady, setHeroReady] = useState(false);
 
+  // Prevent pull-down overscroll bounce on this immersive page
   usePreventOverscroll();
+
+  // Set transparent status bar with WHITE icons for dark hero image
   useMedianStatusBar("dark", "transparent", true, false);
 
+  // Register as dimmable page with IMMEDIATE dimming
   useLayoutEffect(() => {
     setDimmablePage('tourhub-overview');
     setIsLightDimmed(true);
-    // Mark hero as ready after a brief paint delay
-    const raf = requestAnimationFrame(() => setHeroReady(true));
+    
     return () => {
-      cancelAnimationFrame(raf);
       setDimmablePage(null);
       setIsLightDimmed(false);
     };
   }, [setDimmablePage, setIsLightDimmed]);
 
   return (
-    <div
-      className="relative min-h-screen"
-      style={{ backgroundColor: '#F8FAFC' }}
+    <motion.div
+      className="min-h-screen bg-background"
+      style={{ 
+        marginTop: 0,
+        paddingTop: 0,
+      }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
     >
-      {/* 1. Primary Hero — full-bleed, preloaded */}
-      <div
+      {/* 1. Hero Carousel - using containerNoHeader since Overview has no header */}
+      <div 
         className="relative w-full z-0"
         style={HERO_STYLES.containerNoHeader}
       >
-        <PrimaryHero />
+        <HeroCarousel hasHeader={false} />
       </div>
 
-      {/* Content sections — lazy-loaded after hero paint */}
-      {heroReady && (
-        <div id="content-below-hero" className="relative z-10">
-          <div
-            style={{
-              backgroundColor: '#F8FAFC',
-              paddingBottom: 'calc(var(--sab, 30px) + 16px)',
-            }}
-          >
-            {/* 2. Live Right Now */}
-            <LiveRightNow />
+      {/* Content sections — consistent 40px vertical rhythm between major sections */}
+      <div 
+        id="content-below-hero"
+        className="relative z-10"
+      >
+        <div className="bg-background pt-4" style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
+          {/* 2. Live Right Now (conditional - hides if no live) */}
+          <LiveRightNow />
 
-            {/* 3. Tour Intelligence Snapshot */}
-            <TourIntelligenceSnapshot />
+          {/* 3. Tournament Schedule - moved up for user priority */}
+          <ScheduleModule />
 
-            {/* 4. Momentum Index */}
-            <MomentumIndex />
+          {/* 4. Tournament Insights - AI Predictions (CLBHOUZ Intelligence) */}
+          <TournamentInsights />
 
-            {/* 5. Tour Titles */}
-            <TourTitles />
+          {/* 5. Unified World Rankings (Movers + OWGR Table) */}
+          <UnifiedWorldRankings />
 
-            {/* 6. College Rivalries */}
-            <CollegeRivalries />
+          {/* 6. Season Leaderboards */}
+          <SeasonLeaderboards />
 
-            {/* 7. What's Coming */}
-            <WhatsComing />
+          {/* 7. College Golf Rankings (NEW) */}
+          <CollegeRankingsPreview />
 
-            {/* 8. Deep Links */}
-            <DeepLinksStrip />
-          </div>
         </div>
-      )}
-    </div>
+      </div>
+    </motion.div>
   );
 }

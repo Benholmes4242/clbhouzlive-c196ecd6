@@ -71,8 +71,7 @@ function GroupAvatarCluster({ participants }: { participants?: ParticipantPrevie
   if (shown.length === 0) {
     return (
       <div 
-        className="w-14 h-14 flex items-center justify-center bg-emerald-50 border border-emerald-200/30"
-        style={{ borderRadius: '34%' }}
+        className="w-14 h-14 rounded-full flex items-center justify-center bg-emerald-50 border border-emerald-200/30"
       >
         <Users className="w-6 h-6 text-emerald-600" />
       </div>
@@ -91,9 +90,8 @@ function GroupAvatarCluster({ participants }: { participants?: ParticipantPrevie
         return (
           <div
             key={p.id || i}
-            className="absolute border-2 border-card overflow-hidden"
+            className="absolute rounded-full border-2 border-card overflow-hidden"
             style={{ 
-              borderRadius: '34%',
               width: size, height: size,
               ...pos,
               zIndex: shown.length - i,
@@ -276,17 +274,23 @@ export function HubMessagesCardPolished({ conversations, userId, unreadCount, is
                 >
                   {/* Avatar */}
                   <div className="relative flex-shrink-0" aria-hidden="true">
-                    <SquircleAvatar
-                      size={56}
-                      src={conv.avatarUrl}
-                      alt={conv.name}
-                      fallback={conv.name.charAt(0).toUpperCase()}
-                      hideRing
-                    />
-                    {!conv.isGroup && presenceStatus && (
-                      <div className="absolute -bottom-0.5 -right-0.5">
-                        <OnlineDot status={presenceStatus} />
-                      </div>
+                    {conv.isGroup ? (
+                      <GroupAvatarCluster participants={conv.participants} />
+                    ) : (
+                      <>
+                        <SquircleAvatar
+                          size={56}
+                          src={conv.avatarUrl}
+                          alt={conv.name}
+                          fallback={conv.name.charAt(0).toUpperCase()}
+                          hideRing
+                        />
+                        {presenceStatus && (
+                          <div className="absolute -bottom-0.5 -right-0.5">
+                            <OnlineDot status={presenceStatus} />
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                   

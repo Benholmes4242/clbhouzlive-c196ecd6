@@ -1,23 +1,30 @@
-// Overview V3 Components - Editorial Golf Intelligence Destination
+// Overview V3 Components - World-class Tour Hub Overview
 
-// Primary modules (new architecture)
-export { PrimaryHero } from './PrimaryHero';
-export { TourIntelligenceSnapshot } from './TourIntelligenceSnapshot';
-export { MomentumIndex } from './MomentumIndex';
-export { TourTitles } from './TourTitles';
-export { CollegeRivalries } from './CollegeRivalries';
-export { WhatsComing } from './WhatsComing';
-export { DeepLinksStrip } from './DeepLinksStrip';
-
-// Preserved modules (used on other pages)
-export { LiveRightNow } from './LiveRightNow';
-export { ScheduleModule } from './ScheduleModule';
-export { UnifiedWorldRankings } from './UnifiedWorldRankings';
-
-// Legacy exports kept for other pages that may reference them
 export { HeroCarousel } from './HeroCarousel';
 export { TourSwitcher } from './TourSwitcher';
+export { ThisWeekView } from './ThisWeekView';
+export { WorldRankingsShowcase } from './WorldRankingsShowcase';
+export { SeasonDashboardV3 } from './SeasonDashboardV3';
+export { TourBreakdown } from './TourBreakdown';
+
+// New Modules
+export { LiveRightNow } from './LiveRightNow';
+export { ComingUpNext } from './ComingUpNext';
+export { MoversThisWeek } from './MoversThisWeek';
+export { LiveGolfPulse } from './LiveGolfPulse';
 export { WorldRankingsModule } from './WorldRankingsModule';
 export { SeasonStatsShowcase } from './SeasonStatsShowcase';
+
+// Unified World Rankings (combines Movers + OWGR Table)
+export { UnifiedWorldRankings } from './UnifiedWorldRankings';
+
+// Gamified Tour Hub Modules
 export { PowerLadderModule } from './PowerLadderModule';
 export { LiveArenaHero } from './LiveArenaHero';
+// PredictionsModule moved to ../predictions/AIPredictionsModule
+
+// Unified Season Leaderboards (replaces SkillTreeModule + SeasonStatsCarousel)
+export { SeasonLeaderboards } from './SeasonLeaderboards';
+
+// Tournament Schedule
+export { ScheduleModule } from './ScheduleModule';
