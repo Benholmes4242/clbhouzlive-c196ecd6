@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
@@ -42,7 +42,6 @@ const ACCESS_LABELS: Record<string, string> = {
 // Map category to cleaner display text
 function getCategoryDisplay(category: string | null | undefined): string {
   if (!category) return '';
-  // "Brand / Manufacturer" → "Brand"
   if (category.toLowerCase().includes('brand')) return 'Brand';
   return category;
 }
@@ -79,7 +78,6 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
   
   const canDelete = role === 'owner';
   const canManage = role === 'owner' || role === 'admin';
-  const isOwner = role === 'owner';
   
   // Derive verification state
   const verificationState = deriveVerificationState(business.is_verified, verificationRequest);
@@ -87,7 +85,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
   // Check if domain verification is required
   const needsDomainVerification = verificationRequest?.requires_domain_check && !verificationRequest?.domain_confirmed;
 
-  // Format stat display - show "-" for zero/empty with fixed width
+  // Format stat display - show "-" for zero/empty
   const formatStat = (value: number | undefined) => {
     if (value === undefined || value === 0) return '-';
     return value.toLocaleString();
@@ -109,10 +107,26 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
   };
 
   const handleRowClick = (e: React.MouseEvent) => {
-    // Don't navigate if clicking on buttons or dropdown
     if ((e.target as HTMLElement).closest('button')) return;
     navigate(`/business/${business.id}`);
   };
+
+  // Stat tap handlers (Fix 1)
+  const handleStatTap = (target: 'followers' | 'insights') => {
+    if (target === 'followers') {
+      navigate(`/business/${business.id}/followers`);
+    } else {
+      navigate(`/business/${business.id}/insights`);
+    }
+  };
+
+  const categoryDisplay = getCategoryDisplay(business.category);
+  const locationDisplay = getCityCountry({
+    city: business.city,
+    region: business.region,
+    country: business.country,
+    location: business.location,
+  });
 
   return (
     <>
@@ -120,22 +134,22 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.05, duration: 0.2, ease: 'easeOut' }}
-        className="bg-white"
+        className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden"
       >
-        {/* Business Row */}
+        {/* Business Identity Row */}
         <div 
           onClick={handleRowClick}
-          className="flex items-start gap-3.5 px-4 py-3.5 cursor-pointer hover:bg-muted/30 transition-colors"
+          className="flex items-start gap-3.5 p-5 pb-3 cursor-pointer"
         >
-          {/* Logo */}
+          {/* Logo — 48px squircle */}
           {business.logo_url ? (
             <img
               src={business.logo_url}
               alt={business.name}
-              className="h-11 w-11 rounded-full object-cover flex-shrink-0"
+              className="h-12 w-12 rounded-xl object-cover flex-shrink-0 ring-1 ring-border"
             />
           ) : (
-            <div className="h-11 w-11 rounded-full bg-muted flex items-center justify-center text-base font-semibold flex-shrink-0">
+            <div className="h-12 w-12 rounded-xl bg-muted ring-1 ring-border flex items-center justify-center text-base font-semibold text-foreground flex-shrink-0">
               {business.name.charAt(0).toUpperCase()}
             </div>
           )}
@@ -144,48 +158,37 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
           <div className="flex-1 min-w-0">
             {/* Business name row */}
             <div className="flex items-center gap-1.5">
-              <span className="font-semibold text-foreground truncate text-[15px]">{business.name}</span>
-              {business.is_verified && (
-                <VerifiedBadge size="sm" />
-              )}
+              <span className="font-bold text-foreground truncate text-lg leading-tight">{business.name}</span>
+              {business.is_verified && <VerifiedBadge size="sm" />}
             </div>
             
-            {/* Access level + Category + Active pill */}
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="text-xs text-muted-foreground/80">{ACCESS_LABELS[role] || role}</span>
-              {business.category && (
-                <>
-                  <span className="text-xs text-muted-foreground/50">•</span>
-                  <span className="text-xs text-muted-foreground/80">{getCategoryDisplay(business.category)}</span>
-                </>
+            {/* Role + Category pill + Posting as badge */}
+            <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+              <span className="text-xs text-muted-foreground">{ACCESS_LABELS[role] || role}</span>
+              {categoryDisplay && (
+                <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
+                  {categoryDisplay}
+                </span>
               )}
               {isActive && (
-                <span className="ml-1.5 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-600 border border-emerald-200/60">
-                  Active
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-50 text-green-600 border border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-800">
+                  Posting as
                 </span>
               )}
             </div>
 
-            {/* Location - City + Country only */}
-            {(() => {
-              const locationDisplay = getCityCountry({
-                city: business.city,
-                region: business.region,
-                country: business.country,
-                location: business.location
-              });
-              return locationDisplay ? (
-                <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground/60">
-                  <MapPin className="h-3 w-3 flex-shrink-0" />
-                  <span className="truncate">{locationDisplay}</span>
-                </div>
-              ) : null;
-            })()}
+            {/* Location */}
+            {locationDisplay && (
+              <div className="flex items-center gap-1 mt-1.5 text-xs text-muted-foreground">
+                <MapPin className="h-3 w-3 flex-shrink-0" />
+                <span className="truncate">{locationDisplay}</span>
+              </div>
+            )}
             
-            {/* Pending verification subtext */}
+            {/* Pending verification subtext (P4) */}
             {verificationState === 'pending' && (
-              <p className="text-[10px] text-amber-600/80 mt-1">
-                {needsDomainVerification ? 'Action required: verify your domain' : 'Under review'}
+              <p className="text-xs text-[#C1A84C] mt-1">
+                {needsDomainVerification ? 'Action required: verify your domain' : 'Pending verification'}
               </p>
             )}
           </div>
@@ -194,22 +197,22 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
           <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
             <DropdownMenuTrigger asChild>
               <button 
-                className="p-1.5 -mr-1.5 hover:bg-muted/60 rounded-sq-xs transition-colors"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center -mr-2 -mt-1 active:opacity-60 rounded-xl transition-opacity"
                 onClick={(e) => e.stopPropagation()}
               >
-                <MoreHorizontal className="h-5 w-5 text-muted-foreground/70" />
+                <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent 
               align="end" 
-              className="w-52 rounded-sq-sm shadow-lg shadow-black/10 border-border/50"
+              className="w-52 rounded-xl shadow-lg border-border"
             >
               <DropdownMenuItem 
                 onClick={(e) => {
                   e.stopPropagation();
                   navigate(`/business/${business.id}`);
                 }}
-                className="gap-2.5 cursor-pointer py-2"
+                className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
               >
                 <Eye className="h-4 w-4 text-muted-foreground" />
                 View profile
@@ -219,7 +222,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                   e.stopPropagation();
                   navigate(`/business/${business.id}/edit`);
                 }}
-                className="gap-2.5 cursor-pointer py-2"
+                className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
               >
                 <Pencil className="h-4 w-4 text-muted-foreground" />
                 Edit profile
@@ -229,7 +232,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                   e.stopPropagation();
                   navigate(`/business/${business.id}/insights`);
                 }}
-                className="gap-2.5 cursor-pointer py-2"
+                className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
               >
                 <BarChart3 className="h-4 w-4 text-muted-foreground" />
                 Insights
@@ -240,7 +243,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                   <DropdownMenuSeparator className="my-1" />
                   <DropdownMenuItem 
                     onClick={handleManageTeam}
-                    className="gap-2.5 cursor-pointer py-2"
+                    className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
                   >
                     <Users className="h-4 w-4 text-muted-foreground" />
                     Manage team
@@ -251,12 +254,12 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                   
                   {/* Verification menu item - state-based */}
                   {verificationState === 'verified' ? (
-                    <DropdownMenuItem disabled className="gap-2.5 py-2 text-emerald-600">
+                    <DropdownMenuItem disabled className="gap-2.5 min-h-[44px] text-green-600 opacity-50 cursor-default">
                       <CheckCircle className="h-4 w-4" />
                       Verified
                     </DropdownMenuItem>
                   ) : verificationState === 'pending' ? (
-                    <DropdownMenuItem disabled className="gap-2.5 py-2 text-amber-600">
+                    <DropdownMenuItem disabled className="gap-2.5 min-h-[44px] text-[#C1A84C] opacity-50 cursor-default">
                       <Clock className="h-4 w-4" />
                       Verification pending
                     </DropdownMenuItem>
@@ -266,7 +269,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                         e.stopPropagation();
                         setShowVerificationModal(true);
                       }}
-                      className="gap-2.5 cursor-pointer py-2"
+                      className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
                     >
                       <ShieldCheck className="h-4 w-4 text-muted-foreground" />
                       {verificationState === 'rejected' ? 'Request verification (reapply)' : 'Request verification'}
@@ -283,7 +286,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                       e.stopPropagation();
                       setShowDeleteDialog(true);
                     }}
-                    className="gap-2.5 cursor-pointer py-2 text-destructive focus:text-destructive focus:bg-destructive/10"
+                    className="gap-2.5 cursor-pointer min-h-[44px] text-destructive focus:text-destructive focus:bg-destructive/10"
                   >
                     <Trash2 className="h-4 w-4" />
                     Delete business profile
@@ -294,47 +297,66 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
           </DropdownMenu>
         </div>
 
-        {/* Hairline divider above metrics */}
-        <div className="h-px bg-border/20" />
+        {/* Stats Strip — elevated background with tappable stats */}
+        <div className="px-5 pb-3">
+          <div className="bg-muted/50 rounded-xl p-3">
+            <div className="grid grid-cols-3 text-center">
+              {/* Visits */}
+              <button
+                onClick={() => handleStatTap('insights')}
+                className="flex flex-col items-center justify-center cursor-pointer active:opacity-70 transition-opacity border-r border-border pr-2"
+              >
+                <p className={cn(
+                  "text-lg font-bold tabular-nums min-w-[2ch]",
+                  statsLoading ? "opacity-0" : (stats?.visits ? "text-foreground" : "text-muted-foreground")
+                )}>
+                  {statsLoading ? '-' : formatStat(stats?.visits)}
+                </p>
+                <p className="text-[11px] text-muted-foreground uppercase tracking-wide mt-0.5">Visits (7d)</p>
+              </button>
 
-        {/* Metrics Strip - flat, inline */}
-        <div className="px-4 py-3.5">
-          <div className="grid grid-cols-3 text-center">
-            <div className="flex flex-col items-center justify-center">
-              <p className="text-lg font-semibold text-foreground tabular-nums min-w-[2ch]">
-                {statsLoading ? <span className="opacity-0">-</span> : formatStat(stats?.visits)}
-              </p>
-              <p className="text-[11px] text-muted-foreground/70 mt-0.5">Visits (7d)</p>
-            </div>
-            <div className="flex flex-col items-center justify-center">
-              {/* TOTAL followers from source of truth */}
-              <p className="text-lg font-semibold text-foreground tabular-nums min-w-[2ch]">
-                {followersLoading ? <span className="opacity-0">-</span> : formatStat(totalFollowers)}
-              </p>
-              <p className="text-[11px] text-muted-foreground/70 mt-0.5">
-                Followers
-                {/* Show 7-day delta as secondary info */}
-                {!statsLoading && stats?.followersGained !== undefined && stats.followersGained !== 0 && (
-                  <span className="ml-1 text-muted-foreground/50">({formatDelta(stats.followersGained)})</span>
-                )}
-              </p>
-            </div>
-            <div className="flex flex-col items-center justify-center">
-              <p className="text-lg font-semibold text-foreground tabular-nums min-w-[2ch]">
-                {statsLoading ? <span className="opacity-0">-</span> : formatStat(stats?.impressions)}
-              </p>
-              <p className="text-[11px] text-muted-foreground/70 mt-0.5">Impressions (7d)</p>
+              {/* Followers */}
+              <button
+                onClick={() => handleStatTap('followers')}
+                className="flex flex-col items-center justify-center cursor-pointer active:opacity-70 transition-opacity border-r border-border px-2"
+              >
+                <p className={cn(
+                  "text-lg font-bold tabular-nums min-w-[2ch]",
+                  followersLoading ? "opacity-0" : (totalFollowers ? "text-foreground" : "text-muted-foreground")
+                )}>
+                  {followersLoading ? '-' : formatStat(totalFollowers)}
+                </p>
+                <p className="text-[11px] text-muted-foreground uppercase tracking-wide mt-0.5">
+                  Followers
+                  {!statsLoading && stats?.followersGained !== undefined && stats.followersGained !== 0 && (
+                    <span className="ml-1 text-muted-foreground/50">({formatDelta(stats.followersGained)})</span>
+                  )}
+                </p>
+              </button>
+
+              {/* Impressions */}
+              <button
+                onClick={() => handleStatTap('insights')}
+                className="flex flex-col items-center justify-center cursor-pointer active:opacity-70 transition-opacity pl-2"
+              >
+                <p className={cn(
+                  "text-lg font-bold tabular-nums min-w-[2ch]",
+                  statsLoading ? "opacity-0" : (stats?.impressions ? "text-foreground" : "text-muted-foreground")
+                )}>
+                  {statsLoading ? '-' : formatStat(stats?.impressions)}
+                </p>
+                <p className="text-[11px] text-muted-foreground uppercase tracking-wide mt-0.5">Impressions (7d)</p>
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Hairline divider below metrics */}
-        <div className="h-px bg-border/20" />
+        {/* Divider */}
+        <div className="h-px bg-border mx-5" />
 
-        {/* Actions Row - flat buttons with refined styling */}
-        <div className="flex items-center gap-3 px-4 py-3.5">
+        {/* Actions Row */}
+        <div className="flex items-center gap-2 p-5 pt-3">
           {needsDomainVerification ? (
-            // Show domain verification CTA when required
             <Button
               variant="default"
               size="sm"
@@ -342,7 +364,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                 e.stopPropagation();
                 navigate(`/business/${business.id}/verify-domain`);
               }}
-              className="gap-1.5 h-9 flex-1 active:scale-[0.98] transition-all"
+              className="gap-1.5 min-h-[44px] flex-1 active:scale-[0.97] transition-all rounded-xl"
             >
               <Mail className="h-3.5 w-3.5" />
               Verify domain now
@@ -356,8 +378,9 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                   e.stopPropagation();
                   navigate(`/business/${business.id}/edit`);
                 }}
-                className="h-9 flex-1 text-xs whitespace-nowrap border-[#e2e8f0] hover:bg-[#f8fafc] hover:border-[#cbd5e1] active:scale-[0.98] transition-all rounded-lg"
+                className="min-h-[44px] flex-1 text-sm font-medium border-border bg-card text-foreground active:scale-[0.97] transition-transform rounded-xl flex items-center justify-center gap-1.5"
               >
+                <Pencil className="h-3.5 w-3.5" />
                 Edit profile
               </Button>
               
@@ -368,8 +391,9 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                   e.stopPropagation();
                   navigate(`/business/${business.id}/insights`);
                 }}
-                className="h-9 flex-1 text-xs whitespace-nowrap border-[#e2e8f0] hover:bg-[#f8fafc] hover:border-[#cbd5e1] active:scale-[0.98] transition-all rounded-lg"
+                className="min-h-[44px] flex-1 text-sm font-medium border-border bg-card text-foreground active:scale-[0.97] transition-transform rounded-xl flex items-center justify-center gap-1.5"
               >
+                <BarChart3 className="h-3.5 w-3.5" />
                 Insights
               </Button>
               
@@ -378,11 +402,12 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                   variant="outline"
                   size="sm"
                   onClick={handleManageTeam}
-                  className="h-9 flex-1 text-xs whitespace-nowrap border-[#e2e8f0] hover:bg-[#f8fafc] hover:border-[#cbd5e1] active:scale-[0.98] transition-all rounded-lg relative"
+                  className="min-h-[44px] flex-1 text-sm font-medium border-border bg-card text-foreground active:scale-[0.97] transition-transform rounded-xl flex items-center justify-center gap-1.5 relative"
                 >
+                  <Users className="h-3.5 w-3.5" />
                   Manage team
                   {(pendingRequestsCount ?? 0) > 0 && (
-                    <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-[#F79E1B] ring-2 ring-white" />
+                    <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-[#C1A84C] ring-2 ring-card" />
                   )}
                 </Button>
               )}
