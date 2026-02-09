@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, ChevronDown, ChevronUp, MapPin, Loader2 } from 'lucide-react';
+import { ExternalLink, ChevronDown, ChevronUp, MapPin, Loader2, Pencil } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AboutMediaStrip from './AboutMediaStrip';
 import { useCourseCoordinates } from '@/hooks/useCourseCoordinates';
@@ -26,6 +26,8 @@ import CommunityScoreCard from './CommunityScoreCard';
 import { CourseTop100Spotlight } from './CourseTop100Spotlight';
 import { PersonalSection } from '@/components/courses/phase5';
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
+import { useBusinessClaimForCourse } from '@/hooks/useBusinessClaimForCourse';
+import SuggestEditModal from './SuggestEditModal';
 
 interface Course {
   id: string;
@@ -65,10 +67,12 @@ const formatDescription = (description: string) => {
 const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [showWebsiteSheet, setShowWebsiteSheet] = useState(false);
+  const [showSuggestEdit, setShowSuggestEdit] = useState(false);
   const isMobile = useIsMobile();
   const { user } = useSupabaseSession();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { data: businessClaim } = useBusinessClaimForCourse(course.id);
 
   const { coords, loading: coordsLoading } = useCourseCoordinates({
     courseId: course.id,
@@ -202,7 +206,32 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               </button>
             )}
           </div>
+          {/* Suggest an edit - only for verified business members */}
+          {businessClaim?.isVerified && (
+            <button
+              type="button"
+              onClick={() => setShowSuggestEdit(true)}
+              className="flex items-center gap-1 mt-2 text-xs text-muted-foreground active:opacity-70 transition-opacity min-h-[44px]"
+            >
+              <Pencil className="h-3 w-3" />
+              Suggest an edit
+            </button>
+          )}
         </section>
+      )}
+
+      {/* Suggest Edit Modal */}
+      {businessClaim?.isVerified && (
+        <SuggestEditModal
+          open={showSuggestEdit}
+          onClose={() => setShowSuggestEdit(false)}
+          courseId={course.id}
+          businessId={businessClaim.businessId}
+          currentData={{
+            description: course.description,
+            website_url: course.website_url,
+          }}
+        />
       )}
 
       {/* Spacer */}

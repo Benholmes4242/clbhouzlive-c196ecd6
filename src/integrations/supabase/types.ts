@@ -2550,6 +2550,66 @@ export type Database = {
           },
         ]
       }
+      course_edit_suggestions: {
+        Row: {
+          admin_notes: string | null
+          business_id: string
+          course_id: string
+          created_at: string | null
+          current_value: string | null
+          field_name: string
+          id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+          suggested_by: string
+          suggested_value: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          business_id: string
+          course_id: string
+          created_at?: string | null
+          current_value?: string | null
+          field_name: string
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          suggested_by: string
+          suggested_value: string
+        }
+        Update: {
+          admin_notes?: string | null
+          business_id?: string
+          course_id?: string
+          created_at?: string | null
+          current_value?: string | null
+          field_name?: string
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          suggested_by?: string
+          suggested_value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_edit_suggestions_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_edit_suggestions_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_media: {
         Row: {
           course_id: string

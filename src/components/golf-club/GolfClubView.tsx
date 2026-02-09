@@ -14,6 +14,7 @@ import { CourseTabs } from '@/components/courses/course-detail/CourseTabs';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
+import CourseClaimBadge from '@/components/courses/course-detail/CourseClaimBadge';
 
 
 interface GolfClubViewProps {
@@ -169,6 +170,11 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
             />
           )}
         </div>
+      </div>
+
+      {/* Claimed By Badge */}
+      <div className="px-4 pt-3 pb-1 bg-muted">
+        <CourseClaimBadge courseId={course.id} />
       </div>
 
       {/* Segmented Control Tabs - positioned below hero */}
