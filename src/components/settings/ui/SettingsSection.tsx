@@ -29,8 +29,8 @@ export function SettingsSection({
       {/* Section header - outside card */}
       <h2 
         className={cn(
-          'text-[11px] font-semibold tracking-[0.5px] uppercase mb-2.5 ml-1',
-          isDanger ? 'text-red-400' : 'text-gray-400'
+          'text-[11px] font-semibold tracking-[0.5px] mb-2.5 ml-1',
+          isDanger ? 'text-red-400' : 'text-muted-foreground'
         )}
       >
         {title}
@@ -43,7 +43,7 @@ export function SettingsSection({
           'shadow-sm',
           isDanger 
             ? 'bg-red-50/50 border border-red-100' 
-            : 'bg-white border border-gray-100'
+            : 'bg-card border border-border'
         )}
       >
         {children}

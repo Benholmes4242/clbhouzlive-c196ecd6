@@ -408,7 +408,7 @@ export function SettingsPageV2() {
   // Loading state
   if (loading) {
     return (
-      <PageRoot className="min-h-screen" style={{ background: '#F8FAFC' }}>
+      <PageRoot className="min-h-screen bg-background">
         <SettingsHeader onBack={() => navigate(-1)} />
         <div className="max-w-2xl mx-auto py-6 pb-32">
           <SettingsSkeleton />
@@ -420,14 +420,14 @@ export function SettingsPageV2() {
   // Error state
   if (error) {
     return (
-      <PageRoot className="min-h-screen" style={{ background: '#F8FAFC' }}>
+      <PageRoot className="min-h-screen bg-background">
         <SettingsHeader onBack={() => navigate(-1)} />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center space-y-4">
-            <span className="text-red-600 text-base">Error loading settings</span>
+            <span className="text-destructive text-base">Error loading settings</span>
             <button 
               onClick={() => window.location.reload()} 
-              className="block mx-auto text-sm text-gray-500 hover:text-gray-900"
+              className="block mx-auto text-sm text-muted-foreground hover:text-foreground"
             >
               Try refreshing the page
             </button>
@@ -442,7 +442,7 @@ export function SettingsPageV2() {
   const isPersonalProfile = profile?.profile_type !== 'business';
 
   return (
-    <PageRoot className="min-h-screen w-full" style={{ background: '#F8FAFC' }}>
+    <PageRoot className="min-h-screen w-full bg-background">
       <SettingsHeader onBack={() => navigate(-1)} />
       
       <div className="w-full max-w-2xl mx-auto py-6 pb-32 space-y-6">
@@ -472,7 +472,7 @@ export function SettingsPageV2() {
             isLast
             iconTheme="account"
             rightContent={
-              <span className="text-[13px] text-gray-400 font-mono max-w-[45%] truncate block">
+              <span className="text-[13px] text-muted-foreground font-mono max-w-[45%] truncate block">
                 @{profile?.username || 'not set'}
               </span>
             }
@@ -685,6 +685,11 @@ export function SettingsPageV2() {
             isLast
           />
         </SettingsSection>
+
+        {/* Version info */}
+        <p className="text-xs text-muted-foreground text-center py-8">
+          Clbhouz v1.0.0 (Beta)
+        </p>
       </div>
 
 
@@ -730,25 +735,25 @@ export function SettingsPageV2() {
       
       {/* Enable creator-only confirmation */}
       <AlertDialog open={showCreatorOnlyConfirm} onOpenChange={setShowCreatorOnlyConfirm}>
-        <AlertDialogContent className="bg-white border-[rgba(31,36,40,0.1)]">
+        <AlertDialogContent className="bg-card border-border">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-[#1F2428] flex items-center gap-2">
+            <AlertDialogTitle className="text-foreground flex items-center gap-2">
               <EyeOff className="w-5 h-5" />
               Hide your personal profile?
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-[#5E666D] space-y-2">
+            <AlertDialogDescription className="text-muted-foreground space-y-2">
               <span className="block">When enabled, your profile will be hidden from non-followers.</span>
-              <span className="block text-[#97A1AA] text-[12px]">You can switch back at any time.</span>
+              <span className="block text-muted-foreground/60 text-[12px]">You can switch back at any time.</span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-[#EDEFF2] border-transparent text-[#1F2428] hover:bg-[#E4E6E9]">
+            <AlertDialogCancel className="bg-muted border-transparent text-foreground hover:bg-muted/80">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction 
               onClick={() => confirmCreatorOnly(true)}
               disabled={isUpdatingCreator}
-              className="bg-[#1F2428] text-white hover:bg-[#2A3038]"
+              className="bg-foreground text-background hover:bg-foreground/90"
             >
               {isUpdatingCreator ? 'Enabling...' : 'Enable creator-only'}
             </AlertDialogAction>
@@ -758,23 +763,23 @@ export function SettingsPageV2() {
 
       {/* Disable creator-only confirmation */}
       <AlertDialog open={showDisableCreatorOnlyConfirm} onOpenChange={setShowDisableCreatorOnlyConfirm}>
-        <AlertDialogContent className="bg-white border-[rgba(31,36,40,0.1)]">
+        <AlertDialogContent className="bg-card border-border">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-[#1F2428]">
+            <AlertDialogTitle className="text-foreground">
               Show your personal profile again?
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-[#5E666D]">
+            <AlertDialogDescription className="text-muted-foreground">
               Your profile will become visible to everyone again.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-[#EDEFF2] border-transparent text-[#1F2428] hover:bg-[#E4E6E9]">
+            <AlertDialogCancel className="bg-muted border-transparent text-foreground hover:bg-muted/80">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction 
               onClick={() => confirmCreatorOnly(false)}
               disabled={isUpdatingCreator}
-              className="bg-[#1F2428] text-white hover:bg-[#2A3038]"
+              className="bg-foreground text-background hover:bg-foreground/90"
             >
               {isUpdatingCreator ? 'Updating...' : 'Show personal profile'}
             </AlertDialogAction>
@@ -784,23 +789,23 @@ export function SettingsPageV2() {
 
       {/* Business ownership warning before delete */}
       <AlertDialog open={showBusinessWarning} onOpenChange={setShowBusinessWarning}>
-        <AlertDialogContent className="bg-white border-[rgba(31,36,40,0.1)]">
+        <AlertDialogContent className="bg-card border-border">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-amber-600 flex items-center gap-2">
               <Trash2 className="w-5 h-5" />
               You own a business profile
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-[#5E666D] space-y-3">
+            <AlertDialogDescription className="text-muted-foreground space-y-3">
               <p>
-                You own <strong className="text-[#1F2428]">{ownedBusinessNames.join(', ')}</strong>. Deleting your account will deactivate {ownedBusinessNames.length === 1 ? 'this business' : 'these businesses'} if no other owner exists.
+                You own <strong className="text-foreground">{ownedBusinessNames.join(', ')}</strong>. Deleting your account will deactivate {ownedBusinessNames.length === 1 ? 'this business' : 'these businesses'} if no other owner exists.
               </p>
-              <p className="text-[12px] text-[#97A1AA]">
+              <p className="text-[12px] text-muted-foreground/60">
                 Consider transferring ownership first via Manage Team.
               </p>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-[#EDEFF2] border-transparent text-[#1F2428] hover:bg-[#E4E6E9]">
+            <AlertDialogCancel className="bg-muted border-transparent text-foreground hover:bg-muted/80">
               Transfer ownership first
             </AlertDialogCancel>
             <AlertDialogAction 
@@ -818,33 +823,33 @@ export function SettingsPageV2() {
 
       {/* Delete account confirmation */}
       <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-        <AlertDialogContent className="bg-white border-[rgba(31,36,40,0.1)]">
+        <AlertDialogContent className="bg-card border-border">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-red-600 flex items-center gap-2">
               <Trash2 className="w-5 h-5" />
               Delete your account?
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-[#5E666D] space-y-3">
+            <AlertDialogDescription className="text-muted-foreground space-y-3">
               <p>
                 This removes your profile from Clbhouz. Some content may remain anonymised.
               </p>
               <div className="space-y-2 pt-2">
-                <Label htmlFor="delete-confirm" className="text-[#5E666D]">
-                  Type <strong className="text-[#1F2428]">DELETE</strong> to confirm:
+                <Label htmlFor="delete-confirm" className="text-muted-foreground">
+                  Type <strong className="text-foreground">DELETE</strong> to confirm:
                 </Label>
                 <Input
                   id="delete-confirm"
                   value={deleteConfirmText}
                   onChange={(e) => setDeleteConfirmText(e.target.value)}
                   placeholder="Type DELETE here"
-                  className="bg-[#FAFAFB] border-[rgba(31,36,40,0.1)] text-[#1F2428] font-mono placeholder:text-[#97A1AA]"
+                  className="bg-muted border-border text-foreground font-mono placeholder:text-muted-foreground/50"
                 />
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel 
-              className="bg-[#EDEFF2] border-transparent text-[#1F2428] hover:bg-[#E4E6E9]"
+              className="bg-muted border-transparent text-foreground hover:bg-muted/80"
               onClick={() => setDeleteConfirmText('')}
             >
               Cancel
@@ -862,19 +867,19 @@ export function SettingsPageV2() {
 
       {/* Disable Creator Mode confirmation */}
       <AlertDialog open={showDisableCreatorConfirm} onOpenChange={setShowDisableCreatorConfirm}>
-        <AlertDialogContent className="bg-white border-[rgba(31,36,40,0.1)]">
+        <AlertDialogContent className="bg-card border-border">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-[#1F2428] flex items-center gap-2">
+            <AlertDialogTitle className="text-foreground flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-amber-500" />
               Disable Creator Mode?
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-[#5E666D] space-y-2">
+            <AlertDialogDescription className="text-muted-foreground space-y-2">
               <span className="block">You'll lose access to Creator Insights, pinned posts, and featured video.</span>
-              <span className="block text-[#97A1AA] text-[12px]">Your content will remain, but these features will be hidden.</span>
+              <span className="block text-muted-foreground/60 text-[12px]">Your content will remain, but these features will be hidden.</span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-[#EDEFF2] border-transparent text-[#1F2428] hover:bg-[#E4E6E9]">
+            <AlertDialogCancel className="bg-muted border-transparent text-foreground hover:bg-muted/80">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction 
@@ -883,7 +888,7 @@ export function SettingsPageV2() {
                 handleCreatorToggle(false);
               }}
               disabled={isUpdatingCreator}
-              className="bg-[#1F2428] text-white hover:bg-[#2A3038]"
+              className="bg-foreground text-background hover:bg-foreground/90"
             >
               {isUpdatingCreator ? 'Disabling...' : 'Disable Creator Mode'}
             </AlertDialogAction>
@@ -906,9 +911,8 @@ export function SettingsPageV2() {
 function SettingsHeader({ onBack }: { onBack: () => void }) {
   return (
     <header 
-      className="sticky top-0 z-50"
+      className="sticky top-0 z-50 bg-background"
       style={{
-        background: '#F8FAFC',
         paddingTop: 'max(env(safe-area-inset-top), 0px)',
       }}
     >
@@ -916,7 +920,7 @@ function SettingsHeader({ onBack }: { onBack: () => void }) {
       <div className="pt-4 pb-3 px-4">
         <button
           onClick={onBack}
-          className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
+          className="inline-flex items-center gap-1 px-3 min-h-[44px] text-sm font-medium text-muted-foreground bg-muted hover:bg-muted/80 rounded-full transition-all active:opacity-70 active:scale-[0.97]"
         >
           <ArrowLeft className="h-4 w-4" />
           Back
@@ -925,10 +929,10 @@ function SettingsHeader({ onBack }: { onBack: () => void }) {
       
       {/* Title centered below */}
       <div className="mx-auto flex max-w-5xl flex-col gap-1 px-4 pb-5">
-        <h1 className="text-center text-2xl font-semibold tracking-tight text-gray-900">
+        <h1 className="text-center text-2xl font-semibold tracking-tight text-foreground">
           Settings
         </h1>
-        <p className="text-center text-sm text-gray-400">
+        <p className="text-center text-sm text-muted-foreground">
           Manage your account, creator identity<br />and preferences.
         </p>
       </div>
