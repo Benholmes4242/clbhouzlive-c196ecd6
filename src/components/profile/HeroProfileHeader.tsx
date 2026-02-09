@@ -535,6 +535,7 @@ const HeroProfileHeader = ({
           <ProfileAchievementsRail
             userId={profile.id}
             username={username}
+            isOwnProfile={isOwnProfile}
             className="mt-4"
           />
         )}
