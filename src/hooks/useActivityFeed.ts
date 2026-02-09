@@ -249,6 +249,11 @@ function getContextUrl(notification: any): string {
     }
     return '/messages';  // Fallback
   }
+  // Friend course review — deep link to Reviews tab with specific review highlighted
+  if ((type === 'friend_course_review' || type === 'course_review') && data?.course_id) {
+    const reviewId = data?.review_id || entity_id;
+    return `/courses/${data.course_id}?tab=reviews&review=${reviewId}`;
+  }
   if (entity_type === 'course' && entity_id) {
     return `/courses/${entity_id}`;
   }
