@@ -3,8 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Building2, MapPin, Globe, Mail, Phone, 
-  Check, Loader2, GraduationCap, ShoppingBag, Briefcase, Flag, 
-  AlertCircle, Camera, ImageIcon, Trash2
+  Check, Loader2, Flag, 
+  AlertCircle, Camera, Trash2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,6 +29,7 @@ import { DeleteBusinessDialog } from '@/components/business/DeleteBusinessDialog
 import { SectionJumpStrip } from '@/components/profile/edit-v2/SectionJumpStrip';
 import { MapPreview } from '@/components/map/MapPreview';
 import { ImageCropModal } from '@/components/business/ImageCropModal';
+import { BUSINESS_CATEGORIES_WITH_ICONS } from '@/constants/businessCategories';
 
 // Cover aspect ratio: 1600x500 = 3.2:1
 const COVER_ASPECT_RATIO = 3.2;
@@ -40,17 +41,7 @@ const SECTIONS = [
   { id: 'location', label: 'Location' },
 ];
 
-// Categories with icons
-const BUSINESS_CATEGORIES_WITH_ICONS = [
-  { value: 'Golf Club', label: 'Golf Club', icon: Flag },
-  { value: 'Golf Academy', label: 'Golf Academy', icon: GraduationCap },
-  { value: 'Coach / Instructor', label: 'Coach / Instructor', icon: GraduationCap },
-  { value: 'Retailer / Pro Shop', label: 'Retailer / Pro Shop', icon: ShoppingBag },
-  { value: 'Club Fitter', label: 'Club Fitter', icon: Briefcase },
-  { value: 'Resort', label: 'Resort', icon: Building2 },
-  { value: 'Brand / Manufacturer', label: 'Brand / Manufacturer', icon: Briefcase },
-  { value: 'Other', label: 'Other', icon: Building2 },
-];
+// Categories imported from constants/businessCategories.ts (single source of truth)
 
 // Section header component (no card - matches personal profile)
 function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }) {
@@ -72,7 +63,7 @@ const BusinessEditPage = () => {
   
   const { data: business, isLoading: businessLoading, error: businessError } = useBusinessProfile(id);
   const { data: membership, isLoading: membershipLoading } = useBusinessMembership(id);
-  const { uploadLogo, removeLogo, uploadCover, removeCover, uploadingLogo, uploadingCover } = useBusinessImageUpload(id);
+  const { uploadLogo: doUploadLogo, removeLogo: doRemoveLogo, uploadCover: doUploadCover, removeCover: doRemoveCover, uploadingLogo, uploadingCover } = useBusinessImageUpload(id);
   
   const logoInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
@@ -96,12 +87,14 @@ const BusinessEditPage = () => {
   const [coverCropModalOpen, setCoverCropModalOpen] = useState(false);
   const [selectedLogoImage, setSelectedLogoImage] = useState<string | null>(null);
   const [selectedCoverImage, setSelectedCoverImage] = useState<string | null>(null);
-  const [logoSaved, setLogoSaved] = useState(false);
-  const [coverSaved, setCoverSaved] = useState(false);
   
-  // Local preview URLs - show cropped images immediately while uploads happen
+  // Deferred photo state — files held locally until Save
+  const [pendingLogoFile, setPendingLogoFile] = useState<File | null>(null);
+  const [pendingCoverFile, setPendingCoverFile] = useState<File | null>(null);
   const [localLogoPreview, setLocalLogoPreview] = useState<string | null>(null);
   const [localCoverPreview, setLocalCoverPreview] = useState<string | null>(null);
+  const [pendingRemoveLogo, setPendingRemoveLogo] = useState(false);
+  const [pendingRemoveCover, setPendingRemoveCover] = useState(false);
   
   const [formData, setFormData] = useState({
     businessName: '',
@@ -196,7 +189,7 @@ const BusinessEditPage = () => {
     }
   }, [business]);
 
-  // Detect if form is dirty
+  // Detect if form is dirty (includes deferred photo changes)
   const isDirty = useMemo(() => {
     if (!initialValues) return false;
     
@@ -204,9 +197,10 @@ const BusinessEditPage = () => {
     const addressChanged = JSON.stringify(address) !== JSON.stringify(initialValues.address);
     const countryChanged = countrySelection !== initialValues.countrySelection;
     const phoneChanged = JSON.stringify(phone) !== JSON.stringify(initialValues.phone);
+    const photosChanged = !!pendingLogoFile || !!pendingCoverFile || pendingRemoveLogo || pendingRemoveCover;
     
-    return formChanged || addressChanged || countryChanged || phoneChanged;
-  }, [formData, address, countrySelection, phone, initialValues]);
+    return formChanged || addressChanged || countryChanged || phoneChanged || photosChanged;
+  }, [formData, address, countrySelection, phone, initialValues, pendingLogoFile, pendingCoverFile, pendingRemoveLogo, pendingRemoveCover]);
 
   // Redirect to auth if not logged in
   useEffect(() => {
@@ -321,14 +315,25 @@ const BusinessEditPage = () => {
     setSaveSuccess(false);
 
     try {
+      // Upload deferred photos first
+      if (pendingRemoveLogo) {
+        await doRemoveLogo();
+      } else if (pendingLogoFile) {
+        await doUploadLogo(pendingLogoFile);
+      }
+      
+      if (pendingRemoveCover) {
+        await doRemoveCover();
+      } else if (pendingCoverFile) {
+        await doUploadCover(pendingCoverFile);
+      }
+
       const { error: updateError } = await supabase
         .from('business_accounts')
         .update({
           name: formData.businessName,
           category: formData.businessCategory || null,
-          // Legacy location field for backwards compatibility
           location: address.label,
-          // New address fields
           address_label: address.label,
           address_line1: address.addressLine1 || null,
           address_line2: address.addressLine2 || null,
@@ -341,7 +346,6 @@ const BusinessEditPage = () => {
           mapbox_place_id: address.mapboxPlaceId || null,
           location_precision: address.precision || null,
           location_updated_at: new Date().toISOString(),
-          // Other fields
           website: formData.businessWebsite || null,
           email: formData.businessContactEmail || null,
           phone: phone?.fullNumber || null,
@@ -357,6 +361,16 @@ const BusinessEditPage = () => {
 
       setSaveSuccess(true);
       toast.success('Changes saved');
+
+      // Reset deferred photo state
+      setPendingLogoFile(null);
+      setPendingCoverFile(null);
+      setPendingRemoveLogo(false);
+      setPendingRemoveCover(false);
+      if (localLogoPreview) URL.revokeObjectURL(localLogoPreview);
+      if (localCoverPreview) URL.revokeObjectURL(localCoverPreview);
+      setLocalLogoPreview(null);
+      setLocalCoverPreview(null);
 
       // Update initial values so form is no longer dirty
       setInitialValues({
@@ -378,13 +392,22 @@ const BusinessEditPage = () => {
   };
 
   const handleCancel = () => {
-    // Reset to initial values
+    // Reset to initial values including photos
     if (initialValues) {
       setFormData(initialValues.formData);
       setAddress(initialValues.address);
       setCountrySelection(initialValues.countrySelection);
       setPhone(initialValues.phone);
     }
+    // Clear pending photo changes
+    if (localLogoPreview) URL.revokeObjectURL(localLogoPreview);
+    if (localCoverPreview) URL.revokeObjectURL(localCoverPreview);
+    setPendingLogoFile(null);
+    setPendingCoverFile(null);
+    setLocalLogoPreview(null);
+    setLocalCoverPreview(null);
+    setPendingRemoveLogo(false);
+    setPendingRemoveCover(false);
   };
 
   // Handle pin drop confirmation
@@ -469,7 +492,7 @@ const BusinessEditPage = () => {
                 <Label className="text-xs text-muted-foreground mb-2 block">Logo</Label>
                 <div className="flex items-center gap-4">
                   <div className="flex-shrink-0 relative">
-                    {(localLogoPreview || business?.logo_url) ? (
+                    {(!pendingRemoveLogo && (localLogoPreview || business?.logo_url)) ? (
                       <SquircleAvatar
                         key={localLogoPreview || business?.logo_url}
                         src={localLogoPreview || business?.logo_url}
@@ -482,12 +505,6 @@ const BusinessEditPage = () => {
                         {business?.name?.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()}
                       </div>
                     )}
-                    {/* Saved indicator */}
-                    {logoSaved && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-sq-md">
-                        <Check className="h-6 w-6 text-white" />
-                      </div>
-                    )}
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <div className="flex items-center gap-2">
@@ -495,24 +512,18 @@ const BusinessEditPage = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => logoInputRef.current?.click()}
-                        disabled={uploadingLogo}
                         className="text-xs h-8"
                       >
-                        {uploadingLogo ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        ) : logoSaved ? (
-                          <>
-                            <Check className="h-3.5 w-3.5 mr-1" />
-                            Saved
-                          </>
-                        ) : (
-                          'Change'
-                        )}
+                        Change
                       </Button>
-                      {business?.logo_url && (
+                      {(business?.logo_url || localLogoPreview) && !pendingRemoveLogo && (
                         <button
-                          onClick={() => removeLogo()}
-                          disabled={uploadingLogo}
+                          onClick={() => {
+                            setPendingRemoveLogo(true);
+                            setPendingLogoFile(null);
+                            if (localLogoPreview) URL.revokeObjectURL(localLogoPreview);
+                            setLocalLogoPreview(null);
+                          }}
                           className="text-xs text-muted-foreground hover:text-destructive transition-colors"
                         >
                           Remove
@@ -551,15 +562,28 @@ const BusinessEditPage = () => {
                       This image appears at the top of your profile. Use a wide, landscape photo.
                     </p>
                   </div>
-                  {business?.cover_image_url && (
-                    <button
-                      type="button"
-                      onClick={() => coverInputRef.current?.click()}
-                      disabled={uploadingCover}
-                      className="text-sm font-medium text-slate-600 hover:text-slate-500"
-                    >
-                      {uploadingCover ? 'Uploading...' : coverSaved ? '✓ Saved' : 'Change photo'}
-                    </button>
+                  {(!pendingRemoveCover && (localCoverPreview || business?.cover_image_url)) && (
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => coverInputRef.current?.click()}
+                        className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        Change
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPendingRemoveCover(true);
+                          setPendingCoverFile(null);
+                          if (localCoverPreview) URL.revokeObjectURL(localCoverPreview);
+                          setLocalCoverPreview(null);
+                        }}
+                        className="text-xs text-muted-foreground hover:text-destructive transition-colors"
+                      >
+                        Remove
+                      </button>
+                    </div>
                   )}
                 </div>
 
@@ -569,7 +593,7 @@ const BusinessEditPage = () => {
                   disabled={uploadingCover}
                   className="relative w-full aspect-[3.2/1] overflow-hidden rounded-xl border border-dashed border-border/70 bg-muted/40 flex items-center justify-center hover:bg-muted/60 transition-colors group"
                 >
-                  {(localCoverPreview || business?.cover_image_url) ? (
+                  {(!pendingRemoveCover && (localCoverPreview || business?.cover_image_url)) ? (
                     <>
                       <img
                         key={localCoverPreview || business?.cover_image_url}
@@ -583,23 +607,10 @@ const BusinessEditPage = () => {
                           Change photo
                         </div>
                       </div>
-                      {/* Saved indicator */}
-                      {coverSaved && (
-                        <div className="absolute top-3 right-3 flex items-center gap-1.5 px-2 py-1 rounded-full bg-green-500 text-white text-xs font-medium">
-                          <Check className="h-3 w-3" />
-                          Saved
-                        </div>
-                      )}
-                      {uploadingCover && (
-                        <div className="absolute bottom-3 right-3 flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/60 text-white text-xs">
-                          <Loader2 className="h-3 w-3 animate-spin" />
-                          Uploading...
-                        </div>
-                      )}
                     </>
                   ) : (
                     <span className="text-xs text-muted-foreground">
-                      {uploadingCover ? 'Uploading...' : 'Tap to upload a header photo'}
+                      Tap to upload a header photo
                     </span>
                   )}
                 </button>
@@ -640,29 +651,20 @@ const BusinessEditPage = () => {
                 }}
                 imageSrc={selectedLogoImage}
                 aspectRatio={1}
-                onCropComplete={async (croppedFile) => {
-                  // Create local preview immediately
-                  const previewUrl = URL.createObjectURL(croppedFile);
-                  setLocalLogoPreview(previewUrl);
+                onCropComplete={(croppedFile) => {
+                  // Store file for deferred upload on Save
+                  setPendingLogoFile(croppedFile);
+                  setPendingRemoveLogo(false);
                   
-                  // Upload in background
-                  await uploadLogo(croppedFile);
+                  // Show local preview
+                  if (localLogoPreview) URL.revokeObjectURL(localLogoPreview);
+                  setLocalLogoPreview(URL.createObjectURL(croppedFile));
                   
                   // Clean up the original selected image URL
                   if (selectedLogoImage) {
                     URL.revokeObjectURL(selectedLogoImage);
                     setSelectedLogoImage(null);
                   }
-                  
-                  // Show saved indicator
-                  setLogoSaved(true);
-                  setTimeout(() => setLogoSaved(false), 2000);
-                  
-                  // Clear local preview after a short delay to let the query refetch
-                  setTimeout(() => {
-                    if (previewUrl) URL.revokeObjectURL(previewUrl);
-                    setLocalLogoPreview(null);
-                  }, 3000);
                 }}
                 title="Crop Logo"
               />
@@ -681,29 +683,15 @@ const BusinessEditPage = () => {
                 }}
                 imageSrc={selectedCoverImage}
                 aspectRatio={COVER_ASPECT_RATIO}
-                onCropComplete={async (croppedFile) => {
-                  // Create local preview immediately
-                  const previewUrl = URL.createObjectURL(croppedFile);
-                  setLocalCoverPreview(previewUrl);
-                  
-                  // Upload in background
-                  await uploadCover(croppedFile);
-                  
-                  // Clean up the original selected image URL
+                onCropComplete={(croppedFile) => {
+                  setPendingCoverFile(croppedFile);
+                  setPendingRemoveCover(false);
+                  if (localCoverPreview) URL.revokeObjectURL(localCoverPreview);
+                  setLocalCoverPreview(URL.createObjectURL(croppedFile));
                   if (selectedCoverImage) {
                     URL.revokeObjectURL(selectedCoverImage);
                     setSelectedCoverImage(null);
                   }
-                  
-                  // Show saved indicator
-                  setCoverSaved(true);
-                  setTimeout(() => setCoverSaved(false), 2000);
-                  
-                  // Clear local preview after a short delay to let the query refetch
-                  setTimeout(() => {
-                    if (previewUrl) URL.revokeObjectURL(previewUrl);
-                    setLocalCoverPreview(null);
-                  }, 3000);
                 }}
                 title="Crop Cover Photo"
               />
@@ -809,7 +797,7 @@ const BusinessEditPage = () => {
                 onChange={(e) => handleInputChange('businessBio', e.target.value)}
                 placeholder="Tell golfers about your business..."
                 className="min-h-[140px] resize-none"
-                maxLength={2000}
+                maxLength={2500}
               />
             </div>
           </section>
