@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Eye, Users, MousePointerClick, UserPlus, Phone, Globe, MapPin, MessageSquare, TrendingUp, TrendingDown, Star, MessageCircle, BarChart3, Search, Share2, FileText, Compass } from 'lucide-react';
+import { ArrowLeft, BarChart3, Star, MessageCircle } from 'lucide-react';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useBusinessReviewStats } from '@/hooks/useBusinessReviewStats';
@@ -32,7 +32,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
       <section className="bg-card border border-border rounded-[18px] p-4 md:p-5">
         <h3 className="text-[0.9rem] font-medium text-foreground mb-4">Reviews & reputation</h3>
         <div className="flex items-center justify-center h-32">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#C1A84C]" />
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
         </div>
       </section>
     );
@@ -92,8 +92,8 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
               <span className="text-xs text-muted-foreground w-5 text-right">{item.score}</span>
               <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-[#C1A84C] rounded-full transition-all"
-                  style={{ width: `${(item.count / maxCount) * 100}%` }}
+                  className="h-full rounded-full transition-all"
+                  style={{ width: `${(item.count / maxCount) * 100}%`, backgroundColor: '#f59e0b' }}
                 />
               </div>
               <span className="text-xs text-muted-foreground w-6 text-right">{item.count}</span>
@@ -120,7 +120,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
       {/* Action prompts */}
       <div className="flex flex-col sm:flex-row gap-2">
         {reviewStats.unrespondedCount > 0 && (
-          <div className="flex items-center gap-2 text-xs text-[#C1A84C]">
+          <div className="flex items-center gap-2 text-xs" style={{ color: '#f59e0b' }}>
             <MessageCircle className="h-3.5 w-3.5" />
             <span>{reviewStats.unrespondedCount} review{reviewStats.unrespondedCount !== 1 ? 's' : ''} awaiting your response</span>
           </div>
@@ -145,7 +145,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
                 </p>
               </div>
               <div className="flex items-center gap-1 flex-shrink-0">
-                <Star className="h-3 w-3 text-[#C1A84C] fill-[#C1A84C]" />
+                <Star className="h-3 w-3" style={{ color: '#f59e0b', fill: '#f59e0b' }} />
                 <span className="text-sm font-medium text-foreground">{course.avgRating}</span>
               </div>
             </button>
@@ -157,7 +157,8 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
       {reviewStats.courses.length > 0 && (
         <button
           onClick={() => navigate(`/courses/${reviewStats.courses[0].id}?tab=reviews`)}
-          className="text-[0.8rem] text-[#C1A84C] hover:underline"
+          className="text-[0.8rem] hover:underline"
+          style={{ color: '#f59e0b' }}
         >
           View all reviews ›
         </button>
@@ -196,7 +197,7 @@ const BusinessInsightsPageV2 = () => {
     return (
       <PageRoot className="min-h-screen bg-background">
         <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#C1A84C]" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
         </div>
       </PageRoot>
     );
@@ -219,7 +220,7 @@ const BusinessInsightsPageV2 = () => {
     return (
       <PageRoot className="min-h-screen bg-background">
         <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#C1A84C]" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
         </div>
       </PageRoot>
     );
@@ -261,7 +262,7 @@ const BusinessInsightsPageV2 = () => {
                   className={cn(
                     "px-3 md:px-4 py-1.5 text-[0.8rem] rounded-full transition-colors",
                     dateRange === range 
-                      ? "bg-[#C1A84C] text-white font-medium" 
+                      ? "bg-primary text-primary-foreground font-medium" 
                       : "text-muted-foreground hover:text-foreground"
                   )}
                 >
