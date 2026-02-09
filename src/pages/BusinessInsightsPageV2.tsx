@@ -32,7 +32,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
       <section className="bg-card border border-border rounded-[18px] p-4 md:p-5">
         <h3 className="text-[0.9rem] font-medium text-foreground mb-4">Reviews & reputation</h3>
         <div className="flex items-center justify-center h-32">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#f59e0b]" />
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#C1A84C]" />
         </div>
       </section>
     );
@@ -92,7 +92,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
               <span className="text-xs text-muted-foreground w-5 text-right">{item.score}</span>
               <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-[#f59e0b] rounded-full transition-all"
+                  className="h-full bg-[#C1A84C] rounded-full transition-all"
                   style={{ width: `${(item.count / maxCount) * 100}%` }}
                 />
               </div>
@@ -120,7 +120,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
       {/* Action prompts */}
       <div className="flex flex-col sm:flex-row gap-2">
         {reviewStats.unrespondedCount > 0 && (
-          <div className="flex items-center gap-2 text-xs text-[#f59e0b]">
+          <div className="flex items-center gap-2 text-xs text-[#C1A84C]">
             <MessageCircle className="h-3.5 w-3.5" />
             <span>{reviewStats.unrespondedCount} review{reviewStats.unrespondedCount !== 1 ? 's' : ''} awaiting your response</span>
           </div>
@@ -145,7 +145,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
                 </p>
               </div>
               <div className="flex items-center gap-1 flex-shrink-0">
-                <Star className="h-3 w-3 text-[#f59e0b] fill-[#f59e0b]" />
+                <Star className="h-3 w-3 text-[#C1A84C] fill-[#C1A84C]" />
                 <span className="text-sm font-medium text-foreground">{course.avgRating}</span>
               </div>
             </button>
@@ -157,7 +157,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
       {reviewStats.courses.length > 0 && (
         <button
           onClick={() => navigate(`/courses/${reviewStats.courses[0].id}?tab=reviews`)}
-          className="text-[0.8rem] text-[#f59e0b] hover:underline"
+          className="text-[0.8rem] text-[#C1A84C] hover:underline"
         >
           View all reviews ›
         </button>
@@ -196,7 +196,7 @@ const BusinessInsightsPageV2 = () => {
     return (
       <PageRoot className="min-h-screen bg-background">
         <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#f59e0b]" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#C1A84C]" />
         </div>
       </PageRoot>
     );
@@ -219,7 +219,7 @@ const BusinessInsightsPageV2 = () => {
     return (
       <PageRoot className="min-h-screen bg-background">
         <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#f59e0b]" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#C1A84C]" />
         </div>
       </PageRoot>
     );
@@ -261,7 +261,7 @@ const BusinessInsightsPageV2 = () => {
                   className={cn(
                     "px-3 md:px-4 py-1.5 text-[0.8rem] rounded-full transition-colors",
                     dateRange === range 
-                      ? "bg-[#f59e0b] text-white font-medium" 
+                      ? "bg-[#C1A84C] text-white font-medium" 
                       : "text-muted-foreground hover:text-foreground"
                   )}
                 >

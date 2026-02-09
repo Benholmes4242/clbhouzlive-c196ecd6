@@ -1,9 +1,12 @@
 /**
- * LeaderHero - Cinematic Champion Spotlight Card
+ * LeaderHero - Premium #1 Leader Card
  * 
- * Full-width, softly elevated. Discipline-tinted gradient.
- * Big stat number with subtle glow. "SEASON LEADER" label.
- * Apple Fitness hero energy — not gaming UI.
+ * Features:
+ * - Category accent color throughout
+ * - Gradient background glow
+ * - Monospace stat number in accent color
+ * - Premium position badge
+ * - Celebratory podium treatment
  */
 
 import { memo } from 'react';
@@ -21,7 +24,11 @@ interface LeaderHeroProps {
 
 function formatCountryName(country: string | null): string {
   if (!country) return '';
-  return country.toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  return country
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 }
 
 export const LeaderHero = memo(function LeaderHero({ player, accentColor }: LeaderHeroProps) {
@@ -29,38 +36,46 @@ export const LeaderHero = memo(function LeaderHero({ player, accentColor }: Lead
   const photoUrl = player.photoUrl || (player.playerId ? getPgaTourHeadshotUrl(player.playerId) : null);
   const accent = CATEGORY_ACCENT_COLORS[accentColor];
 
+  const handleClick = () => {
+    navigate(`/tourhub/player/${player.playerId}`);
+  };
+
   return (
     <button
-      onClick={() => navigate(`/tourhub/player/${player.playerId}`)}
-      className="w-full text-left relative overflow-hidden active:scale-[0.99] transition-transform duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-      style={{
-        padding: '28px 24px',
+      onClick={handleClick}
+      className="w-full text-left transition-all duration-200 relative overflow-hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+      style={{ 
+        padding: '24px 20px',
         background: '#FFFFFF',
-        borderRadius: '20px',
-        border: '1px solid rgba(0,0,0,0.06)',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+        borderRadius: '16px',
+        border: `1px solid ${accent.border}`,
+        boxShadow: `0 2px 8px ${accent.bgLight}`,
         outlineColor: accent.primary,
       }}
-      aria-label={`Season leader: ${player.playerName}, ${player.statDisplayValue} ${player.statUnit}`}
+      aria-label={`Rank 1: ${player.playerName}, ${player.statDisplayValue} ${player.statUnit}`}
     >
-      {/* Subtle discipline-tinted gradient glow */}
-      <div
+      {/* Accent gradient glow */}
+      <div 
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: `linear-gradient(135deg, ${accent.bgLight} 0%, transparent 50%, ${accent.bgLight}44 100%)`,
-          borderRadius: '20px',
+          background: `linear-gradient(135deg, ${accent.bgLight} 0%, transparent 60%)`,
+          borderRadius: '16px',
         }}
       />
 
+      {/* Content */}
       <div className="relative">
-        {/* Row 1: Avatar + Name + "SEASON LEADER" badge */}
+        {/* Row 1: Avatar + Name Block */}
         <div className="flex items-center" style={{ gap: '14px' }}>
-          {/* Avatar with subtle accent ring */}
+          {/* Avatar container with position badge */}
           <div className="relative flex-shrink-0">
-            <div
+            {/* Avatar - 64px with accent border */}
+            <div 
               className="overflow-hidden"
               style={{
-                width: '68px', height: '68px', borderRadius: '18px',
+                width: '64px',
+                height: '64px',
+                borderRadius: '16px',
                 border: `2px solid ${accent.border}`,
               }}
             >
@@ -72,99 +87,117 @@ export const LeaderHero = memo(function LeaderHero({ player, accentColor }: Lead
                   loading="eager"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
-                    const fb = e.currentTarget.parentElement?.querySelector('.fallback-initials');
-                    if (fb) (fb as HTMLElement).style.display = 'flex';
+                    const fallback = e.currentTarget.parentElement?.querySelector('.fallback-initials');
+                    if (fallback) (fallback as HTMLElement).style.display = 'flex';
                   }}
                 />
               ) : null}
-              <div
+              <div 
                 className="fallback-initials w-full h-full flex items-center justify-center"
-                style={{
+                style={{ 
                   display: photoUrl ? 'none' : 'flex',
                   background: `linear-gradient(135deg, ${accent.bgMedium} 0%, ${accent.bgLight} 100%)`,
                 }}
               >
-                <span style={{ fontSize: '22px', fontWeight: 700, color: accent.textMuted }}>
+                <span 
+                  style={{ 
+                    fontSize: '20px',
+                    fontWeight: 700, 
+                    color: accent.textMuted,
+                  }}
+                >
                   {player.initials}
                 </span>
               </div>
             </div>
 
-            {/* #1 badge */}
-            <div
+            {/* Position badge - overlapping top-right */}
+            <div 
               className="absolute flex items-center justify-center"
               style={{
-                top: '-5px', right: '-5px',
-                width: '22px', height: '22px', borderRadius: '8px',
+                top: '-6px',
+                right: '-6px',
+                width: '22px',
+                height: '22px',
+                borderRadius: '8px',
                 background: `linear-gradient(135deg, ${accent.primary} 0%, ${accent.primary}dd 100%)`,
                 border: '2px solid #FFFFFF',
-                boxShadow: `0 2px 6px ${accent.shadow}`,
+                boxShadow: `0 2px 4px ${accent.shadow}`,
               }}
             >
               <span style={{ fontSize: '11px', fontWeight: 700, color: '#FFFFFF' }}>1</span>
             </div>
           </div>
 
-          {/* Name + Country */}
+          {/* Name block */}
           <div className="flex-1 min-w-0">
-            <span
+            <span 
               className="block truncate"
-              style={{ fontSize: '19px', fontWeight: 700, letterSpacing: '-0.01em', color: 'hsl(var(--foreground))' }}
+              style={{ 
+                fontSize: '18px', 
+                fontWeight: 700, 
+                letterSpacing: '-0.01em',
+                color: '#111827',
+              }}
             >
               {player.playerName}
             </span>
-            <div className="flex items-center mt-1" style={{ gap: '5px' }}>
+
+            {/* Country */}
+            <div className="flex items-center mt-1" style={{ gap: '4px' }}>
               <div style={{ width: '14px', height: '10px', borderRadius: '1px' }}>
                 <CountryFlag country={player.countryCode} size="sm" />
               </div>
-              <span style={{ fontSize: '12px', color: 'hsl(var(--muted-foreground))' }}>
+              <span style={{ fontSize: '12px', color: 'rgba(0, 0, 0, 0.4)' }}>
                 {formatCountryName(player.countryCode)}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Row 2: Hero stat number with soft glow */}
-        <div className="relative" style={{ marginTop: '20px' }}>
-          {/* Very soft gradient glow behind number */}
-          <div
-            className="absolute pointer-events-none"
-            style={{
-              top: '-10px', left: '-20px', right: '-20px', bottom: '-10px',
-              background: `radial-gradient(ellipse at center, ${accent.bgLight} 0%, transparent 70%)`,
-              opacity: 0.6,
+        {/* Row 2: Big Stat Number */}
+        <div className="flex items-baseline" style={{ marginTop: '16px', gap: '4px' }}>
+          <span 
+            style={{ 
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: '48px', 
+              fontWeight: 800, 
+              letterSpacing: '-2px',
+              lineHeight: 1,
+              color: accent.primary,
+              transition: 'color 0.3s ease',
             }}
-          />
-          <div className="relative flex items-baseline" style={{ gap: '4px' }}>
-            <span
-              style={{
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: '52px', fontWeight: 800, letterSpacing: '-2.5px', lineHeight: 1,
-                color: accent.primary,
-                transition: 'color 0.3s ease',
+          >
+            {player.statDisplayValue}
+          </span>
+          {player.statUnit && (
+            <span 
+              style={{ 
+                fontSize: '18px', 
+                fontWeight: 500,
+                color: 'rgba(0, 0, 0, 0.3)',
+                marginLeft: '4px',
               }}
             >
-              {player.statDisplayValue}
+              {player.statUnit}
             </span>
-            {player.statUnit && (
-              <span style={{ fontSize: '18px', fontWeight: 500, color: 'hsl(var(--muted-foreground))', marginLeft: '4px' }}>
-                {player.statUnit}
-              </span>
-            )}
-          </div>
+          )}
         </div>
 
-        {/* Row 3: "SEASON LEADER" label */}
-        <p
-          className="m-0"
-          style={{
-            marginTop: '6px', fontSize: '10px', fontWeight: 700,
-            letterSpacing: '1.5px', textTransform: 'uppercase',
+        {/* Row 3: Sub-label */}
+        <p 
+          style={{ 
+            marginTop: '4px',
+            fontSize: '10px',
+            fontWeight: 600,
+            letterSpacing: '1px',
+            textTransform: 'uppercase',
             color: accent.textMuted,
+            margin: 0,
             transition: 'color 0.3s ease',
           }}
         >
-          Season Leader
+          Season-Leading Average
         </p>
       </div>
     </button>

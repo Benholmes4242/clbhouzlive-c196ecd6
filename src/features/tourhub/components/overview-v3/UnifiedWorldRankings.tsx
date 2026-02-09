@@ -1,24 +1,15 @@
 /**
- * UnifiedWorldRankings v4 - Page-level OWGR Leaderboard
+ * UnifiedWorldRankings v4 - Broadcast-Style OWGR Leaderboard
  * 
- * Design: Card-free, rendered directly on page background.
- * Professional → Slick → Informative → Gamified (in that order).
- * 
- * Features:
- * - No outer card — page-level section
- * - Editorial narrative strip (data-driven)
- * - Momentum pill strip (horizontal scroll, no cards)
- * - Tiered hierarchy: Crown (#1), Elite (#2-3), Contender (#4-10)
- * - Rank velocity arrows per row
- * - "Chase the Crown" pts-to-#1 for ranks 2-5
- * - Stacked Avg/Total pts (modern, not spreadsheet)
- * - Broadcast-style pagination
+ * Design: Card-free, page-level section with PGA broadcast energy.
+ * Features: Momentum pill strip, tiered hierarchy, Chase the Crown,
+ * narrative strip, rank velocity arrows, broadcast pagination.
  */
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Crown } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronLeft, ChevronRight, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRankingMovers, useWorldRankingsFull } from '../../hooks/useOverviewModules';
 import CountryFlag from '@/components/ui/country-flag';
@@ -39,48 +30,72 @@ function formatCountryName(country: string | null): string {
     .join(' ');
 }
 
-/** Generate an editorial narrative from live data */
+/** Generate a narrative strip based on ranking data */
 function generateNarrative(
-  rankings: Array<{ rank: number; rank_change: number; avg_points: number | null; player: { first_name: string; last_name: string } }> | undefined,
-  movers: Array<{ lastName: string; rankChange: number; rank: number }> | undefined,
+  rankings: any[] | undefined,
+  movers: any[] | undefined
 ): string {
   if (!rankings?.length) return '';
 
   const no1 = rankings[0];
-  const no1Name = no1.player.last_name;
-  const no1Stable = no1.rank_change === 0;
+  const no1Name = no1?.player?.last_name || 'The leader';
 
-  // Find biggest mover in top 20
-  const topMovers = (movers || []).filter(m => m.rank <= 50).sort((a, b) => b.rankChange - a.rankChange);
+  // Check if #1 changed
+  const no1Stable = no1?.rank_change === 0;
+
+  // Find biggest mover in top 10
+  const topMovers = movers?.filter(m => m.rank <= 20 && m.rankChange > 0) || [];
   const biggestMover = topMovers[0];
 
-  // Check if top-5 reshuffled
-  const top5Changes = rankings.slice(0, 5).filter(r => r.rank_change !== 0);
-
-  if (biggestMover && biggestMover.rankChange >= 30) {
-    if (no1Stable) {
-      return `${no1Name} holds firm as ${biggestMover.lastName} surges +${biggestMover.rankChange}`;
-    }
-    return `${biggestMover.lastName} surges +${biggestMover.rankChange} as rankings reshuffle`;
+  if (no1Stable && biggestMover) {
+    return `${no1Name} holds firm at No.1 as ${biggestMover.lastName} surges ${biggestMover.rankChange} places`;
   }
-
-  if (top5Changes.length >= 3) {
-    return `Top-5 reshuffle as ${top5Changes.length} positions change hands`;
+  if (!no1Stable && no1?.rank_change > 0) {
+    return `${no1Name} claims the No.1 spot in this week's rankings`;
   }
-
+  if (biggestMover && biggestMover.rankChange >= 20) {
+    return `${biggestMover.lastName} rockets up ${biggestMover.rankChange} spots — biggest move of the week`;
+  }
   if (no1Stable) {
-    return `No.1 unchanged — pressure building behind ${no1Name}`;
+    return `No.1 unchanged — ${no1Name} extends reign at the summit`;
   }
-
-  if (no1.rank_change > 0) {
-    return `${no1Name} climbs to World No.1 after rankings update`;
-  }
-
-  return `${no1Name} leads the rankings into a new week`;
+  return `${no1Name} leads the Official World Golf Ranking`;
 }
 
 // ============================================================================
-// MOMENTUM PILL
+// SKELETON
+// ============================================================================
+
+function SkeletonPill() {
+  return (
+    <div className="flex-shrink-0 flex items-center gap-2 rounded-full bg-muted animate-pulse"
+      style={{ height: '40px', width: '150px' }}
+    />
+  );
+}
+
+function SkeletonRow({ index }: { index: number }) {
+  return (
+    <div className="flex items-center py-3 px-0" style={{ minHeight: '60px' }}>
+      <div className="w-9 flex justify-center">
+        <div className="h-4 w-5 rounded bg-muted animate-pulse" />
+      </div>
+      <div className="flex items-center gap-3 flex-1 min-w-0">
+        <div className="w-10 h-10 rounded-xl bg-muted animate-pulse flex-shrink-0" />
+        <div className="flex-1 space-y-1.5">
+          <div className="h-4 w-28 rounded bg-muted animate-pulse" />
+          <div className="h-3 w-16 rounded bg-muted animate-pulse" />
+        </div>
+      </div>
+      <div className="w-16 flex justify-end">
+        <div className="h-4 w-12 rounded bg-muted animate-pulse" />
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// MOMENTUM PILL — Compact, card-free
 // ============================================================================
 
 interface MomentumPillProps {
@@ -88,9 +103,11 @@ interface MomentumPillProps {
     playerId: string;
     firstName: string;
     lastName: string;
+    country: string;
     photoUrl: string | null;
     pgaTourId: string | null;
     rank: number;
+    priorRank: number | null;
     rankChange: number;
   };
   index: number;
@@ -98,86 +115,109 @@ interface MomentumPillProps {
 }
 
 function MomentumPill({ entry, index, onTap }: MomentumPillProps) {
-  const isRocket = entry.rankChange >= 30;
   const initials = `${entry.firstName?.[0] ?? ''}${entry.lastName?.[0] ?? ''}`.toUpperCase();
-
   const photoUrl = resolvePhotoUrl(entry.photoUrl, entry.pgaTourId);
+  const isRocket = entry.rankChange >= 30;
 
   return (
     <motion.button
       onClick={() => onTap(entry.playerId, entry.rank)}
-      className="flex-shrink-0 flex items-center gap-2 rounded-full bg-card border border-border active:scale-[0.97] transition-transform"
-      style={{
-        padding: '6px 12px 6px 6px',
-        scrollSnapAlign: 'start',
-      }}
-      initial={{ opacity: 0, x: 12 }}
+      className="flex-shrink-0 flex items-center gap-2 rounded-full bg-muted/60 border border-border active:scale-[0.97] transition-transform"
+      style={{ padding: '6px 12px 6px 6px', scrollSnapAlign: 'start' }}
+      initial={{ opacity: 0, x: 16 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.06, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
     >
       {/* Avatar */}
-      <div
-        className="overflow-hidden flex-shrink-0"
-        style={{ width: '28px', height: '28px', borderRadius: '50%' }}
-      >
+      <div className="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 border border-border">
         {photoUrl ? (
-          <img
-            src={photoUrl}
-            alt={entry.lastName}
-            className="w-full h-full object-cover object-top"
-            onError={(e) => { e.currentTarget.style.display = 'none'; }}
-          />
+          <img src={photoUrl} alt={entry.lastName} className="w-full h-full object-cover" loading="lazy" />
         ) : (
-          <div
-            className="w-full h-full flex items-center justify-center bg-muted"
-          >
+          <div className="w-full h-full flex items-center justify-center bg-muted">
             <span className="text-[10px] font-bold text-muted-foreground">{initials}</span>
           </div>
         )}
       </div>
 
       {/* Name */}
-      <span className="text-[13px] font-semibold text-foreground whitespace-nowrap">
-        {entry.lastName}
-      </span>
+      <span className="text-xs font-semibold text-foreground whitespace-nowrap">{entry.lastName}</span>
 
       {/* Rank (muted) */}
-      <span className="text-[11px] text-muted-foreground font-medium">
-        #{entry.rank}
-      </span>
+      <span className="text-[11px] text-muted-foreground font-mono">#{entry.rank}</span>
 
       {/* Movement badge */}
-      <span className="text-[12px] font-bold text-emerald-700 whitespace-nowrap">
-        {isRocket ? '🚀' : '↑'} +{entry.rankChange}
+      <span className="flex items-center gap-0.5 text-[11px] font-bold text-emerald-700">
+        {isRocket && <span className="text-[10px]">🚀</span>}
+        <span>↑{entry.rankChange}</span>
       </span>
     </motion.button>
   );
 }
 
 // ============================================================================
-// SKELETON
+// RANK BADGE (tiered)
 // ============================================================================
 
-function SkeletonStrip() {
-  return (
-    <div className="flex gap-2 overflow-hidden" style={{ padding: '0 16px' }}>
-      {[1, 2, 3, 4].map(i => (
-        <div key={i} className="flex-shrink-0 h-10 w-36 rounded-full bg-muted animate-pulse" />
-      ))}
-    </div>
-  );
-}
-
-function SkeletonRow({ index }: { index: number }) {
-  return (
-    <div className="flex items-center gap-3 py-3" style={{ padding: '12px 16px' }}>
-      <div className="w-6 h-4 rounded bg-muted animate-pulse" />
-      <div className="w-10 h-10 rounded-xl bg-muted animate-pulse flex-shrink-0" />
-      <div className="flex-1 space-y-1.5">
-        <div className="h-4 w-28 rounded bg-muted animate-pulse" />
-        <div className="h-3 w-16 rounded bg-muted animate-pulse" />
+function RankBadge({ rank }: { rank: number }) {
+  // Crown tier
+  if (rank === 1) {
+    return (
+      <div className="absolute -top-1 -right-1 flex items-center justify-center"
+        style={{
+          width: '20px', height: '20px', borderRadius: '7px',
+          background: 'linear-gradient(135deg, #C1A84C 0%, #DAC06A 100%)',
+          color: 'white', fontSize: '10px', fontWeight: 700,
+          border: '1.5px solid white',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+        }}
+      >
+        👑
       </div>
-      <div className="w-16 h-8 rounded bg-muted animate-pulse" />
+    );
+  }
+  // Elite tier (2-3)
+  if (rank <= 3) {
+    return (
+      <div className="absolute -top-1 -right-1 flex items-center justify-center"
+        style={{
+          width: '20px', height: '20px', borderRadius: '7px',
+          background: rank === 2
+            ? 'linear-gradient(135deg, #A5A5A5 0%, #C0C0C0 100%)'
+            : 'linear-gradient(135deg, #B08D57 0%, #CD9B5A 100%)',
+          color: 'white', fontSize: '10px', fontWeight: 700,
+          border: '1.5px solid white',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+        }}
+      >
+        {rank}
+      </div>
+    );
+  }
+  // Contender tier (4-10) — slightly elevated
+  if (rank <= 10) {
+    return (
+      <div className="absolute -top-1 -right-1 flex items-center justify-center bg-[#C1A84C]/10 text-[#C1A84C]"
+        style={{
+          width: '20px', height: '20px', borderRadius: '7px',
+          fontSize: '10px', fontWeight: 700,
+          border: '1.5px solid white',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+        }}
+      >
+        {rank}
+      </div>
+    );
+  }
+  // Standard
+  return (
+    <div className="absolute -top-1 -right-1 flex items-center justify-center bg-muted text-muted-foreground"
+      style={{
+        width: '20px', height: '20px', borderRadius: '7px',
+        fontSize: '10px', fontWeight: 700,
+        border: '1.5px solid white',
+      }}
+    >
+      {rank}
     </div>
   );
 }
@@ -205,14 +245,17 @@ export function UnifiedWorldRankings() {
   const endIndex = Math.min(startIndex + PLAYERS_PER_PAGE, totalPlayers);
   const currentPagePlayers = rankings?.slice(startIndex, endIndex) || [];
 
-  const no1AvgPts = rankings?.[0]?.avg_points ?? 0;
+  // No.1's avg points for "Chase the Crown"
+  const no1AvgPoints = rankings?.[0]?.avg_points ?? 0;
 
-  const narrative = useMemo(
-    () => generateNarrative(rankings, movers),
-    [rankings, movers],
-  );
+  const moverPlayerIds = useMemo(() => new Set(movers?.map(m => m.playerId) || []), [movers]);
 
-  // Clear highlight after animation
+  // Only upward movers for momentum strip
+  const upwardMovers = useMemo(() => (movers || []).filter(m => m.rankChange > 0), [movers]);
+
+  const narrative = useMemo(() => generateNarrative(rankings, movers), [rankings, movers]);
+
+  // Clear highlight
   useEffect(() => {
     if (highlightedPlayerId) {
       const timer = setTimeout(() => setHighlightedPlayerId(null), 1500);
@@ -220,333 +263,312 @@ export function UnifiedWorldRankings() {
     }
   }, [highlightedPlayerId]);
 
-  const goToPrevPage = () => { if (currentPage > 0) setCurrentPage(p => p - 1); };
-  const goToNextPage = () => { if (currentPage < totalPages - 1) setCurrentPage(p => p + 1); };
+  const goToPrevPage = () => { if (currentPage > 0) setCurrentPage(currentPage - 1); };
+  const goToNextPage = () => { if (currentPage < totalPages - 1) setCurrentPage(currentPage + 1); };
 
   const handleMoverTap = useCallback((playerId: string, rank: number) => {
     const playerPage = Math.floor((rank - 1) / PLAYERS_PER_PAGE);
     setCurrentPage(playerPage);
     setTimeout(() => {
       setHighlightedPlayerId(playerId);
-      rowRefs.current.get(playerId)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const el = rowRefs.current.get(playerId);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 100);
   }, []);
 
-  const setRowRef = useCallback((playerId: string, el: HTMLDivElement | null) => {
-    if (el) rowRefs.current.set(playerId, el);
+  const setRowRef = useCallback((playerId: string, element: HTMLDivElement | null) => {
+    if (element) rowRefs.current.set(playerId, element);
     else rowRefs.current.delete(playerId);
   }, []);
 
-  // Dot pagination (max 6 sliding window)
-  const maxDots = 6;
-  const getDotRange = () => {
-    if (totalPages <= maxDots) return { start: 0, end: totalPages };
-    const half = Math.floor(maxDots / 2);
+  // Dot pagination (max 6)
+  const maxVisibleDots = 6;
+  const getVisibleDotRange = () => {
+    if (totalPages <= maxVisibleDots) return { start: 0, end: totalPages };
+    const half = Math.floor(maxVisibleDots / 2);
     let start = currentPage - half;
     let end = currentPage + half;
-    if (start < 0) { start = 0; end = maxDots; }
-    else if (end >= totalPages) { end = totalPages; start = totalPages - maxDots; }
+    if (start < 0) { start = 0; end = maxVisibleDots; }
+    else if (end >= totalPages) { end = totalPages; start = totalPages - maxVisibleDots; }
     return { start, end };
   };
-  const dotRange = getDotRange();
+  const dotRange = getVisibleDotRange();
 
-  // ============ LOADING ============
+  // ── Loading ──
   if (isLoading) {
     return (
       <motion.section
-        style={{ marginTop: '40px', padding: '0 16px' }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        className="mt-10 px-4"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       >
-        <div className="flex items-center justify-between mb-4">
-          <div className="h-5 w-52 bg-muted rounded animate-pulse" />
+        {/* Header skeleton */}
+        <div className="flex items-center justify-between mb-1">
+          <div className="h-5 w-52 rounded bg-muted animate-pulse" />
+          <div className="h-4 w-16 rounded bg-muted animate-pulse" />
         </div>
-        <SkeletonStrip />
-        <div className="mt-6">
-          {[...Array(10)].map((_, i) => <SkeletonRow key={i} index={i} />)}
+        <div className="h-3 w-40 rounded bg-muted animate-pulse mb-4" />
+        <div className="border-b border-border/40 mb-5" />
+
+        {/* Momentum skeleton */}
+        <div className="h-4 w-36 rounded bg-muted animate-pulse mb-3" />
+        <div className="flex gap-2 overflow-hidden mb-6">
+          {[1, 2, 3, 4].map(i => <SkeletonPill key={i} />)}
         </div>
+
+        {/* Table skeleton */}
+        {[...Array(10)].map((_, i) => <SkeletonRow key={i} index={i} />)}
       </motion.section>
     );
   }
 
   if (!rankings?.length) return null;
 
-  const hasMovers = movers && movers.length > 0;
+  const hasMovers = upwardMovers.length > 0;
 
   return (
     <motion.section
-      style={{ marginTop: '40px', padding: '0 16px' }}
+      className="mt-10 px-4"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
     >
-      {/* ────── Section Header ────── */}
+      {/* ── Section Header ── */}
       <div className="flex items-center justify-between mb-1">
-        <h2
-          className="text-foreground"
-          style={{ fontSize: '17px', fontWeight: 600, letterSpacing: '-0.2px' }}
-        >
+        <h2 className="text-foreground text-[17px] font-semibold tracking-tight">
           Official World Golf Ranking
         </h2>
         <button
           onClick={() => navigate('/tourhub?tab=players')}
-          className="flex items-center gap-0.5 text-muted-foreground active:scale-[0.95] transition-transform"
-          style={{ fontSize: '12px', fontWeight: 600, letterSpacing: '0.3px', textTransform: 'uppercase' }}
+          className="flex items-center gap-0.5 text-muted-foreground text-[11px] font-semibold uppercase tracking-wider active:scale-95 transition-transform"
         >
           View All
           <ChevronRight className="w-3 h-3 opacity-60" />
         </button>
       </div>
-
-      {/* Subtext */}
-      <p className="text-muted-foreground mb-5" style={{ fontSize: '11px' }}>
+      <p className="text-[11px] text-muted-foreground mb-3">
         Updated weekly · Official OWGR data
       </p>
+      <div className="border-b border-border/40 mb-5" />
 
-      {/* Hairline divider */}
-      <div className="border-t border-border/60 mb-5" />
-
-      {/* ────── Narrative Strip ────── */}
+      {/* ── Narrative Strip ── */}
       {narrative && (
-        <p
-          className="text-muted-foreground italic mb-5"
-          style={{ fontSize: '13px', lineHeight: 1.5 }}
-        >
+        <p className="text-[13px] text-muted-foreground italic mb-5 leading-relaxed">
           "{narrative}"
         </p>
       )}
 
-      {/* ────── This Week's Momentum ────── */}
+      {/* ── This Week's Momentum ── */}
       {hasMovers && (
         <div className="mb-6">
-          <p
-            className="text-foreground mb-3"
-            style={{ fontSize: '13px', fontWeight: 600 }}
-          >
-            This Week's Momentum
-          </p>
+          <div className="flex items-center gap-1.5 mb-3">
+            <TrendingUp className="w-3.5 h-3.5 text-emerald-700" />
+            <span className="text-[13px] font-semibold text-foreground">This Week's Momentum</span>
+          </div>
           <div
             className="flex gap-2 overflow-x-auto scrollbar-hide pb-1"
             style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory' }}
           >
-            {movers!.map((entry, idx) => (
-              <MomentumPill
-                key={entry.playerId}
-                entry={entry}
-                index={idx}
-                onTap={handleMoverTap}
-              />
+            {upwardMovers.map((entry, idx) => (
+              <MomentumPill key={entry.playerId} entry={entry} index={idx} onTap={handleMoverTap} />
             ))}
           </div>
         </div>
       )}
 
-      {/* ────── Leaderboard Table ────── */}
-
-      {/* Column headers */}
-      <div
-        className="flex items-center pb-2 border-b border-border/60"
-      >
-        <div style={{ width: '30px', flexShrink: 0 }} />
-        <div
-          className="flex-1 min-w-0 text-muted-foreground"
-          style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' }}
-        >
-          Player
-        </div>
-        <div
-          className="text-muted-foreground text-right"
-          style={{ width: '80px', flexShrink: 0, fontSize: '10px', fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' }}
-        >
-          Points
-        </div>
-      </div>
-
-      {/* Player Rows */}
+      {/* ── Leaderboard ── */}
       <div>
-        {currentPagePlayers.map((entry, index) => {
-          const fullName = `${entry.player.first_name} ${entry.player.last_name}`;
-          const isHighlighted = highlightedPlayerId === entry.player.id;
-          const rank = entry.rank;
+        {/* Table header */}
+        <div className="flex items-center pb-2 border-b border-border/40">
+          <div className="w-8 flex-shrink-0 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            #
+          </div>
+          <div className="flex-1 min-w-0 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Player
+          </div>
+          <div className="w-[72px] flex-shrink-0 text-right text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Avg Pts
+          </div>
+        </div>
 
-          // Tier logic
-          const isCrown = rank === 1;
-          const isElite = rank >= 2 && rank <= 3;
-          const isContender = rank >= 4 && rank <= 10;
+        {/* Rows */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentPage}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+          >
+            {currentPagePlayers.map((entry, index) => {
+              const fullName = `${entry.player.first_name} ${entry.player.last_name}`;
+              const isHighlighted = highlightedPlayerId === entry.player.id;
+              const isMover = moverPlayerIds.has(entry.player.id);
 
-          // Chase the Crown: ranks 2-5
-          const showChase = rank >= 2 && rank <= 5 && no1AvgPts > 0 && entry.avg_points;
-          const ptsToNo1 = showChase ? (no1AvgPts - (entry.avg_points || 0)).toFixed(1) : null;
+              // Tier logic
+              const isCrown = entry.rank === 1;
+              const isElite = entry.rank >= 2 && entry.rank <= 3;
+              const isContender = entry.rank >= 4 && entry.rank <= 10;
 
-          // Rank velocity
-          const change = entry.rank_change;
+              // Chase the Crown (ranks 2-5)
+              const showChase = entry.rank >= 2 && entry.rank <= 5 && no1AvgPoints > 0 && entry.avg_points;
+              const ptsToNo1 = showChase ? (no1AvgPoints - (entry.avg_points || 0)).toFixed(1) : null;
 
-          // Row background — no alternating, just tier tints
-          let rowBg = 'transparent';
-          if (isCrown) rowBg = 'hsl(45 80% 96%)'; // very faint gold
-          if (isHighlighted) rowBg = 'hsl(var(--muted))';
+              // Row background
+              let rowBgClass = 'bg-transparent';
+              if (isCrown) rowBgClass = 'bg-[#C1A84C]/[0.04]';
+              if (isHighlighted) rowBgClass = 'bg-primary/[0.04]';
 
-          const photoUrl = entry.player.pga_tour_id
-            ? getPgaTourHeadshotUrl(entry.player.pga_tour_id)
-            : null;
-          const initials = `${entry.player.first_name?.[0] ?? ''}${entry.player.last_name?.[0] ?? ''}`.toUpperCase();
+              // Velocity arrow
+              const rankChange = entry.rank_change;
 
-          return (
-            <motion.div
-              key={entry.player.id}
-              ref={(el) => setRowRef(entry.player.id, el)}
-              className={cn(
-                "flex items-center cursor-pointer transition-colors duration-150 active:scale-[0.98]",
-                "border-b border-border/40",
-              )}
-              onClick={() => navigate(`/tourhub/player/${entry.player.id}`)}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.15 + Math.min(index, 10) * 0.03 }}
-              style={{
-                padding: '10px 0',
-                background: rowBg,
-              }}
-            >
-              {/* Rank + Velocity */}
-              <div
-                className="flex flex-col items-center justify-center"
-                style={{ width: '30px', flexShrink: 0 }}
-              >
-                {/* Rank number */}
-                <span
+              return (
+                <motion.div
+                  key={entry.player.id}
+                  ref={(el) => setRowRef(entry.player.id, el)}
                   className={cn(
-                    "font-mono text-xs font-bold",
-                    isCrown ? "text-[#B8860B]" : isElite ? "text-foreground" : "text-muted-foreground",
+                    'flex items-center cursor-pointer active:scale-[0.98] transition-transform',
+                    rowBgClass,
                   )}
-                >
-                  {rank}
-                </span>
-                {/* Velocity arrow */}
-                {change > 0 ? (
-                  <span className="text-[9px] font-bold text-emerald-700">↑{change}</span>
-                ) : change < 0 ? (
-                  <span className="text-[9px] font-bold text-red-500">↓{Math.abs(change)}</span>
-                ) : (
-                  <span className="text-[9px] text-muted-foreground/40">—</span>
-                )}
-              </div>
-
-              {/* Avatar */}
-              <div className="relative flex-shrink-0 mr-3">
-                <div
-                  className="overflow-hidden"
+                  onClick={() => navigate(`/tourhub/player/${entry.player.id}`)}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: Math.min(index, 10) * 0.03, ease: [0.16, 1, 0.3, 1] }}
                   style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '12px',
-                    border: isCrown
-                      ? '1.5px solid hsl(45 70% 65%)'
-                      : '1px solid hsl(var(--border))',
+                    padding: '10px 0',
+                    minHeight: '58px',
+                    borderBottom: '1px solid hsl(var(--border) / 0.3)',
+                    borderLeft: isMover ? '3px solid hsl(142 76% 36%)' : '3px solid transparent',
                   }}
                 >
-                  <div className="relative w-full h-full">
-                    <div className="absolute inset-0 flex items-center justify-center bg-muted">
-                      <span className="text-xs font-bold text-muted-foreground">{initials}</span>
-                    </div>
-                    {photoUrl && (
-                      <img
-                        src={photoUrl}
-                        alt={fullName}
-                        className="relative z-10 w-full h-full object-cover"
-                        loading="lazy"
-                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                      />
+                  {/* Rank + velocity */}
+                  <div className="w-8 flex-shrink-0 flex flex-col items-center gap-0.5">
+                    <span className={cn(
+                      'text-xs font-bold font-mono',
+                      isCrown ? 'text-[#C1A84C]' :
+                      isElite ? 'text-foreground' :
+                      isContender ? 'text-foreground/80' :
+                      'text-muted-foreground'
+                    )}>
+                      {entry.rank}
+                    </span>
+                    {/* Velocity arrow */}
+                    {rankChange > 0 ? (
+                      <span className="text-[9px] font-bold text-emerald-700">↑</span>
+                    ) : rankChange < 0 ? (
+                      <span className="text-[9px] font-bold text-red-500">↓</span>
+                    ) : (
+                      <span className="text-[9px] text-muted-foreground/40">—</span>
                     )}
                   </div>
-                </div>
-                {/* Crown icon for #1 */}
-                {isCrown && (
-                  <div className="absolute -top-1.5 -right-1.5 w-4 h-4 flex items-center justify-center">
-                    <Crown className="w-3.5 h-3.5 text-[#B8860B] fill-[#B8860B]/20" />
-                  </div>
-                )}
-              </div>
 
-              {/* Player info */}
-              <div className="min-w-0 flex-1">
-                <p
-                  className={cn(
-                    "truncate leading-tight",
-                    isCrown ? "font-bold" : isElite ? "font-semibold" : "font-medium",
-                  )}
-                  style={{
-                    fontSize: '14px',
-                    color: 'hsl(var(--foreground))',
-                  }}
-                  title={fullName}
-                >
-                  {fullName}
-                </p>
-                <div className="flex items-center gap-1 mt-0.5">
-                  <div style={{ width: '14px', height: '10px', borderRadius: '1px' }}>
-                    <CountryFlag country={entry.player.country} size="sm" />
-                  </div>
-                  <span className="text-[11px] text-muted-foreground truncate">
-                    {formatCountryName(entry.player.country)}
-                  </span>
-                </div>
-                {/* Chase the Crown */}
-                {ptsToNo1 && (
-                  <p className="text-[10px] text-muted-foreground mt-0.5">
-                    −{ptsToNo1} pts to #1
-                  </p>
-                )}
-              </div>
+                  {/* Avatar + name */}
+                  <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                    <div className="relative flex-shrink-0">
+                      <div
+                        className="overflow-hidden border border-border/60"
+                        style={{ width: '38px', height: '38px', borderRadius: '11px' }}
+                      >
+                        {(() => {
+                          const initials = `${entry.player.first_name?.[0] ?? ''}${entry.player.last_name?.[0] ?? ''}`.toUpperCase();
+                          const photoUrl = entry.player.pga_tour_id
+                            ? getPgaTourHeadshotUrl(entry.player.pga_tour_id)
+                            : null;
+                          return (
+                            <div className="relative w-full h-full">
+                              <div className="absolute inset-0 flex items-center justify-center bg-muted">
+                                <span className="text-[11px] font-bold text-muted-foreground">{initials}</span>
+                              </div>
+                              {photoUrl && (
+                                <img
+                                  src={photoUrl}
+                                  alt={fullName}
+                                  className="relative z-10 w-full h-full object-cover"
+                                  loading="lazy"
+                                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                />
+                              )}
+                            </div>
+                          );
+                        })()}
+                      </div>
+                      <RankBadge rank={entry.rank} />
+                    </div>
 
-              {/* Points — stacked */}
-              <div className="text-right flex-shrink-0" style={{ width: '80px' }}>
-                <p
-                  className="font-mono font-bold"
-                  style={{
-                    fontSize: '14px',
-                    color: isCrown ? '#B8860B' : 'hsl(var(--foreground))',
-                  }}
-                >
-                  {entry.avg_points?.toFixed(2) ?? '—'}
-                </p>
-                <p className="font-mono text-muted-foreground" style={{ fontSize: '11px' }}>
-                  {entry.total_points
-                    ? entry.total_points.toLocaleString(undefined, { maximumFractionDigits: 1 })
-                    : '—'}
-                </p>
-              </div>
-            </motion.div>
-          );
-        })}
+                    <div className="min-w-0 flex-1">
+                      <div
+                        className={cn(
+                          'truncate text-[14px] font-semibold leading-tight',
+                          isCrown || isElite ? 'text-foreground' : 'text-foreground/90'
+                        )}
+                      >
+                        {fullName}
+                      </div>
+                      <div className="flex items-center gap-1 mt-0.5">
+                        <div style={{ width: '14px', height: '10px', borderRadius: '1px' }}>
+                          <CountryFlag country={entry.player.country} size="sm" />
+                        </div>
+                        <span className="text-[11px] text-muted-foreground truncate">
+                          {formatCountryName(entry.player.country)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Points — stacked */}
+                  <div className="w-[72px] flex-shrink-0 text-right">
+                    <div
+                      className={cn(
+                        'font-mono text-[13px] font-bold',
+                        isCrown ? 'text-[#C1A84C]' : 'text-foreground'
+                      )}
+                    >
+                      {entry.avg_points?.toFixed(2) ?? '—'}
+                    </div>
+                    <div className="font-mono text-[10px] text-muted-foreground mt-0.5">
+                      {entry.total_points
+                        ? entry.total_points.toLocaleString(undefined, { maximumFractionDigits: 1 })
+                        : '—'}
+                    </div>
+                    {/* Chase the Crown */}
+                    {showChase && ptsToNo1 && (
+                      <div className="text-[9px] text-muted-foreground/70 font-medium mt-0.5">
+                        −{ptsToNo1} to #1
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              );
+            })}
+          </motion.div>
+        </AnimatePresence>
       </div>
 
-      {/* ────── Pagination ────── */}
+      {/* ── Broadcast Pagination ── */}
       {totalPages > 1 && (
-        <div className="flex flex-col items-center pt-4 pb-2">
-          <div className="flex items-center gap-3">
-            {/* Prev */}
+        <div className="pt-4 pb-1">
+          <div className="flex items-center justify-center gap-4">
             <button
               onClick={goToPrevPage}
               disabled={currentPage === 0}
-              className="w-8 h-8 flex items-center justify-center rounded-full border border-border transition-opacity disabled:opacity-20 active:scale-[0.95]"
+              className="flex items-center justify-center w-8 h-8 rounded-lg border border-border bg-card active:scale-95 transition-all disabled:opacity-30 disabled:pointer-events-none"
             >
-              <ChevronLeft className="w-4 h-4 text-muted-foreground" />
+              <ChevronLeft className="w-3.5 h-3.5 text-muted-foreground" />
             </button>
 
-            {/* Dots */}
             <div className="flex items-center gap-1.5">
               {Array.from({ length: dotRange.end - dotRange.start }).map((_, i) => {
-                const dotIdx = dotRange.start + i;
-                const isActive = dotIdx === currentPage;
+                const dotIndex = dotRange.start + i;
+                const isActive = dotIndex === currentPage;
                 return (
                   <button
-                    key={dotIdx}
-                    onClick={() => setCurrentPage(dotIdx)}
-                    className="transition-all duration-200"
+                    key={dotIndex}
+                    onClick={() => setCurrentPage(dotIndex)}
+                    className="transition-all duration-300"
                     style={{
-                      height: '6px',
-                      width: isActive ? '18px' : '6px',
+                      height: '5px',
+                      width: isActive ? '18px' : '5px',
                       borderRadius: '3px',
                       background: isActive
                         ? 'hsl(var(--foreground))'
@@ -557,17 +579,16 @@ export function UnifiedWorldRankings() {
               })}
             </div>
 
-            {/* Next */}
             <button
               onClick={goToNextPage}
               disabled={currentPage === totalPages - 1}
-              className="w-8 h-8 flex items-center justify-center rounded-full border border-border transition-opacity disabled:opacity-20 active:scale-[0.95]"
+              className="flex items-center justify-center w-8 h-8 rounded-lg border border-border bg-card active:scale-95 transition-all disabled:opacity-30 disabled:pointer-events-none"
             >
-              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+              <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
             </button>
           </div>
 
-          <p className="text-[11px] text-muted-foreground mt-2">
+          <p className="text-center text-[11px] font-medium text-muted-foreground/60 mt-2 font-mono">
             {startIndex + 1}–{endIndex} of {totalPlayers}
           </p>
         </div>
