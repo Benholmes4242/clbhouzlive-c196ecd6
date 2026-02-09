@@ -75,12 +75,12 @@ function RankingRow({ entry, no1AvgPoints }: { entry: RankingEntry; no1AvgPoints
       {/* Rank badge */}
       <div className={cn(
         "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 font-mono text-sm font-bold",
-        isCrown && "bg-amber-100 text-amber-700",
-        isElite && "bg-muted text-foreground",
-        isContender && "bg-muted/60 text-muted-foreground",
+        isCrown && "bg-red-100 text-red-700",
+        isElite && "bg-red-50 text-red-600",
+        isContender && "bg-red-50/60 text-red-500",
         !isCrown && !isElite && !isContender && "text-muted-foreground",
       )}>
-        {isCrown ? <Crown className="w-4 h-4 text-amber-600" /> : entry.rank}
+        {isCrown ? <Crown className="w-4 h-4 text-red-600" /> : entry.rank}
       </div>
 
       {/* Avatar */}
