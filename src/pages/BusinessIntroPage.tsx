@@ -143,12 +143,14 @@ const BusinessIntroPage: React.FC = () => {
             </li>
           </ul>
         </motion.section>
-      </main>
 
-      {/* Sticky footer */}
-      <footer className="fixed inset-x-0 bottom-0 z-20 border-t border-border/40 bg-background/95 backdrop-blur">
-        <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3">
-          {/* Secondary: text button */}
+        {/* CTA buttons — inline, right after content */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+          className="flex items-center gap-3 pt-6 pb-8"
+        >
           <button
             type="button"
             onClick={handleBack}
@@ -156,17 +158,14 @@ const BusinessIntroPage: React.FC = () => {
           >
             Not now
           </button>
-          
-          {/* Primary: slate button */}
           <Button
-            variant="secondary"
             onClick={handleContinue}
-            className="flex-[1.5] h-11"
+            className="flex-[1.5] h-11 bg-[#334E3D] hover:bg-[#334E3D]/90 text-white rounded-full font-semibold"
           >
             Continue to business details
           </Button>
-        </div>
-      </footer>
+        </motion.div>
+      </main>
     </PageRoot>
   );
 };
