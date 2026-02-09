@@ -26,7 +26,7 @@ import { useLazyTiles } from '@/components/shared/grid/useLazyTiles';
 import { useAdaptivePrefetch } from '@/hooks/useAdaptivePrefetch';
 import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
 import { cn } from '@/lib/utils';
-import { Image as ImageIcon, Plus, Users, RefreshCw, Loader2 } from 'lucide-react';
+import { Image as ImageIcon, Plus, Users, RefreshCw, Loader2, FileText, Video } from 'lucide-react';
 import BusinessPostCard from './BusinessPostCard';
 import TaggedPostCard from './TaggedPostCard';
 import { toast } from 'sonner';
@@ -498,7 +498,7 @@ export function BusinessActivityFeed({
         </div>
         {/* Post cards skeleton */}
         {[1, 2].map((i) => (
-          <div key={i} className="bg-white rounded-sq-md border border-border/50 overflow-hidden">
+          <div key={i} className="bg-card rounded-sq-md border border-border/50 overflow-hidden">
             <div className="p-4 space-y-3">
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-sq-sm bg-muted animate-pulse" />
@@ -519,17 +519,17 @@ export function BusinessActivityFeed({
   return (
     <div>
       {/* Sub-tabs: Activity / Tagged */}
-      <div className="flex justify-center border-b border-border/50 bg-white">
+      <div className="flex justify-center border-b border-border/50 bg-card">
         <button
           onClick={() => setFeedTab('activity')}
           className={cn(
-            'px-6 py-3 text-sm font-medium transition-colors relative',
+            'px-6 py-3 text-sm font-medium transition-colors relative min-h-[44px] active:opacity-70 transition-opacity',
             feedTab === 'activity'
               ? 'text-foreground'
               : 'text-muted-foreground hover:text-foreground'
           )}
         >
-          Activity
+          Posts
           {feedTab === 'activity' && (
             <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground" />
           )}
@@ -537,7 +537,7 @@ export function BusinessActivityFeed({
         <button
           onClick={() => setFeedTab('tagged')}
           className={cn(
-            'px-6 py-3 text-sm font-medium transition-colors relative',
+            'px-6 py-3 text-sm font-medium transition-colors relative min-h-[44px] active:opacity-70 transition-opacity',
             feedTab === 'tagged'
               ? 'text-foreground'
               : 'text-muted-foreground hover:text-foreground'
@@ -550,47 +550,49 @@ export function BusinessActivityFeed({
         </button>
       </div>
 
-      {/* Controls container */}
-      <div className="flex flex-col items-center gap-[10px] py-3">
-        {/* Filter pills */}
-        <div className="w-full max-w-[520px] mx-auto flex justify-center gap-2 px-4">
-          {FILTER_OPTIONS.map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => setActiveFilter(key)}
-              className={cn(
-                'flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-colors',
-                activeFilter === key
-                  ? 'bg-[#e2e8f0] text-slate-800'
-                  : 'bg-white text-foreground border border-border hover:bg-muted/50'
-              )}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        {/* Create post CTA - only on Activity tab for admins */}
-        {feedTab === 'activity' && canManage && (
-          <div className="w-full max-w-[520px] mx-auto px-4">
-            <button
-              onClick={handleCreatePost}
-              className={cn(
-                'w-full flex items-center justify-center gap-2',
-                'min-h-[46px] rounded-sq-md',
-                'bg-white border border-border/60',
-                'text-foreground text-sm font-medium',
-                'shadow-sm hover:shadow-md',
-                'transition-all duration-150',
-                'active:scale-[0.98] active:shadow-sm'
-              )}
-            >
-              <Plus className="h-4 w-4" />
-              Create post
-            </button>
+      {/* Controls container - only show when there are posts to filter */}
+      {filteredPosts.length > 0 && (
+        <div className="flex flex-col items-center gap-[10px] py-3">
+          {/* Filter pills */}
+          <div className="w-full max-w-[520px] mx-auto flex justify-center gap-2 px-4">
+            {FILTER_OPTIONS.map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => setActiveFilter(key)}
+                className={cn(
+                  'flex-shrink-0 px-4 py-2.5 min-h-[44px] flex items-center rounded-full text-sm font-medium transition-colors active:scale-[0.95] transition-transform',
+                  activeFilter === key
+                    ? 'bg-foreground text-background'
+                    : 'bg-card text-foreground border border-border hover:bg-muted/50'
+                )}
+              >
+                {label}
+              </button>
+            ))}
           </div>
-        )}
-      </div>
+
+          {/* Create post CTA - only on Activity tab for admins */}
+          {feedTab === 'activity' && canManage && (
+            <div className="w-full max-w-[520px] mx-auto px-4">
+              <button
+                onClick={handleCreatePost}
+                className={cn(
+                  'w-full flex items-center justify-center gap-2',
+                  'min-h-[46px] rounded-sq-md',
+                  'bg-card border border-border/60',
+                  'text-foreground text-sm font-medium',
+                  'shadow-sm hover:shadow-md',
+                  'transition-all duration-150',
+                  'active:scale-[0.98] active:shadow-sm'
+                )}
+              >
+                <Plus className="h-4 w-4" />
+                Create post
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Feed content */}
       {filteredPosts.length === 0 ? (
@@ -604,10 +606,7 @@ export function BusinessActivityFeed({
       ) : activeFilter !== 'all' ? (
         /* Use shared grid system for longform/shorts/images filters */
         <div
-          className="-mx-5 px-0 mt-3"
-          style={{
-            background: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)',
-          }}
+          className="-mx-5 px-0 mt-3 bg-muted"
         >
           <div className="py-3 md:py-4">
             <ProfileContentGrid
@@ -628,10 +627,7 @@ export function BusinessActivityFeed({
       ) : (
         /* Use original card layout for 'all' filter with LoadingBoundary */
         <div
-          className="-mx-5 px-0 mt-3"
-          style={{
-            background: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)',
-          }}
+          className="-mx-5 px-0 mt-3 bg-muted"
         >
           {/* LoadingBoundary - show skeleton until videos are ready */}
           {!isFeedReady ? (
@@ -661,7 +657,7 @@ export function BusinessActivityFeed({
                             onReady={(id) => markReadyRef.current(id)}
                           />
                         ) : (
-                          <div className="bg-white rounded-sq-md border border-border/50 overflow-hidden min-h-[300px]">
+                          <div className="bg-card rounded-sq-md border border-border/50 overflow-hidden min-h-[300px]">
                             <div className="p-4 space-y-3">
                               <div className="flex items-center gap-3">
                                 <div className="h-10 w-10 rounded-sq-sm bg-muted relative overflow-hidden">
@@ -726,7 +722,7 @@ export function BusinessActivityFeed({
                             onReady={(id) => markReadyRef.current(id)}
                           />
                         ) : (
-                          <div className="bg-white rounded-sq-md border border-border/50 overflow-hidden min-h-[300px]">
+                          <div className="bg-card rounded-sq-md border border-border/50 overflow-hidden min-h-[300px]">
                             <div className="p-4 space-y-3">
                               <div className="flex items-center gap-3">
                                 <div className="h-10 w-10 rounded-full bg-muted relative overflow-hidden">
@@ -803,7 +799,7 @@ function BusinessActivitySkeleton() {
       {[0, 1, 2].map(i => (
         <div 
           key={i} 
-          className="bg-white rounded-sq-md border border-border/50 overflow-hidden"
+          className="bg-card rounded-sq-md border border-border/50 overflow-hidden"
           style={{ 
             animationDelay: prefersReducedMotion ? '0ms' : `${i * 100}ms`,
           }}
@@ -859,8 +855,8 @@ function EmptyState({
   if (filter === 'longform') {
     return (
       <div className="py-12 text-center">
-        <div className="w-16 h-16 rounded-full mx-auto mb-4 bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center">
-          <ImageIcon className="h-7 w-7 text-[#64748b]" />
+        <div className="w-16 h-16 rounded-full mx-auto mb-4 bg-muted border border-border flex items-center justify-center">
+          <FileText className="h-7 w-7 text-muted-foreground" />
         </div>
         <p className="text-base font-medium text-foreground mb-1">No long-form videos yet</p>
         <p className="text-sm text-muted-foreground">
@@ -873,8 +869,8 @@ function EmptyState({
   if (filter === 'shorts') {
     return (
       <div className="py-12 text-center">
-        <div className="w-16 h-16 rounded-full mx-auto mb-4 bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center">
-          <ImageIcon className="h-7 w-7 text-[#64748b]" />
+        <div className="w-16 h-16 rounded-full mx-auto mb-4 bg-muted border border-border flex items-center justify-center">
+          <Video className="h-7 w-7 text-muted-foreground" />
         </div>
         <p className="text-base font-medium text-foreground mb-1">No shorts yet</p>
         <p className="text-sm text-muted-foreground">
@@ -887,8 +883,8 @@ function EmptyState({
   if (filter === 'images') {
     return (
       <div className="py-12 text-center">
-        <div className="w-16 h-16 rounded-full mx-auto mb-4 bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center">
-          <ImageIcon className="h-7 w-7 text-[#64748b]" />
+        <div className="w-16 h-16 rounded-full mx-auto mb-4 bg-muted border border-border flex items-center justify-center">
+          <ImageIcon className="h-7 w-7 text-muted-foreground" />
         </div>
         <p className="text-base font-medium text-foreground mb-1">No images yet</p>
         <p className="text-sm text-muted-foreground">
@@ -902,8 +898,8 @@ function EmptyState({
   if (tab === 'activity') {
     return (
       <div className="py-12 text-center">
-        <div className="w-16 h-16 rounded-full mx-auto mb-4 bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center">
-          <ImageIcon className="h-7 w-7 text-[#64748b]" />
+        <div className="w-16 h-16 rounded-full mx-auto mb-4 bg-muted border border-border flex items-center justify-center">
+          <FileText className="h-7 w-7 text-muted-foreground" />
         </div>
         <p className="text-base font-medium text-foreground mb-1">No posts yet</p>
         <p className="text-sm text-muted-foreground mb-4">
@@ -913,7 +909,7 @@ function EmptyState({
         </p>
         {canManage && (
           <button
-            className="rounded-full bg-slate-800 hover:bg-slate-900 text-white px-6 py-2.5 text-sm font-medium transition-colors"
+            className="rounded-full bg-[#334E3D] hover:bg-[#2a4032] text-white px-6 py-3 min-h-[44px] text-sm font-medium transition-colors active:scale-[0.97] transition-transform"
             onClick={onCreatePost}
           >
             Create your first post
@@ -926,8 +922,8 @@ function EmptyState({
   // Tagged tab empty state
   return (
     <div className="py-12 text-center">
-      <div className="w-16 h-16 rounded-full mx-auto mb-4 bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center">
-        <Users className="h-7 w-7 text-[#64748b]" />
+      <div className="w-16 h-16 rounded-full mx-auto mb-4 bg-muted border border-border flex items-center justify-center">
+        <Users className="h-7 w-7 text-muted-foreground" />
       </div>
       <p className="text-base font-medium text-foreground mb-1">No tagged posts yet</p>
       <p className="text-sm text-muted-foreground max-w-xs mx-auto">
