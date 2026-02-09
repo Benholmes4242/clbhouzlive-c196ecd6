@@ -1,11 +1,20 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 export const useFollowUser = () => {
+  const queryClient = useQueryClient();
   const { user } = useSupabaseSession();
   const [loading, setLoading] = useState(false);
+
+  const invalidateFollowCaches = (targetUserId: string) => {
+    queryClient.invalidateQueries({ queryKey: ['relationship-status', targetUserId] });
+    queryClient.invalidateQueries({ queryKey: ['followers-paginated'] });
+    queryClient.invalidateQueries({ queryKey: ['following-paginated'] });
+    queryClient.invalidateQueries({ queryKey: ['social-counts'] });
+  };
 
   const followUser = async (targetUserId: string) => {
     if (!user) {
@@ -29,6 +38,7 @@ export const useFollowUser = () => {
       }
 
       toast.success('Following user');
+      invalidateFollowCaches(targetUserId);
       return true;
     } catch (error) {
       console.error('Error following user:', error);
@@ -60,6 +70,7 @@ export const useFollowUser = () => {
       }
 
       toast.success('Unfollowed user');
+      invalidateFollowCaches(targetUserId);
       return true;
     } catch (error) {
       console.error('Error unfollowing user:', error);

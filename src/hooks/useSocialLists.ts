@@ -3,6 +3,29 @@ import { supabase } from '@/integrations/supabase/client';
 
 const PAGE_SIZE = 20;
 
+/**
+ * Fetch IDs of users blocked by or blocking the given user.
+ * Returns a Set for O(1) lookups.
+ */
+async function fetchBlockedIds(userId: string): Promise<Set<string>> {
+  const { data, error } = await supabase
+    .from('user_blocks')
+    .select('blocker_id, blocked_id')
+    .or(`blocker_id.eq.${userId},blocked_id.eq.${userId}`);
+
+  if (error) {
+    console.error('[useSocialLists] Failed to fetch blocks:', error);
+    return new Set();
+  }
+
+  const ids = new Set<string>();
+  for (const row of data || []) {
+    if (row.blocker_id !== userId) ids.add(row.blocker_id);
+    if (row.blocked_id !== userId) ids.add(row.blocked_id);
+  }
+  return ids;
+}
+
 type UserProfileRow = {
   id: string;
   username: string | null;
@@ -11,6 +34,7 @@ type UserProfileRow = {
   home_club: string | null;
   eg_handicap_index: number | null;
   creator_only: boolean | null;
+  profile_type: string | null;
 };
 
 export type SocialUser = {
@@ -21,6 +45,7 @@ export type SocialUser = {
   homeClub: string | null;
   handicapIndex: number | null;
   creatorOnly: boolean;
+  profileType: string;
 };
 
 type PageResult = {
@@ -43,6 +68,7 @@ function toSocialUser(profile: UserProfileRow): SocialUser {
     homeClub: profile.home_club,
     handicapIndex: profile.eg_handicap_index,
     creatorOnly: profile.creator_only ?? false,
+    profileType: profile.profile_type || 'personal',
   };
 }
 
@@ -51,7 +77,7 @@ async function fetchProfilesByIds(ids: string[]): Promise<Map<string, UserProfil
 
   const { data, error } = await supabase
     .from('user_profiles')
-    .select('id, username, display_name, profile_photo_url, home_club, eg_handicap_index, creator_only')
+    .select('id, username, display_name, profile_photo_url, home_club, eg_handicap_index, creator_only, profile_type')
     .in('id', ids)
     .is('deleted_at', null);
 
@@ -69,7 +95,10 @@ export function usePaginatedFollowers(userId: string | undefined) {
     queryFn: async ({ pageParam }) => {
       if (!userId) return { users: [], hasMore: false };
 
-      const { from, to } = buildRange(pageParam as number);
+      const [blockedIds, { from, to }] = await Promise.all([
+        fetchBlockedIds(userId),
+        Promise.resolve(buildRange(pageParam as number)),
+      ]);
 
       const { data: followRows, error, count } = await supabase
         .from('user_follows')
@@ -80,7 +109,9 @@ export function usePaginatedFollowers(userId: string | undefined) {
 
       if (error) throw error;
 
-      const followerIds = (followRows || []).map((r: any) => r.follower_id).filter(Boolean) as string[];
+      const followerIds = (followRows || [])
+        .map((r: any) => r.follower_id)
+        .filter((id: string) => id && !blockedIds.has(id)) as string[];
       if (followerIds.length === 0) return { users: [], hasMore: false };
 
       const profilesById = await fetchProfilesByIds(followerIds);
@@ -109,7 +140,10 @@ export function usePaginatedFollowing(userId: string | undefined) {
     queryFn: async ({ pageParam }) => {
       if (!userId) return { users: [], hasMore: false };
 
-      const { from, to } = buildRange(pageParam as number);
+      const [blockedIds, { from, to }] = await Promise.all([
+        fetchBlockedIds(userId),
+        Promise.resolve(buildRange(pageParam as number)),
+      ]);
 
       const { data: followRows, error, count } = await supabase
         .from('user_follows')
@@ -120,7 +154,9 @@ export function usePaginatedFollowing(userId: string | undefined) {
 
       if (error) throw error;
 
-      const followingIds = (followRows || []).map((r: any) => r.following_id).filter(Boolean) as string[];
+      const followingIds = (followRows || [])
+        .map((r: any) => r.following_id)
+        .filter((id: string) => id && !blockedIds.has(id)) as string[];
       if (followingIds.length === 0) return { users: [], hasMore: false };
 
       const profilesById = await fetchProfilesByIds(followingIds);
@@ -149,7 +185,10 @@ export function usePaginatedFriends(userId: string | undefined) {
     queryFn: async ({ pageParam }) => {
       if (!userId) return { users: [], hasMore: false };
 
-      const { from, to } = buildRange(pageParam as number);
+      const [blockedIds, { from, to }] = await Promise.all([
+        fetchBlockedIds(userId),
+        Promise.resolve(buildRange(pageParam as number)),
+      ]);
 
       const { data: rows, error, count } = await supabase
         .from('user_friends')
@@ -163,7 +202,7 @@ export function usePaginatedFriends(userId: string | undefined) {
 
       const friendIds = (rows || [])
         .map((row: any) => (row.user_id === userId ? row.friend_id : row.user_id))
-        .filter(Boolean) as string[];
+        .filter((id: string) => id && !blockedIds.has(id)) as string[];
 
       if (friendIds.length === 0) return { users: [], hasMore: false };
 
