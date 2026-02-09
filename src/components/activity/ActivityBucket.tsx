@@ -42,7 +42,7 @@ export const ActivityBucket: React.FC<ActivityBucketProps> = ({
           "py-2 bg-background border-y border-border"
         )}
       >
-        <span className="text-[0.75rem] font-semibold uppercase tracking-wide text-muted-foreground">
+        <span className="text-[0.75rem] font-semibold tracking-wide text-muted-foreground">
           {label}
         </span>
       </div>

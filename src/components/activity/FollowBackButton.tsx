@@ -46,31 +46,35 @@ export const FollowBackButton: React.FC<FollowBackButtonProps> = ({
     return null;
   }
 
-  // Shared base pill class for unified styling - SDS corners, 30% shorter height
-  const basePillClass = "inline-flex items-center justify-center rounded-sq-xs border px-3 h-6 text-[11px] font-semibold transition-colors";
+  // Shared base pill class for unified styling - SDS corners
+  const basePillClass = "inline-flex items-center justify-center rounded-sq-xs border px-3 h-7 text-[11px] font-semibold transition-colors active:scale-[0.93]";
 
   // Already following - show muted "Following" state with unified styling
   if (isFollowing === 'following') {
     return (
-      <span className={cn(basePillClass, "border-border bg-muted text-foreground/80 gap-1")}>
-        <Check className="h-3 w-3" />
-        Following
-      </span>
+      <div className="min-h-[44px] flex items-center">
+        <span className={cn(basePillClass, "border-blue-200 bg-blue-50 text-blue-500 gap-1")}>
+          <Check className="h-3 w-3" />
+          Following
+        </span>
+      </div>
     );
   }
 
-  // Not following - show "Follow back" button with orange glass styling
+  // Not following - show "Follow back" button with blue styling (Fix 8)
   return (
-    <button
-      onClick={handleFollowBack}
-      disabled={busy}
-      className={cn(
-        basePillClass,
-        "border-orange-500 bg-orange-500/10 text-orange-600 hover:bg-orange-500/15",
-        "disabled:opacity-60 disabled:cursor-not-allowed"
-      )}
-    >
-      {busy ? 'Following...' : 'Follow back'}
-    </button>
+    <div className="min-h-[44px] flex items-center">
+      <button
+        onClick={handleFollowBack}
+        disabled={busy}
+        className={cn(
+          basePillClass,
+          "border-blue-500 bg-blue-50 text-blue-600 hover:bg-blue-100",
+          "disabled:opacity-60 disabled:cursor-not-allowed"
+        )}
+      >
+        {busy ? 'Following...' : 'Follow back'}
+      </button>
+    </div>
   );
 };

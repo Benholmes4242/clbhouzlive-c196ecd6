@@ -283,7 +283,7 @@ const ActivityPage: React.FC = () => {
             )}
           </div>
           <p className="text-[0.875rem] text-muted-foreground mt-0.5">
-            Updates from friends, golf clubs and messages.
+            Updates from friends and golf clubs.
           </p>
         </section>
 
