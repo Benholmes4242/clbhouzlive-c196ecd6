@@ -31,7 +31,7 @@ const basePillClass = "inline-flex items-center justify-center rounded-sq-xs bor
 
 // Icon variants for different friend request states
 function getFriendBadgeIcon(isActive: boolean) {
-  return <Users className={cn("h-3 w-3", isActive ? "text-amber-500" : "text-muted-foreground")} />;
+  return <Users className={cn("h-3 w-3", isActive ? "text-green-500" : "text-muted-foreground")} />;
 }
 
 // Check if notification is a system/Clbhouz notification type
