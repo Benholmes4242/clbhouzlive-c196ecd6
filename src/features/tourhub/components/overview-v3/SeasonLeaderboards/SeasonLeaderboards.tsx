@@ -194,18 +194,10 @@ export function SeasonLeaderboards() {
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
           style={{ marginTop: '16px' }}
         >
-          {/* Stat context line */}
-          <div className="flex items-center gap-2.5 mb-4">
-            <div
-              className="flex items-center justify-center flex-shrink-0 transition-colors duration-300"
-              style={{ width: '28px', height: '28px', borderRadius: '8px', background: accent.bgMedium }}
-            >
-              <IconComponent size={14} style={{ color: accent.primary, transition: 'color 0.3s ease' }} />
-            </div>
-            <p className="m-0 text-muted-foreground" style={{ fontSize: '13px', fontWeight: 500, fontStyle: 'italic' }}>
-              {contextLine}
-            </p>
-          </div>
+          {/* Stat context line — no icon badge */}
+          <p className="m-0 text-muted-foreground mb-4" style={{ fontSize: '13px', fontWeight: 500, fontStyle: 'italic' }}>
+            {contextLine}
+          </p>
 
           {/* ═══ CHAMPION SPOTLIGHT ═══ */}
           {leader && (

@@ -1,11 +1,11 @@
 /**
- * ChasingPack - #2 and #3 as horizontal scroll cards
+ * ChasingPack - #2 and #3 as side-by-side cards
  * 
- * Smaller, flatter cards showing gap to leader.
+ * Horizontal split per card: avatar left, stats right.
  * Creates pressure without clutter.
  */
 
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CountryFlag from '@/components/ui/country-flag';
 import type { LeaderboardPlayer } from './types';
@@ -29,11 +29,6 @@ function formatDelta(playerValue: number, leaderValue: number, higherIsBetter: b
   return displayDelta.toFixed(1);
 }
 
-const POSITION_BADGES: Record<number, { background: string }> = {
-  2: { background: 'linear-gradient(135deg, #C0C0C0 0%, #9A9A9A 100%)' },
-  3: { background: 'linear-gradient(135deg, #CD7F32 0%, #A0622E 100%)' },
-};
-
 const ChaserCard = memo(function ChaserCard({
   player, leaderValue, higherIsBetter, unit, accentColor,
 }: {
@@ -47,7 +42,9 @@ const ChaserCard = memo(function ChaserCard({
   const photoUrl = player.photoUrl || (player.playerId ? getPgaTourHeadshotUrl(player.playerId) : null);
   const delta = formatDelta(player.statValue, leaderValue, higherIsBetter);
   const accent = CATEGORY_ACCENT_COLORS[accentColor];
-  const badge = POSITION_BADGES[player.rank];
+  const [imgError, setImgError] = useState(false);
+
+  const showPhoto = photoUrl && !imgError;
 
   return (
     <button
@@ -56,7 +53,7 @@ const ChaserCard = memo(function ChaserCard({
       style={{
         width: 'calc(50% - 6px)',
         minWidth: '160px',
-        padding: '14px',
+        padding: '12px',
         background: '#FFFFFF',
         borderRadius: '14px',
         border: '1px solid rgba(0,0,0,0.06)',
@@ -64,90 +61,89 @@ const ChaserCard = memo(function ChaserCard({
       }}
       aria-label={`Rank ${player.rank}: ${player.playerName}, ${player.statDisplayValue} ${unit}`}
     >
-      {/* Top row: Badge + Avatar + Name */}
-      <div className="flex items-center" style={{ gap: '8px', marginBottom: '10px' }}>
-        {/* Position badge */}
-        <div
-          className="flex items-center justify-center flex-shrink-0"
-          style={{
-            width: '20px',
-            height: '20px',
-            borderRadius: '7px',
-            background: badge?.background || 'rgba(0,0,0,0.1)',
-          }}
-        >
-          <span style={{ fontSize: '10px', fontWeight: 700, color: '#FFFFFF' }}>
-            {player.rank}
-          </span>
-        </div>
-
-        {/* Avatar */}
-        <div
-          className="relative overflow-hidden flex-shrink-0"
-          style={{ width: '32px', height: '32px', borderRadius: '10px', border: '1px solid rgba(0,0,0,0.06)' }}
-        >
-          {photoUrl ? (
-            <img
-              src={photoUrl}
-              alt={player.playerName}
-              className="w-full h-full object-cover"
-              loading="lazy"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-                const fb = e.currentTarget.parentElement?.querySelector('.fallback-initials');
-                if (fb) (fb as HTMLElement).style.display = 'flex';
-              }}
-            />
-          ) : null}
+      {/* Horizontal split: Avatar left, info right */}
+      <div className="flex" style={{ gap: '10px' }}>
+        {/* LEFT: Avatar */}
+        <div className="flex-shrink-0">
           <div
-            className="fallback-initials w-full h-full flex items-center justify-center"
+            className="overflow-hidden"
             style={{
-              display: photoUrl ? 'none' : 'flex',
-              background: `linear-gradient(135deg, ${accent.bgMedium} 0%, ${accent.bgLight} 100%)`,
+              width: '64px',
+              height: '64px',
+              borderRadius: '12px',
+              border: '1px solid rgba(0,0,0,0.06)',
             }}
           >
-            <span style={{ fontSize: '12px', fontWeight: 700, color: accent.textMuted }}>
-              {player.initials}
+            {showPhoto ? (
+              <img
+                src={photoUrl}
+                alt={player.playerName}
+                className="w-full h-full object-cover"
+                loading="lazy"
+                onError={() => setImgError(true)}
+              />
+            ) : (
+              <div
+                className="w-full h-full flex items-center justify-center"
+                style={{
+                  background: `linear-gradient(135deg, ${accent.bgMedium} 0%, ${accent.bgLight} 100%)`,
+                }}
+              >
+                <span style={{ fontSize: '18px', fontWeight: 700, color: accent.textMuted }}>
+                  {player.initials}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* RIGHT: Rank, name, country, stat, gap */}
+        <div className="flex-1 min-w-0 flex flex-col justify-center">
+          {/* Rank + Name */}
+          <div className="flex items-center" style={{ gap: '4px' }}>
+            <span className="text-muted-foreground" style={{ fontSize: '11px', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
+              #{player.rank}
+            </span>
+            <span className="text-muted-foreground" style={{ fontSize: '11px' }}>·</span>
+            <span className="truncate text-foreground" style={{ fontSize: '13px', fontWeight: 600 }}>
+              {player.lastName}
             </span>
           </div>
-        </div>
 
-        {/* Name + flag */}
-        <div className="flex-1 min-w-0">
-          <p className="m-0 truncate text-foreground" style={{ fontSize: '13px', fontWeight: 600 }}>
-            {player.lastName}
-          </p>
-          <div className="flex items-center" style={{ gap: '2px', marginTop: '1px' }}>
-            <div style={{ width: '10px', height: '7px' }}>
-              <CountryFlag country={player.countryCode} size="sm" />
-            </div>
+          {/* Country — flag + name inline */}
+          <div className="flex items-center mt-0.5" style={{ gap: '4px' }}>
+            <CountryFlag country={player.countryCode} size="sm" />
+            <span className="text-muted-foreground truncate" style={{ fontSize: '11px', lineHeight: 1 }}>
+              {player.countryCode ? player.countryCode.toLowerCase().split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : ''}
+            </span>
           </div>
+
+          {/* Stat value */}
+          <div className="flex items-baseline mt-1.5" style={{ gap: '2px' }}>
+            <span
+              style={{
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: '18px',
+                fontWeight: 700,
+                color: 'hsl(var(--foreground))',
+                lineHeight: 1,
+              }}
+            >
+              {player.statDisplayValue}
+            </span>
+            {unit && (
+              <span className="text-muted-foreground" style={{ fontSize: '10px', fontWeight: 500 }}>
+                {unit}
+              </span>
+            )}
+          </div>
+
+          {/* Gap to leader */}
+          <p className="m-0 text-muted-foreground" style={{ fontSize: '10px', fontWeight: 500, marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
+            {delta} to lead
+          </p>
         </div>
       </div>
-
-      {/* Stat value */}
-      <div className="flex items-baseline" style={{ gap: '2px' }}>
-        <span
-          style={{
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: '20px',
-            fontWeight: 700,
-            color: 'hsl(var(--foreground))',
-          }}
-        >
-          {player.statDisplayValue}
-        </span>
-        {unit && (
-          <span className="text-muted-foreground" style={{ fontSize: '11px', fontWeight: 500 }}>
-            {unit}
-          </span>
-        )}
-      </div>
-
-      {/* Gap to leader */}
-      <p className="m-0 text-muted-foreground" style={{ fontSize: '11px', fontWeight: 500, marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
-        {delta} to lead
-      </p>
     </button>
   );
 });
@@ -158,13 +154,13 @@ export const ChasingPack = memo(function ChasingPack({
   if (players.length === 0) return null;
 
   return (
-    <div style={{ marginTop: '12px' }}>
+    <div style={{ marginTop: '16px' }}>
       {/* Section label */}
       <p className="m-0 text-muted-foreground" style={{ marginBottom: '8px', fontSize: '11px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' }}>
         The Chasers
       </p>
 
-      {/* Horizontal scroll of cards */}
+      {/* Side-by-side cards */}
       <div className="flex" style={{ gap: '12px' }}>
         {players.map((player) => (
           <ChaserCard
