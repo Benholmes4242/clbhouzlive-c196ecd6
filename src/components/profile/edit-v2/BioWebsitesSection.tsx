@@ -1,5 +1,5 @@
-import React from 'react';
-import { Plus, X, ExternalLink, FileText } from 'lucide-react';
+import React, { useState } from 'react';
+import { Plus, X, ExternalLink, FileText, AlertCircle } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
@@ -22,6 +22,7 @@ export const BioWebsitesSection: React.FC<BioWebsitesSectionProps> = ({
   onBioChange,
   onWebsitesChange,
 }) => {
+  const [urlErrors, setUrlErrors] = useState<Record<number, string>>({});
   const handleBioChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     if (value.length <= maxBioLength) {
@@ -41,6 +42,37 @@ export const BioWebsitesSection: React.FC<BioWebsitesSectionProps> = ({
     const updated = [...websites];
     updated[index] = value;
     onWebsitesChange(updated);
+    // Clear error on edit
+    if (urlErrors[index]) {
+      setUrlErrors(prev => {
+        const next = { ...prev };
+        delete next[index];
+        return next;
+      });
+    }
+  };
+
+  const validateUrl = (url: string): boolean => {
+    if (!url.trim()) return true;
+    try {
+      new URL(url.startsWith('http') ? url : `https://${url}`);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const handleWebsiteBlur = (index: number) => {
+    const url = websites[index];
+    if (url.trim() && !validateUrl(url)) {
+      setUrlErrors(prev => ({ ...prev, [index]: 'Please enter a valid URL' }));
+    } else {
+      setUrlErrors(prev => {
+        const next = { ...prev };
+        delete next[index];
+        return next;
+      });
+    }
   };
 
   const formatUrlForDisplay = (url: string): string => {
@@ -125,29 +157,41 @@ export const BioWebsitesSection: React.FC<BioWebsitesSectionProps> = ({
 
           <div className="space-y-3">
             {websites.map((website, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <div className="flex-1 relative">
-                  <Input
-                    value={website}
-                    onChange={(e) => handleWebsiteChange(index, e.target.value)}
-                    placeholder="https://example.com"
-                    className="pr-28 h-11 text-base border-border focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  />
-                  {/* Preview pill */}
-                  {website && (
-                    <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full">
-                      <ExternalLink className="w-3 h-3" />
-                      {formatUrlForDisplay(website)}
-                    </div>
-                  )}
+              <div key={index} className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 relative">
+                    <Input
+                      value={website}
+                      onChange={(e) => handleWebsiteChange(index, e.target.value)}
+                      onBlur={() => handleWebsiteBlur(index)}
+                      placeholder="https://example.com"
+                      className={cn(
+                        "pr-28 h-11 text-base border-border focus:border-primary focus:ring-2 focus:ring-primary/20",
+                        urlErrors[index] && "border-destructive focus:border-destructive focus:ring-destructive/20"
+                      )}
+                    />
+                    {/* Preview pill */}
+                    {website && !urlErrors[index] && (
+                      <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full">
+                        <ExternalLink className="w-3 h-3" />
+                        {formatUrlForDisplay(website)}
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveWebsite(index)}
+                    className="p-2.5 hover:bg-destructive/10 rounded-full transition-colors text-muted-foreground hover:text-destructive"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveWebsite(index)}
-                  className="p-2.5 hover:bg-destructive/10 rounded-full transition-colors text-muted-foreground hover:text-destructive"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+                {urlErrors[index] && (
+                  <div className="flex items-center gap-1 text-xs text-destructive pl-1">
+                    <AlertCircle className="w-3 h-3" />
+                    {urlErrors[index]}
+                  </div>
+                )}
               </div>
             ))}
           </div>

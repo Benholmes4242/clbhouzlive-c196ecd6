@@ -15,6 +15,12 @@ import HandicapSyncInlineNotice from './HandicapSyncInlineNotice';
 import { useCollegeMediaSearch, useCollegeMediaByName, CollegeMediaResult } from '@/hooks/useCollegeMediaSearch';
 import { SectionHeader } from './SectionHeader';
 
+interface DeferredClub {
+  id: string;
+  name: string;
+  country: string | null;
+}
+
 interface GolfInfoSectionProps {
   homeClub: string;
   homeClubId: string | null;
@@ -26,6 +32,11 @@ interface GolfInfoSectionProps {
   handicapSyncInterest?: boolean;
   onChange: (field: string, value: string | null) => void;
   onVisibilityChange: (field: 'homeClubVisibility' | 'additionalClubsVisibility', value: VisibilityValue) => void;
+  // Deferred club operations (optional — if not provided, falls back to immediate save)
+  deferredAddedClubs?: DeferredClub[];
+  deferredRemovedClubIds?: string[];
+  onDeferredAddClub?: (club: DeferredClub) => void;
+  onDeferredRemoveClub?: (clubId: string) => void;
 }
 
 interface AdditionalClub {
@@ -51,7 +62,12 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
   handicapSyncInterest = false,
   onChange,
   onVisibilityChange,
+  deferredAddedClubs,
+  deferredRemovedClubIds,
+  onDeferredAddClub,
+  onDeferredRemoveClub,
 }) => {
+  const isDeferred = !!onDeferredAddClub && !!onDeferredRemoveClub;
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -207,7 +223,20 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
       toast.info('This club is already added');
       return;
     }
+    // Also check deferred adds
+    if (deferredAddedClubs?.some(c => c.id === club.id)) {
+      toast.info('This club is already added');
+      return;
+    }
 
+    if (isDeferred && onDeferredAddClub) {
+      onDeferredAddClub({ id: club.id, name: club.name, country: club.country });
+      setShowAddClub(false);
+      setAddClubQuery('');
+      return;
+    }
+
+    // Fallback: immediate save (legacy)
     try {
       const { error } = await supabase
         .from('user_home_clubs')
@@ -217,7 +246,6 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
         } as any);
 
       if (error) {
-        // Handle duplicate constraint (23505)
         if (error.code === '23505') {
           toast.info('This club is already added');
           return;
@@ -244,6 +272,12 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
   const handleRemoveAdditionalClub = async (clubId: string) => {
     if (!userId) return;
 
+    if (isDeferred && onDeferredRemoveClub) {
+      onDeferredRemoveClub(clubId);
+      return;
+    }
+
+    // Fallback: immediate delete (legacy)
     try {
       const { error } = await supabase
         .from('user_home_clubs')
@@ -267,9 +301,15 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
     }
   };
 
+  // Build the effective list of additional clubs (DB + deferred adds - deferred removes)
+  const effectiveAdditionalClubs = [
+    ...additionalClubs.filter(c => !(deferredRemovedClubIds || []).includes(c.id)),
+    ...(deferredAddedClubs || []),
+  ];
+
   // Filter out primary and already-added clubs from results
   const filteredAddClubResults = addClubResults.filter(
-    c => c.id !== homeClubId && !additionalClubs.some(ac => ac.id === c.id)
+    c => c.id !== homeClubId && !effectiveAdditionalClubs.some(ac => ac.id === c.id)
   );
 
   return (
@@ -289,8 +329,8 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
         )}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                Home Club
+              <Label className="text-xs font-medium text-muted-foreground">
+                Home club
               </Label>
               {homeClub && (
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
@@ -445,10 +485,10 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
 
         {/* Additional Clubs Card */}
         {homeClub && (
-          <div className="rounded-sq-md border border-border bg-white p-4 space-y-3">
+          <div className="rounded-sq-md border border-border bg-card p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                Additional Clubs
+              <Label className="text-xs font-medium text-muted-foreground">
+                Additional clubs
               </Label>
               <VisibilityDropdown
                 value={additionalClubsVisibility}
@@ -469,9 +509,9 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
             )}
 
             {/* List of additional clubs as chips */}
-            {additionalClubs.length > 0 && (
+            {effectiveAdditionalClubs.length > 0 && (
               <div className="flex flex-wrap gap-2">
-                {additionalClubs.map((club) => (
+                {effectiveAdditionalClubs.map((club) => (
                   <div
                     key={club.id}
                     className="inline-flex items-center gap-1.5 pl-3 pr-1.5 py-1.5 bg-[#F8FAFC] border border-border rounded-full text-sm"
@@ -571,7 +611,7 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
             )}
             
             {/* Empty state */}
-            {additionalClubs.length === 0 && !showAddClub && (
+            {effectiveAdditionalClubs.length === 0 && !showAddClub && (
               <p className="text-xs text-muted-foreground py-2">
                 Add clubs you also play at regularly.
               </p>

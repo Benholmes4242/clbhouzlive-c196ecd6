@@ -7,6 +7,7 @@ interface ProfilePhotoCardProps {
   currentUrl?: string | null;
   previewUrl?: string | null;
   onFileChange: (file: File | null) => void;
+  onRemove?: () => void;
 }
 
 // Profile photo aspect ratio: squircle spec (1:1.05)
@@ -16,6 +17,7 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
   currentUrl,
   previewUrl,
   onFileChange,
+  onRemove,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [cropperImage, setCropperImage] = useState<string | null>(null);
@@ -59,8 +61,8 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
   return (
     <div>
       <div className="mb-4">
-        <h3 className="text-sm font-semibold text-[#1e293b]">Profile Photo</h3>
-        <p className="text-xs text-[#64748b]">
+        <h3 className="text-sm font-semibold text-foreground">Profile Photo</h3>
+        <p className="text-xs text-muted-foreground">
           Your photo appears as a squircle across Clbhouz
         </p>
       </div>
@@ -121,21 +123,32 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
         <div className="flex-1">
           {!displayUrl ? (
             <div>
-              <p className="text-sm font-medium text-[#1e293b] mb-0.5">
+              <p className="text-sm font-medium text-foreground mb-0.5">
                 Add a profile photo
               </p>
-              <p className="text-xs text-[#64748b]">
+              <p className="text-xs text-muted-foreground">
                 Square images work best
               </p>
             </div>
           ) : (
-            <button
-              type="button"
-              onClick={handleClick}
-              className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
-            >
-              Change photo
-            </button>
+            <div className="space-y-1">
+              <button
+                type="button"
+                onClick={handleClick}
+                className="text-sm font-medium text-primary hover:text-primary/80 transition-colors block"
+              >
+                Change photo
+              </button>
+              {onRemove && (
+                <button
+                  type="button"
+                  onClick={onRemove}
+                  className="text-sm text-destructive hover:text-destructive/80 transition-colors active:opacity-70 block"
+                >
+                  Remove photo
+                </button>
+              )}
+            </div>
           )}
         </div>
       </div>

@@ -7,6 +7,7 @@ interface HeaderPhotoCardProps {
   currentUrl?: string | null;
   previewUrl?: string | null;
   onFileChange: (file: File | null) => void;
+  onRemove?: () => void;
 }
 
 // Header aspect ratio: full width x 200px height (4:1 ratio for mobile, 1600×400px recommended)
@@ -16,6 +17,7 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
   currentUrl,
   previewUrl,
   onFileChange,
+  onRemove,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [cropperImage, setCropperImage] = useState<string | null>(null);
@@ -60,19 +62,30 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
     <div>
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-[#1e293b]">Header Photo</h3>
-          <p className="text-xs text-[#64748b]">
+          <h3 className="text-sm font-semibold text-foreground">Header Photo</h3>
+          <p className="text-xs text-muted-foreground">
             Appears at the top of your profile
           </p>
         </div>
         {displayUrl && (
-          <button
-            type="button"
-            onClick={handleClick}
-            className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
-          >
-            Change
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleClick}
+              className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+            >
+              Change
+            </button>
+            {onRemove && (
+              <button
+                type="button"
+                onClick={onRemove}
+                className="text-sm text-destructive hover:text-destructive/80 transition-colors active:opacity-70"
+              >
+                Remove
+              </button>
+            )}
+          </div>
         )}
       </div>
 
@@ -106,10 +119,10 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
               <Camera className="w-8 h-8 text-primary" />
             </div>
-            <p className="text-sm font-medium text-[#1e293b] mb-1">
+            <p className="text-sm font-medium text-foreground mb-1">
               Upload header photo
             </p>
-            <p className="text-xs text-[#64748b]">
+            <p className="text-xs text-muted-foreground">
               Recommended: 1600×400px • JPG, PNG or WebP
             </p>
           </div>
