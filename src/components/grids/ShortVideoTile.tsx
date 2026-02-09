@@ -107,15 +107,15 @@ export const ShortVideoTile = React.memo(function ShortVideoTile({
   return (
     <div
       ref={containerRef}
-      className="relative cursor-pointer overflow-hidden aspect-[3/4]"
+      className="relative cursor-pointer overflow-hidden aspect-[3/4] active:scale-[0.97] transition-transform"
       onClick={onClick}
     >
       {/* Grey shimmer loading state (Watch tab standard) */}
       <div className={cn(
-        "absolute inset-0 bg-gray-200 overflow-hidden transition-opacity duration-150",
+        "absolute inset-0 bg-muted overflow-hidden transition-opacity duration-150",
         showShimmer ? "opacity-100" : "opacity-0"
       )}>
-        <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+        <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-background/40 to-transparent" />
       </div>
 
       {/* Poster-first: priority loading */}

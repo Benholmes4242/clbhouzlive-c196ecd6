@@ -85,23 +85,23 @@ export function GridEmptyState({
   
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6">
-      {/* Icon in gradient circle - Hub standard */}
-      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center mb-4">
-        <Icon className="w-7 h-7 text-[#64748b]" />
+      {/* Icon in circle - semantic tokens */}
+      <div className="w-16 h-16 rounded-full bg-muted border border-border flex items-center justify-center mb-4">
+        <Icon className="w-7 h-7 text-muted-foreground" />
       </div>
       
-      <h3 className="text-base font-semibold text-[#1e293b] mb-1 text-center">
+      <h3 className="text-base font-semibold text-foreground mb-1 text-center">
         {title}
       </h3>
       
-      <p className="text-sm text-[#64748b] text-center max-w-[280px] mb-5">
+      <p className="text-sm text-muted-foreground text-center max-w-[280px] mb-5">
         {description}
       </p>
       
       {showCTA && onCreatePost && ctaLabel && (
         <button
           onClick={onCreatePost}
-          className="px-5 py-2.5 bg-[#e2e8f0] text-[#1e293b] text-sm font-medium rounded-full hover:bg-[#cbd5e1] transition-colors"
+          className="px-5 py-3 min-h-[44px] bg-[#334E3D] text-white text-sm font-medium rounded-full hover:bg-[#2a4032] transition-colors active:scale-[0.97] transition-transform"
         >
           {ctaLabel}
         </button>

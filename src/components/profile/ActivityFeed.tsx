@@ -13,6 +13,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { ProfileContentGrid, ContentFilter, GridPost } from '@/components/grids';
+import { ContentFilterPills, FilterOption } from '@/components/common/ContentFilterPills';
 import { useAdaptivePrefetch } from '@/hooks/useAdaptivePrefetch';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
@@ -32,7 +33,7 @@ interface ActivityFeedProps {
 }
 
 // Filter labels for display
-const FILTER_OPTIONS: { key: ContentFilter; label: string }[] = [
+const FILTER_OPTIONS: FilterOption[] = [
   { key: 'all', label: 'All' },
   { key: 'longform', label: 'Long-form' },
   { key: 'shorts', label: 'Shorts' },
@@ -378,22 +379,13 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
         className="mb-4"
       />
 
-      {/* Filter Chips - matches Business Profile exactly */}
-      <div className="flex gap-2 px-2 py-3 overflow-x-auto scrollbar-hide">
-        {FILTER_OPTIONS.map(({ key, label }) => (
-          <button
-            key={key}
-            onClick={() => setActiveFilter(key)}
-            className={cn(
-              'flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-colors',
-              activeFilter === key
-                ? 'bg-[#e2e8f0] text-slate-800'
-                : 'bg-white text-foreground border border-border hover:bg-muted/50'
-            )}
-          >
-            {label}
-          </button>
-        ))}
+      {/* Filter Chips - shared component */}
+      <div className="px-2 py-3">
+        <ContentFilterPills
+          filters={FILTER_OPTIONS}
+          activeFilter={activeFilter}
+          onFilterChange={(filter) => setActiveFilter(filter as ContentFilter)}
+        />
       </div>
 
       {/* Content Grid */}

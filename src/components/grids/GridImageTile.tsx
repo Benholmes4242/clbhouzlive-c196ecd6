@@ -9,9 +9,15 @@
  */
 
 import { useState } from 'react';
-import { Layers } from 'lucide-react';
+import { Layers, Heart } from 'lucide-react';
 import { GridPost } from './types';
 import { cn } from '@/lib/utils';
+
+function formatCount(count: number): string {
+  if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
+  if (count >= 1000) return `${(count / 1000).toFixed(1)}K`;
+  return count.toString();
+}
 
 interface GridImageTileProps {
   post: GridPost;
@@ -36,6 +42,7 @@ export function GridImageTile({
   if (!media) return null;
   
   const hasMultipleImages = post.post_media && post.post_media.length > 1;
+  const likeCount = post.like_count || 0;
   
   // Priority loading for first 9 tiles (3x3 grid visible)
   const isPriority = index < 9;
@@ -43,7 +50,7 @@ export function GridImageTile({
   return (
     <div
       className={cn(
-        "relative cursor-pointer overflow-hidden bg-gray-200",
+        "relative cursor-pointer overflow-hidden bg-muted active:scale-[0.97] transition-transform",
         isNewlyLoaded && !prefersReducedMotion && "animate-in fade-in slide-in-from-bottom-2 duration-200 fill-mode-backwards"
       )}
       style={{ 
@@ -52,14 +59,14 @@ export function GridImageTile({
       }}
       onClick={onClick}
     >
-      {/* Shimmer loading state - Watch tab standard */}
+      {/* Shimmer loading state */}
       <div 
         className={cn(
-          "absolute inset-0 bg-gray-200 overflow-hidden transition-opacity duration-300",
+          "absolute inset-0 bg-muted overflow-hidden transition-opacity duration-300",
           imageLoaded ? "opacity-0 pointer-events-none" : "opacity-100"
         )}
       >
-        <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+        <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-background/40 to-transparent" />
       </div>
       
       <img
@@ -74,9 +81,17 @@ export function GridImageTile({
         onLoad={() => setImageLoaded(true)}
       />
       
+      {/* Like count badge - top right (consistent with ShortVideoTile) */}
+      <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-black/40 backdrop-blur-sm rounded-full z-10">
+        <Heart className={cn("w-3 h-3", likeCount > 0 ? "fill-like text-like" : "text-white")} />
+        {likeCount > 0 && (
+          <span className="text-white text-[10px] font-medium">{formatCount(likeCount)}</span>
+        )}
+      </div>
+
       {/* Multi-image indicator */}
       {hasMultipleImages && (
-        <div className="absolute top-2 right-2">
+        <div className="absolute top-2 left-2">
           <Layers className="w-5 h-5 text-white drop-shadow-lg" />
         </div>
       )}
