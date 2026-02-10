@@ -191,7 +191,7 @@ const PortraitTile = React.memo(function PortraitTile({
   return (
     <div
       ref={containerRef}
-      className="relative cursor-pointer overflow-hidden bg-black will-change-transform"
+      className="relative cursor-pointer overflow-hidden rounded-xl bg-black will-change-transform"
       style={{ aspectRatio: '3/4' }}
       onClick={onClick}
       aria-busy={isVideo && !isVideoReady}
@@ -247,23 +247,20 @@ const PortraitTile = React.memo(function PortraitTile({
       {/* Gradient Overlay - Bottom 30% (Watch tab standard) */}
       <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none z-20" />
 
-      {/* Like Count - Top Right (personalized) */}
-      <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-black/40 backdrop-blur-sm rounded-full z-30">
-        <Heart className={cn("w-3 h-3", isLiked ? "fill-like text-like" : "text-white")} />
-        {likeCount > 0 && (
-          <span className="text-white text-[10px] font-medium">{formatCount(likeCount)}</span>
-        )}
-      </div>
+      {/* Like badge — only when user liked (personalized) */}
+      {isLiked && (
+        <div className="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-0.5 bg-black/30 backdrop-blur-sm rounded-full z-30">
+          <Heart className="w-3 h-3 fill-[#f59e0b] text-[#f59e0b]" />
+          {likeCount > 0 && (
+            <span className="text-white text-xs font-medium">{formatCount(likeCount)}</span>
+          )}
+        </div>
+      )}
 
-      {/* Creator Name + Course - Bottom (Watch tab standard) */}
+      {/* Course name — bottom with gradient scrim */}
       <div className="absolute bottom-2 left-2 right-2 z-30">
-        {(creator?.display_name || creator?.username) && (
-          <p className="text-white text-sm font-medium truncate">
-            {creator?.display_name || creator?.username}
-          </p>
-        )}
         {moment.course_name && (
-          <p className="text-white/60 text-[10px] leading-tight truncate">
+          <p className="text-xs font-semibold text-white truncate">
             {moment.course_name}
           </p>
         )}
@@ -278,6 +275,7 @@ const PortraitTile = React.memo(function PortraitTile({
     prevProps.moment.course_name === nextProps.moment.course_name &&
     prevProps.moment.likes_count === nextProps.moment.likes_count &&
     prevProps.moment.creator?.id === nextProps.moment.creator?.id &&
+    prevProps.isLiked === nextProps.isLiked &&
     prevProps.index === nextProps.index
   );
 });
@@ -396,7 +394,7 @@ const LandscapeTile = React.memo(function LandscapeTile({
   return (
     <div
       ref={containerRef}
-      className="relative cursor-pointer overflow-hidden bg-black will-change-transform"
+      className="relative cursor-pointer overflow-hidden rounded-xl bg-black will-change-transform"
       style={{ aspectRatio: String(aspectRatio) }}
       onClick={onClick}
       aria-busy={isVideo && !isVideoReady}
@@ -697,9 +695,9 @@ export function DiscoverGrid({
   return (
     <div className={className}>
       {/* Watch tab standard: px-[3px] padding, gap-[3px] */}
-      <div className="px-[3px]">
-        {/* 2-column grid - landscape videos span both columns */}
-        <div className="grid grid-cols-2 gap-[3px]">
+    <div className="px-4">
+      {/* 2-column grid — premium 4px gap with rounded tiles */}
+      <div className="grid grid-cols-2 gap-1">
           {allMoments.map((moment, index) => {
             const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;
             const entranceDelay = isNewlyLoaded ? (index - newlyLoadedStartIndex) * 30 : 0;

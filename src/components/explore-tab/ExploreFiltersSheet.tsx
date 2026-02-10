@@ -1,11 +1,6 @@
 /**
- * ExploreFiltersSheet - Bottom sheet for filtering Explore content
- * 
- * Redesigned with polished styling:
- * - Custom slide-up animation
- * - Handle bar and close button
- * - Grid layout for region options
- * - Selected state with check icons
+ * ExploreFiltersSheet - Premium bottom sheet for filtering Explore content
+ * A* Polish: rounded-t-3xl, refined pills, emerald Apply button
  */
 
 import React, { useEffect, useCallback } from 'react';
@@ -43,7 +38,7 @@ const SORT_OPTIONS: { value: SortFilter; label: string }[] = [
   { value: 'liked', label: 'Most liked' },
 ];
 
-// Time filter chip
+// Time filter pill
 const TimeChip: React.FC<{
   label: string;
   selected: boolean;
@@ -53,17 +48,17 @@ const TimeChip: React.FC<{
     onClick={onClick}
     aria-selected={selected}
     className={cn(
-      "px-4 py-2.5 rounded-xl text-sm font-medium transition-all min-h-[44px]",
+      "px-4 py-2.5 rounded-full text-sm font-medium transition-all min-h-[44px]",
       selected
-        ? "bg-gray-900 text-white shadow-md"
-        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+        ? "bg-gray-900 text-white"
+        : "bg-gray-100 text-gray-600"
     )}
   >
     {label}
   </button>
 );
 
-// Region grid item with emoji and check
+// Region item
 const RegionItem: React.FC<{
   label: string;
   emoji: string;
@@ -78,8 +73,8 @@ const RegionItem: React.FC<{
       "flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all min-h-[44px]",
       fullWidth && "col-span-2",
       selected
-        ? "bg-gray-900 text-white shadow-md"
-        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+        ? "bg-gray-900 text-white"
+        : "bg-gray-50 text-gray-600"
     )}
   >
     <span className="flex items-center gap-2">
@@ -90,7 +85,7 @@ const RegionItem: React.FC<{
   </button>
 );
 
-// Sort option with check
+// Sort pill
 const SortItem: React.FC<{
   label: string;
   selected: boolean;
@@ -100,14 +95,13 @@ const SortItem: React.FC<{
     onClick={onClick}
     aria-selected={selected}
     className={cn(
-      "flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all min-h-[44px] flex-1",
+      "px-4 py-2.5 rounded-full text-sm font-medium transition-all min-h-[44px] flex-1",
       selected
-        ? "bg-gray-900 text-white shadow-md"
-        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+        ? "bg-gray-900 text-white"
+        : "bg-gray-100 text-gray-600"
     )}
   >
-    <span>{label}</span>
-    {selected && <Check className="w-4 h-4" />}
+    {label}
   </button>
 );
 
@@ -121,7 +115,6 @@ export const ExploreFiltersSheet: React.FC<ExploreFiltersSheetProps> = ({
   const [localFilters, setLocalFilters] = React.useState<ExploreFilters>(filters);
   const [isAnimating, setIsAnimating] = React.useState(false);
 
-  // Sync local state when sheet opens
   useEffect(() => {
     if (isOpen) {
       setLocalFilters(filters);
@@ -129,36 +122,25 @@ export const ExploreFiltersSheet: React.FC<ExploreFiltersSheetProps> = ({
     }
   }, [isOpen, filters]);
 
-  // Handle escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        onClose();
-      }
+      if (e.key === 'Escape' && isOpen) onClose();
     };
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen, onClose]);
 
-  // Prevent body scroll when open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
     }
-    return () => {
-      document.body.style.overflow = '';
-    };
+    return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
   const handleReset = useCallback(() => {
-    const defaults: ExploreFilters = {
-      timeFrame: 'all',
-      region: 'all',
-      sort: 'recent',
-    };
-    setLocalFilters(defaults);
+    setLocalFilters({ timeFrame: 'all', region: 'all', sort: 'recent' });
   }, []);
 
   const handleApply = useCallback(() => {
@@ -182,41 +164,41 @@ export const ExploreFiltersSheet: React.FC<ExploreFiltersSheetProps> = ({
         aria-hidden="true"
       />
 
-      {/* Sheet container */}
+      {/* Sheet */}
       <div className="fixed bottom-0 left-0 right-0 z-50">
         <div 
           className={cn(
-            "bg-white rounded-t-[32px] shadow-2xl",
+            "bg-white rounded-t-3xl shadow-2xl",
             isAnimating && "animate-in slide-in-from-bottom duration-300"
           )}
           role="dialog"
           aria-modal="true"
           aria-labelledby="filter-sheet-title"
         >
-          {/* Handle bar */}
+          {/* Handle */}
           <div className="flex justify-center pt-3 pb-2">
-            <div className="w-10 h-1 bg-gray-300 rounded-full" />
+            <div className="w-10 h-1 rounded-full bg-gray-200" />
           </div>
 
           {/* Header */}
-          <div className="flex items-center justify-between px-6 pb-5 border-b border-gray-100">
-            <h2 id="filter-sheet-title" className="text-xl font-semibold text-gray-900">
+          <div className="flex items-center justify-between px-5 pb-4">
+            <h2 id="filter-sheet-title" className="text-lg font-semibold text-gray-900">
               Filters
             </h2>
             <button
               onClick={onClose}
-              className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 transition-colors"
               aria-label="Close filters"
             >
-              <X className="w-5 h-5 text-gray-600" />
+              <X className="w-5 h-5 text-gray-400" />
             </button>
           </div>
 
           {/* Content */}
-          <div className="px-6 py-5 space-y-6 max-h-[60vh] overflow-y-auto">
+          <div className="px-5 py-4 space-y-6 max-h-[60vh] overflow-y-auto">
             {/* Time Frame */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
                 Time Frame
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -231,10 +213,10 @@ export const ExploreFiltersSheet: React.FC<ExploreFiltersSheetProps> = ({
               </div>
             </div>
 
-            {/* Region - grid layout */}
+            {/* Region */}
             {showRegionFilter && (
               <div>
-                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
                   Region
                 </h3>
                 <div className="grid grid-cols-2 gap-2">
@@ -245,7 +227,7 @@ export const ExploreFiltersSheet: React.FC<ExploreFiltersSheetProps> = ({
                       emoji={option.emoji}
                       selected={localFilters.region === option.value}
                       onClick={() => setLocalFilters(f => ({ ...f, region: option.value }))}
-                      fullWidth={index === 0} // "All regions" spans full width
+                      fullWidth={index === 0}
                     />
                   ))}
                 </div>
@@ -254,8 +236,8 @@ export const ExploreFiltersSheet: React.FC<ExploreFiltersSheetProps> = ({
 
             {/* Sort */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
-                Sort by
+              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                Sort By
               </h3>
               <div className="flex gap-2">
                 {SORT_OPTIONS.map(option => (
@@ -270,31 +252,23 @@ export const ExploreFiltersSheet: React.FC<ExploreFiltersSheetProps> = ({
             </div>
           </div>
 
-          {/* Action buttons */}
+          {/* Actions */}
           <div 
-            className="flex gap-3 px-6 py-5 border-t border-gray-100 bg-gray-50/50"
+            className="flex items-center gap-4 px-5 py-4 border-t border-gray-100"
             style={{ paddingBottom: 'max(20px, env(safe-area-inset-bottom))' }}
           >
             <button
               onClick={handleReset}
               disabled={!hasChanges}
-              className={cn(
-                "flex-1 py-3.5 rounded-2xl text-sm font-semibold transition-all",
-                "bg-white border border-gray-200 text-gray-700",
-                "hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              )}
+              className="text-sm font-medium text-gray-400 disabled:opacity-40"
             >
               Reset
             </button>
             <button
               onClick={handleApply}
-              className={cn(
-                "flex-[2] py-3.5 rounded-2xl text-sm font-semibold transition-all",
-                "bg-gray-900 text-white shadow-lg shadow-gray-900/20",
-                "hover:bg-gray-800 active:scale-[0.98]"
-              )}
+              className="flex-1 py-3 rounded-full bg-emerald-600 text-white font-semibold text-sm active:scale-[0.98] transition-transform"
             >
-              Apply filters
+              Apply Filters
             </button>
           </div>
         </div>
@@ -312,18 +286,13 @@ export const countActiveFilters = (filters: ExploreFilters, showRegion = true): 
   return count;
 };
 
-// Helper to get date cutoff for time filter
 export const getTimeFilterDate = (timeFrame: TimeFilter): Date | null => {
   const now = new Date();
   switch (timeFrame) {
-    case 'week':
-      return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    case 'month':
-      return new Date(now.getFullYear(), now.getMonth(), 1);
-    case 'year':
-      return new Date(now.getFullYear(), 0, 1);
-    default:
-      return null; // All time
+    case 'week': return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    case 'month': return new Date(now.getFullYear(), now.getMonth(), 1);
+    case 'year': return new Date(now.getFullYear(), 0, 1);
+    default: return null;
   }
 };
 

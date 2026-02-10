@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Bookmark, Flag, Globe, SlidersHorizontal, Compass, Loader2 } from 'lucide-react';
+import { Bookmark, Flag, Globe, SlidersHorizontal, Compass, Loader2, ChevronUp } from 'lucide-react';
 import FeaturedCourseHero from './FeaturedCourseHero';
 import ReviewsOfTheWeekHero from './ReviewsOfTheWeekHero';
 import Top100JourneySummary from './Top100JourneySummary';
@@ -29,32 +29,20 @@ interface ExploreTabProps {
   className?: string;
 }
 
-// Local storage key for filters
 const EXPLORE_FILTERS_KEY = 'explore-filters';
 
-// Enhanced filter options with icons
 const EXPLORE_PILLS: { id: string; label: string; icon?: React.ElementType }[] = [
   { id: 'all', label: 'All' },
   { id: 'courses', label: 'Courses', icon: Flag },
   { id: 'regions', label: 'Regions', icon: Globe },
 ];
 
-// Default filters
 const DEFAULT_FILTERS: ExploreFilters = {
   timeFrame: 'all',
   region: 'all',
   sort: 'recent',
 };
 
-/**
- * ExploreTab - The aspirational discovery surface for golf places, courses, and journeys
- * 
- * Fix 2: Pull-to-refresh
- * Fix 6: Region filter on courses sub-tab
- * Fix 8: Error states for all sections
- * Fix 11: URL param consistency (?main=explore&sub=courses)
- * Fix 12: Dynamic header for courses sub-tab
- */
 export const ExploreTab: React.FC<ExploreTabProps> = ({
   onMediaClick,
   className,
@@ -65,23 +53,18 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const [showFeaturedCourse, setShowFeaturedCourse] = useState(false);
   
-  // Prefetch explore data on mount
   useExplorePrefetch();
   
-  // Fullscreen player hook
   const { openFullscreen } = useUnifiedFullscreen('explore-moments', {
     allowLandscape: true,
   });
   
-  // Fix 11: Read sub-tab from URL params for deep linking
   const activeFilter = searchParams.get('sub') || 'all';
   
-  // Command center state
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [sortOption, setSortOption] = useState<SortOption>('newest');
   
-  // Filter state
   const [filters, setFilters] = useState<ExploreFilters>(() => {
     try {
       const saved = localStorage.getItem(EXPLORE_FILTERS_KEY);
@@ -91,14 +74,24 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
     }
   });
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
-  
-  // Search sheet state
   const [isSearchSheetOpen, setIsSearchSheetOpen] = useState(false);
-  
-  // Region bottom sheet state
   const [isRegionSheetOpen, setIsRegionSheetOpen] = useState(false);
 
-  // Data hooks - Fix 5: Use infinite query for courses
+  // Scroll-to-top FAB state
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleScrollToTop = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
   const {
     data: coursesData,
     isLoading: coursesLoading,
@@ -111,15 +104,12 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
   
   const { data: regions } = useExploreRegions();
 
-  // Flatten courses pages
   const allCourses = useMemo(() => {
     return coursesData?.pages.flatMap(page => page.courses) ?? [];
   }, [coursesData]);
 
-  // Active filter count
   const activeFilterCount = countActiveFilters(filters);
 
-  // Fix 5: Infinite scroll sentinel for courses
   const { ref: courseSentinelRef, inView: courseSentinelInView } = useInView({
     rootMargin: '200px',
   });
@@ -130,7 +120,6 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
     }
   }, [courseSentinelInView, coursesHasNext, coursesFetchingNext, coursesFetchNext]);
 
-  // Handle click outside to close search
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
@@ -155,13 +144,11 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
     setSortOption(sort);
   }, []);
 
-  // Fix 11: Persist sub-tab in URL
   const handleFilterChange = useCallback((key: string) => {
     if (key === 'regions') {
       setIsRegionSheetOpen(true);
       return;
     }
-    // Update URL with sub-tab
     const newParams = new URLSearchParams(searchParams);
     if (key === 'all') {
       newParams.delete('sub');
@@ -178,18 +165,14 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
     } catch {}
   }, []);
 
-  // Handle region selection from bottom sheet — Fix 6: persists across sub-tabs
   const handleRegionChange = useCallback((region: RegionValue) => {
     setFilters(prev => {
       const newFilters = { ...prev, region };
-      try {
-        localStorage.setItem(EXPLORE_FILTERS_KEY, JSON.stringify(newFilters));
-      } catch {}
+      try { localStorage.setItem(EXPLORE_FILTERS_KEY, JSON.stringify(newFilters)); } catch {}
       return newFilters;
     });
   }, []);
 
-  // Get region label for pill
   const getRegionLabel = (region: RegionValue): string => {
     switch (region) {
       case 'GBI': return 'GB & Ireland';
@@ -200,7 +183,6 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
     }
   };
 
-  // Build pills for command center - region pill shows current selection
   const pills: Pill[] = EXPLORE_PILLS.map(p => ({
     key: p.id,
     label: p.id === 'regions' 
@@ -215,25 +197,17 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
     setIsSearchSheetOpen(true);
   }, []);
 
-  const handleStartJourney = () => {
-    navigate('/top100');
-  };
+  const handleStartJourney = () => navigate('/top100');
+  const handleContinueJourney = () => navigate('/top100');
 
-  const handleContinueJourney = () => {
-    navigate('/top100');
-  };
-
-  // Handle moment click - opens fullscreen player with all moments
   const handleMomentClick = useCallback((moment: ExploreMoment, index: number, allMoments: ExploreMoment[]) => {
     openFullscreen(allMoments, index);
   }, [openFullscreen]);
 
-  // Legacy handler for parent callback
   const handleItemClick = (item: any) => {
     onMediaClick?.(item);
   };
 
-  // Fix 2: Pull-to-refresh handler
   const handlePullToRefresh = useCallback(async () => {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ['reviews-of-the-week'] }),
@@ -246,7 +220,6 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
     ]);
   }, [queryClient]);
 
-  // Fix 12: Dynamic header for courses sub-tab
   const coursesHeader = useMemo(() => {
     if (filters.region && filters.region !== 'all') {
       const regionName = getRegionLabel(filters.region);
@@ -261,62 +234,60 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
     };
   }, [filters.region]);
 
-  // Filter button for command center
+  // Filter button for Discover Courses section
   const FilterButton = () => (
     <button
       onClick={() => setIsFilterSheetOpen(true)}
       className={cn(
-        "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors",
+        "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors border",
         activeFilterCount > 0
-          ? "bg-foreground text-background"
-          : "bg-muted text-muted-foreground hover:bg-muted/80"
+          ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+          : "bg-white border-gray-200 text-gray-600"
       )}
     >
-      <SlidersHorizontal className="w-4 h-4" />
+      <SlidersHorizontal className="w-3.5 h-3.5" />
       <span>Filters</span>
       {activeFilterCount > 0 && (
-        <span className="ml-0.5 w-5 h-5 rounded-full bg-background text-foreground text-xs flex items-center justify-center font-semibold">
+        <span className="ml-0.5 w-4 h-4 rounded-full bg-emerald-600 text-white text-[10px] flex items-center justify-center font-semibold">
           {activeFilterCount}
         </span>
       )}
     </button>
   );
 
-  // Render content based on active filter
   const renderContent = () => {
     switch (activeFilter) {
       case 'courses':
         return (
           <div className="py-6">
-            {/* Fix 12: Dynamic header */}
+            {/* Dynamic header */}
             <div className="px-4 mb-4">
-              <h2 className="text-lg font-bold text-foreground">{coursesHeader.title}</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <h2 className="text-lg font-semibold text-gray-900">{coursesHeader.title}</h2>
+              <p className="mt-0.5 text-sm text-gray-500">
                 {coursesHeader.subtitle}
               </p>
             </div>
             
-            {/* Fix 8: Error state */}
             {coursesError ? (
               <ExploreErrorState
                 message="Couldn't load courses"
                 onRetry={() => coursesRefetch()}
               />
             ) : coursesLoading && allCourses.length === 0 ? (
-              /* Fix 7: Loading skeleton */
+              /* Loading skeleton */
               <div className="px-4 grid grid-cols-2 gap-3">
                 {[1, 2, 3, 4, 5, 6].map(i => (
-                  <div key={i} className="aspect-[4/3] rounded-xl bg-gray-100 animate-pulse" />
+                  <div key={i} className="rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-50">
+                    <div className="aspect-[4/3] bg-gray-100 animate-pulse" />
+                  </div>
                 ))}
               </div>
             ) : allCourses.length === 0 ? (
-              /* Fix 7: Empty state */
+              /* Empty state */
               <div className="flex flex-col items-center justify-center py-16 px-4">
-                <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mb-3">
-                  <Compass className="w-6 h-6 text-muted-foreground" />
-                </div>
+                <Compass className="w-12 h-12 text-gray-300 mb-3" />
                 <p className="text-base font-semibold text-gray-600 mb-1">No courses found</p>
-                <p className="text-sm text-muted-foreground text-center max-w-[280px]">
+                <p className="text-sm text-gray-400 text-center max-w-[280px]">
                   {filters.region && filters.region !== 'all'
                     ? `No courses found in ${getRegionLabel(filters.region)}`
                     : 'Check back soon for more courses'}
@@ -324,33 +295,39 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
               </div>
             ) : (
               <>
+                {/* 2-column course directory grid */}
                 <div className="px-4 grid grid-cols-2 gap-3">
                   {allCourses.map(course => (
                     <button
                       key={course.id}
                       onClick={() => navigate(`/courses/${course.id}`)}
-                      className="text-left group"
+                      className="text-left rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-50 active:scale-[0.98] transition-transform"
                     >
-                      <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-surface-alt">
+                      <div className="relative aspect-[4/3]">
                         {course.thumbnail_image ? (
                           <img 
                             src={course.thumbnail_image} 
                             alt={course.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            className="w-full h-full object-cover"
                             loading="lazy"
                           />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-emerald-800/50 via-slate-700/50 to-slate-900/50" />
                         )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                        {/* Bottom gradient */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                        
+                        {/* Top 100 ranking badge */}
                         {course.global_rank && (
-                          <div className="absolute top-2 left-2 px-2 py-0.5 backdrop-blur-md bg-black/35 border border-white/10 rounded-full text-xs text-white font-medium">
+                          <div className="absolute top-2.5 left-2.5 backdrop-blur-md bg-black/40 rounded-lg px-2 py-1 text-xs font-bold text-white">
                             #{course.global_rank}
                           </div>
                         )}
-                        <div className="absolute bottom-0 left-0 right-0 p-3">
-                          <h4 className="text-sm font-medium text-white line-clamp-2">{course.name}</h4>
-                          <p className="text-xs text-white/60 mt-0.5 line-clamp-1">
+                        
+                        {/* Course name + country */}
+                        <div className="absolute bottom-0 left-0 right-0 px-3 pb-2">
+                          <h4 className="text-sm font-semibold text-white line-clamp-2">{course.name}</h4>
+                          <p className="text-xs text-white/70 mt-0.5 line-clamp-1">
                             {course.sub_country || course.country}
                           </p>
                         </div>
@@ -359,19 +336,17 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
                   ))}
                 </div>
                 
-                {/* Fix 5: Infinite scroll sentinel */}
+                {/* Infinite scroll sentinel */}
                 {coursesHasNext && (
                   <div ref={courseSentinelRef} className="h-20" />
                 )}
                 
-                {/* Loading more indicator */}
                 {coursesFetchingNext && (
                   <div className="flex items-center justify-center py-8">
                     <div className="w-5 h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
                   </div>
                 )}
                 
-                {/* End of courses */}
                 {!coursesHasNext && allCourses.length > 0 && !coursesFetchingNext && (
                   <div className="flex items-center justify-center py-8">
                     <p className="text-xs text-gray-400 font-medium">You've seen all courses</p>
@@ -385,16 +360,16 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
       case 'bucket-list':
         return (
           <div className="flex flex-col items-center justify-center py-16 px-6 text-center mx-4">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-100 to-orange-50 dark:from-orange-950/50 dark:to-orange-900/30 flex items-center justify-center mb-4">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center mb-4">
               <Bookmark className="w-10 h-10 text-orange-500" />
             </div>
-            <h3 className="text-lg font-bold text-foreground mb-2">Your Bucket List</h3>
-            <p className="text-sm text-muted-foreground max-w-xs mb-6">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Your Bucket List</h3>
+            <p className="text-sm text-gray-500 max-w-xs mb-6">
               Save courses you dream of playing. We'll help you track your journey.
             </p>
             <button
               onClick={() => handleFilterChange('courses')}
-              className="px-5 py-2.5 bg-foreground text-background text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity"
+              className="px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-xl transition-opacity"
             >
               Explore Courses
             </button>
@@ -415,14 +390,12 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
               onStartJourney={handleStartJourney}
               onContinueJourney={handleContinueJourney}
             />
-            <div className="h-px bg-border/40 mx-4" />
+            
             <ExpandedRegionsSection />
             
-            <div className="h-px bg-border/40 mx-4" />
-            
-            {/* Filter button row */}
-            <div className="px-4 pt-4 pb-2 bg-white flex items-center justify-between border-b border-[#e2e8f0]">
-              <h2 className="text-lg font-bold text-[#1e293b]">Discover Courses</h2>
+            {/* Discover Courses section header */}
+            <div className="px-4 pt-4 pb-3 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-900">Discover Courses</h2>
               <FilterButton />
             </div>
             
@@ -438,10 +411,10 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
   return (
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
       <div className={cn("min-h-screen bg-[#F8FAFC]", className)}>
-        {/* Command Center: Search + Pills */}
+        {/* Command Center */}
         <div className="bg-[#F8FAFC]">
           <DiscoverCommandCenter
-            searchPlaceholder="Search courses, regions..."
+            searchPlaceholder="Search courses, regions…"
             searchValue={searchQuery}
             onSearchChange={handleSearchChange}
             sortValue={sortOption}
@@ -453,7 +426,7 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
           
           {/* Search Results Overlay */}
           {showSearchResults && (
-            <div className="px-4 relative">
+            <div className="px-4 relative" ref={searchContainerRef}>
               <ExploreSearchResults
                 query={searchQuery}
                 onSelect={handleSearchResultSelect}
@@ -464,7 +437,6 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
 
         {renderContent()}
         
-        {/* Bottom spacing */}
         <div className="h-8" />
         
         {/* Search Sheet */}
@@ -489,6 +461,21 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
           value={filters.region}
           onChange={handleRegionChange}
         />
+
+        {/* Scroll-to-Top FAB */}
+        <button
+          onClick={handleScrollToTop}
+          className={cn(
+            "fixed bottom-24 right-4 z-40 w-10 h-10 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center",
+            "transition-all duration-200",
+            showScrollTop 
+              ? "opacity-100 scale-100" 
+              : "opacity-0 scale-75 pointer-events-none"
+          )}
+          aria-label="Scroll to top"
+        >
+          <ChevronUp className="w-5 h-5 text-gray-600" />
+        </button>
       </div>
     </PullToRefreshContainer>
   );
