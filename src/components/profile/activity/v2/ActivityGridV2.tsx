@@ -210,8 +210,8 @@ const ActivityGridV2Inner: React.FC<ActivityGridV2Props> = ({
   // Loading state - grey shimmer (Watch tab standard)
   if ((isLoading && items.length === 0) || !effectiveFeedReady) {
     return (
-      <div className="pb-4 px-[3px]">
-        <div className="grid grid-cols-2 gap-[3px]">
+      <div className="pb-4">
+        <div className="grid grid-cols-2">
           {[...Array(6)].map((_, i) => (
             <div 
               key={i} 
