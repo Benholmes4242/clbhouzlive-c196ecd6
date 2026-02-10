@@ -213,10 +213,10 @@ export function WatchHeroVideo({
   // P2: Enhanced shimmer-down skeleton
   if (isLoading) {
     return (
-      <div className="pt-2 px-[3px]">
-        <Skeleton className="w-full aspect-square animate-shimmer-down" />
+      <div className="pt-3 px-4">
+        <Skeleton className="w-full aspect-square rounded-2xl animate-shimmer-down" />
         <div className="flex items-center gap-2.5 mt-3 px-1">
-          <Skeleton className="w-9 h-10 rounded-[34%] animate-shimmer-down" style={{ animationDelay: '50ms' }} />
+          <Skeleton className="w-9 h-9 rounded-full animate-shimmer-down" style={{ animationDelay: '50ms' }} />
           <div className="space-y-1.5">
             <Skeleton className="w-24 h-4 rounded animate-shimmer-down" style={{ animationDelay: '100ms' }} />
             <Skeleton className="w-16 h-3 rounded animate-shimmer-down" style={{ animationDelay: '150ms' }} />
@@ -230,8 +230,8 @@ export function WatchHeroVideo({
   if (!video || video.media.length === 0 || !hlsUrl) {
     logHero('📭 Empty state - no video available');
     return (
-      <div className="pt-2 px-[3px]">
-        <div className="w-full aspect-square bg-gradient-to-br from-muted/50 to-muted flex flex-col items-center justify-center">
+      <div className="pt-3 px-4">
+        <div className="w-full aspect-square rounded-2xl bg-gradient-to-br from-muted/50 to-muted flex flex-col items-center justify-center">
           <div className="w-16 h-16 rounded-full bg-background/80 flex items-center justify-center mb-3 shadow-sm">
             <Heart className="w-7 h-7 text-muted-foreground" />
           </div>
@@ -246,19 +246,16 @@ export function WatchHeroVideo({
   const courseName = video.course?.name || null;
 
   return (
-    <div className="pt-2 px-[3px]">
+    <div className="pt-3 px-4">
       <div 
         ref={containerRef}
-        className="relative w-full aspect-square overflow-hidden cursor-pointer group bg-black"
+        className="relative w-full aspect-square rounded-2xl overflow-hidden cursor-pointer group bg-black shadow-sm"
         onClick={onTap}
       >
-        {/* Paused-video pattern: UnifiedVideoPlayer handles poster internally */}
-        {/* No external img tag - instant first-frame via video element */}
         <UnifiedVideoPlayer
           ref={playerRef}
           src={hlsUrl}
           posterUrl={posterUrl}
-          // P0: Controlled autoplay via hysteresis (not autoplay prop)
           autoplay={false}
           muted
           loop
@@ -277,40 +274,38 @@ export function WatchHeroVideo({
           onError={handleError}
         />
 
-        {/* Gradient Overlay - Bottom 40% with stronger gradient */}
-        <div className="absolute bottom-0 left-0 right-0 h-2/5 bg-gradient-to-t from-black/80 via-black/30 to-transparent pointer-events-none" />
+        {/* Gradient Overlay - Bottom 40% */}
+        <div className="absolute bottom-0 left-0 right-0 h-2/5 bg-gradient-to-t from-black/50 via-black/20 to-transparent pointer-events-none" />
 
         {/* Hover overlay */}
         <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
         {/* Trending Badge with Like Count - Top Right */}
-        <div className="absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 backdrop-blur-md bg-black/35 border border-white/10 rounded-full">
-          <span className="text-white/80">🔥</span>
-          <span className="text-white text-xs font-semibold tracking-wide">
+        <div className="absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 backdrop-blur-sm bg-black/40 rounded-full">
+          <span className="text-white/90 text-sm leading-none">🔥</span>
+          <span className="text-white text-xs font-medium">
             {BADGE_TEXT[trendingPeriod]}
           </span>
           {video.like_count > 0 && (
             <>
-              <span className="text-white/50">·</span>
-              <span className="text-white/80 text-xs">{formatCount(video.like_count)} {video.like_count === 1 ? 'like' : 'likes'}</span>
+              <span className="text-white/40">·</span>
+              <span className="text-white/80 text-xs font-medium">{formatCount(video.like_count)} {video.like_count === 1 ? 'like' : 'likes'}</span>
             </>
           )}
         </div>
-
 
         {/* Bottom Content - Creator Info + Course Name */}
         <div className="absolute bottom-0 left-0 right-0 p-4">
           {creator && (
             <div className="flex items-center gap-2.5 min-w-0">
-              <SquircleAvatar
-                size={36}
-                src={creator.profile_photo_url}
+              <img
+                src={creator.profile_photo_url || ''}
                 alt={creator.display_name || 'Creator'}
-                fallback={(creator.display_name || 'G').charAt(0).toUpperCase()}
-                hideRing
+                className="w-9 h-9 rounded-full object-cover bg-white/20 flex-shrink-0"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
               />
               <div className="flex flex-col min-w-0">
-                <p className="text-white text-sm font-semibold truncate">
+                <p className="text-white text-base font-semibold truncate">
                   {creator.display_name || creator.username || ''}
                 </p>
                 {courseName && (

@@ -177,16 +177,16 @@ export const WatchShortCard = React.memo(function WatchShortCard({
     <div
       ref={containerRef}
       className={cn(
-        "relative aspect-[3/4] overflow-hidden cursor-pointer",
+        "relative aspect-[3/4] rounded-xl overflow-hidden cursor-pointer",
         "transition-transform duration-100 active:scale-[0.98]",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
-        "will-change-transform" // P3: GPU acceleration for scroll performance
+        "will-change-transform"
       )}
       onClick={onTap}
       tabIndex={0}
       role="button"
       aria-label={`Watch video by ${creator?.display_name || 'Golfer'}`}
-      aria-busy={!hasFirstFrame && shouldMountVideo} // P3: Accessibility - loading state
+      aria-busy={!hasFirstFrame && shouldMountVideo}
        onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
@@ -194,19 +194,19 @@ export const WatchShortCard = React.memo(function WatchShortCard({
         }
       }}
     >
-      {/* Shimmer loading placeholder - light grey with sweeping white highlight */}
+      {/* Shimmer loading placeholder */}
       <div className="absolute inset-0 bg-muted/50 overflow-hidden">
         <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
       </div>
       
-      {/* P1: Priority Poster with fetchPriority="high" for first 6 cards */}
+      {/* Priority Poster with fade-in on load */}
       {posterUrl && (
         <img
           src={posterUrl}
           alt=""
           className={cn(
             "absolute inset-0 h-full w-full object-cover z-10",
-            "transition-opacity duration-150 ease-out",
+            "transition-opacity duration-200 ease-out",
             hasFirstFrame && shouldMountVideo ? "opacity-0" : "opacity-100"
           )}
           loading={isPriority ? "eager" : "lazy"}
@@ -219,13 +219,7 @@ export const WatchShortCard = React.memo(function WatchShortCard({
         />
       )}
 
-      {/* 
-        TIKTOK-LEVEL: Direct UnifiedVideoPlayer
-        - Source stability guard
-        - HLS pool promotion
-        - Buffering debounce
-        - Controlled autoplay via hysteresis (not autoplay prop)
-      */}
+      {/* Video Player */}
       {shouldMountVideo && hlsUrl && (
         <div
           className={cn(
@@ -239,7 +233,6 @@ export const WatchShortCard = React.memo(function WatchShortCard({
             posterUrl={posterUrl}
             muted
             loop
-            // P0: Controlled autoplay via hysteresis (not autoplay prop)
             autoplay={false}
             showMuteButton={false}
             showPlayButton={false}
@@ -257,16 +250,16 @@ export const WatchShortCard = React.memo(function WatchShortCard({
         </div>
       )}
 
-      {/* Gradient Overlay - Bottom 30% only */}
+      {/* Gradient Overlay - Bottom 30% */}
       <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none z-20" />
 
-      {/* Like Count - Top Right - Hide number when zero, orange filled heart if has likes */}
-      <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-black/40 backdrop-blur-sm rounded-full z-30">
-        <Heart className={cn("w-3 h-3", isLikedByMe ? "fill-like text-like" : "text-white")} />
-        {likeCount > 0 && (
-          <span className="text-white text-[10px] font-medium">{formatCount(likeCount)}</span>
-        )}
-      </div>
+      {/* Like Count Badge - Top Right - Only show when like_count > 0 */}
+      {likeCount > 0 && (
+        <div className="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-0.5 bg-black/30 backdrop-blur-sm rounded-full z-30">
+          <Heart className={cn("w-3 h-3", isLikedByMe ? "fill-like text-like" : "fill-like text-like")} />
+          <span className="text-white text-xs font-medium">{formatCount(likeCount)}</span>
+        </div>
+      )}
 
       {/* Creator Name - Bottom */}
       <div className="absolute bottom-2 left-2 right-2 z-30">

@@ -8,7 +8,6 @@ const ScrollToTopGlass = () => {
 
   useEffect(() => {
     const checkScroll = () => {
-      // Check multiple scroll sources
       const rootContainer = document.getElementById('root');
       const mainElement = document.querySelector('main');
       const pageContainer = document.querySelector('.page-with-header');
@@ -20,14 +19,11 @@ const ScrollToTopGlass = () => {
       
       const scrollTop = Math.max(rootScroll, mainScroll, pageScroll, windowScroll);
       
-      // Appear after ~1 screen height of scrolling
-      setVisible(scrollTop > 600);
+      setVisible(scrollTop > 400);
     };
 
-    // Initial check
     checkScroll();
 
-    // Listen to all possible scroll sources
     const rootContainer = document.getElementById('root');
     const mainElement = document.querySelector('main');
     const pageContainer = document.querySelector('.page-with-header');
@@ -61,13 +57,13 @@ const ScrollToTopGlass = () => {
     <div 
       className={`
         fixed
-        bottom-[calc(90px+env(safe-area-inset-bottom))]
-        right-6
+        bottom-24
+        right-4
         z-[39]
         transition-all
-        duration-300
+        duration-200
         ease-out
-        ${visible ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-2 pointer-events-none'}
+        ${visible ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-90 pointer-events-none'}
       `}
     >
       <button
@@ -79,21 +75,17 @@ const ScrollToTopGlass = () => {
         aria-label="Back to top"
         className="
           pointer-events-auto
-          h-11
-          w-11
+          h-10
+          w-10
           rounded-full
           flex
           items-center
           justify-center
-          bg-foreground/80
-          backdrop-blur-md
+          bg-white
           border
-          border-white/15
+          border-gray-100
           shadow-lg
-          shadow-black/20
-          opacity-80
-          hover:opacity-100
-          hover:scale-105
+          hover:shadow-xl
           active:scale-95
           transition-all
           duration-150
@@ -101,7 +93,7 @@ const ScrollToTopGlass = () => {
         "
         style={{ WebkitTapHighlightColor: 'transparent' }}
       >
-        <ChevronUp className="h-4 w-4 text-white" />
+        <ChevronUp className="h-4 w-4" style={{ color: '#4b5563' }} />
       </button>
     </div>,
     document.body

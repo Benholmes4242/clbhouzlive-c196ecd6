@@ -202,7 +202,7 @@ export function WatchTab() {
 
   return (
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
-      <div className="flex flex-col min-h-screen bg-[var(--bg-page)]">
+      <div className="flex flex-col min-h-screen" style={{ background: '#F8FAFC' }}>
         {/* Hero Video - Most Viewed */}
         <WatchHeroVideo 
           video={heroVideo}
@@ -211,12 +211,9 @@ export function WatchTab() {
           onTap={handleHeroTap}
         />
 
-        {/* Gap between hero and section label */}
-        <div className="h-2" />
-
         {/* Section Label */}
-        <div className="px-3 py-2">
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+        <div className="mt-6 mb-3 px-4">
+          <span className="text-base font-semibold" style={{ color: '#374151' }}>
             Latest Shorts
           </span>
         </div>
