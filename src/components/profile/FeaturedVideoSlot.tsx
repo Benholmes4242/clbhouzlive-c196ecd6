@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Video, Play, Plus } from 'lucide-react';
+import { Video, Play, Plus, Camera } from 'lucide-react';
+import { DurationBadge } from '@/components/grids/DurationBadge';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,11 +11,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { cn } from '@/lib/utils';
 
 interface FeaturedVideoSlotProps {
   videoUrl?: string | null;
   posterUrl?: string | null;
+  durationSeconds?: number | null;
   isOwner: boolean;
+  isLoading?: boolean;
   onEditClick?: () => void;
   onRemoveClick?: () => void;
   onPlayClick?: () => void;
@@ -23,17 +27,37 @@ interface FeaturedVideoSlotProps {
 
 /**
  * Phase 3.2: Featured Video Slot for Creators
+ * - Shimmer while poster loads
+ * - Poster fade-in (200ms)
+ * - Broken poster fallback icon
+ * - Duration badge
+ * - Loading skeleton
  */
 export function FeaturedVideoSlot({ 
   videoUrl, 
   posterUrl, 
+  durationSeconds,
   isOwner, 
+  isLoading = false,
   onEditClick,
   onRemoveClick,
   onPlayClick,
   className 
 }: FeaturedVideoSlotProps) {
   const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
+  const [posterLoaded, setPosterLoaded] = useState(false);
+  const [isPosterBroken, setIsPosterBroken] = useState(false);
+
+  // Loading skeleton (Fix 6)
+  if (isLoading) {
+    return (
+      <div className={`rounded-xl bg-muted animate-pulse ${className ?? ''}`}>
+        <div className="aspect-video flex items-center justify-center">
+          <div className="w-14 h-14 rounded-full bg-muted-foreground/10" />
+        </div>
+      </div>
+    );
+  }
 
   if (!videoUrl && !isOwner) return null;
 
@@ -45,8 +69,8 @@ export function FeaturedVideoSlot({
           onClick={onEditClick}
           className="w-full flex flex-col items-center gap-3 active:scale-[0.98] transition-transform"
         >
-          <div className="w-14 h-14 rounded-full flex items-center justify-center bg-[#C1A84C]/10">
-            <Video className="h-6 w-6 text-[#C1A84C]" />
+          <div className="w-14 h-14 rounded-full flex items-center justify-center bg-primary/10">
+            <Video className="h-6 w-6 text-primary" />
           </div>
           <div className="text-center">
             <p className="text-sm font-semibold text-foreground">Feature a video</p>
@@ -54,7 +78,7 @@ export function FeaturedVideoSlot({
               Pin your best content to the top of your profile
             </p>
           </div>
-          <span className="mt-1 inline-flex items-center gap-1.5 min-h-[44px] px-6 rounded-full text-sm font-medium bg-[#C1A84C]/10 border border-[#C1A84C]/30 text-[#C1A84C] active:scale-[0.95] transition-transform">
+          <span className="mt-1 inline-flex items-center gap-1.5 min-h-[44px] px-6 rounded-full text-sm font-medium bg-primary/10 border border-primary/30 text-primary active:scale-[0.95] transition-transform">
             <Plus className="h-4 w-4" />
             Add video
           </span>
@@ -70,14 +94,14 @@ export function FeaturedVideoSlot({
         {/* Header */}
         <div className="px-4 py-2.5 flex items-center justify-between border-b border-border">
           <div className="flex items-center gap-2">
-            <Video className="h-4 w-4 text-[#C1A84C]" />
+            <Video className="h-4 w-4 text-primary" />
             <span className="text-xs font-medium text-muted-foreground">Featured</span>
           </div>
           {isOwner && (
             <div className="flex items-center gap-3">
               <button
                 onClick={onEditClick}
-                className="text-xs text-[#C1A84C] font-medium min-h-[44px] flex items-center"
+                className="text-xs text-primary font-medium min-h-[44px] flex items-center"
               >
                 Change
               </button>
@@ -91,27 +115,44 @@ export function FeaturedVideoSlot({
           )}
         </div>
 
-        {/* Video thumbnail */}
+        {/* Video thumbnail with shimmer + fade-in + error fallback */}
         <button
           onClick={onPlayClick}
           className="relative w-full aspect-video bg-muted block"
         >
-          {posterUrl ? (
+          {/* Shimmer layer (Fix 2) */}
+          <div className={cn(
+            "absolute inset-0 bg-muted animate-pulse transition-opacity duration-300",
+            posterLoaded || isPosterBroken ? "opacity-0 pointer-events-none" : "opacity-100"
+          )} />
+
+          {/* Broken poster fallback (Fix 2) */}
+          {isPosterBroken && (
+            <div className="absolute inset-0 bg-muted flex items-center justify-center">
+              <Camera className="h-8 w-8 text-muted-foreground/40" />
+            </div>
+          )}
+
+          {posterUrl && !isPosterBroken ? (
             <img 
               src={posterUrl} 
               alt="Featured video" 
-              className="w-full h-full object-cover"
+              className={cn(
+                "w-full h-full object-cover transition-opacity duration-200",
+                posterLoaded ? "opacity-100" : "opacity-0"
+              )}
               loading="lazy"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-                e.currentTarget.onerror = null;
+              onLoad={() => setPosterLoaded(true)}
+              onError={() => {
+                setIsPosterBroken(true);
+                setPosterLoaded(true);
               }}
             />
-          ) : (
+          ) : !isPosterBroken ? (
             <div className="w-full h-full flex items-center justify-center bg-muted">
               <Video className="h-12 w-12 text-muted-foreground/30" />
             </div>
-          )}
+          ) : null}
           
           {/* Play button overlay */}
           <div className="absolute inset-0 flex items-center justify-center">
@@ -119,6 +160,14 @@ export function FeaturedVideoSlot({
               <Play className="h-6 w-6 text-foreground ml-1" fill="currentColor" />
             </div>
           </div>
+
+          {/* Duration badge (Fix 4) */}
+          {durationSeconds != null && durationSeconds > 0 && (
+            <DurationBadge 
+              seconds={durationSeconds} 
+              className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm rounded-md px-2 py-0.5 text-xs font-medium text-white z-10"
+            />
+          )}
         </button>
       </div>
 

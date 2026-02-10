@@ -7,6 +7,7 @@ interface FeaturedPost {
   thumbnailUrl?: string;
   videoUrl?: string;
   content?: string;
+  durationSeconds?: number | null;
 }
 
 interface PinnedPost {
@@ -40,7 +41,7 @@ export function useCreatorFeatures(userId?: string) {
     staleTime: 5 * 60 * 1000,
   });
 
-  // Fetch featured post details
+  // Fetch featured post details (including duration)
   const { data: featuredPost } = useQuery({
     queryKey: ['featured-post', creatorData?.featured_post_id],
     queryFn: async () => {
@@ -55,7 +56,8 @@ export function useCreatorFeatures(userId?: string) {
             id,
             media_url,
             media_type,
-            poster_url
+            poster_url,
+            duration_seconds
           )
         `)
         .eq('id', creatorData.featured_post_id)
@@ -69,6 +71,7 @@ export function useCreatorFeatures(userId?: string) {
         thumbnailUrl: media?.poster_url || media?.media_url,
         videoUrl: media?.media_type === 'video' ? media?.media_url : undefined,
         content: post.content,
+        durationSeconds: (media as any)?.duration_seconds ?? null,
       } as FeaturedPost;
     },
     enabled: !!creatorData?.featured_post_id,
