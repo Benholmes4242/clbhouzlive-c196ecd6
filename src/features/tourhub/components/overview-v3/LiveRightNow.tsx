@@ -8,23 +8,9 @@
 
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Calendar, ChevronRight } from 'lucide-react';
 import { useLiveRightNow, type LiveTournamentWithLeader } from '../../hooks/useOverviewModules';
-import { useUpcomingTournaments, TOUR_CONFIG } from '../../hooks/useOverviewData';
 import { useVenueImage } from '../../hooks/useVenueImage';
-import { getTourLogo } from '../../utils/tourLogos';
-import { Skeleton } from '@/components/ui/skeleton';
-import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
 import '@/styles/hero-glass.css';
-
-function getStartLabel(date: string): string {
-  const startDate = new Date(date);
-  if (isToday(startDate)) return 'Today';
-  if (isTomorrow(startDate)) return 'Tomorrow';
-  const days = differenceInDays(startDate, new Date());
-  if (days <= 7) return `In ${days} day${days > 1 ? 's' : ''}`;
-  return format(startDate, 'MMM d');
-}
 
 // Score color helper - PGA Tour convention: under par = red
 function getScoreColor(scoreDisplay: string): string {
@@ -199,167 +185,13 @@ function LiveTournamentCard({
   );
 }
 
-/**
- * Up Next Preview Card - shown when no live tournaments
- */
-function UpNextCard({ tournament }: { tournament: { id: string; name: string; startDate: string; venueCity: string | null; tourSlug: string } }) {
-  const navigate = useNavigate();
-  const tourConfig = TOUR_CONFIG[tournament.tourSlug as keyof typeof TOUR_CONFIG] || TOUR_CONFIG.pga;
-
-  return (
-    <motion.button
-      onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
-      className="flex items-center gap-3 p-3 rounded-xl w-full text-left bg-card border border-border"
-      style={{
-        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
-      }}
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.1, duration: 0.2 }}
-    >
-      {/* Tour Logo */}
-      <div 
-        className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center"
-        style={{ background: '#F8F9FA' }}
-      >
-        <img 
-          src={getTourLogo(tournament.tourSlug as any)} 
-          alt={tourConfig.name}
-          className="h-6 w-auto"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.style.display = 'none';
-          }}
-        />
-      </div>
-
-      {/* Tournament Info */}
-      <div className="flex-1 min-w-0">
-        <h4 className="text-sm font-semibold truncate text-foreground">
-          {tournament.name}
-        </h4>
-        <div className="flex items-center gap-1.5 mt-0.5">
-          <Calendar className="w-3 h-3 text-muted-foreground/60" />
-          <span className="text-xs text-muted-foreground">
-            {getStartLabel(tournament.startDate)}
-            {tournament.venueCity && ` · ${tournament.venueCity}`}
-          </span>
-        </div>
-      </div>
-
-      {/* Chevron */}
-      <ChevronRight className="w-4 h-4 flex-shrink-0 text-muted-foreground/60" />
-    </motion.button>
-  );
-}
-
-/**
- * Empty State Component
- */
-function NoLiveEventsState() {
-  const { data: upcomingTournaments, isLoading } = useUpcomingTournaments(14);
-  const nextTournament = upcomingTournaments?.[0];
-
-  return (
-    <section className="pt-7 px-4 bg-background">
-      {/* Header — FIX 2: Design system section label */}
-      <div className="flex items-center gap-2 mb-4">
-        <span 
-          className="w-2 h-2 rounded-full"
-          style={{ background: 'rgba(0, 0, 0, 0.2)' }}
-        />
-        <h2 className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-          Live Right Now
-        </h2>
-      </div>
-
-      {/* Empty State Card */}
-      <div className="rounded-2xl p-4 bg-card border border-border"
-        style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)' }}
-      >
-        <p className="text-sm mb-3 text-muted-foreground">
-          No competitions live right now
-        </p>
-        
-        {/* Up Next */}
-        {isLoading ? (
-          <Skeleton className="h-16 w-full rounded-xl" />
-        ) : nextTournament ? (
-          <div>
-            <p className="text-xs font-semibold uppercase mb-2 text-foreground"
-              style={{ letterSpacing: '0.5px' }}
-            >
-              Up Next
-            </p>
-            <UpNextCard 
-              tournament={{
-                id: nextTournament.id,
-                name: nextTournament.name,
-                startDate: nextTournament.startDate,
-                venueCity: nextTournament.venueCity,
-                tourSlug: nextTournament.tourSlug,
-              }}
-            />
-          </div>
-        ) : (
-          <p className="text-xs text-muted-foreground/60">
-            Check back soon for upcoming events
-          </p>
-        )}
-      </div>
-    </section>
-  );
-}
 
 export function LiveRightNow() {
   const { data: liveTournaments, isLoading } = useLiveRightNow();
 
-  // Show empty state with "Up Next" when no live tournaments
-  if (!isLoading && (!liveTournaments || liveTournaments.length === 0)) {
-    return <NoLiveEventsState />;
-  }
-
-  if (isLoading) {
-    return (
-      <section className="pt-7 px-4 bg-background">
-        <div className="flex items-center gap-2 mb-4">
-          <span 
-            className="w-2 h-2 rounded-full animate-live-pulse"
-            style={{ 
-              background: '#FF3B30',
-              boxShadow: '0 0 10px rgba(255, 59, 48, 0.35)',
-            }}
-          />
-          <Skeleton className="h-4 w-28" />
-        </div>
-        <div 
-          className="flex gap-3 overflow-x-auto pb-2"
-          style={{
-            scrollSnapType: 'x mandatory',
-            scrollbarWidth: 'none',
-          }}
-        >
-          {[1, 2].map(i => (
-            <div 
-              key={i} 
-              className="w-[280px] flex-shrink-0 rounded-2xl overflow-hidden bg-card border border-border"
-            >
-              <div 
-                className="h-[140px] w-full animate-shimmer"
-                style={{
-                  background: 'linear-gradient(90deg, #F1F3F5 25%, #E5E7EB 50%, #F1F3F5 75%)',
-                  backgroundSize: '200% 100%',
-                }}
-              />
-              <div className="p-3.5">
-                <Skeleton className="h-4 w-3/4 mb-2" />
-                <Skeleton className="h-3 w-1/2" />
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-    );
+  // Hide the entire section when loading or no live tournaments
+  if (isLoading || !liveTournaments || liveTournaments.length === 0) {
+    return null;
   }
 
   return (
