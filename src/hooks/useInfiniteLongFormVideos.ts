@@ -128,7 +128,7 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
           post_views(count),
           course_ratings(
             id,
-            overall_rating,
+            rating,
             golf_courses(
               id,
               name,
@@ -234,7 +234,7 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
 
         // Detect review posts - has source_review_id OR has course_ratings entry
         const isReview = !!(post.source_review_id || (post.course_ratings && post.course_ratings.length > 0));
-        const reviewRating = post.course_ratings?.[0]?.overall_rating ?? null;
+        const reviewRating = post.course_ratings?.[0]?.rating ?? null;
 
         // Get golf course info - from course_ratings, direct relation, or tag
         let golfCourse = null;
