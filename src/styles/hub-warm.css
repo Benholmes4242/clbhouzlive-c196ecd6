@@ -113,9 +113,21 @@
 }
 
 /* Fallback for devices without backdrop-filter */
-@supports not (backdrop-filter: blur(20px)) {
+@supports not (backdrop-filter: blur(1px)) {
   .warm-glass-card {
+    background: rgba(255, 255, 255, 0.88);
+  }
+  .warm-tab-bar {
+    background: rgba(255, 253, 248, 0.92);
+  }
+  .warm-suggestion-chip {
     background: rgba(255, 255, 255, 0.85);
+  }
+  .warm-input-bar {
+    background: rgba(255, 255, 255, 0.88);
+  }
+  .warm-echo-gradient {
+    background: linear-gradient(135deg, rgba(255,237,213,0.95) 0%, rgba(254,215,170,0.85) 50%, rgba(253,186,116,0.75) 100%);
   }
 }
 
