@@ -105,7 +105,7 @@ const MAX_CONCURRENT_PER_SURFACE: Record<MediaSurface, number> = {
   'watch': 4,          // Allow 4 visible watch grid videos to play
   'watch-shorts': 2,   // Watch tab shorts grid - diagonal pattern (1 per visible row)
   'profile': 4,        // Allow 4 visible profile activity videos to play
-  'explore-grid': 2,   // Explore discover grid - 2 visible tiles in 2-column layout
+  'explore-grid': 1,   // Explore discover grid - 1 video at a time in dense 2-column layout
   'friends-feed': 1,   // Friends feed - single column, 1 video at a time
   'miniplayer': 1,     // Global mini player - single persistent player
   'highlights': 1,     // Profile highlights carousel - 1 at a time
