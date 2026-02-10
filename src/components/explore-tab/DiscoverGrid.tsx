@@ -65,8 +65,8 @@ function DiscoverGridSkeleton() {
     : false;
     
   return (
-    <div className="px-[3px]">
-      <div className="grid grid-cols-2 gap-[3px]">
+    <div>
+      <div className="grid grid-cols-2">
         {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
           <div 
             key={i}
