@@ -889,8 +889,8 @@ class MediaRuntimeCore {
     const visibleIds = new Set(candidates.map(c => c.id));
     
     // Process each surface type with incumbent priority
-    // CRITICAL: Include ALL defined MediaSurface types to ensure autoplay works on all surfaces
-    const surfaceTypes: MediaSurface[] = ['grid', 'videos', 'hero', 'fullscreen', 'clubhouse', 'watch', 'watch-shorts', 'profile'];
+    // Dynamically derive from MAX_CONCURRENT_PER_SURFACE to prevent missing-surface bugs
+    const surfaceTypes = Object.keys(MAX_CONCURRENT_PER_SURFACE) as MediaSurface[];
     
     for (const surface of surfaceTypes) {
       const surfaceCandidates = candidates.filter(c => c.surface === surface);
