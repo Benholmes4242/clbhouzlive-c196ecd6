@@ -26,6 +26,8 @@ import { getScoreTier } from '@/utils/getScoreTier';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 import type { ExploreContentItem } from '@/components/explore/types';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
+import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
+import { AlertCircle } from 'lucide-react';
 
 export type SortOption = ReviewsSortBy;
 
@@ -143,7 +145,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   // FIX #1: Use centralized useCourseReviews hook instead of inline query
   // This ensures consistent query keys across the app for proper cache invalidation
-  const { data: reviewsData, isLoading } = useCourseReviews(
+  const { data: reviewsData, isLoading, isError, refetch } = useCourseReviews(
     courseId,
     sortBy,
     hookRatingFilter as any,
@@ -241,7 +243,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   };
 
   // Unified fullscreen for review media
-  const { openFullscreen } = useUnifiedFullscreen('explore', {
+  const { openFullscreen } = useUnifiedFullscreen('course', {
     allowLandscape: true,
   });
 
@@ -337,6 +339,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     };
   };
 
+  // Pull-to-refresh handler (declared before early returns)
+  const handlePullToRefresh = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['course-reviews-full', courseId] });
+  };
+
   if (isLoading) {
     return (
       <div className="flex flex-col">
@@ -367,6 +374,30 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     );
   }
 
+  // Fix 2: Error state
+  if (isError) {
+    return (
+      <section className="px-4 py-8 bg-muted">
+        <div className="flex flex-col items-center text-center">
+          <div className="h-10 w-10 rounded-full bg-muted-foreground/10 flex items-center justify-center mb-3">
+            <AlertCircle className="h-5 w-5 text-muted-foreground/40" />
+          </div>
+          <p className="text-sm font-semibold text-foreground mb-1">Couldn't load reviews</p>
+          <p className="text-sm text-muted-foreground mb-4">
+            Something went wrong. Please try again.
+          </p>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            className="rounded-full bg-emerald-600 text-white text-sm font-medium px-5 py-2 active:scale-[0.98] transition-all min-h-[44px]"
+          >
+            Try Again
+          </button>
+        </div>
+      </section>
+    );
+  }
+
   // Empty state - use aggregates as source of truth
   if (!hasRatings) {
     return (
@@ -394,6 +425,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   }
 
   return (
+    <PullToRefreshContainer onRefresh={handlePullToRefresh}>
     <div className="flex flex-col">
       {/* Compact rating context */}
       <section className="px-4 py-3 bg-muted">
@@ -594,6 +626,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       
       <ScrollToTopGlass />
     </div>
+    </PullToRefreshContainer>
   );
 };
 
