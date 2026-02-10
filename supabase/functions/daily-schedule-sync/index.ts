@@ -15,31 +15,31 @@ const corsHeaders = {
 // Tours to sync - includes all supported professional golf tours
 const TOURS_TO_SYNC = [
   'pga',    // PGA Tour
-  'eur',    // DP World Tour (SportRadar uses 'eur')
+  'euro',   // DP World Tour (Sportradar v3 uses 'euro')
   'lpga',   // LPGA Tour
   'liv',    // LIV Golf
-  'kft',    // Korn Ferry Tour (SportRadar uses 'kft')
-  'champions-tour',  // Champions Tour
+  'pgad',   // Korn Ferry Tour (Sportradar v3 uses 'pgad')
+  'champ',  // Champions Tour (Sportradar v3 uses 'champ')
 ];
 
 // Map database tour names to SportRadar API codes
 const TOUR_NAME_TO_API: Record<string, string> = {
   'pga': 'pga',
   'PGA Tour': 'pga',
-  'EURO': 'eur',
-  'DP World Tour': 'eur',
-  'euro': 'eur',
+  'EURO': 'euro',
+  'DP World Tour': 'euro',
+  'euro': 'euro',
   'LPGA': 'lpga',
   'lpga': 'lpga',
   'LIV': 'liv',
   'LIV Golf': 'liv',
   'liv': 'liv',
-  'PGAD': 'kft',
-  'Korn Ferry': 'kft',
-  'pgad': 'kft',
-  'CHAMP': 'champions-tour',
-  'Champions': 'champions-tour',
-  'champ': 'champions-tour',
+  'PGAD': 'pgad',
+  'Korn Ferry': 'pgad',
+  'pgad': 'pgad',
+  'CHAMP': 'champ',
+  'Champions': 'champ',
+  'champ': 'champ',
 };
 
 // Years to sync
