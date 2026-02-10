@@ -215,7 +215,7 @@ export const WatchShortCard = React.memo(function WatchShortCard({
     <div
       ref={containerRef}
       className={cn(
-        "relative aspect-[3/4] rounded-xl overflow-hidden cursor-pointer",
+        "relative aspect-[3/4] overflow-hidden cursor-pointer",
         "transition-transform duration-100 active:scale-[0.98]",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
         "will-change-transform"

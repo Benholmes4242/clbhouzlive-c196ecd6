@@ -111,7 +111,7 @@ export function ImagesGrid({
     <div className="px-1">
       {/* Initial loading skeleton — 9 squares in 3-column grid */}
       {showInitialSkeleton && (
-        <div className="grid grid-cols-3 gap-0.5">
+        <div className="grid grid-cols-3">
           {Array.from({ length: 9 }).map((_, i) => (
             <div key={i} className="aspect-square bg-muted animate-pulse" />
           ))}
@@ -119,7 +119,7 @@ export function ImagesGrid({
       )}
 
       {!showInitialSkeleton && (
-        <div className="grid grid-cols-3 gap-0.5">
+        <div className="grid grid-cols-3">
           {renderedPosts.map((post, index) => {
             // Entrance animation for newly loaded tiles
             const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;

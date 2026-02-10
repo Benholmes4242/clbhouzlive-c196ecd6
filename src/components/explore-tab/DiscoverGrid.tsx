@@ -65,8 +65,8 @@ function DiscoverGridSkeleton() {
     : false;
     
   return (
-    <div className="px-[3px]">
-      <div className="grid grid-cols-2 gap-[3px]">
+    <div>
+      <div className="grid grid-cols-2">
         {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
           <div 
             key={i}
@@ -186,7 +186,7 @@ const PortraitTile = React.memo(function PortraitTile({
   return (
     <div
       ref={containerRef}
-      className="relative cursor-pointer overflow-hidden rounded-xl bg-muted will-change-transform"
+      className="relative cursor-pointer overflow-hidden bg-muted will-change-transform"
       style={{ aspectRatio: '3/4' }}
       onClick={onClick}
       aria-busy={isVideo && !isVideoReady}
@@ -382,7 +382,7 @@ const LandscapeTile = React.memo(function LandscapeTile({
   return (
     <div
       ref={containerRef}
-      className="relative cursor-pointer overflow-hidden rounded-xl bg-muted will-change-transform"
+      className="relative cursor-pointer overflow-hidden bg-muted will-change-transform"
       style={{ aspectRatio: String(aspectRatio) }}
       onClick={onClick}
       aria-busy={isVideo && !isVideoReady}
@@ -718,8 +718,8 @@ export function DiscoverGrid({
 
   return (
     <div className={className}>
-      <div className="px-4">
-        <div className="grid grid-cols-2 gap-1">
+      <div>
+        <div className="grid grid-cols-2">
           {allMoments.map((moment, index) => {
             const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;
             const entranceDelay = isNewlyLoaded ? (index - newlyLoadedStartIndex) * 30 : 0;

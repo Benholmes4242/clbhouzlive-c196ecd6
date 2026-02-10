@@ -163,7 +163,7 @@ export interface UniversalMediaGridProps {
 
 export const PORTRAIT_ASPECT = '3/4';
 export const LANDSCAPE_ASPECT = '16/9';
-export const GRID_GAP_PX = 2;
+export const GRID_GAP_PX = 0;
 
 // Aspect ratio thresholds
 export const AR_LANDSCAPE_THRESHOLD = 1.25;  // >= 1.25 = landscape
