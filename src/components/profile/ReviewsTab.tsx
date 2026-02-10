@@ -132,7 +132,7 @@ function ReviewCard({
         title: review.text?.slice(0, 50) || 'Review media',
         likes: 0,
         user: {
-          id: review.user.name,
+          id: review.id,
           name: review.user.name,
           avatar: review.user.avatarUrl,
         },

@@ -109,8 +109,9 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
       thumbnailSrc: h.post_media[0]?.media_url || '',
       title: h.content || '',
       user: {
-        id: 'unknown',
-        name: h.golf_course?.name || 'Golf Course',
+        id: userId,
+        name: 'Golfer',
+        avatar: '',
       },
       golfCourse: h.golf_course ? {
         id: h.golf_course.id,
@@ -119,7 +120,7 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
       } : undefined,
     }));
     openFullscreen(items, index);
-  }, [highlights, openFullscreen]);
+  }, [highlights, userId, openFullscreen]);
 
   if (isLoading) {
     return (

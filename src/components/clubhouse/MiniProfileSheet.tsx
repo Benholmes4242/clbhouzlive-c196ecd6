@@ -233,15 +233,16 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
       const items = postItem.post_media.map((m: any, idx: number) => ({
         id: `${postItem.id}-${idx}`,
         type: m.type as 'image' | 'video',
-        url: m.url,
-        posterUrl: m.poster_url,
+        src: m.url,
+        thumbnailSrc: m.poster_url,
+        title: postItem.content || '',
+        likes: 0,
         user: {
           id: user.id,
-          profile_photo_url: user.avatar,
-          display_name: user.name,
-          username: user.username
+          name: user.name,
+          username: user.username,
+          avatar: user.avatar || '',
         },
-        content: postItem.content
       }));
       openFullscreen(items, 0);
     }

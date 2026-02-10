@@ -20,8 +20,16 @@ export const exploreMomentAdapter: FeedAdapter<ExploreMoment> = {
   }],
 
   getCreator: (item) => {
-    // ExploreMoment has user_id but not full profile data
-    // The fullscreen viewer will fetch profile if needed
+    // Use enriched creator data when available
+    if (item.creator) {
+      return {
+        id: item.user_id,
+        name: item.creator.display_name || item.creator.username || 'Golfer',
+        username: item.creator.username || undefined,
+        avatar: item.creator.profile_photo_url || undefined,
+        type: 'personal',
+      };
+    }
     return {
       id: item.user_id,
       name: 'Golfer',
