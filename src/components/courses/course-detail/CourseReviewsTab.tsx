@@ -261,6 +261,12 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       title: '',
       likes: 0,
       aspectRatio: 1,
+      user: (item as any).user_profiles ? {
+        id: (item as any).user_profiles.id || (item as any).user_id,
+        name: (item as any).user_profiles.display_name || (item as any).user_profiles.username || 'Golfer',
+        username: (item as any).user_profiles.username || '',
+        avatar: (item as any).user_profiles.profile_photo_url || '',
+      } : undefined,
     }));
     
     openFullscreen(exploreItems, startIndex);

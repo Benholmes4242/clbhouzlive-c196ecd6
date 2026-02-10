@@ -64,10 +64,19 @@ export function CreatorProfileSection({
     // Open in fullscreen viewer by constructing a minimal media item
     const mediaItem = {
       id: featuredPost.id,
-      type: 'video' as const,
-      url: featuredPost.videoUrl || '',
-      posterUrl: featuredPost.thumbnailUrl,
-      creator: { id: userId },
+      post_media: [{
+        id: featuredPost.id,
+        media_type: 'video' as const,
+        media_url: featuredPost.videoUrl || '',
+        poster_url: featuredPost.thumbnailUrl,
+      }],
+      user: {
+        id: userId,
+        display_name: (featuredPost as any).creatorName || 'Creator',
+        username: (featuredPost as any).creatorUsername,
+        profile_photo_url: (featuredPost as any).creatorAvatar,
+      },
+      content: (featuredPost as any).title || '',
     };
     openFullscreen([mediaItem], 0);
   };

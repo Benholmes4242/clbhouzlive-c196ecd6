@@ -100,6 +100,7 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
       src: url,
       title: content.description?.slice(0, 50) || 'Image',
       likes: 0,
+      golfCourse: content.golfCourse,
     }));
     openFullscreen(mediaItems, index);
   };
@@ -111,6 +112,7 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
       src: videoUrl,
       title: content.description?.slice(0, 50) || 'Video',
       likes: 0,
+      golfCourse: content.golfCourse,
     }];
     openFullscreen(mediaItems, 0);
   };
