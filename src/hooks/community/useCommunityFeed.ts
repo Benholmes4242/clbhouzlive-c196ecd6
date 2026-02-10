@@ -59,6 +59,7 @@ export function useCommunityFeed({
   const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
   const [communityCount, setCommunityCount] = useState({ friends: 0, following: 0 });
   const { activeActor } = useActiveActor();
 
@@ -68,6 +69,7 @@ export function useCommunityFeed({
   const load = useCallback(async (reset = false) => {
     try {
       setLoading(true);
+      setError(null);
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         setLoading(false);
@@ -153,12 +155,11 @@ export function useCommunityFeed({
       }
 
       // Build query with aggregated counts - include categories for filtering
-      // We need to query for posts from both personal users and business accounts
       // Also fetch review data via source_review_id and course data via course_id
       let query = supabase
         .from('posts')
         .select(`
-          id, content, created_at, user_id, badges, categories, actor_type, actor_id, source_review_id, course_id,
+          id, content, created_at, user_id, badges, categories, actor_type, actor_id, source_review_id, course_id, visibility,
           post_media (id, media_type, media_url, duration_seconds, width, height, display_order),
           post_likes (count),
           post_comments!post_comments_post_id_fkey (count),
@@ -170,20 +171,25 @@ export function useCommunityFeed({
             course_review_media (id, media_type, media_url, duration_seconds, width, height)
           ),
           golf_courses!posts_course_id_fkey (id, name, country, sub_country, region)
-        `)
-        .eq('visibility', 'anyone'); // ✅ Only public posts
+        `);
 
-      // Build the actor filter
+      // Fix 1: Include friends-only posts from friends + public posts from all followed
+      // Build the actor + visibility filter
       const orConditions: string[] = [];
       
       if (communityUserIds.size > 0) {
-        // Posts from personal profiles we follow
-        orConditions.push(`and(actor_type.eq.personal,actor_id.in.(${Array.from(communityUserIds).join(',')}))`);
+        // Public posts from anyone we follow/are friends with
+        orConditions.push(`and(actor_type.eq.personal,actor_id.in.(${Array.from(communityUserIds).join(',')}),visibility.eq.anyone)`);
+      }
+      
+      if (friendIds.size > 0) {
+        // Friends-only posts from friends specifically
+        orConditions.push(`and(actor_type.eq.personal,actor_id.in.(${Array.from(friendIds).join(',')}),visibility.eq.friends)`);
       }
       
       if (followedBusinessIds.size > 0) {
-        // Posts from business profiles we follow
-        orConditions.push(`and(actor_type.eq.business,actor_id.in.(${Array.from(followedBusinessIds).join(',')}))`);
+        // Posts from business profiles we follow (always public)
+        orConditions.push(`and(actor_type.eq.business,actor_id.in.(${Array.from(followedBusinessIds).join(',')}),visibility.eq.anyone)`);
       }
 
       if (orConditions.length > 0) {
@@ -206,15 +212,15 @@ export function useCommunityFeed({
       }
 
       // Fetch exact PAGE_SIZE (no overfetch)
-      const { data: posts, error } = await query.range(nextOffset, nextOffset + PAGE_SIZE - 1);
+      const { data: posts, error: queryError } = await query.range(nextOffset, nextOffset + PAGE_SIZE - 1);
 
       console.log('[useCommunityFeed] 📊 RESULT:', {
         postsReturned: posts?.length || 0,
         hasMore: (posts?.length || 0) === PAGE_SIZE,
-        error: error?.message
+        error: queryError?.message
       });
 
-      if (error) throw error;
+      if (queryError) throw queryError;
 
       // Get user profiles for personal actors
       const userActorIds = [...new Set((posts ?? [])
@@ -376,8 +382,9 @@ export function useCommunityFeed({
       setHasMore(newHasMore);
       setOffset(nextOffset + PAGE_SIZE);
       setLoading(false);
-    } catch (error) {
-      console.error('[useCommunityFeed] ❌ Error loading community feed:', error);
+    } catch (err) {
+      console.error('[useCommunityFeed] ❌ Error loading community feed:', err);
+      setError(err instanceof Error ? err : new Error('Failed to load feed'));
       setLoading(false);
     }
   }, [offset, mediaFilter, sortOption, actorType, actorId]);
@@ -387,6 +394,7 @@ export function useCommunityFeed({
     setItems([]);
     setOffset(0);
     setHasMore(true);
+    setError(null);
     load(true);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mediaFilter, sortOption, actorType, actorId]);
@@ -395,12 +403,14 @@ export function useCommunityFeed({
     items,
     loading,
     hasMore,
+    error,
     communityCount,
     loadMore: () => load(false),
     reset: () => {
       setItems([]);
       setOffset(0);
       setHasMore(true);
+      setError(null);
       load(true);
     },
   };

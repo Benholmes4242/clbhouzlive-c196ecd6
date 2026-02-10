@@ -11,7 +11,8 @@
  */
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
-import { MoreHorizontal, MapPin, Copy, Share2, Flag, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MoreHorizontal, MapPin, Copy, Share2, Flag, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { PostActionBar } from '@/components/posts/PostActionBar';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
@@ -27,6 +28,7 @@ import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamThumbnailUrl, generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { isPosterFailed } from '@/utils/posterPrefetch';
 import { RatingPill } from '@/components/ui/RatingPill';
+import { supabase } from '@/integrations/supabase/client';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,6 +36,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import CommentsPage from '@/components/clubhouse/cinematic/CommentsPage';
 
 // 3s first-frame fallback timeout
@@ -49,12 +61,10 @@ const getAspectRatio = (item: CommunityContentItem): number => {
   const media = (item as any).media?.[0];
   if (media?.width && media?.height) {
     const rawRatio = media.width / media.height;
-    // Clamp to reasonable bounds
     const minRatio = 0.8;  // Portrait limit (4:5)
     const maxRatio = 2.0;  // Landscape limit (2:1)
     return Math.max(minRatio, Math.min(maxRatio, rawRatio));
   }
-  // Fallback based on type
   return item.type === 'video' ? 16 / 9 : 4 / 5;
 };
 
@@ -84,7 +94,6 @@ interface CommunityFeedCardProps {
   registerVideo?: RegisterMediaFn;
   isPlaying?: boolean;
   videoIndex?: number;
-  /** Priority loading for first 6 items */
   isPriorityItem?: boolean;
 }
 
@@ -113,7 +122,6 @@ const MediaItem = React.memo(function MediaItem({
   const [imageError, setImageError] = useState(false);
   const isVideo = media.media_type === 'video';
   
-  // Generate URLs for video
   const { hlsUrl, posterUrl, streamId } = useMemo(() => {
     if (!isVideo) {
       return { hlsUrl: null, posterUrl: media.media_url, streamId: media.id };
@@ -137,8 +145,6 @@ const MediaItem = React.memo(function MediaItem({
   }, [isVideo, media.media_url, media.id]);
 
   if (isVideo && hlsUrl) {
-    // Paused-video pattern: UnifiedVideoPlayer handles poster internally
-    // No external img tag - instant first-frame display via video element
     return (
       <div className={cn("absolute inset-0", filterClass)}>
         <UnifiedVideoPlayer
@@ -160,7 +166,6 @@ const MediaItem = React.memo(function MediaItem({
     );
   }
 
-  // Image
   return (
     <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
       {!imageError ? (
@@ -183,8 +188,8 @@ const MediaItem = React.memo(function MediaItem({
 });
 
 /**
- * CommunityFeedCard - TikTok-Level Card with UnifiedVideoPlayer
- * Header → Caption → Divider → Media → Social proof → Action bar
+ * CommunityFeedCard - Premium Card with UnifiedVideoPlayer
+ * Header → Caption → Course Tag → Media → Social proof → Action bar
  */
 export const CommunityFeedCard = React.memo(function CommunityFeedCard({
   item,
@@ -196,19 +201,31 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
   videoIndex = 0,
   isPriorityItem = false,
 }: CommunityFeedCardProps) {
+  const navigate = useNavigate();
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [activeMediaIndex, setActiveMediaIndex] = useState(0);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const playerRef = useRef<UnifiedVideoPlayerRef>(null);
   const tileRef = useRef<HTMLDivElement>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
   const mediaIndexRef = useRef(videoIndex);
   mediaIndexRef.current = videoIndex;
 
-  // Prevent duplicate ready reports
   const hasReportedReadyRef = useRef(false);
   const firstFrameTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Get current user for delete check
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setCurrentUserId(user?.id || null);
+    });
+  }, []);
+
+  const isOwnPost = currentUserId && item.user?.id === currentUserId;
 
   // Get media array
   const mediaItems = useMemo(() => item.media || [], [item.media]);
@@ -230,7 +247,6 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
   const hasMedia = !!item.src;
   const filterClass = getFilterClass((item as any).filterId);
   
-  // Calculate dynamic aspect ratio from media dimensions
   const aspectRatio = useMemo(() => getAspectRatio(item), [item]);
   const durationDisplay = useMemo(() => formatDuration(item.duration || item.durationSeconds), [item.duration, item.durationSeconds]);
 
@@ -239,7 +255,7 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
   const reviewRating = (item as any).reviewRating as number | null;
   const golfCourse = (item as any).golfCourse as { id: string; name: string; country: string; sub_country?: string; region?: string } | undefined;
 
-  // P1: 3s first-frame fallback timeout for first video
+  // P1: 3s first-frame fallback timeout
   useEffect(() => {
     if (isPlaying && isVideo && !isVideoReady && activeMediaIndex === 0) {
       firstFrameTimeoutRef.current = setTimeout(() => {
@@ -260,15 +276,12 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
   // Engagement data
   const { likesCount, commentsCount } = usePostEngagement(item.id);
 
-  // Format timestamp
   const timeAgo = formatTimeAgo(item.createdAt, 'short');
 
-  // Caption text - clean out the "📍 Played at" line since we display it as a separate card
   const captionText = useMemo(() => removePlayedAtLine(item.title || ''), [item.title]);
   const shouldTruncate = captionText.length > 150 && !isExpanded;
   const displayContent = shouldTruncate ? captionText.slice(0, 150) : captionText;
 
-  // Handle video ready (buffered for smooth playback)
   const handleCanPlayThrough = useCallback(() => {
     if (!hasReportedReadyRef.current && isVideo) {
       hasReportedReadyRef.current = true;
@@ -342,12 +355,36 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
     toast.info('Report functionality coming soon');
   }, []);
 
+  // Fix 6: Delete own post
+  const handleDeletePost = useCallback(async () => {
+    setIsDeleting(true);
+    try {
+      const { error } = await supabase.from('posts').delete().eq('id', item.id);
+      if (error) throw error;
+      toast.success('Post deleted');
+      // The card will be removed on next feed refresh
+      setDeleteDialogOpen(false);
+    } catch (err) {
+      toast.error('Failed to delete post');
+    } finally {
+      setIsDeleting(false);
+    }
+  }, [item.id]);
+
   const handleCreatorClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (item.user?.id) {
       onCreatorClick?.(item.user.id);
     }
   };
+
+  // Fix 3: Course tag navigation
+  const handleCourseClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (golfCourse?.id) {
+      navigate(`/courses/${golfCourse.id}`);
+    }
+  }, [golfCourse, navigate]);
 
   const handleMediaClick = useCallback(() => {
     if (isVideo) {
@@ -401,15 +438,14 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
       <div
         ref={tileRef}
         className={cn(
-          "bg-card overflow-hidden border-x border-border/40 will-change-transform",
+          "rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm mx-4 will-change-transform",
+          isReview && "border-t-2 border-t-amber-400",
           className
         )}
-        style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
       >
-        {/* Header - 3 column layout: avatar / meta / actions - reduced padding */}
+        {/* Header - creator row */}
         <div 
-          className="flex items-start gap-3 cursor-pointer" 
-          style={{ padding: '10px 16px 6px 16px' }}
+          className="flex items-start gap-3 cursor-pointer px-4 pt-4"
           onClick={handleCreatorClick}
         >
           {/* Left: Avatar */}
@@ -423,13 +459,13 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
             />
           </div>
 
-          {/* Middle: Meta - tighter spacing */}
+          {/* Middle: Meta */}
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-foreground text-sm leading-tight truncate">
+            <p className="font-semibold text-gray-900 text-sm leading-tight truncate">
               {item.user?.name || 'User'}
             </p>
-            <p className="text-xs text-muted-foreground leading-tight truncate">
-              <span>{timeAgo}</span>
+            <p className="text-xs text-gray-400 leading-tight truncate">
+              {timeAgo}
             </p>
           </div>
 
@@ -438,10 +474,10 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
-                  className="p-1.5 hover:bg-muted/50 rounded-full transition-colors"
+                  className="p-1.5 hover:bg-gray-50 rounded-full transition-colors"
                   aria-label="Post options"
                 >
-                  <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
+                  <MoreHorizontal className="h-5 w-5 text-gray-300" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52">
@@ -453,27 +489,43 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
                   <Share2 className="h-4 w-4 mr-2" />
                   Send
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleReport} className="text-destructive focus:text-destructive">
-                  <Flag className="h-4 w-4 mr-2" />
-                  Report
-                </DropdownMenuItem>
+                {isOwnPost && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={() => setDeleteDialogOpen(true)} 
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete
+                    </DropdownMenuItem>
+                  </>
+                )}
+                {!isOwnPost && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleReport} className="text-destructive focus:text-destructive">
+                      <Flag className="h-4 w-4 mr-2" />
+                      Report
+                    </DropdownMenuItem>
+                  </>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </div>
 
-        {/* Caption - reduced padding */}
+        {/* Caption */}
         {captionText && (
-          <div style={{ padding: '0 16px 6px 16px' }}>
-            <div className="text-sm text-foreground whitespace-pre-wrap leading-snug">
+          <div className="px-4 pt-2">
+            <div className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
               {displayContent}
               {shouldTruncate && (
                 <>
                   {'... '}
                   <button
                     onClick={() => setIsExpanded(true)}
-                    className="text-muted-foreground hover:text-foreground hover:underline"
+                    className="text-emerald-600 font-medium"
                   >
                     more
                   </button>
@@ -483,44 +535,28 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
           </div>
         )}
 
-        {/* Course Location Bar - Reviews: stacked layout with breathing room */}
-        {isReview && golfCourse && (
+        {/* Course Location - clickable (Fix 3) */}
+        {golfCourse && (
           <div 
-            className="flex items-start gap-2 pointer-events-none mt-3"
-            style={{ padding: '0 16px 12px 16px' }}
+            className={cn(
+              "flex items-start gap-2 px-4 pb-3 cursor-pointer active:scale-[0.98] transition-transform",
+              captionText && "border-t border-gray-50 pt-2 mt-1"
+            )}
+            onClick={handleCourseClick}
           >
-            <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+            <MapPin className="h-3.5 w-3.5 text-gray-400 flex-shrink-0 mt-0.5" />
             <div className="flex flex-col min-w-0">
-              <span className="font-semibold text-foreground text-[13px] leading-tight truncate">{golfCourse.name}</span>
+              <span className="font-semibold text-gray-800 text-[13px] leading-tight truncate">{golfCourse.name}</span>
               {courseLocation && (
-                <span className="text-muted-foreground text-xs leading-tight truncate">{courseLocation}</span>
+                <span className="text-gray-400 text-xs leading-tight truncate">{courseLocation}</span>
               )}
             </div>
           </div>
         )}
 
-        {/* Course Tag - Regular posts (non-review): same stacked layout */}
-        {!isReview && golfCourse && (
-          <div 
-            className="flex items-start gap-2 pointer-events-none mt-3"
-            style={{ padding: '0 16px 12px 16px' }}
-          >
-            <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
-            <div className="flex flex-col min-w-0">
-              <span className="font-semibold text-foreground text-[13px] leading-tight truncate">{golfCourse.name}</span>
-              {courseLocation && (
-                <span className="text-muted-foreground text-xs leading-tight truncate">{courseLocation}</span>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Divider */}
-        <div className="h-px bg-border/30 mx-4" />
-
-        {/* Media - Full Width with native aspect ratio */}
+        {/* Media - Full Width within card */}
         <div 
-          className="relative w-full cursor-pointer bg-muted overflow-hidden"
+          className="relative w-full cursor-pointer bg-gray-100 overflow-hidden"
           style={{ aspectRatio }}
           onClick={handleMediaClick}
           aria-busy={isVideo && !isVideoReady}
@@ -528,7 +564,6 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
           {/* Multi-media Carousel or Single Media */}
           {hasMultipleMedia ? (
             <>
-              {/* Carousel container with scroll-snap */}
               <div
                 ref={carouselRef}
                 className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory touch-pan-x h-full w-full"
@@ -554,27 +589,27 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
                 ))}
               </div>
 
-              {/* Chevron Navigation */}
+              {/* Chevron Navigation — Polish 5: lighter arrows */}
               {activeMediaIndex > 0 && (
                 <button
                   onClick={handlePrev}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center transition-opacity hover:bg-black/70"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm shadow-sm flex items-center justify-center transition-opacity"
                   aria-label="Previous"
                 >
-                  <ChevronLeft className="h-5 w-5 text-white" />
+                  <ChevronLeft className="h-5 w-5 text-gray-700" />
                 </button>
               )}
               {activeMediaIndex < mediaItems.length - 1 && (
                 <button
                   onClick={handleNext}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center transition-opacity hover:bg-black/70"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm shadow-sm flex items-center justify-center transition-opacity"
                   aria-label="Next"
                 >
-                  <ChevronRight className="h-5 w-5 text-white" />
+                  <ChevronRight className="h-5 w-5 text-gray-700" />
                 </button>
               )}
 
-              {/* Dot Indicators - max 10, then counter */}
+              {/* Dot Indicators */}
               <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
                 {mediaItems.length <= 10 ? (
                   <div className="flex gap-1.5">
@@ -596,7 +631,6 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
               </div>
             </>
           ) : (
-            // Single media item
             currentMedia && (
               <MediaItem
                 media={currentMedia}
@@ -611,12 +645,12 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
             )
           )}
 
-          {/* Review Indicators - pointer-events-none */}
+          {/* Review Indicators */}
           {isReview && (
             <>
-              {/* Review Pill - Top Left */}
+              {/* Review Pill — Polish 4 */}
               <div className="absolute top-3 left-3 z-10 pointer-events-none">
-                <div className="px-2 py-1 bg-black/60 backdrop-blur-sm rounded-full text-white text-[10px] font-bold uppercase tracking-wider">
+                <div className="bg-gray-900/70 backdrop-blur-sm rounded-lg px-2.5 py-1 text-[10px] font-bold text-white uppercase tracking-wider">
                   Review
                 </div>
               </div>
@@ -634,7 +668,7 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
             </>
           )}
 
-          {/* Duration Badge - videos only, single media */}
+          {/* Duration Badge */}
           {isVideo && durationDisplay && !hasMultipleMedia && (
             <div className="absolute bottom-3 right-3 px-2 py-0.5 bg-black/70 rounded text-white text-xs font-medium tabular-nums z-10 pointer-events-none">
               {durationDisplay}
@@ -642,9 +676,9 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
           )}
         </div>
 
-        {/* Social proof line */}
+        {/* Social proof line — Polish 3 */}
         {(likesCount > 0 || commentsCount > 0) && (
-          <div className="px-4 py-2 text-xs text-muted-foreground border-b border-border/30">
+          <div className="px-4 py-2 text-xs text-gray-400">
             {likesCount > 0 && <span>{likesCount} {likesCount === 1 ? 'like' : 'likes'}</span>}
             {likesCount > 0 && commentsCount > 0 && <span> · </span>}
             {commentsCount > 0 && (
@@ -655,13 +689,37 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
           </div>
         )}
 
-        {/* Action bar */}
-        <PostActionBar
-          postId={item.id}
-          onOpenComments={handleComment}
-          shareTitle={item.title || item.user?.name || 'Post'}
-        />
+        {/* Action bar — Polish 3 */}
+        <div className="px-4 pb-3 pt-1">
+          <PostActionBar
+            postId={item.id}
+            onOpenComments={handleComment}
+            shareTitle={item.title || item.user?.name || 'Post'}
+          />
+        </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete post?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete your post.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeletePost}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? 'Deleting...' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Comments Drawer */}
       <CommentsPage
@@ -677,7 +735,6 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
     </>
   );
 }, (prevProps, nextProps) => {
-  // Custom comparison for memoization
   return (
     prevProps.item.id === nextProps.item.id &&
     prevProps.item.likeCount === nextProps.item.likeCount &&

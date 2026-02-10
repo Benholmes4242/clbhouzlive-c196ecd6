@@ -11,6 +11,10 @@ import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 import { useAdaptivePrefetch } from '@/hooks/useAdaptivePrefetch';
+import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
+import { useQueryClient } from '@tanstack/react-query';
+import { useDebounce } from '@/hooks/use-debounce';
+import { AlertCircle, CheckCircle2, ChevronUp } from 'lucide-react';
 
 interface CommunityFeedProps {
   onMediaClick?: (item: any) => void;
@@ -37,9 +41,15 @@ const COMMUNITY_PILLS: { id: CommunityMediaFilter; label: string }[] = [
  */
 export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   
   // Command center state
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearch = useDebounce(searchQuery, 300);
+  
+  // Scroll-to-top
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   
   // Persist filter/sort/category in localStorage
   const [mediaFilter, setMediaFilter] = useState<CommunityMediaFilter>(() => {
@@ -84,36 +94,29 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     items: rawItems,
     loading,
     hasMore,
+    error,
     communityCount,
     loadMore,
+    reset,
   } = useCommunityFeed({ mediaFilter, sortOption });
 
-  // Apply client-side search filter
+  // Apply client-side search filter with debounce
   const items = useMemo(() => {
     let filtered = rawItems;
     
-    // Apply search filter
-    if (searchQuery && searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
+    // Apply search filter using debounced value
+    if (debouncedSearch && debouncedSearch.trim()) {
+      const query = debouncedSearch.toLowerCase();
       
       filtered = filtered.filter(item => {
-        // Post content fields
         const titleMatch = (item.title || '').toLowerCase().includes(query);
         const captionMatch = ((item as any).caption || '').toLowerCase().includes(query);
         const descriptionMatch = ((item as any).description || '').toLowerCase().includes(query);
-        
-        // User fields (legacy structure)
         const userNameMatch = (item.user?.name || '').toLowerCase().includes(query);
         const userUsernameMatch = (item.user?.username || '').toLowerCase().includes(query);
-        
-        // Creator fields (polymorphic - new structure)
         const creatorNameMatch = ((item as any).creator?.name || '').toLowerCase().includes(query);
         const creatorUsernameMatch = ((item as any).creator?.username || '').toLowerCase().includes(query);
-        
-        // Business profile name
         const businessMatch = ((item as any).business?.name || '').toLowerCase().includes(query);
-        
-        // Golf course name (both camelCase and snake_case)
         const courseMatch = ((item as any).golfCourse?.name || '').toLowerCase().includes(query);
         const golfCourseMatch = ((item as any).golf_course?.name || '').toLowerCase().includes(query);
         
@@ -125,7 +128,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     }
     
     return filtered;
-  }, [rawItems, searchQuery]);
+  }, [rawItems, debouncedSearch]);
 
   // ============ TikTok-Level: Adaptive Prefetch (3-20 ahead based on conditions) ============
   const { config: prefetchConfig, onIndexChange } = useAdaptivePrefetch();
@@ -172,7 +175,6 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   useEffect(() => {
     if (items.length === 0 || !prefetchConfig.preloadManifests) return;
     
-    // Preload initial batch based on adaptive config
     const videoMoments = items
       .slice(0, Math.min(prefetchConfig.prefetchAhead, items.length))
       .filter(m => m.type === 'video' && m.src);
@@ -215,8 +217,8 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     mode: 'grid',
     preloadMargin: 300,
     scrollSettleDelay: 200,
-    startThreshold: 0.5,   // TikTok-level: Play at 50% visible
-    stopThreshold: 0.1,    // TikTok-level: Pause at 10% visible
+    startThreshold: 0.5,
+    stopThreshold: 0.1,
   });
 
   // Unified fullscreen player for Community content
@@ -235,7 +237,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   const [newlyLoadedStartIndex, setNewlyLoadedStartIndex] = useState<number | null>(null);
   const loadingMoreRef = useRef(false);
 
-  // Infinite scroll observer - Watch tab standard: rootMargin 0px
+  // Infinite scroll observer
   useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel) return;
@@ -250,11 +252,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
           setTimeout(() => { loadingMoreRef.current = false; }, 1000);
         }
       },
-      { 
-        root: null,
-        rootMargin: '0px', // Watch tab standard: trigger at bottom
-        threshold: 0,
-      }
+      { root: null, rootMargin: '0px', threshold: 0 }
     );
 
     observer.observe(sentinel);
@@ -305,11 +303,8 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
             const index = items.findIndex(p => p.id === postId);
             if (index !== -1 && index !== currentIndex) {
               setCurrentIndex(index);
-              
-              // TikTok-level: Notify adaptive prefetch of scroll activity
               onIndexChange();
               
-              // Prefetch next batch based on adaptive config
               if (prefetchConfig.preloadManifests && index > lastPrefetchedIndex.current - 3) {
                 const prefetchStart = lastPrefetchedIndex.current + 1;
                 const prefetchEnd = Math.min(prefetchStart + prefetchConfig.prefetchAhead, items.length);
@@ -330,16 +325,25 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
           }
         });
       },
-      { 
-        root: null,
-        rootMargin: '-40% 0px -40% 0px', // Center of viewport
-        threshold: 0,
-      }
+      { root: null, rootMargin: '-40% 0px -40% 0px', threshold: 0 }
     );
 
     cards.forEach(card => observer.observe(card));
     return () => observer.disconnect();
   }, [items, currentIndex, onIndexChange, prefetchConfig]);
+
+  // Scroll-to-top visibility
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleScrollToTop = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
 
   // Fullscreen click handler
   const handleCardClick = useCallback((id: string, index: number) => {
@@ -356,154 +360,177 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     localStorage.setItem(FILTER_KEY, 'all');
   }, []);
 
+  // Pull-to-refresh handler
+  const handlePullToRefresh = useCallback(async () => {
+    reset();
+  }, [reset]);
+
+  // Command center block (shared across all states)
+  const commandCenterBlock = (
+    <div style={{ background: '#F8FAFC' }}>
+      <DiscoverCommandCenter
+        searchPlaceholder="Search posts..."
+        searchValue={searchQuery}
+        onSearchChange={setSearchQuery}
+        sortValue={commandCenterSort}
+        onSortChange={handleSortChange}
+        pills={pills}
+        onPillSelect={handleFilterChange}
+      />
+      {/* Section subtitle — Polish 1 */}
+      <div className="px-4 pt-2 pb-3">
+        <p className="text-xs font-medium text-gray-400">
+          Posts from people you follow
+        </p>
+      </div>
+    </div>
+  );
+
+  // Fix 5: Error state
+  if (error && !loading && items.length === 0) {
+    return (
+      <PullToRefreshContainer onRefresh={handlePullToRefresh}>
+        <div className="min-h-screen pb-20" style={{ background: '#F8FAFC' }}>
+          {commandCenterBlock}
+          <div className="flex flex-col items-center justify-center py-16 px-6">
+            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+              <AlertCircle className="w-6 h-6 text-gray-300" />
+            </div>
+            <h3 className="text-base font-semibold text-gray-600 mb-1">Something went wrong</h3>
+            <p className="text-sm text-gray-400 text-center mb-6">We couldn't load your feed. Please try again.</p>
+            <button
+              onClick={() => reset()}
+              className="rounded-full bg-emerald-600 text-white text-sm font-medium px-6 py-2.5 active:scale-[0.97] transition-transform"
+            >
+              Try again
+            </button>
+          </div>
+        </div>
+      </PullToRefreshContainer>
+    );
+  }
+
   // Empty state: User has no community (no friends/follows)
   if (!loading && communityCount.friends === 0 && communityCount.following === 0) {
     return (
-      <div className="min-h-screen pb-20 bg-background">
-        {/* Command Center */}
-        <div className="bg-background">
-          <DiscoverCommandCenter
-            searchPlaceholder="Search posts..."
-            searchValue={searchQuery}
-            onSearchChange={setSearchQuery}
-            sortValue={commandCenterSort}
-            onSortChange={handleSortChange}
-            pills={pills}
-            onPillSelect={handleFilterChange}
-          />
+      <PullToRefreshContainer onRefresh={handlePullToRefresh}>
+        <div className="min-h-screen pb-20" style={{ background: '#F8FAFC' }}>
+          {commandCenterBlock}
+          <CommunityEmptyState variant="no-community" />
         </div>
-        <CommunityEmptyState variant="no-community" />
-      </div>
+      </PullToRefreshContainer>
     );
   }
 
   // Has community but no posts (or search returned no results)
   if (!loading && items.length === 0 && (communityCount.friends > 0 || communityCount.following > 0)) {
-    // Check if this is due to search or filter
-    const isSearchEmpty = searchQuery && searchQuery.trim().length > 0;
+    const isSearchEmpty = debouncedSearch && debouncedSearch.trim().length > 0;
     const isFilteredEmpty = mediaFilter !== 'all';
     
     return (
-      <div className="min-h-screen pb-20 bg-background">
-        {/* Command Center */}
-        <div className="bg-background">
-          <DiscoverCommandCenter
-            searchPlaceholder="Search posts..."
-            searchValue={searchQuery}
-            onSearchChange={setSearchQuery}
-            sortValue={commandCenterSort}
-            onSortChange={handleSortChange}
-            pills={pills}
-            onPillSelect={handleFilterChange}
-          />
+      <PullToRefreshContainer onRefresh={handlePullToRefresh}>
+        <div className="min-h-screen pb-20" style={{ background: '#F8FAFC' }}>
+          {commandCenterBlock}
+          {isSearchEmpty ? (
+            <div className="flex flex-col items-center justify-center py-16 px-4">
+              <p className="text-sm text-gray-400 text-center">
+                No posts found for "{debouncedSearch}"
+              </p>
+              <button
+                onClick={() => setSearchQuery('')}
+                className="mt-3 text-sm text-emerald-600 font-medium hover:underline"
+              >
+                Clear search
+              </button>
+            </div>
+          ) : isFilteredEmpty ? (
+            <CommunityEmptyState variant="no-results" onClearFilter={handleClearFilter} />
+          ) : (
+            <CommunityEmptyState variant="quiet" />
+          )}
         </div>
-        {isSearchEmpty ? (
-          <div className="flex flex-col items-center justify-center py-16 px-4">
-            <p className="text-muted-foreground text-center">
-              No posts found for "{searchQuery}"
-            </p>
-            <button
-              onClick={() => setSearchQuery('')}
-              className="mt-3 text-sm text-primary hover:underline"
-            >
-              Clear search
-            </button>
-          </div>
-        ) : isFilteredEmpty ? (
-          <CommunityEmptyState variant="no-results" onClearFilter={handleClearFilter} />
-        ) : (
-          <CommunityEmptyState variant="quiet" />
-        )}
-      </div>
+      </PullToRefreshContainer>
     );
   }
 
   return (
-    <div className="min-h-screen pb-20 bg-background">
-      {/* Command Center: Search + Sort + Pills + Subtitle */}
-      <div className="bg-background">
-        <DiscoverCommandCenter
-          searchPlaceholder="Search posts..."
-          searchValue={searchQuery}
-          onSearchChange={setSearchQuery}
-          sortValue={commandCenterSort}
-          onSortChange={handleSortChange}
-          pills={pills}
-          onPillSelect={handleFilterChange}
-        />
-        {/* Section header - reduced spacing */}
-        <div className="px-4 pb-2">
-          <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide truncate">
-            Posts from people you follow and play with
-          </p>
+    <PullToRefreshContainer onRefresh={handlePullToRefresh}>
+      <div className="min-h-screen pb-20" style={{ background: '#F8FAFC' }}>
+        {/* Command Center */}
+        {commandCenterBlock}
+
+        {/* Feed - Single column layout with premium card spacing */}
+        <div className="flex flex-col gap-4 py-2">
+          {items.map((item, index) => {
+            const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;
+            const entranceDelay = isNewlyLoaded ? (index - newlyLoadedStartIndex) * 30 : 0;
+            
+            return (
+              <div 
+                key={item.id} 
+                data-community-card-id={item.id}
+                className={isNewlyLoaded 
+                  ? 'motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-200 motion-safe:fill-mode-backwards' 
+                  : undefined
+                }
+                style={isNewlyLoaded ? { animationDelay: `${entranceDelay}ms` } : undefined}
+              >
+                <CommunityFeedCard
+                  item={item}
+                  onCardClick={handleCardClick}
+                  onCreatorClick={handleCreatorClick}
+                  registerVideo={registerMedia}
+                  isPlaying={playingIds.has(item.id)}
+                  videoIndex={index}
+                  isPriorityItem={index < 6}
+                />
+              </div>
+            );
+          })}
         </div>
-      </div>
 
-      {/* Feed - Single column layout with CommunityFeedCard - tighter gap */}
-      <div className="flex flex-col gap-2 py-2">
-        {items.map((item, index) => {
-          const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;
-          const entranceDelay = isNewlyLoaded ? (index - newlyLoadedStartIndex) * 30 : 0;
-          
-          return (
-            <div 
-              key={item.id} 
-              data-community-card-id={item.id}
-              className={isNewlyLoaded 
-                ? 'motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-200 motion-safe:fill-mode-backwards' 
-                : undefined
-              }
-              style={isNewlyLoaded ? { animationDelay: `${entranceDelay}ms` } : undefined}
-            >
-              <CommunityFeedCard
-                item={item}
-                onCardClick={handleCardClick}
-                onCreatorClick={handleCreatorClick}
-                registerVideo={registerMedia}
-                isPlaying={playingIds.has(item.id)}
-                videoIndex={index}
-                isPriorityItem={index < 6}
-              />
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Loading state - tighter gap */}
-      {loading && items.length === 0 && (
-        <div className="flex flex-col gap-2 py-2">
-          {[1, 2, 3].map((i) => (
-            <CommunityFeedCardSkeleton key={i} index={i - 1} />
-          ))}
-        </div>
-      )}
-
-      {/* Infinite scroll sentinel */}
-      <div ref={sentinelRef} className="h-4" />
-
-      {/* Orange brand spinner for paced infinite scroll (Watch tab standard) */}
-      {showBottomLoader && items.length > 0 && (
-        <div className="flex items-center justify-center py-8">
-          <div className="w-5 h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
-        </div>
-      )}
-
-      {/* End of feed - polished "All caught up" state */}
-      {!hasMore && items.length > 0 && (
-        <div className="flex flex-col items-center justify-center py-12 px-6">
-          <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
-            <svg className="w-6 h-6 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
+        {/* Loading state */}
+        {loading && items.length === 0 && (
+          <div className="flex flex-col gap-4 py-2">
+            {[1, 2, 3].map((i) => (
+              <CommunityFeedCardSkeleton key={i} index={i - 1} />
+            ))}
           </div>
-          <p className="text-sm font-medium text-foreground mb-1">
-            You're all caught up
-          </p>
-          <p className="text-xs text-muted-foreground text-center">
-            Check back later for new posts from your community
-          </p>
-        </div>
-      )}
-    </div>
+        )}
+
+        {/* Infinite scroll sentinel */}
+        <div ref={sentinelRef} className="h-4" />
+
+        {/* Orange brand spinner for paced infinite scroll */}
+        {showBottomLoader && items.length > 0 && (
+          <div className="flex items-center justify-center py-8">
+            <div className="w-5 h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+          </div>
+        )}
+
+        {/* End of feed — Polish 9 */}
+        {!hasMore && items.length > 0 && (
+          <div className="flex flex-col items-center justify-center py-8">
+            <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mb-2">
+              <CheckCircle2 className="w-4 h-4 text-gray-300" />
+            </div>
+            <p className="text-xs text-gray-400 font-medium text-center">
+              You're all caught up
+            </p>
+          </div>
+        )}
+
+        {/* Scroll-to-top FAB */}
+        {showScrollTop && (
+          <button
+            onClick={handleScrollToTop}
+            className="fixed bottom-24 right-4 z-40 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center transition-all duration-200 active:scale-95 animate-in fade-in zoom-in-90"
+            aria-label="Scroll to top"
+          >
+            <ChevronUp className="w-5 h-5 text-gray-600" />
+          </button>
+        )}
+      </div>
+    </PullToRefreshContainer>
   );
 }
