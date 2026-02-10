@@ -42,7 +42,7 @@ const CommunityFeed = lazy(() => import('@/components/community/CommunityFeed'))
 const VideosTab = lazy(() => import('@/components/videos/VideosTab'));
 const ExploreTab = lazy(() => import('@/components/explore-tab/ExploreTab'));
 
-type MainKey = 'shorts' | 'videos' | 'channels' | 'following';
+type MainKey = 'shorts' | 'videos' | 'explore' | 'following';
 
 const Discover = () => {
   const navigate = useNavigate();
@@ -124,7 +124,8 @@ const Discover = () => {
     const mainToFilter: Record<string, string> = {
       'shorts': FILTER_TYPES.VIDEOS,
       'videos': FILTER_TYPES.VIDEOS,
-      'channels': FILTER_TYPES.CHANNELS,
+      'explore': FILTER_TYPES.CHANNELS,
+      'channels': FILTER_TYPES.CHANNELS, // Back-compat
       'following': FILTER_TYPES.FOLLOWING,
       'friends': FILTER_TYPES.FOLLOWING, // Back-compat
       'verified-pros': FILTER_TYPES.VERIFIED_PROS,
@@ -319,10 +320,10 @@ const Discover = () => {
             {/* Main Content - Conditional based on active tab with slide animation */}
             <SlidingPanels
               activeKey={main as MainKey}
-              order={['shorts', 'videos', 'channels', 'following'] as const}
+              order={['shorts', 'videos', 'explore', 'following'] as const}
             >
               {(key: MainKey) => {
-                if (key === 'channels') {
+                if (key === 'explore') {
                   return (
                     <Suspense fallback={null}>
                       <ExploreTab onMediaClick={handleCommunityMediaClick} />

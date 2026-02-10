@@ -37,83 +37,76 @@ const REGION_IMAGE_OVERRIDES: Record<string, string> = {
 
 /**
  * Hook to fetch region data with top course image
+ * Fix 10: Consolidated into parallel queries instead of sequential per-region
  */
 function useRegionsWithTopCourse() {
   return useQuery({
     queryKey: ['regions-with-top-course'],
     queryFn: async (): Promise<RegionData[]> => {
-      // Fetch regions
-      const { data: regions, error } = await supabase
-        .from('explore_regions')
-        .select('id, slug, title, hero_image_url, sort_order')
-        .order('sort_order');
+      // Step 1: Fetch all regions + members in parallel
+      const [regionsResult, membersResult] = await Promise.all([
+        supabase
+          .from('explore_regions')
+          .select('id, slug, title, hero_image_url, sort_order')
+          .order('sort_order'),
+        supabase
+          .from('explore_region_members')
+          .select('region_id, country'),
+      ]);
 
-      if (error || !regions) return [];
+      if (regionsResult.error || !regionsResult.data) return [];
+      const regions = regionsResult.data;
+      const allMembers = membersResult.data || [];
 
-      // For each region, get counts and top course image
-      const regionsWithData = await Promise.all(
-        regions.map(async (region) => {
-          // Get countries in this region
-          const { data: members } = await supabase
-            .from('explore_region_members')
-            .select('country')
-            .eq('region_id', region.id);
+      // Build region->countries map
+      const regionCountries: Record<string, string[]> = {};
+      for (const region of regions) {
+        regionCountries[region.id] = allMembers
+          .filter(m => m.region_id === region.id)
+          .map(m => m.country);
+      }
 
-          const countries = members?.map(m => m.country) || [];
-          
-          let courseCount = 0;
-          let top100Count = 0;
-          let topCourseImage: string | null = null;
+      // Step 2: Fetch all course counts and top100 counts in parallel per region
+      const allCountries = allMembers.map(m => m.country);
+      const uniqueCountries = [...new Set(allCountries)];
 
-          if (countries.length > 0) {
-            // Get course count
-            const { count: cCount } = await supabase
-              .from('golf_courses')
-              .select('*', { count: 'exact', head: true })
-              .in('country', countries);
+      // Single query for all courses with ranks, then aggregate in JS
+      const { data: coursesWithRank } = await supabase
+        .from('golf_courses')
+        .select('id, country, global_rank, thumbnail_image')
+        .in('country', uniqueCountries.length > 0 ? uniqueCountries : ['__none__']);
 
-            courseCount = cCount || 0;
+      const courses = coursesWithRank || [];
 
-            // Get top100 count
-            const { count: t100Count } = await supabase
-              .from('golf_courses')
-              .select('*', { count: 'exact', head: true })
-              .in('country', countries)
-              .not('global_rank', 'is', null)
-              .lte('global_rank', 100);
+      // Build per-region data from the single courses query
+      return regions.map(region => {
+        const countries = regionCountries[region.id] || [];
+        const countriesSet = new Set(countries);
+        const regionCourses = courses.filter(c => countriesSet.has(c.country));
+        
+        const courseCount = regionCourses.length;
+        const top100Count = regionCourses.filter(c => c.global_rank != null && c.global_rank <= 100).length;
+        
+        // Get top course image (best ranked with image)
+        const topCourse = regionCourses
+          .filter(c => c.global_rank != null && c.thumbnail_image != null)
+          .sort((a, b) => (a.global_rank || 999) - (b.global_rank || 999))[0];
+        
+        const topCourseImage = topCourse?.thumbnail_image || null;
 
-            top100Count = t100Count || 0;
+        // Apply region-specific image overrides
+        const overrideImage = REGION_IMAGE_OVERRIDES[region.slug];
 
-            // Get top course image (best ranked with image)
-            const { data: topCourse } = await supabase
-              .from('golf_courses')
-              .select('thumbnail_image')
-              .in('country', countries)
-              .not('global_rank', 'is', null)
-              .not('thumbnail_image', 'is', null)
-              .order('global_rank')
-              .limit(1)
-              .single();
-
-            topCourseImage = topCourse?.thumbnail_image || null;
-          }
-
-          // Apply region-specific image overrides
-          const overrideImage = REGION_IMAGE_OVERRIDES[region.slug];
-
-          return {
-            id: region.id,
-            slug: region.slug,
-            title: region.title,
-            hero_image_url: region.hero_image_url,
-            course_count: courseCount,
-            top100_count: top100Count,
-            topCourseImage: overrideImage || topCourseImage,
-          };
-        })
-      );
-
-      return regionsWithData;
+        return {
+          id: region.id,
+          slug: region.slug,
+          title: region.title,
+          hero_image_url: region.hero_image_url,
+          course_count: courseCount,
+          top100_count: top100Count,
+          topCourseImage: overrideImage || topCourseImage,
+        };
+      });
     },
     staleTime: 10 * 60 * 1000, // 10 minutes
   });

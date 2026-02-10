@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { cn } from '@/lib/utils';
-import { useNavigate } from 'react-router-dom';
-import { Bookmark, Flag, Globe, SlidersHorizontal } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Bookmark, Flag, Globe, SlidersHorizontal, Compass, Loader2 } from 'lucide-react';
 import FeaturedCourseHero from './FeaturedCourseHero';
 import ReviewsOfTheWeekHero from './ReviewsOfTheWeekHero';
 import Top100JourneySummary from './Top100JourneySummary';
@@ -14,10 +14,15 @@ import ExploreFiltersSheet, {
   countActiveFilters 
 } from './ExploreFiltersSheet';
 import RegionBottomSheet, { RegionValue } from './RegionBottomSheet';
-import { useTrendingCourses, useExploreRegions } from '@/hooks/useExploreData';
+import ExploreErrorState from './ExploreErrorState';
+import { useInfiniteTrendingCourses } from '@/hooks/useInfiniteTrendingCourses';
+import { useExploreRegions } from '@/hooks/useExploreData';
 import { useExplorePrefetch, RegionKey, ExploreMoment, ExploreFilters, TimeFilter, SortFilter } from '@/hooks/useExploreMoments';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 import { exploreMomentAdapter } from '@/adapters/exploreMomentAdapter';
+import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
+import { useQueryClient } from '@tanstack/react-query';
+import { useInView } from 'react-intersection-observer';
 
 interface ExploreTabProps {
   onMediaClick?: (item: any) => void;
@@ -34,14 +39,6 @@ const EXPLORE_PILLS: { id: string; label: string; icon?: React.ElementType }[] =
   { id: 'regions', label: 'Regions', icon: Globe },
 ];
 
-// Region metadata for carousels
-const REGION_CONFIG: { key: RegionKey; title: string }[] = [
-  { key: 'GBI', title: 'GB&I' },
-  { key: 'EU', title: 'Europe' },
-  { key: 'USA', title: 'USA' },
-  { key: 'ROW', title: 'Rest of World' },
-];
-
 // Default filters
 const DEFAULT_FILTERS: ExploreFilters = {
   timeFrame: 'all',
@@ -52,13 +49,19 @@ const DEFAULT_FILTERS: ExploreFilters = {
 /**
  * ExploreTab - The aspirational discovery surface for golf places, courses, and journeys
  * 
- * Phase 3: Adds filter bottom sheet for time frame, region, and sort
+ * Fix 2: Pull-to-refresh
+ * Fix 6: Region filter on courses sub-tab
+ * Fix 8: Error states for all sections
+ * Fix 11: URL param consistency (?main=explore&sub=courses)
+ * Fix 12: Dynamic header for courses sub-tab
  */
 export const ExploreTab: React.FC<ExploreTabProps> = ({
   onMediaClick,
   className,
 }) => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queryClient = useQueryClient();
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const [showFeaturedCourse, setShowFeaturedCourse] = useState(false);
   
@@ -70,10 +73,12 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
     allowLandscape: true,
   });
   
+  // Fix 11: Read sub-tab from URL params for deep linking
+  const activeFilter = searchParams.get('sub') || 'all';
+  
   // Command center state
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
-  const [activeFilter, setActiveFilter] = useState('all');
   const [sortOption, setSortOption] = useState<SortOption>('newest');
   
   // Filter state
@@ -93,12 +98,37 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
   // Region bottom sheet state
   const [isRegionSheetOpen, setIsRegionSheetOpen] = useState(false);
 
-  // Data hooks
-  const { data: trendingCourses } = useTrendingCourses(20);
+  // Data hooks - Fix 5: Use infinite query for courses
+  const {
+    data: coursesData,
+    isLoading: coursesLoading,
+    error: coursesError,
+    isFetchingNextPage: coursesFetchingNext,
+    hasNextPage: coursesHasNext,
+    fetchNextPage: coursesFetchNext,
+    refetch: coursesRefetch,
+  } = useInfiniteTrendingCourses(filters.region as RegionKey | 'all');
+  
   const { data: regions } = useExploreRegions();
+
+  // Flatten courses pages
+  const allCourses = useMemo(() => {
+    return coursesData?.pages.flatMap(page => page.courses) ?? [];
+  }, [coursesData]);
 
   // Active filter count
   const activeFilterCount = countActiveFilters(filters);
+
+  // Fix 5: Infinite scroll sentinel for courses
+  const { ref: courseSentinelRef, inView: courseSentinelInView } = useInView({
+    rootMargin: '200px',
+  });
+  
+  useEffect(() => {
+    if (courseSentinelInView && coursesHasNext && !coursesFetchingNext) {
+      coursesFetchNext();
+    }
+  }, [courseSentinelInView, coursesHasNext, coursesFetchingNext, coursesFetchNext]);
 
   // Handle click outside to close search
   useEffect(() => {
@@ -125,14 +155,21 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
     setSortOption(sort);
   }, []);
 
+  // Fix 11: Persist sub-tab in URL
   const handleFilterChange = useCallback((key: string) => {
-    // Open region bottom sheet instead of switching to regions view
     if (key === 'regions') {
       setIsRegionSheetOpen(true);
       return;
     }
-    setActiveFilter(key);
-  }, []);
+    // Update URL with sub-tab
+    const newParams = new URLSearchParams(searchParams);
+    if (key === 'all') {
+      newParams.delete('sub');
+    } else {
+      newParams.set('sub', key);
+    }
+    setSearchParams(newParams, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   const handleApplyFilters = useCallback((newFilters: ExploreFilters) => {
     setFilters(newFilters);
@@ -141,7 +178,7 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
     } catch {}
   }, []);
 
-  // Handle region selection from bottom sheet
+  // Handle region selection from bottom sheet — Fix 6: persists across sub-tabs
   const handleRegionChange = useCallback((region: RegionValue) => {
     setFilters(prev => {
       const newFilters = { ...prev, region };
@@ -196,6 +233,34 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
     onMediaClick?.(item);
   };
 
+  // Fix 2: Pull-to-refresh handler
+  const handlePullToRefresh = useCallback(async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ['reviews-of-the-week'] }),
+      queryClient.invalidateQueries({ queryKey: ['user-top100-intent'] }),
+      queryClient.invalidateQueries({ queryKey: ['regions-with-top-course'] }),
+      queryClient.invalidateQueries({ queryKey: ['explore-moments'] }),
+      queryClient.invalidateQueries({ queryKey: ['infinite-trending-courses'] }),
+      queryClient.invalidateQueries({ queryKey: ['trending-courses'] }),
+      queryClient.invalidateQueries({ queryKey: ['explore-regions'] }),
+    ]);
+  }, [queryClient]);
+
+  // Fix 12: Dynamic header for courses sub-tab
+  const coursesHeader = useMemo(() => {
+    if (filters.region && filters.region !== 'all') {
+      const regionName = getRegionLabel(filters.region);
+      return {
+        title: `Courses in ${regionName}`,
+        subtitle: `Explore courses in this region`,
+      };
+    }
+    return {
+      title: 'All Courses',
+      subtitle: 'Discover courses from around the world',
+    };
+  }, [filters.region]);
+
   // Filter button for command center
   const FilterButton = () => (
     <button
@@ -223,49 +288,99 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
       case 'courses':
         return (
           <div className="py-6">
+            {/* Fix 12: Dynamic header */}
             <div className="px-4 mb-4">
-              <h2 className="text-lg font-bold text-foreground">All Courses</h2>
+              <h2 className="text-lg font-bold text-foreground">{coursesHeader.title}</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Discover courses from around the world
+                {coursesHeader.subtitle}
               </p>
             </div>
-            <div className="px-4 grid grid-cols-2 gap-3">
-              {(trendingCourses || []).map(course => (
-                <button
-                  key={course.id}
-                  onClick={() => navigate(`/courses/${course.id}`)}
-                  className="text-left group"
-                >
-                  <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-surface-alt">
-                    {course.thumbnail_image ? (
-                      <img 
-                        src={course.thumbnail_image} 
-                        alt={course.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-emerald-800/50 via-slate-700/50 to-slate-900/50" />
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                    {course.global_rank && (
-                      <div className="absolute top-2 left-2 px-2 py-0.5 backdrop-blur-md bg-black/35 border border-white/10 rounded-full text-xs text-white font-medium">
-                        #{course.global_rank}
+            
+            {/* Fix 8: Error state */}
+            {coursesError ? (
+              <ExploreErrorState
+                message="Couldn't load courses"
+                onRetry={() => coursesRefetch()}
+              />
+            ) : coursesLoading && allCourses.length === 0 ? (
+              /* Fix 7: Loading skeleton */
+              <div className="px-4 grid grid-cols-2 gap-3">
+                {[1, 2, 3, 4, 5, 6].map(i => (
+                  <div key={i} className="aspect-[4/3] rounded-xl bg-gray-100 animate-pulse" />
+                ))}
+              </div>
+            ) : allCourses.length === 0 ? (
+              /* Fix 7: Empty state */
+              <div className="flex flex-col items-center justify-center py-16 px-4">
+                <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mb-3">
+                  <Compass className="w-6 h-6 text-muted-foreground" />
+                </div>
+                <p className="text-base font-semibold text-gray-600 mb-1">No courses found</p>
+                <p className="text-sm text-muted-foreground text-center max-w-[280px]">
+                  {filters.region && filters.region !== 'all'
+                    ? `No courses found in ${getRegionLabel(filters.region)}`
+                    : 'Check back soon for more courses'}
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="px-4 grid grid-cols-2 gap-3">
+                  {allCourses.map(course => (
+                    <button
+                      key={course.id}
+                      onClick={() => navigate(`/courses/${course.id}`)}
+                      className="text-left group"
+                    >
+                      <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-surface-alt">
+                        {course.thumbnail_image ? (
+                          <img 
+                            src={course.thumbnail_image} 
+                            alt={course.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-emerald-800/50 via-slate-700/50 to-slate-900/50" />
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                        {course.global_rank && (
+                          <div className="absolute top-2 left-2 px-2 py-0.5 backdrop-blur-md bg-black/35 border border-white/10 rounded-full text-xs text-white font-medium">
+                            #{course.global_rank}
+                          </div>
+                        )}
+                        <div className="absolute bottom-0 left-0 right-0 p-3">
+                          <h4 className="text-sm font-medium text-white line-clamp-2">{course.name}</h4>
+                          <p className="text-xs text-white/60 mt-0.5 line-clamp-1">
+                            {course.sub_country || course.country}
+                          </p>
+                        </div>
                       </div>
-                    )}
-                    <div className="absolute bottom-0 left-0 right-0 p-3">
-                      <h4 className="text-sm font-medium text-white line-clamp-2">{course.name}</h4>
-                      <p className="text-xs text-white/60 mt-0.5 line-clamp-1">
-                        {course.sub_country || course.country}
-                      </p>
-                    </div>
+                    </button>
+                  ))}
+                </div>
+                
+                {/* Fix 5: Infinite scroll sentinel */}
+                {coursesHasNext && (
+                  <div ref={courseSentinelRef} className="h-20" />
+                )}
+                
+                {/* Loading more indicator */}
+                {coursesFetchingNext && (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="w-5 h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
                   </div>
-                </button>
-              ))}
-            </div>
+                )}
+                
+                {/* End of courses */}
+                {!coursesHasNext && allCourses.length > 0 && !coursesFetchingNext && (
+                  <div className="flex items-center justify-center py-8">
+                    <p className="text-xs text-gray-400 font-medium">You've seen all courses</p>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         );
-
-      // 'regions' case removed - now handled by bottom sheet
 
       case 'bucket-list':
         return (
@@ -278,7 +393,7 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
               Save courses you dream of playing. We'll help you track your journey.
             </p>
             <button
-              onClick={() => setActiveFilter('courses')}
+              onClick={() => handleFilterChange('courses')}
               className="px-5 py-2.5 bg-foreground text-background text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity"
             >
               Explore Courses
@@ -321,59 +436,61 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
   };
 
   return (
-    <div className={cn("min-h-screen bg-[#F8FAFC]", className)}>
-      {/* Command Center: Search + Pills */}
-      <div className="bg-[#F8FAFC]">
-        <DiscoverCommandCenter
-          searchPlaceholder="Search courses, regions..."
-          searchValue={searchQuery}
-          onSearchChange={handleSearchChange}
-          sortValue={sortOption}
-          onSortChange={handleSortChange}
-          pills={pills}
-          onPillSelect={handleFilterChange}
-          showSort={false}
+    <PullToRefreshContainer onRefresh={handlePullToRefresh}>
+      <div className={cn("min-h-screen bg-[#F8FAFC]", className)}>
+        {/* Command Center: Search + Pills */}
+        <div className="bg-[#F8FAFC]">
+          <DiscoverCommandCenter
+            searchPlaceholder="Search courses, regions..."
+            searchValue={searchQuery}
+            onSearchChange={handleSearchChange}
+            sortValue={sortOption}
+            onSortChange={handleSortChange}
+            pills={pills}
+            onPillSelect={handleFilterChange}
+            showSort={false}
+          />
+          
+          {/* Search Results Overlay */}
+          {showSearchResults && (
+            <div className="px-4 relative">
+              <ExploreSearchResults
+                query={searchQuery}
+                onSelect={handleSearchResultSelect}
+              />
+            </div>
+          )}
+        </div>
+
+        {renderContent()}
+        
+        {/* Bottom spacing */}
+        <div className="h-8" />
+        
+        {/* Search Sheet */}
+        <ExploreSearchSheet 
+          isOpen={isSearchSheetOpen} 
+          onClose={() => setIsSearchSheetOpen(false)} 
         />
         
-        {/* Search Results Overlay */}
-        {showSearchResults && (
-          <div className="px-4 relative">
-            <ExploreSearchResults
-              query={searchQuery}
-              onSelect={handleSearchResultSelect}
-            />
-          </div>
-        )}
+        {/* Filters Sheet */}
+        <ExploreFiltersSheet
+          isOpen={isFilterSheetOpen}
+          onClose={() => setIsFilterSheetOpen(false)}
+          filters={filters}
+          onApply={handleApplyFilters}
+          showRegionFilter={true}
+        />
+        
+        {/* Region Bottom Sheet */}
+        <RegionBottomSheet
+          isOpen={isRegionSheetOpen}
+          onOpenChange={setIsRegionSheetOpen}
+          value={filters.region}
+          onChange={handleRegionChange}
+        />
       </div>
-
-      {renderContent()}
-      
-      {/* Bottom spacing */}
-      <div className="h-8" />
-      
-      {/* Search Sheet */}
-      <ExploreSearchSheet 
-        isOpen={isSearchSheetOpen} 
-        onClose={() => setIsSearchSheetOpen(false)} 
-      />
-      
-      {/* Filters Sheet */}
-      <ExploreFiltersSheet
-        isOpen={isFilterSheetOpen}
-        onClose={() => setIsFilterSheetOpen(false)}
-        filters={filters}
-        onApply={handleApplyFilters}
-        showRegionFilter={true}
-      />
-      
-      {/* Region Bottom Sheet */}
-      <RegionBottomSheet
-        isOpen={isRegionSheetOpen}
-        onOpenChange={setIsRegionSheetOpen}
-        value={filters.region}
-        onChange={handleRegionChange}
-      />
-    </div>
+    </PullToRefreshContainer>
   );
 };
 
