@@ -269,17 +269,39 @@ Deno.serve(async (req) => {
       if (sportradarStatus && closedStatuses.includes(sportradarStatus.toLowerCase())) {
         console.log(`[LiveSync] Sportradar reports ${tournament.name} as '${sportradarStatus}' - transitioning to closed`);
         
+        // Try to populate winner_id from leaderboard if not already set
+        let winnerId: string | null = null;
+        const { data: winnerEntry } = await supabase
+          .from('sr_leaderboards')
+          .select('player_id, sr_players!inner(sr_id)')
+          .eq('tournament_id', tournament.id)
+          .eq('position', 1)
+          .gt('strokes', 0)
+          .order('strokes', { ascending: true })
+          .limit(1)
+          .maybeSingle();
+
+        if (winnerEntry?.sr_players?.sr_id) {
+          winnerId = winnerEntry.sr_players.sr_id;
+          console.log(`[LiveSync] Winner fallback from leaderboard: ${winnerId}`);
+        }
+
+        const updatePayload: any = { 
+          status: 'closed',
+          last_live_sync: new Date().toISOString()
+        };
+        if (winnerId) {
+          updatePayload.winner_id = winnerId;
+        }
+
         const { error: closeError } = await supabase
           .from('sr_tournaments')
-          .update({ 
-            status: 'closed',
-            last_live_sync: new Date().toISOString()
-          })
+          .update(updatePayload)
           .eq('id', tournament.id);
         
         if (!closeError) {
           result.transitionedToClosed = true;
-          console.log(`[LiveSync] ✓ Transitioned ${tournament.name} to closed`);
+          console.log(`[LiveSync] ✓ Transitioned ${tournament.name} to closed${winnerId ? ` (winner: ${winnerId})` : ''}`);
         } else {
           console.error(`[LiveSync] Failed to close ${tournament.name}:`, closeError.message);
         }
