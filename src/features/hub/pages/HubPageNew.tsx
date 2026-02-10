@@ -309,7 +309,7 @@ export function HubPageNew() {
       <div
         className="relative z-10 flex flex-col h-full max-w-lg mx-auto w-full"
         style={{
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 20px)',
+          paddingTop: 'max(var(--sat, env(safe-area-inset-top, 0px)), 47px)',
           paddingBottom: 'calc(82px + env(safe-area-inset-bottom, 0px))',
         }}
       >
