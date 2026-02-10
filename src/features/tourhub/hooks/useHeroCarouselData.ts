@@ -35,6 +35,7 @@ export interface HeroTournament {
   currency: string | null;
   tourSlug: TourId;
   tourName: string;
+  defendingChampion: string | null;
   // Winner info (for completed)
   winnerId: string | null;
   winnerName: string | null;
@@ -74,7 +75,7 @@ async function fetchHeroData(): Promise<HeroSlide[]> {
       .select(`
         id, name, status, start_date, end_date,
         venue_name, venue_city, venue_country, venue_par, venue_yardage,
-        purse, currency, winner_id,
+        purse, currency, winner_id, defending_champion,
         season:sr_seasons!inner(tour_name)
       `)
       .or(`status.eq.inprogress,and(status.in.(created,scheduled),start_date.lte.${todayStr},end_date.gte.${todayStr})`)
@@ -86,7 +87,7 @@ async function fetchHeroData(): Promise<HeroSlide[]> {
       .select(`
         id, name, status, start_date, end_date,
         venue_name, venue_city, venue_country, venue_par, venue_yardage,
-        purse, currency, winner_id,
+        purse, currency, winner_id, defending_champion,
         season:sr_seasons!inner(tour_name)
       `)
       .in('status', ['closed', 'complete'])
@@ -99,7 +100,7 @@ async function fetchHeroData(): Promise<HeroSlide[]> {
       .select(`
         id, name, status, start_date, end_date,
         venue_name, venue_city, venue_country, venue_par, venue_yardage,
-        purse, currency, winner_id,
+        purse, currency, winner_id, defending_champion,
         season:sr_seasons!inner(tour_name)
       `)
       .in('status', ['scheduled', 'created'])
@@ -214,6 +215,7 @@ async function fetchHeroData(): Promise<HeroSlide[]> {
       currency: row.currency,
       tourSlug,
       tourName: tourConfig?.name || 'PGA Tour',
+      defendingChampion: row.defending_champion || null,
       winnerId: row.winner_id,
       winnerName,
       winnerPhotoUrl,
