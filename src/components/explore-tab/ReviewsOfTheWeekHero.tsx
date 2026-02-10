@@ -479,7 +479,6 @@ const ReviewSlide = React.memo(function ReviewSlide({
             alt={review.display_name || review.username || 'Golfer'}
             fallback={initials}
             hideRing
-            className="border-2 border-white/30"
           />
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-white truncate">
