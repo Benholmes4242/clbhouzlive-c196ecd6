@@ -73,8 +73,8 @@ interface UseUnifiedFullscreenOptions {
 }
 
 interface UseUnifiedFullscreenReturn<T> {
-  /** Open fullscreen viewer with items starting at index */
-  openFullscreen: (items: T[], startIndex?: number, focusItemId?: string) => void;
+  /** Open fullscreen viewer with items starting at index, optionally resuming at startAt seconds */
+  openFullscreen: (items: T[], startIndex?: number, focusItemId?: string, startAt?: number) => void;
   /** Close the fullscreen viewer */
   closeFullscreen: () => void;
   /** Whether fullscreen is currently open */
@@ -116,7 +116,7 @@ export function useUnifiedFullscreen<T = any>(
 
   const adapter = getAdapter(sourceType);
 
-  const openFullscreen = useCallback((items: T[], startIndex = 0, focusItemId?: string) => {
+  const openFullscreen = useCallback((items: T[], startIndex = 0, focusItemId?: string, startAt?: number) => {
     if (!items || items.length === 0) return;
 
     openPlayer({
@@ -124,6 +124,7 @@ export function useUnifiedFullscreen<T = any>(
       adapter,
       initialIndex: startIndex,
       focusItemId,
+      startAt,
       allowLandscape: options.allowLandscape,
       onLoadMore: options.onLoadMore,
       hasMore: options.hasMore,

@@ -56,6 +56,25 @@ export const FullscreenMediaItem: React.FC<FullscreenMediaItemProps> = React.mem
     setActiveVideoRef,
   } = viewer;
 
+  // Fix 3: Seek to startAt on first play for resume
+  const hasAppliedStartAt = useRef(false);
+  useEffect(() => {
+    if (!isActive || !viewer.startAt || hasAppliedStartAt.current) return;
+    const videoEl = playerRef.current?.getVideoElement();
+    if (videoEl && videoEl.readyState >= 1) {
+      videoEl.currentTime = viewer.startAt;
+      hasAppliedStartAt.current = true;
+    } else if (videoEl) {
+      const onLoaded = () => {
+        if (viewer.startAt) videoEl.currentTime = viewer.startAt;
+        hasAppliedStartAt.current = true;
+        videoEl.removeEventListener('loadedmetadata', onLoaded);
+      };
+      videoEl.addEventListener('loadedmetadata', onLoaded);
+      return () => videoEl.removeEventListener('loadedmetadata', onLoaded);
+    }
+  }, [isActive, viewer.startAt]);
+
   const hasMultipleMedia = totalMediaInPost > 1;
 
   // Register video element with context when active

@@ -1,8 +1,7 @@
 /**
  * VideosTab - Feed-based long-form video tab
  * 
- * UNIFIED WITH CLUBHOUSE: Video tiles now handle their own visibility-based
- * autoplay internally - no external MediaRuntime coordination needed.
+ * CLUBHOUSE PARITY: MediaRuntime registered, mount-gated, resume-capable.
  * 
  * DATA RULE: Videos tab = long-form ONLY (≥4 min / 240 seconds)
  */
@@ -27,7 +26,7 @@ import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
 import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
-import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { getDiscoverCategories } from '@/components/post/create-moment/categoryDefinitions';
 import { watchTabDebug } from '@/debug/watchTabDebug';
 import type { LongFormVideo } from './LongFormVideoTile';
@@ -61,6 +60,9 @@ const sortOptionToQuerySort = (sortOption: SortOption): QuerySort => {
 
 // Minimum videos ready before showing feed
 const MINIMUM_READY_COUNT = 2;
+
+// Fix 2: Mount buffer — only mount video players within ±3 of current index
+const MOUNT_BUFFER = 3;
 
 // Section entry card data
 interface SectionEntry {
@@ -284,6 +286,32 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     }
   }, [filteredVideos, continueWatchingVideos]);
 
+  // Fix 8: Poster preload links for first 3 cards
+  useEffect(() => {
+    const preloadTargets = filteredVideos.slice(0, 3);
+    const links: HTMLLinkElement[] = [];
+    
+    for (const video of preloadTargets) {
+      if (!video.mediaUrl) continue;
+      const uid = uidFromNode({ src: video.mediaUrl });
+      if (!uid) continue;
+      const posterUrl = generateStreamThumbnailUrl(uid, { height: 720, fit: 'cover' });
+      if (!posterUrl) continue;
+      
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = posterUrl;
+      link.setAttribute('fetchpriority', 'high');
+      document.head.appendChild(link);
+      links.push(link);
+    }
+    
+    return () => {
+      links.forEach(l => l.remove());
+    };
+  }, [filteredVideos]);
+
   // Build combined playlist for fullscreen navigation
   const videosAsExploreItems = useMemo(() => {
     return filteredVideos.map(video => ({
@@ -307,11 +335,11 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     }));
   }, [filteredVideos]);
 
-  const handleVideoTap = useCallback((videoId: string) => {
+  const handleVideoTap = useCallback((videoId: string, startAt?: number) => {
     savePosition();
     const index = videosAsExploreItems.findIndex(v => v.id === videoId);
     if (index !== -1) {
-      openFullscreen(videosAsExploreItems, index);
+      openFullscreen(videosAsExploreItems, index, undefined, startAt);
     }
   }, [videosAsExploreItems, openFullscreen, savePosition]);
 
@@ -476,10 +504,32 @@ export const VideosTab: React.FC<VideosTabProps> = ({
           </div>
         )}
 
-        {/* Continue Watching (only shows if user has in-progress videos) */}
+        {/* Fix 3: Continue Watching — pass resumeAt to fullscreen */}
         <ContinueWatchingSection
-          onVideoClick={(id) => {
+          onVideoClick={(id, resumeAt) => {
             onVideoClick?.(id);
+            // Find video in continue watching list and open fullscreen
+            // Build a minimal playlist from continue watching videos
+            const cwItems = continueWatchingVideos.map(v => ({
+              id: v.id,
+              type: 'video' as const,
+              src: v.mediaUrl || '',
+              thumbnailSrc: v.thumbnailUrl,
+              title: v.title,
+              durationSeconds: v.durationSeconds,
+              user: {
+                id: v.creatorUserId,
+                name: v.creatorName || 'Unknown',
+                avatar: v.creatorAvatarUrl,
+              },
+              likes: 0,
+              createdAt: v.createdAt || new Date().toISOString(),
+            }));
+            const idx = cwItems.findIndex(v => v.id === id);
+            if (idx !== -1) {
+              savePosition();
+              openFullscreen(cwItems, idx, undefined, resumeAt);
+            }
           }}
           className="mb-4"
         />
@@ -525,6 +575,9 @@ export const VideosTab: React.FC<VideosTabProps> = ({
                   const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;
                   const entranceDelay = isNewlyLoaded ? (index - newlyLoadedStartIndex) * 30 : 0;
                   
+                  // Fix 2: Mount gating — only mount video ±3 from current scroll position
+                  const shouldMountVideo = Math.abs(index - currentIndex) <= MOUNT_BUFFER;
+                  
                   return (
                     <div
                       key={video.id}
@@ -537,6 +590,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
                       <LongFormFeedCard
                         video={toFeedVideo(video)}
                         index={index}
+                        shouldMountVideo={shouldMountVideo}
                         onVideoTap={() => handleVideoTap(video.id)}
                         onCreatorTap={() => handleCreatorTap(video.creatorUserId)}
                       />
@@ -544,17 +598,17 @@ export const VideosTab: React.FC<VideosTabProps> = ({
                   );
                 })}
 
-                {/* Infinite scroll sentinel — tall + rootMargin for seamless loading */}
+                {/* Infinite scroll sentinel */}
                 <div ref={loadMoreRef} className="h-20" />
 
-                {/* Orange brand spinner for paced infinite scroll (Watch tab standard) */}
+                {/* Orange brand spinner */}
                 {showBottomLoader && (
                   <div className="flex items-center justify-center py-8">
                     <div className="w-5 h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
                   </div>
                 )}
 
-                {/* End of feed — subtle minimal text */}
+                {/* End of feed */}
                 {!hasMore && filteredVideos.length > 3 && !showBottomLoader && (
                   <div className="flex items-center justify-center py-8">
                     <p className="text-xs text-gray-400 font-medium">You've reached the end</p>

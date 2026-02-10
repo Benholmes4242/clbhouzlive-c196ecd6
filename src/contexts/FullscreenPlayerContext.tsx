@@ -33,6 +33,8 @@ export interface FullscreenPlayerConfig<T = unknown> {
   // Navigation
   initialIndex: number;
   focusItemId?: string;
+  /** Resume playback at this position (seconds) for the initial video */
+  startAt?: number;
   
   // Features
   allowLandscape?: boolean;
@@ -271,6 +273,7 @@ export function FullscreenPlayerProvider({ children }: { children: React.ReactNo
         isOpen={isOpen && !!config}
         items={fullscreenItems}
         initialIndex={config?.initialIndex ?? 0}
+        startAt={config?.startAt}
         context="discover"
         onClose={closeFullscreen}
         onIndexChange={handleIndexChange}
