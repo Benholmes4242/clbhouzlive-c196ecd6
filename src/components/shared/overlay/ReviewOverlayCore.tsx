@@ -248,7 +248,7 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
       {isFullscreen && (
         <TappableWrapper
           className={cn(
-            "absolute left-4 right-4 z-20 top-[76px]",
+            "absolute left-4 right-4 z-20 top-[96px]",
             "rounded-xl border",
             "shadow-[0_4px_20px_rgba(0,0,0,0.2)]",
           )}
