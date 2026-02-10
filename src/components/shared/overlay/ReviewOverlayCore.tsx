@@ -246,9 +246,12 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
       
       {/* Fullscreen variant - Refined Premium Glass Panel */}
       {isFullscreen && (
+        <div 
+          className="absolute left-4 right-4 z-20"
+          style={{ top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 68px)' }}
+        >
         <TappableWrapper
           className={cn(
-            "absolute left-4 right-4 z-20 top-[96px]",
             "rounded-xl border",
             "shadow-[0_4px_20px_rgba(0,0,0,0.2)]",
           )}
@@ -317,6 +320,7 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
             </div>
           </div>
         </TappableWrapper>
+        </div>
       )}
     </div>
   );
