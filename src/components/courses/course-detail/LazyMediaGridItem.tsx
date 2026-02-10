@@ -25,7 +25,7 @@ export const LazyMediaGridItem: React.FC<LazyMediaGridItemProps> = ({
     <div
       ref={refCallback}
       data-lazy-index={index}
-      className="relative aspect-square bg-muted/20 animate-pulse"
+      className="relative aspect-square bg-muted animate-pulse"
     />
   );
 };
