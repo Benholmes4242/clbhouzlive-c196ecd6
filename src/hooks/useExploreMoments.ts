@@ -104,6 +104,7 @@ export function useInfiniteExploreMoments(
       let query = supabase
         .from('explore_moments')
         .select('moment_id, source_type, source_id, course_id, course_name, user_id, created_at, media_type, media_url, thumbnail_url, stream_id, aspect_ratio, display_order, region_key, likes_count, duration_seconds')
+        .not('media_url', 'is', null)
         .limit(PAGE_SIZE);
 
       // Filter by region if provided
@@ -166,8 +167,9 @@ export function useTrendingMoments(limit = 40, regionKey?: RegionKey) {
         console.error('Trending RPC error:', error);
         // Fallback to latest if RPC fails
         const fallbackQuery = supabase
-          .from('explore_moments')
+.from('explore_moments')
           .select('moment_id, source_type, source_id, course_id, course_name, user_id, created_at, media_type, media_url, thumbnail_url, stream_id, aspect_ratio, display_order, region_key, likes_count, duration_seconds')
+          .not('media_url', 'is', null)
           .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
           .order('created_at', { ascending: false })
           .limit(limit);
@@ -214,6 +216,7 @@ export function useNewThisWeekByRegion(regionKey: RegionKey) {
         const { data: fallbackData } = await supabase
           .from('explore_moments')
           .select('moment_id, source_type, source_id, course_id, course_name, user_id, created_at, media_type, media_url, thumbnail_url, stream_id, aspect_ratio, display_order, region_key, likes_count, duration_seconds')
+          .not('media_url', 'is', null)
           .eq('region_key', regionKey)
           .gte('created_at', sevenDaysAgo.toISOString())
           .order('created_at', { ascending: false })

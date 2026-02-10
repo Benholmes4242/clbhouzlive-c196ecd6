@@ -522,7 +522,7 @@ export function DiscoverGrid({
   const userId = session?.user?.id;
 
   const allMoments = useMemo(() => {
-    return data?.pages.flatMap(page => page.moments) ?? [];
+    return (data?.pages.flatMap(page => page.moments) ?? []).filter(m => m.media_url);
   }, [data]);
 
   const sourceIds = useMemo(() => allMoments.map(m => m.source_id), [allMoments]);
