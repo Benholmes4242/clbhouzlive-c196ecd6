@@ -3,9 +3,12 @@
  * 
  * Uses CreatorCapsule and CinematicActionRail from Clubhouse for visual parity.
  * Carousel dots are passed via CreatorCapsule's dotsSlot prop.
+ * 
+ * Wires live engagement hooks (like, follow, share, bookmark) so all entry
+ * points get working interactions without the caller needing to pass callbacks.
  */
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useFullscreenViewerContext } from '../hooks/useFullscreenViewer';
 import { useNavigate } from 'react-router-dom';
@@ -13,12 +16,17 @@ import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule'
 import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicActionRail';
 import CarouselDots from '@/components/posts/CarouselDots';
 import { useAudioFade } from '@/hooks/useAudioFade';
+import { usePostEngagement } from '@/hooks/usePostEngagement';
+import { useFollow } from '@/hooks/useFollow';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { toast } from 'sonner';
 
 export interface FullscreenOverlayProps {
   showComments?: boolean;
   showShare?: boolean;
   showActionRail?: boolean;
   showCreatorCapsule?: boolean;
+  /** Parent-level callbacks (used as fallbacks if provided) */
   onLike?: () => void;
   onComment?: () => void;
   onShare?: () => void;
@@ -32,17 +40,45 @@ export const FullscreenOverlay: React.FC<FullscreenOverlayProps> = ({
   showShare = true,
   showActionRail = true,
   showCreatorCapsule = true,
-  onLike,
-  onComment,
-  onShare,
-  onFollow,
+  onLike: parentOnLike,
+  onComment: parentOnComment,
+  onShare: parentOnShare,
+  onFollow: parentOnFollow,
   className,
 }) => {
   const viewer = useFullscreenViewerContext();
   const navigate = useNavigate();
+  const { user } = useSupabaseSession();
   
   const { fadeIn, fadeOut } = useAudioFade({ duration: 150, easing: 'easeOut' });
   const item = viewer.currentItem;
+
+  // ─── Live engagement hook ───
+  const postId = item?.postId || item?.id || null;
+  const {
+    likesCount,
+    commentsCount,
+    hasLiked,
+    toggleLike,
+  } = usePostEngagement(postId);
+
+  // ─── Live follow hook ───
+  const creatorId = item?.creatorId;
+  const isOwnPost = !!(user?.id && creatorId && user.id === creatorId);
+  const {
+    isFollowing: followState,
+    toggle: toggleFollow,
+    ensureInitial: ensureFollowInitial,
+  } = useFollow(isOwnPost ? undefined : creatorId);
+
+  // Fetch initial follow state when creator changes
+  useEffect(() => {
+    if (creatorId && !isOwnPost) {
+      ensureFollowInitial();
+    }
+  }, [creatorId, isOwnPost, ensureFollowInitial]);
+
+  const isFollowing = followState === 'following';
 
   // Mute toggle with audio fade
   const handleMuteToggle = useCallback(async () => {
@@ -59,6 +95,48 @@ export const FullscreenOverlay: React.FC<FullscreenOverlayProps> = ({
       viewer.setMuted(true);
     }
   }, [viewer, fadeIn, fadeOut]);
+
+  // ─── Action handlers ───
+
+  const handleLike = useCallback(() => {
+    toggleLike();
+    parentOnLike?.();
+  }, [toggleLike, parentOnLike]);
+
+  const handleComment = useCallback(() => {
+    viewer.setCommentsOpen(true);
+    parentOnComment?.();
+  }, [viewer, parentOnComment]);
+
+  const handleShare = useCallback(async () => {
+    const sharePostId = item?.postId || item?.id;
+    if (!sharePostId) return;
+    
+    const shareUrl = `${window.location.origin}/clubhouse/post/${sharePostId}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: item?.creatorName || 'Post',
+          url: shareUrl,
+        });
+      } catch {
+        // User cancelled
+      }
+    } else {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success('Link copied');
+    }
+    parentOnShare?.();
+  }, [item, parentOnShare]);
+
+  const handleFollow = useCallback(() => {
+    toggleFollow();
+    parentOnFollow?.();
+  }, [toggleFollow, parentOnFollow]);
+
+  const handleMore = useCallback(() => {
+    toast('More options coming soon');
+  }, []);
 
   // Navigate to creator profile
   const handleViewProfile = useCallback(() => {
@@ -115,17 +193,17 @@ export const FullscreenOverlay: React.FC<FullscreenOverlayProps> = ({
           }}
         >
           <CinematicActionRail
-            postId={item.postId || item.id}
-            likesCount={item.likeCount || 0}
-            commentsCount={item.commentCount || 0}
-            hasLiked={item.isLiked || false}
+            postId={postId || item.id}
+            likesCount={likesCount}
+            commentsCount={commentsCount}
+            hasLiked={hasLiked}
             isMuted={viewer.isMuted}
             isVisible={true}
-            onLike={onLike || (() => {})}
-            onComment={onComment || (() => {})}
-            onShare={onShare || (() => {})}
+            onLike={handleLike}
+            onComment={handleComment}
+            onShare={handleShare}
             onMuteToggle={handleMuteToggle}
-            onMore={() => {}}
+            onMore={handleMore}
             hasInteracted={true}
             bottomOffset="calc(env(safe-area-inset-bottom, 0px) + 48px - 20px)"
           />
@@ -144,10 +222,10 @@ export const FullscreenOverlay: React.FC<FullscreenOverlayProps> = ({
             }}
             caption={item.caption}
             golfCourse={golfCourse}
-            isFollowing={false}
-            isOwnPost={false}
+            isFollowing={isFollowing}
+            isOwnPost={isOwnPost}
             isVisible={true}
-            onFollow={onFollow}
+            onFollow={handleFollow}
             onViewProfile={handleViewProfile}
             isReview={item.isReview}
             reviewData={item.reviewData}
