@@ -1,19 +1,13 @@
 /**
  * LongFormVideoTileAutoplay - Video tile with visibility-based autoplay
  * 
- * UNIFIED WITH CLUBHOUSE: Uses the exact same video wiring pattern as
- * ClubhouseVerticalGrid for consistent autoplay behavior.
- * 
- * INSTANT VIDEO PATTERN:
- * - Uses managedByMediaRuntime={false}, externallyManaged={false}
- * - Uses autoplay based on visibility (IntersectionObserver)
- * - Uses preload="auto" for instant buffering
- * - Direct browser-led autoplay (no MediaRuntime manual control)
+ * CLUBHOUSE PARITY: Uses MediaRuntime registration, play-gated transitions,
+ * shimmer overlays, and error recovery matching the Clubhouse gold standard.
  */
 
 import React, { useRef, useMemo, useEffect, useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
-import { Play, Flame, Heart } from 'lucide-react';
+import { Play, Flame, Heart, RotateCw } from 'lucide-react';
 import { VideoQueueMenu } from './VideoQueueMenu';
 import { GolferAvatar } from '@/components/golfers/GolferAvatar';
 import { UnifiedVideoPlayer, runtimeUserTap } from '@/media';
@@ -39,8 +33,8 @@ interface LongFormVideoTileAutoplayProps {
 }
 
 /**
- * LongFormVideoTileAutoplay - Video tile unified with Clubhouse pattern
- * TikTok-Level: UnifiedVideoPlayer + 50%/10% hysteresis + 150ms crossfade
+ * LongFormVideoTileAutoplay - Video tile with Clubhouse-grade playback
+ * MediaRuntime registered, play-gated transitions, shimmer + error recovery
  */
 export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps> = ({
   video,
@@ -52,9 +46,14 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
   index = 0,
 }) => {
   const tileRef = useRef<HTMLDivElement>(null);
-  const [isVideoReady, setIsVideoReady] = useState(false);
   const [shouldPlay, setShouldPlay] = useState(false);
-  const hasReportedReadyRef = useRef(false);
+  
+  // Transition states: shimmer → poster fade-in → play-gated video reveal
+  const [posterLoaded, setPosterLoaded] = useState(false);
+  const [isVideoReady, setIsVideoReady] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
+  const isVideoReadyTimerRef = useRef<ReturnType<typeof setTimeout>>();
   
   // P0: TikTok-level 50% start / 10% stop hysteresis autoplay
   useEffect(() => {
@@ -64,7 +63,6 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
     const observer = new IntersectionObserver(
       (entries) => {
         const ratio = entries[0]?.intersectionRatio ?? 0;
-        // Hysteresis: 50% to start, 10% to stop (prevents jitter)
         setShouldPlay(prev => {
           if (!prev && ratio >= 0.5) return true;
           if (prev && ratio < 0.1) return false;
@@ -81,21 +79,49 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
   const hasVideo = !!video.mediaUrl;
   const isPriority = index < 6;
 
-  // CRITICAL: Extract stream UID for cache consistency
+  // Extract stream UID for cache consistency
   const streamId = useMemo(() => {
     return uidFromNode({ src: video.mediaUrl }) || video.id;
   }, [video.mediaUrl, video.id]);
 
-  // UNIFIED: Generate HLS URL and poster URL exactly like Clubhouse
+  // Generate HLS URL and poster URL
   const hlsUrl = streamId ? generateStreamHlsUrl(streamId) : null;
   const generatedPosterUrl = streamId ? generateStreamThumbnailUrl(streamId, { height: 720, fit: 'cover' }) : undefined;
   const posterUrl = generatedPosterUrl && !isPosterFailed(generatedPosterUrl) ? generatedPosterUrl : video.thumbnailUrl;
 
-  // Reset ready flag when video changes
+  // Reset states when video changes
   useEffect(() => {
-    hasReportedReadyRef.current = false;
+    setPosterLoaded(false);
     setIsVideoReady(false);
+    setHasError(false);
+    return () => {
+      if (isVideoReadyTimerRef.current) clearTimeout(isVideoReadyTimerRef.current);
+    };
   }, [video.id]);
+
+  // Play-gated transition with 100ms buffer
+  const handlePlay = useCallback(() => {
+    if (isVideoReadyTimerRef.current) clearTimeout(isVideoReadyTimerRef.current);
+    isVideoReadyTimerRef.current = setTimeout(() => {
+      setIsVideoReady(true);
+    }, 100);
+  }, []);
+
+  // Error handler with retry
+  const handleError = useCallback(() => {
+    setHasError(true);
+    setIsVideoReady(false);
+  }, []);
+
+  const handleRetry = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setHasError(false);
+    setIsVideoReady(false);
+    setRetryKey(k => k + 1);
+  }, []);
+
+  // Whether the video layer is ready to show (play-gated)
+  const videoIsReady = isVideoReady && shouldPlay && !hasError;
 
   const formatLikes = (count?: number): string => {
     if (!count) return '0';
@@ -123,63 +149,79 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
     >
       {/* Media Section - 16:9 aspect ratio with GPU acceleration */}
       <div className="relative w-full aspect-[16/9] overflow-hidden bg-muted will-change-transform">
-        {/* P1: Priority poster loading for first 6 items */}
+        {/* Shimmer overlay (base layer) */}
+        <div className="absolute inset-0 bg-gray-100 overflow-hidden z-0">
+          <div className="h-full w-full -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-gray-200/60 to-transparent motion-reduce:animate-none" />
+        </div>
+
+        {/* Poster image with fade-in */}
         {posterUrl && (
           <img
             src={posterUrl}
             alt=""
-            className="absolute inset-0 h-full w-full object-cover"
+            className={cn(
+              "absolute inset-0 h-full w-full object-cover z-[1] transition-opacity duration-200 ease-out",
+              posterLoaded ? "opacity-100" : "opacity-0",
+              videoIsReady && "!opacity-0 duration-150"
+            )}
             loading={isPriority ? "eager" : "lazy"}
             fetchPriority={isPriority ? "high" : "auto"}
             decoding="async"
+            onLoad={() => setPosterLoaded(true)}
             onError={(e) => {
               e.currentTarget.style.display = 'none';
             }}
           />
         )}
 
-        {hasVideo && hlsUrl ? (
+        {hasVideo && hlsUrl && !hasError ? (
           <>
-            {/* 
-              TikTok-Level: UnifiedVideoPlayer with source stability + pool promotion
-              - 150ms crossfade (ease-out)
-              - Hysteresis autoplay from IntersectionObserver
-            */}
+            {/* Play-gated video layer */}
             <div
               className={cn(
-                "absolute inset-0 transition-opacity duration-150 ease-out",
-                isVideoReady ? "opacity-100" : "opacity-0"
+                "absolute inset-0 z-[2] transition-opacity duration-150 ease-out",
+                videoIsReady ? "opacity-100" : "opacity-0"
               )}
               aria-busy={!isVideoReady}
             >
               <UnifiedVideoPlayer
+                key={retryKey}
                 src={hlsUrl}
                 posterUrl={posterUrl}
                 autoplay={shouldPlay}
                 muted
-                loop
                 objectFit="cover"
                 mediaId={streamId}
                 preload="auto"
-                onCanPlayThrough={() => {
-                  if (!hasReportedReadyRef.current) {
-                    hasReportedReadyRef.current = true;
-                    setIsVideoReady(true);
-                  }
-                }}
+                surface="videos"
+                managedByMediaRuntime={true}
+                onPlay={handlePlay}
+                onError={handleError}
                 className="absolute inset-0 w-full h-full group-hover:scale-[1.02] transition-transform duration-500"
               />
             </div>
 
             {/* Play overlay on hover (only when not playing) */}
             {isVideoReady && !shouldPlay && (
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+              <div className="absolute inset-0 z-[3] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-150">
                 <div className="w-14 h-14 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg">
                   <Play className="h-6 w-6 text-foreground ml-0.5" fill="currentColor" />
                 </div>
               </div>
             )}
           </>
+        ) : hasError ? (
+          /* Error state overlay */
+          <div className="absolute inset-0 z-[3] bg-black/40 flex flex-col items-center justify-center gap-2">
+            <button
+              onClick={handleRetry}
+              className="w-12 h-12 rounded-full bg-white/80 flex items-center justify-center active:scale-[0.95] transition-transform"
+              aria-label="Retry playback"
+            >
+              <RotateCw className="w-5 h-5 text-gray-800" />
+            </button>
+            <span className="text-white/70 text-xs">Tap to retry</span>
+          </div>
         ) : !posterUrl && (
           /* Fallback when no video or thumbnail */
           <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted-foreground/20 flex items-center justify-center">
@@ -188,11 +230,11 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
         )}
 
         {/* Bottom gradient overlay for better badge contrast */}
-        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/50 to-transparent pointer-events-none z-[4]" />
 
         {/* Trending label - top left */}
         {video.isTrending && (
-          <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-orange-500 to-orange-600 text-white text-xs font-semibold rounded-full shadow-lg shadow-orange-500/30">
+          <div className="absolute top-3 left-3 z-[5] flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-orange-500 to-orange-600 text-white text-xs font-semibold rounded-full shadow-lg shadow-orange-500/30">
             <Flame className="h-3.5 w-3.5" />
             <span>Trending</span>
           </div>
@@ -208,13 +250,13 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
             durationSeconds={video.durationSeconds}
             onPlayNext={onPlayNext || (() => {})}
             onEnqueue={onEnqueue || (() => {})}
-            className="absolute top-3 right-3"
+            className="absolute top-3 right-3 z-[5]"
           />
         )}
 
         {/* Likes - bottom left */}
         {(video.likes || video.views) && (video.likes || 0) > 0 && (
-          <div className="absolute bottom-3 left-3 flex items-center gap-1.5 px-2.5 py-1 bg-black/50 backdrop-blur-sm rounded-full">
+          <div className="absolute bottom-3 left-3 z-[5] flex items-center gap-1.5 px-2.5 py-1 bg-black/50 backdrop-blur-sm rounded-full">
             <Heart className="w-3.5 h-3.5 text-white" fill="white" />
             <span className="text-white text-xs font-medium">
               {formatLikes(video.likes || video.views)}
@@ -223,7 +265,7 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
         )}
 
         {/* Duration badge - bottom right */}
-        <div className="absolute bottom-3 right-3 px-2 py-1 bg-black/70 backdrop-blur-sm text-white text-xs font-semibold tabular-nums rounded-md">
+        <div className="absolute bottom-3 right-3 z-[5] px-2 py-1 bg-black/70 backdrop-blur-sm text-white text-xs font-semibold tabular-nums rounded-md">
           {video.duration}
         </div>
       </div>
