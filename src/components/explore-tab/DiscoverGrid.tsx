@@ -718,8 +718,8 @@ export function DiscoverGrid({
 
   return (
     <div className={className}>
-      <div className="px-4">
-        <div className="grid grid-cols-2 gap-1">
+      <div>
+        <div className="grid grid-cols-2">
           {allMoments.map((moment, index) => {
             const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;
             const entranceDelay = isNewlyLoaded ? (index - newlyLoadedStartIndex) * 30 : 0;
