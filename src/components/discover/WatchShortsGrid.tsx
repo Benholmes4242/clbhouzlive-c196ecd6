@@ -44,6 +44,7 @@ interface CardWrapperProps {
   index: number;
   shouldMount: boolean;
   onTap: () => void;
+  isLikedByMe: boolean;
   isVideoReady: boolean;
   onFirstFrameReady: () => void;
   onVisibilityChange: (index: number, isVisible: boolean) => void;
@@ -60,6 +61,7 @@ const CardWrapper = React.memo(function CardWrapper({
   index,
   shouldMount,
   onTap,
+  isLikedByMe,
   isVideoReady,
   onFirstFrameReady,
   onVisibilityChange,
@@ -103,6 +105,7 @@ const CardWrapper = React.memo(function CardWrapper({
         video={video}
         index={index}
         onTap={onTap}
+        isLikedByMe={isLikedByMe}
         shouldMountVideo={shouldMount}
         isVisible={inView}
         isVideoReady={isVideoReady}
@@ -117,6 +120,7 @@ const CardWrapper = React.memo(function CardWrapper({
     prevProps.video.id === nextProps.video.id &&
     prevProps.index === nextProps.index &&
     prevProps.shouldMount === nextProps.shouldMount &&
+    prevProps.isLikedByMe === nextProps.isLikedByMe &&
     prevProps.isVideoReady === nextProps.isVideoReady &&
     prevProps.isPriority === nextProps.isPriority &&
     prevProps.isAutoplayCandidate === nextProps.isAutoplayCandidate &&
@@ -131,6 +135,7 @@ const CardWrapper = React.memo(function CardWrapper({
 
 interface WatchShortsGridProps {
   shorts: WatchShort[];
+  likedPostIds?: Set<string>;
   isLoading: boolean;
   isError?: boolean;
   onRetry?: () => void;
@@ -161,6 +166,7 @@ const prefersReducedMotion = typeof window !== 'undefined'
 
 export function WatchShortsGrid({
   shorts,
+  likedPostIds = new Set(),
   isLoading,
   isError,
   onRetry,
@@ -534,6 +540,7 @@ export function WatchShortsGrid({
                 index={index}
                 shouldMount={shouldMount}
                 onTap={() => onVideoTap(video, index, renderedShorts)}
+                isLikedByMe={likedPostIds.has(video.id)}
                 isVideoReady={videoReady}
                 onFirstFrameReady={() => markReadyRef.current(streamId)}
                 onVisibilityChange={handleVisibilityChange}

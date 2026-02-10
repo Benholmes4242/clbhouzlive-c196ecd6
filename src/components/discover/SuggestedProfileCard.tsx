@@ -140,9 +140,8 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
       if (showHandicap && formattedHandicap) return formattedHandicap;
       return null;
     }
-    // Business: prefer category, fallback to location
-    if (businessData?.category) return businessData.category;
-    if (businessData?.location_label) return businessData.location_label;
+    // Business: always show "Business Profile" — raw category values are internal only
+    return 'Business Profile';
     return null;
   })();
 

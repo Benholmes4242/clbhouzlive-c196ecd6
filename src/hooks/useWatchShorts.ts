@@ -7,11 +7,13 @@
  * - Ordered by created_at (newest first)
  * - Excludes hero video from results (client-side filter)
  * - Uses stable query key for cache hits from route prefetch
+ * - Fetches current user's like status per post
  */
 
-import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useQueryClient, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useMemo, useEffect, useCallback, useRef } from 'react';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 const PAGE_SIZE = 24;
 
@@ -47,6 +49,7 @@ interface WatchShortsPage {
 
 export function useWatchShorts(excludeHeroId?: string) {
   const queryClient = useQueryClient();
+  const { user } = useSupabaseSession();
 
   // Try to use prefetched base data on first load
   useEffect(() => {
@@ -176,6 +179,23 @@ export function useWatchShorts(excludeHeroId?: string) {
     return allShorts.filter(short => short.id !== excludeHeroId);
   }, [allShorts, excludeHeroId]);
 
+  // Fetch current user's liked post IDs for personalized heart state
+  const postIds = useMemo(() => shorts.map(s => s.id), [shorts]);
+  const { data: likedPostIds = new Set<string>() } = useQuery({
+    queryKey: ['watch-shorts-user-likes', user?.id, postIds],
+    queryFn: async () => {
+      if (!user?.id || postIds.length === 0) return new Set<string>();
+      const { data } = await supabase
+        .from('post_likes')
+        .select('post_id')
+        .eq('user_id', user.id)
+        .in('post_id', postIds);
+      return new Set((data || []).map(d => d.post_id));
+    },
+    enabled: !!user?.id && postIds.length > 0,
+    staleTime: 60_000,
+  });
+
   const hasNextPage = query.hasNextPage ?? false;
 
   // =========================================================================
@@ -214,6 +234,7 @@ export function useWatchShorts(excludeHeroId?: string) {
 
   return {
     shorts,
+    likedPostIds,
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.error,

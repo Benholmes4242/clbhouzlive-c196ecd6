@@ -22,6 +22,8 @@ interface WatchShortCardProps {
   video: WatchShort;
   index: number;
   onTap: () => void;
+  /** Whether the current user has liked this post */
+  isLikedByMe?: boolean;
   /** Whether video should be mounted (controlled by parent grid) */
   shouldMountVideo?: boolean;
   /** Whether card is visible in viewport */
@@ -50,6 +52,7 @@ export const WatchShortCard = React.memo(function WatchShortCard({
   video, 
   index, 
   onTap, 
+  isLikedByMe = false,
   shouldMountVideo = false,
   isVisible = false,
   isVideoReady = false,
@@ -166,8 +169,9 @@ export const WatchShortCard = React.memo(function WatchShortCard({
     }
   }, [onFirstFrameReady]);
 
-  // Early return after all hooks
+  // Guard: hide tile if no primary media AND no poster available
   if (!primaryMedia) return null;
+  if (!posterUrl && !hlsUrl) return null;
 
   return (
     <div
@@ -258,7 +262,7 @@ export const WatchShortCard = React.memo(function WatchShortCard({
 
       {/* Like Count - Top Right - Hide number when zero, orange filled heart if has likes */}
       <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-black/40 backdrop-blur-sm rounded-full z-30">
-        <Heart className={cn("w-3 h-3", likeCount > 0 ? "fill-like text-like" : "text-white")} />
+        <Heart className={cn("w-3 h-3", isLikedByMe ? "fill-like text-like" : "text-white")} />
         {likeCount > 0 && (
           <span className="text-white text-[10px] font-medium">{formatCount(likeCount)}</span>
         )}
@@ -284,6 +288,7 @@ export const WatchShortCard = React.memo(function WatchShortCard({
     prevProps.video.id === nextProps.video.id &&
     prevProps.video.like_count === nextProps.video.like_count &&
     prevProps.index === nextProps.index &&
+    prevProps.isLikedByMe === nextProps.isLikedByMe &&
     prevProps.shouldMountVideo === nextProps.shouldMountVideo &&
     prevProps.isVisible === nextProps.isVisible &&
     prevProps.isVideoReady === nextProps.isVideoReady &&
