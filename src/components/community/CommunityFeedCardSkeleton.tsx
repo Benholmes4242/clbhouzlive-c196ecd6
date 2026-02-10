@@ -1,6 +1,6 @@
 /**
- * CommunityFeedCardSkeleton - Watch Tab Standard Loading Skeleton
- * - bg-gray-200 base color
+ * CommunityFeedCardSkeleton - Matches actual CommunityFeedCard styling
+ * Fix 9: rounded-2xl mx-4 shadow-sm border border-gray-100 bg-white
  * - Left-to-right shimmer sweep (via-white/40)
  * - Staggered animation delays
  * - Reduced motion support
@@ -12,7 +12,7 @@ interface CommunityFeedCardSkeletonProps {
   index?: number;
 }
 
-// Shimmer component - Watch tab standard left-to-right sweep
+// Shimmer component
 function Shimmer({ className, delay = 0 }: { className?: string; delay?: number }) {
   return (
     <div 
@@ -27,13 +27,12 @@ function Shimmer({ className, delay = 0 }: { className?: string; delay?: number 
 }
 
 export function CommunityFeedCardSkeleton({ index = 0 }: CommunityFeedCardSkeletonProps) {
-  // Base delay for staggered effect
   const baseDelay = index * 100;
   
   return (
-    <div className="bg-card overflow-hidden border-x border-border/40">
+    <div className="rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm mx-4">
       {/* Header skeleton */}
-      <div className="flex items-start gap-3 p-4">
+      <div className="flex items-start gap-3 px-4 pt-4">
         <Shimmer 
           className="w-10 h-10 rounded-xl flex-shrink-0"
           delay={baseDelay}
@@ -55,7 +54,7 @@ export function CommunityFeedCardSkeleton({ index = 0 }: CommunityFeedCardSkelet
       </div>
 
       {/* Caption skeleton */}
-      <div className="px-4 pb-2 space-y-2">
+      <div className="px-4 py-2 space-y-2">
         <Shimmer 
           className="h-4 w-full rounded"
           delay={baseDelay + 200}
@@ -66,10 +65,7 @@ export function CommunityFeedCardSkeleton({ index = 0 }: CommunityFeedCardSkelet
         />
       </div>
 
-      {/* Divider */}
-      <div className="h-px bg-border/30 mx-4" />
-
-      {/* Media skeleton - alternate between portrait and landscape */}
+      {/* Media skeleton — alternate between portrait and landscape */}
       <Shimmer 
         className={cn(
           "w-full",
@@ -87,15 +83,17 @@ export function CommunityFeedCardSkeleton({ index = 0 }: CommunityFeedCardSkelet
       </div>
 
       {/* Action bar skeleton */}
-      <div className="flex border-t border-border/30">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="flex-1 py-3 flex justify-center">
-            <Shimmer 
-              className="h-5 w-12 rounded"
-              delay={baseDelay + 350 + (i * 50)}
-            />
-          </div>
-        ))}
+      <div className="px-4 pb-3 pt-1">
+        <div className="flex">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="flex-1 py-2 flex justify-center">
+              <Shimmer 
+                className="h-5 w-12 rounded"
+                delay={baseDelay + 350 + (i * 50)}
+              />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

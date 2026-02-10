@@ -1,11 +1,13 @@
 /**
  * CommunityFeedCard - Full-width feed card for community posts (images + videos)
- * TikTok-Level Implementation:
- * - UnifiedVideoPlayer with source stability + HLS pool promotion
- * - 150ms crossfade with ease-out
- * - Priority poster loading for first 6 items
- * - 3s first-frame fallback timeout
- * - GPU-accelerated container (will-change-transform)
+ * Clubhouse Gold Standard Implementation:
+ * - UnifiedVideoPlayer with managedByMediaRuntime + surface="friends-feed"
+ * - Play-gated poster-to-video crossfade (onPlay + 100ms buffer, no timeout)
+ * - Shimmer base layer + poster fade-in (200ms)
+ * - Mount gating via shouldMountVideo prop
+ * - Carousel video mount gating (active + adjacent only)
+ * - Silent error handling (poster fallback)
+ * - GlobalAudioContext integration
  * - Review post visual indicators (pill badges, rating, course info)
  * - Multi-media carousel with swipe/dots/chevrons
  */
@@ -29,6 +31,7 @@ import { generateStreamThumbnailUrl, generateStreamHlsUrl } from '@/config/cloud
 import { isPosterFailed } from '@/utils/posterPrefetch';
 import { RatingPill } from '@/components/ui/RatingPill';
 import { supabase } from '@/integrations/supabase/client';
+import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -47,9 +50,6 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import CommentsPage from '@/components/clubhouse/cinematic/CommentsPage';
-
-// 3s first-frame fallback timeout
-const FIRST_FRAME_FALLBACK_MS = 3000;
 
 // Helper to remove the "📍 Played at" line from content
 function removePlayedAtLine(content: string | null): string {
@@ -95,6 +95,7 @@ interface CommunityFeedCardProps {
   isPlaying?: boolean;
   videoIndex?: number;
   isPriorityItem?: boolean;
+  shouldMountVideo?: boolean; // Fix 1: mount gating
 }
 
 // Single media item renderer
@@ -107,6 +108,8 @@ interface MediaItemProps {
   itemId: string;
   onVideoReady: () => void;
   playerRef?: React.RefObject<UnifiedVideoPlayerRef>;
+  shouldMountPlayer: boolean; // Fix 1 + Fix 5: mount gating
+  onError?: () => void; // Fix 6: error handling
 }
 
 const MediaItem = React.memo(function MediaItem({
@@ -118,9 +121,38 @@ const MediaItem = React.memo(function MediaItem({
   itemId,
   onVideoReady,
   playerRef,
+  shouldMountPlayer,
+  onError,
 }: MediaItemProps) {
   const [imageError, setImageError] = useState(false);
+  const [posterLoaded, setPosterLoaded] = useState(false); // Fix 4: poster fade-in
+  const [isVideoReady, setIsVideoReady] = useState(false); // Fix 3: play-gated
+  const isVideoReadyTimerRef = useRef<NodeJS.Timeout | null>(null);
   const isVideo = media.media_type === 'video';
+  const { isGloballyMuted } = useGlobalAudio(); // Fix 7: GlobalAudioContext
+  
+  // Fix 3: play-gated transition
+  const handlePlay = useCallback(() => {
+    isVideoReadyTimerRef.current = setTimeout(() => {
+      setIsVideoReady(true);
+      onVideoReady();
+    }, 100);
+  }, [onVideoReady]);
+
+  // Cleanup timer
+  useEffect(() => {
+    return () => {
+      if (isVideoReadyTimerRef.current) {
+        clearTimeout(isVideoReadyTimerRef.current);
+      }
+    };
+  }, []);
+
+  // Reset video ready state when item changes
+  useEffect(() => {
+    setIsVideoReady(false);
+    setPosterLoaded(false);
+  }, [media.id]);
   
   const { hlsUrl, posterUrl, streamId } = useMemo(() => {
     if (!isVideo) {
@@ -147,39 +179,82 @@ const MediaItem = React.memo(function MediaItem({
   if (isVideo && hlsUrl) {
     return (
       <div className={cn("absolute inset-0", filterClass)}>
-        <UnifiedVideoPlayer
-          ref={playerRef}
-          src={hlsUrl}
-          posterUrl={posterUrl || undefined}
-          autoplay={isPlaying && isActive}
-          muted
-          loop
-          preload="auto"
-          showMuteButton={false}
-          showPlayButton={false}
-          scrubber={false}
-          mediaId={streamId}
-          className="w-full h-full object-cover"
-          onCanPlayThrough={onVideoReady}
-        />
+        {/* Fix 4: Shimmer base layer */}
+        <div className="absolute inset-0 bg-muted/50 overflow-hidden">
+          <div className="h-full w-full -translate-x-full motion-safe:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+        </div>
+
+        {/* Poster layer — stays until play-gated video ready */}
+        {posterUrl && (
+          <img
+            src={posterUrl}
+            alt=""
+            className={cn(
+              "absolute inset-0 w-full h-full object-cover z-[1] transition-opacity duration-200",
+              posterLoaded ? "opacity-100" : "opacity-0",
+              isVideoReady && "opacity-0 duration-150"
+            )}
+            loading={isPriorityItem ? "eager" : "lazy"}
+            fetchPriority={isPriorityItem ? "high" : "auto"}
+            decoding="async"
+            onLoad={() => setPosterLoaded(true)}
+          />
+        )}
+
+        {/* Fix 1 + 5: Only mount player if allowed */}
+        {shouldMountPlayer && (
+          <div className={cn("absolute inset-0 z-[2]", !isVideoReady && "opacity-0")}>
+            <UnifiedVideoPlayer
+              ref={playerRef}
+              src={hlsUrl}
+              posterUrl={posterUrl || undefined}
+              autoplay={isPlaying && isActive}
+              muted={isGloballyMuted} // Fix 7: GlobalAudioContext
+              loop
+              preload={isPlaying ? "auto" : "metadata"} // Fix 10: preload optimization
+              showMuteButton={false}
+              showPlayButton={false}
+              scrubber={false}
+              mediaId={streamId}
+              className="w-full h-full object-cover"
+              onPlay={handlePlay} // Fix 3: play-gated
+              onError={() => { // Fix 6: silent error handling
+                console.warn('[CommunityFeedCard] Video playback error, keeping poster visible', { itemId, streamId });
+                onError?.();
+              }}
+              managedByMediaRuntime={true} // Fix 2: MediaRuntime
+              surface="friends-feed" // Fix 2: MediaRuntime
+            />
+          </div>
+        )}
       </div>
     );
   }
 
+  // Image rendering with shimmer + fade-in
   return (
     <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
+      {/* Fix 4: Shimmer base for images too */}
+      <div className="absolute inset-0 bg-muted/50 overflow-hidden">
+        <div className="h-full w-full -translate-x-full motion-safe:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+      </div>
+
       {!imageError ? (
         <img
           src={media.media_url}
           alt=""
-          className="w-full h-full object-cover"
+          className={cn(
+            "absolute inset-0 w-full h-full object-cover z-[1] transition-opacity duration-200",
+            posterLoaded ? "opacity-100" : "opacity-0"
+          )}
           loading={isPriorityItem ? "eager" : "lazy"}
           fetchPriority={isPriorityItem ? "high" : "auto"}
           decoding="async"
+          onLoad={() => setPosterLoaded(true)}
           onError={() => setImageError(true)}
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-muted">
+        <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-muted z-[1]">
           <span className="text-4xl">📷</span>
         </div>
       )}
@@ -200,6 +275,7 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
   isPlaying = false,
   videoIndex = 0,
   isPriorityItem = false,
+  shouldMountVideo = true, // Fix 1: default true for backwards compat
 }: CommunityFeedCardProps) {
   const navigate = useNavigate();
   const [commentsOpen, setCommentsOpen] = useState(false);
@@ -214,9 +290,6 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
   const carouselRef = useRef<HTMLDivElement>(null);
   const mediaIndexRef = useRef(videoIndex);
   mediaIndexRef.current = videoIndex;
-
-  const hasReportedReadyRef = useRef(false);
-  const firstFrameTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Get current user for delete check
   useEffect(() => {
@@ -234,13 +307,8 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
 
   // Reset state when item changes
   useEffect(() => {
-    hasReportedReadyRef.current = false;
     setIsVideoReady(false);
     setActiveMediaIndex(0);
-    
-    if (firstFrameTimeoutRef.current) {
-      clearTimeout(firstFrameTimeoutRef.current);
-    }
   }, [item.id]);
 
   const isVideo = item.type === 'video';
@@ -255,23 +323,9 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
   const reviewRating = (item as any).reviewRating as number | null;
   const golfCourse = (item as any).golfCourse as { id: string; name: string; country: string; sub_country?: string; region?: string } | undefined;
 
-  // P1: 3s first-frame fallback timeout
-  useEffect(() => {
-    if (isPlaying && isVideo && !isVideoReady && activeMediaIndex === 0) {
-      firstFrameTimeoutRef.current = setTimeout(() => {
-        if (!hasReportedReadyRef.current) {
-          hasReportedReadyRef.current = true;
-          setIsVideoReady(true);
-        }
-      }, FIRST_FRAME_FALLBACK_MS);
-      
-      return () => {
-        if (firstFrameTimeoutRef.current) {
-          clearTimeout(firstFrameTimeoutRef.current);
-        }
-      };
-    }
-  }, [isPlaying, isVideo, isVideoReady, activeMediaIndex]);
+  const handleVideoReady = useCallback(() => {
+    setIsVideoReady(true);
+  }, []);
 
   // Engagement data
   const { likesCount, commentsCount } = usePostEngagement(item.id);
@@ -281,17 +335,6 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
   const captionText = useMemo(() => removePlayedAtLine(item.title || ''), [item.title]);
   const shouldTruncate = captionText.length > 150 && !isExpanded;
   const displayContent = shouldTruncate ? captionText.slice(0, 150) : captionText;
-
-  const handleCanPlayThrough = useCallback(() => {
-    if (!hasReportedReadyRef.current && isVideo) {
-      hasReportedReadyRef.current = true;
-      setIsVideoReady(true);
-      
-      if (firstFrameTimeoutRef.current) {
-        clearTimeout(firstFrameTimeoutRef.current);
-      }
-    }
-  }, [isVideo]);
 
   // Register video with autoplay system
   useEffect(() => {
@@ -355,14 +398,12 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
     toast.info('Report functionality coming soon');
   }, []);
 
-  // Fix 6: Delete own post
   const handleDeletePost = useCallback(async () => {
     setIsDeleting(true);
     try {
       const { error } = await supabase.from('posts').delete().eq('id', item.id);
       if (error) throw error;
       toast.success('Post deleted');
-      // The card will be removed on next feed refresh
       setDeleteDialogOpen(false);
     } catch (err) {
       toast.error('Failed to delete post');
@@ -378,7 +419,6 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
     }
   };
 
-  // Fix 3: Course tag navigation
   const handleCourseClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     if (golfCourse?.id) {
@@ -448,7 +488,6 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
           className="flex items-start gap-3 cursor-pointer px-4 pt-4"
           onClick={handleCreatorClick}
         >
-          {/* Left: Avatar */}
           <div className="flex-shrink-0">
             <SquircleAvatar
               size={40}
@@ -458,8 +497,6 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
               hideRing
             />
           </div>
-
-          {/* Middle: Meta */}
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-gray-900 text-sm leading-tight truncate">
               {item.user?.name || 'User'}
@@ -468,8 +505,6 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
               {timeAgo}
             </p>
           </div>
-
-          {/* Right: Menu */}
           <div className="flex-shrink-0 self-start" onClick={(e) => e.stopPropagation()}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -535,7 +570,7 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
           </div>
         )}
 
-        {/* Course Location - clickable (Fix 3) */}
+        {/* Course Location - clickable */}
         {golfCourse && (
           <div 
             className={cn(
@@ -556,7 +591,7 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
 
         {/* Media - Full Width within card */}
         <div 
-          className="relative w-full cursor-pointer bg-gray-100 overflow-hidden"
+          className="relative w-full cursor-pointer overflow-hidden"
           style={{ aspectRatio }}
           onClick={handleMediaClick}
           aria-busy={isVideo && !isVideoReady}
@@ -570,26 +605,34 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
                 onScroll={handleScroll}
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
               >
-                {mediaItems.map((media, idx) => (
-                  <div 
-                    key={media.id} 
-                    className="flex-shrink-0 w-full h-full snap-start relative"
-                  >
-                    <MediaItem
-                      media={media}
-                      isActive={activeMediaIndex === idx}
-                      isPlaying={isPlaying}
-                      isPriorityItem={isPriorityItem && idx === 0}
-                      filterClass={filterClass}
-                      itemId={item.id}
-                      onVideoReady={handleCanPlayThrough}
-                      playerRef={idx === 0 ? playerRef : undefined}
-                    />
-                  </div>
-                ))}
+                {mediaItems.map((media, idx) => {
+                  // Fix 5: Carousel mount gating — only mount player for active + adjacent
+                  const isCarouselActive = activeMediaIndex === idx;
+                  const isCarouselAdjacent = Math.abs(activeMediaIndex - idx) <= 1;
+                  const shouldMountCarouselPlayer = shouldMountVideo && (isCarouselActive || isCarouselAdjacent);
+
+                  return (
+                    <div 
+                      key={media.id} 
+                      className="flex-shrink-0 w-full h-full snap-start relative"
+                    >
+                      <MediaItem
+                        media={media}
+                        isActive={isCarouselActive}
+                        isPlaying={isPlaying}
+                        isPriorityItem={isPriorityItem && idx === 0}
+                        filterClass={filterClass}
+                        itemId={item.id}
+                        onVideoReady={handleVideoReady}
+                        playerRef={idx === 0 ? playerRef : undefined}
+                        shouldMountPlayer={shouldMountCarouselPlayer}
+                      />
+                    </div>
+                  );
+                })}
               </div>
 
-              {/* Chevron Navigation — Polish 5: lighter arrows */}
+              {/* Chevron Navigation */}
               {activeMediaIndex > 0 && (
                 <button
                   onClick={handlePrev}
@@ -639,8 +682,9 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
                 isPriorityItem={isPriorityItem}
                 filterClass={filterClass}
                 itemId={item.id}
-                onVideoReady={handleCanPlayThrough}
+                onVideoReady={handleVideoReady}
                 playerRef={playerRef}
+                shouldMountPlayer={shouldMountVideo}
               />
             )
           )}
@@ -648,14 +692,11 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
           {/* Review Indicators */}
           {isReview && (
             <>
-              {/* Review Pill — Polish 4 */}
               <div className="absolute top-3 left-3 z-10 pointer-events-none">
                 <div className="bg-gray-900/70 backdrop-blur-sm rounded-lg px-2.5 py-1 text-[10px] font-bold text-white uppercase tracking-wider">
                   Review
                 </div>
               </div>
-
-              {/* Rating Pill - Top Right */}
               {reviewRating !== null && reviewRating !== undefined && (
                 <div className="absolute top-3 right-3 z-10 pointer-events-none">
                   <RatingPill 
@@ -676,7 +717,7 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
           )}
         </div>
 
-        {/* Social proof line — Polish 3 */}
+        {/* Social proof line */}
         {(likesCount > 0 || commentsCount > 0) && (
           <div className="px-4 py-2 text-xs text-gray-400">
             {likesCount > 0 && <span>{likesCount} {likesCount === 1 ? 'like' : 'likes'}</span>}
@@ -689,7 +730,7 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
           </div>
         )}
 
-        {/* Action bar — Polish 3 */}
+        {/* Action bar */}
         <div className="px-4 pb-3 pt-1">
           <PostActionBar
             postId={item.id}
@@ -742,7 +783,8 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
     prevProps.item.src === nextProps.item.src &&
     prevProps.isPlaying === nextProps.isPlaying &&
     prevProps.videoIndex === nextProps.videoIndex &&
-    prevProps.isPriorityItem === nextProps.isPriorityItem
+    prevProps.isPriorityItem === nextProps.isPriorityItem &&
+    prevProps.shouldMountVideo === nextProps.shouldMountVideo
   );
 });
 

@@ -8,7 +8,7 @@ import { useMediaAutoplay } from '@/media';
 import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
-import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 import { useAdaptivePrefetch } from '@/hooks/useAdaptivePrefetch';
 import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
@@ -24,6 +24,9 @@ interface CommunityFeedProps {
 const FILTER_KEY = 'community-media-filter';
 const SORT_KEY = 'community-sort-option';
 
+// Fix 1: Mount gating buffer
+const MOUNT_BUFFER = 3;
+
 const COMMUNITY_PILLS: { id: CommunityMediaFilter; label: string }[] = [
   { id: 'all', label: 'All' },
   { id: 'shorts', label: 'Shorts' },
@@ -33,10 +36,11 @@ const COMMUNITY_PILLS: { id: CommunityMediaFilter; label: string }[] = [
 
 /**
  * CommunityFeed - Posts from friends and followed users only
- * TikTok-Level Implementation:
+ * Clubhouse Gold Standard Implementation:
+ * - Video mount gating (±3 viewport buffer)
  * - Adaptive prefetch (3-20 ahead) based on network/battery/scroll
  * - 50% start / 10% stop autoplay hysteresis
- * - Scroll velocity tracking via EWMA
+ * - Poster preload links for first 4 video posts
  * - Priority manifest preloading
  */
 export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
@@ -50,6 +54,9 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   // Scroll-to-top
   const [showScrollTop, setShowScrollTop] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  
+  // Fix 1: Track current viewport center index for mount gating
+  const [viewportCenterIndex, setViewportCenterIndex] = useState(0);
   
   // Persist filter/sort/category in localStorage
   const [mediaFilter, setMediaFilter] = useState<CommunityMediaFilter>(() => {
@@ -87,7 +94,6 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     selected: mediaFilter === p.id,
   }));
 
-  // Map community sort to command center sort
   const commandCenterSort: SortOption = sortOption as SortOption;
 
   const {
@@ -104,7 +110,6 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   const items = useMemo(() => {
     let filtered = rawItems;
     
-    // Apply search filter using debounced value
     if (debouncedSearch && debouncedSearch.trim()) {
       const query = debouncedSearch.toLowerCase();
       
@@ -130,14 +135,12 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     return filtered;
   }, [rawItems, debouncedSearch]);
 
-  // ============ TikTok-Level: Adaptive Prefetch (3-20 ahead based on conditions) ============
+  // ============ TikTok-Level: Adaptive Prefetch ============
   const { config: prefetchConfig, onIndexChange } = useAdaptivePrefetch();
   const lastPrefetchedIndex = useRef(-1);
 
-  // Track current scroll position for prefetch window
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Create videoUrlMap for HLS prefetching
   const videoUrlMap = useMemo(() => {
     const map = new Map<string, string>();
     items.forEach(item => {
@@ -161,11 +164,9 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   const sentinelRef = useRef<HTMLDivElement>(null);
   const hasPreloadedFirst = useRef(false);
   
-  // Refs to avoid stale closure in IntersectionObserver callback
   const hasMoreRef = useRef(hasMore);
   const loadingRef = useRef(loading);
   
-  // Keep refs in sync with state
   useEffect(() => {
     hasMoreRef.current = hasMore;
     loadingRef.current = loading;
@@ -190,7 +191,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     lastPrefetchedIndex.current = Math.min(prefetchConfig.prefetchAhead - 1, items.length - 1);
   }, [items, prefetchConfig.prefetchAhead, prefetchConfig.preloadManifests]);
 
-  // CRITICAL: Preload first video immediately in layout phase (before paint)
+  // CRITICAL: Preload first video immediately in layout phase
   useLayoutEffect(() => {
     if (hasPreloadedFirst.current) return;
     if (!items.length) return;
@@ -210,6 +211,37 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
       }
       preloadHlsManifest(hlsUrl);
     }
+  }, [items]);
+
+  // Fix 8: Poster preload links for first 4 video posts
+  useEffect(() => {
+    if (items.length === 0) return;
+    
+    const videoItems = items.filter(item => item.type === 'video' && item.src).slice(0, 4);
+    const links: HTMLLinkElement[] = [];
+    
+    videoItems.forEach(item => {
+      const uid = uidFromNode({ src: item.src! });
+      if (uid) {
+        const posterUrl = generateStreamThumbnailUrl(uid, { height: 800, fit: 'cover' });
+        if (posterUrl) {
+          const existing = document.querySelector(`link[href="${posterUrl}"]`);
+          if (!existing) {
+            const link = document.createElement('link');
+            link.rel = 'preload';
+            link.as = 'image';
+            link.href = posterUrl;
+            link.setAttribute('fetchpriority', 'high');
+            document.head.appendChild(link);
+            links.push(link);
+          }
+        }
+      }
+    });
+    
+    return () => {
+      links.forEach(link => link.remove());
+    };
   }, [items]);
 
   // P0: Unified media autoplay with TikTok-level thresholds (50% start / 10% stop)
@@ -287,10 +319,9 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     prevItemsCountRef.current = newCount;
   }, [items.length]);
 
-  // Show loading indicator
   const showBottomLoader = loading || isPacingDelay;
 
-  // Track scroll position for prefetch window with scroll velocity tracking
+  // Fix 1: Track viewport center index for mount gating via IntersectionObserver
   useEffect(() => {
     const cards = document.querySelectorAll('[data-community-card-id]');
     if (cards.length === 0) return;
@@ -301,25 +332,31 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
           if (entry.isIntersecting) {
             const postId = entry.target.getAttribute('data-community-card-id');
             const index = items.findIndex(p => p.id === postId);
-            if (index !== -1 && index !== currentIndex) {
-              setCurrentIndex(index);
-              onIndexChange();
+            if (index !== -1) {
+              // Update viewport center for mount gating
+              setViewportCenterIndex(index);
               
-              if (prefetchConfig.preloadManifests && index > lastPrefetchedIndex.current - 3) {
-                const prefetchStart = lastPrefetchedIndex.current + 1;
-                const prefetchEnd = Math.min(prefetchStart + prefetchConfig.prefetchAhead, items.length);
+              // Also update prefetch tracking
+              if (index !== currentIndex) {
+                setCurrentIndex(index);
+                onIndexChange();
                 
-                for (let i = prefetchStart; i < prefetchEnd; i++) {
-                  const item = items[i];
-                  if (item?.type === 'video' && item.src) {
-                    const uid = uidFromNode({ src: item.src });
-                    if (uid) {
-                      preloadHlsManifest(generateStreamHlsUrl(uid));
+                if (prefetchConfig.preloadManifests && index > lastPrefetchedIndex.current - 3) {
+                  const prefetchStart = lastPrefetchedIndex.current + 1;
+                  const prefetchEnd = Math.min(prefetchStart + prefetchConfig.prefetchAhead, items.length);
+                  
+                  for (let i = prefetchStart; i < prefetchEnd; i++) {
+                    const item = items[i];
+                    if (item?.type === 'video' && item.src) {
+                      const uid = uidFromNode({ src: item.src });
+                      if (uid) {
+                        preloadHlsManifest(generateStreamHlsUrl(uid));
+                      }
                     }
                   }
+                  
+                  lastPrefetchedIndex.current = prefetchEnd - 1;
                 }
-                
-                lastPrefetchedIndex.current = prefetchEnd - 1;
               }
             }
           }
@@ -354,7 +391,6 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     navigate(`/golfer/${creatorUserId}`);
   }, [navigate]);
 
-  // Helper to clear filter
   const handleClearFilter = useCallback(() => {
     setMediaFilter('all');
     localStorage.setItem(FILTER_KEY, 'all');
@@ -365,7 +401,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     reset();
   }, [reset]);
 
-  // Command center block (shared across all states)
+  // Command center block
   const commandCenterBlock = (
     <div style={{ background: '#F8FAFC' }}>
       <DiscoverCommandCenter
@@ -377,7 +413,6 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
         pills={pills}
         onPillSelect={handleFilterChange}
       />
-      {/* Section subtitle — Polish 1 */}
       <div className="px-4 pt-2 pb-3">
         <p className="text-xs font-medium text-gray-400">
           Posts from people you follow
@@ -386,7 +421,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     </div>
   );
 
-  // Fix 5: Error state
+  // Error state
   if (error && !loading && items.length === 0) {
     return (
       <PullToRefreshContainer onRefresh={handlePullToRefresh}>
@@ -410,7 +445,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     );
   }
 
-  // Empty state: User has no community (no friends/follows)
+  // Empty state: no community
   if (!loading && communityCount.friends === 0 && communityCount.following === 0) {
     return (
       <PullToRefreshContainer onRefresh={handlePullToRefresh}>
@@ -422,7 +457,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     );
   }
 
-  // Has community but no posts (or search returned no results)
+  // Has community but no posts
   if (!loading && items.length === 0 && (communityCount.friends > 0 || communityCount.following > 0)) {
     const isSearchEmpty = debouncedSearch && debouncedSearch.trim().length > 0;
     const isFilteredEmpty = mediaFilter !== 'all';
@@ -456,7 +491,6 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   return (
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
       <div className="min-h-screen pb-20" style={{ background: '#F8FAFC' }}>
-        {/* Command Center */}
         {commandCenterBlock}
 
         {/* Feed - Single column layout with premium card spacing */}
@@ -464,6 +498,9 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
           {items.map((item, index) => {
             const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;
             const entranceDelay = isNewlyLoaded ? (index - newlyLoadedStartIndex) * 30 : 0;
+            
+            // Fix 1: Mount gating — only mount video players within ±3 of viewport center
+            const shouldMountVideo = Math.abs(index - viewportCenterIndex) <= MOUNT_BUFFER;
             
             return (
               <div 
@@ -483,6 +520,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
                   isPlaying={playingIds.has(item.id)}
                   videoIndex={index}
                   isPriorityItem={index < 6}
+                  shouldMountVideo={shouldMountVideo}
                 />
               </div>
             );
@@ -508,7 +546,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
           </div>
         )}
 
-        {/* End of feed — Polish 9 */}
+        {/* End of feed */}
         {!hasMore && items.length > 0 && (
           <div className="flex flex-col items-center justify-center py-8">
             <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mb-2">
