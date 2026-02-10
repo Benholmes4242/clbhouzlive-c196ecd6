@@ -250,7 +250,7 @@ export function BusinessActivityFeed({
           studioEdits: media?.studio_edits || undefined,
           filterId: media?.filter_id || undefined,
           isReview: !!post.course_ratings,
-          reviewRating: post.course_ratings?.overall_rating || undefined,
+          reviewRating: post.course_ratings?.rating || undefined,
           sourceReviewId: post.course_ratings?.id || undefined,
         };
       });
