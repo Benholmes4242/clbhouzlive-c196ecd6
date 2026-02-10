@@ -1,121 +1,56 @@
-import React, { useRef, useEffect, memo } from 'react';
+import React, { useRef, memo, useState, useCallback, useId } from 'react';
 import { Top100Highlight } from '@/hooks/useTop100Highlights';
 import { uidFromNode, generateThumbnailUrl } from '@/utils/cloudflareStreamTransform';
-import { getHlsUrl, attachHlsIfNeeded } from '@/utils/videoPreload';
-import { MediaRuntime } from '@/media/runtime';
-import type { RegisterMediaFn } from '@/media/useMediaAutoplay';
-import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import UnifiedVideoPlayer from '@/media/components/UnifiedVideoPlayer';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 
 interface HighlightVideoProps {
   highlight: Top100Highlight;
   index: number;
   onEnded: () => void;
-  mediaId: string;
-  isPlaying: boolean;
-  registerMedia: RegisterMediaFn;
+  isActive: boolean;
   muted: boolean;
+  onTap?: () => void;
+  durationSeconds?: number;
 }
 
-/** Video element that uses MediaRuntime for playback control */
+/** Video element using UnifiedVideoPlayer with MediaRuntime coordination */
 const HighlightVideo = memo(function HighlightVideo({
   highlight,
   index,
   onEnded,
-  mediaId,
-  isPlaying,
-  registerMedia,
+  isActive,
   muted,
+  onTap,
+  durationSeconds,
 }: HighlightVideoProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [posterLoaded, setPosterLoaded] = useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [hasError, setHasError] = useState(false);
   
   const primaryMedia = highlight.post_media[0];
   
-  // Extract Cloudflare Stream ID for crisp thumbnails
-  const extractCloudflareStreamId = (m3u8: string) => {
-    const match = /\/([a-z0-9-]{16,})\/manifest\/video\.m3u8/i.exec(m3u8);
-    return match?.[1] ?? null;
-  };
-
-  // For videos, use the HLS URL directly
+  // Extract Cloudflare Stream ID
   const videoId = primaryMedia?.media_type === 'video' ? uidFromNode({ media_url: primaryMedia.media_url }) : null;
-  const streamId = videoId ? extractCloudflareStreamId(generateStreamHlsUrl(videoId)) : null;
-  
-  // Use high-res Cloudflare Stream thumbnail for crisp quality
-  const posterUrl = streamId 
-    ? generateThumbnailUrl(streamId, { width: 640, height: 360, time: 5 })
+  const hlsUrl = videoId ? generateStreamHlsUrl(videoId) : null;
+  const posterUrl = videoId 
+    ? generateThumbnailUrl(videoId, { width: 640, height: 360, time: 5 })
     : null;
 
-  // Register with MediaRuntime
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || primaryMedia?.media_type !== 'video') return;
+  const studioEdits = (primaryMedia as any)?.studio_edits;
 
-    registerMedia({
-      id: mediaId,
-      element: video,
-      isCandidate: true,
-      sortIndex: index,
-      observeTarget: containerRef.current,
-    });
+  const handlePlay = useCallback(() => setIsVideoPlaying(true), []);
+  const handleError = useCallback(() => setHasError(true), []);
 
-    return () => {
-      registerMedia({ id: mediaId, element: null });
-    };
-  }, [mediaId, index, registerMedia, primaryMedia?.media_type]);
+  // Format duration for badge
+  const formatDur = (s: number) => {
+    const m = Math.floor(s / 60);
+    const sec = Math.floor(s % 60);
+    return `${m}:${sec.toString().padStart(2, '0')}`;
+  };
 
-  // Setup video source
-  useEffect(() => {
-    let cancelled = false;
-    
-    if (!videoId || !videoRef.current) return;
-    
-    const video = videoRef.current;
-    video.preload = 'auto';
-    video.loop = false; // Ensure no loop
-    
-    // Pre-attach source once we're near visible
-    const setupVideo = async () => {
-      try {
-        const url = await getHlsUrl(videoId);
-        if (!cancelled) {
-          await attachHlsIfNeeded(video, url);
-        }
-      } catch (error) {
-        console.warn('Failed to setup video:', error);
-      }
-    };
-
-    setupVideo();
-
-    // Auto-advance when video ends (mobile behavior controlled by parent)
-    const handleEnded = () => onEnded();
-    const handleTimeUpdate = () => {
-      if (!isFinite(video.duration) || video.duration <= 0) return;
-      const pct = video.currentTime / video.duration;
-      if (pct >= 0.98) onEnded(); // Robust fallback when 'ended' won't fire
-    };
-    
-    video.addEventListener('ended', handleEnded);
-    video.addEventListener('timeupdate', handleTimeUpdate);
-    
-    return () => { 
-      cancelled = true; 
-      video.removeEventListener('ended', handleEnded);
-      video.removeEventListener('timeupdate', handleTimeUpdate);
-    };
-  }, [videoId, onEnded]);
-
-  // Sync muted state
-  useEffect(() => {
-    const video = videoRef.current;
-    if (video) {
-      video.muted = muted;
-    }
-  }, [muted]);
-
-  // Safety check for media
   if (!primaryMedia) {
     return (
       <div ref={containerRef} className="highlights__card">
@@ -126,30 +61,8 @@ const HighlightVideo = memo(function HighlightVideo({
     );
   }
 
-  // Get studio_edits from primaryMedia
-  const studioEdits = (primaryMedia as any)?.studio_edits;
-
-  // Track video ready state for poster-first pattern
-  const [isVideoReady, setIsVideoReady] = React.useState(false);
-  
-  // Handle video ready event
-  React.useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    
-    const handleCanPlay = () => setIsVideoReady(true);
-    video.addEventListener('canplay', handleCanPlay);
-    
-    // If already ready (cached HLS), mark immediately
-    if (video.readyState >= 3) {
-      setIsVideoReady(true);
-    }
-    
-    return () => video.removeEventListener('canplay', handleCanPlay);
-  }, [videoId]);
-
   return (
-    <div ref={containerRef} className="highlights__card relative">
+    <div ref={containerRef} className="highlights__card relative" onClick={onTap}>
       {primaryMedia.media_type === 'image' ? (
         <img
           src={primaryMedia.media_url}
@@ -160,28 +73,55 @@ const HighlightVideo = memo(function HighlightVideo({
         />
       ) : (
         <>
-          {/* Poster image - always visible until video is ready */}
+          {/* Shimmer base layer */}
+          {!posterLoaded && !isVideoPlaying && (
+            <div className="absolute inset-0 bg-muted animate-pulse" />
+          )}
+
+          {/* Poster with fade-in */}
           {posterUrl && (
             <img
               src={posterUrl}
               alt="Video thumbnail"
               className="highlights__video absolute inset-0 w-full h-full object-cover"
-              style={{ opacity: isVideoReady ? 0 : 1, transition: 'opacity 150ms ease-out' }}
+              style={{ 
+                opacity: isVideoPlaying ? 0 : posterLoaded ? 1 : 0, 
+                transition: 'opacity 200ms ease-out' 
+              }}
+              onLoad={() => setPosterLoaded(true)}
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
                 e.currentTarget.onerror = null;
               }}
             />
           )}
-          <video 
-            ref={videoRef}
-            className="highlights__video"
-            style={{ opacity: isVideoReady ? 1 : 0, transition: 'opacity 150ms ease-out' }}
-            muted={muted}
-            playsInline
-            preload="auto"
-            poster={posterUrl || undefined}
-          />
+
+          {/* UnifiedVideoPlayer - only mounted for active + adjacent slides */}
+          {isActive && hlsUrl && !hasError && (
+            <div style={{ opacity: isVideoPlaying ? 1 : 0, transition: 'opacity 150ms ease-out' }}>
+              <UnifiedVideoPlayer
+                src={hlsUrl}
+                posterUrl={posterUrl || undefined}
+                muted={muted}
+                autoplay={isActive}
+                loop={false}
+                className="highlights__video"
+                objectFit="cover"
+                surface="highlights"
+                managedByMediaRuntime={true}
+                onPlay={handlePlay}
+                onEnded={onEnded}
+                onError={handleError}
+              />
+            </div>
+          )}
+
+          {/* Duration badge */}
+          {durationSeconds && durationSeconds > 0 && (
+            <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm rounded-md px-1.5 py-0.5 text-[10px] font-medium text-white z-10">
+              {formatDur(durationSeconds)}
+            </div>
+          )}
         </>
       )}
       

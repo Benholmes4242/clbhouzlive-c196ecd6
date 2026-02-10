@@ -484,7 +484,7 @@ function AppRoutes() {
         <Route path="/create-moment" element={<Suspense fallback={<GenericPageSkeleton />}><CreateMomentPage /></Suspense>} />
         <Route path="/error-logs" element={<ErrorLogPage />} />
         
-        {/* Echo full-page experience */}
+        {/* TODO: Echo AI routes pending decommission — video players use legacy GlassVideo/HLSVideoPlayer outside standard video stack */}
         <Route path="/echo" element={<Suspense fallback={<HubSkeleton />}><EchoPage /></Suspense>} />
         <Route path="/echo/:conversationId" element={<Suspense fallback={<HubSkeleton />}><EchoPage /></Suspense>} />
         
@@ -529,8 +529,10 @@ function AppRoutes() {
         <Route path="/hub/swing" element={<Suspense fallback={<HubSkeleton />}><HubSwingPage /></Suspense>} />
         <Route path="/hub/messages" element={<Suspense fallback={<HubSkeleton />}><HubMessagesListPage /></Suspense>} />
         <Route path="/hub/messages/:conversationId" element={<Suspense fallback={<HubSkeleton />}><HubChatPlaceholderPage /></Suspense>} />
+        {/* TODO: Swing Coach routes pending decommission — video players use legacy GlassVideo/HLSVideoPlayer outside standard video stack */}
         <Route path="/hub/swing/history" element={<Suspense fallback={<HubSkeleton />}><HubSwingHistoryPage /></Suspense>} />
         <Route path="/hub/swing/history/:id" element={<Suspense fallback={<HubSkeleton />}><HubSwingDetailPage /></Suspense>} />
+        {/* TODO: Echo history routes pending decommission — same legacy video player issue */}
         <Route path="/hub/echo/history" element={<Suspense fallback={<HubSkeleton />}><HubEchoHistoryPage /></Suspense>} />
         <Route path="/hub/echo/history/chat/:id" element={<Suspense fallback={<HubSkeleton />}><HubEchoHistoryDetailPage /></Suspense>} />
         <Route path="/hub/echo/tags" element={<Suspense fallback={<HubSkeleton />}><HubEchoTagsPage /></Suspense>} />
