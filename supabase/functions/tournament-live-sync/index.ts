@@ -366,15 +366,15 @@ Deno.serve(async (req) => {
   }
 });
 
-// Map tour names to SportRadar tour codes
+// Map tour names to SportRadar API tour codes (Sportradar v3)
 function mapTourName(tourName: string): string {
   const name = tourName.toLowerCase();
   if (name.includes('liv')) return 'liv';
-  if (name.includes('pga')) return 'pga';
   if (name.includes('lpga')) return 'lpga';
-  if (name.includes('dp world') || name.includes('european') || name.includes('eur')) return 'eur';
-  if (name.includes('champions')) return 'champions-tour';
-  if (name.includes('korn ferry')) return 'kft';
+  if (name.includes('dp world') || name.includes('european') || name.includes('euro')) return 'euro';
+  if (name.includes('champions') || name.includes('champ')) return 'champ';
+  if (name.includes('korn ferry') || name.includes('pgad')) return 'pgad';
+  if (name.includes('pga')) return 'pga';
   return 'pga';
 }
 
