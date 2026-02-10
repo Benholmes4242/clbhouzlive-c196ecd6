@@ -219,6 +219,7 @@ export function useInfiniteBusinessPosts(options: UseInfiniteBusinessPostsOption
   return {
     items: allItems,
     isLoading: query.isLoading,
+    isError: query.isError,
     hasMore: query.hasNextPage ?? false,
     fetchNextPage: query.fetchNextPage,
     isFetchingNextPage: query.isFetchingNextPage,
