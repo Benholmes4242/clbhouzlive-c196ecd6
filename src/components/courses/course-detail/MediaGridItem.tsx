@@ -2,21 +2,26 @@ import React, { memo, useState } from 'react';
 import type { ExtendedMediaItem } from '@/components/media-grid';
 import { VideoPlayIndicator } from '@/components/ui/VideoPlayIndicator';
 import { cn } from '@/lib/utils';
+import { Camera } from 'lucide-react';
 
 interface MediaGridItemProps {
   item: ExtendedMediaItem;
   onClick: (item: ExtendedMediaItem) => void;
   /** Show "+X" overlay for additional media count */
   overflowCount?: number;
+  /** Index in the grid — first 4 tiles get eager loading + high fetch priority */
+  index?: number;
 }
 
 /**
  * Memoized grid item with polish: skeleton, centered play icon, hover effects
  */
-export const MediaGridItem = memo(function MediaGridItem({ item, onClick, overflowCount }: MediaGridItemProps) {
+export const MediaGridItem = memo(function MediaGridItem({ item, onClick, overflowCount, index = 99 }: MediaGridItemProps) {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isBroken, setIsBroken] = useState(false);
   const isVideo = item.type === 'video';
   const imageSrc = isVideo ? (item.posterUrl || item.url) : item.url;
+  const isAboveTheFold = index < 4;
   
   // Format duration for display - returns null if no valid duration
   const formatDuration = (seconds?: number): string | null => {
@@ -39,25 +44,36 @@ export const MediaGridItem = memo(function MediaGridItem({ item, onClick, overfl
       )}
     >
       {/* Skeleton placeholder - shows until image loads */}
-      {!isLoaded && (
+      {!isLoaded && !isBroken && (
         <div className="absolute inset-0 bg-muted animate-pulse" />
       )}
 
+      {/* Fix 1: Broken image fallback */}
+      {isBroken && (
+        <div className="absolute inset-0 bg-muted flex items-center justify-center">
+          <Camera className="h-6 w-6 text-muted-foreground/40" />
+        </div>
+      )}
+
       {/* Lazy-loading image */}
-      <img
-        src={imageSrc}
-        alt={item.alt || 'Media'}
-        className={cn(
-          "w-full h-full object-cover transition-opacity duration-200",
-          isLoaded ? 'opacity-100' : 'opacity-0'
-        )}
-        loading="lazy"
-        decoding="async"
-        onLoad={() => setIsLoaded(true)}
-      />
+      {!isBroken && (
+        <img
+          src={imageSrc}
+          alt={item.alt || 'Media'}
+          className={cn(
+            "w-full h-full object-cover transition-opacity duration-200",
+            isLoaded ? 'opacity-100' : 'opacity-0'
+          )}
+          loading={isAboveTheFold ? 'eager' : 'lazy'}
+          fetchPriority={isAboveTheFold ? 'high' : 'auto'}
+          decoding="async"
+          onLoad={() => setIsLoaded(true)}
+          onError={() => setIsBroken(true)}
+        />
+      )}
 
       {/* Video overlays - using same VideoPlayIndicator as explore/discover pages */}
-      {isVideo && (
+      {isVideo && !isBroken && (
         <>
           {/* Play icon - bottom left, matching explore/discover pages */}
           <VideoPlayIndicator size="lg" />

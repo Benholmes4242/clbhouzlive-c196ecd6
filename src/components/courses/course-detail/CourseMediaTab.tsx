@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useLayoutEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 import { adaptClubMediaArrayToExploreItems } from '@/lib/adapters/clubMediaToExplore';
 import { adaptExploreContentToMediaItems } from '@/components/media-grid';
 import type { ExtendedMediaItem as NewMediaItem } from '@/components/media-grid';
@@ -10,7 +11,7 @@ import { SegmentedTabOption } from '@/components/ui/SegmentedTabs';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useCourseMediaSummary } from '@/hooks/useCourseMediaSummary';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useClubMedia } from '@/hooks/useClubMedia';
+import { useCourseMediaPaginated } from '@/hooks/useCourseMediaPaginated';
 import { MediaGridItem } from './MediaGridItem';
 import { LazyMediaGridItem } from './LazyMediaGridItem';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
@@ -18,6 +19,9 @@ import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { useLazyTiles } from '@/components/shared/grid/useLazyTiles';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { toast } from 'sonner';
+import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
+import { useQueryClient } from '@tanstack/react-query';
+import { Loader2 } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 import { MediaItem } from '@/types/media';
@@ -30,35 +34,32 @@ interface CourseMediaTabProps {
   portalTarget?: HTMLElement | null;
 }
 
-interface LocalMediaItem {
-  id: string;
-  source: 'post' | 'review';
-  sourceId: string;
-  type: 'image' | 'video';
-  url: string;
-  thumbnailUrl?: string;
-  width?: number;
-  height?: number;
-  createdAt: string;
-  author: {
-    id: string;
-    displayName: string;
-    username?: string;
-    avatarUrl?: string;
-  };
-}
-
 const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabProps) => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [filterMode, setFilterMode] = useState<MediaFilterMode>('most_recent');
   const hasPreloadedFirst = useRef(false);
   
   // Track current fullscreen post for engagement
   const [currentFullscreenPostId, setCurrentFullscreenPostId] = useState<string | null>(null);
 
-  // Phase 1 Fix #2: Use shared hook - single query for all media consumers
-  const { data: mediaResp, isLoading, isError, refetch } = useClubMedia(courseId, 30);
+  // Fix 2: Use paginated hook instead of hard-capped useClubMedia
+  const {
+    data: paginatedData,
+    isLoading,
+    isError,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useCourseMediaPaginated(courseId, 30);
+
+  // Flatten all pages into a single array
+  const mediaResp = useMemo(
+    () => paginatedData?.pages.flatMap(page => page.edges) ?? [],
+    [paginatedData]
+  );
 
   // Eager preload first video's HLS manifest on mount (before paint)
   useLayoutEffect(() => {
@@ -74,7 +75,7 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     }
   }, [mediaResp]);
 
-  // A3: Pre-warm HLS.js when media tab mounts with videos (kept for additional warmup)
+  // A3: Pre-warm HLS.js when media tab mounts with videos
   useEffect(() => {
     if (mediaResp && mediaResp.length > 0) {
       const hasVideos = mediaResp.some(item => item.media_type === 'video');
@@ -86,13 +87,35 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     }
   }, [mediaResp]);
 
-  // Phase 1 Fix #3: Simplified transformation pipeline - pure data transformation
+  // Fix 4: Preload links for first 4 tile poster/image URLs
+  useEffect(() => {
+    if (!mediaResp?.length) return;
+    const first4 = mediaResp.slice(0, 4);
+    const links: HTMLLinkElement[] = [];
+
+    first4.forEach(item => {
+      const url = item.thumbnailUrl || item.media_url;
+      if (!url) return;
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = url;
+      document.head.appendChild(link);
+      links.push(link);
+    });
+
+    return () => {
+      links.forEach(link => document.head.removeChild(link));
+    };
+  }, [mediaResp]);
+
+  // Phase 1 Fix #3: Simplified transformation pipeline
   const exploreItems = useMemo(
     () => adaptClubMediaArrayToExploreItems(mediaResp ?? []),
     [mediaResp]
   );
 
-  // Build summary input items - pure memo
+  // Build summary input items
   const summaryItems = useMemo(
     () =>
       exploreItems.map(item => ({
@@ -104,10 +127,9 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     [exploreItems]
   );
 
-  // ✅ Hook called at top level, outside any memo/effect
   const summary = useCourseMediaSummary(summaryItems, user?.id || null);
 
-  // Contributors in separate memo - pure
+  // Contributors
   const contributors = useMemo(() => {
     const contributorIds = Array.from(new Set(exploreItems.map(item => item.user?.id).filter(Boolean))) as string[];
     return contributorIds.slice(0, 3).map(id => {
@@ -120,7 +142,6 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     }).filter(Boolean) as Array<{ id: string; name: string; avatarUrl: string | null }>;
   }, [exploreItems]);
 
-  // Filter options with clear option when filter active
   const isFilterActive = filterMode === 'photos' || filterMode === 'videos';
   
   const filterOptions: SegmentedTabOption[] = [
@@ -129,7 +150,6 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     { value: 'videos', label: 'Videos' },
   ];
 
-  // Phase 1 Fix #3: Lightweight filter memo only
   const filteredItems = useMemo(() => {
     switch (filterMode) {
       case 'videos':
@@ -144,13 +164,12 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     }
   }, [exploreItems, filterMode, user?.id]);
 
-  // Adapt for MediaGrid using filtered items
   const mediaItems = useMemo(
     () => adaptExploreContentToMediaItems(filteredItems),
     [filteredItems]
   );
 
-  // Lazy loading: only mount grid items in/near viewport
+  // Lazy loading
   const { visibleIndices, registerTile } = useLazyTiles({
     totalItems: mediaItems.length,
     initialVisible: 8,
@@ -183,8 +202,8 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     }
   }, [courseId, courseName]);
 
-  // Use unified fullscreen player for course media
-  const { openFullscreen } = useUnifiedFullscreen('explore', {
+  // Fix 6: Use 'course' source type instead of 'explore'
+  const { openFullscreen } = useUnifiedFullscreen('course', {
     allowLandscape: true,
     
     onIndexChange: (index) => {
@@ -209,7 +228,6 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     },
   });
 
-  // Phase 1 Fix #4: Memoized click handler - opens unified fullscreen
   const handleMediaClick = useCallback((item: NewMediaItem) => {
     const index = filteredItems.findIndex(media => media.id === item.id);
     if (index !== -1) {
@@ -218,11 +236,22 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     }
   }, [filteredItems, openFullscreen]);
 
-  // Compute counts for end-of-list indicator
+  // Fix 5: Pull-to-refresh handler
+  const handlePullToRefresh = useCallback(async () => {
+    await queryClient.invalidateQueries({ queryKey: ['club-media-paginated', courseId] });
+  }, [queryClient, courseId]);
+
+  // Fix 2: Load more handler
+  const handleLoadMore = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
   const photoCount = summary.photoCount;
   const videoCount = summary.videoCount;
 
-  // Loading state with proper skeleton placeholders
+  // Loading state
   if (isLoading) {
     return (
       <div className="flex flex-col">
@@ -239,11 +268,11 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
           <div className="h-3 w-20 bg-muted-foreground/10 rounded animate-pulse mb-3" />
           <div className="h-10 w-full bg-muted-foreground/10 rounded-sq-md animate-pulse" />
         </section>
-        {/* Grid skeleton */}
+        {/* Fix 7: Grid skeleton matches 2-col mobile layout */}
         <section className="bg-muted">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-[1px] bg-border">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="aspect-square bg-muted-foreground/10 animate-pulse" />
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="aspect-square bg-muted animate-pulse" />
             ))}
           </div>
         </section>
@@ -272,137 +301,158 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     );
   }
 
-  // Check if we have any media at all (before filtering)
   const hasAnyMedia = exploreItems.length > 0;
 
   return (
-    <div className="flex flex-col">
-      {/* Summary Card */}
-      {hasAnyMedia && (
-        <section className="bg-muted">
-          <CourseMediaSummaryCard
-            photoCount={summary.photoCount}
-            videoCount={summary.videoCount}
-            contributorsCount={contributors.length}
-            courseName={courseName}
-            onAddMedia={() => navigate(`/courses/${courseId}/rate`)}
-          />
-        </section>
-      )}
+    <PullToRefreshContainer onRefresh={handlePullToRefresh}>
+      <div className="flex flex-col">
+        {/* Summary Card */}
+        {hasAnyMedia && (
+          <section className="bg-muted">
+            <CourseMediaSummaryCard
+              photoCount={summary.photoCount}
+              videoCount={summary.videoCount}
+              contributorsCount={contributors.length}
+              courseName={courseName}
+              onAddMedia={() => navigate(`/courses/${courseId}/rate`)}
+            />
+          </section>
+        )}
 
-      {/* Sort/Filter Bar */}
-      {hasAnyMedia && (
-        <section className="px-4 pt-8 pb-6 bg-muted">
-          <p className="mb-4 text-sm font-medium text-muted-foreground">
-            Sort &amp; filter
-          </p>
-          <Tabs value={filterMode} onValueChange={(v) => setFilterMode(v as MediaFilterMode)} className="w-full">
-            <TabsList className="bg-transparent border-0 px-0 py-0 gap-0 w-full flex justify-center">
-              {filterOptions.map((option) => (
-                <TabsTrigger
-                  key={option.value}
-                  value={option.value}
-                  className="relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none min-h-[44px] data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out active:scale-[0.98] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]"
-                >
-                  {option.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-        </section>
-      )}
+        {/* Sort/Filter Bar */}
+        {hasAnyMedia && (
+          <section className="px-4 pt-8 pb-6 bg-muted">
+            <p className="mb-4 text-sm font-medium text-muted-foreground">
+              Sort &amp; filter
+            </p>
+            <Tabs value={filterMode} onValueChange={(v) => setFilterMode(v as MediaFilterMode)} className="w-full">
+              <TabsList className="bg-transparent border-0 px-0 py-0 gap-0 w-full flex justify-center">
+                {filterOptions.map((option) => (
+                  <TabsTrigger
+                    key={option.value}
+                    value={option.value}
+                    className="relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none min-h-[44px] data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out active:scale-[0.98] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]"
+                  >
+                    {option.label}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+          </section>
+        )}
 
-      {/* Empty state - no media at all */}
-      {!hasAnyMedia && !isLoading && (
-        <section className="px-4 py-8 bg-muted flex flex-col items-center text-center">
-          <div className="h-12 w-12 rounded-full bg-muted-foreground/10 flex items-center justify-center mb-4">
-            <svg className="h-6 w-6 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-          </div>
-          <p className="text-base font-semibold text-foreground mb-1">No media yet</p>
-          <p className="text-sm text-muted-foreground mb-6 max-w-[280px]">
-            Be the first to share photos or videos of {courseName || 'this course'}.
-          </p>
-          <button
-            type="button"
-            onClick={() => navigate(`/courses/${courseId}/rate`)}
-            className="inline-flex items-center gap-2 rounded-sq-pill bg-muted text-foreground ring-1 ring-border px-5 py-2.5 text-sm font-medium hover:bg-muted/80 active:scale-[0.98] transition-all min-h-[44px]"
-          >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Add a photo or video
-          </button>
-          <p className="text-xs text-muted-foreground mt-3">
-            Reviews help other golfers discover great courses
-          </p>
-        </section>
-      )}
+        {/* Empty state - no media at all */}
+        {!hasAnyMedia && !isLoading && (
+          <section className="px-4 py-8 bg-muted flex flex-col items-center text-center">
+            <div className="h-12 w-12 rounded-full bg-muted-foreground/10 flex items-center justify-center mb-4">
+              <svg className="h-6 w-6 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <p className="text-base font-semibold text-foreground mb-1">No media yet</p>
+            <p className="text-sm text-muted-foreground mb-6 max-w-[280px]">
+              Be the first to share photos or videos of {courseName || 'this course'}.
+            </p>
+            <button
+              type="button"
+              onClick={() => navigate(`/courses/${courseId}/rate`)}
+              className="inline-flex items-center gap-2 rounded-sq-pill bg-muted text-foreground ring-1 ring-border px-5 py-2.5 text-sm font-medium hover:bg-muted/80 active:scale-[0.98] transition-all min-h-[44px]"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Add a photo or video
+            </button>
+            <p className="text-xs text-muted-foreground mt-3">
+              Reviews help other golfers discover great courses
+            </p>
+          </section>
+        )}
 
-      {/* Filtered empty state - has media but filter shows none */}
-      {hasAnyMedia && filteredItems.length === 0 && !isLoading && (
-        <section className="px-4 py-8 bg-muted flex flex-col items-center text-center">
-          <p className="text-sm font-semibold text-foreground mb-1">
-            {filterMode === 'photos' ? 'No photos yet' : 'No videos yet'}
-          </p>
-          <p className="text-sm text-muted-foreground mb-4">
-            Try a different filter or add your own.
-          </p>
-          <button
-            type="button"
-            onClick={() => setFilterMode('most_recent')}
-            className="inline-flex items-center gap-1.5 rounded-sq-sm bg-muted text-foreground ring-1 ring-border px-4 py-2 text-sm font-medium hover:bg-muted/80 active:scale-[0.98] transition-all min-h-[44px]"
-          >
-            Clear filter
-          </button>
-        </section>
-      )}
+        {/* Filtered empty state */}
+        {hasAnyMedia && filteredItems.length === 0 && !isLoading && (
+          <section className="px-4 py-8 bg-muted flex flex-col items-center text-center">
+            <p className="text-sm font-semibold text-foreground mb-1">
+              {filterMode === 'photos' ? 'No photos yet' : 'No videos yet'}
+            </p>
+            <p className="text-sm text-muted-foreground mb-4">
+              Try a different filter or add your own.
+            </p>
+            <button
+              type="button"
+              onClick={() => setFilterMode('most_recent')}
+              className="inline-flex items-center gap-1.5 rounded-sq-sm bg-muted text-foreground ring-1 ring-border px-4 py-2 text-sm font-medium hover:bg-muted/80 active:scale-[0.98] transition-all min-h-[44px]"
+            >
+              Clear filter
+            </button>
+          </section>
+        )}
 
-      {/* Square Media Grid - 2 columns mobile, 4 desktop with lazy loading */}
-      {filteredItems.length > 0 && (
-        <section className="bg-muted">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-[1px] bg-border">
-            {mediaItems.map((item, index) => {
-              const isVisible = visibleIndices.has(index);
-              
-              if (!isVisible) {
+        {/* Square Media Grid — Fix 3: pass index for fetchPriority */}
+        {filteredItems.length > 0 && (
+          <section className="bg-muted">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-[1px] bg-border">
+              {mediaItems.map((item, index) => {
+                const isVisible = visibleIndices.has(index);
+                
+                if (!isVisible) {
+                  return (
+                    <LazyMediaGridItem
+                      key={`placeholder-${item.id}`}
+                      index={index}
+                      registerTile={registerTile}
+                    />
+                  );
+                }
+                
                 return (
-                  <LazyMediaGridItem
-                    key={`placeholder-${item.id}`}
+                  <MediaGridItem
+                    key={item.id}
+                    item={item}
                     index={index}
-                    registerTile={registerTile}
+                    onClick={handleMediaClick}
                   />
                 );
-              }
-              
-              return (
-                <MediaGridItem
-                  key={item.id}
-                  item={item}
-                  onClick={handleMediaClick}
-                />
-              );
-            })}
+              })}
+            </div>
+
+            {/* Fix 2: Load More button */}
+            {hasNextPage && filterMode === 'most_recent' && (
+              <div className="flex justify-center py-6">
+                <button
+                  type="button"
+                  onClick={handleLoadMore}
+                  disabled={isFetchingNextPage}
+                  className="inline-flex items-center gap-2 rounded-full border border-border bg-card text-sm font-medium text-muted-foreground px-6 py-2.5 hover:bg-muted active:scale-[0.98] transition-all min-h-[44px] disabled:opacity-50"
+                >
+                  {isFetchingNextPage ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Loading…
+                    </>
+                  ) : (
+                    'Load more'
+                  )}
+                </button>
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* End-of-content indicator */}
+        {filteredItems.length > 0 && !isLoading && !hasNextPage && (
+          <div className="py-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              That's everything — {photoCount} {photoCount === 1 ? 'photo' : 'photos'}
+              {videoCount > 0 && ` · ${videoCount} ${videoCount === 1 ? 'video' : 'videos'}`}
+            </p>
           </div>
-        </section>
-      )}
+        )}
 
-      {/* End-of-content indicator */}
-      {filteredItems.length > 0 && !isLoading && (
-        <div className="py-6 text-center">
-          <p className="text-sm text-muted-foreground">
-            That's everything — {photoCount} {photoCount === 1 ? 'photo' : 'photos'}
-            {videoCount > 0 && ` · ${videoCount} ${videoCount === 1 ? 'video' : 'videos'}`}
-          </p>
-        </div>
-      )}
-
-      {/* Unified Fullscreen Player - rendered via context provider in App.tsx */}
-      
-      <ScrollToTopGlass />
-    </div>
+        <ScrollToTopGlass />
+      </div>
+    </PullToRefreshContainer>
   );
 };
 

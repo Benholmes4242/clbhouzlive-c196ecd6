@@ -43,15 +43,18 @@ serve(async (req) => {
     // Read params from GET or POST
     let clubId: string | null = null
     let limit = 30
+    let cursor: string | null = null
 
     if (req.method === 'GET') {
       const url = new URL(req.url)
       clubId = url.searchParams.get('clubId')
       limit = parseInt(url.searchParams.get('limit') ?? '30')
+      cursor = url.searchParams.get('cursor')
     } else if (req.method === 'POST') {
       const body = await req.json().catch(() => ({}))
       clubId = body.clubId || null
       limit = parseInt(String(body.limit ?? 30))
+      cursor = body.cursor || null
     } else {
       return new Response(JSON.stringify({ error: 'Method not allowed' }), {
         status: 405,
@@ -72,7 +75,7 @@ serve(async (req) => {
     }
 
     // Get media from tagged posts
-    const { data: postMedia, error: postError } = await supabaseClient
+    let postQuery = supabaseClient
       .from('post_media')
       .select(`
         id,
@@ -97,12 +100,18 @@ serve(async (req) => {
       .order('created_at', { ascending: false })
       .limit(limit)
 
+    if (cursor) {
+      postQuery = postQuery.lt('created_at', cursor)
+    }
+
+    const { data: postMedia, error: postError } = await postQuery
+
     if (postError) {
       console.error('Error fetching post media:', postError)
     }
 
     // Get media from course reviews
-    const { data: reviewMedia, error: reviewError } = await supabaseClient
+    let reviewQuery = supabaseClient
       .from('course_review_media')
       .select(`
         id,
@@ -118,6 +127,12 @@ serve(async (req) => {
       .eq('course_ratings.course_id', clubId)
       .order('created_at', { ascending: false })
       .limit(limit)
+
+    if (cursor) {
+      reviewQuery = reviewQuery.lt('created_at', cursor)
+    }
+
+    const { data: reviewMedia, error: reviewError } = await reviewQuery
 
     if (reviewError) {
       console.error('Error fetching review media:', reviewError)
