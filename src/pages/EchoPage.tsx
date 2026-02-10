@@ -1,8 +1,7 @@
 /**
  * EchoPage - Full-page Echo AI chat experience
  * Routes: /echo, /echo/:conversationId
- * WhatsApp-inspired bubble design with warm orange accents
- * Immersive full-screen layout (no app header/bottom nav)
+ * Cleo design: warm gradient bg, glass bubbles, glass header
  */
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
@@ -18,6 +17,7 @@ import { EchoPageMessageList } from '@/features/echo/components/page/EchoPageMes
 import { EchoPageComposer } from '@/features/echo/components/page/EchoPageComposer';
 import { EchoHistorySheet } from '@/features/echo/components/page/EchoHistorySheet';
 import { EchoPendingState } from '@/features/echo/components/page/EchoPendingState';
+import { WarmGradientBg } from '@/components/hub-warm/WarmGradientBg';
 
 export default function EchoPage() {
   const navigate = useNavigate();
@@ -147,60 +147,70 @@ export default function EchoPage() {
 
   return (
     <motion.div 
-      className="fixed inset-0 flex flex-col bg-[#F8FAFC]"
+      className="fixed inset-0 flex flex-col"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
     >
-      {/* Header - WhatsApp minimal style */}
-      <EchoPageHeader
-        onBack={handleBack}
-        onNewChat={handleNewChat}
-        onOpenHistory={handleOpenHistory}
-        hasMessages={hasMessages}
-      />
-
-      {/* Content - flex-1 to fill remaining space */}
-      <div className="flex-1 min-h-0">
-        {showPendingState ? (
-          <EchoPendingState prompt={pendingPrompt} />
-        ) : !hasMessages ? (
-          <EchoPageWelcome
-            onPromptClick={handlePromptClick}
-            onFocusInput={handleFocusInput}
-          />
-        ) : (
-          <div className="h-full overflow-y-auto">
-            <EchoPageMessageList
-              messages={messages}
-              isStreaming={isStreaming}
-              streamingContent={streamingContent}
-              onFollowUp={handleFollowUp}
-              onRefresh={async () => {
-                if (conversationId) {
-                  await refetchMessages();
-                }
-              }}
-            />
-          </div>
-        )}
-      </div>
-
-      {/* Input Bar - WhatsApp pill style */}
-      <div 
-        className="flex-none px-4 pt-2 bg-[#F8FAFC]"
-        style={{ paddingBottom: 'calc(32px + env(safe-area-inset-bottom, 0px))' }}
-      >
-        <EchoPageComposer
-          ref={composerRef}
-          value={input}
-          onChange={setInput}
-          onSend={handleSend}
-          onAbort={abortStream}
-          isStreaming={isStreaming}
-          disabled={!!rateLimitCooldown}
-          cooldown={rateLimitCooldown}
+      {/* Warm gradient background */}
+      <WarmGradientBg />
+      
+      <div className="relative z-10 flex flex-col h-full">
+        {/* Header - Glass style */}
+        <EchoPageHeader
+          onBack={handleBack}
+          onNewChat={handleNewChat}
+          onOpenHistory={handleOpenHistory}
+          hasMessages={hasMessages}
         />
+
+        {/* Content - flex-1 to fill remaining space */}
+        <div className="flex-1 min-h-0">
+          {showPendingState ? (
+            <EchoPendingState prompt={pendingPrompt} />
+          ) : !hasMessages ? (
+            <EchoPageWelcome
+              onPromptClick={handlePromptClick}
+              onFocusInput={handleFocusInput}
+            />
+          ) : (
+            <div className="h-full overflow-y-auto">
+              <EchoPageMessageList
+                messages={messages}
+                isStreaming={isStreaming}
+                streamingContent={streamingContent}
+                onFollowUp={handleFollowUp}
+                onRefresh={async () => {
+                  if (conversationId) {
+                    await refetchMessages();
+                  }
+                }}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Input Bar - Glass pill style */}
+        <div 
+          className="flex-none px-4 pt-2"
+          style={{ 
+            paddingBottom: 'calc(32px + env(safe-area-inset-bottom, 0px))',
+            background: 'rgba(255,253,248,0.5)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+          }}
+        >
+          <EchoPageComposer
+            ref={composerRef}
+            value={input}
+            onChange={setInput}
+            onSend={handleSend}
+            onAbort={abortStream}
+            isStreaming={isStreaming}
+            disabled={!!rateLimitCooldown}
+            cooldown={rateLimitCooldown}
+          />
+        </div>
       </div>
 
       {/* History Sheet */}

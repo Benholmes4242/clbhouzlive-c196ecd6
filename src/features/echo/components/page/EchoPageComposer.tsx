@@ -1,5 +1,5 @@
  /**
-  * EchoPageComposer - WhatsApp-style pill input bar
+  * EchoPageComposer - Cleo glass-style pill input bar
   * With voice input, character limit, and full accessibility
   */
  
@@ -9,7 +9,7 @@
  import { useSpeechToText } from '@/hooks/useSpeechToText';
  import { haptic } from '@/utils/haptics';
  import { toast } from 'sonner';
- import { ECHO_LIMITS, ECHO_COLORS } from '@/features/echo/constants/echoTheme';
+ import { ECHO_LIMITS } from '@/features/echo/constants/echoTheme';
  
  interface EchoPageComposerProps {
    value: string;
@@ -28,14 +28,12 @@
    ) {
      const { isListening, transcript, startListening, stopListening, isSupported, error } = useSpeechToText();
  
-     // Insert transcript into input when voice recognition produces text
      useEffect(() => {
        if (transcript) {
          onChange(transcript);
        }
      }, [transcript, onChange]);
  
-     // Show toast on voice input error
      useEffect(() => {
        if (error) {
          toast.error(error);
@@ -82,9 +80,20 @@
      const canSend = value.trim().length > 0 && !disabled;
      const charsRemaining = ECHO_LIMITS.maxInputLength - value.length;
      const showCharCount = charsRemaining <= ECHO_LIMITS.warningThreshold;
+
+     // Mic button gradient style
+     const micGradientStyle = {
+       background: 'linear-gradient(135deg, #F97316, #FBBF24)',
+     };
  
      return (
-       <div className="relative flex items-center gap-2 h-[50px] bg-white rounded-full px-4 shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
+       <div 
+         className="relative flex items-center gap-2 h-[50px] rounded-[22px] px-[14px]"
+         style={{
+           background: 'rgba(255,255,255,0.6)',
+           border: '1px solid rgba(255,255,255,0.5)',
+         }}
+       >
          <input
            ref={ref}
            type="text"
@@ -95,16 +104,17 @@
            disabled={disabled}
            aria-label="Type a message to Echo"
            maxLength={ECHO_LIMITS.maxInputLength}
-           className="flex-1 bg-transparent outline-none text-[0.9375rem] text-[#1D1D1F] placeholder:text-[#8E8E93] disabled:cursor-not-allowed"
+           className="flex-1 bg-transparent outline-none text-[13px] placeholder:opacity-50 disabled:cursor-not-allowed"
+           style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}
          />
  
-         {/* Character count warning */}
          {showCharCount && (
            <span 
              className={cn(
                "absolute right-14 text-[0.6875rem]",
-               charsRemaining <= 50 ? "text-red-500" : "text-[#8E8E93]"
+               charsRemaining <= 50 ? "text-red-500" : "opacity-50"
              )}
+             style={{ color: charsRemaining <= 50 ? undefined : '#A8A29E' }}
            >
              {charsRemaining}
            </span>
@@ -114,38 +124,40 @@
          {isStreaming ? (
            <button
              onClick={handleButtonClick}
-             className="w-9 h-9 rounded-full flex items-center justify-center bg-[#FFBF66] transition-all active:scale-95"
+             className="w-[30px] h-[30px] rounded-full flex items-center justify-center transition-all active:scale-95"
+             style={micGradientStyle}
              aria-label="Stop generating"
            >
-             <Square className="w-4 h-4 text-white fill-white" />
+             <Square className="w-3.5 h-3.5 text-white fill-white" />
            </button>
          ) : canSend ? (
            <button
              onClick={handleButtonClick}
-             className="w-9 h-9 rounded-full flex items-center justify-center bg-[#FFBF66] transition-all active:scale-95"
+             className="w-[30px] h-[30px] rounded-full flex items-center justify-center transition-all active:scale-95"
+             style={micGradientStyle}
              aria-label="Send message"
            >
-             <ArrowUp className="w-5 h-5 text-white" />
+             <ArrowUp className="w-4 h-4 text-white" />
            </button>
          ) : isSupported ? (
            <button
              onClick={handleMicClick}
              className={cn(
-               "w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-95",
-               isListening ? "bg-red-500 animate-pulse" : "bg-transparent"
+               "w-[30px] h-[30px] rounded-full flex items-center justify-center transition-all active:scale-95",
+               isListening && "animate-pulse"
              )}
+             style={isListening ? { background: '#EF4444' } : micGradientStyle}
              aria-label={isListening ? "Stop listening" : "Voice input"}
            >
-             <Mic className={cn("w-5 h-5", isListening ? "text-white" : "text-[#8E8E93]")} />
+             <Mic className="w-4 h-4 text-white" />
            </button>
          ) : (
-           // If voice not supported, show disabled send button
            <button
              disabled
-             className="w-9 h-9 rounded-full flex items-center justify-center bg-transparent opacity-50"
+             className="w-[30px] h-[30px] rounded-full flex items-center justify-center bg-transparent opacity-50"
              aria-label="Send message"
            >
-             <ArrowUp className="w-5 h-5 text-[#8E8E93]" />
+             <ArrowUp className="w-4 h-4" style={{ color: '#A8A29E' }} />
            </button>
          )}
        </div>

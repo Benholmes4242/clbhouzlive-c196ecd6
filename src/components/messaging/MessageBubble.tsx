@@ -308,14 +308,25 @@ export function MessageBubble({
         {/* Message bubble - WhatsApp style */}
         <div
           className={cn(
-            "px-3 py-2 break-words relative group shadow-[0_1px_2px_rgba(0,0,0,0.06)]",
+            "px-[15px] py-[11px] break-words relative group backdrop-blur-[12px]",
             isPressed && "opacity-80",
             isOwnMessage 
-              ? "bg-[#E8F5E1] rounded-[16px] rounded-br-[4px]"
-              : "bg-white border border-[#F0F0F0] rounded-[16px] rounded-bl-[4px]"
+              ? "rounded-[18px_18px_4px_18px]"
+              : "rounded-[18px_18px_18px_4px]"
           )}
-          onTouchStart={() => setIsPressed(true)}
-          onTouchEnd={() => setIsPressed(false)}
+          style={
+            isOwnMessage
+              ? {
+                  background: 'rgba(255,255,255,0.88)',
+                  border: '1px solid rgba(249,115,22,0.12)',
+                  boxShadow: '0 1px 6px rgba(249,115,22,0.06)',
+                }
+              : {
+                  background: 'rgba(255,255,255,0.5)',
+                  border: '1px solid rgba(255,255,255,0.35)',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.02)',
+                }
+          }
           onTouchCancel={() => setIsPressed(false)}
         >
           {/* Reply preview */}
@@ -360,15 +371,15 @@ export function MessageBubble({
 
           {/* Message content */}
           {message.content && (
-            <p className="text-[15px] text-[#1D1D1F] leading-relaxed whitespace-pre-wrap">
+            <p className="text-[15px] leading-relaxed whitespace-pre-wrap" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>
               {message.content}
             </p>
           )}
 
           {/* Timestamp + Read receipt */}
           <div className="flex items-center gap-1 mt-1 justify-end">
-            {message.is_edited && <span className="text-[11px] text-[#8E8E93]">edited</span>}
-            <span className="text-[11px] text-[#6B8F71]">{formatMessageTime(message.created_at)}</span>
+            {message.is_edited && <span className="text-[11px]" style={{ color: 'rgba(120,90,60,0.4)' }}>edited</span>}
+            <span className="text-[11px]" style={{ color: 'rgba(120,90,60,0.4)' }}>{formatMessageTime(message.created_at)}</span>
             {isOwnMessage && <ReadReceipt status={deliveryStatus} />}
           </div>
 

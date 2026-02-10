@@ -84,7 +84,14 @@ function ChatSkeleton() {
 function DateSeparator({ date }: { date: string }) {
   return (
     <div className="flex justify-center py-3">
-      <span className="px-4 py-1.5 bg-white rounded-full text-[12px] font-medium text-[#8E8E93] shadow-[0_1px_2px_rgba(0,0,0,0.06)]">
+      <span 
+        className="px-3 py-[3px] rounded-2xl text-[11px] font-medium"
+        style={{
+          background: 'rgba(255,255,255,0.4)',
+          color: 'rgba(120,90,60,0.35)',
+          fontFamily: "'DM Sans', sans-serif",
+        }}
+      >
         {formatDateHeader(date)}
       </span>
     </div>
@@ -456,15 +463,25 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
   const isTyping = typingUsers.length > 0;
 
   return (
-    <div className="flex flex-col h-full min-h-0 pt-safe bg-[#F8FAFC]">
-      {/* Header - WhatsApp style */}
-      <header className="flex-shrink-0 h-[60px] bg-[#F8FAFC] px-4 flex items-center gap-3 border-b border-[#E5E5EA]">
+    <div className="flex flex-col h-full min-h-0 pt-safe">
+      {/* Header - Cleo glass style */}
+      <header 
+        className="flex-shrink-0 px-[18px] flex items-center gap-3"
+        style={{
+          height: 'calc(60px + env(safe-area-inset-top, 0px))',
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+          background: 'rgba(255,253,248,0.5)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
+          borderBottom: '1px solid rgba(255,255,255,0.25)',
+        }}
+      >
         {/* Back button */}
         <button 
           onClick={onBack}
-          className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors"
+          className="w-11 h-11 -ml-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
         >
-          <ChevronLeft className="w-6 h-6 text-[#1D1D1F]" />
+          <ChevronLeft className="w-5 h-5" style={{ color: '#EA580C' }} />
         </button>
         
         {/* Avatar + Info */}
@@ -482,21 +499,21 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             />
             {/* Online indicator for DMs */}
             {!isGroupChat && otherUserPresence?.status === 'online' && (
-              <div className="absolute bottom-0 right-0 w-3 h-3 bg-[#34C759] rounded-full border-2 border-[#F8FAFC]" />
+              <div className="absolute bottom-0 right-0 w-3 h-3 bg-[#34C759] rounded-full" style={{ borderWidth: 2, borderColor: 'rgba(255,253,248,0.8)' }} />
             )}
           </div>
           
           <div className="flex-1 min-w-0 text-left">
-            <h2 className="text-[17px] font-semibold text-[#1D1D1F] truncate">
+            <h2 className="text-[15px] font-semibold truncate" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>
               {headerInfo.name}
             </h2>
-            <p className="text-[13px] text-[#8E8E93] truncate">
+            <p className="text-[11px] truncate" style={{ color: '#A8A29E' }}>
               {isTyping ? (
-                <span className="text-[#2A9D5C]">typing...</span>
+                <span style={{ color: '#EA580C' }}>typing...</span>
               ) : 
                isGroupChat && conversation ? `${conversation.participants.length} members` :
                otherUserPresence?.status === 'online' ? (
-                <span className="text-[#34C759]">online</span>
+                <span style={{ color: '#34C759' }}>online</span>
               ) : 
                otherUserPresence?.status === 'away' ? 'away' : 'last seen recently'}
             </p>
