@@ -36,6 +36,12 @@ const CLUBHOUSE_ROUTES = [
   '/clubhouse'
 ];
 
+// Routes that use the warm gradient Cleo design
+const WARM_GRADIENT_ROUTES = [
+  '/hub',
+  '/messages',
+];
+
 interface GlobalBottomNavigationProps {
   chromeState?: 'visible' | 'hidden';
 }
@@ -83,6 +89,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const shouldHideForRoute = HIDDEN_ROUTES.includes(location.pathname) ||
     HIDDEN_ROUTE_PREFIXES.some(prefix => location.pathname.startsWith(prefix));
   const isClubhouseRoute = CLUBHOUSE_ROUTES.includes(location.pathname);
+  const isWarmGradientRoute = WARM_GRADIENT_ROUTES.some(r => location.pathname.startsWith(r));
   
   // Final visibility state - chrome auto-hide system now handles ECM footer behavior
   const showNavigation = isVisible && !shouldHideForRoute;
@@ -233,16 +240,20 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
               style={{
                 background: isDimmed 
                   ? 'hsl(var(--clubhouse-dim-bg-footer))'
-                  : isClubhouseRoute 
-                    ? 'hsl(var(--clubhouse-bg-footer))'
-                    : 'hsl(210 40% 98% / 0.95)',
+                  : isWarmGradientRoute
+                    ? 'rgba(255,253,248,0.55)'
+                    : isClubhouseRoute 
+                      ? 'hsl(var(--clubhouse-bg-footer))'
+                      : 'hsl(210 40% 98% / 0.95)',
                 // Match CompactHeader hairline: 0.5px + slate-800/20 equivalent
                 borderTop: isDimmed
                   ? 'none'
-                  : `0.5px solid ${isClubhouseRoute ? 'hsl(var(--clubhouse-border))' : 'hsl(215 25% 27% / 0.2)'}`,
+                  : isWarmGradientRoute
+                    ? '1px solid rgba(255,255,255,0.3)'
+                    : `0.5px solid ${isClubhouseRoute ? 'hsl(var(--clubhouse-border))' : 'hsl(215 25% 27% / 0.2)'}`,
                 // Match header blur intensity (CompactHeader uses blur(20px))
-                backdropFilter: isDimmed ? 'none' : 'blur(20px)',
-                WebkitBackdropFilter: isDimmed ? 'none' : 'blur(20px)',
+                backdropFilter: isDimmed ? 'none' : isWarmGradientRoute ? 'blur(24px)' : 'blur(20px)',
+                WebkitBackdropFilter: isDimmed ? 'none' : isWarmGradientRoute ? 'blur(24px)' : 'blur(20px)',
                 paddingBottom: '30px',
                 transition: 'all var(--motion-slow) cubic-bezier(0.22, 1, 0.36, 1)',
               }}

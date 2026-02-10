@@ -140,12 +140,14 @@ export function MessageBubble({
           <button
             onClick={() => navigate(course.course_slug ? `/courses/${course.course_slug}` : `/courses/${course.course_id}`)}
             className={cn(
-              "w-full rounded-[18px] overflow-hidden text-left transition-all shadow-[0_1px_2px_rgba(0,0,0,0.06)]",
+              "w-full max-w-[260px] rounded-[16px] overflow-hidden text-left transition-all backdrop-blur-[16px]",
               "hover:scale-[1.02] active:scale-[0.98]",
-              isOwnMessage 
-                ? "bg-[#E8F5E1] rounded-br-[4px]" 
-                : "bg-white rounded-bl-[4px]"
             )}
+            style={{
+              background: 'rgba(255,255,255,0.82)',
+              border: '1px solid rgba(255,255,255,0.4)',
+              boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
+            }}
           >
             {/* Course Image */}
             <div className="relative aspect-[16/10] w-full overflow-hidden">
@@ -177,32 +179,32 @@ export function MessageBubble({
 
             <div className="p-3">
               <div className="flex items-start justify-between gap-2">
-                <h4 className="font-semibold text-sm line-clamp-2 flex-1 text-[#1D1D1F]">
+                <h4 className="font-semibold text-[14px] line-clamp-2 flex-1" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>
                   {course.course_name}
                 </h4>
                 
                 {communityRating && communityRating > 0 && (
                   <div className="flex items-center gap-1.5 flex-shrink-0">
                     <ClubhouseLogo size="xs" />
-                    <span className="text-sm font-bold text-[#1D1D1F]">{communityRating.toFixed(1)}</span>
+                    <span className="text-[13px] font-semibold" style={{ color: '#EA580C' }}>{communityRating.toFixed(1)}</span>
                   </div>
                 )}
               </div>
               
               {course.location && (
-                <div className="flex items-center gap-1 mt-1 text-xs text-[#8E8E93]">
+                <div className="flex items-center gap-1 mt-1 text-[12px]" style={{ color: '#78716C' }}>
                   <MapPin size={12} />
                   <span className="truncate">{course.location}</span>
                 </div>
               )}
               
-              <div className="mt-3 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-medium bg-[#1D1D1F] text-white">
+              <div className="mt-3 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-medium" style={{ background: 'rgba(249,115,22,0.08)', color: '#EA580C' }}>
                 <span>View Course</span>
                 <ExternalLink size={14} />
               </div>
               
               {/* Timestamp */}
-              <div className="flex items-center justify-end gap-1 mt-2 text-[11px] text-[#8E8E93]">
+              <div className="flex items-center justify-end gap-1 mt-2 text-[11px]" style={{ color: 'rgba(120,90,60,0.4)' }}>
                 {message.is_edited && <span>edited</span>}
                 <span>{formatMessageTime(message.created_at)}</span>
                 {isOwnMessage && <ReadReceipt status={deliveryStatus} />}
