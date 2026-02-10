@@ -1,8 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Users, MessageCircle } from 'lucide-react';
+import { Users, MessageCircle, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 
 interface CommunityEmptyStateProps {
   variant: 'no-community' | 'quiet' | 'no-results';
@@ -12,15 +11,7 @@ interface CommunityEmptyStateProps {
 
 /**
  * CommunityEmptyState - Empty states for Community tab
- * 
- * A) no-community: User has no friends/follows
- *    "Your Community is empty" with CTAs
- * 
- * B) quiet: Has friends/follows but no recent posts
- *    Soft nudge to be the first to post
- * 
- * C) no-results: Filter/search returned nothing
- *    "No posts yet" with Clear filters button
+ * Polish 7: Premium empty states with consistent design system
  */
 export const CommunityEmptyState: React.FC<CommunityEmptyStateProps> = ({
   variant,
@@ -32,75 +23,67 @@ export const CommunityEmptyState: React.FC<CommunityEmptyStateProps> = ({
   if (variant === 'no-community') {
     return (
       <div className={cn("flex flex-col items-center justify-center py-16 px-6", className)}>
-        {/* Icon */}
-        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-          <Users className="w-8 h-8 text-muted-foreground" />
+        <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+          <Users className="w-6 h-6 text-gray-200" />
         </div>
-        
-        {/* Message */}
-        <h3 className="text-lg font-semibold text-foreground mb-1">
-          Your Community is empty
+        <h3 className="text-base font-semibold text-gray-600 mb-1">
+          Your community is empty
         </h3>
-        <p className="text-sm text-muted-foreground text-center max-w-[260px] mb-6">
+        <p className="text-sm text-gray-400 text-center max-w-[260px] mb-6">
           Follow golfers or connect with friends to see their posts here
         </p>
-        
-        {/* CTA */}
-        <Button
-          variant="outline"
+        <button
           onClick={() => navigate('/golferstofollow')}
+          className="rounded-full bg-emerald-600 text-white text-sm font-medium px-6 py-2.5 active:scale-[0.97] transition-transform"
         >
           Discover golfers
-        </Button>
+        </button>
       </div>
     );
   }
 
-  // no-results variant - filter/search returned nothing
   if (variant === 'no-results') {
     return (
-      <div className={cn("px-5 py-16 text-center", className)}>
-        <div className="max-w-sm mx-auto">
-          <h3 className="text-base font-medium text-foreground">
-            No posts yet
-          </h3>
-          <p className="mt-1.5 text-sm text-muted-foreground">
-            Try another filter or search.
-          </p>
-          {onClearFilter && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onClearFilter}
-              className="mt-4"
-            >
-              Clear filters
-            </Button>
-          )}
+      <div className={cn("flex flex-col items-center justify-center py-16 px-6", className)}>
+        <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+          <Search className="w-6 h-6 text-gray-200" />
         </div>
+        <h3 className="text-base font-semibold text-gray-600 mb-1">
+          No posts found
+        </h3>
+        <p className="text-sm text-gray-400 text-center mb-6">
+          Try another filter or search
+        </p>
+        {onClearFilter && (
+          <button
+            onClick={onClearFilter}
+            className="rounded-full bg-emerald-600 text-white text-sm font-medium px-6 py-2.5 active:scale-[0.97] transition-transform"
+          >
+            Clear filters
+          </button>
+        )}
       </div>
     );
   }
 
-  // quiet variant - soft nudge
+  // quiet variant
   return (
-    <div className={cn("px-5 py-10 text-center", className)}>
-      <div className="max-w-sm mx-auto bg-muted/30 rounded-lg px-6 py-5">
-        <div className="flex items-center justify-center gap-2 text-muted-foreground">
-          <MessageCircle className="w-4 h-4" />
-          <p className="text-sm">
-            Your community's been quiet — be the first to post today.
-          </p>
-        </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate('/create-moment')}
-          className="mt-3 text-primary"
-        >
-          Share a moment
-        </Button>
+    <div className={cn("flex flex-col items-center justify-center py-16 px-6", className)}>
+      <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+        <MessageCircle className="w-6 h-6 text-gray-200" />
       </div>
+      <h3 className="text-base font-semibold text-gray-600 mb-1">
+        It's quiet here
+      </h3>
+      <p className="text-sm text-gray-400 text-center max-w-[260px] mb-6">
+        Your community hasn't posted yet — be the first to share
+      </p>
+      <button
+        onClick={() => navigate('/create-moment')}
+        className="rounded-full bg-emerald-600 text-white text-sm font-medium px-6 py-2.5 active:scale-[0.97] transition-transform"
+      >
+        Share a moment
+      </button>
     </div>
   );
 };
