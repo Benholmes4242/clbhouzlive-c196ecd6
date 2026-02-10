@@ -2,10 +2,10 @@ import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import ExploreGrid from '@/components/explore/ExploreGrid';
-import VideosGrid from '@/components/discover/VideosGrid';
+import { VideosTab } from '@/components/videos/VideosTab';
 import PhotosGrid from '@/components/discover/PhotosGrid';
 import { WatchTab } from '@/components/discover/WatchTab';
-import SlidingPanels from '@/components/ui/SlidingPanels';
+
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { FILTER_TYPES } from '@/components/explore/types';
 import type { ExploreContentItem } from '@/components/explore/types';
@@ -13,7 +13,7 @@ import CreatorHighlightShelf from '@/components/discover/CreatorHighlightShelf';
 import CreatorHighlightTile from '@/components/discover/CreatorHighlightTile';
 import { CreatorHighlight } from '@/hooks/useCreatorHighlights';
 import { getDurationFilter } from '@/constants/videoFilters';
-import type { LengthKey } from '@/components/videos/VideoChipRail';
+
 import { useChannelSuggestions } from '@/hooks/useChannelSuggestions';
 import { useShortsSuggestions } from '@/hooks/useShortsSuggestions';
 import { buildInterleavedFeed, InterleavedItem } from '@/utils/interleaveFeed';
@@ -21,74 +21,7 @@ import { toast } from 'sonner';
 import { DiscoverCommandCenter, SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
 import { MOMENT_CATEGORIES } from '@/components/post/create-moment/categoryDefinitions';
 // Watch tab now uses WatchTab component with its own data fetching
-// Wrapper to avoid useMemo inside render callback (fixes setState during render warning)
-function VideosGridWrapper({
-  durationKey,
-  currentContent,
-  getNextShort,
-  getNextChannel,
-  recentHistory,
-  shortsContentLength,
-  onMediaClick,
-  isLoading,
-  hasMore,
-  onLoadMore,
-  duration,
-}: {
-  durationKey: LengthKey;
-  currentContent: ExploreContentItem[] | null;
-  getNextShort: () => ExploreContentItem | null;
-  getNextChannel: () => any | null;
-  recentHistory: Set<string>;
-  shortsContentLength: number;
-  onMediaClick: (item: any) => void;
-  isLoading: boolean;
-  hasMore: boolean;
-  onLoadMore: () => void;
-  duration: string;
-}) {
-  const itemsForKey = currentContent || [];
-  
-  // Build interleaved feed for "All" tab only - now in a proper component
-  const interleavedFeed = React.useMemo(() => {
-    if (durationKey !== 'all') return null;
-    
-    const feed = buildInterleavedFeed(
-      itemsForKey,
-      getNextShort,
-      getNextChannel,
-      0,
-      recentHistory
-    );
-    
-    if (import.meta.env.DEV) {
-      const shortsBlocks = feed.filter(i => i.kind === 'shorts_block').length;
-      const channelSuggs = feed.filter(i => i.kind === 'channel_suggestion').length;
-      console.debug('[Interleave]', {
-        totalVideos: itemsForKey.length,
-        shortsBlocks,
-        channelSuggs,
-        totalItems: feed.length,
-        sampleKinds: feed.slice(0, 20).map(i => i.kind)
-      });
-    }
-    
-    return feed;
-  }, [durationKey, itemsForKey.length, shortsContentLength]);
-
-  return (
-    <VideosGrid
-      content={itemsForKey}
-      onMediaClick={onMediaClick}
-      isLoading={isLoading}
-      hasMore={hasMore}
-      onLoadMore={onLoadMore}
-      isShorts={false}
-      activeTab={duration}
-      interleavedFeed={durationKey === 'all' ? interleavedFeed : undefined}
-    />
-  );
-}
+// Videos tab now uses VideosTab component with its own data fetching
 
 interface DiscoverContentProps {
   onLike: (contentId: string) => void;
@@ -348,8 +281,6 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     setRecentHistory(new Set());
   }, [main, duration]);
 
-  // Chip order for slide animation
-  const CHIP_ORDER = ['all', 'shorts', 'under4', '4to20', 'over20'] as const;
 
   // Watch tab now uses WatchTab component with its own hero and shorts data
 
@@ -462,30 +393,9 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     return <WatchTab />;
   }
 
-  // Use VideosGrid with SlidingPanels for Videos tab
+  // Videos tab - uses dedicated VideosTab with its own data fetching
   if (main === 'videos') {
-    return (
-      <SlidingPanels
-        activeKey={duration as LengthKey}
-        order={CHIP_ORDER}
-      >
-      {(key: LengthKey) => (
-          <VideosGridWrapper
-            durationKey={key}
-            currentContent={currentContent}
-            getNextShort={getNextShort}
-            getNextChannel={getNextChannel}
-            recentHistory={recentHistory}
-            shortsContentLength={shortsContent?.length ?? 0}
-            onMediaClick={onMediaClick}
-            isLoading={currentContent === null || loading}
-            hasMore={hasMore}
-            onLoadMore={loadMore}
-            duration={duration}
-          />
-        )}
-      </SlidingPanels>
-    );
+    return <VideosTab />;
   }
 
 
