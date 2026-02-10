@@ -1,18 +1,20 @@
 /**
  * DiscoverGrid - 2-column mixed layout for Explore page
  * 
- * TikTok-Level Implementation:
- * - UnifiedVideoPlayer with source stability + HLS pool promotion
- * - 50% start / 10% stop hysteresis for viewport-aware autoplay
- * - 150ms crossfade with ease-out
- * - Priority poster loading for first 6 items
- * - 3s first-frame fallback timeout
- * - Adaptive prefetch with scroll velocity tracking
- * - GPU-accelerated tile transitions
+ * Clubhouse-Parity Performance Fixes:
+ * - Fix 1: Mount gating — only mount UVP within ±4 of viewport (caps HLS to ~9)
+ * - Fix 2: MediaRuntime registration with surface="explore-grid" (MAX_CONCURRENT=2)
+ * - Fix 3: Play-gated poster-to-video transition (onPlay, not canPlayThrough)
+ * - Fix 4: Shimmer base layer + poster fade-in (no bg-black ever visible)
+ * - Fix 5: Silent error handling — poster stays, no error chrome
+ * - Fix 6: Video indicator — duration badge on video tiles
+ * - Fix 7: GlobalAudioContext integration
+ * - Fix 8: Poster preload links for first 4 tiles
+ * - Fix 9: Preload attribute optimisation (metadata vs auto)
  */
 
 import React, { useCallback, useMemo, useRef, useEffect, useState } from 'react';
-import { Compass, Heart, MapPin } from 'lucide-react';
+import { Compass, Heart, Play } from 'lucide-react';
 import { ExploreMoment, ExploreFilters, RegionKey, useInfiniteExploreMoments } from '@/hooks/useExploreMoments';
 import { UnifiedVideoPlayer } from '@/media/components/UnifiedVideoPlayer';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
@@ -23,18 +25,22 @@ import { useAdaptivePrefetch } from '@/hooks/useAdaptivePrefetch';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import ExploreErrorState from './ExploreErrorState';
 import { cn } from '@/lib/utils';
 
 // Format like count for display
 function formatCount(count: number): string {
-  if (count >= 1000000) {
-    return `${(count / 1000000).toFixed(1)}M`;
-  }
-  if (count >= 1000) {
-    return `${(count / 1000).toFixed(1)}K`;
-  }
+  if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
+  if (count >= 1000) return `${(count / 1000).toFixed(1)}K`;
   return count.toString();
+}
+
+// Format duration for badge
+function formatDuration(seconds: number): string {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
 interface DiscoverGridProps {
@@ -46,18 +52,14 @@ interface DiscoverGridProps {
 
 // Helper to determine if moment is landscape
 const isLandscape = (moment: ExploreMoment): boolean => {
-  if (moment.aspect_ratio != null) {
-    return moment.aspect_ratio >= 1;
-  }
+  if (moment.aspect_ratio != null) return moment.aspect_ratio >= 1;
   return false;
 };
 
-// 3s first-frame fallback
-const FIRST_FRAME_FALLBACK_MS = 3000;
+const MOUNT_BUFFER = 4; // ±4 tiles from viewport centre
 
-// Skeleton for Discover Explore grid - Watch tab standard shimmer-down
+// Skeleton for Discover Explore grid
 function DiscoverGridSkeleton() {
-  // Check for reduced motion preference
   const prefersReducedMotion = typeof window !== 'undefined' 
     ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
     : false;
@@ -81,40 +83,38 @@ function DiscoverGridSkeleton() {
   );
 }
 
-// Portrait Tile Component - Watch Tab Aligned Implementation
-const PortraitTile = React.memo(function PortraitTile({ 
-  moment,
-  index,
-  isLiked,
-  onClick,
-}: { 
+// ======================== Portrait Tile ========================
+interface TileProps {
   moment: ExploreMoment;
   index: number;
   isLiked: boolean;
+  shouldMountVideo: boolean;
+  isGloballyMuted: boolean;
   onClick: () => void;
-}) {
+}
+
+const PortraitTile = React.memo(function PortraitTile({ 
+  moment, index, isLiked, shouldMountVideo, isGloballyMuted, onClick,
+}: TileProps) {
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const [posterLoaded, setPosterLoaded] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const hasReportedReadyRef = useRef(false);
-  const firstFrameTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isVideoReadyTimerRef = useRef<NodeJS.Timeout | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   
-  // P0: 50% start / 10% stop hysteresis
+  // Viewport hysteresis for autoplay
   useEffect(() => {
     if (!containerRef.current) return;
-    
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-          setIsVisible(true);
-        } else if (!entry.isIntersecting || entry.intersectionRatio < 0.1) {
-          setIsVisible(false);
-        }
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.5) setIsVisible(true);
+        else if (!entry.isIntersecting || entry.intersectionRatio < 0.1) setIsVisible(false);
       },
       { threshold: [0.1, 0.5] }
     );
-    
     observer.observe(containerRef.current);
     return () => observer.disconnect();
   }, []);
@@ -122,9 +122,8 @@ const PortraitTile = React.memo(function PortraitTile({
   const isVideo = moment.media_type === 'video';
   const isPriorityItem = index < 6;
   const likeCount = moment.likes_count || 0;
-  const creator = moment.creator;
+  const shouldAutoplay = isVisible && shouldMountVideo;
   
-  // CRITICAL: Extract stream UID for cache consistency
   const { hlsUrl, posterUrl, streamId } = useMemo(() => {
     if (!isVideo || !moment.media_url) {
       return { 
@@ -135,12 +134,9 @@ const PortraitTile = React.memo(function PortraitTile({
     }
     const extractedStreamId = uidFromNode({ src: moment.media_url });
     if (!extractedStreamId) return { hlsUrl: null, posterUrl: moment.thumbnail_url, streamId: null };
-    
     const generatedPosterUrl = generateStreamThumbnailUrl(extractedStreamId, { height: 800, fit: 'cover' });
     const finalPosterUrl = generatedPosterUrl && !isPosterFailed(generatedPosterUrl) 
-      ? generatedPosterUrl 
-      : moment.thumbnail_url;
-    
+      ? generatedPosterUrl : moment.thumbnail_url;
     return {
       hlsUrl: generateStreamHlsUrl(extractedStreamId),
       posterUrl: finalPosterUrl,
@@ -148,106 +144,117 @@ const PortraitTile = React.memo(function PortraitTile({
     };
   }, [isVideo, moment.media_url, moment.thumbnail_url, moment.media_type]);
   
-  // Reset ready flag when moment changes
+  // Reset when moment changes or unmounted
   useEffect(() => {
     hasReportedReadyRef.current = false;
     setIsVideoReady(false);
-    
-    if (firstFrameTimeoutRef.current) {
-      clearTimeout(firstFrameTimeoutRef.current);
-    }
+    setHasError(false);
+    if (isVideoReadyTimerRef.current) clearTimeout(isVideoReadyTimerRef.current);
   }, [moment.moment_id]);
-
-  // P1: 3s first-frame fallback timeout
+  
   useEffect(() => {
-    if (isVisible && hlsUrl && !isVideoReady) {
-      firstFrameTimeoutRef.current = setTimeout(() => {
-        if (!hasReportedReadyRef.current) {
-          hasReportedReadyRef.current = true;
-          setIsVideoReady(true);
-        }
-      }, 3000);
-      
-      return () => {
-        if (firstFrameTimeoutRef.current) {
-          clearTimeout(firstFrameTimeoutRef.current);
-        }
-      };
+    if (!shouldMountVideo) {
+      hasReportedReadyRef.current = false;
+      setIsVideoReady(false);
+      if (isVideoReadyTimerRef.current) clearTimeout(isVideoReadyTimerRef.current);
     }
-  }, [isVisible, hlsUrl, isVideoReady]);
-
-  // UNIFIED: Use canplaythrough for buffered ready state
-  const handleCanPlayThrough = useCallback(() => {
+  }, [shouldMountVideo]);
+  
+  // Fix 3: Play-gated transition
+  const handlePlay = useCallback(() => {
     if (!hasReportedReadyRef.current) {
-      hasReportedReadyRef.current = true;
-      setIsVideoReady(true);
-      
-      if (firstFrameTimeoutRef.current) {
-        clearTimeout(firstFrameTimeoutRef.current);
-      }
+      isVideoReadyTimerRef.current = setTimeout(() => {
+        hasReportedReadyRef.current = true;
+        setIsVideoReady(true);
+      }, 100);
     }
   }, []);
+  
+  // Fix 5: Silent error handling
+  const handleError = useCallback(() => {
+    console.warn('[DiscoverGrid] Video error:', moment.moment_id);
+    setHasError(true);
+    setIsVideoReady(false);
+  }, [moment.moment_id]);
+  
+  useEffect(() => {
+    return () => { if (isVideoReadyTimerRef.current) clearTimeout(isVideoReadyTimerRef.current); };
+  }, []);
+  
+  const videoIsReady = isVideoReady && shouldAutoplay && shouldMountVideo && !hasError;
   
   return (
     <div
       ref={containerRef}
-      className="relative cursor-pointer overflow-hidden rounded-xl bg-black will-change-transform"
+      className="relative cursor-pointer overflow-hidden rounded-xl bg-muted will-change-transform"
       style={{ aspectRatio: '3/4' }}
       onClick={onClick}
       aria-busy={isVideo && !isVideoReady}
     >
-      {/* Poster-first: always show thumbnail immediately */}
+      {/* Fix 4: Shimmer base layer */}
+      <div className="absolute inset-0 bg-muted/50 animate-shimmer-down" />
+      
+      {/* Poster — fades in over shimmer */}
       {posterUrl && (
         <img
           src={posterUrl}
           alt=""
-          className="absolute inset-0 h-full w-full object-cover"
+          className={cn(
+            "absolute inset-0 h-full w-full object-cover z-[1] transition-opacity duration-200",
+            posterLoaded ? "opacity-100" : "opacity-0",
+            videoIsReady && "!opacity-0 !duration-150"
+          )}
           loading={isPriorityItem ? "eager" : "lazy"}
           fetchPriority={isPriorityItem ? "high" : "auto"}
           decoding="async"
-          onError={(e) => {
-            e.currentTarget.style.display = 'none';
-          }}
+          onLoad={() => setPosterLoaded(true)}
+          onError={(e) => { e.currentTarget.style.display = 'none'; }}
         />
       )}
 
-      {isVideo && hlsUrl ? (
-        <>
-          {/* TikTok-Level: UnifiedVideoPlayer with 150ms crossfade */}
-          <div className={cn(
-            "absolute inset-0 motion-safe:transition-opacity motion-safe:duration-150 motion-safe:ease-out",
-            isVideoReady ? "opacity-100" : "opacity-0"
-          )}>
-            <UnifiedVideoPlayer
-              src={hlsUrl}
-              posterUrl={posterUrl || undefined}
-              autoplay={isVisible}
-              muted
-              loop
-              preload="auto"
-              showMuteButton={false}
-              showPlayButton={false}
-              scrubber={false}
-              mediaId={streamId || undefined}
-              className="w-full h-full object-cover"
-              onCanPlayThrough={handleCanPlayThrough}
-            />
-          </div>
-          
-          {/* Skeleton - Watch tab shimmer-down */}
-          {!isVideoReady && !posterUrl && (
-            <div 
-              className="absolute inset-0 bg-muted/50 overflow-hidden animate-shimmer-down"
-              aria-busy="true"
-            />
-          )}
-        </>
-      ) : null}
+      {/* Fix 1: Only mount player within buffer window */}
+      {isVideo && hlsUrl && shouldMountVideo && !hasError && (
+        <div className="absolute inset-0 z-[2]">
+          <UnifiedVideoPlayer
+            src={hlsUrl}
+            posterUrl={posterUrl || undefined}
+            autoplay={shouldAutoplay}
+            muted={isGloballyMuted}
+            loop
+            preload={shouldAutoplay ? "auto" : "metadata"}
+            showMuteButton={false}
+            showPlayButton={false}
+            scrubber={false}
+            mediaId={streamId || undefined}
+            className="w-full h-full object-cover"
+            managedByMediaRuntime={true}
+            surface="explore-grid"
+            onPlay={handlePlay}
+            onError={handleError}
+          />
+        </div>
+      )}
       
-      {/* Gradient Overlay - Bottom 30% (Watch tab standard) */}
-      <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none z-20" />
+      {/* Gradient Overlay */}
+      <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none z-10" />
 
-      {/* Like badge — only when user liked (personalized) */}
+      {/* Fix 6: Duration badge for video tiles — hidden when video plays */}
+      {isVideo && moment.duration_seconds && !videoIsReady && (
+        <div className="absolute bottom-2 right-2 z-30 bg-black/60 backdrop-blur-sm rounded-md px-1.5 py-0.5">
+          <span className="text-[10px] font-medium text-white tabular-nums">
+            {formatDuration(moment.duration_seconds)}
+          </span>
+        </div>
+      )}
+      
+      {/* Play icon fallback if no duration */}
+      {isVideo && !moment.duration_seconds && !videoIsReady && (
+        <div className="absolute bottom-2 left-2 z-30">
+          <Play className="w-4 h-4 text-white/70 fill-white/70 drop-shadow-sm" />
+        </div>
+      )}
+
+      {/* Like badge — only when user liked */}
       {isLiked && (
         <div className="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-0.5 bg-black/30 backdrop-blur-sm rounded-full z-30">
           <Heart className="w-3 h-3 fill-[#f59e0b] text-[#f59e0b]" />
@@ -257,8 +264,8 @@ const PortraitTile = React.memo(function PortraitTile({
         </div>
       )}
 
-      {/* Course name — bottom with gradient scrim */}
-      <div className="absolute bottom-2 left-2 right-2 z-30">
+      {/* Course name */}
+      <div className="absolute bottom-2 left-2 right-2 z-20">
         {moment.course_name && (
           <p className="text-xs font-semibold text-white truncate">
             {moment.course_name}
@@ -267,53 +274,43 @@ const PortraitTile = React.memo(function PortraitTile({
       </div>
     </div>
   );
-}, (prevProps, nextProps) => {
+}, (prev, next) => {
   return (
-    prevProps.moment.moment_id === nextProps.moment.moment_id &&
-    prevProps.moment.media_url === nextProps.moment.media_url &&
-    prevProps.moment.thumbnail_url === nextProps.moment.thumbnail_url &&
-    prevProps.moment.course_name === nextProps.moment.course_name &&
-    prevProps.moment.likes_count === nextProps.moment.likes_count &&
-    prevProps.moment.creator?.id === nextProps.moment.creator?.id &&
-    prevProps.isLiked === nextProps.isLiked &&
-    prevProps.index === nextProps.index
+    prev.moment.moment_id === next.moment.moment_id &&
+    prev.moment.media_url === next.moment.media_url &&
+    prev.moment.thumbnail_url === next.moment.thumbnail_url &&
+    prev.moment.course_name === next.moment.course_name &&
+    prev.moment.likes_count === next.moment.likes_count &&
+    prev.moment.creator?.id === next.moment.creator?.id &&
+    prev.isLiked === next.isLiked &&
+    prev.index === next.index &&
+    prev.shouldMountVideo === next.shouldMountVideo &&
+    prev.isGloballyMuted === next.isGloballyMuted
   );
 });
 
-// Landscape Tile Component - Watch Tab Aligned Implementation
+// ======================== Landscape Tile ========================
 const LandscapeTile = React.memo(function LandscapeTile({ 
-  moment,
-  index,
-  isLiked,
-  onClick,
-}: { 
-  moment: ExploreMoment;
-  index: number;
-  isLiked: boolean;
-  onClick: () => void;
-}) {
+  moment, index, isLiked, shouldMountVideo, isGloballyMuted, onClick,
+}: TileProps) {
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const [posterLoaded, setPosterLoaded] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const hasReportedReadyRef = useRef(false);
-  const firstFrameTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isVideoReadyTimerRef = useRef<NodeJS.Timeout | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   
-  // P0: 50% start / 10% stop hysteresis
   useEffect(() => {
     if (!containerRef.current) return;
-    
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-          setIsVisible(true);
-        } else if (!entry.isIntersecting || entry.intersectionRatio < 0.1) {
-          setIsVisible(false);
-        }
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.5) setIsVisible(true);
+        else if (!entry.isIntersecting || entry.intersectionRatio < 0.1) setIsVisible(false);
       },
       { threshold: [0.1, 0.5] }
     );
-    
     observer.observe(containerRef.current);
     return () => observer.disconnect();
   }, []);
@@ -322,12 +319,10 @@ const LandscapeTile = React.memo(function LandscapeTile({
   const isPriorityItem = index < 6;
   const likeCount = moment.likes_count || 0;
   const creator = moment.creator;
-  
-  // Calculate aspect ratio - cap at 16:9 for very wide videos
   const rawAspectRatio = moment.aspect_ratio || 16/9;
   const aspectRatio = Math.min(rawAspectRatio, 16/9);
+  const shouldAutoplay = isVisible && shouldMountVideo;
   
-  // CRITICAL: Extract stream UID for cache consistency
   const { hlsUrl, posterUrl, streamId } = useMemo(() => {
     if (!isVideo || !moment.media_url) {
       return { 
@@ -338,12 +333,9 @@ const LandscapeTile = React.memo(function LandscapeTile({
     }
     const extractedStreamId = uidFromNode({ src: moment.media_url });
     if (!extractedStreamId) return { hlsUrl: null, posterUrl: moment.thumbnail_url, streamId: null };
-    
     const generatedPosterUrl = generateStreamThumbnailUrl(extractedStreamId, { height: 720, fit: 'cover' });
     const finalPosterUrl = generatedPosterUrl && !isPosterFailed(generatedPosterUrl) 
-      ? generatedPosterUrl 
-      : moment.thumbnail_url;
-    
+      ? generatedPosterUrl : moment.thumbnail_url;
     return {
       hlsUrl: generateStreamHlsUrl(extractedStreamId),
       posterUrl: finalPosterUrl,
@@ -351,106 +343,111 @@ const LandscapeTile = React.memo(function LandscapeTile({
     };
   }, [isVideo, moment.media_url, moment.thumbnail_url, moment.media_type]);
   
-  // Reset ready flag when moment changes
   useEffect(() => {
     hasReportedReadyRef.current = false;
     setIsVideoReady(false);
-    
-    if (firstFrameTimeoutRef.current) {
-      clearTimeout(firstFrameTimeoutRef.current);
-    }
+    setHasError(false);
+    if (isVideoReadyTimerRef.current) clearTimeout(isVideoReadyTimerRef.current);
   }, [moment.moment_id]);
-
-  // P1: 3s first-frame fallback timeout
+  
   useEffect(() => {
-    if (isVisible && hlsUrl && !isVideoReady) {
-      firstFrameTimeoutRef.current = setTimeout(() => {
-        if (!hasReportedReadyRef.current) {
-          hasReportedReadyRef.current = true;
-          setIsVideoReady(true);
-        }
-      }, 3000);
-      
-      return () => {
-        if (firstFrameTimeoutRef.current) {
-          clearTimeout(firstFrameTimeoutRef.current);
-        }
-      };
+    if (!shouldMountVideo) {
+      hasReportedReadyRef.current = false;
+      setIsVideoReady(false);
+      if (isVideoReadyTimerRef.current) clearTimeout(isVideoReadyTimerRef.current);
     }
-  }, [isVisible, hlsUrl, isVideoReady]);
-
-  // UNIFIED: Use canplaythrough for buffered ready state
-  const handleCanPlayThrough = useCallback(() => {
+  }, [shouldMountVideo]);
+  
+  const handlePlay = useCallback(() => {
     if (!hasReportedReadyRef.current) {
-      hasReportedReadyRef.current = true;
-      setIsVideoReady(true);
-      
-      if (firstFrameTimeoutRef.current) {
-        clearTimeout(firstFrameTimeoutRef.current);
-      }
+      isVideoReadyTimerRef.current = setTimeout(() => {
+        hasReportedReadyRef.current = true;
+        setIsVideoReady(true);
+      }, 100);
     }
   }, []);
+  
+  const handleError = useCallback(() => {
+    console.warn('[DiscoverGrid] Video error:', moment.moment_id);
+    setHasError(true);
+    setIsVideoReady(false);
+  }, [moment.moment_id]);
+  
+  useEffect(() => {
+    return () => { if (isVideoReadyTimerRef.current) clearTimeout(isVideoReadyTimerRef.current); };
+  }, []);
+  
+  const videoIsReady = isVideoReady && shouldAutoplay && shouldMountVideo && !hasError;
   
   return (
     <div
       ref={containerRef}
-      className="relative cursor-pointer overflow-hidden rounded-xl bg-black will-change-transform"
+      className="relative cursor-pointer overflow-hidden rounded-xl bg-muted will-change-transform"
       style={{ aspectRatio: String(aspectRatio) }}
       onClick={onClick}
       aria-busy={isVideo && !isVideoReady}
     >
-      {/* Poster-first: always show thumbnail immediately */}
+      {/* Shimmer base layer */}
+      <div className="absolute inset-0 bg-muted/50 animate-shimmer-down" />
+      
       {posterUrl && (
         <img
           src={posterUrl}
           alt=""
-          className="absolute inset-0 h-full w-full object-cover"
+          className={cn(
+            "absolute inset-0 h-full w-full object-cover z-[1] transition-opacity duration-200",
+            posterLoaded ? "opacity-100" : "opacity-0",
+            videoIsReady && "!opacity-0 !duration-150"
+          )}
           loading={isPriorityItem ? "eager" : "lazy"}
           fetchPriority={isPriorityItem ? "high" : "auto"}
           decoding="async"
-          onError={(e) => {
-            e.currentTarget.style.display = 'none';
-          }}
+          onLoad={() => setPosterLoaded(true)}
+          onError={(e) => { e.currentTarget.style.display = 'none'; }}
         />
       )}
 
-      {isVideo && hlsUrl ? (
-        <>
-          {/* TikTok-Level: UnifiedVideoPlayer with 150ms crossfade */}
-          <div className={cn(
-            "absolute inset-0 motion-safe:transition-opacity motion-safe:duration-150 motion-safe:ease-out",
-            isVideoReady ? "opacity-100" : "opacity-0"
-          )}>
-            <UnifiedVideoPlayer
-              src={hlsUrl}
-              posterUrl={posterUrl || undefined}
-              autoplay={isVisible}
-              muted
-              loop
-              preload="auto"
-              showMuteButton={false}
-              showPlayButton={false}
-              scrubber={false}
-              mediaId={streamId || undefined}
-              className="w-full h-full object-cover"
-              onCanPlayThrough={handleCanPlayThrough}
-            />
-          </div>
-          
-          {/* Skeleton - Watch tab shimmer-down */}
-          {!isVideoReady && !posterUrl && (
-            <div 
-              className="absolute inset-0 bg-muted/50 overflow-hidden animate-shimmer-down"
-              aria-busy="true"
-            />
-          )}
-        </>
-      ) : null}
+      {isVideo && hlsUrl && shouldMountVideo && !hasError && (
+        <div className="absolute inset-0 z-[2]">
+          <UnifiedVideoPlayer
+            src={hlsUrl}
+            posterUrl={posterUrl || undefined}
+            autoplay={shouldAutoplay}
+            muted={isGloballyMuted}
+            loop
+            preload={shouldAutoplay ? "auto" : "metadata"}
+            showMuteButton={false}
+            showPlayButton={false}
+            scrubber={false}
+            mediaId={streamId || undefined}
+            className="w-full h-full object-cover"
+            managedByMediaRuntime={true}
+            surface="explore-grid"
+            onPlay={handlePlay}
+            onError={handleError}
+          />
+        </div>
+      )}
       
-      {/* Gradient Overlay - Bottom 30% (Watch tab standard) */}
-      <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none z-20" />
+      {/* Gradient Overlay */}
+      <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none z-10" />
 
-      {/* Like Count - Top Right (personalized) */}
+      {/* Duration badge for video tiles */}
+      {isVideo && moment.duration_seconds && !videoIsReady && (
+        <div className="absolute bottom-2 right-2 z-30 bg-black/60 backdrop-blur-sm rounded-md px-1.5 py-0.5">
+          <span className="text-[10px] font-medium text-white tabular-nums">
+            {formatDuration(moment.duration_seconds)}
+          </span>
+        </div>
+      )}
+      
+      {isVideo && !moment.duration_seconds && !videoIsReady && (
+        <div className="absolute bottom-2 left-2 z-30">
+          <Play className="w-4 h-4 text-white/70 fill-white/70 drop-shadow-sm" />
+        </div>
+      )}
+
+      {/* Like Count */}
       <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-black/40 backdrop-blur-sm rounded-full z-30">
         <Heart className={cn("w-3 h-3", isLiked ? "fill-like text-like" : "text-white")} />
         {likeCount > 0 && (
@@ -458,8 +455,8 @@ const LandscapeTile = React.memo(function LandscapeTile({
         )}
       </div>
 
-      {/* Creator Name + Course - Bottom (Watch tab standard) */}
-      <div className="absolute bottom-2 left-2 right-2 z-30">
+      {/* Creator Name + Course */}
+      <div className="absolute bottom-2 left-2 right-2 z-20">
         {(creator?.display_name || creator?.username) && (
           <p className="text-white text-sm font-medium truncate">
             {creator?.display_name || creator?.username}
@@ -473,19 +470,23 @@ const LandscapeTile = React.memo(function LandscapeTile({
       </div>
     </div>
   );
-}, (prevProps, nextProps) => {
+}, (prev, next) => {
   return (
-    prevProps.moment.moment_id === nextProps.moment.moment_id &&
-    prevProps.moment.media_url === nextProps.moment.media_url &&
-    prevProps.moment.thumbnail_url === nextProps.moment.thumbnail_url &&
-    prevProps.moment.course_name === nextProps.moment.course_name &&
-    prevProps.moment.likes_count === nextProps.moment.likes_count &&
-    prevProps.moment.creator?.id === nextProps.moment.creator?.id &&
-    prevProps.moment.aspect_ratio === nextProps.moment.aspect_ratio &&
-    prevProps.index === nextProps.index
+    prev.moment.moment_id === next.moment.moment_id &&
+    prev.moment.media_url === next.moment.media_url &&
+    prev.moment.thumbnail_url === next.moment.thumbnail_url &&
+    prev.moment.course_name === next.moment.course_name &&
+    prev.moment.likes_count === next.moment.likes_count &&
+    prev.moment.creator?.id === next.moment.creator?.id &&
+    prev.moment.aspect_ratio === next.moment.aspect_ratio &&
+    prev.isLiked === next.isLiked &&
+    prev.index === next.index &&
+    prev.shouldMountVideo === next.shouldMountVideo &&
+    prev.isGloballyMuted === next.isGloballyMuted
   );
 });
 
+// ======================== DiscoverGrid Container ========================
 export function DiscoverGrid({ 
   regionKey: regionKeyProp,
   filters, 
@@ -494,11 +495,15 @@ export function DiscoverGrid({
 }: DiscoverGridProps) {
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const lastPrefetchedIndex = useRef(-1);
+  const [currentViewportIndex, setCurrentViewportIndex] = useState(0);
+  const tileRefs = useRef<Map<number, HTMLDivElement>>(new Map());
   
-  // TikTok-level: Adaptive prefetch based on network/battery/scroll
+  // Fix 7: GlobalAudioContext
+  const { isGloballyMuted } = useGlobalAudio();
+  
+  // Adaptive prefetch
   const { config: prefetchConfig, onIndexChange } = useAdaptivePrefetch();
   
-  // Use prop regionKey if provided, otherwise derive from filters
   const regionKey = regionKeyProp || (filters?.region && filters.region !== 'all' 
     ? filters.region as RegionKey 
     : undefined);
@@ -513,16 +518,13 @@ export function DiscoverGrid({
     refetch,
   } = useInfiniteExploreMoments(regionKey, filters);
 
-  // Fix 4: Personalized like state - fetch current user's liked post IDs
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
 
-  // Flatten all pages into single array
   const allMoments = useMemo(() => {
     return data?.pages.flatMap(page => page.moments) ?? [];
   }, [data]);
 
-  // Fix 4: Fetch user's liked source IDs for personalized hearts
   const sourceIds = useMemo(() => allMoments.map(m => m.source_id), [allMoments]);
   const { data: userLikedIds = new Set<string>() } = useQuery({
     queryKey: ['explore-grid-user-likes', userId, sourceIds],
@@ -539,60 +541,95 @@ export function DiscoverGrid({
     staleTime: 60_000,
   });
 
-  // TikTok-level: Adaptive prefetch on mount using dynamic window
+  // Fix 1: Parent-level viewport tracker for mount gating
+  useEffect(() => {
+    if (allMoments.length === 0) return;
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const idx = Number((entry.target as HTMLElement).dataset.tileIndex);
+            if (!isNaN(idx)) {
+              setCurrentViewportIndex(prev => {
+                // Only update if significantly different to avoid excessive re-renders
+                if (Math.abs(prev - idx) >= 2) return idx;
+                return prev;
+              });
+            }
+          }
+        }
+      },
+      { threshold: [0.5], rootMargin: '0px' }
+    );
+    
+    tileRefs.current.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [allMoments.length]);
+
+  // Fix 8: Poster preload links for first 4 tiles
+  useEffect(() => {
+    if (!allMoments.length) return;
+    const links: HTMLLinkElement[] = [];
+    
+    const first4 = allMoments.slice(0, 4);
+    first4.forEach((moment) => {
+      let posterUrl: string | null = null;
+      if (moment.media_type === 'video' && moment.media_url) {
+        const uid = uidFromNode({ src: moment.media_url });
+        if (uid) {
+          const generated = generateStreamThumbnailUrl(uid, { height: 800, fit: 'cover' });
+          if (generated && !isPosterFailed(generated)) posterUrl = generated;
+        }
+      } else if (moment.media_type === 'image') {
+        posterUrl = moment.thumbnail_url || moment.media_url;
+      }
+      if (!posterUrl) return;
+      if (document.querySelector(`link[href="${posterUrl}"]`)) return;
+      
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = posterUrl;
+      link.setAttribute('fetchpriority', 'high');
+      document.head.appendChild(link);
+      links.push(link);
+    });
+    
+    return () => links.forEach(l => l.remove());
+  }, [allMoments]);
+
+  // HLS manifest prefetch
   useEffect(() => {
     if (allMoments.length === 0 || !prefetchConfig.preloadManifests) return;
-    
-    // Preload initial batch based on adaptive config
     const videoMoments = allMoments
       .slice(0, Math.min(prefetchConfig.prefetchAhead, allMoments.length))
       .filter(m => m.media_type === 'video' && m.media_url);
-    
     videoMoments.forEach((moment) => {
       const uid = uidFromNode({ src: moment.media_url! });
-      if (uid) {
-        const hlsUrl = generateStreamHlsUrl(uid);
-        preloadHlsManifest(hlsUrl);
-      }
+      if (uid) preloadHlsManifest(generateStreamHlsUrl(uid));
     });
-    
     lastPrefetchedIndex.current = Math.min(prefetchConfig.prefetchAhead - 1, allMoments.length - 1);
   }, [allMoments, prefetchConfig.prefetchAhead, prefetchConfig.preloadManifests]);
 
-  // Intersection observer for infinite scroll with adaptive prefetch
+  // Infinite scroll observer
   useEffect(() => {
     if (!loadMoreRef.current || !hasNextPage) return;
-    
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && !isFetchingNextPage) {
           fetchNextPage();
-          
-          // Notify adaptive prefetch of scroll activity
           onIndexChange();
-          
-          // Prefetch next batch based on adaptive config
           if (prefetchConfig.preloadManifests) {
-            const currentLength = allMoments.length;
             const prefetchStart = lastPrefetchedIndex.current + 1;
-            const prefetchEnd = Math.min(
-              prefetchStart + prefetchConfig.prefetchAhead,
-              currentLength
-            );
-            
+            const prefetchEnd = Math.min(prefetchStart + prefetchConfig.prefetchAhead, allMoments.length);
             if (prefetchEnd > prefetchStart) {
-              const upcomingVideos = allMoments
-                .slice(prefetchStart, prefetchEnd)
-                .filter(m => m.media_type === 'video' && m.media_url);
-              
-              upcomingVideos.forEach((moment) => {
-                const uid = uidFromNode({ src: moment.media_url! });
-                if (uid) {
-                  const hlsUrl = generateStreamHlsUrl(uid);
-                  preloadHlsManifest(hlsUrl);
-                }
-              });
-              
+              allMoments.slice(prefetchStart, prefetchEnd)
+                .filter(m => m.media_type === 'video' && m.media_url)
+                .forEach((moment) => {
+                  const uid = uidFromNode({ src: moment.media_url! });
+                  if (uid) preloadHlsManifest(generateStreamHlsUrl(uid));
+                });
               lastPrefetchedIndex.current = prefetchEnd - 1;
             }
           }
@@ -600,12 +637,11 @@ export function DiscoverGrid({
       },
       { rootMargin: '200px' }
     );
-    
     observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage, allMoments, prefetchConfig, onIndexChange]);
 
-  // Paced loading state (Watch tab standard)
+  // Paced loading state
   const MIN_LOADING_DISPLAY_MS = 600;
   const loadStartTimeRef = useRef<number>(0);
   const [isPacingDelay, setIsPacingDelay] = useState(false);
@@ -613,25 +649,12 @@ export function DiscoverGrid({
   const [newlyLoadedStartIndex, setNewlyLoadedStartIndex] = useState<number | null>(null);
   const loadingMoreRef = useRef(false);
 
-  // Handle triggering load with timestamp
-  const handleLoadTrigger = useCallback(() => {
-    if (!loadingMoreRef.current && hasNextPage && !isFetchingNextPage) {
-      loadingMoreRef.current = true;
-      loadStartTimeRef.current = Date.now();
-      fetchNextPage();
-      setTimeout(() => { loadingMoreRef.current = false; }, 1000);
-    }
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
-
-  // Handle paced loading when new moments arrive
   useEffect(() => {
     const prevCount = prevMomentsCountRef.current;
     const newCount = allMoments.length;
-    
     if (newCount > prevCount && loadStartTimeRef.current > 0) {
       const elapsed = Date.now() - loadStartTimeRef.current;
       const remaining = Math.max(0, MIN_LOADING_DISPLAY_MS - elapsed);
-      
       if (remaining > 0) {
         setIsPacingDelay(true);
         const timer = setTimeout(() => {
@@ -647,18 +670,21 @@ export function DiscoverGrid({
         setTimeout(() => setNewlyLoadedStartIndex(null), 500);
       }
     }
-    
     prevMomentsCountRef.current = newCount;
   }, [allMoments.length]);
 
-  // Show loading indicator
   const showBottomLoader = isFetchingNextPage || isPacingDelay;
 
   const handleMomentClick = useCallback((moment: ExploreMoment, index: number) => {
     onMomentClick?.(moment, index, allMoments);
   }, [onMomentClick, allMoments]);
 
-  // Fix 8: Error state
+  // Ref callback for tile tracking
+  const setTileRef = useCallback((index: number, el: HTMLDivElement | null) => {
+    if (el) tileRefs.current.set(index, el);
+    else tileRefs.current.delete(index);
+  }, []);
+
   if (error && !isLoading && allMoments.length === 0) {
     return (
       <ExploreErrorState
@@ -668,7 +694,6 @@ export function DiscoverGrid({
     );
   }
 
-  // Empty state
   if (!isLoading && !error && allMoments.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 px-4">
@@ -683,7 +708,6 @@ export function DiscoverGrid({
     );
   }
 
-  // Show skeleton while loading initial data
   if (isLoading && allMoments.length === 0) {
     return (
       <div className={className}>
@@ -694,17 +718,19 @@ export function DiscoverGrid({
 
   return (
     <div className={className}>
-      {/* Watch tab standard: px-[3px] padding, gap-[3px] */}
-    <div className="px-4">
-      {/* 2-column grid — premium 4px gap with rounded tiles */}
-      <div className="grid grid-cols-2 gap-1">
+      <div className="px-4">
+        <div className="grid grid-cols-2 gap-1">
           {allMoments.map((moment, index) => {
             const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;
             const entranceDelay = isNewlyLoaded ? (index - newlyLoadedStartIndex) * 30 : 0;
+            // Fix 1: Mount gating
+            const shouldMountVideo = Math.abs(index - currentViewportIndex) <= MOUNT_BUFFER;
             
             const tileWrapper = (children: React.ReactNode) => (
               <div
                 key={moment.moment_id}
+                ref={(el) => setTileRef(index, el)}
+                data-tile-index={index}
                 className={cn(
                   isLandscape(moment) && "col-span-2",
                   isNewlyLoaded && "motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-200 motion-safe:fill-mode-backwards"
@@ -721,6 +747,8 @@ export function DiscoverGrid({
                   moment={moment}
                   index={index}
                   isLiked={userLikedIds.has(moment.source_id)}
+                  shouldMountVideo={shouldMountVideo}
+                  isGloballyMuted={isGloballyMuted}
                   onClick={() => handleMomentClick(moment, index)}
                 />
               );
@@ -731,25 +759,24 @@ export function DiscoverGrid({
                 moment={moment}
                 index={index}
                 isLiked={userLikedIds.has(moment.source_id)}
+                shouldMountVideo={shouldMountVideo}
+                isGloballyMuted={isGloballyMuted}
                 onClick={() => handleMomentClick(moment, index)}
               />
             );
           })}
         </div>
         
-        {/* Infinite scroll trigger */}
         {hasNextPage && (
           <div ref={loadMoreRef} className="h-20" />
         )}
         
-        {/* Orange brand spinner for paced infinite scroll (Watch tab standard) */}
         {showBottomLoader && (
           <div className="flex items-center justify-center py-8">
             <div className="w-5 h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
           </div>
         )}
         
-        {/* End state */}
         {!hasNextPage && allMoments.length > 0 && !isLoading && !showBottomLoader && (
           <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
             <div className="w-12 h-0.5 bg-muted/40 rounded-full mb-3" />
