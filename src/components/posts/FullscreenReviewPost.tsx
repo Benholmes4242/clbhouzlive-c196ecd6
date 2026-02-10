@@ -312,7 +312,7 @@ export function FullscreenReviewPost({
           "text-left w-auto"
         )}
         style={{
-          top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)',
+          top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 72px)',
           background: isOutstanding 
             ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(251, 191, 36, 0.05) 100%)'
             : 'linear-gradient(135deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.3) 100%)',
