@@ -85,6 +85,8 @@ export interface UseFullscreenViewerOptions {
   onClose?: () => void;
   /** Callback when index changes */
   onIndexChange?: (index: number) => void;
+  /** Resume playback at this position (seconds) for the initial video */
+  startAt?: number;
 }
 
 export interface UseFullscreenViewerReturn {
@@ -103,6 +105,9 @@ export interface UseFullscreenViewerReturn {
   // FIX 3: Active video ref for controls
   activeVideoRef: React.RefObject<HTMLVideoElement> | null;
   setActiveVideoRef: (ref: React.RefObject<HTMLVideoElement> | null) => void;
+  
+  // Resume position for initial video
+  startAt?: number;
   
   // Navigation
   open: (index?: number, items?: FullscreenMediaItem[]) => void;
@@ -145,6 +150,7 @@ export function useFullscreenViewer(
     onFetchMore, 
     onClose,
     onIndexChange,
+    startAt,
   } = options;
 
   // Core state
@@ -348,6 +354,7 @@ export function useFullscreenViewer(
     isBootstrapping,
     activeVideoRef,
     setActiveVideoRef,
+    startAt,
     open,
     close,
     goToIndex,

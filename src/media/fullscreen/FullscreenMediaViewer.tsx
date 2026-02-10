@@ -5,7 +5,7 @@
  * Uses context to share state with children.
  */
 
-import React, { useEffect, useCallback, useMemo } from 'react';
+import React, { useEffect, useCallback, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
@@ -30,6 +30,8 @@ export interface FullscreenMediaViewerProps {
   items: FullscreenMediaItemType[];
   /** Starting index (default: 0) */
   initialIndex?: number;
+  /** Resume playback at this position (seconds) for the initial video */
+  startAt?: number;
   /** Entry context for analytics */
   context?: FullscreenContextType;
   /** Called when viewer closes */
@@ -68,6 +70,7 @@ export const FullscreenMediaViewer: React.FC<FullscreenMediaViewerProps> = ({
   isOpen,
   items,
   initialIndex = 0,
+  startAt,
   context = 'discover',
   onClose,
   onFetchMore,
@@ -89,6 +92,7 @@ export const FullscreenMediaViewer: React.FC<FullscreenMediaViewerProps> = ({
   // ONLY apply when viewer is open - otherwise let underlying page control status bar
   useMedianStatusBar("dark", "transparent", true, false, isOpen);
   
+  
   // Initialize viewer hook
   const viewer = useFullscreenViewer({
     initialItems: items,
@@ -96,6 +100,7 @@ export const FullscreenMediaViewer: React.FC<FullscreenMediaViewerProps> = ({
     onFetchMore,
     onClose,
     onIndexChange,
+    startAt,
   });
 
   // Sync external items with internal state

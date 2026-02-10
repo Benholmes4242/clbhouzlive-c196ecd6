@@ -1,18 +1,12 @@
 /**
  * LongFormFeedCard - Full-width feed card for long-form videos
  * 
- * ALIGNED WITH COMMUNITYFEEDCARD: Uses the exact same patterns for
- * aspect ratio, course location tags, review indicators, and styling.
- * 
- * INSTANT VIDEO PATTERN:
- * - Uses managedByMediaRuntime={false}, externallyManaged={false}
- * - Uses autoplay based on visibility (IntersectionObserver)
- * - Uses preload="auto" for instant buffering
- * - Direct browser-led autoplay (no MediaRuntime manual control)
+ * CLUBHOUSE PARITY: Uses MediaRuntime registration, play-gated transitions,
+ * shimmer overlays, and error recovery matching the Clubhouse gold standard.
  */
 
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
-import { MoreHorizontal, MapPin, Play, Copy, Share2, Flag, Loader2 } from 'lucide-react';
+import { MoreHorizontal, MapPin, Play, Copy, Share2, Flag, RotateCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { PostActionBar } from '@/components/posts/PostActionBar';
@@ -81,6 +75,8 @@ interface LongFormFeedCardProps {
   className?: string;
   /** Index in list - first 6 get priority loading */
   index?: number;
+  /** Whether to mount the video player (Fix 2: mount gating) */
+  shouldMountVideo?: boolean;
 }
 
 export const LongFormFeedCard = React.memo(function LongFormFeedCard({ 
@@ -89,16 +85,22 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
   onCreatorTap,
   className,
   index = 0,
+  shouldMountVideo = true,
 }: LongFormFeedCardProps) {
   const navigate = useNavigate();
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isVideoReady, setIsVideoReady] = useState(false);
   const [shouldPlay, setShouldPlay] = useState(false);
+  
+  // Fix 4/6: Poster and video transition states
+  const [posterLoaded, setPosterLoaded] = useState(false);
+  const [isVideoReady, setIsVideoReady] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
   
   // Video refs
   const videoContainerRef = useRef<HTMLDivElement>(null);
-  const hasReportedReadyRef = useRef(false);
+  const isVideoReadyTimerRef = useRef<ReturnType<typeof setTimeout>>();
   const isPriority = index < 6;
 
   // P0: TikTok-level 50% start / 10% stop hysteresis autoplay
@@ -109,7 +111,6 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
     const observer = new IntersectionObserver(
       (entries) => {
         const ratio = entries[0]?.intersectionRatio ?? 0;
-        // Hysteresis: 50% to start, 10% to stop (prevents jitter)
         setShouldPlay(prev => {
           if (!prev && ratio >= 0.5) return true;
           if (prev && ratio < 0.1) return false;
@@ -126,25 +127,24 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
   // Engagement data
   const { likesCount, commentsCount } = usePostEngagement(video.id);
 
-  // Format timestamp - only timeAgo, no follower count (matches Friends tab)
+  // Format timestamp
   const timeAgo = formatTimeAgo(video.createdAt, 'short');
 
-  // Caption text - clean out "📍 Played at" line (matches CommunityFeedCard)
+  // Caption text
   const rawCaption = video.title || video.caption || video.content || '';
   const captionText = useMemo(() => removePlayedAtLine(rawCaption), [rawCaption]);
   const shouldTruncate = captionText.length > 150 && !isExpanded;
   const displayContent = shouldTruncate ? captionText.slice(0, 150) : captionText;
 
-  // Dynamic aspect ratio calculation (matches CommunityFeedCard)
+  // Dynamic aspect ratio calculation
   const aspectRatio = useMemo(() => {
     const width = video.mediaWidth || 16;
     const height = video.mediaHeight || 9;
     const rawRatio = width / height;
-    // Clamp to reasonable bounds: 0.8 (4:5 portrait) to 2.0 (2:1 landscape)
     return Math.max(0.8, Math.min(2.0, rawRatio));
   }, [video.mediaWidth, video.mediaHeight]);
 
-  // Course location string (matches CommunityFeedCard)
+  // Course location string
   const courseLocation = useMemo(() => {
     if (!video.golfCourse) return null;
     const parts = [
@@ -154,7 +154,7 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
     return parts.join(', ');
   }, [video.golfCourse]);
 
-  // CRITICAL: Extract stream UID for cache consistency
+  // Extract stream UID
   const { hlsUrl, streamId, posterUrl } = useMemo(() => {
     if (!video.mediaUrl) return { hlsUrl: null, streamId: video.id, posterUrl: video.thumbnailUrl };
     const extractedStreamId = uidFromNode({ src: video.mediaUrl });
@@ -171,10 +171,14 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
     };
   }, [video.mediaUrl, video.id, video.thumbnailUrl]);
 
-  // Reset ready flag when video changes
+  // Reset states when video changes
   useEffect(() => {
-    hasReportedReadyRef.current = false;
     setIsVideoReady(false);
+    setPosterLoaded(false);
+    setHasError(false);
+    return () => {
+      if (isVideoReadyTimerRef.current) clearTimeout(isVideoReadyTimerRef.current);
+    };
   }, [video.id]);
 
   const handleComment = useCallback(() => {
@@ -211,6 +215,27 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
     }
   }, [video.golfCourseId, navigate]);
 
+  // Fix 5: Play-gated transition with 100ms buffer
+  const handlePlay = useCallback(() => {
+    if (isVideoReadyTimerRef.current) clearTimeout(isVideoReadyTimerRef.current);
+    isVideoReadyTimerRef.current = setTimeout(() => {
+      setIsVideoReady(true);
+    }, 100);
+  }, []);
+
+  // Fix 6: Error handler with retry
+  const handleError = useCallback(() => {
+    setHasError(true);
+    setIsVideoReady(false);
+  }, []);
+
+  const handleRetry = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setHasError(false);
+    setIsVideoReady(false);
+    setRetryKey(k => k + 1);
+  }, []);
+
   // Determine if this is a review post
   const isReview = !!video.isReview;
   const reviewRating = video.reviewRating;
@@ -222,6 +247,9 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
     sub_country: null 
   } : null);
 
+  // Whether the video layer is ready to show (play-gated)
+  const videoIsReady = isVideoReady && shouldPlay && shouldMountVideo && !hasError;
+
   return (
     <>
       <div
@@ -231,13 +259,12 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
         )}
         data-video-card-id={video.id}
       >
-        {/* Header - 3 column layout: avatar / meta / actions - matches Friends tab padding */}
+        {/* Header */}
         <div 
           className="flex items-start gap-3 cursor-pointer" 
           style={{ padding: '10px 16px 6px 16px' }}
           onClick={onCreatorTap}
         >
-          {/* Left: Avatar */}
           <div className="flex-shrink-0">
             <SquircleAvatar
               size={40}
@@ -247,8 +274,6 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
               hideRing
             />
           </div>
-
-          {/* Middle: Meta - time only, no follower count (matches Friends tab) */}
           <div className="flex-1 min-w-0">
            <p className="font-semibold text-sm text-gray-900 leading-tight truncate">
               {video.creatorName}
@@ -257,8 +282,6 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
               <span>{timeAgo}</span>
             </p>
           </div>
-
-          {/* Right: Menu */}
           <div className="flex-shrink-0 self-start" onClick={(e) => e.stopPropagation()}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -288,7 +311,7 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
           </div>
         </div>
 
-        {/* Caption - matches Friends tab padding and styling */}
+        {/* Caption */}
         {captionText && (
           <div style={{ padding: '0 16px 6px 16px' }}>
           <div className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
@@ -308,7 +331,7 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
           </div>
         )}
 
-        {/* Course Location Bar - Stacked MapPin format (matches CommunityFeedCard) */}
+        {/* Course Location Bar */}
         {golfCourse && (
           <div 
             className="flex items-start gap-2 mt-3 cursor-pointer"
@@ -332,95 +355,96 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
         {/* Divider */}
         <div className="h-px bg-gray-100 mx-4" />
 
-        {/* Media Section - Dynamic aspect ratio (matches CommunityFeedCard) */}
+        {/* Media Section - Dynamic aspect ratio */}
         <div 
           ref={videoContainerRef}
           className="relative w-full cursor-pointer bg-muted overflow-hidden will-change-transform"
           style={{ aspectRatio }}
           onClick={onVideoTap}
         >
-          {/* P1: Priority poster loading for first 6 items */}
+          {/* Fix 4: Shimmer overlay (base layer) */}
+          <div className="absolute inset-0 bg-gray-100 overflow-hidden">
+            <div className="h-full w-full -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-gray-200/60 to-transparent motion-reduce:animate-none" />
+          </div>
+
+          {/* Poster image with fade-in (Fix 4/6) */}
           {posterUrl && (
             <img
               src={posterUrl}
               alt=""
-              className="absolute inset-0 h-full w-full object-cover"
+              className={cn(
+                "absolute inset-0 h-full w-full object-cover z-[1] transition-opacity duration-200 ease-out",
+                posterLoaded ? "opacity-100" : "opacity-0",
+                // Fix 5: Poster fades out ONLY when video is playing
+                videoIsReady && "!opacity-0 duration-150"
+              )}
               loading={isPriority ? "eager" : "lazy"}
               fetchPriority={isPriority ? "high" : "auto"}
               decoding="async"
+              onLoad={() => setPosterLoaded(true)}
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
               }}
             />
           )}
 
-          {hlsUrl ? (
-            <>
-              {/* 
-                TikTok-Level: UnifiedVideoPlayer with source stability + pool promotion
-                - 150ms crossfade (ease-out)
-                - Hysteresis autoplay from IntersectionObserver
-              */}
-              <div 
-                className={cn(
-                  "absolute inset-0 transition-opacity duration-150 ease-out",
-                  isVideoReady ? "opacity-100" : "opacity-0"
-                )}
-                aria-busy={!isVideoReady}
+          {/* Video player - Fix 1: MediaRuntime, Fix 2: mount gating, Fix 7: no loop */}
+          {hlsUrl && shouldMountVideo && !hasError && (
+            <div 
+              className={cn(
+                "absolute inset-0 z-[2] transition-opacity duration-150 ease-out",
+                videoIsReady ? "opacity-100" : "opacity-0"
+              )}
+            >
+              <UnifiedVideoPlayer
+                key={retryKey}
+                src={hlsUrl}
+                posterUrl={posterUrl}
+                autoplay={shouldPlay}
+                muted
+                preload="auto"
+                objectFit="cover"
+                mediaId={streamId}
+                surface="videos"
+                managedByMediaRuntime={true}
+                className="absolute inset-0 w-full h-full object-cover"
+                onPlay={handlePlay}
+                onError={handleError}
+              />
+            </div>
+          )}
+              
+          {/* Fix 6: Error state overlay */}
+          {hasError && (
+            <div className="absolute inset-0 z-[3] bg-black/40 flex flex-col items-center justify-center gap-2">
+              <button
+                onClick={handleRetry}
+                className="w-12 h-12 rounded-full bg-white/80 flex items-center justify-center active:scale-[0.95] transition-transform"
+                aria-label="Retry playback"
               >
-                <UnifiedVideoPlayer
-                  src={hlsUrl}
-                  posterUrl={posterUrl}
-                  autoplay={shouldPlay}
-                  muted
-                  loop
-                  preload="auto"
-                  objectFit="cover"
-                  mediaId={streamId}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  onCanPlayThrough={() => {
-                    if (!hasReportedReadyRef.current) {
-                      hasReportedReadyRef.current = true;
-                      setIsVideoReady(true);
-                    }
-                  }}
-                />
+                <RotateCw className="w-5 h-5 text-gray-800" />
+              </button>
+              <span className="text-white/70 text-xs">Tap to retry</span>
+            </div>
+          )}
+
+          {/* Play button overlay - shown when video is ready but paused */}
+          {!hasError && posterLoaded && !shouldPlay && (
+            <div className="absolute inset-0 z-[3] flex items-center justify-center">
+              <div className="w-16 h-16 rounded-full backdrop-blur-md bg-black/35 border border-white/10 flex items-center justify-center">
+                <Play className="h-8 w-8 text-white ml-1" fill="white" />
               </div>
-              
-              {/* Skeleton/Loading state - only shown BEFORE video has buffered */}
-              {!isVideoReady && !posterUrl && (
-                <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center">
-                  <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-                </div>
-              )}
-              
-              {/* Play button overlay - shown when video is ready but paused */}
-              {isVideoReady && !shouldPlay && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-16 h-16 rounded-full backdrop-blur-md bg-black/35 border border-white/10 flex items-center justify-center">
-                    <Play className="h-8 w-8 text-white ml-1" fill="white" />
-                  </div>
-                </div>
-              )}
-            </>
-          ) : !posterUrl && (
-            /* Fallback for invalid video */
-            <div className="absolute inset-0 bg-muted flex items-center justify-center">
-              <Play className="h-12 w-12 text-muted-foreground/40" />
             </div>
           )}
           
-          {/* Review Indicators (matches CommunityFeedCard) */}
+          {/* Review Indicators */}
           {isReview && (
             <>
-              {/* Review Pill - Top Left */}
               <div className="absolute top-3 left-3 z-10 pointer-events-none">
                 <div className="px-2 py-1 bg-black/60 backdrop-blur-sm rounded-full text-white text-[10px] font-bold uppercase tracking-wider">
                   Review
                 </div>
               </div>
-
-              {/* Rating Pill - Top Right */}
               {reviewRating !== null && reviewRating !== undefined && (
                 <div className="absolute top-3 right-3 z-10 pointer-events-none">
                   <RatingPill 
@@ -435,7 +459,7 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
 
           {/* Duration Badge */}
           {video.duration && (
-            <div className="absolute bottom-3 right-3 px-2 py-0.5 backdrop-blur-sm bg-black/60 rounded-md text-white text-xs font-medium tabular-nums">
+            <div className="absolute bottom-3 right-3 z-[4] px-2 py-0.5 backdrop-blur-sm bg-black/60 rounded-md text-white text-xs font-medium tabular-nums">
               {video.duration}
             </div>
           )}
@@ -476,17 +500,12 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
     </>
   );
 }, (prevProps, nextProps) => {
-  // Custom comparison for memoization
   return (
     prevProps.video.id === nextProps.video.id &&
     prevProps.video.mediaUrl === nextProps.video.mediaUrl &&
-    prevProps.video.title === nextProps.video.title &&
-    prevProps.video.caption === nextProps.video.caption &&
-    prevProps.video.creatorName === nextProps.video.creatorName &&
-    prevProps.video.creatorAvatarUrl === nextProps.video.creatorAvatarUrl &&
-    prevProps.video.isReview === nextProps.video.isReview &&
-    prevProps.video.reviewRating === nextProps.video.reviewRating &&
-    prevProps.className === nextProps.className
+    prevProps.onVideoTap === nextProps.onVideoTap &&
+    prevProps.index === nextProps.index &&
+    prevProps.shouldMountVideo === nextProps.shouldMountVideo
   );
 });
 
