@@ -128,7 +128,7 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
           post_views(count),
           course_ratings(
             id,
-            overall_rating,
+            rating,
             golf_courses(
               id,
               name,
