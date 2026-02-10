@@ -266,7 +266,7 @@ export function HubPageNew() {
     return (
       <div className="h-[100dvh] overflow-hidden relative">
         <WarmGradientBg />
-        <div className="relative z-10 flex-1 flex flex-col px-5 pt-14 font-dm-sans">
+        <div className="relative z-10 flex-1 flex flex-col px-5 font-dm-sans" style={{ paddingTop: 'max(var(--sat, env(safe-area-inset-top, 0px)), 47px)' }}>
           <Skeleton className="h-4 w-28 mb-2 bg-white/30" />
           <Skeleton className="h-9 w-40 mb-8 bg-white/30" />
           <Skeleton className="h-[120px] w-full rounded-[20px] mb-4 bg-white/30" />
