@@ -26,7 +26,7 @@ import { useLazyTiles } from '@/components/shared/grid/useLazyTiles';
 import { useAdaptivePrefetch } from '@/hooks/useAdaptivePrefetch';
 import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
 import { cn } from '@/lib/utils';
-import { Image as ImageIcon, Plus, Users, RefreshCw, Loader2, FileText, Video } from 'lucide-react';
+import { Image as ImageIcon, Plus, Users, RefreshCw, Loader2, FileText, Video, AlertCircle } from 'lucide-react';
 import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
 import BusinessPostCard from './BusinessPostCard';
 import TaggedPostCard from './TaggedPostCard';
@@ -76,6 +76,7 @@ export function BusinessActivityFeed({
   const {
     items: activityPosts,
     isLoading: postsLoading,
+    isError: activityError,
     hasMore: hasMoreActivity,
     fetchNextPage: fetchMoreActivity,
     isFetchingNextPage: isFetchingActivity,
@@ -84,6 +85,7 @@ export function BusinessActivityFeed({
   const {
     items: taggedPosts,
     isLoading: taggedLoading,
+    isError: taggedError,
     hasMore: hasMoreTagged,
     fetchNextPage: fetchMoreTagged,
     isFetchingNextPage: isFetchingTagged,
@@ -598,7 +600,24 @@ export function BusinessActivityFeed({
       )}
 
       {/* Feed content */}
-      {filteredPosts.length === 0 ? (
+      {/* Error state */}
+      {((feedTab === 'activity' && activityError) || (feedTab === 'tagged' && taggedError)) && filteredPosts.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 px-4">
+          <AlertCircle className="h-10 w-10 text-gray-200 mb-4" />
+          <p className="text-sm text-gray-500 mb-4">Couldn't load posts</p>
+          <button
+            onClick={() => {
+              const activeKey = feedTab === 'activity'
+                ? ['business-posts-infinite', businessId]
+                : ['business-tagged-posts-infinite', businessId];
+              queryClient.invalidateQueries({ queryKey: activeKey });
+            }}
+            className="rounded-full bg-emerald-600 text-white text-sm font-medium px-5 py-2 active:scale-[0.97] transition-transform"
+          >
+            Try Again
+          </button>
+        </div>
+      ) : filteredPosts.length === 0 ? (
         <EmptyState 
           tab={feedTab} 
           filter={activeFilter}

@@ -244,6 +244,7 @@ export function useInfiniteBusinessTaggedPosts(options: UseInfiniteBusinessTagge
   return {
     items: allItems,
     isLoading: query.isLoading,
+    isError: query.isError,
     hasMore: query.hasNextPage ?? false,
     fetchNextPage: query.fetchNextPage,
     isFetchingNextPage: query.isFetchingNextPage,
