@@ -179,8 +179,8 @@ const MediaItem = React.memo(function MediaItem({
   if (isVideo && hlsUrl) {
     return (
       <div className={cn("absolute inset-0", filterClass)}>
-        {/* Fix 4: Shimmer base layer */}
-        <div className="absolute inset-0 bg-muted/50 overflow-hidden">
+        {/* Fix 4: Shimmer base layer — fades out once poster or video is ready */}
+        <div className={cn("absolute inset-0 bg-muted/50 overflow-hidden transition-opacity duration-300", (posterLoaded || isVideoReady) ? "opacity-0" : "opacity-100")}>
           <div className="h-full w-full -translate-x-full motion-safe:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent" />
         </div>
 
@@ -234,8 +234,8 @@ const MediaItem = React.memo(function MediaItem({
   // Image rendering with shimmer + fade-in
   return (
     <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
-      {/* Fix 4: Shimmer base for images too */}
-      <div className="absolute inset-0 bg-muted/50 overflow-hidden">
+      {/* Fix 4: Shimmer base for images — fades out once loaded */}
+      <div className={cn("absolute inset-0 bg-muted/50 overflow-hidden transition-opacity duration-300", posterLoaded ? "opacity-0" : "opacity-100")}>
         <div className="h-full w-full -translate-x-full motion-safe:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent" />
       </div>
 
@@ -601,7 +601,7 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
             <>
               <div
                 ref={carouselRef}
-                className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory touch-pan-x h-full w-full"
+                className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory touch-pan-x touch-pan-y h-full w-full"
                 onScroll={handleScroll}
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
               >
