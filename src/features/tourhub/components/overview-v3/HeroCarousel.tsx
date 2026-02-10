@@ -154,14 +154,16 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
   const backgroundImage = venueImage?.imageUrl || getFallbackCourseImage(tournament.name);
   const hasRealImage = !!venueImage?.imageUrl;
 
-  // Warm, golf-feeling gradients for venues without images
-  const gradients = [
-    'from-emerald-800 via-green-700 to-emerald-900',
-    'from-amber-700 via-yellow-600 to-amber-800',
-    'from-teal-800 via-emerald-700 to-cyan-900',
-    'from-green-800 via-lime-700 to-emerald-900',
-  ];
-  const bgGradient = gradients[tournament.name.length % gradients.length];
+   // Tour-branded gradients for venues without images
+  const tourFallbacks: Record<string, string> = {
+    pga: 'from-blue-900 via-blue-800 to-slate-900',
+    liv: 'from-slate-900 via-green-900 to-slate-950',
+    euro: 'from-indigo-900 via-purple-900 to-slate-900',
+    lpga: 'from-pink-900 via-rose-800 to-slate-900',
+    champ: 'from-amber-900 via-yellow-800 to-amber-950',
+    pgad: 'from-emerald-900 via-green-800 to-teal-900',
+  };
+  const bgGradient = tourFallbacks[tournament.tourSlug] || 'from-emerald-800 via-green-700 to-emerald-900';
 
   // Winner info for completed tournaments
   const winnerInfo = isCompleted && tournament.winnerName ? tournament : null;
@@ -297,13 +299,17 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
             {/* ─── LIVE CARD LAYOUT ─── */}
             {isLive && (
               <>
-                {/* Meta line */}
+                {/* Round progress instead of course stats */}
                 <p className="hero-meta">
-                  {[
-                    tournament.purse && formatPurse(tournament.purse),
-                    tournament.venuePar && `PAR ${tournament.venuePar}`,
-                    tournament.venueYardage && `${tournament.venueYardage.toLocaleString()} YDS`
-                  ].filter(Boolean).join(' · ')}
+                  {(() => {
+                    // Compute approximate round based on tournament dates
+                    const start = new Date(tournament.startDate);
+                    const now = new Date();
+                    const dayIndex = Math.max(0, Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
+                    const totalRounds = 4; // Standard PGA
+                    const currentRound = Math.min(dayIndex + 1, totalRounds);
+                    return currentRound >= totalRounds ? 'Final Round' : `Round ${currentRound} of ${totalRounds}`;
+                  })()}
                 </p>
                 
                 {/* Mini Leaderboard or Loading/Starting Soon */}
@@ -327,10 +333,10 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
                   </div>
                 )}
                 
-                {/* See All CTA */}
+                {/* See All - right-aligned text CTA */}
                 <Link 
                   to={`/tourhub/tournament/${tournament.id}`} 
-                  className="see-all-btn mt-2"
+                  className="hero-text-cta mt-1 w-full"
                 >
                   <span>See All</span>
                   <ChevronRight className="w-4 h-4 cta-chevron" />
@@ -341,53 +347,40 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
             {/* ─── COMPLETED CARD LAYOUT ─── */}
             {isCompleted && (
               <>
-                {/* Winner Badge */}
+                {/* Winner - Large centered presentation */}
                 {winnerInfo?.winnerName && (
-                  <div className="winner-badge mt-3">
-                    <Trophy className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                    {(() => {
-                      const photoUrl = resolvePhotoUrl(winnerInfo.winnerPhotoUrl, winnerInfo.winnerPgaTourId);
-                      return photoUrl ? (
-                        <div 
-                          className="w-6 h-6 flex-shrink-0 overflow-hidden bg-white/20"
-                          style={{ borderRadius: '34%' }}
-                        >
-                          <img 
-                            src={photoUrl}
-                            alt={winnerInfo.winnerName}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.style.display = 'none';
-                            }}
-                          />
-                        </div>
-                      ) : null;
-                    })()}
-                    <span className="winner-name">
-                      {winnerInfo.winnerName}
-                    </span>
+                  <div className="winner-section">
+                    <div className="winner-avatar">
+                      {(() => {
+                        const photoUrl = resolvePhotoUrl(winnerInfo.winnerPhotoUrl, winnerInfo.winnerPgaTourId);
+                        if (photoUrl) {
+                          return (
+                            <img 
+                              src={photoUrl}
+                              alt={winnerInfo.winnerName}
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                                target.nextElementSibling?.classList.remove('hidden');
+                              }}
+                            />
+                          );
+                        }
+                        const initials = winnerInfo.winnerName.split(' ').map(n => n[0]).join('').toUpperCase();
+                        return <div className="winner-avatar-fallback">{initials}</div>;
+                      })()}
+                    </div>
+                    <span className="winner-name-large">{winnerInfo.winnerName}</span>
                     {winnerInfo.winnerScore && (
-                      <span className="winner-score">({winnerInfo.winnerScore})</span>
+                      <span className="winner-score-large">({winnerInfo.winnerScore})</span>
                     )}
                   </div>
                 )}
                 
-                {/* Meta */}
-                <p className="hero-meta mt-3">
-                  {[
-                    tournament.purse && formatPurse(tournament.purse),
-                    tournament.venuePar && `PAR ${tournament.venuePar}`,
-                    tournament.venueYardage && `${tournament.venueYardage.toLocaleString()} YDS`
-                  ].filter(Boolean).join(' · ')}
-                </p>
-                
-                {/* CTA */}
-                <Link to={`/tourhub/tournament/${tournament.id}`} className="inline-block mt-2">
-                  <button className="hero-cta">
-                    <span>View Tournament</span>
-                    <ChevronRight className="w-4 h-4 cta-chevron" />
-                  </button>
+                {/* View Results text CTA */}
+                <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta mt-2 w-full">
+                  <span>View Results</span>
+                  <ChevronRight className="w-4 h-4 cta-chevron" />
                 </Link>
               </>
             )}
@@ -395,7 +388,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
             {/* ─── UPCOMING CARD LAYOUT ─── */}
             {isUpcoming && (
               <>
-                {/* Meta */}
+                {/* Course stats — useful for preview */}
                 <p className="hero-meta mt-3">
                   {[
                     tournament.purse && formatPurse(tournament.purse),
@@ -403,6 +396,16 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
                     tournament.venueYardage && `${tournament.venueYardage.toLocaleString()} YDS`
                   ].filter(Boolean).join(' · ')}
                 </p>
+                
+                {/* Defending Champion — if available */}
+                {tournament.defendingChampion && (
+                  <div className="flex items-center gap-2 mt-1 mb-2">
+                    <Trophy className="w-3.5 h-3.5 text-amber-400/70 flex-shrink-0" />
+                    <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.55)' }}>
+                      Defending: <span style={{ fontWeight: 600, color: 'rgba(255,255,255,0.75)' }}>{tournament.defendingChampion}</span>
+                    </span>
+                  </div>
+                )}
                 
                 {/* CTA */}
                 <Link to={`/tourhub/tournament/${tournament.id}`} className="inline-block mt-2">
@@ -542,22 +545,23 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
       onTouchEnd={handleTouchEnd}
     >
       {/* Menu Icon - positioned on hero, below safe area */}
+      {/* Menu Icon - containerless with drop-shadow for legibility */}
       <button 
         className="absolute z-20 flex items-center justify-center"
         style={{ 
           top: '56px',
           left: '16px',
-          width: '36px',
-          height: '36px',
-          borderRadius: '10px',
-          background: 'rgba(0, 0, 0, 0.4)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
+          width: '44px',
+          height: '44px',
         }}
         onClick={openTourNav}
         aria-label="Open tour menu"
       >
-        <Menu className="w-5 h-5 text-white" strokeWidth={1.5} />
+        <Menu 
+          className="w-[22px] h-[22px] text-white" 
+          strokeWidth={1.8}
+          style={{ filter: 'drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5))' }}
+        />
       </button>
 
       <AnimatePresence mode="sync">
