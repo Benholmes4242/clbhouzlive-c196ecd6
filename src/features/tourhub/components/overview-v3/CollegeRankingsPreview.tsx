@@ -163,7 +163,7 @@ function HeroCollegeCard({
       viewport={{ once: true }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className="p-5 relative h-full flex flex-col justify-end">
+      <div className="relative h-full flex flex-col">
         {/* Subtle vignette overlay */}
         <div
           className="absolute inset-0 pointer-events-none"
@@ -172,62 +172,75 @@ function HeroCollegeCard({
           }}
         />
 
-        <div className="relative">
-          {/* #1 THIS SEASON badge — refined */}
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <div
-                className="w-6 h-6 rounded-md flex items-center justify-center"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(255,184,0,0.2) 0%, rgba(255,140,0,0.12) 100%)',
-                  border: '1px solid rgba(255,184,0,0.25)',
-                }}
-              >
-                <Trophy className="w-3 h-3" style={{ color: '#FFB800' }} />
-              </div>
-              <span
-                style={{
-                  fontSize: '10px',
-                  fontWeight: 700,
-                  letterSpacing: '1.2px',
-                  textTransform: 'uppercase',
-                  color: 'rgba(255,255,255,0.45)',
-                }}
-              >
-                #1 This Season
-              </span>
-            </div>
-            <ChevronRight className="w-4 h-4 text-white/20" />
-          </div>
+        {/* Chevron — top right */}
+        <div className="absolute top-4 right-4 z-10">
+          <ChevronRight className="w-4 h-4 text-white/20" />
+        </div>
 
-          {/* College name + logo */}
-          <div className="flex items-center gap-3 mb-4">
-            {media?.logo_url && (
+        {/* Centered vertical stack — logo, badge, name, stats */}
+        <div className="relative flex-1 flex flex-col items-center justify-center px-5 pt-5">
+          {/* Logo — large circular treatment */}
+          {media?.logo_url && (
+            <div
+              className="rounded-full flex items-center justify-center mb-4"
+              style={{
+                width: '110px',
+                height: '110px',
+                background: 'rgba(255,255,255,0.12)',
+                border: '2px solid rgba(255,255,255,0.15)',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+              }}
+            >
               <img
                 src={media.logo_url}
                 alt={displayName}
-                className="w-11 h-11 object-contain flex-shrink-0"
-                style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}
+                className="object-contain"
+                style={{ width: '70px', height: '70px', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.3))' }}
               />
-            )}
-            <h3
-              className="text-white leading-tight"
-              style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}
+            </div>
+          )}
+
+          {/* #1 THIS SEASON badge */}
+          <div className="flex items-center gap-2 mb-2">
+            <div
+              className="w-6 h-6 rounded-md flex items-center justify-center"
+              style={{
+                background: 'linear-gradient(135deg, rgba(255,184,0,0.2) 0%, rgba(255,140,0,0.12) 100%)',
+                border: '1px solid rgba(255,184,0,0.25)',
+              }}
             >
-              {displayName}
-            </h3>
+              <Trophy className="w-3 h-3" style={{ color: '#FFB800' }} />
+            </div>
+            <span
+              style={{
+                fontSize: '10px',
+                fontWeight: 700,
+                letterSpacing: '1.2px',
+                textTransform: 'uppercase',
+                color: 'rgba(255,255,255,0.45)',
+              }}
+            >
+              #1 This Season
+            </span>
           </div>
 
-          {/* THREE STAT PILLARS with faint dividers */}
+          {/* College name — centered, larger */}
+          <h3
+            className="text-white leading-tight text-center m-0 mb-4"
+            style={{ fontSize: '28px', fontWeight: 700, letterSpacing: '-0.4px' }}
+          >
+            {displayName}
+          </h3>
+
+          {/* THREE STAT PILLARS */}
           <div
-            className="grid grid-cols-3"
+            className="grid grid-cols-3 w-full"
             style={{
               background: 'rgba(0,0,0,0.12)',
               borderRadius: '12px',
               padding: '12px 0',
             }}
           >
-            {/* Tour Earnings */}
             <div className="text-center" style={{ borderRight: '1px solid rgba(255,255,255,0.1)' }}>
               <DollarSign className="w-3 h-3 mx-auto mb-1" style={{ color: 'rgba(255,255,255,0.4)' }} />
               <p className="m-0" style={{ fontSize: '9px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)' }}>
@@ -237,8 +250,6 @@ function HeroCollegeCard({
                 {formatCurrency(stats.earnings_total)}
               </p>
             </div>
-
-            {/* Season Wins */}
             <div className="text-center" style={{ borderRight: '1px solid rgba(255,255,255,0.1)' }}>
               <Trophy className="w-3 h-3 mx-auto mb-1" style={{ color: 'rgba(255,255,255,0.4)' }} />
               <p className="m-0" style={{ fontSize: '9px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)' }}>
@@ -248,8 +259,6 @@ function HeroCollegeCard({
                 {stats.wins_total}
               </p>
             </div>
-
-            {/* Alumni on Tour */}
             <div className="text-center">
               <Users className="w-3 h-3 mx-auto mb-1" style={{ color: 'rgba(255,255,255,0.4)' }} />
               <p className="m-0" style={{ fontSize: '9px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)' }}>
@@ -260,8 +269,10 @@ function HeroCollegeCard({
               </p>
             </div>
           </div>
+        </div>
 
-          {/* Pipeline to the Tour */}
+        {/* Pipeline to the Tour — bottom, left-aligned, unchanged */}
+        <div className="relative px-5 pb-5">
           <PipelineStrip alumni={alumni} />
         </div>
       </div>
