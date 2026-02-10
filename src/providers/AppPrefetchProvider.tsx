@@ -451,16 +451,8 @@ export function AppPrefetchProvider({
     }
   }, []);
 
-  // Prefetch route data
-  const prefetchRoute = useCallback(async (path: string) => {
-    if (prefetchedRoutes.current.has(path)) return;
-    if (!shouldPrefetch()) return;
-
-    const config = ROUTE_CONFIGS.find(r => r.path === path);
-    if (!config) return;
-
-    prefetchedRoutes.current.add(path);
-
+  // Prefetch a single config entry
+  const prefetchConfig = useCallback(async (config: RoutePrefetchConfig) => {
     try {
       // Check if we already have fresh data
       const existingData = queryClient.getQueryData(config.queryKey);
@@ -474,8 +466,14 @@ export function AppPrefetchProvider({
       if (config.queryFn) {
         const data = await config.queryFn();
         
+        // Hero video returns a plain object, not an array — store directly
+        if (!Array.isArray(data)) {
+          queryClient.setQueryData(config.queryKey, data);
+          await preloadVideosFromData(data, config);
+          return;
+        }
+
         // Store as infinite query format so useInfiniteQuery can use it
-        // The infinite query expects { pages: [...], pageParams: [...] }
         const infiniteData = {
           pages: [{ items: data, nextCursor: data.length, hasMore: true }],
           pageParams: [0],
@@ -489,7 +487,6 @@ export function AppPrefetchProvider({
         // No queryFn - just check cache for HLS preload
         const cachedData = queryClient.getQueryData(config.queryKey);
         if (cachedData) {
-          // Handle both flat array and infinite query format
           const items = Array.isArray(cachedData) 
             ? cachedData 
             : (cachedData as any)?.pages?.flatMap((p: any) => p.items) || [];
@@ -497,10 +494,23 @@ export function AppPrefetchProvider({
         }
       }
     } catch {
-      // Silent fail - prefetch errors shouldn't block the app
-      prefetchedRoutes.current.delete(path);
+      // Silent fail
     }
-  }, [queryClient, shouldPrefetch, preloadVideosFromData]);
+  }, [queryClient, preloadVideosFromData]);
+
+  // Prefetch route data — processes ALL configs for a path
+  const prefetchRoute = useCallback(async (path: string) => {
+    if (prefetchedRoutes.current.has(path)) return;
+    if (!shouldPrefetch()) return;
+
+    const configs = ROUTE_CONFIGS.filter(r => r.path === path);
+    if (configs.length === 0) return;
+
+    prefetchedRoutes.current.add(path);
+
+    // Fire all configs for this path in parallel
+    await Promise.allSettled(configs.map(config => prefetchConfig(config)));
+  }, [shouldPrefetch, prefetchConfig]);
 
   // Auto-prefetch routes on mount with priority-based timing
   useEffect(() => {
