@@ -135,7 +135,7 @@ export const ExploreRegionCards: React.FC<ExploreRegionCardsProps> = ({
       className={cn("py-6", className)}
     >
       {/* Section Header */}
-      <div className="px-4 mb-4" style={{ paddingLeft: '16px' }}>
+      <div className="px-4 mb-4">
         {isLoading ? (
           <>
             <Skeleton className="h-6 w-40" />
