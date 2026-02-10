@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useDebounce } from '@/hooks/use-debounce';
 
 interface CourseSearchResult {
   type: 'course';
@@ -30,16 +31,17 @@ export type SearchResult = CourseSearchResult | RegionSearchResult | ThemeSearch
 
 export function useExploreSearch(query: string, enabled = true) {
   const trimmedQuery = query.trim().toLowerCase();
-  const shouldSearch = enabled && trimmedQuery.length >= 2;
+  const debouncedQuery = useDebounce(trimmedQuery, 300);
+  const shouldSearch = enabled && debouncedQuery.length >= 2;
 
   // Search courses
   const { data: courses, isLoading: coursesLoading } = useQuery({
-    queryKey: ['explore-search-courses', trimmedQuery],
+    queryKey: ['explore-search-courses', debouncedQuery],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('golf_courses')
         .select('id, name, sub_country, country')
-        .ilike('name', `%${trimmedQuery}%`)
+        .ilike('name', `%${debouncedQuery}%`)
         .limit(5);
 
       if (error) throw error;
@@ -57,12 +59,12 @@ export function useExploreSearch(query: string, enabled = true) {
 
   // Search regions
   const { data: regions, isLoading: regionsLoading } = useQuery({
-    queryKey: ['explore-search-regions', trimmedQuery],
+    queryKey: ['explore-search-regions', debouncedQuery],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('explore_regions')
         .select('id, slug, title, subtitle')
-        .ilike('title', `%${trimmedQuery}%`)
+        .ilike('title', `%${debouncedQuery}%`)
         .limit(5);
 
       if (error) throw error;
@@ -80,12 +82,12 @@ export function useExploreSearch(query: string, enabled = true) {
 
   // Search themes
   const { data: themes, isLoading: themesLoading } = useQuery({
-    queryKey: ['explore-search-themes', trimmedQuery],
+    queryKey: ['explore-search-themes', debouncedQuery],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('explore_themes')
         .select('id, slug, title, subtitle')
-        .ilike('title', `%${trimmedQuery}%`)
+        .ilike('title', `%${debouncedQuery}%`)
         .limit(5);
 
       if (error) throw error;

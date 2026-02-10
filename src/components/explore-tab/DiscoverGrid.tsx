@@ -20,6 +20,10 @@ import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloud
 import { isPosterFailed } from '@/utils/posterPrefetch';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { useAdaptivePrefetch } from '@/hooks/useAdaptivePrefetch';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import ExploreErrorState from './ExploreErrorState';
 import { cn } from '@/lib/utils';
 
 // Format like count for display
@@ -81,10 +85,12 @@ function DiscoverGridSkeleton() {
 const PortraitTile = React.memo(function PortraitTile({ 
   moment,
   index,
+  isLiked,
   onClick,
 }: { 
   moment: ExploreMoment;
   index: number;
+  isLiked: boolean;
   onClick: () => void;
 }) {
   const [isVideoReady, setIsVideoReady] = useState(false);
@@ -241,9 +247,9 @@ const PortraitTile = React.memo(function PortraitTile({
       {/* Gradient Overlay - Bottom 30% (Watch tab standard) */}
       <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none z-20" />
 
-      {/* Like Count - Top Right (Watch tab standard) */}
+      {/* Like Count - Top Right (personalized) */}
       <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-black/40 backdrop-blur-sm rounded-full z-30">
-        <Heart className={cn("w-3 h-3", likeCount > 0 ? "fill-like text-like" : "text-white")} />
+        <Heart className={cn("w-3 h-3", isLiked ? "fill-like text-like" : "text-white")} />
         {likeCount > 0 && (
           <span className="text-white text-[10px] font-medium">{formatCount(likeCount)}</span>
         )}
@@ -280,10 +286,12 @@ const PortraitTile = React.memo(function PortraitTile({
 const LandscapeTile = React.memo(function LandscapeTile({ 
   moment,
   index,
+  isLiked,
   onClick,
 }: { 
   moment: ExploreMoment;
   index: number;
+  isLiked: boolean;
   onClick: () => void;
 }) {
   const [isVideoReady, setIsVideoReady] = useState(false);
@@ -444,9 +452,9 @@ const LandscapeTile = React.memo(function LandscapeTile({
       {/* Gradient Overlay - Bottom 30% (Watch tab standard) */}
       <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none z-20" />
 
-      {/* Like Count - Top Right (Watch tab standard) */}
+      {/* Like Count - Top Right (personalized) */}
       <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-black/40 backdrop-blur-sm rounded-full z-30">
-        <Heart className={cn("w-3 h-3", likeCount > 0 ? "fill-like text-like" : "text-white")} />
+        <Heart className={cn("w-3 h-3", isLiked ? "fill-like text-like" : "text-white")} />
         {likeCount > 0 && (
           <span className="text-white text-[10px] font-medium">{formatCount(likeCount)}</span>
         )}
@@ -499,16 +507,39 @@ export function DiscoverGrid({
 
   const { 
     data, 
-    isLoading, 
+    isLoading,
+    error,
     isFetchingNextPage,
     hasNextPage,
-    fetchNextPage 
+    fetchNextPage,
+    refetch,
   } = useInfiniteExploreMoments(regionKey, filters);
+
+  // Fix 4: Personalized like state - fetch current user's liked post IDs
+  const { session } = useSupabaseSession();
+  const userId = session?.user?.id;
 
   // Flatten all pages into single array
   const allMoments = useMemo(() => {
     return data?.pages.flatMap(page => page.moments) ?? [];
   }, [data]);
+
+  // Fix 4: Fetch user's liked source IDs for personalized hearts
+  const sourceIds = useMemo(() => allMoments.map(m => m.source_id), [allMoments]);
+  const { data: userLikedIds = new Set<string>() } = useQuery({
+    queryKey: ['explore-grid-user-likes', userId, sourceIds],
+    queryFn: async () => {
+      if (!userId || sourceIds.length === 0) return new Set<string>();
+      const { data } = await supabase
+        .from('post_likes')
+        .select('post_id')
+        .eq('user_id', userId)
+        .in('post_id', sourceIds);
+      return new Set((data || []).map(d => d.post_id));
+    },
+    enabled: !!userId && sourceIds.length > 0,
+    staleTime: 60_000,
+  });
 
   // TikTok-level: Adaptive prefetch on mount using dynamic window
   useEffect(() => {
@@ -569,7 +600,7 @@ export function DiscoverGrid({
           }
         }
       },
-      { rootMargin: '0px' } // Watch tab standard: trigger at bottom
+      { rootMargin: '200px' }
     );
     
     observer.observe(loadMoreRef.current);
@@ -629,8 +660,18 @@ export function DiscoverGrid({
     onMomentClick?.(moment, index, allMoments);
   }, [onMomentClick, allMoments]);
 
+  // Fix 8: Error state
+  if (error && !isLoading && allMoments.length === 0) {
+    return (
+      <ExploreErrorState
+        message="Couldn't load content"
+        onRetry={() => refetch()}
+      />
+    );
+  }
+
   // Empty state
-  if (!isLoading && allMoments.length === 0) {
+  if (!isLoading && !error && allMoments.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 px-4">
         <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
@@ -681,6 +722,7 @@ export function DiscoverGrid({
                 <LandscapeTile
                   moment={moment}
                   index={index}
+                  isLiked={userLikedIds.has(moment.source_id)}
                   onClick={() => handleMomentClick(moment, index)}
                 />
               );
@@ -690,6 +732,7 @@ export function DiscoverGrid({
               <PortraitTile
                 moment={moment}
                 index={index}
+                isLiked={userLikedIds.has(moment.source_id)}
                 onClick={() => handleMomentClick(moment, index)}
               />
             );
@@ -698,7 +741,7 @@ export function DiscoverGrid({
         
         {/* Infinite scroll trigger */}
         {hasNextPage && (
-          <div ref={loadMoreRef} className="h-4" />
+          <div ref={loadMoreRef} className="h-20" />
         )}
         
         {/* Orange brand spinner for paced infinite scroll (Watch tab standard) */}

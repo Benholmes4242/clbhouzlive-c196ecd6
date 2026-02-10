@@ -119,9 +119,7 @@ export function useInfiniteExploreMoments(
 
       // Sort order
       if (sortBy === 'liked') {
-        // For "most liked", we'd need engagement data - for now fallback to recent
-        // TODO: Add likes_count to explore_moments view or use RPC
-        query = query.order('created_at', { ascending: false });
+        query = query.order('likes_count', { ascending: false, nullsFirst: false });
       } else {
         query = query.order('created_at', { ascending: false });
       }
