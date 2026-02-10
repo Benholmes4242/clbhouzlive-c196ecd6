@@ -63,15 +63,17 @@ const ChaserCard = memo(function ChaserCard({
     >
       {/* Horizontal split: Avatar left, info right */}
       <div className="flex" style={{ gap: '10px' }}>
-        {/* LEFT: Avatar */}
-        <div className="flex-shrink-0">
+        {/* LEFT: Avatar - edge-to-edge */}
+        <div className="flex-shrink-0 -ml-3 -my-3">
           <div
             className="overflow-hidden"
             style={{
-              width: '64px',
-              height: '64px',
-              borderRadius: '12px',
-              border: '1px solid rgba(0,0,0,0.06)',
+              width: '80px',
+              height: '100%',
+              minHeight: '88px',
+              borderRadius: '0',
+              borderTopLeftRadius: '14px',
+              borderBottomLeftRadius: '14px',
             }}
           >
             {showPhoto ? (

@@ -80,6 +80,9 @@ export function OverviewPageV3() {
           {/* 3. What's Coming - upcoming tournaments across all tours */}
           <WhatsComing />
 
+          {/* Spacer between What's Coming and clbhouz intelligence */}
+          <div style={{ height: '8px' }} />
+
           {/* 4. Tournament Insights - AI Predictions (CLBHOUZ Intelligence) */}
           <TournamentInsights />
 

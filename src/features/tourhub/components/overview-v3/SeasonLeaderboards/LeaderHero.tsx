@@ -56,15 +56,17 @@ export const LeaderHero = memo(function LeaderHero({ player, accentColor }: Lead
 
       {/* Horizontal split: Avatar left, Info right */}
       <div className="relative flex" style={{ gap: '18px' }}>
-        {/* LEFT: Large cinematic avatar */}
-        <div className="flex-shrink-0">
+        {/* LEFT: Large cinematic avatar - edge-to-edge */}
+        <div className="flex-shrink-0 -ml-5 -my-5">
           <div
             className="overflow-hidden"
             style={{
-              width: '112px',
-              height: '112px',
-              borderRadius: '16px',
-              border: '1px solid rgba(0,0,0,0.06)',
+              width: '140px',
+              height: '100%',
+              minHeight: '152px',
+              borderRadius: '0',
+              borderTopLeftRadius: '20px',
+              borderBottomLeftRadius: '20px',
             }}
           >
             {showPhoto ? (

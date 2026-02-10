@@ -27,6 +27,7 @@ export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
   '/top100/', // Individual region top 100 pages - immersive layout
   '/tourhub', // Tour Hub - all tabs & sub-pages are fully immersive
   '/tour', // Tour Hub alias
+  '/discover/explore/region/', // Individual region pages - immersive hero
 ] as const;
 
 /**

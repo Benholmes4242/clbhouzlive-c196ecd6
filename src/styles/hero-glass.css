@@ -244,9 +244,9 @@
 }
 
 .winner-avatar {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
+  width: 72px;
+  height: 72px;
+  border-radius: 34%;
   border: 2px solid rgba(255, 255, 255, 0.3);
   overflow: hidden;
   background: rgba(255, 255, 255, 0.1);

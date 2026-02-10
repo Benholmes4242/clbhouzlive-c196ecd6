@@ -389,12 +389,14 @@ export function WatchHeroVideo({
         <div className="absolute bottom-0 left-0 right-0 p-4">
           {creator && (
             <div className="flex items-center gap-2.5 min-w-0">
-              <img
-                src={creator.profile_photo_url || ''}
-                alt={creator.display_name || 'Creator'}
-                className="w-9 h-9 rounded-full object-cover bg-white/20 flex-shrink-0"
-                onError={(e) => { e.currentTarget.style.display = 'none'; }}
-              />
+              <div className="w-10 h-10 flex-shrink-0 overflow-hidden bg-white/20" style={{ borderRadius: '34%' }}>
+                <img
+                  src={creator.profile_photo_url || ''}
+                  alt={creator.display_name || 'Creator'}
+                  className="w-full h-full object-cover"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
+              </div>
               <div className="flex flex-col min-w-0">
                 <p className="text-white text-base font-semibold truncate">
                   {creator.display_name || creator.username || ''}
