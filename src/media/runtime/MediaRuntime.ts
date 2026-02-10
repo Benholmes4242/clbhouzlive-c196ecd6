@@ -18,7 +18,7 @@ import { MOBILE_VIDEO_DEBUG, logRuntimeRequestPlay, logRuntimePlayResult, logGes
 
 // ============ Types ============
 
-export type MediaSurface = 'grid' | 'fullscreen' | 'clubhouse' | 'hero' | 'videos' | 'watch' | 'watch-shorts' | 'profile' | 'explore-grid';
+export type MediaSurface = 'grid' | 'fullscreen' | 'clubhouse' | 'hero' | 'videos' | 'watch' | 'watch-shorts' | 'profile' | 'explore-grid' | 'friends-feed';
 export type PlaybackReason = 'autoplay' | 'user' | 'resume';
 export type ErrorType = 'transient' | 'hls_fatal' | 'decode_unsupported';
 
@@ -106,6 +106,7 @@ const MAX_CONCURRENT_PER_SURFACE: Record<MediaSurface, number> = {
   'watch-shorts': 2,   // Watch tab shorts grid - diagonal pattern (1 per visible row)
   'profile': 4,        // Allow 4 visible profile activity videos to play
   'explore-grid': 2,   // Explore discover grid - 2 visible tiles in 2-column layout
+  'friends-feed': 1,   // Friends feed - single column, 1 video at a time
 };
 const MAX_CONCURRENT_FULLSCREEN = 1;  // Fullscreen/clubhouse: strict 1-at-a-time
 
@@ -120,6 +121,7 @@ const SURFACE_PRIORITY: Record<MediaSurface, number> = {
   'watch-shorts': 4,   // Same as grid - Watch tab shorts grid
   'profile': 4,        // Same as grid - Profile activity videos
   'explore-grid': 4,   // Same as grid - Explore discover grid
+  'friends-feed': 4,   // Same as grid - Friends feed
 };
 
 // ============ Singleton Runtime ============
