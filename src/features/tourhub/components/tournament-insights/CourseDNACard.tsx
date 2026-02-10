@@ -79,13 +79,13 @@ const getIconBg = (tier: ImportanceTier): string => {
   }
 };
 
-export const CourseDNACard = memo(function CourseDNACard({ items, courseName }: CourseDNACardProps) {
+export const CourseDNACard = memo(function CourseDNACard({ items, inline, courseName }: CourseDNACardProps) {
   if (items.length === 0) return null;
 
   return (
     <div 
-      className="rounded-2xl p-5 bg-card border border-border"
-      style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)' }}
+      className={inline ? "p-5" : "rounded-2xl p-5 bg-card border border-border"}
+      style={inline ? undefined : { boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)' }}
     >
       <h3 className="text-base font-bold mb-4 text-foreground">
         What Matters{courseName ? ` at ${courseName}` : ''}

@@ -15,8 +15,11 @@ interface ClubhouseIntelligenceProps {
   inline?: boolean;
 }
 
+// Keep interface, use inline prop below
+
 export const ClubhouseIntelligence = memo(function ClubhouseIntelligence({ 
-  insight 
+  insight,
+  inline,
 }: ClubhouseIntelligenceProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -28,8 +31,8 @@ export const ClubhouseIntelligence = memo(function ClubhouseIntelligence({
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
       viewport={{ once: true }}
-      className="rounded-2xl p-5 bg-card border border-border"
-      style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)' }}
+      className={inline ? "px-5 pb-5 pt-0 border-t border-border" : "rounded-2xl p-5 bg-card border border-border"}
+      style={inline ? undefined : { boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)' }}
     >
       <h3 className="text-base font-bold mb-2.5 text-foreground">
         Course Breakdown

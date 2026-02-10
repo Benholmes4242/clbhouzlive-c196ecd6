@@ -26,7 +26,7 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
   const imageUrl = venueImageQuery.data?.imageUrl || tournament.heroImageUrl;
 
   return (
-    <div className="relative h-[253px] overflow-hidden">
+    <div className="relative h-[278px] overflow-hidden">
       {/* Background Image - full bleed, pointed corners */}
       <img
         src={imageUrl}
@@ -56,7 +56,7 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
       </div>
 
       {/* Content - anchored bottom left */}
-      <div className="absolute bottom-0 left-0 right-0 p-4">
+      <div className="absolute bottom-0 left-0 right-0 px-5 pb-5 pt-4">
         {/* Tournament Name */}
         <h2 className="text-xl font-bold text-white leading-tight mb-1">
           {tournament.name}
