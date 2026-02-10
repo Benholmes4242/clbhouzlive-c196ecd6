@@ -199,7 +199,7 @@ export const ShortVideoTile = React.memo(function ShortVideoTile({
       {durationSeconds != null && durationSeconds > 0 && (
         <DurationBadge 
           seconds={durationSeconds} 
-          className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm rounded-md px-1.5 py-0.5 text-[10px] font-medium text-white z-10"
+          className="absolute bottom-2 right-2 bg-black/40 backdrop-blur-sm rounded-full px-2 py-1 text-[10px] font-medium text-white z-10"
         />
       )}
 

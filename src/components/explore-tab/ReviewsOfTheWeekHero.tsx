@@ -443,13 +443,14 @@ const ReviewSlide = React.memo(function ReviewSlide({
           }}
         >
           <span 
-            className="text-2xl font-bold tabular-nums leading-none text-white"
-            style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}
+            className="text-2xl font-bold tabular-nums leading-none"
+            style={{ color: '#f59e0b', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}
           >
             {formattedRating}
           </span>
           <span 
-            className="text-[10px] font-medium text-white/80 mt-0.5"
+            className="text-[10px] font-medium mt-0.5"
+            style={{ color: '#f59e0b' }}
           >
             {theme.label}
           </span>

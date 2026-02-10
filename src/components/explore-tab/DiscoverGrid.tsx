@@ -458,7 +458,7 @@ const LandscapeTile = React.memo(function LandscapeTile({
       {/* Creator Name + Course */}
       <div className="absolute bottom-2 left-2 right-2 z-20">
         {(creator?.display_name || creator?.username) && (
-          <p className="text-white text-sm font-medium truncate">
+          <p className="text-xs font-semibold text-white truncate">
             {creator?.display_name || creator?.username}
           </p>
         )}
