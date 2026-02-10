@@ -3,7 +3,12 @@
 
 /* League Spartan - Bold display font for special headings */
 @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700;800&display=swap');
+
+/* DM Sans + Playfair Display — Hub warm redesign typography */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Playfair+Display:wght@400;500;600;700;800&display=swap');
+
 @import './components/ai-chat/ai-chat-fixes.css';
+@import './styles/hub-warm.css';
 @import './styles/liquid-glass.css';
 @import './styles/profile-spacing.css';
 @import './styles/squircle.css';

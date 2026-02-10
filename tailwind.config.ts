@@ -51,10 +51,20 @@ export default {
 				'Arial',
 				'sans-serif',
 			],
-			// League Spartan - Bold display font for special headings
+		// League Spartan - Bold display font for special headings
 			'league-spartan': [
 				'"League Spartan"',
 				'sans-serif',
+			],
+			// DM Sans — Hub warm redesign body font
+			'dm-sans': [
+				'"DM Sans"',
+				'sans-serif',
+			],
+			// Playfair Display — Hub warm redesign display font
+			'playfair': [
+				'"Playfair Display"',
+				'serif',
 			],
 		},
 			fontSize: {
