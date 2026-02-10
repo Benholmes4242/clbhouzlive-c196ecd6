@@ -2287,6 +2287,12 @@ html[data-immersive="true"] .app-shell--topSpacer {
     --surface-nav: rgba(10, 10, 10, 0.98);
   }
 
+  /* Hub: let the warm gradient bleed behind the status bar */
+  body.route-hub .app-shell {
+    padding-top: 0 !important;
+    background-color: transparent;
+  }
+
 /* Hide scrollbars for Netflix-style carousels */
 .scrollbar-hide {
   -ms-overflow-style: none;
