@@ -219,6 +219,7 @@ export function useActivityPostsV2(actorId?: string) {
   return {
     items: allItems,
     isLoading: query.isLoading,
+    isError: query.isError,
     isFetchingNextPage: query.isFetchingNextPage,
     hasMore,
     fetchNextPage: query.fetchNextPage,
