@@ -44,7 +44,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
         viewport={{ once: true }}
-        className="flex items-center justify-between mb-4"
+        className="flex items-center justify-between mb-4 px-4"
       >
         {/* Left: Brain icon + text */}
         <div className="flex items-center gap-3">

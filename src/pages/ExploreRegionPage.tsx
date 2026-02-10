@@ -194,9 +194,16 @@ const ExploreRegionPage: React.FC = () => {
   return (
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
       <div className="min-h-screen pb-24" style={{ background: '#F8FAFC' }}>
-        {/* ====== Hero Section (Polish 1) ====== */}
+        {/* ====== Hero Section (Polish 1) - Bleeds into safe area ====== */}
         {detailLoading ? (
-          <div className="relative overflow-hidden" style={{ aspectRatio: '16/10' }}>
+          <div 
+            className="relative overflow-hidden"
+            style={{ 
+              aspectRatio: '16/10',
+              marginTop: 'calc(-1 * max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
+              paddingTop: 'max(var(--sat, env(safe-area-inset-top, 0px)), 47px)',
+            }}
+          >
             <div className="absolute inset-0 bg-gradient-to-br from-emerald-800 to-emerald-950 animate-pulse" />
             <div className="absolute bottom-0 left-0 right-0 p-5">
               <div className="w-48 h-7 rounded bg-white/20 mb-2" />
@@ -206,7 +213,14 @@ const ExploreRegionPage: React.FC = () => {
             </div>
           </div>
         ) : (
-          <div className="relative overflow-hidden" style={{ aspectRatio: '16/10' }}>
+          <div 
+            className="relative overflow-hidden"
+            style={{ 
+              aspectRatio: '16/10',
+              marginTop: 'calc(-1 * max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
+              paddingTop: 'max(var(--sat, env(safe-area-inset-top, 0px)), 47px)',
+            }}
+          >
             {/* Background image or gradient */}
             {heroSrc && !heroImgFailed ? (
               <img
