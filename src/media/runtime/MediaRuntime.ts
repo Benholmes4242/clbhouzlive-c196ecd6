@@ -118,7 +118,7 @@ const SURFACE_PRIORITY: Record<MediaSurface, number> = {
   'clubhouse': 1,      // Highest - fullscreen feed
   'fullscreen': 2,     // High - fullscreen modal
   'miniplayer': 3,     // Medium-high - persistent mini player
-  'hero': 3,           // Medium-high - hero video at top
+  'hero': 2,           // High - hero video must play before grid
   'grid': 4,           // Medium - grid videos
   'videos': 5,         // Medium-low - videos page (long-form)
   'watch': 4,          // Same as grid - Watch tab grid videos

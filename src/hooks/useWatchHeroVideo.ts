@@ -6,6 +6,9 @@
  * 2. Most liked THIS WEEK (last 7 days)
  * 3. Most liked THIS MONTH (last 30 days)
  * 4. Most liked ALL TIME (fallback)
+ * 
+ * PERFORMANCE: All 4 time windows are fetched in parallel via Promise.all.
+ * Profile data is joined inline to eliminate a separate round-trip.
  */
 
 import { useQuery } from '@tanstack/react-query';
@@ -71,6 +74,12 @@ async function fetchMostLiked(since: Date | null, label: string): Promise<HeroVi
         id,
         name,
         country
+      ),
+      user_profiles (
+        id,
+        username,
+        display_name,
+        profile_photo_url
       )
     `)
     .eq('visibility', 'anyone')
@@ -102,24 +111,14 @@ async function fetchMostLiked(since: Date | null, label: string): Promise<HeroVi
 
   const topPost = videos[0] as any;
   
-  // Fetch user profile separately (no FK between posts and user_profiles)
-  let creator: HeroVideo['creator'] = null;
-  if (topPost.user_id) {
-    const { data: profile } = await supabase
-      .from('user_profiles')
-      .select('id, username, display_name, profile_photo_url')
-      .eq('id', topPost.user_id)
-      .single();
-    
-    if (profile) {
-      creator = {
-        id: profile.id,
-        username: profile.username,
-        display_name: profile.display_name,
-        profile_photo_url: profile.profile_photo_url,
-      };
-    }
-  }
+  // Profile is now inlined in the query — no separate fetch needed
+  const profile = topPost.user_profiles;
+  const creator: HeroVideo['creator'] = profile ? {
+    id: profile.id,
+    username: profile.username,
+    display_name: profile.display_name,
+    profile_photo_url: profile.profile_photo_url,
+  } : null;
 
   console.log(`[useWatchHeroVideo] ${label} result:`, {
     rawCount: data?.length,
@@ -151,55 +150,53 @@ async function fetchMostLiked(since: Date | null, label: string): Promise<HeroVi
   };
 }
 
+/** Standalone queryFn for prefetch use */
+export async function fetchWatchHeroVideo(): Promise<{ heroVideo: HeroVideo | null; trendingPeriod: TrendingPeriod }> {
+  const now = new Date();
+  
+  const todayStart = new Date(now);
+  todayStart.setHours(todayStart.getHours() - 24);
+  
+  const weekStart = new Date(now);
+  weekStart.setDate(weekStart.getDate() - 7);
+  
+  const monthStart = new Date(now);
+  monthStart.setMonth(monthStart.getMonth() - 1);
+
+  // Fire all 4 time-window queries in parallel
+  const [todayPost, weekPost, monthPost, fallbackPost] = await Promise.all([
+    fetchMostLiked(todayStart, 'TODAY'),
+    fetchMostLiked(weekStart, 'WEEK'),
+    fetchMostLiked(monthStart, 'MONTH'),
+    fetchMostLiked(null, 'ALL_TIME'),
+  ]);
+
+  // Pick the narrowest time window that has results
+  if (todayPost) {
+    console.log('[useWatchHeroVideo] ✓ Using TODAY hero:', todayPost.id?.slice(0, 8));
+    return { heroVideo: todayPost, trendingPeriod: 'today' };
+  }
+  if (weekPost) {
+    console.log('[useWatchHeroVideo] ✓ Using WEEK hero:', weekPost.id?.slice(0, 8));
+    return { heroVideo: weekPost, trendingPeriod: 'this_week' };
+  }
+  if (monthPost) {
+    console.log('[useWatchHeroVideo] ✓ Using MONTH hero:', monthPost.id?.slice(0, 8));
+    return { heroVideo: monthPost, trendingPeriod: 'this_month' };
+  }
+  if (fallbackPost) {
+    console.log('[useWatchHeroVideo] ✓ Using ALL TIME hero:', fallbackPost.id?.slice(0, 8));
+    return { heroVideo: fallbackPost, trendingPeriod: 'all_time' };
+  }
+
+  console.log('[useWatchHeroVideo] ✗ No hero found at all');
+  return { heroVideo: null, trendingPeriod: 'all_time' };
+}
+
 export function useWatchHeroVideo(): WatchHeroResult {
   const { data, isLoading, error } = useQuery({
     queryKey: ['watch-hero-video'],
-    queryFn: async (): Promise<{ heroVideo: HeroVideo | null; trendingPeriod: TrendingPeriod }> => {
-      const now = new Date();
-      
-      // Calculate time boundaries
-      const todayStart = new Date(now);
-      todayStart.setHours(todayStart.getHours() - 24);
-      
-      const weekStart = new Date(now);
-      weekStart.setDate(weekStart.getDate() - 7);
-      
-      const monthStart = new Date(now);
-      monthStart.setMonth(monthStart.getMonth() - 1);
-
-      // Priority 1: Most liked TODAY
-      const todayPost = await fetchMostLiked(todayStart, 'TODAY');
-      if (todayPost) {
-        console.log('[useWatchHeroVideo] ✓ Using TODAY hero:', todayPost.id?.slice(0, 8));
-        return { heroVideo: todayPost, trendingPeriod: 'today' };
-      }
-
-      // Priority 2: Most liked THIS WEEK
-      const weekPost = await fetchMostLiked(weekStart, 'WEEK');
-      if (weekPost) {
-        console.log('[useWatchHeroVideo] ✓ Using WEEK hero:', weekPost.id?.slice(0, 8));
-        return { heroVideo: weekPost, trendingPeriod: 'this_week' };
-      }
-
-      // Priority 3: Most liked THIS MONTH
-      const monthPost = await fetchMostLiked(monthStart, 'MONTH');
-      if (monthPost) {
-        console.log('[useWatchHeroVideo] ✓ Using MONTH hero:', monthPost.id?.slice(0, 8));
-        return { heroVideo: monthPost, trendingPeriod: 'this_month' };
-      }
-
-      // Priority 4: ALL TIME fallback
-      console.log('[useWatchHeroVideo] No recent videos, fetching ALL TIME fallback');
-      const fallbackPost = await fetchMostLiked(null, 'ALL_TIME');
-      
-      if (fallbackPost) {
-        console.log('[useWatchHeroVideo] ✓ Using ALL TIME hero:', fallbackPost.id?.slice(0, 8));
-        return { heroVideo: fallbackPost, trendingPeriod: 'all_time' };
-      }
-
-      console.log('[useWatchHeroVideo] ✗ No hero found at all');
-      return { heroVideo: null, trendingPeriod: 'all_time' };
-    },
+    queryFn: fetchWatchHeroVideo,
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
   });
