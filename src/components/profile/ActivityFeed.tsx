@@ -19,6 +19,10 @@ import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { logProfile, createLifecycleLogger, logQueryState, profileTiming, logMediaState, logInteraction } from './debug';
+import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
+import { useQueryClient } from '@tanstack/react-query';
+import { postKeys } from '@/queryKeys/posts';
+import { AlertCircle } from 'lucide-react';
 
 // Minimum videos ready before showing feed
 const MINIMUM_READY_COUNT = 2;
@@ -95,8 +99,12 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     isLoading, 
     isFetchingNextPage, 
     hasMore, 
-    fetchNextPage 
+    fetchNextPage,
+    refetch,
+    isError,
   } = useActivityPostsV2(userId);
+
+  const queryClient = useQueryClient();
   
   // Memoize item counts to prevent recalculation on every render
   const { totalItems, videoCount, imageCount } = useMemo(() => {
@@ -301,7 +309,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   }, [deletePost, userId]);
 
   // Use unified fullscreen player for activity items
-  const { openFullscreen } = useUnifiedFullscreen('unified', {
+  const { openFullscreen } = useUnifiedFullscreen('profile', {
     allowLandscape: true,
     
     // Track current post and creator when user swipes
@@ -370,8 +378,33 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     fetchNextPage();
   }, [fetchNextPage]);
 
+  // Pull-to-refresh handler
+  const handlePullToRefresh = useCallback(async () => {
+    await queryClient.invalidateQueries({
+      queryKey: [...postKeys.actorPosts('personal', userId), 'v2'],
+    });
+  }, [queryClient, userId]);
+
+  // Error state
+  if (isError && !isLoading && items.length === 0) {
+    return (
+      <PullToRefreshContainer onRefresh={handlePullToRefresh}>
+        <div className="flex flex-col items-center justify-center py-20 text-center px-4">
+          <AlertCircle className="h-10 w-10 text-muted-foreground/20 mb-4" />
+          <p className="text-sm text-muted-foreground mb-4">Couldn't load posts</p>
+          <button
+            onClick={() => refetch()}
+            className="rounded-full bg-emerald-600 text-white text-sm font-medium px-5 py-2 active:scale-[0.97] transition-transform"
+          >
+            Try Again
+          </button>
+        </div>
+      </PullToRefreshContainer>
+    );
+  }
+
   return (
-    <>
+    <PullToRefreshContainer onRefresh={handlePullToRefresh}>
       {/* Creator Profile Section - shows only for creators */}
       <CreatorProfileSection
         userId={userId}
@@ -443,7 +476,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
 
       {/* Scroll to top FAB */}
       <ScrollToTopGlass />
-    </>
+    </PullToRefreshContainer>
   );
 };
 

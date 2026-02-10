@@ -89,6 +89,8 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   const [resolvedDurationSeconds, setResolvedDurationSeconds] = useState<number | null | undefined>(
     item.durationSeconds
   );
+  const [isPosterLoaded, setIsPosterLoaded] = useState(false);
+  const [isPosterBroken, setIsPosterBroken] = useState(false);
   
   const handleClick = useCallback(() => {
     onPress?.(item, index);
@@ -137,9 +139,11 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
     };
   }, []);
 
-  // Reset ready flag when item changes
+  // Reset ready flag and poster states when item changes
   useEffect(() => {
     hasReportedReadyRef.current = false;
+    setIsPosterLoaded(false);
+    setIsPosterBroken(false);
   }, [item.postId]);
 
   // State for hysteresis-based autoplay
@@ -257,16 +261,38 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
           className={cn("w-full h-full", filterClass)}
           style={pixelLayerStyle}
         >
-          {/* Thumbnail - priority loading for visible tiles, lazy for others */}
+          {/* Thumbnail - with shimmer base, fade-in, and error fallback */}
           {(!isVideo || !isVideoReady) && (
-            <img
-              src={thumbnailSrc}
-              alt=""
-              className="absolute inset-0 h-full w-full object-cover"
-              loading={index < 6 ? "eager" : "lazy"}
-              fetchPriority={index < 6 ? "high" : "auto"}
-              draggable={false}
-            />
+            <>
+              {/* Shimmer base layer - visible until poster loads */}
+              {!isPosterLoaded && !isPosterBroken && (
+                <div className="absolute inset-0 bg-muted overflow-hidden">
+                  <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-background/40 to-transparent" />
+                </div>
+              )}
+              {/* Broken image fallback */}
+              {isPosterBroken && (
+                <div className="absolute inset-0 bg-muted flex items-center justify-center">
+                  <Images className="h-6 w-6 text-muted-foreground/40" />
+                </div>
+              )}
+              {/* Poster image with fade-in */}
+              {!isPosterBroken && (
+                <img
+                  src={thumbnailSrc}
+                  alt=""
+                  className={cn(
+                    "absolute inset-0 h-full w-full object-cover transition-opacity duration-200",
+                    isPosterLoaded ? "opacity-100" : "opacity-0"
+                  )}
+                  loading={index < 6 ? "eager" : "lazy"}
+                  fetchPriority={index < 6 ? "high" : "auto"}
+                  draggable={false}
+                  onLoad={() => setIsPosterLoaded(true)}
+                  onError={() => setIsPosterBroken(true)}
+                />
+              )}
+            </>
           )}
 
           {/* Video layer - uses UnifiedVideoPlayer with 150ms crossfade */}
@@ -295,8 +321,8 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
           
            {/* Grey shimmer loading state (Watch tab standard) */}
            {isVideo && isAutoplayCandidate && config.autoplayEnabled && !isVideoReady && !isVisible && (
-            <div className="absolute inset-0 bg-gray-200 overflow-hidden">
-              <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+            <div className="absolute inset-0 bg-muted overflow-hidden">
+              <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-background/40 to-transparent" />
             </div>
           )}
         </div>
