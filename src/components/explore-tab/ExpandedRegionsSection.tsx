@@ -1,17 +1,10 @@
 /**
- * ExpandedRegionsSection - Polished region cards (Hub standard)
- * 
- * Uses real course images from top course in each region
- * Features:
- * - Horizontal scroll
- * - Course counts + Top 100 counts
- * - Gradient overlays
- * - Emerald accent line in header
+ * ExpandedRegionsSection - Premium region cards in horizontal scroll
+ * A* Polish: rounded-2xl aspect-[3/2] cards, snap scrolling, clean header
  */
 
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -30,20 +23,14 @@ interface RegionData {
   topCourseImage: string | null;
 }
 
-// Hardcoded image override for specific regions
 const REGION_IMAGE_OVERRIDES: Record<string, string> = {
-  'rest-of-world': 'https://media.clbhouz.co.uk/e44b8cbe-1d40-48d3-978f-1fa5e250ddde/clbhouz-course-images/1764363996472-9h1ryjq2sre.jpeg', // Royal Melbourne Golf Club - West Course
+  'rest-of-world': 'https://media.clbhouz.co.uk/e44b8cbe-1d40-48d3-978f-1fa5e250ddde/clbhouz-course-images/1764363996472-9h1ryjq2sre.jpeg',
 };
 
-/**
- * Hook to fetch region data with top course image
- * Fix 10: Consolidated into parallel queries instead of sequential per-region
- */
 function useRegionsWithTopCourse() {
   return useQuery({
     queryKey: ['regions-with-top-course'],
     queryFn: async (): Promise<RegionData[]> => {
-      // Step 1: Fetch all regions + members in parallel
       const [regionsResult, membersResult] = await Promise.all([
         supabase
           .from('explore_regions')
@@ -58,7 +45,6 @@ function useRegionsWithTopCourse() {
       const regions = regionsResult.data;
       const allMembers = membersResult.data || [];
 
-      // Build region->countries map
       const regionCountries: Record<string, string[]> = {};
       for (const region of regions) {
         regionCountries[region.id] = allMembers
@@ -66,11 +52,9 @@ function useRegionsWithTopCourse() {
           .map(m => m.country);
       }
 
-      // Step 2: Fetch all course counts and top100 counts in parallel per region
       const allCountries = allMembers.map(m => m.country);
       const uniqueCountries = [...new Set(allCountries)];
 
-      // Single query for all courses with ranks, then aggregate in JS
       const { data: coursesWithRank } = await supabase
         .from('golf_courses')
         .select('id, country, global_rank, thumbnail_image')
@@ -78,7 +62,6 @@ function useRegionsWithTopCourse() {
 
       const courses = coursesWithRank || [];
 
-      // Build per-region data from the single courses query
       return regions.map(region => {
         const countries = regionCountries[region.id] || [];
         const countriesSet = new Set(countries);
@@ -87,14 +70,10 @@ function useRegionsWithTopCourse() {
         const courseCount = regionCourses.length;
         const top100Count = regionCourses.filter(c => c.global_rank != null && c.global_rank <= 100).length;
         
-        // Get top course image (best ranked with image)
         const topCourse = regionCourses
           .filter(c => c.global_rank != null && c.thumbnail_image != null)
           .sort((a, b) => (a.global_rank || 999) - (b.global_rank || 999))[0];
         
-        const topCourseImage = topCourse?.thumbnail_image || null;
-
-        // Apply region-specific image overrides
         const overrideImage = REGION_IMAGE_OVERRIDES[region.slug];
 
         return {
@@ -104,15 +83,14 @@ function useRegionsWithTopCourse() {
           hero_image_url: region.hero_image_url,
           course_count: courseCount,
           top100_count: top100Count,
-          topCourseImage: overrideImage || topCourseImage,
+          topCourseImage: overrideImage || topCourse?.thumbnail_image || null,
         };
       });
     },
-    staleTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 10 * 60 * 1000,
   });
 }
 
-// Region card component
 const RegionCard: React.FC<{
   region: RegionData;
   onClick: () => void;
@@ -124,30 +102,31 @@ const RegionCard: React.FC<{
   return (
     <button
       onClick={onClick}
-      className="relative w-36 h-24 rounded-xl overflow-hidden flex-shrink-0 group"
+      className="relative w-[200px] rounded-2xl overflow-hidden flex-shrink-0 group snap-start active:scale-[0.98] transition-transform"
+      style={{ aspectRatio: '3/2' }}
     >
-      {/* Course Image Background */}
       {!showGradient ? (
         <img
           src={imageUrl!}
           alt={region.title}
           onError={() => setImageError(true)}
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          loading="lazy"
         />
       ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-200 to-slate-300" />
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-700 to-emerald-900" />
       )}
       
-      {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
       
       {/* Content */}
       <div className="absolute bottom-0 left-0 right-0 p-3">
-        <p className="text-sm font-semibold text-white line-clamp-1">
+        <p className="text-base font-semibold text-white line-clamp-1">
           {region.title}
         </p>
-        <p className="text-[11px] text-white/70">
-          {region.course_count} courses
+        <p className="text-xs text-white/70">
+          {region.course_count.toLocaleString()} courses
         </p>
       </div>
     </button>
@@ -166,17 +145,19 @@ export const ExpandedRegionsSection: React.FC<ExpandedRegionsSectionProps> = ({
 
   if (isLoading) {
     return (
-      <div className={cn("bg-white border-b border-[#e2e8f0]", className)}>
-        <div className="px-4 py-4">
-          <div className="h-5 w-32 bg-[#e2e8f0] rounded animate-pulse mb-3" />
-          <div className="flex gap-3 overflow-x-auto scrollbar-hide">
-            {[1, 2, 3, 4].map((i) => (
-              <div 
-                key={i} 
-                className="w-36 h-24 rounded-xl bg-[#e2e8f0] animate-pulse flex-shrink-0" 
-              />
-            ))}
-          </div>
+      <div className={cn("mt-6 mb-6", className)}>
+        <div className="px-4 mb-3 flex items-center justify-between">
+          <div className="h-5 w-32 bg-gray-100 rounded animate-pulse" />
+          <div className="h-4 w-12 bg-gray-100 rounded animate-pulse" />
+        </div>
+        <div className="flex gap-3 overflow-x-auto scrollbar-hide px-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div 
+              key={i} 
+              className="w-[200px] rounded-2xl bg-gray-100 animate-pulse flex-shrink-0"
+              style={{ aspectRatio: '3/2' }}
+            />
+          ))}
         </div>
       </div>
     );
@@ -185,34 +166,37 @@ export const ExpandedRegionsSection: React.FC<ExpandedRegionsSectionProps> = ({
   if (!regions || regions.length === 0) return null;
 
   return (
-    <div className={cn("bg-white border-b border-[#e2e8f0]", className)}>
-      <div className="px-4 py-4">
-        {/* Section Header */}
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <span className="w-4 h-0.5 bg-emerald-500 rounded-full" />
-            <h3 className="text-sm font-semibold text-[#1e293b]">
-              Explore by Region
-            </h3>
-          </div>
-          <button 
-            onClick={() => navigate('/regions')}
-            className="text-xs font-medium text-[#64748b] hover:text-[#1e293b] transition-colors"
-          >
-            See all
-          </button>
-        </div>
-        
-        {/* Horizontal Scroll */}
-        <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-4 px-4">
-          {regions.map((region) => (
-            <RegionCard
-              key={region.id}
-              region={region}
-              onClick={() => handleRegionClick(region.slug)}
-            />
-          ))}
-        </div>
+    <div className={cn("mt-6 mb-6", className)}>
+      {/* Section Header */}
+      <div className="flex items-center justify-between px-4 mb-3">
+        <h3 className="text-base font-semibold text-gray-700">
+          Explore by Region
+        </h3>
+        <button 
+          onClick={() => navigate('/regions')}
+          className="text-sm font-medium text-emerald-600"
+        >
+          See all
+        </button>
+      </div>
+      
+      {/* Horizontal Scroll — snap scrolling */}
+      <div 
+        className="flex gap-3 overflow-x-auto scrollbar-hide px-4"
+        style={{
+          scrollSnapType: 'x mandatory',
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
+        {regions.map((region) => (
+          <RegionCard
+            key={region.id}
+            region={region}
+            onClick={() => handleRegionClick(region.slug)}
+          />
+        ))}
+        {/* Spacer for last card bleed */}
+        <div className="w-1 flex-shrink-0" />
       </div>
     </div>
   );
