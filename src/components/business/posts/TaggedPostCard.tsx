@@ -12,7 +12,7 @@
  */
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { TaggedPost } from '@/hooks/useBusinessTaggedPosts';
-import { MoreHorizontal, Play, EyeOff, Flag, Copy, Share2, Loader2, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MoreHorizontal, Play, EyeOff, Flag, Copy, Share2, Loader2, MapPin, ChevronLeft, ChevronRight, Camera } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { getStreamPoster, getStreamIdFromUrl } from '@/utils/stream';
@@ -93,6 +93,7 @@ const MediaItem = React.memo(function MediaItem({
   playerRef,
 }: MediaItemProps) {
   const [imageError, setImageError] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
   const isVideo = media.media_type === 'video';
 
   // Generate URLs for video
@@ -117,7 +118,7 @@ const MediaItem = React.memo(function MediaItem({
   }, [isVideo, media.media_url, media.id, media.poster_url]);
 
   if (isVideo && hlsUrl) {
-    // Paused-video pattern: UnifiedVideoPlayer handles poster internally
+    // TODO: Add managedByMediaRuntime={true} surface="business-feed" for full decoder management
     return (
       <>
         <div className="absolute inset-0">
@@ -137,6 +138,12 @@ const MediaItem = React.memo(function MediaItem({
             onCanPlayThrough={onVideoReady}
           />
         </div>
+        {/* Duration badge */}
+        {media.duration_seconds != null && (
+          <div className="absolute bottom-2 right-2 z-10 bg-black/60 backdrop-blur-sm rounded-md px-1.5 py-0.5 text-[10px] font-medium text-white pointer-events-none">
+            {Math.floor(media.duration_seconds / 60)}:{String(Math.floor(media.duration_seconds % 60)).padStart(2, '0')}
+          </div>
+        )}
         {/* Play button overlay when paused */}
         {!isPlaying && isActive && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -152,19 +159,27 @@ const MediaItem = React.memo(function MediaItem({
   // Image
   return (
     <div className="absolute inset-0 w-full h-full">
+      {/* Shimmer base layer */}
+      {!isLoaded && !imageError && (
+        <div className="absolute inset-0 bg-muted animate-pulse" />
+      )}
       {!imageError ? (
         <img
           src={media.media_url}
           alt=""
-          className="w-full h-full object-cover"
+          className={cn(
+            "w-full h-full object-cover transition-opacity duration-200",
+            isLoaded ? "opacity-100" : "opacity-0"
+          )}
           loading={isPriorityItem ? "eager" : "lazy"}
           fetchPriority={isPriorityItem ? "high" : "auto"}
           decoding="async"
+          onLoad={() => setIsLoaded(true)}
           onError={() => setImageError(true)}
         />
       ) : (
         <div className="w-full h-full flex items-center justify-center bg-muted">
-          <span className="text-4xl">📷</span>
+          <Camera className="w-6 h-6 text-gray-300" />
         </div>
       )}
     </div>
@@ -360,7 +375,7 @@ const TaggedPostCard = React.memo(function TaggedPostCard({
     <>
       <div
         ref={cardRef}
-        className="bg-white overflow-hidden border-x border-border/40"
+        className="bg-card overflow-hidden border-x border-border/40"
         style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
       >
         {/* Header - author info */}

@@ -29,6 +29,7 @@ import {
   MapPin,
   ChevronLeft,
   ChevronRight,
+  Camera,
 } from 'lucide-react';
 import { formatTimeAgo } from '@/utils/formatTime';
 import { cn } from '@/lib/utils';
@@ -59,7 +60,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-import { VideoScrubber } from '@/components/video/VideoScrubber';
+
 
 
 // Helper to extract course info from content and remove the "Played at" line
@@ -120,6 +121,7 @@ const MediaItem = React.memo(function MediaItem({
   playerRef,
 }: MediaItemProps) {
   const [imageError, setImageError] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
   const isVideo = media.media_type === 'video';
 
   // Generate URLs for video
@@ -145,6 +147,7 @@ const MediaItem = React.memo(function MediaItem({
 
   if (isVideo && hlsUrl) {
     // Paused-video pattern: UnifiedVideoPlayer handles poster internally
+    // TODO: Add managedByMediaRuntime={true} surface="business-feed" for full decoder management
     return (
       <>
         <div className={cn("absolute inset-0", filterClass)} style={pixelStyle}>
@@ -164,6 +167,12 @@ const MediaItem = React.memo(function MediaItem({
             onCanPlayThrough={onVideoReady}
           />
         </div>
+        {/* Duration badge */}
+        {media.duration_seconds != null && (
+          <div className="absolute bottom-2 right-2 z-10 bg-black/60 backdrop-blur-sm rounded-md px-1.5 py-0.5 text-[10px] font-medium text-white pointer-events-none">
+            {Math.floor(media.duration_seconds / 60)}:{String(Math.floor(media.duration_seconds % 60)).padStart(2, '0')}
+          </div>
+        )}
         {/* Play button overlay when paused */}
         {!isPlaying && isActive && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -179,19 +188,27 @@ const MediaItem = React.memo(function MediaItem({
   // Image
   return (
     <div className={cn("absolute inset-0 w-full h-full", filterClass)} style={pixelStyle}>
+      {/* Shimmer base layer */}
+      {!isLoaded && !imageError && (
+        <div className="absolute inset-0 bg-muted animate-pulse" />
+      )}
       {!imageError ? (
         <img
           src={media.media_url}
           alt=""
-          className="w-full h-full object-cover"
+          className={cn(
+            "w-full h-full object-cover transition-opacity duration-200",
+            isLoaded ? "opacity-100" : "opacity-0"
+          )}
           loading={isPriorityItem ? "eager" : "lazy"}
           fetchPriority={isPriorityItem ? "high" : "auto"}
           decoding="async"
+          onLoad={() => setIsLoaded(true)}
           onError={() => setImageError(true)}
         />
       ) : (
         <div className="w-full h-full flex items-center justify-center bg-muted">
-          <span className="text-4xl">📷</span>
+          <Camera className="w-6 h-6 text-gray-300" />
         </div>
       )}
     </div>
@@ -429,7 +446,7 @@ const BusinessPostCard = React.memo(function BusinessPostCard({
       <div
         ref={cardRef}
         className={cn(
-          "bg-white overflow-hidden border-x border-border/40",
+          "bg-card overflow-hidden border-x border-border/40",
           isPinned && "ring-1 ring-border/60"
         )}
         style={{

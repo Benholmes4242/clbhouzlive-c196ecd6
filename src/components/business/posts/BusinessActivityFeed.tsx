@@ -27,6 +27,7 @@ import { useAdaptivePrefetch } from '@/hooks/useAdaptivePrefetch';
 import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
 import { cn } from '@/lib/utils';
 import { Image as ImageIcon, Plus, Users, RefreshCw, Loader2, FileText, Video } from 'lucide-react';
+import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
 import BusinessPostCard from './BusinessPostCard';
 import TaggedPostCard from './TaggedPostCard';
 import { toast } from 'sonner';
@@ -468,6 +469,14 @@ export function BusinessActivityFeed({
     setComposerMedia([]);
   }, []);
 
+  // Pull-to-refresh handler
+  const handlePullToRefresh = useCallback(async () => {
+    const activeKey = feedTab === 'activity' 
+      ? ['business-posts-infinite', businessId]
+      : ['business-tagged-posts-infinite', businessId];
+    await queryClient.invalidateQueries({ queryKey: activeKey });
+  }, [feedTab, businessId, queryClient]);
+
   const handleHideTaggedPost = useCallback(async (postId: string) => {
     try {
       await hidePost(postId);
@@ -518,6 +527,7 @@ export function BusinessActivityFeed({
   }
 
   return (
+    <PullToRefreshContainer onRefresh={handlePullToRefresh}>
     <div>
       {/* Sub-tabs: Activity / Tagged */}
       <div className="flex justify-center border-b border-border/50 bg-card">
@@ -654,20 +664,20 @@ export function BusinessActivityFeed({
                             <div className="p-4 space-y-3">
                               <div className="flex items-center gap-3">
                                 <div className="h-10 w-10 rounded-sq-sm bg-muted relative overflow-hidden">
-                                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer-down" />
+                                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-background/20 to-transparent animate-shimmer-down" />
                                 </div>
                                 <div className="space-y-2">
                                   <div className="h-4 w-32 bg-muted rounded relative overflow-hidden">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer-down" />
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-background/20 to-transparent animate-shimmer-down" />
                                   </div>
                                   <div className="h-3 w-24 bg-muted rounded relative overflow-hidden">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer-down" />
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-background/20 to-transparent animate-shimmer-down" />
                                   </div>
                                 </div>
                               </div>
                             </div>
                             <div className="h-48 bg-muted relative overflow-hidden">
-                              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-transparent animate-shimmer-down" />
+                              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/10 to-transparent animate-shimmer-down" />
                             </div>
                           </div>
                         )}
@@ -719,20 +729,20 @@ export function BusinessActivityFeed({
                             <div className="p-4 space-y-3">
                               <div className="flex items-center gap-3">
                                 <div className="h-10 w-10 rounded-full bg-muted relative overflow-hidden">
-                                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer-down" />
+                                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-background/20 to-transparent animate-shimmer-down" />
                                 </div>
                                 <div className="space-y-2">
                                   <div className="h-4 w-32 bg-muted rounded relative overflow-hidden">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer-down" />
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-background/20 to-transparent animate-shimmer-down" />
                                   </div>
                                   <div className="h-3 w-24 bg-muted rounded relative overflow-hidden">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer-down" />
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-background/20 to-transparent animate-shimmer-down" />
                                   </div>
                                 </div>
                               </div>
                             </div>
                             <div className="h-48 bg-muted relative overflow-hidden">
-                              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-transparent animate-shimmer-down" />
+                              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/10 to-transparent animate-shimmer-down" />
                             </div>
                           </div>
                         )}
@@ -777,6 +787,7 @@ export function BusinessActivityFeed({
         initialActorOverride={{ type: 'business', id: businessId }}
       />
     </div>
+    </PullToRefreshContainer>
   );
 }
 
@@ -801,18 +812,18 @@ function BusinessActivitySkeleton() {
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-sq-sm bg-muted relative overflow-hidden">
                 {!prefersReducedMotion && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer-down" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-background/20 to-transparent animate-shimmer-down" />
                 )}
               </div>
               <div className="space-y-2 flex-1">
                 <div className="h-4 w-32 bg-muted rounded relative overflow-hidden">
                   {!prefersReducedMotion && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer-down" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-background/20 to-transparent animate-shimmer-down" />
                   )}
                 </div>
                 <div className="h-3 w-20 bg-muted rounded relative overflow-hidden">
                   {!prefersReducedMotion && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer-down" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-background/20 to-transparent animate-shimmer-down" />
                   )}
                 </div>
               </div>
@@ -820,7 +831,7 @@ function BusinessActivitySkeleton() {
           </div>
           <div className="aspect-video bg-muted flex items-center justify-center relative overflow-hidden">
             {!prefersReducedMotion && (
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-transparent animate-shimmer-down" />
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/10 to-transparent animate-shimmer-down" />
             )}
             <Loader2 className="w-8 h-8 animate-spin text-muted-foreground/50" />
           </div>
