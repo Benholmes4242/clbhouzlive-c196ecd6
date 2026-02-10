@@ -65,7 +65,7 @@ Deno.serve(async (req) => {
 
     console.log(`[Daily Schedule Sync] Starting sync for ${TOURS_TO_SYNC.length} tours x ${YEARS_TO_SYNC.length} years`);
 
-    // PART 0: Auto-close any tournaments past their end_date to prevent stale "live" status
+    // PART 0a: Auto-close any inprogress tournaments past their end_date
     const today = new Date().toISOString().split('T')[0];
     const { data: staleTournaments, error: staleError } = await supabase
       .from('sr_tournaments')
@@ -75,10 +75,42 @@ Deno.serve(async (req) => {
       .select('id, name');
 
     if (!staleError && staleTournaments?.length) {
-      console.log(`[Daily Schedule Sync] Auto-closed ${staleTournaments.length} stale tournament(s):`, 
+      console.log(`[Daily Schedule Sync] Auto-closed ${staleTournaments.length} stale inprogress tournament(s):`, 
         staleTournaments.map((t: any) => t.name).join(', '));
     } else if (staleError) {
       console.error(`[Daily Schedule Sync] Error auto-closing stale tournaments:`, staleError);
+    }
+
+    // PART 0b: Auto-close orphaned tournaments stuck in created/scheduled past end_date + 1 day buffer
+    // These are tournaments that never transitioned to inprogress (e.g., live sync failed or Sportradar didn't return data)
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+    const { data: orphanedTournaments, error: orphanError } = await supabase
+      .from('sr_tournaments')
+      .select('id, sr_id, name, season_id')
+      .in('status', ['created', 'scheduled'])
+      .lt('end_date', yesterdayStr);
+
+    if (orphanError) {
+      console.error(`[Daily Schedule Sync] Error querying orphaned tournaments:`, orphanError);
+    } else if (orphanedTournaments?.length) {
+      console.log(`[Daily Schedule Sync] Found ${orphanedTournaments.length} orphaned tournament(s) past end_date — closing them`);
+      
+      for (const orphan of orphanedTournaments) {
+        // Close the orphaned tournament
+        const { error: closeError } = await supabase
+          .from('sr_tournaments')
+          .update({ status: 'closed' })
+          .eq('id', orphan.id);
+
+        if (closeError) {
+          console.error(`[Daily Schedule Sync] Failed to close orphan ${orphan.name}:`, closeError.message);
+        } else {
+          console.log(`[Daily Schedule Sync] Closed orphaned tournament: ${orphan.name}`);
+        }
+      }
     }
 
     // PART 1: Sync schedules for each tour and year combination
@@ -200,6 +232,55 @@ Deno.serve(async (req) => {
           }
         }
       }
+    }
+
+    // PART 3: Populate winner_id from leaderboard for closed tournaments missing it
+    console.log(`[Daily Schedule Sync] Checking for closed tournaments with missing winner_id...`);
+    
+    const winnerLookbackDate = new Date();
+    winnerLookbackDate.setDate(winnerLookbackDate.getDate() - 30);
+    
+    const { data: missingWinnerTournaments, error: winnerQueryError } = await supabase
+      .from('sr_tournaments')
+      .select('id, name')
+      .eq('status', 'closed')
+      .is('winner_id', null)
+      .gte('end_date', winnerLookbackDate.toISOString().split('T')[0]);
+
+    if (winnerQueryError) {
+      console.error(`[Daily Schedule Sync] Error querying tournaments missing winner:`, winnerQueryError);
+    } else if (missingWinnerTournaments?.length) {
+      console.log(`[Daily Schedule Sync] Found ${missingWinnerTournaments.length} closed tournament(s) missing winner_id`);
+      
+      for (const tournament of missingWinnerTournaments) {
+        // Find position 1 player with the lowest strokes (handles ties)
+        const { data: winner } = await supabase
+          .from('sr_leaderboards')
+          .select('player_id, sr_players!inner(sr_id)')
+          .eq('tournament_id', tournament.id)
+          .eq('position', 1)
+          .gt('strokes', 0)
+          .order('strokes', { ascending: true })
+          .limit(1)
+          .maybeSingle();
+
+        if (winner?.sr_players?.sr_id) {
+          const { error: updateError } = await supabase
+            .from('sr_tournaments')
+            .update({ winner_id: winner.sr_players.sr_id })
+            .eq('id', tournament.id);
+
+          if (!updateError) {
+            console.log(`[Daily Schedule Sync] Set winner_id for ${tournament.name}: ${winner.sr_players.sr_id}`);
+          } else {
+            console.error(`[Daily Schedule Sync] Failed to set winner for ${tournament.name}:`, updateError.message);
+          }
+        } else {
+          console.log(`[Daily Schedule Sync] No position-1 leaderboard entry for ${tournament.name} — skipping winner backfill`);
+        }
+      }
+    } else {
+      console.log(`[Daily Schedule Sync] All closed tournaments have winner_id populated`);
     }
 
     // Log the sync status to sr_cron_status
