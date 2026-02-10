@@ -346,21 +346,6 @@ const ROUTE_CONFIGS: RoutePrefetchConfig[] = [
     videoPrefetchCount: 12,
   },
   {
-    path: '/discover',
-    queryKey: ['watch-hero-video'],
-    priority: 2,
-    queryFn: async () => {
-      const { fetchWatchHeroVideo } = await import('@/hooks/useWatchHeroVideo');
-      return fetchWatchHeroVideo();
-    },
-    extractVideoUrls: (data: any) => {
-      if (!data?.heroVideo?.media?.[0]?.media_url) return [];
-      const streamId = uidFromNode({ src: data.heroVideo.media[0].media_url });
-      return streamId ? [generateStreamHlsUrl(streamId)] : [];
-    },
-    videoPrefetchCount: 1,
-  },
-  {
     // Community tab within Discover - prefetch community feed
     path: '/discover/community',
     queryKey: ['community-feed-base'],

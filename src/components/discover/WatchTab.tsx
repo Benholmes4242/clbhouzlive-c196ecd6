@@ -2,26 +2,20 @@
  * WatchTab - Main container for Watch/Shorts tab
  * 
  * Structure:
- * 1. Hero Video (most viewed with fallback chain)
- * 2. Suggested For You (LiveClubhouseStrip)
- * 3. Shorts Grid (2-column infinite scroll)
- * 
- * NO search bar, NO sort/filter pills - clean viewing experience
- * 
- * DEBUG MODE (Jan 2026):
- * - Comprehensive logging matching profile page debug system
- * - Tracks lifecycle, data fetching, and playback coordination
+ * 1. Search bar (filters shorts in real-time)
+ * 2. Shorts Grid (2-column infinite scroll)
  */
 
-import { useCallback, useEffect } from 'react';
-import { WatchHeroVideo } from './WatchHeroVideo';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { WatchShortsGrid } from './WatchShortsGrid';
 import { WatchTabSkeleton } from './WatchTabSkeleton';
-import { useWatchHeroVideo, HeroVideo } from '@/hooks/useWatchHeroVideo';
 import { useWatchShorts, WatchShort } from '@/hooks/useWatchShorts';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
 import { useQueryClient } from '@tanstack/react-query';
+import { useDebounce } from '@/hooks/useDebounce';
+import { Search, X, VideoOff } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { 
   logWatch, 
   logWatchQueryState, 
@@ -30,7 +24,7 @@ import {
 } from './debug';
 
 // Adapter to convert our types to fullscreen-compatible format
-function toFullscreenItem(video: WatchShort | HeroVideo): any {
+function toFullscreenItem(video: WatchShort): any {
   const primaryMedia = video.media[0];
   return {
     id: video.id,
@@ -54,6 +48,9 @@ function toFullscreenItem(video: WatchShort | HeroVideo): any {
 
 export function WatchTab() {
   const queryClient = useQueryClient();
+  const [searchInput, setSearchInput] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
+  const debouncedSearch = useDebounce(searchInput, 300);
 
   // Debug lifecycle
   const lifecycleLogger = createWatchLifecycleLogger('WatchTab');
@@ -72,14 +69,7 @@ export function WatchTab() {
     allowLandscape: true,
   });
 
-  // Hero video data
-  const { 
-    heroVideo, 
-    trendingPeriod, 
-    isLoading: isLoadingHero,
-  } = useWatchHeroVideo();
-
-  // Shorts grid data (exclude hero from grid)
+  // Shorts grid data
   const {
     shorts,
     likedPostIds,
@@ -89,16 +79,22 @@ export function WatchTab() {
     fetchNextPage,
     isFetchingNextPage,
     refetch: refetchShorts,
-  } = useWatchShorts(heroVideo?.id);
+  } = useWatchShorts();
+
+  // Client-side search filtering
+  const filteredShorts = useMemo(() => {
+    if (!debouncedSearch.trim()) return shorts;
+    const q = debouncedSearch.toLowerCase();
+    return shorts.filter(short => {
+      const caption = short.content?.toLowerCase() || '';
+      const creatorName = short.creator?.display_name?.toLowerCase() || '';
+      const creatorUsername = short.creator?.username?.toLowerCase() || '';
+      const courseName = (short as any).golf_courses?.name?.toLowerCase() || '';
+      return caption.includes(q) || creatorName.includes(q) || creatorUsername.includes(q) || courseName.includes(q);
+    });
+  }, [shorts, debouncedSearch]);
 
   // Debug query states
-  useEffect(() => {
-    logWatchQueryState('heroVideo', {
-      isLoading: isLoadingHero,
-      isSuccess: !!heroVideo,
-    });
-  }, [isLoadingHero, heroVideo]);
-
   useEffect(() => {
     logWatchQueryState('shorts', {
       isLoading: isLoadingShorts,
@@ -115,33 +111,15 @@ export function WatchTab() {
     }
   }, [isLoadingShorts, shorts.length, isFetchingNextPage, isGridError, hasNextPage]);
 
-  // Mark ready when both loaded
+  // Mark ready when loaded
   useEffect(() => {
-    if (!isLoadingHero && !isLoadingShorts) {
+    if (!isLoadingShorts) {
       watchTiming.end('WatchTab-mount-to-ready');
       logWatch('lifecycle', 'WatchTab', '✅ READY', {
-        heroLoaded: !!heroVideo,
         shortsCount: shorts.length,
       });
     }
-  }, [isLoadingHero, isLoadingShorts, heroVideo, shorts.length]);
-
-  // Handle hero video tap - open fullscreen with hero as first item
-  const handleHeroTap = useCallback(() => {
-    if (!heroVideo) return;
-    
-    logWatch('interaction', 'WatchTab', '👆 Hero tapped', {
-      heroId: heroVideo.id?.slice(0, 8),
-      trendingPeriod,
-    });
-
-    // Build playlist: hero first, then all shorts
-    const heroItem = toFullscreenItem(heroVideo);
-    const shortsItems = shorts.map(toFullscreenItem);
-    const playlist = [heroItem, ...shortsItems];
-
-    openFullscreen(playlist, 0, heroVideo.id);
-  }, [heroVideo, shorts, openFullscreen, trendingPeriod]);
+  }, [isLoadingShorts, shorts.length]);
 
   // Handle grid video tap - open fullscreen at tapped index
   const handleVideoTap = useCallback((video: WatchShort, index: number, allVideos: WatchShort[]) => {
@@ -151,22 +129,9 @@ export function WatchTab() {
       totalVideos: allVideos.length,
     });
     
-    // Build playlist: hero (if exists) + all grid videos
-    const playlist: any[] = [];
-    
-    if (heroVideo) {
-      playlist.push(toFullscreenItem(heroVideo));
-    }
-    
-    allVideos.forEach(v => {
-      playlist.push(toFullscreenItem(v));
-    });
-
-    // Adjust index to account for hero
-    const adjustedIndex = heroVideo ? index + 1 : index;
-
-    openFullscreen(playlist, adjustedIndex, video.id);
-  }, [heroVideo, openFullscreen]);
+    const playlist = allVideos.map(toFullscreenItem);
+    openFullscreen(playlist, index, video.id);
+  }, [openFullscreen]);
 
   // Handle infinite scroll load more
   const handleLoadMore = useCallback(() => {
@@ -189,48 +154,97 @@ export function WatchTab() {
   const handlePullToRefresh = useCallback(async () => {
     logWatch('interaction', 'WatchTab', '🔄 Pull-to-refresh');
     await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ['watch-hero-video'] }),
       queryClient.invalidateQueries({ queryKey: ['watch-shorts-base'] }),
       queryClient.invalidateQueries({ queryKey: ['watch-shorts-user-likes'] }),
     ]);
   }, [queryClient]);
 
-  // Full page skeleton when both are loading initially
-  if (isLoadingHero && isLoadingShorts) {
+  // Full page skeleton when loading initially
+  if (isLoadingShorts) {
     return <WatchTabSkeleton />;
   }
+
+  const isSearchActive = debouncedSearch.trim().length > 0;
 
   return (
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
       <div className="flex flex-col min-h-screen" style={{ background: '#F8FAFC' }}>
-        {/* Hero Video - Most Viewed */}
-        <WatchHeroVideo 
-          video={heroVideo}
-          trendingPeriod={trendingPeriod}
-          isLoading={isLoadingHero}
-          onTap={handleHeroTap}
-        />
-
-        {/* Section Label */}
-        <div className="mt-6 mb-3 px-4">
-          <span className="text-base font-semibold" style={{ color: '#374151' }}>
-            Latest Shorts
-          </span>
+        {/* Search Bar - matches Videos tab DiscoverCommandCenter styling */}
+        <div className="px-4 pt-3 pb-2">
+          <div className="relative h-11">
+            <div 
+              className={cn(
+                "absolute inset-0 rounded-xl border transition-all duration-200",
+                "bg-white",
+                isFocused 
+                  ? "border-[#e2e8f0] ring-2 ring-[#e2e8f0]" 
+                  : "border-[#e2e8f0]"
+              )}
+            />
+            <div className="relative h-full flex items-center">
+              <div className="absolute left-4 inset-y-0 flex items-center pointer-events-none">
+                <Search 
+                  className={cn(
+                    "h-5 w-5 transition-colors duration-200",
+                    isFocused ? "text-[#1e293b]" : "text-[#94a3b8]"
+                  )} 
+                  strokeWidth={2} 
+                />
+              </div>
+              <input
+                type="text"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+                placeholder="Search shorts…"
+                className="w-full h-full pl-12 pr-12 text-base text-[#1e293b] placeholder:text-[#94a3b8] rounded-xl bg-transparent font-medium focus:outline-none focus:ring-0"
+                style={{ WebkitTapHighlightColor: 'transparent' }}
+              />
+              {searchInput && (
+                <button
+                  type="button"
+                  onClick={() => setSearchInput('')}
+                  className="absolute right-3 inset-y-0 flex items-center p-1.5 hover:bg-[#f1f5f9] rounded-full transition-colors"
+                >
+                  <X className="h-4 w-4 text-[#64748b]" strokeWidth={2} />
+                </button>
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* Shorts Grid - LiveClubhouseStrip is injected after 8 tiles */}
-        <WatchShortsGrid
-          shorts={shorts}
-          likedPostIds={likedPostIds}
-          isLoading={isLoadingShorts}
-          isError={isGridError}
-          onRetry={handleRetry}
-          onVideoTap={handleVideoTap}
-          onLoadMore={handleLoadMore}
-          hasMore={hasNextPage}
-          isLoadingMore={isFetchingNextPage}
-          showSuggestedStrip={true}
-        />
+        {/* Empty search state */}
+        {isSearchActive && filteredShorts.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 px-6">
+            <VideoOff className="h-10 w-10 text-[#94a3b8] mb-3" strokeWidth={1.5} />
+            <p className="text-base font-medium text-[#64748b]">No shorts found</p>
+            <p className="text-sm text-[#94a3b8] mt-1">Try a different search term</p>
+          </div>
+        ) : (
+          <>
+            {/* Section Label */}
+            <div className="mb-3 px-4">
+              <span className="text-base font-semibold" style={{ color: '#374151' }}>
+                {isSearchActive ? `Results for "${debouncedSearch}"` : 'Latest Shorts'}
+              </span>
+            </div>
+
+            {/* Shorts Grid */}
+            <WatchShortsGrid
+              shorts={filteredShorts}
+              likedPostIds={likedPostIds}
+              isLoading={isLoadingShorts}
+              isError={isGridError}
+              onRetry={handleRetry}
+              onVideoTap={handleVideoTap}
+              onLoadMore={handleLoadMore}
+              hasMore={isSearchActive ? false : hasNextPage}
+              isLoadingMore={isFetchingNextPage}
+              showSuggestedStrip={!isSearchActive}
+            />
+          </>
+        )}
       </div>
     </PullToRefreshContainer>
   );

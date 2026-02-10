@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { navigationTabs } from './navigationTabs';
 import { useHub } from '@/features/hub/useHub';
-import { prefetchHeroVideo } from '@/utils/heroVideoPrefetch';
+
 import { prefetchClubhouseVideos } from '@/utils/clubhouseVideoPrefetch';
 import { prefetchProfileVideos, resolveUsernameToId } from '@/utils/profileVideoPrefetch';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -39,11 +39,6 @@ export const useNavigationHandlers = () => {
       console.log('useNavigationHandlers: Navigating to:', tab.path);
       setActiveTab(tab.id);
       
-      // Trigger prefetch on click too (not just hover) for reliability
-      if (tab.path.includes('shorts') || tab.path.includes('discover')) {
-        console.log('[Navigation] Click-triggered hero prefetch');
-        prefetchHeroVideo();
-      }
 
       // If navigating to Hub, use Hub context to capture origin
       if (tab.path === '/hub' || tab.path.startsWith('/hub')) {
@@ -75,15 +70,6 @@ export const useNavigationHandlers = () => {
   const handlePrefetch = useCallback((path: string) => {
     console.log('[useNavigationHandlers] handlePrefetch called with:', path);
 
-    // Prefetch hero video for Watch/Discover shorts tab
-    if (path.includes('shorts') || path.includes('discover')) {
-      console.log('[Navigation] Triggering hero prefetch for path:', path);
-      prefetchHeroVideo().then(id => {
-        if (id) {
-          console.log('[Navigation] Hero prefetch completed:', id.slice(0, 8));
-        }
-      });
-    }
     
     // Prefetch for Clubhouse/Home tab
     if (path === '/clubhouse' || path === '/' || path.includes('clubhouse')) {
