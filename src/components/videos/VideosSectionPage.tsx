@@ -13,13 +13,16 @@ import { useAdaptivePrefetch } from '@/hooks/useAdaptivePrefetch';
 import { runtimeUserTap } from '@/media';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
-import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+import { isPosterFailed } from '@/utils/posterPrefetch';
 import type { LongFormVideo } from './LongFormVideoTile';
 import type { LongFormFeedVideo } from './LongFormFeedCard';
-
 // Pacing constants (matches Watch tab standard)
 const MIN_LOADING_DISPLAY_MS = 600;
 const TILE_ENTRANCE_STAGGER_MS = 30;
+
+// Fix 1: Mount buffer — only mount video players within ±3 of current index
+const MOUNT_BUFFER = 3;
 
 // Section Empty State Component
 function SectionEmptyState({ 
@@ -139,6 +142,62 @@ export const VideosSectionPage: React.FC = () => {
   const prevVideosCountRef = useRef(videos.length);
   const [newlyLoadedStartIndex, setNewlyLoadedStartIndex] = useState<number | null>(null);
 
+  // ============ Fix 1: SCROLL POSITION TRACKING FOR MOUNT GATING ============
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const cards = document.querySelectorAll('[data-video-card-id]');
+    if (cards.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const videoId = entry.target.getAttribute('data-video-card-id');
+            const index = videos.findIndex(v => v.id === videoId);
+            if (index !== -1) {
+              setCurrentIndex(index);
+            }
+          }
+        });
+      },
+      { 
+        root: null,
+        rootMargin: '-40% 0px -40% 0px',
+        threshold: 0,
+      }
+    );
+
+    cards.forEach(card => observer.observe(card));
+    return () => observer.disconnect();
+  }, [videos]);
+
+  // Fix 2: Poster preload links for first 3 cards
+  useEffect(() => {
+    const preloadTargets = videos.slice(0, 3);
+    const links: HTMLLinkElement[] = [];
+    
+    for (const video of preloadTargets) {
+      if (!video.mediaUrl) continue;
+      const uid = uidFromNode({ media_url: video.mediaUrl });
+      if (!uid) continue;
+      const posterUrl = generateStreamThumbnailUrl(uid, { height: 720, fit: 'cover' });
+      if (!posterUrl || isPosterFailed(posterUrl)) continue;
+      
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = posterUrl;
+      link.setAttribute('fetchpriority', 'high');
+      document.head.appendChild(link);
+      links.push(link);
+    }
+    
+    return () => {
+      links.forEach(l => l.remove());
+    };
+  }, [videos]);
+
   // P1: Preload HLS manifests for videos in prefetch window
   useLayoutEffect(() => {
     if (videos.length === 0) return;
@@ -146,7 +205,6 @@ export const VideosSectionPage: React.FC = () => {
     const { prefetchAhead, preloadManifests } = prefetchConfig;
     if (!preloadManifests) return;
     
-    // Preload first N manifests based on adaptive config
     const toPreload = videos.slice(0, Math.min(prefetchAhead, videos.length));
     
     toPreload.forEach((video) => {
@@ -327,6 +385,8 @@ export const VideosSectionPage: React.FC = () => {
             {videos.map((video, index) => {
               const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;
               const entranceDelay = isNewlyLoaded ? (index - newlyLoadedStartIndex) * TILE_ENTRANCE_STAGGER_MS : 0;
+              // Fix 1: Only mount video player within ±3 of current viewport
+              const shouldMountVideo = Math.abs(index - currentIndex) <= MOUNT_BUFFER;
               
               return (
                 <div
@@ -341,6 +401,7 @@ export const VideosSectionPage: React.FC = () => {
                     onVideoTap={() => handleVideoTap(video, index)}
                     onCreatorTap={() => handleCreatorTap(video.creatorUserId)}
                     index={index}
+                    shouldMountVideo={shouldMountVideo}
                   />
                 </div>
               );
