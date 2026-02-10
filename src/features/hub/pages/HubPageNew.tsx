@@ -4,7 +4,7 @@
  * "Less container, more content" design language
  */
 
-import { useCallback, useMemo, useState, useEffect } from 'react';
+import { useCallback, useMemo, useState, useEffect, useLayoutEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -114,6 +114,13 @@ export function HubPageNew() {
   
   // Dark status bar for warm gradient (content is dark on light bg)
   useMedianStatusBar("dark", "#FFF7ED", false, false, true);
+
+  // Add route-hub class to body so CSS can make .app-shell transparent
+  // (same pattern as Clubhouse.tsx with route-clubhouse)
+  useLayoutEffect(() => {
+    document.body.classList.add('route-hub');
+    return () => document.body.classList.remove('route-hub');
+  }, []);
   
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [currentHour, setCurrentHour] = useState(() => new Date().getHours());

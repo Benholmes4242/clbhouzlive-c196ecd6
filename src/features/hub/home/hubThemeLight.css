@@ -254,16 +254,18 @@
 
 /* ========================================
    HUB OPEN STATE (Light)
-   Hub is now a standard page, these styles apply theming
+   Hub is now a standard page, these styles apply theming.
+   When the warm gradient is active (route-hub on body),
+   all backgrounds must be transparent so it bleeds through.
    ======================================== */
 html.hub-open { 
-  --bg-page: var(--hub-bg-start); 
+  --bg-page: transparent; 
 }
 
 .hub-open body,
 .hub-open #root {
-  background: var(--hub-bg-start) !important;
-  background-color: var(--hub-bg-start) !important;
+  background: transparent !important;
+  background-color: transparent !important;
 }
 
 /* ========================================
