@@ -117,9 +117,8 @@ async function fetchClubhouseBase() {
       user_profiles (
         id,
         username,
-        full_name,
-        profile_image_url,
-        account_type
+        display_name,
+        profile_photo_url
       )
     `)
     .eq('visibility', 'anyone')
