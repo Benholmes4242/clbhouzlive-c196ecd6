@@ -7,6 +7,7 @@
  * - Paced infinite scroll with 600ms hold
  * - Grey shimmer loading states
  * - Fade-up entrance animation
+ * - Loading skeleton for initial load
  */
 
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
@@ -113,45 +114,59 @@ export function ShortsGrid({
   
   // Show loading indicator
   const showBottomLoader = isLoading || isPacingDelay;
+
+  // Initial loading skeleton
+  const showInitialSkeleton = isLoading && renderedPosts.length === 0;
   
   return (
     <div className="px-[3px]">
+      {/* Initial loading skeleton — 6 tiles in 2-column grid */}
+      {showInitialSkeleton && (
+        <div className="grid grid-cols-2 gap-[3px]">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="aspect-[3/4] rounded bg-muted animate-pulse" />
+          ))}
+        </div>
+      )}
+
       {/* 2-column grid - Watch tab standard: 3px gap */}
-      <div className="grid grid-cols-2 gap-[3px]">
-        {renderedPosts.map((post, index) => {
-          // CRITICAL: Use stream UID for cache lookup
-          const streamId = getStreamId(post);
-          
-          // Diagonal autoplay pattern (Watch tab standard)
-          const isAutoplayCandidate = index % 4 === 0 || index % 4 === 3;
-          
-          // Entrance animation for newly loaded tiles
-          const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;
-          const entranceDelay = isNewlyLoaded ? (index - newlyLoadedStartIndex) * TILE_ENTRANCE_STAGGER_MS : 0;
-          
-          return (
-            <div
-              key={post.id}
-              className={isNewlyLoaded && !prefersReducedMotion 
-                ? 'animate-in fade-in slide-in-from-bottom-2 duration-200 fill-mode-backwards' 
-                : undefined
-              }
-              style={isNewlyLoaded && !prefersReducedMotion 
-                ? { animationDelay: `${entranceDelay}ms` } 
-                : undefined
-              }
-            >
-              <ShortVideoTile
-                post={post}
-                onClick={() => onPostTap(post, index)}
-                isVideoReady={isReady(streamId)}
-                onReady={onReady}
-                isAutoplayCandidate={isAutoplayCandidate}
-              />
-            </div>
-          );
-        })}
-      </div>
+      {!showInitialSkeleton && (
+        <div className="grid grid-cols-2 gap-[3px]">
+          {renderedPosts.map((post, index) => {
+            // CRITICAL: Use stream UID for cache lookup
+            const streamId = getStreamId(post);
+            
+            // Diagonal autoplay pattern (Watch tab standard)
+            const isAutoplayCandidate = index % 4 === 0 || index % 4 === 3;
+            
+            // Entrance animation for newly loaded tiles
+            const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;
+            const entranceDelay = isNewlyLoaded ? (index - newlyLoadedStartIndex) * TILE_ENTRANCE_STAGGER_MS : 0;
+            
+            return (
+              <div
+                key={post.id}
+                className={isNewlyLoaded && !prefersReducedMotion 
+                  ? 'animate-in fade-in slide-in-from-bottom-2 duration-200 fill-mode-backwards' 
+                  : undefined
+                }
+                style={isNewlyLoaded && !prefersReducedMotion 
+                  ? { animationDelay: `${entranceDelay}ms` } 
+                  : undefined
+                }
+              >
+                <ShortVideoTile
+                  post={post}
+                  onClick={() => onPostTap(post, index)}
+                  isVideoReady={isReady(streamId)}
+                  onReady={onReady}
+                  isAutoplayCandidate={isAutoplayCandidate}
+                />
+              </div>
+            );
+          })}
+        </div>
+      )}
       
       {/* Infinite scroll trigger */}
       {hasMore && (
@@ -159,7 +174,7 @@ export function ShortsGrid({
       )}
       
       {/* Orange brand spinner for paced infinite scroll (Watch tab standard) */}
-      {showBottomLoader && (
+      {showBottomLoader && !showInitialSkeleton && (
         <div className="flex items-center justify-center py-8">
           <div className="w-5 h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
         </div>
