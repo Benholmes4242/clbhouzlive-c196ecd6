@@ -7,6 +7,8 @@
  * - 150ms crossfade poster→video transition
  * - Priority poster loading for first 6 cards
  * - Source stability, HLS pool, buffering debounce via UnifiedVideoPlayer
+ * - MediaRuntime integration for decoder/resource management
+ * - Poster fade-in on load, poster stays until video plays
  */
 
 import React, { useRef, useCallback, useMemo, useState, useEffect } from 'react';
@@ -48,6 +50,12 @@ function formatCount(count: number): string {
   return count.toString();
 }
 
+function formatDuration(seconds: number): string {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
 export const WatchShortCard = React.memo(function WatchShortCard({ 
   video, 
   index, 
@@ -67,12 +75,14 @@ export const WatchShortCard = React.memo(function WatchShortCard({
   // P0: Hysteresis-based autoplay state (50% start, 10% stop)
   const [shouldPlay, setShouldPlay] = useState(false);
   const [hasFirstFrame, setHasFirstFrame] = useState(false);
+  const [posterLoaded, setPosterLoaded] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const primaryMedia = video.media[0];
   const mediaUrl = primaryMedia?.media_url;
   const creator = video.creator;
   const likeCount = video.like_count || 0;
-  const hasMultipleMedia = video.media.length > 1;
+  const durationSeconds = primaryMedia?.duration_seconds;
 
   // CRITICAL: Extract stream UID for cache consistency
   const streamId = useMemo(() => {
@@ -88,12 +98,26 @@ export const WatchShortCard = React.memo(function WatchShortCard({
     return generatedPosterUrl && !isPosterFailed(generatedPosterUrl) ? generatedPosterUrl : undefined;
   }, [streamId]);
 
-  // Reset ready flag when video changes
+  // Reset state when video changes
   useEffect(() => {
     hasReportedReadyRef.current = false;
     setHasFirstFrame(false);
     setShouldPlay(false);
+    setPosterLoaded(false);
+    setIsPlaying(false);
   }, [video.id]);
+
+  // Fix 4: Preload poster for first 6 tiles
+  useEffect(() => {
+    if (!isPriority || !posterUrl) return;
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = posterUrl;
+    link.setAttribute('fetchpriority', 'high');
+    document.head.appendChild(link);
+    return () => { document.head.removeChild(link); };
+  }, [isPriority, posterUrl]);
 
   // ============================================================================
   // P0: HYSTERESIS AUTOPLAY - 50% to start, 10% to stop
@@ -153,6 +177,11 @@ export const WatchShortCard = React.memo(function WatchShortCard({
     setHasFirstFrame(true);
   }, []);
 
+  // Handle play event — poster can now fade out
+  const handlePlay = useCallback(() => {
+    setIsPlaying(true);
+  }, []);
+
   // Use canplaythrough for buffered ready state
   const handleCanPlayThrough = useCallback(() => {
     if (!hasReportedReadyRef.current) {
@@ -169,9 +198,18 @@ export const WatchShortCard = React.memo(function WatchShortCard({
     }
   }, [onFirstFrameReady]);
 
+  // Poster image loaded handler
+  const handlePosterLoad = useCallback(() => {
+    setPosterLoaded(true);
+  }, []);
+
   // Guard: hide tile if no primary media AND no poster available
   if (!primaryMedia) return null;
   if (!posterUrl && !hlsUrl) return null;
+
+  // Determine if poster should be visible:
+  // Poster stays visible until video is playing with first frame ready
+  const videoIsReady = hasFirstFrame && isPlaying && shouldMountVideo;
 
   return (
     <div
@@ -194,12 +232,12 @@ export const WatchShortCard = React.memo(function WatchShortCard({
         }
       }}
     >
-      {/* Shimmer loading placeholder */}
+      {/* Shimmer loading placeholder — stays until poster fades in on top */}
       <div className="absolute inset-0 bg-muted/50 overflow-hidden">
         <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
       </div>
       
-      {/* Priority Poster with fade-in on load */}
+      {/* Poster with fade-in on load, stays until video plays */}
       {posterUrl && (
         <img
           src={posterUrl}
@@ -207,11 +245,15 @@ export const WatchShortCard = React.memo(function WatchShortCard({
           className={cn(
             "absolute inset-0 h-full w-full object-cover z-10",
             "transition-opacity duration-200 ease-out",
-            hasFirstFrame && shouldMountVideo ? "opacity-0" : "opacity-100"
+            // Fade in when poster loads
+            posterLoaded ? "opacity-100" : "opacity-0",
+            // Fade out only when video is playing with first frame
+            videoIsReady && "!opacity-0 duration-150"
           )}
           loading={isPriority ? "eager" : "lazy"}
           fetchPriority={isPriority ? "high" : "auto"}
           decoding="async"
+          onLoad={handlePosterLoad}
           onError={(e) => {
             e.currentTarget.style.display = 'none';
             e.currentTarget.onerror = null;
@@ -219,7 +261,7 @@ export const WatchShortCard = React.memo(function WatchShortCard({
         />
       )}
 
-      {/* Video Player */}
+      {/* Video Player — Fix 1 & 2: MediaRuntime integration + watch-shorts surface */}
       {shouldMountVideo && hlsUrl && (
         <div
           className={cn(
@@ -239,12 +281,13 @@ export const WatchShortCard = React.memo(function WatchShortCard({
             scrubber={false}
             objectFit="cover"
             className="absolute inset-0 w-full h-full"
-            surface="grid"
-            managedByMediaRuntime={false}
+            surface="watch-shorts"
+            managedByMediaRuntime={true}
             mediaId={streamId}
             preload="auto"
             onLoadedData={handleLoadedData}
             onCanPlayThrough={handleCanPlayThrough}
+            onPlay={handlePlay}
             onError={handleError}
           />
         </div>
@@ -261,8 +304,17 @@ export const WatchShortCard = React.memo(function WatchShortCard({
         </div>
       )}
 
+      {/* Fix 5: Duration Badge - Bottom Right */}
+      {durationSeconds != null && durationSeconds > 0 && (
+        <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm rounded-md px-1.5 py-0.5 z-30">
+          <span className="text-[10px] font-medium text-white">
+            {formatDuration(durationSeconds)}
+          </span>
+        </div>
+      )}
+
       {/* Creator Name - Bottom */}
-      <div className="absolute bottom-2 left-2 right-2 z-30">
+      <div className="absolute bottom-2 left-2 right-14 z-30">
         {(creator?.display_name || creator?.username) && (
           <p className="text-white text-sm font-medium truncate">
             {creator?.display_name || creator?.username}
