@@ -120,9 +120,6 @@ export {
   SingleMediaDisplay,
   MediaCarousel,
   FullscreenOverlay,
-  CreatorInfo,
-  ActionRail,
-  CaptionDisplay,
   FullscreenControls,
   FullscreenComments,
 } from './fullscreen';

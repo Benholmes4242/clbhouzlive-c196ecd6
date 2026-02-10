@@ -21,7 +21,7 @@ import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '../components/Unified
 import { UnifiedImage } from '../components/UnifiedImage';
 import { FullscreenMediaItem as FullscreenMediaItemType, FullscreenMediaItemMedia } from '../hooks/useFullscreenViewer';
 import { useFullscreenViewerContext } from '../hooks/useFullscreenViewer';
-import CarouselDots from '@/components/posts/CarouselDots';
+// CarouselDots moved to FullscreenOverlay via CreatorCapsule dotsSlot
 import { BlurredMediaBackground } from '@/components/media/BlurredMediaBackground';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -296,36 +296,29 @@ export const FullscreenMediaItem: React.FC<FullscreenMediaItemProps> = React.mem
       {/* Navigation Chevrons - Only show if multiple media */}
       {hasMultipleMedia && (
         <>
-          {/* Left Chevron */}
+          {/* Left Chevron — positioned at 45% like Clubhouse */}
           {hasPrevMedia && (
             <button
               onClick={handlePrevClick}
-              className="absolute left-3 top-1/2 -translate-y-1/2 z-40 w-10 h-10 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/90 hover:bg-black/60 transition-colors"
+              className="absolute left-3 top-[45%] z-40 w-10 h-10 flex items-center justify-center rounded-full bg-black/35 backdrop-blur-[20px] text-white/90 active:scale-95 transition-transform"
+              style={{ transform: 'translateY(-50%)' }}
               aria-label="Previous media"
             >
-              <ChevronLeft className="w-6 h-6" />
+              <ChevronLeft className="w-5 h-5" />
             </button>
           )}
 
-          {/* Right Chevron */}
+          {/* Right Chevron — positioned at 45% like Clubhouse */}
           {hasNextMedia && (
             <button
               onClick={handleNextClick}
-              className="absolute right-3 top-1/2 -translate-y-1/2 z-40 w-10 h-10 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/90 hover:bg-black/60 transition-colors"
+              className="absolute right-3 top-[45%] z-40 w-10 h-10 flex items-center justify-center rounded-full bg-black/35 backdrop-blur-[20px] text-white/90 active:scale-95 transition-transform"
+              style={{ transform: 'translateY(-50%)' }}
               aria-label="Next media"
             >
-              <ChevronRight className="w-6 h-6" />
+              <ChevronRight className="w-5 h-5" />
             </button>
           )}
-
-          {/* Dot Indicators - positioned above bottom gradient */}
-          <div className="absolute bottom-[38vh] left-0 right-0 z-30 flex justify-center">
-            <CarouselDots
-              count={totalMediaInPost}
-              activeIndex={currentMediaIndex}
-              onDotClick={handleDotClick}
-            />
-          </div>
         </>
       )}
 

@@ -12,6 +12,6 @@ export type { FullscreenMediaViewerProps } from './FullscreenMediaViewer';
 export { FullscreenNavigation } from './FullscreenNavigation';
 export { FullscreenMediaItem, SingleMediaDisplay } from './FullscreenMediaItem';
 export { MediaCarousel } from './MediaCarousel';
-export { FullscreenOverlay, CreatorInfo, ActionRail, CaptionDisplay } from './FullscreenOverlay';
+export { FullscreenOverlay } from './FullscreenOverlay';
 export { FullscreenControls } from './FullscreenControls';
 export { FullscreenComments } from './FullscreenComments';

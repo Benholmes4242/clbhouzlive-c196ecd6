@@ -35,6 +35,9 @@ interface CinematicActionRailProps {
   audioMode?: string;
   /** Whether the current post has a music track attached */
   postHasMusic?: boolean;
+  /** Override the bottom offset (default accounts for tab bar).
+   *  Use for fullscreen viewer where there's no tab bar. */
+  bottomOffset?: string;
 }
 
 const formatCount = (count: number): string => {
@@ -195,6 +198,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   hasInteracted = false,
   audioMode,
   postHasMusic = false,
+  bottomOffset,
 }) => {
   // Idle opacity: 75% when not interacted, full when interacted or active
   const idleOpacity = hasInteracted ? 1 : 0.75;
@@ -211,7 +215,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   // Align the *circular button* bottom (not the full slot) with CreatorCapsule bottom.
   // Each slot reserves COUNT_HEIGHT + 4px under the circle even when showCount=false,
   // so the circle sits (SLOT_HEIGHT - ICON_SIZE) px above the rail's bottom.
-  const CAPSULE_BOTTOM_OFFSET = `calc(30px + 80px - ${SLOT_HEIGHT - ICON_SIZE}px)`;
+  const CAPSULE_BOTTOM_OFFSET = bottomOffset || `calc(30px + 80px - ${SLOT_HEIGHT - ICON_SIZE}px)`;
 
 
   return (
