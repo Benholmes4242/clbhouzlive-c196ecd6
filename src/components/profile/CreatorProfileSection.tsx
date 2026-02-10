@@ -102,7 +102,9 @@ export function CreatorProfileSection({
       <FeaturedVideoSlot
         videoUrl={featuredPost?.videoUrl}
         posterUrl={featuredPost?.thumbnailUrl}
+        durationSeconds={featuredPost?.durationSeconds}
         isOwner={isOwnProfile}
+        isLoading={isLoading}
         onEditClick={handleEditFeatured}
         onRemoveClick={handleRemoveFeatured}
         onPlayClick={handlePlayFeatured}
@@ -123,7 +125,7 @@ export function CreatorProfileSection({
         pinnedPosts.length < 3 ? (
           <button
             onClick={handleAddPinned}
-            className="mb-4 w-full min-h-[44px] py-2 flex items-center justify-center gap-2 text-sm text-[#C1A84C] font-medium rounded-xl border border-[#C1A84C]/40 bg-[#C1A84C]/5 active:scale-[0.98] transition-transform"
+            className="mb-4 w-full min-h-[44px] py-2 flex items-center justify-center gap-2 text-sm text-primary font-medium rounded-xl border border-primary/40 bg-primary/5 active:scale-[0.98] transition-transform"
           >
             + Pin another post ({3 - pinnedPosts.length} remaining)
           </button>
