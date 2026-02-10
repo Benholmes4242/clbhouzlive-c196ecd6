@@ -1,20 +1,20 @@
 /**
  * WatchHeroVideo - Hero video card for Watch tab
  * 
- * TIKTOK-LEVEL IMPLEMENTATION:
- * - Direct UnifiedVideoPlayer (no legacy wrapper)
+ * CLUBHOUSE-PARITY IMPLEMENTATION:
+ * - UnifiedVideoPlayer with managedByMediaRuntime=true
+ * - surface="hero" for correct priority/telemetry
+ * - Skeleton overlay stays until video plays (100ms buffer + 150ms crossfade)
  * - 50%/10% hysteresis autoplay via IntersectionObserver
- * - Priority poster loading with fetchPriority="high"
- * - 150ms crossfade poster→video transition
- * - Shimmer-down skeleton animation
+ * - Poster preload with fetchPriority="high"
+ * - Visual error state with retry
  */
 
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Heart } from 'lucide-react';
+import { Heart, RefreshCw } from 'lucide-react';
 import { HeroVideo, TrendingPeriod } from '@/hooks/useWatchHeroVideo';
 import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { extractCloudflareUid, shortUid } from '@/utils/videoIdUtils';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { isPosterFailed } from '@/utils/posterPrefetch';
@@ -31,7 +31,7 @@ function formatCount(count: number): string {
 }
 
 // ============================================================================
-// DEBUG CONFIGURATION - Controlled by unified CLUBHOUSE_DEBUG flag
+// DEBUG CONFIGURATION
 // ============================================================================
 const DEBUG_HERO = FLAGS.CLUBHOUSE_DEBUG;
 
@@ -58,7 +58,7 @@ const BADGE_TEXT: Record<TrendingPeriod, string> = {
 };
 
 // ============================================================================
-// COMPONENT - TikTok-Level Implementation
+// COMPONENT — Clubhouse-Parity Implementation
 // ============================================================================
 export function WatchHeroVideo({ 
   video, 
@@ -70,21 +70,14 @@ export function WatchHeroVideo({
   const containerRef = useRef<HTMLDivElement>(null);
   const mountTimeRef = useRef<number>(performance.now());
   const hasReportedReadyRef = useRef(false);
-  // Paused-video pattern: no external hasFirstFrame state needed
-  // UnifiedVideoPlayer handles poster→video transition internally
-  
-  // P0: Hysteresis-based autoplay state (50% start, 10% stop)
+  const readyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // FIX 1: Skeleton-gated playback — skeleton stays until video is playing
+  const [isFirstVideoReady, setIsFirstVideoReady] = useState(false);
+  const [hasVideoError, setHasVideoError] = useState(false);
+
+  // Hysteresis-based autoplay state (50% start, 10% stop)
   const [shouldPlay, setShouldPlay] = useState(false);
-  
-  // Timing tracking for debug
-  const [timings, setTimings] = useState<{
-    loadStart?: number;
-    loadedMetadata?: number;
-    canPlay?: number;
-    canPlayThrough?: number;
-    firstPlay?: number;
-    error?: string;
-  }>({});
 
   // Extract stream ID
   const streamId = video?.media?.[0]?.media_url 
@@ -102,8 +95,51 @@ export function WatchHeroVideo({
     ? generatedPosterUrl 
     : undefined;
 
+  // FIX 5: Preload poster image via <link> for fastest possible fetch
+  useEffect(() => {
+    if (!posterUrl) return;
+    
+    // Check if preload link already exists
+    const existingLink = document.querySelector(`link[href="${posterUrl}"]`);
+    if (existingLink) return;
+
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = posterUrl;
+    link.setAttribute('fetchpriority', 'high');
+    document.head.appendChild(link);
+
+    return () => {
+      // Clean up preload link on unmount
+      if (link.parentNode) {
+        link.parentNode.removeChild(link);
+      }
+    };
+  }, [posterUrl]);
+
+  // Reset ready state when video changes
+  useEffect(() => {
+    setIsFirstVideoReady(false);
+    setHasVideoError(false);
+    hasReportedReadyRef.current = false;
+    if (readyTimerRef.current) {
+      clearTimeout(readyTimerRef.current);
+      readyTimerRef.current = null;
+    }
+  }, [video?.id]);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (readyTimerRef.current) {
+        clearTimeout(readyTimerRef.current);
+      }
+    };
+  }, []);
+
   // ============================================================================
-  // P0: HYSTERESIS AUTOPLAY - 50% to start, 10% to stop
+  // HYSTERESIS AUTOPLAY — 50% to start, 10% to stop
   // ============================================================================
   useEffect(() => {
     const container = containerRef.current;
@@ -117,12 +153,10 @@ export function WatchHeroVideo({
         const ratio = entry.intersectionRatio;
         
         setShouldPlay(prev => {
-          // Start playing at 50% visibility
           if (!prev && ratio >= 0.5) {
             logHero('▶️ Hysteresis START', { ratio: ratio.toFixed(2) });
             return true;
           }
-          // Stop playing when below 10% visibility
           if (prev && ratio < 0.1) {
             logHero('⏸️ Hysteresis STOP', { ratio: ratio.toFixed(2) });
             return false;
@@ -158,8 +192,6 @@ export function WatchHeroVideo({
   // Log mount/unmount
   useEffect(() => {
     mountTimeRef.current = performance.now();
-    hasReportedReadyRef.current = false;
-    setTimings({});
     
     logHero('🎬 MOUNTED', {
       videoId: video?.id?.slice(0, 8),
@@ -178,39 +210,58 @@ export function WatchHeroVideo({
     };
   }, [video?.id, streamId, trendingPeriod, isLoading]);
 
-  // Handle loadeddata - timing only, no external state needed
-  const handleLoadedData = useCallback(() => {
+  // FIX 1: onPlay handler — gate skeleton dismissal with 100ms buffer
+  const handlePlay = useCallback(() => {
     const sinceMountMs = performance.now() - mountTimeRef.current;
-    setTimings(prev => ({ ...prev, loadedMetadata: sinceMountMs }));
-    logHero('📦 loadeddata', { sinceMountMs: `${sinceMountMs.toFixed(0)}ms` });
-  }, []);
+    logHero('▶️ play', { sinceMountMs: `${sinceMountMs.toFixed(0)}ms` });
 
-  // Handle canplaythrough for buffered ready state
-  const handleCanPlayThrough = useCallback(() => {
     if (!hasReportedReadyRef.current) {
       hasReportedReadyRef.current = true;
-      const sinceMountMs = performance.now() - mountTimeRef.current;
-      setTimings(prev => ({ ...prev, canPlayThrough: sinceMountMs }));
-      logHero('🎯 canplaythrough', { sinceMountMs: `${sinceMountMs.toFixed(0)}ms` });
+      // 100ms buffer after play to ensure stability (matches Clubhouse pattern)
+      readyTimerRef.current = setTimeout(() => {
+        setIsFirstVideoReady(true);
+        logHero('✅ isFirstVideoReady = true', { 
+          sinceMountMs: `${(performance.now() - mountTimeRef.current).toFixed(0)}ms` 
+        });
+      }, 100);
     }
   }, []);
 
-  const handlePlay = useCallback(() => {
+  const handleLoadedData = useCallback(() => {
     const sinceMountMs = performance.now() - mountTimeRef.current;
-    setTimings(prev => ({ ...prev, firstPlay: prev.firstPlay ?? sinceMountMs }));
-    logHero('▶️ play', { sinceMountMs: `${sinceMountMs.toFixed(0)}ms` });
+    logHero('📦 loadeddata', { sinceMountMs: `${sinceMountMs.toFixed(0)}ms` });
   }, []);
 
+  const handleCanPlayThrough = useCallback(() => {
+    const sinceMountMs = performance.now() - mountTimeRef.current;
+    logHero('🎯 canplaythrough', { sinceMountMs: `${sinceMountMs.toFixed(0)}ms` });
+  }, []);
+
+  // FIX 4: Error handler with visual state
   const handleError = useCallback((error?: { message?: string }) => {
     const sinceMountMs = performance.now() - mountTimeRef.current;
     logHero('❌ error', { 
       sinceMountMs: `${sinceMountMs.toFixed(0)}ms`,
       error: error?.message || 'Unknown error',
     });
-    setTimings(prev => ({ ...prev, error: error?.message || 'Unknown error' }));
+    setHasVideoError(true);
   }, []);
 
-  // P2: Enhanced shimmer-down skeleton
+  // FIX 4: Retry handler
+  const handleRetry = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    logHero('🔄 Retry requested');
+    setHasVideoError(false);
+    setIsFirstVideoReady(false);
+    hasReportedReadyRef.current = false;
+    // Force re-mount by toggling a key or re-triggering play
+    const player = playerRef.current;
+    if (player) {
+      player.play();
+    }
+  }, []);
+
+  // Loading skeleton (data still fetching)
   if (isLoading) {
     return (
       <div className="pt-3 px-4">
@@ -226,7 +277,7 @@ export function WatchHeroVideo({
     );
   }
 
-  // Empty state - No video available
+  // Empty state
   if (!video || video.media.length === 0 || !hlsUrl) {
     logHero('📭 Empty state - no video available');
     return (
@@ -252,6 +303,7 @@ export function WatchHeroVideo({
         className="relative w-full aspect-square rounded-2xl overflow-hidden cursor-pointer group bg-black shadow-sm"
         onClick={onTap}
       >
+        {/* Player — mounts immediately, plays under skeleton */}
         <UnifiedVideoPlayer
           ref={playerRef}
           src={hlsUrl}
@@ -265,8 +317,8 @@ export function WatchHeroVideo({
           objectFit="cover"
           className="absolute inset-0 w-full h-full"
           mediaId={streamId || undefined}
-          surface="grid"
-          managedByMediaRuntime={false}
+          surface="hero"
+          managedByMediaRuntime={true}
           preload="auto"
           onLoadedData={handleLoadedData}
           onCanPlayThrough={handleCanPlayThrough}
@@ -274,13 +326,52 @@ export function WatchHeroVideo({
           onError={handleError}
         />
 
-        {/* Gradient Overlay - Bottom 40% */}
+        {/* FIX 1: Skeleton overlay — stays on top until video is playing */}
+        {!isFirstVideoReady && !hasVideoError && (
+          <div 
+            className="absolute inset-0 z-10 rounded-2xl overflow-hidden transition-opacity duration-150"
+            style={{ opacity: isFirstVideoReady ? 0 : 1 }}
+          >
+            <Skeleton className="w-full h-full rounded-none animate-shimmer-down" />
+          </div>
+        )}
+
+        {/* FIX 4: Error state overlay */}
+        {hasVideoError && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center">
+            {/* Poster fallback background */}
+            {posterUrl && (
+              <img 
+                src={posterUrl} 
+                alt="" 
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            )}
+            {!posterUrl && (
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-900 to-emerald-950" />
+            )}
+            {/* Dark overlay */}
+            <div className="absolute inset-0 bg-black/50" />
+            {/* Retry button */}
+            <button
+              onClick={handleRetry}
+              className="relative z-20 flex flex-col items-center gap-2 active:scale-95 transition-transform"
+            >
+              <div className="w-14 h-14 rounded-full bg-white/15 backdrop-blur-sm border border-white/20 flex items-center justify-center">
+                <RefreshCw className="w-6 h-6 text-white" />
+              </div>
+              <span className="text-white/80 text-xs font-medium">Tap to retry</span>
+            </button>
+          </div>
+        )}
+
+        {/* Gradient Overlay — Bottom 40% */}
         <div className="absolute bottom-0 left-0 right-0 h-2/5 bg-gradient-to-t from-black/50 via-black/20 to-transparent pointer-events-none" />
 
         {/* Hover overlay */}
         <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
-        {/* Trending Badge with Like Count - Top Right */}
+        {/* Trending Badge with Like Count — Top Right */}
         <div className="absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 backdrop-blur-sm bg-black/40 rounded-full">
           <span className="text-white/90 text-sm leading-none">🔥</span>
           <span className="text-white text-xs font-medium">
@@ -294,7 +385,7 @@ export function WatchHeroVideo({
           )}
         </div>
 
-        {/* Bottom Content - Creator Info + Course Name */}
+        {/* Bottom Content — Creator Info + Course Name */}
         <div className="absolute bottom-0 left-0 right-0 p-4">
           {creator && (
             <div className="flex items-center gap-2.5 min-w-0">
