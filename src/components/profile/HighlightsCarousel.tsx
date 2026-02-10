@@ -1,8 +1,8 @@
 /**
  * HighlightsCarousel - Top 100 highlights carousel
  * 
- * Uses MediaRuntime for playback control.
- * Observer only reports visibility - does NOT call play/pause.
+ * Uses UnifiedVideoPlayer with MediaRuntime for playback control.
+ * Mount gating: only active + adjacent slides mount players.
  */
 
 import React, { useRef, useCallback, useState, useEffect, useMemo } from 'react';
@@ -11,9 +11,8 @@ import { useTop100Highlights } from '@/hooks/useTop100Highlights';
 import { warmHls, getHlsUrl } from '@/utils/videoPreload';
 import HighlightVideo from './HighlightVideo';
 import HighlightOverlays from './HighlightOverlays';
-import { isElementMostlyInView } from '@/utils/videoPreload';
-import { MediaRuntime } from '@/media/runtime';
-import { useMediaAutoplay } from '@/media/useMediaAutoplay';
+import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 
 interface HighlightsCarouselProps {
   userId: string;
@@ -25,24 +24,25 @@ const MOBILE_QUERY = '(pointer: coarse), (hover: none)';
 const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, className = '' }) => {
   const { highlights, isLoading, error } = useTop100Highlights(userId);
   const railRef = useRef<HTMLDivElement>(null);
-  const { registerMedia, playingIds } = useMediaAutoplay({ 
-    mode: 'grid',
-  startThreshold: 0.4,   // Play at 40% visible
-  stopThreshold: 0.35,   // Pause at 35% visible (provides hysteresis)
-  });
-  
-  // Session-wide mute persistence
-  const [muted, setMuted] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return JSON.parse(localStorage.getItem('journeyMuted') ?? 'true') as boolean;
-    }
-    return true;
-  });
+  const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
+  const [activeIndex, setActiveIndex] = useState(0);
+  const { openFullscreen } = useUnifiedFullscreen('explore');
 
-  // Persist mute state to localStorage
+  // Track active index via scroll position
   useEffect(() => {
-    localStorage.setItem('journeyMuted', JSON.stringify(muted));
-  }, [muted]);
+    const rail = railRef.current;
+    if (!rail || !highlights?.length) return;
+
+    const handleScroll = () => {
+      const scrollLeft = rail.scrollLeft;
+      const cardWidth = rail.children[0]?.clientWidth || window.innerWidth;
+      const newIndex = Math.round(scrollLeft / cardWidth);
+      setActiveIndex(Math.max(0, Math.min(newIndex, highlights.length - 1)));
+    };
+
+    rail.addEventListener('scroll', handleScroll, { passive: true });
+    return () => rail.removeEventListener('scroll', handleScroll);
+  }, [highlights?.length]);
 
   // Warm HLS.js and preload initial URLs when component mounts
   useEffect(() => {
@@ -78,18 +78,17 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
 
   // Mobile-only auto-advance
   const tryAutoAdvance = useCallback((index: number) => {
-    if (!isMobile) return; // Desktop unchanged
+    if (!isMobile) return;
     const next = index + 1;
-    if (next >= highlights.length) return; // Last item: stop
+    if (next >= highlights.length) return;
     scrollToIndex(next);
   }, [isMobile, highlights?.length, scrollToIndex]);
 
   const extractVideoUid = (mediaUrl: string): string | null => {
-    // Extract Cloudflare Stream ID from various URL formats
     const patterns = [
-      /\/([a-f0-9-]{36})\//, // Standard UUID format
-      /\/([a-z0-9-]{16,})\//, // Shorter ID format
-      /stream\/([^\/]+)/, // Stream path format
+      /\/([a-f0-9-]{36})\//,
+      /\/([a-z0-9-]{16,})\//,
+      /stream\/([^\/]+)/,
     ];
     
     for (const pattern of patterns) {
@@ -99,18 +98,28 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
     return null;
   };
 
-  // Toggle mute - apply to all visible videos
-  const handleMuteToggle = useCallback(() => {
-    const next = !muted;
-    setMuted(next);
-    localStorage.setItem('journeyMuted', JSON.stringify(next));
-    
-    // Immediately flip mute on the most visible video element
-    const visible = railRef.current?.querySelectorAll('video') ?? [];
-    visible.forEach(v => {
-      if (isElementMostlyInView(v)) (v as HTMLVideoElement).muted = next;
-    });
-  }, [muted]);
+  // Open fullscreen viewer with highlights as playlist
+  const handleHighlightTap = useCallback((index: number) => {
+    if (!highlights) return;
+    // Convert highlights to ExploreContentItem-compatible format for fullscreen
+    const items = highlights.map(h => ({
+      id: h.id,
+      src: h.post_media[0]?.media_url || '',
+      type: h.post_media[0]?.media_type === 'video' ? 'video' as const : 'image' as const,
+      thumbnailSrc: h.post_media[0]?.media_url || '',
+      title: h.content || '',
+      user: {
+        id: 'unknown',
+        name: h.golf_course?.name || 'Golf Course',
+      },
+      golfCourse: h.golf_course ? {
+        id: h.golf_course.id,
+        name: h.golf_course.name,
+        country: h.golf_course.country,
+      } : undefined,
+    }));
+    openFullscreen(items, index);
+  }, [highlights, openFullscreen]);
 
   if (isLoading) {
     return (
@@ -157,10 +166,9 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
         ref={railRef}
       >
         {highlights.map((highlight, index) => {
-          const primaryMedia = highlight.post_media[0];
-          const videoUid = primaryMedia?.media_type === 'video' ? extractVideoUid(primaryMedia.media_url) : null;
-          const mediaId = `highlight-${highlight.id}`;
-          const isPlaying = playingIds.has(mediaId);
+          const videoUid = highlight.post_media[0]?.media_type === 'video' ? extractVideoUid(highlight.post_media[0].media_url) : null;
+          // Mount gating: only active + adjacent slides get players
+          const isActive = Math.abs(index - activeIndex) <= 1;
           
           return (
             <article 
@@ -174,24 +182,22 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
                 }
               }}
             >
-              {/* Video part is memoized and isolated from mute changes */}
               <div className="highlights__card">
                 <HighlightVideo
                   highlight={highlight}
                   index={index}
                   onEnded={() => tryAutoAdvance(index)}
-                  mediaId={mediaId}
-                  isPlaying={isPlaying}
-                  registerMedia={registerMedia}
-                  muted={muted}
+                  isActive={isActive}
+                  muted={isGloballyMuted}
+                  onTap={() => handleHighlightTap(index)}
                 />
                 <button
                   className="unmute-btn"
-                  aria-label={muted ? 'Unmute' : 'Mute'}
-                  onClick={handleMuteToggle}
-                  title={muted ? 'Unmute' : 'Mute'}
+                  aria-label={isGloballyMuted ? 'Unmute' : 'Mute'}
+                  onClick={(e) => { e.stopPropagation(); toggleGlobalMute(); }}
+                  title={isGloballyMuted ? 'Unmute' : 'Mute'}
                 >
-                  {muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                  {isGloballyMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
                 </button>
                 {highlight.golf_course && (
                   <div className="club-badge">

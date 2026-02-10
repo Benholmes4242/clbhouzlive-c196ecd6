@@ -3,7 +3,8 @@ import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSheetPlayback } from './SheetPlaybackContext';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
-// REMOVED: safePlay import - playback now user-tap only via MediaRuntime
+import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { generateThumbnailUrl } from '@/utils/cloudflareStreamTransform';
 
 // Debug flag declaration
 declare global {
@@ -19,6 +20,12 @@ interface VideoThumbPlayerProps {
   className?: string;
 }
 
+// Extract Cloudflare Stream UID from URL for poster generation
+function extractStreamUid(url: string): string | null {
+  const match = /\/([a-z0-9-]{16,})\/manifest\/video\.m3u8/i.exec(url);
+  return match?.[1] ?? null;
+}
+
 export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
   url,
   poster,
@@ -29,15 +36,21 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const hlsRef = useRef<any>(null);
   const { register, requestPlay, requestUnmute } = useSheetPlayback();
+  const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
   const id = React.useId();
   
   const [playing, setPlaying] = useState(false);
-  const [muted, setMuted] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [progress, setProgress] = useState(0);
   const [buffered, setBuffered] = useState(0);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
+  const [posterLoaded, setPosterLoaded] = useState(false);
+  const [hasFirstFrame, setHasFirstFrame] = useState(false);
+
+  // Generate poster from Cloudflare Stream URL if not provided
+  const streamUid = extractStreamUid(url);
+  const resolvedPoster = poster || (streamUid ? generateThumbnailUrl(streamUid, { width: 400, height: 400, time: 1 }) : undefined);
 
   // Register with exclusive playback controller
   useEffect(() => {
@@ -50,12 +63,11 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
     const muteFn = () => {
       if (videoRef.current) {
         videoRef.current.muted = true;
-        setMuted(true);
       }
     };
 
     return register(id, pauseFn, muteFn);
-  }, [id, register, url, muted]);
+  }, [id, register, url, isGloballyMuted]);
 
   // Setup video source and HLS if needed
   useEffect(() => {
@@ -72,7 +84,6 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
           return;
         }
 
-        // Lazy load HLS.js
         const { default: Hls } = await import('hls.js/dist/hls.light.min.js');
         if (!mounted) return;
 
@@ -86,13 +97,12 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
           hls.loadSource(url);
           hls.attachMedia(video);
           
-          hls.on(Hls.Events.ERROR, (event, data) => {
+          hls.on(Hls.Events.ERROR, (event: any, data: any) => {
             if (data.fatal) {
               setError(true);
             }
           });
         } else {
-          // Fallback for browsers that don't support HLS.js
           video.src = url;
         }
       } catch (err) {
@@ -143,7 +153,10 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
     const handleLoadStart = () => {
       if (hasUserInteracted) setLoading(true);
     };
-    const handleCanPlay = () => setLoading(false);
+    const handleCanPlay = () => {
+      setLoading(false);
+      setHasFirstFrame(true);
+    };
     const handlePlay = () => {
       setPlaying(true);
     };
@@ -170,10 +183,6 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
       }
     };
 
-    const handleVolumeChange = () => {
-      setMuted(video.muted);
-    };
-
     video.addEventListener('loadstart', handleLoadStart);
     video.addEventListener('canplay', handleCanPlay);
     video.addEventListener('play', handlePlay);
@@ -181,7 +190,6 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
     video.addEventListener('error', handleError);
     video.addEventListener('timeupdate', handleTimeUpdate);
     video.addEventListener('progress', handleProgress);
-    video.addEventListener('volumechange', handleVolumeChange);
 
     return () => {
       video.removeEventListener('loadstart', handleLoadStart);
@@ -191,9 +199,8 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
       video.removeEventListener('error', handleError);
       video.removeEventListener('timeupdate', handleTimeUpdate);
       video.removeEventListener('progress', handleProgress);
-      video.removeEventListener('volumechange', handleVolumeChange);
     };
-  }, [id, muted]);
+  }, [id, isGloballyMuted]);
 
   const togglePlayPause = useCallback(() => {
     const video = videoRef.current;
@@ -201,29 +208,28 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
 
     setHasUserInteracted(true);
     if (video.paused) {
-      requestPlay(id); // Pause other videos via SheetPlayback
-      // Route through MediaRuntime for user-tap playback
+      requestPlay(id);
       MediaRuntime.requestPlay({ id, surface: 'grid', reason: 'user' });
     } else {
       MediaRuntime.requestPause({ id, reason: 'user' });
     }
   }, [id, requestPlay, error]);
 
-  const toggleMute = useCallback((e: React.MouseEvent) => {
+  const handleMuteToggle = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    const video = videoRef.current;
-    if (!video) return;
-    
-    if (video.muted) {
-      // Request exclusive unmute (mutes all other videos)
-      requestUnmute(id);
-      video.muted = false;
-      setMuted(false);
-    } else {
-      video.muted = true;
-      setMuted(true);
+    toggleGlobalMute();
+    // Immediately sync to video element
+    if (videoRef.current) {
+      videoRef.current.muted = !isGloballyMuted;
     }
-  }, [id, requestUnmute]);
+  }, [toggleGlobalMute, isGloballyMuted]);
+
+  // Sync global mute state to video element
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = isGloballyMuted;
+    }
+  }, [isGloballyMuted]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -232,6 +238,7 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
     }
   }, [togglePlayPause]);
 
+  // TODO: Migrate to UnifiedVideoPlayer in a dedicated media-player standardisation pass
   return (
     <div
       ref={containerRef}
@@ -245,14 +252,35 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
       onClick={togglePlayPause}
       onKeyDown={handleKeyDown}
     >
+      {/* Shimmer while loading */}
+      {!posterLoaded && !hasFirstFrame && (
+        <div className="absolute inset-0 bg-muted animate-pulse" />
+      )}
+
+      {/* Poster thumbnail - visible until video plays */}
+      {resolvedPoster && !playing && (
+        <img
+          src={resolvedPoster}
+          alt=""
+          className={cn(
+            "absolute inset-0 w-full h-full object-cover transition-opacity duration-150",
+            posterLoaded ? "opacity-100" : "opacity-0"
+          )}
+          onLoad={() => setPosterLoaded(true)}
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+          }}
+        />
+      )}
+
       <video
         ref={videoRef}
-        muted={muted}
+        muted={isGloballyMuted}
         playsInline
         preload="metadata"
         className="w-full h-full object-cover"
         style={{ backgroundColor: 'transparent' }}
-        onVolumeChange={() => setMuted(videoRef.current?.muted ?? true)}
+        poster={resolvedPoster}
       />
 
       {/* Center Play/Pause Button */}
@@ -277,27 +305,25 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
 
       {/* Mute Toggle - Top Right with Glass Dark */}
       <button
-        onClick={toggleMute}
+        onClick={handleMuteToggle}
         className="glass-dark absolute top-2 right-2 p-1.5 rounded-full hover:bg-white/10 transition-colors"
-        aria-pressed={!muted}
-        aria-label={muted ? 'Unmute video' : 'Mute video'}
+        aria-pressed={!isGloballyMuted}
+        aria-label={isGloballyMuted ? 'Unmute video' : 'Mute video'}
       >
-        {muted ? (
+        {isGloballyMuted ? (
           <VolumeX className="w-3.5 h-3.5 text-white/80" />
         ) : (
           <Volume2 className="w-3.5 h-3.5 text-white/80" />
         )}
       </button>
 
-      {/* Progress Bar - Smoother Updates */}
+      {/* Progress Bar */}
       {!error && (
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/30">
-          {/* Buffered */}
           <div
             className="absolute top-0 left-0 h-full bg-white/20 transition-all duration-200 ease-linear"
             style={{ width: `${Math.min(100, Math.max(0, buffered))}%` }}
           />
-          {/* Progress */}
           <div
             className="absolute top-0 left-0 h-full bg-white/60 transition-all duration-150 ease-linear"
             style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
@@ -317,7 +343,7 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
 
       {/* Live region for screen readers */}
       <div className="sr-only" aria-live="polite">
-        {playing ? (muted ? 'Playing, muted' : 'Playing') : 'Paused'}
+        {playing ? (isGloballyMuted ? 'Playing, muted' : 'Playing') : 'Paused'}
       </div>
     </div>
   );

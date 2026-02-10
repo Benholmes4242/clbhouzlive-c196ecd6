@@ -4,7 +4,7 @@ import { ChannelVideoCard } from './ChannelVideoCard';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import { useInView } from 'react-intersection-observer';
 import { InlineSpinner } from '@/components/ui/InlineSpinner';
-import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
+import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 
 export const ChannelsFeed: React.FC = () => {
   const { sub } = useDiscoverQuery();
@@ -23,25 +23,25 @@ export const ChannelsFeed: React.FC = () => {
     threshold: 0.5,
   });
 
-  const { openFeed, setPosts } = useVerticalMediaFeed();
+  // Use shared FullscreenMediaViewer instead of legacy VerticalMediaFeed
+  const { openFullscreen } = useUnifiedFullscreen('explore');
 
   const allVideos = data?.pages.flatMap(page => page.items) || [];
 
   const handleVideoPlay = (video: any) => {
-    // Convert to format expected by vertical feed
-    const posts = allVideos.map(v => ({
+    // Convert channel videos to ExploreContentItem-compatible format for shared fullscreen viewer
+    const items = allVideos.map(v => ({
       id: v.id,
-      user_id: v.user_id,
-      content: v.content,
-      created_at: v.created_at,
       src: v.post_media[0]?.media_url || '',
       type: 'video' as const,
+      thumbnailSrc: v.post_media[0]?.poster_url || v.post_media[0]?.media_url || '',
       title: v.content || '',
-      username: v.user_profiles?.username || '',
-      userAvatar: v.user_profiles?.profile_photo_url || '',
-      likes: 0,
-      comments: 0,
-      shares: 0,
+      user: {
+        id: v.user_id,
+        name: v.user_profiles?.display_name || v.user_profiles?.username || 'Unknown',
+        username: v.user_profiles?.username || '',
+        avatar: v.user_profiles?.profile_photo_url || '',
+      },
       media: v.post_media.map((m: any) => ({
         id: m.id,
         media_type: m.media_type,
@@ -49,10 +49,13 @@ export const ChannelsFeed: React.FC = () => {
         poster_url: m.poster_url,
         stream_id: m.stream_id,
       })),
+      likes: 0,
+      comments: 0,
+      durationSeconds: v.post_media[0]?.duration_seconds,
     }));
 
-    setPosts(posts);
-    openFeed(posts.find(p => p.id === video.id)!);
+    const startIndex = items.findIndex(i => i.id === video.id);
+    openFullscreen(items, startIndex >= 0 ? startIndex : 0);
   };
 
   if (isLoading && allVideos.length === 0) {

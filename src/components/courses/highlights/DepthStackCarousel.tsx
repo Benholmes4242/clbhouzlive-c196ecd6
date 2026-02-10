@@ -9,6 +9,7 @@ import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloud
 import { getFilterClass } from '@/utils/studioFilters';
 import { cn } from '@/lib/utils';
 import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
+import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 
 interface HighlightVideo {
   id: string;
@@ -45,13 +46,15 @@ const VideoCard: React.FC<{
   isOwnProfile?: boolean;
   isVideoReady?: boolean;
   onReady?: (id: string) => void;
-}> = ({ video, isActive, onVideoPlay, isMobile, isHovered = false, userFirstName = 'User', isOwnProfile = false, isVideoReady = false, onReady }) => {
+  globalMuted?: boolean;
+}> = ({ video, isActive, onVideoPlay, isMobile, isHovered = false, userFirstName = 'User', isOwnProfile = false, isVideoReady = false, onReady, globalMuted = true }) => {
   const playerRef = useRef<UnifiedVideoPlayerRef>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const hasReportedReadyRef = useRef(false);
   const [shouldAttach, setShouldAttach] = useState(false);
   const [autoplay, setAutoplay] = useState(false);
   const [isPausing, setIsPausing] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const mediaId = useId();
 
   // Get HLS URL and poster from video URL
@@ -61,9 +64,22 @@ const VideoCard: React.FC<{
     ? generateStreamThumbnailUrl(uid, { height: 600 })
     : video.thumbnail;
 
+  // Parse duration string to seconds for smart looping
+  const durationSeconds = useMemo(() => {
+    if (!video.duration) return 0;
+    const parts = video.duration.split(':').map(Number);
+    if (parts.length === 2) return parts[0] * 60 + parts[1];
+    if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+    return 0;
+  }, [video.duration]);
+
+  // Smart looping: only loop videos under 60 seconds
+  const shouldLoop = durationSeconds > 0 ? durationSeconds < 60 : true;
+
   // Reset ready state on video change
   useEffect(() => {
     hasReportedReadyRef.current = false;
+    setHasError(false);
   }, [video.id]);
 
   // Intersection observer for attach/autoplay with hysteresis (50% start / 10% stop)
@@ -76,10 +92,8 @@ const VideoCard: React.FC<{
         const entry = entries[0];
         const ratio = entry.intersectionRatio;
         
-        // Attach when nearby (any visibility)
         setShouldAttach(entry.isIntersecting);
         
-        // Hysteresis: 50% to start, 10% to stop
         if (ratio >= 0.5) {
           setAutoplay(true);
           setIsPausing(false);
@@ -112,7 +126,6 @@ const VideoCard: React.FC<{
     onVideoPlay?.(video.id);
   };
 
-  // Handle canplaythrough callback
   const handleCanPlayThrough = useCallback(() => {
     if (!hasReportedReadyRef.current && hlsUrl) {
       hasReportedReadyRef.current = true;
@@ -120,7 +133,17 @@ const VideoCard: React.FC<{
     }
   }, [video.id, hlsUrl, onReady]);
 
-  // Compute filter class
+  const handleError = useCallback(() => {
+    setHasError(true);
+  }, []);
+
+  // Format duration for badge
+  const formatDur = (s: number) => {
+    const m = Math.floor(s / 60);
+    const sec = Math.floor(s % 60);
+    return `${m}:${sec.toString().padStart(2, '0')}`;
+  };
+
   const filterClass = getFilterClass(video.filterId);
 
   return (
@@ -133,21 +156,23 @@ const VideoCard: React.FC<{
       <div className={cn(
         "absolute inset-0 transition-opacity duration-150 ease-out",
         filterClass,
-        isVideoReady ? "opacity-100" : "opacity-0"
+        isVideoReady && !hasError ? "opacity-100" : "opacity-0"
       )}>
-        {hlsUrl ? (
+        {hlsUrl && !hasError ? (
           <UnifiedVideoPlayer
             ref={playerRef}
             src={hlsUrl}
             posterUrl={poster}
-            muted={true}
+            muted={globalMuted}
             autoplay={autoplay}
-            loop={true}
+            loop={shouldLoop}
             className="w-full h-full"
             objectFit="cover"
-            surface="grid"
+            surface="course-highlights"
+            managedByMediaRuntime={true}
             showMuteButton={false}
             onLoadedData={handleCanPlayThrough}
+            onError={handleError}
           />
         ) : (
           <img 
@@ -165,8 +190,17 @@ const VideoCard: React.FC<{
       </div>
       
       {/* Shimmer skeleton until video is ready */}
-      {hlsUrl && !isVideoReady && (
+      {hlsUrl && !isVideoReady && !hasError && (
         <div className="absolute inset-0 bg-muted motion-safe:animate-shimmer-down" />
+      )}
+
+      {/* Silent error fallback: show poster */}
+      {hasError && poster && (
+        <img 
+          src={poster}
+          alt={video.courseName}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
       )}
       
       {/* Dark overlay for text readability */}
@@ -182,6 +216,13 @@ const VideoCard: React.FC<{
           </div>
         </div>
       </div>
+
+      {/* Duration badge - Bottom Right */}
+      {durationSeconds > 0 && (
+        <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm rounded-md px-1.5 py-0.5 text-[10px] font-medium text-white z-10">
+          {formatDur(durationSeconds)}
+        </div>
+      )}
     </div>
   );
 };
@@ -196,6 +237,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
   const [activeVideoIndex, setActiveVideoIndex] = useState(0);
   const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null);
   const hasPreloadedFirst = useRef(false);
+  const { isGloballyMuted } = useGlobalAudio();
   
   const carouselItems = highlights;
 
@@ -338,9 +380,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
             variant="ghost"
             size="icon"
             className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full overflow-hidden disabled:opacity-30 shadow-lg shadow-black/10"
-            style={{ 
-              backdropFilter: 'blur(40px) saturate(180%)'
-            }}
+            style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
           >
             <div className="absolute inset-0 bg-white/10 border border-white/20 rounded-full" />
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-full" />
@@ -355,9 +395,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
             variant="ghost"
             size="icon"
             className="absolute right-2 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full overflow-hidden disabled:opacity-30 shadow-lg shadow-black/10"
-            style={{ 
-              backdropFilter: 'blur(40px) saturate(180%)'
-            }}
+            style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
           >
             <div className="absolute inset-0 bg-white/10 border border-white/20 rounded-full" />
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-full" />
@@ -414,6 +452,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                   isOwnProfile={isOwnProfile}
                   isVideoReady={item.videoUrl ? isReady(uidFromNode({ src: item.videoUrl }) || item.id) : true}
                   onReady={(id) => markReadyRef.current(id)}
+                  globalMuted={isGloballyMuted}
                 />
               </div>
             );
