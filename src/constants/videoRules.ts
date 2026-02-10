@@ -6,8 +6,8 @@
  */
 
 // Duration threshold in seconds
-// ⚠️ TEMPORARILY 60 for testing - change back to 240 when you have real long-form content!
-export const VIDEO_DURATION_THRESHOLD_SECONDS = 60; // 1 minute (TESTING ONLY)
+// PRODUCTION: 4 minutes minimum for long-form videos
+export const VIDEO_DURATION_THRESHOLD_SECONDS = 240; // 4 minutes
 
 /**
  * Video Classification:

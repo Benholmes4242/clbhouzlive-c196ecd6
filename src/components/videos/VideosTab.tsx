@@ -10,8 +10,9 @@
 import React, { useState, useMemo, useCallback, useLayoutEffect, useRef, useEffect } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useInView } from 'react-intersection-observer';
+import { useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
-import { Play } from 'lucide-react';
+import { Play, Flame, Users, MapPin, AlertCircle } from 'lucide-react';
 import { LongFormFeedCard } from './LongFormFeedCard';
 import { LongFormFeedCardSkeleton } from './LongFormFeedCardSkeleton';
 import { VideosSectionPage } from './VideosSectionPage';
@@ -22,6 +23,7 @@ import { useFollowedUsers } from '@/hooks/useFollowedUsers';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 import { useContinueWatching } from '@/hooks/useContinueWatching';
+import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
 import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
@@ -60,6 +62,15 @@ const sortOptionToQuerySort = (sortOption: SortOption): QuerySort => {
 // Minimum videos ready before showing feed
 const MINIMUM_READY_COUNT = 2;
 
+// Section entry card data
+interface SectionEntry {
+  key: string;
+  label: string;
+  subtitle: string;
+  icon: React.ReactNode;
+  section: string;
+}
+
 interface VideosTabProps {
   onVideoClick?: (id: string) => void;
   className?: string;
@@ -69,13 +80,6 @@ interface VideosTabProps {
  * VideosTab - Feed-based long-form video tab with Paused-Video-First Architecture
  * 
  * DATA RULE: Videos tab = long-form ONLY (≥4 min / 240 seconds)
- * 
- * Architecture:
- * - HLSPlayer always mounted, showing paused first frame when not in view
- * - Autoplay when scrolled into view (40%+ visible)
- * - Pause when scrolled out (below 25% visible)
- * - useVideoReadyQueue for prefetch (8 ahead, 8 behind = 16 total window)
- * - useMediaAutoplay for coordinated play/pause
  */
 export const VideosTab: React.FC<VideosTabProps> = ({
   onVideoClick,
@@ -83,6 +87,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Debug lifecycle
@@ -130,14 +135,61 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   const {
     items: allVideos,
     isLoading,
+    isError,
+    error,
     hasMore,
     fetchNextPage,
     isFetchingNextPage,
   } = useInfiniteLongFormVideos({
-    section: 'recommended', // Use recommended as primary feed
+    section: 'recommended',
     category: categoryFilter,
     sort: querySort,
   });
+
+  // Quick check for trending / following content availability
+  const {
+    items: trendingVideos,
+    isLoading: trendingLoading,
+  } = useInfiniteLongFormVideos({ section: 'trending' });
+
+  const {
+    items: followingVideos,
+    isLoading: followingLoading,
+  } = useInfiniteLongFormVideos({
+    section: 'following',
+    followedCreatorIds: followedIds,
+  });
+
+  // Build section entry cards based on available data
+  const sectionEntries = useMemo<SectionEntry[]>(() => {
+    const entries: SectionEntry[] = [];
+    if (!trendingLoading && trendingVideos.length > 0) {
+      entries.push({
+        key: 'trending',
+        label: 'Trending This Week',
+        subtitle: `${trendingVideos.length} video${trendingVideos.length !== 1 ? 's' : ''}`,
+        icon: <Flame className="h-4 w-4 text-orange-500" />,
+        section: 'trending',
+      });
+    }
+    if (!followingLoading && followedIds.length > 0 && followingVideos.length > 0) {
+      entries.push({
+        key: 'following',
+        label: 'From People You Follow',
+        subtitle: `${followingVideos.length} video${followingVideos.length !== 1 ? 's' : ''}`,
+        icon: <Users className="h-4 w-4 text-blue-500" />,
+        section: 'following',
+      });
+    }
+    entries.push({
+      key: 'courses',
+      label: 'Course Videos',
+      subtitle: 'Vlogs & reviews',
+      icon: <MapPin className="h-4 w-4 text-emerald-500" />,
+      section: 'courses',
+    });
+    return entries;
+  }, [trendingVideos.length, trendingLoading, followingVideos.length, followingLoading, followedIds.length]);
 
   // Handle category selection - update URL
   const handleCategorySelect = (categoryKey: string) => {
@@ -275,6 +327,24 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     navigate('/discover?main=videos');
   };
 
+  // Pull-to-refresh handler
+  const handlePullToRefresh = useCallback(async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ['videos-infinite-longform-v6'] }),
+      queryClient.invalidateQueries({ queryKey: ['continue-watching'] }),
+    ]);
+  }, [queryClient]);
+
+  // Retry handler for error state
+  const handleRetry = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['videos-infinite-longform-v6'] });
+  }, [queryClient]);
+
+  // Section entry card tap
+  const handleSectionTap = useCallback((section: string) => {
+    navigate(`/discover?main=videos&section=${section}`);
+  }, [navigate]);
+
   // Paced loading state (Watch tab standard)
   const MIN_LOADING_DISPLAY_MS = 600;
   const loadStartTimeRef = useRef<number>(0);
@@ -282,8 +352,8 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   const prevVideosCountRef = useRef(filteredVideos.length);
   const [newlyLoadedStartIndex, setNewlyLoadedStartIndex] = useState<number | null>(null);
 
-  // Infinite scroll with intersection observer
-  const { ref: loadMoreRef, inView } = useInView({ threshold: 0, rootMargin: '0px' });
+  // Infinite scroll with intersection observer — h-20 sentinel + 200px rootMargin
+  const { ref: loadMoreRef, inView } = useInView({ threshold: 0, rootMargin: '200px' });
 
   useEffect(() => {
     if (inView && hasMore && !isFetchingNextPage) {
@@ -339,7 +409,6 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     golfCourseName: v.golfCourseName,
     golfCourseId: v.golfCourseId,
     createdAt: v.createdAt || new Date().toISOString(),
-    // Pass through review and golf course data
     isReview: (v as any).isReview,
     reviewRating: (v as any).reviewRating,
     golfCourse: (v as any).golfCourse,
@@ -366,95 +435,137 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   }
 
   return (
-    <div className={cn("min-h-screen pb-20 bg-[#F8FAFC]", className)}>
-      {/* Command Center: Search + Sort + Pills */}
-      <div className="bg-[#F8FAFC] border-b border-[#e2e8f0]">
-        <DiscoverCommandCenter
-          searchPlaceholder="Search videos, creators, courses..."
-          searchValue={searchQuery}
-          onSearchChange={handleSearch}
-          sortValue={sortOption}
-          onSortChange={handleSortChange}
-          pills={pills}
-          onPillSelect={handleCategorySelect}
-        />
-      </div>
-
-      {/* Continue Watching (only shows if user has in-progress videos) */}
-      <ContinueWatchingSection
-        onVideoClick={(id) => {
-          onVideoClick?.(id);
-        }}
-        className="mb-4"
-      />
-
-      {/* Feed Content */}
-      {isLoading ? (
-        <div className="-mx-5 px-0">
-          <div className="flex flex-col gap-3 py-3">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <LongFormFeedCardSkeleton key={i} index={i} />
-            ))}
-          </div>
+    <PullToRefreshContainer onRefresh={handlePullToRefresh}>
+      <div className={cn("min-h-screen pb-20 bg-[#F8FAFC]", className)}>
+        {/* Command Center: Search + Sort + Pills */}
+        <div className="bg-[#F8FAFC]">
+          <DiscoverCommandCenter
+            searchPlaceholder="Search videos, creators, courses..."
+            searchValue={searchQuery}
+            onSearchChange={handleSearch}
+            sortValue={sortOption}
+            onSortChange={handleSortChange}
+            pills={pills}
+            onPillSelect={handleCategorySelect}
+          />
         </div>
-      ) : filteredVideos.length === 0 ? (
-        // Empty state - positioned higher in viewport
-        <div className="flex flex-col items-center justify-center py-10 px-4">
-          <Play className="w-10 h-10 text-muted-foreground mb-3" />
-          <p className="text-foreground font-semibold mb-0.5">No videos yet</p>
-          <p className="text-muted-foreground text-sm text-center max-w-[280px]">
-            Long-form videos (4+ minutes) will appear here as creators share new content
-          </p>
-        </div>
-      ) : (
-          // Video feed - no gradient background (matches Friends tab)
-          <div className="-mx-5 px-0">
-            <div className="flex flex-col gap-3 py-3">
-              {filteredVideos.map((video, index) => {
-                const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;
-                const entranceDelay = isNewlyLoaded ? (index - newlyLoadedStartIndex) * 30 : 0;
-                
-                return (
-                  <div
-                    key={video.id}
-                    className={isNewlyLoaded 
-                      ? 'motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-200 motion-safe:fill-mode-backwards' 
-                      : undefined
-                    }
-                    style={isNewlyLoaded ? { animationDelay: `${entranceDelay}ms` } : undefined}
-                  >
-                    <LongFormFeedCard
-                      video={toFeedVideo(video)}
-                      index={index}
-                      onVideoTap={() => handleVideoTap(video.id)}
-                      onCreatorTap={() => handleCreatorTap(video.creatorUserId)}
-                    />
+
+        {/* Section Entry Cards */}
+        {sectionEntries.length > 0 && (
+          <div className="px-4 pt-1 pb-3">
+            <div 
+              className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
+            >
+              {sectionEntries.map((entry) => (
+                <button
+                  key={entry.key}
+                  onClick={() => handleSectionTap(entry.section)}
+                  className="flex-shrink-0 snap-start rounded-xl bg-white border border-gray-100 shadow-sm px-4 py-3 flex items-center gap-3 active:scale-[0.97] transition-transform min-w-[180px]"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center flex-shrink-0">
+                    {entry.icon}
                   </div>
-                );
-              })}
-
-              {/* Infinite scroll sentinel */}
-              <div ref={loadMoreRef} className="h-4" />
-
-              {/* Orange brand spinner for paced infinite scroll (Watch tab standard) */}
-              {showBottomLoader && (
-                <div className="flex items-center justify-center py-8">
-                  <div className="w-5 h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
-                </div>
-              )}
-
-              {/* End of feed */}
-              {!hasMore && filteredVideos.length > 3 && !showBottomLoader && (
-                <div className="flex flex-col items-center justify-center py-8 bg-white">
-                  <div className="w-12 h-0.5 bg-muted rounded-full mb-3" />
-                  <p className="text-xs font-medium text-muted-foreground">You've reached the end</p>
-                </div>
-              )}
+                  <div className="text-left min-w-0">
+                    <p className="text-sm font-semibold text-gray-800 truncate">{entry.label}</p>
+                    <p className="text-xs text-gray-400 truncate">{entry.subtitle}</p>
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
-        )
-      }
-    </div>
+        )}
+
+        {/* Continue Watching (only shows if user has in-progress videos) */}
+        <ContinueWatchingSection
+          onVideoClick={(id) => {
+            onVideoClick?.(id);
+          }}
+          className="mb-4"
+        />
+
+        {/* Feed Content */}
+        {isLoading ? (
+          <div className="-mx-5 px-0">
+            <div className="flex flex-col gap-4 py-3">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <LongFormFeedCardSkeleton key={i} index={i} />
+              ))}
+            </div>
+          </div>
+        ) : isError ? (
+          // Error state with retry
+          <div className="flex flex-col items-center justify-center py-16 px-4">
+            <AlertCircle className="w-12 h-12 text-gray-300 mb-4" />
+            <p className="text-base font-semibold text-gray-600 mb-1">Something went wrong</p>
+            <p className="text-sm text-gray-400 text-center max-w-[280px] mb-6">
+              {error?.message || 'We couldn\'t load videos right now'}
+            </p>
+            <button
+              onClick={handleRetry}
+              className="px-6 py-2.5 rounded-full bg-emerald-600 text-white text-sm font-medium active:scale-[0.97] transition-transform"
+            >
+              Try Again
+            </button>
+          </div>
+        ) : filteredVideos.length === 0 ? (
+          // Empty state
+          <div className="flex flex-col items-center justify-center py-16 px-4">
+            <Play className="w-12 h-12 text-gray-300 mb-4" />
+            <p className="text-base font-semibold text-gray-600 mb-1">No videos yet</p>
+            <p className="text-sm text-gray-400 text-center max-w-[280px]">
+              Long-form videos (4+ minutes) will appear here as creators share new content
+            </p>
+          </div>
+        ) : (
+            // Video feed
+            <div className="-mx-5 px-0">
+              <div className="flex flex-col gap-4 py-3">
+                {filteredVideos.map((video, index) => {
+                  const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;
+                  const entranceDelay = isNewlyLoaded ? (index - newlyLoadedStartIndex) * 30 : 0;
+                  
+                  return (
+                    <div
+                      key={video.id}
+                      className={isNewlyLoaded 
+                        ? 'motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-200 motion-safe:fill-mode-backwards' 
+                        : undefined
+                      }
+                      style={isNewlyLoaded ? { animationDelay: `${entranceDelay}ms` } : undefined}
+                    >
+                      <LongFormFeedCard
+                        video={toFeedVideo(video)}
+                        index={index}
+                        onVideoTap={() => handleVideoTap(video.id)}
+                        onCreatorTap={() => handleCreatorTap(video.creatorUserId)}
+                      />
+                    </div>
+                  );
+                })}
+
+                {/* Infinite scroll sentinel — tall + rootMargin for seamless loading */}
+                <div ref={loadMoreRef} className="h-20" />
+
+                {/* Orange brand spinner for paced infinite scroll (Watch tab standard) */}
+                {showBottomLoader && (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="w-5 h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+                  </div>
+                )}
+
+                {/* End of feed — subtle minimal text */}
+                {!hasMore && filteredVideos.length > 3 && !showBottomLoader && (
+                  <div className="flex items-center justify-center py-8">
+                    <p className="text-xs text-gray-400 font-medium">You've reached the end</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        }
+      </div>
+    </PullToRefreshContainer>
   );
 };
 

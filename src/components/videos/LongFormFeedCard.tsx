@@ -226,10 +226,9 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
     <>
       <div
         className={cn(
-          "bg-card overflow-hidden border-x border-border/40",
+          "rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm",
           className
         )}
-        style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
         data-video-card-id={video.id}
       >
         {/* Header - 3 column layout: avatar / meta / actions - matches Friends tab padding */}
@@ -251,10 +250,10 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
 
           {/* Middle: Meta - time only, no follower count (matches Friends tab) */}
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-foreground text-sm leading-tight truncate">
+           <p className="font-semibold text-sm text-gray-900 leading-tight truncate">
               {video.creatorName}
             </p>
-            <p className="text-xs text-muted-foreground leading-tight truncate">
+            <p className="text-xs text-gray-400 leading-tight truncate">
               <span>{timeAgo}</span>
             </p>
           </div>
@@ -292,14 +291,14 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
         {/* Caption - matches Friends tab padding and styling */}
         {captionText && (
           <div style={{ padding: '0 16px 6px 16px' }}>
-            <div className="text-sm text-foreground whitespace-pre-wrap leading-snug">
+          <div className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
               {displayContent}
               {shouldTruncate && (
                 <>
                   {'... '}
                   <button
                     onClick={() => setIsExpanded(true)}
-                    className="text-muted-foreground hover:text-foreground hover:underline"
+                    className="text-emerald-600 font-medium hover:underline"
                   >
                     more
                   </button>
@@ -316,13 +315,13 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
             style={{ padding: '0 16px 12px 16px' }}
             onClick={handleCourseTap}
           >
-            <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+            <MapPin className="h-3.5 w-3.5 text-gray-400 flex-shrink-0 mt-0.5" />
             <div className="flex flex-col min-w-0">
-              <span className="font-semibold text-foreground text-[13px] leading-tight truncate">
+              <span className="font-semibold text-gray-700 text-[13px] leading-tight truncate">
                 {golfCourse.name}
               </span>
               {courseLocation && (
-                <span className="text-muted-foreground text-xs leading-tight truncate">
+                <span className="text-gray-500 text-xs leading-tight truncate">
                   {courseLocation}
                 </span>
               )}
@@ -331,7 +330,7 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
         )}
 
         {/* Divider */}
-        <div className="h-px bg-border/30 mx-4" />
+        <div className="h-px bg-gray-100 mx-4" />
 
         {/* Media Section - Dynamic aspect ratio (matches CommunityFeedCard) */}
         <div 
@@ -436,7 +435,7 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
 
           {/* Duration Badge */}
           {video.duration && (
-            <div className="absolute bottom-3 right-3 px-2 py-0.5 backdrop-blur-md bg-black/35 border border-white/10 rounded text-white text-xs font-medium tabular-nums">
+            <div className="absolute bottom-3 right-3 px-2 py-0.5 backdrop-blur-sm bg-black/60 rounded-md text-white text-xs font-medium tabular-nums">
               {video.duration}
             </div>
           )}
@@ -444,7 +443,7 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
 
         {/* Social proof line */}
         {(likesCount > 0 || commentsCount > 0) && (
-          <div className="px-4 py-2 text-xs text-muted-foreground border-b border-border/30">
+          <div className="px-4 py-2 text-xs text-gray-500 border-b border-gray-100">
             {likesCount > 0 && <span>{likesCount} {likesCount === 1 ? 'like' : 'likes'}</span>}
             {likesCount > 0 && commentsCount > 0 && <span> · </span>}
             {commentsCount > 0 && (

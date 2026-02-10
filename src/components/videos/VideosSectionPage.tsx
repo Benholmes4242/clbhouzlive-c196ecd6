@@ -192,7 +192,7 @@ export const VideosSectionPage: React.FC = () => {
   }, [videos]);
 
   // Infinite scroll with intersection observer - rootMargin 0px (matches Friends tab)
-  const { ref: loadMoreRef, inView } = useInView({ threshold: 0, rootMargin: '0px' });
+  const { ref: loadMoreRef, inView } = useInView({ threshold: 0, rootMargin: '200px' });
 
   useEffect(() => {
     if (inView && hasMore && !isFetchingNextPage && !isPacingDelay) {
@@ -347,7 +347,7 @@ export const VideosSectionPage: React.FC = () => {
             })}
 
             {/* Infinite scroll sentinel */}
-            <div ref={loadMoreRef} className="h-4" />
+            <div ref={loadMoreRef} className="h-20" />
 
             {/* Orange spinner for paced infinite scroll (matches Friends tab) */}
             {showBottomLoader && (
