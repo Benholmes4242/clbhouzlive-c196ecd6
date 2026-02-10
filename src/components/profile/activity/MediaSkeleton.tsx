@@ -23,7 +23,7 @@ const MediaSkeleton: React.FC<MediaSkeletonProps> = ({
   return (
     <div 
       className={cn(
-        "relative overflow-hidden rounded-sq-md bg-muted/30",
+        "relative overflow-hidden bg-muted/30",
         aspectClass,
         className
       )}

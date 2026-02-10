@@ -119,19 +119,19 @@ export function ShortsGrid({
   const showInitialSkeleton = isLoading && renderedPosts.length === 0;
   
   return (
-    <div className="px-[3px]">
+    <div>
       {/* Initial loading skeleton — 6 tiles in 2-column grid */}
       {showInitialSkeleton && (
-        <div className="grid grid-cols-2 gap-[3px]">
+        <div className="grid grid-cols-2">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="aspect-[3/4] rounded bg-muted animate-pulse" />
+            <div key={i} className="aspect-[3/4] bg-muted animate-pulse" />
           ))}
         </div>
       )}
 
-      {/* 2-column grid - Watch tab standard: 3px gap */}
+      {/* 2-column grid - Watch tab standard: edge-to-edge */}
       {!showInitialSkeleton && (
-        <div className="grid grid-cols-2 gap-[3px]">
+        <div className="grid grid-cols-2">
           {renderedPosts.map((post, index) => {
             // CRITICAL: Use stream UID for cache lookup
             const streamId = getStreamId(post);

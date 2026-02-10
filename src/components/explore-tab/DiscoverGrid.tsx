@@ -382,7 +382,7 @@ const LandscapeTile = React.memo(function LandscapeTile({
   return (
     <div
       ref={containerRef}
-      className="relative cursor-pointer overflow-hidden rounded-xl bg-muted will-change-transform"
+      className="relative cursor-pointer overflow-hidden bg-muted will-change-transform"
       style={{ aspectRatio: String(aspectRatio) }}
       onClick={onClick}
       aria-busy={isVideo && !isVideoReady}

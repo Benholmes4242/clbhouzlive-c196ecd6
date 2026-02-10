@@ -246,8 +246,8 @@ const ActivityGridV2Inner: React.FC<ActivityGridV2Props> = ({
 
   return (
     <>
-      <div ref={gridRef} className="pb-4 px-[3px]">
-        <div className="grid grid-cols-2 gap-[3px]">
+      <div ref={gridRef} className="pb-4">
+        <div className="grid grid-cols-2">
           {renderedItems.map((item, index) => {
             const isVisible = effectiveVisibleIndices.has(index);
             

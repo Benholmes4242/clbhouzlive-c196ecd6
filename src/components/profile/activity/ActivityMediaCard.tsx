@@ -68,7 +68,7 @@ const ActivityMediaCard: React.FC<ActivityMediaCardProps> = ({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-sq-md bg-muted/10",
+        "relative overflow-hidden bg-muted/10",
         "cursor-pointer",
         // Micro-interactions
         "transition-all duration-150 ease-out",
