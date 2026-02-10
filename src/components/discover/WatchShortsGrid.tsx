@@ -481,12 +481,12 @@ export function WatchShortsGrid({
   // P2: Shimmer-down skeleton with staggered delays
   if (isLoading && shorts.length === 0) {
     return (
-      <div className="pt-1 pb-4 px-[3px]">
-        <div className="grid grid-cols-2 gap-[3px]">
+      <div className="pt-1 pb-4 px-4">
+        <div className="grid grid-cols-2 gap-1">
           {Array.from({ length: 6 }).map((_, i) => (
             <Skeleton 
               key={i} 
-              className={`aspect-[3/4] ${prefersReducedMotion ? '' : 'animate-shimmer-down'}`}
+              className={`aspect-[3/4] rounded-xl ${prefersReducedMotion ? '' : 'animate-shimmer-down'}`}
               style={prefersReducedMotion ? undefined : { animationDelay: `${i * 50}ms` }}
             />
           ))}
@@ -510,24 +510,18 @@ export function WatchShortsGrid({
     );
   }
 
-  // Determine if we should show the loading indicator (fetching or pacing delay)
-  const showBottomLoader = isLoadingMore || isPacingDelay;
-
   return (
-    <div className="pt-1 pb-4 px-[3px]">
-      {/* 2-column grid with 3px gap */}
-      <div className="grid grid-cols-2 gap-[3px]">
+    <div className="pt-1 pb-4 px-4">
+      {/* 2-column grid with 4px gap */}
+      <div className="grid grid-cols-2 gap-1">
         {renderedShorts.map((video, index) => {
           const shouldMount = mountableIndices.has(index);
           const streamId = uidFromNode({ src: video.media?.[0]?.media_url }) || video.id;
           const videoReady = isReady(streamId);
-          const isPriority = index < 6; // First 6 cards get priority loading
+          const isPriority = index < 6;
           
-          // Diagonal/checkerboard autoplay pattern: only 1 card per row autoplays
-          // Row 1: Left (0), Row 2: Right (3), Row 3: Left (4), Row 4: Right (7), etc.
           const isAutoplayCandidate = index % 4 === 0 || index % 4 === 3;
           
-          // Check if this tile is newly loaded (for entrance animation)
           const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;
           const entranceDelay = isNewlyLoaded 
             ? (index - newlyLoadedStartIndex!) * TILE_ENTRANCE_STAGGER_MS 
@@ -549,9 +543,15 @@ export function WatchShortsGrid({
                 isNewlyLoaded={isNewlyLoaded}
                 entranceDelay={entranceDelay}
               />
-              {/* Inject LiveClubhouseStrip after 8th tile (index 7) */}
+              {/* Inject Suggested strip after 8th tile (index 7) */}
               {showSuggestedStrip && index === 7 && (
-                <div className="col-span-2 py-3 -mx-[3px]">
+                <div className="col-span-2 py-4 -mx-4">
+                  {/* Section header for suggested accounts */}
+                  <div className="mb-3 px-4">
+                    <span className="text-base font-semibold" style={{ color: '#374151' }}>
+                      Suggested for You
+                    </span>
+                  </div>
                   <LiveClubhouseStrip />
                 </div>
               )}
@@ -567,15 +567,8 @@ export function WatchShortsGrid({
         message="Loading videos..."
       />
 
-      {/* Brand orange spinner for paced infinite scroll */}
-      {showBottomLoader && (
-        <div className="flex items-center justify-center py-8">
-          <div className="w-5 h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
-        </div>
-      )}
-
-      {/* Infinite scroll sentinel - invisible trigger at bottom */}
-      <div ref={loadMoreRef} className="h-4" />
+      {/* Infinite scroll sentinel - trigger early */}
+      <div ref={loadMoreRef} className="h-20" />
 
       {/* All caught up message */}
       {!hasMore && shorts.length > 0 && !isLoading && !isLoadingMore && !isPacingDelay && (

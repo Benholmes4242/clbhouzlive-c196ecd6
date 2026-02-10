@@ -252,10 +252,10 @@ export function LiveClubhouseStrip() {
   // Show skeleton while loading
   if (isLoading || isLoadingBusinesses) {
     return (
-      <div className="suggested-golfers-row">
-        <div className="suggested-golfers-scroll" role="listbox" aria-label="Loading suggested profiles">
+      <div>
+        <div className="flex gap-3 overflow-x-auto px-4 pb-1 scrollbar-hide">
           {[...Array(4)].map((_, idx) => (
-            <div key={idx} className="w-[140px] h-[160px] rounded-xl bg-muted animate-pulse flex-shrink-0" />
+            <div key={idx} className="min-w-[150px] w-[150px] h-[180px] rounded-2xl bg-muted animate-pulse flex-shrink-0" />
           ))}
         </div>
       </div>
@@ -265,13 +265,18 @@ export function LiveClubhouseStrip() {
   if (mixedItems.length === 0) return null;
 
   return (
-    <div className="suggested-golfers-row">
-      {/* Carousel - no header */}
+    <div>
+      {/* Scroll container with snap */}
       <div
-        className="suggested-golfers-scroll" 
+        className="flex gap-3 overflow-x-auto px-4 pb-1 scrollbar-hide" 
         ref={rowRef} 
         role="listbox" 
         aria-label="Suggested profiles"
+        style={{ 
+          scrollSnapType: 'x mandatory',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
+        }}
       >
         {mixedItems.map((item) => (
           <SuggestedProfileCard

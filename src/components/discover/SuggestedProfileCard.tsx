@@ -142,37 +142,40 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
     }
     // Business: always show "Business Profile" — raw category values are internal only
     return 'Business Profile';
-    return null;
   })();
 
   return (
     <div
       className={cn(
         "suggested-profile-card",
-        "relative flex-shrink-0 w-[140px] rounded-xl overflow-hidden cursor-pointer",
-        "bg-card border border-border/50",
+        "relative flex-shrink-0 min-w-[150px] w-[150px] rounded-2xl overflow-hidden cursor-pointer",
+        "bg-white border border-gray-100",
         "shadow-sm hover:shadow-md transition-shadow duration-200",
-        "select-none touch-manipulation"
+        "select-none touch-manipulation",
+        "snap-start"
       )}
       onClick={handleCardClick}
       role="button"
       tabIndex={0}
     >
-      {/* Card content - compact layout */}
-      <div className="flex flex-col items-center pt-2.5 pb-2 px-2.5">
-        {/* Avatar - centered, no ring */}
-        <div className="relative flex justify-center mb-2">
-          <SquircleAvatar
-            size={56}
-            src={avatarUrl}
+      {/* Card content */}
+      <div className="flex flex-col items-center p-4">
+        {/* Avatar - centered */}
+        <div className="relative flex justify-center mb-2.5">
+          <img
+            src={avatarUrl || ''}
             alt={displayName}
-            hideRing
+            className="w-14 h-14 rounded-xl object-cover bg-gray-100"
+            onError={(e) => {
+              e.currentTarget.src = '';
+              e.currentTarget.style.background = '#e5e7eb';
+            }}
           />
         </div>
 
         {/* Name + Verified badge inline */}
         <div className="flex items-center justify-center gap-0.5 w-full min-w-0">
-          <p className="text-[13px] font-semibold text-foreground text-center leading-tight truncate">
+          <p className="text-sm font-semibold text-center leading-tight truncate" style={{ color: '#111827' }}>
             {displayName}
           </p>
           {isVerified && (
@@ -182,26 +185,24 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
           )}
         </div>
 
-        {/* Single secondary line - fixed height container for consistent button position */}
+        {/* Secondary line */}
         <div className="h-4 flex items-center justify-center w-full">
           {secondaryLine && (
-            <p className="text-[11px] text-muted-foreground text-center truncate w-full leading-tight">
+            <p className="text-xs text-center truncate w-full leading-tight" style={{ color: '#6b7280' }}>
               {secondaryLine}
             </p>
           )}
         </div>
 
-        {/* Follow CTA - always at consistent position */}
+        {/* Follow CTA - Emerald green */}
         <Button
           size="sm"
-          variant={isFollowing ? "secondary" : "ghost"}
           className={cn(
-            "w-full h-[34px] text-xs font-medium rounded-lg border-0 mt-1",
+            "w-full h-[34px] text-xs font-medium rounded-full mt-2 border-0",
             isFollowing 
-              ? "bg-muted text-muted-foreground" 
-              : "text-foreground hover:opacity-80"
+              ? "bg-gray-100 text-gray-500" 
+              : "bg-emerald-600 hover:bg-emerald-700 text-white"
           )}
-          style={!isFollowing ? { backgroundColor: '#e2e8f0' } : undefined}
           onClick={handleFollow}
           disabled={isLoading || isFollowing}
         >
