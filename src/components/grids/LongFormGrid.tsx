@@ -7,9 +7,11 @@
  * - 600ms pacing delay
  * - Orange brand spinner
  * - Fade-up entrance animation
+ * - Mount gating: ±2 viewport buffer caps HLS instances to ~5
+ * - Loading skeleton for initial load
  */
 
-import { useRef, useEffect, useState, useMemo } from 'react';
+import { useRef, useEffect, useState, useMemo, useCallback } from 'react';
 import { LongFormVideoTile } from './LongFormVideoTile';
 import { GridPost } from './types';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
@@ -17,6 +19,7 @@ import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 // Paced loading constants (Watch tab standard)
 const MIN_LOADING_DISPLAY_MS = 600;
 const TILE_ENTRANCE_STAGGER_MS = 30;
+const MOUNT_GATE_BUFFER = 2; // ±2 tiles around viewport centre
 
 // Helper to extract stream UID from post for cache consistency
 const getStreamId = (post: GridPost): string => {
@@ -30,8 +33,8 @@ interface LongFormGridProps {
   hasMore?: boolean;
   onLoadMore?: () => void;
   isLoading?: boolean;
-  isReady?: (id: string) => boolean;    // NEW: Video ready state checker
-  onReady?: (id: string) => void;        // NEW: Video ready callback
+  isReady?: (id: string) => boolean;
+  onReady?: (id: string) => void;
 }
 
 export function LongFormGrid({
@@ -45,6 +48,10 @@ export function LongFormGrid({
 }: LongFormGridProps) {
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
+  const tileRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+  
+  // Mount gating: track which indices are near viewport
+  const [visibleCentre, setVisibleCentre] = useState(0);
   
   // Paced loading state
   const loadStartTimeRef = useRef<number>(0);
@@ -57,6 +64,41 @@ export function LongFormGrid({
   const prefersReducedMotion = useMemo(() => {
     if (typeof window === 'undefined') return false;
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }, []);
+
+  // Mount gating IO: observe all tile containers to find viewport centre
+  useEffect(() => {
+    if (renderedPosts.length === 0) return;
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        let bestIndex = visibleCentre;
+        let bestRatio = 0;
+        for (const entry of entries) {
+          const idx = Number(entry.target.getAttribute('data-tile-index'));
+          if (!isNaN(idx) && entry.intersectionRatio > bestRatio) {
+            bestRatio = entry.intersectionRatio;
+            bestIndex = idx;
+          }
+        }
+        if (bestRatio > 0) {
+          setVisibleCentre(bestIndex);
+        }
+      },
+      { threshold: [0, 0.25, 0.5, 0.75, 1.0] }
+    );
+    
+    tileRefs.current.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [renderedPosts.length]);
+
+  // Register tile ref
+  const setTileRef = useCallback((index: number, el: HTMLDivElement | null) => {
+    if (el) {
+      tileRefs.current.set(index, el);
+    } else {
+      tileRefs.current.delete(index);
+    }
   }, []);
 
   // Handle paced loading when new posts arrive
@@ -113,12 +155,27 @@ export function LongFormGrid({
   
   // Show loading indicator
   const showBottomLoader = isLoading || isPacingDelay;
+
+  // Initial loading skeleton
+  const showInitialSkeleton = isLoading && renderedPosts.length === 0;
   
   return (
     <div className="flex flex-col gap-4 px-4">
-      {renderedPosts.map((post, index) => {
+      {/* Initial loading skeleton — 3 cards in single column */}
+      {showInitialSkeleton && (
+        <>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="w-full rounded-xl bg-muted animate-pulse" style={{ aspectRatio: '16/9' }} />
+          ))}
+        </>
+      )}
+
+      {!showInitialSkeleton && renderedPosts.map((post, index) => {
         // CRITICAL: Use stream UID for cache lookup, not post ID
         const streamId = getStreamId(post);
+        
+        // Mount gating: only mount video player within ±2 of viewport centre
+        const shouldMountVideo = Math.abs(index - visibleCentre) <= MOUNT_GATE_BUFFER;
         
         // Entrance animation for newly loaded tiles
         const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;
@@ -127,6 +184,8 @@ export function LongFormGrid({
         return (
           <div
             key={post.id}
+            ref={(el) => setTileRef(index, el)}
+            data-tile-index={index}
             className={isNewlyLoaded && !prefersReducedMotion 
               ? 'animate-in fade-in slide-in-from-bottom-2 duration-200 fill-mode-backwards' 
               : undefined
@@ -141,6 +200,7 @@ export function LongFormGrid({
               onClick={() => onPostTap(post, index)}
               isVideoReady={isReady(streamId)}
               onReady={onReady}
+              shouldMountVideo={shouldMountVideo}
             />
           </div>
         );
@@ -152,7 +212,7 @@ export function LongFormGrid({
       )}
       
       {/* Orange brand spinner for paced infinite scroll (Watch tab standard) */}
-      {showBottomLoader && (
+      {showBottomLoader && !showInitialSkeleton && (
         <div className="flex items-center justify-center py-8">
           <div className="w-5 h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
         </div>

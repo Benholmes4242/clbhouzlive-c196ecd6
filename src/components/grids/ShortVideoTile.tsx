@@ -6,13 +6,16 @@
  * - Bottom gradient with metadata
  * - Course name display
  * - Like count badge (hidden number at zero)
+ * - Duration badge
  * - Conditional autoplay (diagonal pattern)
  * - 50%/10% hysteresis thresholds
+ * - Broken poster fallback icon
  */
 
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
-import { Heart } from 'lucide-react';
+import { Heart, Camera } from 'lucide-react';
 import { GridPost } from './types';
+import { DurationBadge } from './DurationBadge';
 import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
 import { cn } from '@/lib/utils';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
@@ -50,6 +53,8 @@ export const ShortVideoTile = React.memo(function ShortVideoTile({
   
   const [shouldPlay, setShouldPlay] = useState(false);
   const [posterLoaded, setPosterLoaded] = useState(false);
+  const [isPosterBroken, setIsPosterBroken] = useState(false);
+  const [hasVideoError, setHasVideoError] = useState(false);
   
   // Use media_url directly - it already contains the proper HLS URL
   const hlsUrl = media?.media_url || null;
@@ -58,6 +63,7 @@ export const ShortVideoTile = React.memo(function ShortVideoTile({
   // Extract course name from post
   const courseName = (post as any).golf_courses?.name || (post as any).course?.name || null;
   const likeCount = post.like_count || 0;
+  const durationSeconds = media?.duration_seconds;
   
   // CRITICAL: Extract stream UID for cache consistency
   const streamId = useMemo(() => uidFromNode({ src: hlsUrl }) || post.id, [hlsUrl, post.id]);
@@ -66,6 +72,8 @@ export const ShortVideoTile = React.memo(function ShortVideoTile({
   useEffect(() => {
     hasReportedReadyRef.current = false;
     setPosterLoaded(false);
+    setIsPosterBroken(false);
+    setHasVideoError(false);
   }, [post.id]);
 
   // Handle video ready - CRITICAL: Use stream UID, not post ID
@@ -97,12 +105,17 @@ export const ShortVideoTile = React.memo(function ShortVideoTile({
     observer.observe(containerRef.current);
     return () => observer.disconnect();
   }, [isAutoplayCandidate]);
+
+  // Video error handler - keep poster visible as fallback
+  const handleVideoError = useCallback(() => {
+    setHasVideoError(true);
+  }, []);
   
   // Early return AFTER all hooks
   if (!media || media.media_type !== 'video') return null;
   
   // Determine if shimmer should show (before poster/video loaded)
-  const showShimmer = !posterLoaded && !isVideoReady;
+  const showShimmer = !posterLoaded && !isPosterBroken && !isVideoReady;
   
   return (
     <div
@@ -118,30 +131,36 @@ export const ShortVideoTile = React.memo(function ShortVideoTile({
         <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-background/40 to-transparent" />
       </div>
 
+      {/* Broken poster fallback */}
+      {isPosterBroken && (
+        <div className="absolute inset-0 bg-muted flex items-center justify-center">
+          <Camera className="h-6 w-6 text-muted-foreground/40" />
+        </div>
+      )}
+
       {/* Poster-first: priority loading */}
-      {posterUrl && (
+      {posterUrl && !isPosterBroken && (
         <img
           src={posterUrl}
           alt=""
           className={cn(
             "absolute inset-0 w-full h-full object-cover",
             "transition-opacity duration-150 ease-out",
-            isVideoReady && isAutoplayCandidate ? "opacity-0" : "opacity-100"
+            isVideoReady && isAutoplayCandidate && !hasVideoError ? "opacity-0" : "opacity-100"
           )}
           loading="eager"
           fetchPriority="high"
           decoding="async"
           onLoad={() => setPosterLoaded(true)}
-          onError={(e) => {
-            e.currentTarget.style.display = 'none';
-            e.currentTarget.onerror = null;
-            setPosterLoaded(true); // Treat as "loaded" to hide shimmer
+          onError={() => {
+            setIsPosterBroken(true);
+            setPosterLoaded(true);
           }}
         />
       )}
 
-      {/* Video layer - only for autoplay candidates */}
-      {hlsUrl && isAutoplayCandidate && (
+      {/* Video layer - only for autoplay candidates, skip if video errored */}
+      {hlsUrl && isAutoplayCandidate && !hasVideoError && (
         <div className={cn(
           "absolute inset-0 transition-opacity duration-150 ease-out",
           isVideoReady ? "opacity-100" : "opacity-0"
@@ -158,6 +177,7 @@ export const ShortVideoTile = React.memo(function ShortVideoTile({
             surface="grid"
             mediaId={streamId}
             onLoadedData={handleCanPlayThrough}
+            onError={handleVideoError}
             className="w-full h-full object-cover"
             objectFit="cover"
           />
@@ -175,9 +195,17 @@ export const ShortVideoTile = React.memo(function ShortVideoTile({
         )}
       </div>
 
+      {/* Duration badge - bottom right */}
+      {durationSeconds != null && durationSeconds > 0 && (
+        <DurationBadge 
+          seconds={durationSeconds} 
+          className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm rounded-md px-1.5 py-0.5 text-[10px] font-medium text-white z-10"
+        />
+      )}
+
       {/* Course name - bottom left (Watch tab standard) */}
       {courseName && (
-        <div className="absolute bottom-2 left-2 right-2 z-10">
+        <div className="absolute bottom-2 left-2 right-10 z-10">
           <p className="text-white/60 text-[10px] leading-tight truncate">
             {courseName}
           </p>

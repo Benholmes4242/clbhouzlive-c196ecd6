@@ -8,13 +8,12 @@
  * - 50%/10% hysteresis autoplay thresholds
  * - 150ms crossfade timing
  * - First-frame fallback via UnifiedVideoPlayer
- * 
- * Watch Tab Standard:
- * - bg-gray-200 shimmer loading state
- * - Left-to-right shimmer sweep
+ * - Mount gating support via shouldMountVideo prop
+ * - Broken poster fallback icon
  */
 
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
+import { Camera } from 'lucide-react';
 import { DurationBadge } from './DurationBadge';
 import { GridPost } from './types';
 import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
@@ -26,6 +25,8 @@ interface LongFormVideoTileProps {
   onClick: () => void;
   isVideoReady?: boolean;
   onReady?: (id: string) => void;
+  /** Mount gating: when false, only render poster (no UnifiedVideoPlayer) */
+  shouldMountVideo?: boolean;
 }
 
 export const LongFormVideoTile = React.memo(function LongFormVideoTile({ 
@@ -33,6 +34,7 @@ export const LongFormVideoTile = React.memo(function LongFormVideoTile({
   onClick,
   isVideoReady = true,
   onReady,
+  shouldMountVideo = true,
 }: LongFormVideoTileProps) {
   const playerRef = useRef<UnifiedVideoPlayerRef>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -41,6 +43,8 @@ export const LongFormVideoTile = React.memo(function LongFormVideoTile({
   
   const [shouldPlay, setShouldPlay] = useState(false);
   const [posterLoaded, setPosterLoaded] = useState(false);
+  const [isPosterBroken, setIsPosterBroken] = useState(false);
+  const [hasVideoError, setHasVideoError] = useState(false);
   
   // Calculate aspect ratio from stored dimensions
   const aspectRatio = media?.aspect_ratio || 
@@ -50,6 +54,7 @@ export const LongFormVideoTile = React.memo(function LongFormVideoTile({
   // Use media_url directly - it already contains the proper HLS URL
   const hlsUrl = media?.media_url || null;
   const posterUrl = media?.poster_url || undefined;
+  const durationSeconds = media?.duration_seconds;
   
   // CRITICAL: Extract stream UID for cache consistency
   const streamId = useMemo(() => uidFromNode({ src: hlsUrl }) || post.id, [hlsUrl, post.id]);
@@ -58,6 +63,8 @@ export const LongFormVideoTile = React.memo(function LongFormVideoTile({
   useEffect(() => {
     hasReportedReadyRef.current = false;
     setPosterLoaded(false);
+    setIsPosterBroken(false);
+    setHasVideoError(false);
   }, [post.id]);
 
   // Handle video ready - CRITICAL: Use stream UID, not post ID
@@ -70,7 +77,7 @@ export const LongFormVideoTile = React.memo(function LongFormVideoTile({
   
   // Hysteresis-based autoplay: 50% to start, 10% to stop
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || !shouldMountVideo) return;
     
     const observer = new IntersectionObserver(
       (entries) => {
@@ -88,6 +95,11 @@ export const LongFormVideoTile = React.memo(function LongFormVideoTile({
     
     observer.observe(containerRef.current);
     return () => observer.disconnect();
+  }, [shouldMountVideo]);
+
+  // Video error handler - keep poster visible as fallback
+  const handleVideoError = useCallback(() => {
+    setHasVideoError(true);
   }, []);
   
   // Early return AFTER all hooks
@@ -99,6 +111,12 @@ export const LongFormVideoTile = React.memo(function LongFormVideoTile({
       ? post.content.slice(0, 100) + '...' 
       : post.content
     : null;
+
+  // Determine if shimmer should show
+  const showShimmer = !posterLoaded && !isPosterBroken && !isVideoReady;
+
+  // Should we show the video layer?
+  const showVideo = shouldMountVideo && hlsUrl && !hasVideoError;
   
   return (
     <div
@@ -109,7 +127,7 @@ export const LongFormVideoTile = React.memo(function LongFormVideoTile({
       {/* Video container with adaptive aspect ratio */}
       <div 
         className={cn(
-          "relative w-full overflow-hidden rounded-xl bg-gray-200",
+          "relative w-full overflow-hidden rounded-xl bg-muted",
           isPortrait && "mx-auto"
         )}
         style={{
@@ -118,18 +136,25 @@ export const LongFormVideoTile = React.memo(function LongFormVideoTile({
           maxWidth: isPortrait ? `calc(70vh * ${aspectRatio})` : '100%',
         }}
       >
-        {/* Shimmer loading state - Watch tab standard */}
+        {/* Shimmer loading state */}
         <div 
           className={cn(
-            "absolute inset-0 bg-gray-200 overflow-hidden transition-opacity duration-300",
-            posterLoaded || isVideoReady ? "opacity-0 pointer-events-none" : "opacity-100"
+            "absolute inset-0 bg-muted overflow-hidden transition-opacity duration-300",
+            showShimmer ? "opacity-100" : "opacity-0 pointer-events-none"
           )}
         >
-          <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+          <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-background/40 to-transparent" />
         </div>
+
+        {/* Broken poster fallback */}
+        {isPosterBroken && (
+          <div className="absolute inset-0 bg-muted flex items-center justify-center">
+            <Camera className="h-6 w-6 text-muted-foreground/40" />
+          </div>
+        )}
         
-        {/* Poster-first: priority loading for first 4 tiles */}
-        {posterUrl && (
+        {/* Poster-first: priority loading */}
+        {posterUrl && !isPosterBroken && (
           <img
             src={posterUrl}
             alt=""
@@ -141,14 +166,14 @@ export const LongFormVideoTile = React.memo(function LongFormVideoTile({
             fetchPriority="high"
             decoding="async"
             onLoad={() => setPosterLoaded(true)}
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-              e.currentTarget.onerror = null;
+            onError={() => {
+              setIsPosterBroken(true);
+              setPosterLoaded(true);
             }}
           />
         )}
 
-        {hlsUrl ? (
+        {showVideo ? (
           <>
             {/* UnifiedVideoPlayer - 150ms crossfade */}
             <div className={cn(
@@ -167,16 +192,17 @@ export const LongFormVideoTile = React.memo(function LongFormVideoTile({
                 surface="grid"
                 mediaId={streamId}
                 onLoadedData={handleCanPlayThrough}
+                onError={handleVideoError}
                 className="w-full h-full object-contain"
               />
             </div>
           </>
         ) : null}
         
-        {/* Duration overlay */}
-        {media.duration_seconds && isVideoReady && (
+        {/* Duration overlay — show whenever duration data is available */}
+        {durationSeconds != null && durationSeconds > 0 && (
           <DurationBadge 
-            seconds={media.duration_seconds} 
+            seconds={durationSeconds} 
             className="absolute bottom-3 right-3"
           />
         )}
@@ -196,6 +222,7 @@ export const LongFormVideoTile = React.memo(function LongFormVideoTile({
     prevProps.post.post_media?.[0]?.media_url === nextProps.post.post_media?.[0]?.media_url &&
     prevProps.post.post_media?.[0]?.aspect_ratio === nextProps.post.post_media?.[0]?.aspect_ratio &&
     prevProps.post.content === nextProps.post.content &&
-    prevProps.isVideoReady === nextProps.isVideoReady
+    prevProps.isVideoReady === nextProps.isVideoReady &&
+    prevProps.shouldMountVideo === nextProps.shouldMountVideo
   );
 });

@@ -7,6 +7,7 @@
  * - 600ms pacing delay
  * - Orange brand spinner
  * - Fade-up entrance animation
+ * - Loading skeleton for initial load
  */
 
 import { useRef, useEffect, useState, useMemo } from 'react';
@@ -102,28 +103,42 @@ export function ImagesGrid({
   
   // Show loading indicator
   const showBottomLoader = isLoading || isPacingDelay;
+
+  // Initial loading skeleton
+  const showInitialSkeleton = isLoading && renderedPosts.length === 0;
   
   return (
     <div className="px-1">
-      <div className="grid grid-cols-3 gap-0.5">
-        {renderedPosts.map((post, index) => {
-          // Entrance animation for newly loaded tiles
-          const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;
-          const entranceDelay = isNewlyLoaded ? (index - newlyLoadedStartIndex) * TILE_ENTRANCE_STAGGER_MS : 0;
-          
-          return (
-            <GridImageTile
-              key={post.id}
-              post={post}
-              onClick={() => onPostTap(post, index)}
-              index={index}
-              isNewlyLoaded={isNewlyLoaded}
-              entranceDelay={entranceDelay}
-              prefersReducedMotion={prefersReducedMotion}
-            />
-          );
-        })}
-      </div>
+      {/* Initial loading skeleton — 9 squares in 3-column grid */}
+      {showInitialSkeleton && (
+        <div className="grid grid-cols-3 gap-0.5">
+          {Array.from({ length: 9 }).map((_, i) => (
+            <div key={i} className="aspect-square bg-muted animate-pulse" />
+          ))}
+        </div>
+      )}
+
+      {!showInitialSkeleton && (
+        <div className="grid grid-cols-3 gap-0.5">
+          {renderedPosts.map((post, index) => {
+            // Entrance animation for newly loaded tiles
+            const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;
+            const entranceDelay = isNewlyLoaded ? (index - newlyLoadedStartIndex) * TILE_ENTRANCE_STAGGER_MS : 0;
+            
+            return (
+              <GridImageTile
+                key={post.id}
+                post={post}
+                onClick={() => onPostTap(post, index)}
+                index={index}
+                isNewlyLoaded={isNewlyLoaded}
+                entranceDelay={entranceDelay}
+                prefersReducedMotion={prefersReducedMotion}
+              />
+            );
+          })}
+        </div>
+      )}
       
       {/* Infinite scroll trigger */}
       {hasMore && (
@@ -131,7 +146,7 @@ export function ImagesGrid({
       )}
       
       {/* Orange brand spinner for paced infinite scroll (Watch tab standard) */}
-      {showBottomLoader && (
+      {showBottomLoader && !showInitialSkeleton && (
         <div className="flex items-center justify-center py-8">
           <div className="w-5 h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
         </div>
