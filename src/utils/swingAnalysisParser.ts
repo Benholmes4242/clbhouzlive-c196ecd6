@@ -1,5 +1,16 @@
 import { SwingAnalysisSummary, SwingPhase, SwingDrill } from '@/components/swing-review/SwingReview';
-import { VisualPlanItem } from '@/types/swing';
+
+// Inline type — was previously in @/types/swing (decommissioned)
+interface VisualPlanItem {
+  frameHint: "P1"|"P2"|"P3"|"P4"|"P5";
+  caption: string;
+  overlays: {
+    lines?: Array<{x1:number,y1:number,x2:number,y2:number,label?:string}>;
+    angles?: Array<{cx:number,cy:number,a:number,b:number,label?:string}>;
+    keypoints?: Array<{x:number,y:number,label:string,conf?:number}>;
+    notes?: string;
+  };
+}
 
 // Parse markdown content to extract structured swing analysis data
 export function parseSwingAnalysis(content: string, videoUrl?: string): {

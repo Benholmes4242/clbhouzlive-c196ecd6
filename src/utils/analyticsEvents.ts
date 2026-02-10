@@ -221,10 +221,9 @@ export const analyticsEvents = {
   },
   // Hub-specific Echo events
   hub_echo_open: { event: 'hub_echo_open', category: 'hub' },
-  hub_echo_tab: (tab: 'chat' | 'swing' | 'history') => ({ event: 'hub_echo_tab', category: 'hub', label: tab }),
-  hub_echo_history_open: (mode: 'chat' | 'swing') => ({ event: 'hub_echo_history_open', category: 'hub', label: mode }),
+  hub_echo_tab: (tab: 'chat' | 'history') => ({ event: 'hub_echo_tab', category: 'hub', label: tab }),
+  hub_echo_history_open: (mode: 'chat') => ({ event: 'hub_echo_history_open', category: 'hub', label: mode }),
   hub_echo_chat_send: { event: 'hub_echo_chat_send', category: 'hub' },
-  hub_echo_swing_view: (id: string) => ({ event: 'hub_echo_swing_view', category: 'hub', label: id }),
 
   // Notifications namespace
   notifications: {

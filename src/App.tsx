@@ -180,14 +180,11 @@ const EchoPage = lazy(() => import("./pages/EchoPage"));
 const HubCreateGamePage = lazy(() => import("./features/hub/pages/HubCreateGamePage").then(m => ({ default: m.HubCreateGamePage })));
 const HubGamesPage = lazy(() => import("./features/hub/pages/HubGamesPage").then(m => ({ default: m.HubGamesPage })));
 const HubYourGamesPage = lazy(() => import("./features/hub/pages/HubYourGamesPage").then(m => ({ default: m.HubYourGamesPage })));
-const HubSwingPage = lazy(() => import("./features/hub/pages/HubSwingPage").then(m => ({ default: m.HubSwingPage })));
 const HubMessagesListPage = lazy(() => import("./features/hub/pages/HubMessagesListPage").then(m => ({ default: m.HubMessagesListPage })));
 const HubChatPlaceholderPage = lazy(() => import("./features/hub/pages/HubChatPlaceholderPage").then(m => ({ default: m.HubChatPlaceholderPage })));
 const HubEchoHistoryPage = lazy(() => import("./features/hub/pages/HubEchoHistoryPage").then(m => ({ default: m.HubEchoHistoryPage })));
 const HubEchoSharePage = lazy(() => import("./features/hub/pages/HubEchoSharePage").then(m => ({ default: m.HubEchoSharePage })));
 const HubEchoTagsPage = lazy(() => import("./features/hub/pages/HubEchoTagsPage"));
-const HubSwingHistoryPage = lazy(() => import("./features/hub/pages/HubSwingHistoryPage").then(m => ({ default: m.HubSwingHistoryPage })));
-const HubSwingDetailPage = lazy(() => import("./features/hub/pages/HubSwingDetailPage").then(m => ({ default: m.HubSwingDetailPage })));
 const HubEchoHistoryDetailPage = lazy(() => import("./features/hub/pages/HubEchoHistoryDetailPage"));
 const GameDetailPage = lazy(() => import("./features/hub/pages/GameDetailPage").then(m => ({ default: m.GameDetailPage })));
 const TripDetailPage = lazy(() => import("./features/hub/pages/TripDetailPage").then(m => ({ default: m.TripDetailPage })));
@@ -526,13 +523,8 @@ function AppRoutes() {
         <Route path="/hub/games/:gameId" element={<Suspense fallback={<HubSkeleton />}><GameDetailPage /></Suspense>} />
         <Route path="/hub/trips/:tripId" element={<Suspense fallback={<HubSkeleton />}><TripDetailPage /></Suspense>} />
         <Route path="/hub/your-games" element={<Suspense fallback={<HubSkeleton />}><HubYourGamesPage /></Suspense>} />
-        <Route path="/hub/swing" element={<Suspense fallback={<HubSkeleton />}><HubSwingPage /></Suspense>} />
         <Route path="/hub/messages" element={<Suspense fallback={<HubSkeleton />}><HubMessagesListPage /></Suspense>} />
         <Route path="/hub/messages/:conversationId" element={<Suspense fallback={<HubSkeleton />}><HubChatPlaceholderPage /></Suspense>} />
-        {/* TODO: Swing Coach routes pending decommission — video players use legacy GlassVideo/HLSVideoPlayer outside standard video stack */}
-        <Route path="/hub/swing/history" element={<Suspense fallback={<HubSkeleton />}><HubSwingHistoryPage /></Suspense>} />
-        <Route path="/hub/swing/history/:id" element={<Suspense fallback={<HubSkeleton />}><HubSwingDetailPage /></Suspense>} />
-        {/* TODO: Echo history routes pending decommission — same legacy video player issue */}
         <Route path="/hub/echo/history" element={<Suspense fallback={<HubSkeleton />}><HubEchoHistoryPage /></Suspense>} />
         <Route path="/hub/echo/history/chat/:id" element={<Suspense fallback={<HubSkeleton />}><HubEchoHistoryDetailPage /></Suspense>} />
         <Route path="/hub/echo/tags" element={<Suspense fallback={<HubSkeleton />}><HubEchoTagsPage /></Suspense>} />

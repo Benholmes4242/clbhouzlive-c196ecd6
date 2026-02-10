@@ -11,7 +11,7 @@ import { SlideOver } from '@/components/ui/slide-over';
 import ChatMessageComponent from './ChatMessage';
 import AIChatHistory from './AIChatHistory';
 import CaddieLogs from './CaddieLogs';
-import SwingCoach from './SwingCoach';
+
 import EchoAvatar from './EchoAvatar';
 import { OverlayFooter } from './OverlayFooter';
 import ThreadDivider from '@/features/echo/components/ThreadDivider';
@@ -63,11 +63,10 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
-  const [historyInitialTab, setHistoryInitialTab] = useState<'chat' | 'swing'>('chat');
+  const [historyInitialTab, setHistoryInitialTab] = useState<'chat'>('chat');
   const [userLocation, setUserLocation] = useState<string>('');
   const [activeTab, setActiveTab] = useState('chat');
   const [analysisText, setAnalysisText] = useState('');
-  const [swingCoachAnalysisText, setSwingCoachAnalysisText] = useState('');
   const [showScrollToBottom, setShowScrollToBottom] = useState(false);
   const [newMessageCount, setNewMessageCount] = useState(0);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -427,9 +426,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
     sendMessage(originalMessage, true);
   };
 
-  // Helper to open history with specific tab
-  const openHistory = (tab: 'chat' | 'swing') => {
-    setHistoryInitialTab(tab);
+  // Helper to open history
+  const openHistory = () => {
+    setHistoryInitialTab('chat');
     setShowHistory(true);
   };
 
@@ -595,26 +594,6 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             </div>
           </TabsContent>
 
-          {/* Swing Coach Tab */}
-          <TabsContent value="swing" className="m-0 flex-1 overflow-hidden" style={{ minHeight: 0 }}>
-            <div 
-              className={cn(
-                "h-full overflow-y-auto overscroll-contain scroll-smooth",
-                isPageMode ? "px-0 pt-0 pb-0" : "px-4 pt-3 pb-4"
-              )}
-              style={{ WebkitOverflowScrolling: "touch" }}
-            >
-              <SwingCoach
-                onClose={() => setActiveTab('chat')}
-                isRecording={isRecording}
-                isProcessing={isProcessing}
-                startRecording={startRecording}
-                stopRecording={stopRecording}
-                analysisText={swingCoachAnalysisText}
-                onAnalysisTextChange={setSwingCoachAnalysisText}
-              />
-            </div>
-          </TabsContent>
         </Tabs>
 
         {/* Composer footer (chat only) */}
@@ -765,14 +744,6 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 >
                   Chat
                 </TabsTrigger>
-                <TabsTrigger
-                  value="swing"
-                  className="flex-1 rounded-full px-4 text-sm font-medium 
-                             data-[state=active]:bg-background data-[state=active]:shadow-sm
-                             transition-all"
-                >
-                  Swing Coach
-                </TabsTrigger>
               </TabsList>
             </div>
           </div>
@@ -831,13 +802,6 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             </div>
           </TabsContent>
 
-          <TabsContent value="swing" className="m-0 flex-1 overflow-hidden" style={{ minHeight: 0 }}>
-            <div className="h-full overflow-y-auto">
-              <SwingCoach
-                onAnalysisTextChange={(text) => setSwingCoachAnalysisText(text)}
-              />
-            </div>
-          </TabsContent>
         </Tabs>
 
         {/* Input bar - docked at bottom */}
@@ -871,9 +835,6 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   <Send className="h-[18px] w-[18px] text-white/90" />
                 </button>
               </FrostedPill>
-            )}
-            {activeTab === 'swing' && (
-              <OverlayFooter onOpen={() => openHistory('swing')} isSticky={false} />
             )}
           </div>
         </footer>
@@ -982,15 +943,6 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                                transition-all"
                   >
                     Chat
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="swing"
-                    className="flex-1 rounded-full px-4 text-body-md font-medium 
-                               data-[state=active]:bg-white/05 data-[state=active]:text-white data-[state=active]:shadow-[0_0_16px_rgba(255,255,255,0.18)] data-[state=active]:ring-1 data-[state=active]:ring-inset data-[state=active]:ring-white/20
-                               data-[state=inactive]:text-white/60 data-[state=inactive]:hover:bg-white/05 data-[state=inactive]:hover:ring-1 data-[state=inactive]:hover:ring-inset data-[state=inactive]:hover:ring-white/10
-                               transition-all"
-                  >
-                    Swing Coach
                   </TabsTrigger>
                 </TabsList>
               </div>
@@ -1153,28 +1105,6 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
               </div>
             </TabsContent>
 
-            <TabsContent value="swing" className="m-0 flex-1 overflow-hidden" style={{ minHeight: 0 }}>
-              <div 
-                className="h-full overflow-y-auto overscroll-contain scroll-smooth px-4 pt-3 pb-4"
-                style={{ WebkitOverflowScrolling: "touch" }}
-                data-echo-canvas
-              >
-                {/* Top fade - Phase 52 */}
-                <div className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-white/60 to-transparent z-10" />
-                {/* Bottom fade - Phase 52 */}
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-white/60 to-transparent z-10" />
-                
-                <SwingCoach
-                  onClose={() => setActiveTab('chat')}
-                  isRecording={isRecording}
-                  isProcessing={isProcessing}
-                  startRecording={startRecording}
-                  stopRecording={stopRecording}
-                  analysisText={swingCoachAnalysisText}
-                  onAnalysisTextChange={setSwingCoachAnalysisText}
-                />
-              </div>
-            </TabsContent>
           </Tabs>
         
         {/* Composer footer */}
@@ -1333,12 +1263,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     </div>
                   </div>
 
-                  <OverlayFooter onOpen={() => openHistory('chat')} isSticky={false} />
+                  <OverlayFooter onOpen={() => openHistory()} isSticky={false} />
                 </div>
-              )}
-
-              {activeTab === 'swing' && (
-                <OverlayFooter onOpen={() => openHistory('swing')} isSticky={false} />
               )}
             </div>
         </footer>

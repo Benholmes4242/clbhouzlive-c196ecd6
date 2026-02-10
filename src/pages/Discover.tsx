@@ -20,7 +20,7 @@ import DiscoverContent from '@/components/discover/DiscoverContent';
 import { ChannelsFeed } from '@/components/channels/ChannelsFeed';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
-import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
+
 import { useOptimisticPostInsertion } from '@/hooks/useOptimisticPostInsertion';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 import { usePostEngagement } from '@/hooks/usePostEngagement';

@@ -76,7 +76,6 @@ export function QuickActionsTile() {
 
   const openProfile = () => navigate('/profile');
   const openCreateGame = () => setIsCreateGameSheetOpen(true);
-  const openSwing = () => navigateFromHub('/hub/swing');
   const openEcho = () => setIsEchoSheetOpen(true);
 
   return (
@@ -94,11 +93,6 @@ export function QuickActionsTile() {
               Icon={SparklesIcon}
               onClick={openEcho}
               iconSize="h-10 w-10"
-            />
-            <QuickActionButton
-              label="Swing Coach"
-              Icon={CameraIcon}
-              onClick={openSwing}
             />
             <QuickActionButton
               label="Your Profile"
