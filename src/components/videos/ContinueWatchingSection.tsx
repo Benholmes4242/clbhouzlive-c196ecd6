@@ -35,17 +35,17 @@ export const ContinueWatchingSection: React.FC<ContinueWatchingSectionProps> = (
   if (isLoading) {
     return (
       <div className={cn("", className)}>
-        <div className="flex items-center justify-between px-4 mb-4">
-          <div className="h-6 w-40 bg-muted rounded animate-pulse" />
+        <div className="flex items-center justify-between mt-4 mb-3 px-4">
+          <div className="h-5 w-36 bg-gray-100 rounded animate-pulse" />
         </div>
         <div className="divide-y divide-border/30">
-          <div className="bg-card overflow-hidden animate-pulse">
-            <div className="aspect-video bg-muted" />
+          <div className="bg-white overflow-hidden animate-pulse">
+            <div className="aspect-video bg-gray-100" />
             <div className="px-4 py-3 flex gap-3">
-              <div className="w-10 h-10 rounded-full bg-muted flex-shrink-0" />
+              <div className="w-10 h-10 rounded-full bg-gray-100 flex-shrink-0" />
               <div className="flex-1 space-y-2">
-                <div className="h-4 bg-muted rounded w-3/4" />
-                <div className="h-3 bg-muted/60 rounded w-1/2" />
+                <div className="h-4 bg-gray-100 rounded w-3/4" />
+                <div className="h-3 bg-gray-100 rounded w-1/2" />
               </div>
             </div>
           </div>
@@ -56,18 +56,15 @@ export const ContinueWatchingSection: React.FC<ContinueWatchingSectionProps> = (
 
   return (
     <div className={cn("", className)}>
-      {/* Section header - enhanced */}
-      <div className="flex items-center justify-between px-4 mb-4">
-        <div>
-          <h2 className="text-lg font-bold text-foreground">
-            Continue watching
-          </h2>
-          <p className="text-sm text-muted-foreground mt-0.5">Pick up where you left off</p>
-        </div>
+      {/* Section header — Watch tab standard */}
+      <div className="flex items-center justify-between mt-4 mb-3 px-4">
+        <h2 className="text-base font-semibold text-gray-700">
+          Continue Watching
+        </h2>
         {videos.length > 3 && (
-          <button className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-muted/80 hover:bg-muted transition-colors">
-            <span className="text-sm font-medium text-foreground">View all</span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          <button className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-gray-50 hover:bg-gray-100 transition-colors active:scale-[0.97]">
+            <span className="text-sm font-medium text-gray-700">View all</span>
+            <ChevronRight className="h-4 w-4 text-gray-400" />
           </button>
         )}
       </div>
@@ -85,7 +82,7 @@ export const ContinueWatchingSection: React.FC<ContinueWatchingSectionProps> = (
       </div>
 
       {/* Section divider */}
-      <div className="mt-6 h-2 bg-muted/40" />
+      <div className="mt-6 h-2 bg-gray-50" />
     </div>
   );
 };
