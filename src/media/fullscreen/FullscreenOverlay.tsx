@@ -1,11 +1,16 @@
 /**
  * FullscreenOverlay - UI overlay layer with creator info, actions, and caption
+ * 
+ * Performance Fixes:
+ * - Fix 9: Course tag display with navigation
+ * - Fix 10: Removed mute button from ActionRail (kept in FullscreenControls only)
  */
 
 import React, { useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
-import { Heart, MessageCircle, Share, Bookmark, Volume2, VolumeX } from 'lucide-react';
+import { Heart, MessageCircle, Share, Bookmark, MapPin } from 'lucide-react';
 import { useFullscreenViewerContext, FullscreenMediaItem } from '../hooks/useFullscreenViewer';
+import { useNavigate } from 'react-router-dom';
 
 export interface FullscreenOverlayProps {
   showComments?: boolean;
@@ -37,18 +42,16 @@ export const FullscreenOverlay: React.FC<FullscreenOverlayProps> = ({
 
   return (
     <div className={cn('absolute inset-0 pointer-events-none z-20', className)}>
-      {/* Action Rail (right side) */}
+      {/* Action Rail (right side) — Fix 10: No mute button here */}
       {showActionRail && (
         <div className="absolute right-4 pointer-events-auto"
           style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}
         >
           <ActionRail
             item={item}
-            isMuted={viewer.isMuted}
             onLike={onLike}
             onComment={onComment}
             onShare={showShare ? onShare : undefined}
-            onMuteToggle={() => viewer.setMuted(!viewer.isMuted)}
           />
         </div>
       )}
@@ -60,6 +63,14 @@ export const FullscreenOverlay: React.FC<FullscreenOverlayProps> = ({
           style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}
         >
           <CreatorInfo item={item} onFollow={onFollow} />
+          {/* Fix 9: Course tag */}
+          {item.courseName && (
+            <CourseTag 
+              courseName={item.courseName} 
+              courseId={item.courseId} 
+              onClose={viewer.close}
+            />
+          )}
           {item.caption && (
             <CaptionDisplay caption={item.caption} />
           )}
@@ -117,35 +128,59 @@ export const CreatorInfo: React.FC<CreatorInfoProps> = ({ item, onFollow }) => {
   );
 };
 
+// ============ Fix 9: Course Tag ============
+
+interface CourseTagProps {
+  courseName: string;
+  courseId?: string;
+  onClose: () => void;
+}
+
+const CourseTag: React.FC<CourseTagProps> = ({ courseName, courseId, onClose }) => {
+  const navigate = useNavigate();
+  
+  const handleClick = useCallback(() => {
+    if (courseId) {
+      onClose();
+      // Small delay to let fullscreen close animation complete
+      setTimeout(() => {
+        navigate(`/courses/${courseId}`);
+      }, 100);
+    }
+  }, [courseId, navigate, onClose]);
+
+  return (
+    <button
+      onClick={courseId ? handleClick : undefined}
+      className={cn(
+        'flex items-center gap-1.5 mb-2',
+        courseId && 'active:scale-[0.97] transition-transform'
+      )}
+    >
+      <MapPin className="w-3.5 h-3.5 text-white/60 flex-shrink-0" />
+      <span className="text-xs text-white/70 font-medium truncate">{courseName}</span>
+    </button>
+  );
+};
+
 // ============ Action Rail ============
+// Fix 10: Removed mute button — only in FullscreenControls
 
 interface ActionRailProps {
   item: FullscreenMediaItem;
-  isMuted: boolean;
   onLike?: () => void;
   onComment?: () => void;
   onShare?: () => void;
-  onMuteToggle?: () => void;
 }
 
 export const ActionRail: React.FC<ActionRailProps> = ({
   item,
-  isMuted,
   onLike,
   onComment,
   onShare,
-  onMuteToggle,
 }) => {
   return (
     <div className="flex flex-col gap-4 items-center">
-      {/* Mute button */}
-      {item.mediaType === 'video' && onMuteToggle && (
-        <ActionButton
-          icon={isMuted ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
-          onClick={onMuteToggle}
-        />
-      )}
-
       {/* Like button */}
       <ActionButton
         icon={<Heart className={cn('w-6 h-6', item.isLiked && 'fill-red-500 text-red-500')} />}

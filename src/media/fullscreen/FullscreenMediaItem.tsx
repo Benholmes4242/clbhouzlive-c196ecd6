@@ -4,15 +4,18 @@
  * Renders either video or image with chevron navigation, dot indicators, and swipe support.
  * Includes blurred background for letterboxing when aspect ratio doesn't fill the screen.
  * 
- * TikTok-Level Improvements:
- * - FIX #9: Removed debug logging (was lines 84-95)
- * - Bootstrap-aware autoplay (waits for isBootstrapping to be false)
- * - Registers video element with context for controls via player ref
+ * Performance Fixes:
+ * - Fix 1: MediaRuntime registration (surface="fullscreen", managedByMediaRuntime=true)
+ * - Fix 2: Error state with retry UI
+ * - Fix 3: Play-gated poster-to-video crossfade
+ * - Fix 4: Explicit pause on swipe-away
+ * - Fix 6: Smart loop logic (≥60s no loop, end state)
+ * - Fix 8: Single-tap play/pause with double-tap coexistence
  */
 
 import React, { useRef, useCallback, useState, useMemo, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RotateCcw, Play, Pause } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '../components/UnifiedVideoPlayer';
 import { UnifiedImage } from '../components/UnifiedImage';
@@ -20,6 +23,10 @@ import { FullscreenMediaItem as FullscreenMediaItemType, FullscreenMediaItemMedi
 import { useFullscreenViewerContext } from '../hooks/useFullscreenViewer';
 import CarouselDots from '@/components/posts/CarouselDots';
 import { BlurredMediaBackground } from '@/components/media/BlurredMediaBackground';
+import { AnimatePresence, motion } from 'framer-motion';
+
+// Smart loop threshold: videos under this duration loop, others don't
+const LOOP_DURATION_THRESHOLD = 60; // seconds
 
 export interface FullscreenMediaItemProps {
   item: FullscreenMediaItemType;
@@ -37,6 +44,10 @@ export const FullscreenMediaItem: React.FC<FullscreenMediaItemProps> = React.mem
   const viewer = useFullscreenViewerContext();
   const lastTapRef = useRef<number>(0);
   const [showHeart, setShowHeart] = useState(false);
+  
+  // Fix 8: Single-tap play/pause state
+  const [tapIcon, setTapIcon] = useState<'play' | 'pause' | null>(null);
+  const singleTapTimerRef = useRef<NodeJS.Timeout | null>(null);
   
   // Player ref to get video element
   const playerRef = useRef<UnifiedVideoPlayerRef>(null);
@@ -96,7 +107,24 @@ export const FullscreenMediaItem: React.FC<FullscreenMediaItemProps> = React.mem
     };
   }, [isActive, setActiveVideoRef]);
 
-  // FIX #9: Debug logging REMOVED - was causing console noise
+  // Fix 4: Explicit pause on swipe-away
+  useEffect(() => {
+    if (!isActive) {
+      const videoEl = playerRef.current?.getVideoElement();
+      if (videoEl && !videoEl.paused) {
+        videoEl.pause();
+      }
+    }
+  }, [isActive]);
+
+  // Cleanup single-tap timer on unmount
+  useEffect(() => {
+    return () => {
+      if (singleTapTimerRef.current) {
+        clearTimeout(singleTapTimerRef.current);
+      }
+    };
+  }, []);
 
   // Swipe handlers for horizontal navigation within post
   const swipeHandlers = useSwipeable({
@@ -134,19 +162,39 @@ export const FullscreenMediaItem: React.FC<FullscreenMediaItemProps> = React.mem
     goToMedia(index);
   }, [goToMedia]);
 
-  // Double-tap to like
+  // Fix 8: Single-tap play/pause + double-tap to like
   const handleTap = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     const now = Date.now();
     const timeDiff = now - lastTapRef.current;
     lastTapRef.current = now;
 
     if (timeDiff < 300 && timeDiff > 0) {
-      // Double tap detected
+      // Double tap detected — cancel single-tap timer
+      if (singleTapTimerRef.current) {
+        clearTimeout(singleTapTimerRef.current);
+        singleTapTimerRef.current = null;
+      }
       e.preventDefault();
       e.stopPropagation();
       
       setShowHeart(true);
       setTimeout(() => setShowHeart(false), 450);
+    } else {
+      // Potential single tap — wait 250ms to confirm
+      singleTapTimerRef.current = setTimeout(() => {
+        singleTapTimerRef.current = null;
+        const videoEl = playerRef.current?.getVideoElement();
+        if (!videoEl) return;
+        
+        if (videoEl.paused) {
+          videoEl.play().catch(() => {});
+          setTapIcon('play');
+        } else {
+          videoEl.pause();
+          setTapIcon('pause');
+        }
+        setTimeout(() => setTapIcon(null), 600);
+      }, 250);
     }
   }, []);
 
@@ -166,15 +214,17 @@ export const FullscreenMediaItem: React.FC<FullscreenMediaItemProps> = React.mem
     return displayMedia.posterUrl || displayMedia.mediaUrl || '';
   }, [displayMedia]);
 
-  // Determine if media needs letterboxing (non-portrait content in vertical feed)
-  const needsBlurBackground = useMemo(() => {
-    // Default to showing blur background for all content to handle various aspect ratios
-    // In fullscreen mode, blur background helps with letterboxed content
-    return true;
-  }, []);
-
   // Autoplay only when active AND not bootstrapping
   const shouldAutoplay = isActive && !isBootstrapping;
+
+  // Fix 6: Smart loop — determine based on item duration
+  const shouldLoop = useMemo(() => {
+    const duration = item.duration;
+    if (typeof duration === 'number' && duration >= LOOP_DURATION_THRESHOLD) {
+      return false;
+    }
+    return true; // default loop for shorts or unknown duration
+  }, [item.duration]);
 
   return (
     <div
@@ -183,7 +233,7 @@ export const FullscreenMediaItem: React.FC<FullscreenMediaItemProps> = React.mem
       onClick={handleTap}
     >
       {/* Blurred background for letterboxing effect */}
-      {needsBlurBackground && blurBackgroundUrl && (
+      {blurBackgroundUrl && (
         <BlurredMediaBackground 
           src={blurBackgroundUrl}
           isVideo={displayMedia.mediaType === 'video'}
@@ -206,6 +256,28 @@ export const FullscreenMediaItem: React.FC<FullscreenMediaItemProps> = React.mem
         </div>
       )}
 
+      {/* Fix 8: Single-tap play/pause icon */}
+      <AnimatePresence>
+        {tapIcon && (
+          <motion.div
+            key="tap-icon"
+            initial={{ opacity: 0.8, scale: 0.8 }}
+            animate={{ opacity: 0.6, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.2 }}
+            transition={{ duration: 0.5 }}
+            className="pointer-events-none absolute inset-0 flex items-center justify-center z-50"
+          >
+            <div className="w-16 h-16 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center">
+              {tapIcon === 'play' ? (
+                <Play className="w-8 h-8 text-white ml-1" fill="white" />
+              ) : (
+                <Pause className="w-8 h-8 text-white" fill="white" />
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Media content - z-[1] to appear above blur background */}
       <div className="relative z-[1] w-full h-full">
         <SingleMediaDisplay
@@ -215,7 +287,9 @@ export const FullscreenMediaItem: React.FC<FullscreenMediaItemProps> = React.mem
           muted={viewer.isMuted}
           caption={item.caption}
           shouldAutoplay={shouldAutoplay}
+          shouldLoop={shouldLoop}
           playerRef={playerRef}
+          itemDuration={item.duration}
         />
       </div>
 
@@ -276,7 +350,9 @@ interface SingleMediaDisplayProps {
   muted: boolean;
   caption?: string;
   shouldAutoplay: boolean;
+  shouldLoop: boolean;
   playerRef: React.RefObject<UnifiedVideoPlayerRef>;
+  itemDuration?: number;
 }
 
 export const SingleMediaDisplay: React.FC<SingleMediaDisplayProps> = React.memo(({
@@ -286,24 +362,164 @@ export const SingleMediaDisplay: React.FC<SingleMediaDisplayProps> = React.memo(
   muted,
   caption,
   shouldAutoplay,
+  shouldLoop,
   playerRef,
+  itemDuration,
 }) => {
+  // Fix 2: Error state
+  const [hasError, setHasError] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
+  
+  // Fix 3: Play-gated poster crossfade
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [posterLoaded, setPosterLoaded] = useState(false);
+  const playTimerRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Fix 6: Video ended state
+  const [hasEnded, setHasEnded] = useState(false);
+
+  // Reset states when media changes
+  useEffect(() => {
+    setIsVideoPlaying(false);
+    setPosterLoaded(false);
+    setHasError(false);
+    setHasEnded(false);
+    if (playTimerRef.current) {
+      clearTimeout(playTimerRef.current);
+    }
+  }, [media.id, retryKey]);
+
+  // Fix 6: Listen for video ended event
+  useEffect(() => {
+    if (media.mediaType !== 'video' || shouldLoop || !isActive) return;
+    const videoEl = playerRef.current?.getVideoElement();
+    if (!videoEl) return;
+    
+    const onEnded = () => setHasEnded(true);
+    videoEl.addEventListener('ended', onEnded);
+    return () => videoEl.removeEventListener('ended', onEnded);
+  }, [media.mediaType, shouldLoop, isActive, retryKey]);
+
+  // Cleanup timer
+  useEffect(() => {
+    return () => {
+      if (playTimerRef.current) clearTimeout(playTimerRef.current);
+    };
+  }, []);
+
+  // Fix 3: onPlay callback — 100ms buffer then reveal video
+  const handlePlay = useCallback(() => {
+    setHasEnded(false);
+    playTimerRef.current = setTimeout(() => {
+      setIsVideoPlaying(true);
+    }, 100);
+  }, []);
+
+  // Fix 2: Error handler
+  const handleError = useCallback(() => {
+    setHasError(true);
+    setIsVideoPlaying(false);
+  }, []);
+
+  // Fix 2: Retry handler — remount player
+  const handleRetry = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setHasError(false);
+    setIsVideoPlaying(false);
+    setHasEnded(false);
+    setRetryKey(prev => prev + 1);
+  }, []);
+
+  // Fix 6: Replay handler
+  const handleReplay = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    const videoEl = playerRef.current?.getVideoElement();
+    if (videoEl) {
+      videoEl.currentTime = 0;
+      videoEl.play().catch(() => {});
+      setHasEnded(false);
+    }
+  }, []);
+
   if (media.mediaType === 'video') {
     return (
-      <UnifiedVideoPlayer
-        ref={playerRef}
-        src={media.mediaUrl}
-        posterUrl={media.posterUrl}
-        muted={muted}
-        autoplay={shouldAutoplay}
-        loop
-        controls={false}
-        className="absolute inset-0 w-full h-full"
-        objectFit="cover"
-        managedByMediaRuntime={false}
-        // Priority preload: active OR nearby items always get full preload
-        preload="auto"
-      />
+      <div className="absolute inset-0 w-full h-full">
+        {/* Fix 3: Poster overlay — stays until video is playing */}
+        {media.posterUrl && (
+          <div
+            className="absolute inset-0 z-[2] transition-opacity duration-150"
+            style={{ opacity: isVideoPlaying && !hasError && !hasEnded ? 0 : 1 }}
+          >
+            <img
+              src={media.posterUrl}
+              alt=""
+              className={cn(
+                'w-full h-full object-cover transition-opacity duration-200',
+                posterLoaded ? 'opacity-100' : 'opacity-0'
+              )}
+              onLoad={() => setPosterLoaded(true)}
+              draggable={false}
+            />
+            {/* Shimmer while poster loads */}
+            {!posterLoaded && (
+              <div className="absolute inset-0 bg-muted/50 animate-pulse" />
+            )}
+          </div>
+        )}
+
+        {/* Shimmer if no poster URL */}
+        {!media.posterUrl && !isVideoPlaying && (
+          <div className="absolute inset-0 z-[2] bg-muted/50 animate-pulse" />
+        )}
+
+        {/* Video player */}
+        {!hasError && (
+          <UnifiedVideoPlayer
+            key={retryKey}
+            ref={playerRef}
+            src={media.mediaUrl}
+            posterUrl={media.posterUrl}
+            muted={muted}
+            autoplay={shouldAutoplay}
+            loop={shouldLoop}
+            controls={false}
+            className="absolute inset-0 w-full h-full z-[1]"
+            objectFit="cover"
+            managedByMediaRuntime={true}
+            surface="fullscreen"
+            preload={isActive ? 'auto' : 'metadata'}
+            onPlay={handlePlay}
+            onError={handleError}
+          />
+        )}
+
+        {/* Fix 2: Error state with retry */}
+        {hasError && (
+          <div className="absolute inset-0 z-[5] flex flex-col items-center justify-center">
+            <div className="absolute inset-0 bg-black/50" />
+            <button
+              onClick={handleRetry}
+              className="relative z-10 w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center active:scale-95 transition-transform"
+            >
+              <RotateCcw className="w-6 h-6 text-white" />
+            </button>
+            <p className="relative z-10 text-white/60 text-sm mt-3">Tap to retry</p>
+          </div>
+        )}
+
+        {/* Fix 6: End state for long-form videos */}
+        {hasEnded && !hasError && (
+          <div className="absolute inset-0 z-[5] flex flex-col items-center justify-center">
+            <button
+              onClick={handleReplay}
+              className="relative z-10 w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center active:scale-95 transition-transform"
+            >
+              <RotateCcw className="w-6 h-6 text-white" />
+            </button>
+            <p className="relative z-10 text-white/60 text-sm mt-3">Swipe for next</p>
+          </div>
+        )}
+      </div>
     );
   }
 

@@ -3,6 +3,8 @@
  * 
  * Orchestrates all sub-components while keeping itself under 300 lines.
  * Uses context to share state with children.
+ * 
+ * Fix 12: Clean audio on close — immediately mutes/pauses before animation delay
  */
 
 import React, { useEffect, useCallback, useMemo, useRef } from 'react';
@@ -89,9 +91,7 @@ export const FullscreenMediaViewer: React.FC<FullscreenMediaViewerProps> = ({
   onDelete,
 }) => {
   // Transparent status bar for immersive fullscreen experience
-  // ONLY apply when viewer is open - otherwise let underlying page control status bar
   useMedianStatusBar("dark", "transparent", true, false, isOpen);
-  
   
   // Initialize viewer hook
   const viewer = useFullscreenViewer({
@@ -122,7 +122,7 @@ export const FullscreenMediaViewer: React.FC<FullscreenMediaViewerProps> = ({
     const handleKeyDown = (e: KeyboardEvent) => {
       switch (e.key) {
         case 'Escape':
-          viewer.close();
+          handleClose();
           break;
         case 'ArrowUp':
           e.preventDefault();
@@ -170,14 +170,25 @@ export const FullscreenMediaViewer: React.FC<FullscreenMediaViewerProps> = ({
     window.history.pushState({ fullscreenViewer: true }, '');
 
     const handlePopState = () => {
-      viewer.close();
+      handleClose();
     };
 
     window.addEventListener('popstate', handlePopState);
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [viewer.isOpen, viewer.close]);
+  }, [viewer.isOpen]);
+
+  // Fix 12: Close with immediate audio stop
+  const handleClose = useCallback(() => {
+    // Immediately stop audio before any animation delay
+    const videoRef = viewer.activeVideoRef;
+    if (videoRef?.current) {
+      videoRef.current.pause();
+      videoRef.current.muted = true;
+    }
+    viewer.close();
+  }, [viewer]);
 
   // Handle action callbacks
   const handleLike = useCallback(() => {
@@ -219,29 +230,18 @@ export const FullscreenMediaViewer: React.FC<FullscreenMediaViewerProps> = ({
   }, [viewer.currentItem, onEdit]);
 
   // Handle delete callback
-  // CRITICAL: Close the viewer FIRST to prevent rendering deleted content
   const handleDelete = useCallback(async () => {
     if (viewer.currentItem) {
       const postId = viewer.currentItem.postId;
-      
-      // 1. Close the viewer IMMEDIATELY to prevent freeze
-      viewer.close();
-      
-      // 2. Small delay to let the viewer unmount before deletion
+      handleClose();
       await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // 3. Now perform the actual deletion
       await onDelete?.(postId);
     }
-  }, [viewer, onDelete]);
+  }, [viewer, onDelete, handleClose]);
 
   // Don't render if not open or if there are no items
   if (!viewer.isOpen) return null;
-  
-  // Guard against empty items array - close viewer if no items left
-  if (viewer.items.length === 0) {
-    return null;
-  }
+  if (viewer.items.length === 0) return null;
 
   const content = (
     <AnimatePresence>
@@ -254,8 +254,8 @@ export const FullscreenMediaViewer: React.FC<FullscreenMediaViewerProps> = ({
         >
           {/* Close button - left */}
           <button
-            onClick={viewer.close}
-            className="absolute left-4 z-[10001] w-11 h-11 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center"
+            onClick={handleClose}
+            className="absolute left-4 z-[10001] w-11 h-11 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center active:scale-95 transition-transform"
             style={{ top: 'max(env(safe-area-inset-top, 0px), 47px)' }}
             aria-label="Close"
           >
