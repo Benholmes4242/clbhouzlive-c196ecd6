@@ -292,7 +292,7 @@ export function WatchHeroVideo({
           {video.like_count > 0 && (
             <>
               <span className="text-white/50">·</span>
-              <span className="text-white/80 text-xs">{formatCount(video.like_count)} likes</span>
+              <span className="text-white/80 text-xs">{formatCount(video.like_count)} {video.like_count === 1 ? 'like' : 'likes'}</span>
             </>
           )}
         </div>

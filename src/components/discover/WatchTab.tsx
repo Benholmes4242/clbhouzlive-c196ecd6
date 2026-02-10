@@ -20,6 +20,8 @@ import { WatchTabSkeleton } from './WatchTabSkeleton';
 import { useWatchHeroVideo, HeroVideo } from '@/hooks/useWatchHeroVideo';
 import { useWatchShorts, WatchShort } from '@/hooks/useWatchShorts';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
+import { useQueryClient } from '@tanstack/react-query';
 import { 
   logWatch, 
   logWatchQueryState, 
@@ -51,6 +53,8 @@ function toFullscreenItem(video: WatchShort | HeroVideo): any {
 }
 
 export function WatchTab() {
+  const queryClient = useQueryClient();
+
   // Debug lifecycle
   const lifecycleLogger = createWatchLifecycleLogger('WatchTab');
   
@@ -78,6 +82,7 @@ export function WatchTab() {
   // Shorts grid data (exclude hero from grid)
   const {
     shorts,
+    likedPostIds,
     isLoading: isLoadingShorts,
     isError: isGridError,
     hasNextPage,
@@ -180,44 +185,57 @@ export function WatchTab() {
     refetchShorts();
   }, [refetchShorts]);
 
+  // Pull-to-refresh handler
+  const handlePullToRefresh = useCallback(async () => {
+    logWatch('interaction', 'WatchTab', '🔄 Pull-to-refresh');
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ['watch-hero-video'] }),
+      queryClient.invalidateQueries({ queryKey: ['watch-shorts-base'] }),
+      queryClient.invalidateQueries({ queryKey: ['watch-shorts-user-likes'] }),
+    ]);
+  }, [queryClient]);
+
   // Full page skeleton when both are loading initially
   if (isLoadingHero && isLoadingShorts) {
     return <WatchTabSkeleton />;
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-[var(--bg-page)]">
-      {/* Hero Video - Most Viewed */}
-      <WatchHeroVideo 
-        video={heroVideo}
-        trendingPeriod={trendingPeriod}
-        isLoading={isLoadingHero}
-        onTap={handleHeroTap}
-      />
+    <PullToRefreshContainer onRefresh={handlePullToRefresh}>
+      <div className="flex flex-col min-h-screen bg-[var(--bg-page)]">
+        {/* Hero Video - Most Viewed */}
+        <WatchHeroVideo 
+          video={heroVideo}
+          trendingPeriod={trendingPeriod}
+          isLoading={isLoadingHero}
+          onTap={handleHeroTap}
+        />
 
-      {/* Gap between hero and section label */}
-      <div className="h-2" />
+        {/* Gap between hero and section label */}
+        <div className="h-2" />
 
-      {/* Section Label */}
-      <div className="px-3 py-2">
-        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-          Latest Shorts
-        </span>
+        {/* Section Label */}
+        <div className="px-3 py-2">
+          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+            Latest Shorts
+          </span>
+        </div>
+
+        {/* Shorts Grid - LiveClubhouseStrip is injected after 8 tiles */}
+        <WatchShortsGrid
+          shorts={shorts}
+          likedPostIds={likedPostIds}
+          isLoading={isLoadingShorts}
+          isError={isGridError}
+          onRetry={handleRetry}
+          onVideoTap={handleVideoTap}
+          onLoadMore={handleLoadMore}
+          hasMore={hasNextPage}
+          isLoadingMore={isFetchingNextPage}
+          showSuggestedStrip={true}
+        />
       </div>
-
-      {/* Shorts Grid - LiveClubhouseStrip is injected after 8 tiles */}
-      <WatchShortsGrid
-        shorts={shorts}
-        isLoading={isLoadingShorts}
-        isError={isGridError}
-        onRetry={handleRetry}
-        onVideoTap={handleVideoTap}
-        onLoadMore={handleLoadMore}
-        hasMore={hasNextPage}
-        isLoadingMore={isFetchingNextPage}
-        showSuggestedStrip={true}
-      />
-    </div>
+    </PullToRefreshContainer>
   );
 }
 
