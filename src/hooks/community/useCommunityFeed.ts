@@ -183,8 +183,8 @@ export function useCommunityFeed({
       }
       
       if (friendIds.size > 0) {
-        // Friends-only posts from friends specifically
-        orConditions.push(`and(actor_type.eq.personal,actor_id.in.(${Array.from(friendIds).join(',')}),visibility.eq.friends)`);
+        // Friends-only posts from friends specifically (enum value is 'followers', not 'friends')
+        orConditions.push(`and(actor_type.eq.personal,actor_id.in.(${Array.from(friendIds).join(',')}),visibility.eq.followers)`);
       }
       
       if (followedBusinessIds.size > 0) {
