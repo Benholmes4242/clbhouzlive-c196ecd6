@@ -506,6 +506,10 @@ export default {
 						backgroundImage: 'linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)',
 						backgroundPosition: 'center 200%'
 					}
+				},
+				'progress-fill': {
+					'0%': { transform: 'scaleX(0)' },
+					'100%': { transform: 'scaleX(1)' }
 				}
 			},
 			transitionDuration: {
@@ -554,7 +558,8 @@ export default {
 				'slide-in-rank': 'slide-in-rank 0.3s ease-out',
 				'bounce-in': 'bounce-in 0.4s ease-out',
 				// Shimmer-down animation for Watch tab standard skeletons
-				'shimmer-down': 'shimmer-down 1.5s ease-in-out infinite'
+				'shimmer-down': 'shimmer-down 1.5s ease-in-out infinite',
+				'progress-fill': 'progress-fill 5s linear forwards'
 			}
 		}
 	},

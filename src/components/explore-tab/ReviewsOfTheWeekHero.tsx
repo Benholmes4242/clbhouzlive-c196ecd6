@@ -3,6 +3,17 @@
  * 
  * A* Polish: Cinematic cards with gradient overlays, premium rating badges,
  * refined dot indicators, 4:5 aspect ratio
+ * 
+ * Performance fixes to Clubhouse parity:
+ * - Fix 1: Mount only active + next slide players (caps HLS to 2)
+ * - Fix 2: MediaRuntime registration with surface="hero"
+ * - Fix 3: Play-gated poster-to-video transition (onPlay, not canPlayThrough)
+ * - Fix 4: Skeleton stays until first poster loads
+ * - Fix 5: Shimmer layer + poster fade-in per slide
+ * - Fix 6: Error state keeps poster visible (no error chrome)
+ * - Fix 7: Poster preload link for first slide
+ * - Fix 8: GlobalAudioContext integration
+ * - Fix 9: Auto-advance progress bar indicator
  */
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
@@ -19,6 +30,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { getReviewOverlayTheme } from '@/lib/postHelpers';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ChevronRight } from 'lucide-react';
+import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 
 interface ReviewsOfTheWeekHeroProps {
   onFallbackToFeaturedCourse?: () => void;
@@ -27,7 +39,6 @@ interface ReviewsOfTheWeekHeroProps {
 
 const AUTO_ADVANCE_INTERVAL = 5000;
 const PAUSE_AFTER_INTERACTION = 10000;
-const FIRST_FRAME_FALLBACK_MS = 3000;
 
 export function ReviewsOfTheWeekHero({ 
   onFallbackToFeaturedCourse,
@@ -37,12 +48,37 @@ export function ReviewsOfTheWeekHero({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isHeroVisible, setIsHeroVisible] = useState(true);
+  const [firstPosterLoaded, setFirstPosterLoaded] = useState(false);
+  const [progressKey, setProgressKey] = useState(0); // Reset progress bar animation
   const pauseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const autoAdvanceRef = useRef<NodeJS.Timeout | null>(null);
   const hasFallenBack = useRef(false);
   const heroContainerRef = useRef<HTMLDivElement>(null);
+  const { isGloballyMuted } = useGlobalAudio();
   
   const { data: reviews, isLoading } = useReviewsOfTheWeek({ limit: 7 });
+  
+  // Fix 7: Poster preload link for first slide
+  useEffect(() => {
+    if (!reviews?.length) return;
+    const firstReview = reviews[0];
+    if (!firstReview?.video_url) return;
+    const uid = uidFromNode({ src: firstReview.video_url });
+    if (!uid) return;
+    const posterUrl = generateStreamThumbnailUrl(uid, { width: 1280, height: 1600, time: 1 });
+    if (!posterUrl || isPosterFailed(posterUrl)) return;
+    
+    const existingLink = document.querySelector(`link[href="${posterUrl}"]`);
+    if (existingLink) return;
+    
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = posterUrl;
+    link.setAttribute('fetchpriority', 'high');
+    document.head.appendChild(link);
+    return () => { link.remove(); };
+  }, [reviews]);
   
   // P0: Viewport-aware hysteresis
   useEffect(() => {
@@ -62,7 +98,7 @@ export function ReviewsOfTheWeekHero({
     return () => observer.disconnect();
   }, []);
   
-  // Preload next slide
+  // Preload next slide HLS manifest
   useEffect(() => {
     if (!reviews?.length) return;
     const nextIndex = (currentIndex + 1) % reviews.length;
@@ -72,19 +108,24 @@ export function ReviewsOfTheWeekHero({
     if (uid) preloadHlsManifest(generateStreamHlsUrl(uid));
   }, [currentIndex, reviews]);
   
-  // Auto-advance
+  // Fix 9: Auto-advance with progress bar reset
   useEffect(() => {
     if (!reviews?.length || isPaused || !isHeroVisible) return;
     autoAdvanceRef.current = setInterval(() => {
       setCurrentIndex(prev => (prev + 1) % reviews.length);
+      setProgressKey(prev => prev + 1); // Reset progress bar
     }, AUTO_ADVANCE_INTERVAL);
     return () => { if (autoAdvanceRef.current) clearInterval(autoAdvanceRef.current); };
   }, [reviews?.length, isPaused, isHeroVisible]);
   
   const handleInteraction = useCallback(() => {
     setIsPaused(true);
+    setProgressKey(prev => prev + 1); // Reset progress bar
     if (pauseTimeoutRef.current) clearTimeout(pauseTimeoutRef.current);
-    pauseTimeoutRef.current = setTimeout(() => setIsPaused(false), PAUSE_AFTER_INTERACTION);
+    pauseTimeoutRef.current = setTimeout(() => {
+      setIsPaused(false);
+      setProgressKey(prev => prev + 1); // Restart progress bar
+    }, PAUSE_AFTER_INTERACTION);
   }, []);
   
   const goToSlide = useCallback((index: number) => {
@@ -116,6 +157,11 @@ export function ReviewsOfTheWeekHero({
     navigate(`/post/${review.post_id}`);
   }, [navigate]);
 
+  // Fix 4: Callback for first poster load
+  const handleFirstPosterLoad = useCallback(() => {
+    setFirstPosterLoaded(true);
+  }, []);
+
   useEffect(() => {
     if (!isLoading && !reviews?.length && !hasFallenBack.current) {
       hasFallenBack.current = true;
@@ -133,26 +179,47 @@ export function ReviewsOfTheWeekHero({
   
   if (!reviews?.length) return null;
   
+  // Auto-advance is active (not paused and visible)
+  const isAutoAdvancing = !isPaused && isHeroVisible;
+  
   return (
     <div className={cn("pt-3 px-4", className)}>
-      <div 
-        ref={heroContainerRef}
-        {...swipeHandlers}
-        className="relative w-full overflow-hidden rounded-2xl bg-black will-change-transform"
-      >
-        {reviews.map((review, index) => (
-          <ReviewSlide
-            key={review.post_id}
-            review={review}
-            isActive={index === currentIndex}
-            isNextSlide={index === (currentIndex + 1) % reviews.length}
-            isHeroVisible={isHeroVisible}
-            onTap={() => handleReviewTap(review)}
-            currentIndex={currentIndex}
-            totalSlides={reviews.length}
-            onGoToSlide={goToSlide}
-          />
-        ))}
+      {/* Fix 4: Skeleton overlay that stays until first poster loads */}
+      <div className="relative">
+        <div 
+          ref={heroContainerRef}
+          {...swipeHandlers}
+          className="relative w-full overflow-hidden rounded-2xl bg-muted will-change-transform"
+        >
+          {reviews.map((review, index) => (
+            <ReviewSlide
+              key={review.post_id}
+              review={review}
+              isActive={index === currentIndex}
+              isNextSlide={index === (currentIndex + 1) % reviews.length}
+              shouldMountVideo={index === currentIndex || index === (currentIndex + 1) % reviews.length}
+              isHeroVisible={isHeroVisible}
+              isGloballyMuted={isGloballyMuted}
+              onTap={() => handleReviewTap(review)}
+              currentIndex={currentIndex}
+              totalSlides={reviews.length}
+              onGoToSlide={goToSlide}
+              onPosterLoad={index === 0 ? handleFirstPosterLoad : undefined}
+              isAutoAdvancing={isAutoAdvancing}
+              progressKey={progressKey}
+            />
+          ))}
+        </div>
+        
+        {/* Fix 4: Skeleton stays until first poster loads — crossfade out */}
+        <div
+          className={cn(
+            "absolute inset-0 rounded-2xl overflow-hidden pointer-events-none transition-opacity duration-200",
+            firstPosterLoaded ? "opacity-0" : "opacity-100"
+          )}
+        >
+          <Skeleton className="w-full h-full animate-shimmer-down" />
+        </div>
       </div>
     </div>
   );
@@ -163,34 +230,47 @@ interface ReviewSlideProps {
   review: ReviewOfTheWeek;
   isActive: boolean;
   isNextSlide: boolean;
+  shouldMountVideo: boolean;
   isHeroVisible: boolean;
+  isGloballyMuted: boolean;
   onTap: () => void;
   currentIndex: number;
   totalSlides: number;
   onGoToSlide: (index: number) => void;
+  onPosterLoad?: () => void;
+  isAutoAdvancing: boolean;
+  progressKey: number;
 }
 
 const ReviewSlide = React.memo(function ReviewSlide({
   review,
   isActive,
   isNextSlide,
+  shouldMountVideo,
   isHeroVisible,
+  isGloballyMuted,
   onTap,
   currentIndex,
   totalSlides,
   onGoToSlide,
+  onPosterLoad,
+  isAutoAdvancing,
+  progressKey,
 }: ReviewSlideProps) {
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const [posterLoaded, setPosterLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
   const hasReportedReadyRef = useRef(false);
-  const firstFrameTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isVideoReadyTimerRef = useRef<NodeJS.Timeout | null>(null);
   const playerRef = useRef<UnifiedVideoPlayerRef | null>(null);
   
   const shouldAutoplay = isActive && isHeroVisible;
   const rating = review.rating ?? 0;
-  const isOutstanding = rating >= 9.0;
   const theme = getReviewOverlayTheme(rating);
   const formattedRating = rating === 10 ? '10' : rating.toFixed(1);
   
+  // Imperative play/pause control
   useEffect(() => {
     if (!playerRef.current) return;
     if (shouldAutoplay) {
@@ -214,33 +294,54 @@ const ReviewSlide = React.memo(function ReviewSlide({
     };
   }, [review.video_url, review.thumbnail_url]);
   
+  // Reset video readiness when slide changes identity
   useEffect(() => {
     hasReportedReadyRef.current = false;
     setIsVideoReady(false);
-    if (firstFrameTimeoutRef.current) clearTimeout(firstFrameTimeoutRef.current);
+    setHasError(false);
+    if (isVideoReadyTimerRef.current) clearTimeout(isVideoReadyTimerRef.current);
   }, [review.post_id]);
   
+  // Reset video readiness when player is unmounted (slide scrolled out of mount window)
   useEffect(() => {
-    if (isActive && hlsUrl && !isVideoReady) {
-      firstFrameTimeoutRef.current = setTimeout(() => {
-        if (!hasReportedReadyRef.current) {
-          hasReportedReadyRef.current = true;
-          setIsVideoReady(true);
-        }
-      }, FIRST_FRAME_FALLBACK_MS);
-      return () => { if (firstFrameTimeoutRef.current) clearTimeout(firstFrameTimeoutRef.current); };
+    if (!shouldMountVideo) {
+      hasReportedReadyRef.current = false;
+      setIsVideoReady(false);
+      if (isVideoReadyTimerRef.current) clearTimeout(isVideoReadyTimerRef.current);
     }
-  }, [isActive, hlsUrl, isVideoReady]);
+  }, [shouldMountVideo]);
   
-  const handleCanPlayThrough = useCallback(() => {
+  // Fix 3: Play-gated transition — onPlay + 100ms buffer
+  const handlePlay = useCallback(() => {
     if (!hasReportedReadyRef.current) {
-      hasReportedReadyRef.current = true;
-      setIsVideoReady(true);
-      if (firstFrameTimeoutRef.current) clearTimeout(firstFrameTimeoutRef.current);
+      isVideoReadyTimerRef.current = setTimeout(() => {
+        hasReportedReadyRef.current = true;
+        setIsVideoReady(true);
+      }, 100);
     }
   }, []);
   
+  // Fix 6: Error handler — keep poster, log error, no chrome
+  const handleError = useCallback(() => {
+    console.warn('[ReviewsOfTheWeekHero] Video playback error for:', review.post_id);
+    setHasError(true);
+    setIsVideoReady(false);
+  }, [review.post_id]);
+  
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (isVideoReadyTimerRef.current) clearTimeout(isVideoReadyTimerRef.current);
+    };
+  }, []);
+  
   const isPrioritySlide = isActive || isNextSlide;
+  
+  // Fix 5: Poster load handler
+  const handlePosterLoad = useCallback(() => {
+    setPosterLoaded(true);
+    onPosterLoad?.();
+  }, [onPosterLoad]);
 
   const initials = useMemo(() => {
     return (review.display_name || review.username || 'G')
@@ -250,6 +351,9 @@ const ReviewSlide = React.memo(function ReviewSlide({
       .join('')
       .toUpperCase();
   }, [review.display_name, review.username]);
+  
+  // Determine if video layer should be visible
+  const videoIsReady = isVideoReady && shouldAutoplay && shouldMountVideo && !hasError;
   
   return (
     <div
@@ -262,43 +366,51 @@ const ReviewSlide = React.memo(function ReviewSlide({
     >
       {/* Media layer */}
       <div className="absolute inset-0">
+        {/* Fix 5: Shimmer base layer — always behind poster */}
+        <div className="absolute inset-0 bg-muted animate-shimmer-down" />
+        
+        {/* Poster — fades in over shimmer */}
         {posterUrl && (
           <img
             src={posterUrl}
             alt=""
-            className="absolute inset-0 h-full w-full object-cover"
+            className={cn(
+              "absolute inset-0 h-full w-full object-cover z-[1] transition-opacity duration-200",
+              posterLoaded ? "opacity-100" : "opacity-0",
+              // Fix 3: Poster fades out only when video is truly playing
+              videoIsReady && "!opacity-0 !duration-150"
+            )}
             loading={isPrioritySlide ? "eager" : "lazy"}
             fetchPriority={isPrioritySlide ? "high" : "auto"}
             decoding="async"
+            onLoad={handlePosterLoad}
             onError={(e) => { e.currentTarget.style.display = 'none'; }}
           />
         )}
         
-        {hlsUrl && (
-          <div className={cn(
-            "absolute inset-0 motion-safe:transition-opacity motion-safe:duration-150 motion-safe:ease-out",
-            isVideoReady ? "opacity-100" : "opacity-0"
-          )}>
+        {/* Fix 1: Only mount player for active + next slide */}
+        {hlsUrl && shouldMountVideo && !hasError && (
+          <div className="absolute inset-0 z-[2]">
             <UnifiedVideoPlayer
+              key={retryKey}
               ref={playerRef}
               src={hlsUrl}
               posterUrl={posterUrl || undefined}
               autoplay={shouldAutoplay}
-              muted
+              muted={isGloballyMuted}
               loop
-              preload="auto"
+              preload={isActive ? "auto" : "metadata"}
               showMuteButton={false}
               showPlayButton={false}
               scrubber={false}
               mediaId={streamId || undefined}
               className="h-full w-full object-cover"
-              onCanPlayThrough={handleCanPlayThrough}
+              managedByMediaRuntime={true}
+              surface="hero"
+              onPlay={handlePlay}
+              onError={handleError}
             />
           </div>
-        )}
-        
-        {!isVideoReady && !posterUrl && (
-          <Skeleton className="absolute inset-0 animate-shimmer-down" aria-busy="true" />
         )}
       </div>
 
@@ -381,6 +493,20 @@ const ReviewSlide = React.memo(function ReviewSlide({
         </div>
       </div>
 
+      {/* Fix 9: Auto-advance progress bar — thin bar at bottom */}
+      {isActive && (
+        <div className="absolute bottom-0 left-0 right-0 z-30 h-[2px]">
+          <div
+            key={progressKey}
+            className={cn(
+              "h-full bg-white/60 origin-left",
+              isAutoAdvancing ? "animate-progress-fill" : "w-0"
+            )}
+            style={isAutoAdvancing ? { animationDuration: `${AUTO_ADVANCE_INTERVAL}ms` } : undefined}
+          />
+        </div>
+      )}
+
       {/* Dot indicators — bottom-right, minimal pill style */}
       <div className="absolute bottom-4 right-4 z-30 flex items-center gap-1.5 pointer-events-auto">
         {Array.from({ length: totalSlides }).map((_, i) => (
@@ -407,9 +533,13 @@ const ReviewSlide = React.memo(function ReviewSlide({
     prev.review.post_id === next.review.post_id &&
     prev.isActive === next.isActive &&
     prev.isNextSlide === next.isNextSlide &&
+    prev.shouldMountVideo === next.shouldMountVideo &&
     prev.isHeroVisible === next.isHeroVisible &&
+    prev.isGloballyMuted === next.isGloballyMuted &&
     prev.currentIndex === next.currentIndex &&
-    prev.totalSlides === next.totalSlides
+    prev.totalSlides === next.totalSlides &&
+    prev.isAutoAdvancing === next.isAutoAdvancing &&
+    prev.progressKey === next.progressKey
   );
 });
 
