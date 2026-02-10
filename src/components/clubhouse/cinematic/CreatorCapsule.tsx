@@ -86,6 +86,10 @@ interface CreatorCapsuleProps {
 
   /** Optional slot rendered centered above the capsule (e.g. media navigation dots) */
   dotsSlot?: React.ReactNode;
+
+  /** Override the bottom offset (default: 'calc(30px + 80px)' for tab bar context).
+   *  Use for fullscreen viewer where there's no tab bar. */
+  bottomOffset?: string;
 }
 
 export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
@@ -106,6 +110,8 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   onReviewTap,
   // Dots slot
   dotsSlot,
+  // Bottom offset override
+  bottomOffset,
 }) => {
   
   const [isExpanded, setIsExpanded] = useState(false);
@@ -406,9 +412,11 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             : 'left-4 max-w-[75vw] min-w-[200px]'
         )}
         style={{
-          bottom: isReview 
-            ? 'calc(30px + 88px)'
-            : 'calc(30px + 80px)',
+          bottom: bottomOffset 
+            ? bottomOffset 
+            : (isReview 
+                ? 'calc(30px + 88px)'
+                : 'calc(30px + 80px)'),
         }}
       >
         {/* Media navigation dots - centered above capsule */}
