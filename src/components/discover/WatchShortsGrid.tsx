@@ -511,9 +511,9 @@ export function WatchShortsGrid({
   }
 
   return (
-    <div className="pt-1 pb-4 px-4">
-      {/* 2-column grid with 4px gap */}
-      <div className="grid grid-cols-2 gap-1">
+    <div className="pt-1 pb-4">
+      {/* 2-column grid edge-to-edge */}
+      <div className="grid grid-cols-2">
         {renderedShorts.map((video, index) => {
           const shouldMount = mountableIndices.has(index);
           const streamId = uidFromNode({ src: video.media?.[0]?.media_url }) || video.id;
