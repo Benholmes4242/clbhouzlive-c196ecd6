@@ -152,7 +152,7 @@ function HeroCollegeCard({
   return (
     <motion.button
       onClick={() => navigate(`/tourhub/college?sort=earnings`)}
-      className="w-full rounded-2xl overflow-hidden text-left cursor-pointer"
+      className="w-full overflow-hidden text-left cursor-pointer aspect-square"
       style={{
         background: gradient,
         boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
@@ -163,13 +163,12 @@ function HeroCollegeCard({
       viewport={{ once: true }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className="p-5 relative">
+      <div className="p-5 relative h-full flex flex-col justify-end">
         {/* Subtle vignette overlay */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
             background: 'linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.15) 100%)',
-            borderRadius: '16px',
           }}
         />
 
@@ -485,8 +484,8 @@ export function CollegeRankingsPreview() {
         <NarrativeStrip topCollege={topCollege} />
       </motion.div>
 
-      {/* #1 COLLEGE HERO */}
-      <div className="px-4">
+      {/* #1 COLLEGE HERO — full-width edge-to-edge */}
+      <div>
         <HeroCollegeCard
           stats={topCollege}
           media={topMedia}
