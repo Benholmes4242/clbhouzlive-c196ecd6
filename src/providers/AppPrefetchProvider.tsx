@@ -211,9 +211,8 @@ async function fetchCommunityFeedBase() {
       user_profiles (
         id,
         username,
-        full_name,
-        profile_image_url,
-        account_type
+        display_name,
+        profile_photo_url
       )
     `)
     .in('user_id', Array.from(communityIds))
