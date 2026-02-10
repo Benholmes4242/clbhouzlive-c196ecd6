@@ -12,6 +12,7 @@ import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { useInAppNotifications } from '@/hooks/useInAppNotifications';
 import { useDebouncedCallback } from '@/hooks/useDebouncedCallback';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
+import { WarmGradientBg } from '@/components/hub-warm/WarmGradientBg';
 
 const MessagesPage = () => {
   const navigate = useNavigate();
@@ -20,16 +21,11 @@ const MessagesPage = () => {
   const { loading } = useMessaging();
   const isMobile = useIsMobile();
   
-  // Hide bottom navigation on messages pages
   useHideBottomNav();
   
-  // Push notifications
   const { state: pushState, enable: enablePush, isLoading: pushLoading } = usePushNotifications();
-  
-  // In-app notifications
   useInAppNotifications();
   
-  // State
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(
     urlConversationId || null
   );
@@ -39,7 +35,6 @@ const MessagesPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Handle ?new=dm or ?new=group query params from Hub
   useEffect(() => {
     const newParam = searchParams.get('new');
     if (newParam === 'dm') {
@@ -53,7 +48,6 @@ const MessagesPage = () => {
     }
   }, [searchParams, setSearchParams]);
   
-  // Notification prompt state
   const [notificationPromptDismissed, setNotificationPromptDismissed] = useState(() => {
     return localStorage.getItem('notification_prompt_dismissed') === 'true';
   });
@@ -62,7 +56,6 @@ const MessagesPage = () => {
     pushState === 'prompt' && 
     !notificationPromptDismissed;
 
-  // Debounced search
   const debouncedSetSearch = useDebouncedCallback((value: string) => {
     setSearchQuery(value);
   }, 300);
@@ -81,7 +74,6 @@ const MessagesPage = () => {
     return await enablePush();
   }, [enablePush]);
 
-  // Sync URL param to state
   useEffect(() => {
     if (urlConversationId) {
       setSelectedConversationId(urlConversationId);
@@ -109,15 +101,16 @@ const MessagesPage = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 rounded-full bg-[#E5E5EA] flex items-center justify-center mx-auto mb-4">
-            <MessageCircle className="h-8 w-8 text-[#8E8E93]" />
+      <div className="min-h-screen flex items-center justify-center relative">
+        <WarmGradientBg />
+        <div className="text-center relative z-10">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(255,255,255,0.5)' }}>
+            <MessageCircle className="h-8 w-8 text-warm-stone-500" />
           </div>
-          <p className="text-[#8E8E93]">Please log in to view messages.</p>
+          <p className="text-warm-stone-500">Please log in to view messages.</p>
           <Button 
             onClick={() => navigate('/auth')} 
-            className="mt-4 bg-[#DCF8C6] hover:bg-[#C5E8B0] text-[#1D1D1F] rounded-full"
+            className="mt-4 bg-warm-orange-accent hover:bg-warm-orange-primary text-white rounded-full"
           >
             Log in
           </Button>
@@ -129,12 +122,15 @@ const MessagesPage = () => {
   // Mobile: Full-screen chat when conversation selected
   if (isMobile && selectedConversationId) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col bg-[#F8FAFC]">
-        <OfflineBanner />
-        <ChatView 
-          conversationId={selectedConversationId} 
-          onBack={handleBack} 
-        />
+      <div className="fixed inset-0 z-50 flex flex-col">
+        <WarmGradientBg />
+        <div className="relative z-10 flex flex-col h-full">
+          <OfflineBanner />
+          <ChatView 
+            conversationId={selectedConversationId} 
+            onBack={handleBack} 
+          />
+        </div>
       </div>
     );
   }
@@ -142,117 +138,113 @@ const MessagesPage = () => {
   // Mobile: Conversation list
   if (isMobile) {
     return (
-      <div className="min-h-screen flex flex-col bg-[#F8FAFC]">
-        <OfflineBanner />
-        {/* Header - Echo style */}
-        <header 
-          className="flex-none bg-[#F8FAFC] px-4 flex items-center justify-between"
-          style={{
-            paddingTop: 'env(safe-area-inset-top, 0px)',
-            height: 'calc(56px + env(safe-area-inset-top, 0px))',
-          }}
-        >
-          {/* Back button */}
-          <button
-            onClick={() => navigate('/hub')}
-            className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors"
-            aria-label="Back to Hub"
+      <div className="min-h-screen flex flex-col relative">
+        <WarmGradientBg />
+        <div className="relative z-10 flex flex-col min-h-screen">
+          <OfflineBanner />
+          {/* Glass Header */}
+          <header 
+            className="flex-none px-[18px] flex items-center justify-between"
+            style={{
+              paddingTop: 'calc(54px + env(safe-area-inset-top, 0px))',
+              height: 'calc(56px + 54px + env(safe-area-inset-top, 0px))',
+              background: 'rgba(255,253,248,0.5)',
+              backdropFilter: 'blur(24px)',
+              WebkitBackdropFilter: 'blur(24px)',
+              borderBottom: '1px solid rgba(255,255,255,0.25)',
+            }}
           >
-            <ChevronLeft className="w-6 h-6 text-[#1D1D1F]" />
-          </button>
+            <button
+              onClick={() => navigate('/hub')}
+              className="w-11 h-11 -ml-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
+              aria-label="Back to Hub"
+            >
+              <ChevronLeft className="w-5 h-5" style={{ color: '#EA580C' }} />
+            </button>
 
-          {/* Center title */}
-          <div className="flex-1 flex items-center justify-center">
-            <span className="text-[17px] font-semibold text-[#1D1D1F]">Messages</span>
-          </div>
+            <span className="text-[15px] font-semibold" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>Messages</span>
 
-          {/* New chat button */}
-          <button 
-            onClick={handleNewConversation}
-            className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors"
-            aria-label="New conversation"
-          >
-            <Plus className="w-6 h-6 text-[#1D1D1F]" />
-          </button>
-        </header>
-        
-        {/* Search bar */}
-        <div className="px-4 py-2">
-          <ConversationSearchBar
-            value={searchInput}
-            onChange={handleSearchChange}
-            onNewConversation={handleNewConversation}
-            hideNewButton
-          />
-        </div>
-        
-        {/* Notification Prompt */}
-        {showNotificationPrompt && (
-          <div className="px-4 pb-3">
-            <NotificationPrompt
-              onEnable={handleEnablePush}
-              onDismiss={handleDismissNotificationPrompt}
+            <button 
+              onClick={handleNewConversation}
+              className="w-11 h-11 -mr-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
+              aria-label="New conversation"
+            >
+              <Plus className="w-5 h-5" style={{ color: '#1C1917' }} />
+            </button>
+          </header>
+          
+          {/* Search bar */}
+          <div className="px-4 py-2">
+            <ConversationSearchBar
+              value={searchInput}
+              onChange={handleSearchChange}
+              onNewConversation={handleNewConversation}
+              hideNewButton
             />
           </div>
-        )}
-        
-        {/* Conversation List - WhatsApp style */}
-        <div className="flex-1 overflow-y-auto px-4 pb-24">
-          <ConversationList
-            onSelectConversation={handleSelectConversation}
-            selectedConversationId={selectedConversationId || undefined}
-            searchQuery={searchQuery}
-            onNewConversation={handleNewConversation}
+          
+          {showNotificationPrompt && (
+            <div className="px-4 pb-3">
+              <NotificationPrompt
+                onEnable={handleEnablePush}
+                onDismiss={handleDismissNotificationPrompt}
+              />
+            </div>
+          )}
+          
+          <div className="flex-1 overflow-y-auto px-4 pb-24">
+            <ConversationList
+              onSelectConversation={handleSelectConversation}
+              selectedConversationId={selectedConversationId || undefined}
+              searchQuery={searchQuery}
+              onNewConversation={handleNewConversation}
+            />
+          </div>
+          
+          <NewConversationModal
+            open={showNewConversation}
+            onOpenChange={setShowNewConversation}
+            onConversationCreated={handleConversationCreated}
+            initialTab={newConversationTab}
           />
         </div>
-        
-        <NewConversationModal
-          open={showNewConversation}
-          onOpenChange={setShowNewConversation}
-          onConversationCreated={handleConversationCreated}
-          initialTab={newConversationTab}
-        />
       </div>
     );
   }
 
   // Desktop: Side-by-side layout
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
-      <OfflineBanner />
-      <div className="h-screen max-w-6xl mx-auto px-4 py-4 flex flex-col">
-        {/* Desktop header - Echo style */}
+    <div className="min-h-screen relative">
+      <WarmGradientBg />
+      <div className="relative z-10 h-screen max-w-6xl mx-auto px-4 py-4 flex flex-col">
         <header 
-          className="flex-none bg-[#F8FAFC] px-4 flex items-center justify-between mb-4"
+          className="flex-none px-4 flex items-center justify-between mb-4 rounded-2xl"
           style={{
             height: '56px',
+            background: 'rgba(255,253,248,0.5)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
           }}
         >
-          {/* Back button */}
           <button
             onClick={() => navigate('/hub')}
-            className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors"
+            className="w-11 h-11 -ml-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
             aria-label="Back to Hub"
           >
-            <ChevronLeft className="w-6 h-6 text-[#1D1D1F]" />
+            <ChevronLeft className="w-5 h-5" style={{ color: '#EA580C' }} />
           </button>
 
-          {/* Center title */}
-          <div className="flex-1 flex items-center justify-center">
-            <span className="text-[17px] font-semibold text-[#1D1D1F]">Messages</span>
-          </div>
+          <span className="text-[15px] font-semibold" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>Messages</span>
 
-          {/* New chat button */}
           <button 
             onClick={handleNewConversation}
-            className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors"
+            className="w-11 h-11 -mr-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
             aria-label="New conversation"
           >
-            <Plus className="w-6 h-6 text-[#1D1D1F]" />
+            <Plus className="w-5 h-5" style={{ color: '#1C1917' }} />
           </button>
         </header>
         
-        {/* Notification Prompt (Desktop) */}
         {showNotificationPrompt && (
           <NotificationPrompt
             onEnable={handleEnablePush}
@@ -261,11 +253,9 @@ const MessagesPage = () => {
           />
         )}
         
-        <div className="flex flex-1 rounded-[18px] overflow-hidden bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
-          {/* Left: Conversation List */}
-          <div className="w-80 flex-shrink-0 border-r border-[#E5E5EA] flex flex-col bg-[#F8FAFC]">
-            {/* Search */}
-            <div className="p-4 border-b border-[#E5E5EA]">
+        <div className="flex flex-1 rounded-[20px] overflow-hidden" style={{ background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.45)', boxShadow: '0 2px 16px rgba(0,0,0,0.03)' }}>
+          <div className="w-80 flex-shrink-0 flex flex-col" style={{ borderRight: '1px solid rgba(255,255,255,0.3)' }}>
+            <div className="p-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.3)' }}>
               <ConversationSearchBar
                 value={searchInput}
                 onChange={handleSearchChange}
@@ -274,7 +264,6 @@ const MessagesPage = () => {
               />
             </div>
             
-            {/* Conversation List */}
             <div className="flex-1 overflow-y-auto">
               <ConversationList
                 onSelectConversation={handleSelectConversation}
@@ -285,8 +274,7 @@ const MessagesPage = () => {
             </div>
           </div>
 
-          {/* Right: Chat View or Empty State */}
-          <div className="flex-1 flex flex-col bg-[#F8FAFC]">
+          <div className="flex-1 flex flex-col">
             {selectedConversationId ? (
               <ChatView 
                 conversationId={selectedConversationId} 
@@ -295,13 +283,13 @@ const MessagesPage = () => {
             ) : (
               <div className="flex-1 flex items-center justify-center">
                 <div className="text-center">
-                  <div className="w-16 h-16 rounded-full bg-[#E5E5EA] flex items-center justify-center mx-auto mb-4">
-                    <MessageCircle className="h-8 w-8 text-[#8E8E93]" />
+                  <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(255,255,255,0.5)' }}>
+                    <MessageCircle className="h-8 w-8 text-warm-stone-400" />
                   </div>
-                  <h2 className="font-semibold text-lg text-[#1D1D1F] mb-1">
+                  <h2 className="font-semibold text-lg mb-1" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>
                     Select a conversation
                   </h2>
-                  <p className="text-sm text-[#8E8E93] max-w-[240px] mx-auto">
+                  <p className="text-sm max-w-[240px] mx-auto" style={{ color: '#78716C' }}>
                     Choose a conversation from the list to start chatting
                   </p>
                 </div>

@@ -1,6 +1,6 @@
  /**
-  * EchoPageWelcome - WhatsApp-style welcome state with glowing orb
-  * Clean, centered design with bubble-style prompt buttons
+  * EchoPageWelcome - Cleo-style welcome state with glowing orb
+  * Glass prompt chips on warm gradient canvas
   */
  
  import React, { useMemo } from 'react';
@@ -14,7 +14,6 @@ interface EchoPageWelcomeProps {
 
 // Pool of 50 diverse golf prompts
 const ECHO_PROMPTS = [
-  // Course & Play Strategy
   "What's the best play from 155y?",
   "How do I play a downhill lie?",
   "Tips for playing in the wind",
@@ -25,8 +24,6 @@ const ECHO_PROMPTS = [
   "How to read a breaking putt",
   "Tips for playing fast greens",
   "How to judge distance without a rangefinder",
-  
-  // Rules & Scoring
   "Explain stableford scoring",
   "What's the rule for a lost ball?",
   "Can I move my ball from a divot?",
@@ -37,8 +34,6 @@ const ECHO_PROMPTS = [
   "What's a provisional ball and when to use it?",
   "Can I repair spike marks on the green?",
   "What's the rule for a ball in a water hazard?",
-  
-  // Course Research
   "Course tips for Portrush",
   "Best links courses in Scotland",
   "Hidden gem courses near London",
@@ -49,8 +44,6 @@ const ECHO_PROMPTS = [
   "Most challenging courses in Europe",
   "Best winter golf destinations",
   "Courses with the best views",
-  
-  // Trip Planning
   "Build a 3-day NI golf trip",
   "Plan a Scotland golf tour",
   "Best golf resorts in Spain",
@@ -61,8 +54,6 @@ const ECHO_PROMPTS = [
   "Golf trip packing checklist",
   "Best golf destinations in March",
   "Affordable golf trips in Europe",
-  
-  // Equipment & Gear
   "What clubs should I carry?",
   "How to choose the right driver",
   "Best golf balls for mid handicappers",
@@ -75,14 +66,12 @@ const ECHO_PROMPTS = [
   "How often should I change my ball?",
 ];
 
-// Get random prompts - shuffles and picks first n
 const getRandomPrompts = (count: number = 4): string[] => {
   const shuffled = [...ECHO_PROMPTS].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, count);
 };
 
 export function EchoPageWelcome({ onPromptClick, onFocusInput }: EchoPageWelcomeProps) {
-  // Get 4 random prompts - persists during session, changes on remount
   const prompts = useMemo(() => getRandomPrompts(4), []);
    const prefersReduced = usePrefersReducedMotion();
 
@@ -95,15 +84,21 @@ export function EchoPageWelcome({ onPromptClick, onFocusInput }: EchoPageWelcome
     <div className="h-full flex flex-col items-center justify-center px-5 pb-20 overflow-visible">
       {/* Orb with glow */}
       <div className="relative mb-6">
-        {/* Glow layer */}
         <div 
-          className="absolute inset-0 rounded-full bg-[#FFBF66] blur-2xl opacity-30 scale-[2]"
-           style={prefersReduced ? {} : { animation: 'glowPulse 4s ease-in-out infinite' }}
+          className="absolute inset-0 rounded-full blur-2xl opacity-30 scale-[2]"
+           style={{ 
+             background: 'linear-gradient(135deg, #F97316, #FBBF24)',
+             animation: prefersReduced ? 'none' : 'glowPulse 4s ease-in-out infinite',
+           }}
         />
         
-        {/* Main orb */}
-        <div className="relative w-20 h-20 rounded-full bg-[#FFBF66] flex items-center justify-center shadow-lg">
-          {/* Soundwave bars */}
+        <div 
+          className="relative w-20 h-20 rounded-full flex items-center justify-center shadow-lg"
+          style={{
+            background: 'linear-gradient(135deg, #F97316, #FBBF24)',
+            animation: prefersReduced ? 'none' : 'pulseGlow 3s ease-in-out infinite',
+          }}
+        >
           <div className="flex items-center gap-1">
             <div 
               className="w-1 h-4 bg-white rounded-full" 
@@ -122,25 +117,32 @@ export function EchoPageWelcome({ onPromptClick, onFocusInput }: EchoPageWelcome
       </div>
 
       {/* Title */}
-       <h1 className="text-[1.75rem] font-bold text-[#1D1D1F] tracking-tight mb-2">
+       <h1 className="text-[1.75rem] font-bold tracking-tight mb-2" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>
         Ask Echo
       </h1>
       
       {/* Subtitle */}
-       <p className="text-[0.9375rem] text-[#8E8E93] text-center leading-relaxed mb-8 max-w-[260px]">
-        Instant golf answers - distances, rules, course intel, gear, and trip planning.
+       <p className="text-[0.9375rem] text-center leading-relaxed mb-8 max-w-[260px]" style={{ color: '#92400E', opacity: 0.65, fontFamily: "'DM Sans', sans-serif" }}>
+        Your personal caddie — distances, rules, course intel, gear, and trip planning.
       </p>
 
-      {/* Prompt bubbles - WhatsApp style */}
+      {/* Prompt chips - Glass style */}
       <div className="w-full max-w-[340px] flex flex-col gap-2">
         {prompts.map((prompt, index) => (
           <button
             key={index}
             onClick={() => handleChipClick(prompt)}
-             className="px-4 py-3.5 bg-white rounded-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.08)] text-[0.9375rem] text-[#1D1D1F] text-left active:bg-[#F5F5F5] transition-colors"
+            className="px-[14px] py-[9px] rounded-[12px] text-[13px] font-medium text-left active:scale-[0.98] transition-transform backdrop-blur-[8px] flex items-center justify-between gap-2"
+            style={{
+              background: 'rgba(255,255,255,0.5)',
+              border: '1px solid rgba(255,255,255,0.35)',
+              color: '#44403C',
+              fontFamily: "'DM Sans', sans-serif",
+            }}
              aria-label={`Ask Echo: ${prompt}`}
           >
-            {prompt}
+            <span>{prompt}</span>
+            <span className="text-[11px] flex-shrink-0" style={{ color: '#D97706' }}>→</span>
           </button>
         ))}
       </div>

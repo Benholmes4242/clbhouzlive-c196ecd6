@@ -89,11 +89,17 @@ export function EchoResponseCard({
 
   return (
     <div className="flex justify-start">
-      <div className="max-w-[85%]">
-        {/* Main bubble */}
-        <div className="px-4 py-2.5 bg-white rounded-[18px] rounded-bl-[4px] shadow-[0_1px_2px_rgba(0,0,0,0.06)]">
-          {/* Content - rendered as markdown */}
-           <div className="text-[0.9375rem] text-[#1D1D1F] leading-relaxed prose prose-sm prose-neutral max-w-none">
+      <div className="max-w-[90%]">
+        {/* Main bubble - glass on gradient */}
+        <div 
+          className="px-4 py-2.5 rounded-[20px_20px_20px_4px] backdrop-blur-[16px]"
+          style={{
+            background: 'rgba(255,255,255,0.55)',
+            border: '1px solid rgba(255,255,255,0.4)',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
+          }}
+        >
+           <div className="text-[14px] leading-relaxed prose prose-sm prose-neutral max-w-none" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>
             <ReactMarkdown
               allowedElements={ECHO_ALLOWED_ELEMENTS}
               unwrapDisallowed
@@ -172,12 +178,13 @@ export function EchoResponseCard({
         </div>
 
         {/* Copy button - only show when not streaming */}
-        {!isStreaming && (
-          <button
-            onClick={handleCopy}
-             className="flex items-center gap-1 mt-1.5 px-2 py-1 text-[0.75rem] text-[#8E8E93] active:opacity-70 transition-opacity"
-             aria-label="Copy response to clipboard"
-          >
+         {!isStreaming && (
+           <button
+             onClick={handleCopy}
+              className="flex items-center gap-1 mt-1.5 px-2 py-1 text-[11px] active:opacity-70 transition-opacity"
+              style={{ color: '#A8A29E' }}
+              aria-label="Copy response to clipboard"
+           >
             {copied ? (
               <>
                 <Check className="w-3 h-3 text-green-600" />
@@ -193,21 +200,27 @@ export function EchoResponseCard({
         )}
 
         {/* Follow-up chips - only show on last message when not streaming */}
-        {isLast && !isStreaming && followUps.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mt-2">
-            {followUps.map((chip) => (
-              <button
-                key={chip}
-                onClick={() => handleFollowUp(chip)}
-                 className="flex items-center gap-1 px-3 py-1.5 bg-[#FFF4E6] rounded-full text-[0.75rem] font-medium text-[#B45309] active:opacity-70 transition-opacity"
-                 aria-label={`Ask: ${chip}`}
-              >
-                {chip}
-                <ChevronRight className="w-3 h-3 opacity-60" />
-              </button>
-            ))}
-          </div>
-        )}
+         {isLast && !isStreaming && followUps.length > 0 && (
+           <div className="flex flex-col gap-[6px] mt-2">
+             {followUps.map((chip) => (
+               <button
+                 key={chip}
+                 onClick={() => handleFollowUp(chip)}
+                  className="flex items-center justify-between gap-2 px-[14px] py-[9px] rounded-[12px] text-[13px] font-medium active:scale-[0.98] transition-transform backdrop-blur-[8px]"
+                  style={{
+                    background: 'rgba(255,255,255,0.45)',
+                    border: '1px solid rgba(249,115,22,0.08)',
+                    color: '#EA580C',
+                    fontFamily: "'DM Sans', sans-serif",
+                  }}
+                  aria-label={`Ask: ${chip}`}
+               >
+                 <span>{chip}</span>
+                 <span className="text-[11px] flex-shrink-0" style={{ color: '#D97706' }}>→</span>
+               </button>
+             ))}
+           </div>
+         )}
       </div>
     </div>
   );

@@ -11,18 +11,28 @@
  
    return (
      <div className="flex justify-start" role="status" aria-label="Echo is thinking">
-       <div className="px-4 py-3 bg-white rounded-[18px] rounded-bl-[4px] shadow-[0_1px_2px_rgba(0,0,0,0.06)]">
+        <div 
+          className="px-4 py-3 rounded-[20px_20px_20px_4px] backdrop-blur-[16px]"
+          style={{
+            background: 'rgba(255,255,255,0.55)',
+            border: '1px solid rgba(255,255,255,0.4)',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
+          }}
+        >
          {/* Animated typing indicator - three bouncing dots */}
          <div className="flex items-center gap-1">
            {[0, 1, 2].map((i) => (
              <span
                key={i}
-               className={`w-2 h-2 rounded-full bg-[#FFBF66] ${prefersReduced ? '' : 'animate-bounce'}`}
-               style={prefersReduced ? { opacity: 0.7 } : {
+                className={`w-[7px] h-[7px] rounded-full ${prefersReduced ? '' : 'animate-bounce'}`}
+                style={{
+                  background: '#FBBF24',
+                  ...(prefersReduced ? { opacity: 0.7 } : {
                  opacity: 0.7,
                  animationDelay: `${i * 0.15}s`,
-                 animationDuration: '0.8s',
-               }}
+                    animationDuration: '0.8s',
+                  }),
+                }}
              />
            ))}
          </div>

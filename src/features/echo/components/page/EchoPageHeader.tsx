@@ -1,6 +1,6 @@
  /**
-  * EchoPageHeader - WhatsApp-style minimal header for Echo
-  * Shows navigation controls; orb + title appears in conversation mode
+  * EchoPageHeader - Cleo glass-style header for Echo
+  * Glass background with warm gradient bleed-through
   */
  
  import React from 'react';
@@ -19,27 +19,37 @@ export function EchoPageHeader({ onBack, onNewChat, onOpenHistory, hasMessages }
  
   return (
     <header 
-      className="flex-none h-14 bg-[#F8FAFC] px-4 flex items-center justify-between"
+      className="flex-none px-[18px] flex items-center justify-between"
       style={{
         paddingTop: 'env(safe-area-inset-top, 0px)',
         height: 'calc(56px + env(safe-area-inset-top, 0px))',
+        background: 'rgba(255,253,248,0.5)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
+        borderBottom: '1px solid rgba(255,255,255,0.25)',
       }}
     >
       {/* Back button */}
       <button
         onClick={onBack}
-        className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors"
+        className="w-11 h-11 -ml-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
          aria-label="Go back to Hub"
       >
-        <ChevronLeft className="w-6 h-6 text-[#1D1D1F]" />
+        <ChevronLeft className="w-5 h-5" style={{ color: '#EA580C' }} />
       </button>
 
       {/* Center - show orb + title when in conversation */}
       <div className="flex-1 flex items-center justify-center">
         {hasMessages && (
           <div className="flex items-center gap-2">
-            {/* Small orb */}
-            <div className="w-8 h-8 rounded-full bg-[#FFBF66] flex items-center justify-center">
+            {/* Echo icon - gradient circle */}
+            <div 
+              className="w-8 h-8 rounded-full flex items-center justify-center"
+              style={{
+                background: 'linear-gradient(135deg, #F97316, #FBBF24)',
+                animation: prefersReduced ? 'none' : 'pulseGlow 3s ease-in-out infinite',
+              }}
+            >
               <div className="flex items-center gap-[2px]">
                  <div 
                    className="w-[2px] h-1.5 bg-white rounded-full"
@@ -55,7 +65,7 @@ export function EchoPageHeader({ onBack, onNewChat, onOpenHistory, hasMessages }
                  />
               </div>
             </div>
-             <span className="text-[1.0625rem] font-semibold text-[#1D1D1F]">Echo</span>
+             <span className="text-[16px] font-bold" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>Echo</span>
           </div>
         )}
       </div>
@@ -64,18 +74,18 @@ export function EchoPageHeader({ onBack, onNewChat, onOpenHistory, hasMessages }
       {hasMessages ? (
         <button
           onClick={onNewChat}
-          className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors"
+          className="w-11 h-11 -mr-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
            aria-label="Start new conversation"
         >
-          <Plus className="w-6 h-6 text-[#1D1D1F]" />
+          <Plus className="w-5 h-5" style={{ color: '#D97706' }} />
         </button>
       ) : (
         <button
           onClick={onOpenHistory}
-          className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors"
+          className="w-11 h-11 -mr-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
            aria-label="View conversation history"
         >
-          <Clock className="w-[22px] h-[22px] text-[#1D1D1F]" />
+          <Clock className="w-[22px] h-[22px]" style={{ color: '#D97706' }} />
         </button>
       )}
     </header>
