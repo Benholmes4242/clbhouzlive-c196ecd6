@@ -223,12 +223,14 @@ export function WatchTab() {
           </div>
         ) : (
           <>
-            {/* Section Label */}
-            <div className="mb-3 px-4">
-              <span className="text-base font-semibold" style={{ color: '#374151' }}>
-                {isSearchActive ? `Results for "${debouncedSearch}"` : 'Latest Shorts'}
-              </span>
-            </div>
+            {/* Section Label - only show for search results */}
+            {isSearchActive && (
+              <div className="mb-3 px-4">
+                <span className="text-base font-semibold" style={{ color: '#374151' }}>
+                  {`Results for "${debouncedSearch}"`}
+                </span>
+              </div>
+            )}
 
             {/* Shorts Grid */}
             <WatchShortsGrid

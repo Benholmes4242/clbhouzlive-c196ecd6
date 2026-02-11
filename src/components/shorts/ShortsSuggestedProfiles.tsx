@@ -106,9 +106,9 @@ export default function ShortsSuggestedProfiles() {
   }
 
   return (
-    <div className="relative px-3 mb-5">
-      <div ref={scrollRef} className="overflow-x-auto snap-x snap-mandatory no-scrollbar">
-        <div className="flex gap-3 pr-3">
+    <div className="relative px-4 mb-5">
+      <div ref={scrollRef} className="overflow-x-auto no-scrollbar">
+        <div className="flex gap-3 pr-4">
           {/* CREATOR SQUIRCLES */}
           {creators.map((creator, index) => (
             <Squircle
