@@ -252,7 +252,7 @@ export function UnifiedWorldRankings() {
   if (isLoading) {
     return (
       <motion.section
-        className="mt-10 px-4"
+        className="mt-10 pl-2 pr-4"
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
@@ -278,7 +278,7 @@ export function UnifiedWorldRankings() {
 
   return (
     <motion.section
-      className="mt-10 px-4"
+      className="mt-10 pl-2 pr-4"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
