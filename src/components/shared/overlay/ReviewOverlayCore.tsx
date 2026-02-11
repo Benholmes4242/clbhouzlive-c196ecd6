@@ -146,14 +146,10 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
                 "shadow-[0_2px_12px_rgba(0,0,0,0.2)]"
               )}
               style={{
-                backgroundColor: isOutstanding
-                 ? 'rgba(245, 158, 11, 0.05)'
-                  : 'rgba(0, 0, 0, 0.35)',
+                backgroundColor: 'rgba(0, 0, 0, 0.35)',
                 backdropFilter: 'blur(12px) saturate(130%)',
                 WebkitBackdropFilter: 'blur(12px) saturate(130%)',
-                borderColor: isOutstanding
-                 ? 'rgba(245, 158, 11, 0.15)'
-                  : 'rgba(255, 255, 255, 0.06)',
+                borderColor: 'rgba(255, 255, 255, 0.06)',
                 padding: '8px 10px',
               }}
             >
@@ -199,14 +195,10 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
                 "shadow-[0_2px_12px_rgba(0,0,0,0.2)]"
               )}
               style={{
-                backgroundColor: isOutstanding
-                  ? 'rgba(245, 158, 11, 0.05)'
-                  : 'rgba(0, 0, 0, 0.35)',
+                backgroundColor: 'rgba(0, 0, 0, 0.35)',
                 backdropFilter: 'blur(12px) saturate(130%)',
                 WebkitBackdropFilter: 'blur(12px) saturate(130%)',
-                borderColor: isOutstanding
-                  ? 'rgba(245, 158, 11, 0.15)'
-                  : 'rgba(255, 255, 255, 0.06)',
+                borderColor: 'rgba(255, 255, 255, 0.06)',
                 padding: '8px 10px',
               }}
             >
@@ -255,17 +247,12 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
         >
           <div
             style={{
-              background: isOutstanding 
-                ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(245, 158, 11, 0.05) 100%)'
-                : 'linear-gradient(135deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.3) 100%)',
+              background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.3) 100%)',
               backdropFilter: 'blur(16px) saturate(150%)',
               WebkitBackdropFilter: 'blur(16px) saturate(150%)',
-              borderColor: isOutstanding 
-                ? 'rgba(245, 158, 11, 0.2)' 
-                : 'rgba(255, 255, 255, 0.08)',
               padding: '12px 16px',
               borderRadius: '0.75rem',
-              border: `1px solid ${isOutstanding ? 'rgba(245, 158, 11, 0.2)' : 'rgba(255, 255, 255, 0.08)'}`,
+              border: '1px solid rgba(255, 255, 255, 0.08)',
             }}
           >
             {/* ROW 1: Course Name + Rating Number (compact) */}
