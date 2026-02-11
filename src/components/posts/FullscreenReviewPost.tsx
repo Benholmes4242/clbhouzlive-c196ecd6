@@ -512,12 +512,10 @@ export function FullscreenReviewPost({
           <div
             className="rounded-xl overflow-hidden"
             style={{
-              background: isOutstanding 
-                ? 'rgba(251, 191, 36, 0.05)'
-                : 'rgba(0, 0, 0, 0.35)',
+              background: 'rgba(0, 0, 0, 0.35)',
               backdropFilter: 'blur(12px) saturate(130%)',
               WebkitBackdropFilter: 'blur(12px) saturate(130%)',
-              border: `1px solid ${isOutstanding ? 'rgba(251, 191, 36, 0.15)' : 'rgba(255, 255, 255, 0.06)'}`,
+              border: '1px solid rgba(255, 255, 255, 0.06)',
               boxShadow: '0 2px 12px rgba(0, 0, 0, 0.2)',
             }}
           >
