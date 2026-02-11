@@ -56,7 +56,7 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
       </div>
 
       {/* Content - anchored bottom left */}
-      <div className="absolute bottom-0 left-0 right-0 px-5 pb-5 pt-4">
+      <div className="absolute bottom-0 left-0 right-0 px-4 pb-5 pt-4">
         {/* Tournament Name */}
         <h2 className="text-xl font-bold text-white leading-tight mb-1">
           {tournament.name}
