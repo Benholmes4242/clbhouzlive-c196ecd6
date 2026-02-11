@@ -545,7 +545,7 @@ export function WatchShortsGrid({
               />
               {/* Inject Suggested strip after 8th tile (index 7) */}
               {showSuggestedStrip && index === 7 && (
-                <div className="col-span-2 py-4 -mx-4">
+                <div className="col-span-2 py-4">
                   {/* Section header for suggested accounts */}
                   <div className="mb-3 pl-4">
                     <span className="text-base font-semibold" style={{ color: '#374151' }}>
