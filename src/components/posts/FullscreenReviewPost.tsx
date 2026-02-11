@@ -313,17 +313,11 @@ export function FullscreenReviewPost({
         )}
         style={{
           top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 72px)',
-          background: isOutstanding 
-            ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(251, 191, 36, 0.05) 100%)'
-            : 'linear-gradient(135deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.3) 100%)',
+          background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.3) 100%)',
           backdropFilter: 'blur(20px) saturate(150%)',
           WebkitBackdropFilter: 'blur(20px) saturate(150%)',
-          borderColor: isOutstanding 
-            ? 'rgba(245, 158, 11, 0.2)' 
-            : 'rgba(255, 255, 255, 0.08)',
-          boxShadow: isOutstanding
-            ? '0 4px 20px rgba(245, 158, 11, 0.12)'
-            : '0 4px 20px rgba(0, 0, 0, 0.2)',
+          borderColor: 'rgba(255, 255, 255, 0.08)',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
           padding: '12px 16px',
         }}
       >
