@@ -112,8 +112,9 @@ export function HubPageNew() {
   const { presenceMap, subscribeToPresence } = usePresence();
   const { isListening, transcript, startListening, stopListening, isSupported, error: speechError } = useSpeechToText();
   
-  // Dark status bar for warm gradient (content is dark on light bg)
-  useMedianStatusBar("dark", "#FFF7ED", false, false, true);
+  // Transparent overlay status bar so the warm gradient bleeds into safe area
+  // "dark" = white icons (not applicable here, "light" = black icons on warm bg)
+  useMedianStatusBar("light", "transparent", true, false, true);
 
   // Add route-hub class to body so CSS can make .app-shell transparent
   // (same pattern as Clubhouse.tsx with route-clubhouse)
