@@ -86,8 +86,8 @@ function MiniLeaderboardRow({ leader, isFirst }: LeaderboardRowProps) {
         <span className="leaderboard-position flex-shrink-0">
           {leader.position}
         </span>
-        {/* Player headshot - 24px squircle */}
-        <div className="w-6 h-6 overflow-hidden flex-shrink-0 border border-white/10" style={{ borderRadius: '34%', aspectRatio: '1 / 1.05' }}>
+        {/* Player headshot - 28px squircle */}
+        <div className="overflow-hidden flex-shrink-0 border border-white/10" style={{ width: '28px', height: '29px', borderRadius: '34%' }}>
           {photoUrl ? (
             <img
               src={photoUrl}
