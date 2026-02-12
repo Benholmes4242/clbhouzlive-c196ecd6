@@ -216,20 +216,20 @@
    6. LEADERBOARD INNER CONTAINER
    ============================================ */
 .leaderboard-container {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 14px;
-  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
   margin-top: 12px;
   margin-bottom: 12px;
 }
 
 .leaderboard-row {
-  padding: 6px 0;
+  padding: 7px 0;
 }
 
 .leaderboard-row:not(:first-child) {
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* ============================================
