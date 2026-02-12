@@ -23,7 +23,7 @@ import {
   type HeroTournament,
 } from '../../hooks/useHeroCarouselData';
 import { useTournamentTopLeaders, TOUR_CONFIG, type LeaderEntry } from '../../hooks/useOverviewData';
-import { useTournamentPick } from '../../hooks/useTournamentPick';
+
 import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 import { getTourLogo } from '../../utils/tourLogos';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
@@ -231,26 +231,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
     prevLeadersRef.current = leaders;
   }, [leaders]);
 
-  // Phase 7: Pick Your Winner
-  const { currentPick, makePick, isAuthenticated } = useTournamentPick(
-    (isLive || isCompleted) ? tournament.id : null
-  );
-  const [pickRippleId, setPickRippleId] = useState<string | null>(null);
-  const [pickToast, setPickToast] = useState<string | null>(null);
-
-  const handlePickPlayer = (playerName: string, playerId: string) => {
-    if (!isAuthenticated) return;
-    if (currentPick?.player_id === playerId) {
-      setPickToast('Already your pick ✓');
-      setTimeout(() => setPickToast(null), 2000);
-      return;
-    }
-    makePick(playerName, playerId);
-    setPickRippleId(playerId);
-    setTimeout(() => setPickRippleId(null), 300);
-    setPickToast(`You picked ${playerName}! 🏆`);
-    setTimeout(() => setPickToast(null), 2000);
-  };
 
   const backgroundImage = venueImage?.imageUrl || getFallbackCourseImage(tournament.name);
   const hasRealImage = !!venueImage?.imageUrl;
@@ -409,15 +389,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
                       const tiedLeaderCount = leaders.filter(l => l.position === 1).length;
                       const hasTiedLeaders = tiedLeaderCount > 1;
                       return leaders.map((leader, idx) => (
-                        <div
-                          key={`pick-${leader.position}-${leader.player.id}`}
-                          className={cn(pickRippleId === leader.player.id && 'pick-ripple')}
-                          onClick={() => handlePickPlayer(leader.player.fullName, leader.player.id)}
-                          role="button"
-                          tabIndex={0}
-                          style={{ cursor: isAuthenticated ? 'pointer' : 'default' }}
-                        >
                           <MiniLeaderboardRow
+                            key={`row-${leader.position}-${leader.player.id}`}
                             leader={leader}
                             isFirst={idx === 0}
                             index={idx}
@@ -428,7 +401,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
                             scoreFlash={scoreFlashes[leader.player.id] || null}
                             positionDelta={positionDeltas[leader.player.id] || 0}
                           />
-                        </div>
                       ));
                     })()}
                   </div>
@@ -440,32 +412,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
                   </div>
                 )}
                 
-                {/* Pick prompt / status */}
-                {isAuthenticated && (
-                  currentPick ? (
-                    <p className="pick-made">Your pick: {currentPick.player_name} 🏆</p>
-                  ) : (
-                    <p className="pick-prompt">Tap a player to pick your winner</p>
-                  )
-                )}
-
-                {/* Pick toast */}
-                {pickToast && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    style={{
-                      textAlign: 'center',
-                      fontSize: '12px',
-                      fontWeight: 600,
-                      color: '#facc15',
-                      marginTop: '4px',
-                    }}
-                  >
-                    {pickToast}
-                  </motion.div>
-                )}
 
                 {/* See All - right-aligned text CTA */}
                 <Link 
@@ -511,14 +457,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
                   </div>
                 )}
                 
-                {/* Pick result for completed tournaments */}
-                {currentPick && winnerInfo?.winnerName && (
-                  currentPick.player_name === winnerInfo.winnerName ? (
-                    <div className="pick-result-correct">🎯 You called it!</div>
-                  ) : (
-                    <div className="pick-result-wrong">Your pick: {currentPick.player_name}</div>
-                  )
-                )}
 
                 {/* View Results text CTA */}
                 <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta w-full">
