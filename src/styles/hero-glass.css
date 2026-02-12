@@ -920,6 +920,68 @@
 }
 
 /* ============================================
+   GAMIFICATION: Pick Your Winner
+   ============================================ */
+.pick-prompt {
+  text-align: center;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-top: 8px;
+  margin-bottom: 2px;
+  animation: ctaBreathe 2.5s ease-in-out infinite;
+}
+
+.pick-made {
+  text-align: center;
+  font-size: 11px;
+  color: #facc15;
+  margin-top: 8px;
+  margin-bottom: 2px;
+  font-weight: 500;
+}
+
+.pick-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.pick-ripple::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(250, 204, 21, 0.15);
+  border-radius: 8px;
+  animation: pickFlash 0.3s ease-out forwards;
+}
+
+@keyframes pickFlash {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.picked-avatar-ring {
+  box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.7);
+}
+
+.pick-result-correct {
+  text-align: center;
+  font-size: 12px;
+  color: #facc15;
+  font-weight: 600;
+  margin-top: 8px;
+  padding: 4px 12px;
+  background: rgba(250, 204, 21, 0.1);
+  border-radius: 8px;
+}
+
+.pick-result-wrong {
+  text-align: center;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 8px;
+}
+
+/* ============================================
    CHEVRON HINT ANIMATION
    ============================================ */
 @keyframes chevronFloat {

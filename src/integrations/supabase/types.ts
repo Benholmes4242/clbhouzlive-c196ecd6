@@ -10019,6 +10019,39 @@ export type Database = {
         }
         Relationships: []
       }
+      tournament_picks: {
+        Row: {
+          created_at: string
+          id: string
+          is_correct: boolean | null
+          picked_at: string
+          player_id: string | null
+          player_name: string
+          tournament_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_correct?: boolean | null
+          picked_at?: string
+          player_id?: string | null
+          player_name: string
+          tournament_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_correct?: boolean | null
+          picked_at?: string
+          player_id?: string | null
+          player_name?: string
+          tournament_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       trip_participants: {
         Row: {
           created_at: string
