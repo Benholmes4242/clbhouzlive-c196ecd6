@@ -136,13 +136,13 @@
 
 .leaderboard-score {
   font-family: 'JetBrains Mono', 'SF Mono', 'Courier New', monospace;
-  font-size: 13.5px;
+  font-size: 16px;
   font-weight: 700;
-  min-width: 36px;
+  min-width: 40px;
   text-align: right;
 }
 
-.score-under { color: #F59E0B; }  /* amber = under par */
+.score-under { color: #FBBF24; }  /* brighter amber = under par */
 .score-over { color: #111827; }   /* neutral dark for over par */
 .score-even { color: rgba(255, 255, 255, 0.7); }
 
@@ -167,8 +167,8 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #F59E0B;
-  box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+  background: #FBBF24;
+  box-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
   animation: livePulse 2s ease-in-out infinite;
 }
 
@@ -176,7 +176,7 @@
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 1.2px;
-  color: #F59E0B;
+  color: #FBBF24;
 }
 
 /* Shimmer animation for loading states */
@@ -284,7 +284,7 @@
   font-family: 'JetBrains Mono', 'SF Mono', 'Courier New', monospace;
   font-weight: 700;
   font-size: 16px;
-  color: #F59E0B;
+  color: #FACC15;
   margin-top: 2px;
 }
 
@@ -313,7 +313,7 @@
 }
 
 .finished-text {
-  color: #FFB800;
+  color: #FACC15;
 }
 
 /* ============================================
