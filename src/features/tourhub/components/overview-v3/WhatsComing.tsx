@@ -65,10 +65,10 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
     >
       {/* Date block */}
       <div className="flex-shrink-0 w-12 text-center">
-        <p className="text-muted-foreground uppercase leading-none" style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.02em' }}>
+        <p className="uppercase leading-none" style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.05em', color: '#A8A29E' }}>
           {getMonthAbbr(tournament.startDate)}
         </p>
-        <p className="text-foreground leading-none mt-0.5" style={{ fontSize: '24px', fontWeight: 700 }}>
+        <p className="leading-none mt-0.5" style={{ fontSize: '17px', fontWeight: 700, color: '#1C1917' }}>
           {getDayNum(tournament.startDate)}
         </p>
       </div>
@@ -76,28 +76,28 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
       {/* Content */}
       <div className="flex-1 min-w-0">
         <p
-          className="uppercase leading-none tracking-wide"
+          className="uppercase leading-none"
           style={{
-            fontSize: '10px',
-            fontWeight: 700,
+            fontSize: '9px',
+            fontWeight: 500,
             letterSpacing: '0.05em',
             color: isMajor
               ? 'hsl(var(--primary))'
               : isSignature
                 ? 'hsl(var(--primary))'
-                : 'hsl(var(--muted-foreground))',
+              : '#A8A29E',
           }}
         >
           {contextLabel}
         </p>
         <p
-          className="text-foreground mt-1"
-          style={{ fontSize: '14px', fontWeight: 700, letterSpacing: '-0.15px' }}
+          className="mt-1"
+          style={{ fontSize: '14px', fontWeight: 600, letterSpacing: '-0.15px', color: '#1C1917' }}
         >
           {tournament.name}
         </p>
         {venue && (
-          <p className="flex items-center gap-1 mt-0.5 text-muted-foreground" style={{ fontSize: '12px' }}>
+          <p className="flex items-center gap-1 mt-0.5" style={{ fontSize: '12px', fontWeight: 400, color: '#78716C' }}>
             <MapPin className="w-3 h-3 flex-shrink-0 opacity-60" />
             <span className="line-clamp-1">{venue}</span>
           </p>
@@ -167,15 +167,15 @@ export function WhatsComing() {
       <div className="flex items-center justify-between px-4 mb-3">
         <h2
           className="text-foreground"
-          style={{ fontSize: '18px', fontWeight: 700, letterSpacing: '-0.3px' }}
+          style={{ fontSize: '16px', fontWeight: 600, letterSpacing: '-0.2px' }}
         >
           What's Coming
         </h2>
 
         <button
           onClick={() => navigate('/tourhub?tab=schedule')}
-          className="flex items-center gap-0.5 text-muted-foreground transition-all active:scale-95"
-          style={{ fontSize: '13px', fontWeight: 600 }}
+          className="flex items-center gap-0.5 transition-all active:scale-95"
+          style={{ fontSize: '13px', fontWeight: 500, color: '#EA580C' }}
         >
           <span>View Full Schedule</span>
           <ChevronRight className="w-3.5 h-3.5 opacity-60" />

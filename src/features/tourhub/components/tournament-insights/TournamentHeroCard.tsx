@@ -59,7 +59,7 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
       {/* Content - anchored bottom left */}
       <div className="absolute bottom-0 left-0 right-0 px-4 pb-5 pt-4">
         {/* Tournament Name */}
-        <h2 className="text-[22px] font-bold text-white leading-tight mb-1">
+        <h2 className="text-white leading-tight mb-1" style={{ fontSize: '20px', fontWeight: 700 }}>
           {tournament.name}
         </h2>
 
@@ -72,11 +72,12 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
         <div className="flex flex-wrap gap-2">
           {tournament.purseText && (
             <span 
-              className="px-2 py-[4px] rounded-[5px] uppercase font-bold"
+            className="px-2 py-[4px] rounded-[5px] uppercase"
               style={{
-                fontSize: '10px',
-                letterSpacing: '0.6px',
-                color: 'rgba(255, 255, 255, 0.95)',
+                fontSize: '9px',
+                fontWeight: 500,
+                letterSpacing: '0.05em',
+                color: 'rgba(255, 255, 255, 0.85)',
                 background: 'rgba(0, 0, 0, 0.45)',
                 backdropFilter: 'blur(24px) saturate(180%)',
                 WebkitBackdropFilter: 'blur(24px) saturate(180%)',
@@ -88,11 +89,12 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
           )}
           {tournament.parText && (
             <span 
-              className="px-2 py-[4px] rounded-[5px] uppercase font-bold"
+            className="px-2 py-[4px] rounded-[5px] uppercase"
               style={{
-                fontSize: '10px',
-                letterSpacing: '0.6px',
-                color: 'rgba(255, 255, 255, 0.95)',
+                fontSize: '9px',
+                fontWeight: 500,
+                letterSpacing: '0.05em',
+                color: 'rgba(255, 255, 255, 0.85)',
                 background: 'rgba(0, 0, 0, 0.45)',
                 backdropFilter: 'blur(24px) saturate(180%)',
                 WebkitBackdropFilter: 'blur(24px) saturate(180%)',
@@ -104,11 +106,12 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
           )}
           {tournament.yardageText && (
             <span 
-              className="px-2 py-[4px] rounded-[5px] uppercase font-bold"
+            className="px-2 py-[4px] rounded-[5px] uppercase"
               style={{
-                fontSize: '10px',
-                letterSpacing: '0.6px',
-                color: 'rgba(255, 255, 255, 0.95)',
+                fontSize: '9px',
+                fontWeight: 500,
+                letterSpacing: '0.05em',
+                color: 'rgba(255, 255, 255, 0.85)',
                 background: 'rgba(0, 0, 0, 0.45)',
                 backdropFilter: 'blur(24px) saturate(180%)',
                 WebkitBackdropFilter: 'blur(24px) saturate(180%)',
