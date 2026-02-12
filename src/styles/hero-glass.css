@@ -104,7 +104,7 @@
   letter-spacing: 1.2px;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.6);
-  margin-bottom: 12px;
+  margin-bottom: 0;
 }
 
 .hero-meta-dot {
@@ -221,7 +221,7 @@
   border-radius: 0;
   padding: 0;
   margin-top: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 0;
 }
 
 .leaderboard-row {
@@ -337,7 +337,7 @@
   font-weight: 600;
   color: rgba(255, 255, 255, 0.9);
   transition: color 0.2s ease;
-  min-height: 44px;
+  min-height: 36px;
   padding: 0;
   background: none;
   border: none;
