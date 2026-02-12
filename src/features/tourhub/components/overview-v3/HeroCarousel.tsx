@@ -230,7 +230,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
               top: 'auto',
               minWidth: '280px',
               maxWidth: 'min(350px, calc(100% - 32px))',
-              padding: '20px',
+              padding: '20px 20px 12px 20px',
             }}
             variants={cardVariants}
             initial="enter"
@@ -406,7 +406,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
             
             {/* Carousel Dots - Inside card, below CTA */}
             {totalSlides > 1 && (
-              <div className="flex items-center justify-center" style={{ gap: '6px', marginTop: '16px' }}>
+              <div className="flex items-center justify-center" style={{ gap: '6px', marginTop: '8px' }}>
                 {Array.from({ length: totalSlides }).map((_, index) => (
                   <button
                     key={index}
