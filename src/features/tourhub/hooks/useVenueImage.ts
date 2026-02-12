@@ -126,7 +126,7 @@ export function useVenueImage(venueName: string | null, venueCity: string | null
       return { imageUrl: null, courseName: null, courseId: null };
     },
     enabled: !!venueName,
-    staleTime: 24 * 60 * 60 * 1000, // Cache for 24 hours
+    staleTime: 30 * 60 * 1000, // Cache for 30 minutes
   });
 }
 
