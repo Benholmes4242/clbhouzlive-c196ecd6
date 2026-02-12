@@ -86,8 +86,8 @@ function MiniLeaderboardRow({ leader, isFirst }: LeaderboardRowProps) {
         <span className="leaderboard-position flex-shrink-0">
           {leader.position}
         </span>
-        {/* Player headshot - tiny 20px circle */}
-        <div className="w-5 h-5 rounded-full overflow-hidden flex-shrink-0 border border-white/10">
+        {/* Player headshot - 24px squircle */}
+        <div className="w-6 h-6 overflow-hidden flex-shrink-0 border border-white/10" style={{ borderRadius: '34%', aspectRatio: '1 / 1.05' }}>
           {photoUrl ? (
             <img
               src={photoUrl}
@@ -97,7 +97,7 @@ function MiniLeaderboardRow({ leader, isFirst }: LeaderboardRowProps) {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-white/10">
-              <span style={{ fontSize: '7px', fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>{initials}</span>
+              <span style={{ fontSize: '8px', fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>{initials}</span>
             </div>
           )}
         </div>
@@ -242,9 +242,9 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
             <div className="flex items-center justify-between" style={{ marginBottom: '8px' }}>
               {/* Status Badge - left */}
               {isLive ? (
-                <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5">
                   <span className="live-dot" />
-                  <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: '#FF3B30' }}>LIVE</span>
+                  <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: '#F59E0B' }}>LIVE</span>
                 </div>
               ) : isCompleted ? (
                 <div className="flex items-center gap-1.5">
@@ -313,11 +313,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
                     ))}
                   </div>
                 ) : (
-                  <div style={{
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    borderRadius: '10px',
-                    padding: '12px 16px',
-                  }}>
+                  <div style={{ marginBottom: '4px' }}>
                     <span style={{ fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>
                       Starting Soon
                     </span>

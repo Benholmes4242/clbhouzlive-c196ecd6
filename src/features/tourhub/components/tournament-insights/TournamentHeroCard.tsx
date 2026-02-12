@@ -38,17 +38,18 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
       {/* Gradient Overlay - dark at bottom, transparent at top */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
-      {/* Top Left Pill - Next PGA Event */}
+      {/* Top Left Pill - Next PGA Event — glass style */}
       <div className="absolute top-4 left-4">
         <span 
           className="px-[10px] py-[4px] rounded-[8px] uppercase font-bold"
           style={{
             fontSize: '10px',
             letterSpacing: '0.8px',
-            color: 'rgba(255, 255, 255, 0.85)',
-            background: 'rgba(0, 0, 0, 0.55)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
+            color: 'rgba(255, 255, 255, 0.95)',
+            background: 'rgba(0, 0, 0, 0.45)',
+            backdropFilter: 'blur(24px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
           }}
         >
           Next PGA Event
@@ -67,7 +68,7 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
           {tournament.courseName} • {tournament.dateRangeText}
         </p>
 
-        {/* Metadata Chips */}
+        {/* Metadata Chips — glass style */}
         <div className="flex flex-wrap gap-2">
           {tournament.purseText && (
             <span 
@@ -75,10 +76,11 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
               style={{
                 fontSize: '9px',
                 letterSpacing: '0.6px',
-                color: 'rgba(255, 255, 255, 0.85)',
-                background: 'rgba(0, 0, 0, 0.55)',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
+                color: 'rgba(255, 255, 255, 0.95)',
+                background: 'rgba(0, 0, 0, 0.45)',
+                backdropFilter: 'blur(24px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
               }}
             >
               {tournament.purseText}
@@ -90,10 +92,11 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
               style={{
                 fontSize: '9px',
                 letterSpacing: '0.6px',
-                color: 'rgba(255, 255, 255, 0.85)',
-                background: 'rgba(0, 0, 0, 0.55)',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
+                color: 'rgba(255, 255, 255, 0.95)',
+                background: 'rgba(0, 0, 0, 0.45)',
+                backdropFilter: 'blur(24px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
               }}
             >
               {tournament.parText}
@@ -105,10 +108,11 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
               style={{
                 fontSize: '9px',
                 letterSpacing: '0.6px',
-                color: 'rgba(255, 255, 255, 0.85)',
-                background: 'rgba(0, 0, 0, 0.55)',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
+                color: 'rgba(255, 255, 255, 0.95)',
+                background: 'rgba(0, 0, 0, 0.45)',
+                backdropFilter: 'blur(24px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
               }}
             >
               {tournament.yardageText}
