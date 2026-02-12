@@ -140,7 +140,7 @@ function MomentumPill({ entry, index, direction, onTap }: MomentumPillProps) {
       {/* Top line: Avatar + Surname + Rank */}
       <div className="flex items-center gap-1.5">
         {/* Avatar */}
-        <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 border border-border/40">
+        <div className="w-6 h-6 overflow-hidden flex-shrink-0 border border-border/40" style={{ borderRadius: '34%' }}>
           {showPhoto && (
             <img
               src={photoUrl}
