@@ -207,6 +207,16 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
         )}
       </motion.div>
 
+      {/* Legibility gradient overlay */}
+      <div 
+        className="absolute inset-0 pointer-events-none z-5"
+        style={{
+          background: `
+            linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.20) 100%),
+            linear-gradient(90deg, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0) 55%)
+          `,
+        }}
+      />
 
       {/* Glass Card - Bottom Left with entrance animation */}
       <AnimatePresence mode="wait">
