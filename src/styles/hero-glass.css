@@ -142,7 +142,7 @@
   text-align: right;
 }
 
-.score-under { color: #FBBF24; }  /* brighter amber = under par */
+.score-under { color: #f59e0b; }  /* outstanding amber = under par */
 .score-over { color: #111827; }   /* neutral dark for over par */
 .score-even { color: rgba(255, 255, 255, 0.7); }
 
@@ -167,8 +167,8 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #FBBF24;
-  box-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
+  background: #f59e0b;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
   animation: livePulse 2s ease-in-out infinite;
 }
 
@@ -176,7 +176,7 @@
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 1.2px;
-  color: #FBBF24;
+  color: #f59e0b;
 }
 
 /* Shimmer animation for loading states */
