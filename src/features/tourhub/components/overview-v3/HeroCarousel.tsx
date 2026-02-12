@@ -394,12 +394,13 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
                   </div>
                 )}
                 
-                {/* CTA */}
-                <Link to={`/tourhub/tournament/${tournament.id}`} className="inline-block">
-                  <button className="hero-cta">
-                    <span>View Tournament</span>
-                    <ChevronRight className="w-4 h-4 cta-chevron" />
-                  </button>
+                {/* CTA - text link style like See All */}
+                <Link 
+                  to={`/tourhub/tournament/${tournament.id}`} 
+                  className="hero-text-cta w-full"
+                >
+                  <span>View Tournament</span>
+                  <ChevronRight className="w-4 h-4 cta-chevron" />
                 </Link>
               </>
             )}
