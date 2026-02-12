@@ -365,7 +365,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
                 )}
                 
                 {/* View Results text CTA */}
-                <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta w-full" style={{ marginTop: '12px' }}>
+                <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta w-full">
                   <span>View Results</span>
                   <ChevronRight className="w-4 h-4 cta-chevron" />
                 </Link>
