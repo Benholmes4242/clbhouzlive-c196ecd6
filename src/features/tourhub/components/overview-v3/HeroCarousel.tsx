@@ -120,7 +120,7 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, hasTie
             }}
           >
             <div
-              className="overflow-hidden border border-white/10 bg-white"
+              className="overflow-hidden border border-white/10"
               style={{ width: '100%', height: '100%', borderRadius: '34%' }}
             >
               {photoUrl ? (
