@@ -35,8 +35,8 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
         loading="eager"
       />
 
-      {/* Gradient Overlay - dark at bottom, transparent at top */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+      {/* Dark overlay for text legibility - no gradient */}
+      <div className="absolute inset-0 bg-black/35" />
 
       {/* Top Left Pill - Next PGA Event — glass style */}
       <div className="absolute top-4 left-4">
