@@ -26,7 +26,7 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
   const imageUrl = venueImageQuery.data?.imageUrl || tournament.heroImageUrl;
 
   return (
-    <div className="relative h-[278px] overflow-hidden">
+    <div className="relative h-[306px] overflow-hidden">
       {/* Background Image - full bleed, pointed corners */}
       <img
         src={imageUrl}
@@ -41,9 +41,9 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
       {/* Top Left Pill - Next PGA Event — glass style */}
       <div className="absolute top-4 left-4">
         <span 
-          className="px-[10px] py-[4px] rounded-[8px] uppercase font-bold"
+          className="px-3 py-[5px] rounded-[8px] uppercase font-bold"
           style={{
-            fontSize: '10px',
+            fontSize: '11px',
             letterSpacing: '0.8px',
             color: 'rgba(255, 255, 255, 0.95)',
             background: 'rgba(0, 0, 0, 0.45)',
@@ -59,12 +59,12 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
       {/* Content - anchored bottom left */}
       <div className="absolute bottom-0 left-0 right-0 px-4 pb-5 pt-4">
         {/* Tournament Name */}
-        <h2 className="text-xl font-bold text-white leading-tight mb-1">
+        <h2 className="text-[22px] font-bold text-white leading-tight mb-1">
           {tournament.name}
         </h2>
 
         {/* Course + Dates */}
-        <p className="text-sm text-white/80 mb-3">
+        <p className="text-[15px] text-white/80 mb-3">
           {tournament.courseName} • {tournament.dateRangeText}
         </p>
 
@@ -72,9 +72,9 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
         <div className="flex flex-wrap gap-2">
           {tournament.purseText && (
             <span 
-              className="px-[7px] py-[3px] rounded-[5px] uppercase font-bold"
+              className="px-2 py-[4px] rounded-[5px] uppercase font-bold"
               style={{
-                fontSize: '9px',
+                fontSize: '10px',
                 letterSpacing: '0.6px',
                 color: 'rgba(255, 255, 255, 0.95)',
                 background: 'rgba(0, 0, 0, 0.45)',
@@ -88,9 +88,9 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
           )}
           {tournament.parText && (
             <span 
-              className="px-[7px] py-[3px] rounded-[5px] uppercase font-bold"
+              className="px-2 py-[4px] rounded-[5px] uppercase font-bold"
               style={{
-                fontSize: '9px',
+                fontSize: '10px',
                 letterSpacing: '0.6px',
                 color: 'rgba(255, 255, 255, 0.95)',
                 background: 'rgba(0, 0, 0, 0.45)',
@@ -104,9 +104,9 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
           )}
           {tournament.yardageText && (
             <span 
-              className="px-[7px] py-[3px] rounded-[5px] uppercase font-bold"
+              className="px-2 py-[4px] rounded-[5px] uppercase font-bold"
               style={{
-                fontSize: '9px',
+                fontSize: '10px',
                 letterSpacing: '0.6px',
                 color: 'rgba(255, 255, 255, 0.95)',
                 background: 'rgba(0, 0, 0, 0.45)',
