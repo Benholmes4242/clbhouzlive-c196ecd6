@@ -11,7 +11,7 @@
  * Slide order: LIVE (by tour priority) > COMPLETED (by end_date DESC) > UPCOMING (by start_date ASC)
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, Trophy, Menu } from 'lucide-react';
@@ -73,42 +73,93 @@ function LeaderboardSkeleton() {
 interface LeaderboardRowProps {
   leader: LeaderEntry;
   isFirst: boolean;
+  index: number;
+  isActive: boolean;
+  isLeader: boolean;
+  hasTiedLeaders: boolean;
+  showTieBefore: boolean;
+  scoreFlash?: 'birdie' | 'bogey' | null;
+  positionDelta?: number;
 }
 
-function MiniLeaderboardRow({ leader, isFirst }: LeaderboardRowProps) {
+function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, hasTiedLeaders, showTieBefore, scoreFlash, positionDelta = 0 }: LeaderboardRowProps) {
   const abbreviatedName = `${leader.player.firstName[0]}. ${leader.player.lastName}`;
   const photoUrl = resolvePhotoUrl(leader.player.photoUrl ?? null, null);
   const initials = `${leader.player.firstName[0]}${leader.player.lastName[0]}`.toUpperCase();
+  const progress = leader.thru != null && leader.thru > 0 ? leader.thru / 18 : 0;
+  const hasProgress = progress > 0;
   
   return (
-    <div className={cn("leaderboard-row flex items-center justify-between", !isFirst && "border-t border-white/[0.04]")}>
-      <div className="flex items-center gap-2 min-w-0 flex-1">
-        <span className="leaderboard-position flex-shrink-0">
-          {leader.position}
-        </span>
-        {/* Player headshot - 28px squircle */}
-        <div className="overflow-hidden flex-shrink-0 border border-white/10" style={{ width: '28px', height: '29px', borderRadius: '34%' }}>
-          {photoUrl ? (
-            <img
-              src={photoUrl}
-              alt={abbreviatedName}
-              className="w-full h-full object-cover object-top"
-              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-white/10">
-              <span style={{ fontSize: '8px', fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>{initials}</span>
+    <>
+      {showTieBefore && (
+        <div className="tie-battle-icon">⚡</div>
+      )}
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={isActive ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
+        transition={{ duration: 0.35, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
+        className={cn(
+          "leaderboard-row flex items-center justify-between",
+          !isFirst && !showTieBefore && "border-t border-white/[0.04]",
+          isLeader && "leader-row-highlight"
+        )}
+      >
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <span className="leaderboard-position flex-shrink-0">
+            {isLeader && <span className="leader-crown">👑</span>}
+            {leader.position}
+          </span>
+          {/* Player headshot with progress ring */}
+          <div
+            className="overflow-hidden flex-shrink-0"
+            style={{
+              width: '32px',
+              height: '33px',
+              borderRadius: '34%',
+              padding: hasProgress ? '2px' : '0',
+              background: hasProgress
+                ? `conic-gradient(rgba(250, 204, 21, 0.8) ${progress * 360}deg, rgba(255, 255, 255, 0.1) ${progress * 360}deg)`
+                : 'none',
+            }}
+          >
+            <div
+              className="overflow-hidden border border-white/10"
+              style={{ width: '100%', height: '100%', borderRadius: '34%' }}
+            >
+              {photoUrl ? (
+                <img
+                  src={photoUrl}
+                  alt={abbreviatedName}
+                  className="w-full h-full object-cover object-top"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-white/10">
+                  <span style={{ fontSize: '8px', fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>{initials}</span>
+                </div>
+              )}
             </div>
-          )}
+          </div>
+          <span className={cn("leaderboard-name truncate", isFirst && "font-bold")}>
+            {abbreviatedName}
+          </span>
         </div>
-        <span className={cn("leaderboard-name truncate", isFirst && "font-bold")}>
-          {abbreviatedName}
+        <span className={cn(
+          "leaderboard-score flex-shrink-0 ml-2",
+          getScoreClass(leader.scoreToPar),
+          scoreFlash === 'birdie' && 'score-flash-birdie',
+          scoreFlash === 'bogey' && 'score-flash-bogey',
+        )}>
+          {leader.scoreDisplay}
         </span>
-      </div>
-      <span className={cn("leaderboard-score flex-shrink-0 ml-2", getScoreClass(leader.scoreToPar))}>
-        {leader.scoreDisplay}
-      </span>
-    </div>
+        {positionDelta > 0 && (
+          <span className="movement-up">▲{positionDelta}</span>
+        )}
+        {positionDelta < 0 && (
+          <span className="movement-down">▼{Math.abs(positionDelta)}</span>
+        )}
+      </motion.div>
+    </>
   );
 }
 
@@ -149,6 +200,39 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
   const { data: leaders = [], isLoading: leadersLoading } = useTournamentTopLeaders(
     isLive ? tournament.id : null
   );
+
+  // Phase 3+4: Track previous leaders for score change & movement animations
+  const prevLeadersRef = useRef<LeaderEntry[]>([]);
+  const [scoreFlashes, setScoreFlashes] = useState<Record<string, 'birdie' | 'bogey'>>({});
+  const [positionDeltas, setPositionDeltas] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    if (leaders.length === 0) return;
+    const prev = prevLeadersRef.current;
+    if (prev.length > 0) {
+      const newFlashes: Record<string, 'birdie' | 'bogey'> = {};
+      const newDeltas: Record<string, number> = {};
+      for (const leader of leaders) {
+        const prevEntry = prev.find(p => p.player.id === leader.player.id);
+        if (prevEntry) {
+          if (leader.scoreToPar < prevEntry.scoreToPar) newFlashes[leader.player.id] = 'birdie';
+          else if (leader.scoreToPar > prevEntry.scoreToPar) newFlashes[leader.player.id] = 'bogey';
+          if (leader.position !== prevEntry.position) {
+            newDeltas[leader.player.id] = prevEntry.position - leader.position; // positive = moved up
+          }
+        }
+      }
+      if (Object.keys(newFlashes).length > 0) {
+        setScoreFlashes(newFlashes);
+        setTimeout(() => setScoreFlashes({}), 600);
+      }
+      if (Object.keys(newDeltas).length > 0) {
+        setPositionDeltas(newDeltas);
+        setTimeout(() => setPositionDeltas({}), 3000);
+      }
+    }
+    prevLeadersRef.current = leaders;
+  }, [leaders]);
 
   // Use real image or fallback
   const backgroundImage = venueImage?.imageUrl || getFallbackCourseImage(tournament.name);
@@ -304,13 +388,24 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
                   <LeaderboardSkeleton />
                 ) : leaders.length > 0 ? (
                   <div className="leaderboard-container">
-                    {leaders.map((leader, idx) => (
-                      <MiniLeaderboardRow 
-                        key={`${leader.position}-${leader.player.id}`} 
-                        leader={leader} 
-                        isFirst={idx === 0}
-                      />
-                    ))}
+                    {(() => {
+                      const tiedLeaderCount = leaders.filter(l => l.position === 1).length;
+                      const hasTiedLeaders = tiedLeaderCount > 1;
+                      return leaders.map((leader, idx) => (
+                        <MiniLeaderboardRow
+                          key={`${leader.position}-${leader.player.id}`}
+                          leader={leader}
+                          isFirst={idx === 0}
+                          index={idx}
+                          isActive={isActive}
+                          isLeader={leader.position === 1}
+                          hasTiedLeaders={hasTiedLeaders}
+                          showTieBefore={hasTiedLeaders && leader.position === 1 && idx > 0}
+                          scoreFlash={scoreFlashes[leader.player.id] || null}
+                          positionDelta={positionDeltas[leader.player.id] || 0}
+                        />
+                      ));
+                    })()}
                   </div>
                 ) : (
                   <div style={{ marginBottom: '4px' }}>
