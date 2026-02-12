@@ -222,7 +222,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
       <AnimatePresence mode="wait">
         {isActive && (
           <motion.div 
-            className="glass-card p-5"
+            className="glass-card"
             style={{ 
               position: 'absolute',
               bottom: '20px',
@@ -230,6 +230,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
               top: 'auto',
               minWidth: '280px',
               maxWidth: 'min(350px, calc(100% - 32px))',
+              padding: '20px',
             }}
             variants={cardVariants}
             initial="enter"
@@ -238,43 +239,29 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: 0.08 }}
           >
             {/* Row 1: Status | Tour Badge (right-aligned) */}
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between" style={{ marginBottom: '8px' }}>
               {/* Status Badge - left */}
               {isLive ? (
                 <div className="flex items-center gap-1.5">
                   <span className="live-dot" />
-                  <span className="live-text">LIVE</span>
+                  <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: '#FF3B30' }}>LIVE</span>
                 </div>
               ) : isCompleted ? (
                 <div className="flex items-center gap-1.5">
                   <Trophy className="w-3.5 h-3.5 text-amber-400" />
-                  <span className="finished-text text-sm font-semibold">FINISHED</span>
+                  <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: '#FFB800' }}>FINISHED</span>
                 </div>
               ) : isUpcoming ? (
-                <span className="countdown-label">
+                <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase' as const }}>
                   {getStartLabel(tournament.startDate)}
                 </span>
               ) : (
-                <span className="text-white text-sm font-medium">COMPLETED</span>
+                <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'white' }}>COMPLETED</span>
               )}
               
-              {/* Tour Badge - right (text label) */}
-              <div 
-                className="flex items-center"
-                style={{
-                  padding: '3px 8px',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '6px',
-                }}
-              >
-                <span 
-                  className="uppercase font-semibold"
-                  style={{ 
-                    fontSize: '10px', 
-                    letterSpacing: '0.8px', 
-                    color: 'rgba(255, 255, 255, 0.5)' 
-                  }}
-                >
+              {/* Tour Badge - right (pill shape) */}
+              <div className="tour-badge">
+                <span>
                   {tournament.tourSlug === 'pga' ? 'PGA TOUR' : 
                    tournament.tourSlug === 'liv' ? 'LIV GOLF' : 
                    tournament.tourSlug === 'euro' ? 'DP WORLD' : 
@@ -326,8 +313,12 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
                     ))}
                   </div>
                 ) : (
-                  <div className="leaderboard-container">
-                    <span className="text-white/60 text-sm font-medium italic">
+                  <div style={{
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    borderRadius: '10px',
+                    padding: '12px 16px',
+                  }}>
+                    <span style={{ fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>
                       Starting Soon
                     </span>
                   </div>
@@ -336,7 +327,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
                 {/* See All - right-aligned text CTA */}
                 <Link 
                   to={`/tourhub/tournament/${tournament.id}`} 
-                  className="hero-text-cta mt-1 w-full"
+                  className="hero-text-cta w-full"
                 >
                   <span>See All</span>
                   <ChevronRight className="w-4 h-4 cta-chevron" />
@@ -378,7 +369,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
                 )}
                 
                 {/* View Results text CTA */}
-                <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta mt-2 w-full">
+                <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta w-full" style={{ marginTop: '12px' }}>
                   <span>View Results</span>
                   <ChevronRight className="w-4 h-4 cta-chevron" />
                 </Link>
@@ -388,8 +379,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
             {/* ─── UPCOMING CARD LAYOUT ─── */}
             {isUpcoming && (
               <>
-                {/* Course stats — useful for preview */}
-                <p className="hero-meta mt-3">
+                {/* Course stats */}
+                <p style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: '8px', marginTop: '8px' }}>
                   {[
                     tournament.purse && formatPurse(tournament.purse),
                     tournament.venuePar && `PAR ${tournament.venuePar}`,
@@ -399,16 +390,16 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
                 
                 {/* Defending Champion — if available */}
                 {tournament.defendingChampion && (
-                  <div className="flex items-center gap-2 mt-1 mb-2">
-                    <Trophy className="w-3.5 h-3.5 text-amber-400/70 flex-shrink-0" />
-                    <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.55)' }}>
-                      Defending: <span style={{ fontWeight: 600, color: 'rgba(255,255,255,0.75)' }}>{tournament.defendingChampion}</span>
+                  <div className="flex items-center gap-2" style={{ marginBottom: '12px' }}>
+                    <Trophy className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.6)' }} />
+                    <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>
+                      Defending: <span style={{ fontWeight: 700, color: 'white' }}>{tournament.defendingChampion}</span>
                     </span>
                   </div>
                 )}
                 
                 {/* CTA */}
-                <Link to={`/tourhub/tournament/${tournament.id}`} className="inline-block mt-2">
+                <Link to={`/tourhub/tournament/${tournament.id}`} className="inline-block">
                   <button className="hero-cta">
                     <span>View Tournament</span>
                     <ChevronRight className="w-4 h-4 cta-chevron" />
@@ -417,9 +408,9 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
               </>
             )}
             
-            {/* Row 7: Carousel Dots - Inside card, below CTA */}
+            {/* Carousel Dots - Inside card, below CTA */}
             {totalSlides > 1 && (
-              <div className="flex items-center justify-center gap-1.5 mt-4">
+              <div className="flex items-center justify-center" style={{ gap: '6px', marginTop: '16px' }}>
                 {Array.from({ length: totalSlides }).map((_, index) => (
                   <button
                     key={index}
