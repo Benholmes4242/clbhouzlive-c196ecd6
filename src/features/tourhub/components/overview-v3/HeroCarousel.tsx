@@ -92,9 +92,6 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, hasTie
   
   return (
     <>
-      {showTieBefore && (
-        <div className="tie-battle-icon">⚡</div>
-      )}
       <motion.div
         initial={{ opacity: 0, y: 14 }}
         animate={isActive ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
@@ -107,7 +104,6 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, hasTie
       >
         <div className="flex items-center gap-2 min-w-0 flex-1">
           <span className="leaderboard-position flex-shrink-0">
-            {isLeader && <span className="leader-crown">👑</span>}
             {leader.position}
           </span>
           {/* Player headshot with progress ring */}
