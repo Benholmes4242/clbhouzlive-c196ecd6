@@ -60,7 +60,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
         className="mb-3.5"
       >
         <div className="flex items-center justify-between">
-          <h3 className="text-base font-bold text-foreground">
+          <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#1C1917' }}>
             Likely Winners
           </h3>
           <button 
@@ -261,13 +261,13 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                   </div>
 
                   {/* Name */}
-                  <div className="text-[15px] font-bold tracking-tight mb-0.5 text-foreground">
+                  <div className="tracking-tight mb-0.5" style={{ fontSize: '14px', fontWeight: 600, color: '#1C1917' }}>
                     {card.name}
                   </div>
 
                   {/* Country */}
                   {card.countryCode && (
-                    <div className="text-[10px] font-medium mb-2 text-muted-foreground/60">
+                    <div className="mb-2" style={{ fontSize: '11px', fontWeight: 400, color: '#A8A29E' }}>
                       {card.countryCode}
                     </div>
                   )}
@@ -369,13 +369,13 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                   </div>
 
                   {/* Name */}
-                  <div className="text-[15px] font-bold tracking-tight mb-0.5 text-foreground">
+                  <div className="tracking-tight mb-0.5" style={{ fontSize: '14px', fontWeight: 600, color: '#1C1917' }}>
                     {card.name}
                   </div>
 
                   {/* Country */}
                   {card.countryCode && (
-                    <div className="text-[10px] font-medium mb-2 text-muted-foreground/60">
+                    <div className="mb-2" style={{ fontSize: '11px', fontWeight: 400, color: '#A8A29E' }}>
                       {card.countryCode}
                     </div>
                   )}

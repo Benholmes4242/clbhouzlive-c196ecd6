@@ -61,12 +61,12 @@ export const TournamentInsights = memo(function TournamentInsights() {
 
           <div className="flex flex-col">
             <h2 
-              className="text-lg font-bold tracking-tight leading-tight text-foreground"
-              style={{ letterSpacing: '-0.3px' }}
+              className="tracking-tight leading-tight"
+              style={{ fontSize: '16px', fontWeight: 600, color: '#1C1917', letterSpacing: '-0.2px' }}
             >
               clbhouz intelligence
             </h2>
-            <p className="text-xs font-normal mt-0.5 text-muted-foreground">
+            <p className="mt-0.5" style={{ fontSize: '12px', fontWeight: 400, color: '#78716C' }}>
               AI-powered tournament analysis
             </p>
           </div>

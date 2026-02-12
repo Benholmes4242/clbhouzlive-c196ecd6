@@ -87,7 +87,7 @@ export const CourseDNACard = memo(function CourseDNACard({ items, inline, course
       className={inline ? "p-5" : "rounded-2xl p-5 bg-card border border-border"}
       style={inline ? undefined : { boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)' }}
     >
-      <h3 className="text-base font-bold mb-4 text-foreground">
+      <h3 className="mb-4" style={{ fontSize: '16px', fontWeight: 600, color: '#1C1917' }}>
         What Matters{courseName ? ` at ${courseName}` : ''}
       </h3>
 
@@ -126,12 +126,12 @@ export const CourseDNACard = memo(function CourseDNACard({ items, inline, course
               {/* Name, tag, and bar */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-semibold text-foreground">
+                  <span style={{ fontSize: '14px', fontWeight: 600, color: '#1C1917' }}>
                     {item.label}
                   </span>
                   <span 
-                    className="text-[10px] font-bold uppercase"
-                    style={{ color: hexColor, letterSpacing: '1px' }}
+                    className="uppercase"
+                    style={{ fontSize: '9px', fontWeight: 500, color: hexColor, letterSpacing: '0.05em' }}
                   >
                     {tierToLabel[item.tier]}
                   </span>

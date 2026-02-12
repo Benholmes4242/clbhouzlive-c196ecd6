@@ -461,20 +461,20 @@ export function CollegeRankingsPreview() {
           <div className="flex items-center gap-2">
             <GraduationCap className="w-4 h-4 text-muted-foreground" style={{ marginBottom: '-1px' }} />
             <h2
-              className="text-foreground m-0"
-              style={{ fontSize: '16px', fontWeight: 600, letterSpacing: '-0.2px' }}
+              className="m-0"
+              style={{ fontSize: '16px', fontWeight: 600, color: '#1C1917', letterSpacing: '-0.2px' }}
             >
               College Golf Rankings
             </h2>
           </div>
-          <p className="m-0 text-muted-foreground" style={{ fontSize: '11px', marginTop: '3px', marginLeft: '24px' }}>
+          <p className="m-0" style={{ fontSize: '12px', fontWeight: 400, color: '#78716C', marginTop: '3px', marginLeft: '24px' }}>
             See how your college stacks up on tour
           </p>
         </div>
         <button
           onClick={() => navigate('/tourhub/college')}
           className="flex items-center gap-0.5 group transition-all duration-300 bg-transparent border-none cursor-pointer"
-          style={{ color: 'rgba(0,0,0,0.35)', fontSize: '10px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}
+          style={{ color: '#EA580C', fontSize: '13px', fontWeight: 500 }}
         >
           View All
           <ChevronRight size={12} className="opacity-60" />
@@ -539,7 +539,7 @@ export function CollegeRankingsPreview() {
         <button
           onClick={() => navigate('/tourhub/college')}
           className="flex items-center gap-1 group transition-all duration-200 bg-transparent border-none cursor-pointer active:scale-[0.98]"
-          style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(0,0,0,0.4)' }}
+          style={{ fontSize: '13px', fontWeight: 500, color: '#EA580C' }}
         >
           <span className="group-hover:text-foreground transition-colors">
             View Full College Rankings

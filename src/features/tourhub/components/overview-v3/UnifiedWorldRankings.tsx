@@ -159,16 +159,17 @@ function MomentumPill({ entry, index, direction, onTap }: MomentumPillProps) {
           )}
         </div>
 
-        <span className="text-[12px] font-medium text-foreground whitespace-nowrap">{entry.lastName}</span>
-        <span className="text-[10px] text-muted-foreground font-mono">#{entry.rank}</span>
+        <span className="whitespace-nowrap" style={{ fontSize: '13px', fontWeight: 500, color: '#44403C' }}>{entry.lastName}</span>
+        <span className="font-mono" style={{ fontSize: '10px', color: '#A8A29E' }}>#{entry.rank}</span>
       </div>
 
       {/* Bottom line: Movement arrow + number */}
       <div className="flex items-center gap-0.5 mt-0.5 pl-[30px]">
-        <span className={cn(
-          'text-[11px] font-bold whitespace-nowrap',
-          isUp ? 'text-emerald-700' : 'text-red-500'
-        )}>
+        <span className="whitespace-nowrap" style={{
+          fontSize: '11px',
+          fontWeight: 500,
+          color: isUp ? '#16A34A' : '#DC2626',
+        }}>
           {isUp ? '↑' : '↓'} {isUp ? '+' : '−'}{absChange}
         </span>
       </div>
@@ -285,15 +286,16 @@ export function UnifiedWorldRankings() {
     >
       {/* ═══ 1. Section Header ═══ */}
       <div className="flex items-start justify-between mb-0.5">
-        <h2 className="text-foreground text-[16px] font-medium tracking-tight leading-snug">
+        <h2 className="text-[16px] tracking-tight leading-snug" style={{ fontWeight: 600, color: '#1C1917' }}>
           Official World Golf Ranking
         </h2>
         <button
           onClick={() => navigate('/tourhub?tab=players')}
-          className="flex items-center gap-0.5 text-muted-foreground text-[10px] font-semibold uppercase tracking-wider active:scale-95 transition-transform mt-1"
+          className="flex items-center gap-0.5 active:scale-95 transition-transform mt-1"
+          style={{ fontSize: '13px', fontWeight: 500, color: '#EA580C' }}
         >
           View All
-          <ChevronRight className="w-3 h-3 opacity-60" />
+          <ChevronRight className="w-3.5 h-3.5 opacity-60" />
         </button>
       </div>
       <p className="text-[10px] text-muted-foreground leading-tight mb-2.5">
@@ -309,7 +311,7 @@ export function UnifiedWorldRankings() {
           <div>
             <div className="flex items-center gap-1.5 mb-2">
               <TrendingUp className="w-3.5 h-3.5 text-emerald-700" />
-              <span className="text-[12px] font-semibold text-foreground">This Week's Momentum</span>
+              <span style={{ fontSize: '13px', fontWeight: 600, color: '#1C1917' }}>This Week's Momentum</span>
             </div>
             <div
               className="flex gap-2 overflow-x-auto scrollbar-hide pb-1"
@@ -326,7 +328,7 @@ export function UnifiedWorldRankings() {
             <div>
               <div className="flex items-center gap-1.5 mb-2">
                 <TrendingDown className="w-3.5 h-3.5 text-red-500" />
-                <span className="text-[12px] font-semibold text-foreground">Biggest Drops</span>
+                <span style={{ fontSize: '13px', fontWeight: 600, color: '#1C1917' }}>Biggest Drops</span>
               </div>
               <div
                 className="flex gap-2 overflow-x-auto scrollbar-hide pb-1"
@@ -345,16 +347,16 @@ export function UnifiedWorldRankings() {
       <div>
         {/* Two-column stat headers */}
         <div className="flex items-center pb-2" style={{ borderBottom: '1px solid hsl(var(--border) / 0.1)' }}>
-          <div className="w-10 flex-shrink-0 text-center text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <div className="w-10 flex-shrink-0 text-center uppercase" style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.05em', color: '#A8A29E' }}>
             #
           </div>
-          <div className="flex-1 min-w-0 text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <div className="flex-1 min-w-0 uppercase" style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.05em', color: '#A8A29E' }}>
             Player
           </div>
-          <div className="w-16 flex-shrink-0 text-right text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <div className="w-16 flex-shrink-0 text-right uppercase" style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.05em', color: '#A8A29E' }}>
             Avg Pts
           </div>
-          <div className="w-16 flex-shrink-0 text-right text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <div className="w-16 flex-shrink-0 text-right uppercase" style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.05em', color: '#A8A29E' }}>
             Total Pts
           </div>
         </div>
@@ -415,13 +417,11 @@ export function UnifiedWorldRankings() {
                 >
                   {/* ── Rank + velocity arrow ── */}
                   <div className="w-10 flex-shrink-0 flex flex-col items-center gap-0.5">
-                    <span className={cn(
-                      'text-sm font-bold font-mono',
-                      isCrown ? 'text-[#f59e0b]' :
-                      isElite ? 'text-foreground' :
-                      isContender ? 'text-foreground/80' :
-                      'text-muted-foreground'
-                    )}>
+                    <span className="font-mono" style={{
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: isCrown ? '#EA580C' : '#1C1917',
+                    }}>
                       {entry.rank}
                     </span>
                     {/* Bolder, larger velocity arrows */}
@@ -440,17 +440,19 @@ export function UnifiedWorldRankings() {
 
                     <div className="min-w-0 flex-1">
                       <div
-                        className={cn(
-                          'truncate text-[13px] leading-tight',
-                          isCrown || isElite ? 'font-semibold text-foreground' : 'font-medium text-foreground/90'
-                        )}
+                        className="truncate leading-tight"
+                        style={{
+                          fontSize: '14px',
+                          fontWeight: 600,
+                          color: '#1C1917',
+                        }}
                       >
                         {fullName}
                       </div>
                       {/* Flag + country inline on same line */}
                       <div className="flex items-center gap-1 mt-0.5">
                         <CountryFlag country={entry.player.country} size="sm" />
-                        <span className="text-[11px] text-muted-foreground truncate leading-none">
+                        <span className="truncate leading-none" style={{ fontSize: '11px', fontWeight: 400, color: '#A8A29E' }}>
                           {formatCountryName(entry.player.country)}
                         </span>
                       </div>
@@ -461,17 +463,18 @@ export function UnifiedWorldRankings() {
                   <div className="flex items-start gap-0 flex-shrink-0">
                     {/* Column 1: AVG PTS (primary, bold) */}
                     <div className="w-16 text-right">
-                      <div className={cn(
-                        'font-mono text-[13px] font-bold',
-                        isCrown ? 'text-[#f59e0b]' : 'text-foreground'
-                      )}>
+                      <div className="font-mono" style={{
+                        fontSize: '13px',
+                        fontWeight: 500,
+                        color: isCrown ? '#EA580C' : '#44403C',
+                      }}>
                         {entry.avg_points?.toFixed(2) ?? '—'}
                       </div>
                     </div>
 
                     {/* Column 2: TOTAL PTS (secondary, muted) */}
                     <div className="w-16 text-right">
-                      <div className="font-mono text-[12px] text-muted-foreground">
+                      <div className="font-mono" style={{ fontSize: '13px', fontWeight: 500, color: '#44403C' }}>
                         {entry.total_points
                           ? entry.total_points.toLocaleString(undefined, { maximumFractionDigits: 1 })
                           : '—'}

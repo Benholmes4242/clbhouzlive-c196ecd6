@@ -115,7 +115,7 @@ export const CategoryTabs = memo(function CategoryTabs({
               style={{
                 padding: '8px 14px',
                 gap: '6px',
-                fontSize: '13px',
+                fontSize: '12px',
                 fontWeight: isActive ? 600 : 500,
                 borderRadius: '10px',
                 background: isActive ? categoryAccent.primary : '#FFFFFF',
