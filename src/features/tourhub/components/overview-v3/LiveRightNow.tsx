@@ -14,7 +14,7 @@ import '@/styles/hero-glass.css';
 
 // Score color helper - PGA Tour convention: under par = red
 function getScoreColor(scoreDisplay: string): string {
-  if (scoreDisplay.startsWith('-')) return '#FBBF24'; // Brighter amber = under par
+  if (scoreDisplay.startsWith('-')) return '#f59e0b'; // Outstanding amber = under par
   if (scoreDisplay.startsWith('+')) return '#111827'; // Neutral dark for over par
   return 'rgba(0, 0, 0, 0.4)';
 }
@@ -106,14 +106,14 @@ function LiveTournamentCard({
         >
           <span 
             className="w-[5px] h-[5px] rounded-full animate-live-pulse"
-            style={{ background: '#FBBF24' }}
+            style={{ background: '#f59e0b' }}
           />
           <span 
             className="uppercase font-bold"
             style={{ 
               fontSize: '10px',
               letterSpacing: '0.8px',
-              color: '#FBBF24',
+              color: '#f59e0b',
             }}
           >
             LIVE
@@ -180,8 +180,8 @@ export function LiveRightNow() {
         <span 
           className="w-2 h-2 rounded-full animate-live-pulse"
           style={{ 
-            background: '#FBBF24',
-            boxShadow: '0 0 10px rgba(251, 191, 36, 0.45)',
+            background: '#f59e0b',
+            boxShadow: '0 0 10px rgba(245, 158, 11, 0.45)',
           }}
         />
         <h2 className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
