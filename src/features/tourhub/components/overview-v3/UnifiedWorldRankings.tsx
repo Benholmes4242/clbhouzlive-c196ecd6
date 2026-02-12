@@ -137,8 +137,6 @@ function MomentumPill({ entry, index, direction, onTap }: MomentumPillProps) {
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.06, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className="flex items-center gap-2">
-        {/* Left: Avatar + Name/Rank stack */}
         <div className="flex items-center gap-1.5">
           {/* Avatar */}
           <div className="w-6 h-6 overflow-hidden flex-shrink-0 border border-border/40" style={{ borderRadius: '34%' }}>
@@ -162,18 +160,17 @@ function MomentumPill({ entry, index, direction, onTap }: MomentumPillProps) {
 
           <div className="flex flex-col">
             <span className="whitespace-nowrap" style={{ fontSize: '13px', fontWeight: 500, color: '#44403C' }}>{entry.lastName}</span>
-            <span className="font-mono" style={{ fontSize: '10px', color: '#A8A29E' }}>#{entry.rank}</span>
-          </div>
+            <div className="flex items-center gap-1">
+              <span className="font-mono" style={{ fontSize: '10px', color: '#A8A29E' }}>#{entry.rank}</span>
+              <span className="whitespace-nowrap" style={{
+                fontSize: '10px',
+                fontWeight: 500,
+                color: isUp ? '#16A34A' : '#DC2626',
+              }}>
+                {isUp ? '↑' : '↓'}{isUp ? '+' : '−'}{absChange}
+              </span>
+            </div>
         </div>
-
-        {/* Right: Movement value */}
-        <span className="whitespace-nowrap ml-auto" style={{
-          fontSize: '11px',
-          fontWeight: 500,
-          color: isUp ? '#16A34A' : '#DC2626',
-        }}>
-          {isUp ? '↑' : '↓'} {isUp ? '+' : '−'}{absChange}
-        </span>
       </div>
     </motion.button>
   );
