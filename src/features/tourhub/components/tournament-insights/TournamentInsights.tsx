@@ -37,14 +37,14 @@ export const TournamentInsights = memo(function TournamentInsights() {
   }
 
   return (
-    <section aria-label="Featured tournament analysis" className="space-y-0">
+    <section aria-label="Featured tournament analysis" className="space-y-0 px-4">
       {/* Section Header — ABOVE hero card */}
       <motion.div 
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
         viewport={{ once: true }}
-        className="flex items-center justify-between mb-4 px-4"
+        className="flex items-center justify-between mb-4"
       >
         {/* Left: Brain icon + text */}
         <div className="flex items-center gap-3">
@@ -80,7 +80,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
 
       {/* ═══ UNIFIED INTELLIGENCE WRAPPER — LIGHT THEME ═══ */}
       <div 
-        className="mt-0 px-4 pt-7 bg-background"
+        className="mt-0 pt-7 bg-background"
         style={{ borderTop: '1px solid rgba(0, 0, 0, 0.05)' }}
       >
 
