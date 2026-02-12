@@ -244,12 +244,12 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
               {isLive ? (
               <div className="flex items-center gap-1.5">
                   <span className="live-dot" />
-                  <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: '#F59E0B' }}>LIVE</span>
+                  <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: '#FBBF24' }}>LIVE</span>
                 </div>
               ) : isCompleted ? (
                 <div className="flex items-center gap-1.5">
                   <Trophy className="w-3.5 h-3.5 text-amber-400" />
-                  <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: '#FFB800' }}>FINISHED</span>
+                  <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: '#FACC15' }}>FINISHED</span>
                 </div>
               ) : isUpcoming ? (
                 <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase' as const }}>
