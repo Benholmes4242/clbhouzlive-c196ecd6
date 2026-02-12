@@ -207,23 +207,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
         )}
       </motion.div>
 
-      {/* Bottom + side legibility gradient (matches TournamentHero) */}
-      <div 
-        className="absolute inset-0 pointer-events-none z-5"
-        style={{
-          background: `
-            linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.2) 100%),
-            linear-gradient(to right, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 60%)
-          `,
-        }}
-      />
-      {/* Top gradient for header readability */}
-      <div 
-        className="absolute top-0 left-0 right-0 h-24 z-5"
-        style={{
-          background: 'linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 100%)'
-        }}
-      />
 
       {/* Glass Card - Bottom Left with entrance animation */}
       <AnimatePresence mode="wait">
