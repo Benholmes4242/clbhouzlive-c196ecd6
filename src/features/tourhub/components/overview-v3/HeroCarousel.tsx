@@ -634,15 +634,22 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     touchMoveRef.current = e.touches[0].clientX - touchStartRef.current.x;
   };
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = (e: React.TouchEvent) => {
     if (!touchStartRef.current) return;
     const deltaX = touchMoveRef.current;
+    const deltaY = Math.abs(
+      (e.changedTouches[0]?.clientY ?? 0) - touchStartRef.current.y
+    );
     const threshold = 50;
 
-    if (deltaX < -threshold && currentIndex < slides.length - 1) {
-      setCurrentIndex(prev => prev + 1);
-    } else if (deltaX > threshold && currentIndex > 0) {
-      setCurrentIndex(prev => prev - 1);
+    // Only treat as swipe if horizontal movement exceeds threshold
+    // Otherwise let the tap pass through to interactive children
+    if (Math.abs(deltaX) > threshold && Math.abs(deltaX) > deltaY) {
+      if (deltaX < -threshold && currentIndex < slides.length - 1) {
+        setCurrentIndex(prev => prev + 1);
+      } else if (deltaX > threshold && currentIndex > 0) {
+        setCurrentIndex(prev => prev - 1);
+      }
     }
 
     touchStartRef.current = null;

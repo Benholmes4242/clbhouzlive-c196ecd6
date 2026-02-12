@@ -51,6 +51,9 @@
   /* Allow position override from inline styles */
   overflow: hidden;
   position: relative;
+  
+  /* Ensure interactive children sit above ::before pseudo-element */
+  z-index: 10;
 }
 
 /* Inner contrast gradient overlay — extra text legibility */
@@ -222,6 +225,8 @@
   padding: 0;
   margin-top: 10px;
   margin-bottom: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .leaderboard-row {
@@ -342,6 +347,8 @@
   background: none;
   border: none;
   animation: ctaBreathe 2.5s ease-in-out infinite;
+  position: relative;
+  z-index: 1;
 }
 
 @keyframes ctaBreathe {
