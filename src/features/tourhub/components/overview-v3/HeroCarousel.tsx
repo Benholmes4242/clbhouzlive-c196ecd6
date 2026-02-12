@@ -85,7 +85,7 @@ interface LeaderboardRowProps {
 
 function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, hasTiedLeaders, showTieBefore, scoreFlash, positionDelta = 0 }: LeaderboardRowProps) {
   const abbreviatedName = `${leader.player.firstName[0]}. ${leader.player.lastName}`;
-  const photoUrl = resolvePhotoUrl(leader.player.photoUrl ?? null, null);
+  const photoUrl = resolvePhotoUrl(leader.player.photoUrl ?? null, leader.player.pgaTourId);
   const initials = `${leader.player.firstName[0]}${leader.player.lastName[0]}`.toUpperCase();
   const progress = leader.thru != null && leader.thru > 0 ? leader.thru / 18 : 0;
   const hasProgress = progress > 0;
