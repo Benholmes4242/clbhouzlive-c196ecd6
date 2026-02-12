@@ -14,7 +14,7 @@ import '@/styles/hero-glass.css';
 
 // Score color helper - PGA Tour convention: under par = red
 function getScoreColor(scoreDisplay: string): string {
-  if (scoreDisplay.startsWith('-')) return '#FF3B30'; // Red = under par (PGA Tour standard)
+  if (scoreDisplay.startsWith('-')) return '#F59E0B'; // Amber = under par
   if (scoreDisplay.startsWith('+')) return '#111827'; // Neutral dark for over par
   return 'rgba(0, 0, 0, 0.4)';
 }
@@ -93,33 +93,9 @@ function LiveTournamentCard({
           }}
         />
         
-        {/* Tour Badge - top left (text label) */}
-        <div 
-          className="absolute top-2.5 left-2.5 px-[7px] py-[3px] rounded-[5px] flex items-center"
-          style={{
-            background: 'rgba(0, 0, 0, 0.55)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-          }}
-        >
-          <span 
-            className="uppercase font-bold"
-            style={{ 
-              fontSize: '9px', 
-              letterSpacing: '0.6px', 
-              color: 'rgba(255, 255, 255, 0.85)' 
-            }}
-          >
-            {tournament.tourSlug === 'pga' ? 'PGA' : 
-             tournament.tourSlug === 'liv' ? 'LIV' : 
-             tournament.tourSlug === 'euro' ? 'DP WORLD' : 
-             tournament.tourSlug === 'lpga' ? 'LPGA' : 
-             tournament.tourSlug === 'champ' ? 'CHAMPIONS' : 
-             'PGA DEV'}
-           </span>
-        </div>
+        {/* Tour badge removed from live cards */}
         
-        {/* LIVE Badge - top right, dark glass pill */}
+        {/* LIVE Badge - top right, dark glass pill with amber */}
         <div 
           className="absolute top-2.5 right-2.5 px-[10px] py-[4px] rounded-[8px] flex items-center gap-[5px]"
           style={{
@@ -130,14 +106,14 @@ function LiveTournamentCard({
         >
           <span 
             className="w-[5px] h-[5px] rounded-full animate-live-pulse"
-            style={{ background: '#FF3B30' }}
+            style={{ background: '#F59E0B' }}
           />
           <span 
             className="uppercase font-bold"
             style={{ 
               fontSize: '10px',
               letterSpacing: '0.8px',
-              color: '#FF3B30',
+              color: '#F59E0B',
             }}
           >
             LIVE
@@ -204,8 +180,8 @@ export function LiveRightNow() {
         <span 
           className="w-2 h-2 rounded-full animate-live-pulse"
           style={{ 
-            background: '#FF3B30',
-            boxShadow: '0 0 10px rgba(255, 59, 48, 0.35)',
+            background: '#F59E0B',
+            boxShadow: '0 0 10px rgba(245, 158, 11, 0.35)',
           }}
         />
         <h2 className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
