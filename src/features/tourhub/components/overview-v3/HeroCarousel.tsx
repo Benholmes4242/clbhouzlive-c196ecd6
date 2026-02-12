@@ -260,9 +260,9 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
       {/* Background with Ken Burns - fills ENTIRE container including safe area */}
       <motion.div
         className="absolute inset-0 w-full h-full"
-        initial={{ scale: 1.08, opacity: 0 }}
+        initial={{ scale: 1.03, opacity: 0 }}
         animate={{ 
-          scale: isActive ? 1 : 1.08, 
+          scale: isActive ? 1 : 1.03, 
           opacity: isActive ? 1 : 0 
         }}
         transition={{ 
