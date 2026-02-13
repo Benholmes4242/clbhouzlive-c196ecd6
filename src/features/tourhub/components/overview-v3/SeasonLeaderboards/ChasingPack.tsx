@@ -100,7 +100,7 @@ const ChaserCard = memo(function ChaserCard({
         </div>
 
         {/* RIGHT: Rank, name, country, stat, gap */}
-        <div className="flex-1 min-w-0 flex flex-col justify-center">
+        <div className="flex-1 min-w-0 flex flex-col justify-center items-center text-center">
           {/* Rank + Name */}
           <div className="flex items-center" style={{ gap: '4px' }}>
             <span className="text-muted-foreground" style={{ fontSize: '11px', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
@@ -112,16 +112,13 @@ const ChaserCard = memo(function ChaserCard({
             </span>
           </div>
 
-          {/* Country — flag + name inline */}
-          <div className="flex items-center mt-0.5" style={{ gap: '4px' }}>
+          {/* Country — flag only */}
+          <div className="flex items-center mt-0.5">
             <CountryFlag country={player.countryCode} size="sm" />
-            <span className="text-muted-foreground truncate" style={{ fontSize: '11px', lineHeight: 1 }}>
-              {player.countryCode ? player.countryCode.toLowerCase().split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : ''}
-            </span>
           </div>
 
           {/* Stat value */}
-          <div className="flex items-baseline mt-1.5" style={{ gap: '2px' }}>
+          <div className="flex items-baseline justify-center mt-1.5" style={{ gap: '2px' }}>
             <span
               style={{
                 fontFamily: "'JetBrains Mono', monospace",
