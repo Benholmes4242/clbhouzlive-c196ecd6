@@ -78,6 +78,7 @@ export type ConfidenceTier = 'elite' | 'high' | 'medium';
 // =============================================
 
 export type TournamentPhase = 'pre-tournament' | 'in-progress' | 'completed';
+export type IntelligenceView = 'live' | 'upcoming';
 
 export interface TrackedPrediction {
   playerName: string;
@@ -109,6 +110,7 @@ export interface AccuracyMetrics {
 export interface PredictionTrackerData {
   predictions: TrackedPrediction[];
   darkHorses: TrackedPrediction[];
+  allPicks: TrackedPrediction[];  // Top 5 + dark horses in one list
   accuracy: AccuracyMetrics;
   lastUpdated: string;
 }

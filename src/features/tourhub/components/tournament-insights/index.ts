@@ -11,6 +11,8 @@ export { PredictionTracker } from './PredictionTracker';
 export { AccuracyHeadlineCard } from './AccuracyHeadlineCard';
 export { PredictionScorecard } from './PredictionScorecard';
 export { PredictionScorecardRow } from './PredictionScorecardRow';
+export { PredictionLeaderboard } from './PredictionLeaderboard';
+export { LiveUpcomingToggle } from './LiveUpcomingToggle';
 export { DarkHorseTracker } from './DarkHorseTracker';
 export { LiveBadge } from './LiveBadge';
 export { UpNextPreview } from './UpNextPreview';
@@ -23,6 +25,7 @@ export type {
   DangerousProfile,
   ContenderCard,
   TournamentPhase,
+  IntelligenceView,
   TrackedPrediction,
   AccuracyMetrics,
   PredictionTrackerData,
