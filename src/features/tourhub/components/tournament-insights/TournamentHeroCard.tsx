@@ -1,9 +1,11 @@
 /**
  * TournamentHeroCard - Chapter 1: Cover page with venue image
+ * Now supports LIVE badge overlay during in-progress tournaments
  */
 
 import { memo } from 'react';
 import { useVenueImage } from '../../hooks/useVenueImage';
+import { LiveBadge } from './LiveBadge';
 
 interface TournamentHeroCardProps {
   tournament: {
@@ -16,10 +18,12 @@ interface TournamentHeroCardProps {
     yardageText?: string;
     heroImageUrl: string;
   };
+  isLive?: boolean;
 }
 
 export const TournamentHeroCard = memo(function TournamentHeroCard({
   tournament,
+  isLive = false,
 }: TournamentHeroCardProps) {
   // Try to fetch actual venue image
   const venueImageQuery = useVenueImage(tournament.courseName, null);
@@ -38,7 +42,7 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
       {/* Gradient Overlay - dark at bottom, transparent at top */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
-      {/* Top Left Pill - Next PGA Event — glass style */}
+      {/* Top Left Pill - context-aware */}
       <div className="absolute top-4 left-4">
         <span 
           className="px-3 py-[5px] rounded-[8px] uppercase font-bold"
@@ -52,9 +56,16 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
             border: '1px solid rgba(255, 255, 255, 0.15)',
           }}
         >
-          Next PGA Event
+          {isLive ? 'Live Tournament' : 'Next PGA Event'}
         </span>
       </div>
+
+      {/* Top Right — LIVE badge */}
+      {isLive && (
+        <div className="absolute top-4 right-4">
+          <LiveBadge />
+        </div>
+      )}
 
       {/* Content - anchored bottom left */}
       <div className="absolute bottom-0 left-0 right-0 px-4 pb-5 pt-4">

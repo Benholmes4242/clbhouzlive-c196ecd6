@@ -1,9 +1,11 @@
 /**
  * useTournamentInsights - Transforms AI predictions into the 2.0 narrative shape
+ * Now supports three tournament phases: pre-tournament, in-progress, completed
  */
 
 import { useMemo } from 'react';
 import { useAIPredictions } from '../../../hooks/useAIPredictions';
+import { usePredictionTracker } from '../../../hooks/usePredictionTracker';
 import { format, parseISO } from 'date-fns';
 import { getFallbackCourseImage } from '../../../hooks/useVenueImage';
 import type { 
@@ -11,11 +13,29 @@ import type {
   CourseDNAItem, 
   ConfidenceTier, 
   ImportanceTier,
-  ContenderCard
+  ContenderCard,
+  TournamentPhase,
+  PredictionTrackerData,
+  NextTournamentPreview,
 } from '../types';
 
 export function useTournamentInsights() {
-  const { data: aiData, isLoading, error } = useAIPredictions();
+  const {
+    data: aiData,
+    isLoading,
+    error,
+    tournamentPhase,
+    activeTournamentId,
+    nextTournament,
+    nextTournamentPredictions,
+  } = useAIPredictions();
+
+  // Fetch live tracker data when tournament is in-progress or completed
+  const isLiveOrCompleted = tournamentPhase === 'in-progress' || tournamentPhase === 'completed';
+  const trackerQuery = usePredictionTracker(
+    isLiveOrCompleted ? activeTournamentId : null,
+    isLiveOrCompleted ? aiData : null
+  );
 
   const data = useMemo((): TournamentInsightsData | null => {
     if (!aiData) return null;
@@ -80,12 +100,20 @@ export function useTournamentInsights() {
         oneLiner: dh.hook,
       })),
 
-      // Combined contenders (#2-5) + threats for unified carousel
       contenderCards: buildContenderCards(topContenders, darkHorses),
     };
   }, [aiData]);
 
-  return { data, isLoading, error };
+  return {
+    data,
+    isLoading,
+    error,
+    tournamentPhase,
+    tracker: trackerQuery.data as PredictionTrackerData | undefined ?? null,
+    trackerLoading: trackerQuery.isLoading,
+    nextTournament,
+    nextTournamentPredictions,
+  };
 }
 
 // =============================================
