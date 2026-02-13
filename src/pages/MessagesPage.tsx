@@ -162,14 +162,14 @@ const MessagesPage = () => {
               <ChevronLeft className="w-5 h-5" style={{ color: '#EA580C' }} />
             </button>
 
-            <span className="text-[15px] font-semibold" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>Messages</span>
+            <span className="text-[16px] font-semibold" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>Messages</span>
 
             <button 
               onClick={handleNewConversation}
               className="w-11 h-11 -mr-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
               aria-label="New conversation"
             >
-              <Plus className="w-5 h-5" style={{ color: '#1C1917' }} />
+              <Plus className="w-5 h-5" style={{ color: '#EA580C' }} />
             </button>
           </header>
           
@@ -234,14 +234,14 @@ const MessagesPage = () => {
             <ChevronLeft className="w-5 h-5" style={{ color: '#EA580C' }} />
           </button>
 
-          <span className="text-[15px] font-semibold" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>Messages</span>
+          <span className="text-[16px] font-semibold" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>Messages</span>
 
           <button 
             onClick={handleNewConversation}
             className="w-11 h-11 -mr-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
             aria-label="New conversation"
           >
-            <Plus className="w-5 h-5" style={{ color: '#1C1917' }} />
+            <Plus className="w-5 h-5" style={{ color: '#EA580C' }} />
           </button>
         </header>
         
