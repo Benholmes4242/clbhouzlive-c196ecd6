@@ -72,3 +72,51 @@ export interface ContenderCard {
 
 export type ImportanceTier = 'critical' | 'significant' | 'useful';
 export type ConfidenceTier = 'elite' | 'high' | 'medium';
+
+// =============================================
+// Live Prediction Tracking Types
+// =============================================
+
+export type TournamentPhase = 'pre-tournament' | 'in-progress' | 'completed';
+
+export interface TrackedPrediction {
+  playerName: string;
+  playerId: string;
+  pgaTourId: string;
+  predictedRank: number;
+  winProbability: number;
+  reasons: string[];
+  isDarkHorse: boolean;
+  actualPosition: number | null;
+  actualPositionTied: boolean;
+  score: number | null;
+  thru: number | null;
+  status: string | null;
+  currentRound: number | null;
+  positionDelta: number | null;
+  performanceStatus: 'outperforming' | 'matching' | 'underperforming' | 'cut' | 'withdrawn' | 'not-started';
+}
+
+export interface AccuracyMetrics {
+  totalPredictions: number;
+  inTop5: number;
+  inTop10: number;
+  inTop20: number;
+  accuracyLabel: string;
+  overallGrade: 'excellent' | 'good' | 'mixed' | 'poor';
+}
+
+export interface PredictionTrackerData {
+  predictions: TrackedPrediction[];
+  darkHorses: TrackedPrediction[];
+  accuracy: AccuracyMetrics;
+  lastUpdated: string;
+}
+
+export interface NextTournamentPreview {
+  id: string;
+  name: string;
+  courseName: string;
+  startDate: string;
+  hasPredictions: boolean;
+}

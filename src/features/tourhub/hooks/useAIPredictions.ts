@@ -1,13 +1,17 @@
 /**
  * useAIPredictions - Fetches Claude-powered tournament predictions
  * 
- * Retrieves pre-generated AI predictions from the ai_predictions table.
- * Falls back to algorithmic predictions if AI predictions aren't available.
+ * Priority-based tournament selection:
+ * 1. In-progress tournament (status = 'inprogress')
+ * 2. Next scheduled tournament (start_date >= now)
+ * 
+ * Also fetches "next upcoming" tournament when viewing a live one.
  */
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { getPgaTourHeadshotUrl } from '../utils/resolvePhotoUrl';
+import type { TournamentPhase, NextTournamentPreview } from '../components/tournament-insights/types';
 
 // =============================================
 // TYPES
@@ -57,6 +61,7 @@ export interface AIPredictionData {
     purse: number;
     par: number;
     yardage: number;
+    status: string;
   };
   topContenders: AITopContender[];
   darkHorses: AIDarkHorse[];
@@ -64,6 +69,16 @@ export interface AIPredictionData {
   confidence: number;
   generatedAt: string;
   isAIPowered: boolean;
+}
+
+export interface UseAIPredictionsResult {
+  data: AIPredictionData | null | undefined;
+  isLoading: boolean;
+  error: Error | null;
+  tournamentPhase: TournamentPhase;
+  activeTournamentId: string | null;
+  nextTournament: NextTournamentPreview | null;
+  nextTournamentPredictions: AIPredictionData | null;
 }
 
 // =============================================
@@ -74,11 +89,9 @@ function resolvePlayerPhotoUrl(
   photoUrl: string | null | undefined,
   pgaTourId: string | null | undefined
 ): string | null {
-  // Priority 1: PGA Tour CDN headshot
   if (pgaTourId) {
     return getPgaTourHeadshotUrl(pgaTourId);
   }
-  // Priority 2: Stored photo URL
   return photoUrl || null;
 }
 
@@ -86,19 +99,178 @@ function resolvePlayerPhotoUrl(
 // MAIN HOOK
 // =============================================
 
-export function useAIPredictions() {
-  return useQuery({
-    queryKey: ['ai-predictions', 'next-tournament'],
-    queryFn: fetchAIPredictions,
-    staleTime: 15 * 60 * 1000,  // 15 minutes
-    gcTime: 60 * 60 * 1000,     // 1 hour
-    refetchOnWindowFocus: false,
+export function useAIPredictions(): UseAIPredictionsResult {
+  const mainQuery = useQuery({
+    queryKey: ['ai-predictions', 'active-tournament'],
+    queryFn: fetchActiveTournamentPredictions,
+    staleTime: 15 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
+    refetchOnWindowFocus: true,
     retry: 2,
   });
+
+  const result = mainQuery.data;
+  const tournamentPhase = result?.tournamentPhase ?? 'pre-tournament';
+  const isLive = tournamentPhase === 'in-progress';
+  const activeTournamentId = result?.predictions?.tournament?.id ?? null;
+
+  // Fetch next tournament preview when live
+  const nextQuery = useQuery({
+    queryKey: ['ai-predictions', 'next-tournament-preview'],
+    queryFn: fetchNextTournamentPreview,
+    staleTime: 15 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    retry: 1,
+    enabled: isLive,
+  });
+
+  // Live polling: refetch main query every 3 minutes during live tournaments
+  useQuery({
+    queryKey: ['ai-predictions', 'active-tournament'],
+    queryFn: fetchActiveTournamentPredictions,
+    refetchInterval: isLive ? 3 * 60 * 1000 : false,
+  });
+
+  return {
+    data: result?.predictions ?? undefined,
+    isLoading: mainQuery.isLoading,
+    error: mainQuery.error,
+    tournamentPhase,
+    activeTournamentId,
+    nextTournament: nextQuery.data?.preview ?? null,
+    nextTournamentPredictions: nextQuery.data?.predictions ?? null,
+  };
 }
 
-async function fetchAIPredictions(): Promise<AIPredictionData | null> {
-  // Step 1: Get the current PGA season
+// =============================================
+// FETCH: Active tournament (priority-based)
+// =============================================
+
+interface ActiveTournamentResult {
+  predictions: AIPredictionData | null;
+  tournamentPhase: TournamentPhase;
+}
+
+async function fetchActiveTournamentPredictions(): Promise<ActiveTournamentResult> {
+  const pgaSeasonId = await getPgaSeasonId();
+  if (!pgaSeasonId) return { predictions: null, tournamentPhase: 'pre-tournament' };
+
+  // Priority 1: In-progress tournament
+  const { data: activeTournament } = await supabase
+    .from('sr_tournaments')
+    .select('*')
+    .eq('season_id', pgaSeasonId)
+    .eq('status', 'inprogress')
+    .order('start_date', { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  if (activeTournament) {
+    const predictions = await fetchPredictionsForTournament(activeTournament);
+    return {
+      predictions,
+      tournamentPhase: 'in-progress',
+    };
+  }
+
+  // Check for recently completed tournament (within 24h)
+  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const { data: completedTournament } = await supabase
+    .from('sr_tournaments')
+    .select('*')
+    .eq('season_id', pgaSeasonId)
+    .in('status', ['closed', 'complete'])
+    .gte('end_date', oneDayAgo)
+    .order('end_date', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (completedTournament) {
+    const predictions = await fetchPredictionsForTournament(completedTournament);
+    if (predictions) {
+      return {
+        predictions,
+        tournamentPhase: 'completed',
+      };
+    }
+  }
+
+  // Priority 2: Next scheduled tournament
+  const now = new Date().toISOString();
+  const { data: nextTournament } = await supabase
+    .from('sr_tournaments')
+    .select('*')
+    .eq('season_id', pgaSeasonId)
+    .eq('status', 'scheduled')
+    .gte('start_date', now)
+    .order('start_date', { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  if (nextTournament) {
+    const predictions = await fetchPredictionsForTournament(nextTournament);
+    return { predictions, tournamentPhase: 'pre-tournament' };
+  }
+
+  return { predictions: null, tournamentPhase: 'pre-tournament' };
+}
+
+// =============================================
+// FETCH: Next tournament preview (when live)
+// =============================================
+
+interface NextTournamentResult {
+  preview: NextTournamentPreview | null;
+  predictions: AIPredictionData | null;
+}
+
+async function fetchNextTournamentPreview(): Promise<NextTournamentResult> {
+  const pgaSeasonId = await getPgaSeasonId();
+  if (!pgaSeasonId) return { preview: null, predictions: null };
+
+  const now = new Date().toISOString();
+  const { data: nextTournament } = await supabase
+    .from('sr_tournaments')
+    .select('*')
+    .eq('season_id', pgaSeasonId)
+    .eq('status', 'scheduled')
+    .gte('start_date', now)
+    .order('start_date', { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  if (!nextTournament) return { preview: null, predictions: null };
+
+  // Check if predictions exist
+  const { data: aiPredictions } = await supabase
+    .from('ai_predictions')
+    .select('id')
+    .eq('tournament_id', nextTournament.id)
+    .maybeSingle();
+
+  const preview: NextTournamentPreview = {
+    id: nextTournament.id,
+    name: nextTournament.name,
+    courseName: nextTournament.venue_name || '',
+    startDate: nextTournament.start_date,
+    hasPredictions: !!aiPredictions,
+  };
+
+  // Fetch full predictions if available
+  let predictions: AIPredictionData | null = null;
+  if (aiPredictions) {
+    predictions = await fetchPredictionsForTournament(nextTournament);
+  }
+
+  return { preview, predictions };
+}
+
+// =============================================
+// SHARED HELPERS
+// =============================================
+
+async function getPgaSeasonId(): Promise<string | null> {
   const { data: seasons } = await supabase
     .from('sr_seasons')
     .select('id')
@@ -106,58 +278,31 @@ async function fetchAIPredictions(): Promise<AIPredictionData | null> {
     .order('year', { ascending: false })
     .limit(1);
 
-  const pgaSeasonId = seasons?.[0]?.id;
-  if (!pgaSeasonId) {
-    console.error('[useAIPredictions] No PGA season found');
-    return null;
-  }
+  return seasons?.[0]?.id ?? null;
+}
 
-  // Step 2: Get NEXT tournament that hasn't started yet
-  // This automatically switches to the next tournament when current one begins
-  const now = new Date().toISOString();
-  
-  const { data: tournament, error: tournamentError } = await supabase
-    .from('sr_tournaments')
-    .select('*')
-    .eq('season_id', pgaSeasonId)
-    .gte('start_date', now)  // Tournament hasn't started yet
-    .order('start_date', { ascending: true })
-    .limit(1)
-    .single();
-
-  if (tournamentError || !tournament) {
-    console.log('[useAIPredictions] No upcoming tournaments found - season may be complete');
-    return null;
-  }
-
-  // Step 3: Fetch AI predictions for this tournament
-  const { data: aiPredictions, error: predictionError } = await supabase
+async function fetchPredictionsForTournament(tournament: any): Promise<AIPredictionData | null> {
+  const { data: aiPredictions } = await supabase
     .from('ai_predictions')
     .select('*')
     .eq('tournament_id', tournament.id)
     .maybeSingle();
 
-  // If no AI predictions, trigger generation (optional - can be done manually)
   if (!aiPredictions) {
-    console.log('[useAIPredictions] No AI predictions found for tournament');
-    
-    // Optionally trigger generation
+    // Try to generate predictions
     try {
       const { data, error } = await supabase.functions.invoke('generate-predictions', {
         body: { tournamentId: tournament.id },
       });
-
       if (!error && data?.predictions) {
         return formatPredictions(tournament, data.predictions, true);
       }
     } catch (err) {
       console.error('[useAIPredictions] Failed to generate predictions:', err);
     }
-    
     return null;
   }
 
-  // Step 4: Format and return predictions
   return formatPredictions(
     tournament,
     {
@@ -177,7 +322,6 @@ function formatPredictions(
   isAIPowered: boolean,
   generatedAt?: string
 ): AIPredictionData {
-  // Enhance contenders with resolved photo URLs
   const topContenders = (predictions.topContenders || predictions).map((p: any, index: number) => ({
     ...p,
     rank: p.rank || index + 1,
@@ -201,6 +345,7 @@ function formatPredictions(
       purse: tournament.purse,
       par: tournament.venue_par,
       yardage: tournament.venue_yardage,
+      status: tournament.status,
     },
     topContenders,
     darkHorses,

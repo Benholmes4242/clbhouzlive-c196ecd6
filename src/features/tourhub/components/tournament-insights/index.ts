@@ -7,5 +7,24 @@ export { TournamentHeroCard } from './TournamentHeroCard';
 export { CourseDNACard } from './CourseDNACard';
 export { ClubhouseIntelligence } from './ClubhouseIntelligence';
 export { LikelyWinnersCarousel } from './LikelyWinnersCarousel';
+export { PredictionTracker } from './PredictionTracker';
+export { AccuracyHeadlineCard } from './AccuracyHeadlineCard';
+export { PredictionScorecard } from './PredictionScorecard';
+export { PredictionScorecardRow } from './PredictionScorecardRow';
+export { DarkHorseTracker } from './DarkHorseTracker';
+export { LiveBadge } from './LiveBadge';
+export { UpNextPreview } from './UpNextPreview';
+export { ResultsRecap } from './ResultsRecap';
 export { useTournamentInsights } from './hooks/useTournamentInsights';
-export type { TournamentInsightsData, CourseDNAItem, WinnerProfile, DangerousProfile, ContenderCard } from './types';
+export type {
+  TournamentInsightsData,
+  CourseDNAItem,
+  WinnerProfile,
+  DangerousProfile,
+  ContenderCard,
+  TournamentPhase,
+  TrackedPrediction,
+  AccuracyMetrics,
+  PredictionTrackerData,
+  NextTournamentPreview,
+} from './types';
