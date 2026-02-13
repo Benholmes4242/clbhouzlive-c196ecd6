@@ -327,7 +327,7 @@ export function UnifiedWorldRankings() {
             <div>
               <div className="flex items-center gap-1.5 mb-2">
                 <TrendingDown className="w-3.5 h-3.5 text-red-500" />
-                <span style={{ fontSize: '13px', fontWeight: 600, color: '#1C1917' }}>Biggest Drops</span>
+                <span style={{ fontSize: '13px', fontWeight: 600, color: '#1C1917' }}>Biggest Fallers This Week</span>
               </div>
               <div
                 className="flex gap-2 overflow-x-auto scrollbar-hide pb-1"
