@@ -139,9 +139,6 @@ export const LeaderboardRow = memo(function LeaderboardRow({
           <div style={{ width: '12px', height: '8px', borderRadius: '1px' }}>
             <CountryFlag country={player.countryCode} size="sm" />
           </div>
-          <span style={{ fontSize: '11px', color: 'rgba(0, 0, 0, 0.35)' }}>
-            {formatCountryName(player.countryCode)}
-          </span>
         </div>
       </div>
 

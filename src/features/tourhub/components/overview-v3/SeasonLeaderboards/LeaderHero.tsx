@@ -93,7 +93,7 @@ export const LeaderHero = memo(function LeaderHero({ player, accentColor }: Lead
         </div>
 
         {/* RIGHT: Name, country, stat, label */}
-        <div className="flex-1 min-w-0 flex flex-col justify-center">
+        <div className="flex-1 min-w-0 flex flex-col justify-center items-center text-center">
           {/* Player name */}
           <span
             className="block truncate text-foreground"
@@ -102,16 +102,13 @@ export const LeaderHero = memo(function LeaderHero({ player, accentColor }: Lead
             {player.playerName}
           </span>
 
-          {/* Country — flag + name inline */}
-          <div className="flex items-center mt-1" style={{ gap: '5px' }}>
+          {/* Country — flag only */}
+          <div className="flex items-center mt-1">
             <CountryFlag country={player.countryCode} size="sm" />
-            <span className="text-muted-foreground" style={{ fontSize: '12px', lineHeight: 1 }}>
-              {formatCountryName(player.countryCode)}
-            </span>
           </div>
 
           {/* Stat value */}
-          <div className="flex items-baseline" style={{ marginTop: '12px', gap: '4px' }}>
+          <div className="flex items-baseline justify-center" style={{ marginTop: '12px', gap: '4px' }}>
             <span
               style={{
                 fontFamily: "'JetBrains Mono', monospace",

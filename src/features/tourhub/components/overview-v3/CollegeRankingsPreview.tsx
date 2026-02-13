@@ -1,22 +1,31 @@
 /**
- * CollegeRankingsPreview - Cinematic College Golf Rankings
+ * CollegeRankingsPreview - College Power Rankings
  * 
- * "This is where elite professional golfers are made."
+ * "Who's producing the strongest tour talent?"
  * 
- * Professional → Slick → Informative → Cinematic → Gamified
- * One dominant hero. Two challengers. Depth on intent.
+ * #1 hero: full-width square card with large logo + two featured players (top earner, most wins)
+ * #2/#3 chasers: stacked vertically, same card style as performance rankings leader
  */
 
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronRight, Trophy, GraduationCap, DollarSign, Users } from 'lucide-react';
+import { ChevronRight, GraduationCap, DollarSign, Trophy, Users } from 'lucide-react';
 import { useCollegeSeasonStats, type CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useCollegeMediaMap, type CollegeMedia } from '../../hooks/useCollegeMedia';
 import { useBatchCollegeAlumni, type AlumniFace } from '../../hooks/useBatchCollegeAlumni';
 import { getCollegeGradientCSS } from '../../config/collegeBrandColors';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
-import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
+import { resolvePhotoUrl, getPgaTourHeadshotUrl } from '../../utils/resolvePhotoUrl';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+
+// Amber accent (matches Performance Rankings)
+const AMBER = {
+  primary: '#f59e0b',
+  bgLight: 'rgba(245, 158, 11, 0.04)',
+  bgMedium: 'rgba(245, 158, 11, 0.08)',
+  border: 'rgba(245, 158, 11, 0.2)',
+};
 
 // ============================================================================
 // SKELETON
@@ -40,93 +49,39 @@ function CollegePreviewSkeleton() {
 }
 
 // ============================================================================
-// PIPELINE ALUMNI AVATAR (with proper photo resolution)
+// FEATURED PLAYER PILL (squircle avatar + label)
 // ============================================================================
 
-function AlumniAvatar({ alum }: { alum: AlumniFace }) {
+function FeaturedPlayerPill({
+  alum,
+  label,
+  icon: Icon,
+}: {
+  alum: AlumniFace;
+  label: string;
+  icon: React.FC<{ className?: string; style?: React.CSSProperties }>;
+}) {
   const photoUrl = resolvePhotoUrl(alum.photo_url, alum.pga_tour_id);
-  const initials = alum.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-  const [imgError, setImgError] = useState(false);
-
-  const showPhoto = photoUrl && !imgError;
-
+  
   return (
-    <div
-      className="rounded-full overflow-hidden flex-shrink-0"
-      style={{
-        width: '34px',
-        height: '34px',
-        border: '2px solid rgba(255,255,255,0.7)',
-        boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
-      }}
-    >
-      {showPhoto ? (
-        <img
-          src={photoUrl}
-          alt={alum.full_name}
-          className="w-full h-full object-cover object-top"
-          loading="lazy"
-          onError={() => setImgError(true)}
-        />
-      ) : (
-        <div
-          className="w-full h-full flex items-center justify-center"
-          style={{ background: 'rgba(255,255,255,0.2)' }}
-        >
-          <span style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.8)' }}>
-            {initials}
+    <div className="flex items-center" style={{ gap: '8px' }}>
+      <SquircleAvatar
+        size={34}
+        src={photoUrl}
+        alt={alum.full_name}
+        hideRing
+        fallback={alum.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+      />
+      <div className="min-w-0">
+        <p className="m-0 text-white truncate" style={{ fontSize: '12px', fontWeight: 600, lineHeight: 1.2 }}>
+          {alum.full_name}
+        </p>
+        <div className="flex items-center" style={{ gap: '3px', marginTop: '1px' }}>
+          <Icon className="w-2.5 h-2.5" style={{ color: 'rgba(255,255,255,0.45)' }} />
+          <span style={{ fontSize: '9px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)' }}>
+            {label}
           </span>
         </div>
-      )}
-    </div>
-  );
-}
-
-// ============================================================================
-// PIPELINE STRIP
-// ============================================================================
-
-function PipelineStrip({ alumni }: { alumni: AlumniFace[] }) {
-  if (!alumni.length) return null;
-
-  const displayCount = Math.min(alumni.length, 5);
-  const overflow = alumni.length - displayCount;
-
-  return (
-    <div style={{ marginTop: '14px' }}>
-      <p
-        className="m-0"
-        style={{
-          fontSize: '9px',
-          fontWeight: 600,
-          letterSpacing: '1px',
-          textTransform: 'uppercase',
-          color: 'rgba(255,255,255,0.4)',
-          marginBottom: '8px',
-        }}
-      >
-        Pipeline to the Tour
-      </p>
-
-      <div className="flex items-center">
-        <div className="flex" style={{ marginLeft: '0' }}>
-          {alumni.slice(0, displayCount).map((alum, idx) => (
-            <div
-              key={alum.id}
-              style={{ marginLeft: idx === 0 ? '0' : '-8px', zIndex: displayCount - idx }}
-            >
-              <AlumniAvatar alum={alum} />
-            </div>
-          ))}
-        </div>
-        {overflow > 0 && (
-          <span
-            className="ml-2 font-semibold"
-            style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)' }}
-          >
-            +{overflow} more
-          </span>
-        )}
       </div>
     </div>
   );
@@ -148,6 +103,10 @@ function HeroCollegeCard({
   const navigate = useNavigate();
   const displayName = media?.college_name || stats.normalized_name;
   const gradient = getCollegeGradientCSS(stats.normalized_name);
+
+  // Pick two featured alumni: first as "Top Earner", second as "Most Wins"
+  const topEarner = alumni[0] || null;
+  const topWinner = alumni[1] || null;
 
   return (
     <motion.button
@@ -179,25 +138,18 @@ function HeroCollegeCard({
 
         {/* Centered vertical stack — logo, badge, name, stats */}
         <div className="relative flex-1 flex flex-col items-center justify-center px-5 pt-5">
-          {/* Logo — large circular treatment */}
+          {/* Logo — large, no frosted circle */}
           {media?.logo_url && (
-            <div
-              className="rounded-full flex items-center justify-center mb-4"
+            <img
+              src={media.logo_url}
+              alt={displayName}
+              className="object-contain mb-4"
               style={{
                 width: '110px',
                 height: '110px',
-                background: 'rgba(255,255,255,0.12)',
-                border: '2px solid rgba(255,255,255,0.15)',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.3))',
               }}
-            >
-              <img
-                src={media.logo_url}
-                alt={displayName}
-                className="object-contain"
-                style={{ width: '70px', height: '70px', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.3))' }}
-              />
-            </div>
+            />
           )}
 
           {/* #1 THIS SEASON badge */}
@@ -271,9 +223,16 @@ function HeroCollegeCard({
           </div>
         </div>
 
-        {/* Pipeline to the Tour — bottom, left-aligned, unchanged */}
-        <div className="relative px-5 pb-5">
-          <PipelineStrip alumni={alumni} />
+        {/* Featured players — bottom */}
+        <div className="relative px-5 pb-5" style={{ marginTop: '14px' }}>
+          <div className="flex items-center justify-between">
+            {topEarner && (
+              <FeaturedPlayerPill alum={topEarner} label="Top Earner" icon={DollarSign} />
+            )}
+            {topWinner && (
+              <FeaturedPlayerPill alum={topWinner} label="Most Wins" icon={Trophy} />
+            )}
+          </div>
         </div>
       </div>
     </motion.button>
@@ -281,7 +240,8 @@ function HeroCollegeCard({
 }
 
 // ============================================================================
-// CHASER CARD (#2, #3) — Horizontal split: logo left, stats right
+// CHASER CARD (#2, #3) — Stacked, same style as Performance Rankings leader
+// Left: college logo, Right: stats + two featured alumni
 // ============================================================================
 
 function ChaserCard({
@@ -289,12 +249,14 @@ function ChaserCard({
   media,
   rank,
   leaderStats,
+  alumni,
   index,
 }: {
   stats: CollegeSeasonStats;
   media: CollegeMedia | undefined;
   rank: number;
   leaderStats: CollegeSeasonStats;
+  alumni: AlumniFace[];
   index: number;
 }) {
   const navigate = useNavigate();
@@ -302,21 +264,19 @@ function ChaserCard({
 
   // Gap to leader
   const earningsGap = stats.earnings_total - leaderStats.earnings_total;
-  const winsGap = stats.wins_total - leaderStats.wins_total;
-  const gapText = winsGap < 0
-    ? `${winsGap} wins to #1`
-    : `${earningsGap < 0 ? formatCurrency(earningsGap) : '$0'} to #1`;
+  const gapText = earningsGap < 0 ? `${formatCurrency(earningsGap)} to #1` : 'Tied';
+
+  const topEarner = alumni[0] || null;
+  const topWinner = alumni[1] || null;
 
   return (
     <motion.button
       onClick={() => navigate(`/tourhub/college?sort=earnings`)}
-      className="flex-shrink-0 text-left cursor-pointer active:scale-[0.97] transition-transform duration-150"
+      className="w-full text-left relative overflow-hidden active:scale-[0.99] transition-transform duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
       style={{
-        width: 'calc(50% - 6px)',
-        minWidth: '155px',
-        padding: '12px',
+        padding: '20px',
         background: '#FFFFFF',
-        borderRadius: '14px',
+        borderRadius: '20px',
         border: '1px solid rgba(0,0,0,0.06)',
         boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
       }}
@@ -325,52 +285,92 @@ function ChaserCard({
       viewport={{ once: true }}
       transition={{ duration: 0.4, delay: 0.1 + index * 0.08, ease: [0.16, 1, 0.3, 1] }}
     >
-      {/* Horizontal split: Logo left, info right */}
-      <div className="flex" style={{ gap: '10px' }}>
-        {/* LEFT: Logo */}
-        <div className="flex-shrink-0 flex items-start" style={{ paddingTop: '2px' }}>
+      {/* Horizontal split: Logo left, Info right */}
+      <div className="relative flex" style={{ gap: '18px' }}>
+        {/* LEFT: College logo - edge-to-edge */}
+        <div className="flex-shrink-0 -ml-5 -my-5 flex items-center justify-center"
+          style={{
+            width: '120px',
+            minHeight: '140px',
+            borderTopLeftRadius: '20px',
+            borderBottomLeftRadius: '20px',
+            background: 'rgba(0,0,0,0.02)',
+          }}
+        >
           {media?.logo_url ? (
             <img
               src={media.logo_url}
               alt={displayName}
-              className="object-contain flex-shrink-0"
-              style={{ width: '48px', height: '48px' }}
+              className="object-contain"
+              style={{ width: '72px', height: '72px' }}
             />
           ) : (
-            <div
-              className="flex items-center justify-center rounded-xl bg-muted flex-shrink-0"
-              style={{ width: '48px', height: '48px' }}
-            >
-              <GraduationCap className="w-5 h-5 text-muted-foreground" />
-            </div>
+            <GraduationCap className="w-10 h-10 text-muted-foreground" />
           )}
         </div>
 
-        {/* RIGHT: Name, stats, gap */}
-        <div className="flex-1 min-w-0">
+        {/* RIGHT: Name, stats, featured players */}
+        <div className="flex-1 min-w-0 flex flex-col justify-center">
           {/* Rank + Name */}
           <div className="flex items-center" style={{ gap: '4px' }}>
             <span className="text-muted-foreground" style={{ fontSize: '11px', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
               #{rank}
             </span>
             <span className="text-muted-foreground" style={{ fontSize: '11px' }}>·</span>
-            <span className="truncate text-foreground" style={{ fontSize: '13px', fontWeight: 700 }}>
+            <span className="truncate text-foreground" style={{ fontSize: '16px', fontWeight: 700 }}>
               {displayName}
             </span>
           </div>
 
-          {/* All three stats inline */}
-          <p className="m-0 text-muted-foreground truncate" style={{ fontSize: '11px', fontWeight: 500, marginTop: '4px' }}>
-            {stats.wins_total} Wins · {formatCurrency(stats.earnings_total)}
-          </p>
-          <p className="m-0 text-muted-foreground" style={{ fontSize: '10px', fontWeight: 500, marginTop: '1px' }}>
-            {stats.player_count} Alumni on Tour
+          {/* Stats row */}
+          <p className="m-0 text-muted-foreground" style={{ fontSize: '12px', fontWeight: 500, marginTop: '4px' }}>
+            {formatCurrency(stats.earnings_total)} · {stats.wins_total} Wins · {stats.player_count} Alumni
           </p>
 
           {/* Gap to leader */}
-          <p className="m-0" style={{ fontSize: '10px', fontWeight: 500, marginTop: '4px', color: 'rgba(0,0,0,0.35)', fontVariantNumeric: 'tabular-nums' }}>
+          <p className="m-0" style={{ fontSize: '10px', fontWeight: 500, marginTop: '2px', color: 'rgba(0,0,0,0.35)', fontVariantNumeric: 'tabular-nums' }}>
             {gapText}
           </p>
+
+          {/* Featured alumni squircles */}
+          {(topEarner || topWinner) && (
+            <div className="flex items-center mt-3" style={{ gap: '12px' }}>
+              {topEarner && (
+                <div className="flex items-center" style={{ gap: '5px' }}>
+                  <SquircleAvatar
+                    size={24}
+                    src={resolvePhotoUrl(topEarner.photo_url, topEarner.pga_tour_id)}
+                    alt={topEarner.full_name}
+                    hideRing
+                    fallback={topEarner.full_name[0]}
+                  />
+                  <div>
+                    <p className="m-0 truncate text-foreground" style={{ fontSize: '10px', fontWeight: 600, lineHeight: 1.1, maxWidth: '70px' }}>
+                      {topEarner.full_name.split(' ').pop()}
+                    </p>
+                    <p className="m-0 text-muted-foreground" style={{ fontSize: '8px', fontWeight: 500 }}>Top Earner</p>
+                  </div>
+                </div>
+              )}
+              {topWinner && (
+                <div className="flex items-center" style={{ gap: '5px' }}>
+                  <SquircleAvatar
+                    size={24}
+                    src={resolvePhotoUrl(topWinner.photo_url, topWinner.pga_tour_id)}
+                    alt={topWinner.full_name}
+                    hideRing
+                    fallback={topWinner.full_name[0]}
+                  />
+                  <div>
+                    <p className="m-0 truncate text-foreground" style={{ fontSize: '10px', fontWeight: 600, lineHeight: 1.1, maxWidth: '70px' }}>
+                      {topWinner.full_name.split(' ').pop()}
+                    </p>
+                    <p className="m-0 text-muted-foreground" style={{ fontSize: '8px', fontWeight: 500 }}>Most Wins</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </motion.button>
@@ -388,18 +388,15 @@ function NarrativeStrip({ topCollege }: { topCollege: CollegeSeasonStats }) {
       .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
       .join(' ');
 
-    if (topCollege.wins_total >= 3) {
-      return `${name} dominates with ${topCollege.wins_total} wins this season`;
-    }
-    return `${name} leads the nation in tour earnings`;
+    return `${name} dominates with ${formatCurrency(topCollege.earnings_total)} in tour earnings this season`;
   }, [topCollege]);
 
   return (
     <div
       className="rounded-md"
       style={{
-        borderLeft: '2px solid hsl(142 76% 36% / 0.25)',
-        background: 'hsl(142 76% 36% / 0.03)',
+        borderLeft: '2px solid rgba(245, 158, 11, 0.3)',
+        background: 'rgba(245, 158, 11, 0.03)',
         padding: '8px 10px',
       }}
     >
@@ -430,9 +427,9 @@ export function CollegeRankingsPreview() {
       .slice(0, 3);
   }, [allStats]);
 
-  // Batch alumni for top college only
+  // Batch alumni for all top 3 colleges
   const topCollegeSlugs = useMemo(() => {
-    return top3.length > 0 ? [top3[0].normalized_name] : [];
+    return top3.map(s => s.normalized_name);
   }, [top3]);
   const { data: alumniMap } = useBatchCollegeAlumni(topCollegeSlugs, 5);
 
@@ -464,11 +461,11 @@ export function CollegeRankingsPreview() {
               className="m-0"
               style={{ fontSize: '16px', fontWeight: 600, color: '#1C1917', letterSpacing: '-0.2px' }}
             >
-              College Golf Rankings
+              College Power Rankings
             </h2>
           </div>
           <p className="m-0" style={{ fontSize: '12px', fontWeight: 400, color: '#78716C', marginTop: '3px', marginLeft: '24px' }}>
-            See how your college stacks up on tour
+            Who's producing the strongest tour talent?
           </p>
         </div>
         <button
@@ -484,7 +481,7 @@ export function CollegeRankingsPreview() {
       {/* Hairline divider */}
       <div className="mx-4 mb-3" style={{ borderBottom: '1px solid hsl(var(--border) / 0.1)' }} />
 
-      {/* NARRATIVE STRIP — editorial pull-quote style */}
+      {/* NARRATIVE STRIP */}
       <motion.div
         className="px-4 mb-4"
         initial={{ opacity: 0 }}
@@ -504,7 +501,7 @@ export function CollegeRankingsPreview() {
         />
       </div>
 
-      {/* THE CHASERS (#2 & #3) */}
+      {/* THE CHASERS (#2 & #3) — stacked vertically */}
       {chasers.length > 0 && (
         <div className="px-4" style={{ marginTop: '16px' }}>
           <p
@@ -519,7 +516,7 @@ export function CollegeRankingsPreview() {
           >
             The Chasers
           </p>
-          <div className="flex" style={{ gap: '12px' }}>
+          <div className="flex flex-col" style={{ gap: '12px' }}>
             {chasers.map((s, idx) => (
               <ChaserCard
                 key={s.id}
@@ -527,6 +524,7 @@ export function CollegeRankingsPreview() {
                 media={collegeMap?.get(s.normalized_name)}
                 rank={idx + 2}
                 leaderStats={topCollege}
+                alumni={alumniMap?.get(s.normalized_name) || []}
                 index={idx}
               />
             ))}
@@ -534,17 +532,29 @@ export function CollegeRankingsPreview() {
         </div>
       )}
 
-      {/* CTA — TEXT-ONLY */}
-      <div className="px-4" style={{ marginTop: '16px' }}>
+      {/* CTA — same style as Performance Rankings ViewAllFooter */}
+      <div style={{ padding: '16px 16px 0' }}>
         <button
           onClick={() => navigate('/tourhub/college')}
-          className="flex items-center gap-1 group transition-all duration-200 bg-transparent border-none cursor-pointer active:scale-[0.98]"
-          style={{ fontSize: '13px', fontWeight: 500, color: '#EA580C' }}
+          className="w-full flex items-center justify-center transition-all duration-300 hover:scale-[1.01] active:scale-[0.97]"
+          style={{
+            padding: '12px',
+            background: AMBER.bgLight,
+            border: `1px solid ${AMBER.border}`,
+            borderRadius: '12px',
+            gap: '6px',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = AMBER.bgMedium;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = AMBER.bgLight;
+          }}
         >
-          <span className="group-hover:text-foreground transition-colors">
+          <span style={{ fontSize: '13px', fontWeight: 600, color: AMBER.primary }}>
             View Full College Rankings
           </span>
-          <ChevronRight size={14} className="opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+          <ChevronRight size={14} style={{ color: AMBER.primary }} />
         </button>
       </div>
     </section>
