@@ -98,17 +98,17 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
       {/* PLAYER — Avatar + Name */}
       <div className="flex items-center gap-2.5 flex-1 min-w-0 pl-2">
         <div className="relative flex-shrink-0 w-10 h-10 rounded-full overflow-hidden bg-muted">
-          {avatarUrl ? (
+          <div className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-muted-foreground z-0">
+            {initials}
+          </div>
+          {avatarUrl && (
             <img
               src={avatarUrl}
               alt={prediction.playerName}
-              className="w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-cover z-10"
               onError={(e) => { e.currentTarget.style.display = 'none'; }}
             />
-          ) : null}
-          <div className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-muted-foreground -z-0">
-            {initials}
-          </div>
+          )}
         </div>
         <div className="min-w-0 flex-1">
           <p

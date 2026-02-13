@@ -36,12 +36,6 @@ export const PredictionTracker: React.FC<PredictionTrackerProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* Accuracy headline */}
-      <AccuracyHeadlineCard
-        accuracy={tracker.accuracy}
-        lastUpdated={tracker.lastUpdated}
-      />
-
       {/* Main predictions scorecard */}
       <PredictionScorecard predictions={tracker.predictions} />
 
