@@ -261,7 +261,7 @@ export function HubPageNew() {
   }, [echoInput, handleOpenEcho]);
 
   const shuffledPrompts = useMemo(() => {
-    return [...WHISPER_PROMPTS].sort(() => Math.random() - 0.5).slice(0, 2);
+    return [...WHISPER_PROMPTS].sort(() => Math.random() - 0.5).slice(0, 3);
   }, []);
 
   const containerVariants = useMemo(() => getContainerVariants(prefersReduced), [prefersReduced]);
@@ -546,11 +546,11 @@ export function HubPageNew() {
 
           {/* Echo Card — flex-1 to fill remaining space */}
           <motion.div variants={cardVariants} className="flex-1 min-h-0 flex flex-col">
-            <div className="warm-echo-gradient flex-1 flex flex-col min-h-0 px-[18px] py-[16px]">
+            <div className="warm-echo-gradient flex-1 flex flex-col min-h-0 px-[18px] py-[14px]">
               {/* Header */}
               <button
                 onClick={() => { haptic('light'); navigate('/echo'); }}
-                className="flex items-center justify-between mb-3 active:scale-[0.98] transition-transform"
+                className="flex items-center justify-between mb-2 active:scale-[0.98] transition-transform"
               >
                 <div className="flex items-center gap-3">
                   {/* Echo orb */}
@@ -575,8 +575,13 @@ export function HubPageNew() {
                 <span className="text-[16px]" style={{ color: '#D97706' }}>→</span>
               </button>
 
-              {/* Suggestion chips — 2 only, flex-1 to center */}
-              <div className="flex-1 flex flex-col justify-center gap-[7px] min-h-0">
+              {/* Greeting text — fills the gap */}
+              <p className="text-[13px] font-normal mb-2" style={{ color: 'rgba(146,64,14,0.5)' }}>
+                How can I help today?
+              </p>
+
+              {/* Suggestion chips — 3 chips, tight spacing */}
+              <div className="flex flex-col gap-[6px] min-h-0">
                 {shuffledPrompts.map((prompt, i) => (
                   <button
                     key={i}
@@ -591,7 +596,7 @@ export function HubPageNew() {
               </div>
 
               {/* Input bar */}
-              <div className="flex-none mt-3">
+              <div className="flex-none mt-[12px]">
                 <div className="warm-input-bar">
                   <input
                     type="text"
