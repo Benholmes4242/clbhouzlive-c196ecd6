@@ -137,7 +137,7 @@ function HeroCollegeCard({
         </div>
 
         {/* Centered vertical stack — logo, badge, name, stats */}
-        <div className="relative flex-1 flex flex-col items-center justify-center px-5 pt-5">
+        <div className="relative flex-1 flex flex-col items-center justify-center px-5">
           {/* Logo — large, no frosted circle */}
           {media?.logo_url && (
             <img
@@ -224,7 +224,7 @@ function HeroCollegeCard({
         </div>
 
         {/* Featured players — bottom */}
-        <div className="relative px-5 pb-5" style={{ marginTop: '14px' }}>
+        <div className="relative px-5 pb-5" style={{ marginTop: 'auto' }}>
           <div className="flex items-center justify-between">
             {topEarner && (
               <FeaturedPlayerPill alum={topEarner} label="Top Earner" icon={DollarSign} />
@@ -264,7 +264,8 @@ function ChaserCard({
 
   // Gap to leader
   const earningsGap = stats.earnings_total - leaderStats.earnings_total;
-  const gapText = earningsGap < 0 ? `${formatCurrency(earningsGap)} to #1` : 'Tied';
+  const absGap = Math.abs(earningsGap);
+  const gapText = earningsGap < 0 ? `-${formatCurrency(absGap).replace('$', '')} to #1` : 'Tied';
 
   const topEarner = alumni[0] || null;
   const topWinner = alumni[1] || null;
@@ -310,7 +311,7 @@ function ChaserCard({
         </div>
 
         {/* RIGHT: Name, stats, featured players */}
-        <div className="flex-1 min-w-0 flex flex-col justify-center">
+        <div className="flex-1 min-w-0 flex flex-col justify-center items-center text-center">
           {/* Rank + Name */}
           <div className="flex items-center" style={{ gap: '4px' }}>
             <span className="text-muted-foreground" style={{ fontSize: '11px', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
@@ -334,7 +335,7 @@ function ChaserCard({
 
           {/* Featured alumni squircles */}
           {(topEarner || topWinner) && (
-            <div className="flex items-center mt-3" style={{ gap: '12px' }}>
+            <div className="flex items-center justify-center mt-3" style={{ gap: '12px' }}>
               {topEarner && (
                 <div className="flex items-center" style={{ gap: '5px' }}>
                   <SquircleAvatar

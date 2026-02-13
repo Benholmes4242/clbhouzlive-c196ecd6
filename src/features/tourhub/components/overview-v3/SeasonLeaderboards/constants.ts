@@ -39,11 +39,11 @@ export const CATEGORY_CONFIG: {
   id: CategoryId;
   name: string;
 }[] = [
+  { id: 'sg_total', name: 'Overall' },
   { id: 'distance', name: 'Distance' },
   { id: 'accuracy', name: 'Accuracy' },
   { id: 'scrambling', name: 'Scrambling' },
   { id: 'putting', name: 'Putting' },
-  { id: 'sg_total', name: 'Overall' },
 ];
 
 // Spring config kept for potential future use
