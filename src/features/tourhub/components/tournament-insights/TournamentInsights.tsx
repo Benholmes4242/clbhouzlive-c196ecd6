@@ -191,9 +191,6 @@ export const TournamentInsights = memo(function TournamentInsights() {
           >
             {tracker ? (
               <div className="space-y-4">
-                {/* Accuracy headline */}
-                <AccuracyHeadlineCard accuracy={tracker.accuracy} lastUpdated={tracker.lastUpdated} />
-
                 {/* Unified leaderboard table */}
                 <PredictionLeaderboard allPicks={tracker.allPicks} />
 

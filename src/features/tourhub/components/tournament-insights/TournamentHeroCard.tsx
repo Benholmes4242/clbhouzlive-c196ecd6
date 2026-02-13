@@ -60,12 +60,6 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
         </span>
       </div>
 
-      {/* Top Right — LIVE badge */}
-      {isLive && (
-        <div className="absolute top-4 right-4">
-          <LiveBadge />
-        </div>
-      )}
 
       {/* Content - anchored bottom left */}
       <div className="absolute bottom-0 left-0 right-0 px-4 pb-5 pt-4">
