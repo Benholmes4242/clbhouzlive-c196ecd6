@@ -8,6 +8,7 @@ import { useAIPredictions } from '../../../hooks/useAIPredictions';
 import { usePredictionTracker } from '../../../hooks/usePredictionTracker';
 import { format, parseISO } from 'date-fns';
 import { getFallbackCourseImage } from '../../../hooks/useVenueImage';
+import type { AIPredictionData } from '../../../hooks/useAIPredictions';
 import type { 
   TournamentInsightsData, 
   CourseDNAItem, 
@@ -39,70 +40,14 @@ export function useTournamentInsights() {
 
   const data = useMemo((): TournamentInsightsData | null => {
     if (!aiData) return null;
-
-    const { tournament, topContenders, darkHorses, courseAnalysis } = aiData;
-
-    // Format date range
-    const formatDate = (dateStr: string) => {
-      try {
-        return format(parseISO(dateStr), 'MMM d');
-      } catch {
-        return dateStr;
-      }
-    };
-    const dateRangeText = `${formatDate(tournament.startDate)} - ${formatDate(tournament.endDate)}`;
-
-    // Format purse
-    const purseText = tournament.purse 
-      ? `$${(tournament.purse / 1000000).toFixed(1)}M` 
-      : undefined;
-
-    return {
-      tournament: {
-        id: tournament.id,
-        name: tournament.name,
-        courseName: tournament.venueName,
-        location: tournament.venueCity 
-          ? `${tournament.venueCity}, ${tournament.venueState}` 
-          : tournament.venueState,
-        dateRangeText,
-        purseText,
-        parText: tournament.par ? `Par ${tournament.par}` : undefined,
-        yardageText: tournament.yardage 
-          ? `${tournament.yardage.toLocaleString()} yds` 
-          : undefined,
-        heroImageUrl: getFallbackCourseImage(tournament.name),
-      },
-
-      courseDNA: deduplicateByLabel(transformCourseDNA(courseAnalysis?.keyStats || [])),
-
-      clubhouseIntelligence: {
-        primaryText: extractPrimaryText(courseAnalysis?.insight),
-        expandedText: (courseAnalysis as any)?.skillsAnalysis || generateSkillsAnalysis(courseAnalysis?.keyStats),
-      },
-
-      winners: topContenders.slice(0, 5).map((p, i) => ({
-        id: p.playerId,
-        name: p.playerName,
-        countryCode: p.country,
-        avatarUrl: p.photoUrl || '',
-        confidenceTier: getConfidenceTier(i),
-        fitBullets: p.reasons?.slice(0, 3) || [],
-        keyTag: extractKeyTag(p.reasons?.[0]),
-      })),
-
-      dangerous: darkHorses.slice(0, 4).map(dh => ({
-        id: dh.playerId,
-        name: dh.playerName,
-        avatarUrl: dh.photoUrl || '',
-        worldRankText: dh.worldRanking ? `#${dh.worldRanking}` : undefined,
-        traitLabel: extractTraitLabel(dh.keyStat),
-        oneLiner: dh.hook,
-      })),
-
-      contenderCards: buildContenderCards(topContenders, darkHorses),
-    };
+    return transformPredictions(aiData);
   }, [aiData]);
+
+  // Transform next tournament predictions into the same shape
+  const nextTournamentInsights = useMemo((): TournamentInsightsData | null => {
+    if (!nextTournamentPredictions) return null;
+    return transformPredictions(nextTournamentPredictions);
+  }, [nextTournamentPredictions]);
 
   return {
     data,
@@ -113,6 +58,73 @@ export function useTournamentInsights() {
     trackerLoading: trackerQuery.isLoading,
     nextTournament,
     nextTournamentPredictions,
+    nextTournamentInsights,
+  };
+}
+
+// =============================================
+// TRANSFORM: AIPredictionData → TournamentInsightsData
+// =============================================
+
+function transformPredictions(aiData: AIPredictionData): TournamentInsightsData {
+  const { tournament, topContenders, darkHorses, courseAnalysis } = aiData;
+
+  const formatDate = (dateStr: string) => {
+    try {
+      return format(parseISO(dateStr), 'MMM d');
+    } catch {
+      return dateStr;
+    }
+  };
+  const dateRangeText = `${formatDate(tournament.startDate)} - ${formatDate(tournament.endDate)}`;
+  const purseText = tournament.purse
+    ? `$${(tournament.purse / 1000000).toFixed(1)}M`
+    : undefined;
+
+  return {
+    tournament: {
+      id: tournament.id,
+      name: tournament.name,
+      courseName: tournament.venueName,
+      location: tournament.venueCity
+        ? `${tournament.venueCity}, ${tournament.venueState}`
+        : tournament.venueState,
+      dateRangeText,
+      purseText,
+      parText: tournament.par ? `Par ${tournament.par}` : undefined,
+      yardageText: tournament.yardage
+        ? `${tournament.yardage.toLocaleString()} yds`
+        : undefined,
+      heroImageUrl: getFallbackCourseImage(tournament.name),
+    },
+
+    courseDNA: deduplicateByLabel(transformCourseDNA(courseAnalysis?.keyStats || [])),
+
+    clubhouseIntelligence: {
+      primaryText: extractPrimaryText(courseAnalysis?.insight),
+      expandedText: (courseAnalysis as any)?.skillsAnalysis || generateSkillsAnalysis(courseAnalysis?.keyStats),
+    },
+
+    winners: topContenders.slice(0, 5).map((p, i) => ({
+      id: p.playerId,
+      name: p.playerName,
+      countryCode: p.country,
+      avatarUrl: p.photoUrl || '',
+      confidenceTier: getConfidenceTier(i),
+      fitBullets: p.reasons?.slice(0, 3) || [],
+      keyTag: extractKeyTag(p.reasons?.[0]),
+    })),
+
+    dangerous: darkHorses.slice(0, 4).map(dh => ({
+      id: dh.playerId,
+      name: dh.playerName,
+      avatarUrl: dh.photoUrl || '',
+      worldRankText: dh.worldRanking ? `#${dh.worldRanking}` : undefined,
+      traitLabel: extractTraitLabel(dh.keyStat),
+      oneLiner: dh.hook,
+    })),
+
+    contenderCards: buildContenderCards(topContenders, darkHorses),
   };
 }
 

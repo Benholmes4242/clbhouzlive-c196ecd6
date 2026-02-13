@@ -68,6 +68,7 @@ async function fetchTrackerData(
   return {
     predictions: trackedPredictions,
     darkHorses: trackedDarkHorses,
+    allPicks: [...trackedPredictions, ...trackedDarkHorses],
     accuracy,
     lastUpdated: new Date().toISOString(),
   };
