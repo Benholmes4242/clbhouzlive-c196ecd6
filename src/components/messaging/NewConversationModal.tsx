@@ -4,8 +4,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMessaging } from '@/hooks/useMessaging';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -26,6 +24,17 @@ interface NewConversationModalProps {
   initialTab?: 'direct' | 'group';
 }
 
+// Warm input style object shared across all inputs
+const warmInputStyle: React.CSSProperties = {
+  background: 'rgba(255,255,255,0.55)',
+  border: '1px solid rgba(234,88,12,0.08)',
+  borderRadius: '12px',
+  fontSize: '13px',
+  color: '#1C1917',
+};
+
+const warmInputClass = "w-full h-10 px-3 outline-none placeholder:text-[13px] placeholder:font-normal focus:ring-2 focus:ring-orange-200/60 transition-shadow";
+
 export function NewConversationModal({
   open,
   onOpenChange,
@@ -35,7 +44,6 @@ export function NewConversationModal({
   const { user } = useSupabaseSession();
   const { getOrCreateDM, createGroupChat } = useMessaging();
   
-  // Tab mode state
   const [mode, setMode] = useState<'direct' | 'group'>('direct');
   
   // DM tab state
@@ -70,13 +78,11 @@ export function NewConversationModal({
     }
   };
 
-  // Debounced search for DM tab
   useEffect(() => {
     if (!dmSearch.trim() || !user) {
       setDmResults([]);
       return;
     }
-
     const timeoutId = setTimeout(async () => {
       setDmLoading(true);
       try {
@@ -86,7 +92,6 @@ export function NewConversationModal({
           .or(`username.ilike.%${dmSearch}%,display_name.ilike.%${dmSearch}%`)
           .neq('id', user.id)
           .limit(20);
-
         if (error) throw error;
         setDmResults(data || []);
       } catch (err) {
@@ -96,30 +101,25 @@ export function NewConversationModal({
         setDmLoading(false);
       }
     }, 300);
-
     return () => clearTimeout(timeoutId);
   }, [dmSearch, user]);
 
-  // Debounced search for Group tab
   useEffect(() => {
     if (!groupSearch.trim() || !user) {
       setGroupResults([]);
       return;
     }
-
     const timeoutId = setTimeout(async () => {
       setGroupLoading(true);
       try {
         const selectedIds = selectedUsers.map(u => u.id);
         const excludeIds = [user.id, ...selectedIds];
-        
         const { data, error } = await supabase
           .from('public_profiles')
           .select('id, username, display_name, profile_photo_url')
           .or(`username.ilike.%${groupSearch}%,display_name.ilike.%${groupSearch}%`)
           .not('id', 'in', `(${excludeIds.join(',')})`)
           .limit(20);
-
         if (error) throw error;
         setGroupResults(data || []);
       } catch (err) {
@@ -129,11 +129,9 @@ export function NewConversationModal({
         setGroupLoading(false);
       }
     }, 300);
-
     return () => clearTimeout(timeoutId);
   }, [groupSearch, user, selectedUsers]);
 
-  // Reset state when modal closes
   useEffect(() => {
     if (!open) {
       setMode('direct');
@@ -142,7 +140,6 @@ export function NewConversationModal({
     }
   }, [open, initialTab]);
 
-  // Reset search state when modal closes
   useEffect(() => {
     if (!open) {
       setDmSearch('');
@@ -189,21 +186,16 @@ export function NewConversationModal({
 
   const handleCreateGroup = async () => {
     if (!groupName.trim() || selectedUsers.length === 0) return;
-    
     setCreatingGroup(true);
     try {
       let avatarUrl: string | undefined;
-      
-      // Upload avatar if selected
       if (groupAvatarFile) {
         const fileExt = groupAvatarFile.name.split('.').pop();
         const fileName = `group-${Date.now()}.${fileExt}`;
         const filePath = `group-avatars/${fileName}`;
-        
         const { error: uploadError } = await supabase.storage
           .from('avatars')
           .upload(filePath, groupAvatarFile);
-          
         if (!uploadError) {
           const { data: { publicUrl } } = supabase.storage
             .from('avatars')
@@ -211,7 +203,6 @@ export function NewConversationModal({
           avatarUrl = publicUrl;
         }
       }
-      
       const participantIds = selectedUsers.map(u => u.id);
       const conversationId = await createGroupChat(groupName.trim(), participantIds, avatarUrl);
       if (conversationId) {
@@ -247,10 +238,10 @@ export function NewConversationModal({
         }
       }}
       className={cn(
-        "w-full flex items-center gap-3 p-3 rounded-lg transition-colors text-left",
-        "hover:bg-muted/50 cursor-pointer",
+        "w-full flex items-center gap-3 p-3 rounded-xl transition-colors text-left active:scale-[0.98] transition-transform",
+        "hover:bg-white/40 cursor-pointer",
         isLoading && "opacity-50 pointer-events-none",
-        isSelected && "bg-primary/10"
+        isSelected && "bg-white/50"
       )}
     >
       {showCheckbox && (
@@ -264,17 +255,17 @@ export function NewConversationModal({
         hideRing
       />
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-foreground truncate">
+        <p className="text-[14px] font-semibold truncate" style={{ color: '#1C1917' }}>
           {userProfile.display_name || userProfile.username || 'Unknown User'}
         </p>
         {userProfile.username && (
-          <p className="text-sm text-muted-foreground truncate">
+          <p className="text-[13px] truncate" style={{ color: '#A8A29E' }}>
             @{userProfile.username}
           </p>
         )}
       </div>
       {isLoading && (
-        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+        <Loader2 className="h-4 w-4 animate-spin" style={{ color: '#A8A29E' }} />
       )}
     </div>
   );
@@ -283,7 +274,7 @@ export function NewConversationModal({
     if (loading) {
       return (
         <div className="flex items-center justify-center py-8">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          <Loader2 className="h-6 w-6 animate-spin" style={{ color: '#A8A29E' }} />
         </div>
       );
     }
@@ -291,45 +282,67 @@ export function NewConversationModal({
     if (searchQuery.trim()) {
       return (
         <div className="text-center py-8">
-          <p className="text-muted-foreground">No users found</p>
+          <p className="text-[14px]" style={{ color: '#78716C' }}>No users found</p>
         </div>
       );
     }
 
     return (
       <div className="text-center py-8">
-        <Search className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-        <p className="text-muted-foreground">Search for users to start a conversation</p>
+        <Search className="h-8 w-8 mx-auto mb-2" style={{ color: '#EA580C', opacity: 0.3 }} />
+        <p className="text-[14px] font-normal" style={{ color: '#78716C' }}>
+          Search for users to start a conversation
+        </p>
       </div>
     );
   };
+
+  const isGroupValid = groupName.trim() && selectedUsers.length > 0;
 
   return (
     <BottomSheet
       open={open}
       onClose={handleClose}
       className="flex flex-col"
+      style={{
+        background: 'linear-gradient(180deg, #FFF8F0 0%, #FFF5EB 40%, #FFECD2 100%)',
+        borderRadius: '20px 20px 0 0',
+      }}
       ariaLabelledBy="new-message-title"
     >
       <div className="flex flex-col h-[85vh]">
         {/* Header */}
-        <div className="px-4 pb-3">
-          <h2 id="new-message-title" className="text-lg font-semibold text-foreground text-center">
+        <div className="px-5 pb-3">
+          <h2
+            id="new-message-title"
+            className="text-[17px] font-bold text-center font-dm-sans"
+            style={{ color: '#1C1917' }}
+          >
             New Message
           </h2>
         </div>
 
         {/* Tab Switcher */}
-        <div className="px-4 pb-4">
-          <div className="flex bg-muted rounded-xl p-1">
+        <div className="px-5 pb-4">
+          <div
+            className="flex rounded-xl p-1"
+            style={{
+              background: 'rgba(255,255,255,0.55)',
+              border: '1px solid rgba(234,88,12,0.08)',
+            }}
+          >
             <button
               onClick={() => setMode('direct')}
               className={cn(
-                "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all",
-                mode === 'direct' 
-                  ? "bg-background text-foreground shadow-sm" 
-                  : "text-muted-foreground"
+                "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[13px] transition-all",
+                mode === 'direct'
+                  ? "font-semibold shadow-sm"
+                  : "font-medium"
               )}
+              style={{
+                background: mode === 'direct' ? 'rgba(255,255,255,0.8)' : 'transparent',
+                color: mode === 'direct' ? '#1C1917' : '#78716C',
+              }}
             >
               <MessageCircle size={18} />
               Direct Message
@@ -337,11 +350,15 @@ export function NewConversationModal({
             <button
               onClick={() => setMode('group')}
               className={cn(
-                "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all",
-                mode === 'group' 
-                  ? "bg-background text-foreground shadow-sm" 
-                  : "text-muted-foreground"
+                "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[13px] transition-all",
+                mode === 'group'
+                  ? "font-semibold shadow-sm"
+                  : "font-medium"
               )}
+              style={{
+                background: mode === 'group' ? 'rgba(255,255,255,0.8)' : 'transparent',
+                color: mode === 'group' ? '#1C1917' : '#78716C',
+              }}
             >
               <Users size={18} />
               Group Chat
@@ -352,19 +369,24 @@ export function NewConversationModal({
         {/* DM Content */}
         {mode === 'direct' && (
           <div className="flex-1 flex flex-col min-h-0">
-            <div className="px-4 pb-3">
+            <div className="px-5 pb-3">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search by name or username..."
+                <Search
+                  className="absolute left-3 top-1/2 -translate-y-1/2"
+                  size={16}
+                  style={{ color: '#A8A29E' }}
+                />
+                <input
+                  placeholder="Search by name or username…"
                   value={dmSearch}
                   onChange={(e) => setDmSearch(e.target.value)}
-                  className="pl-9"
+                  className={warmInputClass}
+                  style={{ ...warmInputStyle, paddingLeft: '36px' }}
                 />
               </div>
             </div>
-            
-            <ScrollArea className="flex-1 px-4 pb-4">
+
+            <ScrollArea className="flex-1 px-5 pb-4">
               <div className="space-y-1">
                 {dmResults.length > 0
                   ? dmResults.map(userProfile =>
@@ -383,25 +405,29 @@ export function NewConversationModal({
         {/* Group Content */}
         {mode === 'group' && (
           <div className="flex-1 flex flex-col min-h-0">
-            <div className="px-4 space-y-4 pb-3">
-              {/* Group Avatar Picker - Squircle style matching SquircleAvatar */}
+            <div className="px-5 space-y-3 pb-3">
+              {/* Group Avatar Picker */}
               <div className="flex flex-col items-center">
                 <div className="relative">
-                  <div 
+                  <div
                     onClick={() => groupAvatarInputRef.current?.click()}
-                    className="bg-muted flex items-center justify-center cursor-pointer hover:bg-muted/80 transition-colors overflow-hidden border-2 border-dashed border-muted-foreground/30"
+                    className="flex items-center justify-center cursor-pointer transition-colors overflow-hidden active:scale-[0.97]"
                     style={{
                       width: '80px',
                       aspectRatio: '1 / 1.05',
                       borderRadius: '34%',
+                      border: '2px dashed rgba(234,88,12,0.25)',
+                      background: groupAvatarPreview ? 'transparent' : 'rgba(234,88,12,0.05)',
                     }}
                   >
                     {groupAvatarPreview ? (
                       <img src={groupAvatarPreview} alt="Group" className="w-full h-full object-cover" />
                     ) : (
-                      <div className="flex flex-col items-center text-muted-foreground">
-                        <Camera size={24} />
-                        <span className="text-xs mt-1">Add Photo</span>
+                      <div className="flex flex-col items-center">
+                        <Camera size={24} style={{ color: '#EA580C' }} />
+                        <span className="text-[11px] font-medium mt-1" style={{ color: '#EA580C' }}>
+                          Add Photo
+                        </span>
                       </div>
                     )}
                   </div>
@@ -428,10 +454,12 @@ export function NewConversationModal({
                 />
               </div>
 
-              <Input
+              <input
                 placeholder="Group name"
                 value={groupName}
                 onChange={(e) => setGroupName(e.target.value)}
+                className={warmInputClass}
+                style={warmInputStyle}
               />
 
               {/* Selected Users Pills */}
@@ -442,6 +470,10 @@ export function NewConversationModal({
                       key={userProfile.id}
                       variant="secondary"
                       className="gap-1 pr-1 py-1"
+                      style={{
+                        background: 'rgba(255,255,255,0.7)',
+                        border: '1px solid rgba(234,88,12,0.12)',
+                      }}
                     >
                       <SquircleAvatar
                         src={userProfile.profile_photo_url}
@@ -450,14 +482,14 @@ export function NewConversationModal({
                         fallback={getInitials(userProfile.display_name, userProfile.username)}
                         hideRing
                       />
-                      <span className="max-w-[100px] truncate">
+                      <span className="max-w-[100px] truncate text-[13px]" style={{ color: '#1C1917' }}>
                         {userProfile.display_name || userProfile.username}
                       </span>
                       <button
                         onClick={() => handleRemoveUser(userProfile.id)}
-                        className="ml-1 p-0.5 rounded-full hover:bg-muted"
+                        className="ml-1 p-0.5 rounded-full hover:bg-white/60"
                       >
-                        <X className="h-3 w-3" />
+                        <X className="h-3 w-3" style={{ color: '#78716C' }} />
                       </button>
                     </Badge>
                   ))}
@@ -465,17 +497,22 @@ export function NewConversationModal({
               )}
 
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search users to add..."
+                <Search
+                  className="absolute left-3 top-1/2 -translate-y-1/2"
+                  size={16}
+                  style={{ color: '#A8A29E' }}
+                />
+                <input
+                  placeholder="Search users to add…"
                   value={groupSearch}
                   onChange={(e) => setGroupSearch(e.target.value)}
-                  className="pl-9"
+                  className={warmInputClass}
+                  style={{ ...warmInputStyle, paddingLeft: '36px' }}
                 />
               </div>
             </div>
 
-            <ScrollArea className="flex-1 px-4">
+            <ScrollArea className="flex-1 px-5">
               <div className="space-y-1">
                 {groupResults.length > 0
                   ? groupResults.map(userProfile =>
@@ -491,29 +528,31 @@ export function NewConversationModal({
               </div>
             </ScrollArea>
 
-            <div className="p-4 border-t border-border">
-              <Button
+            <div className="p-5 pb-8">
+              <button
                 onClick={handleCreateGroup}
-                disabled={!groupName.trim() || selectedUsers.length === 0 || creatingGroup}
+                disabled={!isGroupValid || creatingGroup}
                 className={cn(
-                  "w-full",
-                  (!groupName.trim() || selectedUsers.length === 0)
-                    ? "bg-[#F0F2F5] text-[#AEAEB2]"
-                    : "bg-[#DCF8C6] hover:bg-[#C5E8B0] text-[#1D1D1F]"
+                  "w-full h-[48px] flex items-center justify-center gap-2 text-[14px] font-semibold transition-all active:scale-[0.97]",
                 )}
+                style={{
+                  borderRadius: '14px',
+                  background: isGroupValid ? '#EA580C' : 'rgba(234,88,12,0.08)',
+                  color: isGroupValid ? '#FFFFFF' : 'rgba(234,88,12,0.35)',
+                }}
               >
                 {creatingGroup ? (
                   <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin" />
                     Creating...
                   </>
                 ) : (
                   <>
-                    <Users className="h-4 w-4 mr-2" />
+                    <Users className="h-4 w-4" />
                     Create Group {selectedUsers.length > 0 && `(${selectedUsers.length} members)`}
                   </>
                 )}
-              </Button>
+              </button>
             </div>
           </div>
         )}

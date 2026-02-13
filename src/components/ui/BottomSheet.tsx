@@ -100,10 +100,10 @@ export function BottomSheet({
       {/* Backdrop with fade animation */}
       <div
         className={cn(
-          "fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300",
+          "fixed inset-0 backdrop-blur-sm transition-opacity duration-300",
           isAnimating ? "opacity-100" : "opacity-0"
         )}
-        style={{ zIndex: zIndexBase }}
+        style={{ zIndex: zIndexBase, backgroundColor: 'rgba(28,25,23,0.4)' }}
         onClick={onClose}
         aria-hidden="true"
       />
@@ -131,7 +131,7 @@ export function BottomSheet({
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          <div className="w-12 h-1.5 mx-auto rounded-full bg-muted-foreground/40" />
+          <div className="w-12 h-1.5 mx-auto rounded-full" style={{ backgroundColor: 'rgba(120,90,60,0.2)' }} />
         </div>
         {children}
       </div>
