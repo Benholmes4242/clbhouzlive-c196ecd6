@@ -141,8 +141,13 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, hasTie
             {abbreviatedName}
           </span>
         </div>
+        {/* Thru indicator */}
+        <span className="leaderboard-thru flex-shrink-0">
+          {leader.thru != null && leader.thru >= 18 ? 'F' :
+           leader.thru != null && leader.thru > 0 ? `thru ${leader.thru}` : ''}
+        </span>
         <span className={cn(
-          "leaderboard-score flex-shrink-0 ml-2",
+          "leaderboard-score flex-shrink-0",
           getScoreClass(leader.scoreToPar),
           scoreFlash === 'birdie' && 'score-flash-birdie',
           scoreFlash === 'bogey' && 'score-flash-bogey',
