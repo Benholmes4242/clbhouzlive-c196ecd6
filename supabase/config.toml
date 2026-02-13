@@ -159,3 +159,6 @@ verify_jwt = false
 
 [functions.generate-predictions]
 verify_jwt = false
+
+[functions.auto-map-tournament-venues]
+verify_jwt = false
