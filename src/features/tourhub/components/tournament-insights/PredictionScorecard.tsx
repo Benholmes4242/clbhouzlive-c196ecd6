@@ -15,7 +15,8 @@ interface PredictionScorecardProps {
 export const PredictionScorecard: React.FC<PredictionScorecardProps> = ({
   predictions,
 }) => {
-  if (predictions.length === 0) return null;
+  const visible = predictions.slice(0, 5);
+  if (visible.length === 0) return null;
 
   return (
     <motion.div
@@ -48,10 +49,10 @@ export const PredictionScorecard: React.FC<PredictionScorecardProps> = ({
       </div>
 
       {/* Player rows */}
-      {predictions.map((prediction, i) => (
+      {visible.map((prediction, i) => (
         <React.Fragment key={prediction.playerId}>
           <PredictionScorecardRow prediction={prediction} index={i} />
-          {i < predictions.length - 1 && (
+          {i < visible.length - 1 && (
             <div className="border-b" style={{ borderColor: 'rgba(0, 0, 0, 0.04)' }} />
           )}
         </React.Fragment>
