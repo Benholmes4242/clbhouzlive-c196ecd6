@@ -49,12 +49,12 @@ function formatMessageTime(dateString: string): string {
 
 function ReadReceipt({ status }: { status: 'sent' | 'delivered' | 'read' }) {
   if (status === 'read') {
-    return <CheckCheck className="w-3.5 h-3.5 text-[#2A9D5C]" />;
+    return <CheckCheck className="w-3.5 h-3.5" style={{ color: '#EA580C' }} />;
   }
   if (status === 'delivered') {
-    return <CheckCheck className="w-3.5 h-3.5 text-[#8E8E93]" />;
+    return <CheckCheck className="w-3.5 h-3.5" style={{ color: '#A8A29E' }} />;
   }
-  return <Check className="w-3.5 h-3.5 text-[#8E8E93]" />;
+  return <Check className="w-3.5 h-3.5" style={{ color: '#A8A29E' }} />;
 }
 
 export function MessageBubble({
@@ -116,7 +116,7 @@ export function MessageBubble({
     const communityRating = course.rating;
 
     const courseCardContent = (
-      <div className={cn("flex gap-2 mb-1.5", isOwnMessage ? "justify-end" : "justify-start")}>
+      <div className={cn("flex gap-2", isOwnMessage ? "justify-end" : "justify-start")}>
         {/* Avatar for received */}
         {!isOwnMessage && showSenderInfo && (
           <SquircleAvatar
@@ -144,13 +144,13 @@ export function MessageBubble({
               "hover:scale-[1.02] active:scale-[0.98]",
             )}
             style={{
-              background: 'rgba(255,255,255,0.82)',
-              border: '1px solid rgba(255,255,255,0.4)',
+              background: 'rgba(255,255,255,0.7)',
+              border: '1px solid rgba(234,88,12,0.08)',
               boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
             }}
           >
             {/* Course Image */}
-            <div className="relative aspect-[16/10] w-full overflow-hidden">
+            <div className="relative aspect-[16/10] w-full overflow-hidden rounded-t-[16px]">
               {course.course_image_url ? (
                 <img src={course.course_image_url} alt={course.course_name} className="w-full h-full object-cover" />
               ) : (
@@ -179,32 +179,34 @@ export function MessageBubble({
 
             <div className="p-3">
               <div className="flex items-start justify-between gap-2">
-                <h4 className="font-semibold text-[14px] line-clamp-2 flex-1" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>
+                <h4 className="font-semibold text-[15px] line-clamp-2 flex-1" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>
                   {course.course_name}
                 </h4>
                 
                 {communityRating && communityRating > 0 && (
                   <div className="flex items-center gap-1.5 flex-shrink-0">
                     <ClubhouseLogo size="xs" />
-                    <span className="text-[13px] font-semibold" style={{ color: '#EA580C' }}>{communityRating.toFixed(1)}</span>
+                    <span className="text-[14px] font-bold" style={{ color: '#EA580C' }}>{communityRating.toFixed(1)}</span>
                   </div>
                 )}
               </div>
               
               {course.location && (
-                <div className="flex items-center gap-1 mt-1 text-[12px]" style={{ color: '#78716C' }}>
-                  <MapPin size={12} />
+                <div className="flex items-center gap-1 mt-1 text-[12px] font-normal" style={{ color: '#78716C' }}>
+                  <MapPin size={12} style={{ color: '#A8A29E' }} />
                   <span className="truncate">{course.location}</span>
                 </div>
               )}
               
-              <div className="mt-3 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-medium" style={{ background: 'rgba(249,115,22,0.08)', color: '#EA580C' }}>
+              <div 
+                className="mt-3 flex items-center justify-center gap-2 py-2 rounded-[10px] text-[13px] font-semibold w-full" 
+                style={{ background: 'rgba(234,88,12,0.06)', color: '#EA580C', border: '1px solid rgba(234,88,12,0.1)' }}
+              >
                 <span>View Course</span>
                 <ExternalLink size={14} />
               </div>
-              
               {/* Timestamp */}
-              <div className="flex items-center justify-end gap-1 mt-2 text-[11px]" style={{ color: 'rgba(120,90,60,0.4)' }}>
+              <div className="flex items-center justify-end gap-1 mt-2 text-[11px] font-normal" style={{ color: '#A8A29E' }}>
                 {message.is_edited && <span>edited</span>}
                 <span>{formatMessageTime(message.created_at)}</span>
                 {isOwnMessage && <ReadReceipt status={deliveryStatus} />}
@@ -285,7 +287,7 @@ export function MessageBubble({
   };
 
   const bubbleContent = (
-    <div className={cn("flex gap-2 mb-1.5", isOwnMessage ? "justify-end" : "justify-start")}>
+    <div className={cn("flex gap-2", isOwnMessage ? "justify-end" : "justify-start")}>
       {/* Avatar for received */}
       {!isOwnMessage && showSenderInfo && (
         <SquircleAvatar
@@ -307,25 +309,25 @@ export function MessageBubble({
           </span>
         )}
 
-        {/* Message bubble - WhatsApp style */}
+        {/* Message bubble */}
         <div
           className={cn(
             "px-[15px] py-[11px] break-words relative group backdrop-blur-[12px]",
             isPressed && "opacity-80",
             isOwnMessage 
-              ? "rounded-[18px_18px_4px_18px]"
-              : "rounded-[18px_18px_18px_4px]"
+              ? "rounded-[16px_16px_4px_16px]"
+              : "rounded-[16px_16px_16px_4px]"
           )}
           style={
             isOwnMessage
               ? {
-                  background: 'rgba(255,255,255,0.88)',
-                  border: '1px solid rgba(249,115,22,0.12)',
+                  background: 'rgba(255,255,255,0.7)',
+                  border: '1px solid rgba(234,88,12,0.08)',
                   boxShadow: '0 1px 6px rgba(249,115,22,0.06)',
                 }
               : {
-                  background: 'rgba(255,255,255,0.5)',
-                  border: '1px solid rgba(255,255,255,0.35)',
+                  background: 'rgba(255,255,255,0.45)',
+                  border: '1px solid rgba(0,0,0,0.04)',
                   boxShadow: '0 1px 4px rgba(0,0,0,0.02)',
                 }
           }
@@ -373,30 +375,17 @@ export function MessageBubble({
 
           {/* Message content */}
           {message.content && (
-            <p className="text-[15px] leading-relaxed whitespace-pre-wrap" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>
+            <p className="text-[14px] leading-relaxed whitespace-pre-wrap" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>
               {message.content}
             </p>
           )}
 
           {/* Timestamp + Read receipt */}
           <div className="flex items-center gap-1 mt-1 justify-end">
-            {message.is_edited && <span className="text-[11px]" style={{ color: 'rgba(120,90,60,0.4)' }}>edited</span>}
-            <span className="text-[11px]" style={{ color: 'rgba(120,90,60,0.4)' }}>{formatMessageTime(message.created_at)}</span>
+            {message.is_edited && <span className="text-[11px] font-normal" style={{ color: '#A8A29E' }}>edited</span>}
+            <span className="text-[11px] font-normal" style={{ color: '#A8A29E' }}>{formatMessageTime(message.created_at)}</span>
             {isOwnMessage && <ReadReceipt status={deliveryStatus} />}
           </div>
-
-          {/* Emoji picker button */}
-          {onToggleReaction && (
-            <div className={cn(
-              "absolute -bottom-2 opacity-0 group-hover:opacity-100 transition-opacity",
-              isOwnMessage ? "left-0" : "right-0"
-            )}>
-              <EmojiPicker 
-                onSelect={handleEmojiSelect}
-                triggerClassName="h-6 w-6 bg-white border shadow-sm"
-              />
-            </div>
-          )}
         </div>
 
         {/* Reactions */}
