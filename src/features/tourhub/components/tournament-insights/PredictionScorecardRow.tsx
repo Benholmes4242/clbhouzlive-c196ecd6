@@ -1,5 +1,6 @@
 /**
- * PredictionScorecardRow - Individual player row showing predicted vs actual position
+ * PredictionScorecardRow - OWGR-style row with columns: # | PLAYER | PREDICTED | ACTUAL | +/-
+ * Matches WorldRankingsModule row density and styling
  */
 
 import React from 'react';
@@ -12,62 +13,43 @@ interface PredictionScorecardRowProps {
   index: number;
 }
 
-function formatPosition(pos: number | null, tied: boolean): string {
-  if (pos === null) return '—';
-  return tied ? `T${pos}` : `${pos}${getOrdinalSuffix(pos)}`;
-}
-
 function getOrdinalSuffix(n: number): string {
   const s = ['th', 'st', 'nd', 'rd'];
   const v = n % 100;
   return s[(v - 20) % 10] || s[v] || s[0];
 }
 
-function formatPredictedRank(rank: number): string {
-  return `${rank}${getOrdinalSuffix(rank)}`;
+function formatOrdinal(n: number): string {
+  return `${n}${getOrdinalSuffix(n)}`;
+}
+
+function formatActual(prediction: TrackedPrediction): string {
+  if (prediction.performanceStatus === 'cut') return 'MC';
+  if (prediction.performanceStatus === 'withdrawn') return 'WD';
+  if (prediction.actualPosition === null) return '—';
+  return prediction.actualPositionTied ? `T${prediction.actualPosition}` : formatOrdinal(prediction.actualPosition);
 }
 
 function getDeltaDisplay(prediction: TrackedPrediction): {
-  icon: string;
   text: string;
   color: string;
+  arrow?: string;
 } {
   switch (prediction.performanceStatus) {
     case 'outperforming':
-      return {
-        icon: '🟢',
-        text: `↑${Math.abs(prediction.positionDelta!)}`,
-        color: '#059669',
-      };
+      return { text: `${Math.abs(prediction.positionDelta!)}`, color: '#059669', arrow: '↑' };
     case 'matching':
-      return { icon: '⚪', text: '—', color: '#9ca3af' };
+      return { text: '—', color: '#9ca3af' };
     case 'underperforming':
-      return {
-        icon: '🔴',
-        text: `↓${Math.abs(prediction.positionDelta!)}`,
-        color: '#ef4444',
-      };
+      return { text: `${Math.abs(prediction.positionDelta!)}`, color: '#ef4444', arrow: '↓' };
     case 'cut':
-      return { icon: '🔴', text: 'CUT', color: '#ef4444' };
+      return { text: 'MC', color: '#ef4444' };
     case 'withdrawn':
-      return { icon: '⚪', text: 'WD', color: '#9ca3af' };
+      return { text: 'WD', color: '#9ca3af' };
     case 'not-started':
     default:
-      return { icon: '⚪', text: '—', color: '#d1d5db' };
+      return { text: '—', color: '#d1d5db' };
   }
-}
-
-function getScoreLine(prediction: TrackedPrediction): string {
-  if (prediction.score === null) return '';
-  const scoreStr = prediction.score === 0 ? 'E' : prediction.score > 0 ? `+${prediction.score}` : `${prediction.score}`;
-  const parts = [scoreStr];
-  if (prediction.thru !== null && prediction.thru > 0) {
-    parts.push(`thru ${prediction.thru}`);
-  }
-  if (prediction.currentRound) {
-    parts.push(`R${prediction.currentRound}`);
-  }
-  return parts.join(' · ');
 }
 
 export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
@@ -76,10 +58,17 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
 }) => {
   const delta = getDeltaDisplay(prediction);
   const isCut = prediction.performanceStatus === 'cut';
+  const isWD = prediction.performanceStatus === 'withdrawn';
+  const isDimmed = isCut || isWD;
   const avatarUrl = prediction.pgaTourId
     ? getPgaTourHeadshotUrl(prediction.pgaTourId)
     : null;
-  const scoreLine = getScoreLine(prediction);
+  const initials = prediction.playerName
+    .split(' ')
+    .map(w => w[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
 
   return (
     <motion.div
@@ -90,58 +79,78 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
         ease: [0.16, 1, 0.3, 1],
         delay: index * 0.05,
       }}
-      className="flex items-center gap-3 px-4 py-3"
-      style={{ opacity: isCut ? 0.6 : 1 }}
+      className="flex items-center px-4"
+      style={{ opacity: isDimmed ? 0.6 : 1, height: '68px' }}
     >
-      {/* Avatar */}
-      <div className="flex-none w-10 h-10 rounded-full overflow-hidden bg-muted">
-        {avatarUrl ? (
-          <img
-            src={avatarUrl}
-            alt={prediction.playerName}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-xs font-semibold text-muted-foreground">
-            {prediction.playerName.charAt(0)}
-          </div>
-        )}
-      </div>
-
-      {/* Player info */}
-      <div className="flex-1 min-w-0">
-        <p
-          className="text-sm font-semibold text-foreground truncate"
-          style={{ textDecoration: isCut ? 'line-through' : undefined }}
-        >
-          {prediction.playerName}
-        </p>
-        <p className="text-xs text-muted-foreground">
-          Predicted: {formatPredictedRank(prediction.predictedRank)} → Actual:{' '}
-          <span style={{ textDecoration: isCut ? 'line-through' : undefined }}>
-            {prediction.performanceStatus === 'cut'
-              ? 'MC'
-              : formatPosition(prediction.actualPosition, prediction.actualPositionTied)}
+      {/* # — Rank number */}
+      <div className="w-8 flex-shrink-0 flex flex-col items-center justify-center">
+        <span className="text-lg font-bold text-foreground leading-none">
+          {prediction.predictedRank}
+        </span>
+        {/* Movement arrow below rank (OWGR style) */}
+        {delta.arrow && (
+          <span className="text-[10px] font-semibold leading-none mt-0.5" style={{ color: delta.color }}>
+            {delta.arrow}
           </span>
-        </p>
-        {scoreLine && (
-          <p className="text-xs text-muted-foreground">{scoreLine}</p>
         )}
       </div>
 
-      {/* Delta indicator */}
+      {/* PLAYER — Avatar + Name */}
+      <div className="flex items-center gap-2.5 flex-1 min-w-0 pl-2">
+        <div className="relative flex-shrink-0 w-10 h-10 rounded-full overflow-hidden bg-muted">
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt={prediction.playerName}
+              className="w-full h-full object-cover"
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
+          ) : null}
+          <div className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-muted-foreground -z-0">
+            {initials}
+          </div>
+        </div>
+        <div className="min-w-0 flex-1">
+          <p
+            className="text-sm font-semibold text-foreground truncate leading-tight"
+            style={{ textDecoration: isCut ? 'line-through' : undefined }}
+          >
+            {prediction.playerName}
+          </p>
+          {/* Score line — compact */}
+          {prediction.score !== null && (
+            <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">
+              {prediction.score === 0 ? 'E' : prediction.score > 0 ? `+${prediction.score}` : prediction.score}
+              {prediction.thru !== null && prediction.thru > 0 ? ` · thru ${prediction.thru}` : ''}
+              {prediction.currentRound ? ` · R${prediction.currentRound}` : ''}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* PREDICTED */}
+      <div className="w-[60px] flex-shrink-0 text-center">
+        <span className="text-sm text-muted-foreground">
+          {formatOrdinal(prediction.predictedRank)}
+        </span>
+      </div>
+
+      {/* ACTUAL */}
+      <div className="w-[52px] flex-shrink-0 text-center">
+        <span className="text-sm font-semibold text-foreground">
+          {formatActual(prediction)}
+        </span>
+      </div>
+
+      {/* +/- Delta */}
       <motion.div
-        className="flex-none flex items-center gap-1"
+        className="w-[48px] flex-shrink-0 text-right"
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.3 + index * 0.05 }}
       >
-        <span className="text-sm">{delta.icon}</span>
-        <span
-          className="text-xs font-semibold"
-          style={{ color: delta.color }}
-        >
-          {delta.text}
+        <span className="text-xs font-semibold" style={{ color: delta.color }}>
+          {delta.arrow ? `${delta.arrow}${delta.text}` : delta.text}
         </span>
       </motion.div>
     </motion.div>
