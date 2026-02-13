@@ -242,36 +242,54 @@ export function EchoSheetV2({
               "fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[28px] overflow-hidden touch-none",
               HUB_SHEET
             )}
-            style={{ height: '90svh', maxHeight: '90svh' }}
+            style={{ 
+              height: '90svh', 
+              maxHeight: '90svh',
+              background: 'linear-gradient(180deg, #FFF8F0 0%, #FFF5EB 40%, #FFECD2 100%)',
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Drag handle */}
             <div className="flex justify-center pt-3 pb-4 flex-shrink-0 cursor-grab active:cursor-grabbing">
-              <div className="w-9 h-1 bg-[#D1D5DB] rounded-full" />
+              <div className="w-9 h-1 rounded-full" style={{ backgroundColor: 'rgba(120,90,60,0.2)' }} />
             </div>
 
             {/* Tabs */}
             <div className="px-5 pb-4 flex-shrink-0">
-              <div className="flex bg-[#F0F0F5] rounded-[12px] p-1">
+              <div 
+                className="flex rounded-[12px] p-1"
+                style={{
+                  background: 'rgba(255,255,255,0.55)',
+                  border: '1px solid rgba(234,88,12,0.08)',
+                }}
+              >
                 <button
                   onClick={() => handleTabChange('chat')}
                   className={cn(
-                    "flex-1 py-2.5 rounded-[10px] text-[15px] font-semibold transition-all duration-200",
+                    "flex-1 py-2.5 rounded-[10px] text-[13px] transition-all duration-200",
                     activeTab === 'chat' 
-                      ? "bg-white shadow-sm text-[#1D1D1F]" 
-                      : "text-[#86868B]"
+                      ? "shadow-sm font-semibold" 
+                      : "font-medium"
                   )}
+                  style={{
+                    backgroundColor: activeTab === 'chat' ? 'rgba(255,255,255,0.8)' : 'transparent',
+                    color: activeTab === 'chat' ? '#1C1917' : '#78716C',
+                  }}
                 >
                   Chat
                 </button>
                 <button
                   onClick={() => handleTabChange('history')}
                   className={cn(
-                    "flex-1 py-2.5 rounded-[10px] text-[15px] font-semibold transition-all duration-200",
+                    "flex-1 py-2.5 rounded-[10px] text-[13px] transition-all duration-200",
                     activeTab === 'history' 
-                      ? "bg-white shadow-sm text-[#1D1D1F]" 
-                      : "text-[#86868B]"
+                      ? "shadow-sm font-semibold" 
+                      : "font-medium"
                   )}
+                  style={{
+                    backgroundColor: activeTab === 'history' ? 'rgba(255,255,255,0.8)' : 'transparent',
+                    color: activeTab === 'history' ? '#1C1917' : '#78716C',
+                  }}
                 >
                   History
                 </button>

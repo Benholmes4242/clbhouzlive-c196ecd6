@@ -68,17 +68,25 @@ export const EchoComposer = forwardRef<HTMLInputElement, EchoComposerProps>(({
 
   return (
     <div 
-      className="flex-none px-5 pt-3 bg-[#F8FAFC]"
+      className="flex-none px-5 pt-3"
       style={{ 
         paddingBottom: 'calc(32px + env(safe-area-inset-bottom, 0px))',
+        background: 'rgba(255,245,235,0.85)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderTop: '1px solid rgba(234,88,12,0.06)',
       }}
     >
       <div
         className={cn(
-          "flex items-center gap-3 h-[52px] bg-white border border-[#E5E5EA] rounded-[14px] px-4 shadow-sm transition-all duration-200",
-          "focus-within:border-[#FFBF66] focus-within:shadow-[0_0_0_3px_rgba(255,191,102,0.1)]",
+          "flex items-center gap-3 h-[50px] rounded-[22px] px-4 transition-all duration-200",
+          "focus-within:shadow-[0_0_0_3px_rgba(234,88,12,0.08)]",
           disabled && "opacity-60"
         )}
+        style={{
+          background: 'rgba(255,255,255,0.6)',
+          border: '1px solid rgba(234,88,12,0.08)',
+        }}
       >
         <input
           ref={ref}
@@ -87,7 +95,7 @@ export const EchoComposer = forwardRef<HTMLInputElement, EchoComposerProps>(({
           onKeyDown={handleKeyDown}
           placeholder={cooldown ? `Wait ${cooldown}s...` : placeholder}
           disabled={isStreaming || disabled}
-          className="flex-1 bg-transparent outline-none text-[15px] text-[#1D1D1F] placeholder:text-[#AEAEB2]"
+          className="flex-1 bg-transparent outline-none text-[13px] text-[#1C1917] placeholder:text-[#A8A29E]"
           style={{ caretColor: ECHO_ORANGE }}
           autoComplete="off"
           autoCorrect="off"
@@ -98,10 +106,11 @@ export const EchoComposer = forwardRef<HTMLInputElement, EchoComposerProps>(({
           <button
             type="button"
             onClick={handleAbort}
-            className="w-10 h-10 rounded-[10px] flex items-center justify-center flex-shrink-0 transition-all active:scale-95 bg-red-500 hover:bg-red-600"
+            className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 transition-all active:scale-95"
+            style={{ backgroundColor: '#EA580C' }}
             aria-label="Stop"
           >
-            <StopCircle className="w-5 h-5 text-white" />
+            <StopCircle className="w-[18px] h-[18px] text-white" />
           </button>
         ) : (
           <button
@@ -109,11 +118,11 @@ export const EchoComposer = forwardRef<HTMLInputElement, EchoComposerProps>(({
             onClick={handleSend}
             disabled={!canSend}
             className={cn(
-              "w-10 h-10 rounded-[10px] flex items-center justify-center flex-shrink-0 transition-all duration-200",
+              "w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200",
               canSend ? "active:scale-95" : "cursor-not-allowed"
             )}
             style={{
-              backgroundColor: canSend ? ECHO_ORANGE : '#E5E5EA',
+              backgroundColor: canSend ? '#EA580C' : 'rgba(234,88,12,0.15)',
             }}
             aria-label="Send"
           >

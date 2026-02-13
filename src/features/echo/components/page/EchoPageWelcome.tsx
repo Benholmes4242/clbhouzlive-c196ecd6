@@ -1,11 +1,12 @@
- /**
-  * EchoPageWelcome - Cleo-style welcome state with glowing orb
-  * Glass prompt chips on warm gradient canvas
-  */
- 
- import React, { useMemo } from 'react';
- import { haptic } from '@/utils/haptics';
- import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+/**
+ * EchoPageWelcome - Cleo-style welcome state with glowing orb
+ * Glass prompt chips on warm gradient canvas
+ */
+
+import React, { useMemo } from 'react';
+import { ChevronRight } from 'lucide-react';
+import { haptic } from '@/utils/haptics';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 interface EchoPageWelcomeProps {
   onPromptClick: (prompt: string) => void;
@@ -73,7 +74,7 @@ const getRandomPrompts = (count: number = 4): string[] => {
 
 export function EchoPageWelcome({ onPromptClick, onFocusInput }: EchoPageWelcomeProps) {
   const prompts = useMemo(() => getRandomPrompts(4), []);
-   const prefersReduced = usePrefersReducedMotion();
+  const prefersReduced = usePrefersReducedMotion();
 
   const handleChipClick = (prompt: string) => {
     haptic('light');
@@ -82,47 +83,48 @@ export function EchoPageWelcome({ onPromptClick, onFocusInput }: EchoPageWelcome
 
   return (
     <div className="h-full flex flex-col items-center justify-center px-5 pb-20 overflow-visible">
-      {/* Orb with glow */}
+      {/* Orb with ambient glow */}
       <div className="relative mb-6">
         <div 
           className="absolute inset-0 rounded-full blur-2xl opacity-30 scale-[2]"
-           style={{ 
-             background: 'linear-gradient(135deg, #F97316, #FBBF24)',
-             animation: prefersReduced ? 'none' : 'glowPulse 4s ease-in-out infinite',
-           }}
+          style={{ 
+            background: 'linear-gradient(135deg, #F97316, #FBBF24)',
+            animation: prefersReduced ? 'none' : 'glowPulse 4s ease-in-out infinite',
+          }}
         />
         
         <div 
-          className="relative w-20 h-20 rounded-full flex items-center justify-center shadow-lg"
+          className="relative w-16 h-16 rounded-full flex items-center justify-center"
           style={{
             background: 'linear-gradient(135deg, #F97316, #FBBF24)',
+            boxShadow: '0 4px 20px rgba(234,88,12,0.2)',
             animation: prefersReduced ? 'none' : 'pulseGlow 3s ease-in-out infinite',
           }}
         >
           <div className="flex items-center gap-1">
             <div 
               className="w-1 h-4 bg-white rounded-full" 
-               style={prefersReduced ? {} : { animation: 'gentleWave 3s ease-in-out infinite' }} 
+              style={prefersReduced ? {} : { animation: 'gentleWave 3s ease-in-out infinite' }} 
             />
             <div 
               className="w-1 h-6 bg-white rounded-full" 
-               style={prefersReduced ? {} : { animation: 'gentleWave 3s ease-in-out infinite', animationDelay: '0.5s' }} 
+              style={prefersReduced ? {} : { animation: 'gentleWave 3s ease-in-out infinite', animationDelay: '0.5s' }} 
             />
             <div 
               className="w-1 h-4 bg-white rounded-full" 
-               style={prefersReduced ? {} : { animation: 'gentleWave 3s ease-in-out infinite', animationDelay: '1s' }} 
+              style={prefersReduced ? {} : { animation: 'gentleWave 3s ease-in-out infinite', animationDelay: '1s' }} 
             />
           </div>
         </div>
       </div>
 
       {/* Title */}
-       <h1 className="text-[1.75rem] font-bold tracking-tight mb-2" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>
+      <h1 className="text-[24px] font-bold tracking-tight mb-2" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>
         Ask Echo
       </h1>
       
       {/* Subtitle */}
-       <p className="text-[0.9375rem] text-center leading-relaxed mb-8 max-w-[260px]" style={{ color: '#92400E', opacity: 0.65, fontFamily: "'DM Sans', sans-serif" }}>
+      <p className="text-[14px] text-center mb-8 max-w-[280px]" style={{ color: '#78716C', lineHeight: 1.5, fontFamily: "'DM Sans', sans-serif" }}>
         Your personal caddie — distances, rules, course intel, gear, and trip planning.
       </p>
 
@@ -132,17 +134,17 @@ export function EchoPageWelcome({ onPromptClick, onFocusInput }: EchoPageWelcome
           <button
             key={index}
             onClick={() => handleChipClick(prompt)}
-            className="px-[14px] py-[9px] rounded-[12px] text-[13px] font-medium text-left active:scale-[0.98] transition-transform backdrop-blur-[8px] flex items-center justify-between gap-2"
+            className="px-[14px] py-[10px] rounded-[12px] text-[13px] font-medium text-left active:scale-[0.98] transition-all backdrop-blur-[8px] flex items-center justify-between gap-2"
             style={{
-              background: 'rgba(255,255,255,0.5)',
-              border: '1px solid rgba(255,255,255,0.35)',
+              background: 'rgba(255,255,255,0.45)',
+              border: '1px solid rgba(234,88,12,0.08)',
               color: '#44403C',
               fontFamily: "'DM Sans', sans-serif",
             }}
-             aria-label={`Ask Echo: ${prompt}`}
+            aria-label={`Ask Echo: ${prompt}`}
           >
             <span>{prompt}</span>
-            <span className="text-[11px] flex-shrink-0" style={{ color: '#D97706' }}>→</span>
+            <ChevronRight className="w-[14px] h-[14px] flex-shrink-0" style={{ color: '#A8A29E' }} />
           </button>
         ))}
       </div>
