@@ -255,7 +255,7 @@ export function ConversationList({
 
   if (loading) {
     return (
-      <div className="bg-white rounded-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.08)] overflow-hidden mx-0">
+      <div className="rounded-[16px] overflow-hidden" style={{ background: 'rgba(255,255,255,0.55)', border: '1px solid rgba(234,88,12,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
         {[1, 2, 3, 4, 5].map(i => (
           <ConversationSkeleton key={i} />
         ))}
@@ -307,40 +307,46 @@ export function ConversationList({
             {/* Avatar - Group icon or user photo */}
             <div className="relative flex-shrink-0">
               {isGroup && !avatarUrl ? (
-                <div className="w-14 h-14 rounded-full flex items-center justify-center bg-gradient-to-br from-purple-500 to-purple-600">
-                  <Users className="w-6 h-6 text-white" />
+                <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-br from-purple-500 to-purple-600">
+                  <Users className="w-5 h-5 text-white" />
                 </div>
               ) : (
                 <SquircleAvatar
                   src={avatarUrl}
                   alt={name}
-                  size={56}
+                  size={48}
                   fallback={initials}
                   hideRing
                 />
               )}
-              {/* Online indicator placeholder */}
             </div>
 
             {/* Content */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2 mb-0.5">
                 <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                  {/* Unread dot */}
+                  {hasUnread && (
+                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#EA580C' }} />
+                  )}
                   <span className={cn(
-                    "text-[16px] truncate",
-                    hasUnread ? "font-bold text-[#1D1D1F]" : "font-semibold text-[#1D1D1F]"
-                  )}>
+                    "text-[14px] truncate",
+                    hasUnread ? "font-bold" : "font-semibold"
+                  )}
+                    style={{ color: '#1C1917' }}
+                  >
                     {name}
                   </span>
                   {isMuted && (
-                    <BellOff className="w-3.5 h-3.5 text-[#8E8E93] flex-shrink-0" />
+                    <BellOff className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#A8A29E' }} />
                   )}
                 </div>
                 <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
                   <span className={cn(
-                    "text-[13px]",
-                    hasUnread ? "text-[#2A9D5C] font-medium" : "text-[#8E8E93]"
-                  )}>
+                    "text-[12px] font-normal",
+                  )}
+                    style={{ color: hasUnread ? '#EA580C' : '#A8A29E' }}
+                  >
                     {formatRelativeTime(conversation.last_message_at)}
                   </span>
                 </div>
@@ -348,9 +354,10 @@ export function ConversationList({
               
               <div className="flex items-center justify-between">
                 <p className={cn(
-                  "text-[14px] truncate flex-1",
-                  hasUnread ? "text-[#1D1D1F] font-medium" : "text-[#8E8E93]"
-                )}>
+                  "text-[13px] truncate flex-1 font-normal",
+                )}
+                  style={{ color: hasUnread ? '#44403C' : '#A8A29E' }}
+                >
                   <ConversationTypingOrPreview 
                     conversationId={conversation.id}
                     preview={conversation.last_message_preview}
@@ -358,7 +365,7 @@ export function ConversationList({
                 </p>
                 
                 {hasUnread && (
-                  <span className="ml-2 min-w-[20px] h-5 px-1.5 bg-[#2A9D5C] rounded-full flex items-center justify-center">
+                  <span className="ml-2 min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center" style={{ backgroundColor: '#EA580C' }}>
                     <span className="text-[12px] font-bold text-white">
                       {conversation.unread_count > 99 ? '99+' : conversation.unread_count}
                     </span>
@@ -368,9 +375,9 @@ export function ConversationList({
             </div>
           </button>
           
-          {/* Divider - indented after avatar */}
+          {/* Divider - inset after avatar, Apple Messages style */}
           {showDivider && (
-            <div className="h-px bg-[#E5E5EA] ml-[82px]" />
+            <div className="h-px ml-[76px]" style={{ backgroundColor: 'rgba(0,0,0,0.06)' }} />
           )}
         </div>
       </SwipeableConversationItem>
@@ -381,7 +388,7 @@ export function ConversationList({
     <div>
       {/* Swipe hint */}
       {showSwipeHint && filteredConversations.length > 0 && (
-        <div className="px-4 py-2 bg-white rounded-[18px] mb-3 shadow-[0_1px_3px_rgba(0,0,0,0.08)] text-center text-[13px] text-[#8E8E93] flex items-center justify-center gap-2">
+        <div className="px-4 py-2 rounded-[16px] mb-3 text-center text-[13px] flex items-center justify-center gap-2" style={{ background: 'rgba(255,255,255,0.55)', border: '1px solid rgba(234,88,12,0.08)', color: '#A8A29E' }}>
           <span>← Swipe left to delete</span>
           <span>•</span>
           <span>Swipe right to archive →</span>
@@ -390,15 +397,16 @@ export function ConversationList({
               setShowSwipeHint(false);
               localStorage.setItem('swipeHintDismissed', 'true');
             }}
-            className="ml-2 text-[#2A9D5C] font-medium"
+            className="ml-2 font-medium"
+            style={{ color: '#EA580C' }}
           >
             Got it
           </button>
         </div>
       )}
 
-      {/* Conversations card */}
-      <div className="bg-white rounded-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.08)] overflow-hidden">
+      {/* Conversations card — warm glass container */}
+      <div className="rounded-[16px] overflow-hidden" style={{ background: 'rgba(255,255,255,0.55)', border: '1px solid rgba(234,88,12,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
         {filteredConversations.map((conversation, index) => 
           renderConversationItem(conversation, false, index, filteredConversations.length)
         )}
