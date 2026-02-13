@@ -138,7 +138,7 @@ export function EchoPageMessageList({
        role="log"
        aria-live="polite"
     >
-      <div className="max-w-[600px] mx-auto space-y-3">
+      <div className="max-w-[600px] mx-auto space-y-4">
         {/* FIX 12: Pull to refresh indicator */}
         {isRefreshing && (
           <div className="flex justify-center py-3">

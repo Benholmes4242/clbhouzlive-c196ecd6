@@ -115,7 +115,7 @@ export function EchoMessageList({
       }}
       onScroll={handleScroll}
     >
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-4">
         <AnimatePresence initial={false}>
           {messages.map((msg, index) => (
             <motion.div

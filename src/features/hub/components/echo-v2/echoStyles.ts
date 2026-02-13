@@ -12,7 +12,7 @@ export const ECHO_SHEET_BG = '#F8FAFC';
 
 // Main sheet container
 export const HUB_SHEET = 
-  "bg-[#F8FAFC] shadow-[0_-4px_40px_rgba(0,0,0,0.12)]";
+  "shadow-[0_-4px_40px_rgba(0,0,0,0.12)]";
 
 // Inner cards (white with subtle border)
 export const HUB_CARD = 
