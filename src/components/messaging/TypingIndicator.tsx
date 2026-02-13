@@ -23,24 +23,30 @@ export function TypingIndicator({ typingUsers, className }: TypingIndicatorProps
       {/* Spacer for avatar alignment */}
       <div className="w-8 flex-shrink-0" />
       
-      {/* Typing bubble - WhatsApp style */}
-      <div className="px-4 py-3 bg-white rounded-[18px] rounded-bl-[4px] shadow-[0_1px_2px_rgba(0,0,0,0.06)]">
+      {/* Typing bubble */}
+      <div 
+        className="px-4 py-3 rounded-[16px] rounded-bl-[4px]"
+        style={{
+          background: 'rgba(255,255,255,0.45)',
+          border: '1px solid rgba(0,0,0,0.04)',
+        }}
+      >
         <div className="flex items-center gap-2">
           <div className="flex gap-1">
             <div 
-              className="w-2 h-2 bg-[#8E8E93] rounded-full animate-bounce"
-              style={{ animationDelay: '0ms' }}
+              className="w-2 h-2 rounded-full animate-bounce"
+              style={{ animationDelay: '0ms', backgroundColor: '#EA580C' }}
             />
             <div 
-              className="w-2 h-2 bg-[#8E8E93] rounded-full animate-bounce"
-              style={{ animationDelay: '150ms' }}
+              className="w-2 h-2 rounded-full animate-bounce"
+              style={{ animationDelay: '150ms', backgroundColor: '#EA580C' }}
             />
             <div 
-              className="w-2 h-2 bg-[#8E8E93] rounded-full animate-bounce"
-              style={{ animationDelay: '300ms' }}
+              className="w-2 h-2 rounded-full animate-bounce"
+              style={{ animationDelay: '300ms', backgroundColor: '#EA580C' }}
             />
           </div>
-          <span className="text-[13px] text-[#8E8E93] italic ml-1">
+          <span className="text-[13px] italic ml-1" style={{ color: '#A8A29E' }}>
             {getTypingText()}
           </span>
         </div>

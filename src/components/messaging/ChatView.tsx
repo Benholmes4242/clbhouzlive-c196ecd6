@@ -83,12 +83,13 @@ function ChatSkeleton() {
 
 function DateSeparator({ date }: { date: string }) {
   return (
-    <div className="flex justify-center py-3">
+    <div className="flex justify-center py-5">
       <span 
-        className="px-3 py-[3px] rounded-2xl text-[11px] font-medium"
+        className="px-[14px] py-[8px] rounded-[12px] text-[11px] font-medium"
         style={{
-          background: 'rgba(255,255,255,0.4)',
-          color: 'rgba(120,90,60,0.35)',
+          background: 'rgba(255,255,255,0.5)',
+          border: '1px solid rgba(234,88,12,0.08)',
+          color: '#A8A29E',
           fontFamily: "'DM Sans', sans-serif",
         }}
       >
@@ -504,7 +505,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
           </div>
           
           <div className="flex-1 min-w-0 text-left">
-            <h2 className="text-[15px] font-semibold truncate" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>
+           <h2 className="text-[16px] font-semibold truncate" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>
               {headerInfo.name}
             </h2>
             <p className="text-[11px] truncate" style={{ color: '#A8A29E' }}>
@@ -563,7 +564,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
           )}
 
           {/* Messages grouped by date */}
-          <div className="max-w-[800px] mx-auto space-y-2">
+          <div className="max-w-[800px] mx-auto">
             {Array.from(groupedMessages.entries()).map(([dateKey, dateMessages]) => (
               <div key={dateKey}>
                 <DateSeparator date={dateMessages[0].created_at} />
@@ -609,11 +610,12 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
           {showScrollToBottom && (
             <button
               onClick={scrollToBottom}
-              className="fixed bottom-28 right-4 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center z-20 active:scale-95 transition-transform"
+              className="fixed bottom-28 right-4 w-9 h-9 bg-white rounded-full flex items-center justify-center z-20 active:scale-95 transition-transform"
+              style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
             >
-              <ChevronDown className="w-5 h-5 text-[#1D1D1F]" />
+              <ChevronDown className="w-[18px] h-[18px]" style={{ color: '#44403C' }} />
               {unreadBelowCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-[#2A9D5C] rounded-full text-[10px] font-bold text-white flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-[#EA580C] rounded-full text-[10px] font-bold text-white flex items-center justify-center">
                   {unreadBelowCount > 99 ? '99+' : unreadBelowCount}
                 </span>
               )}

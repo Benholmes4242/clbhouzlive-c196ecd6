@@ -204,7 +204,13 @@ export function MessageInput({
   const hasText = content.trim().length > 0;
 
   return (
-    <div className="flex-none px-4 pb-8 pt-2 bg-[#F0F2F5]">
+    <div 
+      className="flex-none px-4 pb-8 pt-2"
+      style={{
+        background: 'rgba(255,245,235,0.95)',
+        borderTop: '1px solid rgba(234,88,12,0.06)',
+      }}
+    >
       {/* Reply preview */}
       {replyingTo && (
         <div className="flex items-center justify-between gap-2 px-4 py-2 mb-2 bg-white rounded-[18px] shadow-[0_1px_2px_rgba(0,0,0,0.06)]">
@@ -278,7 +284,7 @@ export function MessageInput({
           disabled={disabled || uploading}
           className="w-10 h-10 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors flex-shrink-0"
         >
-          <Paperclip className="w-5 h-5 text-[#8E8E93]" />
+          <Paperclip className="w-5 h-5" style={{ color: '#78716C' }} />
         </button>
 
         {/* Golf content share button */}
@@ -288,11 +294,17 @@ export function MessageInput({
           title="Share golf content"
           className="w-10 h-10 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors flex-shrink-0"
         >
-          <MapPin className="w-5 h-5 text-[#2A9D5C]" />
+          <MapPin className="w-5 h-5" style={{ color: '#EA580C' }} />
         </button>
 
-        {/* Input container - WhatsApp pill style */}
-        <div className="flex-1 flex items-end gap-2 bg-white rounded-[24px] px-4 py-2 shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
+        {/* Input container - pill style */}
+        <div 
+          className="flex-1 flex items-end gap-2 rounded-[22px] px-4 py-2"
+          style={{
+            background: 'rgba(255,255,255,0.6)',
+            border: '1px solid rgba(234,88,12,0.08)',
+          }}
+        >
            {/* Emoji picker */}
            <EmojiPickerPopover onEmojiSelect={handleEmojiSelect} />
           
@@ -305,7 +317,8 @@ export function MessageInput({
             placeholder="Message"
             disabled={disabled || uploading}
             rows={1}
-            className="flex-1 bg-transparent outline-none text-[15px] text-[#1D1D1F] placeholder:text-[#8E8E93] resize-none max-h-[120px] py-1"
+            className="flex-1 bg-transparent outline-none text-[13px] text-[#1D1D1F] placeholder:text-[#A8A29E] resize-none max-h-[120px] py-1"
+            style={{ fontFamily: "'DM Sans', sans-serif" }}
           />
           
            {/* Camera button (when no text/media) */}
@@ -314,7 +327,7 @@ export function MessageInput({
                onClick={() => cameraInputRef.current?.click()}
                className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 active:bg-[#F5F5F5]"
              >
-              <Camera className="w-5 h-5 text-[#8E8E93]" />
+              <Camera className="w-5 h-5" style={{ color: '#A8A29E' }} />
             </button>
           )}
         </div>
