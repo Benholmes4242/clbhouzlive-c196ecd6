@@ -1,5 +1,6 @@
 /**
- * PredictionScorecard - List of predicted players with live comparison
+ * PredictionScorecard - OWGR-style leaderboard table for predicted players
+ * Columns: # | PLAYER | PREDICTED | ACTUAL | +/-
  */
 
 import React from 'react';
@@ -24,11 +25,34 @@ export const PredictionScorecard: React.FC<PredictionScorecardProps> = ({
       className="rounded-2xl bg-card border border-border overflow-hidden"
       style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)' }}
     >
+      {/* Column header row — OWGR style */}
+      <div
+        className="flex items-center px-4 py-2.5 border-b"
+        style={{ borderColor: 'rgba(0, 0, 0, 0.06)', backgroundColor: 'rgba(0, 0, 0, 0.015)' }}
+      >
+        <div className="w-8 flex-shrink-0 text-center">
+          <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">#</span>
+        </div>
+        <div className="flex-1 min-w-0 pl-2">
+          <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">Player</span>
+        </div>
+        <div className="w-[60px] flex-shrink-0 text-center">
+          <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">Pred</span>
+        </div>
+        <div className="w-[52px] flex-shrink-0 text-center">
+          <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">Actual</span>
+        </div>
+        <div className="w-[48px] flex-shrink-0 text-right">
+          <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">+/-</span>
+        </div>
+      </div>
+
+      {/* Player rows */}
       {predictions.map((prediction, i) => (
         <React.Fragment key={prediction.playerId}>
           <PredictionScorecardRow prediction={prediction} index={i} />
           {i < predictions.length - 1 && (
-            <div className="mx-4 border-b" style={{ borderColor: 'rgba(0, 0, 0, 0.05)' }} />
+            <div className="border-b" style={{ borderColor: 'rgba(0, 0, 0, 0.04)' }} />
           )}
         </React.Fragment>
       ))}
