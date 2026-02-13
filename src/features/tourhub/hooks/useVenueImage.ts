@@ -4,9 +4,8 @@
  * 
  * Matching priority:
  * 1. Exact match via sr_course_map (canonical authority)
- * 2. Exact name match in golf_courses
- * 3. Smart fuzzy match (prefers shorter names / exact prefix matches)
- * 4. City-based fallback
+ * 2. Smart name match: exact → abbreviation-expanded exact → starts-with → expanded starts-with
+ * 3. Fallback: null (triggers gradient/stock fallback in UI)
  */
 
 import { useQuery } from '@tanstack/react-query';
@@ -19,41 +18,15 @@ interface VenueImageResult {
 }
 
 /**
- * Normalize a venue/course name for comparison
- * Strips common suffixes and normalizes whitespace
+ * Expand common golf venue abbreviations to full names for matching.
  */
-function normalizeName(name: string): string {
+function expandAbbreviations(name: string): string {
   return name
-    .replace(/Golf Club|Golf Course|Country Club|Golf & Country Club|CC|GC|Resort|The /gi, '')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .toLowerCase();
-}
-
-/**
- * Score how well a course name matches a venue name
- * Higher score = better match
- */
-function scoreMatch(venueName: string, courseName: string): number {
-  const venueNorm = normalizeName(venueName);
-  const courseNorm = normalizeName(courseName);
-  
-  // Exact match after normalization = perfect score
-  if (venueNorm === courseNorm) return 1000;
-  
-  // Course name starts with venue name = very good
-  if (courseNorm.startsWith(venueNorm)) return 900;
-  
-  // Venue name starts with course name = good
-  if (venueNorm.startsWith(courseNorm)) return 800;
-  
-  // Contains match - prefer shorter course names (more specific)
-  if (courseNorm.includes(venueNorm) || venueNorm.includes(courseNorm)) {
-    // Shorter names score higher (max 700, minus length penalty)
-    return Math.max(100, 700 - courseName.length);
-  }
-  
-  return 0;
+    .replace(/\bG\s*&\s*CC\b/gi, 'Golf & Country Club')
+    .replace(/\bGCC\b/gi, 'Golf & Country Club')
+    .replace(/\bCC\b/gi, 'Country Club')
+    .replace(/\bGC\b/gi, 'Golf Club')
+    .trim();
 }
 
 /**
@@ -94,8 +67,11 @@ export function useVenueImage(venueName: string | null, venueCity: string | null
       }
 
       // ============================================================
-      // TIER 2: Exact name match in golf_courses
+      // TIER 2: Smart name matching (multiple strategies)
       // ============================================================
+      const expandedName = expandAbbreviations(venueName);
+
+      // 2a. Exact name match
       const { data: exactMatch } = await supabase
         .from('golf_courses')
         .select('id, name, thumbnail_image')
@@ -112,21 +88,67 @@ export function useVenueImage(venueName: string | null, venueCity: string | null
         };
       }
 
-      // ============================================================
-      // TIER 3 & 4: DISABLED - Fuzzy matching leads to wrong images
-      // If the venue isn't in sr_course_map or exact name match,
-      // return null to trigger gradient fallback in UI
-      // ============================================================
-      // NOTE: Previously used fuzzy matching and city-based matching
-      // but this caused venues like "Royal GC" in Bahrain to match
-      // unrelated "Royal" courses in other countries.
-      // 
-      // To add a venue image, add a mapping to sr_course_map table.
+      // 2b. Expanded abbreviation exact match (e.g. "Riviera CC" → "Riviera Country Club")
+      if (expandedName !== venueName) {
+        const { data: expandedMatch } = await supabase
+          .from('golf_courses')
+          .select('id, name, thumbnail_image')
+          .eq('name', expandedName)
+          .not('thumbnail_image', 'is', null)
+          .limit(1)
+          .maybeSingle();
+
+        if (expandedMatch?.thumbnail_image) {
+          return {
+            imageUrl: expandedMatch.thumbnail_image,
+            courseName: expandedMatch.name,
+            courseId: expandedMatch.id,
+          };
+        }
+      }
+
+      // 2c. Starts-with match (e.g. "Tiburon Golf Club" → "Tiburon Golf Club - Gold Course")
+      const { data: startsWithMatch } = await supabase
+        .from('golf_courses')
+        .select('id, name, thumbnail_image')
+        .ilike('name', `${venueName}%`)
+        .not('thumbnail_image', 'is', null)
+        .order('name', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+
+      if (startsWithMatch?.thumbnail_image) {
+        return {
+          imageUrl: startsWithMatch.thumbnail_image,
+          courseName: startsWithMatch.name,
+          courseId: startsWithMatch.id,
+        };
+      }
+
+      // 2d. Expanded starts-with match
+      if (expandedName !== venueName) {
+        const { data: expStartsMatch } = await supabase
+          .from('golf_courses')
+          .select('id, name, thumbnail_image')
+          .ilike('name', `${expandedName}%`)
+          .not('thumbnail_image', 'is', null)
+          .order('name', { ascending: true })
+          .limit(1)
+          .maybeSingle();
+
+        if (expStartsMatch?.thumbnail_image) {
+          return {
+            imageUrl: expStartsMatch.thumbnail_image,
+            courseName: expStartsMatch.name,
+            courseId: expStartsMatch.id,
+          };
+        }
+      }
 
       return { imageUrl: null, courseName: null, courseId: null };
     },
     enabled: !!venueName,
-    staleTime: 30 * 60 * 1000, // Cache for 30 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }
 
