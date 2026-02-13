@@ -215,7 +215,8 @@ async function fetchSeasonLeaderboards(requestedYear?: number): Promise<SeasonLe
         first_name,
         last_name,
         photo_url,
-        country
+        country,
+        pga_tour_id
       )
     `)
     .eq('season_id', seasonData.id);
@@ -241,6 +242,7 @@ async function fetchSeasonLeaderboards(requestedYear?: number): Promise<SeasonLe
           last_name: string | null;
           photo_url: string | null;
           country: string | null;
+          pga_tour_id: string | null;
         } | null;
 
         if (typeof statValue !== 'number' || !player) {
@@ -257,7 +259,7 @@ async function fetchSeasonLeaderboards(requestedYear?: number): Promise<SeasonLe
           firstName,
           lastName,
           countryCode: player.country || 'USA',
-          photoUrl: resolvePhotoUrl(player.photo_url),
+          photoUrl: resolvePhotoUrl(player.photo_url, player.pga_tour_id),
           initials: `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase(),
           statValue,
           statDisplayValue: config.formatValue(statValue),

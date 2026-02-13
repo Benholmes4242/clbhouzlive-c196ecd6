@@ -81,7 +81,7 @@ const SeasonLeaderboardsEmpty = memo(function SeasonLeaderboardsEmpty() {
           Season
         </p>
         <h2 className="m-0 mt-1 text-foreground" style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}>
-          Season Leaders
+          Performance Rankings
         </h2>
       </div>
       <div className="mx-4 mt-4 p-8 text-center rounded-2xl" style={{ background: 'rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.06)' }}>
@@ -157,7 +157,7 @@ export function SeasonLeaderboards() {
             />
           </div>
           <h2 className="m-0 mt-1" style={{ fontSize: '16px', fontWeight: 600, color: '#1C1917', letterSpacing: '-0.2px' }}>
-            Season Leaders
+            Performance Rankings
           </h2>
         </div>
         <button
