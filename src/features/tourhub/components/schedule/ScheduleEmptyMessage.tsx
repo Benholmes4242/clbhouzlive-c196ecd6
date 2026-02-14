@@ -1,95 +1,108 @@
 /**
- * ScheduleEmptyMessage - Cinematic empty states (Apple-grade)
+ * ScheduleEmptyMessage - Polished empty states matching app design language
  * 
- * Features:
- * - Glassmorphic container using design system tokens
- * - Animated icons with semantic accent colors
- * - Clear call-to-action
+ * Variants:
+ * - no-live: No live events, shows next upcoming + CTA to switch filter
+ * - no-results: Tour filter yields nothing, CTA to reset
+ * - no-upcoming: No upcoming events scheduled
+ * - season-complete: Season done, link to overview
  */
 
 import { Link } from 'react-router-dom';
-import { Calendar, Radio, Trophy } from 'lucide-react';
+import { Calendar, Flag, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
+import { format } from 'date-fns';
 
 interface ScheduleEmptyMessageProps {
-  variant: 'no-live' | 'no-results' | 'season-complete';
+  variant: 'no-live' | 'no-results' | 'no-upcoming' | 'season-complete';
   nextTournamentName?: string;
+  nextTournamentDate?: string;
+  tourName?: string;
+  onSwitchFilter?: (filter: string) => void;
+  onResetTour?: () => void;
   className?: string;
 }
 
 export function ScheduleEmptyMessage({ 
   variant, 
   nextTournamentName,
+  nextTournamentDate,
+  tourName,
+  onSwitchFilter,
+  onResetTour,
   className 
 }: ScheduleEmptyMessageProps) {
-  const content = {
-    'no-live': {
-      icon: <Radio className="w-6 h-6" />,
-      title: 'No Live Events',
-      message: nextTournamentName 
-        ? `Check back soon — next up is ${nextTournamentName}` 
-        : 'No live tournaments right now. Check back soon!',
-      iconClassName: 'bg-accent text-accent-foreground',
-    },
-    'no-results': {
-      icon: <Calendar className="w-6 h-6" />,
-      title: 'No Matches',
-      message: 'No tournaments match your search or filter.',
-      iconClassName: 'bg-muted text-muted-foreground',
-    },
-    'season-complete': {
-      icon: <Trophy className="w-6 h-6" />,
-      title: 'Season Complete',
-      message: null,
-      iconClassName: 'bg-primary text-primary-foreground',
-    },
-  };
 
-  const { icon, title, message, iconClassName } = content[variant];
+  const formattedDate = nextTournamentDate 
+    ? format(new Date(nextTournamentDate), 'EEE, MMM d') 
+    : null;
 
   return (
-    <motion.div 
+    <div 
       className={cn(
-        "flex flex-col items-center justify-center gap-4 py-16 px-6 text-center mx-4 rounded-2xl",
-        "bg-muted/40 backdrop-blur-sm border border-border/60",
+        "flex flex-col items-center justify-center gap-4 min-h-[240px]",
+        "py-12 px-6 mx-4 rounded-2xl text-center",
+        "bg-card border border-border shadow-sm",
         className
       )}
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
     >
-      {/* Animated icon container */}
-      <motion.div 
-        className={cn(
-          "w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg",
-          iconClassName
-        )}
-        initial={{ rotate: -10, scale: 0.8 }}
-        animate={{ rotate: 0, scale: 1 }}
-        transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 20 }}
-      >
-        {icon}
-      </motion.div>
+      {/* Icon */}
+      {variant === 'no-live' && <Flag className="w-8 h-8 text-muted-foreground/40" />}
+      {variant === 'no-results' && <Calendar className="w-8 h-8 text-muted-foreground/40" />}
+      {variant === 'no-upcoming' && <Calendar className="w-8 h-8 text-muted-foreground/40" />}
+      {variant === 'season-complete' && <Trophy className="w-8 h-8 text-muted-foreground/40" />}
 
-      <div className="space-y-1">
-        <h4 className="text-base font-bold text-foreground">{title}</h4>
-        <p className="text-sm text-muted-foreground max-w-xs">
-          {variant === 'season-complete' ? (
-            <>
-              Relive the highlights in{' '}
-              <Link 
-                to="/tourhub?tab=overview" 
-                className="text-primary hover:text-primary/80 font-semibold transition-colors active:opacity-70"
-              >
-                Overview →
-              </Link>
-            </>
-          ) : (
-            message
-          )}
-        </p>
-      </div>
-    </motion.div>
+      {/* Title */}
+      <h4 className="text-lg font-semibold text-foreground">
+        {variant === 'no-live' && 'No Live Events Right Now'}
+        {variant === 'no-results' && (tourName ? `No ${tourName} Tournaments` : 'No Matches Found')}
+        {variant === 'no-upcoming' && 'No Upcoming Tournaments'}
+        {variant === 'season-complete' && 'Season Complete'}
+      </h4>
+
+      {/* Subtitle */}
+      <p className="text-sm text-muted-foreground text-center max-w-[280px] mx-auto">
+        {variant === 'no-live' && (
+          nextTournamentName 
+            ? <>Next up: <span className="font-medium text-foreground">{nextTournamentName}</span>{formattedDate && <> · {formattedDate}</>}</>
+            : 'No tournaments are in progress. Check back soon!'
+        )}
+        {variant === 'no-results' && (
+          tourName 
+            ? `There are no ${tourName} events scheduled right now. Try a different tour or check back later.`
+            : 'No tournaments match your search or filter.'
+        )}
+        {variant === 'no-upcoming' && 'The schedule will be updated when new events are announced.'}
+        {variant === 'season-complete' && (
+          <>
+            Relive the highlights in{' '}
+            <Link 
+              to="/tourhub?tab=overview" 
+              className="text-amber-600 font-medium transition-colors active:opacity-70"
+            >
+              Overview →
+            </Link>
+          </>
+        )}
+      </p>
+
+      {/* CTA */}
+      {variant === 'no-live' && onSwitchFilter && (
+        <button
+          onClick={() => onSwitchFilter('upcoming')}
+          className="text-sm text-amber-600 font-medium transition-colors active:opacity-70"
+        >
+          View Upcoming →
+        </button>
+      )}
+      {variant === 'no-results' && onResetTour && (
+        <button
+          onClick={() => onResetTour()}
+          className="text-sm text-amber-600 font-medium transition-colors active:opacity-70"
+        >
+          View All Tours →
+        </button>
+      )}
+    </div>
   );
 }
