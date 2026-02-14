@@ -1,431 +1,171 @@
 /**
- * ScheduleTournamentCard - Cinematic tournament card (Apple-grade)
+ * ScheduleTournamentCard - Clean list-row design matching WhatsComing EventRow
  * 
- * Features:
- * - Proper card depth with border and shadow
- * - Unified status badge system
- * - Winner/Leader display for completed/live tournaments
- * - Stronger text hierarchy
- * - Smooth image loading with skeleton placeholder
- * - Smart date formatting for cross-month ranges
- * - Lazy image loading
- * - font-mono on stat values
+ * Design language from Overview:
+ * - Date block (month + day) left-aligned
+ * - Context label (MAJOR / SIGNATURE / TOUR EVENT) 
+ * - Tournament name 17px/600
+ * - Venue with MapPin icon 13px/400
+ * - bg-card rounded-2xl border border-border/50
+ * - Winner/Leader inline display
  */
 
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { format, isSameMonth } from 'date-fns';
-import { MapPin, DollarSign, Flag, Ruler, ChevronRight } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { MapPin, Trophy } from 'lucide-react';
+import { motion } from 'framer-motion';
 import type { TourTournament } from '../../hooks/useTourHubData';
 import type { SeasonTournament } from '../../hooks/useSeasonTournaments';
 import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
-import { useSingleCourseImage } from '../../hooks/useCourseImageResolver';
-import { getCourseImage } from '../../utils/placeholders';
 
 interface ScheduleTournamentCardProps {
   tournament: TourTournament | SeasonTournament;
   className?: string;
   compact?: boolean;
-  /** Leader/winner data from useTournamentLeadersWinners */
   leaderWinner?: TournamentLeaderWinner;
-  /** Pre-resolved image URL from batch hook (skips per-card lookup) */
   batchImageUrl?: string | null;
 }
 
-/**
- * Format date range with smart month handling
- * Same month: "Jan 15 – 18, 2026"
- * Cross month: "Jan 29 – Feb 1, 2026"
- */
-function formatDateRange(startDate: string, endDate: string): string {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-  
-  if (isSameMonth(start, end)) {
-    return `${format(start, 'MMM d')} – ${format(end, 'd, yyyy')}`;
-  } else {
-    return `${format(start, 'MMM d')} – ${format(end, 'MMM d, yyyy')}`;
-  }
-}
-
-/** Unified Status Badge - Dark glass pill over image */
-function StatusBadge({ status }: { status: string }) {
-  const isLive = status === 'inprogress';
-  const isFinal = status === 'closed' || status === 'complete';
-  
-  const getLabel = () => {
-    if (isLive) return 'LIVE';
-    if (isFinal) return 'FINAL';
-    return 'UPCOMING';
-  };
-  
-  return (
-    <span 
-      className="inline-flex items-center"
-      style={{
-        padding: '4px 10px',
-        borderRadius: '8px',
-        fontSize: '10px',
-        fontWeight: 700,
-        letterSpacing: '0.8px',
-        textTransform: 'uppercase',
-        background: 'rgba(0, 0, 0, 0.55)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
-        gap: '5px',
-      }}
-    >
-      {isLive && (
-        <span 
-          className="animate-live-pulse"
-          style={{
-            width: '5px',
-            height: '5px',
-            borderRadius: '50%',
-            background: '#FF3B30',
-          }}
-        />
-      )}
-      <span style={{ color: isLive ? '#FF3B30' : 'rgba(255, 255, 255, 0.85)' }}>
-        {getLabel()}
-      </span>
-    </span>
-  );
-}
-
-/** Skeleton placeholder for loading state */
-function ImageSkeleton({ compact }: { compact: boolean }) {
-  return (
-    <div 
-      className="absolute inset-0"
-      style={{
-        background: 'linear-gradient(90deg, #F1F3F5 25%, #E5E7EB 50%, #F1F3F5 75%)',
-        backgroundSize: '200% 100%',
-        animation: 'shimmer 1.5s ease-in-out infinite',
-      }}
-    >
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div 
-          className="w-16 h-16 rounded-full flex items-center justify-center"
-          style={{ background: 'rgba(0, 0, 0, 0.05)' }}
-        >
-          <Flag className="w-6 h-6" style={{ color: 'rgba(0, 0, 0, 0.1)' }} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Type guard to check if tournament is SeasonTournament
+// Type guard
 function isSeasonTournament(t: TourTournament | SeasonTournament): t is SeasonTournament {
   return 'startDate' in t;
 }
 
-export function ScheduleTournamentCard({ tournament, className, compact = false, leaderWinner, batchImageUrl }: ScheduleTournamentCardProps) {
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null);
-  
-  // Normalize field names between TourTournament and SeasonTournament
+const MAJOR_KEYWORDS = ['masters', 'u.s. open', 'us open', 'open championship', 'pga championship'];
+const SIGNATURE_KEYWORDS = ['invitational', 'genesis', 'arnold palmer', 'memorial', 'players'];
+const PLAYOFF_KEYWORDS = ['playoff', 'tour championship', 'fedexcup'];
+
+function getContextLabel(name: string, tourName?: string): string {
+  const nameLower = name.toLowerCase();
+  if (MAJOR_KEYWORDS.some(k => nameLower.includes(k))) return 'MAJOR CHAMPIONSHIP';
+  if (PLAYOFF_KEYWORDS.some(k => nameLower.includes(k))) return 'PLAYOFF EVENT';
+  if (SIGNATURE_KEYWORDS.some(k => nameLower.includes(k))) return 'SIGNATURE EVENT';
+  return `${(tourName || 'TOUR').toUpperCase()} EVENT`;
+}
+
+function getMonthAbbr(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
+}
+
+function getDayNum(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  return String(d.getDate());
+}
+
+export function ScheduleTournamentCard({ 
+  tournament, 
+  className, 
+  compact = false, 
+  leaderWinner, 
+}: ScheduleTournamentCardProps) {
+  const navigate = useNavigate();
+
+  // Normalize fields
   const venueName = isSeasonTournament(tournament) ? tournament.venueName : tournament.venue_name;
   const venueCity = isSeasonTournament(tournament) ? tournament.venueCity : tournament.venue_city;
-  const venueCountry = isSeasonTournament(tournament) ? tournament.venueCountry : tournament.venue_country;
   const startDate = isSeasonTournament(tournament) ? tournament.startDate : tournament.start_date;
-  const endDate = isSeasonTournament(tournament) ? tournament.endDate : tournament.end_date;
-  const venuePar = isSeasonTournament(tournament) ? tournament.venuePar : tournament.venue_par;
-  const venueYardage = isSeasonTournament(tournament) ? tournament.venueYardage : tournament.venue_yardage;
+  const tourName = isSeasonTournament(tournament) ? tournament.tourName : tournament.tour_full_name;
   
-  // Winner info from SeasonTournament type
   const winnerFirstName = isSeasonTournament(tournament) ? tournament.winnerFirstName : null;
   const winnerLastName = isSeasonTournament(tournament) ? tournament.winnerLastName : null;
-  const winnerScore = isSeasonTournament(tournament) ? (tournament as any).winnerScore : null;
   
-  // Determine winner display: prefer SeasonTournament fields, fallback to leaderWinner prop
   const isFinal = tournament.status === 'closed' || tournament.status === 'complete';
   const isLive = tournament.status === 'inprogress';
   
+  const contextLabel = getContextLabel(tournament.name, tourName ?? undefined);
+  const isMajor = contextLabel === 'MAJOR CHAMPIONSHIP';
+  const isSignature = contextLabel === 'SIGNATURE EVENT';
+  
+  const venue = [venueName, venueCity].filter(Boolean).join(' · ');
+
+  // Winner display
   const hasSeasonWinner = winnerFirstName && winnerLastName && isFinal;
   const hasLeaderWinnerData = leaderWinner && isFinal;
   const hasLeaderData = leaderWinner && isLive;
   
-  // Resolve course image — use batch URL if provided, else fallback to single lookup
-  const { courseImage } = useSingleCourseImage(
-    !batchImageUrl && venueName ? {
-      venueName: venueName,
-      city: venueCity,
-      country: venueCountry,
-    } : null
-  );
-
-  const imageUrl = batchImageUrl || courseImage?.imageUrl || getCourseImage({ id: tournament.id });
-  
-  // Reset loading state when image URL changes
-  useEffect(() => {
-    if (imageUrl !== currentImageUrl) {
-      setImageLoaded(false);
-      setCurrentImageUrl(imageUrl);
-    }
-  }, [imageUrl, currentImageUrl]);
-
-  const handleImageLoad = () => {
-    setImageLoaded(true);
-  };
+  const winnerDisplay = hasSeasonWinner 
+    ? `${winnerFirstName?.charAt(0)}. ${winnerLastName}`
+    : hasLeaderWinnerData ? leaderWinner!.displayName : null;
 
   return (
-    <Link
-      to={`/tourhub/tournament/${tournament.id}`}
-      className={cn("block relative group", className)}
-      aria-label={`${tournament.name}, ${tournament.status}, ${formatDateRange(startDate, endDate)}`}
-      role="button"
+    <motion.button
+      onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
+      className={`w-full flex items-center gap-3 px-3.5 py-2.5 bg-card rounded-2xl border border-border/50 text-left transition-all active:scale-[0.98] ${className || ''}`}
+      whileTap={{ scale: 0.98 }}
     >
-      <motion.div
-        className={cn(
-          "relative overflow-hidden border border-border/30",
-          !compact && "mx-4"
-        )}
-        style={{ 
-          aspectRatio: '4/3',
-          borderRadius: '14px',
-          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
-        }}
-        whileHover={{ 
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
-        }}
-        whileTap={{ scale: 0.98 }}
-        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-      >
-        {/* Skeleton placeholder - shows while image loads */}
-        <AnimatePresence>
-          {!imageLoaded && (
-            <motion.div
-              className="absolute inset-0 z-[1]"
-              initial={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
-            >
-              <ImageSkeleton compact={compact} />
-            </motion.div>
-          )}
-        </AnimatePresence>
-        
-        {/* Background Image with hover Ken Burns */}
-        <motion.div
-          className="absolute inset-0"
-          whileHover={{ scale: 1.05 }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <motion.img 
-            key={imageUrl}
-            src={imageUrl}
-            alt={venueName || tournament.name}
-            className="w-full h-full object-cover"
-            loading="lazy"
-            onLoad={handleImageLoad}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: imageLoaded ? 1 : 0 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
-          />
-        </motion.div>
-        
-        {/* Bottom gradient overlay - 70% height for text protection */}
-        <div 
-          className="absolute inset-x-0 bottom-0 pointer-events-none z-[2]"
-          style={{
-            height: '70%',
-            background: 'linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.4) 35%, rgba(0, 0, 0, 0.1) 60%, transparent 100%)',
-          }}
-        />
-        
-        {/* Tour Badge - Top Left */}
-        {'tour_full_name' in tournament && (tournament as TourTournament).tour_full_name && (
-          <div className="absolute top-2.5 left-2.5 z-10">
-            <span 
-              className="inline-flex items-center text-[9px] font-bold uppercase tracking-wider text-white/85"
-              style={{
-                padding: '3px 8px',
-                borderRadius: '6px',
-                background: 'rgba(0, 0, 0, 0.55)',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
-                letterSpacing: '0.6px',
-              }}
-            >
-              {(tournament as TourTournament).tour_full_name}
-            </span>
-          </div>
-        )}
+      {/* Date block */}
+      <div className="flex-shrink-0 w-12 text-center">
+        <p className="uppercase leading-none" style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.05em', color: '#A8A29E' }}>
+          {getMonthAbbr(startDate)}
+        </p>
+        <p className="leading-none mt-0.5" style={{ fontSize: '17px', fontWeight: 700, color: '#1C1917' }}>
+          {getDayNum(startDate)}
+        </p>
+      </div>
 
-        {/* Status Badge - Top Right - Unified dark glass */}
-        <div className="absolute top-2.5 right-2.5 z-10">
-          <StatusBadge status={tournament.status} />
-        </div>
-
-        {/* Tap affordance - glassmorphic chevron */}
-        <motion.div 
-          className="absolute right-3 bottom-3 w-8 h-8 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
-          style={{ 
-            background: 'rgba(255,255,255,0.15)',
-            backdropFilter: 'blur(4px)',
-            border: '1px solid rgba(255,255,255,0.2)',
-          }}
-        >
-          <ChevronRight className="w-4 h-4 text-white" />
-        </motion.div>
-        
-        {/* Content - Bottom with stronger hierarchy */}
-        <div 
-          className="absolute inset-x-0 bottom-0 z-10"
-          style={{ padding: '12px' }}
-        >
-          {/* Event Name - Dominant */}
-          <h3 
-            className="line-clamp-2"
-            style={{ 
-              fontSize: '16px',
-              fontWeight: 700,
-              color: '#FFFFFF',
-              lineHeight: 1.2,
-              letterSpacing: '-0.2px',
-              marginBottom: '3px',
-              textShadow: '0 1px 3px rgba(0,0,0,0.5)',
+      {/* Content */}
+      <div className="flex-1 min-w-0">
+        {/* Context label */}
+        <div className="flex items-center gap-1.5">
+          <p
+            className="uppercase leading-none"
+            style={{
+              fontSize: '9px',
+              fontWeight: 500,
+              letterSpacing: '0.05em',
+              color: (isMajor || isSignature) ? 'hsl(var(--primary))' : isLive ? '#E09F3E' : '#A8A29E',
             }}
           >
-            {tournament.name}
-          </h3>
-          
-          {/* Winner Display (completed tournaments) — prefer SeasonTournament data, fallback to leaderWinner */}
-          {isFinal && (hasSeasonWinner || hasLeaderWinnerData) && (
-            <div 
-              className="flex items-center gap-1.5"
-              style={{ 
-                fontSize: '12px',
-                fontWeight: 600,
-                color: '#FFD700',
-                marginBottom: '3px',
-                textShadow: '0 1px 3px rgba(0,0,0,0.5)',
-              }}
-            >
-              <span>🏆</span>
-              <span>
-                {hasSeasonWinner 
-                  ? `${winnerFirstName?.charAt(0)}. ${winnerLastName}`
-                  : leaderWinner!.displayName
-                }
-                {(hasSeasonWinner ? winnerScore : leaderWinner?.displayScore) && (
-                  <span className="font-mono"> ({hasSeasonWinner ? winnerScore : leaderWinner!.displayScore})</span>
+            {isLive ? '● LIVE' : contextLabel}
+          </p>
+        </div>
+        
+        {/* Tournament name */}
+        <p
+          className="mt-1 line-clamp-1"
+          style={{ fontSize: '17px', fontWeight: 600, letterSpacing: '-0.15px', color: '#1C1917' }}
+        >
+          {tournament.name}
+        </p>
+        
+        {/* Winner/Leader row */}
+        {(winnerDisplay || hasLeaderData) && (
+          <p className="flex items-center gap-1 mt-0.5" style={{ fontSize: '12px', fontWeight: 600 }}>
+            {isFinal && winnerDisplay && (
+              <span style={{ color: '#78716C' }}>
+                <Trophy className="w-3 h-3 inline mr-0.5" style={{ color: '#f59e0b' }} />
+                {winnerDisplay}
+                {(hasSeasonWinner ? (tournament as any).winnerScore : leaderWinner?.displayScore) && (
+                  <span className="font-mono ml-1" style={{ color: '#A8A29E' }}>
+                    ({hasSeasonWinner ? (tournament as any).winnerScore : leaderWinner!.displayScore})
+                  </span>
                 )}
               </span>
-            </div>
-          )}
-          
-          {/* Leader Display (live tournaments) — real leader data */}
-          {isLive && hasLeaderData && (
-            <div 
-              className="flex items-center gap-1"
-              style={{ 
-                fontSize: '12px',
-                fontWeight: 600,
-                color: '#FF3B30',
-                marginBottom: '3px',
-                textShadow: '0 1px 3px rgba(0,0,0,0.5)',
-              }}
-            >
-              <span>Leader: {leaderWinner!.displayName}</span>
-              <span className="font-mono">{leaderWinner!.displayScore}</span>
-            </div>
-          )}
-          
-          {/* Live fallback — no leader data yet */}
-          {isLive && !hasLeaderData && (
-            <div 
-              className="flex items-center gap-1"
-              style={{ 
-                fontSize: '12px',
-                fontWeight: 600,
-                color: '#FF3B30',
-                marginBottom: '3px',
-                textShadow: '0 1px 3px rgba(0,0,0,0.5)',
-              }}
-            >
-              <span>Tap for leaderboard</span>
-            </div>
-          )}
-          
-          {/* Date range - Subdued */}
-          <p 
-            style={{
-              fontSize: '11px',
-              fontWeight: 400,
-              color: 'rgba(255, 255, 255, 0.7)',
-              textShadow: '0 1px 3px rgba(0,0,0,0.5)',
-            }}
-          >
-            {formatDateRange(startDate, endDate)}
-          </p>
-          
-          {/* Location (non-compact only) */}
-          {(venueName || venueCity) && !compact && (
-            <div 
-              className="flex items-center gap-1.5 mt-2"
-              style={{ 
-                fontSize: '12px',
-                color: 'rgba(255, 255, 255, 0.7)',
-                textShadow: '0 1px 3px rgba(0,0,0,0.5)',
-              }}
-            >
-              <MapPin className="w-3.5 h-3.5 shrink-0" />
-              <span className="truncate">
-                {[venueName, venueCity].filter(Boolean).join(' • ')}
+            )}
+            {hasLeaderData && !isFinal && (
+              <span style={{ color: '#E09F3E' }}>
+                Leader: {leaderWinner!.displayName}
+                <span className="font-mono ml-1">{leaderWinner!.displayScore}</span>
               </span>
-            </div>
-          )}
-
-          {/* Meta Info - Glassmorphic pills with font-mono on values */}
-          {!compact && (
-            <div className="flex items-center gap-2 mt-2.5 text-[11px]">
-              {tournament.purse && (
-                <div 
-                  className="flex items-center gap-1 px-2 py-0.5 rounded-full text-white font-semibold"
-                  style={{ background: 'rgba(255,255,255,0.15)' }}
-                >
-                  <DollarSign className="w-3 h-3" />
-                  <span className="font-mono">${(tournament.purse / 1_000_000).toFixed(1)}M</span>
-                </div>
-              )}
-              {venuePar && (
-                <div 
-                  className="flex items-center gap-1 px-2 py-0.5 rounded-full text-white/80"
-                  style={{ background: 'rgba(255,255,255,0.1)' }}
-                >
-                  <Flag className="w-3 h-3" />
-                  <span className="font-mono">Par {venuePar}</span>
-                </div>
-              )}
-              {venueYardage && (
-                <div 
-                  className="flex items-center gap-1 px-2 py-0.5 rounded-full text-white/80"
-                  style={{ background: 'rgba(255,255,255,0.1)' }}
-                >
-                  <Ruler className="w-3 h-3" />
-                  <span className="font-mono">{venueYardage.toLocaleString()} yds</span>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </motion.div>
-    </Link>
+            )}
+          </p>
+        )}
+        
+        {/* Venue */}
+        {venue && !compact && (
+          <p className="flex items-center gap-1 mt-0.5" style={{ fontSize: '13px', fontWeight: 400, color: '#78716C' }}>
+            <MapPin className="w-3 h-3 flex-shrink-0 opacity-60" />
+            <span className="line-clamp-1">{venue}</span>
+          </p>
+        )}
+      </div>
+    </motion.button>
   );
 }
 
 /**
  * Prefetch course images for a list of tournaments
  */
-export function prefetchTournamentImages(tournaments: (TourTournament | SeasonTournament)[]) {
-  tournaments.forEach(tournament => {
-    const fallbackUrl = getCourseImage({ id: tournament.id });
-    const img = new Image();
-    img.src = fallbackUrl;
-  });
+export function prefetchTournamentImages(_tournaments: (TourTournament | SeasonTournament)[]) {
+  // No-op: list view no longer uses course images
 }
