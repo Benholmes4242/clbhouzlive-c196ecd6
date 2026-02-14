@@ -75,23 +75,19 @@ export function CollegeGolfHubPage() {
         />
       )}
 
-      {/* Content area with padding */}
-      <div className="px-4 pt-6 pb-24">
+      {/* Content area — Overview-matched rhythm */}
+      <div className="px-4 space-y-section pt-5 pb-24">
         {/* Search Section */}
-        <section className="mb-6">
-          <CollegeSearch />
-        </section>
+        <CollegeSearch />
 
         {/* Franchise Leaderboard (includes sticky tabs) */}
-        <section className="mb-10">
-          <FranchiseLeaderboard limit={25} />
-        </section>
+        <FranchiseLeaderboard limit={25} />
 
         {/* Weekly Movers */}
-        <section className="mb-8">
+        <section>
           <div className="flex items-center gap-2 mb-4">
-            <Zap className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-semibold text-foreground">
+            <Zap className="w-4 h-4 text-primary" />
+            <h2 className="text-[16px] font-semibold text-foreground tracking-tight">
               This Week's Movers
             </h2>
           </div>

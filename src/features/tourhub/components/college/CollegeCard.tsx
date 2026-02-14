@@ -23,8 +23,8 @@ export function CollegeCard({ stats, college, rank, alumni, className }: College
     <Link
       to={`/tourhub/college-golf/${slug}`}
       className={cn(
-        'block bg-card border border-border rounded-xl p-4',
-        'hover:border-primary/30 hover:bg-card/90 transition-all duration-200',
+        'block bg-card border border-border/30 rounded-xl p-3.5',
+        'hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-200',
         'active:scale-[0.98]',
         'focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:outline-none',
         'group',
@@ -53,19 +53,19 @@ export function CollegeCard({ stats, college, rank, alumni, className }: College
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-bold text-foreground truncate group-hover:text-primary transition-colors">{displayName}</h3>
+          <h3 className="text-[14px] font-semibold text-foreground truncate group-hover:text-primary transition-colors leading-tight">{displayName}</h3>
           <div className="flex items-center gap-4 mt-1.5">
-            <span className="inline-flex items-center gap-1 text-sm font-semibold text-[hsl(var(--tab-orange))]">
+            <span className="inline-flex items-center gap-1 text-[13px] font-semibold font-mono tabular-nums text-[hsl(var(--tab-orange))]">
               <DollarSign className="w-3.5 h-3.5" />
               {formatCurrency(stats.earnings_total)}
             </span>
             {stats.wins_total > 0 && (
-              <span className="inline-flex items-center gap-1 text-sm font-medium text-primary">
+              <span className="inline-flex items-center gap-1 text-[13px] font-medium text-primary">
                 <Trophy className="w-3.5 h-3.5" />
                 {stats.wins_total}
               </span>
             )}
-            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground/60">
+            <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground/50">
               <Users className="w-3 h-3" />
               {stats.player_count}
             </span>
@@ -89,7 +89,7 @@ export function CollegeCard({ stats, college, rank, alumni, className }: College
           )}
         </div>
 
-        <ArrowRight className="w-5 h-5 text-muted-foreground/30 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0 self-center" />
+        <ArrowRight className="w-4 h-4 text-muted-foreground/30 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0 self-center" />
       </div>
     </Link>
   );

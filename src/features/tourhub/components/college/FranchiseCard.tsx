@@ -157,19 +157,19 @@ export function FranchiseCard({
       <Link
         to={`/tourhub/college-golf/${slug}`}
         className={cn(
-          'block p-4 rounded-xl',
-          'bg-card/80 backdrop-blur-sm',
-          'border border-border/40',
-          'hover:border-primary/30 hover:bg-card hover:shadow-lg hover:shadow-primary/5',
+          'block p-3.5 rounded-xl',
+          'bg-card',
+          'border border-border/30',
+          'hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5',
           'transition-all duration-200',
           'group',
           className
         )}
       >
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3.5">
           {/* Rank Badge */}
-          <div className="flex flex-col items-center shrink-0 w-8">
-            <span className={cn("text-lg font-bold tabular-nums", isTopThree ? "text-primary" : "text-muted-foreground")}>
+          <div className="flex flex-col items-center shrink-0 w-7">
+            <span className={cn("text-[15px] font-bold tabular-nums font-mono", isTopThree ? "text-primary" : "text-muted-foreground/70")}>
               {rank}
             </span>
             {rankDelta !== 0 && (
@@ -197,15 +197,15 @@ export function FranchiseCard({
 
           {/* Content */}
           <div className="flex-1 min-w-0">
-            <h3 className="text-[15px] font-bold text-foreground truncate group-hover:text-primary transition-colors">
+            <h3 className="text-[14px] font-semibold text-foreground truncate group-hover:text-primary transition-colors leading-tight">
               {displayName}
             </h3>
 
             <div className="flex items-center gap-3 mt-1">
-              <span className={cn("text-sm font-semibold", activeMetric === 'earnings' ? "text-[hsl(var(--tab-orange))]" : "text-foreground")}>
+              <span className={cn("text-[13px] font-semibold font-mono tabular-nums", activeMetric === 'earnings' ? "text-[hsl(var(--tab-orange))]" : "text-foreground")}>
                 {typeof metricDisplay.value === 'string' ? metricDisplay.value : `${metricDisplay.value} ${metricDisplay.label}`}
               </span>
-              <span className="inline-flex items-center gap-1 text-xs text-muted-foreground/60">
+              <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground/50">
                 <Users className="w-3 h-3" />
                 {stats.player_count}
               </span>
@@ -215,11 +215,11 @@ export function FranchiseCard({
             {alumni && alumni.length > 0 && (
               <div className="flex items-center -space-x-1.5 mt-2">
                 {alumni.slice(0, 3).map(a => (
-                  <div key={a.id} className="w-6 h-6 rounded-full border-[1.5px] border-card overflow-hidden bg-muted">
+                  <div key={a.id} className="w-5 h-5 rounded-full border-[1.5px] border-card overflow-hidden bg-muted">
                     {a.photo_url ? (
                       <img src={a.photo_url} alt={a.full_name} className="w-full h-full object-cover" loading="lazy" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-[8px] font-bold text-muted-foreground">
+                      <div className="w-full h-full flex items-center justify-center text-[7px] font-bold text-muted-foreground">
                         {a.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                       </div>
                     )}
@@ -229,11 +229,11 @@ export function FranchiseCard({
             )}
           </div>
 
-          <ChevronRight className="w-5 h-5 text-muted-foreground/30 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0 self-center" />
+          <ChevronRight className="w-4 h-4 text-muted-foreground/30 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0 self-center" />
         </div>
 
         {/* Dominance bar */}
-        <div className="mt-3 h-1 rounded-full bg-border/20 overflow-hidden">
+        <div className="mt-3 h-[3px] rounded-full bg-border/15 overflow-hidden">
           <motion.div
             className="h-full rounded-full"
             style={{ background: 'linear-gradient(90deg, hsl(var(--tab-orange)), hsl(45, 93%, 47%))' }}
