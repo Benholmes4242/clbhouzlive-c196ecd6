@@ -365,18 +365,18 @@ export function PlayersTab() {
           </AnimatePresence>
         </div>
 
+        {/* Category filter tabs (sliding indicator) */}
+        <PlayerFilterTabs
+          activeFilter={tier}
+          onFilterChange={setTier}
+          counts={counts}
+        />
+
         {/* Tour filter pills */}
         <PlayersTourFilter
           activeTour={activeTour}
           onTourChange={setActiveTour}
           tourCounts={tourCounts}
-        />
-
-        {/* Category filter tabs */}
-        <PlayerFilterTabs
-          activeFilter={tier}
-          onFilterChange={setTier}
-          counts={counts}
         />
       </div>
 
