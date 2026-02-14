@@ -132,7 +132,7 @@ export function PlayersHero({ players, activeTour }: PlayersHeroProps) {
                 <motion.img
                   src={photoUrl}
                   alt={champion.playerName}
-                  className="absolute inset-0 w-full h-full object-cover object-top"
+                  className="absolute inset-0 w-full h-full object-cover object-[center_20%]"
                   loading="eager"
                   initial={{ scale: 1.06 }}
                   animate={{ scale: 1 }}
@@ -185,11 +185,11 @@ export function PlayersHero({ players, activeTour }: PlayersHeroProps) {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.35 }}
-              className=""
+              className="px-4"
               style={{ marginTop: '-8px', position: 'relative', zIndex: 10 }}
             >
               <div
-                className="flex gap-2.5 overflow-x-auto pb-1 px-4 scrollbar-hide"
+                className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-hide"
                 style={{
                   WebkitOverflowScrolling: 'touch',
                   scrollbarWidth: 'none',
