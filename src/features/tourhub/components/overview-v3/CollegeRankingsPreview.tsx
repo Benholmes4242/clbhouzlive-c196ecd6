@@ -39,7 +39,7 @@ function CollegePreviewSkeleton() {
   };
 
   return (
-    <section style={{ paddingTop: '40px', paddingBottom: '8px' }}>
+    <section>
       <div className="flex items-center justify-between px-4 mb-4">
         <div className="h-6 w-48 rounded-lg" style={shimmerBg} />
       </div>
@@ -195,28 +195,28 @@ function HeroCollegeCard({
           >
             <div className="text-center" style={{ borderRight: '1px solid rgba(255,255,255,0.1)' }}>
               <DollarSign className="w-3 h-3 mx-auto mb-1" style={{ color: 'rgba(255,255,255,0.4)' }} />
-              <p className="m-0" style={{ fontSize: '9px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)' }}>
+              <p className="m-0" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)' }}>
                 Earnings
               </p>
-              <p className="m-0 text-white font-bold" style={{ fontSize: '15px', fontFamily: "'JetBrains Mono', monospace", marginTop: '2px' }}>
+              <p className="m-0 text-white font-bold" style={{ fontSize: '17px', fontFamily: "'JetBrains Mono', monospace", marginTop: '2px' }}>
                 {formatCurrency(stats.earnings_total)}
               </p>
             </div>
             <div className="text-center" style={{ borderRight: '1px solid rgba(255,255,255,0.1)' }}>
               <Trophy className="w-3 h-3 mx-auto mb-1" style={{ color: 'rgba(255,255,255,0.4)' }} />
-              <p className="m-0" style={{ fontSize: '9px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)' }}>
+              <p className="m-0" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)' }}>
                 Wins
               </p>
-              <p className="m-0 text-white font-bold" style={{ fontSize: '15px', fontFamily: "'JetBrains Mono', monospace", marginTop: '2px' }}>
+              <p className="m-0 text-white font-bold" style={{ fontSize: '17px', fontFamily: "'JetBrains Mono', monospace", marginTop: '2px' }}>
                 {stats.wins_total}
               </p>
             </div>
             <div className="text-center">
               <Users className="w-3 h-3 mx-auto mb-1" style={{ color: 'rgba(255,255,255,0.4)' }} />
-              <p className="m-0" style={{ fontSize: '9px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)' }}>
+              <p className="m-0" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)' }}>
                 Alumni
               </p>
-              <p className="m-0 text-white font-bold" style={{ fontSize: '15px', fontFamily: "'JetBrains Mono', monospace", marginTop: '2px' }}>
+              <p className="m-0 text-white font-bold" style={{ fontSize: '17px', fontFamily: "'JetBrains Mono', monospace", marginTop: '2px' }}>
                 {stats.player_count}
               </p>
             </div>
@@ -324,7 +324,7 @@ function ChaserCard({
           </div>
 
           {/* Stats row */}
-          <p className="m-0 text-muted-foreground" style={{ fontSize: '12px', fontWeight: 500, marginTop: '4px' }}>
+          <p className="m-0 text-muted-foreground" style={{ fontSize: '13px', fontWeight: 500, marginTop: '4px' }}>
             {formatCurrency(stats.earnings_total)} · {stats.wins_total} Wins · {stats.player_count} Alumni
           </p>
 
@@ -403,7 +403,7 @@ function NarrativeStrip({ topCollege }: { topCollege: CollegeSeasonStats }) {
     >
       <p
         className="m-0 text-muted-foreground"
-        style={{ fontSize: '12px', fontWeight: 500, fontStyle: 'italic', lineHeight: 1.4 }}
+        style={{ fontSize: '13px', fontWeight: 500, fontStyle: 'italic', lineHeight: 1.4 }}
       >
         {narrative}
       </p>
@@ -446,7 +446,7 @@ export function CollegeRankingsPreview() {
   const chasers = top3.slice(1);
 
   return (
-    <section style={{ paddingTop: '40px', paddingBottom: '8px' }}>
+    <section>
       {/* SECTION HEADER */}
       <motion.div
         className="flex items-end justify-between px-4 mb-1"
@@ -460,19 +460,19 @@ export function CollegeRankingsPreview() {
             <GraduationCap className="w-4 h-4 text-muted-foreground" style={{ marginBottom: '-1px' }} />
             <h2
               className="m-0"
-              style={{ fontSize: '16px', fontWeight: 600, color: '#1C1917', letterSpacing: '-0.2px' }}
+              style={{ fontSize: '22px', fontWeight: 700, color: '#1C1917', letterSpacing: '-0.3px' }}
             >
               College Power Rankings
             </h2>
           </div>
-          <p className="m-0" style={{ fontSize: '12px', fontWeight: 400, color: '#78716C', marginTop: '3px', marginLeft: '24px' }}>
+          <p className="m-0" style={{ fontSize: '13px', fontWeight: 400, color: '#78716C', marginTop: '3px', marginLeft: '24px' }}>
             Who's producing the strongest tour talent?
           </p>
         </div>
         <button
           onClick={() => navigate('/tourhub/college')}
           className="flex items-center gap-0.5 group transition-all duration-300 bg-transparent border-none cursor-pointer"
-          style={{ color: '#EA580C', fontSize: '13px', fontWeight: 500 }}
+          style={{ color: '#64748b', fontSize: '13px', fontWeight: 500 }}
         >
           View All
           <ChevronRight size={12} className="opacity-60" />
