@@ -300,6 +300,9 @@ export function useTourPlayers(search?: string) {
       return (data || []) as TourPlayer[];
     },
     staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    retry: 1,
+    placeholderData: (prev: any) => prev,
   });
 }
 
