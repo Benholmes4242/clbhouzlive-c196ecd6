@@ -1,6 +1,6 @@
 /**
  * PlayersTourFilter - Scrollable tour filter pills for the Players tab.
- * Matches ScheduleTourFilter pattern: white pill active, no emojis, text only.
+ * Active pill: dark bg with white text. Inactive: muted bg.
  */
 
 import { cn } from '@/lib/utils';
@@ -65,17 +65,17 @@ export function PlayersTourFilter({
             whileTap={{ scale: 0.95 }}
             className={cn(
               'flex items-center gap-1.5 px-3 py-2 rounded-full whitespace-nowrap',
-              'text-xs font-semibold transition-colors duration-200',
-              'min-h-[44px]',
+              'text-[13px] font-semibold transition-colors duration-200',
+              'min-h-[44px] border',
               isActive
-                ? 'bg-card text-foreground shadow-sm border border-border/40'
-                : 'bg-muted text-muted-foreground',
+                ? 'bg-foreground text-background border-foreground'
+                : 'bg-muted/50 text-muted-foreground border-border',
             )}
           >
             {tour.label}
             <span className={cn(
               'text-[10px] font-bold tabular-nums',
-              isActive ? 'text-muted-foreground' : 'text-muted-foreground/60'
+              isActive ? 'text-background/60' : 'text-muted-foreground/60'
             )}>
               {count}
             </span>

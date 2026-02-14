@@ -1,58 +1,74 @@
 /**
- * PlayerSortControl - Sort dropdown for player list
- * Clean, minimal design matching editorial feel
+ * PlayerSortControl - Compact pill-style sort dropdown
  */
 
-import { ChevronDown } from 'lucide-react';
+import { Check, ChevronDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
-export type PlayerSortType = 'alphabetical' | 'world-rank' | 'most-active' | 'newest-pro';
+export type PlayerSortType =
+  | 'world-rank-desc'
+  | 'world-rank-asc'
+  | 'alpha-az'
+  | 'alpha-za'
+  | 'most-events'
+  | 'highest-earnings';
 
 interface PlayerSortControlProps {
   value: PlayerSortType;
   onChange: (value: PlayerSortType) => void;
 }
 
-const sortOptions: { value: PlayerSortType; label: string }[] = [
-  { value: 'alphabetical', label: 'Alphabetical' },
-  { value: 'world-rank', label: 'World Rank' },
-  { value: 'most-active', label: 'Most Active' },
-  { value: 'newest-pro', label: 'Turned Pro (Newest)' },
+const SORT_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string }[] = [
+  { value: 'world-rank-desc', label: 'Highest World Ranking', shortLabel: 'World Ranking' },
+  { value: 'world-rank-asc', label: 'Lowest World Ranking', shortLabel: 'Rank (Low)' },
+  { value: 'alpha-az', label: 'Alphabetical A-Z', shortLabel: 'A-Z' },
+  { value: 'alpha-za', label: 'Alphabetical Z-A', shortLabel: 'Z-A' },
+  { value: 'most-events', label: 'Most Events Played', shortLabel: 'Events' },
+  { value: 'highest-earnings', label: 'Highest Earnings', shortLabel: 'Earnings' },
 ];
 
 export function PlayerSortControl({ value, onChange }: PlayerSortControlProps) {
+  const activeOption = SORT_OPTIONS.find(o => o.value === value) || SORT_OPTIONS[0];
+
   return (
-    <div className="flex flex-col items-end gap-0.5">
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-[#64748b]">Sort by</span>
-        <Select value={value} onValueChange={onChange}>
-          <SelectTrigger className="w-[160px] h-9 text-sm bg-white border-[#e2e8f0] text-[#1e293b] focus:ring-2 focus:ring-[#e2e8f0] focus:border-[#e2e8f0]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent className="bg-white border-[#e2e8f0]">
-            {sortOptions.map((option) => (
-              <SelectItem 
-                key={option.value} 
-                value={option.value}
-                className="text-[#1e293b] focus:bg-[#f8fafc] focus:text-[#1e293b] data-[state=checked]:bg-[#f8fafc] data-[state=checked]:text-[#1e293b]"
-              >
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      {value === 'world-rank' && (
-        <span className="text-[10px] text-[#94a3b8]">
-          Official World Golf Ranking (OWGR)
-        </span>
-      )}
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          className={cn(
+            "flex items-center gap-1.5 px-3 py-1.5",
+            "bg-muted/50 border border-border rounded-full",
+            "text-sm font-medium text-foreground",
+            "hover:bg-muted active:scale-[0.97] transition-all",
+            "outline-none focus:outline-none focus-visible:ring-0"
+          )}
+        >
+          Sort: {activeOption.shortLabel}
+          <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent 
+        align="end" 
+        className="w-56 bg-card border border-border shadow-lg z-50"
+      >
+        {SORT_OPTIONS.map((option) => (
+          <DropdownMenuItem
+            key={option.value}
+            onClick={() => onChange(option.value)}
+            className="flex items-center justify-between text-sm cursor-pointer"
+          >
+            {option.label}
+            {value === option.value && (
+              <Check className="w-4 h-4 text-primary" />
+            )}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
