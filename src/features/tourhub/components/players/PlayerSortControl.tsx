@@ -16,7 +16,7 @@ export type PlayerSortType =
   | 'world-rank-asc'
   | 'alpha-az'
   | 'alpha-za'
-  | 'most-events'
+  | 'most-wins'
   | 'highest-earnings';
 
 interface PlayerSortControlProps {
@@ -29,7 +29,7 @@ const SORT_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string }
   { value: 'world-rank-asc', label: 'Lowest World Ranking', shortLabel: 'Rank (Low)' },
   { value: 'alpha-az', label: 'Alphabetical A-Z', shortLabel: 'A-Z' },
   { value: 'alpha-za', label: 'Alphabetical Z-A', shortLabel: 'Z-A' },
-  { value: 'most-events', label: 'Most Events Played', shortLabel: 'Events' },
+  { value: 'most-wins', label: 'Most Wins', shortLabel: 'Wins' },
   { value: 'highest-earnings', label: 'Highest Earnings', shortLabel: 'Earnings' },
 ];
 
@@ -63,12 +63,12 @@ export function PlayerSortControl({ value, onChange }: PlayerSortControlProps) {
             onClick={() => onChange(option.value)}
             className={cn(
               "flex items-center justify-between text-sm cursor-pointer rounded-lg px-3 py-2.5",
-              value === option.value && "font-medium"
+              value === option.value && "font-semibold bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent"
             )}
           >
             <span className="flex items-center gap-2">
               {value === option.value && (
-                <Check className="w-4 h-4 text-primary" />
+                <Check className="w-4 h-4 text-amber-500" />
               )}
               {value !== option.value && <span className="w-4" />}
               {option.label}
