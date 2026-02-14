@@ -178,8 +178,9 @@ export function useLiveTournaments() {
         tourSlug: mapTourSlug(row.season.tour_name),
       }));
     },
-    staleTime: 30 * 1000, // 30 seconds for live data
-    refetchInterval: 60 * 1000, // Refetch every minute
+    staleTime: 5 * 1000,          // 5s — Realtime handles freshness
+    refetchInterval: false,        // No polling — Realtime pushes updates
+    refetchOnWindowFocus: true,
   });
 }
 
@@ -745,7 +746,8 @@ export function useTournamentTopLeaders(tournamentId: string | null) {
       });
     },
     enabled: !!tournamentId,
-    staleTime: 30 * 1000,
-    refetchInterval: 60 * 1000, // Refetch every minute for live play
+    staleTime: 5 * 1000,          // 5s — Realtime handles freshness
+    refetchInterval: false,        // No polling — Realtime pushes updates
+    refetchOnWindowFocus: true,
   });
 }

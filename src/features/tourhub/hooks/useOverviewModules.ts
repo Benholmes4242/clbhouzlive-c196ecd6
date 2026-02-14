@@ -198,8 +198,9 @@ export function useLiveRightNow() {
 
       return tournamentsWithLeaders;
     },
-    staleTime: 30 * 1000, // 30 seconds for live data
-    refetchInterval: 60 * 1000, // Refetch every minute
+    staleTime: 5 * 1000,          // 5s — Realtime handles freshness
+    refetchInterval: false,        // No polling — Realtime pushes updates
+    refetchOnWindowFocus: true,
   });
 }
 
@@ -887,8 +888,9 @@ export function useLiveGolfPulse() {
         avgScore: Math.round(avgScore * 10) / 10,
       } as LivePulseStats;
     },
-    staleTime: 30 * 1000,
-    refetchInterval: 60 * 1000,
+    staleTime: 5 * 1000,          // 5s — Realtime handles freshness
+    refetchInterval: false,        // No polling — Realtime pushes updates
+    refetchOnWindowFocus: true,
   });
 }
 

@@ -314,7 +314,8 @@ export function useHeroCarouselData() {
   return useQuery({
     queryKey: ['hero-carousel-data'],
     queryFn: fetchHeroData,
-    staleTime: 30 * 1000, // 30 seconds for live data
-    refetchInterval: 60 * 1000, // Refetch every minute
+    staleTime: 5 * 1000,          // 5s — Realtime handles freshness
+    refetchInterval: false,        // No polling — Realtime pushes updates
+    refetchOnWindowFocus: true,
   });
 }

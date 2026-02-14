@@ -18,7 +18,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
 import { TourHubShell } from '../components/TourHubShell';
 import { useTourTournament, useTourLeaderboard } from '../hooks/useTourHubData';
-import { useTournamentLiveUpdates } from '../hooks/useTournamentLiveUpdates';
+import { useLeaderboardRealtime } from '../hooks/useLeaderboardRealtime';
 import { usePlayerHeadshots } from '../hooks/usePlayerMedia';
 import { useSingleCourseImage } from '../hooks/useCourseImageResolver';
 import { getCourseImage } from '../utils/placeholders';
@@ -70,12 +70,8 @@ export function TournamentDetailPage() {
   const isCompleted = tournament?.status === 'closed';
   const isUpcoming = tournament?.status === 'scheduled' || tournament?.status === 'created';
   
-  const { lastUpdatedText, isRefreshing, refresh } = useTournamentLiveUpdates({
-    tournamentId: tournamentId || '',
-    tournamentSrId: tournament?.sr_id || null,
-    isLive,
-    enabled: !!tournament,
-  });
+  // Realtime subscription — replaces useTournamentLiveUpdates (no more per-user API calls)
+  const { isConnected } = useLeaderboardRealtime(isLive ? tournamentId : null);
   
   const venueInput = useMemo(() => {
     if (!tournament) return null;
@@ -267,9 +263,8 @@ export function TournamentDetailPage() {
           {isLive && (
             <StatusBar
               variant="live"
-              lastUpdatedText={lastUpdatedText}
-              isRefreshing={isRefreshing}
-              onRefresh={refresh}
+              lastUpdatedText={isConnected ? 'Live' : 'Reconnecting…'}
+              isRefreshing={false}
               leaderName={leader?.name}
               leaderScore={leader?.score}
               className="mb-4"

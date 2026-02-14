@@ -1,18 +1,9 @@
 /**
- * tournament-live-sync - Automated live tournament data sync
+ * tournament-live-sync - Centralised live tournament data sync
  * 
- * This function is called by pg_cron every 2 minutes to:
- * 1. RESOLVE STATUS: Find tournaments that should be live (created/scheduled with dates in range)
- *    and check Sportradar for live data - if found, flip to 'inprogress'
- * 2. Find tournaments with status = 'inprogress'
- * 3. Sync ONE tournament per invocation (round-robin by last_live_sync) to avoid CPU timeout
- * 4. Update last_live_sync timestamp on each tournament
- * 5. Log results to sr_sync_log
- * 
- * OPTIMIZATION: To avoid CPU timeout with multiple live tournaments, we sync only ONE
- * tournament per invocation, prioritizing the one with the oldest last_live_sync.
- * With pg_cron running every 2 minutes and typical tournaments taking ~5s to sync,
- * all tournaments get fresh data within reasonable intervals.
+ * Called by pg_cron. Syncs ALL live tournaments per invocation (typically 1-3).
+ * This is the ONLY thing calling Sportradar — decoupled from user count.
+ * Supabase Realtime broadcasts DB changes to all connected clients.
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
@@ -27,8 +18,8 @@ const getAccessLevel = () => Deno.env.get('SPORTRADAR_ACCESS_LEVEL') || 'product
 const getTourBaseUrl = (tour: string = 'pga') => 
   `https://api.sportradar.com/golf/${getAccessLevel()}/${tour}/v3/en`;
 
-// Maximum tournaments to sync per invocation (to avoid CPU timeout)
-const MAX_TOURNAMENTS_PER_SYNC = 1;
+// Sync ALL live tournaments per invocation (typically 1-3, safe for CPU budget)
+const MAX_TOURNAMENTS_PER_SYNC = 10;
 
 interface LiveTournament {
   id: string;

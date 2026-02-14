@@ -84,10 +84,8 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
       return result;
     },
     enabled: tournamentIds.length > 0,
-    staleTime: 60_000, // 1 min for live data freshness
-    refetchInterval: (query) => {
-      // Refetch every 60s if there are any live tournaments
-      return query.state.data && query.state.data.size > 0 ? 60_000 : false;
-    },
+    staleTime: 5_000,              // 5s — Realtime handles freshness
+    refetchInterval: false,        // No polling — Realtime pushes updates
+    refetchOnWindowFocus: true,
   });
 }
