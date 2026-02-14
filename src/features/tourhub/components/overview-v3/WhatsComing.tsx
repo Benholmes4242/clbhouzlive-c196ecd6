@@ -92,12 +92,12 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
         </p>
         <p
           className="mt-1"
-          style={{ fontSize: '14px', fontWeight: 600, letterSpacing: '-0.15px', color: '#1C1917' }}
+          style={{ fontSize: '17px', fontWeight: 600, letterSpacing: '-0.15px', color: '#1C1917' }}
         >
           {tournament.name}
         </p>
         {venue && (
-          <p className="flex items-center gap-1 mt-0.5" style={{ fontSize: '12px', fontWeight: 400, color: '#78716C' }}>
+          <p className="flex items-center gap-1 mt-0.5" style={{ fontSize: '13px', fontWeight: 400, color: '#78716C' }}>
             <MapPin className="w-3 h-3 flex-shrink-0 opacity-60" />
             <span className="line-clamp-1">{venue}</span>
           </p>
@@ -141,7 +141,7 @@ export function WhatsComing() {
 
   if (isLoading) {
     return (
-      <section style={{ paddingTop: '40px', paddingBottom: '16px' }}>
+      <section>
         <div className="px-4 mb-3">
           <Skeleton className="h-5 w-32" />
         </div>
@@ -158,7 +158,6 @@ export function WhatsComing() {
 
   return (
     <motion.section
-      style={{ paddingTop: '40px', paddingBottom: '16px' }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
@@ -167,7 +166,7 @@ export function WhatsComing() {
       <div className="flex items-center justify-between px-4 mb-3">
         <h2
           className="text-foreground"
-          style={{ fontSize: '16px', fontWeight: 600, letterSpacing: '-0.2px' }}
+          style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}
         >
           What's Coming
         </h2>
