@@ -73,15 +73,12 @@ export function OverviewPageV3() {
         id="content-below-hero"
         className="relative z-10"
       >
-        <div className="bg-background pt-4" style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
+        <div className="bg-background pt-4 space-y-section" style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
           {/* 2. Live Right Now (conditional - hides if no live) */}
           <LiveRightNow />
 
           {/* 3. What's Coming - upcoming tournaments across all tours */}
           <WhatsComing />
-
-          {/* Spacer between What's Coming and clbhouz intelligence */}
-          <div style={{ height: '8px' }} />
 
           {/* 4. Tournament Insights - AI Predictions (CLBHOUZ Intelligence) */}
           <TournamentInsights />
