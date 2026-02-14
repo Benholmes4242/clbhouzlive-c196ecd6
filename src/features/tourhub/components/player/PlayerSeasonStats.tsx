@@ -28,13 +28,7 @@ function fmt(value: number | null | undefined, type?: 'decimal' | 'percent' | 'y
 }
 
 // Glass card shared style
-const GLASS_CARD_STYLE = {
-  background: 'rgba(255, 255, 255, 0.7)',
-  backdropFilter: 'blur(8px)',
-  WebkitBackdropFilter: 'blur(8px)',
-  border: '1px solid rgba(255, 255, 255, 0.5)',
-  boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04)',
-};
+const CARD_CLASS = "rounded-2xl border border-border/40 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.04)]";
 
 interface StatRowProps {
   label: string;
@@ -49,9 +43,9 @@ function StatRow({ label, value, trend, barPercent, barIndex = 0 }: StatRowProps
   return (
     <div className="py-3 border-b border-border/20 last:border-0">
       <div className="flex justify-between items-center">
-        <span className="text-sm text-muted-foreground">{label}</span>
+        <span className="text-[13px] text-muted-foreground">{label}</span>
         <span className={cn(
-          "text-sm font-medium font-mono",
+          "text-[13px] font-medium font-mono tabular-nums",
           hasValue ? (
             trend === 'positive' ? "text-emerald-500" :
             trend === 'negative' ? "text-red-500" :
@@ -98,9 +92,9 @@ function SGBar({ label, value }: SGBarProps) {
   return (
     <div className="py-3 border-b border-border/20 last:border-0">
       <div className="flex justify-between items-center mb-1.5">
-        <span className="text-sm text-muted-foreground">{label}</span>
+        <span className="text-[13px] text-muted-foreground">{label}</span>
         <span className={cn(
-          "text-sm font-bold font-mono",
+          "text-[13px] font-bold font-mono tabular-nums",
           isPositive ? "text-emerald-500" : "text-red-500"
         )}>
           {value > 0 ? `+${value.toFixed(2)}` : value.toFixed(2)}
@@ -151,9 +145,9 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
     ? (playerStats.top_25s / playerStats.events_played) * 100 : undefined;
 
   return (
-    <div className="rounded-[20px] p-6" style={GLASS_CARD_STYLE}>
-      <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2 pl-3 border-l-3 border-primary">
-        <TrendingUp className="w-5 h-5 text-primary" />
+    <div className={cn(CARD_CLASS, "p-5")}>
+      <h2 className="text-[16px] font-semibold text-foreground mb-4 flex items-center gap-2 pl-3 border-l-3 border-primary">
+        <TrendingUp className="w-4.5 h-4.5 text-primary" />
         Season Performance
       </h2>
 
@@ -166,7 +160,7 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={cn(
-                "relative flex-1 py-2.5 text-sm text-center transition-colors active:scale-[0.95]",
+                "relative flex-1 py-2.5 text-[13px] text-center transition-colors active:scale-[0.95]",
                 isActive ? "font-semibold text-foreground" : "font-medium text-muted-foreground"
               )}
             >
@@ -186,7 +180,7 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
       {activeTab === 'Overview' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
           <div>
-            <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2 font-medium flex items-center gap-1.5">
+            <p className="text-[9px] uppercase tracking-wider text-muted-foreground/60 mb-2 font-medium flex items-center gap-1.5">
               <Trophy className="w-3.5 h-3.5" />
               Results
             </p>
@@ -202,7 +196,7 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
             <StatRow label="Top 25s" value={fmt(playerStats.top_25s)} barPercent={top25Ratio} barIndex={2} />
           </div>
           <div>
-            <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2 font-medium flex items-center gap-1.5">
+            <p className="text-[9px] uppercase tracking-wider text-muted-foreground/60 mb-2 font-medium flex items-center gap-1.5">
               <TrendingUp className="w-3.5 h-3.5" />
               Financials
             </p>
@@ -215,7 +209,7 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
 
       {activeTab === 'Ball Striking' && (
         <div>
-          <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2 font-medium flex items-center gap-1.5">
+          <p className="text-[9px] uppercase tracking-wider text-muted-foreground/60 mb-2 font-medium flex items-center gap-1.5">
             <Target className="w-3.5 h-3.5" />
             Off the Tee & Approach
           </p>

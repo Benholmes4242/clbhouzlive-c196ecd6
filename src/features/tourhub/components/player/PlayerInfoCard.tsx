@@ -9,13 +9,7 @@ import { Calendar, MapPin, Building, GraduationCap, Award, Ruler, Scale, User, H
 import { cn } from '@/lib/utils';
 import type { TourPlayer } from '../../hooks/useTourHubData';
 
-const GLASS_CARD_STYLE = {
-  background: 'rgba(255, 255, 255, 0.7)',
-  backdropFilter: 'blur(8px)',
-  WebkitBackdropFilter: 'blur(8px)',
-  border: '1px solid rgba(255, 255, 255, 0.5)',
-  boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04)',
-};
+const CARD_CLASS = "rounded-2xl border border-border/40 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.04)]";
 
 function formatHeight(inches: string | number | null | undefined): string {
   if (!inches) return '—';
@@ -57,8 +51,8 @@ function InfoRow({ icon: Icon, label, value }: InfoRowProps) {
     <div className="flex items-start gap-3">
       <Icon className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
       <div className="min-w-0">
-        <p className="text-muted-foreground text-xs">{label}</p>
-        <div className="text-foreground text-sm">{value}</div>
+        <p className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider">{label}</p>
+        <div className="text-foreground text-[13px]">{value}</div>
       </div>
     </div>
   );
@@ -76,12 +70,12 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
 
   if (!hasPersonal && !hasCareer) {
     return (
-      <div className="rounded-[20px] p-6" style={GLASS_CARD_STYLE}>
-        <h2 className="text-sm font-semibold text-foreground mb-5 uppercase tracking-wide flex items-center gap-2">
+      <div className={cn(CARD_CLASS, "p-5")}>
+        <h2 className="text-[14px] font-semibold text-foreground mb-5 uppercase tracking-wider flex items-center gap-2">
           <User className="w-4 h-4 text-primary" />
           Player Info
         </h2>
-        <p className="text-muted-foreground text-center py-4 text-sm">
+        <p className="text-muted-foreground text-center py-4 text-[13px]">
           No additional info available.
         </p>
       </div>
@@ -89,8 +83,8 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
   }
 
   return (
-    <div className="rounded-[20px] p-6" style={GLASS_CARD_STYLE}>
-      <h2 className="text-sm font-semibold text-foreground mb-5 uppercase tracking-wide flex items-center gap-2">
+    <div className={cn(CARD_CLASS, "p-5")}>
+      <h2 className="text-[14px] font-semibold text-foreground mb-5 uppercase tracking-wider flex items-center gap-2">
         <User className="w-4 h-4 text-primary" />
         Player Info
       </h2>
@@ -98,7 +92,7 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
       <div className="space-y-5">
         {hasPersonal && (
           <div>
-            <p className="text-xs text-muted-foreground/70 uppercase tracking-wide font-medium mb-3">Personal</p>
+            <p className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-medium mb-3">Personal</p>
             <div className="grid grid-cols-1 min-[390px]:grid-cols-2 gap-3">
               {player.birth_date && (
                 <InfoRow
@@ -125,7 +119,7 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
 
         {hasCareer && (
           <div>
-            <p className="text-xs text-muted-foreground/70 uppercase tracking-wide font-medium mb-3">Golf Career</p>
+            <p className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-medium mb-3">Golf Career</p>
             <div className="grid grid-cols-1 min-[390px]:grid-cols-2 gap-3">
               {/* Tour Membership */}
               <InfoRow
