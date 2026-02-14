@@ -87,27 +87,25 @@ export function formatThruDisplay(
     return isThruFromToday ? 'F' : '';
   }
 
-  // 5. Check round_N completion (handles LIV shotgun: round_3=55 even though thru=16)
-  if (lastCompletedRound != null) {
-    // Check if the NEXT round after the last completed one has started
-    const nextRoundScores = [null, round1, round2, round3, round4];
-    const nextRoundIdx = lastCompletedRound + 1;
-    const nextRoundScore = nextRoundIdx <= 4 ? (nextRoundScores[nextRoundIdx] ?? null) : null;
-
-    if (nextRoundScore == null) {
-      // Next round hasn't started yet (or tournament is over)
-      // Was the last round completed today?
-      return isThruFromToday ? 'F' : '';
-    }
-    // Next round has a score — we're into or past it, fall through to show thru
-  }
-
-  // 6. Standard thru display (hole number)
+  // 5. Standard thru display (hole number) — check BEFORE round-completion inference
+  //    because Sportradar populates round_N with in-progress scores
   if (thruNum != null && !isNaN(thruNum) && thruNum > 0 && thruNum <= 18) {
     if (thruNum >= 18) {
       return isThruFromToday ? 'F' : '';
     }
     return String(thruNum);
+  }
+
+  // 6. Check round_N completion (handles LIV shotgun: round_3=55 even though thru=16)
+  //    Only reached when thru is not a valid 1-17 hole number
+  if (lastCompletedRound != null) {
+    const nextRoundScores = [null, round1, round2, round3, round4];
+    const nextRoundIdx = lastCompletedRound + 1;
+    const nextRoundScore = nextRoundIdx <= 4 ? (nextRoundScores[nextRoundIdx] ?? null) : null;
+
+    if (nextRoundScore == null) {
+      return isThruFromToday ? 'F' : '';
+    }
   }
 
   // 7. No data
