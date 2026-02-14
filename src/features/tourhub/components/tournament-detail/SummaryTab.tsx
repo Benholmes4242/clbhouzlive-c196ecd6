@@ -101,17 +101,17 @@ function WinnerCard({ winner, runnerUp, headshotMap }: {
 
   return (
     <motion.div
-      className="bg-card/80 backdrop-blur-sm rounded-2xl border border-amber-200/60 shadow-sm overflow-hidden"
+      className="rounded-2xl border border-amber-200/60 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden"
       style={{ background: 'linear-gradient(135deg, hsl(var(--card) / 0.85) 60%, rgba(255, 253, 245, 0.6) 100%)' }}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
       <div className="flex items-center gap-2 px-4 py-3 border-b border-amber-100/40">
-        <div className="w-8 h-8 rounded-lg bg-amber-50/80 flex items-center justify-center">
-          <Trophy className="w-4 h-4 text-amber-600" />
+        <div className="w-7 h-7 rounded-lg bg-amber-50/80 flex items-center justify-center">
+          <Trophy className="w-3.5 h-3.5 text-amber-600" />
         </div>
-        <h3 className="font-semibold text-foreground">Champion</h3>
+        <h3 className="text-[14px] font-semibold text-foreground">Champion</h3>
       </div>
 
       <div className="p-4">
@@ -124,7 +124,7 @@ function WinnerCard({ winner, runnerUp, headshotMap }: {
             size="lg"
           />
           <div className="flex-1 min-w-0">
-            <h4 className="text-lg font-bold text-foreground truncate">
+            <h4 className="text-[16px] font-bold text-foreground truncate">
               {winner.player?.full_name || 'Unknown'}
             </h4>
             {winner.player?.country && (
@@ -208,7 +208,7 @@ export function SummaryTab({
 
   return (
     <motion.div
-      className="space-y-5"
+      className="space-y-section"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
@@ -221,35 +221,35 @@ export function SummaryTab({
       {/* Round-by-round scoring summary */}
       {scoringStats && scoringStats.rounds.length > 0 && (
         <motion.div
-          className="bg-card/80 backdrop-blur-sm rounded-2xl border border-border/30 shadow-sm overflow-hidden"
+          className="rounded-2xl border border-border/40 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.4 }}
         >
           <div className="flex items-center gap-2 px-4 py-3 border-b border-border/20">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-              <TrendingUp className="w-4 h-4 text-primary" />
+            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+              <TrendingUp className="w-3.5 h-3.5 text-primary" />
             </div>
-            <h3 className="font-semibold text-foreground">Round-by-Round</h3>
+            <h3 className="text-[14px] font-semibold text-foreground">Round-by-Round</h3>
           </div>
 
           {/* Column headers */}
           <div className="grid grid-cols-5 gap-2 px-4 py-2 border-b border-border/20 bg-muted/20">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Round</span>
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground text-center">Low</span>
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground text-center">Avg</span>
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground text-center">Birdies</span>
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground text-center">Bogeys</span>
+            <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">Round</span>
+            <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60 text-center">Low</span>
+            <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60 text-center">Avg</span>
+            <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60 text-center">Birdies</span>
+            <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60 text-center">Bogeys</span>
           </div>
 
           <div className="divide-y divide-border/20">
             {scoringStats.rounds.map(round => (
               <div key={round.round} className="grid grid-cols-5 gap-2 px-4 py-2.5 items-center">
-                <span className="text-sm font-semibold text-foreground">R{round.round}</span>
-                <span className="text-sm text-center score-mono font-medium text-foreground">{round.lowScore}</span>
-                <span className="text-sm text-center score-mono text-muted-foreground">{round.avgScore.toFixed(1)}</span>
-                <span className="text-sm text-center score-mono text-green-600">{round.totalBirdies}</span>
-                <span className="text-sm text-center score-mono text-orange-500">{round.totalBogeys}</span>
+                <span className="text-[13px] font-semibold text-foreground font-mono">R{round.round}</span>
+                <span className="text-[13px] text-center font-mono font-medium text-foreground tabular-nums">{round.lowScore}</span>
+                <span className="text-[13px] text-center font-mono text-muted-foreground tabular-nums">{round.avgScore.toFixed(1)}</span>
+                <span className="text-[13px] text-center font-mono text-green-600 tabular-nums">{round.totalBirdies}</span>
+                <span className="text-[13px] text-center font-mono text-orange-500 tabular-nums">{round.totalBogeys}</span>
               </div>
             ))}
           </div>
@@ -259,16 +259,16 @@ export function SummaryTab({
       {/* Field statistics */}
       {scoringStats && (
         <motion.div
-          className="bg-card/80 backdrop-blur-sm rounded-2xl border border-border/30 shadow-sm overflow-hidden"
+          className="rounded-2xl border border-border/40 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.4 }}
         >
           <div className="flex items-center gap-2 px-4 py-3 border-b border-border/20">
-            <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
-              <Award className="w-4 h-4 text-muted-foreground" />
+            <div className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center">
+              <Award className="w-3.5 h-3.5 text-muted-foreground" />
             </div>
-            <h3 className="font-semibold text-foreground">Field Statistics</h3>
+            <h3 className="text-[14px] font-semibold text-foreground">Field Statistics</h3>
           </div>
 
           <div className="p-4">
@@ -300,9 +300,9 @@ export function SummaryTab({
                   <div className="grid grid-cols-5 gap-2">
                     {segments.map((seg) => (
                       <div key={seg.label} className="text-center">
-                        <div className="text-sm font-bold text-foreground score-mono">{seg.count}</div>
-                        <div className="text-[9px] text-muted-foreground uppercase tracking-wide">{seg.label}</div>
-                        <div className="text-[9px] text-muted-foreground">{seg.pct}%</div>
+                        <div className="text-[13px] font-bold text-foreground font-mono tabular-nums">{seg.count}</div>
+                        <div className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-medium">{seg.label}</div>
+                        <div className="text-[9px] text-muted-foreground/50 tabular-nums">{seg.pct}%</div>
                       </div>
                     ))}
                   </div>
@@ -316,16 +316,16 @@ export function SummaryTab({
       {/* Final Top 10 (completed) */}
       {isCompleted && top10.length > 0 && (
         <motion.div
-          className="bg-card/80 backdrop-blur-sm rounded-2xl border border-border/30 shadow-sm overflow-hidden"
+          className="rounded-2xl border border-border/40 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.4 }}
         >
           <div className="flex items-center gap-2 px-4 py-3 border-b border-border/20">
-            <div className="w-8 h-8 rounded-lg bg-amber-50/80 flex items-center justify-center">
-              <Trophy className="w-4 h-4 text-amber-600" />
+            <div className="w-7 h-7 rounded-lg bg-amber-50/80 flex items-center justify-center">
+              <Trophy className="w-3.5 h-3.5 text-amber-600" />
             </div>
-            <h3 className="font-semibold text-foreground">Final Top 10</h3>
+            <h3 className="text-[14px] font-semibold text-foreground">Final Top 10</h3>
           </div>
 
           <div className="divide-y divide-border/20">
@@ -343,7 +343,7 @@ export function SummaryTab({
                   transition={{ delay: 0.3 + idx * 0.03, duration: 0.25 }}
                 >
                   <span className={cn(
-                    "w-7 text-center text-xs font-bold score-mono",
+                    "w-7 text-center text-[12px] font-bold font-mono tabular-nums",
                     isWinner ? "text-amber-600" : "text-muted-foreground"
                   )}>
                     {entry.position_tied ? `T${entry.position}` : entry.position}
@@ -355,7 +355,7 @@ export function SummaryTab({
                     headshotMap={headshotMap}
                     size="sm"
                   />
-                  <span className="flex-1 text-sm font-medium text-foreground truncate">
+                  <span className="flex-1 text-[14px] font-medium text-foreground truncate">
                     {entry.player?.full_name || 'Unknown'}
                   </span>
                   <ScoreToPar score={entry.score} />
@@ -374,7 +374,7 @@ export function SummaryTab({
       {/* Live round summary */}
       {isLive && !isCompleted && scoringStats && scoringStats.rounds.length > 0 && (
         <motion.div
-          className="bg-card/80 backdrop-blur-sm rounded-2xl border border-emerald-200/40 shadow-sm overflow-hidden"
+          className="rounded-2xl border border-emerald-200/40 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.4 }}
@@ -385,7 +385,7 @@ export function SummaryTab({
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
               </span>
-              <h3 className="font-semibold text-foreground">Live Round Summary</h3>
+              <h3 className="text-[14px] font-semibold text-foreground">Live Round Summary</h3>
             </div>
           </div>
           <div className="p-4">
@@ -394,16 +394,16 @@ export function SummaryTab({
               return (
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
-                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Low Round</div>
-                    <div className="text-xl font-bold text-foreground score-mono">{latestRound.lowScore}</div>
+                    <div className="text-[9px] uppercase tracking-wider text-muted-foreground/60 font-medium mb-1">Low Round</div>
+                    <div className="text-[18px] font-bold text-foreground font-mono tabular-nums">{latestRound.lowScore}</div>
                   </div>
                   <div>
-                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Scoring Avg</div>
-                    <div className="text-xl font-bold text-foreground score-mono">{latestRound.avgScore.toFixed(1)}</div>
+                    <div className="text-[9px] uppercase tracking-wider text-muted-foreground/60 font-medium mb-1">Scoring Avg</div>
+                    <div className="text-[18px] font-bold text-foreground font-mono tabular-nums">{latestRound.avgScore.toFixed(1)}</div>
                   </div>
                   <div>
-                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Field</div>
-                    <div className="text-xl font-bold text-foreground score-mono">{latestRound.playerCount}</div>
+                    <div className="text-[9px] uppercase tracking-wider text-muted-foreground/60 font-medium mb-1">Field</div>
+                    <div className="text-[18px] font-bold text-foreground font-mono tabular-nums">{latestRound.playerCount}</div>
                   </div>
                 </div>
               );

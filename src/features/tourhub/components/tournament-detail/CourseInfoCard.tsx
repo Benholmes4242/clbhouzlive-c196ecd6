@@ -14,13 +14,7 @@ interface CourseInfoCardProps {
   courseId?: string | null;
 }
 
-const glassCardStyle = {
-  background: 'rgba(255, 255, 255, 0.7)',
-  backdropFilter: 'blur(8px)',
-  border: '1px solid rgba(255, 255, 255, 0.5)',
-  borderRadius: '20px',
-  boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04)',
-};
+const cardClass = "rounded-2xl overflow-hidden border border-border/40 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.04)]";
 
 export function CourseInfoCard({ tournament, courseImage, courseId }: CourseInfoCardProps) {
   const hasLocation = tournament.venue_city || tournament.venue_state || tournament.venue_country;
@@ -33,8 +27,7 @@ export function CourseInfoCard({ tournament, courseImage, courseId }: CourseInfo
 
   return (
     <motion.div 
-      className="overflow-hidden"
-      style={glassCardStyle}
+      className={cardClass}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
@@ -54,18 +47,18 @@ export function CourseInfoCard({ tournament, courseImage, courseId }: CourseInfo
       )}
       
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border/40">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border/30">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
-            <Flag className="w-4 h-4 text-emerald-600" />
+          <div className="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center">
+            <Flag className="w-3.5 h-3.5 text-emerald-600" />
           </div>
-          <h3 className="font-semibold text-foreground">Course</h3>
+          <h3 className="text-[14px] font-semibold text-foreground">Course</h3>
         </div>
         
         {courseLink && (
           <Link 
             to={courseLink}
-            className="text-xs font-semibold text-primary hover:text-primary/80 flex items-center gap-0.5 active:scale-[0.97] transition-transform"
+            className="text-[12px] font-semibold text-primary hover:text-primary/80 flex items-center gap-0.5 active:scale-[0.97] transition-transform"
           >
             View Course
             <ExternalLink className="w-3 h-3" />
@@ -77,13 +70,13 @@ export function CourseInfoCard({ tournament, courseImage, courseId }: CourseInfo
       <div className="p-4">
         <div className="flex-1 min-w-0">
           {tournament.venue_course_name && (
-            <h4 className="font-semibold text-foreground text-lg mb-1 truncate">
+            <h4 className="font-semibold text-foreground text-[16px] mb-1 truncate">
               {tournament.venue_course_name}
             </h4>
           )}
           
           {tournament.venue_name && tournament.venue_name !== tournament.venue_course_name && (
-            <p className="text-sm text-muted-foreground mb-2 truncate">
+            <p className="text-[13px] text-muted-foreground mb-2 truncate">
               {tournament.venue_name}
             </p>
           )}

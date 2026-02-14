@@ -153,9 +153,9 @@ export function TeeTimesTab({ tournamentId }: TeeTimesTabProps) {
       )}
 
       {/* Summary */}
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+      <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
         <Users className="w-4 h-4" />
-        <span>{groups.length} groups • Round {roundNumber}</span>
+        <span className="tabular-nums">{groups.length} groups • Round {roundNumber}</span>
       </div>
 
       {/* Tee time groups */}
@@ -163,7 +163,7 @@ export function TeeTimesTab({ tournamentId }: TeeTimesTabProps) {
         {groups.map((group, groupIdx) => (
           <motion.div
             key={`${group.teeTime}-${groupIdx}`}
-            className="bg-card/80 backdrop-blur-sm rounded-2xl border border-border/30 p-4 active:scale-[0.995] transition-transform"
+            className="bg-card rounded-2xl border border-border/40 p-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)] active:scale-[0.995] transition-transform"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: groupIdx * 0.03, duration: 0.3 }}
@@ -199,7 +199,7 @@ export function TeeTimesTab({ tournamentId }: TeeTimesTabProps) {
                     size="sm"
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-foreground truncate">
+                    <p className="text-[14px] font-semibold text-foreground truncate">
                       {player.name}
                     </p>
                     {player.country && (
