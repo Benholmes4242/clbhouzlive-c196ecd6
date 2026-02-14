@@ -64,14 +64,14 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
   return (
     <div className={cn('', className)}>
       {weekLabel && (
-        <div className="flex items-center gap-1.5 text-sm text-muted-foreground/70 mb-4">
+        <div className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground/50 uppercase tracking-wider mb-4">
           <CalendarDays className="w-3.5 h-3.5" />
           {weekLabel}
         </div>
       )}
 
       {/* Glass Bar Tabs */}
-      <div className={cn("relative mb-6", "bg-background/60 backdrop-blur-md", "border border-border/40", "rounded-xl", "p-1")}>
+      <div className={cn("relative mb-6", "bg-muted/50", "border border-border/30", "rounded-xl", "p-1")}>
         <div ref={containerRef} className="relative flex" role="tablist" aria-label="Mover direction">
           <motion.div
             className={cn("absolute bottom-0 h-[2px] rounded-full", "bg-[hsl(var(--tab-orange))]", "shadow-[0_0_8px_hsl(var(--tab-orange)/0.4)]")}
@@ -86,7 +86,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
             const isSelected = direction === value;
             return (
               <button key={value} data-tab={value} role="tab" aria-selected={isSelected} onClick={() => setDirection(value)}
-                className={cn("relative flex-1 px-3 py-2.5 text-sm font-medium transition-colors duration-200 rounded-lg flex items-center justify-center gap-1.5 active:scale-95", isSelected ? "text-foreground" : "text-muted-foreground hover:text-foreground/80")}
+                className={cn("relative flex-1 px-3 py-2.5 text-[13px] font-semibold transition-colors duration-200 rounded-lg flex items-center justify-center gap-1.5 active:scale-95", isSelected ? "text-foreground" : "text-muted-foreground hover:text-foreground/80")}
               >
                 <Icon className="w-3.5 h-3.5" />
                 {label}
@@ -127,10 +127,10 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
                   <Link
                     to={`/tourhub/college-golf/${mover.normalized_name}`}
                     className={cn(
-                      'flex items-center gap-3 p-4 rounded-xl',
-                      'bg-card/80 backdrop-blur-sm',
-                      'border border-border/40',
-                      'hover:border-primary/30 hover:bg-card hover:shadow-lg hover:shadow-primary/5',
+                      'flex items-center gap-3 p-3.5 rounded-xl',
+                      'bg-card',
+                      'border border-border/30',
+                      'hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5',
                       'transition-all duration-200',
                       'group'
                     )}
@@ -180,7 +180,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-[15px] font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+                      <p className="text-[14px] font-semibold text-foreground truncate group-hover:text-primary transition-colors leading-tight">
                         {displayName}
                       </p>
 
@@ -204,7 +204,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
                       </div>
                     </div>
 
-                    <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary transition-colors shrink-0" />
+                    <ChevronRight className="w-4 h-4 text-muted-foreground/30 group-hover:text-primary transition-colors shrink-0" />
                   </Link>
                 </motion.div>
               );

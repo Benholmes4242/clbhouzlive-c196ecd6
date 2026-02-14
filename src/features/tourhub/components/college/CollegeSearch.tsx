@@ -23,13 +23,13 @@ export function CollegeSearch({ className }: CollegeSearchProps) {
     <div className={cn('relative', className)}>
       {/* Search Input */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60 pointer-events-none" />
         <input
           type="text"
           placeholder="Search colleges..."
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          className="w-full h-11 pl-9 pr-9 bg-card border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-border focus:border-border transition-all"
+          className="w-full h-11 pl-10 pr-9 bg-muted/50 border border-border/40 rounded-xl text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
         />
         {searchInput && (
           <button

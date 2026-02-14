@@ -88,10 +88,10 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
 
   return (
     <div className={cn('', className)}>
-      {/* Section header */}
+      {/* Section header — Cleo display-sm */}
       <div className="flex items-center gap-2 mb-4">
-        <Trophy className="w-5 h-5 text-primary" />
-        <h2 className="text-lg font-semibold text-foreground">
+        <Trophy className="w-4 h-4 text-primary" />
+        <h2 className="text-[16px] font-semibold text-foreground tracking-tight">
           Franchise Leaderboard
         </h2>
       </div>
@@ -100,14 +100,14 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
       <div
         className={cn(
           "sticky top-0 z-20 -mx-4 px-4 py-2 mb-4",
-          "bg-background/80 backdrop-blur-xl"
+          "bg-background/95 backdrop-blur-md"
         )}
       >
         <div
           className={cn(
             "relative",
-            "bg-background/60 backdrop-blur-md",
-            "border border-border/40",
+            "bg-muted/50",
+            "border border-border/30",
             "rounded-xl",
             "p-1"
           )}
@@ -129,7 +129,7 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
                   aria-selected={isSelected}
                   onClick={() => setActiveMetric(value)}
                   className={cn(
-                    "relative flex-1 px-3 py-2.5 text-sm font-medium transition-colors duration-200 rounded-lg active:scale-95",
+                    "relative flex-1 px-3 py-2.5 text-[13px] font-semibold transition-colors duration-200 rounded-lg active:scale-95",
                     isSelected ? "text-foreground" : "text-muted-foreground hover:text-foreground/80"
                   )}
                 >
