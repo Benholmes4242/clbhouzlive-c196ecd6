@@ -98,8 +98,8 @@ function TournamentRow({ tournament, isLive, index }: {
             {tournament.name}
           </h3>
           {isLive ? (
-            <span className="flex items-center gap-1 text-xs font-semibold text-red-500 flex-shrink-0">
-              <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
+            <span className="flex items-center gap-1 text-xs font-semibold flex-shrink-0" style={{ color: '#E09F3E' }}>
+              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#E09F3E' }} />
               LIVE
             </span>
           ) : (
@@ -115,7 +115,7 @@ function TournamentRow({ tournament, isLive, index }: {
         </p>
         
         {isLive && leader ? (
-          <p className="text-sm font-medium text-emerald-600 mt-1">
+          <p className="text-sm font-medium mt-1" style={{ color: '#E09F3E' }}>
             Leader: {leader.player.firstName[0]}. {leader.player.lastName} {leader.scoreDisplay}
           </p>
         ) : (
