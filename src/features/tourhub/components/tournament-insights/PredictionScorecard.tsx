@@ -31,14 +31,8 @@ export const PredictionScorecard: React.FC<PredictionScorecardProps> = ({
         className="flex items-center px-4 py-2.5 border-b"
         style={{ borderColor: 'rgba(0, 0, 0, 0.06)', backgroundColor: 'rgba(0, 0, 0, 0.015)' }}
       >
-        <div className="w-8 flex-shrink-0 text-center">
-          <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">#</span>
-        </div>
-        <div className="flex-1 min-w-0 pl-2">
+        <div className="flex-1 min-w-0">
           <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">Player</span>
-        </div>
-        <div className="w-[60px] flex-shrink-0 text-center">
-          <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">Pred</span>
         </div>
         <div className="w-[52px] flex-shrink-0 text-center">
           <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">Actual</span>

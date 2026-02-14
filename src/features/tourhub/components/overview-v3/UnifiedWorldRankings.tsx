@@ -161,7 +161,7 @@ function MomentumPill({ entry, index, direction, onTap }: MomentumPillProps) {
           <div className="flex flex-col">
             <span className="whitespace-nowrap" style={{ fontSize: '13px', fontWeight: 500, color: '#44403C' }}>{entry.lastName}</span>
             <div className="flex items-center gap-1">
-              <span className="font-mono" style={{ fontSize: '10px', color: '#A8A29E' }}>#{entry.rank}</span>
+              <span style={{ fontSize: '10px', color: '#A8A29E', fontVariantNumeric: 'tabular-nums' }}>#{entry.rank}</span>
               <span className="whitespace-nowrap" style={{
                 fontSize: '10px',
                 fontWeight: 500,
@@ -356,7 +356,7 @@ export function UnifiedWorldRankings() {
             Avg Pts
           </div>
           <div className="w-16 flex-shrink-0 text-right uppercase" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.05em', color: '#A8A29E' }}>
-            Total Pts
+            Total
           </div>
         </div>
 
@@ -416,9 +416,9 @@ export function UnifiedWorldRankings() {
                 >
                   {/* ── Rank + velocity arrow ── */}
                   <div className="w-10 flex-shrink-0 flex flex-col items-center gap-0.5">
-                    <span className="font-mono" style={{
+                    <span style={{
                       fontSize: '14px',
-                      fontWeight: 600,
+                      fontWeight: 600, fontVariantNumeric: 'tabular-nums',
                       color: isCrown ? '#EA580C' : '#1C1917',
                     }}>
                       {entry.rank}
@@ -462,9 +462,9 @@ export function UnifiedWorldRankings() {
                   <div className="flex items-start gap-0 flex-shrink-0">
                     {/* Column 1: AVG PTS (primary, bold) */}
                     <div className="w-16 text-right">
-                      <div className="font-mono" style={{
+                      <div style={{
                         fontSize: '13px',
-                        fontWeight: 500,
+                        fontWeight: 500, fontVariantNumeric: 'tabular-nums',
                         color: isCrown ? '#EA580C' : '#44403C',
                       }}>
                         {entry.avg_points?.toFixed(2) ?? '—'}
@@ -473,17 +473,12 @@ export function UnifiedWorldRankings() {
 
                     {/* Column 2: TOTAL PTS (secondary, muted) */}
                     <div className="w-16 text-right">
-                      <div className="font-mono" style={{ fontSize: '13px', fontWeight: 500, color: '#44403C' }}>
+                      <div style={{ fontSize: '13px', fontWeight: 500, color: '#44403C', fontVariantNumeric: 'tabular-nums' }}>
                         {entry.total_points
                           ? entry.total_points.toLocaleString(undefined, { maximumFractionDigits: 1 })
                           : '—'}
                       </div>
-                      {/* Chase the Crown — ranks 2-5 only, based on total pts gap */}
-                      {showChase && ptsToNo1 && (
-                        <div className="text-[9px] text-muted-foreground/60 font-medium mt-0.5 whitespace-nowrap">
-                          {ptsToNo1} to #1
-                        </div>
-                      )}
+                      {/* Chase the Crown removed */}
                     </div>
                   </div>
                 </motion.div>
@@ -538,7 +533,7 @@ export function UnifiedWorldRankings() {
             </button>
           </div>
 
-          <p className="text-center text-[10px] font-medium text-muted-foreground/50 mt-1.5 font-mono">
+          <p className="text-center text-[10px] font-medium text-muted-foreground/50 mt-1.5" style={{ fontFamily: 'system-ui, -apple-system, sans-serif', fontVariantNumeric: 'normal' }}>
             {startIndex + 1}–{endIndex} of {totalPlayers}
           </p>
         </div>
