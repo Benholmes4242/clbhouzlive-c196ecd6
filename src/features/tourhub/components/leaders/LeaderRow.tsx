@@ -64,10 +64,10 @@ export function LeaderRow({
     >
       <Link
         to={`/tourhub/player/${player.id}`}
-        className="flex items-center gap-3 px-4 py-3.5 hover:bg-muted/50 border-b border-border/50 last:border-0 active:scale-[0.98] transition-transform"
+        className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30 border-b border-border/20 last:border-0 active:scale-[0.98] transition-transform"
       >
         {/* Rank */}
-        <span className="w-8 text-center font-mono text-sm font-semibold text-muted-foreground">
+        <span className="w-7 text-center font-mono text-[13px] font-bold text-muted-foreground/70 tabular-nums">
           {displayRank}
         </span>
 
@@ -81,37 +81,38 @@ export function LeaderRow({
 
         {/* Info + stat bar */}
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-foreground truncate">
+          <p className="text-[14px] font-semibold text-foreground truncate leading-tight">
             {player.fullName}
           </p>
-          <p className="text-xs text-muted-foreground truncate">
-            {flag} {countryName}
-          </p>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            {flag && <span className="text-xs leading-none">{flag}</span>}
+            <span className="text-[12px] text-muted-foreground/80 truncate">{countryName}</span>
+          </div>
           {/* Relative stat bar */}
-          <div className="mt-1 h-1 rounded-full bg-muted/50 overflow-hidden">
+          <div className="mt-1.5 h-[3px] rounded-full bg-muted/40 overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-500"
               style={{
                 width: `${barPercent}%`,
                 backgroundColor: category.accentColor,
-                opacity: 0.6,
+                opacity: 0.5,
               }}
             />
           </div>
         </div>
 
         {/* Stat value */}
-        <div className="flex items-baseline gap-1 shrink-0">
-          <span className="font-mono text-sm font-bold text-foreground">
+        <div className="text-right shrink-0">
+          <span className="font-mono text-[13px] font-bold text-foreground tabular-nums">
             {fmt(value)}
           </span>
           {unit && (
-            <span className="text-[10px] text-muted-foreground">{unit}</span>
+            <p className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider">{unit}</p>
           )}
         </div>
 
         {/* Chevron */}
-        <ChevronRight className="w-4 h-4 text-muted-foreground/50 shrink-0" />
+        <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0" />
       </Link>
     </motion.div>
   );

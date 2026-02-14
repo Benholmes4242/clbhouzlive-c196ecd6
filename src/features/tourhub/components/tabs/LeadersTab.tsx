@@ -105,21 +105,17 @@ export function LeadersTab() {
   // ─── Loading skeleton ───
   if (isLoading) {
     return (
-      <div className="space-y-0 animate-pulse">
-        <div className="relative w-full bg-muted/50" style={{ minHeight: '320px' }} />
-        <div className="px-5 py-4">
-          <div className="flex gap-2 overflow-hidden">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="h-9 w-20 rounded-full bg-muted/50 shrink-0" />
-            ))}
-          </div>
+      <div className="space-y-4 animate-pulse py-4">
+        <div className="rounded-2xl bg-muted/40 -mx-4 sm:-mx-6" style={{ minHeight: '340px' }} />
+        <div className="flex gap-2 overflow-hidden">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-9 w-20 rounded-full bg-muted/40 shrink-0" />
+          ))}
         </div>
-        <div className="px-5">
-          <div className="rounded-2xl overflow-hidden bg-card border border-border">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-[68px] border-b border-border/30 bg-muted/30" />
-            ))}
-          </div>
+        <div className="rounded-2xl border border-border/30 overflow-hidden">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-[60px] border-b border-border/20 bg-muted/20" />
+          ))}
         </div>
       </div>
     );
@@ -131,7 +127,7 @@ export function LeadersTab() {
   const listPlayers = rankedPlayers.slice(3);
 
   return (
-    <div className="space-y-0 -mx-4 sm:-mx-6">
+    <div className="-mx-4 sm:-mx-6">
       {/* Immersive hero for #1 */}
       <AnimatePresence mode="wait">
         {leader && (
@@ -155,7 +151,8 @@ export function LeadersTab() {
         />
       )}
 
-      <div className="px-4 sm:px-6 space-y-4 pt-4">
+      {/* Content area — Overview-matched rhythm */}
+      <div className="px-4 sm:px-6 space-y-section pt-5 pb-6">
         {/* Category picker */}
         <LeadersCategoryPicker
           categories={LEADER_CATEGORIES}
@@ -168,12 +165,12 @@ export function LeadersTab() {
         {isWorldCategory && (
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20">
-              <Info className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-              <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
+              <Info className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+              <span className="text-[11px] font-semibold text-amber-600 dark:text-amber-400">
                 Official World Golf Ranking
               </span>
             </div>
-            <span className="text-xs text-muted-foreground">Updated weekly</span>
+            <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Updated weekly</span>
           </div>
         )}
 
@@ -187,13 +184,13 @@ export function LeadersTab() {
         <AnimatePresence mode="wait">
           <motion.div
             key={category.key}
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25 }}
           >
             {listPlayers.length > 0 && (
-              <div className="bg-card border border-border rounded-2xl overflow-hidden">
+              <div className="bg-card border border-border/40 rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
                 {listPlayers.map((item, idx) => (
                   <LeaderRow
                     key={item.playerId}
@@ -224,9 +221,9 @@ export function LeadersTab() {
         </AnimatePresence>
 
         {/* Footer */}
-        <div className="text-center pt-2 pb-4">
-          <p className="text-xs text-muted-foreground">
-            Season leaders computed from available tournament data
+        <div className="text-center">
+          <p className="text-[10px] font-medium text-muted-foreground/50 uppercase tracking-wider">
+            Season leaders • available tournament data
           </p>
         </div>
       </div>
