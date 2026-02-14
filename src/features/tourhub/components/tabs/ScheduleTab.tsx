@@ -353,9 +353,10 @@ export function ScheduleTab() {
           >
             <Search 
               className={cn(
-                "absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-200",
-                isSearchFocused ? "text-foreground" : "text-muted-foreground"
+                "absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] transition-colors duration-200",
+                isSearchFocused ? "text-foreground" : "text-muted-foreground/70"
               )} 
+              strokeWidth={2.5}
             />
             <input
               type="text"
