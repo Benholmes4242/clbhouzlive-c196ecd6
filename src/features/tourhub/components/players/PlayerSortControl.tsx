@@ -63,12 +63,12 @@ export function PlayerSortControl({ value, onChange }: PlayerSortControlProps) {
             onClick={() => onChange(option.value)}
             className={cn(
               "flex items-center justify-between text-sm cursor-pointer rounded-lg px-3 py-2.5",
-              value === option.value && "font-semibold bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent"
+              value === option.value && "font-medium bg-accent text-accent-foreground"
             )}
           >
             <span className="flex items-center gap-2">
               {value === option.value && (
-                <Check className="w-4 h-4 text-amber-500" />
+                <Check className="w-4 h-4 text-foreground" />
               )}
               {value !== option.value && <span className="w-4" />}
               {option.label}
