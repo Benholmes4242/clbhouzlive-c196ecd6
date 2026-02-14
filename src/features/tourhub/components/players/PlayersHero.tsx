@@ -115,7 +115,7 @@ export function PlayersHero({ players, activeTour }: PlayersHeroProps) {
             to={`/tourhub/player/${champion.playerId}`}
             className="block active:scale-[0.995] transition-transform"
           >
-            <div className="relative w-full overflow-hidden rounded-2xl" style={{ height: 'clamp(320px, 60vh, 480px)' }}>
+            <div className="relative w-full overflow-hidden rounded-2xl" style={{ height: 'clamp(256px, 48vh, 384px)' }}>
               {photoUrl ? (
                 <motion.img
                   src={photoUrl}

@@ -64,7 +64,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
   }, [player.full_name]);
 
   return (
-    <div ref={heroRef} className="relative w-full overflow-hidden" style={{ height: 'calc(clamp(320px, 60vh, 480px) + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}>
+    <div ref={heroRef} className="relative w-full overflow-hidden" style={{ height: 'calc(clamp(256px, 48vh, 384px) + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}>
       {/* Hero Image or Fallback Gradient */}
       {heroPhotoUrl ? (
         <motion.img
