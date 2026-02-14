@@ -486,7 +486,7 @@ export function WatchShortsGrid({
           {Array.from({ length: 9 }).map((_, i) => (
             <Skeleton 
               key={i} 
-              className={`aspect-square ${prefersReducedMotion ? '' : 'animate-shimmer-down'}`}
+              className={`aspect-[4/5] ${prefersReducedMotion ? '' : 'animate-shimmer-down'}`}
               style={prefersReducedMotion ? undefined : { animationDelay: `${i * 50}ms` }}
             />
           ))}

@@ -73,12 +73,6 @@ export function PlayersTourFilter({
             )}
           >
             {tour.label}
-            <span className={cn(
-              'text-[10px] font-bold tabular-nums',
-              isActive ? 'text-muted-foreground' : 'text-muted-foreground/60'
-            )}>
-              {count}
-            </span>
           </motion.button>
         );
       })}

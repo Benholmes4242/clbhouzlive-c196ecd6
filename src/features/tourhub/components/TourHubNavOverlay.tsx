@@ -240,12 +240,8 @@ export function TourHubNavOverlay({
         </div>
       );
     }
-    if (item.value === 'players' && playerCount) {
-      return (
-        <span className="text-xs text-muted-foreground font-mono flex-shrink-0">
-          {playerCount.toLocaleString()}
-        </span>
-      );
+    if (item.value === 'players') {
+      return null;
     }
     if (item.value === 'leaderboards' && worldNumber1) {
       const lastName = worldNumber1.playerName.split(' ').slice(-1)[0];
