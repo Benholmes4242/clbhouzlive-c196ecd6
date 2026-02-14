@@ -109,12 +109,9 @@ export function ScheduleFilterPills({
                     <span className="relative flex h-2 w-2">
                       <span className={cn(
                         "absolute inline-flex h-full w-full rounded-full opacity-75",
-                        isActive ? "animate-ping bg-red-500" : "bg-red-400"
-                      )} />
-                      <span className={cn(
-                        "relative inline-flex rounded-full h-2 w-2",
-                        isActive ? "bg-red-500" : "bg-red-400"
-                      )} />
+                        isActive ? "animate-ping" : ""
+                      )} style={{ background: '#E09F3E' }} />
+                      <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: '#E09F3E' }} />
                     </span>
                   </>
                 )}
