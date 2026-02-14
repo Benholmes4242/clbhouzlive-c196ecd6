@@ -12,8 +12,8 @@
  */
 
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Search, X } from 'lucide-react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { Search, X, ChevronLeft } from 'lucide-react';
 import { useTourSeason, useTourTournaments, type TourTournament } from '../../hooks/useTourHubData';
 import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
 import { TourHubEmptyState } from '../TourHubEmptyState';
@@ -69,6 +69,7 @@ function InViewCard({ children }: { children: React.ReactNode }) {
 
 export function ScheduleTab() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [hasScrolledToNow, setHasScrolledToNow] = useState(false);
@@ -285,11 +286,21 @@ export function ScheduleTab() {
       
       {/* Immersive Hero — glass card matching Overview HeroCarousel */}
       {filter !== 'live' && !search && heroItems.length > 0 && (
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        >
+        <div className="relative">
+          {/* Back button */}
+          <button
+            onClick={() => navigate(-1)}
+            className="absolute z-30 left-4 h-11 w-11 rounded-md bg-black/20 backdrop-blur-sm flex items-center justify-center active:scale-95 transition-transform"
+            style={{ top: 'max(var(--sat, env(safe-area-inset-top, 0px)), 47px)' }}
+            aria-label="Go back"
+          >
+            <ChevronLeft className="w-5 h-5 text-white" />
+          </button>
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          >
           {heroItems.length === 1 ? (
             <ScheduleHeroCard 
               tournament={heroItems[0].tournament} 
@@ -324,6 +335,7 @@ export function ScheduleTab() {
             </>
           )}
         </motion.div>
+        </div>
       )}
 
       {/* Content below hero — matching Overview's bg-background + consistent spacing */}
