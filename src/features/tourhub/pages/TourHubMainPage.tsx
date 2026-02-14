@@ -20,7 +20,6 @@ function TourHubMainPageInner() {
   
   // Sync tab with URL + redirect legacy player-stats to leaderboards
   useEffect(() => {
-    // Legacy redirect: player-stats → leaderboards (using string comparison to avoid type error)
     if (tabParam === ('player-stats' as string)) {
       setSearchParams({ tab: 'leaderboards' }, { replace: true });
       setActiveTab('leaderboards');
@@ -29,6 +28,8 @@ function TourHubMainPageInner() {
     
     if (tabParam && tabParam !== activeTab) {
       setActiveTab(tabParam);
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
     }
   }, [tabParam]);
   
