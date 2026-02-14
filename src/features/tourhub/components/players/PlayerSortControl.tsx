@@ -41,10 +41,11 @@ export function PlayerSortControl({ value, onChange }: PlayerSortControlProps) {
       <DropdownMenuTrigger asChild>
         <button
           className={cn(
-            "flex items-center gap-1.5 px-3 py-1.5",
-            "bg-muted/50 border border-border rounded-full",
+            "flex items-center gap-1.5 h-11 px-3",
+            "bg-card border border-border rounded-sq-sm",
             "text-sm font-medium text-foreground",
-            "hover:bg-muted active:scale-[0.97] transition-all",
+            "shadow-[0_1px_3px_rgba(0,0,0,0.06)]",
+            "hover:bg-muted active:scale-[0.98] transition-all duration-150",
             "outline-none focus:outline-none focus-visible:ring-0"
           )}
         >
@@ -54,7 +55,7 @@ export function PlayerSortControl({ value, onChange }: PlayerSortControlProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent 
         align="end" 
-        className="w-56 bg-card border border-border shadow-lg z-50"
+        className="w-56 bg-card border border-border rounded-sq-sm shadow-lg z-50 animate-in fade-in-0 zoom-in-95 duration-150"
       >
         {SORT_OPTIONS.map((option) => (
           <DropdownMenuItem
