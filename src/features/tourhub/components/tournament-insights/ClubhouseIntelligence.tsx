@@ -34,7 +34,7 @@ export const ClubhouseIntelligence = memo(function ClubhouseIntelligence({
       className={inline ? "px-4 pb-5 pt-0" : "rounded-2xl p-5 bg-card border border-border"}
       style={inline ? undefined : { boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)' }}
     >
-      <h3 className="mb-2.5" style={{ fontSize: '16px', fontWeight: 600, color: '#1C1917' }}>
+      <h3 className="mb-2.5" style={{ fontSize: '17px', fontWeight: 600, color: '#1C1917' }}>
         Course Breakdown
       </h3>
 
