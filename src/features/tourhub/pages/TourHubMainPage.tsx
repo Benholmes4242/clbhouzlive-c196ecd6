@@ -35,6 +35,9 @@ function TourHubMainPageInner() {
   const handleTabChange = (tab: TourHubTab) => {
     setActiveTab(tab);
     setSearchParams({ tab });
+    // Scroll to top when switching tabs
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
   };
   
   const renderTab = () => {

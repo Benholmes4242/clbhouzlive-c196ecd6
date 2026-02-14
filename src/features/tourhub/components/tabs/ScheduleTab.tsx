@@ -80,12 +80,17 @@ export function ScheduleTab() {
 
   // Scroll to top on mount (fixes page opening mid-scroll)
   useEffect(() => {
+    // Immediate scroll
     window.scrollTo(0, 0);
     document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
-    // Also try the parent scrollable container (Median wrapper)
     const scrollContainer = document.querySelector('[data-scroll-container]') || document.querySelector('main') || document.querySelector('.page-root');
     if (scrollContainer) scrollContainer.scrollTop = 0;
+    // Deferred scroll to catch late-rendering content
+    requestAnimationFrame(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+    });
   }, []);
   
   const setFilter = useCallback((f: ScheduleFilterType) => {
