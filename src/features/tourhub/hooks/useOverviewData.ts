@@ -668,6 +668,7 @@ export interface LeaderEntry {
   round_2: number | null;
   round_3: number | null;
   round_4: number | null;
+  updatedAt: string | null;
   player: {
     id: string;
     firstName: string;
@@ -697,6 +698,7 @@ export function useTournamentTopLeaders(tournamentId: string | null) {
           strokes,
           thru,
           status,
+          updated_at,
           round_1,
           round_2,
           round_3,
@@ -729,6 +731,7 @@ export function useTournamentTopLeaders(tournamentId: string | null) {
           scoreDisplay,
           thru: row.thru,
           status: row.status ?? null,
+          updatedAt: row.updated_at ?? null,
           round_1: row.round_1 ?? null,
           round_2: row.round_2 ?? null,
           round_3: row.round_3 ?? null,
