@@ -62,6 +62,11 @@ interface StatusResolverResult {
   reason: string;
 }
 
+// Number of sync iterations per invocation (with SYNC_INTERVAL_MS waits between)
+// 3 iterations × ~15s wait = ~45s + sync time, fits within 60s edge function timeout
+const SYNC_ITERATIONS = 3;
+const SYNC_INTERVAL_MS = 15_000; // 15 seconds between iterations
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -96,9 +101,9 @@ Deno.serve(async (req) => {
 
     const syncLogId = syncLog?.id;
 
-    console.log('[LiveSync] Starting automated live tournament sync...');
+    console.log(`[LiveSync] Starting automated live tournament sync (${SYNC_ITERATIONS} iterations, ${SYNC_INTERVAL_MS / 1000}s apart)...`);
 
-    // FIRST: Auto-close any tournaments past their end_date to prevent stale "live" status
+    // === ITERATION 1 ONLY: housekeeping (stale close + status resolver) ===
     const today = new Date().toISOString().split('T')[0];
     const { data: staleTournaments, error: staleError } = await supabase
       .from('sr_tournaments')
@@ -112,76 +117,15 @@ Deno.serve(async (req) => {
         staleTournaments.map(t => t.name).join(', '));
     }
 
-    // ============================================================
-    // STATUS RESOLVER: Find tournaments that should be live
-    // ============================================================
     const statusResolverResults = await resolveToLiveStatus(supabase, sportradarApiKey, today);
     console.log(`[LiveSync] Status resolver completed: ${statusResolverResults.filter(r => r.resolved).length} tournament(s) transitioned to inprogress`);
 
-    // Find all live tournaments, ordered by last_live_sync (oldest first for round-robin)
-    // This ensures fair distribution of syncs across all tournaments
-    const { data: allLiveTournaments, error: queryError } = await supabase
-      .from('sr_tournaments')
-      .select('id, sr_id, name, status, start_date, end_date, season_id, last_live_sync')
-      .eq('status', 'inprogress')
-      .order('last_live_sync', { ascending: true, nullsFirst: true });
-
-    if (queryError) {
-      throw new Error(`Failed to query live tournaments: ${queryError.message}`);
-    }
-
-    if (!allLiveTournaments || allLiveTournaments.length === 0) {
-      console.log('[LiveSync] No live tournaments found');
-      
-      if (syncLogId) {
-        await supabase
-          .from('sr_sync_log')
-          .update({
-            status: 'success',
-            records_synced: 0,
-            completed_at: new Date().toISOString(),
-            error_message: 'No live tournaments to sync'
-          })
-          .eq('id', syncLogId);
-      }
-
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          message: 'No live tournaments to sync',
-          tournaments: 0,
-          staleClosed: staleTournaments?.length || 0,
-          duration: Date.now() - startTime
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Select only the tournament(s) with oldest last_live_sync to avoid CPU timeout
-    // With MAX_TOURNAMENTS_PER_SYNC=1, we sync one tournament per cron run
-    const liveTournaments = allLiveTournaments.slice(0, MAX_TOURNAMENTS_PER_SYNC);
-    
-    console.log(`[LiveSync] Found ${allLiveTournaments.length} live tournament(s), syncing ${liveTournaments.length} (oldest by last_live_sync)`);
-
-    // Get season info for year
-    const seasonIds = [...new Set(liveTournaments.map(t => t.season_id).filter(Boolean))];
-    const { data: seasons } = await supabase
-      .from('sr_seasons')
-      .select('id, year, tour_name')
-      .in('id', seasonIds);
-
-    const seasonMap = new Map(seasons?.map(s => [s.id, s]) || []);
-    const results: SyncResult[] = [];
-    let totalRecords = 0;
-
-    // Helper to sync a single tournament
-    const syncSingleTournament = async (tournament: LiveTournament): Promise<SyncResult> => {
+    // Helper to sync a single tournament (defined once, used in every iteration)
+    const syncSingleTournament = async (tournament: LiveTournament, seasonMap: Map<string, any>): Promise<SyncResult> => {
       const tournamentStart = Date.now();
       const season = seasonMap.get(tournament.season_id);
       const year = season?.year || new Date().getFullYear();
       const tour = mapTourName(season?.tour_name || 'pga');
-
-      console.log(`[LiveSync] Syncing: ${tournament.name} (${tour}/${year})`);
 
       const result: SyncResult = {
         tournamentId: tournament.id,
@@ -203,48 +147,37 @@ Deno.serve(async (req) => {
         );
         result.leaderboard = { success: true, records: leaderboardResult.records };
         sportradarStatus = leaderboardResult.sportradarStatus;
-        
-        if (sportradarStatus) {
-          console.log(`[LiveSync] Sportradar status for ${tournament.name}: ${sportradarStatus}`);
-        }
       } catch (error) {
         result.leaderboard = { success: false, records: 0, error: error.message };
         console.error(`[LiveSync] Leaderboard error for ${tournament.name}:`, error.message);
       }
 
-      // OPTIMIZATION: Only sync rounds 1-2 to reduce API calls and CPU time
-      // R3-R4 tee times are typically synced by daily-schedule-sync when available
-      // For live updates, R1-R2 is sufficient for most tournament days
       const roundsToSync = [1, 2];
       
       // 2 & 3: Sync Hole Statistics and Tee Times in parallel
       const [holeStatsResult, teeTimesResults] = await Promise.allSettled([
-        // Hole stats (single call)
         syncHoleStatistics(supabase, sportradarApiKey, tour, year, tournament.sr_id, tournament.id)
           .catch(e => { console.error(`[LiveSync] Hole stats error for ${tournament.name}:`, e.message); return 0; }),
-        
-        // Tee times for relevant rounds in parallel
         Promise.all(roundsToSync.map(roundNumber => 
           syncTeeTimes(supabase, sportradarApiKey, tour, year, tournament.sr_id, tournament.id, roundNumber)
-            .catch(() => 0) // Round may not exist yet
+            .catch(() => 0)
         ))
       ]);
 
       if (holeStatsResult.status === 'fulfilled') {
         result.holeStats = { success: true, records: holeStatsResult.value as number };
       }
-
       if (teeTimesResults.status === 'fulfilled') {
         const teeTimeRecords = (teeTimesResults.value as number[]).reduce((a, b) => a + b, 0);
         result.teeTimes = { success: true, records: teeTimeRecords };
       }
 
-      // 4. Sync Scorecards for relevant rounds in parallel
+      // 4. Sync Scorecards
       try {
         const scorecardResults = await Promise.all(
           roundsToSync.map(roundNumber => 
             syncScorecards(supabase, sportradarApiKey, tour, year, tournament.sr_id, tournament.id, roundNumber)
-              .catch(() => 0) // Round may not exist yet
+              .catch(() => 0)
           )
         );
         const scorecardRecords = scorecardResults.reduce((a, b) => a + b, 0);
@@ -260,7 +193,6 @@ Deno.serve(async (req) => {
       if (sportradarStatus && closedStatuses.includes(sportradarStatus.toLowerCase())) {
         console.log(`[LiveSync] Sportradar reports ${tournament.name} as '${sportradarStatus}' - transitioning to closed`);
         
-        // Try to populate winner_id from leaderboard if not already set
         let winnerId: string | null = null;
         const { data: winnerEntry } = await supabase
           .from('sr_leaderboards')
@@ -274,16 +206,13 @@ Deno.serve(async (req) => {
 
         if (winnerEntry?.sr_players?.sr_id) {
           winnerId = winnerEntry.sr_players.sr_id;
-          console.log(`[LiveSync] Winner fallback from leaderboard: ${winnerId}`);
         }
 
         const updatePayload: any = { 
           status: 'closed',
           last_live_sync: new Date().toISOString()
         };
-        if (winnerId) {
-          updatePayload.winner_id = winnerId;
-        }
+        if (winnerId) updatePayload.winner_id = winnerId;
 
         const { error: closeError } = await supabase
           .from('sr_tournaments')
@@ -293,27 +222,78 @@ Deno.serve(async (req) => {
         if (!closeError) {
           result.transitionedToClosed = true;
           console.log(`[LiveSync] ✓ Transitioned ${tournament.name} to closed${winnerId ? ` (winner: ${winnerId})` : ''}`);
-        } else {
-          console.error(`[LiveSync] Failed to close ${tournament.name}:`, closeError.message);
         }
       } else {
-        // Just update last_live_sync timestamp
         await supabase
           .from('sr_tournaments')
           .update({ last_live_sync: new Date().toISOString() })
           .eq('id', tournament.id);
       }
 
-      console.log(`[LiveSync] Completed ${tournament.name} in ${result.duration}ms`);
       return result;
     };
 
-    // Process selected tournament(s) - with MAX_TOURNAMENTS_PER_SYNC=1, this is typically just one
-    for (const tournament of liveTournaments) {
-      const result = await syncSingleTournament(tournament);
-      results.push(result);
-      totalRecords += result.leaderboard.records + result.teeTimes.records + 
-                      result.holeStats.records + result.scorecards.records;
+    // ================================================================
+    // ITERATION LOOP: Sync all live tournaments SYNC_ITERATIONS times
+    // with SYNC_INTERVAL_MS waits between each iteration
+    // ================================================================
+    const allIterationResults: { iteration: number; results: SyncResult[]; durationMs: number }[] = [];
+    let grandTotalRecords = 0;
+
+    for (let iteration = 1; iteration <= SYNC_ITERATIONS; iteration++) {
+      const iterStart = Date.now();
+
+      // Re-query live tournaments each iteration (a tournament may have closed mid-loop)
+      const { data: currentLive, error: liveErr } = await supabase
+        .from('sr_tournaments')
+        .select('id, sr_id, name, status, start_date, end_date, season_id, last_live_sync')
+        .eq('status', 'inprogress')
+        .order('last_live_sync', { ascending: true, nullsFirst: true });
+
+      if (liveErr || !currentLive?.length) {
+        console.log(`[LiveSync] Iteration ${iteration}/${SYNC_ITERATIONS} — no live tournaments, skipping`);
+        if (iteration < SYNC_ITERATIONS) {
+          await new Promise(r => setTimeout(r, SYNC_INTERVAL_MS));
+        }
+        continue;
+      }
+
+      const tournaments = currentLive.slice(0, MAX_TOURNAMENTS_PER_SYNC);
+
+      // Build season map for this batch
+      const sIds = [...new Set(tournaments.map(t => t.season_id).filter(Boolean))];
+      const { data: sData } = await supabase
+        .from('sr_seasons')
+        .select('id, year, tour_name')
+        .in('id', sIds);
+      const sMap = new Map(sData?.map(s => [s.id, s]) || []);
+
+      const iterResults: SyncResult[] = [];
+      let iterRecords = 0;
+
+      for (const tournament of tournaments) {
+        const result = await syncSingleTournament(tournament, sMap);
+        iterResults.push(result);
+        iterRecords += result.leaderboard.records + result.teeTimes.records + 
+                       result.holeStats.records + result.scorecards.records;
+      }
+
+      const iterDuration = Date.now() - iterStart;
+      grandTotalRecords += iterRecords;
+      allIterationResults.push({ iteration, results: iterResults, durationMs: iterDuration });
+
+      console.log(`[tournament-live-sync] Iteration ${iteration}/${SYNC_ITERATIONS} — synced ${tournaments.length} tournaments in ${iterDuration}ms`);
+
+      // Wait before next iteration (skip wait after final iteration)
+      if (iteration < SYNC_ITERATIONS) {
+        // Safety: if we're already close to the 60s wall-clock limit, bail early
+        const elapsed = Date.now() - startTime;
+        if (elapsed + SYNC_INTERVAL_MS > 55_000) {
+          console.log(`[LiveSync] Elapsed ${elapsed}ms — skipping remaining iterations to avoid timeout`);
+          break;
+        }
+        await new Promise(r => setTimeout(r, SYNC_INTERVAL_MS));
+      }
     }
 
     const totalDuration = Date.now() - startTime;
@@ -324,26 +304,25 @@ Deno.serve(async (req) => {
         .from('sr_sync_log')
         .update({
           status: 'success',
-          records_synced: totalRecords,
+          records_synced: grandTotalRecords,
           completed_at: new Date().toISOString(),
         })
         .eq('id', syncLogId);
     }
 
-    console.log(`[LiveSync] Complete: ${results.length}/${allLiveTournaments.length} tournaments synced, ${totalRecords} records in ${totalDuration}ms`);
+    console.log(`[LiveSync] Complete: ${allIterationResults.length} iterations, ${grandTotalRecords} total records in ${totalDuration}ms`);
 
     return new Response(
       JSON.stringify({
         success: true,
-        message: `Synced ${results.length}/${allLiveTournaments.length} live tournament(s)`,
-        tournamentsTotal: allLiveTournaments.length,
-        tournamentsSynced: results.length,
-        totalRecords,
+        message: `Completed ${allIterationResults.length} sync iterations`,
+        iterations: allIterationResults.length,
+        totalRecords: grandTotalRecords,
         duration: totalDuration,
         staleClosed: staleTournaments?.length || 0,
         statusResolved: statusResolverResults.filter(r => r.resolved).length,
         statusResolverResults,
-        results,
+        iterationDetails: allIterationResults,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
