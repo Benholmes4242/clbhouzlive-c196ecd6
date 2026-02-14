@@ -151,9 +151,11 @@ export function PlayersTab() {
           return a.full_name.localeCompare(b.full_name);
         case 'alpha-za':
           return b.full_name.localeCompare(a.full_name);
-        case 'most-events':
-          // We don't have events on TourPlayer directly; use rank as tiebreak
-          return aRank - bRank;
+        case 'most-wins': {
+          const aWins = statsMap.get(a.id)?.wins ?? 0;
+          const bWins = statsMap.get(b.id)?.wins ?? 0;
+          return bWins - aWins || aRank - bRank;
+        }
         case 'highest-earnings':
           return aRank - bRank;
         default:
