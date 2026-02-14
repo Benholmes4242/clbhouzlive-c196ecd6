@@ -23,6 +23,7 @@ interface PlayerCardV2Props {
   worldRank?: number | null;
   eventsPlayed?: number | null;
   earnings?: number | null;
+  wins?: number | null;
   /** Override headshot URL from batch-loaded map */
   batchHeadshotUrl?: string | null;
   /** Whether to show the tour badge (hidden when filtering by specific tour) */
@@ -37,34 +38,20 @@ function formatEarnings(amount: number): string {
   return `$${amount}`;
 }
 
-function getTourLabel(tourCodes: string[] | null | undefined): string | null {
-  if (!tourCodes || tourCodes.length === 0) return null;
-  const code = tourCodes[0];
-  const map: Record<string, string> = {
-    pga: 'PGA Tour',
-    EURO: 'DP World',
-    PGAD: 'Korn Ferry',
-    LIV: 'LIV Golf',
-    LPGA: 'LPGA',
-  };
-  return map[code] || code;
-}
-
 export function PlayerCardV2({
   player,
   worldRank,
   eventsPlayed,
   earnings,
+  wins,
   batchHeadshotUrl,
   showTourBadge = true,
   index = 0,
 }: PlayerCardV2Props) {
-  // Filter out ui-avatars.com from batch headshots, then fall back to resolvePhotoUrl (uses Cloudinary if pgaTourId exists)
   const filteredBatchUrl = batchHeadshotUrl && !batchHeadshotUrl.includes('ui-avatars.com') ? batchHeadshotUrl : null;
   const photoUrl = filteredBatchUrl ?? resolvePhotoUrl(player.photoUrl, player.pgaTourId);
   const flag = countryCodeToFlag(player.countryCode);
   const countryName = titleCaseCountry(player.country);
-  const tourLabel = showTourBadge ? getTourLabel(player.tourCodes) : null;
 
   const initials = player.fullName
     .split(' ')
@@ -74,6 +61,12 @@ export function PlayerCardV2({
     .toUpperCase();
 
   const staggerDelay = Math.min(index, 20) * 0.015;
+
+  // Build meta line: #N OWGR · $X.XM · X wins
+  const metaParts: string[] = [];
+  if (worldRank != null && worldRank > 0) metaParts.push(`#${worldRank} OWGR`);
+  if (earnings != null && earnings > 0) metaParts.push(formatEarnings(earnings));
+  if (wins != null && wins > 0) metaParts.push(`${wins} ${wins === 1 ? 'win' : 'wins'}`);
 
   return (
     <motion.div
@@ -122,31 +115,11 @@ export function PlayerCardV2({
             </div>
           )}
 
-          {/* World rank */}
-          {worldRank != null && worldRank > 0 && (
-            <p className="text-xs text-muted-foreground mt-1.5">
-              <span className="font-semibold text-foreground">#{worldRank}</span>{' '}
-              World Golf Ranking
+          {/* Meta line: #N OWGR · $X.XM · X wins */}
+          {metaParts.length > 0 && (
+            <p className="text-xs text-muted-foreground mt-1.5 tabular-nums truncate">
+              {metaParts.join(' · ')}
             </p>
-          )}
-
-          {/* Stats row */}
-          {(eventsPlayed != null || (earnings != null && earnings > 0)) && (
-            <div className="flex items-center gap-2 mt-1">
-              {eventsPlayed != null && (
-                <span className="text-xs text-muted-foreground">
-                  Events: {eventsPlayed}
-                </span>
-              )}
-              {eventsPlayed != null && earnings != null && earnings > 0 && (
-                <span className="text-xs text-muted-foreground/40">·</span>
-              )}
-              {earnings != null && earnings > 0 && (
-                <span className="text-xs text-muted-foreground">
-                  {formatEarnings(earnings)}
-                </span>
-              )}
-            </div>
           )}
         </div>
 

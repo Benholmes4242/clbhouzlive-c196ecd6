@@ -10,27 +10,19 @@ import { resolvePhotoUrl, getPgaTourHeadshotUrl } from '../../utils/resolvePhoto
 import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
 import type { ElitePlayer } from '../../hooks/useElitePlayers';
 import type { PlayerTourCode } from './PlayersTourFilter';
-import { TOUR_LABELS } from './PlayersTourFilter';
 
 interface PlayersHeroProps {
   players: ElitePlayer[];
   activeTour: PlayerTourCode;
+  /** Stats map: playerId → { earnings, wins } */
+  statsMap?: Map<string, { earnings: number | null; wins: number | null }>;
 }
 
-function StatPill({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
-  return (
-    <div className="flex flex-col items-center px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-sm">
-      <span className={cn(
-        "font-mono text-base font-bold leading-tight",
-        highlight ? "text-amber-400" : "text-white"
-      )}>
-        {value}
-      </span>
-      <span className="text-[10px] text-white/60 uppercase tracking-wider font-medium mt-0.5">
-        {label}
-      </span>
-    </div>
-  );
+function formatEarningsCompact(amount: number | null | undefined): string | null {
+  if (amount == null || amount <= 0) return null;
+  if (amount >= 1_000_000) return `$${(amount / 1_000_000).toFixed(1)}M`;
+  if (amount >= 1_000) return `$${(amount / 1_000).toFixed(0)}K`;
+  return `$${amount}`;
 }
 
 /** Runner card — matches TourHubNavOverlay World Rankings row style */
@@ -98,7 +90,7 @@ function RunnerCard({ player, index }: { player: ElitePlayer; index: number }) {
   );
 }
 
-export function PlayersHero({ players, activeTour }: PlayersHeroProps) {
+export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps) {
   if (players.length === 0) return null;
 
   const champion = players[0];
@@ -107,9 +99,15 @@ export function PlayersHero({ players, activeTour }: PlayersHeroProps) {
   const flag = countryCodeToFlag(champion.countryCode);
   const country = titleCaseCountry(champion.country);
 
-  const heroLabel = activeTour === 'all'
-    ? '#1 · World'
-    : `#1 · ${TOUR_LABELS[activeTour]}`;
+  // Build meta line: #1 OWGR · $X.XM · X wins
+  const champStats = statsMap?.get(champion.playerId);
+  const metaParts: string[] = [];
+  metaParts.push(`#${champion.worldRank} OWGR`);
+  const earningsStr = formatEarningsCompact(champStats?.earnings);
+  if (earningsStr) metaParts.push(earningsStr);
+  if (champStats?.wins && champStats.wins > 0) {
+    metaParts.push(`${champStats.wins} ${champStats.wins === 1 ? 'win' : 'wins'}`);
+  }
 
   // 10% taller hero: clamp(282px, 53vh, 422px)
   return (
@@ -147,7 +145,7 @@ export function PlayersHero({ players, activeTour }: PlayersHeroProps) {
                 background: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.55) 100%)',
               }} />
 
-              <div className="absolute bottom-0 left-0 right-0 p-5 pb-6 space-y-2">
+              <div className="absolute bottom-0 left-0 right-0 p-5 pb-6 space-y-1.5">
                 <motion.h2
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -160,15 +158,21 @@ export function PlayersHero({ players, activeTour }: PlayersHeroProps) {
                 <motion.div
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.25, duration: 0.4 }}
-                  className="flex items-center gap-2"
+                  transition={{ delay: 0.22, duration: 0.4 }}
+                  className="flex items-center gap-1.5"
                 >
                   {flag && <span className="text-lg">{flag}</span>}
                   <span className="text-sm text-white/80">{country}</span>
-                  <span className="text-sm font-semibold text-amber-400">
-                    {heroLabel}
-                  </span>
                 </motion.div>
+
+                <motion.p
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.26, duration: 0.4 }}
+                  className="text-sm font-medium text-amber-400"
+                >
+                  {metaParts.join(' · ')}
+                </motion.p>
               </div>
             </div>
           </Link>

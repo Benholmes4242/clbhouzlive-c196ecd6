@@ -41,32 +41,38 @@ export function PlayerSortControl({ value, onChange }: PlayerSortControlProps) {
       <DropdownMenuTrigger asChild>
         <button
           className={cn(
-            "flex items-center gap-1.5 h-11 px-3",
-            "bg-card border border-border rounded-sq-sm",
+            "flex items-center gap-1.5 h-11 px-4",
+            "bg-card border border-border rounded-xl",
             "text-sm font-medium text-foreground",
             "shadow-[0_1px_3px_rgba(0,0,0,0.06)]",
             "hover:bg-muted active:scale-[0.98] transition-all duration-150",
             "outline-none focus:outline-none focus-visible:ring-0"
           )}
         >
-          Sort: {activeOption.shortLabel}
+          {activeOption.shortLabel}
           <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent 
         align="end" 
-        className="w-56 bg-card border border-border rounded-sq-sm shadow-lg z-50 animate-in fade-in-0 zoom-in-95 duration-150"
+        className="w-56 bg-card border border-border rounded-xl shadow-lg z-50 p-1"
       >
         {SORT_OPTIONS.map((option) => (
           <DropdownMenuItem
             key={option.value}
             onClick={() => onChange(option.value)}
-            className="flex items-center justify-between text-sm cursor-pointer"
-          >
-            {option.label}
-            {value === option.value && (
-              <Check className="w-4 h-4 text-primary" />
+            className={cn(
+              "flex items-center justify-between text-sm cursor-pointer rounded-lg px-3 py-2.5",
+              value === option.value && "font-medium"
             )}
+          >
+            <span className="flex items-center gap-2">
+              {value === option.value && (
+                <Check className="w-4 h-4 text-primary" />
+              )}
+              {value !== option.value && <span className="w-4" />}
+              {option.label}
+            </span>
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
