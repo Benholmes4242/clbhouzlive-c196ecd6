@@ -132,17 +132,18 @@
 }
 
 .leaderboard-name {
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.9);
 }
 
 .leaderboard-score {
   font-family: 'JetBrains Mono', 'SF Mono', 'Courier New', monospace;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
-  min-width: 40px;
+  min-width: 44px;
   text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 .leaderboard-thru {
@@ -155,16 +156,16 @@
   text-align: right;
 }
 
-.score-under { color: #f59e0b; }  /* outstanding amber = under par */
-.score-over { color: #111827; }   /* neutral dark for over par */
+.score-under { color: #E09F3E; }  /* amber/gold = under par */
+.score-over { color: #D62828; }   /* red = over par */
 .score-even { color: rgba(255, 255, 255, 0.7); }
 
 /* ============================================
    4. LIVE INDICATOR - Animated Pulse with Glow
    ============================================ */
 @keyframes livePulse {
-  0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 6px 2px rgba(245, 158, 11, 0.45); }
-  50% { opacity: 0.5; transform: scale(0.85); box-shadow: 0 0 2px 1px rgba(245, 158, 11, 0.2); }
+  0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 6px 2px rgba(224, 159, 62, 0.45); }
+  50% { opacity: 0.5; transform: scale(0.85); box-shadow: 0 0 2px 1px rgba(224, 159, 62, 0.2); }
 }
 
 @keyframes live-pulse {
@@ -180,8 +181,8 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #f59e0b;
-  box-shadow: 0 0 6px 2px rgba(245, 158, 11, 0.45);
+  background: #E09F3E;
+  box-shadow: 0 0 6px 2px rgba(224, 159, 62, 0.45);
   animation: livePulse 2s ease-in-out infinite;
 }
 
@@ -189,7 +190,7 @@
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 1.2px;
-  color: #f59e0b;
+  color: #E09F3E;
 }
 
 /* Shimmer animation for loading states */
@@ -206,7 +207,7 @@
    5. TOUR LOGO BADGES - Consistent Container
    ============================================ */
 .tour-badge {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.5px;
   text-transform: uppercase;
@@ -545,8 +546,8 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #F59E0B;
-  box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+  background: #E09F3E;
+  box-shadow: 0 0 10px rgba(224, 159, 62, 0.4);
   animation: livePulse 2s ease-in-out infinite;
 }
 
