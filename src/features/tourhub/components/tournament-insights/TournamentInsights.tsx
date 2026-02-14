@@ -82,13 +82,13 @@ export const TournamentInsights = memo(function TournamentInsights() {
           <div className="flex flex-col">
             <h2
               className="tracking-tight leading-tight"
-              style={{ fontSize: '16px', fontWeight: 600, color: '#1C1917', letterSpacing: '-0.2px' }}
+              style={{ fontSize: '22px', fontWeight: 700, color: '#1C1917', letterSpacing: '-0.3px' }}
             >
               clbhouz intelligence
             </h2>
             {/* Subtitle only when NOT live — toggle replaces it */}
             {!isLive && (
-              <p className="mt-0.5" style={{ fontSize: '12px', fontWeight: 400, color: '#78716C' }}>
+              <p className="mt-0.5" style={{ fontSize: '13px', fontWeight: 400, color: '#78716C' }}>
                 {isCompleted ? 'Tournament results' : 'AI-powered tournament analysis'}
               </p>
             )}
