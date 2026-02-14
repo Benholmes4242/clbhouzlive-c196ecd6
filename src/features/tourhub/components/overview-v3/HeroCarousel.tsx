@@ -88,9 +88,6 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, hasTie
   const abbreviatedName = `${leader.player.firstName[0]}. ${leader.player.lastName}`;
   const photoUrl = resolvePhotoUrl(leader.player.photoUrl ?? null, leader.player.pgaTourId);
   const initials = `${leader.player.firstName[0]}${leader.player.lastName[0]}`.toUpperCase();
-  const thruValue = leader.thru ?? (leader.round_1 != null || leader.round_2 != null || leader.round_3 != null || leader.round_4 != null ? 18 : 0);
-  const progress = thruValue > 0 ? thruValue / 18 : 0;
-  const hasProgress = progress > 0;
   
   return (
     <>
@@ -108,36 +105,27 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, hasTie
           <span className="leaderboard-position flex-shrink-0">
             {leader.position}
           </span>
-          {/* Player headshot with progress ring */}
+          {/* Player headshot — plain squircle, no progress ring */}
           <div
-            className="overflow-hidden flex-shrink-0"
+            className="overflow-hidden flex-shrink-0 border border-white/10"
             style={{
               width: '32px',
               height: '33px',
               borderRadius: '34%',
-              padding: hasProgress ? '2px' : '0',
-              background: hasProgress
-                ? `conic-gradient(rgba(250, 204, 21, 0.8) ${progress * 360}deg, rgba(255, 255, 255, 0.1) ${progress * 360}deg)`
-                : 'none',
             }}
           >
-            <div
-              className="overflow-hidden border border-white/10"
-              style={{ width: '100%', height: '100%', borderRadius: '34%' }}
-            >
-              {photoUrl ? (
-                <img
-                  src={photoUrl}
-                  alt={abbreviatedName}
-                  className="w-full h-full object-cover object-top"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-white/10">
-                  <span style={{ fontSize: '8px', fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>{initials}</span>
-                </div>
-              )}
-            </div>
+            {photoUrl ? (
+              <img
+                src={photoUrl}
+                alt={abbreviatedName}
+                className="w-full h-full object-cover object-top"
+                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-white/10">
+                <span style={{ fontSize: '8px', fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>{initials}</span>
+              </div>
+            )}
           </div>
           <span className={cn("leaderboard-name truncate", isFirst && "font-bold")}>
             {abbreviatedName}
@@ -145,7 +133,7 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, hasTie
         </div>
         {/* Thru indicator */}
         <span className="leaderboard-thru flex-shrink-0">
-          {formatThruDisplay(leader.thru, leader.round_1, leader.round_2, leader.round_3, leader.round_4, leader.status)}
+          {formatThruDisplay(leader.thru, leader.round_1, leader.round_2, leader.round_3, leader.round_4, leader.status, leader.updatedAt)}
         </span>
         <span className={cn(
           "leaderboard-score flex-shrink-0",

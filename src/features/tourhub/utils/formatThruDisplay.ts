@@ -23,7 +23,8 @@ export function formatThruDisplay(
   round2: number | null | undefined,
   round3: number | null | undefined,
   round4: number | null | undefined,
-  status: string | null | undefined
+  status: string | null | undefined,
+  updatedAt?: string | null | undefined
 ): string {
   // 1. Status-based indicators (cut/wd/dq)
   if (status === 'cut') return 'MC';
@@ -32,12 +33,36 @@ export function formatThruDisplay(
   if (status === 'mdf' || status === 'MDF') return 'MDF';
 
   // 2. If thru is populated, use it directly
-  if (thru != null && thru >= 18) return 'F';
-  if (thru != null && thru > 0) return `thru ${thru}`;
+  if (thru != null && thru >= 18) {
+    // "F" only shows if the data was updated today; otherwise stale — show blank
+    if (updatedAt) {
+      const updatedDate = new Date(updatedAt);
+      const now = new Date();
+      const isToday =
+        updatedDate.getUTCFullYear() === now.getUTCFullYear() &&
+        updatedDate.getUTCMonth() === now.getUTCMonth() &&
+        updatedDate.getUTCDate() === now.getUTCDate();
+      if (!isToday) return '';
+    }
+    return 'F';
+  }
+  if (thru != null && thru > 0) return `${thru}`;
 
   // 3. Fallback: derive from round_N fields
   const currentRound = getCurrentRound(round1, round2, round3, round4);
-  if (currentRound.isComplete) return 'F';
+  if (currentRound.isComplete) {
+    // Same stale-F check for fallback path
+    if (updatedAt) {
+      const updatedDate = new Date(updatedAt);
+      const now = new Date();
+      const isToday =
+        updatedDate.getUTCFullYear() === now.getUTCFullYear() &&
+        updatedDate.getUTCMonth() === now.getUTCMonth() &&
+        updatedDate.getUTCDate() === now.getUTCDate();
+      if (!isToday) return '';
+    }
+    return 'F';
+  }
   if (currentRound.number > 0) return `R${currentRound.number}`;
 
   // 4. Nothing available
