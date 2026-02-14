@@ -52,7 +52,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
       <Link
         to={`/tourhub/player/${player.id}`}
         className="block relative w-full overflow-hidden active:scale-[0.99] transition-transform"
-        style={{ minHeight: '340px' }}
+        style={{ height: 'clamp(320px, 60vh, 480px)' }}
       >
         {/* Player photo with Ken Burns */}
         {photoUrl ? (

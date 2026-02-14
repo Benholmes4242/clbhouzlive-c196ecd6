@@ -106,7 +106,7 @@ export function LeadersTab() {
   if (isLoading) {
     return (
       <div className="space-y-4 animate-pulse py-4">
-        <div className="rounded-2xl bg-muted/40 -mx-4 sm:-mx-6" style={{ minHeight: '340px' }} />
+        <div className="rounded-2xl bg-muted/40 -mx-4 sm:-mx-6" style={{ height: 'clamp(320px, 60vh, 480px)' }} />
         <div className="flex gap-2 overflow-hidden">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="h-9 w-20 rounded-full bg-muted/40 shrink-0" />

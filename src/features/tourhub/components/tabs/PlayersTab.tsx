@@ -166,7 +166,7 @@ export function PlayersTab() {
   if (isLoading) {
     return (
       <div className="space-y-4 py-6">
-        <div className="rounded-2xl bg-muted/40 h-[340px] animate-pulse" />
+        <div className="rounded-2xl bg-muted/40 animate-pulse" style={{ height: 'clamp(320px, 60vh, 480px)' }} />
         <div className="bg-muted/40 h-11 rounded-xl animate-pulse" />
         <div className="bg-muted/40 h-11 rounded-xl animate-pulse" />
         {Array.from({ length: 4 }).map((_, i) => (
