@@ -1,9 +1,9 @@
 /**
  * ShortsGrid - Unified Watch Tab Standard
  * 
- * All tiles are uniform 3:4 portrait in a 2-column grid
- * - 3px gap and padding
- * - Diagonal autoplay pattern (index % 4 === 0 || index % 4 === 3)
+ * All tiles are uniform 1:1 square in a 3-column grid
+ * - 2px gap, edge-to-edge
+ * - Zigzag autoplay pattern (left, mid, right, mid cycle)
  * - Paced infinite scroll with 600ms hold
  * - Grey shimmer loading states
  * - Fade-up entrance animation
@@ -122,22 +122,24 @@ export function ShortsGrid({
     <div>
       {/* Initial loading skeleton — 6 tiles in 2-column grid */}
       {showInitialSkeleton && (
-        <div className="grid grid-cols-2">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="aspect-[3/4] bg-muted animate-pulse" />
+        <div className="grid grid-cols-3 gap-[2px]">
+          {Array.from({ length: 9 }).map((_, i) => (
+            <div key={i} className="aspect-square bg-muted animate-pulse" />
           ))}
         </div>
       )}
 
       {/* 2-column grid - Watch tab standard: edge-to-edge */}
       {!showInitialSkeleton && (
-        <div className="grid grid-cols-2">
+        <div className="grid grid-cols-3 gap-[2px]">
           {renderedPosts.map((post, index) => {
             // CRITICAL: Use stream UID for cache lookup
             const streamId = getStreamId(post);
             
-            // Diagonal autoplay pattern (Watch tab standard)
-            const isAutoplayCandidate = index % 4 === 0 || index % 4 === 3;
+            // Zigzag autoplay: Row 0→left, Row 1→mid, Row 2→right, Row 3→mid, repeat
+            const row = Math.floor(index / 3);
+            const zigzagCol = [0, 1, 2, 1][row % 4];
+            const isAutoplayCandidate = (index % 3) === zigzagCol;
             
             // Entrance animation for newly loaded tiles
             const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;
