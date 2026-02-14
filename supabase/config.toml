@@ -162,3 +162,9 @@ verify_jwt = false
 
 [functions.auto-map-tournament-venues]
 verify_jwt = false
+
+[functions.tournament-round-complete]
+verify_jwt = false
+
+[functions.daily-schedule-sync]
+verify_jwt = false
