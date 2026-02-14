@@ -14,7 +14,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Search, X, ChevronDown } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { useTourPlayers, type TourPlayer } from '../../hooks/useTourHubData';
+import { useTourPlayers, useTourSeason, useTourPlayerStatistics, type TourPlayer } from '../../hooks/useTourHubData';
 import { useElitePlayers, type ElitePlayer } from '../../hooks/useElitePlayers';
 import { usePlayerHeadshots } from '../../hooks/usePlayerMedia';
 import { PlayersHero } from '../players/PlayersHero';
@@ -64,6 +64,8 @@ export function PlayersTab() {
   // Data hooks
   const { data: allPlayers, isLoading: allLoading } = useTourPlayers();
   const { data: elitePlayers, isLoading: eliteLoading } = useElitePlayers(200);
+  const { data: season } = useTourSeason();
+  const { data: playerStats } = useTourPlayerStatistics(season?.id);
 
   // Reset pagination on search/sort change
   useEffect(() => {
@@ -80,6 +82,17 @@ export function PlayersTab() {
     }
     return map;
   }, [elitePlayers]);
+
+  // Build stats map (earnings, wins) from player statistics
+  const statsMap = useMemo(() => {
+    const map = new Map<string, { earnings: number | null; wins: number | null }>();
+    if (playerStats) {
+      playerStats.forEach(ps => {
+        map.set(ps.player_id, { earnings: ps.earnings, wins: ps.wins });
+      });
+    }
+    return map;
+  }, [playerStats]);
 
   // Tour-level filtering
   const tourFilteredPlayers = useMemo(() => {
@@ -182,7 +195,7 @@ export function PlayersTab() {
     <div className="pb-6">
       {/* Hero */}
       {showHero && heroPlayers.length > 0 && (
-        <PlayersHero players={heroPlayers} activeTour={activeTour} />
+        <PlayersHero players={heroPlayers} activeTour={activeTour} statsMap={statsMap} />
       )}
 
       {/* Search Bar — matches schedule page width/style (inside px-4 wrapper) */}
@@ -256,6 +269,7 @@ export function PlayersTab() {
               <>
                 {displayRows.map((player, index) => {
                   const rank = rankMap.get(player.id);
+                  const pStats = statsMap.get(player.id);
                   return (
                     <PlayerCardV2
                       key={player.id}
@@ -269,6 +283,8 @@ export function PlayersTab() {
                         tourCodes: player.tour_codes,
                       }}
                       worldRank={rank?.worldRank}
+                      earnings={pStats?.earnings}
+                      wins={pStats?.wins}
                       batchHeadshotUrl={headshotMap?.get(player.id)}
                       showTourBadge={activeTour === 'all'}
                       index={index}
