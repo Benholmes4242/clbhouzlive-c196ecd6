@@ -122,7 +122,7 @@ export function useAIPredictions(): UseAIPredictionsResult {
     gcTime: 60 * 60 * 1000,
     refetchOnWindowFocus: false,
     retry: 1,
-    enabled: isLive,
+    enabled: true,
   });
 
   // Live polling: refetch main query every 3 minutes during live tournaments
@@ -202,7 +202,7 @@ async function fetchActiveTournamentPredictions(): Promise<ActiveTournamentResul
     .from('sr_tournaments')
     .select('*')
     .eq('season_id', pgaSeasonId)
-    .eq('status', 'scheduled')
+    .in('status', ['scheduled', 'created'])
     .gte('start_date', now)
     .order('start_date', { ascending: true })
     .limit(1)
@@ -234,7 +234,7 @@ async function fetchNextTournamentPreview(): Promise<NextTournamentResult> {
     .from('sr_tournaments')
     .select('*')
     .eq('season_id', pgaSeasonId)
-    .eq('status', 'scheduled')
+    .in('status', ['scheduled', 'created'])
     .gte('start_date', now)
     .order('start_date', { ascending: true })
     .limit(1)
