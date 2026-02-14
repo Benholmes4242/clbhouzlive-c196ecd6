@@ -1,6 +1,6 @@
 /**
- * PlayerFilterTabs - Segmented control matching ScheduleFilterPills pattern.
- * Animated sliding indicator, semantic tokens, 44px touch targets.
+ * PlayerFilterTabs - Text-on-background tabs with white active indicator
+ * Matches ScheduleFilterPills pattern exactly.
  */
 
 import { cn } from '@/lib/utils';
@@ -49,14 +49,18 @@ export function PlayerFilterTabs({
   }, [activeFilter]);
 
   return (
-    <div role="tablist" aria-label="Filter players">
+    <div
+      className="py-2"
+      role="tablist"
+      aria-label="Filter players"
+    >
       <div
         ref={containerRef}
-        className="relative flex items-stretch rounded-xl overflow-hidden p-1 bg-muted/60"
+        className="relative flex items-stretch"
       >
-        {/* Animated sliding indicator */}
+        {/* Animated white rounded indicator behind active tab */}
         <motion.div
-          className="absolute top-1 bottom-1 rounded-lg bg-card shadow-sm border border-border/20"
+          className="absolute top-0 bottom-0 rounded-xl bg-card shadow-sm border border-border/40"
           animate={{
             left: indicatorStyle.left,
             width: indicatorStyle.width,
@@ -75,21 +79,23 @@ export function PlayerFilterTabs({
               onClick={() => onFilterChange(option.value)}
               className={cn(
                 "relative flex-1 z-10 py-2.5 text-[13px] font-semibold transition-colors duration-200 whitespace-nowrap",
-                "min-h-[44px] rounded-lg active:scale-[0.95] transition-transform",
+                "min-h-[44px] rounded-xl active:scale-[0.95] transition-transform",
                 isActive
                   ? "text-foreground"
                   : "text-muted-foreground hover:text-foreground/70"
               )}
             >
-              {option.label}
-              {count > 0 && (
-                <span className={cn(
-                  "ml-1 text-[10px] font-bold tabular-nums",
-                  isActive ? "text-foreground/50" : "text-muted-foreground/50"
-                )}>
-                  ({count})
-                </span>
-              )}
+              <span className="flex items-center justify-center gap-1">
+                {option.label}
+                {count > 0 && (
+                  <span className={cn(
+                    "text-[10px] font-bold tabular-nums",
+                    isActive ? "text-foreground/50" : "text-muted-foreground/50"
+                  )}>
+                    ({count})
+                  </span>
+                )}
+              </span>
             </button>
           );
         })}
