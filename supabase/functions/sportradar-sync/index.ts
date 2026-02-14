@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { resolveTimezone } from '../_shared/countryTimezoneMap.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -264,6 +265,7 @@ async function syncSchedule(supabase: any, apiKey: string, tour: string, year: n
           ? `${defendingChamp.first_name || ''} ${defendingChamp.last_name || ''}`.trim()
           : null,
         winner_id: winner?.id,
+        timezone: resolveTimezone(venue?.country, venue?.state),
         raw_data: tournament,
       }, { onConflict: 'sr_id' });
       if (!error) totalRecords++;

@@ -6,16 +6,17 @@
  * data (tee times, hole stats, scorecards) handled by daily-schedule-sync
  * and tournament-round-complete.
  * 
- * Time-of-day gating: Skips Sportradar API calls outside 6 AM – 9 PM ET
- * (covers most PGA Tour playing hours). Still runs housekeeping (stale-close,
- * status resolver) every invocation. On Mon–Wed, only syncs if a tournament
- * is explicitly 'inprogress' (handles rain delays / Monday finishes).
+ * Per-tournament timezone gating: Each tournament's IANA timezone (stored in
+ * sr_tournaments.timezone) determines the playing hours window (5 AM – 9 PM local).
+ * The tournament's start_date/end_date replace the old Mon–Wed day-of-week check.
+ * Housekeeping (stale-close, status resolver) runs every invocation regardless.
  * 
  * With N live tournaments, each gets synced every ~N minutes.
  * Supabase Realtime broadcasts DB changes instantly to all connected clients.
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { isWithinPlayingHoursForTimezone, isTournamentDay } from '../_shared/countryTimezoneMap.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -25,35 +26,6 @@ const corsHeaders = {
 const getAccessLevel = () => Deno.env.get('SPORTRADAR_ACCESS_LEVEL') || 'production';
 const getTourBaseUrl = (tour: string = 'pga') =>
   `https://api.sportradar.com/golf/${getAccessLevel()}/${tour}/v3/en`;
-
-/**
- * Check if current time is within active playing hours.
- * Uses US Eastern (America/New_York) as default — covers most PGA Tour events.
- * Window: 6 AM – 9 PM ET (generous to cover early tee times and potential playoffs).
- */
-function isWithinPlayingHours(): { allowed: boolean; reason: string; hour: number; dayOfWeek: number } {
-  const now = new Date();
-  // Get ET hour using Intl — works in Deno
-  const etFormatter = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/New_York',
-    hour: 'numeric',
-    hour12: false,
-    weekday: 'short',
-  });
-  const parts = etFormatter.formatToParts(now);
-  const hour = parseInt(parts.find(p => p.type === 'hour')?.value || '0', 10);
-  const dayName = parts.find(p => p.type === 'weekday')?.value || '';
-  
-  // 0=Sun, 1=Mon, ... 6=Sat
-  const dayMap: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
-  const dayOfWeek = dayMap[dayName] ?? new Date().getDay();
-
-  if (hour < 6 || hour >= 21) {
-    return { allowed: false, reason: `Outside playing hours (${hour}:00 ET)`, hour, dayOfWeek };
-  }
-
-  return { allowed: true, reason: `Within playing hours (${hour}:00 ET, ${dayName})`, hour, dayOfWeek };
-}
 
 interface PendingLiveTournament {
   id: string;
@@ -98,7 +70,7 @@ Deno.serve(async (req) => {
       .single();
     const syncLogId = syncLog?.id;
 
-    // ── Housekeeping (lightweight, every invocation) ──────────────────
+    // ── Housekeeping (lightweight, every invocation — no API calls) ───
     const today = new Date().toISOString().split('T')[0];
 
     // 1. Auto-close stale tournaments whose end_date has passed
@@ -114,40 +86,18 @@ Deno.serve(async (req) => {
         staleTournaments.map((t: any) => t.name).join(', '));
     }
 
-    // 2. Status resolver — only during playing hours (uses 1 API call per pending tournament)
-    const timeCheck = isWithinPlayingHours();
-    let resolved = 0;
-
-    if (timeCheck.allowed) {
-      const statusResolverResults = await resolveToLiveStatus(supabase, sportradarApiKey, today);
-      resolved = statusResolverResults.filter(r => r.resolved).length;
-      if (resolved > 0) {
-        console.log(`[LiveSync] Status resolver: ${resolved} tournament(s) transitioned to inprogress`);
-      }
-    }
-
-    // ── Time-of-day gate: skip API calls outside playing hours ────────
-    // Housekeeping above still runs (DB-only, no API calls).
-    // Mon–Wed (dayOfWeek 1-3): only sync if tournaments are explicitly inprogress.
-    // Outside 6 AM – 9 PM ET: skip entirely.
-    if (!timeCheck.allowed) {
-      console.log(`[LiveSync] Skipping — ${timeCheck.reason}`);
-      if (syncLogId) {
-        await supabase.from('sr_sync_log').update({
-          status: 'success', records_synced: 0, completed_at: new Date().toISOString(),
-          error_message: `Gated: ${timeCheck.reason}`
-        }).eq('id', syncLogId);
-      }
-      return new Response(
-        JSON.stringify({ success: true, message: timeCheck.reason, gated: true, duration: Date.now() - startTime }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    // 2. Status resolver — uses 1 API call per pending tournament
+    //    (runs regardless of gating — uses its own lightweight check)
+    const statusResolverResults = await resolveToLiveStatus(supabase, sportradarApiKey, today);
+    const resolved = statusResolverResults.filter(r => r.resolved).length;
+    if (resolved > 0) {
+      console.log(`[LiveSync] Status resolver: ${resolved} tournament(s) transitioned to inprogress`);
     }
 
     // ── Round-robin: pick the ONE stalest live tournament ─────────────
     const { data: liveTournaments, error: queryError } = await supabase
       .from('sr_tournaments')
-      .select('id, sr_id, name, status, start_date, end_date, season_id, last_live_sync')
+      .select('id, sr_id, name, status, start_date, end_date, season_id, last_live_sync, timezone')
       .eq('status', 'inprogress')
       .order('last_live_sync', { ascending: true, nullsFirst: true })
       .limit(1);
@@ -156,11 +106,9 @@ Deno.serve(async (req) => {
       throw new Error(`Failed to query live tournaments: ${queryError.message}`);
     }
 
-    // Mon–Wed with no inprogress tournaments: skip (normal off-day)
+    // No inprogress tournaments: return early (zero API calls)
     if (!liveTournaments || liveTournaments.length === 0) {
-      const msg = timeCheck.dayOfWeek >= 1 && timeCheck.dayOfWeek <= 3
-        ? 'No live tournaments (off-day Mon-Wed)'
-        : 'No live tournaments found';
+      const msg = 'No live tournaments found';
       console.log(`[LiveSync] ${msg}`);
       if (syncLogId) {
         await supabase.from('sr_sync_log').update({
@@ -175,7 +123,37 @@ Deno.serve(async (req) => {
     }
 
     const tournament = liveTournaments[0];
-    console.log(`[LiveSync] Round-robin selected: ${tournament.name} (last sync: ${tournament.last_live_sync || 'never'})`);
+    const tournamentTz = tournament.timezone || 'America/New_York';
+
+    // ── Per-tournament time-of-day gate ───────────────────────────────
+    const timeCheck = isWithinPlayingHoursForTimezone(tournamentTz);
+    const dateCheck = isTournamentDay(tournament.start_date, tournament.end_date, tournamentTz);
+
+    if (!timeCheck.allowed) {
+      console.log(`[LiveSync] Skipping ${tournament.name} — ${timeCheck.reason}`);
+      if (syncLogId) {
+        await supabase.from('sr_sync_log').update({
+          status: 'success', records_synced: 0, completed_at: new Date().toISOString(),
+          error_message: `Gated: ${timeCheck.reason}`
+        }).eq('id', syncLogId);
+      }
+      return new Response(
+        JSON.stringify({
+          success: true, message: timeCheck.reason,
+          tournament: tournament.name, timezone: tournamentTz,
+          gated: true, duration: Date.now() - startTime,
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Date check is informational — trust inprogress status over date range
+    // (handles rain delays, Monday finishes)
+    if (!dateCheck.isActive) {
+      console.log(`[LiveSync] Note: ${dateCheck.reason} — but status is inprogress, syncing anyway`);
+    }
+
+    console.log(`[LiveSync] Round-robin selected: ${tournament.name} (tz: ${tournamentTz}, last sync: ${tournament.last_live_sync || 'never'})`);
 
     // Get season info
     const { data: seasonData } = await supabase
@@ -200,8 +178,6 @@ Deno.serve(async (req) => {
     }
 
     // ── Round-completion detection ───────────────────────────────────
-    // After syncing leaderboard, check if all players have finished their round.
-    // If so, invoke tournament-round-complete to fetch scorecards + hole stats once.
     let roundCompleteTriggered = false;
     if (leaderboardRecords > 0) {
       try {
@@ -267,9 +243,10 @@ Deno.serve(async (req) => {
       JSON.stringify({
         success: true,
         tournament: tournament.name,
+        timezone: tournamentTz,
+        playingHours: timeCheck.reason,
         records: leaderboardRecords,
         duration: totalDuration,
-        playingHours: timeCheck.reason,
         transitionedToClosed,
         roundCompleteTriggered,
         staleClosed: staleTournaments?.length || 0,
@@ -469,13 +446,10 @@ async function syncLeaderboard(
 }
 
 // ── Round-completion detection ───────────────────────────────────────
-// Checks if all active players in the current round show thru=18 or "F".
-// If a new round has completed since we last triggered, invoke tournament-round-complete.
 
 async function checkAndTriggerRoundComplete(
   supabase: any, tournamentId: string, tournamentName: string
 ): Promise<boolean> {
-  // Get leaderboard entries with thru data
   const { data: entries } = await supabase
     .from('sr_leaderboards')
     .select('thru, status')
@@ -484,18 +458,14 @@ async function checkAndTriggerRoundComplete(
 
   if (!entries || entries.length === 0) return false;
 
-  // Check how many have finished (thru = 18, "F", or "F*")
   const finished = entries.filter((e: any) => {
     const thru = String(e.thru || '').toLowerCase();
     return thru === '18' || thru === 'f' || thru === 'f*';
   });
 
-  // Need at least 80% of active players finished to consider round complete
   const ratio = finished.length / entries.length;
   if (ratio < 0.8) return false;
 
-  // Determine current round number from the highest round with data
-  // (Check round_4 → round_3 → round_2 → round_1)
   const { data: roundCheck } = await supabase
     .from('sr_leaderboards')
     .select('round_1, round_2, round_3, round_4')
@@ -511,7 +481,6 @@ async function checkAndTriggerRoundComplete(
     else if (sample.round_2 != null) currentRound = 2;
   }
 
-  // Check if we already triggered for this round (use sr_sync_log)
   const { data: existing } = await supabase
     .from('sr_sync_log')
     .select('id')
@@ -520,11 +489,10 @@ async function checkAndTriggerRoundComplete(
     .like('error_message', `%round_${currentRound}%`)
     .limit(1);
 
-  if (existing?.length) return false; // Already triggered
+  if (existing?.length) return false;
 
   console.log(`[LiveSync] Round ${currentRound} complete for ${tournamentName} (${finished.length}/${entries.length} finished) — triggering round-complete`);
 
-  // Invoke tournament-round-complete edge function
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -538,7 +506,6 @@ async function checkAndTriggerRoundComplete(
       body: JSON.stringify({ tournamentId, roundNumber: currentRound }),
     });
 
-    // Log that we triggered it
     await supabase.from('sr_sync_log').insert({
       sync_type: 'round_complete',
       tournament_id: tournamentId,
