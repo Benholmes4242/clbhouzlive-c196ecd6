@@ -1,11 +1,10 @@
 /**
- * ScheduleTourFilter - Scrollable tour filter pill bar
+ * ScheduleTourFilter - Scrollable tour filter pills (sub-tabs)
  * 
- * Features:
- * - Emoji-prefixed pills for 6 professional tours + "All Tours"
- * - Dynamic counts reflecting active status filter
- * - Semantic token styling (bg-foreground/text-background active, bg-muted inactive)
- * - Spring tap animation
+ * Matches the Course Details breadcrumb-pill pattern:
+ * - White pill for active tab
+ * - Muted background for inactive
+ * - No emojis, text only
  * - 44px minimum touch targets
  */
 
@@ -16,24 +15,22 @@ export type TourFilterCode = 'all' | 'pga' | 'EURO' | 'LPGA' | 'CHAMP' | 'PGAD' 
 
 interface TourOption {
   code: TourFilterCode;
-  emoji: string;
   label: string;
 }
 
 const TOUR_OPTIONS: TourOption[] = [
-  { code: 'all', emoji: '', label: 'All Tours' },
-  { code: 'pga', emoji: '⛳', label: 'PGA Tour' },
-  { code: 'EURO', emoji: '🇪🇺', label: 'DP World' },
-  { code: 'LPGA', emoji: '', label: 'LPGA' },
-  { code: 'CHAMP', emoji: '🏆', label: 'Champions' },
-  { code: 'PGAD', emoji: '🌱', label: 'Korn Ferry' },
-  { code: 'LIV', emoji: '⚡', label: 'LIV Golf' },
+  { code: 'all', label: 'All Tours' },
+  { code: 'pga', label: 'PGA Tour' },
+  { code: 'EURO', label: 'DP World' },
+  { code: 'LPGA', label: 'LPGA' },
+  { code: 'CHAMP', label: 'Champions' },
+  { code: 'PGAD', label: 'Korn Ferry' },
+  { code: 'LIV', label: 'LIV Golf' },
 ];
 
 interface ScheduleTourFilterProps {
   activeTour: TourFilterCode;
   onTourChange: (tour: TourFilterCode) => void;
-  /** Map of tour code → count (filtered by current status filter) */
   tourCounts: Record<string, number>;
 }
 
@@ -67,15 +64,14 @@ export function ScheduleTourFilter({
               'text-xs font-semibold transition-colors duration-200',
               'min-h-[44px]',
               isActive
-                ? 'bg-foreground text-background'
+                ? 'bg-card text-foreground shadow-sm border border-border/40'
                 : 'bg-muted text-muted-foreground',
             )}
           >
-            {tour.emoji && <span>{tour.emoji}</span>}
             {tour.label}
             <span className={cn(
               'text-[10px] font-bold tabular-nums',
-              isActive ? 'text-background/60' : 'text-muted-foreground/60'
+              isActive ? 'text-muted-foreground' : 'text-muted-foreground/60'
             )}>
               {count}
             </span>
