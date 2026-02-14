@@ -9074,6 +9074,7 @@ export type Database = {
           sr_id: string
           start_date: string | null
           status: string | null
+          timezone: string | null
           updated_at: string
           venue_city: string | null
           venue_country: string | null
@@ -9115,6 +9116,7 @@ export type Database = {
           sr_id: string
           start_date?: string | null
           status?: string | null
+          timezone?: string | null
           updated_at?: string
           venue_city?: string | null
           venue_country?: string | null
@@ -9156,6 +9158,7 @@ export type Database = {
           sr_id?: string
           start_date?: string | null
           status?: string | null
+          timezone?: string | null
           updated_at?: string
           venue_city?: string | null
           venue_country?: string | null
