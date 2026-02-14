@@ -148,15 +148,6 @@ export function PlayersHero({ players, activeTour }: PlayersHeroProps) {
               }} />
 
               <div className="absolute bottom-0 left-0 right-0 p-5 pb-6 space-y-2">
-                <motion.span
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.15, duration: 0.4 }}
-                  className="inline-block text-sm font-semibold text-amber-400"
-                >
-                  {heroLabel}
-                </motion.span>
-
                 <motion.h2
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -170,10 +161,15 @@ export function PlayersHero({ players, activeTour }: PlayersHeroProps) {
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.25, duration: 0.4 }}
-                  className="flex items-center gap-2"
+                  className="flex items-center justify-between"
                 >
-                  {flag && <span className="text-lg">{flag}</span>}
-                  <span className="text-sm text-white/80">{country}</span>
+                  <div className="flex items-center gap-2">
+                    {flag && <span className="text-lg">{flag}</span>}
+                    <span className="text-sm text-white/80">{country}</span>
+                  </div>
+                  <span className="text-sm font-semibold text-amber-400">
+                    {heroLabel}
+                  </span>
                 </motion.div>
               </div>
             </div>
