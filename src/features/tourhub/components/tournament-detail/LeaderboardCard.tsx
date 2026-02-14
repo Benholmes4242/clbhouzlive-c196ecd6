@@ -139,7 +139,7 @@ function LeaderboardRow({
         <div className="flex-1 min-w-0">
           <p className={cn(
             "font-semibold truncate text-foreground",
-            isTop3 ? "text-base" : "text-sm"
+            isTop3 ? "text-[15px]" : "text-[14px]"
           )}>
             {entry.player?.full_name || 'Unknown'}
           </p>
@@ -147,7 +147,7 @@ function LeaderboardRow({
         
         {/* Score to Par */}
         <div className="text-right shrink-0 w-14">
-          <ScoreToPar score={entry.score} className={isTop3 ? "text-lg" : "text-base"} />
+          <ScoreToPar score={entry.score} className={isTop3 ? "text-[17px]" : "text-[15px]"} />
         </div>
         
         {/* Thru (if in progress) */}
@@ -175,13 +175,7 @@ function LeaderboardRow({
   );
 }
 
-const glassCardStyle = {
-  background: 'rgba(255, 255, 255, 0.7)',
-  backdropFilter: 'blur(8px)',
-  border: '1px solid rgba(255, 255, 255, 0.5)',
-  borderRadius: '20px',
-  boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04)',
-};
+const cardClass = "rounded-2xl overflow-hidden border border-border/40 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.04)]";
 
 export function LeaderboardCard({ 
   entries, 
@@ -196,8 +190,7 @@ export function LeaderboardCard({
   
   return (
     <motion.div 
-      className="overflow-hidden"
-      style={glassCardStyle}
+      className={cardClass}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
@@ -205,12 +198,12 @@ export function LeaderboardCard({
     >
       {/* Header */}
       {showHeader && (
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border/40">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border/30">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
-              <Trophy className="w-4 h-4 text-amber-600" />
+            <div className="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center">
+              <Trophy className="w-3.5 h-3.5 text-amber-600" />
             </div>
-            <h3 className="font-semibold text-foreground">{title}</h3>
+            <h3 className="text-[14px] font-semibold text-foreground">{title}</h3>
           </div>
           
           {onViewAll && hasMore && (
@@ -226,7 +219,7 @@ export function LeaderboardCard({
       )}
       
       {/* Leaderboard rows */}
-      <div className="divide-y divide-border/30">
+      <div className="divide-y divide-border/20">
         {displayEntries.map((entry, index) => (
           <LeaderboardRow
             key={entry.id}
@@ -241,7 +234,7 @@ export function LeaderboardCard({
       {onViewAll && hasMore && (
         <button 
           onClick={onViewAll}
-          className="w-full py-3 text-sm font-semibold text-primary bg-primary/5 border-t border-primary/10 rounded-b-xl hover:bg-primary/10 transition-colors flex items-center justify-center gap-1 active:scale-[0.97] transition-transform"
+          className="w-full py-3 text-[13px] font-semibold text-primary bg-primary/5 border-t border-border/30 rounded-b-2xl hover:bg-primary/10 transition-colors flex items-center justify-center gap-1 active:scale-[0.97] transition-transform"
         >
           View Full Leaderboard
           <ChevronRight className="w-4 h-4" />

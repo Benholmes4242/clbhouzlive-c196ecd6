@@ -19,13 +19,7 @@ interface InfoItem {
   value: string;
 }
 
-const glassCardStyle = {
-  background: 'rgba(255, 255, 255, 0.7)',
-  backdropFilter: 'blur(8px)',
-  border: '1px solid rgba(255, 255, 255, 0.5)',
-  borderRadius: '20px',
-  boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04)',
-};
+const cardClass = "rounded-2xl overflow-hidden border border-border/40 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.04)]";
 
 export function TournamentInfoGrid({ tournament, fieldSize }: TournamentInfoGridProps) {
   const items: InfoItem[] = [];
@@ -89,36 +83,35 @@ export function TournamentInfoGrid({ tournament, fieldSize }: TournamentInfoGrid
   
   return (
     <motion.div 
-      className="overflow-hidden"
-      style={glassCardStyle}
+      className={cardClass}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.35 }}
     >
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-border/40">
-        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-          <Award className="w-4 h-4 text-primary" />
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-border/30">
+        <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+          <Award className="w-3.5 h-3.5 text-primary" />
         </div>
-        <h3 className="font-semibold text-foreground">Tournament Details</h3>
+        <h3 className="text-[14px] font-semibold text-foreground">Tournament Details</h3>
       </div>
       
       {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-border/30">
+      <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-border/20">
         {items.map((item) => (
           <div 
             key={item.label}
             className="px-4 py-3 flex items-start gap-3"
           >
-            <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0 text-muted-foreground">
+            <div className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center shrink-0 text-muted-foreground">
               {item.icon}
             </div>
             <div className="min-w-0">
-              <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium mb-0.5">
+              <p className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider mb-0.5">
                 {item.label}
               </p>
-              <p className="text-sm font-semibold text-foreground truncate">
+              <p className="text-[13px] font-semibold text-foreground truncate">
                 {item.value}
               </p>
             </div>

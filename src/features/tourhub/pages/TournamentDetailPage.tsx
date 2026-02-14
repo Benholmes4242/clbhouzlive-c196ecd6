@@ -162,7 +162,7 @@ export function TournamentDetailPage() {
       case 'overview':
         return (
           <motion.div 
-            className="space-y-5"
+            className="space-y-section"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
@@ -260,7 +260,7 @@ export function TournamentDetailPage() {
       
       <div className="px-4 sm:px-6 lg:px-8 pb-24">
         {/* Status bar — live, final, or upcoming */}
-        <div className="pt-4">
+        <div className="pt-5">
           {isLive && (
             <StatusBar
               variant="live"
@@ -268,20 +268,20 @@ export function TournamentDetailPage() {
               isRefreshing={false}
               leaderName={leader?.name}
               leaderScore={leader?.score}
-              className="mb-4"
+              className="mb-5"
             />
           )}
           {isCompleted && (
-            <StatusBar variant="final" className="mb-4" />
+            <StatusBar variant="final" className="mb-5" />
           )}
           {isUpcoming && (
-            <StatusBar variant="upcoming" countdownText={countdownText} className="mb-4" />
+            <StatusBar variant="upcoming" countdownText={countdownText} className="mb-5" />
           )}
         </div>
         
         {/* Sticky Tabs */}
         <motion.div
-          className="sticky top-0 z-20 -mx-4 px-4 py-2 bg-background/95 backdrop-blur-sm"
+          className="sticky top-0 z-20 -mx-4 px-4 py-2.5 bg-background/95 backdrop-blur-md border-b border-border/20"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.55, duration: 0.3 }}
@@ -290,20 +290,19 @@ export function TournamentDetailPage() {
             activeTab={activeTab} 
             onTabChange={handleTabChange}
             tournamentStatus={tournament.status}
-            className="mb-2"
           />
         </motion.div>
         
         {/* Tab Content */}
         <AnimatePresence mode="wait">
-          <div key={activeTab}>
+          <div key={activeTab} className="pt-5">
             {renderTabContent()}
           </div>
         </AnimatePresence>
         
         {/* Data source footer */}
         <motion.div 
-          className="mt-12 pt-6 border-t border-border flex items-center gap-2 text-xs text-muted-foreground/70"
+          className="mt-section pt-6 border-t border-border/40 flex items-center gap-2 text-[11px] text-muted-foreground/50"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}

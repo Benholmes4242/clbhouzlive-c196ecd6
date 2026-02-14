@@ -234,12 +234,12 @@ export function HoleStatsTab({ tournamentId }: HoleStatsTabProps) {
       {/* Toughest holes strip */}
       {toughestHoles.length > 0 && (
         <motion.div
-          className="bg-card/80 backdrop-blur-sm rounded-2xl border border-border/30 p-4"
+          className="bg-card rounded-2xl border border-border/40 p-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)]"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
         >
-          <h4 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-3">
+          <h4 className="text-[9px] font-medium uppercase tracking-wider text-muted-foreground/60 mb-3">
             Toughest Holes
           </h4>
           <div className="flex gap-3">
@@ -251,13 +251,13 @@ export function HoleStatsTab({ tournamentId }: HoleStatsTabProps) {
                 <div className="text-xs font-bold text-destructive/80 mb-1">
                   #{idx + 1}
                 </div>
-                <div className="text-lg font-bold text-foreground score-mono">
+                <div className="text-[16px] font-bold text-foreground font-mono tabular-nums">
                   Hole {hole.holeNumber}
                 </div>
                 <div className="text-xs text-muted-foreground">
                   Par {hole.par} • Avg {hole.scoringAverage.toFixed(2)}
                 </div>
-                <div className="text-xs font-semibold text-destructive mt-1 score-mono">
+                <div className="text-[11px] font-semibold text-destructive mt-1 font-mono tabular-nums">
                   +{hole.avgDiff.toFixed(2)}
                 </div>
               </div>
@@ -270,43 +270,43 @@ export function HoleStatsTab({ tournamentId }: HoleStatsTabProps) {
       {summary && (
         <div className="grid grid-cols-3 gap-3">
           <motion.div
-            className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/30 p-3 text-center"
+            className="bg-card rounded-xl border border-border/40 p-3 text-center shadow-[0_2px_12px_rgba(0,0,0,0.04)]"
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05, duration: 0.3 }}
           >
-            <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground mb-1">
+            <div className="text-[9px] font-medium uppercase tracking-wider text-muted-foreground/60 mb-1">
               Course Avg
             </div>
-            <div className="text-lg font-bold text-foreground score-mono">
+            <div className="text-[16px] font-bold text-foreground font-mono tabular-nums">
               {summary.avgScore.toFixed(1)}
             </div>
-            <div className="text-[10px] text-muted-foreground">Par {summary.totalPar}</div>
+            <div className="text-[9px] text-muted-foreground/50 tabular-nums">Par {summary.totalPar}</div>
           </motion.div>
           <motion.div
-            className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/30 p-3 text-center"
+            className="bg-card rounded-xl border border-border/40 p-3 text-center shadow-[0_2px_12px_rgba(0,0,0,0.04)]"
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.3 }}
           >
-            <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground mb-1">
+            <div className="text-[9px] font-medium uppercase tracking-wider text-muted-foreground/60 mb-1">
               Birdies
             </div>
-            <div className="text-lg font-bold text-green-600 score-mono">
+            <div className="text-[16px] font-bold text-green-600 font-mono tabular-nums">
               {summary.totalBirdies}
             </div>
-            <div className="text-[10px] text-muted-foreground">{summary.totalEagles} eagles</div>
+            <div className="text-[9px] text-muted-foreground/50 tabular-nums">{summary.totalEagles} eagles</div>
           </motion.div>
           <motion.div
-            className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/30 p-3 text-center"
+            className="bg-card rounded-xl border border-border/40 p-3 text-center shadow-[0_2px_12px_rgba(0,0,0,0.04)]"
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15, duration: 0.3 }}
           >
-            <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground mb-1">
+            <div className="text-[9px] font-medium uppercase tracking-wider text-muted-foreground/60 mb-1">
               Bogeys
             </div>
-            <div className="text-lg font-bold text-orange-500 score-mono">
+            <div className="text-[16px] font-bold text-orange-500 font-mono tabular-nums">
               {summary.totalBogeys}
             </div>
           </motion.div>
@@ -318,7 +318,7 @@ export function HoleStatsTab({ tournamentId }: HoleStatsTabProps) {
         {processedHoles.map((hole, idx) => (
           <motion.div
             key={hole.holeNumber}
-            className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/30 p-3"
+            className="bg-card rounded-xl border border-border/40 p-3 shadow-[0_2px_12px_rgba(0,0,0,0.04)]"
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.02, duration: 0.25 }}
@@ -335,7 +335,7 @@ export function HoleStatsTab({ tournamentId }: HoleStatsTabProps) {
               {/* Center content */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1.5">
-                  <span className="text-sm font-semibold text-foreground">
+                  <span className="text-[13px] font-semibold text-foreground">
                     Par {hole.par}
                   </span>
                   {hole.yardage && (
@@ -361,7 +361,7 @@ export function HoleStatsTab({ tournamentId }: HoleStatsTabProps) {
                     )}
                     <div className="absolute top-0 left-1/2 w-px h-full bg-muted-foreground/30" />
                   </div>
-                  <span className="score-mono text-sm font-bold text-foreground w-12 text-right">
+                  <span className="font-mono text-[13px] font-bold text-foreground w-12 text-right tabular-nums">
                     {hole.scoringAverage.toFixed(2)}
                   </span>
                 </div>
@@ -375,15 +375,15 @@ export function HoleStatsTab({ tournamentId }: HoleStatsTabProps) {
                 {hole.avgDiff > 0 ? (
                   <div className="flex items-center gap-0.5 text-destructive">
                     <TrendingUp className="w-3.5 h-3.5" />
-                    <span className="score-mono text-xs font-semibold">+{hole.avgDiff.toFixed(2)}</span>
+                    <span className="font-mono text-[11px] font-semibold tabular-nums">+{hole.avgDiff.toFixed(2)}</span>
                   </div>
                 ) : hole.avgDiff < 0 ? (
                   <div className="flex items-center gap-0.5 text-green-500">
                     <TrendingDown className="w-3.5 h-3.5" />
-                    <span className="score-mono text-xs font-semibold">{hole.avgDiff.toFixed(2)}</span>
+                    <span className="font-mono text-[11px] font-semibold tabular-nums">{hole.avgDiff.toFixed(2)}</span>
                   </div>
                 ) : (
-                  <span className="score-mono text-xs text-muted-foreground">Even</span>
+                  <span className="font-mono text-[11px] text-muted-foreground tabular-nums">Even</span>
                 )}
               </div>
             </div>
