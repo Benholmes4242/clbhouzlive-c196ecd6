@@ -98,7 +98,7 @@ const SeasonLeaderboardsEmpty = memo(function SeasonLeaderboardsEmpty() {
 export function SeasonLeaderboards() {
   const navigate = useNavigate();
   const [selectedYear, setSelectedYear] = useState<number | undefined>(undefined);
-  const [activeCategory, setActiveCategory] = useState<CategoryId>('distance');
+  const [activeCategory, setActiveCategory] = useState<CategoryId>('sg_total');
   const [showFullList, setShowFullList] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
