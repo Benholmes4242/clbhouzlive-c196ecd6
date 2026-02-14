@@ -10,16 +10,18 @@ interface LiveUpcomingToggleProps {
   activeView: IntelligenceView;
   onViewChange: (view: IntelligenceView) => void;
   hasUpcoming?: boolean;
+  isLive?: boolean;
 }
 
 export const LiveUpcomingToggle: React.FC<LiveUpcomingToggleProps> = ({
   activeView,
   onViewChange,
   hasUpcoming = true,
+  isLive = false,
 }) => {
   const tabs: { id: IntelligenceView; label: string }[] = [
-    { id: 'live', label: 'Live' },
-    { id: 'upcoming', label: 'Upcoming' },
+    { id: 'live', label: isLive ? 'Live' : 'Current' },
+    { id: 'upcoming', label: 'Next Up' },
   ];
 
   return (
@@ -46,7 +48,7 @@ export const LiveUpcomingToggle: React.FC<LiveUpcomingToggleProps> = ({
               transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
             }}
           >
-            {tab.id === 'live' && isActive && (
+            {tab.id === 'live' && isActive && isLive && (
               <span
                 className="w-[6px] h-[6px] rounded-full flex-shrink-0"
                 style={{
