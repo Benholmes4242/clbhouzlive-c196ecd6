@@ -8291,6 +8291,7 @@ export type Database = {
           status: string | null
           strokes: number | null
           thru: number | null
+          thru_updated_at: string | null
           tournament_id: string | null
           updated_at: string | null
           wins: number | null
@@ -8314,6 +8315,7 @@ export type Database = {
           status?: string | null
           strokes?: number | null
           thru?: number | null
+          thru_updated_at?: string | null
           tournament_id?: string | null
           updated_at?: string | null
           wins?: number | null
@@ -8337,6 +8339,7 @@ export type Database = {
           status?: string | null
           strokes?: number | null
           thru?: number | null
+          thru_updated_at?: string | null
           tournament_id?: string | null
           updated_at?: string | null
           wins?: number | null

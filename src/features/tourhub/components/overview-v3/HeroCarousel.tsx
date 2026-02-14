@@ -133,7 +133,7 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, hasTie
         </div>
         {/* Thru indicator */}
         <span className="leaderboard-thru flex-shrink-0">
-          {formatThruDisplay(leader.thru, leader.round_1, leader.round_2, leader.round_3, leader.round_4, leader.status, leader.updatedAt)}
+          {formatThruDisplay(leader.thru, leader.round_1, leader.round_2, leader.round_3, leader.round_4, leader.status, leader.thruUpdatedAt, leader.tournamentTimezone)}
         </span>
         <span className={cn(
           "leaderboard-score flex-shrink-0",

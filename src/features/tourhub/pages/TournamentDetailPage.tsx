@@ -211,6 +211,7 @@ export function TournamentDetailPage() {
             entries={leaderboard}
             headshotMap={headshotMap}
             tournamentStatus={tournament.status}
+            tournamentTimezone={tournament.timezone}
             venuePar={tournament.venue_par}
           />
         );

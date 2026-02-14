@@ -28,6 +28,7 @@ export interface TourTournament {
   venue_par: number | null;
   venue_yardage: number | null;
   defending_champion: string | null;
+  timezone: string | null;
   /** Tour code from sr_seasons.tour_name (e.g. 'pga', 'EURO', 'LIV') */
   tour_code: string | null;
   /** Full tour label from sr_seasons.tour_full_name (e.g. 'PGA Tour') */

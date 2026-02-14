@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils';
 import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { RoundSelector } from './RoundSelector';
 import { TOUR_COLORS } from '../../constants/colors';
+import { formatThruDisplay } from '../../utils/formatThruDisplay';
 
 interface FullLeaderboardEntry {
   id: string;
@@ -31,6 +32,7 @@ interface FullLeaderboardEntry {
   thru: number | null;
   money: number | null;
   status?: string;
+  thru_updated_at?: string | null;
   round_1?: number | null;
   round_2?: number | null;
   round_3?: number | null;
@@ -48,6 +50,7 @@ interface FullLeaderboardProps {
   entries: FullLeaderboardEntry[];
   headshotMap?: Map<string, string>;
   tournamentStatus?: string;
+  tournamentTimezone?: string | null;
   venuePar?: number | null;
 }
 
@@ -120,6 +123,7 @@ export function FullLeaderboard({
   entries,
   headshotMap,
   tournamentStatus,
+  tournamentTimezone,
   venuePar,
 }: FullLeaderboardProps) {
   const [selectedRound, setSelectedRound] = useState('Overall');
@@ -367,19 +371,24 @@ export function FullLeaderboard({
                   {/* Thru for live */}
                   {tournamentStatus === 'inprogress' && (
                     <div className="w-10 text-center">
-                      {entry.status === 'cut' || entry.status === 'CUT' ? (
-                        <span className="text-[10px] text-muted-foreground font-medium">MC</span>
-                      ) : entry.status === 'wd' || entry.status === 'WD' ? (
-                        <span className="text-[10px] text-muted-foreground font-medium">WD</span>
-                      ) : entry.thru != null && entry.thru < 18 ? (
-                        <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
-                          {entry.thru}
-                        </span>
-                      ) : entry.thru != null && entry.thru >= 18 ? (
-                        <span className="text-[10px] text-emerald-600 font-medium">F</span>
-                      ) : entry.round_1 != null || entry.round_2 != null || entry.round_3 != null || entry.round_4 != null ? (
-                        <span className="text-[10px] text-emerald-600 font-medium">F</span>
-                      ) : null}
+                      {(() => {
+                        const display = formatThruDisplay(
+                          entry.thru, entry.round_1, entry.round_2, entry.round_3, entry.round_4,
+                          entry.status, entry.thru_updated_at, tournamentTimezone
+                        );
+                        if (!display) return null;
+                        if (display === 'MC' || display === 'WD' || display === 'DQ' || display === 'MDF' || display === 'DNS') {
+                          return <span className="text-[10px] text-muted-foreground font-medium">{display}</span>;
+                        }
+                        if (display === 'F') {
+                          return <span className="text-[10px] text-emerald-600 font-medium">F</span>;
+                        }
+                        return (
+                          <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
+                            {display}
+                          </span>
+                        );
+                      })()}
                     </div>
                   )}
 
