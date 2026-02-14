@@ -7,60 +7,77 @@
  */
 
 const COUNTRY_TIMEZONE_MAP: Record<string, string> = {
-  // North America
+  // North America (full names + ISO alpha-3)
   'usa': 'America/New_York', 'united states': 'America/New_York',
   'us': 'America/New_York',
-  'canada': 'America/Toronto', 'mexico': 'America/Mexico_City',
-  'bermuda': 'Atlantic/Bermuda', 'bahamas': 'America/Nassau',
-  'dominican republic': 'America/Santo_Domingo',
-  'puerto rico': 'America/Puerto_Rico',
+  'canada': 'America/Toronto', 'can': 'America/Toronto',
+  'mexico': 'America/Mexico_City', 'mex': 'America/Mexico_City',
+  'bermuda': 'Atlantic/Bermuda', 'bmu': 'Atlantic/Bermuda',
+  'bahamas': 'America/Nassau', 'bhs': 'America/Nassau',
+  'dominican republic': 'America/Santo_Domingo', 'dom': 'America/Santo_Domingo',
+  'puerto rico': 'America/Puerto_Rico', 'pri': 'America/Puerto_Rico',
 
-  // Europe
+  // Europe (full names + ISO alpha-3)
   'united kingdom': 'Europe/London', 'england': 'Europe/London',
   'scotland': 'Europe/London', 'wales': 'Europe/London',
   'northern ireland': 'Europe/London',
-  'ireland': 'Europe/Dublin',
-  'france': 'Europe/Paris', 'spain': 'Europe/Madrid',
-  'italy': 'Europe/Rome', 'germany': 'Europe/Berlin',
-  'portugal': 'Europe/Lisbon', 'netherlands': 'Europe/Amsterdam',
-  'sweden': 'Europe/Stockholm', 'denmark': 'Europe/Copenhagen',
-  'norway': 'Europe/Oslo', 'finland': 'Europe/Helsinki',
-  'czech republic': 'Europe/Prague', 'czechia': 'Europe/Prague',
-  'austria': 'Europe/Vienna', 'switzerland': 'Europe/Zurich',
-  'belgium': 'Europe/Brussels',
-  'turkey': 'Europe/Istanbul', 'türkiye': 'Europe/Istanbul',
+  'gbr': 'Europe/London',
+  'ireland': 'Europe/Dublin', 'irl': 'Europe/Dublin',
+  'france': 'Europe/Paris', 'fra': 'Europe/Paris',
+  'spain': 'Europe/Madrid', 'esp': 'Europe/Madrid',
+  'italy': 'Europe/Rome', 'ita': 'Europe/Rome',
+  'germany': 'Europe/Berlin', 'deu': 'Europe/Berlin',
+  'portugal': 'Europe/Lisbon', 'prt': 'Europe/Lisbon',
+  'netherlands': 'Europe/Amsterdam', 'nld': 'Europe/Amsterdam',
+  'sweden': 'Europe/Stockholm', 'swe': 'Europe/Stockholm',
+  'denmark': 'Europe/Copenhagen', 'dnk': 'Europe/Copenhagen',
+  'norway': 'Europe/Oslo', 'nor': 'Europe/Oslo',
+  'finland': 'Europe/Helsinki', 'fin': 'Europe/Helsinki',
+  'czech republic': 'Europe/Prague', 'czechia': 'Europe/Prague', 'cze': 'Europe/Prague',
+  'austria': 'Europe/Vienna', 'aut': 'Europe/Vienna',
+  'switzerland': 'Europe/Zurich', 'che': 'Europe/Zurich',
+  'belgium': 'Europe/Brussels', 'bel': 'Europe/Brussels',
+  'turkey': 'Europe/Istanbul', 'türkiye': 'Europe/Istanbul', 'tur': 'Europe/Istanbul',
 
-  // Middle East
-  'united arab emirates': 'Asia/Dubai', 'uae': 'Asia/Dubai',
-  'saudi arabia': 'Asia/Riyadh', 'qatar': 'Asia/Qatar',
-  'bahrain': 'Asia/Bahrain', 'oman': 'Asia/Muscat',
+  // Middle East (full names + ISO alpha-3)
+  'united arab emirates': 'Asia/Dubai', 'uae': 'Asia/Dubai', 'are': 'Asia/Dubai',
+  'saudi arabia': 'Asia/Riyadh', 'sau': 'Asia/Riyadh',
+  'qatar': 'Asia/Qatar', 'qat': 'Asia/Qatar',
+  'bahrain': 'Asia/Bahrain', 'bhr': 'Asia/Bahrain',
+  'oman': 'Asia/Muscat', 'omn': 'Asia/Muscat',
 
-  // Asia-Pacific
-  'japan': 'Asia/Tokyo', 'south korea': 'Asia/Seoul',
-  'korea': 'Asia/Seoul',
-  'china': 'Asia/Shanghai', 'india': 'Asia/Kolkata',
-  'thailand': 'Asia/Bangkok', 'singapore': 'Asia/Singapore',
-  'malaysia': 'Asia/Kuala_Lumpur', 'indonesia': 'Asia/Jakarta',
-  'philippines': 'Asia/Manila', 'vietnam': 'Asia/Ho_Chi_Minh',
-  'australia': 'Australia/Sydney',
-  'new zealand': 'Pacific/Auckland',
+  // Asia-Pacific (full names + ISO alpha-3)
+  'japan': 'Asia/Tokyo', 'jpn': 'Asia/Tokyo',
+  'south korea': 'Asia/Seoul', 'korea': 'Asia/Seoul', 'kor': 'Asia/Seoul',
+  'china': 'Asia/Shanghai', 'chn': 'Asia/Shanghai',
+  'india': 'Asia/Kolkata', 'ind': 'Asia/Kolkata',
+  'thailand': 'Asia/Bangkok', 'tha': 'Asia/Bangkok',
+  'singapore': 'Asia/Singapore', 'sgp': 'Asia/Singapore',
+  'malaysia': 'Asia/Kuala_Lumpur', 'mys': 'Asia/Kuala_Lumpur',
+  'indonesia': 'Asia/Jakarta', 'idn': 'Asia/Jakarta',
+  'philippines': 'Asia/Manila', 'phl': 'Asia/Manila',
+  'vietnam': 'Asia/Ho_Chi_Minh', 'vnm': 'Asia/Ho_Chi_Minh',
+  'australia': 'Australia/Sydney', 'aus': 'Australia/Sydney',
+  'new zealand': 'Pacific/Auckland', 'nzl': 'Pacific/Auckland',
 
-  // Africa
-  'south africa': 'Africa/Johannesburg',
-  'kenya': 'Africa/Nairobi', 'morocco': 'Africa/Casablanca',
-  'egypt': 'Africa/Cairo', 'nigeria': 'Africa/Lagos',
-  'mauritius': 'Indian/Mauritius',
+  // Africa (full names + ISO alpha-3)
+  'south africa': 'Africa/Johannesburg', 'zaf': 'Africa/Johannesburg',
+  'kenya': 'Africa/Nairobi', 'ken': 'Africa/Nairobi',
+  'morocco': 'Africa/Casablanca', 'mar': 'Africa/Casablanca',
+  'egypt': 'Africa/Cairo', 'egy': 'Africa/Cairo',
+  'nigeria': 'Africa/Lagos', 'nga': 'Africa/Lagos',
+  'mauritius': 'Indian/Mauritius', 'mus': 'Indian/Mauritius',
 
-  // Caribbean / Central America
-  'jamaica': 'America/Jamaica',
-  'costa rica': 'America/Costa_Rica',
-  'panama': 'America/Panama',
+  // Caribbean / Central America (full names + ISO alpha-3)
+  'jamaica': 'America/Jamaica', 'jam': 'America/Jamaica',
+  'costa rica': 'America/Costa_Rica', 'cri': 'America/Costa_Rica',
+  'panama': 'America/Panama', 'pan': 'America/Panama',
 
-  // South America
-  'argentina': 'America/Argentina/Buenos_Aires',
-  'brazil': 'America/Sao_Paulo',
-  'chile': 'America/Santiago',
-  'colombia': 'America/Bogota',
+  // South America (full names + ISO alpha-3)
+  'argentina': 'America/Argentina/Buenos_Aires', 'arg': 'America/Argentina/Buenos_Aires',
+  'brazil': 'America/Sao_Paulo', 'bra': 'America/Sao_Paulo',
+  'chile': 'America/Santiago', 'chl': 'America/Santiago',
+  'colombia': 'America/Bogota', 'col': 'America/Bogota',
 };
 
 const US_STATE_TIMEZONE_MAP: Record<string, string> = {
