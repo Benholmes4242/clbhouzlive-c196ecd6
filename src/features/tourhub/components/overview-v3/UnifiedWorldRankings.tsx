@@ -252,7 +252,7 @@ export function UnifiedWorldRankings() {
   if (isLoading) {
     return (
       <motion.section
-        className="mt-10 px-4"
+        className="px-4"
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
@@ -278,26 +278,26 @@ export function UnifiedWorldRankings() {
 
   return (
     <motion.section
-      className="mt-10 px-4"
+      className="px-4"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
     >
       {/* ═══ 1. Section Header ═══ */}
       <div className="flex items-start justify-between mb-0.5">
-        <h2 className="text-[16px] tracking-tight leading-snug" style={{ fontWeight: 600, color: '#1C1917' }}>
+        <h2 className="tracking-tight leading-snug" style={{ fontSize: '22px', fontWeight: 700, color: '#1C1917', letterSpacing: '-0.3px' }}>
           Official World Golf Ranking
         </h2>
         <button
           onClick={() => navigate('/tourhub?tab=players')}
           className="flex items-center gap-0.5 active:scale-95 transition-transform mt-1"
-          style={{ fontSize: '13px', fontWeight: 500, color: '#EA580C' }}
+          style={{ fontSize: '13px', fontWeight: 500, color: '#64748b' }}
         >
           View All
           <ChevronRight className="w-3.5 h-3.5 opacity-60" />
         </button>
       </div>
-      <p className="text-[10px] text-muted-foreground leading-tight mb-2.5">
+      <p className="text-[11px] text-muted-foreground leading-tight mb-2.5">
         Updated weekly · Official OWGR data
       </p>
       <div className="border-b mb-4" style={{ borderColor: 'hsl(var(--border) / 0.1)' }} />
@@ -310,7 +310,7 @@ export function UnifiedWorldRankings() {
           <div>
             <div className="flex items-center gap-1.5 mb-2">
               <TrendingUp className="w-3.5 h-3.5 text-emerald-700" />
-              <span style={{ fontSize: '13px', fontWeight: 600, color: '#1C1917' }}>This Week's Momentum</span>
+              <span style={{ fontSize: '15px', fontWeight: 600, color: '#1C1917' }}>This Week's Momentum</span>
             </div>
             <div
               className="flex gap-2 overflow-x-auto scrollbar-hide pb-1"
@@ -327,7 +327,7 @@ export function UnifiedWorldRankings() {
             <div>
               <div className="flex items-center gap-1.5 mb-2">
                 <TrendingDown className="w-3.5 h-3.5 text-red-500" />
-                <span style={{ fontSize: '13px', fontWeight: 600, color: '#1C1917' }}>Biggest Fallers This Week</span>
+                <span style={{ fontSize: '15px', fontWeight: 600, color: '#1C1917' }}>Biggest Fallers This Week</span>
               </div>
               <div
                 className="flex gap-2 overflow-x-auto scrollbar-hide pb-1"
@@ -346,16 +346,16 @@ export function UnifiedWorldRankings() {
       <div>
         {/* Two-column stat headers */}
         <div className="flex items-center pb-2" style={{ borderBottom: '1px solid hsl(var(--border) / 0.1)' }}>
-          <div className="w-10 flex-shrink-0 text-center uppercase" style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.05em', color: '#A8A29E' }}>
+          <div className="w-10 flex-shrink-0 text-center uppercase" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.05em', color: '#A8A29E' }}>
             #
           </div>
-          <div className="flex-1 min-w-0 uppercase" style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.05em', color: '#A8A29E' }}>
+          <div className="flex-1 min-w-0 uppercase" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.05em', color: '#A8A29E' }}>
             Player
           </div>
-          <div className="w-16 flex-shrink-0 text-right uppercase" style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.05em', color: '#A8A29E' }}>
+          <div className="w-16 flex-shrink-0 text-right uppercase" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.05em', color: '#A8A29E' }}>
             Avg Pts
           </div>
-          <div className="w-16 flex-shrink-0 text-right uppercase" style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.05em', color: '#A8A29E' }}>
+          <div className="w-16 flex-shrink-0 text-right uppercase" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.05em', color: '#A8A29E' }}>
             Total Pts
           </div>
         </div>
@@ -500,9 +500,10 @@ export function UnifiedWorldRankings() {
             <button
               onClick={goToPrevPage}
               disabled={currentPage === 0}
-              className="flex items-center justify-center w-7 h-7 rounded-lg border border-border/60 bg-card active:scale-95 transition-all disabled:opacity-25 disabled:pointer-events-none"
+              className="flex items-center justify-center rounded-lg border border-border/60 bg-card active:scale-95 transition-all disabled:opacity-25 disabled:pointer-events-none"
+              style={{ width: '44px', height: '44px' }}
             >
-              <ChevronLeft className="w-3 h-3 text-muted-foreground" />
+              <ChevronLeft className="w-4 h-4 text-muted-foreground" />
             </button>
 
             <div className="flex items-center gap-1">
@@ -530,9 +531,10 @@ export function UnifiedWorldRankings() {
             <button
               onClick={goToNextPage}
               disabled={currentPage === totalPages - 1}
-              className="flex items-center justify-center w-7 h-7 rounded-lg border border-border/60 bg-card active:scale-95 transition-all disabled:opacity-25 disabled:pointer-events-none"
+              className="flex items-center justify-center rounded-lg border border-border/60 bg-card active:scale-95 transition-all disabled:opacity-25 disabled:pointer-events-none"
+              style={{ width: '44px', height: '44px' }}
             >
-              <ChevronRight className="w-3 h-3 text-muted-foreground" />
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </button>
           </div>
 
