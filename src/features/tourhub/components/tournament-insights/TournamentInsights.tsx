@@ -51,7 +51,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
 
   const isLive = tournamentPhase === 'in-progress';
   const isCompleted = tournamentPhase === 'completed';
-  const hasUpcoming = !!nextTournamentInsights;
+  const hasUpcoming = !!nextTournament || !!nextTournamentInsights;
 
   // Determine which tournament data to show for the hero card
   const heroData = isLive && intelligenceView === 'upcoming' && nextTournamentInsights
