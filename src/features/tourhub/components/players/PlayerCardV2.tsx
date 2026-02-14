@@ -122,19 +122,13 @@ export function PlayerCardV2({
             </div>
           )}
 
-          {/* Tour badge + World rank row */}
-          <div className="flex items-center gap-2 mt-1.5">
-            {tourLabel && (
-              <span className="text-xs font-medium bg-muted rounded-full px-2 py-0.5 text-muted-foreground">
-                {tourLabel}
-              </span>
-            )}
-            {worldRank != null && worldRank > 0 && (
-              <span className="text-sm font-semibold text-foreground">
-                #{worldRank}
-              </span>
-            )}
-          </div>
+          {/* World rank */}
+          {worldRank != null && worldRank > 0 && (
+            <p className="text-xs text-muted-foreground mt-1.5">
+              <span className="font-semibold text-foreground">#{worldRank}</span>{' '}
+              World Golf Ranking
+            </p>
+          )}
 
           {/* Stats row */}
           {(eventsPlayed != null || (earnings != null && earnings > 0)) && (
