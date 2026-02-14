@@ -186,7 +186,7 @@ export function PlayersTab() {
       {/* Sticky toolbar */}
       <div className={cn(
         "sticky top-0 z-20",
-        "bg-background/95 backdrop-blur-md",
+        "bg-[#F8FAFC]",
         "-mx-4 px-4 pt-4 pb-2 space-y-2",
         "border-b border-border/5",
       )}>
@@ -200,7 +200,7 @@ export function PlayersTab() {
             onChange={(e) => setSearch(e.target.value)}
             className={cn(
               "w-full h-11 pl-10 pr-10",
-              "bg-muted/50 border border-border/40",
+              "bg-card border border-border/40",
               "rounded-xl text-sm text-foreground placeholder:text-muted-foreground/60",
               "focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30",
               "transition-all"
