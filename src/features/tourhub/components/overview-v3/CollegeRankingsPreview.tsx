@@ -111,7 +111,7 @@ function HeroCollegeCard({
   return (
     <motion.button
       onClick={() => navigate(`/tourhub/college?sort=earnings`)}
-      className="w-full overflow-hidden text-left cursor-pointer aspect-square"
+      className="w-full overflow-hidden text-left cursor-pointer aspect-square rounded-2xl"
       style={{
         background: gradient,
         boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
@@ -472,7 +472,7 @@ export function CollegeRankingsPreview() {
         <button
           onClick={() => navigate('/tourhub/college')}
           className="flex items-center gap-0.5 group transition-all duration-300 bg-transparent border-none cursor-pointer"
-          style={{ color: '#64748b', fontSize: '13px', fontWeight: 500 }}
+          style={{ color: '#64748b', fontSize: '13px', fontWeight: 500, minHeight: '44px' }}
         >
           View All
           <ChevronRight size={12} className="opacity-60" />
