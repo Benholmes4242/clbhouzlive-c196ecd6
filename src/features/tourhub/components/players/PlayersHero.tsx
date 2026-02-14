@@ -161,12 +161,10 @@ export function PlayersHero({ players, activeTour }: PlayersHeroProps) {
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.25, duration: 0.4 }}
-                  className="flex items-center justify-between"
+                  className="flex items-center gap-2"
                 >
-                  <div className="flex items-center gap-2">
-                    {flag && <span className="text-lg">{flag}</span>}
-                    <span className="text-sm text-white/80">{country}</span>
-                  </div>
+                  {flag && <span className="text-lg">{flag}</span>}
+                  <span className="text-sm text-white/80">{country}</span>
                   <span className="text-sm font-semibold text-amber-400">
                     {heroLabel}
                   </span>
