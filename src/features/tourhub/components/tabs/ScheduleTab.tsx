@@ -34,6 +34,10 @@ import {
   type TourFilterCode,
 } from '../schedule';
 
+const TOUR_LABELS: Record<string, string> = {
+  pga: 'PGA Tour', EURO: 'DP World Tour', LPGA: 'LPGA', CHAMP: 'Champions Tour', PGAD: 'Korn Ferry', LIV: 'LIV Golf',
+};
+
 interface MonthGroup {
   monthKey: string;
   monthLabel: string;
@@ -73,6 +77,16 @@ export function ScheduleTab() {
   
   const filter = (searchParams.get('filter') as ScheduleFilterType) || 'all';
   const activeTour = (searchParams.get('tour') as TourFilterCode) || 'all';
+
+  // Scroll to top on mount (fixes page opening mid-scroll)
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+    // Also try the parent scrollable container (Median wrapper)
+    const scrollContainer = document.querySelector('[data-scroll-container]') || document.querySelector('main') || document.querySelector('.page-root');
+    if (scrollContainer) scrollContainer.scrollTop = 0;
+  }, []);
   
   const setFilter = useCallback((f: ScheduleFilterType) => {
     const params = new URLSearchParams(searchParams);
@@ -389,16 +403,18 @@ export function ScheduleTab() {
           />
         </motion.div>
 
-        {/* No Live Message */}
+        {/* No Live Message — only show this, suppress the no-results below */}
         {filter === 'live' && filterStats.live === 0 && (
           <motion.div
-            className="mt-6 px-4"
+            className="mt-6"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
           >
             <ScheduleEmptyMessage 
               variant="no-live" 
               nextTournamentName={nextUpcoming?.name}
+              nextTournamentDate={nextUpcoming?.start_date}
+              onSwitchFilter={setFilter}
             />
           </motion.div>
         )}
@@ -442,19 +458,26 @@ export function ScheduleTab() {
               ))}
             </motion.div>
           ) : (
-            <motion.div
-              className="px-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              <ScheduleEmptyMessage variant="no-results" />
-            </motion.div>
+            /* Don't show a second empty state if we already have the no-live one */
+            filter === 'live' && filterStats.live === 0 ? null : (
+              <motion.div
+                className="mt-6"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <ScheduleEmptyMessage 
+                  variant={filter === 'upcoming' ? 'no-upcoming' : 'no-results'}
+                  tourName={activeTour !== 'all' ? TOUR_LABELS[activeTour] : undefined}
+                  onResetTour={() => setActiveTour('all')}
+                />
+              </motion.div>
+            )
           )}
         </AnimatePresence>
 
         {/* Season Complete Message */}
         {filterStats.upcoming === 0 && filterStats.live === 0 && filterStats.completed > 0 && filter === 'all' && !search && (
-          <div className="pt-8 border-t border-border mt-8 px-4">
+          <div className="pt-8 mt-8">
             <ScheduleEmptyMessage variant="season-complete" />
           </div>
         )}
