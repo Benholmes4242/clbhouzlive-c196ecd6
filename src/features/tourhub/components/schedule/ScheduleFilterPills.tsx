@@ -1,12 +1,11 @@
 /**
- * ScheduleFilterPills - Cinematic segmented control (SDS compliant)
+ * ScheduleFilterPills - Text-on-background tabs with white active indicator
  * 
- * Features:
- * - Unified pill-track design matching design system
- * - Animated sliding indicator
- * - Live pulse indicator
+ * Matches the Course Details page pattern:
+ * - Text labels sit on the page background (no container track)
+ * - Active tab has a white rounded-xl card behind it
+ * - Spring-animated sliding indicator
  * - 44px minimum touch targets
- * - Semantic token compliance
  */
 
 import { cn } from '@/lib/utils';
@@ -47,8 +46,6 @@ export function ScheduleFilterPills({
     { value: 'completed', label: 'Completed' },
   ];
 
-  const showLiveDot = counts.live > 0;
-
   // Calculate indicator position
   useEffect(() => {
     if (!containerRef.current) return;
@@ -70,14 +67,14 @@ export function ScheduleFilterPills({
       role="tablist"
       aria-label="Filter tournaments"
     >
-      {/* Segmented control track */}
+      {/* Tab row — no background track, text sits on page background */}
       <div 
         ref={containerRef}
-        className="relative flex items-stretch rounded-xl overflow-hidden p-1 bg-muted/60 backdrop-blur-sm"
+        className="relative flex items-stretch"
       >
-        {/* Animated sliding indicator */}
+        {/* Animated white rounded indicator behind active tab */}
         <motion.div
-          className="absolute top-1 bottom-1 rounded-lg bg-card shadow-sm border border-border/20"
+          className="absolute top-0 bottom-0 rounded-xl bg-card shadow-sm border border-border/40"
           animate={{
             left: indicatorStyle.left,
             width: indicatorStyle.width,
@@ -96,7 +93,7 @@ export function ScheduleFilterPills({
               onClick={() => onFilterChange(option.value)}
               className={cn(
                 "relative flex-1 z-10 py-2.5 text-[13px] font-semibold transition-colors duration-200 whitespace-nowrap",
-                "min-h-[44px] rounded-lg active:scale-[0.95] transition-transform",
+                "min-h-[44px] rounded-xl active:scale-[0.95] transition-transform",
                 isActive 
                   ? "text-foreground" 
                   : "text-muted-foreground hover:text-foreground/70"
