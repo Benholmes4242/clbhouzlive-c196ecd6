@@ -45,7 +45,7 @@ export function PlayersTourFilter({
 }: PlayersTourFilterProps) {
   return (
     <div
-      className="flex items-center gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide"
+      className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-hide"
       role="group"
       aria-label="Filter by tour"
       style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
