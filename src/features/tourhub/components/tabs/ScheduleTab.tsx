@@ -80,12 +80,12 @@ export function ScheduleTab() {
 
   // Scroll to top on mount (fixes page opening mid-scroll)
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    window.scrollTo(0, 0);
     document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
-    // Also try parent scrollable containers (Median wrapper, etc.)
-    const containers = document.querySelectorAll('[data-scroll-container], main, .page-root, [role="main"]');
-    containers.forEach(el => { el.scrollTop = 0; });
+    // Also try the parent scrollable container (Median wrapper)
+    const scrollContainer = document.querySelector('[data-scroll-container]') || document.querySelector('main') || document.querySelector('.page-root');
+    if (scrollContainer) scrollContainer.scrollTop = 0;
   }, []);
   
   const setFilter = useCallback((f: ScheduleFilterType) => {
@@ -384,9 +384,9 @@ export function ScheduleTab() {
           </motion.div>
         </div>
 
-        {/* Sticky Filter Toolbar — Row 1: text tabs, Row 2: tour pills */}
+        {/* Sticky Filter Toolbar */}
         <motion.div
-          className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm"
+          className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm px-4 pb-2 space-y-2"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.3 }}
@@ -396,13 +396,11 @@ export function ScheduleTab() {
             onFilterChange={setFilter}
             counts={filterStats}
           />
-          <div className="px-4 pt-1 pb-2">
-            <ScheduleTourFilter
-              activeTour={activeTour}
-              onTourChange={setActiveTour}
-              tourCounts={tourCounts}
-            />
-          </div>
+          <ScheduleTourFilter
+            activeTour={activeTour}
+            onTourChange={setActiveTour}
+            tourCounts={tourCounts}
+          />
         </motion.div>
 
         {/* No Live Message — only show this, suppress the no-results below */}

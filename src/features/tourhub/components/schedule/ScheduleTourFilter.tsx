@@ -2,9 +2,10 @@
  * ScheduleTourFilter - Scrollable tour filter pill bar
  * 
  * Features:
- * - Text-only pills with counts (no emojis)
+ * - Emoji-prefixed pills for 6 professional tours + "All Tours"
  * - Dynamic counts reflecting active status filter
- * - Standardized pill styling with border
+ * - Semantic token styling (bg-foreground/text-background active, bg-muted inactive)
+ * - Spring tap animation
  * - 44px minimum touch targets
  */
 
@@ -15,17 +16,18 @@ export type TourFilterCode = 'all' | 'pga' | 'EURO' | 'LPGA' | 'CHAMP' | 'PGAD' 
 
 interface TourOption {
   code: TourFilterCode;
+  emoji: string;
   label: string;
 }
 
 const TOUR_OPTIONS: TourOption[] = [
-  { code: 'all', label: 'All Tours' },
-  { code: 'pga', label: 'PGA Tour' },
-  { code: 'EURO', label: 'DP World' },
-  { code: 'LPGA', label: 'LPGA' },
-  { code: 'CHAMP', label: 'Champions' },
-  { code: 'PGAD', label: 'Korn Ferry' },
-  { code: 'LIV', label: 'LIV Golf' },
+  { code: 'all', emoji: '', label: 'All Tours' },
+  { code: 'pga', emoji: '⛳', label: 'PGA Tour' },
+  { code: 'EURO', emoji: '🇪🇺', label: 'DP World' },
+  { code: 'LPGA', emoji: '', label: 'LPGA' },
+  { code: 'CHAMP', emoji: '🏆', label: 'Champions' },
+  { code: 'PGAD', emoji: '🌱', label: 'Korn Ferry' },
+  { code: 'LIV', emoji: '⚡', label: 'LIV Golf' },
 ];
 
 interface ScheduleTourFilterProps {
@@ -62,13 +64,14 @@ export function ScheduleTourFilter({
             whileTap={{ scale: 0.95 }}
             className={cn(
               'flex items-center gap-1.5 px-3 py-2 rounded-full whitespace-nowrap',
-              'text-[13px] font-semibold transition-colors duration-200',
-              'min-h-[44px] border',
+              'text-xs font-semibold transition-colors duration-200',
+              'min-h-[44px]',
               isActive
-                ? 'bg-foreground text-background border-foreground'
-                : 'bg-muted/50 text-muted-foreground border-border',
+                ? 'bg-foreground text-background'
+                : 'bg-muted text-muted-foreground',
             )}
           >
+            {tour.emoji && <span>{tour.emoji}</span>}
             {tour.label}
             <span className={cn(
               'text-[10px] font-bold tabular-nums',
