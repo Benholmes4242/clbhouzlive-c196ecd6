@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
 import { useTopWorldRanked, toTitleCase, getInitials } from '../hooks/useWorldRankings';
+import { getPgaTourHeadshotUrl } from '../utils/resolvePhotoUrl';
 import { 
   useLiveTournamentCount, 
   useLiveLeaderTeaser, 
@@ -377,16 +378,6 @@ export function TourHubNavOverlay({
                 
                 {/* Glass Cards Row with fade edges */}
                 <div className="relative">
-                  {/* Left fade */}
-                  <div 
-                    className="absolute left-0 top-0 bottom-0 w-4 z-10 pointer-events-none"
-                    style={{ background: 'linear-gradient(to right, rgba(248,250,252,0.85), transparent)' }}
-                  />
-                  {/* Right fade */}
-                  <div 
-                    className="absolute right-0 top-0 bottom-0 w-6 z-10 pointer-events-none"
-                    style={{ background: 'linear-gradient(to left, rgba(248,250,252,0.85), transparent)' }}
-                  />
                   
                   <div
                     ref={scrollRef}
@@ -443,30 +434,37 @@ export function TourHubNavOverlay({
                             </span>
                           </div>
                           
-                          {/* Avatar */}
-                          <div 
-                            className="flex-shrink-0 w-9 h-9 rounded-full overflow-hidden flex items-center justify-center"
-                            style={{
-                              background: isFirst 
-                                ? 'linear-gradient(135deg, #FDE68A 0%, #FCD34D 100%)'
-                                : 'rgba(100, 116, 139, 0.1)',
-                            }}
-                          >
-                            {player.photoUrl ? (
-                              <img 
-                                src={player.photoUrl}
-                                alt={player.playerName}
-                                className="w-full h-full rounded-full object-cover object-top"
-                              />
-                            ) : (
-                              <span 
-                                className="text-xs font-semibold"
-                                style={{ color: isFirst ? '#92400E' : undefined }}
+                          {/* Avatar — squircle matching world rankings leaderboard */}
+                          {(() => {
+                            const pgaTourId = player.player?.pga_tour_id;
+                            const headshot = pgaTourId ? getPgaTourHeadshotUrl(pgaTourId) : player.photoUrl;
+                            const initials = getInitials(player.playerName);
+                            return (
+                              <div 
+                                className="flex-shrink-0 overflow-hidden border border-border/50"
+                                style={{ width: '36px', height: '36px', borderRadius: '11px' }}
                               >
-                                {getInitials(player.playerName)}
-                              </span>
-                            )}
-                          </div>
+                                {headshot ? (
+                                  <div className="relative w-full h-full">
+                                    <div className="absolute inset-0 flex items-center justify-center bg-muted">
+                                      <span className="text-[9px] font-bold text-muted-foreground">{initials}</span>
+                                    </div>
+                                    <img 
+                                      src={headshot}
+                                      alt={player.playerName}
+                                      className="relative z-10 w-full h-full object-cover"
+                                      loading="lazy"
+                                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                    />
+                                  </div>
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center bg-muted">
+                                    <span className="text-[9px] font-bold text-muted-foreground">{initials}</span>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })()}
                           
                           {/* Name & Country */}
                           <div className="flex-1 min-w-0 text-left">
