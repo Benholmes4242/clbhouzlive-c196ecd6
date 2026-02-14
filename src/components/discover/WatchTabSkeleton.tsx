@@ -48,9 +48,9 @@ export function WatchTabSkeleton() {
 
       {/* Grid Skeleton - pointed corners */}
       <div className="py-2">
-        <div className="grid grid-cols-2 gap-[2px]">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="aspect-[3/4]" />
+        <div className="grid grid-cols-3 gap-[2px]">
+          {Array.from({ length: 9 }).map((_, i) => (
+            <Skeleton key={i} className="aspect-square" />
           ))}
         </div>
       </div>

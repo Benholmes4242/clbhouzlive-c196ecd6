@@ -67,7 +67,7 @@ export default function ShortsVideoTile({
   return (
     <div
       ref={containerRef}
-      className="group relative aspect-[9/16] overflow-hidden rounded bg-muted cursor-pointer"
+      className="group relative aspect-square overflow-hidden rounded bg-muted cursor-pointer"
       onClick={onClick}
     >
       {/* Filtered pixel layer */}

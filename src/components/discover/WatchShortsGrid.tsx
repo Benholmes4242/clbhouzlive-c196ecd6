@@ -307,7 +307,7 @@ export function WatchShortsGrid({
   
   // Track which items are currently visible
   const visibleIndicesRef = useRef(new Set<number>());
-  const [mountableIndices, setMountableIndices] = useState<Set<number>>(() => new Set([0, 1, 2, 3, 4, 5]));
+  const [mountableIndices, setMountableIndices] = useState<Set<number>>(() => new Set([0, 1, 2, 3, 4, 5, 6, 7, 8]));
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // REF for shorts.length to avoid dependency in updateMountableIndices
@@ -482,11 +482,11 @@ export function WatchShortsGrid({
   if (isLoading && shorts.length === 0) {
     return (
       <div className="pt-1 pb-4">
-        <div className="grid grid-cols-2">
-          {Array.from({ length: 6 }).map((_, i) => (
+        <div className="grid grid-cols-3 gap-[2px]">
+          {Array.from({ length: 9 }).map((_, i) => (
             <Skeleton 
               key={i} 
-              className={`aspect-[3/4] ${prefersReducedMotion ? '' : 'animate-shimmer-down'}`}
+              className={`aspect-square ${prefersReducedMotion ? '' : 'animate-shimmer-down'}`}
               style={prefersReducedMotion ? undefined : { animationDelay: `${i * 50}ms` }}
             />
           ))}
@@ -512,15 +512,18 @@ export function WatchShortsGrid({
 
   return (
     <div className="pt-1 pb-4">
-      {/* 2-column grid edge-to-edge */}
-      <div className="grid grid-cols-2">
+      {/* 3-column grid edge-to-edge with 2px gap */}
+      <div className="grid grid-cols-3 gap-[2px]">
         {renderedShorts.map((video, index) => {
           const shouldMount = mountableIndices.has(index);
           const streamId = uidFromNode({ src: video.media?.[0]?.media_url }) || video.id;
           const videoReady = isReady(streamId);
-          const isPriority = index < 6;
+          const isPriority = index < 9;
           
-          const isAutoplayCandidate = index % 4 === 0 || index % 4 === 3;
+          // Zigzag autoplay: Row 0→left, Row 1→mid, Row 2→right, Row 3→mid, repeat
+          const row = Math.floor(index / 3);
+          const zigzagCol = [0, 1, 2, 1][row % 4];
+          const isAutoplayCandidate = (index % 3) === zigzagCol;
           
           const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;
           const entranceDelay = isNewlyLoaded 
@@ -544,8 +547,8 @@ export function WatchShortsGrid({
                 entranceDelay={entranceDelay}
               />
               {/* Inject Suggested strip after 8th tile (index 7) */}
-              {showSuggestedStrip && index === 7 && (
-                <div className="col-span-2 py-4">
+              {showSuggestedStrip && index === 8 && (
+                <div className="col-span-3 py-4">
                   {/* Section header for suggested accounts */}
                   <div className="mb-3 pl-4">
                     <span className="text-base font-semibold" style={{ color: '#374151' }}>
