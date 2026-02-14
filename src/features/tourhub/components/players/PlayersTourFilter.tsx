@@ -1,12 +1,6 @@
 /**
- * PlayersTourFilter - Tour filter pills for the Players tab.
- * Reuses the same pattern as ScheduleTourFilter with player-specific tour list.
- * 
- * Features:
- * - Emoji-prefixed pills for 5 tours + "All Tours"
- * - Dynamic counts from tour_codes column
- * - Semantic token styling
- * - 44px minimum touch targets
+ * PlayersTourFilter - Scrollable tour filter pills for the Players tab.
+ * Matches ScheduleTourFilter pattern: white pill active, no emojis, text only.
  */
 
 import { cn } from '@/lib/utils';
@@ -16,17 +10,16 @@ export type PlayerTourCode = 'all' | 'pga' | 'EURO' | 'PGAD' | 'LIV' | 'LPGA';
 
 interface TourOption {
   code: PlayerTourCode;
-  emoji: string;
   label: string;
 }
 
 const TOUR_OPTIONS: TourOption[] = [
-  { code: 'all', emoji: '', label: 'All Tours' },
-  { code: 'pga', emoji: '⛳', label: 'PGA Tour' },
-  { code: 'EURO', emoji: '🇪🇺', label: 'DP World' },
-  { code: 'PGAD', emoji: '🌱', label: 'Korn Ferry' },
-  { code: 'LIV', emoji: '⚡', label: 'LIV Golf' },
-  { code: 'LPGA', emoji: '', label: 'LPGA' },
+  { code: 'all', label: 'All Tours' },
+  { code: 'pga', label: 'PGA Tour' },
+  { code: 'EURO', label: 'DP World' },
+  { code: 'PGAD', label: 'Korn Ferry' },
+  { code: 'LIV', label: 'LIV Golf' },
+  { code: 'LPGA', label: 'LPGA' },
 ];
 
 /** Map of tour code → display label */
@@ -75,15 +68,14 @@ export function PlayersTourFilter({
               'text-xs font-semibold transition-colors duration-200',
               'min-h-[44px]',
               isActive
-                ? 'bg-foreground text-background'
+                ? 'bg-card text-foreground shadow-sm border border-border/40'
                 : 'bg-muted text-muted-foreground',
             )}
           >
-            {tour.emoji && <span>{tour.emoji}</span>}
             {tour.label}
             <span className={cn(
               'text-[10px] font-bold tabular-nums',
-              isActive ? 'text-background/60' : 'text-muted-foreground/60'
+              isActive ? 'text-muted-foreground' : 'text-muted-foreground/60'
             )}>
               {count}
             </span>
