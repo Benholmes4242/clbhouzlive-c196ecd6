@@ -1,9 +1,6 @@
 /**
  * PlayersHero - Immersive full-bleed #1 player hero.
- * 
- * Shows the world's (or tour's) #1 ranked player as a full-bleed hero image
- * with gradient scrim, stat pills, and a glass runners strip (#2–5).
- * Adapts to active tour filter via AnimatePresence crossfade.
+ * Shows the #1 ranked player with dark glass runner strip.
  */
 
 import { Link } from 'react-router-dom';
@@ -17,9 +14,7 @@ import type { PlayerTourCode } from './PlayersTourFilter';
 import { TOUR_LABELS } from './PlayersTourFilter';
 
 interface PlayersHeroProps {
-  /** Top 5 players for the active tour (index 0 = #1) */
   players: ElitePlayer[];
-  /** Active tour filter code */
   activeTour: PlayerTourCode;
 }
 
@@ -27,13 +22,9 @@ function getInitials(name: string): string {
   return name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
 }
 
-/** Stat pill for the hero overlay */
 function StatPill({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
-    <div className={cn(
-      "flex flex-col items-center px-3 py-1.5 rounded-lg",
-      "bg-white/10 backdrop-blur-sm"
-    )}>
+    <div className="flex flex-col items-center px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-sm">
       <span className={cn(
         "font-mono text-base font-bold leading-tight",
         highlight ? "text-amber-400" : "text-white"
@@ -47,7 +38,7 @@ function StatPill({ label, value, highlight }: { label: string; value: string; h
   );
 }
 
-/** Runner pill card for #2–5 strip */
+/** Runner pill card with dark glass background for readability */
 function RunnerPill({ player, rank }: { player: ElitePlayer; rank: number }) {
   const photoUrl = resolvePhotoUrl(player.photoUrl, player.pgaTourId);
   const flag = countryCodeToFlag(player.countryCode);
@@ -56,18 +47,21 @@ function RunnerPill({ player, rank }: { player: ElitePlayer; rank: number }) {
   return (
     <Link
       to={`/tourhub/player/${player.playerId}`}
-      className="flex-shrink-0 flex items-center gap-2.5 px-3 py-2 rounded-xl bg-white/10 backdrop-blur-md border border-white/10 active:scale-[0.97] transition-transform"
-      style={{ scrollSnapAlign: 'start' }}
+      className="flex-shrink-0 flex items-center gap-2.5 px-3 py-2 rounded-xl active:scale-[0.97] transition-transform"
+      style={{
+        scrollSnapAlign: 'start',
+        background: 'rgba(0, 0, 0, 0.6)',
+        backdropFilter: 'blur(12px)',
+        border: '1px solid rgba(255, 255, 255, 0.12)',
+      }}
     >
-      {/* Rank badge */}
       <span className={cn(
         "w-6 h-6 rounded-md flex items-center justify-center text-[11px] font-bold shrink-0",
-        rank === 2 ? "bg-gradient-to-br from-foreground/30 to-foreground/40 text-background" : "bg-white/15 text-white/80"
+        rank === 2 ? "bg-white/20 text-white" : "bg-white/10 text-white/70"
       )}>
         {rank}
       </span>
 
-      {/* Avatar */}
       <SquircleAvatar
         src={photoUrl}
         alt={player.playerName}
@@ -76,7 +70,6 @@ function RunnerPill({ player, rank }: { player: ElitePlayer; rank: number }) {
         hideRing
       />
 
-      {/* Info */}
       <div className="min-w-0">
         <p className="text-sm font-semibold text-white truncate max-w-[120px]">
           {player.playerName}
@@ -104,14 +97,12 @@ export function PlayersHero({ players, activeTour }: PlayersHeroProps) {
   const country = titleCaseCountry(champion.country);
   const initials = getInitials(champion.playerName);
 
-  // Hero label adapts to tour
   const heroLabel = activeTour === 'all'
-    ? '🏆 World #1'
-    : `🏆 #1 • ${TOUR_LABELS[activeTour]}`;
+    ? '#1 · World'
+    : `#1 · ${TOUR_LABELS[activeTour]}`;
 
   return (
     <div className="space-y-0">
-      {/* Hero container */}
       <AnimatePresence mode="wait">
         <motion.div
           key={champion.playerId}
@@ -125,7 +116,6 @@ export function PlayersHero({ players, activeTour }: PlayersHeroProps) {
             className="block active:scale-[0.995] transition-transform"
           >
             <div className="relative w-full overflow-hidden rounded-2xl" style={{ minHeight: '340px' }}>
-              {/* Player photo — full bleed */}
               {photoUrl ? (
                 <motion.img
                   src={photoUrl}
@@ -137,13 +127,11 @@ export function PlayersHero({ players, activeTour }: PlayersHeroProps) {
                   transition={{ duration: 12, ease: 'linear' }}
                 />
               ) : (
-                /* Gradient fallback with large initials */
                 <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-foreground/70 to-foreground flex items-center justify-center">
                   <span className="text-7xl font-bold text-background/30">{initials}</span>
                 </div>
               )}
 
-              {/* Gradient scrim */}
               <div
                 className="absolute inset-0"
                 style={{
@@ -151,9 +139,7 @@ export function PlayersHero({ players, activeTour }: PlayersHeroProps) {
                 }}
               />
 
-              {/* Overlay content */}
               <div className="absolute bottom-0 left-0 right-0 p-5 pb-6 space-y-2">
-                {/* Label */}
                 <motion.span
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -163,7 +149,6 @@ export function PlayersHero({ players, activeTour }: PlayersHeroProps) {
                   {heroLabel}
                 </motion.span>
 
-                {/* Name */}
                 <motion.h2
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -173,7 +158,6 @@ export function PlayersHero({ players, activeTour }: PlayersHeroProps) {
                   {champion.playerName}
                 </motion.h2>
 
-                {/* Country */}
                 <motion.div
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -184,7 +168,6 @@ export function PlayersHero({ players, activeTour }: PlayersHeroProps) {
                   <span className="text-sm text-white/80">{country}</span>
                 </motion.div>
 
-                {/* Stat pills */}
                 <motion.div
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -205,7 +188,6 @@ export function PlayersHero({ players, activeTour }: PlayersHeroProps) {
             </div>
           </Link>
 
-          {/* Runners strip (#2–5) — glass ribbon overlapping hero by 16px */}
           {runners.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 12 }}
