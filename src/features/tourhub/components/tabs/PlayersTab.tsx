@@ -308,13 +308,12 @@ export function PlayersTab() {
   if (isLoading && totalCount === 0) {
     return (
       <div className="space-y-4 py-6">
-        <div className="rounded-2xl bg-muted/50 h-[340px] animate-pulse" />
-        <div className="bg-muted/50 h-12 rounded-xl animate-pulse" />
-        <div className="bg-muted/50 h-12 rounded-xl animate-pulse" />
-        <div className="bg-muted/50 h-12 rounded-xl animate-pulse" />
-        <div className="rounded-2xl border border-border/50 overflow-hidden">
+        <div className="rounded-2xl bg-muted/40 h-[340px] animate-pulse" />
+        <div className="bg-muted/40 h-11 rounded-xl animate-pulse" />
+        <div className="bg-muted/40 h-11 rounded-xl animate-pulse" />
+        <div className="rounded-2xl border border-border/30 overflow-hidden">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-[72px] bg-muted/30 border-b border-border/30 animate-pulse" />
+            <div key={i} className="h-[64px] bg-muted/20 border-b border-border/20 animate-pulse" />
           ))}
         </div>
       </div>
@@ -322,7 +321,7 @@ export function PlayersTab() {
   }
 
   return (
-    <div className="space-y-0 pb-6">
+    <div className="pb-6">
       {/* Immersive Hero */}
       {showHero && heroPlayers.length > 0 && (
         <PlayersHero players={heroPlayers} activeTour={activeTour} />
@@ -331,24 +330,22 @@ export function PlayersTab() {
       {/* Sticky filter toolbar */}
       <div className={cn(
         "sticky top-0 z-20",
-        "bg-background/95 backdrop-blur-sm",
+        "bg-background/95 backdrop-blur-md",
         "-mx-4 px-4 pt-4 pb-2 space-y-2",
-        "border-b border-transparent",
-        // When stuck, add subtle bottom border
-        "[&:has(+*)]:border-b-border/10"
+        "border-b border-border/5",
       )}>
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60" />
           <input
             type="text"
             placeholder="Search players, countries..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className={cn(
-              "w-full h-12 pl-11 pr-10",
-              "bg-card/80 border border-border",
-              "rounded-xl text-sm text-foreground placeholder:text-muted-foreground",
+              "w-full h-11 pl-10 pr-10",
+              "bg-muted/50 border border-border/40",
+              "rounded-xl text-sm text-foreground placeholder:text-muted-foreground/60",
               "focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30",
               "transition-all"
             )}
@@ -383,83 +380,86 @@ export function PlayersTab() {
         />
       </div>
 
-      {/* Context line */}
-      <div className="flex items-center justify-between px-1 pt-3 pb-1">
-        <p className="text-sm text-muted-foreground">
-          {getTierDescription(tier, activeTour)}
-        </p>
-        <p className="text-sm font-mono text-muted-foreground shrink-0 ml-3">
-          {totalCount} player{totalCount !== 1 ? 's' : ''}
-        </p>
-      </div>
-
-      {/* Player list with AnimatePresence crossfade */}
-      <div ref={listRef}>
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={contentKey}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            {displayRows.length > 0 ? (
-              <div
-                className={cn(
-                  "rounded-2xl overflow-hidden",
-                  "border border-border/40",
-                  "bg-card/70 backdrop-blur-md",
-                  "shadow-[0_2px_12px_rgba(0,0,0,0.04)]"
-                )}
-              >
-                {displayRows.map((row, index) => (
-                  <PlayerListRow
-                    key={row.id}
-                    player={{
-                      id: row.id,
-                      fullName: row.fullName,
-                      country: row.country,
-                      countryCode: row.countryCode,
-                      photoUrl: row.photoUrl,
-                      pgaTourId: row.pgaTourId,
-                    }}
-                    rank={row.rank}
-                    rankChange={row.rankChange}
-                    statValue={row.statValue}
-                    statLabel={row.statLabel}
-                    variant={row.variant}
-                    batchHeadshotUrl={headshotMap?.get(row.id)}
-                    index={index}
-                  />
-                ))}
-              </div>
-            ) : (
-              <PlayersEmptyState />
-            )}
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
-      {/* Load More button */}
-      {hasMore && (
-        <div className="flex flex-col items-center gap-2 pt-4">
-          <button
-            onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
-            className={cn(
-              "w-full max-w-xs h-11 flex items-center justify-center gap-1.5",
-              "rounded-xl border border-border bg-card/70 backdrop-blur-sm",
-              "text-sm font-medium text-foreground",
-              "hover:bg-muted/50 active:scale-[0.98] transition-all"
-            )}
-          >
-            Show {Math.min(PAGE_SIZE, totalCount - visibleCount)} more players
-            <ChevronDown className="w-4 h-4" />
-          </button>
-          <p className="text-[11px] text-muted-foreground">
-            Showing {visibleCount} of {totalCount} players
+      {/* Content area — matches Overview's bg-background + section rhythm */}
+      <div className="space-y-section mt-4">
+        {/* Context line — Cleo metadata typography */}
+        <div className="flex items-center justify-between px-0.5">
+          <p className="text-[13px] text-muted-foreground leading-snug">
+            {getTierDescription(tier, activeTour)}
+          </p>
+          <p className="text-[11px] font-mono font-medium text-muted-foreground/70 shrink-0 ml-3 tabular-nums">
+            {totalCount} player{totalCount !== 1 ? 's' : ''}
           </p>
         </div>
-      )}
+
+        {/* Player list with AnimatePresence crossfade */}
+        <div ref={listRef}>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={contentKey}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              {displayRows.length > 0 ? (
+                <div
+                  className={cn(
+                    "rounded-2xl overflow-hidden",
+                    "border border-border/40",
+                    "bg-card shadow-[0_2px_12px_rgba(0,0,0,0.04)]"
+                  )}
+                >
+                  {displayRows.map((row, index) => (
+                    <PlayerListRow
+                      key={row.id}
+                      player={{
+                        id: row.id,
+                        fullName: row.fullName,
+                        country: row.country,
+                        countryCode: row.countryCode,
+                        photoUrl: row.photoUrl,
+                        pgaTourId: row.pgaTourId,
+                      }}
+                      rank={row.rank}
+                      rankChange={row.rankChange}
+                      statValue={row.statValue}
+                      statLabel={row.statLabel}
+                      variant={row.variant}
+                      batchHeadshotUrl={headshotMap?.get(row.id)}
+                      index={index}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <PlayersEmptyState />
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Load More button */}
+        {hasMore && (
+          <div className="flex flex-col items-center gap-2">
+            <button
+              onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
+              className={cn(
+                "w-full max-w-xs h-11 flex items-center justify-center gap-1.5",
+                "rounded-xl border border-border/50 bg-card",
+                "text-[13px] font-semibold text-foreground",
+                "hover:bg-muted/50 active:scale-[0.97] transition-all",
+                "shadow-sm"
+              )}
+            >
+              Show {Math.min(PAGE_SIZE, totalCount - visibleCount)} more
+              <ChevronDown className="w-4 h-4 text-muted-foreground" />
+            </button>
+            <p className="text-[10px] font-mono text-muted-foreground/60 tabular-nums">
+              {visibleCount} of {totalCount}
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

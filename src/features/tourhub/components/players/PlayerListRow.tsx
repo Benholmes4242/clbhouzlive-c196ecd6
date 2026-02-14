@@ -99,9 +99,9 @@ export function PlayerListRow({
       <Link
         to={`/tourhub/player/${player.id}`}
         className={cn(
-          "flex items-center gap-3 px-4 py-3.5",
+          "flex items-center gap-3 px-4 py-3",
           "bg-transparent hover:bg-muted/30",
-          "border-b border-border/30 last:border-0",
+          "border-b border-border/20 last:border-0",
           "active:scale-[0.98] transition-transform"
         )}
       >
@@ -129,13 +129,13 @@ export function PlayerListRow({
 
         {/* Name + country */}
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold text-foreground truncate">
+          <h3 className="text-[14px] font-semibold text-foreground truncate leading-tight">
             {player.fullName}
           </h3>
           {countryName && (
             <div className="flex items-center gap-1.5 mt-0.5">
-              {flag && <span className="text-sm leading-none">{flag}</span>}
-              <span className="text-xs text-muted-foreground truncate">{countryName}</span>
+              {flag && <span className="text-xs leading-none">{flag}</span>}
+              <span className="text-[12px] text-muted-foreground/80 truncate">{countryName}</span>
             </div>
           )}
         </div>
@@ -143,15 +143,15 @@ export function PlayerListRow({
         {/* Stat value */}
         {statValue && (
           <div className="text-right shrink-0">
-            <p className="font-mono text-sm font-semibold text-foreground">{statValue}</p>
+            <p className="font-mono text-[13px] font-semibold text-foreground tabular-nums">{statValue}</p>
             {statLabel && (
-              <p className="text-[10px] text-muted-foreground">{statLabel}</p>
+              <p className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider">{statLabel}</p>
             )}
           </div>
         )}
 
         {/* Chevron */}
-        <ChevronRight className="w-4 h-4 text-muted-foreground/50 shrink-0" />
+        <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0" />
       </Link>
     </motion.div>
   );
