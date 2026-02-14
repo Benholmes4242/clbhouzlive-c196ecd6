@@ -6,6 +6,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { getPgaTourHeadshotUrl } from '../../utils/resolvePhotoUrl';
+import { GolferAvatar } from '@/components/golfers/GolferAvatar';
 import type { TrackedPrediction } from './types';
 
 interface PredictionScorecardRowProps {
@@ -97,19 +98,11 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
 
       {/* PLAYER — Avatar + Name */}
       <div className="flex items-center gap-2.5 flex-1 min-w-0 pl-2">
-        <div className="relative flex-shrink-0 w-10 h-10 rounded-full overflow-hidden bg-muted">
-          <div className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-muted-foreground z-0">
-            {initials}
-          </div>
-          {avatarUrl && (
-            <img
-              src={avatarUrl}
-              alt={prediction.playerName}
-              className="absolute inset-0 w-full h-full object-cover z-10"
-              onError={(e) => { e.currentTarget.style.display = 'none'; }}
-            />
-          )}
-        </div>
+        <GolferAvatar
+          name={prediction.playerName}
+          photoUrl={avatarUrl}
+          size={40}
+        />
         <div className="min-w-0 flex-1">
           <p
             className="text-sm font-semibold text-foreground truncate leading-tight"

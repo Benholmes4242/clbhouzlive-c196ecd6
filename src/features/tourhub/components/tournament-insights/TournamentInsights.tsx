@@ -95,12 +95,13 @@ export const TournamentInsights = memo(function TournamentInsights() {
           </div>
         </div>
 
-        {/* Live/Upcoming toggle — only shown during in-progress */}
-        {isLive && (
+        {/* Live/Upcoming toggle — shown when live OR when there's upcoming data */}
+        {(isLive || hasUpcoming) && (
           <LiveUpcomingToggle
             activeView={intelligenceView}
             onViewChange={setIntelligenceView}
             hasUpcoming={hasUpcoming}
+            isLive={isLive}
           />
         )}
       </motion.div>
@@ -122,8 +123,8 @@ export const TournamentInsights = memo(function TournamentInsights() {
 
       {/* ═══ Content area — phase & view dependent ═══ */}
       <AnimatePresence mode="wait">
-        {/* PRE-TOURNAMENT — existing tab UI (no changes) */}
-        {tournamentPhase === 'pre-tournament' && (
+        {/* PRE-TOURNAMENT — existing tab UI (when not viewing upcoming) */}
+        {tournamentPhase === 'pre-tournament' && intelligenceView === 'live' && (
           <motion.div
             key="pre-tournament"
             initial={{ opacity: 0, y: 16 }}
@@ -174,6 +175,70 @@ export const TournamentInsights = memo(function TournamentInsights() {
                   <LikelyWinnersCarousel featured={data.winners[0]} cards={data.contenderCards} />
                 )}
               </motion.div>
+            )}
+          </motion.div>
+        )}
+
+        {/* PRE-TOURNAMENT — UPCOMING VIEW */}
+        {tournamentPhase === 'pre-tournament' && intelligenceView === 'upcoming' && (
+          <motion.div
+            key="pre-upcoming"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-0 pt-7 bg-background"
+            style={{ borderTop: '1px solid rgba(0, 0, 0, 0.05)' }}
+          >
+            {nextTournamentInsights ? (
+              <>
+                <IntelligenceTabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
+
+                {activeTab === 'courseDNA' && (
+                  <motion.div
+                    key="upcoming-courseDNA"
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+                    className="pb-6"
+                  >
+                    <div
+                      className="rounded-2xl bg-card border border-border overflow-hidden"
+                      style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)' }}
+                    >
+                      {nextTournamentInsights.courseDNA.length > 0 && (
+                        <CourseDNACard
+                          items={nextTournamentInsights.courseDNA}
+                          courseName={nextTournamentInsights.tournament.courseName}
+                          inline
+                        />
+                      )}
+                      <ClubhouseIntelligence insight={nextTournamentInsights.clubhouseIntelligence} inline />
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeTab === 'predictions' && (
+                  <motion.div
+                    key="upcoming-predictions"
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+                    className="pb-6"
+                  >
+                    {nextTournamentInsights.winners.length > 0 && (
+                      <LikelyWinnersCarousel
+                        featured={nextTournamentInsights.winners[0]}
+                        cards={nextTournamentInsights.contenderCards}
+                      />
+                    )}
+                  </motion.div>
+                )}
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-8">
+                No upcoming tournament data available yet.
+              </p>
             )}
           </motion.div>
         )}
@@ -240,6 +305,70 @@ export const TournamentInsights = memo(function TournamentInsights() {
                   <LikelyWinnersCarousel featured={data.winners[0]} cards={data.contenderCards} />
                 )}
               </div>
+            )}
+          </motion.div>
+        )}
+
+        {/* UPCOMING VIEW — shown from any phase when toggled to upcoming */}
+        {intelligenceView === 'upcoming' && !isLive && (
+          <motion.div
+            key="upcoming-view"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-0 pt-7 bg-background"
+            style={{ borderTop: '1px solid rgba(0, 0, 0, 0.05)' }}
+          >
+            {nextTournamentInsights ? (
+              <>
+                <IntelligenceTabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
+
+                {activeTab === 'courseDNA' && (
+                  <motion.div
+                    key="upcoming-courseDNA"
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+                    className="pb-6"
+                  >
+                    <div
+                      className="rounded-2xl bg-card border border-border overflow-hidden"
+                      style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)' }}
+                    >
+                      {nextTournamentInsights.courseDNA.length > 0 && (
+                        <CourseDNACard
+                          items={nextTournamentInsights.courseDNA}
+                          courseName={nextTournamentInsights.tournament.courseName}
+                          inline
+                        />
+                      )}
+                      <ClubhouseIntelligence insight={nextTournamentInsights.clubhouseIntelligence} inline />
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeTab === 'predictions' && (
+                  <motion.div
+                    key="upcoming-predictions"
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+                    className="pb-6"
+                  >
+                    {nextTournamentInsights.winners.length > 0 && (
+                      <LikelyWinnersCarousel
+                        featured={nextTournamentInsights.winners[0]}
+                        cards={nextTournamentInsights.contenderCards}
+                      />
+                    )}
+                  </motion.div>
+                )}
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-8">
+                No upcoming tournament data available yet.
+              </p>
             )}
           </motion.div>
         )}
