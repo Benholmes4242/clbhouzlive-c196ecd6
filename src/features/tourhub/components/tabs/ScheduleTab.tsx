@@ -1,15 +1,14 @@
 /**
- * ScheduleTab - Cinematic Schedule Experience (A* Redesign)
+ * ScheduleTab - Full visual overhaul matching Overview design language
  * 
- * Features:
- * - Dynamic hero: LIVE carousel / Next Up / Recent Winner
- * - Tour filter pills (6 tours + All)
- * - Batch course image resolution (1 query, not 366)
- * - Sticky filter toolbar (status + tour)
- * - URL-persisted filters (?filter=live&tour=pga)
- * - Debounced search with tour name matching
- * - InView entrance animations per card
- * - Live count on filter pill
+ * Design parity with OverviewPageV3:
+ * - Immersive hero with glass card (live/upcoming/recent)
+ * - Clean EventRow-style tournament cards (date block + content)
+ * - 40px section spacing (space-y-section)
+ * - Cleo typography: 22px section headers, 17px names, 13px metadata
+ * - Segmented filter pills + tour pills
+ * - URL-persisted filters
+ * - InView entrance animations
  */
 
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
@@ -17,14 +16,12 @@ import { useSearchParams } from 'react-router-dom';
 import { Search, X } from 'lucide-react';
 import { useTourSeason, useTourTournaments, type TourTournament } from '../../hooks/useTourHubData';
 import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
-import { useBatchCourseImages } from '../../hooks/useBatchCourseImages';
 import { TourHubEmptyState } from '../TourHubEmptyState';
 import { format, isAfter } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 
-// Import schedule components
 import {
   ScheduleFilterPills,
   type ScheduleFilterType,
@@ -43,7 +40,6 @@ interface MonthGroup {
   tournaments: TourTournament[];
 }
 
-// Debounce hook
 function useDebouncedValue<T>(value: T, delay: number): T {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
@@ -53,13 +49,12 @@ function useDebouncedValue<T>(value: T, delay: number): T {
   return debounced;
 }
 
-// InView card wrapper for staggered entrance
 function InViewCard({ children }: { children: React.ReactNode }) {
   const { ref, inView } = useInView({ threshold: 0.1, triggerOnce: true });
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={inView ? { opacity: 1, y: 0 } : undefined}
       transition={{ duration: 0.35 }}
     >
@@ -76,7 +71,6 @@ export function ScheduleTab() {
   const heroScrollRef = useRef<HTMLDivElement>(null);
   const [activeHeroIndex, setActiveHeroIndex] = useState(0);
   
-  // Filters from URL params
   const filter = (searchParams.get('filter') as ScheduleFilterType) || 'all';
   const activeTour = (searchParams.get('tour') as TourFilterCode) || 'all';
   
@@ -92,16 +86,11 @@ export function ScheduleTab() {
     setSearchParams(params, { replace: true });
   }, [searchParams, setSearchParams]);
 
-  // Debounce search
   const search = useDebouncedValue(searchInput, 200);
   
   const { data: season } = useTourSeason();
   const { data: tournaments, isLoading } = useTourTournaments(season?.id);
 
-  // Batch course images (replaces 366 individual queries)
-  const { data: batchImages } = useBatchCourseImages(tournaments);
-
-  // Collect live + completed tournament IDs for leader/winner fetch
   const { liveIds, completedIds } = useMemo(() => {
     if (!tournaments) return { liveIds: [] as string[], completedIds: [] as string[] };
     return {
@@ -112,11 +101,10 @@ export function ScheduleTab() {
 
   const { data: leadersWinnersMap } = useTournamentLeadersWinners([...liveIds, ...completedIds]);
 
-  // Dynamic hero: context-aware based on active status filter
+  // Dynamic hero
   const heroItems = useMemo(() => {
     if (!tournaments) return [];
     
-    // For completed filter: show most recent completed
     if (filter === 'completed') {
       const completed = tournaments
         .filter(t => t.status === 'closed')
@@ -127,7 +115,6 @@ export function ScheduleTab() {
         : [];
     }
 
-    // For live filter: show all live events as carousel
     if (filter === 'live') {
       return tournaments
         .filter(t => t.status === 'inprogress')
@@ -135,7 +122,6 @@ export function ScheduleTab() {
         .map(t => ({ tournament: t, type: 'live' as const }));
     }
 
-    // Default: prioritize live (carousel), then upcoming, then recent
     const liveTournaments = tournaments
       .filter(t => t.status === 'inprogress')
       .filter(t => activeTour === 'all' || t.tour_code === activeTour);
@@ -143,7 +129,6 @@ export function ScheduleTab() {
       return liveTournaments.map(t => ({ tournament: t, type: 'live' as const }));
     }
 
-    // Next upcoming
     const featured = getFeaturedTournament(
       activeTour === 'all' ? tournaments : tournaments.filter(t => t.tour_code === activeTour)
     );
@@ -166,90 +151,49 @@ export function ScheduleTab() {
     return () => container.removeEventListener('scroll', handleScroll);
   }, [heroItems.length]);
 
-  // Filter stats for pills
   const filterStats = useMemo(() => {
     if (!tournaments) return { all: 0, live: 0, upcoming: 0, completed: 0 };
-    
     const now = new Date();
-    const tourFiltered = activeTour === 'all' 
-      ? tournaments 
-      : tournaments.filter(t => t.tour_code === activeTour);
-    
+    const tourFiltered = activeTour === 'all' ? tournaments : tournaments.filter(t => t.tour_code === activeTour);
     return {
       all: tourFiltered.length,
       live: tourFiltered.filter(t => t.status === 'inprogress').length,
-      upcoming: tourFiltered.filter(t => 
-        t.status === 'scheduled' || t.status === 'created' || isAfter(new Date(t.start_date), now)
-      ).length,
+      upcoming: tourFiltered.filter(t => t.status === 'scheduled' || t.status === 'created' || isAfter(new Date(t.start_date), now)).length,
       completed: tourFiltered.filter(t => t.status === 'closed').length,
     };
   }, [tournaments, activeTour]);
 
-  // Tour counts (filtered by active status filter)
   const tourCounts = useMemo(() => {
     if (!tournaments) return {} as Record<string, number>;
-    
     const now = new Date();
     let statusFiltered = [...tournaments];
-    
     switch (filter) {
-      case 'upcoming':
-        statusFiltered = statusFiltered.filter(t => 
-          t.status === 'scheduled' || t.status === 'created' || isAfter(new Date(t.start_date), now)
-        );
-        break;
-      case 'completed':
-        statusFiltered = statusFiltered.filter(t => t.status === 'closed');
-        break;
-      case 'live':
-        statusFiltered = statusFiltered.filter(t => t.status === 'inprogress');
-        break;
+      case 'upcoming': statusFiltered = statusFiltered.filter(t => t.status === 'scheduled' || t.status === 'created' || isAfter(new Date(t.start_date), now)); break;
+      case 'completed': statusFiltered = statusFiltered.filter(t => t.status === 'closed'); break;
+      case 'live': statusFiltered = statusFiltered.filter(t => t.status === 'inprogress'); break;
     }
-    
     const counts: Record<string, number> = {};
-    for (const t of statusFiltered) {
-      if (t.tour_code) {
-        counts[t.tour_code] = (counts[t.tour_code] || 0) + 1;
-      }
-    }
+    for (const t of statusFiltered) { if (t.tour_code) counts[t.tour_code] = (counts[t.tour_code] || 0) + 1; }
     return counts;
   }, [tournaments, filter]);
 
-  // Get next upcoming tournament for empty state
   const nextUpcoming = useMemo(() => {
     if (!tournaments) return undefined;
-    const upcoming = tournaments
+    return tournaments
       .filter(t => t.status === 'scheduled' || t.status === 'created')
-      .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime());
-    return upcoming[0];
+      .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime())[0];
   }, [tournaments]);
 
-  // Filter tournaments (exclude featured from list)
   const filteredResults = useMemo(() => {
     if (!tournaments) return [];
-    
     let filtered = [...tournaments];
-
-    // Tour filter
-    if (activeTour !== 'all') {
-      filtered = filtered.filter(t => t.tour_code === activeTour);
-    }
-    
+    if (activeTour !== 'all') filtered = filtered.filter(t => t.tour_code === activeTour);
     const now = new Date();
     switch (filter) {
-      case 'upcoming':
-        filtered = filtered.filter(t => 
-          t.status === 'scheduled' || t.status === 'created' || isAfter(new Date(t.start_date), now)
-        );
-        break;
-      case 'completed':
-        filtered = filtered.filter(t => t.status === 'closed');
-        break;
-      case 'live':
-        filtered = filtered.filter(t => t.status === 'inprogress');
-        break;
+      case 'upcoming': filtered = filtered.filter(t => t.status === 'scheduled' || t.status === 'created' || isAfter(new Date(t.start_date), now)); break;
+      case 'completed': filtered = filtered.filter(t => t.status === 'closed'); break;
+      case 'live': filtered = filtered.filter(t => t.status === 'inprogress'); break;
     }
-    
     if (search) {
       const searchLower = search.toLowerCase();
       filtered = filtered.filter(t => 
@@ -260,52 +204,32 @@ export function ScheduleTab() {
         t.tour_full_name?.toLowerCase().includes(searchLower)
       );
     }
-
-    // Exclude hero tournament(s) from the list when on 'all' filter and no search
     if (filter === 'all' && !search && heroItems.length > 0) {
       const heroIds = new Set(heroItems.map(h => h.tournament.id));
       filtered = filtered.filter(t => !heroIds.has(t.id));
     }
-    
     return filtered;
   }, [tournaments, filter, activeTour, search, heroItems]);
 
-  // Group by month with sort order based on filter
   const monthGroups = useMemo((): (MonthGroup & { tourBreakdown: Record<string, number> })[] => {
     if (!filteredResults.length) return [];
-
     const groups = new Map<string, TourTournament[]>();
-    
     filteredResults.forEach(tournament => {
       const date = new Date(tournament.start_date);
       const monthKey = format(date, 'yyyy-MM');
       const existing = groups.get(monthKey) || [];
       groups.set(monthKey, [...existing, tournament]);
     });
-
     const entries = Array.from(groups.entries());
-    
-    // Completed: most recent first (reverse chronological)
     if (filter === 'completed') {
       entries.sort(([a], [b]) => b.localeCompare(a));
-      entries.forEach(([, tournaments]) => {
-        tournaments.sort((a, b) => 
-          new Date(b.start_date).getTime() - new Date(a.start_date).getTime()
-        );
-      });
+      entries.forEach(([, tournaments]) => tournaments.sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime()));
     } else {
       entries.sort(([a], [b]) => a.localeCompare(b));
     }
-
     return entries.map(([monthKey, tournaments]) => {
-      // Compute tour breakdown for this month
       const tourBreakdown: Record<string, number> = {};
-      for (const t of tournaments) {
-        if (t.tour_code) {
-          tourBreakdown[t.tour_code] = (tourBreakdown[t.tour_code] || 0) + 1;
-        }
-      }
-
+      for (const t of tournaments) { if (t.tour_code) tourBreakdown[t.tour_code] = (tourBreakdown[t.tour_code] || 0) + 1; }
       return {
         monthKey,
         monthLabel: format(new Date(tournaments[0].start_date), 'MMMM yyyy').toUpperCase(),
@@ -315,15 +239,13 @@ export function ScheduleTab() {
     });
   }, [filteredResults, filter]);
 
-  // Scroll to current month on load (only for 'all' or 'upcoming' with no search)
+  // Scroll to current month
   useEffect(() => {
     if (hasScrolledToNow || isLoading || !monthGroups.length) return;
     if (filter !== 'all' && filter !== 'upcoming') return;
     if (search) return;
-
     const currentMonthKey = format(new Date(), 'yyyy-MM');
     const targetEl = document.getElementById(`month-${currentMonthKey}`);
-    
     if (targetEl) {
       const timer = setTimeout(() => {
         targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -334,39 +256,22 @@ export function ScheduleTab() {
     setHasScrolledToNow(true);
   }, [hasScrolledToNow, isLoading, monthGroups, filter, search]);
 
-  // Loading state with cinematic shimmer
+  // Loading state
   if (isLoading) {
     return (
       <div className="space-y-6 -mx-4">
-        {/* Hero skeleton */}
-        <div className="animate-pulse bg-muted" style={{ height: '320px' }} />
-        
-        {/* Search skeleton */}
-        <div className="px-4">
-          <div className="h-12 bg-muted rounded-xl w-full max-w-md animate-pulse" />
-        </div>
-        
-        {/* Filters skeleton */}
-        <div className="px-4 space-y-2">
-          <div className="h-12 bg-muted rounded-xl animate-pulse" />
-          <div className="h-11 bg-muted rounded-xl animate-pulse w-3/4" />
-        </div>
-        
-        {/* Cards skeleton */}
-        <div className="space-y-4 mt-4 px-4">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div 
-              key={i} 
-              className="animate-pulse rounded-2xl bg-muted"
-              style={{ height: '220px' }}
-            />
+        <div className="animate-pulse bg-muted" style={{ height: '380px' }} />
+        <div className="px-4 space-y-3">
+          <div className="h-12 bg-muted rounded-xl w-full animate-pulse" />
+          <div className="h-11 bg-muted rounded-xl animate-pulse" />
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-20 bg-muted rounded-2xl animate-pulse" />
           ))}
         </div>
       </div>
     );
   }
   
-  // Empty state - no tournaments at all
   if (!tournaments || tournaments.length === 0) {
     return <TourHubEmptyState variant="schedule" />;
   }
@@ -374,10 +279,9 @@ export function ScheduleTab() {
   return (
     <div className="min-h-screen pb-24 -mx-4">
       
-      {/* Dynamic Hero — carousel when multiple live events */}
+      {/* Immersive Hero — glass card matching Overview HeroCarousel */}
       {filter !== 'live' && !search && heroItems.length > 0 && (
         <motion.div 
-          className="mb-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
@@ -390,7 +294,6 @@ export function ScheduleTab() {
             />
           ) : (
             <>
-              {/* Snap-scroll carousel for multiple live events */}
               <div 
                 ref={heroScrollRef}
                 className="flex snap-x snap-mandatory overflow-x-auto scrollbar-hide"
@@ -406,17 +309,11 @@ export function ScheduleTab() {
                   </div>
                 ))}
               </div>
-              {/* Page dots */}
               <div className="flex items-center justify-center gap-1.5 mt-2">
                 {heroItems.map((_, i) => (
                   <span
                     key={i}
-                    className={cn(
-                      'rounded-full transition-all duration-300',
-                      i === activeHeroIndex
-                        ? 'w-6 h-1.5 bg-foreground'
-                        : 'w-1.5 h-1.5 bg-foreground/25'
-                    )}
+                    className={i === activeHeroIndex ? "hero-dot-active" : "hero-dot-inactive"}
                   />
                 ))}
               </div>
@@ -425,55 +322,57 @@ export function ScheduleTab() {
         </motion.div>
       )}
 
-      {/* Content container with padding */}
-      <div className="px-4">
-        {/* Premium Glassmorphic Search Bar */}
-        <motion.div 
-          className="relative max-w-md mb-4"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.3 }}
-        >
-          <Search 
-            className={cn(
-              "absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-200",
-              isSearchFocused ? "text-foreground" : "text-muted-foreground"
-            )} 
-          />
-          <input
-            type="text"
-            placeholder="Search tournaments, venues, tours..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            onFocus={() => setIsSearchFocused(true)}
-            onBlur={() => setIsSearchFocused(false)}
-            className={cn(
-              "w-full h-12 pl-11 pr-10 rounded-xl text-[14px] transition-all duration-200",
-              "bg-card/80 backdrop-blur-sm border text-foreground placeholder:text-muted-foreground",
-              "focus:outline-none focus:ring-2 focus:bg-card",
-              isSearchFocused 
-                ? "border-border ring-border/50 shadow-lg" 
-                : "border-border/60 ring-transparent shadow-sm"
-            )}
-          />
-          <AnimatePresence>
-            {searchInput && (
-              <motion.button
-                onClick={() => setSearchInput('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-muted hover:bg-muted/80 transition-colors active:scale-90"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-              >
-                <X className="w-3.5 h-3.5 text-muted-foreground" />
-              </motion.button>
-            )}
-          </AnimatePresence>
-        </motion.div>
+      {/* Content below hero — matching Overview's bg-background + consistent spacing */}
+      <div className="bg-background pt-4">
+        {/* Search Bar */}
+        <div className="px-4">
+          <motion.div 
+            className="relative mb-4"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.3 }}
+          >
+            <Search 
+              className={cn(
+                "absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-200",
+                isSearchFocused ? "text-foreground" : "text-muted-foreground"
+              )} 
+            />
+            <input
+              type="text"
+              placeholder="Search tournaments, venues, tours..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onFocus={() => setIsSearchFocused(true)}
+              onBlur={() => setIsSearchFocused(false)}
+              className={cn(
+                "w-full h-12 pl-11 pr-10 rounded-xl text-[14px] transition-all duration-200",
+                "bg-card/80 backdrop-blur-sm border text-foreground placeholder:text-muted-foreground",
+                "focus:outline-none focus:ring-2 focus:bg-card",
+                isSearchFocused 
+                  ? "border-border ring-border/50 shadow-lg" 
+                  : "border-border/60 ring-transparent shadow-sm"
+              )}
+            />
+            <AnimatePresence>
+              {searchInput && (
+                <motion.button
+                  onClick={() => setSearchInput('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-muted hover:bg-muted/80 transition-colors active:scale-90"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                >
+                  <X className="w-3.5 h-3.5 text-muted-foreground" />
+                </motion.button>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        </div>
 
-        {/* Sticky Filter Toolbar — status pills + tour pills stick together */}
+        {/* Sticky Filter Toolbar */}
         <motion.div
-          className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm -mx-4 px-4 pb-2 space-y-2"
+          className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm px-4 pb-2 space-y-2"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.3 }}
@@ -489,82 +388,77 @@ export function ScheduleTab() {
             tourCounts={tourCounts}
           />
         </motion.div>
-      </div>
 
-      {/* No Live Message */}
-      {filter === 'live' && filterStats.live === 0 && (
-        <motion.div
-          className="mt-6"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <ScheduleEmptyMessage 
-            variant="no-live" 
-            nextTournamentName={nextUpcoming?.name}
-          />
-        </motion.div>
-      )}
-      
-      {/* Event Cards - Grouped by Month */}
-      <AnimatePresence mode="wait">
-        {monthGroups.length > 0 ? (
-          <motion.div 
-            className="space-y-6 mt-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            {monthGroups.map((group, groupIndex) => (
-              <motion.div 
-                key={group.monthKey}
-                id={`month-${group.monthKey}`}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: groupIndex * 0.05, duration: 0.3 }}
-              >
-                {/* Month Header */}
-                <ScheduleMonthHeader 
-                  monthLabel={group.monthLabel}
-                  eventCount={group.tournaments.length}
-                  tourBreakdown={group.tourBreakdown}
-                />
-
-                {/* Tournament Cards - Full width with spacing + InView entrance */}
-                <div className="space-y-3 mt-3 -mx-4">
-                  {group.tournaments.map((tournament) => (
-                    <InViewCard key={tournament.id}>
-                      <ScheduleTournamentCard 
-                        tournament={tournament}
-                        leaderWinner={leadersWinnersMap?.get(tournament.id)}
-                        batchImageUrl={
-                          tournament.venue_name
-                            ? batchImages?.get(tournament.venue_name) ?? undefined
-                            : undefined
-                        }
-                      />
-                    </InViewCard>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        ) : (
+        {/* No Live Message */}
+        {filter === 'live' && filterStats.live === 0 && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            className="mt-6 px-4"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
           >
-            <ScheduleEmptyMessage variant="no-results" />
+            <ScheduleEmptyMessage 
+              variant="no-live" 
+              nextTournamentName={nextUpcoming?.name}
+            />
           </motion.div>
         )}
-      </AnimatePresence>
+        
+        {/* Event Cards — Grouped by Month with 40px section spacing */}
+        <AnimatePresence mode="wait">
+          {monthGroups.length > 0 ? (
+            <motion.div 
+              className="space-y-section mt-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              {monthGroups.map((group, groupIndex) => (
+                <motion.div 
+                  key={group.monthKey}
+                  id={`month-${group.monthKey}`}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: groupIndex * 0.05, duration: 0.3 }}
+                >
+                  <ScheduleMonthHeader 
+                    monthLabel={group.monthLabel}
+                    eventCount={group.tournaments.length}
+                    tourBreakdown={group.tourBreakdown}
+                  />
 
-      {/* Season Complete Message */}
-      {filterStats.upcoming === 0 && filterStats.live === 0 && filterStats.completed > 0 && filter === 'all' && !search && (
-        <div className="pt-8 border-t border-border mt-8">
-          <ScheduleEmptyMessage variant="season-complete" />
-        </div>
-      )}
+                  {/* Tournament list — clean EventRow cards */}
+                  <div className="flex flex-col gap-2 px-4">
+                    {group.tournaments.map((tournament) => (
+                      <InViewCard key={tournament.id}>
+                        <ScheduleTournamentCard 
+                          tournament={tournament}
+                          leaderWinner={leadersWinnersMap?.get(tournament.id)}
+                        />
+                      </InViewCard>
+                    ))}
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          ) : (
+            <motion.div
+              className="px-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <ScheduleEmptyMessage variant="no-results" />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Season Complete Message */}
+        {filterStats.upcoming === 0 && filterStats.live === 0 && filterStats.completed > 0 && filter === 'all' && !search && (
+          <div className="pt-8 border-t border-border mt-8 px-4">
+            <ScheduleEmptyMessage variant="season-complete" />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
