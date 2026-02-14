@@ -368,14 +368,19 @@ async function checkForLiveLeaderboard(
 // ── Sportradar fetch helper ──────────────────────────────────────────
 
 async function fetchSportradar(url: string, apiKey: string, description: string) {
+  console.log(`[LiveSync] Fetching URL: ${url}`);
   const response = await fetch(url, {
     headers: { 'x-api-key': apiKey, 'Accept': 'application/json' }
   });
   if (!response.ok) {
     const errorText = await response.text();
+    console.error(`[LiveSync] API error for ${description}: HTTP ${response.status}, body: ${errorText.substring(0, 300)}`);
     throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 200)}`);
   }
-  return await response.json();
+  const data = await response.json();
+  const bodyStr = JSON.stringify(data);
+  console.log(`[LiveSync] API response: ${response.status}, body length: ${bodyStr.length}, keys: ${Object.keys(data).join(',')}`);
+  return data;
 }
 
 // ── Leaderboard sync ─────────────────────────────────────────────────
@@ -390,15 +395,34 @@ async function syncLeaderboard(
   tournamentSrId: string, tournamentDbId: string
 ): Promise<LeaderboardSyncResult> {
   const url = `${getTourBaseUrl(tour)}/${year}/tournaments/${tournamentSrId}/leaderboard.json`;
+  console.log(`[LiveSync] syncLeaderboard → tour=${tour}, year=${year}, sr_id=${tournamentSrId}`);
   const data = await fetchSportradar(url, apiKey, 'Leaderboard');
 
   const sportradarStatus = data.status || data.tournament?.status;
   const leaderboard = data.leaderboard || [];
+  console.log(`[LiveSync] Leaderboard entries: ${leaderboard.length}, sportradar status: ${sportradarStatus}, tournament.name: ${data.tournament?.name || 'N/A'}`);
+
+  if (leaderboard.length === 0) {
+    console.warn(`[LiveSync] ⚠ EMPTY leaderboard! Data keys: ${Object.keys(data).join(',')}, tournament keys: ${Object.keys(data.tournament || {}).join(',')}`);
+    if (data.tournament) {
+      console.log(`[LiveSync] Tournament from API: id=${data.tournament.id}, name=${data.tournament.name}, status=${data.tournament.status}`);
+    }
+  }
+
+  if (leaderboard[0]) {
+    console.log(`[LiveSync] Sample entry: ${JSON.stringify(leaderboard[0]).substring(0, 300)}`);
+  }
+
   let records = 0;
 
   for (const entry of leaderboard) {
-    const playerSrId = entry.player?.id;
+    // Support both nested (entry.player.id) and flat (entry.id) Sportradar formats
+    const playerSrId = entry.player?.id || entry.id;
     if (!playerSrId) continue;
+
+    const firstName = entry.player?.first_name || entry.first_name;
+    const lastName = entry.player?.last_name || entry.last_name;
+    const country = entry.player?.country || entry.country;
 
     let { data: player } = await supabase
       .from('sr_players').select('id').eq('sr_id', playerSrId).maybeSingle();
@@ -406,10 +430,10 @@ async function syncLeaderboard(
     if (!player) {
       const { data: newPlayer } = await supabase.from('sr_players').insert({
         sr_id: playerSrId,
-        first_name: entry.player?.first_name,
-        last_name: entry.player?.last_name,
-        full_name: `${entry.player?.first_name || ''} ${entry.player?.last_name || ''}`.trim(),
-        country: entry.player?.country,
+        first_name: firstName,
+        last_name: lastName,
+        full_name: `${firstName || ''} ${lastName || ''}`.trim(),
+        country: country,
       }).select().single();
       player = newPlayer;
     }
@@ -438,7 +462,11 @@ async function syncLeaderboard(
         raw_data: entry,
       }, { onConflict: 'tournament_id,player_id' });
 
-      if (!error) records++;
+      if (error) {
+        console.error(`[LiveSync] Upsert error for player ${playerSrId}:`, error.message);
+      } else {
+        records++;
+      }
     }
   }
 
