@@ -446,9 +446,7 @@ export function TourHubNavOverlay({
                               >
                                 {headshot ? (
                                   <div className="relative w-full h-full">
-                                    <div className="absolute inset-0 flex items-center justify-center bg-muted">
-                                      <span className="text-[9px] font-bold text-muted-foreground">{initials}</span>
-                                    </div>
+                                    <div className="absolute inset-0 bg-muted" />
                                     <img 
                                       src={headshot}
                                       alt={player.playerName}
@@ -458,9 +456,7 @@ export function TourHubNavOverlay({
                                     />
                                   </div>
                                 ) : (
-                                  <div className="w-full h-full flex items-center justify-center bg-muted">
-                                    <span className="text-[9px] font-bold text-muted-foreground">{initials}</span>
-                                  </div>
+                                  <div className="w-full h-full bg-muted" />
                                 )}
                               </div>
                             );

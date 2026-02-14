@@ -152,9 +152,7 @@ function MomentumPill({ entry, index, direction, onTap }: MomentumPillProps) {
               />
             )}
             {showInitials && (
-              <div className="w-full h-full flex items-center justify-center bg-muted">
-                <span className="text-[9px] font-bold text-muted-foreground">{initials}</span>
-              </div>
+              <div className="w-full h-full flex items-center justify-center bg-muted" />
             )}
           </div>
 
@@ -568,11 +566,8 @@ function PlayerAvatar({ photoUrl, initials, fullName }: { photoUrl: string | nul
           style={{ display: imgLoaded ? 'block' : 'none' }}
         />
       )}
-      {/* Show initials ONLY when no photo or photo hasn't loaded */}
       {(!showPhoto || !imgLoaded) && (
-        <div className="w-full h-full flex items-center justify-center bg-muted">
-          <span className="text-xs font-bold text-muted-foreground">{initials}</span>
-        </div>
+        <div className="w-full h-full flex items-center justify-center bg-muted" />
       )}
     </div>
   );

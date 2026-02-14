@@ -86,15 +86,11 @@ const ChaserCard = memo(function ChaserCard({
               />
             ) : (
               <div
-                className="w-full h-full flex items-center justify-center"
+                className="w-full h-full"
                 style={{
                   background: `linear-gradient(135deg, ${accent.bgMedium} 0%, ${accent.bgLight} 100%)`,
                 }}
-              >
-                <span style={{ fontSize: '18px', fontWeight: 700, color: accent.textMuted }}>
-                  {player.initials}
-                </span>
-              </div>
+              />
             )}
           </div>
         </div>

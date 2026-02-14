@@ -310,9 +310,7 @@ export function WorldRankingsModule() {
 
                             return (
                               <div className="relative w-full h-full">
-                                <div className="absolute inset-0 flex items-center justify-center bg-slate-200">
-                                  <span className="text-[10px] font-bold text-slate-400">{initials}</span>
-                                </div>
+                                <div className="absolute inset-0 bg-slate-200" />
 
                                 {photoUrl && (
                                   <img

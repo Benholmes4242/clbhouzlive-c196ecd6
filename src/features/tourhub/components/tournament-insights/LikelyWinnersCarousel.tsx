@@ -129,11 +129,9 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
               />
             ) : (
               <div 
-                className={`w-14 h-14 rounded-[14px] ${avatarColors[0]} flex items-center justify-center text-lg font-extrabold text-white tracking-tight`}
+                className={`w-14 h-14 rounded-[14px] bg-muted`}
                 style={{ border: '2px solid rgba(255, 184, 0, 0.3)' }}
-              >
-                {getInitials(featured.name)}
-              </div>
+              />
             )}
             {/* #1 badge overlapping top-left */}
             <div 
@@ -245,10 +243,8 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                       />
                     ) : (
                       <div 
-                        className={`w-12 h-12 rounded-xl ${avatarColors[(i + 1) % avatarColors.length]} flex items-center justify-center text-sm font-extrabold text-white border border-border`}
-                      >
-                        {getInitials(card.name)}
-                      </div>
+                        className="w-12 h-12 rounded-xl bg-muted border border-border"
+                      />
                     )}
 
                     {/* Rank badge */}
@@ -352,11 +348,9 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                       />
                     ) : (
                       <div 
-                        className={`w-12 h-12 rounded-xl ${avatarColors[(i + 1) % avatarColors.length]} flex items-center justify-center text-sm font-extrabold text-white`}
+                        className="w-12 h-12 rounded-xl bg-muted"
                         style={{ border: '1px solid rgba(245, 158, 11, 0.15)' }}
-                      >
-                        {getInitials(card.name)}
-                      </div>
+                      />
                     )}
 
                     {/* Lightning badge */}
