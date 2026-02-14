@@ -252,8 +252,9 @@ export function useLiveArena() {
   return useQuery({
     queryKey: ['live-arena'],
     queryFn: fetchLiveArenaData,
-    staleTime: 1000 * 60 * 2, // 2 minutes
-    refetchInterval: 1000 * 60 * 2, // Auto-refresh every 2 minutes
+    staleTime: 5 * 1000,          // 5s — Realtime handles freshness
+    refetchInterval: false,        // No polling — Realtime pushes updates
+    refetchOnWindowFocus: true,
     gcTime: 1000 * 60 * 10, // 10 minutes
   });
 }

@@ -7,7 +7,7 @@ import type { TourHubTab } from '../components/TourHubTabs';
 // TourHubEmptyState available if needed for future tab variants
 import { OverviewTab, ScheduleTab, PlayersTab, LeadersTab } from '../components/tabs';
 import { TourNavProvider, useTourNav } from '../contexts/TourNavContext';
-import { useLiveTournamentSync } from '../hooks/useLiveTournamentSync';
+import { useTournamentStatusRealtime } from '../hooks/useTournamentStatusRealtime';
 
 function TourHubMainPageInner() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -15,14 +15,8 @@ function TourHubMainPageInner() {
   const [activeTab, setActiveTab] = useState<TourHubTab>(tabParam || 'overview');
   const { isNavOpen, closeNav } = useTourNav();
   
-  // Background live tournament sync - runs in background every 60s when live tournaments exist
-  const { isLive, liveTournaments } = useLiveTournamentSync();
-  
-  useEffect(() => {
-    if (isLive) {
-      console.log(`[TourHub] ${liveTournaments.length} live tournament(s) detected, background sync active`);
-    }
-  }, [isLive, liveTournaments.length]);
+  // Subscribe to tournament status changes (live/completed transitions)
+  useTournamentStatusRealtime();
   
   // Sync tab with URL + redirect legacy player-stats to leaderboards
   useEffect(() => {

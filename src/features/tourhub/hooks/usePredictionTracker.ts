@@ -22,10 +22,10 @@ export function usePredictionTracker(
   return useQuery({
     queryKey: ['prediction-tracker', tournamentId],
     queryFn: () => fetchTrackerData(tournamentId!, predictions!),
-    staleTime: 2 * 60 * 1000,
+    staleTime: 5 * 1000,          // 5s — Realtime handles freshness
     gcTime: 10 * 60 * 1000,
     refetchOnWindowFocus: true,
-    refetchInterval: 3 * 60 * 1000,
+    refetchInterval: false,        // No polling — Realtime pushes updates
     retry: 2,
     enabled: !!tournamentId && !!predictions,
   });
