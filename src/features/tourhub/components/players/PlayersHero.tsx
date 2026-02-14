@@ -54,15 +54,9 @@ function RunnerCard({ player, index }: { player: ElitePlayer; index: number }) {
       className="flex-shrink-0 flex items-center gap-2.5 px-3 py-2.5 rounded-2xl active:scale-[0.97] transition-transform"
       style={{
         scrollSnapAlign: 'start',
-        background: isFirst
-          ? 'linear-gradient(135deg, rgba(251, 191, 36, 0.12) 0%, rgba(245, 158, 11, 0.08) 100%)'
-          : 'rgba(255, 255, 255, 0.6)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
-        border: isFirst
-          ? '1.5px solid rgba(245, 158, 11, 0.35)'
-          : '1px solid rgba(255, 255, 255, 0.5)',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04), 0 0 1px rgba(0, 0, 0, 0.08)',
+        background: 'hsl(var(--card))',
+        border: '1px solid hsl(var(--border) / 0.4)',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06), 0 0 1px rgba(0, 0, 0, 0.08)',
         minWidth: '140px',
       }}
     >
@@ -192,7 +186,7 @@ export function PlayersHero({ players, activeTour }: PlayersHeroProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.35 }}
               className="px-4"
-              style={{ marginTop: '-84px', position: 'relative', zIndex: 10 }}
+              style={{ marginTop: '-42px', position: 'relative', zIndex: 10 }}
             >
               <div
                 className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-hide"
