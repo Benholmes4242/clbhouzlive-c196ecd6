@@ -165,7 +165,7 @@ export function PlayersTab() {
   // Loading skeleton
   if (isLoading) {
     return (
-      <div className="space-y-4 py-6 -mx-4">
+      <div className="space-y-4 py-6">
         <div className="bg-muted/40 animate-pulse" style={{ height: 'clamp(282px, 53vh, 422px)' }} />
         <div className="px-4 space-y-3">
           <div className="bg-muted/40 h-12 rounded-xl animate-pulse" />
@@ -179,7 +179,7 @@ export function PlayersTab() {
   }
 
   return (
-    <div className="pb-6 -mx-4">
+    <div className="pb-6">
       {/* Hero */}
       {showHero && heroPlayers.length > 0 && (
         <PlayersHero players={heroPlayers} activeTour={activeTour} />
