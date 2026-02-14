@@ -1282,7 +1282,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
             {/* Header - Centered clean design */}
             <div 
               className={cn(
-                "relative z-10 flex-shrink-0 pt-[max(env(safe-area-inset-top,0px),0px)] border-b",
+                "relative z-10 flex-shrink-0 pt-[max(env(safe-area-inset-top,0px),47px)] border-b",
                 isDark ? "border-white/8" : "border-border/50"
               )}
               style={isDark ? {
