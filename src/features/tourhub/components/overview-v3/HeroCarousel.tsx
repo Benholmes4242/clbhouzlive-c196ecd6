@@ -122,9 +122,7 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, hasTie
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-white/10">
-                <span style={{ fontSize: '8px', fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>{initials}</span>
-              </div>
+              <div className="w-full h-full bg-white/10" />
             )}
           </div>
           <span className={cn("leaderboard-name truncate", isFirst && "font-bold")}>

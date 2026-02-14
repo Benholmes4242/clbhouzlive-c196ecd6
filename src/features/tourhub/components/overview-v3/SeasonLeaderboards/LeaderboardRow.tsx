@@ -101,22 +101,13 @@ export const LeaderboardRow = memo(function LeaderboardRow({
           />
         ) : null}
         <div 
-          className="fallback-initials w-full h-full flex items-center justify-center"
+          className="fallback-initials w-full h-full"
           style={{ 
             display: photoUrl ? 'none' : 'flex',
             background: `linear-gradient(135deg, ${accent.bgMedium} 0%, ${accent.bgLight} 100%)`,
             transition: 'background 0.3s ease',
           }}
-        >
-          <span style={{ 
-            fontSize: '14px', 
-            fontWeight: 700, 
-            color: accent.textMuted,
-            transition: 'color 0.3s ease',
-          }}>
-            {player.initials}
-          </span>
-        </div>
+        />
       </div>
 
       {/* Player Info - CSS ellipsis, no hard truncation */}
