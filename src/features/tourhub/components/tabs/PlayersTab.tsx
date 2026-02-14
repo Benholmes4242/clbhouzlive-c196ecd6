@@ -238,9 +238,7 @@ export function PlayersTab() {
       <div className="space-y-3 mt-4 px-4">
         {/* Count + sort row */}
         <div className="flex items-center justify-between px-0.5">
-          <p className="text-[13px] text-muted-foreground tabular-nums">
-            {totalCount} player{totalCount !== 1 ? 's' : ''}
-          </p>
+          <div />
           <PlayerSortControl value={sort} onChange={(v) => { setSort(v); setVisibleCount(PAGE_SIZE); }} />
         </div>
 
