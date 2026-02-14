@@ -59,7 +59,9 @@ export function PlayerCardV2({
   showTourBadge = true,
   index = 0,
 }: PlayerCardV2Props) {
-  const photoUrl = batchHeadshotUrl ?? resolvePhotoUrl(player.photoUrl, player.pgaTourId);
+  // Filter out ui-avatars.com from batch headshots, then fall back to resolvePhotoUrl (uses Cloudinary if pgaTourId exists)
+  const filteredBatchUrl = batchHeadshotUrl && !batchHeadshotUrl.includes('ui-avatars.com') ? batchHeadshotUrl : null;
+  const photoUrl = filteredBatchUrl ?? resolvePhotoUrl(player.photoUrl, player.pgaTourId);
   const flag = countryCodeToFlag(player.countryCode);
   const countryName = titleCaseCountry(player.country);
   const tourLabel = showTourBadge ? getTourLabel(player.tourCodes) : null;

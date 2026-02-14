@@ -117,8 +117,9 @@ export function PlayersHero({ players, activeTour }: PlayersHeroProps) {
     ? '#1 · World'
     : `#1 · ${TOUR_LABELS[activeTour]}`;
 
+  // 10% taller hero: clamp(282px, 53vh, 422px)
   return (
-    <div className="space-y-4">
+    <div className="relative">
       <AnimatePresence mode="wait">
         <motion.div
           key={champion.playerId}
@@ -131,7 +132,8 @@ export function PlayersHero({ players, activeTour }: PlayersHeroProps) {
             to={`/tourhub/player/${champion.playerId}`}
             className="block active:scale-[0.995] transition-transform"
           >
-            <div className="relative w-full overflow-hidden rounded-2xl" style={{ height: 'clamp(256px, 48vh, 384px)' }}>
+            {/* Straight-edge hero (no rounded corners) */}
+            <div className="relative w-full overflow-hidden" style={{ height: 'clamp(282px, 53vh, 422px)' }}>
               {photoUrl ? (
                 <motion.img
                   src={photoUrl}
@@ -179,34 +181,18 @@ export function PlayersHero({ players, activeTour }: PlayersHeroProps) {
                   {flag && <span className="text-lg">{flag}</span>}
                   <span className="text-sm text-white/80">{country}</span>
                 </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3, duration: 0.4 }}
-                  className="flex gap-2 pt-1"
-                >
-                  {champion.avgPoints != null && (
-                    <StatPill label="AVG PTS" value={champion.avgPoints.toFixed(2)} highlight />
-                  )}
-                  {champion.rankChange != null && champion.rankChange !== 0 && (
-                    <StatPill
-                      label="RANK Δ"
-                      value={champion.rankChange > 0 ? `+${champion.rankChange}` : String(champion.rankChange)}
-                    />
-                  )}
-                </motion.div>
               </div>
             </div>
           </Link>
 
-          {/* Runner row — WorldRankingsShowcase style */}
+          {/* Runner row — overlaps the hero by ~20% */}
           {runners.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.35 }}
-              className="mt-4"
+              className="px-4"
+              style={{ marginTop: '-84px', position: 'relative', zIndex: 10 }}
             >
               <div
                 className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-hide"

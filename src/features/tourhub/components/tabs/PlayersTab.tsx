@@ -165,45 +165,44 @@ export function PlayersTab() {
   // Loading skeleton
   if (isLoading) {
     return (
-      <div className="space-y-4 py-6">
-        <div className="rounded-2xl bg-muted/40 animate-pulse" style={{ height: 'clamp(256px, 48vh, 384px)' }} />
-        <div className="bg-muted/40 h-11 rounded-xl animate-pulse" />
-        <div className="bg-muted/40 h-11 rounded-xl animate-pulse" />
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="h-[110px] bg-muted/20 rounded-xl animate-pulse" />
-        ))}
+      <div className="space-y-4 py-6 -mx-4">
+        <div className="bg-muted/40 animate-pulse" style={{ height: 'clamp(282px, 53vh, 422px)' }} />
+        <div className="px-4 space-y-3">
+          <div className="bg-muted/40 h-12 rounded-xl animate-pulse" />
+          <div className="bg-muted/40 h-11 rounded-xl animate-pulse" />
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-[110px] bg-muted/20 rounded-xl animate-pulse" />
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="pb-6">
+    <div className="pb-6 -mx-4">
       {/* Hero */}
       {showHero && heroPlayers.length > 0 && (
         <PlayersHero players={heroPlayers} activeTour={activeTour} />
       )}
 
-      {/* Sticky toolbar */}
-      <div className={cn(
-        "sticky top-0 z-20",
-        "bg-[#F8FAFC]",
-        "-mx-4 px-4 pt-4 pb-2 space-y-2",
-        "border-b border-border/5",
-      )}>
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-muted-foreground z-10" strokeWidth={2.5} />
+      {/* Search Bar — matches schedule page width/style (inside px-4 wrapper) */}
+      <div className="px-4 pt-4">
+        <div className="relative mb-4">
+          <Search 
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-muted-foreground w-[18px] h-[18px]"
+            strokeWidth={2.5}
+          />
           <input
             type="text"
             placeholder="Search players, countries..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className={cn(
-              "w-full h-11 pl-10 pr-10",
-              "bg-card border border-border/40",
-              "rounded-xl text-sm text-foreground placeholder:text-muted-foreground/60",
-              "focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30",
-              "transition-all"
+              "w-full h-12 pl-11 pr-10 rounded-xl text-[14px] transition-all duration-200",
+              "bg-card/80 backdrop-blur-sm border text-foreground placeholder:text-muted-foreground",
+              "focus:outline-none focus:ring-2 focus:bg-card",
+              "border-border/60 ring-transparent shadow-sm",
+              "focus:border-border focus:ring-border/50 focus:shadow-lg"
             )}
           />
           <AnimatePresence>
@@ -213,15 +212,21 @@ export function PlayersTab() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
                 onClick={() => setSearch('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full bg-muted hover:bg-muted/80 active:scale-[0.9] transition-transform"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-muted hover:bg-muted/80 active:scale-[0.9] transition-transform"
               >
                 <X className="w-3.5 h-3.5 text-muted-foreground" />
               </motion.button>
             )}
           </AnimatePresence>
         </div>
+      </div>
 
-        {/* Tour filter pills */}
+      {/* Sticky toolbar — tour filter pills with px-4 for 16px viewport gap */}
+      <div className={cn(
+        "sticky top-0 z-20",
+        "bg-background/95 backdrop-blur-sm",
+        "px-4 pb-2 space-y-2",
+      )}>
         <PlayersTourFilter
           activeTour={activeTour}
           onTourChange={setActiveTour}
@@ -230,7 +235,7 @@ export function PlayersTab() {
       </div>
 
       {/* Content */}
-      <div className="space-y-3 mt-4">
+      <div className="space-y-3 mt-4 px-4">
         {/* Count + sort row */}
         <div className="flex items-center justify-between px-0.5">
           <p className="text-[13px] text-muted-foreground tabular-nums">
