@@ -12,10 +12,10 @@ import { useLiveRightNow, type LiveTournamentWithLeader } from '../../hooks/useO
 import { useVenueImage } from '../../hooks/useVenueImage';
 import '@/styles/hero-glass.css';
 
-// Score color helper - PGA Tour convention: under par = red
+// Score color helper - unified palette
 function getScoreColor(scoreDisplay: string): string {
-  if (scoreDisplay.startsWith('-')) return '#f59e0b'; // Outstanding amber = under par
-  if (scoreDisplay.startsWith('+')) return '#111827'; // Neutral dark for over par
+  if (scoreDisplay.startsWith('-')) return '#E09F3E'; // Amber/gold = under par
+  if (scoreDisplay.startsWith('+')) return '#D62828'; // Red = over par
   return 'rgba(0, 0, 0, 0.4)';
 }
 
@@ -106,14 +106,14 @@ function LiveTournamentCard({
         >
           <span 
             className="w-[5px] h-[5px] rounded-full animate-live-pulse"
-            style={{ background: '#f59e0b' }}
+            style={{ background: '#22C55E' }}
           />
           <span 
             className="uppercase font-bold"
             style={{ 
               fontSize: '10px',
               letterSpacing: '0.8px',
-              color: '#f59e0b',
+              color: '#22C55E',
             }}
           >
             LIVE
@@ -126,7 +126,7 @@ function LiveTournamentCard({
         <div className="flex-1 min-w-0">
           {/* Tournament name - single line truncated */}
           <h3 
-            className="text-[15px] font-bold mb-[3px] truncate text-foreground"
+            className="text-[17px] font-semibold mb-[3px] truncate text-foreground"
             style={{ letterSpacing: '-0.2px' }}
           >
             {tournament.name}
@@ -134,7 +134,7 @@ function LiveTournamentCard({
           
           {/* Leader name */}
           {tournament.leader ? (
-            <span className="text-[12.5px] font-normal truncate block text-muted-foreground">
+            <span className="text-[14px] font-normal truncate block text-muted-foreground">
               {tournament.leader.name}
             </span>
           ) : (
@@ -171,17 +171,14 @@ export function LiveRightNow() {
   }
 
   return (
-    <section 
-      className="pt-7 bg-background"
-      style={{ marginBottom: '24px' }}
-    >
-      {/* Header — FIX 2: Design system section label */}
+    <section className="bg-background">
+      {/* Header */}
       <div className="flex items-center gap-2 mb-4 px-4">
         <span 
           className="w-2 h-2 rounded-full animate-live-pulse"
           style={{ 
-            background: '#f59e0b',
-            boxShadow: '0 0 10px rgba(245, 158, 11, 0.45)',
+            background: '#22C55E',
+            boxShadow: '0 0 10px rgba(34, 197, 94, 0.45)',
           }}
         />
         <h2 className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
