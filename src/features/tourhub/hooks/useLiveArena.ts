@@ -18,6 +18,7 @@ export interface LiveArenaPlayer {
   score: number;
   scoreDisplay: string;
   thru: string | null;
+  thruUpdatedAt: string | null;
   money: number | null;
   player: {
     id: string;
@@ -43,6 +44,7 @@ export interface LiveArenaTournament {
   venueYardage: number | null;
   startDate: string;
   endDate: string;
+  timezone: string | null;
   
   // Leader data
   leader: LiveArenaPlayer | null;
@@ -155,6 +157,7 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
         score,
         money,
         thru,
+        thru_updated_at,
         player:sr_players!sr_leaderboards_player_id_fkey (
           id,
           first_name,
@@ -181,6 +184,7 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
       score: entry.score || 0,
       scoreDisplay: formatScore(entry.score),
       thru: entry.thru,
+      thruUpdatedAt: entry.thru_updated_at ?? null,
       money: entry.money,
       player: {
         id: entry.player?.id || '',
@@ -232,6 +236,7 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
       venueYardage: tournament.venue_yardage,
       startDate: tournament.start_date || '',
       endDate: tournament.end_date || '',
+      timezone: tournament.timezone ?? null,
       leader,
       chasePack,
       volatilityIndex: volatility,

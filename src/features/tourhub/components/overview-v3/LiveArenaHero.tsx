@@ -18,6 +18,7 @@ import { useLiveArena, type LiveArenaTournament, type LiveArenaPlayer } from '..
 import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 import { getTourLogo } from '../../utils/tourLogos';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
+import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import '@/styles/hero-glass.css';
 
 // TOUR_CONFIG for styling
@@ -288,14 +289,17 @@ function LiveArenaSlide({
                 <span className={cn("text-2xl font-bold", getScoreClass(tournament.leader.score))}>
                   {tournament.leader.scoreDisplay}
                 </span>
-                {tournament.leader.thru != null && Number(tournament.leader.thru) > 0 && Number(tournament.leader.thru) < 18 && (
-                  <span className="text-white/50 text-sm">
-                    thru {tournament.leader.thru}
-                  </span>
-                )}
-                {tournament.leader.thru != null && Number(tournament.leader.thru) >= 18 && (
-                  <span className="text-white/50 text-sm">F</span>
-                )}
+                {(() => {
+                  const display = formatThruDisplay(
+                    tournament.leader.thru, null, null, null, null,
+                    null, tournament.leader.thruUpdatedAt, tournament.timezone
+                  );
+                  return display ? (
+                    <span className="text-white/50 text-sm">
+                      {display === 'F' ? 'F' : `thru ${display}`}
+                    </span>
+                  ) : null;
+                })()}
               </div>
             </div>
           </div>

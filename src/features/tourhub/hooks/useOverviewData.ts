@@ -669,6 +669,8 @@ export interface LeaderEntry {
   round_3: number | null;
   round_4: number | null;
   updatedAt: string | null;
+  thruUpdatedAt: string | null;
+  tournamentTimezone: string | null;
   player: {
     id: string;
     firstName: string;
@@ -690,6 +692,15 @@ export function useTournamentTopLeaders(tournamentId: string | null) {
     queryFn: async (): Promise<LeaderEntry[]> => {
       if (!tournamentId) return [];
 
+      // First fetch tournament timezone
+      const { data: tournamentData } = await supabase
+        .from('sr_tournaments')
+        .select('timezone')
+        .eq('id', tournamentId!)
+        .maybeSingle();
+
+      const tournamentTimezone = tournamentData?.timezone ?? null;
+
       const { data, error } = await supabase
         .from('sr_leaderboards')
         .select(`
@@ -699,6 +710,7 @@ export function useTournamentTopLeaders(tournamentId: string | null) {
           thru,
           status,
           updated_at,
+          thru_updated_at,
           round_1,
           round_2,
           round_3,
@@ -712,7 +724,7 @@ export function useTournamentTopLeaders(tournamentId: string | null) {
             pga_tour_id
           )
         `)
-        .eq('tournament_id', tournamentId)
+        .eq('tournament_id', tournamentId!)
         .gt('strokes', 0)
         .not('position', 'is', null)
         .order('position', { ascending: true })
@@ -732,6 +744,8 @@ export function useTournamentTopLeaders(tournamentId: string | null) {
           thru: row.thru,
           status: row.status ?? null,
           updatedAt: row.updated_at ?? null,
+          thruUpdatedAt: row.thru_updated_at ?? null,
+          tournamentTimezone,
           round_1: row.round_1 ?? null,
           round_2: row.round_2 ?? null,
           round_3: row.round_3 ?? null,
