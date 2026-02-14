@@ -347,8 +347,13 @@ async function syncFinalLeaderboard(
   let records = 0;
 
   for (const entry of leaderboard) {
-    const playerSrId = entry.player?.id;
+    // Support both nested (entry.player.id) and flat (entry.id) Sportradar formats
+    const playerSrId = entry.player?.id || entry.id;
     if (!playerSrId) continue;
+
+    const firstName = entry.player?.first_name || entry.first_name;
+    const lastName = entry.player?.last_name || entry.last_name;
+    const country = entry.player?.country || entry.country;
 
     // Find or create player
     let { data: player } = await supabase
@@ -360,15 +365,16 @@ async function syncFinalLeaderboard(
     if (!player) {
       const { data: newPlayer } = await supabase.from('sr_players').insert({
         sr_id: playerSrId,
-        first_name: entry.player?.first_name,
-        last_name: entry.player?.last_name,
-        full_name: `${entry.player?.first_name || ''} ${entry.player?.last_name || ''}`.trim(),
-        country: entry.player?.country,
+        first_name: firstName,
+        last_name: lastName,
+        full_name: `${firstName || ''} ${lastName || ''}`.trim(),
+        country: country,
       }).select().single();
       player = newPlayer;
     }
 
     if (player) {
+      const rounds = entry.rounds || [];
       const { error } = await supabase.from('sr_leaderboards').upsert({
         tournament_id: tournamentDbId,
         player_id: player.id,
@@ -377,10 +383,10 @@ async function syncFinalLeaderboard(
         score: entry.score,
         strokes: entry.strokes,
         thru: entry.thru,
-        round_1: entry.rounds?.[0]?.strokes,
-        round_2: entry.rounds?.[1]?.strokes,
-        round_3: entry.rounds?.[2]?.strokes,
-        round_4: entry.rounds?.[3]?.strokes,
+        round_1: rounds[0]?.strokes,
+        round_2: rounds[1]?.strokes,
+        round_3: rounds[2]?.strokes,
+        round_4: rounds[3]?.strokes,
         money: entry.money,
         points: entry.points,
         status: entry.status,

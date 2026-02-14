@@ -265,7 +265,7 @@ async function syncSchedule(supabase: any, apiKey: string, tour: string, year: n
           ? `${defendingChamp.first_name || ''} ${defendingChamp.last_name || ''}`.trim()
           : null,
         winner_id: winner?.id,
-        timezone: resolveTimezone(venue?.country, venue?.state),
+        timezone: tournament.course_timezone || resolveTimezone(venue?.country, venue?.state),
         raw_data: tournament,
       }, { onConflict: 'sr_id' });
       if (!error) totalRecords++;
