@@ -288,10 +288,13 @@ function LiveArenaSlide({
                 <span className={cn("text-2xl font-bold", getScoreClass(tournament.leader.score))}>
                   {tournament.leader.scoreDisplay}
                 </span>
-                {tournament.leader.thru && (
+                {tournament.leader.thru != null && Number(tournament.leader.thru) > 0 && Number(tournament.leader.thru) < 18 && (
                   <span className="text-white/50 text-sm">
                     thru {tournament.leader.thru}
                   </span>
+                )}
+                {tournament.leader.thru != null && Number(tournament.leader.thru) >= 18 && (
+                  <span className="text-white/50 text-sm">F</span>
                 )}
               </div>
             </div>

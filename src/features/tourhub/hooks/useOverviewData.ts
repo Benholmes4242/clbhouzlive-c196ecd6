@@ -662,6 +662,11 @@ export interface LeaderEntry {
   scoreToPar: number;
   scoreDisplay: string;
   thru: number | null;
+  status: string | null;
+  round_1: number | null;
+  round_2: number | null;
+  round_3: number | null;
+  round_4: number | null;
   player: {
     id: string;
     firstName: string;
@@ -690,6 +695,11 @@ export function useTournamentTopLeaders(tournamentId: string | null) {
           score,
           strokes,
           thru,
+          status,
+          round_1,
+          round_2,
+          round_3,
+          round_4,
           player:sr_players!inner(
             id,
             first_name,
@@ -717,6 +727,11 @@ export function useTournamentTopLeaders(tournamentId: string | null) {
           scoreToPar,
           scoreDisplay,
           thru: row.thru,
+          status: row.status ?? null,
+          round_1: row.round_1 ?? null,
+          round_2: row.round_2 ?? null,
+          round_3: row.round_3 ?? null,
+          round_4: row.round_4 ?? null,
           player: {
             id: row.player.id,
             firstName: row.player.first_name,

@@ -27,6 +27,7 @@ import { useTournamentTopLeaders, TOUR_CONFIG, type LeaderEntry } from '../../ho
 import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 import { getTourLogo } from '../../utils/tourLogos';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
+import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
 import '@/styles/hero-glass.css';
 
@@ -87,7 +88,8 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, hasTie
   const abbreviatedName = `${leader.player.firstName[0]}. ${leader.player.lastName}`;
   const photoUrl = resolvePhotoUrl(leader.player.photoUrl ?? null, leader.player.pgaTourId);
   const initials = `${leader.player.firstName[0]}${leader.player.lastName[0]}`.toUpperCase();
-  const progress = leader.thru != null && leader.thru > 0 ? leader.thru / 18 : 0;
+  const thruValue = leader.thru ?? (leader.round_1 != null || leader.round_2 != null || leader.round_3 != null || leader.round_4 != null ? 18 : 0);
+  const progress = thruValue > 0 ? thruValue / 18 : 0;
   const hasProgress = progress > 0;
   
   return (
@@ -143,8 +145,7 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, hasTie
         </div>
         {/* Thru indicator */}
         <span className="leaderboard-thru flex-shrink-0">
-          {leader.thru != null && leader.thru >= 18 ? 'F' :
-           leader.thru != null && leader.thru > 0 ? `thru ${leader.thru}` : ''}
+          {formatThruDisplay(leader.thru, leader.round_1, leader.round_2, leader.round_3, leader.round_4, leader.status)}
         </span>
         <span className={cn(
           "leaderboard-score flex-shrink-0",
