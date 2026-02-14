@@ -11,13 +11,7 @@ import { format } from 'date-fns';
 import { usePlayerResults, formatPosition, formatScore, formatMoney } from '../../hooks/usePlayerResults';
 import { TOUR_COLORS } from '../../constants/colors';
 
-const GLASS_CARD_STYLE = {
-  background: 'rgba(255, 255, 255, 0.7)',
-  backdropFilter: 'blur(8px)',
-  WebkitBackdropFilter: 'blur(8px)',
-  border: '1px solid rgba(255, 255, 255, 0.5)',
-  boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04)',
-};
+const CARD_CLASS = "rounded-2xl border border-border/40 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.04)]";
 
 function getPositionStyle(pos: string, position: number | null) {
   const isWin = pos === '1st' || pos === 'T1st';
@@ -47,9 +41,9 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
   const hasMore = (allResults?.length ?? 0) > INITIAL_LIMIT;
 
   return (
-    <div className="rounded-[20px] p-6" style={GLASS_CARD_STYLE}>
-      <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2 pl-3 border-l-3 border-primary">
-        <Activity className="w-5 h-5 text-primary" />
+    <div className={cn(CARD_CLASS, "p-5")}>
+      <h2 className="text-[16px] font-semibold text-foreground mb-4 flex items-center gap-2 pl-3 border-l-3 border-primary">
+        <Activity className="w-4.5 h-4.5 text-primary" />
         Recent Tournaments
       </h2>
 
@@ -78,7 +72,7 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
                   {/* Left: Position badge + vertical line */}
                   <div className="flex flex-col items-center">
                     <div className={cn(
-                      "w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold font-mono shrink-0",
+                      "w-10 h-10 rounded-xl flex items-center justify-center text-[13px] font-bold font-mono shrink-0 tabular-nums",
                       getPositionStyle(pos, result.position)
                     )}>
                       {isWin ? '🏆' : pos}
@@ -90,17 +84,17 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
 
                   {/* Right: Tournament info */}
                   <div className="flex-1 min-w-0 pb-4">
-                    <p className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">
+                    <p className="text-[14px] font-medium text-foreground truncate group-hover:text-primary transition-colors">
                       {result.tournament_name}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
+                    <p className="text-[11px] text-muted-foreground/60 mt-0.5">
                       {result.tournament_end_date
                         ? format(new Date(result.tournament_end_date), 'MMM d, yyyy')
                         : '—'}
                     </p>
                     <div className="flex items-center gap-3 mt-1">
                       <span
-                        className="text-sm font-bold font-mono"
+                        className="text-[14px] font-bold font-mono tabular-nums"
                         style={{
                           color: score !== null && score < 0
                             ? TOUR_COLORS.scoreUnderPar
@@ -112,7 +106,7 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
                         {scoreStr}
                       </span>
                       {result.money !== null && result.money > 0 && (
-                        <span className="text-xs text-emerald-500 font-mono">
+                        <span className="text-[11px] text-emerald-500 font-mono tabular-nums">
                           {formatMoney(result.money)}
                         </span>
                       )}
@@ -126,7 +120,7 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
           {hasMore && (
             <button
               onClick={() => setShowAll(prev => !prev)}
-              className="mt-4 w-full flex items-center justify-center gap-1.5 py-2.5 text-sm font-medium text-primary hover:text-primary/80 active:scale-[0.97] transition-all rounded-lg border border-border/30 hover:border-primary/30"
+              className="mt-4 w-full flex items-center justify-center gap-1.5 py-2.5 text-[13px] font-semibold text-primary hover:text-primary/80 active:scale-[0.97] transition-all rounded-xl border border-border/40 bg-card shadow-sm hover:border-primary/30"
             >
               {showAll ? (
                 <>Show Less <ChevronUp className="w-4 h-4" /></>

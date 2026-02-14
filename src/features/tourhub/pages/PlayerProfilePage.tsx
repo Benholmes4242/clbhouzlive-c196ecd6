@@ -96,7 +96,7 @@ export function PlayerProfilePage() {
       {playerId && <PlayerRecentForm playerId={playerId} />}
 
       {/* Content sections — constrained width */}
-      <div className="w-full max-w-5xl mx-auto px-4 pb-8 mt-6 space-y-6">
+      <div className="w-full max-w-5xl mx-auto px-4 pb-8 mt-6 space-y-section">
         {/* Season Performance */}
         <motion.div
           variants={sectionVariants}
@@ -108,14 +108,7 @@ export function PlayerProfilePage() {
           {playerStats ? (
             <PlayerSeasonStats playerStats={playerStats} />
           ) : (
-            <div className="py-16 text-center rounded-[20px] border border-border/50"
-              style={{
-                background: 'rgba(255,255,255,0.7)',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
-                boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
-              }}
-            >
+            <div className="py-16 text-center rounded-2xl border border-border/40 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
               <div className="w-14 h-14 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
                 <TrendingUp className="w-7 h-7 text-muted-foreground" />
               </div>
@@ -165,8 +158,8 @@ export function PlayerProfilePage() {
         </motion.div>
 
         {/* Data Source Attribution */}
-        <div className="px-4 py-3 rounded-lg bg-muted/30 border border-border/30">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <div className="py-3 rounded-lg bg-muted/20 border border-border/30">
+          <div className="flex items-center gap-2 px-4 text-[11px] text-muted-foreground/50">
             <Globe className="w-3.5 h-3.5" />
             <span>Powered by SportsRadar</span>
           </div>

@@ -27,11 +27,11 @@ function StatPill({ label, value, highlight = false, delay = 0 }: StatPillProps)
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 + delay, duration: 0.3 }}
     >
-      <span className="text-[10px] font-semibold tracking-wider uppercase text-muted-foreground block mb-0.5">
+      <span className="text-[9px] font-semibold tracking-wider uppercase text-muted-foreground/60 block mb-0.5">
         {label}
       </span>
       <span className={cn(
-        "text-base font-bold font-mono block",
+        "text-[15px] font-bold font-mono tabular-nums block",
         value ? (highlight ? "text-amber-500" : "text-foreground") : "text-muted-foreground"
       )}>
         {value || '—'}
@@ -66,14 +66,7 @@ export function StatRibbon({ playerStats }: StatRibbonProps) {
   return (
     <div className="relative z-10 -mt-5 mx-4">
       <div
-        className="flex gap-2 overflow-x-auto px-4 py-3 rounded-2xl no-scrollbar"
-        style={{
-          background: 'rgba(255,255,255,0.7)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          border: '1px solid rgba(255,255,255,0.5)',
-          boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
-        }}
+        className="flex gap-2 overflow-x-auto px-4 py-3 rounded-2xl no-scrollbar border border-border/40 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.04)]"
       >
         <StatPill label="WORLD" value={worldRank} highlight={isWorldNo1} delay={0} />
         <StatPill label="FEDEX" value={fedexRank} delay={0.03} />

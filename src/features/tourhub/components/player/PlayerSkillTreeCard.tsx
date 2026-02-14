@@ -16,13 +16,7 @@ import {
   type SkillAttribute,
 } from '../../hooks/usePlayerSkillTree';
 
-const GLASS_CARD_STYLE = {
-  background: 'rgba(255, 255, 255, 0.7)',
-  backdropFilter: 'blur(8px)',
-  WebkitBackdropFilter: 'blur(8px)',
-  border: '1px solid rgba(255, 255, 255, 0.5)',
-  boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04)',
-};
+const CARD_CLASS = "rounded-2xl border border-border/40 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.04)]";
 
 const SKILL_ICONS: Record<SkillAttributeKey, React.ElementType> = {
   power: Zap,
@@ -86,7 +80,7 @@ const AttributeRow = memo(({ attribute, isStrongest, delay = 0, animate = true }
         <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center", SKILL_ICON_BG[attribute.key])}>
           <Icon className="w-3.5 h-3.5" />
         </div>
-        <span className={cn("text-sm font-semibold", isStrongest ? "text-amber-600" : config.color)}>
+        <span className={cn("text-[13px] font-semibold", isStrongest ? "text-amber-600" : config.color)}>
           {config.name}
         </span>
       </div>
@@ -97,10 +91,10 @@ const AttributeRow = memo(({ attribute, isStrongest, delay = 0, animate = true }
         animate={animate}
       />
       <div className={cn("w-12 text-right", isStrongest ? "text-amber-600" : config.color)}>
-        <span className="text-sm font-bold font-mono">Lv.{attribute.level}</span>
+        <span className="text-[13px] font-bold font-mono tabular-nums">Lv.{attribute.level}</span>
       </div>
       <div className="w-16 text-right shrink-0">
-        <span className="text-xs text-muted-foreground font-mono">
+        <span className="text-[11px] text-muted-foreground font-mono tabular-nums">
           {attribute.rawValue?.toFixed(attribute.key === 'consistency' ? 2 : 1)} {config.unit}
         </span>
       </div>
@@ -134,7 +128,7 @@ const OverallLevelBadge = memo(({ level, animate = true }: { level: number; anim
         <span className="text-white text-2xl font-bold font-mono">{level}</span>
       </div>
       <div>
-        <span className={cn("text-lg font-bold", tier.color)}>{tier.name}</span>
+        <span className={cn("text-[16px] font-bold", tier.color)}>{tier.name}</span>
         <p className="text-xs text-muted-foreground">Skill Tier</p>
       </div>
     </motion.div>
@@ -283,9 +277,9 @@ export function PlayerSkillTreeCard({ playerId }: { playerId: string }) {
 
   if (isLoading) {
     return (
-      <div className="rounded-[20px] p-6" style={GLASS_CARD_STYLE}>
-        <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2 pl-3 border-l-3 border-primary">
-          <Activity className="w-5 h-5 text-primary" />
+      <div className={cn(CARD_CLASS, "p-5")}>
+        <h2 className="text-[16px] font-semibold text-foreground mb-4 flex items-center gap-2 pl-3 border-l-3 border-primary">
+          <Activity className="w-4.5 h-4.5 text-primary" />
           Skill Build
         </h2>
         <SkillTreeSkeleton />
@@ -295,9 +289,9 @@ export function PlayerSkillTreeCard({ playerId }: { playerId: string }) {
 
   if (error || !skillTree || skillTree.attributes.length === 0) {
     return (
-      <div className="rounded-[20px] p-6" style={GLASS_CARD_STYLE}>
-        <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2 pl-3 border-l-3 border-primary">
-          <Activity className="w-5 h-5 text-primary" />
+      <div className={cn(CARD_CLASS, "p-5")}>
+        <h2 className="text-[16px] font-semibold text-foreground mb-4 flex items-center gap-2 pl-3 border-l-3 border-primary">
+          <Activity className="w-4.5 h-4.5 text-primary" />
           Skill Build
         </h2>
         <SkillTreeEmpty />
@@ -306,11 +300,11 @@ export function PlayerSkillTreeCard({ playerId }: { playerId: string }) {
   }
 
   return (
-    <div ref={ref} className="rounded-[20px] p-6" style={GLASS_CARD_STYLE}>
+    <div ref={ref} className={cn(CARD_CLASS, "p-5")}>
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2 pl-3 border-l-3 border-primary">
-          <Activity className="w-5 h-5 text-primary" />
+        <h2 className="text-[16px] font-semibold text-foreground flex items-center gap-2 pl-3 border-l-3 border-primary">
+          <Activity className="w-4.5 h-4.5 text-primary" />
           Skill Build
         </h2>
         <OverallLevelBadge level={skillTree.overallLevel} animate={inView} />
@@ -325,11 +319,11 @@ export function PlayerSkillTreeCard({ playerId }: { playerId: string }) {
           transition={springSnappy}
         >
           <div className="flex items-center gap-2">
-            <span className="text-amber-500 text-sm font-semibold">🏆 Dominant Skill:</span>
-            <div className={cn("w-6 h-6 rounded-md flex items-center justify-center", SKILL_ICON_BG[skillTree.strongestAttribute])}>
+            <span className="text-amber-500 text-[13px] font-semibold">🏆 Dominant Skill:</span>
+            <div className={cn("w-5 h-5 rounded-md flex items-center justify-center", SKILL_ICON_BG[skillTree.strongestAttribute])}>
               {(() => { const Ic = SKILL_ICONS[skillTree.strongestAttribute]; return <Ic className="w-3.5 h-3.5" />; })()}
             </div>
-            <span className={cn("font-bold text-sm", SKILL_ATTRIBUTES[skillTree.strongestAttribute].color)}>
+            <span className={cn("font-bold text-[13px]", SKILL_ATTRIBUTES[skillTree.strongestAttribute].color)}>
               {SKILL_ATTRIBUTES[skillTree.strongestAttribute].name}
             </span>
           </div>

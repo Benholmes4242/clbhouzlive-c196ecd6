@@ -43,7 +43,7 @@ export function PlayerRecentForm({ playerId }: PlayerRecentFormProps) {
   return (
     <div className="px-5 mt-3">
       <span className={cn(
-        "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold",
+        "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold",
         formColor
       )}>
         Recent Form: {formLabel} (avg. T{avgPosition})
