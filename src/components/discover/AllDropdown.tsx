@@ -31,7 +31,7 @@ const AllDropdown: React.FC<AllDropdownProps> = ({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
-          className="inline-flex items-center gap-1.5 h-11 px-3 rounded-full text-sm font-medium bg-neutral-100 hover:bg-neutral-200 active:bg-neutral-200/80 transition-colors shadow-sm"
+         className="inline-flex items-center gap-1.5 h-11 px-3 rounded-sq-sm bg-card border border-border text-sm font-medium shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:bg-muted active:scale-[0.98] transition-all duration-150"
           aria-label="Filter by duration"
           aria-expanded={open}
         >
@@ -41,7 +41,7 @@ const AllDropdown: React.FC<AllDropdownProps> = ({
       </PopoverTrigger>
       <PopoverContent 
         align="start" 
-        className="w-48 p-1 rounded-xl shadow-lg ring-1 ring-black/5 bg-white z-50"
+        className="w-48 p-1 rounded-sq-sm shadow-lg border border-border bg-card z-50 animate-in fade-in-0 zoom-in-95 duration-150"
         sideOffset={8}
       >
         <div role="menu" aria-label="Duration filters">
@@ -51,7 +51,7 @@ const AllDropdown: React.FC<AllDropdownProps> = ({
               role="menuitemradio"
               aria-checked={option.key === activeDuration}
               onClick={() => handleSelect(option.key)}
-              className="flex items-center justify-between w-full px-3 py-2 text-sm rounded-lg hover:bg-neutral-100 transition-colors"
+              className="flex items-center justify-between w-full px-3 py-2 text-sm rounded-sq-xs hover:bg-muted transition-colors"
             >
               <span className={option.key === activeDuration ? 'font-medium' : ''}>
                 {option.label}
