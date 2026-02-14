@@ -47,7 +47,7 @@ const SeasonLeaderboardsSkeleton = memo(function SeasonLeaderboardsSkeleton() {
   };
 
   return (
-    <section style={{ paddingTop: '40px', paddingBottom: '16px' }}>
+    <section>
       <style>{animationStyles}</style>
       <div className="px-4 mb-4">
         <div className="h-3 w-24 rounded mb-2" style={shimmerBg} />
@@ -75,7 +75,7 @@ const SeasonLeaderboardsSkeleton = memo(function SeasonLeaderboardsSkeleton() {
 // Empty state
 const SeasonLeaderboardsEmpty = memo(function SeasonLeaderboardsEmpty() {
   return (
-    <section style={{ paddingTop: '40px', paddingBottom: '16px' }}>
+    <section>
       <div className="px-4">
         <p className="m-0" style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(0,0,0,0.3)', textTransform: 'uppercase', letterSpacing: '1.2px' }}>
           Season
@@ -134,7 +134,7 @@ export function SeasonLeaderboards() {
   const contextLine = DISCIPLINE_CONTEXT[activeCategory];
 
   return (
-    <section style={{ paddingTop: '40px', paddingBottom: '16px' }}>
+    <section>
       <style>{animationStyles}</style>
 
       {/* ═══ SECTION HEADER ═══ */}
@@ -147,7 +147,7 @@ export function SeasonLeaderboards() {
       >
         <div>
           <div className="flex items-center gap-2">
-          <p className="m-0" style={{ fontSize: '9px', fontWeight: 500, color: '#A8A29E', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <p className="m-0" style={{ fontSize: '10px', fontWeight: 700, color: '#A8A29E', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               {data.year} Season
             </p>
             <SeasonToggle
@@ -156,14 +156,14 @@ export function SeasonLeaderboards() {
               onYearChange={setSelectedYear}
             />
           </div>
-          <h2 className="m-0 mt-1" style={{ fontSize: '16px', fontWeight: 600, color: '#1C1917', letterSpacing: '-0.2px' }}>
+          <h2 className="m-0 mt-1" style={{ fontSize: '22px', fontWeight: 700, color: '#1C1917', letterSpacing: '-0.3px' }}>
             Performance Rankings
           </h2>
         </div>
         <button
           onClick={() => navigate('/tourhub/stats')}
           className="flex items-center gap-0.5 transition-all duration-300 bg-transparent border-none cursor-pointer group"
-          style={{ color: '#EA580C', fontSize: '13px', fontWeight: 500 }}
+          style={{ color: '#64748b', fontSize: '13px', fontWeight: 500 }}
         >
           View All
           <ChevronRight size={14} className="transition-transform duration-300 group-hover:translate-x-0.5" />
@@ -195,7 +195,7 @@ export function SeasonLeaderboards() {
           style={{ marginTop: '16px' }}
         >
           {/* Stat context line — no icon badge */}
-          <p className="m-0 text-muted-foreground mb-4" style={{ fontSize: '13px', fontWeight: 500, fontStyle: 'italic' }}>
+          <p className="m-0 text-muted-foreground mb-4" style={{ fontSize: '14px', fontWeight: 500, fontStyle: 'italic' }}>
             {contextLine}
           </p>
 
