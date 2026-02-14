@@ -291,7 +291,7 @@ export function UnifiedWorldRankings() {
         <button
           onClick={() => navigate('/tourhub?tab=players')}
           className="flex items-center gap-0.5 active:scale-95 transition-transform mt-1"
-          style={{ fontSize: '13px', fontWeight: 500, color: '#64748b' }}
+          style={{ fontSize: '13px', fontWeight: 500, color: '#64748b', minHeight: '44px' }}
         >
           View All
           <ChevronRight className="w-3.5 h-3.5 opacity-60" />
@@ -314,7 +314,7 @@ export function UnifiedWorldRankings() {
             </div>
             <div
               className="flex gap-2 overflow-x-auto scrollbar-hide pb-1"
-              style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory' }}
+              style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory', touchAction: 'pan-x pan-y' }}
             >
               {upwardMovers.map((entry, idx) => (
                 <MomentumPill key={entry.playerId} entry={entry} index={idx} direction="up" onTap={handleMoverTap} />
@@ -331,7 +331,7 @@ export function UnifiedWorldRankings() {
               </div>
               <div
                 className="flex gap-2 overflow-x-auto scrollbar-hide pb-1"
-                style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory' }}
+                style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory', touchAction: 'pan-x pan-y' }}
               >
                 {downwardMovers.map((entry, idx) => (
                   <MomentumPill key={entry.playerId} entry={entry} index={idx} direction="down" onTap={handleMoverTap} />

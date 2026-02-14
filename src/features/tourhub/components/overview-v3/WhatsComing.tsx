@@ -174,7 +174,7 @@ export function WhatsComing() {
         <button
           onClick={() => navigate('/tourhub?tab=schedule')}
           className="flex items-center gap-0.5 transition-all active:scale-95"
-          style={{ fontSize: '13px', fontWeight: 500, color: '#64748b' }}
+          style={{ fontSize: '13px', fontWeight: 500, color: '#64748b', minHeight: '44px' }}
         >
           <span>View Full Schedule</span>
           <ChevronRight className="w-3.5 h-3.5 opacity-60" />

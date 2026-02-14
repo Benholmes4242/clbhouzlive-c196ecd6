@@ -163,7 +163,7 @@ export function SeasonLeaderboards() {
         <button
           onClick={() => navigate('/tourhub/stats')}
           className="flex items-center gap-0.5 transition-all duration-300 bg-transparent border-none cursor-pointer group"
-          style={{ color: '#64748b', fontSize: '13px', fontWeight: 500 }}
+          style={{ color: '#64748b', fontSize: '13px', fontWeight: 500, minHeight: '44px' }}
         >
           View All
           <ChevronRight size={14} className="transition-transform duration-300 group-hover:translate-x-0.5" />

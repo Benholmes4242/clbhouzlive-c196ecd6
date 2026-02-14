@@ -197,6 +197,7 @@ export function LiveRightNow() {
             WebkitOverflowScrolling: 'touch',
             scrollbarWidth: 'none',
             overscrollBehavior: 'contain',
+            touchAction: 'pan-x pan-y',
           }}
         >
           {/* Left inset */}
