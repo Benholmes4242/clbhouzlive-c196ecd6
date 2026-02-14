@@ -13,6 +13,7 @@ import type {
   PredictionTrackerData,
 } from '../components/tournament-insights/types';
 import type { AIPredictionData } from './useAIPredictions';
+import { getCurrentRound } from '../utils/formatThruDisplay';
 
 export function usePredictionTracker(
   tournamentId: string | null,
@@ -104,10 +105,8 @@ function buildTrackedPrediction(
   // Determine current round from which round fields are populated
   let currentRound: number | null = null;
   if (lb) {
-    if (lb.round_4 != null) currentRound = 4;
-    else if (lb.round_3 != null) currentRound = 3;
-    else if (lb.round_2 != null) currentRound = 2;
-    else if (lb.round_1 != null) currentRound = 1;
+    const roundInfo = getCurrentRound(lb.round_1, lb.round_2, lb.round_3, lb.round_4);
+    currentRound = roundInfo.number > 0 ? roundInfo.number : null;
   }
 
   return {

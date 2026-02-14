@@ -542,6 +542,12 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
 
     if (playerId) {
       const rounds = entry.rounds || [];
+      // Derive thru from the latest round's thru field (Sportradar puts thru per-round, not at entry level)
+      const latestRound = rounds.length > 0 ? rounds[rounds.length - 1] : null;
+      const derivedThru = latestRound?.thru ?? entry.thru ?? null;
+      // Status is at entry level for WD/cut, default to 'active' if playing
+      const derivedStatus = entry.status || (entry.position != null ? 'active' : null);
+
       const { error } = await supabase.from('sr_leaderboards').upsert({
         tournament_id: tournament.id,
         player_id: playerId,
@@ -549,14 +555,14 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
         position_tied: entry.tied || false,
         score: entry.score,
         strokes: entry.strokes,
-        thru: entry.thru,
+        thru: derivedThru,
         round_1: rounds[0]?.strokes,
         round_2: rounds[1]?.strokes,
         round_3: rounds[2]?.strokes,
         round_4: rounds[3]?.strokes,
         money: entry.money,
         points: entry.points,
-        status: entry.status,
+        status: derivedStatus,
         // New fields
         starting_score: entry.starting_score,
         wins: entry.wins,

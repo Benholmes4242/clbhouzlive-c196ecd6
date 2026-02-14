@@ -367,11 +367,17 @@ export function FullLeaderboard({
                   {/* Thru for live */}
                   {tournamentStatus === 'inprogress' && (
                     <div className="w-10 text-center">
-                      {entry.thru != null && entry.thru < 18 ? (
+                      {entry.status === 'cut' || entry.status === 'CUT' ? (
+                        <span className="text-[10px] text-muted-foreground font-medium">MC</span>
+                      ) : entry.status === 'wd' || entry.status === 'WD' ? (
+                        <span className="text-[10px] text-muted-foreground font-medium">WD</span>
+                      ) : entry.thru != null && entry.thru < 18 ? (
                         <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
                           {entry.thru}
                         </span>
-                      ) : entry.thru === 18 ? (
+                      ) : entry.thru != null && entry.thru >= 18 ? (
+                        <span className="text-[10px] text-emerald-600 font-medium">F</span>
+                      ) : entry.round_1 != null || entry.round_2 != null || entry.round_3 != null || entry.round_4 != null ? (
                         <span className="text-[10px] text-emerald-600 font-medium">F</span>
                       ) : null}
                     </div>

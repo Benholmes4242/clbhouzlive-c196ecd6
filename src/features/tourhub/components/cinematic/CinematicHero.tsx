@@ -64,8 +64,11 @@ function MiniLeaderboardGlass({ leaders }: { leaders: LeaderEntry[] }) {
           </div>
           <div className="flex items-center gap-4 text-sm">
             <span className="text-white font-bold tabular-nums">{leader.score}</span>
-            {leader.thru && (
+            {leader.thru && leader.thru !== 'F' && (
               <span className="text-white/50 tabular-nums">Thru {leader.thru}</span>
+            )}
+            {leader.thru === 'F' && (
+              <span className="text-white/50 tabular-nums">F</span>
             )}
             {leader.today && (
               <span className={cn(
