@@ -258,22 +258,7 @@ export function ScheduleTab() {
     });
   }, [filteredResults, filter]);
 
-  // Scroll to current month
-  useEffect(() => {
-    if (hasScrolledToNow || isLoading || !monthGroups.length) return;
-    if (filter !== 'all' && filter !== 'upcoming') return;
-    if (search) return;
-    const currentMonthKey = format(new Date(), 'yyyy-MM');
-    const targetEl = document.getElementById(`month-${currentMonthKey}`);
-    if (targetEl) {
-      const timer = setTimeout(() => {
-        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        setHasScrolledToNow(true);
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-    setHasScrolledToNow(true);
-  }, [hasScrolledToNow, isLoading, monthGroups, filter, search]);
+  // (Removed: scrollIntoView to current month — was overriding scroll-to-top on mount)
 
   // Loading state
   if (isLoading) {
@@ -352,9 +337,7 @@ export function ScheduleTab() {
             transition={{ delay: 0.1, duration: 0.3 }}
           >
             <Search 
-              className={cn(
-                "absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] transition-colors duration-200 text-muted-foreground"
-              )} 
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-muted-foreground w-[18px] h-[18px]"
               strokeWidth={2.5}
             />
             <input
