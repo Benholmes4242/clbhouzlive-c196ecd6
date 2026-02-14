@@ -66,5 +66,8 @@ export function usePlayerHeadshots(playerIds: string[]) {
     },
     enabled: playerIds.length > 0,
     staleTime: 30 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    retry: 1,
+    placeholderData: (prev: any) => prev,
   });
 }

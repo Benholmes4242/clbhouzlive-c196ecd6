@@ -89,5 +89,8 @@ export function useActivePlayers(minEvents: number = 10, limit: number = 100) {
       return activePlayers;
     },
     staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    retry: 1,
+    placeholderData: (prev: any) => prev,
   });
 }

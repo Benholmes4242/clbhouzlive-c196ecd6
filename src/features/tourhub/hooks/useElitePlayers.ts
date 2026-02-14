@@ -106,6 +106,9 @@ export function useElitePlayers(limit: number = 50) {
       return elitePlayers;
     },
     staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    retry: 1,
+    placeholderData: (prev: any) => prev,
   });
 }
 
