@@ -12,20 +12,20 @@ interface LeadersStatContextProps {
 
 export function LeadersStatContext({ category, leaderValue }: LeadersStatContextProps) {
   return (
-    <div className="bg-muted/30 border border-border/50 rounded-xl px-4 py-3">
-      <p className="text-xs text-muted-foreground leading-relaxed">
+    <div className="bg-muted/20 border border-border/30 rounded-xl px-4 py-3">
+      <p className="text-[12px] text-muted-foreground/80 leading-relaxed">
         {category.description}
       </p>
       {(category.tourAverage !== '—' || leaderValue) && (
-        <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+        <div className="flex items-center gap-4 mt-2">
           {category.tourAverage !== '—' && (
-            <span>
-              Tour avg: <span className="font-mono font-semibold text-foreground">{category.tourAverage}</span>
+            <span className="text-[11px] text-muted-foreground/60">
+              Tour avg: <span className="font-mono font-semibold text-foreground tabular-nums">{category.tourAverage}</span>
             </span>
           )}
           {leaderValue && (
-            <span>
-              Leader: <span className="font-mono font-semibold text-foreground">{leaderValue}</span>
+            <span className="text-[11px] text-muted-foreground/60">
+              Leader: <span className="font-mono font-semibold text-foreground tabular-nums">{leaderValue}</span>
             </span>
           )}
         </div>

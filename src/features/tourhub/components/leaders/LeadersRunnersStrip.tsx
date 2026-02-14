@@ -81,15 +81,15 @@ function RunnerPill({
         />
 
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-semibold text-white truncate">
+          <p className="text-[12px] font-semibold text-white truncate">
             {flag} {player.full_name}
           </p>
-          <div className="flex items-baseline gap-0.5">
-            <span className="font-mono text-sm font-bold text-white">
+          <div className="flex items-baseline gap-0.5 mt-0.5">
+            <span className="font-mono text-[13px] font-bold text-white tabular-nums">
               {fmt(value)}
             </span>
             {unit && (
-              <span className="text-[10px] text-white/50">{unit}</span>
+              <span className="text-[9px] text-white/50 uppercase tracking-wider">{unit}</span>
             )}
           </div>
         </div>
