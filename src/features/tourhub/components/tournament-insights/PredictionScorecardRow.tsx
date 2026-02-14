@@ -6,7 +6,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { getPgaTourHeadshotUrl } from '../../utils/resolvePhotoUrl';
-import { GolferAvatar } from '@/components/golfers/GolferAvatar';
 import type { TrackedPrediction } from './types';
 
 interface PredictionScorecardRowProps {
@@ -83,26 +82,34 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
       className="flex items-center px-4"
       style={{ opacity: isDimmed ? 0.6 : 1, height: '68px' }}
     >
-      {/* # — Rank number */}
-      <div className="w-8 flex-shrink-0 flex flex-col items-center justify-center">
-        <span className="text-lg font-bold text-foreground leading-none">
-          {prediction.predictedRank}
-        </span>
-        {/* Movement arrow below rank (OWGR style) */}
-        {delta.arrow && (
-          <span className="text-[10px] font-semibold leading-none mt-0.5" style={{ color: delta.color }}>
-            {delta.arrow}
-          </span>
-        )}
-      </div>
-
       {/* PLAYER — Avatar + Name */}
-      <div className="flex items-center gap-2.5 flex-1 min-w-0 pl-2">
-        <GolferAvatar
-          name={prediction.playerName}
-          photoUrl={avatarUrl}
-          size={40}
-        />
+      <div className="flex items-center gap-2.5 flex-1 min-w-0">
+        {/* Avatar matching world rankings style: squircle with border */}
+        <div
+          className="overflow-hidden border border-border/50 flex-shrink-0"
+          style={{ width: '40px', height: '40px', borderRadius: '13px' }}
+        >
+          {avatarUrl ? (
+            <div className="relative w-full h-full">
+              <div className="absolute inset-0 flex items-center justify-center bg-muted">
+                <span className="text-[10px] font-bold text-muted-foreground">{initials}</span>
+              </div>
+              <img
+                src={avatarUrl}
+                alt={prediction.playerName}
+                className="relative z-10 w-full h-full object-cover"
+                loading="lazy"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            </div>
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-muted">
+              <span className="text-[10px] font-bold text-muted-foreground">{initials}</span>
+            </div>
+          )}
+        </div>
         <div className="min-w-0 flex-1">
           <p
             className="text-sm font-semibold text-foreground truncate leading-tight"
@@ -119,13 +126,6 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
             </p>
           )}
         </div>
-      </div>
-
-      {/* PREDICTED */}
-      <div className="w-[60px] flex-shrink-0 text-center">
-        <span className="text-sm text-muted-foreground">
-          {formatOrdinal(prediction.predictedRank)}
-        </span>
       </div>
 
       {/* ACTUAL */}
