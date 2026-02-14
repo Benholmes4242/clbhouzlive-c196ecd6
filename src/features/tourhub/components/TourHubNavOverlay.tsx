@@ -227,13 +227,13 @@ export function TourHubNavOverlay({
         <div className="flex items-center gap-1.5 flex-shrink-0">
           <motion.span
             className="w-2 h-2 rounded-full"
-            style={{ background: TOUR_COLORS.liveAmber }}
+            style={{ background: TOUR_COLORS.liveGreen }}
             animate={{ scale: [1, 1.3, 1], opacity: [1, 0.7, 1] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           />
           <span 
             className="text-[10px] font-bold uppercase tracking-wide"
-            style={{ color: TOUR_COLORS.liveAmber }}
+            style={{ color: TOUR_COLORS.liveGreen }}
           >
             {liveCount} LIVE
           </span>
