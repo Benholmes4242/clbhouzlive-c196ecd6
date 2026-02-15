@@ -12,7 +12,8 @@
 
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Search, X, ArrowLeft, AlertCircle } from 'lucide-react';
+import { Search, X, ArrowLeft, AlertCircle, RefreshCw } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useTourSeason, useTourTournaments, type TourTournament } from '../../hooks/useTourHubData';
 import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
 import { TourHubEmptyState } from '../TourHubEmptyState';
@@ -128,8 +129,52 @@ export function ScheduleTab() {
 
   const search = useDebouncedValue(searchInput, 200);
   
+  const queryClient = useQueryClient();
   const { data: season } = useTourSeason();
-  const { data: tournaments, isLoading, error, refetch } = useTourTournaments(season?.id);
+  const { data: tournaments, isLoading, error, refetch } = useTourTournaments(season?.id, {
+    refetchInterval: filter === 'live' ? 30000 : false,
+  });
+
+  // Pull-to-refresh state
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [pullDistance, setPullDistance] = useState(0);
+  const touchStartY = useRef(0);
+  const isPulling = useRef(false);
+
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ['tourhub', 'tournaments'] }),
+      queryClient.invalidateQueries({ queryKey: ['tournament-leaders-winners'] }),
+    ]);
+    setIsRefreshing(false);
+  }, [queryClient]);
+
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    if (window.scrollY === 0) {
+      touchStartY.current = e.touches[0].clientY;
+      isPulling.current = true;
+    }
+  }, []);
+
+  const onTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isPulling.current) return;
+    const distance = e.touches[0].clientY - touchStartY.current;
+    if (distance > 0 && window.scrollY === 0) {
+      setPullDistance(Math.min(distance * 0.5, 80));
+    } else {
+      isPulling.current = false;
+      setPullDistance(0);
+    }
+  }, []);
+
+  const onTouchEnd = useCallback(() => {
+    if (pullDistance > 50) {
+      handleRefresh();
+    }
+    setPullDistance(0);
+    isPulling.current = false;
+  }, [pullDistance, handleRefresh]);
 
   const { liveIds, completedIds } = useMemo(() => {
     if (!tournaments) return { liveIds: [] as string[], completedIds: [] as string[] };
@@ -323,7 +368,33 @@ export function ScheduleTab() {
   }
   
   return (
-    <div className="min-h-screen pb-24 -mx-4" ref={scrollContainerRef}>
+    <div
+      className="min-h-screen pb-24 -mx-4"
+      ref={scrollContainerRef}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
+      {/* Pull-to-refresh indicator — SC-08 */}
+      <AnimatePresence>
+        {(pullDistance > 0 || isRefreshing) && (
+          <motion.div
+            className="flex items-center justify-center"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: isRefreshing ? 48 : pullDistance, opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <RefreshCw
+              className={cn(
+                'w-5 h-5 text-muted-foreground transition-transform',
+                isRefreshing && 'animate-spin'
+              )}
+              style={{ transform: isRefreshing ? undefined : `rotate(${pullDistance * 3}deg)` }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
       
       {/* Live Hero Carousel — SC-01 */}
       {filter === 'live' && !search && liveTournaments.length > 0 && (
