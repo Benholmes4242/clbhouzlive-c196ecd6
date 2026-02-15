@@ -598,46 +598,18 @@ export function PostWizard({
             />
           </div>
 
-          {/* Progress indicator — bar on steps 1-2, completion dots on final step */}
-          {isLastStep ? (
-            <div className="h-6 w-full flex items-center justify-center flex-shrink-0">
-              <div className="flex items-center gap-0">
-                {Array.from({ length: totalSteps }).map((_, i) => (
-                  <React.Fragment key={i}>
-                    {/* Connector line before dot (not for first) */}
-                    {i > 0 && (
-                      <motion.div
-                        className="h-0.5 w-6"
-                        style={{ background: '#fbbf24' }}
-                        initial={{ scaleX: 0 }}
-                        animate={{ scaleX: 1 }}
-                        transition={{ delay: i * 0.1 - 0.05, duration: 0.2 }}
-                      />
-                    )}
-                    <motion.div
-                      className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                      style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)' }}
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: i * 0.1, duration: 0.3, ease: 'easeOut' }}
-                    />
-                  </React.Fragment>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="h-2 w-full bg-gray-100 flex-shrink-0 overflow-hidden">
-              <motion.div
-                className="h-full shadow-sm"
-                style={{ background: 'linear-gradient(to right, #fbbf24, #f59e0b)' }}
-                initial={{ width: 0 }}
-                animate={{
-                  width: `${((currentStepIndex + 1) / totalSteps) * 100}%`,
-                }}
-                transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-              />
-            </div>
-          )}
+          {/* Progress bar */}
+          <div className="h-2 w-full bg-gray-100 flex-shrink-0 overflow-hidden">
+            <motion.div
+              className="h-full shadow-sm"
+              style={{ background: 'linear-gradient(to right, #fbbf24, #f59e0b)' }}
+              initial={{ width: 0 }}
+              animate={{
+                width: `${((currentStepIndex + 1) / totalSteps) * 100}%`,
+              }}
+              transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+            />
+          </div>
 
           {/* Step content - fills remaining space */}
           <main className="flex-1 min-h-0 overflow-y-auto">
