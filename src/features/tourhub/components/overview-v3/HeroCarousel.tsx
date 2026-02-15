@@ -12,7 +12,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, Trophy, Menu } from 'lucide-react';
 import { openTourNav } from '../../contexts/TourNavContext';
@@ -85,9 +85,15 @@ interface LeaderboardRowProps {
 }
 
 function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, hasTiedLeaders, showTieBefore, scoreFlash, positionDelta = 0 }: LeaderboardRowProps) {
+  const navigate = useNavigate();
   const abbreviatedName = `${leader.player.firstName[0]}. ${leader.player.lastName}`;
   const photoUrl = resolvePhotoUrl(leader.player.photoUrl ?? null, leader.player.pgaTourId);
   const initials = `${leader.player.firstName[0]}${leader.player.lastName[0]}`.toUpperCase();
+  
+  const handlePlayerTap = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/tourhub/player/${leader.player.id}`);
+  };
   
   return (
     <>
@@ -105,29 +111,34 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, hasTie
           <span className="leaderboard-position flex-shrink-0">
             {leader.position}
           </span>
-          {/* Player headshot — plain squircle, no progress ring */}
-          <div
-            className="overflow-hidden flex-shrink-0 border border-white/10"
-            style={{
-              width: '32px',
-              height: '33px',
-              borderRadius: '34%',
-            }}
+          {/* Player headshot + name — tappable to profile */}
+          <button
+            onClick={handlePlayerTap}
+            className="flex items-center gap-2 min-w-0 active:opacity-70 transition-opacity"
           >
-            {photoUrl ? (
-              <img
-                src={photoUrl}
-                alt={abbreviatedName}
-                className="w-full h-full object-cover object-top"
-                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-              />
-            ) : (
-              <div className="w-full h-full bg-white/10" />
-            )}
-          </div>
-          <span className={cn("leaderboard-name truncate", isFirst && "font-bold")}>
-            {abbreviatedName}
-          </span>
+            <div
+              className="overflow-hidden flex-shrink-0 border border-white/10"
+              style={{
+                width: '32px',
+                height: '33px',
+                borderRadius: '34%',
+              }}
+            >
+              {photoUrl ? (
+                <img
+                  src={photoUrl}
+                  alt={abbreviatedName}
+                  className="w-full h-full object-cover object-top"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+              ) : (
+                <div className="w-full h-full bg-white/10 flex items-center justify-center text-white/60 text-[10px] font-semibold">{initials}</div>
+              )}
+            </div>
+            <span className={cn("leaderboard-name truncate", isFirst && "font-bold")}>
+              {abbreviatedName}
+            </span>
+          </button>
         </div>
         {/* Thru indicator */}
         <span className="leaderboard-thru flex-shrink-0">
@@ -345,10 +356,12 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
               </div>
             </div>
             
-            {/* Row 2: Tournament Name */}
-            <h2 className="hero-tournament-name">
-              {tournament.name}
-            </h2>
+            {/* Row 2: Tournament Name — tappable to tournament detail */}
+            <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
+              <h2 className="hero-tournament-name">
+                {tournament.name}
+              </h2>
+            </Link>
             
             {/* Row 3: Venue */}
             <p className="hero-venue">

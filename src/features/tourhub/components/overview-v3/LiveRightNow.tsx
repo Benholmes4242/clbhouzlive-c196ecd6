@@ -132,11 +132,17 @@ function LiveTournamentCard({
             {tournament.name}
           </h3>
           
-          {/* Leader name */}
+          {/* Leader name — tappable to player profile */}
           {tournament.leader ? (
-            <span className="text-[14px] font-normal truncate block text-muted-foreground">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/tourhub/player/${tournament.leader!.id}`);
+              }}
+              className="text-[14px] font-normal truncate block text-muted-foreground text-left active:opacity-70 transition-opacity"
+            >
               {tournament.leader.name}
-            </span>
+            </button>
           ) : (
             <span className="text-[12.5px] italic truncate block text-muted-foreground/60">
               Starting Soon

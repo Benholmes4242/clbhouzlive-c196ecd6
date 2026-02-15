@@ -24,6 +24,7 @@ export interface LiveTournamentWithLeader {
   /** True if tournament is in date range but has no leaderboard data with strokes yet */
   isStartingSoon?: boolean;
   leader: {
+    id: string;
     name: string;
     score: number;
     scoreDisplay: string;
@@ -164,7 +165,8 @@ export function useLiveRightNow() {
             .select(`
               position,
               score,
-              player:sr_players!inner(first_name, last_name)
+              player_id,
+              player:sr_players!inner(id, first_name, last_name)
             `)
             .eq('tournament_id', t.id)
             .gt('strokes', 0)
@@ -188,6 +190,7 @@ export function useLiveRightNow() {
             venueCity: t.venue_city,
             isStartingSoon,
             leader: leader ? {
+              id: (leader.player as any).id,
               name: `${(leader.player as any).first_name} ${(leader.player as any).last_name}`,
               score: leader.score,
               scoreDisplay: formatScore(leader.score),
