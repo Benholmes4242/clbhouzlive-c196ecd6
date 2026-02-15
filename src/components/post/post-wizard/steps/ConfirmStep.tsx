@@ -2,8 +2,7 @@
 // All inputs are now on CaptionStep - this is review only with Edit links
 import { useMemo, useCallback, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Tag, Image, Play } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { MapPin, Tag, Image, Play, PenLine, GripVertical, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StepProps, OrderedMediaItem } from '../types';
 import { buildVideoPosterUrl } from '@/utils/mediaThumbs';
@@ -35,44 +34,56 @@ interface ConfirmStepProps extends StepProps {
   onEditLocation?: () => void;
 }
 
-// Review Card — themed with left accent & stagger entrance
-function ReviewCard({ 
-  label, 
-  value, 
-  onEdit,
+// Section Card wrapper
+function SectionCard({ 
+  children, 
   delay = 0,
+  className,
 }: { 
-  label: string; 
-  value: React.ReactNode; 
-  onEdit?: () => void;
+  children: React.ReactNode; 
   delay?: number;
+  className?: string;
 }) {
   return (
     <motion.div 
-      className="px-4 py-3 bg-card rounded-2xl border border-border border-l-2 border-l-primary shadow-sm"
+      className={cn("bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden", className)}
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: 'easeOut', delay }}
     >
-      <div className="flex items-center justify-between mb-1">
-        <span className="text-xs font-medium text-primary uppercase tracking-wide">
+      {children}
+    </motion.div>
+  );
+}
+
+// Section header with edit action
+function SectionHeader({ 
+  icon: Icon, 
+  label, 
+  onEdit,
+}: { 
+  icon: React.ElementType;
+  label: string; 
+  onEdit?: () => void;
+}) {
+  return (
+    <div className="flex items-center justify-between px-4 pt-3 pb-1">
+      <div className="flex items-center gap-1.5">
+        <Icon className="h-3.5 w-3.5 text-emerald-600" />
+        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
           {label}
         </span>
-        {onEdit && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onEdit}
-            className="h-7 px-2 py-1 -mr-2 text-xs text-primary font-medium hover:text-primary/80 active:bg-muted/50 rounded-lg"
-          >
-            Edit
-          </Button>
-        )}
       </div>
-      <div className="text-sm text-foreground">
-        {value}
-      </div>
-    </motion.div>
+      {onEdit && (
+        <button
+          onClick={onEdit}
+          className="flex items-center gap-1 px-2 py-1 -mr-1 text-xs font-medium text-emerald-600 rounded-lg active:bg-emerald-50 transition-colors"
+        >
+          <PenLine className="h-3 w-3" />
+          Edit
+        </button>
+      )}
+    </div>
   );
 }
 
@@ -141,25 +152,32 @@ function ConfirmThumbnailContent({
 
   return (
     <div className="relative aspect-square flex-shrink-0 w-full">
-      {/* Cover badge — clear "Cover" pill instead of ambiguous dot */}
+      {/* Cover badge */}
       {isFirst && !isDragOverlay && (
         <span 
-          className="absolute top-1 left-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium z-30"
+          className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-md text-[10px] font-semibold z-30"
           style={{
-            background: 'rgba(255, 255, 255, 0.9)',
+            background: 'linear-gradient(135deg, rgba(52, 211, 153, 0.9), rgba(5, 150, 105, 0.9))',
             backdropFilter: 'blur(8px)',
             WebkitBackdropFilter: 'blur(8px)',
-            color: '#334E3D',
+            color: '#fff',
           }}
         >
           Cover
         </span>
       )}
 
+      {/* Drag grip indicator */}
+      {!isDragOverlay && (
+        <div className="absolute top-1.5 right-1.5 z-30 opacity-60">
+          <GripVertical className="h-3.5 w-3.5 text-white drop-shadow-md" />
+        </div>
+      )}
+
       <div className={cn(
-        "absolute inset-0 overflow-hidden transition-all duration-150",
+        "absolute inset-0 overflow-hidden rounded-xl transition-all duration-150",
         isActive 
-          ? 'ring-2 ring-primary ring-inset' 
+          ? 'ring-2 ring-emerald-500 ring-offset-1 ring-offset-white shadow-md' 
           : 'opacity-70 hover:opacity-100'
       )}>
         {item.type === 'image' ? (
@@ -189,8 +207,10 @@ function ConfirmThumbnailContent({
 
       {/* Video indicator */}
       {item.type === 'video' && (
-        <div className="absolute bottom-1 left-1 w-4 h-4 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center z-20">
-          <Play className="w-2 h-2 text-white fill-white" />
+        <div className="absolute bottom-1.5 left-1.5 w-5 h-5 rounded-full flex items-center justify-center z-20"
+          style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
+        >
+          <Play className="w-2.5 h-2.5 text-white fill-white" />
         </div>
       )}
     </div>
@@ -322,72 +342,99 @@ export function ConfirmStep({
     setActivePreviewIndex(index);
   }, []);
 
-  // Stagger delay base for review cards
   const cardBaseDelay = 0.1;
 
   return (
-    <div className="h-full flex flex-col bg-background overflow-y-auto">
-      {/* Hero preview — 4:3 aspect, crossfade between items, video auto-loop */}
-      <div className="flex-shrink-0 w-full aspect-[4/3] max-h-[55vh] bg-muted relative overflow-hidden">
-        <AnimatePresence mode="wait">
-          {activeItem ? (
-            <motion.div
-              key={activeItem.id}
-              className="absolute inset-0"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15 }}
+    <div className="h-full flex flex-col overflow-y-auto" style={{ backgroundColor: '#FAFAF8' }}>
+      {/* Ready to share header */}
+      <motion.div 
+        className="flex items-center gap-2 px-4 pt-4 pb-2"
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <div className="h-6 w-6 rounded-full flex items-center justify-center"
+          style={{ background: 'linear-gradient(135deg, #34d399, #059669)' }}
+        >
+          <Sparkles className="h-3.5 w-3.5 text-white" />
+        </div>
+        <span className="text-sm font-semibold text-gray-800">Looking good — review your moment</span>
+      </motion.div>
+
+      {/* Hero preview — 4:3 aspect, crossfade between items */}
+      <div className="flex-shrink-0 mx-4 rounded-2xl overflow-hidden shadow-sm">
+        <div className="w-full aspect-[4/3] max-h-[55vh] bg-muted relative overflow-hidden">
+          <AnimatePresence mode="wait">
+            {activeItem ? (
+              <motion.div
+                key={activeItem.id}
+                className="absolute inset-0"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
+              >
+                {activeItem.type === 'video' ? (
+                  <video
+                    src={activeItem.previewUrl}
+                    className="w-full h-full object-cover"
+                    muted
+                    autoPlay
+                    loop
+                    playsInline
+                  />
+                ) : (
+                  <img
+                    src={activeItem.previewUrl}
+                    alt="Post preview"
+                    className="w-full h-full object-cover"
+                  />
+                )}
+              </motion.div>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <Image className="h-12 w-12 text-muted-foreground" />
+              </div>
+            )}
+          </AnimatePresence>
+
+          {/* Bottom scrim */}
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/50 via-black/20 to-transparent pointer-events-none" />
+          
+          {/* Media counter pill */}
+          {state.mediaItems.length > 1 && (
+            <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full"
+              style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(12px)' }}
             >
-              {activeItem.type === 'video' ? (
-                <video
-                  src={activeItem.previewUrl}
-                  className="w-full h-full object-cover"
-                  muted
-                  autoPlay
-                  loop
-                  playsInline
-                />
-              ) : (
-                <img
-                  src={activeItem.previewUrl}
-                  alt="Post preview"
-                  className="w-full h-full object-cover"
-                />
-              )}
-            </motion.div>
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <Image className="h-12 w-12 text-muted-foreground" />
+              <span className="text-xs text-white font-semibold tabular-nums">
+                {activePreviewIndex + 1} / {state.mediaItems.length}
+              </span>
             </div>
           )}
-        </AnimatePresence>
-
-        {/* Bottom scrim — taller gradient for caption legibility */}
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/50 via-black/20 to-transparent pointer-events-none" />
-        
-        {/* Media counter pill */}
-        {state.mediaItems.length > 1 && (
-          <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-md">
-            <span className="text-xs text-white font-medium tabular-nums">
-              {activePreviewIndex + 1}/{state.mediaItems.length}
-            </span>
-          </div>
-        )}
-        
-        {/* Caption preview overlay — responsive width */}
-        {state.caption && (
-          <div className="absolute bottom-3 left-3 right-3 max-w-[85%]">
-            <p className="text-sm text-white font-medium line-clamp-2 drop-shadow-md">
-              {state.caption}
-            </p>
-          </div>
-        )}
+          
+          {/* Caption preview overlay */}
+          {state.caption && (
+            <div className="absolute bottom-3 left-3 right-3 max-w-[85%]">
+              <p className="text-sm text-white font-medium line-clamp-2 drop-shadow-md">
+                {state.caption}
+              </p>
+            </div>
+          )}
+        </div>
       </div>
       
-      {/* Thumbnail grid — drag-to-reorder, 4px gaps, active ring */}
+      {/* Thumbnail grid — drag-to-reorder */}
       {state.mediaItems.length > 1 && (
-        <div style={{ paddingTop: '2px', paddingBottom: '2px' }}>
+        <motion.div 
+          className="px-4 pt-3"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.1 }}
+        >
+          <div className="flex items-center gap-1.5 mb-2">
+            <GripVertical className="h-3 w-3 text-gray-400" />
+            <span className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Hold & drag to reorder</span>
+          </div>
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
@@ -400,7 +447,7 @@ export function ConfirmStep({
               items={state.mediaItems.map(item => item.id)}
               strategy={rectSortingStrategy}
             >
-              <div className="grid grid-cols-3 gap-1 w-full">
+              <div className="grid grid-cols-4 gap-1.5 w-full">
                 {state.mediaItems.map((item, index) => (
                   <SortableConfirmThumbnail
                     key={item.id}
@@ -414,10 +461,9 @@ export function ConfirmStep({
               </div>
             </SortableContext>
             
-            {/* Drag overlay - follows finger */}
             <DragOverlay adjustScale={false}>
               {activeDragItem && (
-                <div className="scale-105 shadow-xl rounded-lg overflow-hidden" style={{ width: 'calc((100vw - 8px) / 3)' }}>
+                <div className="scale-105 shadow-xl rounded-xl overflow-hidden" style={{ width: 'calc((100vw - 44px) / 4)' }}>
                   <ConfirmThumbnailContent
                     item={activeDragItem}
                     index={activeDragIndex}
@@ -429,105 +475,61 @@ export function ConfirmStep({
               )}
             </DragOverlay>
           </DndContext>
-        </div>
+        </motion.div>
       )}
       
-      {/* Review cards — staggered entrance, left accent, themed tokens */}
-      <div className="flex-shrink-0 p-4 space-y-2.5">
+      {/* Review cards */}
+      <div className="flex-shrink-0 p-4 space-y-3">
         {/* Caption review card */}
         {state.caption && (
-          <ReviewCard
-            label="Caption"
-            delay={cardBaseDelay}
-            value={
-              <p className="whitespace-pre-wrap line-clamp-3">
+          <SectionCard delay={cardBaseDelay}>
+            <SectionHeader icon={PenLine} label="Caption" onEdit={onEditCaption} />
+            <div className="px-4 pb-3">
+              <p className="text-sm text-gray-700 whitespace-pre-wrap line-clamp-3 leading-relaxed">
                 {state.caption}
               </p>
-            }
-            onEdit={onEditCaption}
-          />
+            </div>
+          </SectionCard>
         )}
         
-        {/* Location review card — vertical list for 2+ courses */}
+        {/* Location review card */}
         {state.selectedCourses.length > 0 && (
-          <motion.div 
-            className="px-4 py-3 bg-card rounded-2xl border border-border border-l-2 border-l-primary shadow-sm"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, ease: 'easeOut', delay: cardBaseDelay + 0.1 }}
-          >
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-medium text-primary uppercase tracking-wide">
-                {state.selectedCourses.length === 1 ? 'Location' : 'Locations'}
-              </span>
-              {onEditLocation && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onEditLocation}
-                  className="h-7 px-2 py-1 -mr-2 text-xs text-primary font-medium hover:text-primary/80 active:bg-muted/50 rounded-lg"
-                >
-                  Edit
-                </Button>
-              )}
-            </div>
-            {state.selectedCourses.length === 1 ? (
-              /* Single course — inline */
-              <div className="flex items-center gap-2 text-sm text-foreground">
-                <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
-                <span className="font-medium">{state.selectedCourses[0].name}</span>
-              </div>
-            ) : (
-              /* Multiple courses — vertical stack */
-              <div className="flex flex-col gap-1.5">
-                {state.selectedCourses.map((course) => (
-                  <div key={course.id} className="flex items-center gap-2 text-sm text-foreground">
-                    <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
-                    <span className="font-medium">{course.name}</span>
+          <SectionCard delay={cardBaseDelay + 0.08}>
+            <SectionHeader icon={MapPin} label={state.selectedCourses.length === 1 ? 'Location' : 'Locations'} onEdit={onEditLocation} />
+            <div className="px-4 pb-3 space-y-1.5">
+              {state.selectedCourses.map((course) => (
+                <div key={course.id} className="flex items-center gap-2 text-sm">
+                  <div className="h-6 w-6 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
+                    <MapPin className="h-3 w-3 text-emerald-600" />
                   </div>
-                ))}
-              </div>
-            )}
-          </motion.div>
+                  <span className="font-medium text-gray-800">{course.name}</span>
+                </div>
+              ))}
+            </div>
+          </SectionCard>
         )}
         
-        {/* Categories card — consistent accent, stagger */}
+        {/* Categories card */}
         {hasCategories && (
-          <motion.div 
-            className="px-4 py-3 bg-card rounded-2xl border border-border border-l-2 border-l-primary shadow-sm"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, ease: 'easeOut', delay: cardBaseDelay + 0.2 }}
-          >
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-medium text-primary uppercase tracking-wide">
-                Categories
-              </span>
-              {onOpenCategories && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onOpenCategories}
-                  className="h-7 px-2 py-1 -mr-2 text-xs text-primary font-medium hover:text-primary/80 active:bg-muted/50 rounded-lg"
-                >
-                  Edit
-                </Button>
-              )}
-            </div>
-            <div className="flex items-center gap-2">
-              <Tag className="h-4 w-4 text-primary flex-shrink-0" />
-              <div className="flex flex-wrap gap-1">
+          <SectionCard delay={cardBaseDelay + 0.16}>
+            <SectionHeader icon={Tag} label="Categories" onEdit={onOpenCategories} />
+            <div className="px-4 pb-3">
+              <div className="flex flex-wrap gap-1.5">
                 {state.selectedCategories.map((cat) => (
                   <span 
                     key={typeof cat === 'string' ? cat : cat.id}
-                    className="px-2 py-0.5 text-xs rounded-full bg-primary text-primary-foreground font-medium"
+                    className="px-2.5 py-1 text-xs rounded-full font-medium"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(52, 211, 153, 0.12), rgba(5, 150, 105, 0.12))',
+                      color: '#047857',
+                    }}
                   >
                     {typeof cat === 'string' ? cat : cat.label}
                   </span>
                 ))}
               </div>
             </div>
-          </motion.div>
+          </SectionCard>
         )}
       </div>
     </div>
