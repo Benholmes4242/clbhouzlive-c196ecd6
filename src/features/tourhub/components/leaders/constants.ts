@@ -162,7 +162,7 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     tourAverage: '60.5%',
     accentColor: '#3478F6',
     accessor: (s) => s.driving_accuracy,
-    format: (v) => `${v.toFixed(1)}%`,
+    format: (v) => v.toFixed(1),
   },
   {
     key: 'gir_pct',
@@ -177,7 +177,7 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     tourAverage: '65.0%',
     accentColor: '#16A34A',
     accessor: (s) => s.greens_in_reg,
-    format: (v) => `${v.toFixed(1)}%`,
+    format: (v) => v.toFixed(1),
   },
   {
     key: 'putt_avg',
@@ -207,7 +207,7 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     tourAverage: '49.5%',
     accentColor: '#FF9500',
     accessor: (s) => s.sand_saves,
-    format: (v) => `${v.toFixed(1)}%`,
+    format: (v) => v.toFixed(1),
   },
   {
     key: 'scrambling_pct',
@@ -222,7 +222,7 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     tourAverage: '56.8%',
     accentColor: '#FF9500',
     accessor: (s) => s.scrambling,
-    format: (v) => `${v.toFixed(1)}%`,
+    format: (v) => v.toFixed(1),
   },
 ];
 

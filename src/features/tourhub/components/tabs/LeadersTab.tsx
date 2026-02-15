@@ -5,9 +5,11 @@
  * URL-persisted category via ?category= param.
  */
 
-import { useMemo } from 'react';
+import { useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { RefreshCw } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useTourSeason, useTourPlayerStatistics } from '../../hooks/useTourHubData';
 import { useWorldRankingsLeaders } from '../../hooks/useWorldRankingsLeaders';
 import { LEADER_CATEGORIES, getCategoryByKey } from '../leaders/constants';
@@ -35,6 +37,7 @@ export function LeadersTab() {
   const [searchParams, setSearchParams] = useSearchParams();
   const categoryKey = searchParams.get('category') || 'world_rank';
   const category = getCategoryByKey(categoryKey) || LEADER_CATEGORIES[0];
+  const queryClient = useQueryClient();
 
   const { data: season } = useTourSeason();
   const { data: playerStats, isLoading: statsLoading } = useTourPlayerStatistics(season?.id);
@@ -42,6 +45,57 @@ export function LeadersTab() {
 
   const isWorldCategory = category.key === 'world_rank';
   const isLoading = isWorldCategory ? worldLoading : statsLoading;
+
+  // ─── Scroll to top on category change ───
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [categoryKey]);
+
+  // ─── Scroll to top on mount ───
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
+
+  // ─── Pull-to-refresh ───
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [pullDistance, setPullDistance] = useState(0);
+  const touchStartY = useRef(0);
+  const isPulling = useRef(false);
+
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    await queryClient.invalidateQueries({ queryKey: ['tour-player-statistics'] });
+    await queryClient.invalidateQueries({ queryKey: ['world-rankings-leaders'] });
+    setTimeout(() => {
+      setIsRefreshing(false);
+      setPullDistance(0);
+    }, 600);
+  }, [queryClient]);
+
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    if (window.scrollY <= 0) {
+      touchStartY.current = e.touches[0].clientY;
+      isPulling.current = true;
+    }
+  }, []);
+
+  const onTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isPulling.current || isRefreshing) return;
+    const diff = e.touches[0].clientY - touchStartY.current;
+    if (diff > 0) {
+      setPullDistance(Math.min(diff * 0.5, 80));
+    }
+  }, [isRefreshing]);
+
+  const onTouchEnd = useCallback(() => {
+    if (!isPulling.current) return;
+    isPulling.current = false;
+    if (pullDistance >= 50) {
+      handleRefresh();
+    } else {
+      setPullDistance(0);
+    }
+  }, [pullDistance, handleRefresh]);
 
   const setCategory = (key: string) => {
     const params = new URLSearchParams(searchParams);
@@ -125,7 +179,22 @@ export function LeadersTab() {
   const listPlayers = rankedPlayers.slice(3);
 
   return (
-    <div>
+    <div
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
+      {/* Pull-to-refresh indicator */}
+      <div className="flex justify-center overflow-hidden" style={{ height: pullDistance > 0 || isRefreshing ? `${Math.max(pullDistance, isRefreshing ? 40 : 0)}px` : '0px', transition: isRefreshing ? 'none' : 'height 0.2s ease' }}>
+        <motion.div
+          className="flex items-center justify-center"
+          animate={{ rotate: isRefreshing ? 360 : pullDistance * 3.6 }}
+          transition={isRefreshing ? { repeat: Infinity, duration: 0.8, ease: 'linear' } : { duration: 0 }}
+        >
+          <RefreshCw className="w-5 h-5 text-muted-foreground" />
+        </motion.div>
+      </div>
+
       {/* Immersive hero for #1 */}
       <div className="relative">
         <AnimatePresence mode="wait">

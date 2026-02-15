@@ -73,7 +73,11 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
               transition={{ duration: 12, ease: 'linear' }}
             />
           ) : (
-            <div className="absolute inset-0 w-full h-full bg-muted" />
+            <div className="absolute inset-0 w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${category.accentColor}22, ${category.accentColor}44)` }}>
+              <span className="text-6xl font-bold text-foreground/20 select-none">
+                {player.full_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+              </span>
+            </div>
           )}
 
           {/* Gradient for text legibility — matches PlayersHero */}
