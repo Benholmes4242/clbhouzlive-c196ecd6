@@ -1,7 +1,6 @@
 /**
- * PlayerSkillTreeCard - RPG-style skill visualization
- * Scroll-triggered animations, larger radar chart with gradient fill,
- * bigger overall badge with glow, glass card treatment.
+ * PlayerSkillTreeCard - RPG-style skill visualization.
+ * No card container — editorial layout directly on page background.
  */
 
 import { memo } from 'react';
@@ -16,8 +15,6 @@ import {
   type SkillAttribute,
 } from '../../hooks/usePlayerSkillTree';
 
-const CARD_CLASS = "rounded-2xl border border-border/40 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.04)]";
-
 const SKILL_ICONS: Record<SkillAttributeKey, React.ElementType> = {
   power: Zap,
   precision: Target,
@@ -28,10 +25,18 @@ const SKILL_ICONS: Record<SkillAttributeKey, React.ElementType> = {
 
 const SKILL_ICON_BG: Record<SkillAttributeKey, string> = {
   power: 'bg-red-500/10 text-red-500',
-  precision: 'bg-blue-500/10 text-blue-500',
-  scoring: 'bg-amber-500/10 text-amber-500',
-  recovery: 'bg-green-500/10 text-green-500',
+  precision: 'bg-amber-500/10 text-amber-500',
+  scoring: 'bg-emerald-500/10 text-emerald-500',
+  recovery: 'bg-teal-500/10 text-teal-500',
   consistency: 'bg-purple-500/10 text-purple-500',
+};
+
+const SKILL_BAR_COLORS: Record<SkillAttributeKey, string> = {
+  power: 'bg-red-500',
+  precision: 'bg-amber-500',
+  scoring: 'bg-emerald-500',
+  recovery: 'bg-teal-500',
+  consistency: 'bg-purple-500',
 };
 
 const springSnappy = {
@@ -41,15 +46,17 @@ const springSnappy = {
   mass: 0.8,
 };
 
-/** Animated Level Bar - 10 blocks with stagger */
-const LevelBar = memo(({ level, gradient, delay = 0, animate = true }: { level: number; gradient: string; delay?: number; animate?: boolean }) => (
-  <div className="flex gap-0.5 flex-1">
+/** Animated Level Bar - 10 pill segments */
+const LevelBar = memo(({ level, colorKey, isStrongest, delay = 0, animate = true }: { level: number; colorKey: SkillAttributeKey; isStrongest: boolean; delay?: number; animate?: boolean }) => (
+  <div className="flex gap-1 flex-1">
     {Array.from({ length: 10 }).map((_, index) => (
       <motion.div
         key={index}
         className={cn(
-          "flex-1 h-3 rounded-sm",
-          index < level ? `bg-gradient-to-r ${gradient}` : "bg-muted/30"
+          "flex-1 h-3 rounded-full",
+          index < level
+            ? isStrongest ? "bg-amber-500" : SKILL_BAR_COLORS[colorKey]
+            : "bg-muted"
         )}
         initial={animate ? { scaleX: 0 } : false}
         animate={animate ? { scaleX: 1 } : undefined}
@@ -69,8 +76,8 @@ const AttributeRow = memo(({ attribute, isStrongest, delay = 0, animate = true }
   return (
     <motion.div
       className={cn(
-        "flex items-center gap-3 py-3 px-3 rounded-xl transition-colors",
-        isStrongest && "bg-gradient-to-r from-amber-500/10 to-transparent border border-amber-500/20"
+        "flex items-center gap-3 py-3 px-3 rounded-lg transition-colors",
+        isStrongest && "bg-amber-50 dark:bg-amber-500/10 -mx-3"
       )}
       initial={animate ? { opacity: 0, x: -20 } : false}
       animate={animate ? { opacity: 1, x: 0 } : undefined}
@@ -86,7 +93,8 @@ const AttributeRow = memo(({ attribute, isStrongest, delay = 0, animate = true }
       </div>
       <LevelBar
         level={attribute.level}
-        gradient={isStrongest ? "from-amber-500 to-amber-400" : config.gradient}
+        colorKey={attribute.key}
+        isStrongest={isStrongest}
         delay={delay}
         animate={animate}
       />
@@ -103,13 +111,13 @@ const AttributeRow = memo(({ attribute, isStrongest, delay = 0, animate = true }
 });
 AttributeRow.displayName = 'AttributeRow';
 
-/** Overall Level Badge — larger (64px) with glow */
+/** Overall Level Badge — larger with glow */
 const OverallLevelBadge = memo(({ level, animate = true }: { level: number; animate?: boolean }) => {
   const getTier = (lvl: number) => {
-    if (lvl >= 9) return { name: 'Elite', color: 'text-amber-500', gradient: 'from-amber-500 to-yellow-400', glow: '0 0 20px rgba(245,158,11,0.3)' };
-    if (lvl >= 7) return { name: 'Champion', color: 'text-purple-500', gradient: 'from-purple-500 to-violet-400', glow: '0 0 20px rgba(168,85,247,0.3)' };
-    if (lvl >= 5) return { name: 'Contender', color: 'text-blue-500', gradient: 'from-blue-500 to-cyan-400', glow: '0 0 20px rgba(59,130,246,0.3)' };
-    return { name: 'Rising', color: 'text-emerald-500', gradient: 'from-emerald-500 to-green-400', glow: '0 0 20px rgba(16,185,129,0.3)' };
+    if (lvl >= 9) return { name: 'Elite', color: 'text-amber-500', gradient: 'from-amber-500 to-yellow-400', glow: '0 0 24px rgba(245,158,11,0.35)' };
+    if (lvl >= 7) return { name: 'Champion', color: 'text-purple-500', gradient: 'from-purple-500 to-violet-400', glow: '0 0 24px rgba(168,85,247,0.35)' };
+    if (lvl >= 5) return { name: 'Contender', color: 'text-blue-500', gradient: 'from-blue-500 to-cyan-400', glow: '0 0 24px rgba(59,130,246,0.35)' };
+    return { name: 'Rising', color: 'text-emerald-500', gradient: 'from-emerald-500 to-green-400', glow: '0 0 24px rgba(16,185,129,0.35)' };
   };
   const tier = getTier(level);
 
@@ -121,14 +129,14 @@ const OverallLevelBadge = memo(({ level, animate = true }: { level: number; anim
       transition={springSnappy}
     >
       <div
-        className={cn("w-16 h-16 rounded-2xl bg-gradient-to-br flex flex-col items-center justify-center", tier.gradient)}
+        className={cn("w-[68px] h-[68px] rounded-2xl bg-gradient-to-br flex flex-col items-center justify-center", tier.gradient)}
         style={{ boxShadow: tier.glow }}
       >
         <span className="text-white/80 text-[10px] uppercase tracking-wide font-medium">Overall</span>
         <span className="text-white text-2xl font-bold font-mono">{level}</span>
       </div>
       <div>
-        <span className={cn("text-[16px] font-bold", tier.color)}>{tier.name}</span>
+        <span className={cn("text-[17px] font-bold", tier.color)}>{tier.name}</span>
         <p className="text-xs text-muted-foreground">Skill Tier</p>
       </div>
     </motion.div>
@@ -136,7 +144,7 @@ const OverallLevelBadge = memo(({ level, animate = true }: { level: number; anim
 });
 OverallLevelBadge.displayName = 'OverallLevelBadge';
 
-/** SVG Radar / Spider Chart — larger with gradient fill */
+/** SVG Radar / Spider Chart */
 function SkillRadarChart({ attributes, animate = true }: { attributes: SkillAttribute[]; animate?: boolean }) {
   const SIZE = 280;
   const CENTER = SIZE / 2;
@@ -277,9 +285,9 @@ export function PlayerSkillTreeCard({ playerId }: { playerId: string }) {
 
   if (isLoading) {
     return (
-      <div className={cn(CARD_CLASS, "p-5")}>
-        <h2 className="text-[16px] font-semibold text-foreground mb-4 flex items-center gap-2 pl-3 border-l-3 border-primary">
-          <Activity className="w-4.5 h-4.5 text-primary" />
+      <div>
+        <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+          <Activity className="w-5 h-5 text-muted-foreground" />
           Skill Build
         </h2>
         <SkillTreeSkeleton />
@@ -289,9 +297,9 @@ export function PlayerSkillTreeCard({ playerId }: { playerId: string }) {
 
   if (error || !skillTree || skillTree.attributes.length === 0) {
     return (
-      <div className={cn(CARD_CLASS, "p-5")}>
-        <h2 className="text-[16px] font-semibold text-foreground mb-4 flex items-center gap-2 pl-3 border-l-3 border-primary">
-          <Activity className="w-4.5 h-4.5 text-primary" />
+      <div>
+        <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+          <Activity className="w-5 h-5 text-muted-foreground" />
           Skill Build
         </h2>
         <SkillTreeEmpty />
@@ -300,26 +308,26 @@ export function PlayerSkillTreeCard({ playerId }: { playerId: string }) {
   }
 
   return (
-    <div ref={ref} className={cn(CARD_CLASS, "p-5")}>
+    <div ref={ref}>
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-[16px] font-semibold text-foreground flex items-center gap-2 pl-3 border-l-3 border-primary">
-          <Activity className="w-4.5 h-4.5 text-primary" />
+        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+          <Activity className="w-5 h-5 text-muted-foreground" />
           Skill Build
         </h2>
         <OverallLevelBadge level={skillTree.overallLevel} animate={inView} />
       </div>
 
-      {/* Strongest Attribute Callout */}
+      {/* Strongest Attribute Callout — full width strip */}
       {inView && skillTree.strongestAttribute && (
         <motion.div
-          className="mb-4 px-4 py-3 rounded-xl bg-gradient-to-r from-amber-500/10 to-transparent border border-amber-500/20"
+          className="mb-4 px-4 py-3 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-500/20 w-full"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={springSnappy}
         >
           <div className="flex items-center gap-2">
-            <span className="text-amber-500 text-[13px] font-semibold">Dominant Skill:</span>
+            <span className="text-amber-600 text-[13px] font-semibold">Dominant Skill:</span>
             <div className={cn("w-5 h-5 rounded-md flex items-center justify-center", SKILL_ICON_BG[skillTree.strongestAttribute])}>
               {(() => { const Ic = SKILL_ICONS[skillTree.strongestAttribute]; return <Ic className="w-3.5 h-3.5" />; })()}
             </div>
@@ -330,7 +338,7 @@ export function PlayerSkillTreeCard({ playerId }: { playerId: string }) {
         </motion.div>
       )}
 
-      {/* Attribute Rows — only animate when in view */}
+      {/* Attribute Rows */}
       <div className="space-y-1">
         {skillTree.attributes.map((attr, index) => (
           <AttributeRow
@@ -344,7 +352,7 @@ export function PlayerSkillTreeCard({ playerId }: { playerId: string }) {
       </div>
 
       {/* Radar Chart */}
-      <div className="mt-6 pt-4 border-t border-border/30">
+      <div className="mt-6 pt-4 border-t border-border">
         <SkillRadarChart attributes={skillTree.attributes} animate={inView} />
       </div>
 
