@@ -333,3 +333,12 @@
     line-height: 28px;
   }
 }
+
+/* FIX 22: Landscape orientation safety net */
+@media (orientation: landscape) and (max-height: 500px) {
+  .th-hero-full,
+  .th-hero-half {
+    max-height: 60vh;
+    min-height: auto;
+  }
+}

@@ -7,7 +7,7 @@
  * #2/#3 chasers: stacked vertically, same card style as performance rankings leader
  */
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRight, GraduationCap, DollarSign, Trophy, Users } from 'lucide-react';
@@ -104,10 +104,12 @@ function HeroCollegeCard({
   stats,
   media,
   alumni,
+  rank = 1,
 }: {
   stats: CollegeSeasonStats;
   media: CollegeMedia | undefined;
   alumni: AlumniFace[];
+  rank?: number;
 }) {
   const navigate = useNavigate();
   const displayName = media?.college_name || stats.normalized_name;
@@ -118,18 +120,13 @@ function HeroCollegeCard({
   const topWinner = alumni[1] || null;
 
   return (
-    <motion.button
+    <button
       onClick={() => navigate(`/tourhub/college?sort=earnings`)}
       className="w-full overflow-hidden text-left cursor-pointer aspect-square rounded-2xl"
       style={{
         background: gradient,
         boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
       }}
-      whileTap={{ scale: 0.98 }}
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
     >
       <div className="relative h-full flex flex-col">
         {/* Subtle vignette overlay */}
@@ -161,7 +158,7 @@ function HeroCollegeCard({
             />
           )}
 
-          {/* #1 THIS SEASON badge */}
+          {/* Rank badge */}
           <div className="flex items-center gap-2 mb-2">
             <div
               className="w-6 h-6 rounded-md flex items-center justify-center"
@@ -181,7 +178,7 @@ function HeroCollegeCard({
                 color: 'rgba(255,255,255,0.45)',
               }}
             >
-              #1 This Season
+              #{rank} This Season
             </span>
           </div>
 
@@ -244,7 +241,110 @@ function HeroCollegeCard({
           </div>
         </div>
       </div>
-    </motion.button>
+    </button>
+  );
+}
+
+// ============================================================================
+// COLLEGE HERO CAROUSEL — Swipeable top 3 schools
+// ============================================================================
+
+function CollegeHeroCarousel({
+  top3,
+  collegeMap,
+  alumniMap,
+}: {
+  top3: CollegeSeasonStats[];
+  collegeMap: Map<string, CollegeMedia> | undefined;
+  alumniMap: Map<string, AlumniFace[]> | undefined;
+}) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const touchMoveRef = useRef(0);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartRef.current = {
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY,
+    };
+    touchMoveRef.current = 0;
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!touchStartRef.current) return;
+    touchMoveRef.current = e.touches[0].clientX - touchStartRef.current.x;
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (!touchStartRef.current) return;
+    const deltaX = touchMoveRef.current;
+    const deltaY = Math.abs(
+      (e.changedTouches[0]?.clientY ?? 0) - touchStartRef.current.y
+    );
+    const threshold = 50;
+
+    if (Math.abs(deltaX) > threshold && Math.abs(deltaX) > deltaY) {
+      if (deltaX < -threshold && currentIndex < top3.length - 1) {
+        setCurrentIndex(prev => prev + 1);
+      } else if (deltaX > threshold && currentIndex > 0) {
+        setCurrentIndex(prev => prev - 1);
+      }
+    }
+
+    touchStartRef.current = null;
+    touchMoveRef.current = 0;
+  }, [currentIndex, top3.length]);
+
+  return (
+    <div>
+      <div
+        className="overflow-hidden"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        <div
+          className="flex"
+          style={{
+            transform: `translateX(-${currentIndex * 100}%)`,
+            transition: 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+          }}
+        >
+          {top3.map((stats, idx) => (
+            <div key={stats.id} className="w-full flex-shrink-0">
+              <HeroCollegeCard
+                stats={stats}
+                media={collegeMap?.get(stats.normalized_name)}
+                alumni={alumniMap?.get(stats.normalized_name) || []}
+                rank={idx + 1}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Pagination dots */}
+      {top3.length > 1 && (
+        <div className="flex items-center justify-center gap-1.5 mt-3">
+          {top3.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentIndex(idx)}
+              className="transition-all duration-300"
+              style={{
+                width: idx === currentIndex ? 20 : 6,
+                height: 6,
+                borderRadius: 3,
+                background: idx === currentIndex
+                  ? 'hsl(var(--foreground) / 0.7)'
+                  : 'hsl(var(--foreground) / 0.15)',
+              }}
+              aria-label={`View school ${idx + 1}`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -523,45 +623,12 @@ export function CollegeRankingsPreview() {
         <NarrativeStrip topCollege={topCollege} />
       </motion.div>
 
-      {/* #1 COLLEGE HERO — full-width edge-to-edge */}
-      <div>
-        <HeroCollegeCard
-          stats={topCollege}
-          media={topMedia}
-          alumni={topAlumni}
-        />
-      </div>
-
-      {/* THE CHASERS (#2 & #3) — stacked vertically */}
-      {chasers.length > 0 && (
-        <div className="px-4" style={{ marginTop: '16px' }}>
-          <p
-            className="m-0 text-muted-foreground"
-            style={{
-              fontSize: '11px',
-              fontWeight: 600,
-              letterSpacing: '0.5px',
-              textTransform: 'uppercase',
-              marginBottom: '8px',
-            }}
-          >
-            The Chasers
-          </p>
-          <div className="flex flex-col" style={{ gap: '12px' }}>
-            {chasers.map((s, idx) => (
-              <ChaserCard
-                key={s.id}
-                stats={s}
-                media={collegeMap?.get(s.normalized_name)}
-                rank={idx + 2}
-                leaderStats={topCollege}
-                alumni={alumniMap?.get(s.normalized_name) || []}
-                index={idx}
-              />
-            ))}
-          </div>
-        </div>
-      )}
+      {/* COLLEGE HERO CAROUSEL — swipeable top 3 */}
+      <CollegeHeroCarousel
+        top3={top3}
+        collegeMap={collegeMap}
+        alumniMap={alumniMap}
+      />
 
       {/* CTA — same style as Performance Rankings ViewAllFooter */}
       <div style={{ padding: '16px 16px 0' }}>
