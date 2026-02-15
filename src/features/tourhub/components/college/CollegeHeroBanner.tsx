@@ -32,7 +32,7 @@ export function CollegeHeroBanner({ stats, college, className }: CollegeHeroBann
         exit={{ opacity: 0 }}
         transition={{ duration: 0.4 }}
         className={cn('relative overflow-hidden', className)}
-        style={{ height: 'clamp(256px, 48vh, 384px)' }}
+        style={{ height: 'clamp(282px, 53vh, 422px)' }}
       >
         {/* Background gradient with Ken Burns */}
         <motion.div
@@ -63,7 +63,7 @@ export function CollegeHeroBanner({ stats, college, className }: CollegeHeroBann
         <Link
           to={`/tourhub/college-golf/${stats.normalized_name}`}
           className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-8 pt-20"
-          style={{ minHeight: 'clamp(256px, 48vh, 384px)' }}
+          style={{ minHeight: 'clamp(282px, 53vh, 422px)' }}
         >
           {/* Logo */}
           <motion.div
