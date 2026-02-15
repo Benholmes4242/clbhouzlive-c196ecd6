@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTourSeason, useTourPlayerStatistics } from '../../hooks/useTourHubData';
 import { useWorldRankingsLeaders } from '../../hooks/useWorldRankingsLeaders';
 import { LEADER_CATEGORIES, getCategoryByKey } from '../leaders/constants';
-import { LeadersCategoryPicker } from '../leaders/LeadersCategoryPicker';
+import { LeadersCategorySheet } from '../leaders/LeadersCategorySheet';
 import { LeadersHero } from '../leaders/LeadersHero';
 import { LeadersRunnersStrip } from '../leaders/LeadersRunnersStrip';
 import { LeaderRow } from '../leaders/LeaderRow';
@@ -153,12 +153,11 @@ export function LeadersTab() {
 
       {/* Content area — tight spacing */}
       <div className="px-4 sm:px-6 space-y-3 pt-4 pb-6">
-        {/* Category picker — no fade */}
-        <LeadersCategoryPicker
+        {/* Category selector button + bottom sheet */}
+        <LeadersCategorySheet
           categories={LEADER_CATEGORIES}
           activeKey={category.key}
           onCategoryChange={setCategory}
-          leaderValue={leaderValue}
         />
 
         {/* Rankings list (#4–50) */}
