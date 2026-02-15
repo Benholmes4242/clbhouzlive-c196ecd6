@@ -104,7 +104,7 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
     : null;
 
   return (
-    <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 overflow-hidden">
+    <div className="relative overflow-hidden">
       {/* Background container with Ken Burns */}
       <motion.div 
         className="relative overflow-hidden"
