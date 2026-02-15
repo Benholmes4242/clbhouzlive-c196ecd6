@@ -10,6 +10,7 @@ import { ChevronRight, MapPin } from 'lucide-react';
 import { useUpcomingTournaments } from '../../hooks/useUpcomingTournaments';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SectionErrorState } from '../SectionErrorState';
+import { getTourLogo } from '../../utils/tourLogos';
 import type { SeasonTournament } from '../../hooks/useSeasonTournaments';
 
 // ============ Context Label Logic ============
@@ -17,6 +18,15 @@ import type { SeasonTournament } from '../../hooks/useSeasonTournaments';
 const MAJOR_KEYWORDS = ['masters', 'u.s. open', 'us open', 'open championship', 'pga championship'];
 const SIGNATURE_KEYWORDS = ['invitational', 'genesis', 'arnold palmer', 'memorial', 'players'];
 const PLAYOFF_KEYWORDS = ['playoff', 'tour championship', 'fedexcup'];
+
+const TOUR_NAME_TO_SLUG: Record<string, string> = {
+  'PGA Tour': 'pga',
+  'LIV Golf': 'liv',
+  'DP World Tour': 'euro',
+  'Korn Ferry Tour': 'pgad',
+  'Champions Tour': 'champ',
+  'LPGA Tour': 'lpga',
+};
 
 function getContextLabel(tournament: SeasonTournament): string {
   const nameLower = tournament.name.toLowerCase();
@@ -54,6 +64,8 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
   const isSignature = contextLabel === 'SIGNATURE EVENT';
   const isMajor = contextLabel === 'MAJOR CHAMPIONSHIP';
   const venue = getVenueString(tournament);
+  const tourSlug = TOUR_NAME_TO_SLUG[tournament.tourName || ''] || '';
+  const tourLogoSrc = tourSlug ? getTourLogo(tourSlug) : null;
 
   // FIX 17: Left border accent for Signature/Major events
   const leftBorderStyle = isMajor
@@ -107,6 +119,17 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
           </p>
         )}
       </div>
+
+      {/* Tour logo */}
+      {tourLogoSrc && (
+        <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center opacity-50">
+          <img
+            src={tourLogoSrc}
+            alt={tournament.tourName || 'Tour'}
+            className="max-w-full max-h-full object-contain"
+          />
+        </div>
+      )}
     </motion.button>
   );
 }
