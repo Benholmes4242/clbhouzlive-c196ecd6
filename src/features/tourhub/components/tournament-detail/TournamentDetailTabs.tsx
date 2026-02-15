@@ -90,8 +90,8 @@ export function TournamentDetailTabs({ activeTab, onTabChange, className, tourna
               {/* LIVE pulsing dot on Leaderboard tab */}
               {isLive && tab.value === 'leaderboard' && (
                 <span className="relative flex h-2 w-2 ml-0.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: '#E09F3E' }} />
-                  <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: '#E09F3E' }} />
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: '#f59e0b' }} />
+                  <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: '#f59e0b' }} />
                 </span>
               )}
             </button>

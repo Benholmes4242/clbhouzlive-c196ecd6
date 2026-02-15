@@ -115,7 +115,7 @@ function TournamentRow({ tournament, isLive, index }: {
         </p>
         
         {isLive && leader ? (
-          <p className="text-sm font-medium mt-1" style={{ color: '#E09F3E' }}>
+          <p className="text-sm font-medium mt-1" style={{ color: '#f59e0b' }}>
             Leader: {leader.player.firstName[0]}. {leader.player.lastName} {leader.scoreDisplay}
           </p>
         ) : (

@@ -92,9 +92,9 @@ export function ScheduleTournamentCard({
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
       className={`w-full flex items-center gap-3 px-3.5 py-2.5 bg-card rounded-2xl border text-left transition-all active:scale-[0.98] ${className || ''}`}
       style={{
-        borderColor: isMajor ? 'rgba(224, 159, 62, 0.35)' : undefined,
+        borderColor: isMajor ? 'rgba(245, 158, 11, 0.35)' : undefined,
         borderLeftWidth: isMajor ? '3px' : undefined,
-        borderLeftColor: isMajor ? '#E09F3E' : undefined,
+        borderLeftColor: isMajor ? '#f59e0b' : undefined,
       }}
       whileTap={{ scale: 0.98 }}
     >
@@ -118,7 +118,7 @@ export function ScheduleTournamentCard({
               fontSize: '9px',
               fontWeight: 500,
               letterSpacing: '0.05em',
-              color: isMajor ? '#E09F3E' : isSignature ? 'hsl(var(--primary))' : isLive ? '#E09F3E' : '#A8A29E',
+              color: isMajor ? '#f59e0b' : isSignature ? 'hsl(var(--primary))' : isLive ? '#f59e0b' : '#A8A29E',
             }}
           >
             {isLive ? '● LIVE' : contextLabel}
@@ -148,7 +148,7 @@ export function ScheduleTournamentCard({
               </span>
             )}
             {hasLeaderData && !isFinal && (
-              <span style={{ color: '#E09F3E' }}>
+              <span style={{ color: '#f59e0b' }}>
                 Leader: {leaderWinner!.displayName}
                 <span className="font-mono ml-1">{leaderWinner!.displayScore}</span>
               </span>

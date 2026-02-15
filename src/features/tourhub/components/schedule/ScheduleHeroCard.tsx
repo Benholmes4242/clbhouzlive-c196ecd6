@@ -147,7 +147,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
                 <span style={{ fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>
                   Leader: {leaderWinner.displayName}
                 </span>
-                <span className="score-mono" style={{ fontSize: '16px', fontWeight: 700, color: '#E09F3E' }}>
+                <span className="score-mono" style={{ fontSize: '16px', fontWeight: 700, color: '#f59e0b' }}>
                   {leaderWinner.displayScore}
                 </span>
               </div>

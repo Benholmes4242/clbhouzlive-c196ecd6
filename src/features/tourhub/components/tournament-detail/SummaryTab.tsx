@@ -150,7 +150,7 @@ function WinnerCard({ winner, runnerUp, headshotMap }: {
         {earnings && (
           <div className="flex items-center gap-1.5">
             <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Earnings:</span>
-            <span className="text-xs font-semibold" style={{ color: '#E09F3E' }}>{earnings}</span>
+            <span className="text-xs font-semibold" style={{ color: '#f59e0b' }}>{earnings}</span>
           </div>
         )}
       </div>

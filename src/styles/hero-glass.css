@@ -157,7 +157,7 @@
   text-align: right;
 }
 
-.score-under { color: #E09F3E; }  /* amber/gold = under par */
+.score-under { color: #f59e0b; }  /* amber-500 = under par */
 .score-over { color: #D62828; }   /* red = over par */
 .score-even { color: rgba(255, 255, 255, 0.7); }
 
@@ -547,8 +547,8 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #E09F3E;
-  box-shadow: 0 0 10px rgba(224, 159, 62, 0.4);
+  background: #f59e0b;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
   animation: livePulse 2s ease-in-out infinite;
 }
 
