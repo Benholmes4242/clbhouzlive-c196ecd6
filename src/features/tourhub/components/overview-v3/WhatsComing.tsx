@@ -122,7 +122,13 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
 
       {/* Tour logo */}
       {tourLogoSrc && (
-        <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center opacity-50">
+        <div
+          className="flex-shrink-0 flex items-center justify-center opacity-50"
+          style={{
+            width: ['euro', 'pgad', 'liv'].includes(tourSlug) ? 48 : 40,
+            height: ['euro', 'pgad', 'liv'].includes(tourSlug) ? 48 : 40,
+          }}
+        >
           <img
             src={tourLogoSrc}
             alt={tournament.tourName || 'Tour'}
