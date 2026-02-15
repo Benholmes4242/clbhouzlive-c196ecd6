@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { Users, ChevronRight, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
+import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import type { CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import type { CollegeMedia } from '../../hooks/useCollegeMedia';
 import type { CollegeStatus, CollegeMomentum } from '../../hooks/useCollegeStatus';
@@ -211,20 +212,21 @@ export function FranchiseCard({
               </span>
             </div>
 
-            {/* Alumni face preview */}
+            {/* Alumni face preview — squircle shape with resolved photos */}
             {alumni && alumni.length > 0 && (
               <div className="flex items-center -space-x-1.5 mt-2">
-                {alumni.slice(0, 3).map(a => (
-                  <div key={a.id} className="w-5 h-5 rounded-full border-[1.5px] border-card overflow-hidden bg-muted">
-                    {a.photo_url ? (
-                      <img src={a.photo_url} alt={a.full_name} className="w-full h-full object-cover" loading="lazy" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-[7px] font-bold text-muted-foreground">
-                        {a.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                      </div>
-                    )}
-                  </div>
-                ))}
+                {alumni.slice(0, 3).map(a => {
+                  const photoUrl = resolvePhotoUrl(a.photo_url, a.pga_tour_id);
+                  return (
+                    <div key={a.id} className="w-5 h-5 border-[1.5px] border-card overflow-hidden bg-muted" style={{ borderRadius: '34%' }}>
+                      {photoUrl ? (
+                        <img src={photoUrl} alt={a.full_name} className="w-full h-full object-cover object-top" loading="lazy" />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20" />
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

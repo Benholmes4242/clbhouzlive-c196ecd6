@@ -21,23 +21,29 @@ export function CollegeSearch({ className }: CollegeSearchProps) {
   
   return (
     <div className={cn('relative', className)}>
-      {/* Search Input */}
+      {/* Search Input — matches Players page design */}
       <div className="relative">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60 pointer-events-none" />
+        <Search 
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-muted-foreground w-[18px] h-[18px]"
+          strokeWidth={2.5}
+        />
         <input
           type="text"
           placeholder="Search colleges..."
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          className="w-full h-11 pl-10 pr-9 bg-muted/50 border border-border/40 rounded-xl text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
+          className="w-full h-12 pl-11 pr-10 rounded-xl text-[14px] transition-all duration-200 bg-card/80 backdrop-blur-sm border text-foreground placeholder:text-muted-foreground border-border/60 ring-transparent shadow-sm focus:outline-none focus:ring-2 focus:border-border focus:ring-border/50 focus:shadow-lg focus:bg-card"
         />
         {searchInput && (
-          <button
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
             onClick={() => setSearchInput('')}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-muted-foreground hover:text-foreground active:scale-90 transition-all"
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-muted hover:bg-muted/80 active:scale-[0.9] transition-transform"
           >
-            <X className="w-4 h-4" />
-          </button>
+            <X className="w-3.5 h-3.5 text-muted-foreground" />
+          </motion.button>
         )}
       </div>
       

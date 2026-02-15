@@ -13,6 +13,7 @@ import {
 import { useCollegeStats } from '../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
 import { useCollegeRivalries } from '../hooks/useCollegeMovers';
+import { getCollegeGradientCSS } from '../config/collegeBrandColors';
 import { Button } from '@/components/ui/button';
 import {
   Tooltip,
@@ -43,6 +44,9 @@ export function CollegeProfilePage() {
   const rivalSlugs = rivalries?.map(r => r.rivalNormalizedName) ?? [];
   const firstRival = rivalSlugs[0] ?? null;
   
+  // Get college gradient for hero color bleed
+  const gradientCSS = collegeSlug ? getCollegeGradientCSS(collegeSlug) : null;
+  
   // Reset compareCollege2 when collegeSlug changes
   useEffect(() => {
     setCompareCollege2(null);
@@ -65,11 +69,24 @@ export function CollegeProfilePage() {
   
   return (
     <TourHubShell>
+      {/* College brand color bleed — matches CollegeHeroBanner */}
+      {gradientCSS && (
+        <div
+          className="absolute inset-x-0 top-0 h-[200px] z-0"
+          style={{
+            background: gradientCSS,
+            maskImage: 'linear-gradient(180deg, black 0%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(180deg, black 0%, transparent 100%)',
+          }}
+        />
+      )}
+
       {/* Back Link */}
-      <div className="pt-4">
+      <div className="pt-4 relative z-10">
         <Link 
           to="/tourhub/college-golf" 
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          style={gradientCSS ? { color: 'rgba(255,255,255,0.7)' } : undefined}
         >
           <ArrowLeft className="w-4 h-4" />
           College Rankings
@@ -77,7 +94,7 @@ export function CollegeProfilePage() {
       </div>
       
       {/* Content */}
-      <div className="py-6">
+      <div className="py-6 relative z-10">
         {isLoading ? (
           <div className="space-y-6">
             {/* Hero skeleton */}
