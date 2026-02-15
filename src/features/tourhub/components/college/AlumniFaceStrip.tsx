@@ -11,6 +11,12 @@ import { cn } from '@/lib/utils';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import type { AlumniFace } from '../../hooks/useBatchCollegeAlumni';
 
+function getInitials(fullName: string): string {
+  const parts = fullName.trim().split(/\s+/);
+  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  return parts[0]?.slice(0, 2).toUpperCase() || '?';
+}
+
 interface AlumniFaceStripProps {
   alumni: AlumniFace[];
   collegeName: string;
@@ -68,7 +74,11 @@ export function AlumniFaceStrip({ alumni, collegeName, collegeSlug, totalAlumniC
                     loading="lazy"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20" />
+                  <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/30 flex items-center justify-center">
+                    <span className="text-[9px] font-bold text-muted-foreground/70 leading-none">
+                      {getInitials(alum.full_name)}
+                    </span>
+                  </div>
                 )}
               </div>
             );

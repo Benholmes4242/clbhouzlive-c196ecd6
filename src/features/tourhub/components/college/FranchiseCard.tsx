@@ -51,6 +51,16 @@ function formatDeltaValue(n: number): string {
   return `${sign}$${Math.abs(n).toLocaleString()}`;
 }
 
+function pluralize(count: number, singular: string, plural?: string): string {
+  return Math.abs(count) === 1 ? singular : (plural || singular + 's');
+}
+
+function getInitials(fullName: string): string {
+  const parts = fullName.trim().split(/\s+/);
+  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  return parts[0]?.slice(0, 2).toUpperCase() || '?';
+}
+
 export function FranchiseCard({
   stats, college, rank, activeMetric = 'earnings',
   status, momentum, alumni, className, animationDelay = 0,
@@ -70,21 +80,30 @@ export function FranchiseCard({
       const cutsStr = deltas.cuts_delta !== 0 ? `${deltas.cuts_delta > 0 ? '+' : ''}${deltas.cuts_delta}` : null;
       
       items.push({ label: '', value: earningsStr, isAccent: true, color: deltas.earnings_delta >= 0 ? 'text-emerald-600' : 'text-rose-600' });
-      if (winsStr) items.push({ label: 'wins', value: winsStr, isAccent: false, color: deltas.wins_delta > 0 ? 'text-amber-600' : 'text-muted-foreground' });
-      if (cutsStr) items.push({ label: 'cuts', value: cutsStr, isAccent: false });
+      if (winsStr) items.push({ label: pluralize(deltas.wins_delta, 'win'), value: winsStr, isAccent: false, color: deltas.wins_delta > 0 ? 'text-amber-600' : 'text-muted-foreground' });
+      if (cutsStr) items.push({ label: pluralize(deltas.cuts_delta, 'cut'), value: cutsStr, isAccent: false });
       return items;
     }
 
     // Totals mode — show all stats, emphasize active
     return [
       { label: '', value: formatCompact(stats.earnings_total), isAccent: activeMetric === 'earnings' },
-      { label: 'wins', value: String(stats.wins_total), isAccent: activeMetric === 'wins' },
-      { label: 'cuts', value: String(stats.cuts_total), isAccent: activeMetric === 'cuts' },
+      { label: pluralize(stats.wins_total, 'win'), value: String(stats.wins_total), isAccent: activeMetric === 'wins' },
+      { label: pluralize(stats.cuts_total, 'cut'), value: String(stats.cuts_total), isAccent: activeMetric === 'cuts' },
     ];
   };
 
   const statItems = buildStats();
   const rankChange = isDelta ? deltas?.earnings_rank_change : null;
+
+  const ariaLabel = [
+    rank !== undefined ? `Rank ${rank}` : null,
+    displayName,
+    `${formatCompact(stats.earnings_total)} earnings`,
+    `${stats.wins_total} ${pluralize(stats.wins_total, 'win')}`,
+    `${stats.cuts_total} ${pluralize(stats.cuts_total, 'cut')}`,
+    `${stats.player_count} alumni`,
+  ].filter(Boolean).join(', ');
 
   return (
     <motion.div
@@ -95,6 +114,7 @@ export function FranchiseCard({
     >
       <Link
         to={`/tourhub/college-golf/${slug}`}
+        aria-label={ariaLabel}
         className={cn(
           'flex overflow-hidden',
           'bg-card rounded-xl border border-border/40 shadow-sm',
@@ -189,7 +209,11 @@ export function FranchiseCard({
                       {photoUrl ? (
                         <img src={photoUrl} alt={a.full_name} className="w-full h-full object-cover object-top" loading="lazy" />
                       ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20" />
+                        <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/30 flex items-center justify-center">
+                          <span className="text-[6px] font-bold text-muted-foreground/70 leading-none">
+                            {getInitials(a.full_name)}
+                          </span>
+                        </div>
                       )}
                     </div>
                   );

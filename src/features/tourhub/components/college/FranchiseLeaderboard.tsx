@@ -68,7 +68,7 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
   return (
     <div className={cn('', className)}>
       {/* Simple text tabs with underline — no dark track */}
-      <div className="border-b border-border/60 mb-3">
+      <div className="border-b border-border/60 mb-3" role="tablist" aria-label="Franchise Leaderboard Sort">
         <div className="flex">
           {METRIC_TABS.map(({ value, label }) => {
             const isSelected = activeMetric === value;
