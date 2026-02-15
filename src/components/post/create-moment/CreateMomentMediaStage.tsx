@@ -5,7 +5,7 @@ import { ComposerMediaItem } from "@/hooks/useSnapModal";
 import MediaCarousel from "@/components/posts/MediaCarousel";
 import { MediaNavigationDots } from "@/components/posts/user-post/overlays/MediaNavigationDots";
 import { StudioEdits, StudioTool, TextOverlay } from "@/types/studio";
-import MediaThumbnailStrip from "./MediaThumbnailStrip";
+
 import SoundtrackStrip from "@/components/studio/SoundtrackStrip";
 import TextOverlayRenderer from "@/components/studio/TextOverlayRenderer";
 import { useToast } from "@/hooks/use-toast";
@@ -269,21 +269,6 @@ export default function CreateMomentMediaStage({
         />
       </div>
 
-      {/* Thumbnail strip with drag-to-reorder */}
-      {media.length > 1 && (
-        <MediaThumbnailStrip
-          media={media}
-          activeMediaId={activeMediaId}
-          onSelect={handleThumbnailSelect}
-          onRemove={onRemoveMedia}
-          onReorder={onReorder}
-          getEdits={getEdits}
-          onDragStateChange={onDragStateChange}
-          processingMediaIds={processingMediaIds}
-          warningMediaIds={warningMediaIds}
-          removingMediaIds={removingMediaIds}
-        />
-      )}
     </motion.div>
   );
 }

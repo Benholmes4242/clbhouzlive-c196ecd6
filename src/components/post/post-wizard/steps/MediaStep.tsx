@@ -557,8 +557,8 @@ export function MediaStep({
       {/* Non-blocking picker loading banner */}
       <PickerLoadingBanner isVisible={isPickerOpen} />
       
-      {/* Large media preview stage — restored */}
-      <div className="flex-shrink-0">
+      {/* Large media preview stage — reduced height by 15% */}
+      <div className="flex-shrink-0" style={{ maxHeight: '85%', height: '85%' }}>
         <CreateMomentMediaStage
           media={state.mediaItems}
           activeMediaId={activeMediaId}
