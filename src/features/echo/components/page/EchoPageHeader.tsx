@@ -21,8 +21,8 @@ export function EchoPageHeader({ onBack, onNewChat, onOpenHistory, hasMessages }
     <header 
       className="flex-none px-[18px] flex items-center justify-between"
       style={{
-        paddingTop: 'env(safe-area-inset-top, 0px)',
-        height: 'calc(56px + env(safe-area-inset-top, 0px))',
+        paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+        height: 'calc(56px + max(env(safe-area-inset-top, 0px), 47px))',
         background: 'rgba(255,253,248,0.5)',
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
