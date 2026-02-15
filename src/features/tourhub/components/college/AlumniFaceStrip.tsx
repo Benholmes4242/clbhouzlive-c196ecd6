@@ -50,15 +50,15 @@ export function AlumniFaceStrip({ alumni, collegeName, collegeSlug, totalAlumniC
           'active:scale-[0.99] group'
         )}
       >
-        {/* Stacked headshots */}
+        {/* Stacked headshots — squircle with 1px neutral border */}
         <div className="flex items-center -space-x-2.5 shrink-0">
           {visible.map((alum, i) => {
             const photoUrl = resolvePhotoUrl(alum.photo_url, alum.pga_tour_id);
             return (
               <div
                 key={alum.id}
-                className="w-9 h-9 border-2 border-card overflow-hidden bg-muted shadow-sm"
-                style={{ zIndex: MAX_VISIBLE - i, borderRadius: '34%', aspectRatio: '1 / 1.05' }}
+                className="w-9 overflow-hidden bg-muted shadow-sm"
+                style={{ zIndex: MAX_VISIBLE - i, borderRadius: '34%', aspectRatio: '1 / 1.05', border: '1px solid #D1D5DB' }}
               >
                 {photoUrl ? (
                   <img
@@ -74,7 +74,7 @@ export function AlumniFaceStrip({ alumni, collegeName, collegeSlug, totalAlumniC
             );
           })}
           {overflow > 0 && (
-            <div className="w-9 h-9 border-2 border-card bg-muted flex items-center justify-center shadow-sm" style={{ borderRadius: '34%' }}>
+            <div className="w-9 bg-muted flex items-center justify-center shadow-sm" style={{ borderRadius: '34%', aspectRatio: '1 / 1.05', border: '1px solid #D1D5DB' }}>
               <span className="text-[10px] font-bold text-muted-foreground">
                 +{overflow}
               </span>

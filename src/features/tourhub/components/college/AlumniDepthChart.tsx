@@ -1,12 +1,8 @@
 /**
  * AlumniDepthChart - Squad-style depth chart with expand/collapse sections
  * 
- * Sections (franchise-style naming):
- * - Headliners: Top ranked / winners (formerly "Stars")
- * - Engine Room: Made cuts / earnings (formerly "Core Contributors")
- * - Pipeline: Rookies / newer pros (formerly "Next Wave")
- * 
- * Each player shows contribution chips: earnings, wins (if any), rank (if notable)
+ * Uses SquircleAvatar with 1px neutral border (matching world rankings leaderboard).
+ * Photos resolved via pga_tour_id for Cloudinary CDN quality.
  */
 
 import { useState, useMemo } from 'react';
@@ -15,14 +11,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Crown, Cog, Rocket, DollarSign, Trophy, Globe, ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCollegeAlumni, type CollegeAlumnus } from '../../hooks/useCollegeAlumni';
-import { PlayerAvatar } from '../PlayerAvatar';
+import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { formatCurrency } from '@/lib/utils/formatCurrency';
 
 interface AlumniDepthChartProps {
   normalizedName: string;
   className?: string;
 }
-
-import { formatCurrency } from '@/lib/utils/formatCurrency';
 
 interface AlumniRowProps {
   alumnus: CollegeAlumnus;
@@ -34,6 +30,7 @@ function AlumniRow({ alumnus, index }: AlumniRowProps) {
   const hasWins = (alumnus.wins || 0) > 0;
   const hasEarnings = (alumnus.earnings || 0) > 0;
   const hasWorldRank = alumnus.world_ranking && alumnus.world_ranking < 500;
+  const photoUrl = resolvePhotoUrl(alumnus.photo_url, alumnus.pga_tour_id);
   
   return (
     <motion.div
@@ -53,12 +50,13 @@ function AlumniRow({ alumnus, index }: AlumniRowProps) {
           'group'
         )}
       >
-        {/* Avatar */}
-        <PlayerAvatar
-          playerId={alumnus.id}
-          playerName={fullName}
-          fallbackPhotoUrl={alumnus.photo_url}
-          size="md"
+        {/* Avatar — SquircleAvatar with 1px neutral border matching world rankings */}
+        <SquircleAvatar
+          size={44}
+          src={photoUrl}
+          alt={fullName}
+          thinRing
+          hideRing={false}
         />
         
         {/* Info */}
@@ -69,7 +67,6 @@ function AlumniRow({ alumnus, index }: AlumniRowProps) {
           
           {/* Contribution Chips - earnings, wins, rank */}
           <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
-            {/* Earnings chip - primary contribution */}
             {hasEarnings && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-600">
                 <DollarSign className="w-3 h-3" />
@@ -77,7 +74,6 @@ function AlumniRow({ alumnus, index }: AlumniRowProps) {
               </span>
             )}
             
-            {/* Wins chip */}
             {hasWins && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-600">
                 <Trophy className="w-3 h-3" />
@@ -85,7 +81,6 @@ function AlumniRow({ alumnus, index }: AlumniRowProps) {
               </span>
             )}
             
-            {/* World rank chip if notable */}
             {hasWorldRank && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground">
                 <Globe className="w-3 h-3" />
@@ -119,16 +114,12 @@ function Section({ title, subtitle, icon: Icon, iconColor, alumni, defaultExpand
   
   return (
     <div className="mb-6">
-      {/* Section Header - Tappable */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="flex items-center justify-between w-full mb-3 group"
       >
         <div className="flex items-center gap-2">
-          <div className={cn(
-            "w-7 h-7 rounded-lg flex items-center justify-center",
-            "bg-muted/50"
-          )}>
+          <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center", "bg-muted/50")}>
             <Icon className={cn('w-4 h-4', iconColor)} />
           </div>
           <div className="text-left">
@@ -152,20 +143,14 @@ function Section({ title, subtitle, icon: Icon, iconColor, alumni, defaultExpand
         </div>
       </button>
       
-      {/* Alumni List */}
       <AnimatePresence initial={false}>
-        <motion.div 
-          className="space-y-2"
-          initial={false}
-          animate={{ height: 'auto' }}
-        >
+        <motion.div className="space-y-2" initial={false} animate={{ height: 'auto' }}>
           {displayedAlumni.map((alumnus, index) => (
             <AlumniRow key={alumnus.id} alumnus={alumnus} index={index} />
           ))}
         </motion.div>
       </AnimatePresence>
       
-      {/* View All / Collapse toggle */}
       {hasMore && (
         <button
           onClick={() => setIsExpanded(!isExpanded)}
@@ -193,13 +178,11 @@ function Section({ title, subtitle, icon: Icon, iconColor, alumni, defaultExpand
 }
 
 export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChartProps) {
-  // Fetch all alumni (larger limit to categorize)
   const { data: alumni, isLoading, error } = useCollegeAlumni(normalizedName, { 
     orderBy: 'earnings',
     limit: 50 
   });
   
-  // Categorize alumni into sections (franchise-style)
   const { headliners, engineRoom, pipeline } = useMemo(() => {
     if (!alumni) return { headliners: [], engineRoom: [], pipeline: [] };
     
@@ -208,16 +191,11 @@ export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChart
     const pipeline: CollegeAlumnus[] = [];
     
     alumni.forEach(a => {
-      // Headliners: Top 50 world rank OR has wins
       if ((a.world_ranking && a.world_ranking <= 50) || (a.wins || 0) > 0) {
         headliners.push(a);
-      }
-      // Engine Room: Made cuts and significant earnings but not a headliner
-      else if ((a.cuts_made || 0) >= 5 || (a.earnings || 0) >= 100_000) {
+      } else if ((a.cuts_made || 0) >= 5 || (a.earnings || 0) >= 100_000) {
         engineRoom.push(a);
-      }
-      // Pipeline: Everyone else with some activity
-      else if ((a.earnings || 0) > 0) {
+      } else if ((a.earnings || 0) > 0) {
         pipeline.push(a);
       }
     });
@@ -229,10 +207,7 @@ export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChart
     return (
       <div className={cn('space-y-3', className)}>
         {Array.from({ length: 5 }).map((_, i) => (
-          <div 
-            key={i}
-            className="h-[72px] bg-card/50 border border-border/30 rounded-xl animate-pulse"
-          />
+          <div key={i} className="h-[72px] bg-card/50 border border-border/30 rounded-xl animate-pulse" />
         ))}
       </div>
     );
@@ -248,32 +223,9 @@ export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChart
   
   return (
     <div className={className}>
-      <Section
-        title="Headliners"
-        subtitle="Elite performers and winners"
-        icon={Crown}
-        iconColor="text-amber-500"
-        alumni={headliners}
-        defaultExpanded={true}
-      />
-      
-      <Section
-        title="Engine Room"
-        subtitle="Reliable contributors making cuts"
-        icon={Cog}
-        iconColor="text-primary"
-        alumni={engineRoom}
-        defaultExpanded={engineRoom.length <= 5}
-      />
-      
-      <Section
-        title="Pipeline"
-        subtitle="Rising talent building careers"
-        icon={Rocket}
-        iconColor="text-purple-500"
-        alumni={pipeline}
-        defaultExpanded={false}
-      />
+      <Section title="Headliners" subtitle="Elite performers and winners" icon={Crown} iconColor="text-amber-500" alumni={headliners} defaultExpanded={true} />
+      <Section title="Engine Room" subtitle="Reliable contributors making cuts" icon={Cog} iconColor="text-primary" alumni={engineRoom} defaultExpanded={engineRoom.length <= 5} />
+      <Section title="Pipeline" subtitle="Rising talent building careers" icon={Rocket} iconColor="text-purple-500" alumni={pipeline} defaultExpanded={false} />
     </div>
   );
 }

@@ -80,23 +80,17 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
       {/* Gradient scrim */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10" />
 
-      {/* Glass Back button — top left */}
-      <motion.button
+      {/* Glass Back button — 44px squircle matching standard */}
+      <button
         onClick={handleBack}
-        className="absolute z-10 flex items-center gap-2 px-3 py-2 rounded-full"
+        className="absolute z-10 h-11 w-11 rounded-md flex items-center justify-center bg-black/20 backdrop-blur-sm hover:bg-black/40 active:scale-95 transition-all"
         style={{
-          top: 'calc(max(var(--sat, env(safe-area-inset-top, 0px)), 47px) + 4px)',
+          top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
           left: '16px',
-          background: 'rgba(0,0,0,0.3)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255,255,255,0.15)',
         }}
-        whileTap={{ scale: 0.95 }}
       >
-        <ArrowLeft className="w-4 h-4 text-white" />
-        <span className="text-white text-sm font-medium">Back</span>
-      </motion.button>
+        <ArrowLeft className="w-5 h-5 text-white" />
+      </button>
 
       {/* Share button — top right */}
       <motion.button

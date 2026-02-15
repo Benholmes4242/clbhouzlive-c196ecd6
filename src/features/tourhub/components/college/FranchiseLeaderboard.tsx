@@ -69,13 +69,8 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
 
   return (
     <div className={cn('', className)}>
-      {/* Segmented Tabs — matches Course Detail page style */}
-      <div
-        className={cn(
-          "sticky top-0 z-20 -mx-4 px-4 py-3 mb-4",
-          "bg-muted"
-        )}
-      >
+      {/* Segmented Tabs — no dark strip background */}
+      <div className="sticky top-0 z-20 -mx-4 px-4 py-3 mb-4">
         <div className="flex items-stretch rounded-xl overflow-hidden bg-secondary">
           {METRIC_TABS.map(({ value, label }) => {
             const isSelected = activeMetric === value;
