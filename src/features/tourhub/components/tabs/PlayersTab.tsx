@@ -18,8 +18,9 @@ import { useTourPlayers, useTourSeason, useTourPlayerStatistics, type TourPlayer
 import { useElitePlayers, type ElitePlayer } from '../../hooks/useElitePlayers';
 import { usePlayerHeadshots } from '../../hooks/usePlayerMedia';
 import { PlayersHero } from '../players/PlayersHero';
-import { PlayersTourFilter, type PlayerTourCode } from '../players/PlayersTourFilter';
+import { type PlayerTourCode } from '../players/PlayersTourFilter';
 import { PlayerSortControl, type PlayerSortType } from '../players/PlayerSortControl';
+import { PlayersTourFilterSheet } from '../players/PlayersTourFilterSheet';
 import { PlayerCardV2 } from '../players/PlayerCardV2';
 import { PlayersEmptyState } from '../players/PlayersEmptyState';
 
@@ -236,13 +237,16 @@ export function PlayersTab() {
         </div>
       </div>
 
-      {/* Sticky toolbar — tour filter pills with px-4 for 16px viewport gap */}
-      <div className={cn(
-        "sticky top-0 z-20",
-        "bg-background/95 backdrop-blur-sm",
-        "px-4 pb-2 space-y-2",
-      )}>
-        <PlayersTourFilter
+      {/* Sticky toolbar — tour selector button + safe-area notch fill */}
+      <div
+        className={cn(
+          "sticky top-0 z-20",
+          "bg-background/95 backdrop-blur-sm",
+          "px-4 pb-2",
+        )}
+        style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+      >
+        <PlayersTourFilterSheet
           activeTour={activeTour}
           onTourChange={setActiveTour}
           tourCounts={tourCounts}
