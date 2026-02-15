@@ -37,7 +37,10 @@ interface StatRowProps {
 function StatRow({ label, value, trend, barPercent, barIndex = 0 }: StatRowProps) {
   const hasValue = value !== '—';
   return (
-    <div className="flex justify-between items-center py-3 border-b border-border">
+    <div
+      className="flex justify-between items-center py-3 border-b border-border"
+      aria-label={`${label}: ${value}`}
+    >
       <span className="text-sm text-muted-foreground">{label}</span>
       <div className="flex flex-col items-end">
         <span className={cn(
@@ -79,16 +82,20 @@ function SGBar({ label, value }: SGBarProps) {
   const maxWidth = 60;
   const barWidth = Math.min(maxWidth, Math.abs(value) * 15);
   const isPositive = value >= 0;
+  const formattedValue = value > 0 ? `+${value.toFixed(2)}` : value.toFixed(2);
 
   return (
-    <div className="py-3 border-b border-border">
+    <div
+      className="py-3 border-b border-border"
+      aria-label={`${label}: ${formattedValue} strokes gained`}
+    >
       <div className="flex justify-between items-center mb-1.5">
         <span className="text-sm text-muted-foreground">{label}</span>
         <span className={cn(
           "text-sm font-bold font-mono tabular-nums",
           isPositive ? "text-emerald-600" : "text-red-500"
         )}>
-          {value > 0 ? `+${value.toFixed(2)}` : value.toFixed(2)}
+          {formattedValue}
         </span>
       </div>
       <div className="relative h-2 bg-muted/20 rounded-full overflow-hidden">
@@ -139,13 +146,15 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
         Season Performance
       </h2>
 
-      {/* Tab bar */}
-      <div className="flex border-b border-border mb-5">
-        {TABS.map((tab) => {
+      {/* Tab bar — PD-03: semantic roles */}
+      <div className="flex border-b border-border mb-5" role="tablist" aria-label="Season Performance Stats">
+        {TABS.map((tab, index) => {
           const isActive = activeTab === tab;
           return (
             <button
               key={tab}
+              role="tab"
+              aria-selected={isActive}
               onClick={() => setActiveTab(tab)}
               className={cn(
                 "relative flex-1 py-2.5 text-[13px] text-center transition-colors active:scale-[0.95]",
@@ -168,6 +177,7 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
       <AnimatePresence mode="wait">
         <motion.div
           key={activeTab}
+          role="tabpanel"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
