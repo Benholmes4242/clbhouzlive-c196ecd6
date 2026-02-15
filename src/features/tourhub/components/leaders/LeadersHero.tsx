@@ -1,10 +1,10 @@
 /**
- * LeadersHero — Full-bleed immersive hero for the #1 ranked player.
- * Ken Burns animation, gradient scrim, category badge + stat glass pill.
- * Crossfades via AnimatePresence in parent.
+ * LeadersHero — Full-bleed immersive hero matching PlayersHero style.
+ * Straight-edge, Ken Burns, gradient scrim, stat pill.
  */
 
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
@@ -30,17 +30,13 @@ interface LeadersHeroProps {
 }
 
 export function LeadersHero({ leader, category, formatOverride, unitOverride }: LeadersHeroProps) {
+  const navigate = useNavigate();
   const { player, value } = leader;
   const photoUrl = resolvePhotoUrl(player.photo_url, player.pga_tour_id, 'hero');
   const flag = countryCodeToFlag(player.country_code);
   const countryName = titleCaseCountry(player.country);
   const fmt = formatOverride ?? category.format;
   const unit = unitOverride ?? category.unit;
-  const initials = player.full_name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .slice(0, 2);
 
   return (
     <motion.div
@@ -49,71 +45,78 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
       exit={{ opacity: 0 }}
       transition={{ duration: 0.4 }}
     >
+      {/* Glass back button - matches CourseDetailPage */}
+      <button
+        type="button"
+        onClick={() => navigate(-1)}
+        className="absolute z-30 left-4 flex h-11 w-11 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 active:scale-95 transition-all"
+        style={{ top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
+        aria-label="Back"
+      >
+        <ArrowLeft className="h-5 w-5 text-white" />
+      </button>
+
       <Link
         to={`/tourhub/player/${player.id}`}
-        className="block relative w-full overflow-hidden active:scale-[0.99] transition-transform"
-        style={{ height: 'clamp(256px, 48vh, 384px)' }}
+        className="block active:scale-[0.995] transition-transform"
       >
-        {/* Player photo with Ken Burns */}
-        {photoUrl ? (
-          <motion.img
-            src={photoUrl}
-            alt={player.full_name}
-            className="absolute inset-0 w-full h-full object-cover object-top"
-            loading="eager"
-            initial={{ scale: 1.06 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 12, ease: 'linear' }}
-          />
-        ) : (
-          /* Gradient fallback with initials */
-          <div
-            className="absolute inset-0 w-full h-full flex items-center justify-center"
-            style={{
-              background: `linear-gradient(135deg, ${category.accentColor}40, ${category.accentColor}20)`,
-            }}
-          >
-            <span className="text-7xl font-extrabold text-white/30">{initials}</span>
-          </div>
-        )}
+        {/* Straight-edge hero (no rounded corners) — matches PlayersHero */}
+        <div className="relative w-full overflow-hidden" style={{ height: 'clamp(282px, 53vh, 422px)' }}>
+          {photoUrl ? (
+            <motion.img
+              src={photoUrl}
+              alt={player.full_name}
+              className="absolute inset-0 w-full h-full object-cover object-[center_20%]"
+              loading="eager"
+              initial={{ scale: 1.06 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 12, ease: 'linear' }}
+            />
+          ) : (
+            <div className="absolute inset-0 w-full h-full bg-muted" />
+          )}
 
-        {/* Gradient scrim */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(to bottom, transparent 20%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.8) 85%, rgba(0,0,0,0.95) 100%)',
-          }}
-        />
+          {/* Gradient for text legibility — matches PlayersHero */}
+          <div className="absolute inset-0" style={{
+            background: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.55) 100%)',
+          }} />
 
-        {/* Content overlay */}
-        <div className="absolute bottom-0 left-0 right-0 px-5 pb-5">
-          <span
-            className="text-xs font-bold uppercase tracking-widest"
-            style={{ color: category.accentColor }}
-          >
-            {category.emoji} {category.label} Leader
-          </span>
-          <h2 className="text-3xl font-extrabold text-white mt-1">
-            {player.full_name}
-          </h2>
-          <p className="text-white/70 text-sm">
-            {flag} {countryName}
-          </p>
-          <div
-            className="mt-2 inline-flex items-baseline gap-1.5 px-3 py-1.5 rounded-full"
-            style={{
-              background: 'rgba(255,255,255,0.15)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-            }}
-          >
-            <span className="font-mono text-2xl font-bold text-white">
-              {fmt(value)}
-            </span>
-            {unit && (
-              <span className="text-xs text-white/60">{unit}</span>
-            )}
+          <div className="absolute bottom-0 left-0 right-0 px-4 pb-6 space-y-1.5">
+            <motion.p
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15, duration: 0.4 }}
+              className="text-xs font-bold uppercase tracking-widest text-amber-400"
+            >
+              {category.label} Leader
+            </motion.p>
+            <motion.h2
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.4 }}
+              className="text-3xl font-bold text-white leading-tight"
+            >
+              {player.full_name}
+            </motion.h2>
+
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.22, duration: 0.4 }}
+              className="flex items-center gap-1.5"
+            >
+              {flag && <span className="text-lg">{flag}</span>}
+              <span className="text-sm text-white/80">{countryName}</span>
+            </motion.div>
+
+            <motion.p
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.26, duration: 0.4 }}
+              className="text-sm font-medium text-amber-400"
+            >
+              {fmt(value)}{unit ? ` ${unit}` : ''}
+            </motion.p>
           </div>
         </div>
       </Link>

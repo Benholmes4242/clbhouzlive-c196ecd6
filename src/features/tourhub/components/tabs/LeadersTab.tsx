@@ -1,14 +1,13 @@
 /**
  * LeadersTab — Immersive hero-driven leaderboard.
- * Full-bleed #1 hero, glass runners for #2–#3, gamified rankings.
+ * Full-bleed #1 hero matching PlayersHero, opaque runner cards,
+ * pill tabs matching PlayersTourFilter, OWGR leaderboard style.
  * URL-persisted category via ?category= param.
- * World Ranking uses sr_world_rankings directly.
  */
 
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Info } from 'lucide-react';
 import { useTourSeason, useTourPlayerStatistics } from '../../hooks/useTourHubData';
 import { useWorldRankingsLeaders } from '../../hooks/useWorldRankingsLeaders';
 import { LEADER_CATEGORIES, getCategoryByKey } from '../leaders/constants';
@@ -17,7 +16,6 @@ import { LeadersHero } from '../leaders/LeadersHero';
 import { LeadersRunnersStrip } from '../leaders/LeadersRunnersStrip';
 import { LeaderRow } from '../leaders/LeaderRow';
 import { LeadersEmptyState } from '../leaders/LeadersEmptyState';
-import { LeadersStatContext } from '../leaders/LeadersStatContext';
 
 interface RankedItem {
   player: {
@@ -106,13 +104,13 @@ export function LeadersTab() {
   if (isLoading) {
     return (
       <div className="space-y-4 animate-pulse py-4">
-        <div className="rounded-2xl bg-muted/40 -mx-4 sm:-mx-6" style={{ height: 'clamp(256px, 48vh, 384px)' }} />
-        <div className="flex gap-2 overflow-hidden">
+        <div className="rounded-2xl bg-muted/40 -mx-4 sm:-mx-6" style={{ height: 'clamp(282px, 53vh, 422px)' }} />
+        <div className="flex gap-2 overflow-hidden px-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="h-9 w-20 rounded-full bg-muted/40 shrink-0" />
           ))}
         </div>
-        <div className="rounded-2xl border border-border/30 overflow-hidden">
+        <div className="rounded-2xl border border-border/30 overflow-hidden mx-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="h-[60px] border-b border-border/20 bg-muted/20" />
           ))}
@@ -129,19 +127,21 @@ export function LeadersTab() {
   return (
     <div className="-mx-4 sm:-mx-6">
       {/* Immersive hero for #1 */}
-      <AnimatePresence mode="wait">
-        {leader && (
-          <LeadersHero
-            key={`${category.key}-${leader.playerId}`}
-            leader={leader}
-            category={category}
-            formatOverride={worldFormatOverride}
-            unitOverride={worldUnitOverride}
-          />
-        )}
-      </AnimatePresence>
+      <div className="relative">
+        <AnimatePresence mode="wait">
+          {leader && (
+            <LeadersHero
+              key={`${category.key}-${leader.playerId}`}
+              leader={leader}
+              category={category}
+              formatOverride={worldFormatOverride}
+              unitOverride={worldUnitOverride}
+            />
+          )}
+        </AnimatePresence>
+      </div>
 
-      {/* Glass runners strip for #2–#3, overlapping hero */}
+      {/* Opaque runner cards for #2–#3, overlapping hero */}
       {runners.length > 0 && (
         <LeadersRunnersStrip
           runners={runners}
@@ -151,33 +151,14 @@ export function LeadersTab() {
         />
       )}
 
-      {/* Content area — Overview-matched rhythm */}
-      <div className="px-4 sm:px-6 space-y-section pt-5 pb-6">
-        {/* Category picker */}
+      {/* Content area — tight spacing */}
+      <div className="px-4 sm:px-6 space-y-3 pt-4 pb-6">
+        {/* Category picker — no fade */}
         <LeadersCategoryPicker
           categories={LEADER_CATEGORIES}
           activeKey={category.key}
           onCategoryChange={setCategory}
           leaderValue={leaderValue}
-        />
-
-        {/* OWGR badge (world_rank only) */}
-        {isWorldCategory && (
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20">
-              <Info className="w-3 h-3 text-amber-600 dark:text-amber-400" />
-              <span className="text-[11px] font-semibold text-amber-600 dark:text-amber-400">
-                Official World Golf Ranking
-              </span>
-            </div>
-            <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Updated weekly</span>
-          </div>
-        )}
-
-        {/* Stat context panel */}
-        <LeadersStatContext
-          category={category}
-          leaderValue={leader ? (worldFormatOverride ?? category.format)(leader.value) : undefined}
         />
 
         {/* Rankings list (#4–50) */}
