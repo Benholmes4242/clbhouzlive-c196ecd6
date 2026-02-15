@@ -575,7 +575,7 @@ export function MediaStep({
       </div>
       
       {/* Two-row scrollable thumbnail grid below the preview */}
-      <div className="flex-shrink-0 px-3 py-2">
+      <div className="flex-shrink-0 px-0" style={{ paddingTop: '2px' }}>
         <div 
           className="overflow-x-auto media-grid-scroll"
           style={{ 
@@ -588,8 +588,9 @@ export function MediaStep({
             .media-grid-scroll::-webkit-scrollbar { display: none; }
           `}} />
           <div 
-            className="grid gap-1.5"
+            className="grid"
             style={{
+              gap: '2px',
               gridTemplateRows: state.mediaItems.length <= 4 ? '1fr' : 'repeat(2, 1fr)',
               gridAutoFlow: 'column',
               gridAutoColumns: 'minmax(0, 1fr)',
@@ -605,7 +606,7 @@ export function MediaStep({
               return (
                 <motion.div
                   key={item.id}
-                  className="relative rounded-lg overflow-hidden cursor-pointer"
+                  className="relative overflow-hidden cursor-pointer"
                   style={{ 
                     width: '5rem',
                     height: '5rem',
@@ -655,7 +656,7 @@ export function MediaStep({
                   
                   {/* Active ring */}
                   {isActive && (
-                    <div className="absolute inset-0 rounded-lg ring-2 ring-amber-400 pointer-events-none" />
+                    <div className="absolute inset-0 ring-2 ring-amber-400 pointer-events-none" />
                   )}
                   
                   {/* Processing overlay */}
@@ -673,7 +674,7 @@ export function MediaStep({
               <button
                 onClick={handleGallery}
                 disabled={isPickerOpen}
-                className="rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 active:bg-gray-50 transition-colors disabled:opacity-50"
+                className="border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 active:bg-gray-50 transition-colors disabled:opacity-50"
                 style={{ 
                   width: '5rem',
                   height: '5rem',
