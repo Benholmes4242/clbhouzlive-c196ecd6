@@ -226,7 +226,7 @@ export function PostWizardHeader({
             className={cn(
               'px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 active:scale-[0.97]',
               !canProceed || isSubmitting
-                ? 'bg-amber-200/60 text-amber-400 cursor-not-allowed'
+                ? 'bg-amber-100/80 text-amber-700 cursor-not-allowed'
                 : 'text-white shadow-sm'
             )}
             style={canProceed && !isSubmitting ? {
