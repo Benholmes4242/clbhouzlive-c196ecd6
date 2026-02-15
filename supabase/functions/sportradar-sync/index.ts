@@ -1141,10 +1141,16 @@ async function syncPlayerStatistics(supabase: any, apiKey: string, tour: string,
   const players = data.players || [];
   let totalRecords = 0;
 
+  // Filter by both year AND tour_name to avoid maybeSingle() returning null
+  // when multiple tours exist for the same year
+  const tourNameMap: Record<string, string> = { pga: 'pga', lpga: 'LPGA', eur: 'EURO', 'champions-tour': 'CHAMP' };
+  const tourName = tourNameMap[tour] || tour;
   const { data: season } = await supabase
     .from('sr_seasons')
     .select('id')
     .eq('year', year)
+    .eq('tour_name', tourName)
+    .limit(1)
     .maybeSingle();
 
   if (!season) {
