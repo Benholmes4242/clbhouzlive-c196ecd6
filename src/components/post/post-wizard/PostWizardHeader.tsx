@@ -139,7 +139,7 @@ export function PostWizardHeader({
             className="w-8 h-8 rounded-full flex items-center justify-center relative transition-colors hover:bg-muted"
             aria-label={`View ${draftCount} drafts`}
           >
-            <FileEdit className="h-3.5 w-3.5 text-amber-600" />
+            <FileEdit className="h-3.5 w-3.5 text-amber-700" />
             <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-[14px] rounded-full bg-amber-500 text-white text-[8px] font-semibold flex items-center justify-center">
               {draftCount > 9 ? '9+' : draftCount}
             </span>
@@ -177,7 +177,7 @@ export function PostWizardHeader({
               )}
               aria-label={scheduledCount > 0 ? `View ${scheduledCount} scheduled posts` : "Schedule post"}
             >
-              <Clock className="h-4 w-4 text-amber-600" />
+              <Clock className="h-4 w-4 text-amber-700" />
               {scheduledCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] rounded-full bg-primary text-primary-foreground text-[9px] font-semibold flex items-center justify-center">
                   {scheduledCount > 9 ? '9+' : scheduledCount}

@@ -642,11 +642,6 @@ export function MediaStep({
                     </>
                   )}
                   
-                  {/* Number badge */}
-                  <div className="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-black/50 backdrop-blur-sm text-white text-[9px] font-bold flex items-center justify-center">
-                    {index + 1}
-                  </div>
-                  
                   {/* Remove button */}
                   <button
                     onClick={(e) => {
