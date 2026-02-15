@@ -1,6 +1,6 @@
 /**
- * FranchiseLeaderboard - Premium college leaderboard with franchise cards
- * Segmented control tabs matching Course Detail page style
+ * FranchiseLeaderboard - Premium college leaderboard
+ * Simple text tabs with underline active state (no dark track)
  */
 
 import { useMemo } from 'react';
@@ -47,7 +47,6 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
   const statusMap = useCollegeStatusMap();
   const { data: moverInfo } = useTopMovers();
 
-  // Sort ALL colleges by selected metric, then take top N
   const { sortedStats, maxValue } = useMemo(() => {
     if (!allStats) return { sortedStats: [], maxValue: 1 };
     const getValue = (s: CollegeSeasonStats) => {
@@ -63,39 +62,44 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
     return { sortedStats: sorted, maxValue: max };
   }, [allStats, activeMetric, limit]);
 
-  // Batch alumni for visible colleges
   const collegeSlugs = useMemo(() => sortedStats.map(s => s.normalized_name), [sortedStats]);
   const { data: alumniMap } = useBatchCollegeAlumni(collegeSlugs, 3);
 
   return (
     <div className={cn('', className)}>
-      {/* Segmented Tabs — no dark strip background */}
-      <div className="sticky top-0 z-20 -mx-4 px-4 py-3 mb-4">
-        <div className="flex items-stretch rounded-xl overflow-hidden bg-secondary">
+      {/* Simple text tabs with underline — no dark track */}
+      <div className="border-b border-border/60 mb-3">
+        <div className="flex">
           {METRIC_TABS.map(({ value, label }) => {
             const isSelected = activeMetric === value;
             return (
               <button
                 key={value}
-                data-tab={value}
                 role="tab"
                 aria-selected={isSelected}
                 onClick={() => setActiveMetric(value)}
                 className={cn(
-                  "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98]",
-                  isSelected 
-                    ? "bg-card text-foreground shadow-sm m-1 rounded-lg" 
-                    : "text-muted-foreground hover:text-foreground rounded-lg active:bg-card/50"
+                  "relative flex-1 py-2.5 text-[13px] transition-colors duration-200 whitespace-nowrap min-h-[40px] active:scale-[0.98]",
+                  isSelected
+                    ? "font-semibold text-foreground"
+                    : "font-medium text-muted-foreground hover:text-foreground"
                 )}
               >
                 {label}
+                {isSelected && (
+                  <motion.div
+                    layoutId="franchise-tab-underline"
+                    className="absolute bottom-0 left-1/4 right-1/4 h-[2px] bg-foreground rounded-full"
+                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  />
+                )}
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Leaderboard List with AnimatePresence */}
+      {/* Leaderboard List */}
       <AnimatePresence mode="wait">
         <motion.div
           key={activeMetric}
@@ -107,7 +111,7 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
         >
           {isLoading ? (
             Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="h-[100px] bg-card/50 border border-border/30 rounded-xl animate-pulse" />
+              <div key={i} className="h-[110px] bg-card/50 border border-border/30 rounded-xl animate-pulse" />
             ))
           ) : error ? (
             <div className="text-center py-12 text-sm text-muted-foreground">Failed to load leaderboard</div>
