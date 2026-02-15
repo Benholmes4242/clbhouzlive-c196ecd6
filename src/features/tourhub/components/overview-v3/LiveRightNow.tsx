@@ -14,7 +14,7 @@ import '@/styles/hero-glass.css';
 
 // Score color helper - unified palette
 function getScoreColor(scoreDisplay: string): string {
-  if (scoreDisplay.startsWith('-')) return '#E09F3E'; // Amber/gold = under par
+  if (scoreDisplay.startsWith('-')) return '#f59e0b'; // Amber/gold = under par
   if (scoreDisplay.startsWith('+')) return '#D62828'; // Red = over par
   return 'rgba(0, 0, 0, 0.4)';
 }

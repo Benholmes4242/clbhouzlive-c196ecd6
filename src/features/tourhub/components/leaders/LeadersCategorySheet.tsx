@@ -139,7 +139,7 @@ export function LeadersCategorySheet({
                           {cat.shortLabel}
                         </span>
                         {isActive && (
-                          <Check className="w-4 h-4 text-[#E09F3E] shrink-0" />
+                          <Check className="w-4 h-4 text-[#f59e0b] shrink-0" />
                         )}
                       </button>
                     );
