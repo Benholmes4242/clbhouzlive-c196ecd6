@@ -236,6 +236,7 @@ export function TournamentDetailPage() {
             tournamentId={tournamentId || ''}
             tournamentSrId={tournament.sr_id}
             isLive={isLive}
+            isCompleted={isCompleted}
           />
         );
       
