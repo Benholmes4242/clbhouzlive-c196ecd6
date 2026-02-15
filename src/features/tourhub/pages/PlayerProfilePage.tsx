@@ -54,7 +54,7 @@ export function PlayerProfilePage() {
 
   if (playerLoading) {
     return (
-      <PageRoot className="min-h-screen w-full bg-background" immersive>
+      <PageRoot className="min-h-screen w-full bg-background" immersive immersiveStatusBar>
         <div className="animate-pulse">
           <div className="h-[60vh] bg-muted" />
           <div className="px-5 mt-4 space-y-6">
@@ -85,7 +85,7 @@ export function PlayerProfilePage() {
   }
 
   return (
-    <PageRoot className="min-h-screen w-full bg-background" immersive hasBottomNav>
+    <PageRoot className="min-h-screen w-full bg-background" immersive immersiveStatusBar hasBottomNav>
       {/* Hero — Full bleed, no max-width */}
       <PlayerHero player={player} playerStats={playerStats ?? null} />
 
