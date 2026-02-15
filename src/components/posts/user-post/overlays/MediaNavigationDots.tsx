@@ -7,6 +7,8 @@ interface MediaNavigationDotsProps {
   onJump?: (index: number) => void;
   bottomOffset?: number | string; // allows overriding default bottom positioning
   className?: string; // optional className to override z-index or other styles
+  activeColor?: string;
+  inactiveColor?: string;
 }
 
 export const MediaNavigationDots: React.FC<MediaNavigationDotsProps> = ({
@@ -14,7 +16,9 @@ export const MediaNavigationDots: React.FC<MediaNavigationDotsProps> = ({
   currentIndex,
   onJump,
   bottomOffset,
-  className
+  className,
+  activeColor,
+  inactiveColor,
 }) => {
   if (mediaCount <= 1) return null;
 
@@ -42,8 +46,8 @@ export const MediaNavigationDots: React.FC<MediaNavigationDotsProps> = ({
             onClick={() => onJump?.(index)}
             className={`h-1.5 rounded-full transition-all duration-200 ease-out relative after:content-[''] after:absolute after:-inset-2 ${
               isActive 
-                ? 'w-5 bg-white' 
-                : 'w-1.5 bg-white/60'
+                ? `w-5 ${activeColor ?? 'bg-white'}` 
+                : `w-1.5 ${inactiveColor ?? 'bg-white/60'}`
             }`}
           />
         );

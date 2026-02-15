@@ -259,13 +259,15 @@ export default function CreateMomentMediaStage({
           </div>
         )}
 
-        {/* Navigation dots - centered bottom */}
+        {/* Navigation dots - 12px above bottom, clubhouse-style subdued colors */}
         <MediaNavigationDots
           mediaCount={media.length}
           currentIndex={activeIndex}
           onJump={handleDotJump}
-          bottomOffset={8}
+          bottomOffset={12}
           className="z-20"
+          activeColor="bg-white/50"
+          inactiveColor="bg-white/25"
         />
       </div>
 
