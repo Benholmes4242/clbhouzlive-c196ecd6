@@ -161,7 +161,7 @@ export function PostWizardHeader({
             hideRing
           />
           {actorVerified && <VerifiedBadge size="sm" />}
-          <ChevronDown className="h-3 w-3 text-muted-foreground" />
+          <ChevronDown className="h-3 w-3 text-amber-700" />
         </button>
       </div>
       
