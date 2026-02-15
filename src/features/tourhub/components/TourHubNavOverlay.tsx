@@ -550,9 +550,9 @@ export function TourHubNavOverlay({
                     </motion.button>
                   );
                 })}
-              </div>
+               </div>
 
-              {/* Divider before link items */}
+              {/* Divider before link items — matches the overview divider width */}
               <div className="h-px my-4 border-t border-border/60" />
 
               {/* Link Items (College Golf, etc.) */}
