@@ -15,8 +15,7 @@ interface CategoryGroup {
 }
 
 const CATEGORY_GROUPS: { label: string; keys: string[] }[] = [
-  { label: 'General', keys: ['world_rank', 'events_played', 'cuts_made', 'top_10'] },
-  { label: 'Scoring', keys: ['earnings', 'scoring_avg'] },
+  { label: 'General', keys: ['world_rank', 'events_played', 'cuts_made', 'top_10', 'earnings', 'scoring_avg'] },
   { label: 'Ball Striking', keys: ['drive_avg', 'drive_acc', 'gir_pct'] },
   { label: 'Short Game', keys: ['putt_avg', 'sand_saves_pct', 'scrambling_pct'] },
 ];
