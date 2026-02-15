@@ -80,7 +80,7 @@ export function CollegeProfilePage() {
   };
   
   return (
-    <PageRoot className="min-h-screen w-full bg-background" immersive hasBottomNav>
+    <PageRoot className="min-h-screen w-full bg-background" immersive immersiveStatusBar hasBottomNav>
       {/* Immersive Brand Color Hero */}
       <div
         className="relative overflow-hidden"
