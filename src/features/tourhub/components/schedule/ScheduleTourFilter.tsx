@@ -1,6 +1,6 @@
 /**
  * ScheduleTourFilter — Selector button + BottomSheet for tour filtering
- * Matches LeadersCategorySheet button pattern + MomentAudienceSheet tile styling
+ * Dark-mode safe: all colors use semantic tokens
  */
 
 import { useState, useCallback } from 'react';
@@ -54,7 +54,7 @@ export function ScheduleTourFilter({
 
   return (
     <>
-      {/* Selector Button — matches LeadersCategorySheet */}
+      {/* Selector Button */}
       <button
         onClick={() => setOpen(true)}
         className={cn(
@@ -63,7 +63,6 @@ export function ScheduleTourFilter({
           'px-4 py-3.5',
           'shadow-[0_1px_4px_rgba(0,0,0,0.04)]',
           'transition-all duration-200',
-          'hover:border-[hsl(var(--accent-amber))] hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)]',
           'active:scale-[0.99]'
         )}
         aria-haspopup="dialog"
@@ -79,7 +78,7 @@ export function ScheduleTourFilter({
         <ChevronDown className="w-4 h-4 text-muted-foreground" />
       </button>
 
-      {/* Bottom Sheet — MomentAudienceSheet tile styling */}
+      {/* Bottom Sheet */}
       <BottomSheet
         open={open}
         onClose={() => setOpen(false)}
@@ -106,8 +105,8 @@ export function ScheduleTourFilter({
             </button>
           </div>
 
-          {/* Tour options — audience sheet tile style */}
-          <div className="space-y-1.5">
+          {/* Tour options */}
+          <div className="space-y-1.5" role="listbox">
             {TOUR_OPTIONS.map((tour) => {
               const isActive = activeTour === tour.code;
               const count = tour.code === 'all'
@@ -119,17 +118,19 @@ export function ScheduleTourFilter({
                   key={tour.code}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => handleSelect(tour.code)}
+                  role="option"
+                  aria-selected={isActive}
                   className={cn(
                     'w-full flex items-center gap-3 p-2.5 rounded-xl transition-all',
                     isActive
-                      ? 'bg-[#f8fafc] border border-[#e2e8f0]'
-                      : 'bg-[#f8fafc] border border-transparent hover:border-[#e2e8f0]'
+                      ? 'bg-muted border border-border'
+                      : 'bg-muted/50 border border-transparent hover:border-border'
                   )}
                 >
                   <div
                     className={cn(
                       'w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold tabular-nums',
-                      isActive ? 'bg-[#1e293b] text-white' : 'bg-white text-muted-foreground'
+                      isActive ? 'bg-foreground text-background' : 'bg-card text-muted-foreground'
                     )}
                   >
                     {count}
@@ -139,7 +140,7 @@ export function ScheduleTourFilter({
                     <p
                       className={cn(
                         'font-medium text-[13px]',
-                        isActive ? 'text-[#1e293b]' : 'text-[#64748b]'
+                        isActive ? 'text-foreground' : 'text-muted-foreground'
                       )}
                     >
                       {tour.label}
@@ -147,21 +148,20 @@ export function ScheduleTourFilter({
                     <p
                       className={cn(
                         'text-[11px] mt-0.5',
-                        isActive ? 'text-[#64748b]' : 'text-[#94a3b8]'
+                        isActive ? 'text-muted-foreground' : 'text-muted-foreground/70'
                       )}
                     >
                       {tour.description}
                     </p>
                   </div>
 
-                  {isActive && <AnimatedCheck color="#1e293b" />}
+                  {isActive && <AnimatedCheck color="hsl(var(--foreground))" />}
                 </motion.button>
               );
             })}
           </div>
         </div>
 
-        {/* Safe area bottom padding */}
         <div style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }} />
       </BottomSheet>
     </>

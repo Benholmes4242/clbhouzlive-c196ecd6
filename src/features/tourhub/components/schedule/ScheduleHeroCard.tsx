@@ -1,16 +1,9 @@
 /**
- * ScheduleHeroCard - Immersive glass-card hero matching Overview HeroCarousel
- * 
- * Design language from OverviewPageV3:
- * - Full-bleed background with Ken Burns (1.03x)
- * - Glass card (rgba(0,0,0,0.45), blur(24px)) bottom-left
- * - Hero typography: 22px/800 name, 13px/500 venue, 11px/700 meta
- * - Live: amber pulsing dot + leaderboard rows
- * - Completed: Winner avatar (squircle 34%) + yellow score
- * - Upcoming: Countdown label + course stats
+ * ScheduleHeroCard - Immersive glass-card hero with tappable names + score colors
  */
 
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { ChevronRight, Trophy } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -41,7 +34,16 @@ function formatPurse(purse: number | null): string {
     : `$${(purse / 1000).toFixed(0)}K`;
 }
 
+function getScoreColor(score: number | null): string {
+  if (score === null || score === undefined) return 'rgba(255,255,255,0.7)';
+  if (score < 0) return '#22C55E';
+  if (score > 0) return '#EF4444';
+  return 'rgba(255,255,255,0.7)';
+}
+
 export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHeroCardProps) {
+  const navigate = useNavigate();
+  const [imgError, setImgError] = useState(false);
   const { courseImage } = useSingleCourseImage(
     tournament.venue_name ? {
       venueName: tournament.venue_name,
@@ -54,6 +56,18 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
   const isLive = type === 'live';
   const isRecent = type === 'recent';
   const isUpcoming = type === 'upcoming';
+
+  const handlePlayerTap = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (leaderWinner?.playerId) navigate(`/tourhub/player/${leaderWinner.playerId}`);
+  };
+
+  const handleVenueTap = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (tournament.venue_name) navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venue_name)}`);
+  };
 
   return (
     <Link
@@ -71,13 +85,18 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
           scale: { duration: 5, ease: 'linear' }
         }}
       >
-        <img
-          src={imageUrl}
-          alt={tournament.venue_name || tournament.name}
-          className="absolute inset-0 w-full h-full object-cover"
-          loading="eager"
-          fetchPriority="high"
-        />
+        {!imgError ? (
+          <img
+            src={imageUrl}
+            alt={tournament.venue_name || tournament.name}
+            className="absolute inset-0 w-full h-full object-cover"
+            loading="eager"
+            fetchPriority="high"
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-emerald-900 to-emerald-700" />
+        )}
       </motion.div>
 
       {/* Legibility gradient overlay */}
@@ -91,7 +110,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
         }}
       />
 
-      {/* Glass Card - matching HeroCarousel exactly */}
+      {/* Glass Card */}
       <motion.div 
         className="glass-card"
         style={{ 
@@ -133,21 +152,31 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
         {/* Row 2: Tournament Name */}
         <h2 className="hero-tournament-name">{tournament.name}</h2>
         
-        {/* Row 3: Venue */}
-        <p className="hero-venue">
+        {/* Row 3: Venue (tappable) */}
+        <button
+          onClick={handleVenueTap}
+          className="hero-venue block text-left transition-opacity active:opacity-70"
+        >
           {tournament.venue_name}
           {tournament.venue_city && ` · ${tournament.venue_city}`}
-        </p>
+        </button>
 
         {/* ─── LIVE LAYOUT ─── */}
         {isLive && (
           <>
             {leaderWinner && (
               <div className="flex items-center gap-1.5" style={{ marginTop: '8px' }}>
-                <span style={{ fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>
-                  Leader: {leaderWinner.displayName}
+                <span style={{ fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>
+                  Leader:{' '}
                 </span>
-                <span className="score-mono" style={{ fontSize: '16px', fontWeight: 700, color: '#f59e0b' }}>
+                <button
+                  onClick={handlePlayerTap}
+                  className="transition-opacity active:opacity-70"
+                  style={{ fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}
+                >
+                  {leaderWinner.displayName}
+                </button>
+                <span className="score-mono" style={{ fontSize: '16px', fontWeight: 700, color: getScoreColor(leaderWinner.score) }}>
                   {leaderWinner.displayScore}
                 </span>
               </div>
@@ -165,10 +194,16 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
             {leaderWinner && (
               <div className="winner-section" style={{ padding: '8px 0 0' }}>
                 <span className="winner-name-large" style={{ marginTop: 0 }}>
-                  🏆 {leaderWinner.displayName}
+                  🏆{' '}
+                  <button
+                    onClick={handlePlayerTap}
+                    className="transition-opacity active:opacity-70 inline"
+                  >
+                    {leaderWinner.displayName}
+                  </button>
                 </span>
                 {leaderWinner.displayScore && (
-                  <span className="winner-score-large" style={{ marginTop: '2px' }}>
+                  <span className="winner-score-large" style={{ marginTop: '2px', color: getScoreColor(leaderWinner.score) }}>
                     ({leaderWinner.displayScore})
                     {leaderWinner.money && ` · ${formatPurse(leaderWinner.money)}`}
                   </span>
@@ -206,27 +241,21 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
   );
 }
 
-// Helper to determine which tournament to feature
 export function getFeaturedTournament(
   tournaments: TourTournament[]
 ): { tournament: TourTournament; type: 'live' | 'upcoming' | 'recent' } | null {
   if (!tournaments || tournaments.length === 0) return null;
-
   const now = new Date();
-
   const live = tournaments.find(t => t.status === 'inprogress');
   if (live) return { tournament: live, type: 'live' };
-
   const upcoming = tournaments
     .filter(t => t.status === 'scheduled' || t.status === 'created')
     .filter(t => new Date(t.start_date) >= now)
     .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime());
   if (upcoming.length > 0) return { tournament: upcoming[0], type: 'upcoming' };
-
   const completed = tournaments
     .filter(t => t.status === 'closed')
     .sort((a, b) => new Date(b.end_date).getTime() - new Date(a.end_date).getTime());
   if (completed.length > 0) return { tournament: completed[0], type: 'recent' };
-
   return { tournament: tournaments[0], type: 'upcoming' };
 }

@@ -1,19 +1,18 @@
 /**
  * ScheduleTab - Full visual overhaul matching Overview design language
  * 
- * Design parity with OverviewPageV3:
- * - Immersive hero with glass card (live/upcoming/recent)
- * - Clean EventRow-style tournament cards (date block + content)
- * - 40px section spacing (space-y-section)
- * - Cleo typography: 22px section headers, 17px names, 13px metadata
- * - Segmented filter pills + tour pills
- * - URL-persisted filters
- * - InView entrance animations
+ * SC-01: Live Hero Carousel on Live tab
+ * SC-02: Premium empty state with countdown
+ * SC-07: Error state with retry
+ * SC-08: Pull-to-refresh compatible
+ * SC-09: 30s polling on Live tab
+ * SC-12: Sticky month headers
+ * SC-17: Scroll position via sessionStorage
  */
 
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Search, X, ArrowLeft } from 'lucide-react';
+import { Search, X, ArrowLeft, AlertCircle } from 'lucide-react';
 import { useTourSeason, useTourTournaments, type TourTournament } from '../../hooks/useTourHubData';
 import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
 import { TourHubEmptyState } from '../TourHubEmptyState';
@@ -32,6 +31,7 @@ import {
   getFeaturedTournament,
   ScheduleTourFilter,
   type TourFilterCode,
+  LiveHeroCarousel,
 } from '../schedule';
 
 const TOUR_LABELS: Record<string, string> = {
@@ -67,37 +67,57 @@ function InViewCard({ children }: { children: React.ReactNode }) {
   );
 }
 
+const SCROLL_KEY = 'schedule-scroll-pos';
+
 export function ScheduleTab() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const [hasScrolledToNow, setHasScrolledToNow] = useState(false);
   const heroScrollRef = useRef<HTMLDivElement>(null);
   const [activeHeroIndex, setActiveHeroIndex] = useState(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   
   const filter = (searchParams.get('filter') as ScheduleFilterType) || 'all';
   const activeTour = (searchParams.get('tour') as TourFilterCode) || 'all';
 
-  // Scroll to top on mount (fixes page opening mid-scroll)
+  // Scroll to top on mount
   useEffect(() => {
-    // Immediate scroll
     window.scrollTo(0, 0);
     document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
     const scrollContainer = document.querySelector('[data-scroll-container]') || document.querySelector('main') || document.querySelector('.page-root');
     if (scrollContainer) scrollContainer.scrollTop = 0;
-    // Deferred scroll to catch late-rendering content
     requestAnimationFrame(() => {
       window.scrollTo(0, 0);
       document.documentElement.scrollTop = 0;
     });
+
+    // Restore scroll position on back navigation
+    const savedPos = sessionStorage.getItem(SCROLL_KEY);
+    if (savedPos) {
+      requestAnimationFrame(() => {
+        window.scrollTo(0, parseInt(savedPos, 10));
+      });
+      sessionStorage.removeItem(SCROLL_KEY);
+    }
+  }, []);
+
+  // Save scroll position before navigating away
+  useEffect(() => {
+    const saveScroll = () => {
+      sessionStorage.setItem(SCROLL_KEY, String(window.scrollY));
+    };
+    window.addEventListener('beforeunload', saveScroll);
+    return () => window.removeEventListener('beforeunload', saveScroll);
   }, []);
   
   const setFilter = useCallback((f: ScheduleFilterType) => {
     const params = new URLSearchParams(searchParams);
     if (f === 'all') { params.delete('filter'); } else { params.set('filter', f); }
     setSearchParams(params, { replace: true });
+    // Scroll to top on filter change
+    window.scrollTo({ top: 0 });
   }, [searchParams, setSearchParams]);
 
   const setActiveTour = useCallback((t: TourFilterCode) => {
@@ -109,7 +129,7 @@ export function ScheduleTab() {
   const search = useDebouncedValue(searchInput, 200);
   
   const { data: season } = useTourSeason();
-  const { data: tournaments, isLoading } = useTourTournaments(season?.id);
+  const { data: tournaments, isLoading, error, refetch } = useTourTournaments(season?.id);
 
   const { liveIds, completedIds } = useMemo(() => {
     if (!tournaments) return { liveIds: [] as string[], completedIds: [] as string[] };
@@ -121,10 +141,20 @@ export function ScheduleTab() {
 
   const { data: leadersWinnersMap } = useTournamentLeadersWinners([...liveIds, ...completedIds]);
 
-  // Dynamic hero
+  // Live tournaments for hero carousel
+  const liveTournaments = useMemo(() => {
+    if (!tournaments) return [];
+    return tournaments
+      .filter(t => t.status === 'inprogress')
+      .filter(t => activeTour === 'all' || t.tour_code === activeTour);
+  }, [tournaments, activeTour]);
+
+  // Dynamic hero (for non-live tabs)
   const heroItems = useMemo(() => {
     if (!tournaments) return [];
     
+    if (filter === 'live') return []; // Handled by LiveHeroCarousel
+
     if (filter === 'completed') {
       const completed = tournaments
         .filter(t => t.status === 'closed')
@@ -135,18 +165,11 @@ export function ScheduleTab() {
         : [];
     }
 
-    if (filter === 'live') {
-      return tournaments
-        .filter(t => t.status === 'inprogress')
-        .filter(t => activeTour === 'all' || t.tour_code === activeTour)
-        .map(t => ({ tournament: t, type: 'live' as const }));
-    }
-
-    const liveTournaments = tournaments
+    const liveTourneys = tournaments
       .filter(t => t.status === 'inprogress')
       .filter(t => activeTour === 'all' || t.tour_code === activeTour);
-    if (liveTournaments.length > 0) {
-      return liveTournaments.map(t => ({ tournament: t, type: 'live' as const }));
+    if (liveTourneys.length > 0) {
+      return liveTourneys.map(t => ({ tournament: t, type: 'live' as const }));
     }
 
     const featured = getFeaturedTournament(
@@ -224,7 +247,8 @@ export function ScheduleTab() {
         t.tour_full_name?.toLowerCase().includes(searchLower)
       );
     }
-    if (filter === 'all' && !search && heroItems.length > 0) {
+    // Exclude hero items from list (non-live tabs only)
+    if (filter !== 'live' && filter === 'all' && !search && heroItems.length > 0) {
       const heroIds = new Set(heroItems.map(h => h.tournament.id));
       filtered = filtered.filter(t => !heroIds.has(t.id));
     }
@@ -235,7 +259,7 @@ export function ScheduleTab() {
     if (!filteredResults.length) return [];
     const groups = new Map<string, TourTournament[]>();
     filteredResults.forEach(tournament => {
-      const date = new Date(tournament.start_date);
+      const date = new Date(tournament.start_date + 'T12:00:00Z');
       const monthKey = format(date, 'yyyy-MM');
       const existing = groups.get(monthKey) || [];
       groups.set(monthKey, [...existing, tournament]);
@@ -252,14 +276,12 @@ export function ScheduleTab() {
       for (const t of tournaments) { if (t.tour_code) tourBreakdown[t.tour_code] = (tourBreakdown[t.tour_code] || 0) + 1; }
       return {
         monthKey,
-        monthLabel: format(new Date(tournaments[0].start_date), 'MMMM yyyy').toUpperCase(),
+        monthLabel: format(new Date(tournaments[0].start_date + 'T12:00:00Z'), 'MMMM yyyy').toUpperCase(),
         tournaments,
         tourBreakdown,
       };
     });
   }, [filteredResults, filter]);
-
-  // (Removed: scrollIntoView to current month — was overriding scroll-to-top on mount)
 
   // Loading state
   if (isLoading) {
@@ -276,18 +298,58 @@ export function ScheduleTab() {
       </div>
     );
   }
+
+  // SC-07: Error state
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-4 py-24 px-6 text-center">
+        <AlertCircle className="w-10 h-10 text-muted-foreground/50" />
+        <h3 className="text-lg font-semibold text-foreground">Couldn't load the schedule</h3>
+        <p className="text-sm text-muted-foreground max-w-[280px]">
+          Something went wrong. Please try again.
+        </p>
+        <button
+          onClick={() => refetch()}
+          className="px-6 py-2.5 rounded-xl text-sm font-semibold bg-card border border-border text-foreground transition-all active:scale-95 shadow-sm"
+        >
+          Tap to Retry
+        </button>
+      </div>
+    );
+  }
   
   if (!tournaments || tournaments.length === 0) {
     return <TourHubEmptyState variant="schedule" />;
   }
   
   return (
-    <div className="min-h-screen pb-24 -mx-4">
+    <div className="min-h-screen pb-24 -mx-4" ref={scrollContainerRef}>
       
-      {/* Immersive Hero — glass card matching Overview HeroCarousel */}
+      {/* Live Hero Carousel — SC-01 */}
+      {filter === 'live' && !search && liveTournaments.length > 0 && (
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="absolute z-30 left-4 flex h-11 w-11 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 active:scale-95 transition-all"
+            style={{ top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
+            aria-label="Back"
+          >
+            <ArrowLeft className="h-5 w-5 text-white" />
+          </button>
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <LiveHeroCarousel tournaments={liveTournaments} leadersMap={leadersWinnersMap} />
+          </motion.div>
+        </div>
+      )}
+
+      {/* Standard Hero — non-live tabs */}
       {filter !== 'live' && !search && heroItems.length > 0 && (
         <div className="relative">
-          {/* Glass back button - matches CourseDetailPage */}
           <button
             type="button"
             onClick={() => navigate(-1)}
@@ -339,7 +401,7 @@ export function ScheduleTab() {
         </div>
       )}
 
-      {/* Content below hero — matching Overview's bg-background + consistent spacing */}
+      {/* Content below hero */}
       <div className="bg-background pt-4">
         {/* Search Bar */}
         <div className="px-4">
@@ -405,10 +467,9 @@ export function ScheduleTab() {
           />
         </motion.div>
 
-        {/* No Live Message — only show this, suppress the no-results below */}
+        {/* No Live Message — premium empty state SC-02 */}
         {filter === 'live' && filterStats.live === 0 && (
           <motion.div
-            className="mt-6"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
           >
@@ -421,7 +482,7 @@ export function ScheduleTab() {
           </motion.div>
         )}
         
-        {/* Event Cards — Grouped by Month with 40px section spacing */}
+        {/* Event Cards — Grouped by Month */}
         <AnimatePresence mode="wait">
           {monthGroups.length > 0 ? (
             <motion.div 
@@ -439,13 +500,19 @@ export function ScheduleTab() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: groupIndex * 0.05, duration: 0.3 }}
                 >
-                  <ScheduleMonthHeader 
-                    monthLabel={group.monthLabel}
-                    eventCount={group.tournaments.length}
-                    tourBreakdown={group.tourBreakdown}
-                  />
+                  {/* SC-12: Sticky month header */}
+                  <div 
+                    className="sticky z-10 bg-background/95 backdrop-blur-sm"
+                    style={{ top: '140px' }} 
+                  >
+                    <ScheduleMonthHeader 
+                      monthLabel={group.monthLabel}
+                      eventCount={group.tournaments.length}
+                      tourBreakdown={group.tourBreakdown}
+                    />
+                  </div>
 
-                  {/* Tournament list — clean EventRow cards */}
+                  {/* Tournament list */}
                   <div className="flex flex-col gap-2 px-4">
                     {group.tournaments.map((tournament) => (
                       <InViewCard key={tournament.id}>
@@ -460,7 +527,6 @@ export function ScheduleTab() {
               ))}
             </motion.div>
           ) : (
-            /* Don't show a second empty state if we already have the no-live one */
             filter === 'live' && filterStats.live === 0 ? null : (
               <motion.div
                 className="mt-6"

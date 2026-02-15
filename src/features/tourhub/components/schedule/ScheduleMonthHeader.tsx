@@ -1,8 +1,6 @@
 /**
- * ScheduleMonthHeader - Section header matching Overview's display-sm token
- * 
- * Design: 22px/700 bold heading with event count badge
- * Matches Overview section headers (What's Coming, World Rankings, etc.)
+ * ScheduleMonthHeader - Section header with semantic tokens for dark mode
+ * Now sticky-capable via className prop
  */
 
 import { cn } from '@/lib/utils';
@@ -37,7 +35,6 @@ export function ScheduleMonthHeader({
         .map(([code, count]) => `${count} ${TOUR_LABELS[code] || code}`)
     : [];
 
-  // Format month label: "FEBRUARY 2026" → "February 2026"
   const formattedMonth = monthLabel.charAt(0) + monthLabel.slice(1).toLowerCase();
 
   return (
@@ -47,14 +44,13 @@ export function ScheduleMonthHeader({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
     >
-      {/* Header row — matching Overview section headers */}
       <div className="flex items-center justify-between">
         <h3 
+          className="text-foreground"
           style={{ 
             fontSize: '22px',
             fontWeight: 700,
             letterSpacing: '-0.3px',
-            color: '#1C1917',
           }}
         >
           {formattedMonth}
@@ -68,9 +64,8 @@ export function ScheduleMonthHeader({
         </span>
       </div>
 
-      {/* Tour breakdown line */}
       {breakdownParts.length > 1 && (
-        <p className="mt-1" style={{ fontSize: '11px', fontWeight: 500, color: '#A8A29E' }}>
+        <p className="mt-1 text-muted-foreground/70" style={{ fontSize: '11px', fontWeight: 500 }}>
           {breakdownParts.join(' · ')}
         </p>
       )}
