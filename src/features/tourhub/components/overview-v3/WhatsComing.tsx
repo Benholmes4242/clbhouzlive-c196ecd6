@@ -40,13 +40,13 @@ function getContextLabel(tournament: SeasonTournament): string {
 // ============ Date formatting helpers ============
 
 function getMonthAbbr(dateStr: string): string {
-  const d = new Date(dateStr + 'T00:00:00');
-  return d.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
+  const d = new Date(dateStr + 'T12:00:00Z');
+  return new Intl.DateTimeFormat('en-US', { month: 'short' }).format(d).toUpperCase();
 }
 
 function getDayNum(dateStr: string): string {
-  const d = new Date(dateStr + 'T00:00:00');
-  return String(d.getDate());
+  const d = new Date(dateStr + 'T12:00:00Z');
+  return new Intl.DateTimeFormat('en-US', { day: 'numeric' }).format(d);
 }
 
 function getVenueString(tournament: SeasonTournament): string {
@@ -113,10 +113,16 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
           {tournament.name}
         </p>
         {venue && (
-          <p className="flex items-center gap-1 mt-0.5 text-[0.8125rem] text-muted-foreground">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`);
+            }}
+            className="flex items-center gap-1 mt-0.5 text-[0.8125rem] text-muted-foreground active:opacity-70 transition-opacity"
+          >
             <MapPin className="w-3 h-3 flex-shrink-0 opacity-60" />
             <span className="line-clamp-1">{venue}</span>
-          </p>
+          </button>
         )}
       </div>
 

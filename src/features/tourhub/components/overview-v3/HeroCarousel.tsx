@@ -363,11 +363,17 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
               </h2>
             </Link>
             
-            {/* Row 3: Venue */}
-            <p className="hero-venue">
+            {/* Row 3: Venue — tappable to course search */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                window.location.href = `/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`;
+              }}
+              className="hero-venue block active:opacity-70 transition-opacity cursor-pointer"
+            >
               {tournament.venueName}
               {tournament.venueCity && ` · ${tournament.venueCity}`}
-            </p>
+            </button>
             
             {/* ─── LIVE CARD LAYOUT ─── */}
             {isLive && (

@@ -24,6 +24,7 @@ import { WhatsComing } from '../overview-v3/WhatsComing';
 import { CollegeRankingsPreview } from '../overview-v3/CollegeRankingsPreview';
 import { SeasonLeaderboards } from '../overview-v3/SeasonLeaderboards';
 import { TournamentInsights } from '../tournament-insights';
+import { LazySection } from '../overview-v3/LazySection';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { usePreventOverscroll } from '@/hooks/usePreventOverscroll';
@@ -102,16 +103,24 @@ export function OverviewPageV3() {
           <WhatsComing />
 
           {/* 4. Tournament Insights - AI Predictions (CLBHOUZ Intelligence) */}
-          <TournamentInsights />
+          <LazySection minHeight={250}>
+            <TournamentInsights />
+          </LazySection>
 
           {/* 5. Unified World Rankings (Movers + OWGR Table) */}
-          <UnifiedWorldRankings />
+          <LazySection minHeight={400}>
+            <UnifiedWorldRankings />
+          </LazySection>
 
           {/* 6. Season Leaderboards */}
-          <SeasonLeaderboards />
+          <LazySection minHeight={300}>
+            <SeasonLeaderboards />
+          </LazySection>
 
           {/* 7. College Golf Rankings */}
-          <CollegeRankingsPreview />
+          <LazySection minHeight={350}>
+            <CollegeRankingsPreview />
+          </LazySection>
 
         </div>
       </div>

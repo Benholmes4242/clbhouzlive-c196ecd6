@@ -184,7 +184,7 @@ function MomentumPill({ entry, index, direction }: MomentumPillProps) {
 export function UnifiedWorldRankings() {
   const navigate = useNavigate();
   const { data: movers, isLoading: moversLoading, error: moversError, refetch: refetchMovers } = useRankingMovers();
-  const { data: rankings, isLoading: rankingsLoading, error: rankingsError, refetch: refetchRankings } = useWorldRankingsFull();
+  const { data: rankings, isLoading: rankingsLoading, error: rankingsError, refetch: refetchRankings, dataUpdatedAt } = useWorldRankingsFull();
 
   const [currentPage, setCurrentPage] = useState(0);
   const [highlightedPlayerId, setHighlightedPlayerId] = useState<string | null>(null);
@@ -302,7 +302,15 @@ export function UnifiedWorldRankings() {
         </button>
       </div>
       <p className="text-[11px] text-muted-foreground leading-tight mb-2.5">
-        Updated weekly · Official OWGR data
+        {dataUpdatedAt
+          ? `Updated ${(() => {
+              const diff = Date.now() - dataUpdatedAt;
+              const days = Math.floor(diff / 86400000);
+              if (days === 0) return 'today';
+              if (days === 1) return 'yesterday';
+              return `${days} days ago`;
+            })()} · Official OWGR data`
+          : 'Updated weekly · Official OWGR data'}
       </p>
       <div className="border-b mb-4" style={{ borderColor: 'hsl(var(--border) / 0.1)' }} />
 
