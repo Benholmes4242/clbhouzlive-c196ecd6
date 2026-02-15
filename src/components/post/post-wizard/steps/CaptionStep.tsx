@@ -176,10 +176,10 @@ export function CaptionStep({
       ref={scrollContainerRef}
       data-caption-scroll
       className="h-full flex flex-col overflow-y-auto"
-      style={{ backgroundColor: '#FAFAF8' }}
+      style={{ backgroundColor: '#F8FAFC' }}
     >
       <div className="flex flex-col space-y-3 py-4 pb-32">
-        {/* Media Preview Strip — full width */}
+        {/* Media Preview Strip */}
         {state.mediaItems.length > 0 && (
           <motion.div
             initial={{ opacity: 0, x: -12 }}
@@ -191,20 +191,18 @@ export function CaptionStep({
               {previewMedia.map((item, idx) => (
                 <div key={item.id} className={cn(
                   "relative flex-shrink-0 rounded-xl overflow-hidden",
-                  idx === 0 ? "w-14 h-14 ring-2 ring-emerald-500 scale-105" : "w-12 h-12"
+                  idx === 0 ? "w-14 h-14 ring-2 ring-amber-400 scale-105" : "w-12 h-12"
                 )}>
                   <img
                     src={item.previewUrl}
                     alt=""
                     className="w-full h-full object-cover"
                   />
-                  {/* Video play icon */}
                   {item.type === 'video' && (
                     <div className="absolute inset-0 flex items-center justify-center">
                       <Play className="w-4 h-4 text-white drop-shadow-md" fill="white" />
                     </div>
                   )}
-                  {/* +N overflow */}
                   {idx === previewMedia.length - 1 && overflowCount > 0 && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                       <span className="text-white text-xs font-semibold">+{overflowCount}</span>
@@ -226,7 +224,7 @@ export function CaptionStep({
           <div className={cn(
             "rounded-2xl border p-4 transition-all duration-200",
             isFocused 
-              ? "border-emerald-300 shadow-emerald-100/50 ring-1 ring-emerald-200" 
+              ? "border-amber-300 shadow-amber-100/50 ring-1 ring-amber-200" 
               : "border-gray-200"
           )}>
             <Textarea
@@ -245,7 +243,7 @@ export function CaptionStep({
               maxLength={CAPTION_MAX_LENGTH + 100}
             />
 
-            {/* Tagged entities chips */}
+            {/* Tagged entities chips — amber */}
             {state.selectedTags.length > 0 && (
               <div className="pt-2 flex flex-wrap items-center gap-1.5 border-t border-gray-100 mt-2">
                 <span className="text-xs text-gray-400">Tagged:</span>
@@ -253,7 +251,7 @@ export function CaptionStep({
                   <button
                     key={tag.id}
                     onClick={() => handleRemoveTag(tag.id)}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors bg-amber-50 text-amber-700 hover:bg-amber-100"
                   >
                     @{(tag.username || tag.name).charAt(0).toUpperCase() + (tag.username || tag.name).slice(1)}
                     <X className="w-3 h-3 opacity-60 hover:opacity-100" />
@@ -262,14 +260,14 @@ export function CaptionStep({
               </div>
             )}
 
-            {/* Character counter with circular progress */}
+            {/* Character counter — amber circle */}
             {hasContent && (
               <div className="flex items-center justify-end gap-1.5 pt-2">
                 <svg className="w-4 h-4" viewBox="0 0 16 16">
                   <circle cx="8" cy="8" r="6" fill="none" stroke="#e5e7eb" strokeWidth="2" />
                   <circle
                     cx="8" cy="8" r="6" fill="none"
-                    stroke={charPercent >= 0.95 ? '#ef4444' : charPercent >= 0.8 ? '#f59e0b' : '#10b981'}
+                    stroke={charPercent >= 0.95 ? '#ef4444' : charPercent >= 0.8 ? '#f59e0b' : '#f59e0b'}
                     strokeWidth="2"
                     strokeDasharray={circumference}
                     strokeDashoffset={strokeDashoffset}
@@ -286,7 +284,7 @@ export function CaptionStep({
           </div>
         </SectionCard>
         
-        {/* Tagged Courses Card */}
+        {/* Tagged Courses Card — amber accents */}
         <SectionCard delay={0.08}>
           <div className="flex items-center justify-between mb-3">
             <SectionHeader>Tagged Courses</SectionHeader>
@@ -297,7 +295,6 @@ export function CaptionStep({
             )}
           </div>
 
-          {/* Course chips */}
           {hasSelectedCourses && (
             <div className="flex flex-wrap gap-2 mb-3">
               {state.selectedCourses
@@ -305,15 +302,15 @@ export function CaptionStep({
                 .map((course) => (
                   <div 
                     key={course.id}
-                    className="flex items-center gap-2 px-3 py-2 rounded-full bg-emerald-50 border border-emerald-200"
+                    className="flex items-center gap-2 px-3 py-2 rounded-full bg-amber-50 border border-amber-200"
                   >
-                    <MapPin className="w-3.5 h-3.5 text-emerald-600" />
-                    <span className="text-sm text-emerald-700 font-medium">{course.name}</span>
+                    <MapPin className="w-3.5 h-3.5 text-amber-500" />
+                    <span className="text-sm text-amber-800 font-medium">{course.name}</span>
                     <button
                       onClick={() => handleRemoveCourse(course.id)}
-                      className="p-0.5 rounded-full hover:bg-emerald-100 transition-colors"
+                      className="p-0.5 rounded-full hover:bg-amber-100 transition-colors"
                     >
-                      <X className="w-3.5 h-3.5 text-emerald-500" />
+                      <X className="w-3.5 h-3.5 text-amber-600" />
                     </button>
                   </div>
                 ))}
@@ -322,7 +319,7 @@ export function CaptionStep({
 
           <button
             onClick={onOpenCourseSearch}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-dashed border-gray-200 hover:border-emerald-300 hover:text-emerald-600 transition-colors text-left"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-dashed border-gray-200 hover:border-amber-300 hover:text-amber-600 transition-colors text-left"
           >
             <MapPin className="h-4 w-4 text-gray-400 flex-shrink-0" />
             <span className="text-sm text-gray-500">
@@ -332,7 +329,7 @@ export function CaptionStep({
           </button>
         </SectionCard>
         
-        {/* Categories Card */}
+        {/* Categories Card — amber accents */}
         <SectionCard delay={0.1}>
           <div className="flex items-center justify-between mb-3">
             <SectionHeader>Categories</SectionHeader>
@@ -349,20 +346,20 @@ export function CaptionStep({
             className={cn(
               "w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors text-left active:scale-[0.98]",
               hasCategories 
-                ? "bg-emerald-50 border-emerald-200 hover:bg-emerald-100" 
-                : "border-gray-200 hover:border-emerald-300"
+                ? "bg-amber-50 border-amber-200 hover:bg-amber-100" 
+                : "border-gray-200 hover:border-amber-300"
             )}
           >
             <Tag className={cn(
               "h-4 w-4 flex-shrink-0",
-              hasCategories ? "text-emerald-600" : "text-gray-400"
+              hasCategories ? "text-amber-600" : "text-gray-400"
             )} />
             {hasCategories ? (
               <div className="flex-1 flex flex-wrap gap-1.5 min-w-0">
                 {state.selectedCategories.slice(0, 3).map((cat) => (
                   <span 
                     key={typeof cat === 'string' ? cat : cat.id}
-                    className="px-2.5 py-0.5 text-xs rounded-full bg-emerald-500 text-white font-medium"
+                    className="px-2.5 py-0.5 text-xs rounded-full bg-amber-500 text-white font-medium"
                   >
                     {typeof cat === 'string' ? cat : cat.label}
                   </span>
