@@ -171,7 +171,7 @@ export function LeadersTab() {
             transition={{ duration: 0.25 }}
           >
             {listPlayers.length > 0 && (
-              <div className="bg-card border border-border/40 rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+              <div className="divide-y divide-border/30">
                 {listPlayers.map((item, idx) => (
                   <LeaderRow
                     key={item.playerId}
