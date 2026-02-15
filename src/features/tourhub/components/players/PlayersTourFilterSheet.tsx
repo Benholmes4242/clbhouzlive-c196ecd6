@@ -104,7 +104,7 @@ export function PlayersTourFilterSheet({
           </div>
 
           {/* Tour options */}
-          <div className="space-y-1.5" role="listbox">
+          <div className="space-y-1.5" role="listbox" aria-label="Filter by Tour">
             {TOUR_OPTIONS.map((tour) => {
               const isActive = activeTour === tour.code;
               const count = tour.code === 'all'

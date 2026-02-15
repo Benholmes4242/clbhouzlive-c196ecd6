@@ -1,6 +1,7 @@
 /**
  * PlayerCardV2 - Redesigned player card with photo filling the left side.
- * Similar to tournament cards on the Schedule page.
+ * PL-04: Stats line reorders based on active sort.
+ * PL-05: aria-label for screen readers.
  */
 
 import { Link } from 'react-router-dom';
@@ -9,6 +10,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
+import type { PlayerSortType } from './PlayerSortControl';
 
 interface PlayerCardV2Props {
   player: {
@@ -24,12 +26,13 @@ interface PlayerCardV2Props {
   eventsPlayed?: number | null;
   earnings?: number | null;
   wins?: number | null;
-  /** Override headshot URL from batch-loaded map */
   batchHeadshotUrl?: string | null;
-  /** Whether to show the tour badge (hidden when filtering by specific tour) */
   showTourBadge?: boolean;
-  /** Index for staggered animation */
   index?: number;
+  /** Active sort — determines stats line order (PL-04) */
+  activeSort?: PlayerSortType;
+  /** Called before navigating to save scroll position (PL-03) */
+  onNavigate?: () => void;
 }
 
 function formatEarnings(amount: number): string {
@@ -47,6 +50,8 @@ export function PlayerCardV2({
   batchHeadshotUrl,
   showTourBadge = true,
   index = 0,
+  activeSort = 'world-rank-desc',
+  onNavigate,
 }: PlayerCardV2Props) {
   const filteredBatchUrl = batchHeadshotUrl && !batchHeadshotUrl.includes('ui-avatars.com') ? batchHeadshotUrl : null;
   const photoUrl = filteredBatchUrl ?? resolvePhotoUrl(player.photoUrl, player.pgaTourId);
@@ -62,11 +67,41 @@ export function PlayerCardV2({
 
   const staggerDelay = Math.min(index, 20) * 0.015;
 
-  // Build meta line: #N OWGR · $X.XM · X wins
-  const metaParts: string[] = [];
-  if (worldRank != null && worldRank > 0) metaParts.push(`#${worldRank} OWGR`);
-  if (earnings != null && earnings > 0) metaParts.push(formatEarnings(earnings));
-  if (wins != null && wins > 0) metaParts.push(`${wins} ${wins === 1 ? 'win' : 'wins'}`);
+  // Build meta parts
+  const rankPart = worldRank != null && worldRank > 0 ? `#${worldRank} OWGR` : null;
+  const earningsPart = earnings != null && earnings > 0 ? formatEarnings(earnings) : null;
+  const winCount = wins ?? 0;
+  const winsPart = winCount > 0 ? `${winCount} ${winCount === 1 ? 'win' : 'wins'}` : null;
+
+  // PL-04: Reorder stats based on active sort
+  let metaParts: string[] = [];
+  let primaryIndex = -1;
+
+  if (activeSort === 'most-wins') {
+    if (winsPart) metaParts.push(winsPart);
+    primaryIndex = 0;
+    if (rankPart) metaParts.push(rankPart);
+    if (earningsPart) metaParts.push(earningsPart);
+  } else if (activeSort === 'highest-earnings') {
+    if (earningsPart) metaParts.push(earningsPart);
+    primaryIndex = 0;
+    if (rankPart) metaParts.push(rankPart);
+    if (winsPart) metaParts.push(winsPart);
+  } else {
+    // Default / world-rank / alpha
+    if (rankPart) metaParts.push(rankPart);
+    if (earningsPart) metaParts.push(earningsPart);
+    if (winsPart) metaParts.push(winsPart);
+  }
+
+  // PL-05: Build aria-label
+  const ariaLabel = [
+    player.fullName,
+    countryName,
+    rankPart ? `rank ${worldRank}` : null,
+    earningsPart,
+    winCount > 0 ? `${winCount} wins` : null,
+  ].filter(Boolean).join(', ');
 
   return (
     <motion.div
@@ -76,6 +111,8 @@ export function PlayerCardV2({
     >
       <Link
         to={`/tourhub/player/${player.id}`}
+        onClick={onNavigate}
+        aria-label={ariaLabel}
         className={cn(
           "flex overflow-hidden",
           "bg-card rounded-xl border border-border/40 shadow-sm",
@@ -102,12 +139,10 @@ export function PlayerCardV2({
 
         {/* Info section — right ~65% */}
         <div className="flex-1 min-w-0 px-3.5 py-3 flex flex-col justify-center">
-          {/* Name */}
           <h3 className="text-base font-semibold text-foreground truncate leading-tight">
             {player.fullName}
           </h3>
 
-          {/* Country */}
           {countryName && (
             <div className="flex items-center gap-1.5 mt-1">
               {flag && <span className="text-xs leading-none">{flag}</span>}
@@ -115,10 +150,19 @@ export function PlayerCardV2({
             </div>
           )}
 
-          {/* Meta line: #N OWGR · $X.XM · X wins */}
+          {/* Meta line — PL-04: primary metric is bold */}
           {metaParts.length > 0 && (
             <p className="text-xs text-muted-foreground mt-1.5 tabular-nums truncate">
-              {metaParts.join(' · ')}
+              {metaParts.map((part, i) => (
+                <span key={i}>
+                  {i > 0 && ' · '}
+                  {i === primaryIndex && primaryIndex >= 0 ? (
+                    <span className="font-semibold text-foreground">{part}</span>
+                  ) : (
+                    part
+                  )}
+                </span>
+              ))}
             </p>
           )}
         </div>
