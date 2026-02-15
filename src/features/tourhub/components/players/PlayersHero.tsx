@@ -50,7 +50,7 @@ function RunnerCard({ player, index }: { player: ElitePlayer; index: number }) {
         background: 'hsl(var(--card))',
         border: '1px solid hsl(var(--border) / 0.4)',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06), 0 0 1px rgba(0, 0, 0, 0.08)',
-        minWidth: '140px',
+        flex: '1 1 0%',
       }}
     >
       {/* Rank Badge */}
@@ -200,15 +200,8 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
               className="px-4"
               style={{ marginTop: '-8px', position: 'relative', zIndex: 10 }}
             >
-              <div
-                className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-hide"
-                style={{
-                  WebkitOverflowScrolling: 'touch',
-                  scrollbarWidth: 'none',
-                  scrollSnapType: 'x mandatory',
-                }}
-              >
-                {runners.map((player, index) => (
+              <div className="flex gap-2.5">
+                {runners.slice(0, 2).map((player, index) => (
                   <RunnerCard key={player.playerId} player={player} index={index} />
                 ))}
               </div>
