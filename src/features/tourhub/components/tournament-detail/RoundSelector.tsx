@@ -1,5 +1,6 @@
 /**
  * RoundSelector - Pill-style round filter (secondary navigation)
+ * TD-06: Added role="tablist" and role="tab" with aria-selected
  */
 
 import { cn } from '@/lib/utils';
@@ -13,12 +14,18 @@ interface RoundSelectorProps {
 
 export function RoundSelector({ rounds, activeRound, onRoundChange, className }: RoundSelectorProps) {
   return (
-    <div className={cn("flex items-center gap-2 overflow-x-auto scrollbar-hide mb-4", className)}>
+    <div
+      className={cn("flex items-center gap-2 overflow-x-auto scrollbar-hide mb-4", className)}
+      role="tablist"
+      aria-label="Round Selection"
+    >
       {rounds.map((round) => {
         const isActive = activeRound === round;
         return (
           <button
             key={round}
+            role="tab"
+            aria-selected={isActive}
             onClick={() => onRoundChange(round)}
             className={cn(
               "px-5 py-1.5 rounded-full text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.95]",

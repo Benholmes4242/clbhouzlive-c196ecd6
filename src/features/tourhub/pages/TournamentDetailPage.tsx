@@ -2,11 +2,13 @@
  * TournamentDetailPage - Editorial tournament detail experience
  */
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { Globe, Trophy, Clock, Target } from 'lucide-react';
+import { Globe, Trophy, Clock, Target, RefreshCw, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
+import { useQueryClient } from '@tanstack/react-query';
+import { cn } from '@/lib/utils';
 import { TourHubShell } from '../components/TourHubShell';
 import { useTourTournament, useTourLeaderboard } from '../hooks/useTourHubData';
 import { useLeaderboardRealtime } from '../hooks/useLeaderboardRealtime';
@@ -31,10 +33,12 @@ import {
 } from '../components/tournament-detail';
 
 const VALID_TABS: TournamentTab[] = ['overview', 'leaderboard', 'summary', 'tee-times', 'hole-stats'];
+const SCROLL_KEY = 'tournament-detail-scroll';
 
 export function TournamentDetailPage() {
   const { tournamentId } = useParams<{ tournamentId: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
+  const queryClient = useQueryClient();
   
   const initialTab = useMemo(() => {
     const tabParam = searchParams.get('tab') as TournamentTab | null;
@@ -42,15 +46,63 @@ export function TournamentDetailPage() {
   }, []);
   
   const [activeTab, setActiveTab] = useState<TournamentTab>(initialTab);
-  
-  // Scroll to top on mount
+
+  // TD-08: Scroll position restoration
   useEffect(() => {
-    window.scrollTo(0, 0);
+    const saved = sessionStorage.getItem(SCROLL_KEY);
+    if (saved) {
+      requestAnimationFrame(() => window.scrollTo(0, parseInt(saved, 10)));
+      sessionStorage.removeItem(SCROLL_KEY);
+    } else {
+      window.scrollTo(0, 0);
+    }
   }, []);
+
+  const saveScrollPosition = useCallback(() => {
+    sessionStorage.setItem(SCROLL_KEY, String(window.scrollY));
+  }, []);
+
+  // TD-01: Pull-to-refresh
+  const [isPulling, setIsPulling] = useState(false);
+  const [pullDistance, setPullDistance] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const touchStartY = useRef(0);
+  const PULL_THRESHOLD = 50;
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (window.scrollY <= 0) {
+      touchStartY.current = e.touches[0].clientY;
+      setIsPulling(true);
+    }
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isPulling) return;
+    const delta = e.touches[0].clientY - touchStartY.current;
+    if (delta > 0) {
+      setPullDistance(Math.min(delta, 100));
+    }
+  }, [isPulling]);
+
+  const handleTouchEnd = useCallback(async () => {
+    if (pullDistance >= PULL_THRESHOLD && !isRefreshing) {
+      setIsRefreshing(true);
+      setPullDistance(0);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['tournament', tournamentId] }),
+        queryClient.invalidateQueries({ queryKey: ['tournament-leaderboard', tournamentId] }),
+        queryClient.invalidateQueries({ queryKey: ['tournament-tee-times', tournamentId] }),
+        queryClient.invalidateQueries({ queryKey: ['tournament-holes', tournamentId] }),
+      ]);
+      setIsRefreshing(false);
+    } else {
+      setPullDistance(0);
+    }
+    setIsPulling(false);
+  }, [pullDistance, isRefreshing, queryClient, tournamentId]);
   
   const handleTabChange = (tab: TournamentTab) => {
     setActiveTab(tab);
-    // Scroll to top on tab change
     window.scrollTo({ top: 0, behavior: 'instant' });
     const newParams = new URLSearchParams(searchParams);
     if (tab === 'overview') {
@@ -61,7 +113,7 @@ export function TournamentDetailPage() {
     setSearchParams(newParams, { replace: true });
   };
   
-  const { data: tournament, isLoading } = useTourTournament(tournamentId || '');
+  const { data: tournament, isLoading, refetch } = useTourTournament(tournamentId || '');
   const { data: leaderboard } = useTourLeaderboard(tournamentId || '');
   
   const isLive = tournament?.status === 'inprogress';
@@ -133,14 +185,27 @@ export function TournamentDetailPage() {
     );
   }
   
+  // TD-02: Error state with retry
   if (!tournament) {
     return (
       <TourHubShell>
         <div className="pt-6 px-4">
           <div className="flex items-center justify-center py-20">
             <div className="text-center space-y-4">
-              <h3 className="text-lg font-semibold text-foreground">Tournament Not Found</h3>
-              <p className="text-sm text-muted-foreground">This tournament may not exist or has been removed.</p>
+              <AlertCircle className="w-10 h-10 mx-auto text-muted-foreground" />
+              <h3 className="text-lg font-semibold text-foreground">Couldn't load tournament</h3>
+              <p className="text-sm text-muted-foreground">Tap to try again</p>
+              <div className="flex flex-col items-center gap-3 pt-2">
+                <button
+                  onClick={() => refetch()}
+                  className="px-6 py-2.5 bg-primary text-primary-foreground rounded-full text-sm font-semibold active:scale-95 transition-transform"
+                >
+                  Retry
+                </button>
+                <a href="/tourhub?tab=schedule" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Back to Schedule
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -159,7 +224,24 @@ export function TournamentDetailPage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
           >
+            {/* TD-07: Champion placeholder for live events */}
             {isCompleted && tournamentId && <EventWinnerCard tournamentId={tournamentId} />}
+            {!isCompleted && (
+              <motion.div
+                className="py-6 border-t border-border"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+              >
+                <div className="flex flex-col items-center text-center py-6 space-y-3">
+                  <Trophy className="w-8 h-8 text-amber-500/60" />
+                  <h3 className="text-sm font-semibold text-foreground">Champion unlocking soon</h3>
+                  <p className="text-xs text-muted-foreground max-w-[260px]">
+                    Official results will appear once the event concludes
+                  </p>
+                </div>
+              </motion.div>
+            )}
             {isCompleted && tournamentId && <EventMomentsList tournamentId={tournamentId} limit={5} />}
             
             {hasLeaderboard && (
@@ -206,6 +288,7 @@ export function TournamentDetailPage() {
             tournamentStatus={tournament.status}
             tournamentTimezone={tournament.timezone}
             venuePar={tournament.venue_par}
+            onPlayerTap={saveScrollPosition}
           />
         );
       
@@ -247,52 +330,79 @@ export function TournamentDetailPage() {
   
   return (
     <TourHubShell immersive>
-      <TournamentHero 
-        tournament={tournament} 
-        imageUrl={heroImageUrl}
-      />
-      
-      <div className="px-4 pb-24">
-        {/* Status bar */}
-        <div className="pt-5">
-          {isLive && (
-            <StatusBar
-              variant="live"
-              lastUpdatedText={isConnected ? 'Live' : 'Reconnecting…'}
-              isRefreshing={false}
-              leaderName={leader?.name}
-              leaderScore={leader?.score}
-              className="mb-4"
+      {/* TD-01: Pull-to-refresh indicator */}
+      <AnimatePresence>
+        {(pullDistance > 0 || isRefreshing) && (
+          <motion.div
+            className="flex items-center justify-center py-3 bg-background z-50 relative"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+          >
+            <RefreshCw
+              className={cn(
+                "w-5 h-5 text-muted-foreground transition-transform",
+                isRefreshing && "animate-spin"
+              )}
+              style={!isRefreshing ? { transform: `rotate(${(pullDistance / PULL_THRESHOLD) * 360}deg)` } : undefined}
             />
-          )}
-          {isCompleted && (
-            <StatusBar variant="final" className="mb-4" />
-          )}
-          {isUpcoming && (
-            <StatusBar variant="upcoming" countdownText={countdownText} className="mb-4" />
-          )}
-        </div>
-        
-        {/* Tabs */}
-        <TournamentDetailTabs 
-          activeTab={activeTab} 
-          onTabChange={handleTabChange}
-          tournamentStatus={tournament.status}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        <TournamentHero 
+          tournament={tournament} 
+          imageUrl={heroImageUrl}
         />
         
-        {/* Tab Content */}
-        <AnimatePresence mode="wait">
-          <div key={activeTab} className="pt-4">
-            {renderTabContent()}
+        <div className="px-4 pb-24">
+          {/* Status bar */}
+          <div className="pt-5">
+            {isLive && (
+              <StatusBar
+                variant="live"
+                lastUpdatedText={isConnected ? 'Live' : 'Reconnecting…'}
+                isRefreshing={false}
+                leaderName={leader?.name}
+                leaderScore={leader?.score}
+                className="mb-4"
+              />
+            )}
+            {isCompleted && (
+              <StatusBar variant="final" className="mb-4" />
+            )}
+            {isUpcoming && (
+              <StatusBar variant="upcoming" countdownText={countdownText} className="mb-4" />
+            )}
           </div>
-        </AnimatePresence>
-        
-        {/* Data source footer */}
-        <div className="mt-12 pt-6 border-t border-border/40 flex items-center justify-center gap-2 text-[11px] text-muted-foreground/30 pb-8">
-          <Globe className="w-3.5 h-3.5" />
-          <span>Powered by SportsRadar</span>
+          
+          {/* TD-05: Tabs with role="tablist" */}
+          <TournamentDetailTabs 
+            activeTab={activeTab} 
+            onTabChange={handleTabChange}
+            tournamentStatus={tournament.status}
+          />
+          
+          {/* Tab Content with role="tabpanel" */}
+          <AnimatePresence mode="wait">
+            <div key={activeTab} className="pt-4" role="tabpanel" aria-label={`${activeTab} content`}>
+              {renderTabContent()}
+            </div>
+          </AnimatePresence>
+          
+          {/* Data source footer */}
+          <div className="mt-12 pt-6 border-t border-border/40 flex items-center justify-center gap-2 text-[11px] text-muted-foreground/30 pb-8">
+            <Globe className="w-3.5 h-3.5" />
+            <span>Powered by SportsRadar</span>
+          </div>
         </div>
       </div>
     </TourHubShell>
   );
 }
+
