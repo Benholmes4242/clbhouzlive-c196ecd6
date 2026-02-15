@@ -23,7 +23,7 @@ export function PermissionDeniedCard({ type, onRetry }: PermissionDeniedCardProp
   };
   
   return (
-    <div className="h-full flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-300" style={{ backgroundColor: '#FAFAF8' }}>
+    <div className="h-full flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-300" style={{ backgroundColor: '#F8FAFC' }}>
       <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-5">
         <Icon className="w-9 h-9 text-gray-400" />
       </div>
@@ -42,7 +42,7 @@ export function PermissionDeniedCard({ type, onRetry }: PermissionDeniedCardProp
       <div className="flex flex-col items-center gap-3 w-full max-w-[220px]">
         <button
           onClick={handleOpenSettings}
-          className="w-full flex items-center justify-center gap-2 bg-emerald-500 text-white rounded-full px-6 py-3 font-medium active:scale-[0.97] transition-transform"
+          className="w-full flex items-center justify-center gap-2 bg-amber-500 text-white rounded-full px-6 py-3 font-medium active:scale-[0.97] transition-transform"
         >
           <Settings className="w-4 h-4" />
           Open Settings
@@ -51,7 +51,7 @@ export function PermissionDeniedCard({ type, onRetry }: PermissionDeniedCardProp
         {onRetry && (
           <button
             onClick={onRetry}
-            className="text-emerald-600 font-medium text-sm active:opacity-70 transition-opacity"
+            className="text-amber-600 font-medium text-sm active:opacity-70 transition-opacity"
           >
             Try Again
           </button>

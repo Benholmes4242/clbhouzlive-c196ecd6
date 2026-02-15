@@ -56,7 +56,7 @@ function SectionCard({
   );
 }
 
-// Section header with edit action
+// Section header with edit action — amber accents
 function SectionHeader({ 
   icon: Icon, 
   label, 
@@ -69,7 +69,7 @@ function SectionHeader({
   return (
     <div className="flex items-center justify-between px-4 pt-3 pb-1">
       <div className="flex items-center gap-1.5">
-        <Icon className="h-3.5 w-3.5 text-emerald-600" />
+        <Icon className="h-3.5 w-3.5 text-amber-500" />
         <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
           {label}
         </span>
@@ -77,7 +77,7 @@ function SectionHeader({
       {onEdit && (
         <button
           onClick={onEdit}
-          className="flex items-center gap-1 px-2 py-1 -mr-1 text-xs font-medium text-emerald-600 rounded-lg active:bg-emerald-50 transition-colors"
+          className="flex items-center gap-1 px-2 py-1 -mr-1 text-xs font-medium text-amber-600 rounded-lg active:bg-amber-50 transition-colors"
         >
           <PenLine className="h-3 w-3" />
           Edit
@@ -87,7 +87,7 @@ function SectionHeader({
   );
 }
 
-// Thumbnail content - shared between sortable and overlay
+// Thumbnail content - shared between sortable and overlay — amber accents
 function ConfirmThumbnailContent({
   item,
   index,
@@ -152,12 +152,12 @@ function ConfirmThumbnailContent({
 
   return (
     <div className="relative aspect-square flex-shrink-0 w-full">
-      {/* Cover badge */}
+      {/* Cover badge — amber, only on ConfirmStep */}
       {isFirst && !isDragOverlay && (
         <span 
           className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-md text-[10px] font-semibold z-30"
           style={{
-            background: 'linear-gradient(135deg, rgba(52, 211, 153, 0.9), rgba(5, 150, 105, 0.9))',
+            background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.9), rgba(245, 158, 11, 0.9))',
             backdropFilter: 'blur(8px)',
             WebkitBackdropFilter: 'blur(8px)',
             color: '#fff',
@@ -177,7 +177,7 @@ function ConfirmThumbnailContent({
       <div className={cn(
         "absolute inset-0 overflow-hidden rounded-xl transition-all duration-150",
         isActive 
-          ? 'ring-2 ring-emerald-500 ring-offset-1 ring-offset-white shadow-md' 
+          ? 'ring-2 ring-amber-400 ring-offset-1 ring-offset-white shadow-md' 
           : 'opacity-70 hover:opacity-100'
       )}>
         {item.type === 'image' ? (
@@ -345,8 +345,8 @@ export function ConfirmStep({
   const cardBaseDelay = 0.1;
 
   return (
-    <div className="h-full flex flex-col overflow-y-auto" style={{ backgroundColor: '#FAFAF8' }}>
-      {/* Ready to share header */}
+    <div className="h-full flex flex-col overflow-y-auto" style={{ backgroundColor: '#F8FAFC' }}>
+      {/* Ready to share header — amber sparkle */}
       <motion.div 
         className="flex items-center gap-2 px-4 pt-4 pb-2"
         initial={{ opacity: 0, y: -8 }}
@@ -354,7 +354,7 @@ export function ConfirmStep({
         transition={{ duration: 0.3 }}
       >
         <div className="h-6 w-6 rounded-full flex items-center justify-center"
-          style={{ background: 'linear-gradient(135deg, #34d399, #059669)' }}
+          style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)' }}
         >
           <Sparkles className="h-3.5 w-3.5 text-white" />
         </div>
@@ -499,8 +499,8 @@ export function ConfirmStep({
             <div className="px-4 pb-3 space-y-1.5">
               {state.selectedCourses.map((course) => (
                 <div key={course.id} className="flex items-center gap-2 text-sm">
-                  <div className="h-6 w-6 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
-                    <MapPin className="h-3 w-3 text-emerald-600" />
+                  <div className="h-6 w-6 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
+                    <MapPin className="h-3 w-3 text-amber-500" />
                   </div>
                   <span className="font-medium text-gray-800">{course.name}</span>
                 </div>
@@ -509,7 +509,7 @@ export function ConfirmStep({
           </SectionCard>
         )}
         
-        {/* Categories card */}
+        {/* Categories card — amber pills */}
         {hasCategories && (
           <SectionCard delay={cardBaseDelay + 0.16}>
             <SectionHeader icon={Tag} label="Categories" onEdit={onOpenCategories} />
@@ -520,8 +520,8 @@ export function ConfirmStep({
                     key={typeof cat === 'string' ? cat : cat.id}
                     className="px-2.5 py-1 text-xs rounded-full font-medium"
                     style={{
-                      background: 'linear-gradient(135deg, rgba(52, 211, 153, 0.12), rgba(5, 150, 105, 0.12))',
-                      color: '#047857',
+                      background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.12), rgba(245, 158, 11, 0.12))',
+                      color: '#92400e',
                     }}
                   >
                     {typeof cat === 'string' ? cat : cat.label}

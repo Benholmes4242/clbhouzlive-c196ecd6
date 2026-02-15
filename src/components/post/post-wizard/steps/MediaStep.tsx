@@ -2,7 +2,7 @@
 // Uses native OS picker via pickMediaFiles utility
 import { useCallback, useMemo, useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Images, Plus, Wand2, Award, MapPin, AtSign } from 'lucide-react';
+import { Camera, Images, Plus, Wand2, Award, MapPin, AtSign, X, Play } from 'lucide-react';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { pickMediaFiles, validateMediaFiles } from '@/utils/media/pickMediaFiles';
 import { StepProps } from '../types';
@@ -116,7 +116,6 @@ async function generateVideoPoster(videoFile: File): Promise<string | undefined>
       resolve(undefined);
     };
     
-    // Timeout fallback
     setTimeout(() => {
       if (!resolved) {
         captureFrame();
@@ -197,7 +196,6 @@ export function MediaStep({
         next.delete(mediaId);
         return next;
       });
-      // Also clean up processing/warning state
       setProcessingMediaIds(prev => {
         const next = new Set(prev);
         next.delete(mediaId);
@@ -229,7 +227,7 @@ export function MediaStep({
         type,
         file,
         previewUrl,
-        thumbnailUrl: type === 'image' ? previewUrl : undefined, // Images ready immediately
+        thumbnailUrl: type === 'image' ? previewUrl : undefined,
         duration: undefined,
       } as ComposerMediaItem;
     });
@@ -469,7 +467,7 @@ export function MediaStep({
     }
     
     return (
-      <div className="h-full flex flex-col items-center justify-center px-8 relative" style={{ background: 'linear-gradient(to bottom, rgba(236,253,245,0.4), white, white)' }}>
+      <div className="h-full flex flex-col items-center justify-center px-8 relative" style={{ background: 'linear-gradient(to bottom, rgba(254,243,199,0.3), white, white)' }}>
         {/* Skeleton loading banner */}
         <PickerLoadingBanner isVisible={isPickerOpen} />
         
@@ -479,11 +477,11 @@ export function MediaStep({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
         >
-          {/* Branded camera icon */}
-          <div className="relative h-20 w-20 rounded-[28%] bg-emerald-100 flex items-center justify-center mb-6">
-            <Camera className="h-9 w-9 text-emerald-600" />
+          {/* Branded camera icon — amber */}
+          <div className="relative h-20 w-20 rounded-[28%] bg-amber-100 flex items-center justify-center mb-6">
+            <Camera className="h-9 w-9 text-amber-600" />
             <div 
-              className="absolute inset-0 rounded-[28%] bg-emerald-50 animate-ping" 
+              className="absolute inset-0 rounded-[28%] bg-amber-50 animate-ping" 
               style={{ animationDuration: '3s' }} 
             />
           </div>
@@ -498,12 +496,13 @@ export function MediaStep({
             Up to {POST_LIMITS.MAX_MEDIA_COUNT} photos & videos
           </p>
           
-          {/* Action cards — Camera & Gallery */}
+          {/* Action cards — Camera (amber) & Gallery */}
           <div className="flex gap-3 w-full max-w-[280px]">
             <button
               onClick={handleCamera}
               disabled={isPickerOpen}
-              className="flex-1 flex flex-col items-center gap-2 py-5 rounded-2xl bg-emerald-500 text-white font-medium shadow-sm active:scale-[0.97] transition-all disabled:opacity-50"
+              className="flex-1 flex flex-col items-center gap-2 py-5 rounded-2xl text-white font-medium shadow-sm active:scale-[0.97] transition-all disabled:opacity-50"
+              style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)' }}
             >
               <Camera className="h-6 w-6" />
               <div>
@@ -516,7 +515,7 @@ export function MediaStep({
               disabled={isPickerOpen}
               className="flex-1 flex flex-col items-center gap-2 py-5 rounded-2xl bg-white border border-gray-200 text-gray-800 font-medium shadow-sm active:scale-[0.97] transition-all disabled:opacity-50"
             >
-              <Images className="h-6 w-6 text-emerald-500" />
+              <Images className="h-6 w-6 text-amber-500" />
               <div>
                 <div className="text-sm font-semibold">Gallery</div>
                 <div className="text-[10px] text-gray-400">Choose media</div>
@@ -533,18 +532,18 @@ export function MediaStep({
             />
           </div>
           
-          {/* Quick action chips */}
+          {/* Quick action chips — amber icons */}
           <div className="flex flex-wrap justify-center gap-2 mt-6">
             <span className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-white border border-gray-200 shadow-sm text-sm font-medium text-gray-600 active:bg-gray-50 transition-colors">
-              <Camera className="h-4 w-4 text-emerald-500" />
+              <Camera className="h-4 w-4 text-amber-500" />
               Best shots
             </span>
             <span className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-white border border-gray-200 shadow-sm text-sm font-medium text-gray-600 active:bg-gray-50 transition-colors">
-              <AtSign className="h-4 w-4 text-emerald-500" />
+              <AtSign className="h-4 w-4 text-amber-500" />
               Tag partners
             </span>
             <span className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-white border border-gray-200 shadow-sm text-sm font-medium text-gray-600 active:bg-gray-50 transition-colors">
-              <MapPin className="h-4 w-4 text-emerald-500" />
+              <MapPin className="h-4 w-4 text-amber-500" />
               Add location
             </span>
           </div>
@@ -554,38 +553,129 @@ export function MediaStep({
   }
 
   return (
-    <div className="h-full flex flex-col relative" style={{ backgroundColor: '#FAFAF8' }}>
-      {/* Non-blocking picker loading banner (for adding more media) */}
+    <div className="h-full flex flex-col relative" style={{ backgroundColor: '#F8FAFC' }}>
+      {/* Non-blocking picker loading banner */}
       <PickerLoadingBanner isVisible={isPickerOpen} />
       
-      {/* Media stage — rounded container per spec */}
-      <div className="flex-1 min-h-0 relative overflow-hidden rounded-xl mx-4 mt-2 shadow-sm">
-        <CreateMomentMediaStage
-          media={state.mediaItems}
-          activeMediaId={activeMediaId}
-          coverMediaId={coverMediaId}
-          onActiveMediaChange={handleActiveMediaChange}
-          onSetCover={handleSetCover}
-          onRemoveMedia={handleRemoveMedia}
-          onReorder={handleReorder}
-          getEdits={getEdits}
-          processingMediaIds={processingMediaIds}
-          warningMediaIds={warningMediaIds}
-          removingMediaIds={removingMediaIds}
-        />
-        
-        {/* Media counter pill */}
-        {state.mediaItems.length > 1 && (
-          <div className="absolute top-3 left-3 z-30 flex items-center px-2 py-1 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 shadow-lg shadow-black/20">
-            <span className="text-[10px] text-white font-medium tabular-nums">
-              {currentMediaIndex + 1}/{state.mediaItems.length}
-            </span>
+      {/* Two-row scrollable thumbnail grid — replaces hero preview */}
+      <div className="flex-1 min-h-0 flex flex-col px-4 pt-3">
+        <div 
+          className="flex-1 overflow-x-auto overflow-y-hidden"
+          style={{ 
+            scrollSnapType: 'x mandatory',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+          }}
+        >
+          <style dangerouslySetInnerHTML={{ __html: `
+            .media-grid-scroll::-webkit-scrollbar { display: none; }
+          `}} />
+          <div 
+            className="media-grid-scroll grid gap-2 h-full"
+            style={{
+              gridTemplateRows: state.mediaItems.length <= 4 ? '1fr' : 'repeat(2, 1fr)',
+              gridAutoFlow: 'column',
+              gridAutoColumns: 'minmax(0, 1fr)',
+              width: 'max-content',
+              minWidth: '100%',
+            }}
+          >
+            {state.mediaItems.map((item, index) => {
+              const isRemoving = removingMediaIds.has(item.id);
+              const isProcessing = processingMediaIds.has(item.id);
+              const isActive = item.id === activeMediaId;
+              
+              return (
+                <motion.div
+                  key={item.id}
+                  className="relative rounded-xl overflow-hidden cursor-pointer"
+                  style={{ 
+                    width: 'calc(25vw - 12px)',
+                    height: 'calc(25vw - 12px)',
+                    scrollSnapAlign: 'start',
+                  }}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ 
+                    opacity: isRemoving ? 0 : 1, 
+                    scale: isRemoving ? 0.5 : 1,
+                  }}
+                  transition={{ duration: 0.2 }}
+                  onClick={() => handleActiveMediaChange(item.id)}
+                >
+                  {/* Image/Video */}
+                  {item.type === 'image' ? (
+                    <img 
+                      src={item.previewUrl} 
+                      alt="" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <>
+                      <img 
+                        src={item.thumbnailUrl || item.previewUrl} 
+                        alt="" 
+                        className="w-full h-full object-cover"
+                      />
+                      {/* Video play icon */}
+                      <div className="absolute bottom-1 left-1 w-5 h-5 rounded-full flex items-center justify-center"
+                        style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
+                      >
+                        <Play className="w-2.5 h-2.5 text-white fill-white" />
+                      </div>
+                    </>
+                  )}
+                  
+                  {/* Number badge */}
+                  <div className="absolute top-1 left-1 w-5 h-5 rounded-full bg-black/50 backdrop-blur-sm text-white text-[10px] font-bold flex items-center justify-center">
+                    {index + 1}
+                  </div>
+                  
+                  {/* Remove button */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      animateAndRemove(item.id);
+                    }}
+                    className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/40 text-white flex items-center justify-center"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                  
+                  {/* Active ring */}
+                  {isActive && (
+                    <div className="absolute inset-0 rounded-xl ring-2 ring-amber-400 pointer-events-none" />
+                  )}
+                  
+                  {/* Processing overlay */}
+                  {isProcessing && (
+                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                      <div className="w-5 h-5 border-2 border-white/60 border-t-white rounded-full animate-spin" />
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })}
+            
+            {/* "+ Add More" cell */}
+            {canAddMore && (
+              <button
+                onClick={handleGallery}
+                disabled={isPickerOpen}
+                className="rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 text-2xl active:bg-gray-50 transition-colors disabled:opacity-50"
+                style={{ 
+                  width: 'calc(25vw - 12px)',
+                  height: 'calc(25vw - 12px)',
+                }}
+              >
+                <Plus className="w-6 h-6" />
+              </button>
+            )}
           </div>
-        )}
+        </div>
       </div>
       
-      {/* Bottom action bar */}
-      <div className="flex-shrink-0 border-t border-gray-100 bg-white px-4 py-3">
+      {/* Bottom action bar — extra padding for safe area */}
+      <div className="flex-shrink-0 border-t border-gray-100 bg-white px-4 py-3 pb-6">
         {/* Non-blocking processing progress banner */}
         <MediaProcessingBanner 
           totalVideos={batchTotal} 
@@ -615,7 +705,7 @@ export function MediaStep({
               <Wand2 className="h-4 w-4" />
               Studio
               {!studioFirstRun.hasSeen && (
-                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
               )}
             </button>
             
@@ -630,7 +720,7 @@ export function MediaStep({
               <Award className="h-4 w-4" />
               Badges
               {!badgesFirstRun.hasSeen && (
-                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
               )}
             </button>
           </div>
@@ -640,6 +730,23 @@ export function MediaStep({
             {state.mediaItems.length}/{POST_LIMITS.MAX_MEDIA_COUNT}
           </span>
         </div>
+      </div>
+      
+      {/* Hidden: CreateMomentMediaStage kept for Studio use — not rendered in main view */}
+      <div className="hidden">
+        <CreateMomentMediaStage
+          media={state.mediaItems}
+          activeMediaId={activeMediaId}
+          coverMediaId={coverMediaId}
+          onActiveMediaChange={handleActiveMediaChange}
+          onSetCover={handleSetCover}
+          onRemoveMedia={handleRemoveMedia}
+          onReorder={handleReorder}
+          getEdits={getEdits}
+          processingMediaIds={processingMediaIds}
+          warningMediaIds={warningMediaIds}
+          removingMediaIds={removingMediaIds}
+        />
       </div>
     </div>
   );

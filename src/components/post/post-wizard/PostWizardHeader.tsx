@@ -18,33 +18,27 @@ export interface PostWizardHeaderProps {
   isFirstStep: boolean;
   isLastStep: boolean;
   
-  // Actor info for profile selector
   actor: ActorRef;
   actorName: string;
   actorAvatarUrl?: string;
   actorVerified?: boolean;
   onOpenProfileSelector: () => void;
   
-  // Counts for badges
   draftCount: number;
   scheduledCount: number;
   
-  // Schedule state
   scheduledAt?: Date | null;
   onClearSchedule?: () => void;
   
-  // Callbacks
   onBack: () => void;
   onOpenDrafts: () => void;
   onOpenScheduled: () => void;
   onOpenScheduleSheet: () => void;
   
-  // Next/Post button
   canProceed: boolean;
   isSubmitting: boolean;
   onNext: () => void;
   
-  // Safe-area handling - when true, hero handles safe-area so header doesn't need it
   hasHeroAbove?: boolean;
 }
 
@@ -143,7 +137,6 @@ export function PostWizardHeader({
           )}
         </button>
         
-        {/* Drafts button with badge - only on first step */}
         {isFirstStep && draftCount > 0 && (
           <button
             onClick={onOpenDrafts}
@@ -158,7 +151,7 @@ export function PostWizardHeader({
         )}
       </div>
       
-      {/* Center: Avatar-only profile selector — clean creation flow */}
+      {/* Center: Avatar-only profile selector */}
       <div className="flex-1 flex justify-center">
         <button 
           onClick={onOpenProfileSelector}
@@ -178,7 +171,6 @@ export function PostWizardHeader({
       
       {/* Right: Context-aware CTA */}
       <div className="flex items-center gap-1 min-w-[72px] justify-end">
-        {/* Schedule button — always visible on Step 1 */}
         {isFirstStep && (
           <div className="relative">
             <button
@@ -197,7 +189,6 @@ export function PostWizardHeader({
               )}
             </button>
             
-            {/* First-time tooltip */}
             <AnimatePresence>
               {showTooltip && (
                 <motion.div
@@ -216,7 +207,6 @@ export function PostWizardHeader({
           </div>
         )}
 
-        {/* Schedule button on Step 3 — opens picker */}
         {isLastStep && !isFirstStep && (
           <button
             onClick={onOpenScheduleSheet}
@@ -232,7 +222,7 @@ export function PostWizardHeader({
           </button>
         )}
         
-        {/* Next/Post/Schedule button */}
+        {/* Next/Post/Schedule button — amber accent */}
         <div className="flex flex-col items-end">
             <button
             onClick={onNext}
@@ -245,8 +235,8 @@ export function PostWizardHeader({
             )}
             style={canProceed && !isSubmitting ? {
               background: isLastStep && !hasSchedule 
-                ? 'linear-gradient(135deg, #10b981, #059669)' 
-                : '#10b981',
+                ? 'linear-gradient(135deg, #fbbf24, #f59e0b)' 
+                : '#f59e0b',
             } : undefined}
           >
             {isSubmitting ? (

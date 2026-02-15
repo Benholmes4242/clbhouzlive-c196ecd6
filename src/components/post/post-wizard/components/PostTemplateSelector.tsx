@@ -79,7 +79,7 @@ export function PostTemplateSelector({
         <div className="flex-1 h-px bg-gray-200" />
       </div>
 
-      {/* Scrollable template chips */}
+      {/* Scrollable template chips — amber active state */}
       <div className="flex gap-2 overflow-x-auto px-6 pb-2 -mx-6 scrollbar-hide">
         {TEMPLATES.map((template) => {
           const isActive = activeTemplateId === template.id;
@@ -90,7 +90,7 @@ export function PostTemplateSelector({
               whileTap={{ scale: 0.97 }}
               className={`flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-full border shadow-sm transition-colors ${
                 isActive
-                  ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
+                  ? 'bg-amber-50 border-amber-300 text-amber-700'
                   : 'bg-white border-gray-200 text-gray-700'
               }`}
             >

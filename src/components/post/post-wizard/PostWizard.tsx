@@ -140,7 +140,7 @@ export function PostWizard({
 
   // Control native status bar appearance when wizard is open
   // "light" = black icons for light backgrounds (#F8FAFC)
-  useMedianStatusBar("light", "#FAFAF8", true, false, isOpen);
+  useMedianStatusBar("light", "#F8FAFC", true, false, isOpen);
 
   // Lock body scroll when open
   useEffect(() => {
@@ -567,7 +567,7 @@ export function PostWizard({
               touchAction: 'pan-y pinch-zoom',
               overscrollBehavior: 'contain',
             },
-            backgroundColor: '#FAFAF8',
+            backgroundColor: '#F8FAFC',
           }}
         >
           {/* Header - fixed height, won't shrink */}
@@ -608,7 +608,7 @@ export function PostWizard({
                     {i > 0 && (
                       <motion.div
                         className="h-0.5 w-6"
-                        style={{ background: '#10b981' }}
+                        style={{ background: '#fbbf24' }}
                         initial={{ scaleX: 0 }}
                         animate={{ scaleX: 1 }}
                         transition={{ delay: i * 0.1 - 0.05, duration: 0.2 }}
@@ -616,7 +616,7 @@ export function PostWizard({
                     )}
                     <motion.div
                       className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                      style={{ background: 'linear-gradient(135deg, #34d399, #059669)' }}
+                      style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)' }}
                       initial={{ scale: 0, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       transition={{ delay: i * 0.1, duration: 0.3, ease: 'easeOut' }}
@@ -629,7 +629,7 @@ export function PostWizard({
             <div className="h-2 w-full bg-gray-100 flex-shrink-0 overflow-hidden">
               <motion.div
                 className="h-full shadow-sm"
-                style={{ background: 'linear-gradient(to right, #34d399, #059669)' }}
+                style={{ background: 'linear-gradient(to right, #fbbf24, #f59e0b)' }}
                 initial={{ width: 0 }}
                 animate={{
                   width: `${((currentStepIndex + 1) / totalSteps) * 100}%`,
