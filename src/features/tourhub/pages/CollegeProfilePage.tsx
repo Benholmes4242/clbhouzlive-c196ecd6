@@ -1,17 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, Swords, GitCompare, Globe } from 'lucide-react';
+import { ArrowLeft, Swords, GitCompare, Globe, Crown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
 import { 
-  FranchiseHero, 
   FranchiseStoryStrip,
   AlumniDepthChart, 
   CollegeRivalsCarousel,
   CollegeCompareSheet,
 } from '../components/college';
-import { useCollegeStats } from '../hooks/useCollegeStats';
+import { useCollegeStats, useCollegeSeasonStats } from '../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
 import { useCollegeRivalries } from '../hooks/useCollegeMovers';
 import { getCollegeGradientCSS } from '../config/collegeBrandColors';
@@ -22,10 +21,6 @@ const sectionVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-/**
- * College Profile Page - Immersive profile with brand color hero,
- * glass back button, and magazine-quality sections.
- */
 export function CollegeProfilePage() {
   const { collegeSlug } = useParams<{ collegeSlug: string }>();
   const navigate = useNavigate();
@@ -34,6 +29,7 @@ export function CollegeProfilePage() {
   const { data: stats, isLoading: statsLoading } = useCollegeStats(collegeSlug);
   const { data: collegeMap, isLoading: mediaLoading } = useCollegeMediaMap();
   const { data: rivalries } = useCollegeRivalries(collegeSlug);
+  const { data: allSeasonStats } = useCollegeSeasonStats();
   
   const [compareOpen, setCompareOpen] = useState(false);
   const [compareCollege2, setCompareCollege2] = useState<string | null>(null);
@@ -44,8 +40,20 @@ export function CollegeProfilePage() {
   const rivalSlugs = rivalries?.map(r => r.rivalNormalizedName) ?? [];
   const firstRival = rivalSlugs[0] ?? null;
   const gradientCSS = collegeSlug ? getCollegeGradientCSS(collegeSlug) : null;
+
+  // Compute this college's rank by earnings
+  const collegeRank = (() => {
+    if (!allSeasonStats || !collegeSlug) return null;
+    const sorted = [...allSeasonStats].sort((a, b) => b.earnings_total - a.earnings_total);
+    const idx = sorted.findIndex(s => s.normalized_name === collegeSlug);
+    return idx >= 0 ? idx + 1 : null;
+  })();
+
+  // Scroll to top on mount
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [collegeSlug]);
   
-  // Immersive mode: hide header
   useEffect(() => {
     hideHeader();
     return () => {
@@ -78,6 +86,11 @@ export function CollegeProfilePage() {
     setCompareCollege2(rivalSlug);
     setCompareOpen(true);
   };
+
+  // Build descriptive subtitle
+  const subtitleText = stats
+    ? `${stats.player_count} alumni on the PGA Tour`
+    : null;
   
   return (
     <PageRoot className="min-h-screen w-full bg-background" immersive immersiveStatusBar hasBottomNav>
@@ -111,7 +124,7 @@ export function CollegeProfilePage() {
           }}
         />
 
-        {/* Glass Back Button — matches Players page (44px squircle) */}
+        {/* Glass Back Button */}
         <button
           onClick={handleBack}
           className="absolute z-20 h-11 w-11 rounded-md flex items-center justify-center bg-black/20 backdrop-blur-sm hover:bg-black/40 active:scale-95 transition-all"
@@ -132,6 +145,31 @@ export function CollegeProfilePage() {
           </div>
         ) : college ? (
           <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-8 pt-20">
+            {/* Season label — top context */}
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+              className="text-[10px] tracking-[0.15em] font-medium text-white/40 uppercase mb-3"
+            >
+              2024-25 Season
+            </motion.span>
+
+            {/* Rank badge */}
+            {collegeRank && (
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.12 }}
+                className="flex items-center gap-1.5 mb-3"
+              >
+                <Crown className="w-3.5 h-3.5 text-amber-400" />
+                <span className="text-xs font-semibold tracking-wider text-amber-400 uppercase">
+                  #{collegeRank} This Season
+                </span>
+              </motion.div>
+            )}
+
             {/* Logo */}
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
@@ -162,27 +200,27 @@ export function CollegeProfilePage() {
               initial={{ y: 8, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.3, delay: 0.25 }}
-              className="text-2xl md:text-3xl font-bold text-white text-center tracking-tight mb-2"
+              className="text-2xl md:text-3xl font-bold text-white text-center tracking-tight mb-1.5"
             >
               {displayName}
             </motion.h1>
 
             {/* Subtitle */}
-            {stats && (
+            {subtitleText && (
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3, delay: 0.3 }}
                 className="text-sm text-white/70"
               >
-                {stats.player_count} PGA Tour {stats.player_count === 1 ? 'player' : 'players'}
+                {subtitleText}
               </motion.p>
             )}
           </div>
         ) : null}
       </div>
 
-      {/* Stat Ribbon — overlaps hero, compact to fit all stats */}
+      {/* Stat Ribbon — overlaps hero */}
       {stats && (
         <div className="relative z-10 -mt-5 mx-4">
           <motion.div
@@ -200,9 +238,9 @@ export function CollegeProfilePage() {
         </div>
       )}
 
-      {/* Content sections */}
-      <div className="w-full max-w-5xl mx-auto px-4 pb-8 mt-6 space-y-section">
-        {/* Action Buttons — Compare only (follow removed) */}
+      {/* Content sections — 24px gaps */}
+      <div className="w-full max-w-5xl mx-auto px-4 pb-8 mt-6 space-y-6">
+        {/* Action Buttons — Compare only */}
         {stats && firstRival && (
           <motion.div
             variants={sectionVariants}
@@ -224,7 +262,7 @@ export function CollegeProfilePage() {
           </motion.div>
         )}
 
-        {/* Story Strip */}
+        {/* Story Strip — 2 tiles (no Chasing) */}
         {stats && (
           <motion.div
             variants={sectionVariants}
@@ -290,9 +328,9 @@ export function CollegeProfilePage() {
           </div>
         )}
 
-        {/* Data Source */}
-        <div className="py-3 rounded-lg bg-muted/20 border border-border/30">
-          <div className="flex items-center gap-2 px-4 text-[11px] text-muted-foreground/50">
+        {/* Data Source — subtle footer */}
+        <div className="pt-4 pb-6">
+          <div className="flex items-center gap-2 justify-center text-[11px] text-muted-foreground/40">
             <Globe className="w-3.5 h-3.5" />
             <span>Powered by SportsRadar</span>
           </div>

@@ -1,15 +1,17 @@
 /**
  * CollegeCompareSheet - Bottom sheet for quick college comparison
+ * Hides bottom nav when open, dark overlay, winning stat highlighted
  */
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Trophy, DollarSign, Scissors, Target, ArrowRight, Check, Users, AlertCircle } from 'lucide-react';
+import { X, ArrowRight, Check, Users, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { useCollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useCollegeMediaMap, type CollegeMedia } from '../../hooks/useCollegeMedia';
+import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 
 type CompareMetric = 'earnings' | 'wins' | 'cuts' | 'top10s';
 
@@ -76,8 +78,8 @@ function CollegeSide({ college, value, metric, isWinner }: CollegeSideProps) {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.2 }}
         className={cn(
-          "text-xl font-bold tabular-nums",
-          isWinner ? "text-primary" : "text-muted-foreground"
+          "text-xl tabular-nums",
+          isWinner ? "font-bold text-primary" : "font-medium text-muted-foreground"
         )}
       >
         {formatValue(value, metric)}
@@ -102,26 +104,17 @@ function RivalChip({ normalizedName, college, isSelected, onClick }: RivalChipPr
       className={cn(
         "shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl",
         "border transition-all duration-200",
-        "active:scale-95",
+        "active:scale-95 min-h-[44px]",
         isSelected 
           ? "bg-muted border-border shadow-sm" 
           : "bg-card border-border hover:bg-muted/80"
       )}
     >
-      <div className={cn(
-        "w-7 h-7 rounded-lg flex items-center justify-center overflow-hidden",
-        "bg-muted"
-      )}>
+      <div className="w-7 h-7 rounded-lg flex items-center justify-center overflow-hidden bg-muted">
         {college?.logo_url ? (
-          <img 
-            src={college.logo_url} 
-            alt={displayName}
-            className="w-5 h-5 object-contain"
-          />
+          <img src={college.logo_url} alt={displayName} className="w-5 h-5 object-contain" />
         ) : (
-          <span className="text-xs font-bold text-muted-foreground">
-            {displayName.charAt(0)}
-          </span>
+          <span className="text-xs font-bold text-muted-foreground">{displayName.charAt(0)}</span>
         )}
       </div>
       
@@ -132,27 +125,20 @@ function RivalChip({ normalizedName, college, isSelected, onClick }: RivalChipPr
         {displayName}
       </span>
       
-      {isSelected && (
-        <Check className="w-3.5 h-3.5 text-foreground" />
-      )}
+      {isSelected && <Check className="w-3.5 h-3.5 text-foreground" />}
     </button>
   );
 }
 
-const METRICS: { key: CompareMetric; label: string; icon: React.ElementType }[] = [
-  { key: 'earnings', label: 'Earnings', icon: DollarSign },
-  { key: 'wins', label: 'Wins', icon: Trophy },
-  { key: 'cuts', label: 'Cuts', icon: Scissors },
-  { key: 'top10s', label: 'Top 10s', icon: Target },
+const METRICS: { key: CompareMetric; label: string }[] = [
+  { key: 'earnings', label: 'Earnings' },
+  { key: 'wins', label: 'Wins' },
+  { key: 'cuts', label: 'Cuts' },
+  { key: 'top10s', label: 'Top 10s' },
 ];
 
 export function CollegeCompareSheet({ 
-  isOpen, 
-  onClose, 
-  college1, 
-  college2, 
-  rivals = [],
-  onCollegeChange 
+  isOpen, onClose, college1, college2, rivals = [], onCollegeChange 
 }: CollegeCompareSheetProps) {
   const [activeMetric, setActiveMetric] = useState<CompareMetric>('earnings');
   const [selectedCollege2, setSelectedCollege2] = useState(college2);
@@ -160,10 +146,20 @@ export function CollegeCompareSheet({
   const { data: allStats, isLoading: statsLoading, error: statsError } = useCollegeSeasonStats();
   const { data: collegeMap, isLoading: mediaLoading, error: mediaError } = useCollegeMediaMap();
 
+  const { setVisible: setBottomNavVisible } = useBottomNavigation();
+
+  // Hide bottom nav when sheet is open
   useEffect(() => {
-    if (isOpen && college2) {
-      setSelectedCollege2(college2);
+    if (isOpen) {
+      setBottomNavVisible(false);
+    } else {
+      setBottomNavVisible(true);
     }
+    return () => setBottomNavVisible(true);
+  }, [isOpen, setBottomNavVisible]);
+
+  useEffect(() => {
+    if (isOpen && college2) setSelectedCollege2(college2);
   }, [college2, isOpen]);
 
   const stats1 = allStats?.find(s => s.normalized_name === college1);
@@ -194,22 +190,17 @@ export function CollegeCompareSheet({
   
   const hasValidComparison = college1 && selectedCollege2 && !hasNoRivals;
 
-  if (hasError) {
-    console.error('CollegeCompareSheet: Failed to load college data', { 
-      college1, statsError, mediaError, stats1Exists: !!stats1 
-    });
-  }
-
   return (
     <AnimatePresence>
       {isOpen && (
         <>
+          {/* Dark overlay */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50"
           />
           
           <motion.div
@@ -219,12 +210,13 @@ export function CollegeCompareSheet({
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className={cn(
               "fixed bottom-0 left-0 right-0 z-50",
-              "bg-card rounded-t-3xl",
+              "bg-card rounded-t-2xl",
               "border-t border-border",
               "shadow-2xl shadow-black/20",
               "max-h-[85vh] overflow-hidden"
             )}
           >
+            {/* Drag handle */}
             <div className="flex justify-center pt-3 pb-2">
               <div className="w-10 h-1 rounded-full bg-border" />
             </div>
@@ -233,7 +225,7 @@ export function CollegeCompareSheet({
               <h3 className="text-lg font-semibold text-foreground">Head to Head</h3>
               <button
                 onClick={onClose}
-                className="p-2 -m-2 text-muted-foreground hover:text-foreground transition-colors"
+                className="p-2 -m-2 text-muted-foreground hover:text-foreground transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -248,9 +240,7 @@ export function CollegeCompareSheet({
                 <p className="text-xs text-muted-foreground text-center mb-4">
                   There was an error loading the comparison data.
                 </p>
-                <Button variant="outline" size="sm" onClick={onClose}>
-                  Close
-                </Button>
+                <Button variant="outline" size="sm" onClick={onClose}>Close</Button>
               </div>
             )}
 
@@ -283,28 +273,29 @@ export function CollegeCompareSheet({
               </div>
             )}
             
+            {/* Metric pills — clean text, no icons */}
             {!hasError && !hasNoRivals && (
               <div className="flex gap-2 px-4 pb-4">
-                {METRICS.map(({ key, label, icon: Icon }) => (
+                {METRICS.map(({ key, label }) => (
                   <button
                     key={key}
                     onClick={() => setActiveMetric(key)}
                     className={cn(
-                      "flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg",
-                      "text-xs font-medium transition-all",
+                      "flex-1 flex items-center justify-center py-2 px-3 rounded-lg",
+                      "text-xs font-medium transition-all min-h-[40px]",
                       "active:scale-95",
                       activeMetric === key
                         ? "bg-card text-foreground border border-border shadow-sm"
                         : "bg-muted text-muted-foreground border border-transparent hover:bg-muted/80"
                     )}
                   >
-                    <Icon className="w-3.5 h-3.5" />
                     {label}
                   </button>
                 ))}
               </div>
             )}
             
+            {/* VS comparison */}
             {!hasError && !hasNoRivals && hasValidComparison && (
               <div className="flex items-center justify-around px-6 py-6">
                 <CollegeSide college={media1} value={value1} metric={activeMetric} isWinner={value1 > value2} />
@@ -314,7 +305,7 @@ export function CollegeCompareSheet({
             )}
             
             {!hasError && !hasNoRivals && (
-              <div className="px-4 pb-8">
+              <div className="px-4 pb-8" style={{ paddingBottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))' }}>
                 {hasValidComparison ? (
                   <Link to={`/tourhub/college-golf/compare?c1=${college1}&c2=${selectedCollege2}`}>
                     <Button className="w-full gap-2" onClick={onClose}>

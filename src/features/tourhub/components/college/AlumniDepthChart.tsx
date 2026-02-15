@@ -1,14 +1,12 @@
 /**
- * AlumniDepthChart - Squad-style depth chart with expand/collapse sections
- * 
- * Uses SquircleAvatar with 1px neutral border (matching world rankings leaderboard).
+ * AlumniDepthChart - Squad-style depth chart with tier-colored left borders
  * Photos resolved via pga_tour_id for Cloudinary CDN quality.
  */
 
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Crown, Cog, Rocket, DollarSign, Trophy, Globe, ChevronDown, ChevronUp, ChevronRight } from 'lucide-react';
+import { Crown, Cog, Rocket, ChevronDown, ChevronUp, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCollegeAlumni, type CollegeAlumnus } from '../../hooks/useCollegeAlumni';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
@@ -19,12 +17,21 @@ interface AlumniDepthChartProps {
   className?: string;
 }
 
+type TierAccent = 'amber' | 'blue' | 'green';
+
 interface AlumniRowProps {
   alumnus: CollegeAlumnus;
   index: number;
+  tierAccent: TierAccent;
 }
 
-function AlumniRow({ alumnus, index }: AlumniRowProps) {
+const tierBorderClass: Record<TierAccent, string> = {
+  amber: 'border-l-4 border-l-amber-400',
+  blue: 'border-l-4 border-l-blue-400',
+  green: 'border-l-4 border-l-green-400',
+};
+
+function AlumniRow({ alumnus, index, tierAccent }: AlumniRowProps) {
   const fullName = `${alumnus.first_name} ${alumnus.last_name}`;
   const hasWins = (alumnus.wins || 0) > 0;
   const hasEarnings = (alumnus.earnings || 0) > 0;
@@ -55,6 +62,7 @@ function AlumniRow({ alumnus, index }: AlumniRowProps) {
         className={cn(
           "flex overflow-hidden",
           "bg-card rounded-xl border border-border/40 shadow-sm",
+          tierBorderClass[tierAccent],
           "hover:border-primary/30 hover:shadow-md",
           "active:scale-[0.98] transition-all"
         )}
@@ -106,9 +114,10 @@ interface SectionProps {
   iconColor: string;
   alumni: CollegeAlumnus[];
   defaultExpanded?: boolean;
+  tierAccent: TierAccent;
 }
 
-function Section({ title, subtitle, icon: Icon, iconColor, alumni, defaultExpanded = true }: SectionProps) {
+function Section({ title, subtitle, icon: Icon, iconColor, alumni, defaultExpanded = true, tierAccent }: SectionProps) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const COLLAPSED_COUNT = 3;
   
@@ -121,7 +130,7 @@ function Section({ title, subtitle, icon: Icon, iconColor, alumni, defaultExpand
     <div className="mb-6">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex items-center justify-between w-full mb-3 group"
+        className="flex items-center justify-between w-full mb-3 group min-h-[44px]"
       >
         <div className="flex items-center gap-2">
           <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center", "bg-muted/50")}>
@@ -151,7 +160,7 @@ function Section({ title, subtitle, icon: Icon, iconColor, alumni, defaultExpand
       <AnimatePresence initial={false}>
         <motion.div className="space-y-2" initial={false} animate={{ height: 'auto' }}>
           {displayedAlumni.map((alumnus, index) => (
-            <AlumniRow key={alumnus.id} alumnus={alumnus} index={index} />
+            <AlumniRow key={alumnus.id} alumnus={alumnus} index={index} tierAccent={tierAccent} />
           ))}
         </motion.div>
       </AnimatePresence>
@@ -160,9 +169,10 @@ function Section({ title, subtitle, icon: Icon, iconColor, alumni, defaultExpand
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className={cn(
-            "w-full mt-2 py-2 text-xs font-medium text-primary",
-            "hover:bg-primary/5 rounded-lg transition-colors",
-            "flex items-center justify-center gap-1"
+            "w-full mt-2 py-2.5 text-xs font-medium text-muted-foreground",
+            "hover:bg-muted/50 rounded-lg transition-colors",
+            "flex items-center justify-center gap-1",
+            "min-h-[44px]"
           )}
         >
           {isExpanded ? (
@@ -212,7 +222,7 @@ export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChart
     return (
       <div className={cn('space-y-3', className)}>
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="h-[72px] bg-card/50 border border-border/30 rounded-xl animate-pulse" />
+          <div key={i} className="h-[110px] bg-card/50 border border-border/30 rounded-xl animate-pulse" />
         ))}
       </div>
     );
@@ -228,9 +238,9 @@ export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChart
   
   return (
     <div className={className}>
-      <Section title="Headliners" subtitle="Elite performers and winners" icon={Crown} iconColor="text-amber-500" alumni={headliners} defaultExpanded={true} />
-      <Section title="Engine Room" subtitle="Reliable contributors making cuts" icon={Cog} iconColor="text-primary" alumni={engineRoom} defaultExpanded={engineRoom.length <= 5} />
-      <Section title="Pipeline" subtitle="Rising talent building careers" icon={Rocket} iconColor="text-purple-500" alumni={pipeline} defaultExpanded={false} />
+      <Section title="Headliners" subtitle="Elite performers and winners" icon={Crown} iconColor="text-amber-500" alumni={headliners} defaultExpanded={true} tierAccent="amber" />
+      <Section title="Engine Room" subtitle="Reliable contributors making cuts" icon={Cog} iconColor="text-blue-400" alumni={engineRoom} defaultExpanded={engineRoom.length <= 5} tierAccent="blue" />
+      <Section title="Pipeline" subtitle="Rising talent building careers" icon={Rocket} iconColor="text-green-500" alumni={pipeline} defaultExpanded={false} tierAccent="green" />
     </div>
   );
 }
