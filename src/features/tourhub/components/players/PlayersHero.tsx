@@ -35,11 +35,10 @@ function RunnerCard({ player, index }: { player: ElitePlayer; index: number }) {
   const lastName = player.playerName.split(' ').slice(-1)[0];
   const country = titleCaseCountry(player.country);
 
+  // PL-07: #2 = amber/gold, #3 = silver/slate
   const rankColors = isFirst
     ? 'linear-gradient(135deg, #D97706 0%, #B45309 100%)'
-    : index === 1
-    ? 'linear-gradient(135deg, #94A3B8 0%, #64748B 100%)'
-    : 'linear-gradient(135deg, #B45309 0%, #92400E 100%)';
+    : 'linear-gradient(135deg, #94A3B8 0%, #64748B 100%)';
 
   return (
     <Link

@@ -10,9 +10,10 @@
  */
 
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Search, X, ChevronDown } from 'lucide-react';
+import { useSearchParams, useLocation } from 'react-router-dom';
+import { Search, X, ChevronDown, RefreshCw } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import { useTourPlayers, useTourSeason, useTourPlayerStatistics, type TourPlayer } from '../../hooks/useTourHubData';
 import { useElitePlayers, type ElitePlayer } from '../../hooks/useElitePlayers';
@@ -43,10 +44,65 @@ const PAGE_SIZE = 50;
 
 export function PlayersTab() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebouncedValue(search, 200);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [sort, setSort] = useState<PlayerSortType>('world-rank-desc');
+
+  // PL-03: Scroll-to-top on mount / restore on back nav
+  useEffect(() => {
+    const saved = sessionStorage.getItem('players-scroll');
+    if (saved) {
+      requestAnimationFrame(() => window.scrollTo(0, parseInt(saved, 10)));
+      sessionStorage.removeItem('players-scroll');
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, []);
+
+  // PL-02: Pull-to-refresh state
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [pullDistance, setPullDistance] = useState(0);
+  const touchStartY = useRef(0);
+  const isPulling = useRef(false);
+
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ['tourhub', 'players'] }),
+      queryClient.invalidateQueries({ queryKey: ['elite-players'] }),
+      queryClient.invalidateQueries({ queryKey: ['tourhub', 'player-statistics'] }),
+    ]);
+    setIsRefreshing(false);
+  }, [queryClient]);
+
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    if (window.scrollY === 0) {
+      touchStartY.current = e.touches[0].clientY;
+      isPulling.current = true;
+    }
+  }, []);
+
+  const onTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isPulling.current) return;
+    const distance = e.touches[0].clientY - touchStartY.current;
+    if (distance > 0 && window.scrollY === 0) {
+      setPullDistance(Math.min(distance * 0.5, 80));
+    } else {
+      isPulling.current = false;
+      setPullDistance(0);
+    }
+  }, []);
+
+  const onTouchEnd = useCallback(() => {
+    if (pullDistance > 50) {
+      handleRefresh();
+    }
+    setPullDistance(0);
+    isPulling.current = false;
+  }, [pullDistance, handleRefresh]);
 
   // Tour filter from URL
   const activeTour = (searchParams.get('tour') as PlayerTourCode) || 'all';
@@ -157,8 +213,11 @@ export function PlayersTab() {
           const bWins = statsMap.get(b.id)?.wins ?? 0;
           return bWins - aWins || aRank - bRank;
         }
-        case 'highest-earnings':
-          return aRank - bRank;
+        case 'highest-earnings': {
+          const aEarn = statsMap.get(a.id)?.earnings ?? 0;
+          const bEarn = statsMap.get(b.id)?.earnings ?? 0;
+          return bEarn - aEarn || aRank - bRank;
+        }
         default:
           return aRank - bRank;
       }
@@ -195,7 +254,32 @@ export function PlayersTab() {
   }
 
   return (
-    <div className="pb-6">
+    <div
+      className="pb-6"
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
+      {/* Pull-to-refresh indicator — PL-02 */}
+      <AnimatePresence>
+        {(pullDistance > 0 || isRefreshing) && (
+          <motion.div
+            className="flex items-center justify-center"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: isRefreshing ? 48 : pullDistance, opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <RefreshCw
+              className={cn(
+                'w-5 h-5 text-muted-foreground transition-transform',
+                isRefreshing && 'animate-spin'
+              )}
+              style={{ transform: isRefreshing ? undefined : `rotate(${pullDistance * 3}deg)` }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
       {/* Hero */}
       {showHero && heroPlayers.length > 0 && (
         <PlayersHero players={heroPlayers} activeTour={activeTour} statsMap={statsMap} />
@@ -294,6 +378,8 @@ export function PlayersTab() {
                       batchHeadshotUrl={headshotMap?.get(player.id)}
                       showTourBadge={activeTour === 'all'}
                       index={index}
+                      activeSort={sort}
+                      onNavigate={() => sessionStorage.setItem('players-scroll', String(window.scrollY))}
                     />
                   );
                 })}
