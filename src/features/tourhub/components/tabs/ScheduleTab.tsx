@@ -13,7 +13,7 @@
 
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Search, X, ChevronLeft } from 'lucide-react';
+import { Search, X, ArrowLeft } from 'lucide-react';
 import { useTourSeason, useTourTournaments, type TourTournament } from '../../hooks/useTourHubData';
 import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
 import { TourHubEmptyState } from '../TourHubEmptyState';
@@ -287,14 +287,15 @@ export function ScheduleTab() {
       {/* Immersive Hero — glass card matching Overview HeroCarousel */}
       {filter !== 'live' && !search && heroItems.length > 0 && (
         <div className="relative">
-          {/* Back button */}
+          {/* Glass back button - matches CourseDetailPage */}
           <button
+            type="button"
             onClick={() => navigate(-1)}
-            className="absolute z-30 left-4 h-11 w-11 rounded-md bg-black/20 backdrop-blur-sm flex items-center justify-center active:scale-95 transition-transform"
-            style={{ top: 'max(var(--sat, env(safe-area-inset-top, 0px)), 47px)' }}
-            aria-label="Go back"
+            className="absolute z-30 left-4 flex h-11 w-11 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 active:scale-95 transition-all"
+            style={{ top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
+            aria-label="Back"
           >
-            <ChevronLeft className="w-5 h-5 text-white" />
+            <ArrowLeft className="h-5 w-5 text-white" />
           </button>
           <motion.div 
             initial={{ opacity: 0 }}

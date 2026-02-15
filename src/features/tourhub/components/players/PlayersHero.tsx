@@ -4,7 +4,7 @@
  */
 
 import { Link, useNavigate } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { resolvePhotoUrl, getPgaTourHeadshotUrl } from '../../utils/resolvePhotoUrl';
@@ -115,14 +115,15 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
 
   return (
     <div className="relative">
-      {/* Back button */}
+      {/* Glass back button - matches CourseDetailPage */}
       <button
-        onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate(-1); }}
-        className="absolute z-30 left-4 h-11 w-11 rounded-md bg-black/20 backdrop-blur-sm flex items-center justify-center active:scale-95 transition-transform"
-        style={{ top: 'max(var(--sat, env(safe-area-inset-top, 0px)), 47px)' }}
-        aria-label="Go back"
+        type="button"
+        onClick={() => navigate(-1)}
+        className="absolute z-30 left-4 flex h-11 w-11 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 active:scale-95 transition-all"
+        style={{ top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
+        aria-label="Back"
       >
-        <ChevronLeft className="w-5 h-5 text-white" />
+        <ArrowLeft className="h-5 w-5 text-white" />
       </button>
       <AnimatePresence mode="wait">
         <motion.div
