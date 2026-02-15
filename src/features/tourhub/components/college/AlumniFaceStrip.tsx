@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import type { AlumniFace } from '../../hooks/useBatchCollegeAlumni';
 
 interface AlumniFaceStripProps {
@@ -51,28 +52,29 @@ export function AlumniFaceStrip({ alumni, collegeName, collegeSlug, totalAlumniC
       >
         {/* Stacked headshots */}
         <div className="flex items-center -space-x-2.5 shrink-0">
-          {visible.map((alum, i) => (
-            <div
-              key={alum.id}
-              className="w-9 h-9 rounded-full border-2 border-card overflow-hidden bg-muted shadow-sm"
-              style={{ zIndex: MAX_VISIBLE - i }}
-            >
-              {alum.photo_url ? (
-                <img
-                  src={alum.photo_url}
-                  alt={alum.full_name}
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-muted text-[10px] font-bold text-muted-foreground">
-                  {alum.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                </div>
-              )}
-            </div>
-          ))}
+          {visible.map((alum, i) => {
+            const photoUrl = resolvePhotoUrl(alum.photo_url, alum.pga_tour_id);
+            return (
+              <div
+                key={alum.id}
+                className="w-9 h-9 border-2 border-card overflow-hidden bg-muted shadow-sm"
+                style={{ zIndex: MAX_VISIBLE - i, borderRadius: '34%', aspectRatio: '1 / 1.05' }}
+              >
+                {photoUrl ? (
+                  <img
+                    src={photoUrl}
+                    alt={alum.full_name}
+                    className="w-full h-full object-cover object-top"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20" />
+                )}
+              </div>
+            );
+          })}
           {overflow > 0 && (
-            <div className="w-9 h-9 rounded-full border-2 border-card bg-muted flex items-center justify-center shadow-sm">
+            <div className="w-9 h-9 border-2 border-card bg-muted flex items-center justify-center shadow-sm" style={{ borderRadius: '34%' }}>
               <span className="text-[10px] font-bold text-muted-foreground">
                 +{overflow}
               </span>

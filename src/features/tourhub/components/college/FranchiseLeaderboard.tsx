@@ -9,9 +9,9 @@
  * - Staggered entrance animations
  */
 
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Loader2, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCollegeSeasonStats, type CollegeSeasonStats } from '../../hooks/useCollegeStats';
@@ -53,19 +53,6 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
   const statusMap = useCollegeStatusMap();
   const { data: moverInfo } = useTopMovers();
 
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const activeButton = containerRef.current.querySelector(`[data-tab="${activeMetric}"]`) as HTMLElement;
-    if (activeButton) {
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const buttonRect = activeButton.getBoundingClientRect();
-      setIndicatorStyle({ left: buttonRect.left - containerRect.left, width: buttonRect.width });
-    }
-  }, [activeMetric]);
-
   // Sort ALL colleges by selected metric, then take top N
   const { sortedStats, maxValue } = useMemo(() => {
     if (!allStats) return { sortedStats: [], maxValue: 1 };
@@ -96,48 +83,34 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
         </h2>
       </div>
 
-      {/* Glass Bar Tabs — sticky */}
+      {/* Segmented Tabs — matches Course Detail page style */}
       <div
         className={cn(
-          "sticky top-0 z-20 -mx-4 px-4 py-2 mb-4",
-          "bg-background/95 backdrop-blur-md"
+          "sticky top-0 z-20 -mx-4 px-4 py-3 mb-4",
+          "bg-muted"
         )}
       >
-        <div
-          className={cn(
-            "relative",
-            "bg-muted/50",
-            "border border-border/30",
-            "rounded-xl",
-            "p-1"
-          )}
-        >
-          <div ref={containerRef} className="relative flex" role="tablist" aria-label="College leaderboard metrics">
-            <motion.div
-              className={cn("absolute bottom-0 h-[2px] rounded-full", "bg-[hsl(var(--tab-orange))]", "shadow-[0_0_8px_hsl(var(--tab-orange)/0.4)]")}
-              initial={false}
-              animate={{ left: indicatorStyle.left, width: indicatorStyle.width }}
-              transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            />
-            {METRIC_TABS.map(({ value, label }) => {
-              const isSelected = activeMetric === value;
-              return (
-                <button
-                  key={value}
-                  data-tab={value}
-                  role="tab"
-                  aria-selected={isSelected}
-                  onClick={() => setActiveMetric(value)}
-                  className={cn(
-                    "relative flex-1 px-3 py-2.5 text-[13px] font-semibold transition-colors duration-200 rounded-lg active:scale-95",
-                    isSelected ? "text-foreground" : "text-muted-foreground hover:text-foreground/80"
-                  )}
-                >
-                  {label}
-                </button>
-              );
-            })}
-          </div>
+        <div className="flex items-stretch rounded-xl overflow-hidden bg-secondary">
+          {METRIC_TABS.map(({ value, label }) => {
+            const isSelected = activeMetric === value;
+            return (
+              <button
+                key={value}
+                data-tab={value}
+                role="tab"
+                aria-selected={isSelected}
+                onClick={() => setActiveMetric(value)}
+                className={cn(
+                  "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98]",
+                  isSelected 
+                    ? "bg-card text-foreground shadow-sm m-1 rounded-lg" 
+                    : "text-muted-foreground hover:text-foreground rounded-lg active:bg-card/50"
+                )}
+              >
+                {label}
+              </button>
+            );
+          })}
         </div>
       </div>
 

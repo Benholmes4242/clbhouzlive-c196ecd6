@@ -73,13 +73,16 @@ export function CollegeHeroBanner({ stats, college, className }: CollegeHeroBann
             className="mb-4"
           >
             {college?.logo_url ? (
-              <div className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center shadow-2xl">
-                <img
-                  src={college.logo_url}
-                  alt={displayName}
-                  className="w-14 h-14 object-contain"
-                />
-              </div>
+              <img
+                src={college.logo_url}
+                alt={displayName}
+                className="object-contain"
+                style={{
+                  width: '110px',
+                  height: '110px',
+                  filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.3))',
+                }}
+              />
             ) : (
               <div className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center shadow-2xl">
                 <span className="text-3xl font-bold text-white/60">
