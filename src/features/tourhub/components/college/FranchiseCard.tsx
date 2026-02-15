@@ -1,11 +1,11 @@
 /**
- * FranchiseCard - College card matching PlayerCardV2 layout
- * 110px height, squircle logo left, info right, clean design
+ * FranchiseCard - Unified college card for both Leaderboard and Movers sections
+ * ~110px height, logo left with rank badge, full stats right, player thumbnails
  */
 
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Users, ChevronRight, TrendingUp, TrendingDown } from 'lucide-react';
+import { Users, ChevronRight, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
@@ -17,7 +17,7 @@ import type { AlumniFace } from '../../hooks/useBatchCollegeAlumni';
 interface FranchiseCardProps {
   stats: CollegeSeasonStats;
   college: CollegeMedia | null;
-  rank: number;
+  rank?: number;
   maxValue?: number;
   activeMetric?: 'earnings' | 'wins' | 'cuts' | 'top10s';
   previousRank?: number;
@@ -26,38 +26,65 @@ interface FranchiseCardProps {
   alumni?: AlumniFace[];
   className?: string;
   animationDelay?: number;
+  /** When true, shows delta values with +/- prefix instead of totals */
+  isDelta?: boolean;
+  /** Delta values for movers mode */
+  deltas?: {
+    earnings_delta: number;
+    wins_delta: number;
+    cuts_delta: number;
+    top10_delta: number;
+    earnings_rank_change: number | null;
+  };
+}
+
+function formatCompact(n: number): string {
+  if (Math.abs(n) >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
+  if (Math.abs(n) >= 1_000) return `$${(n / 1_000).toFixed(0)}K`;
+  return `$${n.toLocaleString()}`;
+}
+
+function formatDeltaValue(n: number): string {
+  const sign = n >= 0 ? '+' : '';
+  if (Math.abs(n) >= 1_000_000) return `${sign}$${(n / 1_000_000).toFixed(1)}M`;
+  if (Math.abs(n) >= 1_000) return `${sign}$${(n / 1_000).toFixed(0)}K`;
+  return `${sign}$${Math.abs(n).toLocaleString()}`;
 }
 
 export function FranchiseCard({
-  stats, college, rank, maxValue = 1, activeMetric = 'earnings',
-  previousRank, status, momentum, alumni, className, animationDelay = 0,
+  stats, college, rank, activeMetric = 'earnings',
+  status, momentum, alumni, className, animationDelay = 0,
+  isDelta = false, deltas,
 }: FranchiseCardProps) {
   const displayName = college?.short_name || college?.college_name || stats.normalized_name;
   const slug = stats.normalized_name;
-
-  const getMetricValue = () => {
-    switch (activeMetric) {
-      case 'wins': return stats.wins_total;
-      case 'cuts': return stats.cuts_total;
-      case 'top10s': return stats.top10_total;
-      default: return stats.earnings_total;
-    }
-  };
-
-  const progress = maxValue > 0 ? getMetricValue() / maxValue : 0;
-  const rankDelta = previousRank ? previousRank - rank : 0;
-  const isTopThree = rank <= 3;
+  const isTopThree = rank !== undefined && rank <= 3;
   const momentumRising = momentum?.isRising ?? false;
 
-  const getMetricDisplay = () => {
-    switch (activeMetric) {
-      case 'wins': return { value: stats.wins_total, label: 'wins' };
-      case 'cuts': return { value: stats.cuts_total, label: 'cuts' };
-      case 'top10s': return { value: stats.top10_total, label: 'top 10s' };
-      default: return { value: formatCurrency(stats.earnings_total), label: '' };
+  // Build stat items based on mode (totals vs deltas)
+  const buildStats = () => {
+    if (isDelta && deltas) {
+      const items: { label: string; value: string; isAccent: boolean; color?: string }[] = [];
+      const earningsStr = formatDeltaValue(deltas.earnings_delta);
+      const winsStr = deltas.wins_delta !== 0 ? `${deltas.wins_delta > 0 ? '+' : ''}${deltas.wins_delta}` : null;
+      const cutsStr = deltas.cuts_delta !== 0 ? `${deltas.cuts_delta > 0 ? '+' : ''}${deltas.cuts_delta}` : null;
+      
+      items.push({ label: '', value: earningsStr, isAccent: true, color: deltas.earnings_delta >= 0 ? 'text-emerald-600' : 'text-rose-600' });
+      if (winsStr) items.push({ label: 'wins', value: winsStr, isAccent: false, color: deltas.wins_delta > 0 ? 'text-amber-600' : 'text-muted-foreground' });
+      if (cutsStr) items.push({ label: 'cuts', value: cutsStr, isAccent: false });
+      return items;
     }
+
+    // Totals mode — show all stats, emphasize active
+    return [
+      { label: '', value: formatCompact(stats.earnings_total), isAccent: activeMetric === 'earnings' },
+      { label: 'wins', value: String(stats.wins_total), isAccent: activeMetric === 'wins' },
+      { label: 'cuts', value: String(stats.cuts_total), isAccent: activeMetric === 'cuts' },
+    ];
   };
-  const metricDisplay = getMetricDisplay();
+
+  const statItems = buildStats();
+  const rankChange = isDelta ? deltas?.earnings_rank_change : null;
 
   return (
     <motion.div
@@ -78,27 +105,43 @@ export function FranchiseCard({
         )}
         style={{ height: '110px' }}
       >
-        {/* Logo section — left ~110px, matching PlayerCardV2 photo area */}
-        <div className="relative w-[110px] shrink-0 bg-muted overflow-hidden flex items-center justify-center">
+        {/* Logo section — left */}
+        <div className="relative w-[100px] shrink-0 bg-muted/50 overflow-hidden flex items-center justify-center">
           {college?.logo_url ? (
             <img
               src={college.logo_url}
               alt={displayName}
-              className="w-16 h-16 object-contain"
+              className="w-14 h-14 object-contain"
               loading="lazy"
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20" />
           )}
-          {/* Rank badge overlay */}
-          <div className={cn(
-            "absolute top-2 left-2 w-6 h-6 rounded-md flex items-center justify-center text-[11px] font-bold tabular-nums font-mono",
-            isTopThree ? "bg-amber-500/20 text-amber-600" : "bg-background/80 text-muted-foreground"
-          )}>
-            {rank}
-          </div>
+
+          {/* Rank badge — top-left */}
+          {rank !== undefined && (
+            <div className={cn(
+              "absolute top-2 left-2 w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold tabular-nums",
+              isTopThree
+                ? "bg-amber-500 text-white shadow-sm"
+                : "bg-background/90 text-muted-foreground border border-border/60"
+            )}>
+              {rank}
+            </div>
+          )}
+
+          {/* Rank change for movers — bottom-left */}
+          {isDelta && rankChange !== null && rankChange !== 0 && (
+            <div className={cn(
+              "absolute bottom-2 left-2 text-[10px] font-bold tabular-nums",
+              rankChange > 0 ? "text-emerald-600" : "text-rose-600"
+            )}>
+              {rankChange > 0 ? `+${rankChange}` : rankChange}
+            </div>
+          )}
+
           {/* Momentum indicator */}
-          {momentumRising && (
+          {!isDelta && momentumRising && (
             <div className="absolute bottom-2 left-2">
               <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
             </div>
@@ -106,41 +149,57 @@ export function FranchiseCard({
         </div>
 
         {/* Info section — right */}
-        <div className="flex-1 min-w-0 px-3.5 py-3 flex flex-col justify-center">
-          {/* Name */}
-          <h3 className="text-base font-semibold text-foreground truncate leading-tight group-hover:text-primary transition-colors">
+        <div className="flex-1 min-w-0 px-3 py-2.5 flex flex-col justify-center">
+          {/* Row 1 — College name */}
+          <h3 className="text-[15px] font-semibold text-foreground truncate leading-tight group-hover:text-primary transition-colors">
             {displayName}
           </h3>
 
-          {/* Stats row */}
-          <div className="flex items-center gap-3 mt-1.5">
-            <span className={cn(
-              "text-[13px] font-semibold font-mono tabular-nums",
-              activeMetric === 'earnings' ? "text-[hsl(var(--tab-orange))]" : "text-foreground"
-            )}>
-              {typeof metricDisplay.value === 'string' ? metricDisplay.value : `${metricDisplay.value} ${metricDisplay.label}`}
-            </span>
-            <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground/50">
-              <Users className="w-3 h-3" />
-              {stats.player_count}
+          {/* Row 2 — Stats inline */}
+          <div className="flex items-center gap-1 mt-1 flex-wrap">
+            {statItems.map((item, i) => (
+              <span key={i} className="flex items-center">
+                {i > 0 && <span className="text-muted-foreground/30 mx-0.5 text-[10px]">·</span>}
+                <span className={cn(
+                  "text-[12px] tabular-nums",
+                  item.isAccent
+                    ? "font-semibold text-[hsl(var(--tab-orange))]"
+                    : item.color || "font-medium text-muted-foreground"
+                )}>
+                  {item.value}{item.label ? ` ${item.label}` : ''}
+                </span>
+              </span>
+            ))}
+            {/* Alumni count always shown */}
+            <span className="flex items-center">
+              <span className="text-muted-foreground/30 mx-0.5 text-[10px]">·</span>
+              <Users className="w-3 h-3 text-muted-foreground/50 mr-0.5" />
+              <span className="text-[12px] text-muted-foreground tabular-nums">{stats.player_count}</span>
             </span>
           </div>
 
-          {/* Alumni face preview — squircle */}
+          {/* Row 3 — Alumni face thumbnails */}
           {alumni && alumni.length > 0 && (
-            <div className="flex items-center -space-x-1.5 mt-2">
-              {alumni.slice(0, 3).map(a => {
-                const photoUrl = resolvePhotoUrl(a.photo_url, a.pga_tour_id);
-                return (
-                  <div key={a.id} className="w-5 overflow-hidden bg-muted" style={{ borderRadius: '34%', aspectRatio: '1 / 1.05', border: '1px solid #D1D5DB' }}>
-                    {photoUrl ? (
-                      <img src={photoUrl} alt={a.full_name} className="w-full h-full object-cover object-top" loading="lazy" />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20" />
-                    )}
-                  </div>
-                );
-              })}
+            <div className="flex items-center mt-1.5">
+              <div className="flex -space-x-1.5">
+                {alumni.slice(0, 3).map(a => {
+                  const photoUrl = resolvePhotoUrl(a.photo_url, a.pga_tour_id);
+                  return (
+                    <div key={a.id} className="w-5 overflow-hidden bg-muted" style={{ borderRadius: '34%', aspectRatio: '1 / 1.05', border: '1px solid #D1D5DB' }}>
+                      {photoUrl ? (
+                        <img src={photoUrl} alt={a.full_name} className="w-full h-full object-cover object-top" loading="lazy" />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20" />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              {stats.player_count > 3 && (
+                <span className="text-[10px] text-muted-foreground/50 ml-1.5 tabular-nums">
+                  +{stats.player_count - 3}
+                </span>
+              )}
             </div>
           )}
         </div>
