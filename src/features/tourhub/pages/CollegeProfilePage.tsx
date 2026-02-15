@@ -84,7 +84,7 @@ export function CollegeProfilePage() {
       {/* Immersive Brand Color Hero */}
       <div
         className="relative overflow-hidden"
-        style={{ height: 'calc(clamp(282px, 53vh, 422px) + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
+        style={{ height: 'clamp(282px, 53vh, 422px)' }}
       >
         {/* Brand gradient background with Ken Burns */}
         <motion.div
