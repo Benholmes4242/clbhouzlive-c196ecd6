@@ -279,9 +279,9 @@ export function TournamentDetailPage() {
           )}
         </div>
         
-        {/* Sticky Tabs */}
+        {/* Tabs */}
         <motion.div
-          className="sticky top-0 z-20 py-2.5 bg-background/95 backdrop-blur-md border-b border-border/20"
+          className="py-2.5"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.55, duration: 0.3 }}
