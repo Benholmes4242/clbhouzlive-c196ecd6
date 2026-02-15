@@ -1,18 +1,12 @@
 /**
  * FranchiseLeaderboard - Premium college leaderboard with franchise cards
- * 
- * Features:
- * - Glass bar tabs with sliding underline
- * - Franchise cards with medallion + performance ring
- * - Alumni face previews per card
- * - AnimatePresence on tab switch
- * - Staggered entrance animations
+ * Segmented control tabs matching Course Detail page style
  */
 
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Loader2, Trophy } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCollegeSeasonStats, type CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
@@ -75,14 +69,6 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
 
   return (
     <div className={cn('', className)}>
-      {/* Section header — Cleo display-sm */}
-      <div className="flex items-center gap-2 mb-4">
-        <Trophy className="w-4 h-4 text-primary" />
-        <h2 className="text-[16px] font-semibold text-foreground tracking-tight">
-          Franchise Leaderboard
-        </h2>
-      </div>
-
       {/* Segmented Tabs — matches Course Detail page style */}
       <div
         className={cn(

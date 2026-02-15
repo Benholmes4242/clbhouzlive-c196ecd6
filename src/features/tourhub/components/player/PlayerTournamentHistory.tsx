@@ -5,7 +5,7 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Activity, ChevronDown, ChevronUp } from 'lucide-react';
+import { Activity, ChevronDown, ChevronUp, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { usePlayerResults, formatPosition, formatScore, formatMoney } from '../../hooks/usePlayerResults';
@@ -75,7 +75,7 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
                       "w-10 h-10 rounded-xl flex items-center justify-center text-[13px] font-bold font-mono shrink-0 tabular-nums",
                       getPositionStyle(pos, result.position)
                     )}>
-                      {isWin ? '🏆' : pos}
+                      {isWin ? <Trophy className="w-4 h-4 text-amber-500" /> : pos}
                     </div>
                     {!isLast && (
                       <div className="w-px flex-1 bg-border/50 mt-2 mb-1" />
@@ -133,7 +133,7 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
       ) : (
         <div className="py-12 text-center">
           <div className="w-14 h-14 rounded-full bg-muted/30 flex items-center justify-center mx-auto mb-4">
-            <span className="text-2xl">⛳</span>
+            <Activity className="w-7 h-7 text-muted-foreground" />
           </div>
           <p className="text-muted-foreground font-medium">No tournament results yet</p>
           <p className="text-xs text-muted-foreground/70 mt-1">

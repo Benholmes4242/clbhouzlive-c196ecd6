@@ -1,9 +1,9 @@
 /**
- * FranchiseMovers - Enhanced weekly movers with Power Rankings style
- * Larger rank badges, animated fire emoji, reason chips + medallions
+ * FranchiseMovers - Weekly movers with segmented control tabs
+ * Aligned with Tour Hub design language
  */
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DollarSign, Trophy, Target, ChevronRight, TrendingUp, TrendingDown, CalendarDays } from 'lucide-react';
@@ -33,19 +33,6 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
   const { data: collegeMap } = useCollegeMediaMap();
   const statusMap = useCollegeStatusMap();
 
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const activeButton = containerRef.current.querySelector(`[data-tab="${direction}"]`) as HTMLElement;
-    if (activeButton) {
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const buttonRect = activeButton.getBoundingClientRect();
-      setIndicatorStyle({ left: buttonRect.left - containerRect.left, width: buttonRect.width });
-    }
-  }, [direction]);
-
   const enrichedMovers = (movers || []).map(mover => ({
     ...mover,
     college: collegeMap?.get(mover.normalized_name) || mover.college || null,
@@ -70,30 +57,31 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
         </div>
       )}
 
-      {/* Glass Bar Tabs */}
-      <div className={cn("relative mb-6", "bg-muted/50", "border border-border/30", "rounded-xl", "p-1")}>
-        <div ref={containerRef} className="relative flex" role="tablist" aria-label="Mover direction">
-          <motion.div
-            className={cn("absolute bottom-0 h-[2px] rounded-full", "bg-[hsl(var(--tab-orange))]", "shadow-[0_0_8px_hsl(var(--tab-orange)/0.4)]")}
-            initial={false}
-            animate={{ left: indicatorStyle.left, width: indicatorStyle.width }}
-            transition={{ type: "spring", stiffness: 400, damping: 30 }}
-          />
-          {[
-            { value: 'up' as Direction, label: 'Rising', icon: TrendingUp },
-            { value: 'down' as Direction, label: 'Falling', icon: TrendingDown },
-          ].map(({ value, label, icon: Icon }) => {
-            const isSelected = direction === value;
-            return (
-              <button key={value} data-tab={value} role="tab" aria-selected={isSelected} onClick={() => setDirection(value)}
-                className={cn("relative flex-1 px-3 py-2.5 text-[13px] font-semibold transition-colors duration-200 rounded-lg flex items-center justify-center gap-1.5 active:scale-95", isSelected ? "text-foreground" : "text-muted-foreground hover:text-foreground/80")}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                {label}
-              </button>
-            );
-          })}
-        </div>
+      {/* Segmented Control — matches Course Detail / Franchise Leaderboard style */}
+      <div className="flex items-stretch rounded-xl overflow-hidden bg-secondary mb-5">
+        {[
+          { value: 'up' as Direction, label: 'Rising', icon: TrendingUp },
+          { value: 'down' as Direction, label: 'Falling', icon: TrendingDown },
+        ].map(({ value, label, icon: Icon }) => {
+          const isSelected = direction === value;
+          return (
+            <button
+              key={value}
+              role="tab"
+              aria-selected={isSelected}
+              onClick={() => setDirection(value)}
+              className={cn(
+                "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98] flex items-center justify-center gap-1.5",
+                isSelected
+                  ? "bg-card text-foreground shadow-sm m-1 rounded-lg"
+                  : "text-muted-foreground hover:text-foreground rounded-lg active:bg-card/50"
+              )}
+            >
+              <Icon className="w-3.5 h-3.5" />
+              {label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Movers List */}
@@ -135,7 +123,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
                       'group'
                     )}
                   >
-                    {/* Large Rank Change Badge */}
+                    {/* Rank Change Badge */}
                     <div className="shrink-0">
                       {mover.earnings_rank_change !== null && mover.earnings_rank_change !== 0 ? (
                         <motion.div
@@ -143,11 +131,12 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
                           animate={{ scale: 1 }}
                           transition={{ type: 'spring', stiffness: 400, delay: idx * 0.04 + 0.1 }}
                           className={cn(
-                            'w-11 h-11 rounded-full flex flex-col items-center justify-center text-xs font-bold',
+                            'w-11 h-11 flex flex-col items-center justify-center text-xs font-bold',
                             mover.earnings_rank_change > 0
                               ? 'bg-emerald-500/15 text-emerald-600 border border-emerald-500/20'
                               : 'bg-rose-500/15 text-rose-600 border border-rose-500/20'
                           )}
+                          style={{ borderRadius: '34%' }}
                         >
                           <span className="text-sm leading-none">
                             {mover.earnings_rank_change > 0 ? '▲' : '▼'}
@@ -157,24 +146,29 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
                           </span>
                         </motion.div>
                       ) : (
-                        <div className="w-11 h-11 rounded-full bg-muted/40 flex items-center justify-center">
+                        <div className="w-11 h-11 bg-muted/40 flex items-center justify-center" style={{ borderRadius: '34%' }}>
                           <span className="text-xs text-muted-foreground">—</span>
                         </div>
                       )}
                     </div>
 
-                    {/* Logo */}
+                    {/* Logo — squircle */}
                     <div className="relative shrink-0">
-                      <div className={cn("w-12 h-12 rounded-full bg-gradient-to-br from-background via-background to-muted/50 border border-border/60 shadow-inner flex items-center justify-center overflow-hidden")}>
+                      <div
+                        className="w-12 h-12 bg-gradient-to-br from-background via-background to-muted/50 border border-border/60 shadow-inner flex items-center justify-center overflow-hidden"
+                        style={{ borderRadius: '34%' }}
+                      >
                         {mover.college?.logo_url ? (
                           <img src={mover.college.logo_url} alt={displayName} className="w-9 h-9 object-contain" loading="lazy" />
                         ) : (
-                          <span className="text-lg font-bold text-muted-foreground/60">{displayName.charAt(0).toUpperCase()}</span>
+                          <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20" />
                         )}
                       </div>
-                      {/* Animated fire emoji for hot streaks */}
+                      {/* Hot streak indicator */}
                       {isHotStreak && (
-                        <span className="absolute -top-1 -right-1 text-sm animate-flame">🔥</span>
+                        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-orange-500/15 border border-orange-500/30 flex items-center justify-center">
+                          <TrendingUp className="w-2.5 h-2.5 text-orange-500" />
+                        </div>
                       )}
                     </div>
 
