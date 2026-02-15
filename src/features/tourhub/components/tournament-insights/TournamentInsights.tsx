@@ -47,7 +47,20 @@ export const TournamentInsights = memo(function TournamentInsights() {
   const [showCourseDNA, setShowCourseDNA] = useState(false);
 
   if (isLoading) return <TournamentInsightsSkeleton />;
-  if (error || !data) return null;
+  if (error || !data) {
+    // FIX 08: Show error state for intelligence section (silent fail is fine for no data)
+    if (error) {
+      return (
+        <section aria-label="Tournament intelligence" className="px-4">
+          <div className="rounded-2xl bg-card border border-border/50 p-6 text-center">
+            <Brain className="w-5 h-5 mx-auto mb-2 text-muted-foreground/50" />
+            <p className="text-sm text-muted-foreground">Intelligence unavailable right now.</p>
+          </div>
+        </section>
+      );
+    }
+    return null;
+  }
 
   const isLive = tournamentPhase === 'in-progress';
   const isCompleted = tournamentPhase === 'completed';
@@ -81,14 +94,14 @@ export const TournamentInsights = memo(function TournamentInsights() {
           </div>
           <div className="flex flex-col">
             <h2
-              className="tracking-tight leading-tight"
-              style={{ fontSize: '22px', fontWeight: 700, color: '#1C1917', letterSpacing: '-0.3px' }}
+              className="tracking-tight leading-tight text-foreground"
+              style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}
             >
               clbhouz intelligence
             </h2>
             {/* Subtitle only when NOT live — toggle replaces it */}
             {!isLive && (
-              <p className="mt-0.5" style={{ fontSize: '13px', fontWeight: 400, color: '#78716C' }}>
+              <p className="mt-0.5 text-muted-foreground" style={{ fontSize: '13px', fontWeight: 400 }}>
                 {isCompleted ? 'Tournament results' : 'AI-powered tournament analysis'}
               </p>
             )}

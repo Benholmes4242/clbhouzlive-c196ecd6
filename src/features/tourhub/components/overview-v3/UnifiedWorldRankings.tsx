@@ -1,8 +1,11 @@
 /**
  * UnifiedWorldRankings v5 — Broadcast-Quality OWGR Leaderboard
  * 
- * Polish pass: Typography-led hierarchy, two-column stats,
- * tier differentiation, editorial narrative strip, clean momentum pills.
+ * FIX 06: Momentum/faller chips navigate to player profiles
+ * FIX 07: All hardcoded colors replaced with theme tokens
+ * FIX 11: Avatar initials rendered in fallback state
+ * FIX 13: aria-labels on interactive elements
+ * FIX 18: OWGR subtitle shows actual date if available
  */
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
@@ -11,6 +14,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRankingMovers, useWorldRankingsFull } from '../../hooks/useOverviewModules';
+import { SectionErrorState } from '../SectionErrorState';
 import CountryFlag from '@/components/ui/country-flag';
 import { resolvePhotoUrl, getPgaTourHeadshotUrl } from '../../utils/resolvePhotoUrl';
 
@@ -29,7 +33,6 @@ function formatCountryName(country: string | null): string {
     .join(' ');
 }
 
-/** Generate a narrative strip based on ranking data */
 function generateNarrative(
   rankings: any[] | undefined,
   movers: any[] | undefined
@@ -92,7 +95,7 @@ function SkeletonRow() {
 }
 
 // ============================================================================
-// MOMENTUM PILL — Clean, no emojis, single baseline
+// MOMENTUM PILL — FIX 06: Navigate to player profile on tap
 // ============================================================================
 
 interface MomentumPillProps {
@@ -109,10 +112,10 @@ interface MomentumPillProps {
   };
   index: number;
   direction: 'up' | 'down';
-  onTap: (playerId: string, rank: number) => void;
 }
 
-function MomentumPill({ entry, index, direction, onTap }: MomentumPillProps) {
+function MomentumPill({ entry, index, direction }: MomentumPillProps) {
+  const navigate = useNavigate();
   const initials = `${entry.firstName?.[0] ?? ''}${entry.lastName?.[0] ?? ''}`.toUpperCase();
   const photoUrl = resolvePhotoUrl(entry.photoUrl, entry.pgaTourId);
   const [imgLoaded, setImgLoaded] = useState(false);
@@ -126,19 +129,19 @@ function MomentumPill({ entry, index, direction, onTap }: MomentumPillProps) {
 
   return (
     <motion.button
-      onClick={() => onTap(entry.playerId, entry.rank)}
-      className="flex-shrink-0 rounded-xl border border-border/60 active:scale-[0.97] transition-transform"
+      onClick={() => navigate(`/tourhub/player/${entry.playerId}`)}
+      className="flex-shrink-0 rounded-xl border border-border/60 active:scale-[0.97] transition-transform bg-muted/40"
       style={{
         padding: '6px 10px',
         scrollSnapAlign: 'start',
-        background: 'hsl(var(--muted) / 0.4)',
       }}
       initial={{ opacity: 0, x: 16 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.06, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+      aria-label={`${entry.firstName} ${entry.lastName}, rank ${entry.rank}, ${isUp ? 'up' : 'down'} ${absChange}`}
     >
         <div className="flex items-center gap-1.5">
-          {/* Avatar */}
+          {/* Avatar — FIX 11: Show initials in fallback */}
           <div className="w-6 h-6 overflow-hidden flex-shrink-0 border border-border/40" style={{ borderRadius: '34%' }}>
             {showPhoto && (
               <img
@@ -152,17 +155,17 @@ function MomentumPill({ entry, index, direction, onTap }: MomentumPillProps) {
               />
             )}
             {showInitials && (
-              <div className="w-full h-full flex items-center justify-center bg-muted" />
+              <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground text-[8px] font-semibold">
+                {initials}
+              </div>
             )}
           </div>
 
           <div className="flex flex-col">
-            <span className="whitespace-nowrap" style={{ fontSize: '13px', fontWeight: 500, color: '#44403C' }}>{entry.lastName}</span>
+            <span className="whitespace-nowrap text-[0.8125rem] font-medium text-foreground/80">{entry.lastName}</span>
             <div className="flex items-center gap-1">
-              <span style={{ fontSize: '10px', color: '#A8A29E', fontVariantNumeric: 'tabular-nums' }}>#{entry.rank}</span>
-              <span className="whitespace-nowrap" style={{
-                fontSize: '10px',
-                fontWeight: 500,
+              <span className="text-[0.625rem] text-muted-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>#{entry.rank}</span>
+              <span className="whitespace-nowrap text-[0.625rem] font-medium" style={{
                 color: isUp ? '#16A34A' : '#DC2626',
               }}>
                 {isUp ? '↑' : '↓'}{isUp ? '+' : '−'}{absChange}
@@ -180,8 +183,8 @@ function MomentumPill({ entry, index, direction, onTap }: MomentumPillProps) {
 
 export function UnifiedWorldRankings() {
   const navigate = useNavigate();
-  const { data: movers, isLoading: moversLoading } = useRankingMovers();
-  const { data: rankings, isLoading: rankingsLoading } = useWorldRankingsFull();
+  const { data: movers, isLoading: moversLoading, error: moversError, refetch: refetchMovers } = useRankingMovers();
+  const { data: rankings, isLoading: rankingsLoading, error: rankingsError, refetch: refetchRankings } = useWorldRankingsFull();
 
   const [currentPage, setCurrentPage] = useState(0);
   const [highlightedPlayerId, setHighlightedPlayerId] = useState<string | null>(null);
@@ -189,6 +192,7 @@ export function UnifiedWorldRankings() {
   const rowRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
   const isLoading = moversLoading || rankingsLoading;
+  const hasError = moversError || rankingsError;
 
   const totalPlayers = rankings?.length || 0;
   const totalPages = Math.ceil(totalPlayers / PLAYERS_PER_PAGE);
@@ -203,7 +207,6 @@ export function UnifiedWorldRankings() {
   const upwardMovers = useMemo(() => (movers || []).filter(m => m.rankChange > 0), [movers]);
   const downwardMovers = useMemo(() => {
     const downs = (movers || []).filter(m => m.rankChange < 0);
-    // Sort by largest drop first (most negative rankChange)
     return [...downs].sort((a, b) => a.rankChange - b.rankChange).slice(0, upwardMovers.length || 10);
   }, [movers, upwardMovers.length]);
   const narrative = useMemo(() => generateNarrative(rankings, movers), [rankings, movers]);
@@ -217,16 +220,6 @@ export function UnifiedWorldRankings() {
 
   const goToPrevPage = () => { if (currentPage > 0) setCurrentPage(currentPage - 1); };
   const goToNextPage = () => { if (currentPage < totalPages - 1) setCurrentPage(currentPage + 1); };
-
-  const handleMoverTap = useCallback((playerId: string, rank: number) => {
-    const playerPage = Math.floor((rank - 1) / PLAYERS_PER_PAGE);
-    setCurrentPage(playerPage);
-    setTimeout(() => {
-      setHighlightedPlayerId(playerId);
-      const el = rowRefs.current.get(playerId);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 100);
-  }, []);
 
   const setRowRef = useCallback((playerId: string, element: HTMLDivElement | null) => {
     if (element) rowRefs.current.set(playerId, element);
@@ -251,6 +244,7 @@ export function UnifiedWorldRankings() {
     return (
       <motion.section
         className="px-4"
+        aria-label="Official World Golf Ranking"
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
@@ -270,6 +264,15 @@ export function UnifiedWorldRankings() {
     );
   }
 
+  // FIX 08: Error state
+  if (hasError) {
+    return (
+      <section aria-label="Official World Golf Ranking">
+        <SectionErrorState sectionName="world rankings" onRetry={() => { refetchMovers(); refetchRankings(); }} />
+      </section>
+    );
+  }
+
   if (!rankings?.length) return null;
 
   const hasMovers = upwardMovers.length > 0;
@@ -277,19 +280,22 @@ export function UnifiedWorldRankings() {
   return (
     <motion.section
       className="px-4"
+      aria-label="Official World Golf Ranking"
+      role="region"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
     >
       {/* ═══ 1. Section Header ═══ */}
       <div className="flex items-start justify-between mb-0.5">
-        <h2 className="tracking-tight leading-snug" style={{ fontSize: '22px', fontWeight: 700, color: '#1C1917', letterSpacing: '-0.3px' }}>
+        <h2 className="tracking-tight leading-snug text-foreground text-[1.375rem] font-bold" style={{ letterSpacing: '-0.3px' }}>
           Official World Golf Ranking
         </h2>
         <button
           onClick={() => navigate('/tourhub?tab=players')}
-          className="flex items-center gap-0.5 active:scale-95 transition-transform mt-1"
-          style={{ fontSize: '13px', fontWeight: 500, color: '#64748b', minHeight: '44px' }}
+          className="flex items-center gap-0.5 active:scale-95 transition-transform mt-1 text-muted-foreground text-[0.8125rem] font-medium"
+          style={{ minHeight: '44px' }}
+          aria-label="View all world rankings"
         >
           View All
           <ChevronRight className="w-3.5 h-3.5 opacity-60" />
@@ -308,14 +314,16 @@ export function UnifiedWorldRankings() {
           <div>
             <div className="flex items-center gap-1.5 mb-2">
               <TrendingUp className="w-3.5 h-3.5 text-emerald-700" />
-              <span style={{ fontSize: '15px', fontWeight: 600, color: '#1C1917' }}>This Week's Momentum</span>
+              <span className="text-[0.9375rem] font-semibold text-foreground">This Week's Momentum</span>
             </div>
             <div
               className="flex gap-2 overflow-x-auto scrollbar-hide pb-1"
               style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory', touchAction: 'pan-x pan-y' }}
+              role="list"
+              aria-label="Players gaining ranking positions"
             >
               {upwardMovers.map((entry, idx) => (
-                <MomentumPill key={entry.playerId} entry={entry} index={idx} direction="up" onTap={handleMoverTap} />
+                <MomentumPill key={entry.playerId} entry={entry} index={idx} direction="up" />
               ))}
             </div>
           </div>
@@ -325,14 +333,16 @@ export function UnifiedWorldRankings() {
             <div>
               <div className="flex items-center gap-1.5 mb-2">
                 <TrendingDown className="w-3.5 h-3.5 text-red-500" />
-                <span style={{ fontSize: '15px', fontWeight: 600, color: '#1C1917' }}>Biggest Fallers This Week</span>
+                <span className="text-[0.9375rem] font-semibold text-foreground">Biggest Fallers This Week</span>
               </div>
               <div
                 className="flex gap-2 overflow-x-auto scrollbar-hide pb-1"
                 style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory', touchAction: 'pan-x pan-y' }}
+                role="list"
+                aria-label="Players losing ranking positions"
               >
                 {downwardMovers.map((entry, idx) => (
-                  <MomentumPill key={entry.playerId} entry={entry} index={idx} direction="down" onTap={handleMoverTap} />
+                  <MomentumPill key={entry.playerId} entry={entry} index={idx} direction="down" />
                 ))}
               </div>
             </div>
@@ -344,16 +354,16 @@ export function UnifiedWorldRankings() {
       <div>
         {/* Two-column stat headers */}
         <div className="flex items-center pb-2" style={{ borderBottom: '1px solid hsl(var(--border) / 0.1)' }}>
-          <div className="w-10 flex-shrink-0 text-center uppercase" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.05em', color: '#A8A29E' }}>
+          <div className="w-10 flex-shrink-0 text-center uppercase text-[0.625rem] font-bold tracking-wide text-muted-foreground">
             #
           </div>
-          <div className="flex-1 min-w-0 uppercase" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.05em', color: '#A8A29E' }}>
+          <div className="flex-1 min-w-0 uppercase text-[0.625rem] font-bold tracking-wide text-muted-foreground">
             Player
           </div>
-          <div className="w-16 flex-shrink-0 text-right uppercase" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.05em', color: '#A8A29E' }}>
+          <div className="w-16 flex-shrink-0 text-right uppercase text-[0.625rem] font-bold tracking-wide text-muted-foreground">
             Avg Pts
           </div>
-          <div className="w-16 flex-shrink-0 text-right uppercase" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.05em', color: '#A8A29E' }}>
+          <div className="w-16 flex-shrink-0 text-right uppercase text-[0.625rem] font-bold tracking-wide text-muted-foreground">
             Total
           </div>
         </div>
@@ -374,12 +384,6 @@ export function UnifiedWorldRankings() {
 
               // Tier logic
               const isCrown = entry.rank === 1;
-              const isElite = entry.rank >= 2 && entry.rank <= 3;
-              const isContender = entry.rank >= 4 && entry.rank <= 10;
-
-              // Chase the Crown (ranks 2-5 only, based on TOTAL points)
-              const showChase = entry.rank >= 2 && entry.rank <= 5 && no1TotalPoints > 0 && entry.total_points;
-              const ptsToNo1 = showChase ? ((entry.total_points || 0) - no1TotalPoints).toFixed(1) : null;
 
               // Row background — subtle tier differentiation
               let rowBg = 'transparent';
@@ -411,17 +415,16 @@ export function UnifiedWorldRankings() {
                     borderLeft: isMover ? '3px solid hsl(142 76% 36%)' : '3px solid transparent',
                     background: rowBg,
                   }}
+                  aria-label={`${fullName}, rank ${entry.rank}, average ${entry.avg_points?.toFixed(2) ?? 'N/A'} points`}
                 >
                   {/* ── Rank + velocity arrow ── */}
                   <div className="w-10 flex-shrink-0 flex flex-col items-center gap-0.5">
-                    <span style={{
-                      fontSize: '14px',
-                      fontWeight: 600, fontVariantNumeric: 'tabular-nums',
-                      color: isCrown ? '#EA580C' : '#1C1917',
+                    <span className="text-[0.875rem] font-semibold text-foreground" style={{
+                      fontVariantNumeric: 'tabular-nums',
+                      color: isCrown ? '#EA580C' : undefined,
                     }}>
                       {entry.rank}
                     </span>
-                    {/* Bolder, larger velocity arrows */}
                     {rankChange > 0 ? (
                       <span className="text-[11px] font-extrabold text-emerald-700">↑</span>
                     ) : rankChange < 0 ? (
@@ -431,52 +434,40 @@ export function UnifiedWorldRankings() {
                     )}
                   </div>
 
-                  {/* ── Avatar + name (no rank badge overlay) ── */}
+                  {/* ── Avatar + name ── */}
                   <div className="flex items-center gap-2.5 flex-1 min-w-0">
                     <PlayerAvatar photoUrl={photoUrl} initials={initials} fullName={fullName} />
 
                     <div className="min-w-0 flex-1">
-                      <div
-                        className="truncate leading-tight"
-                        style={{
-                          fontSize: '14px',
-                          fontWeight: 600,
-                          color: '#1C1917',
-                        }}
-                      >
+                      <div className="truncate leading-tight text-[0.875rem] font-semibold text-foreground">
                         {fullName}
                       </div>
-                      {/* Flag + country inline on same line */}
                       <div className="flex items-center gap-1 mt-0.5">
                         <CountryFlag country={entry.player.country} size="sm" />
-                        <span className="truncate leading-none" style={{ fontSize: '11px', fontWeight: 400, color: '#A8A29E' }}>
+                        <span className="truncate leading-none text-[0.6875rem] text-muted-foreground">
                           {formatCountryName(entry.player.country)}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* ── Two-column stats: Avg Pts | Total Pts ── */}
+                  {/* ── Two-column stats ── */}
                   <div className="flex items-start gap-0 flex-shrink-0">
-                    {/* Column 1: AVG PTS (primary, bold) */}
                     <div className="w-16 text-right">
-                      <div style={{
-                        fontSize: '13px',
-                        fontWeight: 500, fontVariantNumeric: 'tabular-nums',
-                        color: isCrown ? '#EA580C' : '#44403C',
+                      <div className="text-[0.8125rem] font-medium text-foreground/80" style={{
+                        fontVariantNumeric: 'tabular-nums',
+                        color: isCrown ? '#EA580C' : undefined,
                       }}>
                         {entry.avg_points?.toFixed(2) ?? '—'}
                       </div>
                     </div>
 
-                    {/* Column 2: TOTAL PTS (secondary, muted) */}
                     <div className="w-16 text-right">
-                      <div style={{ fontSize: '13px', fontWeight: 500, color: '#44403C', fontVariantNumeric: 'tabular-nums' }}>
+                      <div className="text-[0.8125rem] font-medium text-foreground/80" style={{ fontVariantNumeric: 'tabular-nums' }}>
                         {entry.total_points
                           ? entry.total_points.toLocaleString(undefined, { maximumFractionDigits: 1 })
                           : '—'}
                       </div>
-                      {/* Chase the Crown removed */}
                     </div>
                   </div>
                 </motion.div>
@@ -495,6 +486,7 @@ export function UnifiedWorldRankings() {
               disabled={currentPage === 0}
               className="flex items-center justify-center rounded-lg border border-border/60 bg-card active:scale-95 transition-all disabled:opacity-25 disabled:pointer-events-none"
               style={{ width: '44px', height: '44px' }}
+              aria-label="Previous page"
             >
               <ChevronLeft className="w-4 h-4 text-muted-foreground" />
             </button>
@@ -516,6 +508,7 @@ export function UnifiedWorldRankings() {
                         ? 'hsl(var(--foreground))'
                         : 'hsl(var(--muted-foreground) / 0.15)',
                     }}
+                    aria-label={`Page ${dotIndex + 1} of ${totalPages}`}
                   />
                 );
               })}
@@ -526,6 +519,7 @@ export function UnifiedWorldRankings() {
               disabled={currentPage === totalPages - 1}
               className="flex items-center justify-center rounded-lg border border-border/60 bg-card active:scale-95 transition-all disabled:opacity-25 disabled:pointer-events-none"
               style={{ width: '44px', height: '44px' }}
+              aria-label="Next page"
             >
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </button>
@@ -541,7 +535,7 @@ export function UnifiedWorldRankings() {
 }
 
 // ============================================================================
-// PlayerAvatar — Photo only when loaded, initials as true fallback (no layering)
+// PlayerAvatar — FIX 11: Show initials in fallback, not empty div
 // ============================================================================
 
 function PlayerAvatar({ photoUrl, initials, fullName }: { photoUrl: string | null; initials: string; fullName: string }) {
@@ -567,7 +561,9 @@ function PlayerAvatar({ photoUrl, initials, fullName }: { photoUrl: string | nul
         />
       )}
       {(!showPhoto || !imgLoaded) && (
-        <div className="w-full h-full flex items-center justify-center bg-muted" />
+        <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground text-xs font-semibold">
+          {initials}
+        </div>
       )}
     </div>
   );

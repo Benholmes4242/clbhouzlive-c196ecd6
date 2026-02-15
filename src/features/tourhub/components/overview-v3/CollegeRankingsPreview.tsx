@@ -11,6 +11,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRight, GraduationCap, DollarSign, Trophy, Users } from 'lucide-react';
+import { SectionErrorState } from '../SectionErrorState';
 import { useCollegeSeasonStats, type CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useCollegeMediaMap, type CollegeMedia } from '../../hooks/useCollegeMedia';
 import { useBatchCollegeAlumni, type AlumniFace } from '../../hooks/useBatchCollegeAlumni';
@@ -281,12 +282,10 @@ function ChaserCard({
   return (
     <motion.button
       onClick={() => navigate(`/tourhub/college?sort=earnings`)}
-      className="w-full text-left relative overflow-hidden active:scale-[0.99] transition-transform duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+      className="w-full text-left relative overflow-hidden active:scale-[0.99] transition-transform duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 bg-card border border-border/50"
       style={{
         padding: '20px',
-        background: '#FFFFFF',
         borderRadius: '20px',
-        border: '1px solid rgba(0,0,0,0.06)',
         boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
       }}
       initial={{ opacity: 0, y: 12 }}
@@ -337,7 +336,7 @@ function ChaserCard({
           </p>
 
           {/* Gap to leader */}
-          <p className="m-0" style={{ fontSize: '10px', fontWeight: 500, marginTop: '2px', color: 'rgba(0,0,0,0.35)', fontVariantNumeric: 'tabular-nums' }}>
+          <p className="m-0 text-muted-foreground/50" style={{ fontSize: '10px', fontWeight: 500, marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
             {gapText}
           </p>
 
@@ -439,8 +438,8 @@ function NarrativeStrip({ topCollege }: { topCollege: CollegeSeasonStats }) {
 
 export function CollegeRankingsPreview() {
   const navigate = useNavigate();
-  const { data: allStats, isLoading: statsLoading } = useCollegeSeasonStats();
-  const { data: collegeMap, isLoading: mediaLoading } = useCollegeMediaMap();
+  const { data: allStats, isLoading: statsLoading, error: statsError, refetch: refetchStats } = useCollegeSeasonStats();
+  const { data: collegeMap, isLoading: mediaLoading, error: mediaError, refetch: refetchMedia } = useCollegeMediaMap();
 
   // Sort by earnings and get top 3
   const top3 = useMemo(() => {
@@ -458,6 +457,15 @@ export function CollegeRankingsPreview() {
 
   if (statsLoading || mediaLoading) {
     return <CollegePreviewSkeleton />;
+  }
+
+  // FIX 08: Error state
+  if (statsError || mediaError) {
+    return (
+      <section aria-label="College Power Rankings">
+        <SectionErrorState sectionName="college rankings" onRetry={() => { refetchStats(); refetchMedia(); }} />
+      </section>
+    );
   }
 
   if (!top3.length) return null;
@@ -481,20 +489,20 @@ export function CollegeRankingsPreview() {
           <div className="flex items-center gap-2">
             <GraduationCap className="w-4 h-4 text-muted-foreground" style={{ marginBottom: '-1px' }} />
             <h2
-              className="m-0"
-              style={{ fontSize: '22px', fontWeight: 700, color: '#1C1917', letterSpacing: '-0.3px' }}
+              className="m-0 text-foreground"
+              style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}
             >
               College Power Rankings
             </h2>
           </div>
-          <p className="m-0" style={{ fontSize: '13px', fontWeight: 400, color: '#78716C', marginTop: '3px', marginLeft: '24px' }}>
+          <p className="m-0 text-muted-foreground" style={{ fontSize: '13px', fontWeight: 400, marginTop: '3px', marginLeft: '24px' }}>
             Who's producing the strongest tour talent?
           </p>
         </div>
         <button
           onClick={() => navigate('/tourhub/college')}
-          className="flex items-center gap-0.5 group transition-all duration-300 bg-transparent border-none cursor-pointer"
-          style={{ color: '#64748b', fontSize: '13px', fontWeight: 500, minHeight: '44px' }}
+          className="flex items-center gap-0.5 group transition-all duration-300 bg-transparent border-none cursor-pointer text-muted-foreground"
+          style={{ fontSize: '13px', fontWeight: 500, minHeight: '44px' }}
         >
           View All
           <ChevronRight size={12} className="opacity-60" />
