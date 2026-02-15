@@ -387,8 +387,8 @@ export function ScheduleTab() {
 
         {/* Sticky Filter Toolbar */}
         <motion.div
-          className="sticky z-20 bg-background/95 backdrop-blur-sm px-4 pb-2 space-y-2"
-          style={{ top: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+          className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm px-4 pb-2 space-y-2"
+          style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.3 }}
