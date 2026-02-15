@@ -59,13 +59,12 @@ function RunnerCard({
   return (
     <Link
       to={`/tourhub/player/${player.id}`}
-      className="flex-shrink-0 flex items-center gap-2.5 px-3 py-2.5 rounded-2xl active:scale-[0.97] transition-transform"
+      className="flex-shrink-0 flex items-center gap-2 px-2.5 py-2 rounded-2xl active:scale-[0.97] transition-transform"
       style={{
         scrollSnapAlign: 'start',
         background: 'hsl(var(--card))',
         border: '1px solid hsl(var(--border) / 0.4)',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06), 0 0 1px rgba(0, 0, 0, 0.08)',
-        minWidth: '140px',
         flex: '1 1 0%',
       }}
     >

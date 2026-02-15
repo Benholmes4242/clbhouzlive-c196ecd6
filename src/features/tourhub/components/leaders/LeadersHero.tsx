@@ -109,14 +109,15 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
               <span className="text-sm text-white/80">{countryName}</span>
             </motion.div>
 
-            <motion.p
+            <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.26, duration: 0.4 }}
-              className="text-sm font-medium text-amber-400"
             >
-              {fmt(value)}{unit ? ` ${unit}` : ''}
-            </motion.p>
+              <span className="inline-block px-3 py-1 rounded-md bg-black/20 backdrop-blur-sm text-sm font-medium text-amber-400">
+                {fmt(value)}{unit ? ` ${unit}` : ''}
+              </span>
+            </motion.div>
           </div>
         </div>
       </Link>
