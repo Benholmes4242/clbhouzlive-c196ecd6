@@ -61,10 +61,18 @@ function FeaturedPlayerPill({
   label: string;
   icon: React.FC<{ className?: string; style?: React.CSSProperties }>;
 }) {
+  const navigate = useNavigate();
   const photoUrl = resolvePhotoUrl(alum.photo_url, alum.pga_tour_id);
   
   return (
-    <div className="flex items-center" style={{ gap: '8px' }}>
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        navigate(`/tourhub/player/${alum.id}`);
+      }}
+      className="flex items-center active:opacity-70 transition-opacity"
+      style={{ gap: '8px' }}
+    >
       <SquircleAvatar
         size={34}
         src={photoUrl}
@@ -83,7 +91,7 @@ function FeaturedPlayerPill({
           </span>
         </div>
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -337,7 +345,14 @@ function ChaserCard({
           {(topEarner || topWinner) && (
             <div className="flex items-center justify-center mt-3" style={{ gap: '12px' }}>
               {topEarner && (
-                <div className="flex items-center" style={{ gap: '5px' }}>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/tourhub/player/${topEarner.id}`);
+                  }}
+                  className="flex items-center active:opacity-70 transition-opacity"
+                  style={{ gap: '5px' }}
+                >
                   <SquircleAvatar
                     size={24}
                     src={resolvePhotoUrl(topEarner.photo_url, topEarner.pga_tour_id)}
@@ -351,10 +366,17 @@ function ChaserCard({
                     </p>
                     <p className="m-0 text-muted-foreground" style={{ fontSize: '8px', fontWeight: 500 }}>Top Earner</p>
                   </div>
-                </div>
+                </button>
               )}
               {topWinner && (
-                <div className="flex items-center" style={{ gap: '5px' }}>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/tourhub/player/${topWinner.id}`);
+                  }}
+                  className="flex items-center active:opacity-70 transition-opacity"
+                  style={{ gap: '5px' }}
+                >
                   <SquircleAvatar
                     size={24}
                     src={resolvePhotoUrl(topWinner.photo_url, topWinner.pga_tour_id)}
@@ -368,7 +390,7 @@ function ChaserCard({
                     </p>
                     <p className="m-0 text-muted-foreground" style={{ fontSize: '8px', fontWeight: 500 }}>Most Wins</p>
                   </div>
-                </div>
+                </button>
               )}
             </div>
           )}
