@@ -42,7 +42,7 @@ export function DiscardActionSheet({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 320 }}
-            className="absolute bottom-0 left-0 right-0 p-3 pb-safe"
+            className="absolute bottom-0 left-0 right-0 p-3 pb-safe mb-8"
           >
             {/* Main actions card */}
             <div 
