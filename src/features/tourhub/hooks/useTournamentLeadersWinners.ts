@@ -12,6 +12,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface TournamentLeaderWinner {
+  playerId: string | null;
   firstName: string;
   lastName: string;
   score: number | null;
@@ -48,6 +49,7 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
           position,
           score,
           money,
+          player_id,
           player:sr_players!sr_leaderboards_player_id_fkey (
             first_name,
             last_name
@@ -72,6 +74,7 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
         const lastName = player?.last_name || null;
 
         result.set(entry.tournament_id, {
+          playerId: entry.player_id || null,
           firstName: firstName || '',
           lastName: lastName || '',
           score: entry.score,
