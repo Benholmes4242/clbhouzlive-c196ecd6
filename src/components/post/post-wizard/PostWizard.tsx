@@ -570,8 +570,8 @@ export function PostWizard({
             backgroundColor: '#F8FAFC',
           }}
         >
-          {/* Header - fixed height, won't shrink */}
-          <div className="flex-shrink-0 bg-amber-50">
+          {/* Header + progress bar — single amber surface that bleeds behind status bar */}
+          <div className="flex-shrink-0 bg-amber-50" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}>
             <PostWizardHeader
               currentStep={state.currentStep}
               currentStepIndex={currentStepIndex}
@@ -594,21 +594,20 @@ export function PostWizard({
               canProceed={canProceed}
               isSubmitting={state.isSubmitting}
               onNext={handleNext}
-              hasHeroAbove={false}
+              hasHeroAbove
             />
-          </div>
-
-          {/* Progress bar */}
-          <div className="h-2 w-full bg-amber-200/50 flex-shrink-0 overflow-hidden">
-            <motion.div
-              className="h-full shadow-sm"
-              style={{ background: 'linear-gradient(to right, #fbbf24, #f59e0b)' }}
-              initial={{ width: 0 }}
-              animate={{
-                width: `${((currentStepIndex + 1) / totalSteps) * 100}%`,
-              }}
-              transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-            />
+            {/* Progress bar inside amber surface */}
+              <div className="h-2 w-full bg-amber-200/50 overflow-hidden">
+                <motion.div
+                  className="h-full shadow-sm"
+                  style={{ background: 'linear-gradient(to right, #fbbf24, #f59e0b)' }}
+                  initial={{ width: 0 }}
+                  animate={{
+                    width: `${((currentStepIndex + 1) / totalSteps) * 100}%`,
+                  }}
+                  transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+                />
+              </div>
           </div>
 
           {/* Step content - fills remaining space */}
