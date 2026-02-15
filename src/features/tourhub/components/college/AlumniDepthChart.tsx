@@ -8,11 +8,10 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Crown, Cog, Rocket, DollarSign, Trophy, Globe, ChevronDown, ChevronUp } from 'lucide-react';
+import { Crown, Cog, Rocket, DollarSign, Trophy, Globe, ChevronDown, ChevronUp, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCollegeAlumni, type CollegeAlumnus } from '../../hooks/useCollegeAlumni';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 
 interface AlumniDepthChartProps {
@@ -31,63 +30,69 @@ function AlumniRow({ alumnus, index }: AlumniRowProps) {
   const hasEarnings = (alumnus.earnings || 0) > 0;
   const hasWorldRank = alumnus.world_ranking && alumnus.world_ranking < 500;
   const photoUrl = resolvePhotoUrl(alumnus.photo_url, alumnus.pga_tour_id);
-  
+
+  const initials = fullName
+    .split(' ')
+    .map(n => n[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+
+  // Build meta line: #N OWGR · $X.XM · X wins
+  const metaParts: string[] = [];
+  if (hasWorldRank) metaParts.push(`#${alumnus.world_ranking} OWGR`);
+  if (hasEarnings) metaParts.push(formatCurrency(alumnus.earnings || 0));
+  if (hasWins) metaParts.push(`${alumnus.wins} ${alumnus.wins === 1 ? 'win' : 'wins'}`);
+
   return (
     <motion.div
-      initial={{ opacity: 0, x: -10 }}
-      animate={{ opacity: 1, x: 0 }}
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2, delay: index * 0.03 }}
-      whileTap={{ scale: 0.98 }}
     >
       <Link
         to={`/tourhub/player/${alumnus.id}`}
         className={cn(
-          'flex items-center gap-3 p-3 rounded-xl',
-          'bg-card/60 backdrop-blur-sm',
-          'border border-border/30',
-          'hover:border-primary/30 hover:bg-card hover:shadow-md',
-          'transition-all duration-200',
-          'group'
+          "flex overflow-hidden",
+          "bg-card rounded-xl border border-border/40 shadow-sm",
+          "hover:border-primary/30 hover:shadow-md",
+          "active:scale-[0.98] transition-all"
         )}
+        style={{ height: '110px' }}
       >
-        {/* Avatar — SquircleAvatar with 1px neutral border matching world rankings */}
-        <SquircleAvatar
-          size={44}
-          src={photoUrl}
-          alt={fullName}
-          thinRing
-          hideRing={false}
-        />
-        
-        {/* Info */}
-        <div className="flex-1 min-w-0">
-          <p className="text-[15px] font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+        {/* Photo section — left */}
+        <div className="relative w-[110px] shrink-0 bg-muted overflow-hidden">
+          {photoUrl ? (
+            <img
+              src={photoUrl}
+              alt={fullName}
+              className="w-full h-full object-cover object-top"
+              loading="lazy"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20 flex items-center justify-center">
+              <span className="text-2xl font-bold text-muted-foreground/40">{initials}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Info section — right */}
+        <div className="flex-1 min-w-0 px-3.5 py-3 flex flex-col justify-center">
+          <h3 className="text-base font-semibold text-foreground truncate leading-tight">
             {fullName}
-          </p>
-          
-          {/* Contribution Chips - earnings, wins, rank */}
-          <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
-            {hasEarnings && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-600">
-                <DollarSign className="w-3 h-3" />
-                {formatCurrency(alumnus.earnings || 0)}
-              </span>
-            )}
-            
-            {hasWins && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-600">
-                <Trophy className="w-3 h-3" />
-                {alumnus.wins} win{alumnus.wins !== 1 ? 's' : ''}
-              </span>
-            )}
-            
-            {hasWorldRank && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground">
-                <Globe className="w-3 h-3" />
-                #{alumnus.world_ranking}
-              </span>
-            )}
-          </div>
+          </h3>
+
+          {/* Meta line */}
+          {metaParts.length > 0 && (
+            <p className="text-xs text-muted-foreground mt-1.5 tabular-nums truncate">
+              {metaParts.join(' · ')}
+            </p>
+          )}
+        </div>
+
+        {/* Chevron */}
+        <div className="flex items-center pr-3 shrink-0">
+          <ChevronRight className="w-4 h-4 text-muted-foreground/40" />
         </div>
       </Link>
     </motion.div>
