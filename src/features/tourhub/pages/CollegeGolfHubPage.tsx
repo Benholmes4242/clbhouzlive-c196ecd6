@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Trophy, Zap } from 'lucide-react';
+import { ArrowLeft, Trophy, TrendingUp } from 'lucide-react';
 import { TourHubShell } from '../components';
 import { CollegeSearch, FranchiseLeaderboard, FranchiseMovers } from '../components/college';
 import { CollegeHeroBanner } from '../components/college/CollegeHeroBanner';
@@ -81,12 +81,20 @@ export function CollegeGolfHubPage() {
         <CollegeSearch />
 
         {/* Franchise Leaderboard (includes sticky tabs) */}
-        <FranchiseLeaderboard limit={25} />
+        <section>
+          <div className="flex items-center gap-2 mb-4">
+            <Trophy className="w-4 h-4 text-[hsl(var(--tab-orange))]" />
+            <h2 className="text-[16px] font-semibold text-foreground tracking-tight">
+              Franchise Leaderboard
+            </h2>
+          </div>
+          <FranchiseLeaderboard limit={25} />
+        </section>
 
         {/* Weekly Movers */}
         <section>
           <div className="flex items-center gap-2 mb-4">
-            <Zap className="w-4 h-4 text-primary" />
+            <TrendingUp className="w-4 h-4 text-[hsl(var(--tab-orange))]" />
             <h2 className="text-[16px] font-semibold text-foreground tracking-tight">
               This Week's Movers
             </h2>

@@ -24,12 +24,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
 
   const heroPhotoUrl = resolvePhotoUrl(player.photo_url, player.pga_tour_id, 'hero');
 
-  const initials = player.full_name
-    .split(' ')
-    .map(n => n[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
+  // No initials fallback per SDS rules
 
   const age = player.birth_date
     ? Math.floor((Date.now() - new Date(player.birth_date).getTime()) / (365.25 * 24 * 60 * 60 * 1000))
@@ -79,9 +74,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
           style={{ y: imageY }}
         />
       ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-800 via-emerald-900 to-slate-900 flex items-center justify-center">
-          <span className="text-white/20 text-8xl font-bold font-mono select-none">{initials}</span>
-        </div>
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-800 via-emerald-900 to-slate-900" />
       )}
 
       {/* Gradient scrim */}

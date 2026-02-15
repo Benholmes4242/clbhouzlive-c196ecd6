@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Swords, GitCompare } from 'lucide-react';
-import { TourHubShell } from '../components';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
+import { ArrowLeft, Swords, GitCompare, Globe } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { PageRoot } from '@/components/layout/PageRoot';
+import { useHeader } from '@/contexts/GlobalHeaderContext';
 import { 
   FranchiseHero, 
   FranchiseStoryStrip,
@@ -21,39 +23,56 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
+const sectionVariants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0 },
+};
+
 /**
- * College Profile Page - Premium alumni page with franchise identity
- * Route: /tourhub/college-golf/:collegeSlug
+ * College Profile Page - Immersive profile with brand color hero,
+ * glass back button, and magazine-quality sections.
  */
 export function CollegeProfilePage() {
   const { collegeSlug } = useParams<{ collegeSlug: string }>();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { setVariant, hideHeader, showHeader } = useHeader();
   const { data: stats, isLoading: statsLoading } = useCollegeStats(collegeSlug);
   const { data: collegeMap, isLoading: mediaLoading } = useCollegeMediaMap();
   const { data: rivalries } = useCollegeRivalries(collegeSlug);
   
-  // Compare sheet state
   const [compareOpen, setCompareOpen] = useState(false);
   const [compareCollege2, setCompareCollege2] = useState<string | null>(null);
   
   const college = collegeSlug ? collegeMap?.get(collegeSlug) || null : null;
   const displayName = college?.short_name || college?.college_name || collegeSlug || 'College';
-  
   const isLoading = statsLoading || mediaLoading;
-  
-  // Get rival slugs for the sheet
   const rivalSlugs = rivalries?.map(r => r.rivalNormalizedName) ?? [];
   const firstRival = rivalSlugs[0] ?? null;
-  
-  // Get college gradient for hero color bleed
   const gradientCSS = collegeSlug ? getCollegeGradientCSS(collegeSlug) : null;
   
-  // Reset compareCollege2 when collegeSlug changes
+  // Immersive mode: hide header
+  useEffect(() => {
+    hideHeader();
+    return () => {
+      showHeader();
+      setVariant('solid-light');
+    };
+  }, [hideHeader, showHeader, setVariant]);
+  
   useEffect(() => {
     setCompareCollege2(null);
     setCompareOpen(false);
   }, [collegeSlug]);
   
-  // Handler for Compare button
+  const handleBack = () => {
+    if (location.key !== 'default') {
+      navigate(-1);
+    } else {
+      navigate('/tourhub/college-golf');
+    }
+  };
+  
   const handleCompareClick = () => {
     if (!compareCollege2 && firstRival) {
       setCompareCollege2(firstRival);
@@ -61,119 +80,228 @@ export function CollegeProfilePage() {
     setCompareOpen(true);
   };
   
-  // Handler for rival tile click (from carousel)
   const handleRivalCompare = (rivalSlug: string) => {
     setCompareCollege2(rivalSlug);
     setCompareOpen(true);
   };
   
   return (
-    <TourHubShell>
-      {/* College brand color bleed — matches CollegeHeroBanner */}
-      {gradientCSS && (
+    <PageRoot className="min-h-screen w-full bg-background" immersive hasBottomNav>
+      {/* Immersive Brand Color Hero */}
+      <div
+        className="relative overflow-hidden"
+        style={{ height: 'calc(clamp(256px, 48vh, 384px) + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
+      >
+        {/* Brand gradient background with Ken Burns */}
+        <motion.div
+          className="absolute inset-0"
+          initial={{ scale: 1.04 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 15, ease: 'easeOut' }}
+          style={{ background: gradientCSS || 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--foreground)))' }}
+        />
+        
+        {/* Texture overlay */}
         <div
-          className="absolute inset-x-0 top-0 h-[200px] z-0"
+          className="absolute inset-0 opacity-[0.04]"
           style={{
-            background: gradientCSS,
-            maskImage: 'linear-gradient(180deg, black 0%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(180deg, black 0%, transparent 100%)',
+            backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(255,255,255,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 40%)',
           }}
         />
+
+        {/* Bottom fade */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.25) 100%)',
+          }}
+        />
+
+        {/* Glass Back Button — top left */}
+        <motion.button
+          onClick={handleBack}
+          className="absolute z-20 flex items-center gap-2 px-3 py-2 rounded-full"
+          style={{
+            top: 'calc(max(var(--sat, env(safe-area-inset-top, 0px)), 47px) + 4px)',
+            left: '16px',
+            background: 'rgba(0,0,0,0.3)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255,255,255,0.15)',
+          }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <ArrowLeft className="w-4 h-4 text-white" />
+          <span className="text-white text-sm font-medium">Back</span>
+        </motion.button>
+
+        {/* Content — centered */}
+        {isLoading ? (
+          <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-8 pt-20">
+            <div className="w-[110px] h-[110px] rounded-full bg-white/10 animate-pulse mb-4" />
+            <div className="h-8 w-48 bg-white/10 rounded animate-pulse mb-2" />
+            <div className="h-4 w-32 bg-white/10 rounded animate-pulse" />
+          </div>
+        ) : college ? (
+          <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-8 pt-20">
+            {/* Logo */}
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.15 }}
+              className="mb-4"
+            >
+              {college?.logo_url ? (
+                <img
+                  src={college.logo_url}
+                  alt={displayName}
+                  className="object-contain"
+                  style={{
+                    width: '110px',
+                    height: '110px',
+                    filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.3))',
+                  }}
+                />
+              ) : (
+                <div className="w-[110px] h-[110px] bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center shadow-2xl" style={{ borderRadius: '34%' }}>
+                  <div className="w-full h-full bg-gradient-to-br from-white/10 to-white/5" style={{ borderRadius: '34%' }} />
+                </div>
+              )}
+            </motion.div>
+
+            {/* Name */}
+            <motion.h1
+              initial={{ y: 8, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.25 }}
+              className="text-2xl md:text-3xl font-bold text-white text-center tracking-tight mb-2"
+            >
+              {displayName}
+            </motion.h1>
+
+            {/* Subtitle */}
+            {stats && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3, delay: 0.3 }}
+                className="text-sm text-white/70"
+              >
+                {stats.player_count} PGA Tour {stats.player_count === 1 ? 'player' : 'players'}
+              </motion.p>
+            )}
+          </div>
+        ) : null}
+      </div>
+
+      {/* Stat Ribbon — overlaps hero */}
+      {stats && (
+        <div className="relative z-10 -mt-5 mx-4">
+          <motion.div
+            className="flex gap-2 overflow-x-auto px-4 py-3 rounded-2xl no-scrollbar border border-border/40 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.04)]"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.3 }}
+          >
+            <StatPill label="WINS" value={String(stats.wins_total)} highlight={stats.wins_total > 0} />
+            <StatPill label="EARNINGS" value={formatCurrency(stats.earnings_total)} />
+            <StatPill label="CUTS" value={String(stats.cuts_total)} />
+            <StatPill label="TOP 10" value={String(stats.top10_total)} />
+            <StatPill label="PLAYERS" value={String(stats.player_count)} />
+          </motion.div>
+        </div>
       )}
 
-      {/* Back Link */}
-      <div className="pt-4 relative z-10">
-        <Link 
-          to="/tourhub/college-golf" 
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-          style={gradientCSS ? { color: 'rgba(255,255,255,0.7)' } : undefined}
-        >
-          <ArrowLeft className="w-4 h-4" />
-          College Rankings
-        </Link>
-      </div>
-      
-      {/* Content */}
-      <div className="py-6 relative z-10">
-        {isLoading ? (
-          <div className="space-y-6">
-            {/* Hero skeleton */}
-            <div className="flex flex-col items-center">
-              <div className="w-[120px] h-[120px] rounded-full bg-muted animate-pulse mb-4" />
-              <div className="h-8 w-48 bg-muted rounded animate-pulse mb-2" />
-              <div className="h-4 w-32 bg-muted rounded animate-pulse" />
+      {/* Content sections */}
+      <div className="w-full max-w-5xl mx-auto px-4 pb-8 mt-6 space-y-section">
+        {/* Action Buttons */}
+        {stats && (
+          <motion.div
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            transition={{ duration: 0.4 }}
+            className="flex items-center justify-center gap-3"
+          >
+            <FollowCollegeButton normalizedName={collegeSlug || ''} />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="gap-2"
+                    onClick={handleCompareClick}
+                    disabled={!firstRival}
+                  >
+                    <GitCompare className="w-4 h-4" />
+                    Compare
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              {!firstRival && (
+                <TooltipContent>
+                  <p>No rivals to compare</p>
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </motion.div>
+        )}
+
+        {/* Story Strip */}
+        {stats && (
+          <motion.div
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-50px' }}
+            transition={{ duration: 0.4 }}
+          >
+            <FranchiseStoryStrip normalizedName={collegeSlug || ''} />
+          </motion.div>
+        )}
+
+        {/* Rivalries */}
+        {stats && rivalSlugs.length > 0 && (
+          <motion.section
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-50px' }}
+            transition={{ duration: 0.4 }}
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <Swords className="w-4 h-4 text-[hsl(var(--tab-orange))]" />
+              <h2 className="text-[16px] font-semibold text-foreground tracking-tight">Rivals</h2>
             </div>
-            {/* Stats skeleton */}
-            <div className="grid grid-cols-3 gap-3">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="h-24 bg-muted rounded-xl animate-pulse" />
-              ))}
-            </div>
-            {/* List skeleton */}
-            <div className="space-y-2 mt-8">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="h-[72px] bg-muted rounded-xl animate-pulse" />
-              ))}
-            </div>
-          </div>
-        ) : stats ? (
-          <>
-            {/* Franchise Hero */}
-            <FranchiseHero stats={stats} college={college} className="mb-6" />
-            
-            {/* Franchise Story Strip - This week's activity */}
-            <FranchiseStoryStrip normalizedName={collegeSlug || ''} className="mb-8" />
-            
-            {/* Action Buttons */}
-            <div className="flex items-center justify-center gap-3 mb-10">
-              <FollowCollegeButton normalizedName={collegeSlug || ''} />
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="gap-2"
-                      onClick={handleCompareClick}
-                      disabled={!firstRival}
-                    >
-                      <GitCompare className="w-4 h-4" />
-                      Compare
-                    </Button>
-                  </span>
-                </TooltipTrigger>
-                {!firstRival && (
-                  <TooltipContent>
-                    <p>No rivals to compare</p>
-                  </TooltipContent>
-                )}
-              </Tooltip>
-            </div>
-            
-            {/* Rivalries */}
-            <section className="mb-10">
-              <div className="flex items-center gap-2 mb-4">
-                <Swords className="w-4 h-4 text-muted-foreground" />
-                <h2 className="text-sm font-semibold text-foreground">Rivals</h2>
-              </div>
-              <CollegeRivalsCarousel 
-                normalizedName={collegeSlug || ''} 
-                onCompare={handleRivalCompare}
-              />
-            </section>
-            
-            {/* Alumni Depth Chart */}
-            <section>
-              <h2 className="text-lg font-semibold text-foreground mb-2">
-                Alumni Depth Chart
-              </h2>
-              <p className="text-sm text-muted-foreground mb-6">
-                Current PGA Tour players ranked by contribution
-              </p>
-              <AlumniDepthChart normalizedName={collegeSlug || ''} />
-            </section>
-          </>
-        ) : (
+            <CollegeRivalsCarousel 
+              normalizedName={collegeSlug || ''} 
+              onCompare={handleRivalCompare}
+            />
+          </motion.section>
+        )}
+
+        {/* Alumni Depth Chart */}
+        {stats && (
+          <motion.section
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-50px' }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+          >
+            <h2 className="text-[16px] font-semibold text-foreground mb-2 tracking-tight">
+              Alumni Depth Chart
+            </h2>
+            <p className="text-sm text-muted-foreground mb-6">
+              Current PGA Tour players ranked by contribution
+            </p>
+            <AlumniDepthChart normalizedName={collegeSlug || ''} />
+          </motion.section>
+        )}
+
+        {!isLoading && !stats && (
           <div className="text-center py-16">
             <p className="text-sm text-muted-foreground">
               No stats found for "{displayName}"
@@ -186,8 +314,16 @@ export function CollegeProfilePage() {
             </Link>
           </div>
         )}
+
+        {/* Data Source */}
+        <div className="py-3 rounded-lg bg-muted/20 border border-border/30">
+          <div className="flex items-center gap-2 px-4 text-[11px] text-muted-foreground/50">
+            <Globe className="w-3.5 h-3.5" />
+            <span>Powered by SportsRadar</span>
+          </div>
+        </div>
       </div>
-      
+
       {/* Compare Sheet */}
       {collegeSlug && (
         <CollegeCompareSheet
@@ -199,6 +335,25 @@ export function CollegeProfilePage() {
           onCollegeChange={setCompareCollege2}
         />
       )}
-    </TourHubShell>
+    </PageRoot>
+  );
+}
+
+function formatCurrency(amount: number): string {
+  if (amount >= 1_000_000) return `$${(amount / 1_000_000).toFixed(1)}M`;
+  if (amount >= 1_000) return `$${(amount / 1_000).toFixed(0)}K`;
+  return `$${amount.toFixed(0)}`;
+}
+
+function StatPill({ label, value, highlight = false }: { label: string; value: string; highlight?: boolean }) {
+  return (
+    <div className={`min-w-[72px] flex-shrink-0 text-center px-3 py-2.5 rounded-xl ${highlight ? 'bg-amber-500/8 border border-amber-500/15' : 'bg-card/60 border border-border/30'}`}>
+      <span className="text-[9px] font-semibold tracking-wider uppercase text-muted-foreground/60 block mb-0.5">
+        {label}
+      </span>
+      <span className={`text-[15px] font-bold font-mono tabular-nums block ${highlight ? 'text-amber-500' : 'text-foreground'}`}>
+        {value}
+      </span>
+    </div>
   );
 }

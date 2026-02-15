@@ -319,7 +319,7 @@ export function PlayerSkillTreeCard({ playerId }: { playerId: string }) {
           transition={springSnappy}
         >
           <div className="flex items-center gap-2">
-            <span className="text-amber-500 text-[13px] font-semibold">🏆 Dominant Skill:</span>
+            <span className="text-amber-500 text-[13px] font-semibold">Dominant Skill:</span>
             <div className={cn("w-5 h-5 rounded-md flex items-center justify-center", SKILL_ICON_BG[skillTree.strongestAttribute])}>
               {(() => { const Ic = SKILL_ICONS[skillTree.strongestAttribute]; return <Ic className="w-3.5 h-3.5" />; })()}
             </div>

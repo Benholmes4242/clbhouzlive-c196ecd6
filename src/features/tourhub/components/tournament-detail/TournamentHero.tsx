@@ -36,7 +36,7 @@ function StatusBadge({ status }: { status: string }) {
     inprogress: { 
       label: 'LIVE', 
       icon: <Zap className="w-3.5 h-3.5" />,
-      className: 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg shadow-red-500/30',
+      className: 'bg-[#34C759] text-white shadow-lg shadow-[#34C759]/30',
       pulse: true,
     },
     scheduled: { 
