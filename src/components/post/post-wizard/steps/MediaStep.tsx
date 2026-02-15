@@ -3,13 +3,13 @@
 import { useCallback, useMemo, useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, Images, Plus, Wand2, Award, MapPin, AtSign } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { pickMediaFiles, validateMediaFiles } from '@/utils/media/pickMediaFiles';
 import { StepProps } from '../types';
 import { StudioEdits } from '@/types/studio';
 import { ComposerMediaItem } from '@/hooks/useSnapModal';
 import { PermissionDeniedCard } from '../components';
+import { PostTemplateSelector, PostTemplate } from '../components/PostTemplateSelector';
 import { useFirstRunFlag } from '@/hooks/useFirstRunFlag';
 import { useToast } from '@/hooks/use-toast';
 
@@ -438,9 +438,27 @@ export function MediaStep({
     triggerHaptic('selection');
   }, [state.mediaItems, dispatch]);
 
-  // Empty state - Apple-level: refined, visible text, with max media tip
+  // Template state
+  const [activeTemplateId, setActiveTemplateId] = useState<string | null>(null);
+
+  const handleSelectTemplate = useCallback((template: PostTemplate) => {
+    setActiveTemplateId(template.id);
+    dispatch({ type: 'SET_CATEGORIES', payload: template.categories as any });
+    dispatch({ type: 'SET_CAPTION', payload: template.captionStructure });
+    if (template.badges) {
+      dispatch({ type: 'SET_BADGES', payload: template.badges });
+    }
+  }, [dispatch]);
+
+  const handleDeselectTemplate = useCallback(() => {
+    setActiveTemplateId(null);
+    dispatch({ type: 'SET_CATEGORIES', payload: [] as any });
+    dispatch({ type: 'SET_CAPTION', payload: '' });
+    dispatch({ type: 'SET_BADGES', payload: [] });
+  }, [dispatch]);
+
+  // Empty state
   if (!hasMedia) {
-    // Show permission denied UI if permission was denied
     if (permissionDenied) {
       return (
         <PermissionDeniedCard 
@@ -451,8 +469,8 @@ export function MediaStep({
     }
     
     return (
-      <div className="h-full flex flex-col items-center justify-center px-8 bg-background relative">
-        {/* Non-blocking picker loading banner */}
+      <div className="h-full flex flex-col items-center justify-center px-8 relative" style={{ background: 'linear-gradient(to bottom, rgba(236,253,245,0.4), white, white)' }}>
+        {/* Skeleton loading banner */}
         <PickerLoadingBanner isVisible={isPickerOpen} />
         
         <motion.div 
@@ -461,59 +479,72 @@ export function MediaStep({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
         >
-          {/* Branded camera icon with subtle pulse ring */}
-          <div className="relative h-20 w-20 rounded-[28%] bg-primary/10 flex items-center justify-center mb-6">
-            <Camera className="h-8 w-8 text-primary" />
+          {/* Branded camera icon */}
+          <div className="relative h-20 w-20 rounded-[28%] bg-emerald-100 flex items-center justify-center mb-6">
+            <Camera className="h-9 w-9 text-emerald-600" />
             <div 
-              className="absolute inset-0 rounded-[28%] bg-primary/5 animate-ping" 
+              className="absolute inset-0 rounded-[28%] bg-emerald-50 animate-ping" 
               style={{ animationDuration: '3s' }} 
             />
           </div>
           
-          {/* Copy — aligned with Moment branding */}
-          <h3 className="text-lg font-semibold text-foreground mb-1.5">
-            Share your moment
+          <h3 className="text-xl font-bold tracking-tight text-gray-900 mb-1.5">
+            Create Your Moment
           </h3>
-          <p className="text-sm text-muted-foreground mb-1">
+          <p className="text-sm font-medium text-gray-500 mb-1">
             Photos and videos from your round
           </p>
-          <p className="text-xs text-muted-foreground/70 mb-8">
-            Up to {POST_LIMITS.MAX_MEDIA_COUNT} photos &amp; videos
+          <p className="text-xs text-gray-400 mb-8">
+            Up to {POST_LIMITS.MAX_MEDIA_COUNT} photos & videos
           </p>
           
-          {/* CTA buttons — Camera primary, Gallery secondary */}
-          <div className="flex gap-3 w-full max-w-[260px]">
-            <Button
+          {/* Action cards — Camera & Gallery */}
+          <div className="flex gap-3 w-full max-w-[280px]">
+            <button
               onClick={handleCamera}
               disabled={isPickerOpen}
-              className="flex-1 gap-2 rounded-xl h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-medium active:scale-[0.97] transition-all duration-150"
+              className="flex-1 flex flex-col items-center gap-2 py-5 rounded-2xl bg-emerald-500 text-white font-medium shadow-sm active:scale-[0.97] transition-all disabled:opacity-50"
             >
-              <Camera className="h-4 w-4" />
-              Camera
-            </Button>
-            <Button
-              variant="outline"
+              <Camera className="h-6 w-6" />
+              <div>
+                <div className="text-sm font-semibold">Camera</div>
+                <div className="text-[10px] opacity-80">Capture now</div>
+              </div>
+            </button>
+            <button
               onClick={handleGallery}
               disabled={isPickerOpen}
-              className="flex-1 gap-2 rounded-xl h-11 border-border bg-background hover:bg-muted/50 text-foreground font-medium active:scale-[0.97] transition-all duration-150"
+              className="flex-1 flex flex-col items-center gap-2 py-5 rounded-2xl bg-white border border-gray-200 text-gray-800 font-medium shadow-sm active:scale-[0.97] transition-all disabled:opacity-50"
             >
-              <Images className="h-4 w-4" />
-              Gallery
-            </Button>
+              <Images className="h-6 w-6 text-emerald-500" />
+              <div>
+                <div className="text-sm font-semibold">Gallery</div>
+                <div className="text-[10px] text-gray-400">Choose media</div>
+              </div>
+            </button>
+          </div>
+
+          {/* Post Templates */}
+          <div className="w-full mt-8">
+            <PostTemplateSelector
+              onSelectTemplate={handleSelectTemplate}
+              onDeselectTemplate={handleDeselectTemplate}
+              activeTemplateId={activeTemplateId}
+            />
           </div>
           
-          {/* Tips as pill badges */}
-          <div className="flex flex-wrap justify-center gap-2 mt-8">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted/60 text-xs text-muted-foreground">
-              <Camera className="h-3 w-3 flex-shrink-0" />
+          {/* Quick action chips */}
+          <div className="flex flex-wrap justify-center gap-2 mt-6">
+            <span className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-white border border-gray-200 shadow-sm text-sm font-medium text-gray-600 active:bg-gray-50 transition-colors">
+              <Camera className="h-4 w-4 text-emerald-500" />
               Best shots
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted/60 text-xs text-muted-foreground">
-              <AtSign className="h-3 w-3 flex-shrink-0" />
+            <span className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-white border border-gray-200 shadow-sm text-sm font-medium text-gray-600 active:bg-gray-50 transition-colors">
+              <AtSign className="h-4 w-4 text-emerald-500" />
               Tag partners
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted/60 text-xs text-muted-foreground">
-              <MapPin className="h-3 w-3 flex-shrink-0" />
+            <span className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-white border border-gray-200 shadow-sm text-sm font-medium text-gray-600 active:bg-gray-50 transition-colors">
+              <MapPin className="h-4 w-4 text-emerald-500" />
               Add location
             </span>
           </div>
@@ -522,14 +553,13 @@ export function MediaStep({
     );
   }
 
-  // Media selected state - Apple-level flexbox constraints
   return (
-    <div className="h-full flex flex-col bg-[#F8FAFC] relative">
+    <div className="h-full flex flex-col relative" style={{ backgroundColor: '#FAFAF8' }}>
       {/* Non-blocking picker loading banner (for adding more media) */}
       <PickerLoadingBanner isVisible={isPickerOpen} />
       
-      {/* Media stage - fills available space, never overflows (flex-1 min-h-0 pattern) */}
-      <div className="flex-1 min-h-0 relative overflow-hidden">
+      {/* Media stage — rounded container per spec */}
+      <div className="flex-1 min-h-0 relative overflow-hidden rounded-xl mx-4 mt-2 shadow-sm">
         <CreateMomentMediaStage
           media={state.mediaItems}
           activeMediaId={activeMediaId}
@@ -544,7 +574,7 @@ export function MediaStep({
           removingMediaIds={removingMediaIds}
         />
         
-        {/* Media counter pill — elevated z-index, frosted glass */}
+        {/* Media counter pill */}
         {state.mediaItems.length > 1 && (
           <div className="absolute top-3 left-3 z-30 flex items-center px-2 py-1 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 shadow-lg shadow-black/20">
             <span className="text-[10px] text-white font-medium tabular-nums">
@@ -554,71 +584,61 @@ export function MediaStep({
         )}
       </div>
       
-      {/* Bottom action bar — elevated, with safe area */}
-      <div 
-        className="flex-shrink-0 border-t border-border bg-background px-4 py-3"
-        style={{ boxShadow: '0 -2px 8px rgba(0,0,0,0.06)' }}
-      >
+      {/* Bottom action bar */}
+      <div className="flex-shrink-0 border-t border-gray-100 bg-white px-4 py-3">
         {/* Non-blocking processing progress banner */}
         <MediaProcessingBanner 
           totalVideos={batchTotal} 
           completedVideos={batchCompleted} 
         />
         
-        {/* Media counter */}
-        <div className="text-center mb-2">
-          <p className="text-xs text-muted-foreground">
-            {state.mediaItems.length}/{POST_LIMITS.MAX_MEDIA_COUNT} items selected
-            {!canAddMore && <span className="text-muted-foreground ml-1">• Maximum reached</span>}
-          </p>
-        </div>
-        
-        <div className="flex items-center justify-center gap-2">
-          {/* Add more media — aggressive grey-out at max */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleGallery}
-            disabled={!canAddMore || isPickerOpen}
-            className={`gap-1.5 px-4 py-2.5 h-auto rounded-full bg-muted hover:bg-muted/80 text-sm font-medium transition-colors text-foreground ${!canAddMore ? 'opacity-30 cursor-not-allowed' : ''}`}
-          >
-            <Plus className="h-4 w-4" />
-            Add Media
-          </Button>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {/* Add more media */}
+            <button
+              onClick={handleGallery}
+              disabled={!canAddMore || isPickerOpen}
+              className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-gray-100 text-sm font-medium text-gray-800 active:bg-gray-200 transition-colors ${!canAddMore ? 'opacity-30 cursor-not-allowed' : ''}`}
+            >
+              <Plus className="h-4 w-4" />
+              Add
+            </button>
+            
+            {/* Studio button */}
+            <button
+              onClick={() => {
+                studioFirstRun.markSeen();
+                onOpenStudio();
+              }}
+              className="relative flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-gray-100 text-sm font-medium text-gray-800 active:bg-gray-200 transition-colors"
+            >
+              <Wand2 className="h-4 w-4" />
+              Studio
+              {!studioFirstRun.hasSeen && (
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              )}
+            </button>
+            
+            {/* Badges button */}
+            <button
+              onClick={() => {
+                badgesFirstRun.markSeen();
+                onOpenBadges();
+              }}
+              className="relative flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-gray-100 text-sm font-medium text-gray-800 active:bg-gray-200 transition-colors"
+            >
+              <Award className="h-4 w-4" />
+              Badges
+              {!badgesFirstRun.hasSeen && (
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              )}
+            </button>
+          </div>
           
-          {/* Studio button with first-run indicator */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              studioFirstRun.markSeen();
-              onOpenStudio();
-            }}
-            className="relative gap-1.5 px-4 py-2.5 h-auto rounded-full bg-muted hover:bg-muted/80 text-sm font-medium transition-colors text-foreground"
-          >
-            <Wand2 className="h-4 w-4" />
-            Studio
-            {!studioFirstRun.hasSeen && (
-              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-primary animate-pulse" />
-            )}
-          </Button>
-          
-          {/* Badges button with first-run indicator */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              badgesFirstRun.markSeen();
-              onOpenBadges();
-            }}
-            className="relative gap-1.5 px-4 py-2.5 h-auto rounded-full bg-muted hover:bg-muted/80 text-sm font-medium transition-colors text-foreground"
-          >
-            <Award className="h-4 w-4" />
-            Badges
-            {!badgesFirstRun.hasSeen && (
-              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-primary animate-pulse" />
-            )}
-          </Button>
+          {/* Media count */}
+          <span className="text-xs text-gray-400 font-medium tabular-nums">
+            {state.mediaItems.length}/{POST_LIMITS.MAX_MEDIA_COUNT}
+          </span>
         </div>
       </div>
     </div>
