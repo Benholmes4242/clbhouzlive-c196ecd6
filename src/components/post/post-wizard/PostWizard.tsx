@@ -599,7 +599,7 @@ export function PostWizard({
           </div>
 
           {/* Progress bar */}
-          <div className="h-2 w-full bg-gray-100 flex-shrink-0 overflow-hidden">
+          <div className="h-2 w-full bg-amber-200/50 flex-shrink-0 overflow-hidden">
             <motion.div
               className="h-full shadow-sm"
               style={{ background: 'linear-gradient(to right, #fbbf24, #f59e0b)' }}
