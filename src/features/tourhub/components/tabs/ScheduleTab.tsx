@@ -265,7 +265,7 @@ export function ScheduleTab() {
   if (isLoading) {
     return (
       <div className="space-y-6 -mx-4">
-        <div className="animate-pulse bg-muted" style={{ height: '380px' }} />
+        <div className="animate-pulse bg-muted" style={{ height: 'clamp(282px, 53vh, 422px)' }} />
         <div className="px-4 space-y-3">
           <div className="h-12 bg-muted rounded-xl w-full animate-pulse" />
           <div className="h-11 bg-muted rounded-xl animate-pulse" />

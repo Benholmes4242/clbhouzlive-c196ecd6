@@ -124,7 +124,7 @@ export function TournamentDetailPage() {
           <div 
             className=""
             style={{ 
-              minHeight: 'calc(45vh + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
+              minHeight: 'calc(clamp(282px, 53vh, 422px) + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
               background: 'linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--background)) 50%, hsl(var(--muted)) 75%)',
               backgroundSize: '200% 100%',
               animation: 'shimmer 1.5s infinite',
