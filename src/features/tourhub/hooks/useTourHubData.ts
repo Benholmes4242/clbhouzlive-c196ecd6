@@ -190,7 +190,11 @@ export function useTourSeason() {
 }
 
 // Hook: Get all tournaments for a season (or all if no seasonId)
-export function useTourTournaments(seasonId?: string) {
+interface UseTourTournamentsOptions {
+  refetchInterval?: number | false;
+}
+
+export function useTourTournaments(seasonId?: string, options?: UseTourTournamentsOptions) {
   return useQuery({
     queryKey: ['tourhub', 'tournaments', seasonId || 'all'],
     queryFn: async () => {
@@ -246,6 +250,7 @@ export function useTourTournaments(seasonId?: string) {
     },
     enabled: true,
     staleTime: 5 * 60 * 1000,
+    refetchInterval: options?.refetchInterval,
   });
 }
 
