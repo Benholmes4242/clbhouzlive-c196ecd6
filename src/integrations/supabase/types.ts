@@ -8540,6 +8540,8 @@ export type Database = {
           cuts_missed: number | null
           driving_accuracy: number | null
           driving_distance: number | null
+          earnings: number | null
+          earnings_rank: number | null
           events_played: number | null
           fedex_points: number | null
           fedex_rank: number | null
@@ -8570,6 +8572,8 @@ export type Database = {
           cuts_missed?: number | null
           driving_accuracy?: number | null
           driving_distance?: number | null
+          earnings?: number | null
+          earnings_rank?: number | null
           events_played?: number | null
           fedex_points?: number | null
           fedex_rank?: number | null
@@ -8600,6 +8604,8 @@ export type Database = {
           cuts_missed?: number | null
           driving_accuracy?: number | null
           driving_distance?: number | null
+          earnings?: number | null
+          earnings_rank?: number | null
           events_played?: number | null
           fedex_points?: number | null
           fedex_rank?: number | null
