@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, Swords, GitCompare, Globe, Crown } from 'lucide-react';
+import { ArrowLeft, Swords, GitCompare, Globe, Crown, RefreshCw, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useQueryClient } from '@tanstack/react-query';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
 import { 
@@ -16,6 +17,8 @@ import { useCollegeRivalries } from '../hooks/useCollegeMovers';
 import { getCollegeGradientCSS } from '../config/collegeBrandColors';
 import { Button } from '@/components/ui/button';
 
+const SCROLL_KEY = 'college-detail-scroll';
+
 const sectionVariants = {
   hidden: { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0 },
@@ -25,13 +28,21 @@ export function CollegeProfilePage() {
   const { collegeSlug } = useParams<{ collegeSlug: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+  const queryClient = useQueryClient();
   const { setVariant, hideHeader, showHeader } = useHeader();
-  const { data: stats, isLoading: statsLoading } = useCollegeStats(collegeSlug);
+  const { data: stats, isLoading: statsLoading, error: statsError, refetch: refetchStats } = useCollegeStats(collegeSlug);
   const { data: collegeMap, isLoading: mediaLoading } = useCollegeMediaMap();
   const { data: rivalries } = useCollegeRivalries(collegeSlug);
   const { data: allSeasonStats } = useCollegeSeasonStats();
   
   const [compareOpen, setCompareOpen] = useState(false);
+  const [heroImgError, setHeroImgError] = useState(false);
+
+  // Pull-to-refresh state
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [pullDistance, setPullDistance] = useState(0);
+  const touchStartY = useRef(0);
+  const isPulling = useRef(false);
   const [compareCollege2, setCompareCollege2] = useState<string | null>(null);
   
   const college = collegeSlug ? collegeMap?.get(collegeSlug) || null : null;
@@ -49,10 +60,46 @@ export function CollegeProfilePage() {
     return idx >= 0 ? idx + 1 : null;
   })();
 
-  // Scroll to top on mount
+  // Scroll restoration
   useEffect(() => {
-    window.scrollTo(0, 0);
+    const saved = sessionStorage.getItem(SCROLL_KEY);
+    if (saved) {
+      requestAnimationFrame(() => window.scrollTo(0, parseInt(saved, 10)));
+      sessionStorage.removeItem(SCROLL_KEY);
+    } else {
+      window.scrollTo(0, 0);
+    }
   }, [collegeSlug]);
+
+  // Pull-to-refresh handlers
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (window.scrollY <= 0) {
+      touchStartY.current = e.touches[0].clientY;
+      isPulling.current = true;
+    }
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isPulling.current) return;
+    const delta = e.touches[0].clientY - touchStartY.current;
+    if (delta > 0) setPullDistance(Math.min(delta, 100));
+  }, []);
+
+  const handleTouchEnd = useCallback(async () => {
+    if (pullDistance >= 50 && !isRefreshing) {
+      setIsRefreshing(true);
+      setPullDistance(0);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['college-stats', collegeSlug] }),
+        queryClient.invalidateQueries({ queryKey: ['college-alumni', collegeSlug] }),
+        queryClient.invalidateQueries({ queryKey: ['college-rivals', collegeSlug] }),
+      ]);
+      setIsRefreshing(false);
+    } else {
+      setPullDistance(0);
+    }
+    isPulling.current = false;
+  }, [pullDistance, isRefreshing, queryClient, collegeSlug]);
   
   useEffect(() => {
     hideHeader();
@@ -93,7 +140,22 @@ export function CollegeProfilePage() {
     : null;
   
   return (
-    <PageRoot className="min-h-screen w-full bg-background" immersive immersiveStatusBar hasBottomNav>
+    <PageRoot className="min-h-screen w-full bg-background" immersive immersiveStatusBar hasBottomNav
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Pull-to-refresh indicator */}
+      {(pullDistance > 0 || isRefreshing) && (
+        <div className="flex justify-center py-3 relative z-50">
+          <motion.div
+            animate={{ rotate: isRefreshing ? 360 : pullDistance * 3.6 }}
+            transition={isRefreshing ? { repeat: Infinity, duration: 0.8, ease: 'linear' } : { duration: 0 }}
+          >
+            <RefreshCw className="w-5 h-5 text-muted-foreground" />
+          </motion.div>
+        </div>
+      )}
       {/* Immersive Brand Color Hero */}
       <div
         className="relative overflow-hidden"
@@ -177,7 +239,7 @@ export function CollegeProfilePage() {
               transition={{ duration: 0.4, delay: 0.15 }}
               className="mb-4"
             >
-              {college?.logo_url ? (
+              {college?.logo_url && !heroImgError ? (
                 <img
                   src={college.logo_url}
                   alt={displayName}
@@ -187,10 +249,13 @@ export function CollegeProfilePage() {
                     height: '110px',
                     filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.3))',
                   }}
+                  onError={() => setHeroImgError(true)}
                 />
               ) : (
                 <div className="w-[110px] h-[110px] bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center shadow-2xl" style={{ borderRadius: '34%' }}>
-                  <div className="w-full h-full bg-gradient-to-br from-white/10 to-white/5" style={{ borderRadius: '34%' }} />
+                  <span className="text-4xl font-bold text-white/70">
+                    {displayName?.charAt(0)?.toUpperCase() || '?'}
+                  </span>
                 </div>
               )}
             </motion.div>
@@ -316,12 +381,25 @@ export function CollegeProfilePage() {
 
         {!isLoading && !stats && (
           <div className="text-center py-16">
-            <p className="text-sm text-muted-foreground">
-              No stats found for "{displayName}"
+            <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-destructive/10 flex items-center justify-center">
+              <AlertCircle className="w-6 h-6 text-destructive" />
+            </div>
+            <h3 className="text-base font-semibold text-foreground mb-2">
+              Couldn't load school data
+            </h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Something went wrong. Please try again.
             </p>
+            <button
+              onClick={() => refetchStats()}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Tap to Retry
+            </button>
             <Link 
               to="/tourhub/college-golf" 
-              className="inline-block mt-4 text-primary hover:underline text-sm"
+              className="block mt-4 text-primary hover:underline text-sm"
             >
               Browse all colleges
             </Link>
