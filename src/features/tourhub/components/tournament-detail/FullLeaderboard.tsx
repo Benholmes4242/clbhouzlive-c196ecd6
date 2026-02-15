@@ -47,7 +47,7 @@ function ScoreCell({ score, className }: { score: number | null; className?: str
   if (score === null || score === undefined) {
     return <span className={cn("score-mono text-muted-foreground/50", className)}>—</span>;
   }
-  return <span className={cn("score-mono font-medium", className)}>{score}</span>;
+  return <span className={cn("score-mono font-semibold text-foreground tabular-nums", className)}>{score}</span>;
 }
 
 function ScoreToPar({ score, className }: { score: number | null; className?: string }) {
@@ -86,7 +86,7 @@ function PositionBadge({ position, tied, isMissedCut, status }: {
 
   return (
     <div className={cn(
-      "w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold shrink-0",
+      "w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0",
       isTop3 ? podiumStyles[position] : "bg-muted text-muted-foreground"
     )}>
       {display}
@@ -193,7 +193,7 @@ export function FullLeaderboard({
           onChange={(e) => setSearchQuery(e.target.value)}
           className={cn(
             "w-full h-12 pl-10 pr-10 rounded-xl text-[14px] text-foreground placeholder:text-muted-foreground/50",
-            "bg-muted/40 backdrop-blur-md border border-border/40",
+            "bg-muted/50 border border-border",
             "focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30",
             "transition-all duration-200"
           )}
@@ -214,7 +214,7 @@ export function FullLeaderboard({
       </div>
 
       {/* Column headers */}
-      <div className="flex items-center gap-2 px-1 py-2 border-b border-border">
+      <div className="flex items-center gap-2 px-4 py-2 border-b border-border sticky top-0 bg-background/95 backdrop-blur-sm z-10">
         <div className="w-8 shrink-0 text-center">
           <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">Pos</span>
         </div>
@@ -275,9 +275,10 @@ export function FullLeaderboard({
               <Link
                 to={`/tourhub/player/${entry.player?.id}`}
                 className={cn(
-                  "flex items-center gap-2 px-1 py-2.5 transition-all duration-200",
-                  "hover:bg-muted/40 active:scale-[0.995] rounded-lg",
-                  isTop3 && "bg-amber-50/20 dark:bg-amber-900/5",
+                  "flex items-center gap-2 px-4 py-3 transition-all duration-200 min-h-[52px]",
+                   "hover:bg-muted/40 active:scale-[0.995]",
+                   entry.position === 1 && !isMissedCut && !isWD && "bg-amber-50/30 dark:bg-amber-900/10 border-l-[3px] border-l-amber-400",
+                   isTop3 && entry.position !== 1 && "bg-amber-50/10 dark:bg-amber-900/5",
                   (isMissedCut || isWD) && "opacity-50",
                 )}
               >
@@ -393,8 +394,8 @@ export function FullLeaderboard({
       </div>
 
       {/* Results count */}
-      <div className="py-2.5 border-t border-border/20">
-        <span className="text-[11px] text-muted-foreground/50 tabular-nums">
+      <div className="py-4 border-t border-border/20 text-center">
+        <span className="text-xs text-muted-foreground tabular-nums">
           {sortedEntries.length} player{sortedEntries.length !== 1 ? 's' : ''}
           {searchQuery && ` matching "${searchQuery}"`}
         </span>
