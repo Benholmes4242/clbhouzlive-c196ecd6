@@ -1,6 +1,5 @@
 import React from 'react';
 import { Camera, ImageOff, Settings } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { isMedianApp } from '@/utils/median/isMedianApp';
 
 interface PermissionDeniedCardProps {
@@ -13,11 +12,7 @@ export function PermissionDeniedCard({ type, onRetry }: PermissionDeniedCardProp
   const Icon = isCamera ? Camera : ImageOff;
   
   const handleOpenSettings = () => {
-    // On native, we can potentially open app settings
-    // For now, provide instructions
     if (isMedianApp()) {
-      // Note: Opening settings requires native bridge
-      // For now, we'll just show instructions
       alert(
         `To enable ${isCamera ? 'camera' : 'photo library'} access:\n\n` +
         '1. Open your device Settings\n' +
@@ -28,41 +23,38 @@ export function PermissionDeniedCard({ type, onRetry }: PermissionDeniedCardProp
   };
   
   return (
-    <div className="h-full flex flex-col items-center justify-center p-8 text-center bg-background animate-in fade-in duration-300">
-      <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-        <Icon className="w-8 h-8 text-muted-foreground" />
+    <div className="h-full flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-300" style={{ backgroundColor: '#FAFAF8' }}>
+      <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-5">
+        <Icon className="w-9 h-9 text-gray-400" />
       </div>
       
-      <h3 className="text-lg font-semibold text-foreground mb-2">
+      <h3 className="text-lg font-semibold text-gray-900 mb-2">
         {isCamera ? 'Camera Access Needed' : 'Photo Library Access Needed'}
       </h3>
       
-      <p className="text-sm text-muted-foreground mb-6 max-w-xs">
+      <p className="text-sm text-gray-500 mb-8 max-w-xs">
         {isCamera 
           ? 'Allow camera access to capture photos and videos of your golf moments.'
           : 'Allow photo library access to share your golf memories.'
         }
       </p>
       
-      <div className="flex gap-3">
-        <Button
-          variant="outline"
-          size="sm"
+      <div className="flex flex-col items-center gap-3 w-full max-w-[220px]">
+        <button
           onClick={handleOpenSettings}
-          className="gap-2"
+          className="w-full flex items-center justify-center gap-2 bg-emerald-500 text-white rounded-full px-6 py-3 font-medium active:scale-[0.97] transition-transform"
         >
           <Settings className="w-4 h-4" />
           Open Settings
-        </Button>
+        </button>
         
         {onRetry && (
-          <Button
-            variant="default"
-            size="sm"
+          <button
             onClick={onRetry}
+            className="text-emerald-600 font-medium text-sm active:opacity-70 transition-opacity"
           >
             Try Again
-          </Button>
+          </button>
         )}
       </div>
     </div>
