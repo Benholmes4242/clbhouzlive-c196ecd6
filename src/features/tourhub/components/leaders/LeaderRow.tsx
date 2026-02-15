@@ -47,6 +47,9 @@ export function LeaderRow({
   const countryName = titleCaseCountry(player.country);
   const fmt = formatOverride ?? category.format;
   const unit = unitOverride ?? category.unit;
+  const formattedStat = fmt(value);
+
+  const ariaLabel = `Rank ${displayRank}, ${player.fullName}, ${countryName || 'Unknown'}, ${formattedStat}${unit ? ` ${unit}` : ''}`;
 
   return (
     <motion.div
@@ -57,6 +60,7 @@ export function LeaderRow({
       <Link
         to={`/tourhub/player/${player.id}`}
         className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30 border-b border-border/20 last:border-0 active:scale-[0.98] transition-transform"
+        aria-label={ariaLabel}
       >
         {/* Rank */}
         <span className="w-7 text-center font-mono text-[13px] font-bold text-muted-foreground/70 tabular-nums">
@@ -85,7 +89,7 @@ export function LeaderRow({
         {/* Stat value — bigger, focal point */}
         <div className="text-right shrink-0">
           <span className="font-mono text-[15px] font-bold text-foreground tabular-nums">
-            {fmt(value)}
+            {formattedStat}
           </span>
           {unit && (
             <p className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{unit}</p>
