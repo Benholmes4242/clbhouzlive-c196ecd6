@@ -1,16 +1,5 @@
 /**
- * TournamentHero - Cinematic immersive hero for tournament detail
- * 
- * Features:
- * - Full-bleed viewport-relative immersive container
- * - Ken Burns animation (scale 1.06)
- * - Parallax scroll effect
- * - Glass back button (top-left)
- * - LIVE badge (top-right)
- * - Premium glassmorphism status badges
- * - Gradient scrim overlays
- * - Floating metadata pills
- * - Line-clamped tournament name
+ * TournamentHero - Cinematic immersive hero with gradient scrim
  */
 
 import { format } from 'date-fns';
@@ -25,7 +14,6 @@ interface TournamentHeroProps {
   imageUrl: string | null;
 }
 
-// Cinematic status badge
 function StatusBadge({ status }: { status: string }) {
   const config: Record<string, { 
     label: string; 
@@ -41,18 +29,18 @@ function StatusBadge({ status }: { status: string }) {
     },
     scheduled: { 
       label: 'UPCOMING', 
-      icon: <Clock className="w-3.5 h-3.5" />,
-      className: 'bg-white/15 backdrop-blur-xl text-white border border-white/20',
+      icon: <Calendar className="w-3.5 h-3.5" />,
+      className: 'bg-slate-700/80 backdrop-blur-xl text-white',
     },
     created: { 
       label: 'SCHEDULED', 
       icon: <Calendar className="w-3.5 h-3.5" />,
-      className: 'bg-white/15 backdrop-blur-xl text-white border border-white/20',
+      className: 'bg-slate-700/80 backdrop-blur-xl text-white',
     },
     closed: { 
       label: 'COMPLETED', 
       icon: <Trophy className="w-3.5 h-3.5" />,
-      className: 'bg-black/40 backdrop-blur-xl text-white border border-white/10',
+      className: 'bg-slate-600/80 backdrop-blur-xl text-white',
     },
   };
 
@@ -75,18 +63,16 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-// Standardized glassmorphic pill
 function HeroPill({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
     <div 
       className={cn(
-        "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-white active:opacity-70 transition-opacity",
+        "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-white active:opacity-70 transition-opacity",
         className
       )}
       style={{ 
-        background: 'rgba(255,255,255,0.12)', 
+        background: 'rgba(0,0,0,0.30)', 
         backdropFilter: 'blur(12px)',
-        border: '1px solid rgba(255,255,255,0.1)',
       }}
     >
       {children}
@@ -105,7 +91,6 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
 
   return (
     <div className="relative overflow-hidden">
-      {/* Background container with Ken Burns */}
       <motion.div 
         className="relative overflow-hidden"
         style={{ minHeight: 'calc(clamp(282px, 53vh, 422px) + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
@@ -138,17 +123,24 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
             />
           )}
         </motion.div>
-        
+
+        {/* Enhanced gradient scrim at bottom for text contrast */}
+        <div 
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.05) 70%, transparent 100%)',
+          }}
+        />
 
         {/* Glass Back Button - top-left */}
         <motion.button
           onClick={() => navigate(-1)}
-          className="absolute left-4 z-20 flex items-center gap-2 px-3 py-2 rounded-full"
+          className="absolute left-4 z-20 flex items-center gap-2 rounded-full"
           style={{
             top: 'calc(max(var(--sat, env(safe-area-inset-top, 0px)), 47px) + 8px)',
-            background: 'rgba(0,0,0,0.3)',
+            background: 'rgba(0,0,0,0.40)',
             backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255,255,255,0.15)',
+            padding: '8px 16px',
           }}
           whileTap={{ scale: 0.95 }}
           initial={{ opacity: 0, x: -10 }}
@@ -172,7 +164,6 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
 
         {/* Content overlay - bottom aligned */}
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6">
-          {/* Tournament Name - line clamped */}
           <motion.h1 
             className="font-extrabold text-white mb-3"
             style={{ 
@@ -192,7 +183,6 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
             {tournament.name}
           </motion.h1>
 
-          {/* Date and Location row */}
           <motion.div 
             className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4"
             initial={{ opacity: 0, y: 20 }}
@@ -218,7 +208,7 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
             )}
           </motion.div>
 
-          {/* Glassmorphic metadata pills - staggered */}
+          {/* Metadata pills - consistent styling */}
           <motion.div 
             className="flex flex-wrap items-center gap-2"
             initial={{ opacity: 0, y: 20 }}
@@ -241,6 +231,7 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
             
             {tournament.venue_par && (
               <HeroPill>
+                <Flag className="w-3.5 h-3.5" />
                 <span>Par {tournament.venue_par}</span>
               </HeroPill>
             )}

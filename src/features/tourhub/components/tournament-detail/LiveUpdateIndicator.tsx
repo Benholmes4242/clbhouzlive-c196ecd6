@@ -1,10 +1,5 @@
 /**
- * LiveUpdateIndicator - Shows status bar for live, final, and upcoming tournaments
- * 
- * Features:
- * - Glassmorphic treatment per variant
- * - LIVE variant shows current leader inline
- * - Animated entrance
+ * LiveUpdateIndicator - Status bar with left accent border
  */
 
 import { RefreshCw, Clock, CheckCircle } from 'lucide-react';
@@ -24,7 +19,6 @@ interface StatusBarProps {
   isRefreshing?: boolean;
   onRefresh?: () => void;
   countdownText?: string;
-  /** Current leader info for live status bar */
   leaderName?: string | null;
   leaderScore?: string | null;
   className?: string;
@@ -44,13 +38,14 @@ export function StatusBar({
     return (
       <motion.div
         className={cn(
-          "flex items-center gap-3 px-3 py-2 rounded-xl",
+          "flex items-center gap-3 px-3 py-2 rounded-xl border-l-[3px] border-l-slate-400",
           className
         )}
         style={{
           background: 'rgba(var(--muted-rgb, 241, 245, 249), 0.7)',
           backdropFilter: 'blur(8px)',
           border: '1px solid hsl(var(--border))',
+          borderLeft: '3px solid rgb(148, 163, 184)',
         }}
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -79,6 +74,7 @@ export function StatusBar({
           background: 'rgba(255, 251, 235, 0.7)',
           backdropFilter: 'blur(8px)',
           border: '1px solid rgba(245, 158, 11, 0.15)',
+          borderLeft: '3px solid rgb(217, 119, 6)',
         }}
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -98,7 +94,7 @@ export function StatusBar({
     );
   }
 
-  // Live variant with glassmorphic treatment
+  // Live variant
   return (
     <motion.div
       className={cn(
@@ -109,12 +105,12 @@ export function StatusBar({
         background: 'rgba(236, 253, 245, 0.7)',
         backdropFilter: 'blur(8px)',
         border: '1px solid rgba(16, 185, 129, 0.15)',
+        borderLeft: '3px solid rgb(16, 185, 129)',
       }}
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Live pulse */}
       <div className="flex items-center gap-1.5">
         <span className="relative flex h-2 w-2">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
@@ -125,17 +121,15 @@ export function StatusBar({
         </span>
       </div>
 
-      {/* Leader info inline */}
       {leaderName && (
         <>
-          <span className="text-xs text-emerald-600/60">•</span>
+          <span className="text-xs text-emerald-600/60">·</span>
           <span className="text-xs font-medium text-emerald-700 truncate">
             {leaderName} leads{leaderScore ? ` at ${leaderScore}` : ''}
           </span>
         </>
       )}
 
-      {/* Last updated */}
       {lastUpdatedText && !leaderName && (
         <>
           <div className="h-4 w-px bg-emerald-200/60" />
@@ -145,7 +139,6 @@ export function StatusBar({
         </>
       )}
 
-      {/* Refresh button */}
       {onRefresh && (
         <button
           onClick={onRefresh}
@@ -170,7 +163,6 @@ export function StatusBar({
   );
 }
 
-// Backwards-compatible export
 export function LiveUpdateIndicator({
   lastUpdatedText,
   isRefreshing,

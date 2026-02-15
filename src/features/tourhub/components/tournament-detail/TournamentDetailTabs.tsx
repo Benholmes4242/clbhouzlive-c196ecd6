@@ -1,13 +1,5 @@
 /**
- * TournamentDetailTabs - Premium segmented tab control
- * 
- * Features:
- * - Text-only labels (no icons)
- * - Spring-animated sliding indicator
- * - LIVE pulsing dot on Leaderboard tab
- * - Summary tab hidden for non-completed tournaments
- * - Tap feedback
- * - Horizontal scroll on narrow screens
+ * TournamentDetailTabs - Plain text tabs with underline active state
  */
 
 import { useRef, useState, useEffect } from 'react';
@@ -33,7 +25,6 @@ interface TournamentDetailTabsProps {
   activeTab: TournamentTab;
   onTabChange: (tab: TournamentTab) => void;
   className?: string;
-  /** Tournament status — used for contextual badges */
   tournamentStatus?: string;
 }
 
@@ -44,13 +35,11 @@ export function TournamentDetailTabs({ activeTab, onTabChange, className, tourna
   const isLive = tournamentStatus === 'inprogress';
   const isCompleted = tournamentStatus === 'closed';
 
-  // Filter tabs: hide Summary for non-completed tournaments
   const visibleTabs = ALL_TABS.filter(tab => {
     if (tab.value === 'summary' && !isCompleted) return false;
     return true;
   });
 
-  // Calculate indicator position
   useEffect(() => {
     if (!containerRef.current) return;
     const activeIndex = visibleTabs.findIndex(t => t.value === activeTab);
@@ -66,15 +55,14 @@ export function TournamentDetailTabs({ activeTab, onTabChange, className, tourna
   }, [activeTab, visibleTabs.length]);
 
   return (
-    <div className={cn("relative", className)}>
-      {/* Scrollable container */}
+    <div className={cn("relative border-b border-border", className)}>
       <div 
         ref={containerRef}
-        className="relative flex items-stretch rounded-xl overflow-x-auto scrollbar-hide p-1 bg-muted/60 scroll-snap-x"
+        className="relative flex items-stretch"
       >
-        {/* Animated sliding indicator */}
+        {/* Animated underline indicator */}
         <motion.div
-          className="absolute top-1 bottom-1 rounded-lg bg-card shadow-sm border border-border/60"
+          className="absolute bottom-0 h-[2px] rounded-full bg-foreground"
           animate={{
             left: indicatorStyle.left,
             width: indicatorStyle.width,
@@ -82,7 +70,6 @@ export function TournamentDetailTabs({ activeTab, onTabChange, className, tourna
           transition={{ type: 'spring', stiffness: 400, damping: 30 }}
         />
 
-        {/* Tab buttons */}
         {visibleTabs.map((tab) => {
           const isActive = activeTab === tab.value;
 
@@ -91,11 +78,11 @@ export function TournamentDetailTabs({ activeTab, onTabChange, className, tourna
               key={tab.value}
               onClick={() => onTabChange(tab.value)}
               className={cn(
-                "relative z-10 flex items-center justify-center gap-1.5 px-4 py-2.5 text-sm font-medium transition-colors duration-200 whitespace-nowrap",
-                "min-h-[44px] rounded-lg shrink-0 active:scale-[0.95] transition-transform scroll-snap-start",
+                "relative flex-1 flex items-center justify-center gap-1.5 py-3 text-sm whitespace-nowrap",
+                "min-h-[44px] transition-colors duration-200 active:scale-[0.95] transition-transform",
                 isActive 
                   ? "text-foreground font-semibold" 
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-muted-foreground font-medium hover:text-foreground"
               )}
             >
               {tab.label}

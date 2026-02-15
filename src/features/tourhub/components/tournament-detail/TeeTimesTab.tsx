@@ -23,6 +23,7 @@ interface TeeTimesTabProps {
   tournamentId: string;
   tournamentSrId: string | null;
   isLive: boolean;
+  isCompleted?: boolean;
 }
 
 // Loading skeleton
@@ -44,7 +45,7 @@ function TeeTimesSkeleton() {
 }
 
 // Empty state
-function TeeTimesEmpty() {
+function TeeTimesEmpty({ isCompleted }: { isCompleted?: boolean }) {
   return (
     <motion.div
       className="flex items-center justify-center py-20"
@@ -52,16 +53,14 @@ function TeeTimesEmpty() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="text-center space-y-4">
-        <div className="w-16 h-16 mx-auto rounded-2xl bg-muted/50 flex items-center justify-center">
-          <Clock className="w-8 h-8 text-muted-foreground/70" />
-        </div>
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold text-foreground">Tee Times Not Available</h3>
-          <p className="text-sm text-muted-foreground max-w-[280px] mx-auto">
-            Tee times will be posted closer to the tournament start.
-          </p>
-        </div>
+      <div className="text-center space-y-3">
+        <Clock className="w-12 h-12 mx-auto text-muted-foreground/30" />
+        <h3 className="text-lg font-semibold text-foreground">Tee Times Not Available</h3>
+        <p className="text-sm text-muted-foreground max-w-[280px] mx-auto">
+          {isCompleted 
+            ? 'Tee times are no longer available for completed tournaments.'
+            : 'Tee times will be posted closer to the tournament start.'}
+        </p>
       </div>
     </motion.div>
   );

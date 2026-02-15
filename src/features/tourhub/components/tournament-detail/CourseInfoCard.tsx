@@ -1,10 +1,9 @@
 /**
- * CourseInfoCard - Premium course information display
- * Glass card treatment, section entrance animation
+ * CourseInfoCard - Course information section (no card container)
  */
 
 import { Link } from 'react-router-dom';
-import { MapPin, Flag, Ruler, ExternalLink } from 'lucide-react';
+import { MapPin, Flag, Ruler, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { TourTournament } from '../../hooks/useTourHubData';
 
@@ -13,8 +12,6 @@ interface CourseInfoCardProps {
   courseImage?: string | null;
   courseId?: string | null;
 }
-
-const cardClass = "rounded-2xl overflow-hidden border border-border/40 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.04)]";
 
 export function CourseInfoCard({ tournament, courseImage, courseId }: CourseInfoCardProps) {
   const hasLocation = tournament.venue_city || tournament.venue_state || tournament.venue_country;
@@ -27,15 +24,15 @@ export function CourseInfoCard({ tournament, courseImage, courseId }: CourseInfo
 
   return (
     <motion.div 
-      className={cardClass}
+      className="py-6 border-t border-border"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.35 }}
     >
-      {/* Full-width course image banner */}
+      {/* Course image */}
       {courseImage && (
-        <div className="relative w-full aspect-[16/7] overflow-hidden group">
+        <div className="relative w-full aspect-[16/7] overflow-hidden rounded-xl mb-4 group">
           <img 
             src={courseImage} 
             alt={tournament.venue_course_name || 'Course'} 
@@ -46,71 +43,65 @@ export function CourseInfoCard({ tournament, courseImage, courseId }: CourseInfo
         </div>
       )}
       
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border/30">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center">
-            <Flag className="w-3.5 h-3.5 text-emerald-600" />
-          </div>
-          <h3 className="text-[14px] font-semibold text-foreground">Course</h3>
+      {/* Course name - tappable */}
+      <div className="flex items-center justify-between mb-2">
+        <div className="min-w-0">
+          {tournament.venue_course_name && (
+            courseLink ? (
+              <Link to={courseLink} className="group/link">
+                <h3 className="text-lg font-semibold text-foreground group-hover/link:text-primary transition-colors truncate">
+                  {tournament.venue_course_name}
+                </h3>
+              </Link>
+            ) : (
+              <h3 className="text-lg font-semibold text-foreground truncate">
+                {tournament.venue_course_name}
+              </h3>
+            )
+          )}
+          
+          {tournament.venue_name && tournament.venue_name !== tournament.venue_course_name && (
+            <p className="text-sm text-muted-foreground truncate">
+              {tournament.venue_name}
+            </p>
+          )}
         </div>
         
         {courseLink && (
           <Link 
             to={courseLink}
-            className="text-[12px] font-semibold text-primary hover:text-primary/80 flex items-center gap-0.5 active:scale-[0.97] transition-transform"
+            className="text-xs font-semibold text-primary hover:text-primary/80 flex items-center gap-0.5 active:scale-[0.97] transition-transform shrink-0 ml-3"
           >
             View Course
-            <ExternalLink className="w-3 h-3" />
+            <ChevronRight className="w-3.5 h-3.5" />
           </Link>
         )}
       </div>
       
-      {/* Content */}
-      <div className="p-4">
-        <div className="flex-1 min-w-0">
-          {tournament.venue_course_name && (
-            <h4 className="font-semibold text-foreground text-[16px] mb-1 truncate">
-              {tournament.venue_course_name}
-            </h4>
-          )}
-          
-          {tournament.venue_name && tournament.venue_name !== tournament.venue_course_name && (
-            <p className="text-[13px] text-muted-foreground mb-2 truncate">
-              {tournament.venue_name}
-            </p>
-          )}
-          
-          {/* Stats row */}
-          <div className="flex flex-wrap items-center gap-3 mb-2">
-            {tournament.venue_par && (
-              <span className="flex items-center gap-1.5 text-sm text-foreground">
-                <div className="w-6 h-6 rounded-lg bg-muted flex items-center justify-center">
-                  <Flag className="w-3.5 h-3.5 text-muted-foreground" />
-                </div>
-                <span className="font-medium">Par {tournament.venue_par}</span>
-              </span>
-            )}
-            
-            {tournament.venue_yardage && (
-              <span className="flex items-center gap-1.5 text-sm text-foreground">
-                <div className="w-6 h-6 rounded-lg bg-muted flex items-center justify-center">
-                  <Ruler className="w-3.5 h-3.5 text-muted-foreground" />
-                </div>
-                <span className="font-medium">{tournament.venue_yardage.toLocaleString()} yards</span>
-              </span>
-            )}
-          </div>
-          
-          {hasLocation && (
-            <p className="text-sm text-muted-foreground flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 shrink-0" />
-              <span className="truncate">
-                {[tournament.venue_city, tournament.venue_state, tournament.venue_country].filter(Boolean).join(', ')}
-              </span>
-            </p>
-          )}
-        </div>
+      {/* Stats row */}
+      <div className="flex flex-wrap items-center gap-4 mt-2">
+        {tournament.venue_par && (
+          <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+            <Flag className="w-3.5 h-3.5" />
+            <span className="font-medium">Par {tournament.venue_par}</span>
+          </span>
+        )}
+        
+        {tournament.venue_yardage && (
+          <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+            <Ruler className="w-3.5 h-3.5" />
+            <span className="font-medium">{tournament.venue_yardage.toLocaleString()} yards</span>
+          </span>
+        )}
+        
+        {hasLocation && (
+          <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+            <MapPin className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">
+              {[tournament.venue_city, tournament.venue_state, tournament.venue_country].filter(Boolean).join(', ')}
+            </span>
+          </span>
+        )}
       </div>
     </motion.div>
   );

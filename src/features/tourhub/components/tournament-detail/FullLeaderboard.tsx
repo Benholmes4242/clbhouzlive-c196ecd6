@@ -1,16 +1,5 @@
 /**
- * FullLeaderboard - Expanded tournament leaderboard with round scores
- * 
- * Features:
- * - Glassmorphic card container
- * - Column headers (POS, PLAYER, R1-R4, TOTAL, TO PAR)
- * - Round filter selector with spring animation
- * - Player search with glass input
- * - Cut line separator with accent styling
- * - MC/WD handling
- * - JetBrains Mono for scores
- * - Staggered row entrance animations
- * - Semantic token compliant
+ * FullLeaderboard - Expanded tournament leaderboard (no card container)
  */
 
 import { useState, useMemo } from 'react';
@@ -54,7 +43,6 @@ interface FullLeaderboardProps {
   venuePar?: number | null;
 }
 
-// Score display with PGA convention
 function ScoreCell({ score, className }: { score: number | null; className?: string }) {
   if (score === null || score === undefined) {
     return <span className={cn("score-mono text-muted-foreground/50", className)}>—</span>;
@@ -81,7 +69,6 @@ function ScoreToPar({ score, className }: { score: number | null; className?: st
   );
 }
 
-// Position badge with podium gradients
 function PositionBadge({ position, tied, isMissedCut, status }: {
   position: number;
   tied?: boolean;
@@ -107,7 +94,6 @@ function PositionBadge({ position, tied, isMissedCut, status }: {
   );
 }
 
-// Stagger animation for rows
 const rowVariants = {
   hidden: { opacity: 0 },
   visible: (i: number) => ({
@@ -129,7 +115,6 @@ export function FullLeaderboard({
   const [selectedRound, setSelectedRound] = useState('Overall');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Determine available rounds
   const availableRounds = useMemo(() => {
     const rounds: string[] = ['Overall'];
     if (entries.some(e => e.round_1 != null)) rounds.push('R1');
@@ -139,7 +124,6 @@ export function FullLeaderboard({
     return rounds;
   }, [entries]);
 
-  // Filter by search
   const filteredEntries = useMemo(() => {
     if (!searchQuery.trim()) return entries;
     const q = searchQuery.toLowerCase();
@@ -148,7 +132,6 @@ export function FullLeaderboard({
     );
   }, [entries, searchQuery]);
 
-  // Sort by selected round or overall position
   const sortedEntries = useMemo(() => {
     if (selectedRound === 'Overall') return filteredEntries;
 
@@ -163,7 +146,6 @@ export function FullLeaderboard({
     });
   }, [filteredEntries, selectedRound]);
 
-  // Find cut line index (last non-MC player)
   const cutLineIndex = useMemo(() => {
     if (selectedRound !== 'Overall') return -1;
     let lastActiveIdx = -1;
@@ -173,7 +155,6 @@ export function FullLeaderboard({
         lastActiveIdx = i;
       }
     }
-    // Only show cut line if there are MC players after
     if (lastActiveIdx >= 0 && lastActiveIdx < sortedEntries.length - 1) {
       const nextStatus = sortedEntries[lastActiveIdx + 1]?.status;
       if (nextStatus === 'MC' || nextStatus === 'CUT') {
@@ -184,6 +165,7 @@ export function FullLeaderboard({
   }, [sortedEntries, selectedRound]);
 
   const showRoundColumns = selectedRound === 'Overall';
+  const isLive = tournamentStatus === 'inprogress';
 
   return (
     <motion.div
@@ -192,7 +174,7 @@ export function FullLeaderboard({
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Round selector */}
+      {/* Round selector - pill style */}
       {availableRounds.length > 1 && (
         <RoundSelector
           rounds={availableRounds}
@@ -201,16 +183,16 @@ export function FullLeaderboard({
         />
       )}
 
-      {/* Search input — glassmorphic */}
+      {/* Search input */}
       <div className="relative">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60" />
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-muted-foreground z-10" strokeWidth={2.5} />
         <input
           type="text"
           placeholder="Search players..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className={cn(
-            "w-full h-11 pl-10 pr-10 rounded-xl text-[14px] text-foreground placeholder:text-muted-foreground/50",
+            "w-full h-12 pl-10 pr-10 rounded-xl text-[14px] text-foreground placeholder:text-muted-foreground/50",
             "bg-muted/40 backdrop-blur-md border border-border/40",
             "focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30",
             "transition-all duration-200"
@@ -223,201 +205,199 @@ export function FullLeaderboard({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-muted flex items-center justify-center hover:bg-muted-foreground/20 transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-muted flex items-center justify-center hover:bg-muted-foreground/20 transition-colors"
             >
-              <X className="w-3 h-3 text-muted-foreground" />
+              <X className="w-3.5 h-3.5 text-muted-foreground" />
             </motion.button>
           )}
         </AnimatePresence>
       </div>
 
-      {/* Leaderboard table — glassmorphic container */}
-      <div className="rounded-2xl border border-border/40 shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden bg-card">
-        {/* Column headers */}
-        <div className="flex items-center gap-2 px-3 py-2.5 border-b border-border/30 bg-muted/20">
-          <div className="w-8 shrink-0 text-center">
-            <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">Pos</span>
-          </div>
-          <div className="w-8 shrink-0" /> {/* Avatar space */}
-          <div className="flex-1 min-w-0">
-            <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">Player</span>
-          </div>
-          {showRoundColumns && (
-            <>
-              <div className="w-9 text-center hidden sm:block">
-                <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">R1</span>
-              </div>
-              <div className="w-9 text-center hidden sm:block">
-                <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">R2</span>
-              </div>
-              <div className="w-9 text-center hidden sm:block">
-                <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">R3</span>
-              </div>
-              <div className="w-9 text-center hidden sm:block">
-                <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">R4</span>
-              </div>
-              <div className="w-12 text-center hidden sm:block">
-                <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">Total</span>
-              </div>
-            </>
-          )}
-          <div className="w-12 text-center">
-            <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">
-              {selectedRound === 'Overall' ? 'To Par' : 'Score'}
-            </span>
-          </div>
-          {/* Thru column for live */}
-          {tournamentStatus === 'inprogress' && (
-            <div className="w-10 text-center">
-              <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">Thru</span>
+      {/* Column headers */}
+      <div className="flex items-center gap-2 px-1 py-2 border-b border-border">
+        <div className="w-8 shrink-0 text-center">
+          <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">Pos</span>
+        </div>
+        <div className="w-8 shrink-0" />
+        <div className="flex-1 min-w-0">
+          <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">Player</span>
+        </div>
+        {showRoundColumns && (
+          <>
+            <div className="w-9 text-center hidden sm:block">
+              <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">R1</span>
             </div>
-          )}
-          <div className="w-4 shrink-0" /> {/* Chevron space */}
-        </div>
-
-        {/* Player rows */}
-        <div className="divide-y divide-border/20">
-          {sortedEntries.map((entry, index) => {
-            const isMissedCut = entry.status === 'MC' || entry.status === 'CUT';
-            const isWD = entry.status === 'WD';
-            const isTop3 = entry.position <= 3 && !isMissedCut && !isWD;
-            const showCutLine = index === cutLineIndex;
-
-            const roundScoreForSelected = selectedRound !== 'Overall'
-              ? (entry as any)[`round_${selectedRound.replace('R', '')}`] as number | null
-              : null;
-
-            return (
-              <motion.div
-                key={entry.id}
-                custom={index}
-                variants={rowVariants}
-                initial="hidden"
-                animate="visible"
-              >
-                <Link
-                  to={`/tourhub/player/${entry.player?.id}`}
-                  className={cn(
-                    "flex items-center gap-2 px-3 py-2.5 transition-all duration-200",
-                    "hover:bg-muted/40 active:scale-[0.995]",
-                    isTop3 && "bg-amber-50/20 dark:bg-amber-900/5",
-                    (isMissedCut || isWD) && "opacity-50",
-                  )}
-                >
-                  {/* Position */}
-                  <PositionBadge
-                    position={entry.position}
-                    tied={entry.position_tied}
-                    isMissedCut={isMissedCut}
-                    status={entry.status}
-                  />
-
-                  {/* Avatar */}
-                  <div className="shrink-0">
-                    <BatchPlayerAvatar
-                      playerId={entry.player?.id || ''}
-                      playerName={entry.player?.full_name || 'Unknown'}
-                      fallbackPhotoUrl={entry.player?.photo_url}
-                      headshotMap={headshotMap}
-                      size="sm"
-                    />
-                  </div>
-
-                  {/* Name */}
-                  <div className="flex-1 min-w-0">
-                    <p className={cn(
-                      "font-semibold truncate text-foreground text-[14px]",
-                      isWD && "italic"
-                    )}>
-                      {entry.player?.full_name || 'Unknown'}
-                    </p>
-                    {entry.player?.country_code && (
-                      <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
-                        {entry.player.country_code}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Round scores (overall mode) */}
-                  {showRoundColumns && (
-                    <>
-                      <div className="w-9 text-center hidden sm:block">
-                        <ScoreCell score={entry.round_1 ?? null} className="text-xs" />
-                      </div>
-                      <div className="w-9 text-center hidden sm:block">
-                        <ScoreCell score={entry.round_2 ?? null} className="text-xs" />
-                      </div>
-                      <div className="w-9 text-center hidden sm:block">
-                        <ScoreCell score={entry.round_3 ?? null} className="text-xs" />
-                      </div>
-                      <div className="w-9 text-center hidden sm:block">
-                        <ScoreCell score={entry.round_4 ?? null} className="text-xs" />
-                      </div>
-                      <div className="w-12 text-center hidden sm:block">
-                        <ScoreCell score={entry.strokes ?? null} className="text-xs font-semibold" />
-                      </div>
-                    </>
-                  )}
-
-                  {/* Score to Par / Round Score */}
-                  <div className="w-12 text-center">
-                    {selectedRound === 'Overall' ? (
-                      <ScoreToPar score={entry.score} className="text-sm" />
-                    ) : (
-                      <ScoreCell score={roundScoreForSelected} className="text-sm font-semibold" />
-                    )}
-                  </div>
-
-                  {/* Thru for live */}
-                  {tournamentStatus === 'inprogress' && (
-                    <div className="w-10 text-center">
-                      {(() => {
-                        const display = formatThruDisplay(
-                          entry.thru, entry.round_1, entry.round_2, entry.round_3, entry.round_4,
-                          entry.status, entry.thru_updated_at, tournamentTimezone
-                        );
-                        if (!display) return null;
-                        if (display === 'MC' || display === 'WD' || display === 'DQ' || display === 'MDF' || display === 'DNS') {
-                          return <span className="text-[10px] text-muted-foreground font-medium">{display}</span>;
-                        }
-                        if (display === 'F') {
-                          return <span className="text-[10px] text-emerald-600 font-medium">F</span>;
-                        }
-                        return (
-                          <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
-                            {display}
-                          </span>
-                        );
-                      })()}
-                    </div>
-                  )}
-
-                  {/* Chevron */}
-                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/30 shrink-0" />
-                </Link>
-
-                {/* Cut line separator */}
-                {showCutLine && (
-                  <div className="flex items-center gap-3 px-4 py-2 bg-destructive/5">
-                    <div className="flex-1 border-t border-dashed border-destructive/30" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-destructive/60">
-                      Projected Cut
-                    </span>
-                    <div className="flex-1 border-t border-dashed border-destructive/30" />
-                  </div>
-                )}
-              </motion.div>
-            );
-          })}
-        </div>
-
-        {/* Results count footer */}
-        <div className="px-4 py-2.5 border-t border-border/20 bg-muted/10">
-          <span className="text-[11px] text-muted-foreground/50 tabular-nums">
-            {sortedEntries.length} player{sortedEntries.length !== 1 ? 's' : ''}
-            {searchQuery && ` matching "${searchQuery}"`}
+            <div className="w-9 text-center hidden sm:block">
+              <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">R2</span>
+            </div>
+            <div className="w-9 text-center hidden sm:block">
+              <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">R3</span>
+            </div>
+            <div className="w-9 text-center hidden sm:block">
+              <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">R4</span>
+            </div>
+            <div className="w-12 text-center hidden sm:block">
+              <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">Total</span>
+            </div>
+          </>
+        )}
+        <div className="w-12 text-center">
+          <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+            {selectedRound === 'Overall' ? 'To Par' : 'Score'}
           </span>
         </div>
+        <div className="w-10 text-center">
+          <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">Thru</span>
+        </div>
+        <div className="w-4 shrink-0" />
+      </div>
+
+      {/* Player rows */}
+      <div className="divide-y divide-border/30">
+        {sortedEntries.map((entry, index) => {
+          const isMissedCut = entry.status === 'MC' || entry.status === 'CUT';
+          const isWD = entry.status === 'WD';
+          const isTop3 = entry.position <= 3 && !isMissedCut && !isWD;
+          const showCutLine = index === cutLineIndex;
+
+          const roundScoreForSelected = selectedRound !== 'Overall'
+            ? (entry as any)[`round_${selectedRound.replace('R', '')}`] as number | null
+            : null;
+
+          return (
+            <motion.div
+              key={entry.id}
+              custom={index}
+              variants={rowVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              <Link
+                to={`/tourhub/player/${entry.player?.id}`}
+                className={cn(
+                  "flex items-center gap-2 px-1 py-2.5 transition-all duration-200",
+                  "hover:bg-muted/40 active:scale-[0.995] rounded-lg",
+                  isTop3 && "bg-amber-50/20 dark:bg-amber-900/5",
+                  (isMissedCut || isWD) && "opacity-50",
+                )}
+              >
+                <PositionBadge
+                  position={entry.position}
+                  tied={entry.position_tied}
+                  isMissedCut={isMissedCut}
+                  status={entry.status}
+                />
+
+                <div className="shrink-0">
+                  <BatchPlayerAvatar
+                    playerId={entry.player?.id || ''}
+                    playerName={entry.player?.full_name || 'Unknown'}
+                    fallbackPhotoUrl={entry.player?.photo_url}
+                    headshotMap={headshotMap}
+                    size="sm"
+                  />
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <p className={cn(
+                    "font-semibold truncate text-foreground text-[14px]",
+                    isWD && "italic"
+                  )}>
+                    {entry.player?.full_name || 'Unknown'}
+                  </p>
+                  {entry.player?.country_code && (
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
+                      {entry.player.country_code}
+                    </p>
+                  )}
+                </div>
+
+                {showRoundColumns && (
+                  <>
+                    <div className="w-9 text-center hidden sm:block">
+                      <ScoreCell score={entry.round_1 ?? null} className="text-xs" />
+                    </div>
+                    <div className="w-9 text-center hidden sm:block">
+                      <ScoreCell score={entry.round_2 ?? null} className="text-xs" />
+                    </div>
+                    <div className="w-9 text-center hidden sm:block">
+                      <ScoreCell score={entry.round_3 ?? null} className="text-xs" />
+                    </div>
+                    <div className="w-9 text-center hidden sm:block">
+                      <ScoreCell score={entry.round_4 ?? null} className="text-xs" />
+                    </div>
+                    <div className="w-12 text-center hidden sm:block">
+                      <ScoreCell score={entry.strokes ?? null} className="text-xs font-semibold" />
+                    </div>
+                  </>
+                )}
+
+                <div className="w-12 text-center">
+                  {selectedRound === 'Overall' ? (
+                    <ScoreToPar score={entry.score} className="text-sm" />
+                  ) : (
+                    <ScoreCell score={roundScoreForSelected} className="text-sm font-semibold" />
+                  )}
+                </div>
+
+                {/* Thru - always shown */}
+                <div className="w-10 text-center">
+                  {(() => {
+                    if (isLive) {
+                      const display = formatThruDisplay(
+                        entry.thru, entry.round_1, entry.round_2, entry.round_3, entry.round_4,
+                        entry.status, entry.thru_updated_at, tournamentTimezone
+                      );
+                      if (!display) return <span className="text-[10px] text-muted-foreground">—</span>;
+                      if (display === 'MC' || display === 'WD' || display === 'DQ' || display === 'MDF' || display === 'DNS') {
+                        return <span className="text-[10px] text-muted-foreground font-medium">{display}</span>;
+                      }
+                      if (display === 'F') {
+                        return <span className="text-[10px] text-emerald-600 font-medium">F</span>;
+                      }
+                      return (
+                        <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
+                          {display}
+                        </span>
+                      );
+                    }
+                    // For completed/upcoming: show F if they have scores
+                    if (entry.status === 'MC' || entry.status === 'CUT') {
+                      return <span className="text-[10px] text-muted-foreground font-medium">MC</span>;
+                    }
+                    if (entry.status === 'WD') {
+                      return <span className="text-[10px] text-muted-foreground font-medium">WD</span>;
+                    }
+                    if (entry.strokes) {
+                      return <span className="text-[10px] text-emerald-600 font-medium">F</span>;
+                    }
+                    return <span className="text-[10px] text-muted-foreground">—</span>;
+                  })()}
+                </div>
+
+                <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/30 shrink-0" />
+              </Link>
+
+              {showCutLine && (
+                <div className="flex items-center gap-3 px-4 py-2 bg-destructive/5">
+                  <div className="flex-1 border-t border-dashed border-destructive/30" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-destructive/60">
+                    Projected Cut
+                  </span>
+                  <div className="flex-1 border-t border-dashed border-destructive/30" />
+                </div>
+              )}
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {/* Results count */}
+      <div className="py-2.5 border-t border-border/20">
+        <span className="text-[11px] text-muted-foreground/50 tabular-nums">
+          {sortedEntries.length} player{sortedEntries.length !== 1 ? 's' : ''}
+          {searchQuery && ` matching "${searchQuery}"`}
+        </span>
       </div>
     </motion.div>
   );

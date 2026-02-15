@@ -1,20 +1,12 @@
 /**
- * SummaryTab - Post-tournament summary with winner, scoring stats, and field analysis
- * 
- * Features:
- * - Winner card with gold accent (completed tournaments)
- * - Round-by-round scoring summary
- * - Field statistics (birdies, eagles, bogeys distribution)
- * - Final top 10 compact table
- * - Live round summary (for live tournaments)
- * - Glassmorphic card treatment
- * - Empty state for upcoming
+ * SummaryTab - Post-tournament summary (no card containers)
  */
 
 import { useMemo } from 'react';
-import { Trophy, FileText, TrendingUp, Award } from 'lucide-react';
+import { Trophy, TrendingUp, Award } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { Link } from 'react-router-dom';
 import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { TOUR_COLORS } from '../../constants/colors';
 import { useTournamentScoringStats } from '../../hooks/useTourHubData';
@@ -28,7 +20,6 @@ interface SummaryTabProps {
   headshotMap?: Map<string, string>;
 }
 
-// Loading skeleton
 function SummarySkeleton() {
   return (
     <div className="space-y-4 animate-pulse">
@@ -39,7 +30,6 @@ function SummarySkeleton() {
   );
 }
 
-// Empty state for upcoming tournaments
 function SummaryEmpty() {
   return (
     <motion.div
@@ -48,22 +38,17 @@ function SummaryEmpty() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="text-center space-y-4">
-        <div className="w-16 h-16 mx-auto rounded-2xl bg-muted/50 flex items-center justify-center">
-          <FileText className="w-8 h-8 text-muted-foreground/70" />
-        </div>
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold text-foreground">Summary Coming Soon</h3>
-          <p className="text-sm text-muted-foreground max-w-[280px] mx-auto">
-            Tournament summary will be available after completion.
-          </p>
-        </div>
+      <div className="text-center space-y-3">
+        <Trophy className="w-12 h-12 mx-auto text-muted-foreground/30" />
+        <h3 className="text-lg font-semibold text-foreground">Summary Coming Soon</h3>
+        <p className="text-sm text-muted-foreground max-w-[280px] mx-auto">
+          Tournament summary will be available after completion.
+        </p>
       </div>
     </motion.div>
   );
 }
 
-// Score to par display
 function ScoreToPar({ score }: { score: number | null }) {
   if (score === null) return <span className="text-muted-foreground/50">—</span>;
   const formatted = score === 0 ? 'E' : score > 0 ? `+${score}` : String(score);
@@ -83,7 +68,6 @@ function ScoreToPar({ score }: { score: number | null }) {
   );
 }
 
-// Winner card component
 function WinnerCard({ winner, runnerUp, headshotMap }: {
   winner: any;
   runnerUp: any | null;
@@ -101,21 +85,18 @@ function WinnerCard({ winner, runnerUp, headshotMap }: {
 
   return (
     <motion.div
-      className="rounded-2xl border border-amber-200/60 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden"
-      style={{ background: 'linear-gradient(135deg, hsl(var(--card) / 0.85) 60%, rgba(255, 253, 245, 0.6) 100%)' }}
+      className="py-6 border-t border-border"
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-amber-100/40">
-        <div className="w-7 h-7 rounded-lg bg-amber-50/80 flex items-center justify-center">
-          <Trophy className="w-3.5 h-3.5 text-amber-600" />
-        </div>
-        <h3 className="text-[14px] font-semibold text-foreground">Champion</h3>
+      <div className="flex items-center gap-2 mb-4">
+        <Trophy className="w-4 h-4 text-amber-600" />
+        <h3 className="text-sm font-semibold text-foreground">Champion</h3>
       </div>
 
-      <div className="p-4">
-        <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4">
+        <Link to={`/tourhub/player/${winner.player?.id}`}>
           <BatchPlayerAvatar
             playerId={winner.player?.id || ''}
             playerName={winner.player?.full_name || 'Unknown'}
@@ -123,54 +104,55 @@ function WinnerCard({ winner, runnerUp, headshotMap }: {
             headshotMap={headshotMap}
             size="lg"
           />
-          <div className="flex-1 min-w-0">
-            <h4 className="text-[16px] font-bold text-foreground truncate">
+        </Link>
+        <div className="flex-1 min-w-0">
+          <Link to={`/tourhub/player/${winner.player?.id}`}>
+            <h4 className="text-2xl font-bold text-foreground truncate hover:text-primary transition-colors">
               {winner.player?.full_name || 'Unknown'}
             </h4>
-            {winner.player?.country && (
-              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
-                {winner.player.country}
-              </p>
-            )}
-            <div className="flex items-baseline gap-3">
-              <span className="score-mono text-2xl font-bold" style={{ color: TOUR_COLORS.scoreUnderPar }}>
-                {winner.score === 0 ? 'E' : winner.score > 0 ? `+${winner.score}` : String(winner.score)}
-              </span>
-              <span className="score-mono text-sm text-muted-foreground">
-                ({winner.strokes} strokes)
-              </span>
-            </div>
+          </Link>
+          {winner.player?.country && (
+            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
+              {winner.player.country}
+            </p>
+          )}
+          <div className="flex items-baseline gap-3">
+            <span className="score-mono text-3xl font-bold" style={{ color: TOUR_COLORS.scoreUnderPar }}>
+              {winner.score === 0 ? 'E' : winner.score > 0 ? `+${winner.score}` : String(winner.score)}
+            </span>
+            <span className="score-mono text-sm text-muted-foreground">
+              ({winner.strokes} strokes)
+            </span>
           </div>
         </div>
+      </div>
 
-        {/* Stats row */}
-        <div className="flex flex-wrap gap-3 mt-4 pt-3 border-t border-border/30">
-          {/* Round scores */}
-          {[winner.round_1, winner.round_2, winner.round_3, winner.round_4].some(Boolean) && (
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Rounds:</span>
-              <span className="score-mono text-xs font-medium text-foreground">
-                {[winner.round_1, winner.round_2, winner.round_3, winner.round_4]
-                  .filter(r => r != null)
-                  .join('-')}
-              </span>
-            </div>
-          )}
-          {marginOfVictory !== null && marginOfVictory > 0 && (
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Won by:</span>
-              <span className="text-xs font-semibold text-foreground">
-                {marginOfVictory} stroke{marginOfVictory !== 1 ? 's' : ''}
-              </span>
-            </div>
-          )}
-          {earnings && (
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Earnings:</span>
-              <span className="text-xs font-semibold text-emerald-600">{earnings}</span>
-            </div>
-          )}
-        </div>
+      {/* Stats row */}
+      <div className="flex flex-wrap gap-4 mt-4 pt-3 border-t border-border/30">
+        {[winner.round_1, winner.round_2, winner.round_3, winner.round_4].some(Boolean) && (
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Rounds:</span>
+            <span className="score-mono text-xs font-medium text-foreground">
+              {[winner.round_1, winner.round_2, winner.round_3, winner.round_4]
+                .filter(r => r != null)
+                .join('-')}
+            </span>
+          </div>
+        )}
+        {marginOfVictory !== null && marginOfVictory > 0 && (
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Won by:</span>
+            <span className="text-xs font-semibold text-foreground">
+              {marginOfVictory} stroke{marginOfVictory !== 1 ? 's' : ''}
+            </span>
+          </div>
+        )}
+        {earnings && (
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Earnings:</span>
+            <span className="text-xs font-semibold" style={{ color: '#E09F3E' }}>{earnings}</span>
+          </div>
+        )}
       </div>
     </motion.div>
   );
@@ -185,7 +167,6 @@ export function SummaryTab({
 }: SummaryTabProps) {
   const { data: scoringStats, isLoading } = useTournamentScoringStats(tournamentId);
 
-  // Get winner and runner-up
   const winner = useMemo(() => {
     if (!leaderboard || leaderboard.length === 0) return null;
     return leaderboard.find((e: any) => e.position === 1) || leaderboard[0];
@@ -196,24 +177,21 @@ export function SummaryTab({
     return leaderboard.find((e: any) => e.position === 2) || leaderboard[1];
   }, [leaderboard]);
 
-  // Top 10 for final standings
   const top10 = useMemo(() => {
     if (!leaderboard) return [];
     return leaderboard.slice(0, 10);
   }, [leaderboard]);
 
-  // Show empty state for upcoming tournaments
   if (!isLive && !isCompleted) return <SummaryEmpty />;
   if (isLoading) return <SummarySkeleton />;
 
   return (
     <motion.div
-      className="space-y-section"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Winner card (completed only) */}
+      {/* Winner card */}
       {isCompleted && winner && (
         <WinnerCard winner={winner} runnerUp={runnerUp} headshotMap={headshotMap} />
       )}
@@ -221,20 +199,18 @@ export function SummaryTab({
       {/* Round-by-round scoring summary */}
       {scoringStats && scoringStats.rounds.length > 0 && (
         <motion.div
-          className="rounded-2xl border border-border/40 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden"
+          className="py-6 border-t border-border"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.4 }}
         >
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-border/20">
-            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
-              <TrendingUp className="w-3.5 h-3.5 text-primary" />
-            </div>
-            <h3 className="text-[14px] font-semibold text-foreground">Round-by-Round</h3>
+          <div className="flex items-center gap-2 mb-4">
+            <TrendingUp className="w-4 h-4 text-muted-foreground" />
+            <h3 className="text-sm font-semibold text-foreground">Round-by-Round</h3>
           </div>
 
           {/* Column headers */}
-          <div className="grid grid-cols-5 gap-2 px-4 py-2 border-b border-border/20 bg-muted/20">
+          <div className="grid grid-cols-5 gap-2 py-2 border-b border-border">
             <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">Round</span>
             <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60 text-center">Low</span>
             <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60 text-center">Avg</span>
@@ -242,9 +218,9 @@ export function SummaryTab({
             <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60 text-center">Bogeys</span>
           </div>
 
-          <div className="divide-y divide-border/20">
+          <div className="divide-y divide-border/30">
             {scoringStats.rounds.map(round => (
-              <div key={round.round} className="grid grid-cols-5 gap-2 px-4 py-2.5 items-center">
+              <div key={round.round} className="grid grid-cols-5 gap-2 py-2.5 items-center">
                 <span className="text-[13px] font-semibold text-foreground font-mono">R{round.round}</span>
                 <span className="text-[13px] text-center font-mono font-medium text-foreground tabular-nums">{round.lowScore}</span>
                 <span className="text-[13px] text-center font-mono text-muted-foreground tabular-nums">{round.avgScore.toFixed(1)}</span>
@@ -259,111 +235,108 @@ export function SummaryTab({
       {/* Field statistics */}
       {scoringStats && (
         <motion.div
-          className="rounded-2xl border border-border/40 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden"
+          className="py-6 border-t border-border"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.4 }}
         >
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-border/20">
-            <div className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center">
-              <Award className="w-3.5 h-3.5 text-muted-foreground" />
-            </div>
-            <h3 className="text-[14px] font-semibold text-foreground">Field Statistics</h3>
+          <div className="flex items-center gap-2 mb-4">
+            <Award className="w-4 h-4 text-muted-foreground" />
+            <h3 className="text-sm font-semibold text-foreground">Field Statistics</h3>
           </div>
 
-          <div className="p-4">
-            {/* Horizontal bar */}
-            {(() => {
-              const t = scoringStats.totals;
-              const total = t.eagles + t.birdies + t.pars + t.bogeys + t.doubleBogeys;
-              if (total === 0) return null;
+          {(() => {
+            const t = scoringStats.totals;
+            const total = t.eagles + t.birdies + t.pars + t.bogeys + t.doubleBogeys;
+            if (total === 0) return null;
 
-              const segments = [
-                { label: 'Eagles', count: t.eagles, color: 'bg-amber-400', pct: (t.eagles / total * 100).toFixed(1) },
-                { label: 'Birdies', count: t.birdies, color: 'bg-green-500', pct: (t.birdies / total * 100).toFixed(1) },
-                { label: 'Pars', count: t.pars, color: 'bg-muted-foreground/30', pct: (t.pars / total * 100).toFixed(1) },
-                { label: 'Bogeys', count: t.bogeys, color: 'bg-orange-400', pct: (t.bogeys / total * 100).toFixed(1) },
-                { label: 'Double+', count: t.doubleBogeys, color: 'bg-destructive', pct: (t.doubleBogeys / total * 100).toFixed(1) },
-              ];
+            const segments = [
+              { label: 'Eagles', count: t.eagles, color: 'bg-amber-400', pct: (t.eagles / total * 100).toFixed(1) },
+              { label: 'Birdies', count: t.birdies, color: 'bg-green-500', pct: (t.birdies / total * 100).toFixed(1) },
+              { label: 'Pars', count: t.pars, color: 'bg-muted-foreground/30', pct: (t.pars / total * 100).toFixed(1) },
+              { label: 'Bogeys', count: t.bogeys, color: 'bg-orange-400', pct: (t.bogeys / total * 100).toFixed(1) },
+              { label: 'Double+', count: t.doubleBogeys, color: 'bg-destructive', pct: (t.doubleBogeys / total * 100).toFixed(1) },
+            ];
 
-              return (
-                <div className="space-y-3">
-                  <div className="flex h-3 rounded-full overflow-hidden">
-                    {segments.filter(s => s.count > 0).map((seg, i) => (
-                      <div
-                        key={i}
-                        className={cn("transition-all", seg.color)}
-                        style={{ width: `${(seg.count / total) * 100}%` }}
-                      />
-                    ))}
-                  </div>
-                  <div className="grid grid-cols-5 gap-2">
-                    {segments.map((seg) => (
-                      <div key={seg.label} className="text-center">
-                        <div className="text-[13px] font-bold text-foreground font-mono tabular-nums">{seg.count}</div>
-                        <div className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-medium">{seg.label}</div>
-                        <div className="text-[9px] text-muted-foreground/50 tabular-nums">{seg.pct}%</div>
-                      </div>
-                    ))}
-                  </div>
+            return (
+              <div className="space-y-3">
+                <div className="flex h-3 rounded-full overflow-hidden">
+                  {segments.filter(s => s.count > 0).map((seg, i) => (
+                    <div
+                      key={i}
+                      className={cn("transition-all", seg.color)}
+                      style={{ width: `${(seg.count / total) * 100}%` }}
+                    />
+                  ))}
                 </div>
-              );
-            })()}
-          </div>
+                <div className="grid grid-cols-5 gap-2">
+                  {segments.map((seg) => (
+                    <div key={seg.label} className="text-center">
+                      <div className="text-[13px] font-bold text-foreground font-mono tabular-nums">{seg.count}</div>
+                      <div className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-medium">{seg.label}</div>
+                      <div className="text-[9px] text-muted-foreground/50 tabular-nums">{seg.pct}%</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
         </motion.div>
       )}
 
-      {/* Final Top 10 (completed) */}
+      {/* Final Top 10 */}
       {isCompleted && top10.length > 0 && (
         <motion.div
-          className="rounded-2xl border border-border/40 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden"
+          className="py-6 border-t border-border"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.4 }}
         >
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-border/20">
-            <div className="w-7 h-7 rounded-lg bg-amber-50/80 flex items-center justify-center">
-              <Trophy className="w-3.5 h-3.5 text-amber-600" />
-            </div>
-            <h3 className="text-[14px] font-semibold text-foreground">Final Top 10</h3>
+          <div className="flex items-center gap-2 mb-4">
+            <Trophy className="w-4 h-4 text-amber-600" />
+            <h3 className="text-sm font-semibold text-foreground">Final Top 10</h3>
           </div>
 
-          <div className="divide-y divide-border/20">
+          <div className="divide-y divide-border/30">
             {top10.map((entry: any, idx: number) => {
               const isWinner = entry.position === 1;
               return (
                 <motion.div
                   key={entry.id}
-                  className={cn(
-                    "flex items-center gap-3 px-4 py-2.5",
-                    isWinner && "bg-amber-50/20"
-                  )}
                   initial={{ opacity: 0, x: -4 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 + idx * 0.03, duration: 0.25 }}
                 >
-                  <span className={cn(
-                    "w-7 text-center text-[12px] font-bold font-mono tabular-nums",
-                    isWinner ? "text-amber-600" : "text-muted-foreground"
-                  )}>
-                    {entry.position_tied ? `T${entry.position}` : entry.position}
-                  </span>
-                  <BatchPlayerAvatar
-                    playerId={entry.player?.id || ''}
-                    playerName={entry.player?.full_name || 'Unknown'}
-                    fallbackPhotoUrl={entry.player?.photo_url}
-                    headshotMap={headshotMap}
-                    size="sm"
-                  />
-                  <span className="flex-1 text-[14px] font-medium text-foreground truncate">
-                    {entry.player?.full_name || 'Unknown'}
-                  </span>
-                  <ScoreToPar score={entry.score} />
-                  {entry.money && entry.money > 0 && (
-                    <span className="text-[10px] text-muted-foreground score-mono hidden sm:block">
-                      ${(entry.money / 1000).toFixed(0)}K
+                  <Link
+                    to={`/tourhub/player/${entry.player?.id}`}
+                    className={cn(
+                      "flex items-center gap-3 py-2.5 hover:bg-muted/40 rounded-lg px-1 transition-colors active:scale-[0.99]",
+                      isWinner && "bg-amber-50/20"
+                    )}
+                  >
+                    <span className={cn(
+                      "w-7 text-center text-[12px] font-bold font-mono tabular-nums",
+                      isWinner ? "text-amber-600" : "text-muted-foreground"
+                    )}>
+                      {entry.position_tied ? `T${entry.position}` : entry.position}
                     </span>
-                  )}
+                    <BatchPlayerAvatar
+                      playerId={entry.player?.id || ''}
+                      playerName={entry.player?.full_name || 'Unknown'}
+                      fallbackPhotoUrl={entry.player?.photo_url}
+                      headshotMap={headshotMap}
+                      size="sm"
+                    />
+                    <span className="flex-1 text-[14px] font-medium text-foreground truncate">
+                      {entry.player?.full_name || 'Unknown'}
+                    </span>
+                    <ScoreToPar score={entry.score} />
+                    {entry.money && entry.money > 0 && (
+                      <span className="text-[10px] text-muted-foreground score-mono hidden sm:block">
+                        ${(entry.money / 1000).toFixed(0)}K
+                      </span>
+                    )}
+                  </Link>
                 </motion.div>
               );
             })}
@@ -374,41 +347,37 @@ export function SummaryTab({
       {/* Live round summary */}
       {isLive && !isCompleted && scoringStats && scoringStats.rounds.length > 0 && (
         <motion.div
-          className="rounded-2xl border border-emerald-200/40 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden"
+          className="py-6 border-t border-border"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.4 }}
         >
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-emerald-100/30">
-            <div className="flex items-center gap-1.5">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-              </span>
-              <h3 className="text-[14px] font-semibold text-foreground">Live Round Summary</h3>
-            </div>
+          <div className="flex items-center gap-1.5 mb-4">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+            </span>
+            <h3 className="text-sm font-semibold text-foreground">Live Round Summary</h3>
           </div>
-          <div className="p-4">
-            {(() => {
-              const latestRound = scoringStats.rounds[scoringStats.rounds.length - 1];
-              return (
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  <div>
-                    <div className="text-[9px] uppercase tracking-wider text-muted-foreground/60 font-medium mb-1">Low Round</div>
-                    <div className="text-[18px] font-bold text-foreground font-mono tabular-nums">{latestRound.lowScore}</div>
-                  </div>
-                  <div>
-                    <div className="text-[9px] uppercase tracking-wider text-muted-foreground/60 font-medium mb-1">Scoring Avg</div>
-                    <div className="text-[18px] font-bold text-foreground font-mono tabular-nums">{latestRound.avgScore.toFixed(1)}</div>
-                  </div>
-                  <div>
-                    <div className="text-[9px] uppercase tracking-wider text-muted-foreground/60 font-medium mb-1">Field</div>
-                    <div className="text-[18px] font-bold text-foreground font-mono tabular-nums">{latestRound.playerCount}</div>
-                  </div>
+          {(() => {
+            const latestRound = scoringStats.rounds[scoringStats.rounds.length - 1];
+            return (
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <div className="text-[9px] uppercase tracking-wider text-muted-foreground/60 font-medium mb-1">Low Round</div>
+                  <div className="text-[18px] font-bold text-foreground font-mono tabular-nums">{latestRound.lowScore}</div>
                 </div>
-              );
-            })()}
-          </div>
+                <div>
+                  <div className="text-[9px] uppercase tracking-wider text-muted-foreground/60 font-medium mb-1">Scoring Avg</div>
+                  <div className="text-[18px] font-bold text-foreground font-mono tabular-nums">{latestRound.avgScore.toFixed(1)}</div>
+                </div>
+                <div>
+                  <div className="text-[9px] uppercase tracking-wider text-muted-foreground/60 font-medium mb-1">Field</div>
+                  <div className="text-[18px] font-bold text-foreground font-mono tabular-nums">{latestRound.playerCount}</div>
+                </div>
+              </div>
+            );
+          })()}
         </motion.div>
       )}
     </motion.div>
