@@ -108,7 +108,7 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
       {/* Background container with Ken Burns */}
       <motion.div 
         className="relative overflow-hidden"
-        style={{ minHeight: 'calc(45vh + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
+        style={{ minHeight: 'calc(clamp(282px, 53vh, 422px) + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
