@@ -1,22 +1,25 @@
 /**
  * LiveRightNow - Multi-Tour Live Snapshot
  * Premium light-mode cards with horizontal scroll
- * Shows "No competitions live" with Up Next preview when no live tournaments
  * 
- * Polish spec: 12-point light-mode design system
+ * FIX 07: Theme tokens
+ * FIX 08: Error state
+ * FIX 13: Accessibility labels
+ * FIX 21: iPhone SE responsive width
  */
 
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useLiveRightNow, type LiveTournamentWithLeader } from '../../hooks/useOverviewModules';
 import { useVenueImage } from '../../hooks/useVenueImage';
+import { SectionErrorState } from '../SectionErrorState';
 import '@/styles/hero-glass.css';
 
 // Score color helper - unified palette
 function getScoreColor(scoreDisplay: string): string {
   if (scoreDisplay.startsWith('-')) return '#f59e0b'; // Amber/gold = under par
   if (scoreDisplay.startsWith('+')) return '#D62828'; // Red = over par
-  return 'rgba(0, 0, 0, 0.4)';
+  return 'hsl(var(--muted-foreground))';
 }
 
 /**
@@ -31,16 +34,14 @@ function LiveTournamentCard({
 }) {
   const navigate = useNavigate();
   
-  // Use the smart venue image hook for each card
   const { data: venueImage, isLoading: imageLoading } = useVenueImage(tournament.venueName, tournament.venueCity);
   
-  // Use real image or fallback
   const hasRealImage = !!venueImage?.imageUrl;
 
   return (
     <motion.button
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
-      className="w-[280px] flex-shrink-0 rounded-2xl overflow-hidden text-left cursor-pointer transition-all duration-300 bg-card border border-border"
+      className="w-[min(280px,80vw)] flex-shrink-0 rounded-2xl overflow-hidden text-left cursor-pointer transition-all duration-300 bg-card border border-border"
       style={{
         boxShadow: '0 2px 8px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)',
         scrollSnapAlign: 'start',
@@ -57,14 +58,14 @@ function LiveTournamentCard({
         boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
       }}
       whileTap={{ scale: 0.98 }}
+      aria-label={`${tournament.name}, live${tournament.leader ? `, leader ${tournament.leader.name} at ${tournament.leader.scoreDisplay}` : ''}`}
     >
-      {/* Image Area - 140px height with protective gradient */}
+      {/* Image Area */}
       <div className="relative h-[140px] w-full overflow-hidden">
         {imageLoading ? (
           <div 
-            className="w-full h-full animate-shimmer"
+            className="w-full h-full animate-shimmer bg-muted"
             style={{
-              background: 'linear-gradient(90deg, #F1F3F5 25%, #E5E7EB 50%, #F1F3F5 75%)',
               backgroundSize: '200% 100%',
             }}
           />
@@ -76,7 +77,6 @@ function LiveTournamentCard({
             loading="lazy"
           />
         ) : (
-          /* Styled gradient fallback */
           <div 
             className="w-full h-full"
             style={{
@@ -85,7 +85,7 @@ function LiveTournamentCard({
           />
         )}
         
-        {/* Protective gradient overlay - matches hero legibility gradient */}
+        {/* Protective gradient overlay */}
         <div 
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -93,9 +93,7 @@ function LiveTournamentCard({
           }}
         />
         
-        {/* Tour badge removed from live cards */}
-        
-        {/* LIVE Badge - top right, dark glass pill with amber */}
+        {/* LIVE Badge */}
         <div 
           className="absolute top-2.5 right-2.5 px-[10px] py-[4px] rounded-[8px] flex items-center gap-[5px]"
           style={{
@@ -109,9 +107,8 @@ function LiveTournamentCard({
             style={{ background: '#22C55E' }}
           />
           <span 
-            className="uppercase font-bold"
+            className="uppercase font-bold text-[10px]"
             style={{ 
-              fontSize: '10px',
               letterSpacing: '0.8px',
               color: '#22C55E',
             }}
@@ -121,10 +118,9 @@ function LiveTournamentCard({
         </div>
       </div>
 
-      {/* Body Content - flex layout with score on right */}
+      {/* Body Content */}
       <div className="p-3.5 flex items-end justify-between">
         <div className="flex-1 min-w-0">
-          {/* Tournament name - single line truncated */}
           <h3 
             className="text-[17px] font-semibold mb-[3px] truncate text-foreground"
             style={{ letterSpacing: '-0.2px' }}
@@ -140,6 +136,7 @@ function LiveTournamentCard({
                 navigate(`/tourhub/player/${tournament.leader!.id}`);
               }}
               className="text-[14px] font-normal truncate block text-muted-foreground text-left active:opacity-70 transition-opacity"
+              aria-label={`View ${tournament.leader.name}'s profile`}
             >
               {tournament.leader.name}
             </button>
@@ -150,7 +147,7 @@ function LiveTournamentCard({
           )}
         </div>
         
-        {/* Score - right side */}
+        {/* Score */}
         {tournament.leader && (
           <span 
             className="flex-shrink-0 ml-3 font-mono text-2xl font-bold leading-none"
@@ -169,7 +166,16 @@ function LiveTournamentCard({
 
 
 export function LiveRightNow() {
-  const { data: liveTournaments, isLoading } = useLiveRightNow();
+  const { data: liveTournaments, isLoading, error, refetch } = useLiveRightNow();
+
+  // FIX 08: Show error state on failure
+  if (error) {
+    return (
+      <section aria-label="Live tournaments">
+        <SectionErrorState sectionName="live tournaments" onRetry={() => refetch()} />
+      </section>
+    );
+  }
 
   // Hide the entire section when loading or no live tournaments
   if (isLoading || !liveTournaments || liveTournaments.length === 0) {
@@ -177,7 +183,7 @@ export function LiveRightNow() {
   }
 
   return (
-    <section className="bg-background">
+    <section className="bg-background" aria-label="Live tournaments">
       {/* Header */}
       <div className="flex items-center gap-2 mb-4 px-4">
         <span 
@@ -192,7 +198,7 @@ export function LiveRightNow() {
         </h2>
       </div>
 
-      {/* Scroll Container with fade hint */}
+      {/* Scroll Container */}
       <div className="relative">
         <div
           className="flex gap-3 overflow-x-auto pb-2"
@@ -205,8 +211,9 @@ export function LiveRightNow() {
             overscrollBehavior: 'contain',
             touchAction: 'pan-x pan-y',
           }}
+          role="list"
+          aria-label="Live tournament cards"
         >
-          {/* Left inset */}
           <div className="w-4 flex-shrink-0" aria-hidden />
 
           {liveTournaments!.map((tournament, idx) => (
@@ -217,7 +224,6 @@ export function LiveRightNow() {
             />
           ))}
 
-          {/* Right inset */}
           <div className="w-4 flex-shrink-0" aria-hidden />
         </div>
 
@@ -227,7 +233,7 @@ export function LiveRightNow() {
           style={{
             width: '16px',
             background:
-              'linear-gradient(to left, rgba(248, 250, 252, 0.20) 0%, transparent 100%)',
+              'linear-gradient(to left, hsl(var(--background) / 0.2) 0%, transparent 100%)',
           }}
         />
       </div>
