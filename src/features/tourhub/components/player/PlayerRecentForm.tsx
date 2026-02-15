@@ -1,8 +1,9 @@
 /**
- * PlayerRecentForm - Simple label showing recent form from last 5 results
- * "Recent Form: Strong (avg. T4)" — color-coded
+ * PlayerRecentForm - Full-width tinted strip with trend icon
+ * showing recent form assessment from last 5 results.
  */
 
+import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePlayerResults } from '../../hooks/usePlayerResults';
 
@@ -15,7 +16,6 @@ export function PlayerRecentForm({ playerId }: PlayerRecentFormProps) {
 
   if (isLoading || !results || results.length === 0) return null;
 
-  // Calculate average finish from completed results
   const completedResults = results.filter(r => r.position !== null && r.status !== 'cut' && r.status !== 'MC');
   if (completedResults.length === 0) return null;
 
@@ -24,29 +24,32 @@ export function PlayerRecentForm({ playerId }: PlayerRecentFormProps) {
   );
 
   let formLabel: string;
-  let formColor: string;
+  let stripClass: string;
+  let Icon: React.ElementType;
 
   if (avgPosition <= 5) {
     formLabel = 'Excellent';
-    formColor = 'text-emerald-600 bg-emerald-500/10';
+    stripClass = 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400';
+    Icon = TrendingUp;
   } else if (avgPosition <= 10) {
     formLabel = 'Strong';
-    formColor = 'text-emerald-500 bg-emerald-500/8';
+    stripClass = 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/8 dark:text-emerald-400';
+    Icon = TrendingUp;
   } else if (avgPosition <= 25) {
     formLabel = 'Steady';
-    formColor = 'text-amber-600 bg-amber-500/8';
+    stripClass = 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400';
+    Icon = Minus;
   } else {
     formLabel = 'Struggling';
-    formColor = 'text-red-500 bg-red-500/8';
+    stripClass = 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400';
+    Icon = TrendingDown;
   }
 
   return (
-    <div className="px-5 mt-3">
-      <span className={cn(
-        "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold",
-        formColor
-      )}>
-        Recent Form: {formLabel} (avg. T{avgPosition})
+    <div className={cn("px-4 py-3 flex items-center gap-2", stripClass)}>
+      <Icon className="w-4 h-4 shrink-0" />
+      <span className="text-sm font-semibold">
+        {formLabel} · avg. T{avgPosition} in last {completedResults.length} events
       </span>
     </div>
   );

@@ -1,6 +1,6 @@
 /**
- * PlayerProfilePage - Immersive player profile with full-bleed hero,
- * stat ribbon, and magazine-quality sections.
+ * PlayerProfilePage - Editorial player profile with full-bleed hero,
+ * no card containers — content flows directly on page background.
  */
 
 import { useEffect } from 'react';
@@ -20,7 +20,6 @@ import { StatRibbon } from '../components/player/StatRibbon';
 import { PlayerRecentForm } from '../components/player/PlayerRecentForm';
 import { useTourPlayer, useSinglePlayerStatistics } from '../hooks/useTourHubData';
 
-// Section entrance animation wrapper
 const sectionVariants = {
   hidden: { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0 },
@@ -35,7 +34,12 @@ export function PlayerProfilePage() {
   const { data: player, isLoading: playerLoading } = useTourPlayer(playerId || '');
   const { data: playerStats } = useSinglePlayerStatistics(playerId);
 
-  // Immersive mode: hide header, go transparent
+  // Scroll to top on mount
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [playerId]);
+
+  // Immersive mode
   useEffect(() => {
     hideHeader();
     return () => {
@@ -56,10 +60,18 @@ export function PlayerProfilePage() {
     return (
       <PageRoot className="min-h-screen w-full bg-background" immersive immersiveStatusBar>
         <div className="animate-pulse">
-          <div className="h-[60vh] bg-muted" />
-          <div className="px-5 mt-4 space-y-6">
-            <div className="h-20 bg-muted rounded-2xl" />
-            <div className="h-64 bg-muted rounded-xl" />
+          <div className="h-[53vh] bg-muted" />
+          <div className="border-t border-b border-border px-4 py-4 flex justify-between">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="text-center space-y-1">
+                <div className="h-3 w-10 bg-muted rounded mx-auto" />
+                <div className="h-5 w-8 bg-muted rounded mx-auto" />
+              </div>
+            ))}
+          </div>
+          <div className="px-4 mt-6 space-y-6">
+            <div className="h-48 bg-muted/30 rounded" />
+            <div className="h-64 bg-muted/30 rounded" />
           </div>
         </div>
       </PageRoot>
@@ -69,7 +81,7 @@ export function PlayerProfilePage() {
   if (!player) {
     return (
       <PageRoot className="min-h-screen w-full bg-background">
-        <div className="pt-20 px-5">
+        <div className="pt-20 px-4">
           <button
             onClick={handleBack}
             className="text-primary hover:underline flex items-center gap-1 mb-6 text-sm active:opacity-70 transition-opacity"
@@ -86,19 +98,22 @@ export function PlayerProfilePage() {
 
   return (
     <PageRoot className="min-h-screen w-full bg-background" immersive immersiveStatusBar hasBottomNav>
-      {/* Hero — Full bleed, no max-width */}
+      {/* Hero */}
       <PlayerHero player={player} playerStats={playerStats ?? null} />
 
-      {/* Stat Ribbon — overlaps hero */}
+      {/* Stats Strip — full width, no card */}
       <StatRibbon playerStats={playerStats ?? null} />
 
-      {/* Recent Form indicator */}
+      {/* Recent Form — full width tinted strip */}
       {playerId && <PlayerRecentForm playerId={playerId} />}
 
-      {/* Content sections — constrained width */}
-      <div className="w-full max-w-5xl mx-auto px-4 pb-8 mt-6 space-y-section">
+      {/* Content sections — no cards, editorial flow */}
+      <div className="w-full max-w-5xl mx-auto px-4 pb-8">
+        {/* Section dividers via border-t on each section wrapper */}
+
         {/* Season Performance */}
         <motion.div
+          className="py-6 border-t border-border"
           variants={sectionVariants}
           initial="hidden"
           whileInView="visible"
@@ -108,7 +123,7 @@ export function PlayerProfilePage() {
           {playerStats ? (
             <PlayerSeasonStats playerStats={playerStats} />
           ) : (
-            <div className="py-16 text-center rounded-2xl border border-border/40 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+            <div className="py-16 text-center">
               <div className="w-14 h-14 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
                 <TrendingUp className="w-7 h-7 text-muted-foreground" />
               </div>
@@ -123,6 +138,7 @@ export function PlayerProfilePage() {
         {/* Skill Build */}
         {playerId && (
           <motion.div
+            className="py-6 border-t border-border"
             variants={sectionVariants}
             initial="hidden"
             whileInView="visible"
@@ -136,6 +152,7 @@ export function PlayerProfilePage() {
         {/* Recent Tournaments */}
         {playerId && (
           <motion.div
+            className="py-6 border-t border-border"
             variants={sectionVariants}
             initial="hidden"
             whileInView="visible"
@@ -148,6 +165,7 @@ export function PlayerProfilePage() {
 
         {/* Player Info */}
         <motion.div
+          className="py-6 border-t border-border"
           variants={sectionVariants}
           initial="hidden"
           whileInView="visible"
@@ -157,9 +175,9 @@ export function PlayerProfilePage() {
           <PlayerInfoCard player={player} />
         </motion.div>
 
-        {/* Data Source Attribution */}
-        <div className="py-3 rounded-lg bg-muted/20 border border-border/30">
-          <div className="flex items-center gap-2 px-4 text-[11px] text-muted-foreground/50">
+        {/* Footer */}
+        <div className="py-8 text-center border-t border-border">
+          <div className="flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground/30">
             <Globe className="w-3.5 h-3.5" />
             <span>Powered by SportsRadar</span>
           </div>
