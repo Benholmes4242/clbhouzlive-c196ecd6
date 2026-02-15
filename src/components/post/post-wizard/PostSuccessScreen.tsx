@@ -2,26 +2,17 @@
 // Premium feel with confetti, animated checkmark, and post preview
 import { useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Check, Plus, ArrowRight, Clock } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface PostSuccessScreenProps {
-  /** Whether the post was scheduled */
   isScheduled?: boolean;
-  /** Scheduled time if applicable */
   scheduledAt?: Date | null;
-  /** Preview URL of the first media item */
   firstMediaUrl?: string | null;
-  /** Type of the first media item */
   firstMediaType?: 'image' | 'video';
-  /** Total number of media items */
   mediaCount?: number;
-  /** Callback to view the post */
   onViewPost?: () => void;
-  /** Callback to create another post */
   onCreateAnother: () => void;
-  /** Callback to close the wizard */
   onDone: () => void;
 }
 
@@ -35,17 +26,28 @@ export function PostSuccessScreen({
   onCreateAnother,
   onDone,
 }: PostSuccessScreenProps) {
-  // Fire confetti on mount with golf-themed colors
+  // Fire confetti on mount
   useEffect(() => {
     const timer = setTimeout(() => {
+      // First burst
       confetti({
-        particleCount: 80,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ['#10b981', '#34d399', '#6ee7b7', '#ffffff', '#fbbf24'],
+        particleCount: 60,
+        spread: 55,
+        origin: { y: 0.65, x: 0.5 },
+        colors: ['#34d399', '#059669', '#6ee7b7', '#ffffff', '#fbbf24'],
         disableForReducedMotion: true,
       });
-    }, 300);
+      // Second burst — slightly delayed
+      setTimeout(() => {
+        confetti({
+          particleCount: 40,
+          spread: 80,
+          origin: { y: 0.55, x: 0.5 },
+          colors: ['#34d399', '#10b981', '#a7f3d0'],
+          disableForReducedMotion: true,
+        });
+      }, 200);
+    }, 400);
     return () => clearTimeout(timer);
   }, []);
 
@@ -57,7 +59,6 @@ export function PostSuccessScreen({
       hour: 'numeric',
       minute: '2-digit',
     });
-    // Append timezone abbreviation
     const tz = new Intl.DateTimeFormat('en-US', { timeZoneName: 'short' })
       .formatToParts(date)
       .find(p => p.type === 'timeZoneName')?.value || '';
@@ -66,126 +67,151 @@ export function PostSuccessScreen({
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.98 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
-      className="light fixed inset-0 z-[9999] bg-background flex flex-col items-center justify-center p-6 pt-safe pb-safe"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+      className="light fixed inset-0 z-[9999] flex flex-col items-center justify-center p-6 pt-safe pb-safe"
+      style={{ backgroundColor: '#FAFAF8' }}
     >
-      {/* Post thumbnail preview */}
+      {/* Decorative background glow */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse at 50% 40%, rgba(52, 211, 153, 0.08) 0%, transparent 60%)',
+        }}
+      />
+
+      {/* Media thumbnail with success badge */}
       {firstMediaUrl && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ type: 'spring', stiffness: 200, damping: 20, delay: 0 }}
-          className="relative mb-5"
+          initial={{ opacity: 0, scale: 0.8, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 18, delay: 0.1 }}
+          className="relative mb-6 z-10"
         >
-          <img
-            src={firstMediaUrl}
-            alt="Your post"
-            className="w-16 h-16 rounded-xl object-cover shadow-md"
-          />
+          <div className="relative">
+            <img
+              src={firstMediaUrl}
+              alt="Your post"
+              className="w-20 h-20 rounded-2xl object-cover shadow-lg"
+              style={{ boxShadow: '0 8px 32px -8px rgba(0,0,0,0.15)' }}
+            />
+            {/* Gradient overlay shimmer */}
+            <div className="absolute inset-0 rounded-2xl" style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%)',
+            }} />
+          </div>
+          {/* Success check overlay */}
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 15, delay: 0.4 }}
+            className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full flex items-center justify-center shadow-md"
+            style={{ background: 'linear-gradient(135deg, #34d399, #059669)' }}
+          >
+            <Check className="h-4 w-4 text-white" strokeWidth={3} />
+          </motion.div>
           {mediaCount > 1 && (
-            <div className="absolute -top-1.5 -right-1.5 bg-primary text-primary-foreground text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-sm">
+            <div 
+              className="absolute -top-1.5 -right-1.5 text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center text-white shadow-sm"
+              style={{ background: 'linear-gradient(135deg, #34d399, #059669)' }}
+            >
               +{mediaCount - 1}
             </div>
           )}
         </motion.div>
       )}
 
-      {/* Success icon with double-pulse rings */}
-      <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{
-          type: 'spring',
-          stiffness: 200,
-          damping: 15,
-          delay: 0.15,
-        }}
-        className="relative mb-8"
-      >
-        {/* First pulse ring */}
+      {/* Animated success icon (when no media) */}
+      {!firstMediaUrl && (
         <motion.div
-          initial={{ scale: 0.8, opacity: 0.6 }}
-          animate={{ scale: 1.8, opacity: 0 }}
-          transition={{ duration: 0.8, delay: 0.35 }}
-          className="absolute inset-0 w-20 h-20 rounded-full bg-primary/30"
-        />
-        {/* Second pulse ring (staggered) */}
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0.5 }}
-          animate={{ scale: 1.5, opacity: 0 }}
-          transition={{ duration: 0.7, delay: 0.55 }}
-          className="absolute inset-0 w-20 h-20 rounded-full bg-primary/20"
-        />
-        {/* Main icon circle */}
-        <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center relative z-10">
-          <CheckCircle2 className="h-10 w-10 text-primary" />
-        </div>
-      </motion.div>
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.15 }}
+          className="relative mb-6 z-10"
+        >
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0.6 }}
+            animate={{ scale: 2, opacity: 0 }}
+            transition={{ duration: 1, delay: 0.4 }}
+            className="absolute inset-0 w-20 h-20 rounded-full"
+            style={{ background: 'rgba(52, 211, 153, 0.2)' }}
+          />
+          <div 
+            className="w-20 h-20 rounded-full flex items-center justify-center relative z-10"
+            style={{ background: 'linear-gradient(135deg, rgba(52, 211, 153, 0.15), rgba(5, 150, 105, 0.1))' }}
+          >
+            <Check className="h-10 w-10 text-emerald-600" strokeWidth={2.5} />
+          </div>
+        </motion.div>
+      )}
 
-      {/* Success message */}
+      {/* Success text */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="text-center mb-2"
+        transition={{ delay: 0.35 }}
+        className="text-center mb-2 z-10"
       >
-        <h2 className="text-xl font-semibold text-foreground mb-2">
-          {isScheduled ? 'Scheduled!' : 'Posted!'}
+        <h2 className="text-2xl font-bold text-gray-900 mb-1.5">
+          {isScheduled ? 'Scheduled!' : "You're live! 🎉"}
         </h2>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-gray-500 leading-relaxed max-w-[260px]">
           {isScheduled && scheduledAt
             ? `Your post will go live on ${formatScheduledTime(scheduledAt)}`
-            : 'Your moment is now live on Clbhouz'}
+            : 'Your moment is out there — time to see the love roll in'}
         </p>
       </motion.div>
 
-      {/* Engagement prompt */}
-      <motion.p
+      {/* Subtle notification hint */}
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.4 }}
-        className="text-[12px] text-muted-foreground/60 text-center mb-10"
-      >
-        We'll notify you when people interact with your moment
-      </motion.p>
-
-      {/* Action buttons - 3-tier hierarchy */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
-        className="flex flex-col gap-3 w-full max-w-[280px]"
+        className="flex items-center gap-1.5 mt-1 mb-10 z-10"
       >
-        {/* Primary action - View Post */}
+        <Clock className="h-3 w-3 text-gray-400" />
+        <span className="text-[11px] text-gray-400">We'll ping you when people interact</span>
+      </motion.div>
+
+      {/* Action buttons */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.55 }}
+        className="flex flex-col gap-3 w-full max-w-[280px] z-10"
+      >
+        {/* Primary - View Post */}
         {onViewPost && !isScheduled && (
-          <Button
+          <button
             onClick={onViewPost}
-            className="w-full h-12 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 font-medium border-0"
+            className="w-full h-12 rounded-xl text-white font-semibold text-[15px] flex items-center justify-center gap-2 active:scale-[0.97] transition-transform shadow-lg"
+            style={{ 
+              background: 'linear-gradient(135deg, #34d399, #059669)',
+              boxShadow: '0 4px 16px -4px rgba(5, 150, 105, 0.4)',
+            }}
           >
             View Post
-          </Button>
+            <ArrowRight className="h-4 w-4" />
+          </button>
         )}
 
-        {/* Secondary action - Create Another */}
-        <Button
-          variant="outline"
+        {/* Secondary - Create Another */}
+        <button
           onClick={onCreateAnother}
-          className="w-full h-12 rounded-xl gap-2 font-medium"
+          className="w-full h-12 rounded-xl bg-white text-gray-800 font-semibold text-[15px] flex items-center justify-center gap-2 border border-gray-200 shadow-sm active:scale-[0.97] transition-transform"
         >
           <Plus className="h-4 w-4" />
           Create Another
-        </Button>
+        </button>
 
-        {/* Tertiary action - Done */}
-        <Button
-          variant="ghost"
+        {/* Tertiary - Done */}
+        <button
           onClick={onDone}
-          className="w-full h-12 rounded-xl text-muted-foreground hover:text-foreground font-medium"
+          className="w-full h-12 rounded-xl text-gray-500 font-medium text-[15px] active:bg-gray-100 transition-colors"
         >
           Done
-        </Button>
+        </button>
       </motion.div>
     </motion.div>
   );
