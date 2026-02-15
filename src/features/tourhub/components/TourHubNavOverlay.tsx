@@ -3,7 +3,7 @@
  * Glassmorphic card-style nav items with live data teasers and cinematic animations
  */
 
-import React, { useEffect, useCallback, useRef } from 'react';
+import React, { useEffect, useCallback, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -62,12 +62,10 @@ const LINK_ITEMS: LinkItem[] = [
     subtitle: 'From campus standout to Tour contender.',
     path: '/tourhub/college-golf',
     icon: <GraduationCap className="w-5 h-5" />,
-    
   },
 ];
 
 // Animation config
-const ITEM_SPRING = { type: 'spring' as const, stiffness: 400, damping: 25 };
 const ITEM_EASE = [0.25, 0.46, 0.45, 0.94] as const;
 
 interface TourHubNavOverlayProps {
@@ -111,48 +109,41 @@ export function TourHubNavOverlay({
   // Handle ESC key
   useEffect(() => {
     if (!isOpen) return;
-    
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
+      if (e.key === 'Escape') onClose();
     };
-    
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
+  // TM-10: Android back button handler
+  useEffect(() => {
+    if (!isOpen) return;
+    window.history.pushState({ drawer: true }, '');
+    const handlePopState = () => { onClose(); };
+    window.addEventListener('popstate', handlePopState);
+    return () => { window.removeEventListener('popstate', handlePopState); };
   }, [isOpen, onClose]);
 
   // Simple focus trap
   useEffect(() => {
     if (!isOpen || !overlayRef.current) return;
-    
     const overlay = overlayRef.current;
     const focusableEls = overlay.querySelectorAll<HTMLElement>(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     );
     if (focusableEls.length === 0) return;
-    
     const firstEl = focusableEls[0];
     const lastEl = focusableEls[focusableEls.length - 1];
-    
-    // Focus close button on open
     firstEl.focus();
-    
     const handleTab = (e: KeyboardEvent) => {
       if (e.key !== 'Tab') return;
       if (e.shiftKey) {
-        if (document.activeElement === firstEl) {
-          e.preventDefault();
-          lastEl.focus();
-        }
+        if (document.activeElement === firstEl) { e.preventDefault(); lastEl.focus(); }
       } else {
-        if (document.activeElement === lastEl) {
-          e.preventDefault();
-          firstEl.focus();
-        }
+        if (document.activeElement === lastEl) { e.preventDefault(); firstEl.focus(); }
       }
     };
-    
     document.addEventListener('keydown', handleTab);
     return () => document.removeEventListener('keydown', handleTab);
   }, [isOpen]);
@@ -197,7 +188,18 @@ export function TourHubNavOverlay({
     ? `${liveCount} tournament${(liveCount ?? 0) > 1 ? 's' : ''} live right now`
     : "What's happening — past, present, and upcoming.";
 
-  // Helper: render card teaser text
+  // TM-08: aria-labels for each card
+  const getAriaLabel = (item: NavItem) => {
+    switch (item.value) {
+      case 'overview': return 'Overview — The global golf season at a glance';
+      case 'schedule': return hasLive ? `Schedule — ${liveCount} tournament${(liveCount ?? 0) > 1 ? 's' : ''} live right now` : 'Schedule — What\'s happening past, present, and upcoming';
+      case 'players': return 'Players — The names shaping the season';
+      case 'leaderboards': return 'Leaders — Who\'s on top and who\'s chasing them';
+      default: return item.label;
+    }
+  };
+
+  // Helper: render card teaser text — TM-04: player + tournament names tappable
   const renderTeaser = (item: NavItem) => {
     if (item.value === 'overview' && leaderTeaser && hasLive) {
       const scoreStr = leaderTeaser.score !== null
@@ -205,7 +207,15 @@ export function TourHubNavOverlay({
         : null;
       return (
         <p className="text-xs mt-1 text-muted-foreground">
-          <span className="font-medium">{leaderTeaser.playerName}</span>
+          <span 
+            className="font-medium transition-opacity active:opacity-70 cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (leaderTeaser.playerId) handlePlayerClick(leaderTeaser.playerId);
+            }}
+          >
+            {leaderTeaser.playerName}
+          </span>
           {' leads at '}
           {scoreStr !== null && (
             <span style={{ color: leaderTeaser.score !== null && leaderTeaser.score < 0 ? TOUR_COLORS.scoreUnderPar : undefined }}>
@@ -213,7 +223,20 @@ export function TourHubNavOverlay({
             </span>
           )}
           {' • '}
-          <span className="truncate">{leaderTeaser.tournamentName}</span>
+          <span 
+            className="truncate transition-opacity active:opacity-70 cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (leaderTeaser.tournamentId) {
+                haptic('light');
+                onClose();
+                navigate(`/tourhub/tournament/${leaderTeaser.tournamentId}`);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+            }}
+          >
+            {leaderTeaser.tournamentName}
+          </span>
         </p>
       );
     }
@@ -240,13 +263,25 @@ export function TourHubNavOverlay({
         </div>
       );
     }
-    if (item.value === 'players') {
-      return null;
+    // TM-09: Players card count badge
+    if (item.value === 'players' && playerCount) {
+      return (
+        <span className="text-xs text-muted-foreground flex-shrink-0">
+          {playerCount > 800 ? '800+' : playerCount} players
+        </span>
+      );
     }
+    // TM-05: Leaders card #1 badge — tappable
     if (item.value === 'leaderboards' && worldNumber1) {
       const lastName = worldNumber1.playerName.split(' ').slice(-1)[0];
       return (
-        <span className="text-xs text-muted-foreground flex-shrink-0">
+        <span 
+          className="text-xs text-muted-foreground flex-shrink-0 transition-opacity active:opacity-70 cursor-pointer"
+          onClick={(e) => {
+            e.stopPropagation();
+            handlePlayerClick(worldNumber1.playerId);
+          }}
+        >
           #{worldNumber1.worldRank} {lastName}
         </span>
       );
@@ -274,7 +309,7 @@ export function TourHubNavOverlay({
             aria-hidden="true"
           />
           
-          {/* Menu Panel - frosted glass */}
+          {/* TM-02: 85vw width, TM-01: swipe-to-dismiss */}
           <motion.div
             ref={overlayRef}
             initial={{ x: '100%', opacity: 0.5 }}
@@ -285,12 +320,23 @@ export function TourHubNavOverlay({
               damping: 28,
               stiffness: 300,
             }}
-            className="fixed inset-0 z-[10000] flex flex-col overflow-hidden"
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.2}
+            dragDirectionLock={true}
+            onDragEnd={(_e, info) => {
+              if (info.offset.x > 100 || info.velocity.x > 500) {
+                onClose();
+              }
+            }}
+            className="fixed inset-y-0 right-0 z-[10000] flex flex-col overflow-hidden"
             style={{
-              background: 'rgba(248, 250, 252, 0.85)',
+              width: '85vw',
+              maxWidth: '380px',
+              background: 'hsl(var(--background) / 0.85)',
               backdropFilter: 'blur(24px) saturate(1.4)',
               WebkitBackdropFilter: 'blur(24px) saturate(1.4)',
-              borderLeft: '1px solid rgba(0, 0, 0, 0.06)',
+              borderLeft: '1px solid hsl(var(--border) / 0.3)',
               boxShadow: '-8px 0 32px rgba(0, 0, 0, 0.08)',
             }}
             role="dialog"
@@ -332,10 +378,10 @@ export function TourHubNavOverlay({
                 }}
                 className="w-11 h-11 flex items-center justify-center rounded-full transition-all outline-none focus:outline-none focus-visible:ring-0"
                 style={{ 
-                  background: 'rgba(255, 255, 255, 0.7)',
+                  background: 'hsl(var(--card) / 0.7)',
                   backdropFilter: 'blur(12px)',
                   WebkitBackdropFilter: 'blur(12px)',
-                  border: '1px solid rgba(0, 0, 0, 0.06)',
+                  border: '1px solid hsl(var(--border) / 0.3)',
                 }}
                 aria-label="Close menu"
               >
@@ -372,9 +418,8 @@ export function TourHubNavOverlay({
                   </motion.button>
                 </div>
                 
-                {/* Glass Cards Row with fade edges */}
+                {/* Glass Cards Row */}
                 <div className="relative">
-                  
                   <div
                     ref={scrollRef}
                     className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-hide"
@@ -403,12 +448,12 @@ export function TourHubNavOverlay({
                             scrollSnapAlign: 'start',
                             background: isFirst 
                               ? 'linear-gradient(135deg, rgba(251, 191, 36, 0.12) 0%, rgba(245, 158, 11, 0.08) 100%)'
-                              : 'rgba(255, 255, 255, 0.6)',
+                              : 'hsl(var(--card) / 0.6)',
                             backdropFilter: 'blur(8px)',
                             WebkitBackdropFilter: 'blur(8px)',
                             border: isFirst 
                               ? '1.5px solid rgba(245, 158, 11, 0.35)'
-                              : '1px solid rgba(255, 255, 255, 0.5)',
+                              : '1px solid hsl(var(--border) / 0.3)',
                             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04), 0 0 1px rgba(0, 0, 0, 0.08)',
                             minWidth: '140px',
                           }}
@@ -430,31 +475,18 @@ export function TourHubNavOverlay({
                             </span>
                           </div>
                           
-                          {/* Avatar — squircle matching world rankings leaderboard */}
+                          {/* TM-11: Avatar with initials fallback */}
                           {(() => {
                             const pgaTourId = player.player?.pga_tour_id;
                             const headshot = pgaTourId ? getPgaTourHeadshotUrl(pgaTourId) : player.photoUrl;
                             const initials = getInitials(player.playerName);
                             return (
-                              <div 
-                                className="flex-shrink-0 overflow-hidden border border-border/50"
-                                style={{ width: '36px', height: '36px', borderRadius: '11px' }}
-                              >
-                                {headshot ? (
-                                  <div className="relative w-full h-full">
-                                    <div className="absolute inset-0 bg-muted" />
-                                    <img 
-                                      src={headshot}
-                                      alt={player.playerName}
-                                      className="relative z-10 w-full h-full object-cover"
-                                      loading="lazy"
-                                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                    />
-                                  </div>
-                                ) : (
-                                  <div className="w-full h-full bg-muted" />
-                                )}
-                              </div>
+                              <AvatarWithInitials
+                                src={headshot}
+                                alt={player.playerName}
+                                initials={initials}
+                                size={36}
+                              />
                             );
                           })()}
                           
@@ -478,10 +510,13 @@ export function TourHubNavOverlay({
             {/* Divider */}
             <div className="h-px mx-5 border-t border-border/60" />
             
-            {/* Menu Items */}
+            {/* Menu Items — TM-03: bottom safe area padding */}
             <div 
               className="flex-1 overflow-y-auto px-5 py-5"
-              style={{ overscrollBehavior: 'contain' }}
+              style={{ 
+                overscrollBehavior: 'contain',
+                paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)',
+              }}
             >
               <div className="space-y-3">
                 {NAV_ITEMS.map((item, index) => {
@@ -503,16 +538,17 @@ export function TourHubNavOverlay({
                       className="w-full flex items-center gap-3.5 p-4 rounded-2xl text-left relative overflow-hidden"
                       style={{
                         background: isActive 
-                          ? 'rgba(255, 255, 255, 0.8)' 
-                          : 'rgba(255, 255, 255, 0.5)',
+                          ? 'hsl(var(--card) / 0.8)' 
+                          : 'hsl(var(--card) / 0.5)',
                         border: isActive
-                          ? '1px solid rgba(0, 0, 0, 0.08)'
-                          : '1px solid rgba(0, 0, 0, 0.04)',
+                          ? '1px solid hsl(var(--border) / 0.4)'
+                          : '1px solid hsl(var(--border) / 0.2)',
                         boxShadow: isActive
                           ? '0 2px 8px rgba(0, 0, 0, 0.04)'
                           : '0 1px 2px rgba(0, 0, 0, 0.02)',
                       }}
                       aria-current={isActive ? 'page' : undefined}
+                      aria-label={getAriaLabel(item)}
                     >
                       {/* Icon in circle */}
                       <div 
@@ -520,7 +556,7 @@ export function TourHubNavOverlay({
                         style={{
                           background: isActive 
                             ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(245, 158, 11, 0.06))'
-                            : 'rgba(0, 0, 0, 0.03)',
+                            : 'hsl(var(--muted) / 0.5)',
                           color: isActive ? '#D97706' : undefined,
                         }}
                       >
@@ -552,7 +588,7 @@ export function TourHubNavOverlay({
                 })}
                </div>
 
-              {/* Divider before link items — matches the overview divider width */}
+              {/* Divider before link items */}
               <div className="h-px my-4 border-t border-border/60" />
 
               {/* Link Items (College Golf, etc.) */}
@@ -571,15 +607,16 @@ export function TourHubNavOverlay({
                     onClick={() => handleLinkClick(item.path)}
                     className="w-full flex items-center gap-3.5 p-4 rounded-2xl text-left"
                     style={{
-                      background: 'rgba(255, 255, 255, 0.5)',
-                      border: '1px solid rgba(0, 0, 0, 0.04)',
+                      background: 'hsl(var(--card) / 0.5)',
+                      border: '1px solid hsl(var(--border) / 0.2)',
                       boxShadow: '0 1px 2px rgba(0, 0, 0, 0.02)',
                     }}
+                    aria-label="College Golf — From campus standout to Tour contender"
                   >
                     {/* Icon in circle */}
                     <div 
                       className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-muted-foreground"
-                      style={{ background: 'rgba(0, 0, 0, 0.03)' }}
+                      style={{ background: 'hsl(var(--muted) / 0.5)' }}
                     >
                       {item.icon}
                     </div>
@@ -605,18 +642,29 @@ export function TourHubNavOverlay({
                       <div className="text-[12px] mt-0.5 leading-relaxed text-muted-foreground">
                         {item.subtitle}
                       </div>
-                      {/* College #1 teaser */}
+                      {/* TM-06: College #1 teaser — school name tappable */}
                       {item.id === 'college-golf' && topCollege && (
                         <p className="text-xs mt-1 text-muted-foreground flex items-center gap-1.5">
-                          {topCollege.logoUrl && (
-                            <img 
-                              src={topCollege.logoUrl} 
-                              alt="" 
-                              className="w-5 h-5 rounded-sm object-contain flex-shrink-0" 
-                            />
-                          )}
-                          <span>
+                          <span 
+                            className="inline-flex items-center gap-1.5 transition-opacity active:opacity-70 cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              haptic('light');
+                              onClose();
+                              navigate('/tourhub/college-golf');
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
+                          >
+                            {topCollege.logoUrl && (
+                              <img 
+                                src={topCollege.logoUrl} 
+                                alt="" 
+                                className="w-5 h-5 rounded-sm object-contain flex-shrink-0" 
+                              />
+                            )}
                             <span className="font-medium">{topCollege.name}</span>
+                          </span>
+                          <span>
                             {' leads • '}
                             {formatCurrency(topCollege.earnings)} in earnings
                           </span>
@@ -624,7 +672,7 @@ export function TourHubNavOverlay({
                       )}
                     </div>
                     
-                    {/* Chevron - keep for link items */}
+                    {/* Chevron */}
                     <ChevronRight 
                       className="w-4.5 h-4.5 flex-shrink-0 text-muted-foreground"
                     />
@@ -637,5 +685,37 @@ export function TourHubNavOverlay({
       )}
     </AnimatePresence>,
     portalRoot
+  );
+}
+
+/** TM-11: Avatar with initials fallback */
+function AvatarWithInitials({ src, alt, initials, size }: { src: string | null | undefined; alt: string; initials: string; size: number }) {
+  const [imgFailed, setImgFailed] = useState(false);
+  const radius = `${Math.round(size * 0.306)}px`; // 34% squircle
+
+  if (!src || imgFailed) {
+    return (
+      <div 
+        className="flex-shrink-0 overflow-hidden border border-border/50 bg-muted flex items-center justify-center"
+        style={{ width: size, height: size, borderRadius: radius }}
+      >
+        <span className="text-[11px] font-semibold text-muted-foreground">{initials}</span>
+      </div>
+    );
+  }
+
+  return (
+    <div 
+      className="flex-shrink-0 overflow-hidden border border-border/50"
+      style={{ width: size, height: size, borderRadius: radius }}
+    >
+      <img 
+        src={src}
+        alt={alt}
+        className="w-full h-full object-cover"
+        loading="lazy"
+        onError={() => setImgFailed(true)}
+      />
+    </div>
   );
 }

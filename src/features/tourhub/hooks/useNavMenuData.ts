@@ -66,7 +66,9 @@ export function useLiveLeaderTeaser() {
 
       return {
         playerName: displayName,
+        playerId: leader.player_id,
         score: leader.score,
+        tournamentId: tournament.id,
         tournamentName: tournament.name,
       };
     },
