@@ -132,7 +132,7 @@ export function FranchiseCard({
               {alumni.slice(0, 3).map(a => {
                 const photoUrl = resolvePhotoUrl(a.photo_url, a.pga_tour_id);
                 return (
-                  <div key={a.id} className="w-5 h-5 border border-card overflow-hidden bg-muted" style={{ borderRadius: '34%' }}>
+                  <div key={a.id} className="w-5 overflow-hidden bg-muted" style={{ borderRadius: '34%', aspectRatio: '1 / 1.05', border: '1px solid #D1D5DB' }}>
                     {photoUrl ? (
                       <img src={photoUrl} alt={a.full_name} className="w-full h-full object-cover object-top" loading="lazy" />
                     ) : (

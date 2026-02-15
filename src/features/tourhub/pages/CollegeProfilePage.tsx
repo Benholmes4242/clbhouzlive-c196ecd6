@@ -10,18 +10,12 @@ import {
   AlumniDepthChart, 
   CollegeRivalsCarousel,
   CollegeCompareSheet,
-  FollowCollegeButton 
 } from '../components/college';
 import { useCollegeStats } from '../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
 import { useCollegeRivalries } from '../hooks/useCollegeMovers';
 import { getCollegeGradientCSS } from '../config/collegeBrandColors';
 import { Button } from '@/components/ui/button';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -117,23 +111,17 @@ export function CollegeProfilePage() {
           }}
         />
 
-        {/* Glass Back Button — top left */}
-        <motion.button
+        {/* Glass Back Button — matches Players page (44px squircle) */}
+        <button
           onClick={handleBack}
-          className="absolute z-20 flex items-center gap-2 px-3 py-2 rounded-full"
+          className="absolute z-20 h-11 w-11 rounded-md flex items-center justify-center bg-black/20 backdrop-blur-sm hover:bg-black/40 active:scale-95 transition-all"
           style={{
-            top: 'calc(max(var(--sat, env(safe-area-inset-top, 0px)), 47px) + 4px)',
+            top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
             left: '16px',
-            background: 'rgba(0,0,0,0.3)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255,255,255,0.15)',
           }}
-          whileTap={{ scale: 0.95 }}
         >
-          <ArrowLeft className="w-4 h-4 text-white" />
-          <span className="text-white text-sm font-medium">Back</span>
-        </motion.button>
+          <ArrowLeft className="w-5 h-5 text-white" />
+        </button>
 
         {/* Content — centered */}
         {isLoading ? (
@@ -194,11 +182,11 @@ export function CollegeProfilePage() {
         ) : null}
       </div>
 
-      {/* Stat Ribbon — overlaps hero */}
+      {/* Stat Ribbon — overlaps hero, compact to fit all stats */}
       {stats && (
         <div className="relative z-10 -mt-5 mx-4">
           <motion.div
-            className="flex gap-2 overflow-x-auto px-4 py-3 rounded-2xl no-scrollbar border border-border/40 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.04)]"
+            className="flex gap-1.5 px-3 py-2.5 rounded-2xl border border-border/40 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.04)]"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.3 }}
@@ -214,8 +202,8 @@ export function CollegeProfilePage() {
 
       {/* Content sections */}
       <div className="w-full max-w-5xl mx-auto px-4 pb-8 mt-6 space-y-section">
-        {/* Action Buttons */}
-        {stats && (
+        {/* Action Buttons — Compare only (follow removed) */}
+        {stats && firstRival && (
           <motion.div
             variants={sectionVariants}
             initial="hidden"
@@ -224,28 +212,15 @@ export function CollegeProfilePage() {
             transition={{ duration: 0.4 }}
             className="flex items-center justify-center gap-3"
           >
-            <FollowCollegeButton normalizedName={collegeSlug || ''} />
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="gap-2"
-                    onClick={handleCompareClick}
-                    disabled={!firstRival}
-                  >
-                    <GitCompare className="w-4 h-4" />
-                    Compare
-                  </Button>
-                </span>
-              </TooltipTrigger>
-              {!firstRival && (
-                <TooltipContent>
-                  <p>No rivals to compare</p>
-                </TooltipContent>
-              )}
-            </Tooltip>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-2"
+              onClick={handleCompareClick}
+            >
+              <GitCompare className="w-4 h-4" />
+              Compare
+            </Button>
           </motion.div>
         )}
 
@@ -347,11 +322,11 @@ function formatCurrency(amount: number): string {
 
 function StatPill({ label, value, highlight = false }: { label: string; value: string; highlight?: boolean }) {
   return (
-    <div className={`min-w-[72px] flex-shrink-0 text-center px-3 py-2.5 rounded-xl ${highlight ? 'bg-amber-500/8 border border-amber-500/15' : 'bg-card/60 border border-border/30'}`}>
-      <span className="text-[9px] font-semibold tracking-wider uppercase text-muted-foreground/60 block mb-0.5">
+    <div className={`flex-1 text-center px-1.5 py-2 rounded-lg ${highlight ? 'bg-amber-500/8 border border-amber-500/15' : 'bg-card/60 border border-border/30'}`}>
+      <span className="text-[8px] font-semibold tracking-wider uppercase text-muted-foreground/60 block mb-0.5">
         {label}
       </span>
-      <span className={`text-[15px] font-bold font-mono tabular-nums block ${highlight ? 'text-amber-500' : 'text-foreground'}`}>
+      <span className={`text-[13px] font-bold font-mono tabular-nums block ${highlight ? 'text-amber-500' : 'text-foreground'}`}>
         {value}
       </span>
     </div>

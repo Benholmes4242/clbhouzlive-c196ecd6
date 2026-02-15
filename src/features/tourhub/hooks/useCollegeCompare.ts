@@ -83,7 +83,7 @@ async function fetchAlumniForCompare(normalizedName: string, seasonId: string) {
   // Get players with their stats
   const { data: players } = await supabase
     .from('sr_players')
-    .select('id, first_name, last_name, country, photo_url, college')
+    .select('id, first_name, last_name, country, photo_url, pga_tour_id, college')
     .eq('college_normalized', normalizedName);
   
   if (!players?.length) {
@@ -109,6 +109,7 @@ async function fetchAlumniForCompare(normalizedName: string, seasonId: string) {
       last_name: p.last_name,
       country: p.country,
       photo_url: p.photo_url,
+      pga_tour_id: p.pga_tour_id || null,
       college: p.college || '',
       world_ranking: typeof statistics.world_rank === 'number' ? statistics.world_rank : null,
       earnings: typeof statistics.earnings === 'number' ? statistics.earnings : 0,
