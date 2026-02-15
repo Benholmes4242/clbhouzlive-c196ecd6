@@ -123,7 +123,7 @@ export function PostWizardHeader({
       <div className="flex items-center gap-1 min-w-[72px]">
         <button
           onClick={onBack}
-          className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center active:bg-gray-200 transition-colors"
+          className="w-9 h-9 rounded-full bg-amber-100/80 text-amber-700 flex items-center justify-center active:bg-amber-200/80 transition-colors"
           aria-label={isFirstStep ? 'Close' : 'Back'}
         >
           {isFirstStep ? (
@@ -139,8 +139,8 @@ export function PostWizardHeader({
             className="w-8 h-8 rounded-full flex items-center justify-center relative transition-colors hover:bg-muted"
             aria-label={`View ${draftCount} drafts`}
           >
-            <FileEdit className="h-3.5 w-3.5 text-muted-foreground" />
-            <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-[14px] rounded-full bg-destructive text-destructive-foreground text-[8px] font-semibold flex items-center justify-center">
+            <FileEdit className="h-3.5 w-3.5 text-amber-600" />
+            <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-[14px] rounded-full bg-amber-500 text-white text-[8px] font-semibold flex items-center justify-center">
               {draftCount > 9 ? '9+' : draftCount}
             </span>
           </button>
@@ -177,7 +177,7 @@ export function PostWizardHeader({
               )}
               aria-label={scheduledCount > 0 ? `View ${scheduledCount} scheduled posts` : "Schedule post"}
             >
-              <Clock className="h-4 w-4 text-muted-foreground" />
+              <Clock className="h-4 w-4 text-amber-600" />
               {scheduledCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] rounded-full bg-primary text-primary-foreground text-[9px] font-semibold flex items-center justify-center">
                   {scheduledCount > 9 ? '9+' : scheduledCount}
@@ -226,7 +226,7 @@ export function PostWizardHeader({
             className={cn(
               'px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 active:scale-[0.97]',
               !canProceed || isSubmitting
-                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                ? 'bg-amber-200/60 text-amber-400 cursor-not-allowed'
                 : 'text-white shadow-sm'
             )}
             style={canProceed && !isSubmitting ? {
