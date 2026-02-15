@@ -1,5 +1,6 @@
 /**
  * TournamentDetailTabs - Plain text tabs with underline active state
+ * TD-05: Added role="tablist" and role="tab" with aria-selected
  */
 
 import { useRef, useState, useEffect } from 'react';
@@ -59,6 +60,8 @@ export function TournamentDetailTabs({ activeTab, onTabChange, className, tourna
       <div 
         ref={containerRef}
         className="relative flex items-stretch"
+        role="tablist"
+        aria-label="Tournament Sections"
       >
         {/* Animated underline indicator */}
         <motion.div
@@ -76,6 +79,8 @@ export function TournamentDetailTabs({ activeTab, onTabChange, className, tourna
           return (
             <button
               key={tab.value}
+              role="tab"
+              aria-selected={isActive}
               onClick={() => onTabChange(tab.value)}
               className={cn(
                 "relative flex-1 flex items-center justify-center gap-1.5 py-3 text-sm whitespace-nowrap",

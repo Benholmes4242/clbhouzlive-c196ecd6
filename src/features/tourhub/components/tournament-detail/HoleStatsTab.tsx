@@ -6,7 +6,7 @@
  */
 
 import { useState, useMemo, useEffect, useRef } from 'react';
-import { Target, TrendingUp, TrendingDown, Flame, Leaf } from 'lucide-react';
+import { Target, TrendingUp, TrendingDown, Flame, Leaf, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { RoundSelector } from './RoundSelector';
@@ -231,6 +231,9 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
     return <HoleStatsEmpty isCompleted={isCompleted} />;
   }
 
+  // TD-03: Check if selected round has actual data
+  const hasRoundData = processedHoles.some(h => h.scoringAverage > 0);
+
   return (
     <motion.div
       ref={contentRef}
@@ -247,140 +250,162 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
         />
       )}
 
-      {/* Toughest holes */}
-      {toughestHoles.length > 0 && (
-        <div className="px-4 pt-6 pb-4">
-          <div className="flex items-center gap-1.5 mb-3">
-            <Flame className="w-3.5 h-3.5 text-red-500" />
-            <span className="text-[10px] font-semibold tracking-widest uppercase text-muted-foreground">
-              Toughest Holes
-            </span>
+      {/* TD-03: Empty round state */}
+      {!hasRoundData && selectedRound !== 'Overall' ? (
+        <motion.div
+          className="flex items-center justify-center min-h-[300px] py-12"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <div className="text-center space-y-3">
+            <Clock className="w-8 h-8 mx-auto text-muted-foreground" />
+            <h3 className="text-base font-semibold text-foreground">
+              {selectedRound} hasn't started yet
+            </h3>
+            <p className="text-sm text-muted-foreground max-w-[280px] mx-auto">
+              Hole-by-hole stats will appear once play begins.
+            </p>
           </div>
-          <div className="flex gap-3">
-            {toughestHoles.map((hole, idx) => (
-              <div
-                key={hole.holeNumber}
-                className="flex-1 bg-red-50 dark:bg-red-950/20 rounded-xl border border-red-100 dark:border-red-900/30 p-3 text-center"
-              >
-                <div className="text-sm font-bold text-red-500">#{idx + 1}</div>
+        </motion.div>
+      ) : (
+        <>
+          {/* Toughest holes */}
+          {hasRoundData && toughestHoles.length > 0 && (
+            <div className="px-4 pt-6 pb-4">
+              <div className="flex items-center gap-1.5 mb-3">
+                <Flame className="w-3.5 h-3.5 text-red-500" />
+                <span className="text-[10px] font-semibold tracking-widest uppercase text-muted-foreground">
+                  Toughest Holes
+                </span>
+              </div>
+              <div className="flex gap-3">
+                {toughestHoles.map((hole, idx) => (
+                  <div
+                    key={hole.holeNumber}
+                    className="flex-1 bg-red-50 dark:bg-red-950/20 rounded-xl border border-red-100 dark:border-red-900/30 p-3 text-center"
+                  >
+                    <div className="text-sm font-bold text-red-500">#{idx + 1}</div>
+                    <div className="text-xl font-bold text-foreground font-mono tabular-nums">
+                      Hole {hole.holeNumber}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Par {hole.par} · Avg {hole.scoringAverage.toFixed(2)}
+                    </div>
+                    <div className="text-sm font-semibold text-red-500 mt-1 font-mono tabular-nums">
+                      +{hole.avgDiff.toFixed(2)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Easiest holes */}
+          {hasRoundData && easiestHoles.length > 0 && easiestHoles[0].avgDiff < 0 && (
+            <div className="px-4 pb-4">
+              <div className="flex items-center gap-1.5 mb-3">
+                <Leaf className="w-3.5 h-3.5 text-green-500" />
+                <span className="text-[10px] font-semibold tracking-widest uppercase text-muted-foreground">
+                  Easiest Holes
+                </span>
+              </div>
+              <div className="flex gap-3">
+                {easiestHoles.map((hole, idx) => (
+                  <div
+                    key={hole.holeNumber}
+                    className="flex-1 bg-green-50 dark:bg-green-950/20 rounded-xl border border-green-100 dark:border-green-900/30 p-3 text-center"
+                  >
+                    <div className="text-sm font-bold text-green-600">#{idx + 1}</div>
+                    <div className="text-xl font-bold text-foreground font-mono tabular-nums">
+                      Hole {hole.holeNumber}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Par {hole.par} · Avg {hole.scoringAverage.toFixed(2)}
+                    </div>
+                    <div className="text-sm font-semibold text-green-600 mt-1 font-mono tabular-nums">
+                      {hole.avgDiff.toFixed(2)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Course summary stats strip */}
+          {hasRoundData && summary && (
+            <div className="border-y border-border grid grid-cols-3 text-center py-4">
+              <div>
+                <div className="text-[10px] font-semibold tracking-widest uppercase text-muted-foreground">
+                  Course Avg
+                </div>
                 <div className="text-xl font-bold text-foreground font-mono tabular-nums">
-                  Hole {hole.holeNumber}
+                  {summary.avgScore.toFixed(1)}
                 </div>
-                <div className="text-xs text-muted-foreground">
-                  Par {hole.par} · Avg {hole.scoringAverage.toFixed(2)}
+                <div className="text-[10px] text-muted-foreground font-mono tabular-nums">Par {summary.totalPar}</div>
+              </div>
+              <div>
+                <div className="text-[10px] font-semibold tracking-widest uppercase text-muted-foreground">
+                  Birdies
                 </div>
-                <div className="text-sm font-semibold text-red-500 mt-1 font-mono tabular-nums">
-                  +{hole.avgDiff.toFixed(2)}
+                <div className="text-xl font-bold text-green-600 font-mono tabular-nums">
+                  {summary.totalBirdies}
+                </div>
+                {summary.totalEagles > 0 && (
+                  <div className="text-[10px] text-muted-foreground font-mono tabular-nums">{summary.totalEagles} eagles</div>
+                )}
+              </div>
+              <div>
+                <div className="text-[10px] font-semibold tracking-widest uppercase text-muted-foreground">
+                  Bogeys
+                </div>
+                <div className="text-xl font-bold text-red-500 font-mono tabular-nums">
+                  {summary.totalBogeys}
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
+            </div>
+          )}
 
-      {/* Easiest holes */}
-      {easiestHoles.length > 0 && easiestHoles[0].avgDiff < 0 && (
-        <div className="px-4 pb-4">
-          <div className="flex items-center gap-1.5 mb-3">
-            <Leaf className="w-3.5 h-3.5 text-green-500" />
-            <span className="text-[10px] font-semibold tracking-widest uppercase text-muted-foreground">
-              Easiest Holes
-            </span>
-          </div>
-          <div className="flex gap-3">
-            {easiestHoles.map((hole, idx) => (
-              <div
-                key={hole.holeNumber}
-                className="flex-1 bg-green-50 dark:bg-green-950/20 rounded-xl border border-green-100 dark:border-green-900/30 p-3 text-center"
-              >
-                <div className="text-sm font-bold text-green-600">#{idx + 1}</div>
-                <div className="text-xl font-bold text-foreground font-mono tabular-nums">
-                  Hole {hole.holeNumber}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  Par {hole.par} · Avg {hole.scoringAverage.toFixed(2)}
-                </div>
-                <div className="text-sm font-semibold text-green-600 mt-1 font-mono tabular-nums">
-                  {hole.avgDiff.toFixed(2)}
-                </div>
+          {/* Hole rows — flowing list */}
+          <div>
+            {/* Front Nine header */}
+            {frontNine.length > 0 && (
+              <div className="bg-muted/50 text-center py-2 border-b border-border">
+                <span className="text-[10px] font-semibold tracking-widest uppercase text-muted-foreground">
+                  Front Nine
+                </span>
+                {frontNineAvg !== null && (
+                  <span className="text-[10px] text-muted-foreground ml-2 font-mono tabular-nums">
+                    Avg {frontNineAvg.toFixed(1)} (Par {frontNinePar})
+                  </span>
+                )}
               </div>
+            )}
+
+            {frontNine.map((hole) => (
+              <HoleRow key={hole.holeNumber} hole={hole} total={processedHoles.length} />
+            ))}
+
+            {/* Back Nine header */}
+            {backNine.length > 0 && (
+              <div className="bg-muted/50 text-center py-2 border-y border-border">
+                <span className="text-[10px] font-semibold tracking-widest uppercase text-muted-foreground">
+                  Back Nine
+                </span>
+                {backNineAvg !== null && (
+                  <span className="text-[10px] text-muted-foreground ml-2 font-mono tabular-nums">
+                    Avg {backNineAvg.toFixed(1)} (Par {backNinePar})
+                  </span>
+                )}
+              </div>
+            )}
+
+            {backNine.map((hole) => (
+              <HoleRow key={hole.holeNumber} hole={hole} total={processedHoles.length} />
             ))}
           </div>
-        </div>
+        </>
       )}
-
-      {/* Course summary stats strip */}
-      {summary && (
-        <div className="border-y border-border grid grid-cols-3 text-center py-4">
-          <div>
-            <div className="text-[10px] font-semibold tracking-widest uppercase text-muted-foreground">
-              Course Avg
-            </div>
-            <div className="text-xl font-bold text-foreground font-mono tabular-nums">
-              {summary.avgScore.toFixed(1)}
-            </div>
-            <div className="text-[10px] text-muted-foreground font-mono tabular-nums">Par {summary.totalPar}</div>
-          </div>
-          <div>
-            <div className="text-[10px] font-semibold tracking-widest uppercase text-muted-foreground">
-              Birdies
-            </div>
-            <div className="text-xl font-bold text-green-600 font-mono tabular-nums">
-              {summary.totalBirdies}
-            </div>
-            {summary.totalEagles > 0 && (
-              <div className="text-[10px] text-muted-foreground font-mono tabular-nums">{summary.totalEagles} eagles</div>
-            )}
-          </div>
-          <div>
-            <div className="text-[10px] font-semibold tracking-widest uppercase text-muted-foreground">
-              Bogeys
-            </div>
-            <div className="text-xl font-bold text-red-500 font-mono tabular-nums">
-              {summary.totalBogeys}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Hole rows — flowing list */}
-      <div>
-        {/* Front Nine header */}
-        {frontNine.length > 0 && (
-          <div className="bg-muted/50 text-center py-2 border-b border-border">
-            <span className="text-[10px] font-semibold tracking-widest uppercase text-muted-foreground">
-              Front Nine
-            </span>
-            {frontNineAvg !== null && (
-              <span className="text-[10px] text-muted-foreground ml-2 font-mono tabular-nums">
-                Avg {frontNineAvg.toFixed(1)} (Par {frontNinePar})
-              </span>
-            )}
-          </div>
-        )}
-
-        {frontNine.map((hole) => (
-          <HoleRow key={hole.holeNumber} hole={hole} total={processedHoles.length} />
-        ))}
-
-        {/* Back Nine header */}
-        {backNine.length > 0 && (
-          <div className="bg-muted/50 text-center py-2 border-y border-border">
-            <span className="text-[10px] font-semibold tracking-widest uppercase text-muted-foreground">
-              Back Nine
-            </span>
-            {backNineAvg !== null && (
-              <span className="text-[10px] text-muted-foreground ml-2 font-mono tabular-nums">
-                Avg {backNineAvg.toFixed(1)} (Par {backNinePar})
-              </span>
-            )}
-          </div>
-        )}
-
-        {backNine.map((hole) => (
-          <HoleRow key={hole.holeNumber} hole={hole} total={processedHoles.length} />
-        ))}
-      </div>
     </motion.div>
   );
 }

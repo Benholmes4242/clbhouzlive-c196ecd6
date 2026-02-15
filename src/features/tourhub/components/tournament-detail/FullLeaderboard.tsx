@@ -41,6 +41,7 @@ interface FullLeaderboardProps {
   tournamentStatus?: string;
   tournamentTimezone?: string | null;
   venuePar?: number | null;
+  onPlayerTap?: () => void;
 }
 
 function ScoreCell({ score, className }: { score: number | null; className?: string }) {
@@ -111,6 +112,7 @@ export function FullLeaderboard({
   tournamentStatus,
   tournamentTimezone,
   venuePar,
+  onPlayerTap,
 }: FullLeaderboardProps) {
   const [selectedRound, setSelectedRound] = useState('Overall');
   const [searchQuery, setSearchQuery] = useState('');
@@ -274,6 +276,14 @@ export function FullLeaderboard({
             >
               <Link
                 to={`/tourhub/player/${entry.player?.id}`}
+                onClick={onPlayerTap}
+                aria-label={`Position ${entry.position_tied ? `T${entry.position}` : entry.position}, ${entry.player?.full_name || 'Unknown'}, ${entry.score === null ? 'no score' : entry.score === 0 ? 'even' : entry.score < 0 ? `${entry.score} to par` : `+${entry.score} to par`}, ${(() => {
+                  if (isMissedCut) return 'missed cut';
+                  if (isWD) return 'withdrawn';
+                  if (entry.thru === null) return 'not started';
+                  if (entry.thru === 18 || entry.strokes) return 'finished';
+                  return `through hole ${entry.thru}`;
+                })()}`}
                 className={cn(
                   "flex items-center gap-2 px-4 py-3 transition-all duration-200 min-h-[52px]",
                    "hover:bg-muted/40 active:scale-[0.995]",
