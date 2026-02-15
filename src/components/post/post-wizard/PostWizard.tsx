@@ -571,7 +571,7 @@ export function PostWizard({
           }}
         >
           {/* Header - fixed height, won't shrink */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 bg-amber-50">
             <PostWizardHeader
               currentStep={state.currentStep}
               currentStepIndex={currentStepIndex}
