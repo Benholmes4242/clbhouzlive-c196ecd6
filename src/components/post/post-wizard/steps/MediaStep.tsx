@@ -557,10 +557,27 @@ export function MediaStep({
       {/* Non-blocking picker loading banner */}
       <PickerLoadingBanner isVisible={isPickerOpen} />
       
-      {/* Two-row scrollable thumbnail grid — replaces hero preview */}
-      <div className="flex-1 min-h-0 flex flex-col px-4 pt-3">
+      {/* Large media preview stage — restored */}
+      <div className="flex-shrink-0">
+        <CreateMomentMediaStage
+          media={state.mediaItems}
+          activeMediaId={activeMediaId}
+          coverMediaId={coverMediaId}
+          onActiveMediaChange={handleActiveMediaChange}
+          onSetCover={handleSetCover}
+          onRemoveMedia={handleRemoveMedia}
+          onReorder={handleReorder}
+          getEdits={getEdits}
+          processingMediaIds={processingMediaIds}
+          warningMediaIds={warningMediaIds}
+          removingMediaIds={removingMediaIds}
+        />
+      </div>
+      
+      {/* Two-row scrollable thumbnail grid below the preview */}
+      <div className="flex-shrink-0 px-3 py-2">
         <div 
-          className="flex-1 overflow-x-auto overflow-y-hidden"
+          className="overflow-x-auto media-grid-scroll"
           style={{ 
             scrollSnapType: 'x mandatory',
             scrollbarWidth: 'none',
@@ -571,7 +588,7 @@ export function MediaStep({
             .media-grid-scroll::-webkit-scrollbar { display: none; }
           `}} />
           <div 
-            className="media-grid-scroll grid gap-2 h-full"
+            className="grid gap-1.5"
             style={{
               gridTemplateRows: state.mediaItems.length <= 4 ? '1fr' : 'repeat(2, 1fr)',
               gridAutoFlow: 'column',
@@ -588,10 +605,10 @@ export function MediaStep({
               return (
                 <motion.div
                   key={item.id}
-                  className="relative rounded-xl overflow-hidden cursor-pointer"
+                  className="relative rounded-lg overflow-hidden cursor-pointer"
                   style={{ 
-                    width: 'calc(25vw - 12px)',
-                    height: 'calc(25vw - 12px)',
+                    width: '5rem',
+                    height: '5rem',
                     scrollSnapAlign: 'start',
                   }}
                   initial={{ opacity: 0, scale: 0.8 }}
@@ -626,7 +643,7 @@ export function MediaStep({
                   )}
                   
                   {/* Number badge */}
-                  <div className="absolute top-1 left-1 w-5 h-5 rounded-full bg-black/50 backdrop-blur-sm text-white text-[10px] font-bold flex items-center justify-center">
+                  <div className="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-black/50 backdrop-blur-sm text-white text-[9px] font-bold flex items-center justify-center">
                     {index + 1}
                   </div>
                   
@@ -636,20 +653,20 @@ export function MediaStep({
                       e.stopPropagation();
                       animateAndRemove(item.id);
                     }}
-                    className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/40 text-white flex items-center justify-center"
+                    className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-black/40 text-white flex items-center justify-center"
                   >
-                    <X className="w-3 h-3" />
+                    <X className="w-2.5 h-2.5" />
                   </button>
                   
                   {/* Active ring */}
                   {isActive && (
-                    <div className="absolute inset-0 rounded-xl ring-2 ring-amber-400 pointer-events-none" />
+                    <div className="absolute inset-0 rounded-lg ring-2 ring-amber-400 pointer-events-none" />
                   )}
                   
                   {/* Processing overlay */}
                   {isProcessing && (
                     <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                      <div className="w-5 h-5 border-2 border-white/60 border-t-white rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-white/60 border-t-white rounded-full animate-spin" />
                     </div>
                   )}
                 </motion.div>
@@ -661,13 +678,13 @@ export function MediaStep({
               <button
                 onClick={handleGallery}
                 disabled={isPickerOpen}
-                className="rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 text-2xl active:bg-gray-50 transition-colors disabled:opacity-50"
+                className="rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 active:bg-gray-50 transition-colors disabled:opacity-50"
                 style={{ 
-                  width: 'calc(25vw - 12px)',
-                  height: 'calc(25vw - 12px)',
+                  width: '5rem',
+                  height: '5rem',
                 }}
               >
-                <Plus className="w-6 h-6" />
+                <Plus className="w-5 h-5" />
               </button>
             )}
           </div>
@@ -730,23 +747,6 @@ export function MediaStep({
             {state.mediaItems.length}/{POST_LIMITS.MAX_MEDIA_COUNT}
           </span>
         </div>
-      </div>
-      
-      {/* Hidden: CreateMomentMediaStage kept for Studio use — not rendered in main view */}
-      <div className="hidden">
-        <CreateMomentMediaStage
-          media={state.mediaItems}
-          activeMediaId={activeMediaId}
-          coverMediaId={coverMediaId}
-          onActiveMediaChange={handleActiveMediaChange}
-          onSetCover={handleSetCover}
-          onRemoveMedia={handleRemoveMedia}
-          onReorder={handleReorder}
-          getEdits={getEdits}
-          processingMediaIds={processingMediaIds}
-          warningMediaIds={warningMediaIds}
-          removingMediaIds={removingMediaIds}
-        />
       </div>
     </div>
   );
