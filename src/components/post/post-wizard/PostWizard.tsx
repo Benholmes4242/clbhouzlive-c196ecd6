@@ -140,7 +140,7 @@ export function PostWizard({
 
   // Control native status bar appearance when wizard is open
   // "light" = black icons for light backgrounds (#F8FAFC)
-  useMedianStatusBar("light", "#F8FAFC", true, false, isOpen);
+  useMedianStatusBar("light", "transparent", true, false, isOpen);
 
   // Lock body scroll when open
   useEffect(() => {
@@ -567,7 +567,7 @@ export function PostWizard({
               touchAction: 'pan-y pinch-zoom',
               overscrollBehavior: 'contain',
             },
-            backgroundColor: '#F8FAFC',
+            backgroundColor: '#FFFBEB',
           }}
         >
           {/* Header + progress bar — single amber surface that bleeds behind status bar */}
