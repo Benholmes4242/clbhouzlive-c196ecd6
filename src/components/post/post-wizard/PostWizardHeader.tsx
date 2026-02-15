@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
-import { Button } from '@/components/ui/button';
 import { PostWizardStep, ActorRef } from './types';
 import { format } from 'date-fns';
 
@@ -124,19 +123,17 @@ export function PostWizardHeader({
       style={{ 
         height: hasHeroAbove ? '55px' : 'calc(55px + max(env(safe-area-inset-top, 0px), 47px))',
         paddingTop: hasHeroAbove ? '0px' : 'max(env(safe-area-inset-top, 0px), 47px)',
-        background: 'hsl(210 40% 98% / 0.95)',
+        background: 'rgba(255, 255, 255, 0.80)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        borderBottom: '0.5px solid hsl(215 25% 27% / 0.2)',
+        borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
       }}
     >
       {/* Left: Close button */}
       <div className="flex items-center gap-1 min-w-[72px]">
-        <Button
-          variant="ghost"
-          size="icon"
+        <button
           onClick={onBack}
-          className="h-8 w-8 rounded-full"
+          className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center active:bg-gray-200 transition-colors"
           aria-label={isFirstStep ? 'Close' : 'Back'}
         >
           {isFirstStep ? (
@@ -144,7 +141,7 @@ export function PostWizardHeader({
           ) : (
             <ChevronLeft className="h-5 w-5" />
           )}
-        </Button>
+        </button>
         
         {/* Drafts button with badge - only on first step */}
         {isFirstStep && draftCount > 0 && (
@@ -237,31 +234,33 @@ export function PostWizardHeader({
         
         {/* Next/Post/Schedule button */}
         <div className="flex flex-col items-end">
-          <Button
-            size="sm"
+            <button
             onClick={onNext}
             disabled={!canProceed || isSubmitting}
             className={cn(
-              'px-4 py-1.5 h-8 rounded-full text-sm font-medium transition-all duration-200 active:scale-[0.96]',
+              'px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 active:scale-[0.97]',
               !canProceed || isSubmitting
-                ? 'bg-muted text-muted-foreground'
-                : hasSchedule
-                  ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                  : isLastStep
-                    ? 'text-white shadow-md hover:shadow-lg'
-                    : 'bg-primary text-primary-foreground hover:bg-primary/90'
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                : 'text-white shadow-sm'
             )}
-            style={canProceed && !isSubmitting && isLastStep && !hasSchedule ? {
-              background: 'linear-gradient(135deg, #10b981, #059669)',
+            style={canProceed && !isSubmitting ? {
+              background: isLastStep && !hasSchedule 
+                ? 'linear-gradient(135deg, #10b981, #059669)' 
+                : '#10b981',
             } : undefined}
           >
             {isSubmitting ? (
-              <>
-                <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
-                <span>{hasSchedule ? 'Scheduling…' : 'Posting…'}</span>
-              </>
-            ) : <span className="text-inherit">{nextButtonText}</span>}
-          </Button>
+              <span className="flex items-center gap-1.5">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                {hasSchedule ? 'Scheduling…' : 'Posting…'}
+              </span>
+            ) : (
+              <span className="flex items-center gap-1.5">
+                {hasSchedule && isLastStep && <Calendar className="h-3.5 w-3.5" />}
+                {nextButtonText}
+              </span>
+            )}
+          </button>
         </div>
       </div>
     </header>

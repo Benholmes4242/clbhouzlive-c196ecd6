@@ -3,7 +3,7 @@
 
 export const POST_LIMITS = {
   /** Maximum number of media items per post */
-  MAX_MEDIA_COUNT: 6,
+  MAX_MEDIA_COUNT: 10,
   /** Maximum caption length in characters */
   MAX_CAPTION_LENGTH: 2200,
   /** Maximum video file size in bytes (1GB) */

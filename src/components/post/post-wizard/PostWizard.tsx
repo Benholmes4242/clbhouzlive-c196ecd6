@@ -140,7 +140,7 @@ export function PostWizard({
 
   // Control native status bar appearance when wizard is open
   // "light" = black icons for light backgrounds (#F8FAFC)
-  useMedianStatusBar("light", "#F8FAFC", true, false, isOpen);
+  useMedianStatusBar("light", "#FAFAF8", true, false, isOpen);
 
   // Lock body scroll when open
   useEffect(() => {
@@ -561,13 +561,13 @@ export function PostWizard({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="light fixed inset-0 z-[9999] bg-background flex flex-col overflow-hidden pb-safe"
+          className="light fixed inset-0 z-[9999] flex flex-col overflow-hidden pb-safe"
           style={{ 
-            // Allow vertical pan (scrolling) but prevent horizontal swipe and pull-to-refresh
-            // Note: @dnd-kit handles its own touch-action for drag-and-drop areas
-            touchAction: 'pan-y pinch-zoom',
-            // Prevent iOS overscroll/bounce that can interfere with wizard
-            overscrollBehavior: 'contain',
+            ...{
+              touchAction: 'pan-y pinch-zoom',
+              overscrollBehavior: 'contain',
+            },
+            backgroundColor: '#FAFAF8',
           }}
         >
           {/* Header - fixed height, won't shrink */}
@@ -600,27 +600,41 @@ export function PostWizard({
 
           {/* Progress indicator — bar on steps 1-2, completion dots on final step */}
           {isLastStep ? (
-            <div className="h-6 w-full flex items-center justify-center gap-2.5 flex-shrink-0">
-              {Array.from({ length: totalSteps }).map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="w-2 h-2 rounded-full"
-                  style={{ background: '#10b981' }}
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: i * 0.1, duration: 0.3, ease: 'easeOut' }}
-                />
-              ))}
+            <div className="h-6 w-full flex items-center justify-center flex-shrink-0">
+              <div className="flex items-center gap-0">
+                {Array.from({ length: totalSteps }).map((_, i) => (
+                  <React.Fragment key={i}>
+                    {/* Connector line before dot (not for first) */}
+                    {i > 0 && (
+                      <motion.div
+                        className="h-0.5 w-6"
+                        style={{ background: '#10b981' }}
+                        initial={{ scaleX: 0 }}
+                        animate={{ scaleX: 1 }}
+                        transition={{ delay: i * 0.1 - 0.05, duration: 0.2 }}
+                      />
+                    )}
+                    <motion.div
+                      className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                      style={{ background: 'linear-gradient(135deg, #34d399, #059669)' }}
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: i * 0.1, duration: 0.3, ease: 'easeOut' }}
+                    />
+                  </React.Fragment>
+                ))}
+              </div>
             </div>
           ) : (
-            <div className="h-1.5 w-full bg-muted/20 flex-shrink-0 overflow-hidden">
+            <div className="h-2 w-full bg-gray-100 flex-shrink-0 overflow-hidden">
               <motion.div
-                className="h-full bg-primary"
+                className="h-full shadow-sm"
+                style={{ background: 'linear-gradient(to right, #34d399, #059669)' }}
                 initial={{ width: 0 }}
                 animate={{
                   width: `${((currentStepIndex + 1) / totalSteps) * 100}%`,
                 }}
-                transition={{ duration: 0.5, ease: 'easeOut' }}
+                transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
               />
             </div>
           )}
@@ -630,10 +644,10 @@ export function PostWizard({
             <AnimatePresence mode="wait">
               <motion.div
                 key={state.currentStep}
-                initial={{ opacity: 0, x: 20 }}
+                initial={{ opacity: 0, x: 300 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2 }}
+                exit={{ opacity: 0, x: -300 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                 className="h-full"
               >
                 {state.currentStep === 'media' && (
