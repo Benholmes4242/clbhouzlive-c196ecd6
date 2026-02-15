@@ -59,6 +59,8 @@ function AlumniRow({ alumnus, index, tierAccent }: AlumniRowProps) {
     >
       <Link
         to={`/tourhub/player/${alumnus.id}`}
+        aria-label={`${fullName}, rank ${alumnus.world_ranking || 'N/A'}, ${formatCurrency(alumnus.earnings || 0)}${hasWins ? `, ${alumnus.wins} ${alumnus.wins === 1 ? 'win' : 'wins'}` : ''}`}
+        onClick={() => sessionStorage.setItem('college-detail-scroll', String(window.scrollY))}
         className={cn(
           "flex overflow-hidden",
           "bg-card rounded-xl border border-border/40 shadow-sm",
