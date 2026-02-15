@@ -3,10 +3,11 @@
  * no card containers — content flows directly on page background.
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Globe, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Globe, TrendingUp, AlertCircle, RefreshCw } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
 import {
@@ -25,14 +26,53 @@ const sectionVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
+const PULL_THRESHOLD = 50;
+
 export function PlayerProfilePage() {
   const { playerId } = useParams<{ playerId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+  const queryClient = useQueryClient();
   const { setVariant, hideHeader, showHeader } = useHeader();
 
-  const { data: player, isLoading: playerLoading } = useTourPlayer(playerId || '');
+  const { data: player, isLoading: playerLoading, refetch } = useTourPlayer(playerId || '');
   const { data: playerStats } = useSinglePlayerStatistics(playerId);
+
+  // ── Pull-to-refresh (PD-01) ──
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [pullDistance, setPullDistance] = useState(0);
+  const touchStartY = useRef(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (window.scrollY === 0) {
+      touchStartY.current = e.touches[0].clientY;
+    }
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (touchStartY.current === 0 || isRefreshing) return;
+    const delta = e.touches[0].clientY - touchStartY.current;
+    if (delta > 0 && window.scrollY === 0) {
+      setPullDistance(Math.min(delta * 0.5, 100));
+    }
+  }, [isRefreshing]);
+
+  const handleTouchEnd = useCallback(async () => {
+    if (pullDistance >= PULL_THRESHOLD && !isRefreshing) {
+      setIsRefreshing(true);
+      setPullDistance(PULL_THRESHOLD);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['player', playerId] }),
+        queryClient.invalidateQueries({ queryKey: ['player-stats', playerId] }),
+        queryClient.invalidateQueries({ queryKey: ['player-results', playerId] }),
+        queryClient.invalidateQueries({ queryKey: ['world-rankings', playerId] }),
+      ]);
+      setIsRefreshing(false);
+    }
+    setPullDistance(0);
+    touchStartY.current = 0;
+  }, [pullDistance, isRefreshing, queryClient, playerId]);
 
   // Scroll to top on mount
   useEffect(() => {
@@ -78,6 +118,7 @@ export function PlayerProfilePage() {
     );
   }
 
+  // ── Error / not-found state with retry (PD-02) ──
   if (!player) {
     return (
       <PageRoot className="min-h-screen w-full bg-background">
@@ -88,55 +129,122 @@ export function PlayerProfilePage() {
           >
             <ArrowLeft className="w-4 h-4" /> Back to Players
           </button>
-          <div className="text-center py-20">
-            <p className="text-muted-foreground text-lg font-medium">Player not found</p>
+          <div className="text-center py-20 flex flex-col items-center gap-3">
+            <AlertCircle className="w-10 h-10 text-muted-foreground" />
+            <p className="text-muted-foreground text-lg font-medium">Couldn't load player data</p>
+            <p className="text-sm text-muted-foreground">Tap to try again</p>
+            <button
+              onClick={() => refetch()}
+              className="mt-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium active:opacity-70 transition-opacity"
+            >
+              Retry
+            </button>
           </div>
         </div>
       </PageRoot>
     );
   }
 
+  const pullProgress = Math.min(pullDistance / PULL_THRESHOLD, 1);
+
   return (
-    <PageRoot className="min-h-screen w-full bg-background" immersive immersiveStatusBar hasBottomNav>
-      {/* Hero */}
-      <PlayerHero player={player} playerStats={playerStats ?? null} />
-
-      {/* Stats Strip — full width, no card */}
-      <StatRibbon playerStats={playerStats ?? null} />
-
-      {/* Recent Form — full width tinted strip */}
-      {playerId && <PlayerRecentForm playerId={playerId} />}
-
-      {/* Content sections — no cards, editorial flow */}
-      <div className="w-full max-w-5xl mx-auto px-4 pb-8">
-        {/* Section dividers via border-t on each section wrapper */}
-
-        {/* Season Performance */}
-        <motion.div
-          className="py-6 border-t border-border"
-          variants={sectionVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-50px' }}
-          transition={{ duration: 0.4 }}
+    <PageRoot
+      className="min-h-screen w-full bg-background"
+      immersive
+      immersiveStatusBar
+      hasBottomNav
+    >
+      {/* Pull-to-refresh indicator */}
+      {(pullDistance > 0 || isRefreshing) && (
+        <div
+          className="absolute left-0 right-0 flex items-center justify-center z-50"
+          style={{ top: 0, height: pullDistance || PULL_THRESHOLD }}
         >
-          {playerStats ? (
-            <PlayerSeasonStats playerStats={playerStats} />
-          ) : (
-            <div className="py-16 text-center">
-              <div className="w-14 h-14 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
-                <TrendingUp className="w-7 h-7 text-muted-foreground" />
+          <motion.div
+            className="w-10 h-10 rounded-full bg-background shadow-md border border-border flex items-center justify-center"
+            animate={isRefreshing ? { rotate: 360 } : { rotate: pullProgress * 360 }}
+            transition={isRefreshing ? { repeat: Infinity, duration: 0.8, ease: 'linear' } : { duration: 0 }}
+            style={{ opacity: Math.min(pullProgress * 1.5, 1) }}
+          >
+            <RefreshCw className="w-5 h-5 text-primary" />
+          </motion.div>
+        </div>
+      )}
+
+      <div
+        ref={containerRef}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        style={{
+          transform: pullDistance > 0 ? `translateY(${pullDistance}px)` : undefined,
+          transition: !pullDistance && !isRefreshing ? 'transform 0.2s ease-out' : 'none',
+        }}
+      >
+        {/* Hero */}
+        <PlayerHero player={player} playerStats={playerStats ?? null} />
+
+        {/* Stats Strip — full width, no card */}
+        <StatRibbon playerStats={playerStats ?? null} />
+
+        {/* Recent Form — full width tinted strip */}
+        {playerId && <PlayerRecentForm playerId={playerId} />}
+
+        {/* Content sections — no cards, editorial flow */}
+        <div className="w-full max-w-5xl mx-auto px-4 pb-8">
+          {/* Season Performance */}
+          <motion.div
+            className="py-6 border-t border-border"
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-50px' }}
+            transition={{ duration: 0.4 }}
+          >
+            {playerStats ? (
+              <PlayerSeasonStats playerStats={playerStats} />
+            ) : (
+              <div className="py-16 text-center">
+                <div className="w-14 h-14 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
+                  <TrendingUp className="w-7 h-7 text-muted-foreground" />
+                </div>
+                <p className="text-muted-foreground font-medium">Season Statistics Unavailable</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  No season statistics found for this player.
+                </p>
               </div>
-              <p className="text-muted-foreground font-medium">Season Statistics Unavailable</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                No season statistics found for this player.
-              </p>
-            </div>
+            )}
+          </motion.div>
+
+          {/* Skill Build */}
+          {playerId && (
+            <motion.div
+              className="py-6 border-t border-border"
+              variants={sectionVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+            >
+              <PlayerSkillTreeCard playerId={playerId} />
+            </motion.div>
           )}
-        </motion.div>
 
-        {/* Skill Build */}
-        {playerId && (
+          {/* Recent Tournaments */}
+          {playerId && (
+            <motion.div
+              className="py-6 border-t border-border"
+              variants={sectionVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+            >
+              <PlayerTournamentHistory playerId={playerId} />
+            </motion.div>
+          )}
+
+          {/* Player Info */}
           <motion.div
             className="py-6 border-t border-border"
             variants={sectionVariants}
@@ -145,41 +253,15 @@ export function PlayerProfilePage() {
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.4, delay: 0.1 }}
           >
-            <PlayerSkillTreeCard playerId={playerId} />
+            <PlayerInfoCard player={player} />
           </motion.div>
-        )}
 
-        {/* Recent Tournaments */}
-        {playerId && (
-          <motion.div
-            className="py-6 border-t border-border"
-            variants={sectionVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-50px' }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-          >
-            <PlayerTournamentHistory playerId={playerId} />
-          </motion.div>
-        )}
-
-        {/* Player Info */}
-        <motion.div
-          className="py-6 border-t border-border"
-          variants={sectionVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-50px' }}
-          transition={{ duration: 0.4, delay: 0.1 }}
-        >
-          <PlayerInfoCard player={player} />
-        </motion.div>
-
-        {/* Footer */}
-        <div className="py-8 text-center border-t border-border">
-          <div className="flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground/30">
-            <Globe className="w-3.5 h-3.5" />
-            <span>Powered by SportsRadar</span>
+          {/* Footer */}
+          <div className="py-8 text-center border-t border-border">
+            <div className="flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground/30">
+              <Globe className="w-3.5 h-3.5" />
+              <span>Powered by SportsRadar</span>
+            </div>
           </div>
         </div>
       </div>

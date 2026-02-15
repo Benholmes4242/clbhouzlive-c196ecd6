@@ -3,7 +3,7 @@
  * No card container — editorial layout directly on page background.
  */
 
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Zap, Target, Flame, Shield, Activity } from 'lucide-react';
@@ -37,6 +37,14 @@ const SKILL_BAR_COLORS: Record<SkillAttributeKey, string> = {
   scoring: 'bg-emerald-500',
   recovery: 'bg-teal-500',
   consistency: 'bg-purple-500',
+};
+
+const SKILL_ACCENT_COLORS: Record<SkillAttributeKey, string> = {
+  power: '#EF4444',
+  precision: '#F59E0B',
+  scoring: '#10B981',
+  recovery: '#14B8A6',
+  consistency: '#A855F7',
 };
 
 const springSnappy = {
@@ -144,8 +152,8 @@ const OverallLevelBadge = memo(({ level, animate = true }: { level: number; anim
 });
 OverallLevelBadge.displayName = 'OverallLevelBadge';
 
-/** SVG Radar / Spider Chart */
-function SkillRadarChart({ attributes, animate = true }: { attributes: SkillAttribute[]; animate?: boolean }) {
+/** SVG Radar / Spider Chart — PD-05: supports activeSkill highlighting */
+function SkillRadarChart({ attributes, animate = true, activeSkill = null }: { attributes: SkillAttribute[]; animate?: boolean; activeSkill?: SkillAttributeKey | null }) {
   const SIZE = 280;
   const CENTER = SIZE / 2;
   const RADIUS = 100;
@@ -175,7 +183,19 @@ function SkillRadarChart({ attributes, animate = true }: { attributes: SkillAttr
 
   const axisLines = Array.from({ length: count }).map((_, i) => {
     const p = getPoint(i, LEVELS);
-    return <line key={i} x1={CENTER} y1={CENTER} x2={p.x} y2={p.y} stroke="hsl(var(--border))" strokeWidth="0.5" opacity="0.3" />;
+    const isActive = activeSkill === orderedKeys[i];
+    return (
+      <line
+        key={i}
+        x1={CENTER}
+        y1={CENTER}
+        x2={p.x}
+        y2={p.y}
+        stroke={isActive ? SKILL_ACCENT_COLORS[orderedKeys[i]] : "hsl(var(--border))"}
+        strokeWidth={isActive ? "2" : "0.5"}
+        opacity={isActive ? 1 : 0.3}
+      />
+    );
   });
 
   const dataPoints = ordered.map((attr, i) => {
@@ -188,6 +208,7 @@ function SkillRadarChart({ attributes, animate = true }: { attributes: SkillAttr
     const x = CENTER + LABEL_RADIUS * Math.cos(angle);
     const y = CENTER + LABEL_RADIUS * Math.sin(angle);
     const config = SKILL_ATTRIBUTES[attr.key];
+    const isActive = activeSkill === attr.key;
     return (
       <text
         key={attr.key}
@@ -195,7 +216,10 @@ function SkillRadarChart({ attributes, animate = true }: { attributes: SkillAttr
         y={y}
         textAnchor="middle"
         dominantBaseline="central"
-        className="fill-muted-foreground text-[10px] font-medium"
+        className={cn(
+          "text-[10px] font-medium",
+          isActive ? "fill-foreground font-bold" : "fill-muted-foreground"
+        )}
       >
         {config.name}
       </text>
@@ -224,17 +248,18 @@ function SkillRadarChart({ attributes, animate = true }: { attributes: SkillAttr
       />
       {ordered.map((attr, i) => {
         const p = getPoint(i, attr.level);
+        const isActive = activeSkill === attr.key;
         return (
           <motion.circle
             key={attr.key}
             cx={p.x}
             cy={p.y}
-            r="4"
-            fill="#F59E0B"
+            r={isActive ? 6 : 4}
+            fill={isActive ? SKILL_ACCENT_COLORS[attr.key] : "#F59E0B"}
             stroke="white"
             strokeWidth="1.5"
             initial={animate ? { scale: 0 } : false}
-            animate={animate ? { scale: 1 } : undefined}
+            animate={animate ? { scale: isActive ? 1.3 : 1 } : undefined}
             transition={{ delay: 0.5 + i * 0.1 }}
           />
         );
@@ -282,6 +307,7 @@ function SkillTreeEmpty() {
 export function PlayerSkillTreeCard({ playerId }: { playerId: string }) {
   const { data: skillTree, isLoading, error } = usePlayerSkillTree(playerId);
   const { ref, inView } = useInView({ threshold: 0.2, triggerOnce: true });
+  const [activeSkill, setActiveSkill] = useState<SkillAttributeKey | null>(null);
 
   if (isLoading) {
     return (
@@ -353,18 +379,29 @@ export function PlayerSkillTreeCard({ playerId }: { playerId: string }) {
 
       {/* Radar Chart */}
       <div className="mt-6 pt-4 border-t border-border">
-        <SkillRadarChart attributes={skillTree.attributes} animate={inView} />
+        <SkillRadarChart attributes={skillTree.attributes} animate={inView} activeSkill={activeSkill} />
       </div>
 
-      {/* Legend */}
+      {/* Interactive Legend — PD-05 */}
       <div className="mt-4 flex flex-wrap gap-3 justify-center text-xs text-muted-foreground">
         {(['power', 'precision', 'scoring', 'recovery', 'consistency'] as SkillAttributeKey[]).map(key => {
           const Ic = SKILL_ICONS[key];
+          const isActive = activeSkill === key;
           return (
-            <span key={key} className="flex items-center gap-1">
+            <button
+              key={key}
+              onClick={() => setActiveSkill(key === activeSkill ? null : key)}
+              className={cn(
+                'flex items-center gap-1 p-1.5 rounded-full transition-all',
+                isActive
+                  ? 'bg-primary/10 scale-110 ring-2 ring-primary/30 text-foreground font-semibold'
+                  : 'hover:bg-muted/50'
+              )}
+              aria-label={`Highlight ${SKILL_ATTRIBUTES[key].name} on radar chart`}
+            >
               <Ic className="w-3 h-3" />
               {SKILL_ATTRIBUTES[key].name}
-            </span>
+            </button>
           );
         })}
       </div>
