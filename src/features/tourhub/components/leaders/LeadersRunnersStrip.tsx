@@ -1,12 +1,13 @@
 /**
- * LeadersRunnersStrip — Glass ribbon for #2 and #3 overlapping the hero.
- * Uses backdrop-blur glass effect with avatar + stat value.
+ * LeadersRunnersStrip — Opaque card runners matching PlayersHero RunnerCard style.
+ * bg-card, border, squircle avatars, rank badges.
  */
 
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
-import { countryCodeToFlag } from '../../utils/countryFlags';
+import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
 import type { LeaderCategory } from './constants';
 
 interface RunnerItem {
@@ -30,69 +31,67 @@ interface LeadersRunnersStripProps {
   unitOverride?: string;
 }
 
-const RANK_STYLES: Record<number, string> = {
-  2: 'bg-gradient-to-br from-gray-200 to-gray-400 text-gray-700',
-  3: 'bg-gradient-to-br from-amber-500/80 to-amber-700/80 text-amber-100',
+const RANK_COLORS: Record<number, string> = {
+  2: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)',
+  3: 'linear-gradient(135deg, #94A3B8 0%, #64748B 100%)',
 };
 
-function RunnerPill({
+function RunnerCard({
   runner,
   category,
   formatOverride,
   unitOverride,
+  index,
 }: {
   runner: RunnerItem;
   category: LeaderCategory;
   formatOverride?: (v: number) => string;
   unitOverride?: string;
+  index: number;
 }) {
   const { player, value, rank } = runner;
   const photoUrl = resolvePhotoUrl(player.photo_url, player.pga_tour_id);
-  const flag = countryCodeToFlag(player.country_code);
+  const lastName = player.full_name.split(' ').slice(-1)[0];
+  const country = titleCaseCountry(player.country);
   const fmt = formatOverride ?? category.format;
   const unit = unitOverride ?? category.unit;
 
   return (
     <Link
       to={`/tourhub/player/${player.id}`}
-      className="flex-1 active:scale-[0.96] transition-transform"
+      className="flex-shrink-0 flex items-center gap-2.5 px-3 py-2.5 rounded-2xl active:scale-[0.97] transition-transform"
+      style={{
+        scrollSnapAlign: 'start',
+        background: 'hsl(var(--card))',
+        border: '1px solid hsl(var(--border) / 0.4)',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06), 0 0 1px rgba(0, 0, 0, 0.08)',
+        minWidth: '140px',
+        flex: '1 1 0%',
+      }}
     >
+      {/* Rank Badge */}
       <div
-        className="rounded-xl border border-white/10 px-3 py-2.5 flex items-center gap-2.5"
-        style={{
-          background: 'rgba(0,0,0,0.45)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-        }}
+        className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center"
+        style={{ background: RANK_COLORS[rank] || RANK_COLORS[3], boxShadow: '0 1px 3px rgba(0, 0, 0, 0.12)' }}
       >
-        {/* Rank badge */}
-        <div
-          className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 ${RANK_STYLES[rank] || RANK_STYLES[3]}`}
-        >
-          <span className="text-[10px] font-bold">{rank}</span>
-        </div>
+        <span className="text-xs font-bold text-white">{rank}</span>
+      </div>
 
-        <SquircleAvatar
-          src={photoUrl}
-          alt={player.full_name}
-          size="sm"
-          hideRing
-          className="shrink-0"
-        />
+      {/* Avatar — squircle */}
+      <SquircleAvatar
+        src={photoUrl}
+        alt={player.full_name}
+        size="sm"
+        hideRing
+        className="shrink-0"
+      />
 
-        <div className="min-w-0 flex-1">
-          <p className="text-[12px] font-semibold text-white truncate">
-            {flag} {player.full_name}
-          </p>
-          <div className="flex items-baseline gap-0.5 mt-0.5">
-            <span className="font-mono text-[13px] font-bold text-white tabular-nums">
-              {fmt(value)}
-            </span>
-            {unit && (
-              <span className="text-[9px] text-white/50 uppercase tracking-wider">{unit}</span>
-            )}
-          </div>
-        </div>
+      {/* Name & stat */}
+      <div className="flex-1 min-w-0 text-left">
+        <p className="text-sm font-semibold text-foreground truncate">{lastName}</p>
+        <p className="text-[10px] text-muted-foreground truncate tabular-nums">
+          {fmt(value)}{unit ? ` ${unit}` : ''}
+        </p>
       </div>
     </Link>
   );
@@ -107,16 +106,23 @@ export function LeadersRunnersStrip({
   if (runners.length === 0) return null;
 
   return (
-    <div className="flex gap-2 px-4 sm:px-6 -mt-4 relative z-10">
-      {runners.map((runner) => (
-        <RunnerPill
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.4, duration: 0.35 }}
+      className="flex gap-2.5 px-4 sm:px-6"
+      style={{ marginTop: '-8px', position: 'relative', zIndex: 10 }}
+    >
+      {runners.map((runner, index) => (
+        <RunnerCard
           key={runner.playerId}
           runner={runner}
           category={category}
           formatOverride={formatOverride}
           unitOverride={unitOverride}
+          index={index}
         />
       ))}
-    </div>
+    </motion.div>
   );
 }

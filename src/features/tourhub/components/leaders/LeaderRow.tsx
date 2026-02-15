@@ -1,6 +1,6 @@
 /**
- * LeaderRow — Gamified ranked player row with relative stat bar.
- * Staggered entrance animation, semantic tokens, font-mono stats.
+ * LeaderRow — Matches OWGR leaderboard style on overview page.
+ * No progression bar. Stat value is focal point. Centered meta.
  */
 
 import { Link } from 'react-router-dom';
@@ -48,14 +48,6 @@ export function LeaderRow({
   const fmt = formatOverride ?? category.format;
   const unit = unitOverride ?? category.unit;
 
-  // Calculate relative bar width (proportion of leader's value)
-  // For asc stats (lower is better), invert the ratio
-  const barPercent = leaderValue > 0
-    ? category.sortDirection === 'desc'
-      ? Math.min((value / leaderValue) * 100, 100)
-      : Math.min((leaderValue / value) * 100, 100)
-    : 0;
-
   return (
     <motion.div
       initial={{ opacity: 0, x: -12 }}
@@ -79,8 +71,8 @@ export function LeaderRow({
           hideRing
         />
 
-        {/* Info + stat bar */}
-        <div className="flex-1 min-w-0">
+        {/* Info — no progression bar */}
+        <div className="flex-1 min-w-0 flex flex-col justify-center">
           <p className="text-[14px] font-semibold text-foreground truncate leading-tight">
             {player.fullName}
           </p>
@@ -88,26 +80,15 @@ export function LeaderRow({
             {flag && <span className="text-xs leading-none">{flag}</span>}
             <span className="text-[12px] text-muted-foreground/80 truncate">{countryName}</span>
           </div>
-          {/* Relative stat bar */}
-          <div className="mt-1.5 h-[3px] rounded-full bg-muted/40 overflow-hidden">
-            <div
-              className="h-full rounded-full transition-all duration-500"
-              style={{
-                width: `${barPercent}%`,
-                backgroundColor: category.accentColor,
-                opacity: 0.5,
-              }}
-            />
-          </div>
         </div>
 
-        {/* Stat value */}
+        {/* Stat value — bigger, focal point */}
         <div className="text-right shrink-0">
-          <span className="font-mono text-[13px] font-bold text-foreground tabular-nums">
+          <span className="font-mono text-[15px] font-bold text-foreground tabular-nums">
             {fmt(value)}
           </span>
           {unit && (
-            <p className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider">{unit}</p>
+            <p className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{unit}</p>
           )}
         </div>
 
