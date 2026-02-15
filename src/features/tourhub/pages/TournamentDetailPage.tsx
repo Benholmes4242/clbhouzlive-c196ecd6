@@ -122,7 +122,7 @@ export function TournamentDetailPage() {
       <TourHubShell immersive>
         <div className="animate-pulse">
           <div 
-            className="-mx-4 sm:-mx-6 lg:-mx-8"
+            className=""
             style={{ 
               minHeight: 'calc(45vh + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
               background: 'linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--background)) 50%, hsl(var(--muted)) 75%)',
@@ -281,7 +281,7 @@ export function TournamentDetailPage() {
         
         {/* Sticky Tabs */}
         <motion.div
-          className="sticky top-0 z-20 -mx-4 px-4 py-2.5 bg-background/95 backdrop-blur-md border-b border-border/20"
+          className="sticky top-0 z-20 py-2.5 bg-background/95 backdrop-blur-md border-b border-border/20"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.55, duration: 0.3 }}
