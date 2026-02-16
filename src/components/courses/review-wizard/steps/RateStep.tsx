@@ -249,11 +249,11 @@ export function RateStep({
                       initial={isTouched ? { opacity: 0, scale: 0.9 } : false}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.2 }}
-                      className="text-sm font-medium tabular-nums min-w-[3ch] text-right"
+                      className="text-sm font-semibold tabular-nums min-w-[3ch] text-right"
                       style={{
                         ...(scoreIsOutstanding
                           ? { color: '#f59e0b' }
-                          : { color: isTouched ? '#6b7280' : 'rgba(107, 114, 128, 0.7)' }
+                          : { color: isTouched ? '#d97706' : 'rgba(156, 163, 175, 0.7)' }
                         ),
                       }}
                     >

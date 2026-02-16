@@ -3456,6 +3456,36 @@ html[data-immersive="true"] .app-shell--topSpacer {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   Wizard Slider — Amber fill for Review Wizard breakdown sliders
+   .wizard-slider overrides the default slate fill with muted amber
+   Outstanding tier (data-tier="outstanding") already handles ≥9.0
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Muted amber fill for touched, non-outstanding wizard sliders */
+.wizard-slider:not([data-tier="outstanding"]):not([data-untouched="true"]) [data-radix-slider-range] {
+  background-color: hsl(38, 92%, 70%) !important;
+  background: hsl(38, 92%, 70%) !important;
+}
+
+/* Amber-tinted thumb border for wizard sliders */
+.wizard-slider:not([data-untouched="true"]) [data-radix-slider-thumb] {
+  border-color: hsl(38, 92%, 60%) !important;
+}
+
+/* Wizard slider thumb hover — warm amber border */
+.wizard-slider:not([data-untouched="true"]) [data-radix-slider-thumb]:hover {
+  border-color: hsl(38, 92%, 50%) !important;
+  background-color: hsl(48, 100%, 97%) !important;
+}
+
+/* Wizard slider thumb focus — amber ring */
+.wizard-slider:not([data-untouched="true"]) [data-radix-slider-thumb]:focus {
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.15),
+    0 0 0 3px hsla(38, 92%, 50%, 0.25) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    Phase 3A: Rating Label Transition
    Applied to RatingPill for smooth tier changes
    ═══════════════════════════════════════════════════════════════════════════ */
