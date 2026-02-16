@@ -409,7 +409,6 @@ export function ConversationList({
         className="overflow-hidden rounded-[20px]"
         style={{
           background: 'var(--hub-card)',
-          border: '1px solid var(--hub-card-border)',
           boxShadow: '0 8px 24px rgba(2, 6, 23, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
         }}
       >
