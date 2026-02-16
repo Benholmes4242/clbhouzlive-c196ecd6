@@ -33,13 +33,13 @@ interface GroupInfoPageProps {
 /* ── shared card style ── */
 const warmCard: React.CSSProperties = {
   background: 'rgba(255,255,255,0.55)',
-  border: '1px solid rgba(234,88,12,0.08)',
+  border: '1px solid rgba(217,119,6,0.08)',
   borderRadius: 14,
 };
 const insetDivider: React.CSSProperties = {
   height: 1,
   marginLeft: 56,
-  backgroundColor: 'rgba(0,0,0,0.04)',
+  backgroundColor: 'rgba(217,119,6,0.06)',
 };
 
 export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
@@ -251,16 +251,17 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         style={{
           height: 'calc(56px + env(safe-area-inset-top, 0px))',
           paddingTop: 'env(safe-area-inset-top, 0px)',
-          background: 'rgba(255,248,240,0.85)',
+          background: 'rgba(255,251,235,0.85)',
           backdropFilter: 'blur(24px)',
           WebkitBackdropFilter: 'blur(24px)',
+          borderBottom: '1px solid rgba(217,119,6,0.08)',
         }}
       >
         <button
           onClick={onClose}
           className="w-11 h-11 -ml-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
         >
-          <ChevronLeft size={22} style={{ color: '#EA580C' }} />
+          <ChevronLeft size={22} style={{ color: '#B45309' }} />
         </button>
         <div className="flex-1 text-center">
           <span className="text-[16px] font-semibold" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>
@@ -294,7 +295,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploading}
                   className="absolute bottom-1 right-1 w-8 h-8 rounded-full flex items-center justify-center shadow-md active:scale-[0.95] transition-transform disabled:opacity-50"
-                  style={{ background: '#EA580C' }}
+                  style={{ background: '#F59E0B' }}
                 >
                   <Camera size={16} className="text-white" />
                 </button>
@@ -332,7 +333,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                     onClick={() => setIsEditingName(true)}
                     className="p-1 rounded active:scale-[0.95] transition-transform"
                   >
-                    <Pencil size={18} style={{ color: '#EA580C' }} />
+                    <Pencil size={18} style={{ color: '#D97706' }} />
                   </button>
                 )}
               </>
@@ -403,7 +404,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
               onClick={handleToggleMute}
               className="relative w-[50px] h-[28px] rounded-full transition-colors duration-200"
               style={{
-                background: isMuted ? 'rgba(120,90,60,0.15)' : '#EA580C',
+                background: isMuted ? 'rgba(120,90,60,0.15)' : '#F59E0B',
               }}
             >
               <div
@@ -429,9 +430,9 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
               <button
                 onClick={() => setIsAddMembersOpen(true)}
                 className="flex items-center gap-1 text-[13px] font-semibold active:opacity-70 transition-opacity"
-                style={{ color: '#EA580C' }}
+                style={{ color: '#D97706' }}
               >
-                <UserPlus size={14} style={{ color: '#EA580C' }} />
+                <UserPlus size={14} style={{ color: '#D97706' }} />
                 Add
               </button>
             )}
@@ -466,9 +467,9 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                           <span
                             className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-[1px] rounded-lg"
                             style={{
-                              color: '#EA580C',
-                              background: 'rgba(234,88,12,0.08)',
-                            }}
+                             color: '#D97706',
+                               background: 'rgba(217,119,6,0.08)',
+                             }}
                           >
                             {participant.user_id === conversation.created_by ? (
                               <ShieldCheck size={11} />
@@ -530,7 +531,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
 
           {!isCreator && (
             <>
-              <div style={{ height: 1, backgroundColor: 'rgba(0,0,0,0.04)' }} />
+               <div style={{ height: 1, backgroundColor: 'rgba(217,119,6,0.06)' }} />
               <button
                 onClick={handleLeaveGroup}
                 className="w-full flex items-center gap-3 px-4 py-[14px] active:opacity-70 transition-opacity"
@@ -541,7 +542,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
             </>
           )}
 
-          <div style={{ height: 1, backgroundColor: 'rgba(0,0,0,0.04)' }} />
+           <div style={{ height: 1, backgroundColor: 'rgba(217,119,6,0.06)' }} />
           <button
             onClick={() => setIsReportOpen(true)}
             className="w-full flex items-center gap-3 px-4 py-[14px] active:opacity-70 transition-opacity"
@@ -552,7 +553,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
 
           {isAdmin && (
             <>
-              <div style={{ height: 1, backgroundColor: 'rgba(0,0,0,0.04)' }} />
+              <div style={{ height: 1, backgroundColor: 'rgba(217,119,6,0.06)' }} />
               <button
                 onClick={handleDeleteGroup}
                 className="w-full flex items-center gap-3 px-4 py-[14px] active:opacity-70 transition-opacity"

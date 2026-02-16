@@ -214,8 +214,8 @@ export function MessageInput({
       {/* Reply preview */}
       {replyingTo && (
         <div className="flex items-center justify-between gap-2 px-4 py-2 mb-2 bg-white rounded-[18px] shadow-[0_1px_2px_rgba(0,0,0,0.06)]">
-          <div className="flex-1 min-w-0 pl-2 border-l-2 border-[#2A9D5C]">
-            <span className="text-[12px] font-semibold text-[#2A9D5C]">
+          <div className="flex-1 min-w-0 pl-2 border-l-2 border-amber-500">
+            <span className="text-[12px] font-semibold text-amber-600">
               Replying to {replyToName}
             </span>
             <p className="text-[13px] text-[#8E8E93] truncate">
@@ -224,7 +224,7 @@ export function MessageInput({
           </div>
           <button
             onClick={onCancelReply}
-            className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F5F5F5]"
+            className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-amber-50/50"
           >
             <X className="w-4 h-4 text-[#8E8E93]" />
           </button>
