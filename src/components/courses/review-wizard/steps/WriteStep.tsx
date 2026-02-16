@@ -161,7 +161,7 @@ export function WriteStep({
       exit={{ opacity: 0, x: -300 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       className="flex-1 flex flex-col min-h-0 px-4 pt-6 pb-6"
-      style={{ backgroundColor: '#F8FAFC' }}
+      style={{ backgroundColor: '#FFFBEB' }}
     >
       {/* Header */}
       <div className="text-center mb-5">
