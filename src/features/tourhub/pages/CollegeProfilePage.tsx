@@ -178,24 +178,33 @@ export function CollegeProfilePage() {
           }}
         />
 
-        {/* Bottom fade */}
+        {/* Bottom fade — strong gradient for text legibility */}
         <div
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.25) 100%)',
+            background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%)',
           }}
         />
 
-        {/* Glass Back Button */}
+        {/* Back Button — plain arrow, 44×44px, matching Players/Leaders */}
         <button
           onClick={handleBack}
-          className="absolute z-20 h-11 w-11 rounded-md flex items-center justify-center bg-black/20 backdrop-blur-sm hover:bg-black/40 active:scale-95 transition-all"
+          className="absolute z-20 flex items-center justify-center active:scale-95 transition-all"
           style={{
             top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
             left: '16px',
+            width: '44px',
+            height: '44px',
           }}
         >
-          <ArrowLeft className="w-5 h-5 text-white" />
+          <ArrowLeft 
+            className="text-white" 
+            style={{ 
+              width: '22px', 
+              height: '22px',
+              filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))',
+            }} 
+          />
         </button>
 
         {/* Content — centered */}
@@ -207,12 +216,19 @@ export function CollegeProfilePage() {
           </div>
         ) : college ? (
           <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-8 pt-20">
-            {/* Season label — top context */}
+            {/* Season label */}
             <motion.span
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3, delay: 0.1 }}
-              className="text-[10px] tracking-[0.15em] font-medium text-white/40 uppercase mb-3"
+              style={{
+                fontSize: '10px',
+                fontWeight: 700,
+                letterSpacing: '1.2px',
+                textTransform: 'uppercase' as const,
+                color: 'rgba(255,255,255,0.45)',
+                marginBottom: '4px',
+              }}
             >
               2024-25 Season
             </motion.span>
@@ -223,21 +239,28 @@ export function CollegeProfilePage() {
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.12 }}
-                className="flex items-center gap-1.5 mb-3"
+                className="flex items-center gap-1.5"
+                style={{ marginTop: '4px', marginBottom: '20px' }}
               >
-                <Crown className="w-3.5 h-3.5 text-amber-400" />
-                <span className="text-xs font-semibold tracking-wider text-amber-400 uppercase">
+                <Crown className="w-4 h-4" style={{ color: '#f59e0b' }} />
+                <span style={{
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  letterSpacing: '1.2px',
+                  textTransform: 'uppercase' as const,
+                  color: '#f59e0b',
+                }}>
                   #{collegeRank} This Season
                 </span>
               </motion.div>
             )}
 
-            {/* Logo */}
+            {/* Logo — 110×110px */}
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.4, delay: 0.15 }}
-              className="mb-4"
+              style={{ marginBottom: '16px' }}
             >
               {college?.logo_url && !heroImgError ? (
                 <img
@@ -260,23 +283,33 @@ export function CollegeProfilePage() {
               )}
             </motion.div>
 
-            {/* Name */}
+            {/* Name — 28px, weight 700, tracking -0.4px */}
             <motion.h1
               initial={{ y: 8, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.3, delay: 0.25 }}
-              className="text-2xl md:text-3xl font-bold text-white text-center tracking-tight mb-1.5"
+              className="text-center text-white"
+              style={{
+                fontSize: '28px',
+                fontWeight: 700,
+                letterSpacing: '-0.4px',
+                marginBottom: '4px',
+              }}
             >
               {displayName}
             </motion.h1>
 
-            {/* Subtitle */}
+            {/* Subtitle — 13px, weight 400, rgba(255,255,255,0.6) */}
             {subtitleText && (
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3, delay: 0.3 }}
-                className="text-sm text-white/70"
+                style={{
+                  fontSize: '13px',
+                  fontWeight: 400,
+                  color: 'rgba(255,255,255,0.6)',
+                }}
               >
                 {subtitleText}
               </motion.p>
@@ -285,27 +318,37 @@ export function CollegeProfilePage() {
         ) : null}
       </div>
 
-      {/* Stat Ribbon — overlaps hero */}
+      {/* Stats Bar — 5-column, overlaps hero by -24px */}
       {stats && (
-        <div className="relative z-10 -mt-5 mx-4">
+        <div className="relative z-10 mx-4" style={{ marginTop: '-24px' }}>
           <motion.div
-            className="flex gap-1.5 px-3 py-2.5 rounded-2xl border border-border/40 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.04)]"
+            className="rounded-2xl border border-border/50 bg-card"
+            style={{
+              padding: '14px 8px',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(5, 1fr)',
+            }}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.3 }}
           >
             <StatPill label="WINS" value={String(stats.wins_total)} highlight={stats.wins_total > 0} />
+            <StatDivider />
             <StatPill label="EARNINGS" value={formatCurrency(stats.earnings_total)} />
+            <StatDivider />
             <StatPill label="CUTS" value={String(stats.cuts_total)} />
+            <StatDivider />
             <StatPill label="TOP 10" value={String(stats.top10_total)} />
+            <StatDivider />
             <StatPill label="PLAYERS" value={String(stats.player_count)} />
           </motion.div>
         </div>
       )}
 
-      {/* Content sections — 24px gaps */}
-      <div className="w-full max-w-5xl mx-auto px-4 pb-8 mt-6 space-y-6">
-        {/* Action Buttons — Compare only */}
+      {/* Content sections */}
+      <div className="w-full max-w-5xl mx-auto px-4" style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
+        {/* Compare Button — 16px from stats bar */}
         {stats && firstRival && (
           <motion.div
             variants={sectionVariants}
@@ -313,21 +356,21 @@ export function CollegeProfilePage() {
             whileInView="visible"
             viewport={{ once: true }}
             transition={{ duration: 0.4 }}
-            className="flex items-center justify-center gap-3"
+            className="flex items-center justify-center"
+            style={{ marginTop: '16px' }}
           >
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="gap-2"
+            <button 
               onClick={handleCompareClick}
+              className="flex items-center rounded-xl border border-border/50 bg-card active:scale-95 transition-all"
+              style={{ padding: '10px 20px', gap: '6px' }}
             >
-              <GitCompare className="w-4 h-4" />
-              Compare
-            </Button>
+              <GitCompare className="w-4 h-4 text-muted-foreground" />
+              <span style={{ fontSize: '14px', fontWeight: 600 }} className="text-foreground">Compare</span>
+            </button>
           </motion.div>
         )}
 
-        {/* Story Strip — 2 tiles (no Chasing) */}
+        {/* Story Strip — 16px from compare button */}
         {stats && (
           <motion.div
             variants={sectionVariants}
@@ -335,12 +378,13 @@ export function CollegeProfilePage() {
             whileInView="visible"
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.4 }}
+            style={{ marginTop: '16px' }}
           >
             <FranchiseStoryStrip normalizedName={collegeSlug || ''} />
           </motion.div>
         )}
 
-        {/* Rivalries */}
+        {/* Rivalries — 24px from activity cards */}
         {stats && rivalSlugs.length > 0 && (
           <motion.section
             variants={sectionVariants}
@@ -348,10 +392,11 @@ export function CollegeProfilePage() {
             whileInView="visible"
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.4 }}
+            style={{ marginTop: '24px' }}
           >
-            <div className="flex items-center gap-2 mb-4">
-              <Swords className="w-4 h-4 text-[hsl(var(--tab-orange))]" />
-              <h2 className="text-[16px] font-semibold text-foreground tracking-tight">Rivals</h2>
+            <div className="flex items-center gap-2" style={{ marginBottom: '12px' }}>
+              <Swords className="w-4 h-4 text-muted-foreground" />
+              <h2 style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }} className="text-foreground">Rivals</h2>
             </div>
             <CollegeRivalsCarousel 
               normalizedName={collegeSlug || ''} 
@@ -360,7 +405,7 @@ export function CollegeProfilePage() {
           </motion.section>
         )}
 
-        {/* Alumni Depth Chart */}
+        {/* Alumni Depth Chart — 28px from rivals */}
         {stats && (
           <motion.section
             variants={sectionVariants}
@@ -368,11 +413,12 @@ export function CollegeProfilePage() {
             whileInView="visible"
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.4, delay: 0.1 }}
+            style={{ marginTop: '28px' }}
           >
-            <h2 className="text-[16px] font-semibold text-foreground mb-2 tracking-tight">
+            <h2 style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }} className="text-foreground">
               Alumni Depth Chart
             </h2>
-            <p className="text-sm text-muted-foreground mb-6">
+            <p className="text-muted-foreground" style={{ fontSize: '13px', fontWeight: 400, marginTop: '4px', marginBottom: '20px' }}>
               Current PGA Tour players ranked by contribution
             </p>
             <AlumniDepthChart normalizedName={collegeSlug || ''} />
@@ -406,11 +452,13 @@ export function CollegeProfilePage() {
           </div>
         )}
 
-        {/* Data Source — subtle footer */}
-        <div className="pt-4 pb-6">
-          <div className="flex items-center gap-2 justify-center text-[11px] text-muted-foreground/40">
-            <Globe className="w-3.5 h-3.5" />
-            <span>Powered by SportsRadar</span>
+        {/* Footer */}
+        <div style={{ marginTop: '24px' }}>
+          <div className="flex items-center gap-2 justify-center">
+            <Globe className="w-4 h-4" style={{ color: 'hsl(var(--muted-foreground) / 0.2)' }} />
+            <span style={{ fontSize: '11px', fontWeight: 400, color: 'hsl(var(--muted-foreground) / 0.3)' }}>
+              Powered by SportsRadar
+            </span>
           </div>
         </div>
       </div>
@@ -436,13 +484,28 @@ function formatCurrency(amount: number): string {
   return `$${amount.toFixed(0)}`;
 }
 
+function StatDivider() {
+  return <div className="w-px self-stretch bg-border/10" />;
+}
+
 function StatPill({ label, value, highlight = false }: { label: string; value: string; highlight?: boolean }) {
   return (
-    <div className={`flex-1 text-center px-1.5 py-2 rounded-lg ${highlight ? 'bg-amber-500/8 border border-amber-500/15' : 'bg-card/60 border border-border/30'}`}>
-      <span className="text-[8px] font-semibold tracking-wider uppercase text-muted-foreground/60 block mb-0.5">
+    <div className="flex flex-col items-center justify-center">
+      <span style={{
+        fontSize: '9px',
+        fontWeight: 700,
+        letterSpacing: '0.5px',
+        textTransform: 'uppercase' as const,
+      }} className="text-muted-foreground/50 block mb-0.5">
         {label}
       </span>
-      <span className={`text-[13px] font-bold font-mono tabular-nums block ${highlight ? 'text-amber-500' : 'text-foreground'}`}>
+      <span style={{
+        fontSize: '15px',
+        fontWeight: 700,
+        fontFamily: "'JetBrains Mono', monospace",
+        fontVariantNumeric: 'tabular-nums',
+        color: highlight ? '#f59e0b' : undefined,
+      }} className={highlight ? '' : 'text-foreground'}>
         {value}
       </span>
     </div>
