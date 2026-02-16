@@ -88,7 +88,7 @@ export function EchoPageWelcome({ onPromptClick, onFocusInput }: EchoPageWelcome
         <div 
           className="absolute inset-0 rounded-full blur-2xl opacity-30 scale-[2]"
           style={{ 
-            background: '#F59E0B',
+            background: 'linear-gradient(135deg, #F97316, #FBBF24)',
             animation: prefersReduced ? 'none' : 'glowPulse 4s ease-in-out infinite',
           }}
         />
@@ -96,8 +96,8 @@ export function EchoPageWelcome({ onPromptClick, onFocusInput }: EchoPageWelcome
         <div 
           className="relative w-16 h-16 rounded-full flex items-center justify-center"
           style={{
-            background: '#F59E0B',
-            boxShadow: '0 4px 20px rgba(245,158,11,0.25)',
+            background: 'linear-gradient(135deg, #F97316, #FBBF24)',
+            boxShadow: '0 4px 20px rgba(234,88,12,0.2)',
             animation: prefersReduced ? 'none' : 'pulseGlow 3s ease-in-out infinite',
           }}
         >
@@ -137,14 +137,14 @@ export function EchoPageWelcome({ onPromptClick, onFocusInput }: EchoPageWelcome
             className="px-[14px] py-[10px] rounded-[12px] text-[13px] font-medium text-left active:scale-[0.98] transition-all backdrop-blur-[8px] flex items-center justify-between gap-2"
             style={{
               background: 'rgba(255,255,255,0.45)',
-              border: '1px solid rgba(217,119,6,0.12)',
+              border: '1px solid rgba(234,88,12,0.08)',
               color: '#44403C',
               fontFamily: "'DM Sans', sans-serif",
             }}
             aria-label={`Ask Echo: ${prompt}`}
           >
             <span>{prompt}</span>
-            <ChevronRight className="w-[14px] h-[14px] flex-shrink-0" style={{ color: '#D97706' }} />
+            <ChevronRight className="w-[14px] h-[14px] flex-shrink-0" style={{ color: '#A8A29E' }} />
           </button>
         ))}
       </div>

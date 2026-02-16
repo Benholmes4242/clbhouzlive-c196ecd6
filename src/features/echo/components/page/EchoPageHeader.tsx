@@ -35,7 +35,7 @@ export function EchoPageHeader({ onBack, onNewChat, onOpenHistory, hasMessages }
         className="w-11 h-11 -ml-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
         aria-label="Go back to Hub"
       >
-        <ChevronLeft className="w-5 h-5" style={{ color: '#B45309' }} />
+        <ChevronLeft className="w-5 h-5" style={{ color: '#EA580C' }} />
       </button>
 
       {/* Center - show orb + title when in conversation */}
@@ -46,7 +46,7 @@ export function EchoPageHeader({ onBack, onNewChat, onOpenHistory, hasMessages }
             <div 
               className="w-6 h-6 rounded-full flex items-center justify-center"
               style={{
-                background: '#F59E0B',
+                background: 'linear-gradient(135deg, #F97316, #FBBF24)',
                 animation: prefersReduced ? 'none' : 'pulseGlow 3s ease-in-out infinite',
               }}
             >
@@ -77,7 +77,7 @@ export function EchoPageHeader({ onBack, onNewChat, onOpenHistory, hasMessages }
           className="w-11 h-11 -mr-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
           aria-label="Start new conversation"
         >
-          <Plus className="w-[22px] h-[22px]" style={{ color: '#B45309' }} />
+          <Plus className="w-[22px] h-[22px]" style={{ color: '#EA580C' }} />
         </button>
       ) : (
         <button
@@ -85,7 +85,7 @@ export function EchoPageHeader({ onBack, onNewChat, onOpenHistory, hasMessages }
           className="w-11 h-11 -mr-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
           aria-label="View conversation history"
         >
-          <Clock className="w-5 h-5" style={{ color: '#B45309' }} />
+          <Clock className="w-5 h-5" style={{ color: '#78716C' }} />
         </button>
       )}
     </header>
