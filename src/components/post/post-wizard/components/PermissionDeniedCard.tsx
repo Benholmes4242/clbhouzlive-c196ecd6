@@ -23,7 +23,7 @@ export function PermissionDeniedCard({ type, onRetry }: PermissionDeniedCardProp
   };
   
   return (
-    <div className="h-full flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-300" style={{ backgroundColor: '#F8FAFC' }}>
+    <div className="h-full flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-300" style={{ background: 'linear-gradient(to bottom, rgba(254,243,199,0.3), white, white)' }}>
       <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-5">
         <Icon className="w-9 h-9 text-gray-400" />
       </div>
