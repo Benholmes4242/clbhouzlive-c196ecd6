@@ -253,12 +253,12 @@ export function MediaStep({
       
       {/* Course context bar — visual continuity from Steps 1-2 hero */}
       {course && (
-        <motion.div 
-          className="shrink-0 flex items-center gap-3 px-4 py-2.5 border-b"
-          style={{ 
-            backgroundColor: '#FFF8E1',
-            borderColor: 'rgba(251, 191, 36, 0.15)',
-          }}
+         <motion.div 
+           className="shrink-0 flex items-center gap-3 px-4 py-2.5 border-b"
+           style={{ 
+             background: 'transparent',
+             borderColor: 'rgba(251, 191, 36, 0.15)',
+           }}
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25 }}
