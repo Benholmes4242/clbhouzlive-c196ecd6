@@ -26,14 +26,14 @@ interface NewConversationModalProps {
 
 // Warm input style object shared across all inputs
 const warmInputStyle: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.55)',
-  border: '1px solid rgba(234,88,12,0.08)',
+  background: 'rgba(255,255,255,0.7)',
+  border: '1px solid rgba(217,119,6,0.12)',
   borderRadius: '12px',
   fontSize: '13px',
   color: '#1C1917',
 };
 
-const warmInputClass = "w-full h-10 px-3 outline-none placeholder:text-[13px] placeholder:font-normal focus:ring-2 focus:ring-orange-200/60 transition-shadow";
+const warmInputClass = "w-full h-10 px-3 outline-none placeholder:text-[13px] placeholder:font-normal placeholder:text-gray-400 focus:ring-1 focus:ring-amber-200 focus:border-amber-300 transition-shadow";
 
 export function NewConversationModal({
   open,
@@ -238,10 +238,9 @@ export function NewConversationModal({
         }
       }}
       className={cn(
-        "w-full flex items-center gap-3 p-3 rounded-xl transition-colors text-left active:scale-[0.98] transition-transform",
-        "hover:bg-white/40 cursor-pointer",
+        "w-full flex items-center gap-3 px-4 py-3 transition-colors text-left active:bg-amber-100/30 border-b border-amber-200/15",
         isLoading && "opacity-50 pointer-events-none",
-        isSelected && "bg-white/50"
+        isSelected && "bg-amber-50/50"
       )}
     >
       {showCheckbox && (
@@ -255,11 +254,11 @@ export function NewConversationModal({
         hideRing
       />
       <div className="flex-1 min-w-0">
-        <p className="text-[14px] font-semibold truncate" style={{ color: '#1C1917' }}>
+        <p className="text-sm font-semibold text-gray-900 truncate">
           {userProfile.display_name || userProfile.username || 'Unknown User'}
         </p>
         {userProfile.username && (
-          <p className="text-[13px] truncate" style={{ color: '#A8A29E' }}>
+          <p className="text-xs text-gray-400 truncate">
             @{userProfile.username}
           </p>
         )}
@@ -289,8 +288,8 @@ export function NewConversationModal({
 
     return (
       <div className="text-center py-8">
-        <Search className="h-8 w-8 mx-auto mb-2" style={{ color: '#EA580C', opacity: 0.3 }} />
-        <p className="text-[14px] font-normal" style={{ color: '#78716C' }}>
+        <Search className="h-8 w-8 mx-auto mb-2 text-amber-300" />
+        <p className="text-sm text-gray-400">
           Search for users to start a conversation
         </p>
       </div>
@@ -326,42 +325,30 @@ export function NewConversationModal({
         {/* Tab Switcher */}
         <div className="px-5 pb-4">
           <div
-            className="flex rounded-xl p-1"
-            style={{
-              background: 'rgba(255,255,255,0.55)',
-              border: '1px solid rgba(234,88,12,0.08)',
-            }}
+            className="flex rounded-full p-1 bg-amber-100/50"
           >
             <button
               onClick={() => setMode('direct')}
               className={cn(
-                "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[13px] transition-all",
+                "flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-sm transition-all",
                 mode === 'direct'
-                  ? "font-semibold shadow-sm"
-                  : "font-medium"
+                  ? "font-semibold shadow-sm bg-white text-gray-900"
+                  : "font-medium text-gray-500"
               )}
-              style={{
-                background: mode === 'direct' ? 'rgba(255,255,255,0.8)' : 'transparent',
-                color: mode === 'direct' ? '#1C1917' : '#78716C',
-              }}
             >
-              <MessageCircle size={18} />
+              <MessageCircle size={18} className={mode === 'direct' ? 'text-gray-700' : 'text-gray-400'} />
               Direct Message
             </button>
             <button
               onClick={() => setMode('group')}
               className={cn(
-                "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[13px] transition-all",
+                "flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-sm transition-all",
                 mode === 'group'
-                  ? "font-semibold shadow-sm"
-                  : "font-medium"
+                  ? "font-semibold shadow-sm bg-white text-gray-900"
+                  : "font-medium text-gray-500"
               )}
-              style={{
-                background: mode === 'group' ? 'rgba(255,255,255,0.8)' : 'transparent',
-                color: mode === 'group' ? '#1C1917' : '#78716C',
-              }}
             >
-              <Users size={18} />
+              <Users size={18} className={mode === 'group' ? 'text-gray-700' : 'text-gray-400'} />
               Group Chat
             </button>
           </div>
@@ -417,16 +404,17 @@ export function NewConversationModal({
                       width: '80px',
                       aspectRatio: '1 / 1.05',
                       borderRadius: '34%',
-                      border: '2px dashed rgba(234,88,12,0.25)',
-                      background: groupAvatarPreview ? 'transparent' : 'rgba(234,88,12,0.05)',
+                      border: '2px dashed',
+                      borderColor: 'rgb(252,211,77)',
+                      background: groupAvatarPreview ? 'transparent' : 'rgba(245,158,11,0.05)',
                     }}
                   >
                     {groupAvatarPreview ? (
                       <img src={groupAvatarPreview} alt="Group" className="w-full h-full object-cover" />
                     ) : (
                       <div className="flex flex-col items-center">
-                        <Camera size={24} style={{ color: '#EA580C' }} />
-                        <span className="text-[11px] font-medium mt-1" style={{ color: '#EA580C' }}>
+                        <Camera size={24} className="text-amber-500" />
+                        <span className="text-xs font-medium mt-1 text-amber-600">
                           Add Photo
                         </span>
                       </div>
@@ -470,11 +458,7 @@ export function NewConversationModal({
                     <Badge
                       key={userProfile.id}
                       variant="secondary"
-                      className="gap-1 pr-1 py-1"
-                      style={{
-                        background: 'rgba(255,255,255,0.7)',
-                        border: '1px solid rgba(234,88,12,0.12)',
-                      }}
+                      className="gap-1 pr-1 py-1 bg-amber-100/80 border-0"
                     >
                       <SquircleAvatar
                         src={userProfile.profile_photo_url}
@@ -483,14 +467,14 @@ export function NewConversationModal({
                         fallback={getInitials(userProfile.display_name, userProfile.username)}
                         hideRing
                       />
-                      <span className="max-w-[100px] truncate text-[13px]" style={{ color: '#1C1917' }}>
+                      <span className="max-w-[100px] truncate text-sm text-amber-800">
                         {userProfile.display_name || userProfile.username}
                       </span>
                       <button
                         onClick={() => handleRemoveUser(userProfile.id)}
-                        className="ml-1 p-0.5 rounded-full hover:bg-white/60"
+                        className="ml-1 p-0.5 rounded-full hover:bg-amber-200/50"
                       >
-                        <X className="h-3 w-3" style={{ color: '#78716C' }} />
+                        <X className="h-3 w-3 text-amber-500" />
                       </button>
                     </Badge>
                   ))}
@@ -538,8 +522,8 @@ export function NewConversationModal({
                 )}
                 style={{
                   borderRadius: '14px',
-                  background: isGroupValid ? '#EA580C' : 'rgba(234,88,12,0.08)',
-                  color: isGroupValid ? '#FFFFFF' : 'rgba(234,88,12,0.35)',
+                  background: isGroupValid ? '#F59E0B' : 'rgba(217,119,6,0.15)',
+                  color: isGroupValid ? '#FFFFFF' : 'rgba(217,119,6,0.4)',
                 }}
               >
                 {creatingGroup ? (
