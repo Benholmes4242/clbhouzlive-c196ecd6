@@ -88,10 +88,13 @@ export function WizardHeader({
 
   return (
     <header 
-      className="sticky top-0 z-10 flex items-center justify-between px-3 bg-amber-50"
+      className="sticky top-0 z-10 flex items-center justify-between px-3"
       style={{ 
         paddingTop: hasHeroAbove ? '0px' : 'max(env(safe-area-inset-top, 0px), 47px)',
-        minHeight: hasHeroAbove ? '48px' : 'calc(48px + max(env(safe-area-inset-top, 0px), 47px))'
+        minHeight: hasHeroAbove ? '48px' : 'calc(48px + max(env(safe-area-inset-top, 0px), 47px))',
+        background: hasHeroAbove 
+          ? 'rgba(254,243,199,0.4)' 
+          : '#FFFBEB'
       }}
     >
       {/* Left: Close/Back + Trash (edit mode only) */}
