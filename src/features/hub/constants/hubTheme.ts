@@ -8,7 +8,7 @@ export const HUB_COLORS = {
   // Messages brand accent (intentional WhatsApp-style green)
   messagesIcon: '#25D366',
   unreadGreen: '#2A9D5C',
-  onlineGreen: '#34C759',
+  onlineGreen: '#22C55E',
 
   // Echo card brand (warm orange tones — intentional)
   echoBgGradient: 'linear-gradient(135deg, #FFF8F0 0%, #FFF4E6 50%, #FFEDD5 100%)',

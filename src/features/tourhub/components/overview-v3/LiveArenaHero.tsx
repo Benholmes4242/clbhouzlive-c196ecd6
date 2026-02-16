@@ -226,9 +226,9 @@ function LiveArenaSlide({
         {/* Row 1: LIVE Badge + Tour Logo + Round */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 px-2 py-1 rounded-full" style={{ background: 'rgba(52, 199, 89, 0.15)', border: '1px solid rgba(52, 199, 89, 0.3)' }}>
+            <div className="flex items-center gap-1.5 px-2 py-1 rounded-full" style={{ background: 'rgba(34, 197, 94, 0.15)', border: '1px solid rgba(34, 197, 94, 0.3)' }}>
               <span className="live-dot" style={{ width: '6px', height: '6px' }} />
-              <span style={{ color: '#34C759', fontSize: '11px', fontWeight: 700, letterSpacing: '1px' }}>LIVE</span>
+              <span style={{ color: '#22C55E', fontSize: '11px', fontWeight: 700, letterSpacing: '1px' }}>LIVE</span>
             </div>
             {tournament.currentRound && (
               <span className="text-white/60 text-xs">

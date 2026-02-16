@@ -1,7 +1,7 @@
 /**
  * HubMessagesCardPolished - Semantic token migration
  * All hardcoded HUB_COLORS replaced with semantic tokens
- * Intentional brand colors (#25D366, #34C759, #2A9D5C) preserved
+ * Intentional brand colors (#25D366, #22C55E, #2A9D5C) preserved
  */
 
 import { useMemo, useEffect } from 'react';
@@ -17,7 +17,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 const BRAND = {
   messagesIcon: '#25D366',
   unreadGreen: '#2A9D5C',
-  onlineGreen: '#34C759',
+  onlineGreen: '#22C55E',
   newChatBg: 'rgba(42, 157, 92, 0.15)',
 } as const;
 

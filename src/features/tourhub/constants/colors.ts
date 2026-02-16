@@ -18,7 +18,7 @@ export const TOUR_COLORS = {
   
   // Live indicator
   liveAmber: '#f59e0b',
-  liveGreen: '#34C759',
+  liveGreen: '#22C55E',
   
   // Link/interactive
   linkBlue: '#3478F6',

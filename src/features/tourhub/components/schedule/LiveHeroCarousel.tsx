@@ -125,7 +125,7 @@ function LiveSlide({ tournament, leader }: { tournament: TourTournament; leader?
         <div className="flex items-center justify-between" style={{ marginBottom: '8px' }}>
           <div className="flex items-center gap-1.5">
             <span className="live-dot" />
-            <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: '#34C759' }}>LIVE</span>
+            <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: '#22C55E' }}>LIVE</span>
           </div>
           <div className="tour-badge">
             <span>{getTourLabel(tournament.tour_code)}</span>

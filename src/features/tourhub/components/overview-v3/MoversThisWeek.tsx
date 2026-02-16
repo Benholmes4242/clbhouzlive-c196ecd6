@@ -173,7 +173,7 @@ export function MoversThisWeek() {
                   )}
                   style={{
                     background: isUp 
-                      ? 'linear-gradient(135deg, #34C759 0%, #30B350 100%)'
+                      ? 'linear-gradient(135deg, #22C55E 0%, #1EA34E 100%)'
                       : 'linear-gradient(135deg, #FF3B30 0%, #E6352B 100%)',
                     border: '2.5px solid white',
                     boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)',

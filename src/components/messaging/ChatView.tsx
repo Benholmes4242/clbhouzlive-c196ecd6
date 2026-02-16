@@ -500,7 +500,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             />
             {/* Online indicator for DMs */}
             {!isGroupChat && otherUserPresence?.status === 'online' && (
-              <div className="absolute bottom-0 right-0 w-3 h-3 bg-[#34C759] rounded-full" style={{ borderWidth: 2, borderColor: 'rgba(255,253,248,0.8)' }} />
+              <div className="absolute bottom-0 right-0 w-3 h-3 bg-[#22C55E] rounded-full" style={{ borderWidth: 2, borderColor: 'rgba(255,253,248,0.8)' }} />
             )}
           </div>
           
@@ -514,7 +514,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
               ) : 
                isGroupChat && conversation ? `${conversation.participants.length} members` :
                otherUserPresence?.status === 'online' ? (
-                <span style={{ color: '#34C759' }}>online</span>
+                <span style={{ color: '#22C55E' }}>online</span>
               ) : 
                otherUserPresence?.status === 'away' ? 'away' : 'last seen recently'}
             </p>

@@ -30,9 +30,9 @@
   --th-accent-gold-rgb: 255, 215, 0;
   --th-accent-silver: #C0C0C0;       /* #2 */
   --th-accent-bronze: #CD7F32;       /* #3 */
-  --th-accent-live: #34C759;         /* Live indicator */
-  --th-accent-live-glow: rgba(52, 199, 89, 0.4);
-  --th-accent-birdie: #34C759;       /* Under par */
+  --th-accent-live: #22C55E;         /* Live indicator */
+  --th-accent-live-glow: rgba(34, 197, 94, 0.4);
+  --th-accent-birdie: #22C55E;       /* Under par */
   --th-accent-bogey: #FF9500;        /* Over par */
   --th-accent-eagle: #5856D6;        /* Eagle */
   --th-accent-par: rgba(255, 255, 255, 0.7);

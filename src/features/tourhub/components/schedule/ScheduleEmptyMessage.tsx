@@ -1,11 +1,5 @@
 /**
- * ScheduleEmptyMessage - Premium empty states for the schedule page
- * 
- * Variants:
- * - no-live: Premium empty state with next-event countdown + CTA
- * - no-results: Tour filter yields nothing, CTA to reset
- * - no-upcoming: No upcoming events scheduled
- * - season-complete: Season done, link to overview
+ * ScheduleEmptyMessage - Premium empty states aligned with Tour Overview audit
  */
 
 import { Link } from 'react-router-dom';
@@ -56,38 +50,38 @@ export function ScheduleEmptyMessage({
     return (
       <div
         className={cn(
-          "flex flex-col items-center justify-center gap-5",
+          "flex flex-col items-center justify-center",
           "py-16 px-6 mx-4 text-center",
           className
         )}
         style={{ minHeight: 'clamp(282px, 53vh, 422px)' }}
       >
-        {/* Golf-themed icon with gradient circle */}
+        {/* Icon cluster */}
         <div className="relative">
-          <div 
-            className="w-20 h-20 rounded-full flex items-center justify-center"
-            style={{ background: 'linear-gradient(135deg, hsl(var(--muted)), hsl(var(--muted) / 0.5))' }}
-          >
-            <Flag className="w-8 h-8 text-muted-foreground" />
-          </div>
-          <div 
-            className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full flex items-center justify-center bg-card border-2 border-background"
-          >
-            <Clock className="w-4 h-4 text-muted-foreground" />
+          <Flag className="w-12 h-12 text-muted-foreground/30" />
+          <div className="absolute -bottom-1 -right-2">
+            <Clock className="w-5 h-5 text-muted-foreground/40" />
           </div>
         </div>
 
         {/* Primary message */}
-        <h3 className="text-xl font-bold text-foreground">
+        <h3 
+          className="text-foreground text-center"
+          style={{ fontSize: '18px', fontWeight: 700, marginTop: '16px' }}
+        >
           No Tournaments Live Right Now
         </h3>
 
         {/* Countdown to next event */}
         {nextTournamentName && countdown && (
-          <div className="flex flex-col items-center gap-1.5 max-w-[300px]">
-            <p className="text-sm text-muted-foreground">Next up</p>
-            <p className="text-base font-semibold text-foreground">{nextTournamentName}</p>
-            <p className="text-sm text-muted-foreground">
+          <div className="flex flex-col items-center max-w-[300px]" style={{ marginTop: '12px' }}>
+            <p className="text-muted-foreground" style={{ fontSize: '13px', fontWeight: 400 }}>
+              Next up
+            </p>
+            <p className="text-foreground text-center" style={{ fontSize: '16px', fontWeight: 600, marginTop: '4px' }}>
+              {nextTournamentName}
+            </p>
+            <p className="text-muted-foreground" style={{ fontSize: '13px', fontWeight: 400, marginTop: '2px' }}>
               {countdown}
               {formattedDate && <> · {formattedDate}</>}
             </p>
@@ -95,7 +89,7 @@ export function ScheduleEmptyMessage({
         )}
 
         {!nextTournamentName && (
-          <p className="text-sm text-muted-foreground max-w-[280px]">
+          <p className="text-muted-foreground max-w-[280px]" style={{ fontSize: '13px', fontWeight: 400, marginTop: '12px' }}>
             No tournaments are in progress. Check back soon!
           </p>
         )}
@@ -104,7 +98,8 @@ export function ScheduleEmptyMessage({
         {onSwitchFilter && (
           <button
             onClick={() => onSwitchFilter('upcoming')}
-            className="mt-2 px-6 py-2.5 rounded-xl text-sm font-semibold bg-card border border-border text-foreground transition-all active:scale-95 shadow-sm"
+            className="rounded-xl text-foreground border border-border/60 transition-all active:scale-95"
+            style={{ fontSize: '14px', fontWeight: 600, padding: '12px 24px', marginTop: '20px' }}
           >
             View Upcoming Schedule →
           </button>
