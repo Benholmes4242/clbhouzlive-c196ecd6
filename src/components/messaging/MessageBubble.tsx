@@ -49,7 +49,7 @@ function formatMessageTime(dateString: string): string {
 
 function ReadReceipt({ status }: { status: 'sent' | 'delivered' | 'read' }) {
   if (status === 'read') {
-    return <CheckCheck className="w-3.5 h-3.5" style={{ color: '#EA580C' }} />;
+    return <CheckCheck className="w-3.5 h-3.5 text-amber-500/60" />;
   }
   if (status === 'delivered') {
     return <CheckCheck className="w-3.5 h-3.5" style={{ color: '#A8A29E' }} />;
@@ -144,8 +144,8 @@ export function MessageBubble({
               "hover:scale-[1.02] active:scale-[0.98]",
             )}
             style={{
-              background: 'rgba(255,255,255,0.7)',
-              border: '1px solid rgba(234,88,12,0.08)',
+              background: 'rgba(255,255,255,0.8)',
+              border: '1px solid rgba(217,119,6,0.08)',
               boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
             }}
           >
@@ -186,7 +186,7 @@ export function MessageBubble({
                 {communityRating && communityRating > 0 && (
                   <div className="flex items-center gap-1.5 flex-shrink-0">
                     <ClubhouseLogo size="xs" />
-                    <span className="text-[14px] font-bold" style={{ color: '#EA580C' }}>{communityRating.toFixed(1)}</span>
+                    <span className="text-[14px] font-bold text-amber-600">{communityRating.toFixed(1)}</span>
                   </div>
                 )}
               </div>
@@ -200,7 +200,7 @@ export function MessageBubble({
               
               <div 
                 className="mt-3 flex items-center justify-center gap-2 py-2 rounded-[10px] text-[13px] font-semibold w-full" 
-                style={{ background: 'rgba(234,88,12,0.06)', color: '#EA580C', border: '1px solid rgba(234,88,12,0.1)' }}
+                style={{ background: 'rgba(245,158,11,0.08)', color: '#D97706', border: '1px solid rgba(217,119,6,0.12)' }}
               >
                 <span>View Course</span>
                 <ExternalLink size={14} />
@@ -321,14 +321,12 @@ export function MessageBubble({
           style={
             isOwnMessage
               ? {
-                  background: 'rgba(255,255,255,0.7)',
-                  border: '1px solid rgba(234,88,12,0.08)',
-                  boxShadow: '0 1px 6px rgba(249,115,22,0.06)',
+                  background: 'rgba(254,243,199,0.5)',
+                  border: 'none',
                 }
               : {
-                  background: 'rgba(255,255,255,0.45)',
-                  border: '1px solid rgba(0,0,0,0.04)',
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.02)',
+                  background: 'rgba(255,255,255,0.8)',
+                  border: '1px solid rgba(217,119,6,0.08)',
                 }
           }
           onTouchCancel={() => setIsPressed(false)}
@@ -382,8 +380,8 @@ export function MessageBubble({
 
           {/* Timestamp + Read receipt */}
           <div className="flex items-center gap-1 mt-1 justify-end">
-            {message.is_edited && <span className="text-[11px] font-normal" style={{ color: '#A8A29E' }}>edited</span>}
-            <span className="text-[11px] font-normal" style={{ color: '#A8A29E' }}>{formatMessageTime(message.created_at)}</span>
+            {message.is_edited && <span className="text-[11px] font-normal" style={{ color: isOwnMessage ? 'rgba(180,83,9,0.6)' : '#A8A29E' }}>edited</span>}
+            <span className="text-[11px] font-normal" style={{ color: isOwnMessage ? 'rgba(180,83,9,0.6)' : '#A8A29E' }}>{formatMessageTime(message.created_at)}</span>
             {isOwnMessage && <ReadReceipt status={deliveryStatus} />}
           </div>
         </div>
@@ -404,7 +402,7 @@ export function MessageBubble({
   return (
     <ContextMenu>
       <ContextMenuTrigger asChild>{bubbleContent}</ContextMenuTrigger>
-      <ContextMenuContent className="w-48 bg-white border border-[#E5E5EA] shadow-lg rounded-xl z-50">
+      <ContextMenuContent className="w-48 bg-white border border-amber-200/20 shadow-lg rounded-xl z-50">
         {/* Quick reactions row */}
         <div className="flex items-center justify-around py-2 px-3 border-b border-[#E5E5EA]">
           {['👍', '🔥', '⛳', '😂', '❤️', '🏌️'].map((emoji) => (

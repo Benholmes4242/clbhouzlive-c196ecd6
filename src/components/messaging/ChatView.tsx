@@ -85,11 +85,11 @@ function DateSeparator({ date }: { date: string }) {
   return (
     <div className="flex justify-center py-5">
       <span 
-        className="px-[14px] py-[8px] rounded-[12px] text-[11px] font-medium"
+        className="px-[14px] py-[8px] rounded-full text-[11px] font-medium"
         style={{
-          background: 'rgba(255,255,255,0.5)',
-          border: '1px solid rgba(234,88,12,0.08)',
-          color: '#A8A29E',
+          background: 'rgba(254,243,199,0.6)',
+          border: '1px solid rgba(217,119,6,0.12)',
+          color: '#B45309',
           fontFamily: "'DM Sans', sans-serif",
         }}
       >
@@ -471,10 +471,10 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
         style={{
           height: 'calc(60px + max(env(safe-area-inset-top, 0px), 47px))',
           paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
-          background: 'rgba(255,253,248,0.5)',
+          background: 'rgba(255,251,235,0.85)',
           backdropFilter: 'blur(24px)',
           WebkitBackdropFilter: 'blur(24px)',
-          borderBottom: '1px solid rgba(255,255,255,0.25)',
+          borderBottom: '1px solid rgba(217,119,6,0.08)',
         }}
       >
         {/* Back button */}
@@ -482,7 +482,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
           onClick={onBack}
           className="w-11 h-11 -ml-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
         >
-          <ChevronLeft className="w-5 h-5" style={{ color: '#EA580C' }} />
+          <ChevronLeft className="w-5 h-5 text-amber-700" />
         </button>
         
         {/* Avatar + Info */}
@@ -510,7 +510,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             </h2>
             <p className="text-[11px] truncate" style={{ color: '#A8A29E' }}>
               {isTyping ? (
-                <span style={{ color: '#EA580C' }}>typing...</span>
+                <span className="text-amber-500">typing...</span>
               ) : 
                isGroupChat && conversation ? `${conversation.participants.length} members` :
                otherUserPresence?.status === 'online' ? (
@@ -610,12 +610,12 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
           {showScrollToBottom && (
             <button
               onClick={scrollToBottom}
-              className="fixed bottom-28 right-4 w-9 h-9 bg-white rounded-full flex items-center justify-center z-20 active:scale-95 transition-transform"
-              style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+              className="fixed bottom-28 right-4 w-9 h-9 rounded-full flex items-center justify-center z-20 active:scale-95 transition-transform"
+              style={{ background: 'rgba(255,255,255,0.8)', border: '1px solid rgba(217,119,6,0.12)', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
             >
-              <ChevronDown className="w-[18px] h-[18px]" style={{ color: '#44403C' }} />
+              <ChevronDown className="w-[18px] h-[18px] text-amber-600" />
               {unreadBelowCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-[#EA580C] rounded-full text-[10px] font-bold text-white flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-amber-500 rounded-full text-[10px] font-bold text-white flex items-center justify-center">
                   {unreadBelowCount > 99 ? '99+' : unreadBelowCount}
                 </span>
               )}

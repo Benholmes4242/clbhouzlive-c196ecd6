@@ -35,15 +35,15 @@ export function TypingIndicator({ typingUsers, className }: TypingIndicatorProps
           <div className="flex gap-1">
             <div 
               className="w-2 h-2 rounded-full animate-bounce"
-              style={{ animationDelay: '0ms', backgroundColor: '#EA580C' }}
+              style={{ animationDelay: '0ms', backgroundColor: '#F59E0B' }}
             />
             <div 
               className="w-2 h-2 rounded-full animate-bounce"
-              style={{ animationDelay: '150ms', backgroundColor: '#EA580C' }}
+              style={{ animationDelay: '150ms', backgroundColor: '#F59E0B' }}
             />
             <div 
               className="w-2 h-2 rounded-full animate-bounce"
-              style={{ animationDelay: '300ms', backgroundColor: '#EA580C' }}
+              style={{ animationDelay: '300ms', backgroundColor: '#F59E0B' }}
             />
           </div>
           <span className="text-[13px] italic ml-1" style={{ color: '#A8A29E' }}>
