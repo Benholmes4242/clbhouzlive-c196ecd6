@@ -523,8 +523,8 @@ export function PostWizard({
       .map(item => item.file)
       .filter(Boolean) as File[];
     
-    onClose();
     onRequestReview?.(course, mediaFiles);
+    onClose();
   }, [onClose, onRequestReview, state.mediaItems]);
 
   if (!isOpen) return null;
