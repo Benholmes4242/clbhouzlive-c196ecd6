@@ -161,7 +161,7 @@ export function WriteStep({
       exit={{ opacity: 0, x: -300 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       className="flex-1 flex flex-col min-h-0 px-4 pt-6 pb-6"
-      style={{ background: 'linear-gradient(to bottom, rgba(254,243,199,0.4), white 80%)' }}
+      style={{ background: 'linear-gradient(to bottom, rgba(254,243,199,0.4), white 85%)' }}
     >
       {/* Header */}
       <div className="text-center mb-5">
