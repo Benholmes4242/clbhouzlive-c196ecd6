@@ -405,7 +405,7 @@ export function ReviewWizard({
               touchAction: 'pan-y',
               background: wizard.state.step === 'preview' 
                 ? undefined 
-                : 'linear-gradient(to bottom, #FEF3C7 0%, #FFFBEB 85%)',
+                : 'linear-gradient(to bottom, #FDE68A 0%, #FEF3C7 30%, #FFFBEB 85%)',
             }}
           >
             {/* Hero image - extends into safe area */}
