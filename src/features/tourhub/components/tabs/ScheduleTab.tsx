@@ -369,7 +369,7 @@ export function ScheduleTab() {
   
   return (
     <div
-      className="min-h-screen pb-24 -mx-4"
+      className="min-h-screen -mx-4"
       ref={scrollContainerRef}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
@@ -473,11 +473,11 @@ export function ScheduleTab() {
       )}
 
       {/* Content below hero */}
-      <div className="bg-background pt-4">
+      <div className="bg-background pt-6">
         {/* Search Bar */}
         <div className="px-4">
           <motion.div 
-            className="relative mb-4"
+            className="relative"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.3 }}
@@ -494,12 +494,12 @@ export function ScheduleTab() {
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
               className={cn(
-                "w-full h-12 pl-11 pr-10 rounded-xl text-[14px] transition-all duration-200",
-                "bg-card/80 backdrop-blur-sm border text-foreground placeholder:text-muted-foreground",
+                "w-full h-12 pl-11 pr-10 rounded-2xl text-[13px] transition-all duration-200",
+                "bg-card border text-foreground placeholder:text-muted-foreground",
                 "focus:outline-none focus:ring-2 focus:bg-card",
                 isSearchFocused 
                   ? "border-border ring-border/50 shadow-lg" 
-                  : "border-border/60 ring-transparent shadow-sm"
+                  : "border-border/50 ring-transparent shadow-sm"
               )}
             />
             <AnimatePresence>
@@ -520,22 +520,26 @@ export function ScheduleTab() {
 
         {/* Sticky Filter Toolbar */}
         <motion.div
-          className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm px-4 pb-2 space-y-2"
+          className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm px-4 pb-2"
           style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.3 }}
         >
-          <ScheduleFilterPills
-            activeFilter={filter}
-            onFilterChange={setFilter}
-            counts={filterStats}
-          />
-          <ScheduleTourFilter
-            activeTour={activeTour}
-            onTourChange={setActiveTour}
-            tourCounts={tourCounts}
-          />
+          <div style={{ marginTop: '20px' }}>
+            <ScheduleFilterPills
+              activeFilter={filter}
+              onFilterChange={setFilter}
+              counts={filterStats}
+            />
+          </div>
+          <div style={{ marginTop: '12px' }}>
+            <ScheduleTourFilter
+              activeTour={activeTour}
+              onTourChange={setActiveTour}
+              tourCounts={tourCounts}
+            />
+          </div>
         </motion.div>
 
         {/* No Live Message — premium empty state SC-02 */}
@@ -557,7 +561,7 @@ export function ScheduleTab() {
         <AnimatePresence mode="wait">
           {monthGroups.length > 0 ? (
             <motion.div 
-              className="space-y-section mt-4"
+              className="mt-5"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -567,6 +571,7 @@ export function ScheduleTab() {
                 <motion.div 
                   key={group.monthKey}
                   id={`month-${group.monthKey}`}
+                  className={groupIndex > 0 ? 'mt-7' : ''}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: groupIndex * 0.05, duration: 0.3 }}
@@ -583,8 +588,8 @@ export function ScheduleTab() {
                     />
                   </div>
 
-                  {/* Tournament list */}
-                  <div className="flex flex-col gap-2 px-4">
+                  {/* Tournament list — 12px gap from header, 8px between cards */}
+                  <div className="flex flex-col gap-2 px-4 mt-3">
                     {group.tournaments.map((tournament) => (
                       <InViewCard key={tournament.id}>
                         <ScheduleTournamentCard 
@@ -621,6 +626,9 @@ export function ScheduleTab() {
           </div>
         )}
       </div>
+
+      {/* Bottom safe area */}
+      <div style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }} />
     </div>
   );
 }

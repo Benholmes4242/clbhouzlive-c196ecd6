@@ -98,8 +98,8 @@ function TournamentRow({ tournament, isLive, index }: {
             {tournament.name}
           </h3>
           {isLive ? (
-            <span className="flex items-center gap-1 text-xs font-semibold flex-shrink-0" style={{ color: '#34C759' }}>
-              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#34C759' }} />
+            <span className="flex items-center gap-1 text-xs font-semibold flex-shrink-0" style={{ color: '#22C55E' }}>
+              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#22C55E' }} />
               LIVE
             </span>
           ) : (

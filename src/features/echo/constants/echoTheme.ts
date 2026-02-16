@@ -32,7 +32,7 @@
    
    // Semantic
    error: '#FF3B30',
-   success: '#34C759',
+   success: '#22C55E',
  } as const;
  
  // Animation durations for reduced motion support

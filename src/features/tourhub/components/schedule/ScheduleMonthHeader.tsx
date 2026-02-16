@@ -1,6 +1,6 @@
 /**
- * ScheduleMonthHeader - Section header with semantic tokens for dark mode
- * Now sticky-capable via className prop
+ * ScheduleMonthHeader - Section header aligned with Tour Overview audit
+ * 22px / 700 / tracking -0.3px section headers
  */
 
 import { cn } from '@/lib/utils';
@@ -39,7 +39,7 @@ export function ScheduleMonthHeader({
 
   return (
     <motion.div 
-      className={cn("pt-2 pb-3 px-4", className)}
+      className={cn("pt-5 pb-3 px-4", className)}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
@@ -65,7 +65,7 @@ export function ScheduleMonthHeader({
       </div>
 
       {breakdownParts.length > 1 && (
-        <p className="mt-1 text-muted-foreground/70" style={{ fontSize: '11px', fontWeight: 500 }}>
+        <p className="mt-0.5 text-muted-foreground/60" style={{ fontSize: '12px', fontWeight: 400 }}>
           {breakdownParts.join(' · ')}
         </p>
       )}

@@ -1,6 +1,6 @@
 /**
  * ScheduleTourFilter — Selector button + BottomSheet for tour filtering
- * Dark-mode safe: all colors use semantic tokens
+ * Aligned with Tour Overview audit specs
  */
 
 import { useState, useCallback } from 'react';
@@ -59,8 +59,8 @@ export function ScheduleTourFilter({
         onClick={() => setOpen(true)}
         className={cn(
           'w-full flex items-center justify-between',
-          'bg-card border border-border/50 rounded-[14px]',
-          'px-4 py-3.5',
+          'bg-card border border-border/50 rounded-2xl',
+          'px-4 py-3',
           'shadow-[0_1px_4px_rgba(0,0,0,0.04)]',
           'transition-all duration-200',
           'active:scale-[0.99]'
@@ -69,13 +69,13 @@ export function ScheduleTourFilter({
         aria-expanded={open}
       >
         <div className="flex items-center gap-2.5">
-          <Globe className="w-4 h-4 text-muted-foreground" />
-          <span className="text-sm font-bold text-foreground">{activeTourOption.label}</span>
-          <span className="text-[10px] font-semibold uppercase tracking-[1.2px] text-muted-foreground">
+          <Globe className="w-5 h-5 text-muted-foreground" />
+          <span className="text-sm font-semibold text-foreground">{activeTourOption.label}</span>
+          <span className="text-[11px] font-bold uppercase tracking-[0.5px] text-muted-foreground">
             Schedule
           </span>
         </div>
-        <ChevronDown className="w-4 h-4 text-muted-foreground" />
+        <ChevronDown className="w-4 h-4 text-muted-foreground opacity-60" />
       </button>
 
       {/* Bottom Sheet */}

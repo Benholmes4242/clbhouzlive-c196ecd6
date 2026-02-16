@@ -40,7 +40,7 @@ export function WarmAvatar({ src, name = '', size = 36, online, className }: War
       )}
       {online && (
         <div
-          className="absolute bottom-0 right-0 rounded-full bg-[#34C759] border-2"
+          className="absolute bottom-0 right-0 rounded-full bg-[#22C55E] border-2"
           style={{
             width: dotSize,
             height: dotSize,

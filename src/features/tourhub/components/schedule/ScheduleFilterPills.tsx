@@ -1,6 +1,6 @@
 /**
- * ScheduleFilterPills - Text-on-background tabs with white active indicator
- * Overflow-safe: scrolls horizontally on narrow screens
+ * ScheduleFilterPills - Filter tabs matching Tour Overview Performance Rankings style
+ * Active: dark bg, white text | Inactive: transparent, muted text
  */
 
 import { cn } from '@/lib/utils';
@@ -57,7 +57,7 @@ export function ScheduleFilterPills({
 
   return (
     <div 
-      className="py-2"
+      className="py-1"
       role="tablist"
       aria-label="Filter tournaments"
     >
@@ -68,7 +68,7 @@ export function ScheduleFilterPills({
       >
         {/* Animated indicator */}
         <motion.div
-          className="absolute top-0 bottom-0 rounded-xl bg-card shadow-sm border border-border/40"
+          className="absolute top-0 bottom-0 rounded-xl bg-foreground"
           animate={{
             left: indicatorStyle.left,
             width: indicatorStyle.width,
@@ -86,11 +86,11 @@ export function ScheduleFilterPills({
               aria-selected={isActive}
               onClick={() => onFilterChange(option.value)}
               className={cn(
-                "relative flex-shrink-0 flex-1 z-10 py-2.5 px-4 text-[13px] font-semibold transition-colors duration-200 whitespace-nowrap",
+                "relative flex-shrink-0 flex-1 z-10 py-2.5 px-5 text-sm transition-colors duration-200 whitespace-nowrap",
                 "min-h-[44px] rounded-xl active:scale-[0.95] transition-transform",
                 isActive 
-                  ? "text-foreground" 
-                  : "text-muted-foreground hover:text-foreground/70"
+                  ? "text-background font-semibold" 
+                  : "text-muted-foreground font-medium hover:text-foreground/70"
               )}
             >
               <span className="flex items-center justify-center gap-1.5">
@@ -103,8 +103,8 @@ export function ScheduleFilterPills({
                       <span className={cn(
                         "absolute inline-flex h-full w-full rounded-full opacity-75",
                         isActive ? "animate-ping" : ""
-                      )} style={{ background: '#34C759' }} />
-                      <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: '#34C759' }} />
+                      )} style={{ background: '#22C55E' }} />
+                      <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: '#22C55E' }} />
                     </span>
                   </>
                 )}

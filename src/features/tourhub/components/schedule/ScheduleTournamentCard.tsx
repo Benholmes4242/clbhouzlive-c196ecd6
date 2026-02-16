@@ -115,18 +115,17 @@ export function ScheduleTournamentCard({
   return (
     <motion.button
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
-      className={`w-full flex items-center gap-3 px-3.5 py-2.5 bg-card rounded-2xl border text-left transition-all active:scale-[0.98] ${className || ''}`}
+      className={`w-full flex items-center gap-3 px-3.5 py-2.5 bg-card rounded-2xl border border-border/50 text-left transition-all active:scale-[0.98] ${className || ''}`}
       style={{
-        borderColor: (isMajor || isSignature) ? 'rgba(245, 158, 11, 0.35)' : undefined,
         borderLeftWidth: (isMajor || isSignature) ? '3px' : undefined,
-        borderLeftColor: (isMajor || isSignature) ? '#f59e0b' : undefined,
+        borderLeftColor: isMajor ? 'hsl(142, 76%, 36%)' : isSignature ? '#f59e0b' : undefined,
       }}
       whileTap={{ scale: 0.98 }}
       aria-label={ariaLabel}
     >
       {/* Date block */}
       <div className="flex-shrink-0 w-12 text-center">
-        <p className="uppercase leading-none text-muted-foreground" style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.05em' }}>
+        <p className="uppercase leading-none text-muted-foreground/70" style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.05em' }}>
           {getMonthAbbr(startDate)}
         </p>
         <p className="leading-none mt-0.5 text-foreground" style={{ fontSize: '17px', fontWeight: 700 }}>
@@ -144,7 +143,7 @@ export function ScheduleTournamentCard({
               fontSize: '9px',
               fontWeight: 500,
               letterSpacing: '0.05em',
-              color: isMajor ? '#f59e0b' : isSignature ? '#f59e0b' : isLive ? '#34C759' : 'hsl(var(--muted-foreground))',
+              color: isMajor ? '#f59e0b' : isSignature ? '#f59e0b' : isLive ? '#22C55E' : 'hsl(var(--muted-foreground) / 0.7)',
             }}
           >
             {isLive ? '● LIVE' : contextLabel}
@@ -161,7 +160,7 @@ export function ScheduleTournamentCard({
         
         {/* Winner/Leader row */}
         {(winnerDisplay || hasLeaderData) && (
-          <p className="flex items-center gap-1 mt-0.5" style={{ fontSize: '12px', fontWeight: 600 }}>
+          <p className="flex items-center gap-1 mt-0.5" style={{ fontSize: '13px', fontWeight: 500 }}>
             {isFinal && winnerDisplay && (
               <span className="text-muted-foreground">
                 <Trophy className="w-3 h-3 inline mr-0.5" style={{ color: '#f59e0b' }} />
@@ -172,14 +171,14 @@ export function ScheduleTournamentCard({
                   {winnerDisplay}
                 </button>
                 {winnerScore !== null && winnerScore !== undefined && (
-                  <span className="font-mono ml-1" style={{ color: getScoreColor(winnerScore) }}>
+                  <span className="font-semibold ml-1" style={{ color: '#f59e0b' }}>
                     ({hasSeasonWinner ? (tournament as any).winnerScore : leaderWinner!.displayScore})
                   </span>
                 )}
               </span>
             )}
             {hasLeaderData && !isFinal && (
-              <span style={{ color: '#34C759' }}>
+              <span style={{ color: '#22C55E' }}>
                 Leader:{' '}
                 <button
                   onClick={handlePlayerTap}
@@ -187,7 +186,7 @@ export function ScheduleTournamentCard({
                 >
                   {leaderWinner!.displayName}
                 </button>
-                <span className="font-mono ml-1" style={{ color: getScoreColor(leaderWinner!.score) }}>
+                <span className="font-semibold ml-1" style={{ color: getScoreColor(leaderWinner!.score) }}>
                   {leaderWinner!.displayScore}
                 </span>
               </span>

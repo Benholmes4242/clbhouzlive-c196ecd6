@@ -182,8 +182,8 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #34C759;
-  box-shadow: 0 0 6px 2px rgba(52, 199, 89, 0.45);
+  background: #22C55E;
+  box-shadow: 0 0 6px 2px rgba(34, 197, 94, 0.45);
   animation: livePulse 2s ease-in-out infinite;
 }
 
@@ -191,7 +191,7 @@
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 1.2px;
-  color: #34C759;
+  color: #22C55E;
 }
 
 /* Shimmer animation for loading states */
@@ -816,7 +816,7 @@
   font-family: 'JetBrains Mono', 'SF Mono', 'Courier New', monospace;
   font-size: 28px;
   font-weight: 700;
-  color: #34C759;
+  color: #22C55E;
 }
 
 /* ============================================
@@ -1014,7 +1014,7 @@
 
 /* Legacy score colors (for backwards compatibility) */
 .score-under-par {
-  color: #34C759;
+  color: #22C55E;
 }
 
 .score-over-par {
