@@ -552,13 +552,15 @@ export function MediaStep({
     );
   }
 
+  const useDoubleRow = state.mediaItems.length >= 5;
+
   return (
-    <div className="h-full flex flex-col relative" style={{ backgroundColor: '#F8FAFC' }}>
+    <div className="h-full flex flex-col relative" style={{ backgroundColor: '#FFF8E1' }}>
       {/* Non-blocking picker loading banner */}
       <PickerLoadingBanner isVisible={isPickerOpen} />
       
-      {/* Large media preview stage — reduced height for more thumbnail space */}
-      <div className="flex-shrink-0" style={{ maxHeight: '65%', height: '65%' }}>
+      {/* Zone 1: Large media preview stage — takes remaining space above thumbnail grid */}
+      <div className="flex-1 min-h-0">
         <CreateMomentMediaStage
           media={state.mediaItems}
           activeMediaId={activeMediaId}
@@ -574,12 +576,14 @@ export function MediaStep({
         />
       </div>
       
-      {/* Two-row scrollable thumbnail grid below the preview */}
-      <div className="flex-shrink-0 px-0" style={{ paddingTop: '2px' }}>
+      {/* Zone 2: Thumbnail grid — adaptive rows, amber background */}
+      <div 
+        className="flex-shrink-0 border-t border-amber-200/20 px-2 py-2"
+        style={{ backgroundColor: '#FFF8E1' }}
+      >
         <div 
           className="overflow-x-auto media-grid-scroll"
           style={{ 
-            scrollSnapType: 'x mandatory',
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
           }}
@@ -588,17 +592,14 @@ export function MediaStep({
             .media-grid-scroll::-webkit-scrollbar { display: none; }
           `}} />
           <div 
-            className="grid"
+            className="grid gap-2"
             style={{
-              gap: '2px',
-              gridTemplateRows: state.mediaItems.length <= 4 ? '1fr' : 'repeat(2, 1fr)',
+              gridTemplateRows: useDoubleRow ? 'repeat(2, 80px)' : '80px',
               gridAutoFlow: 'column',
-              gridAutoColumns: 'minmax(0, 1fr)',
-              width: 'max-content',
-              minWidth: '100%',
+              gridAutoColumns: '80px',
             }}
           >
-            {state.mediaItems.map((item, index) => {
+            {state.mediaItems.map((item) => {
               const isRemoving = removingMediaIds.has(item.id);
               const isProcessing = processingMediaIds.has(item.id);
               const isActive = item.id === activeMediaId;
@@ -606,12 +607,7 @@ export function MediaStep({
               return (
                 <motion.div
                   key={item.id}
-                  className="relative overflow-hidden cursor-pointer"
-                  style={{ 
-                    width: '5rem',
-                    height: '5rem',
-                    scrollSnapAlign: 'start',
-                  }}
+                  className="relative overflow-hidden cursor-pointer rounded-xl w-20 h-20"
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ 
                     opacity: isRemoving ? 0 : 1, 
@@ -620,21 +616,19 @@ export function MediaStep({
                   transition={{ duration: 0.2 }}
                   onClick={() => handleActiveMediaChange(item.id)}
                 >
-                  {/* Image/Video */}
                   {item.type === 'image' ? (
                     <img 
                       src={item.previewUrl} 
                       alt="" 
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover rounded-xl"
                     />
                   ) : (
                     <>
                       <img 
                         src={item.thumbnailUrl || item.previewUrl} 
                         alt="" 
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover rounded-xl"
                       />
-                      {/* Video play icon */}
                       <div className="absolute bottom-1 left-1 w-5 h-5 rounded-full flex items-center justify-center"
                         style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
                       >
@@ -656,12 +650,12 @@ export function MediaStep({
                   
                   {/* Active ring */}
                   {isActive && (
-                    <div className="absolute inset-0 ring-2 ring-amber-400 pointer-events-none" />
+                    <div className="absolute inset-0 ring-2 ring-amber-400 rounded-xl pointer-events-none" />
                   )}
                   
                   {/* Processing overlay */}
                   {isProcessing && (
-                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                    <div className="absolute inset-0 bg-black/30 rounded-xl flex items-center justify-center">
                       <div className="w-4 h-4 border-2 border-white/60 border-t-white rounded-full animate-spin" />
                     </div>
                   )}
@@ -674,21 +668,20 @@ export function MediaStep({
               <button
                 onClick={handleGallery}
                 disabled={isPickerOpen}
-                className="border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 active:bg-gray-50 transition-colors disabled:opacity-50"
-                style={{ 
-                  width: '5rem',
-                  height: '5rem',
-                }}
+                className="w-20 h-20 rounded-xl border-2 border-dashed border-amber-300/60 flex items-center justify-center bg-amber-50/30 active:bg-amber-100/40 transition-colors disabled:opacity-50"
               >
-                <Plus className="w-5 h-5" />
+                <Plus className="w-5 h-5 text-amber-400" />
               </button>
             )}
           </div>
         </div>
       </div>
       
-      {/* Bottom action bar — extra padding for safe area */}
-      <div className="flex-shrink-0 border-t border-gray-100 bg-white px-4 py-3 pb-6">
+      {/* Zone 3: Fixed bottom bar — Add/Studio/Badges */}
+      <div 
+        className="flex-shrink-0 border-t border-amber-200/30 px-4 py-3"
+        style={{ backgroundColor: '#FFF8E1', paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}
+      >
         {/* Non-blocking processing progress banner */}
         <MediaProcessingBanner 
           totalVideos={batchTotal} 
@@ -701,7 +694,7 @@ export function MediaStep({
             <button
               onClick={handleGallery}
               disabled={!canAddMore || isPickerOpen}
-              className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-gray-100 text-sm font-medium text-gray-800 active:bg-gray-200 transition-colors ${!canAddMore ? 'opacity-30 cursor-not-allowed' : ''}`}
+              className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-amber-100/80 text-sm font-medium text-amber-700 active:bg-amber-200/80 transition-colors ${!canAddMore ? 'opacity-30 cursor-not-allowed' : ''}`}
             >
               <Plus className="h-4 w-4" />
               Add
@@ -713,7 +706,7 @@ export function MediaStep({
                 studioFirstRun.markSeen();
                 onOpenStudio();
               }}
-              className="relative flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-gray-100 text-sm font-medium text-gray-800 active:bg-gray-200 transition-colors"
+              className="relative flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-amber-100/80 text-sm font-medium text-amber-700 active:bg-amber-200/80 transition-colors"
             >
               <Wand2 className="h-4 w-4" />
               Studio
@@ -728,7 +721,7 @@ export function MediaStep({
                 badgesFirstRun.markSeen();
                 onOpenBadges();
               }}
-              className="relative flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-gray-100 text-sm font-medium text-gray-800 active:bg-gray-200 transition-colors"
+              className="relative flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-amber-100/80 text-sm font-medium text-amber-700 active:bg-amber-200/80 transition-colors"
             >
               <Award className="h-4 w-4" />
               Badges
@@ -739,7 +732,7 @@ export function MediaStep({
           </div>
           
           {/* Media count */}
-          <span className="text-xs text-gray-400 font-medium tabular-nums">
+          <span className="text-xs text-amber-600 font-medium tabular-nums">
             {state.mediaItems.length}/{POST_LIMITS.MAX_MEDIA_COUNT}
           </span>
         </div>
