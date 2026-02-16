@@ -1,13 +1,12 @@
 /**
  * FranchiseCard - Unified college card for both Leaderboard and Movers sections
- * ~110px height, logo left with rank badge, full stats right, player thumbnails
+ * ~110px height, logo left (140px) with rank badge, full stats right, player thumbnails
  */
 
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Users, ChevronRight, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import type { CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import type { CollegeMedia } from '../../hooks/useCollegeMedia';
@@ -26,9 +25,7 @@ interface FranchiseCardProps {
   alumni?: AlumniFace[];
   className?: string;
   animationDelay?: number;
-  /** When true, shows delta values with +/- prefix instead of totals */
   isDelta?: boolean;
-  /** Delta values for movers mode */
   deltas?: {
     earnings_delta: number;
     wins_delta: number;
@@ -71,7 +68,6 @@ export function FranchiseCard({
   const isTopThree = rank !== undefined && rank <= 3;
   const momentumRising = momentum?.isRising ?? false;
 
-  // Build stat items based on mode (totals vs deltas)
   const buildStats = () => {
     if (isDelta && deltas) {
       const items: { label: string; value: string; isAccent: boolean; color?: string }[] = [];
@@ -85,7 +81,6 @@ export function FranchiseCard({
       return items;
     }
 
-    // Totals mode — show all stats, emphasize active
     return [
       { label: '', value: formatCompact(stats.earnings_total), isAccent: activeMetric === 'earnings' },
       { label: pluralize(stats.wins_total, 'win'), value: String(stats.wins_total), isAccent: activeMetric === 'wins' },
@@ -116,22 +111,32 @@ export function FranchiseCard({
         to={`/tourhub/college-golf/${slug}`}
         aria-label={ariaLabel}
         className={cn(
-          'flex overflow-hidden',
-          'bg-card rounded-xl border border-border/40 shadow-sm',
-          'hover:border-primary/30 hover:shadow-md',
+          'flex overflow-hidden group',
           'active:scale-[0.98] transition-all',
-          'group',
           className
         )}
-        style={{ height: '110px' }}
+        style={{
+          background: 'hsl(var(--card))',
+          borderRadius: 16,
+          border: '1px solid hsl(var(--border) / 0.5)',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+          minHeight: 110,
+        }}
       >
-        {/* Logo section — left */}
-        <div className="relative w-[100px] shrink-0 bg-muted/50 overflow-hidden flex items-center justify-center">
+        {/* Logo section — left, 140px wide */}
+        <div
+          className="relative shrink-0 overflow-hidden flex items-center justify-center"
+          style={{
+            width: 140,
+            background: 'hsl(var(--muted) / 0.3)',
+            borderRadius: '16px 0 0 16px',
+          }}
+        >
           {college?.logo_url ? (
             <img
               src={college.logo_url}
               alt={displayName}
-              className="w-14 h-14 object-contain"
+              style={{ width: 64, height: 64, objectFit: 'contain' }}
               loading="lazy"
             />
           ) : (
@@ -140,17 +145,26 @@ export function FranchiseCard({
 
           {/* Rank badge — top-left */}
           {rank !== undefined && (
-            <div className={cn(
-              "absolute top-2 left-2 w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold tabular-nums",
-              isTopThree
-                ? "bg-amber-500 text-white shadow-sm"
-                : "bg-background/90 text-muted-foreground border border-border/60"
-            )}>
+            <div
+              className="absolute flex items-center justify-center"
+              style={{
+                top: 8,
+                left: 10,
+                width: isTopThree ? 24 : 'auto',
+                height: isTopThree ? 24 : 'auto',
+                borderRadius: isTopThree ? '50%' : 4,
+                background: isTopThree ? '#f59e0b' : 'transparent',
+                color: isTopThree ? 'white' : 'hsl(var(--muted-foreground) / 0.5)',
+                fontSize: isTopThree ? 11 : 12,
+                fontWeight: isTopThree ? 700 : 600,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
               {rank}
             </div>
           )}
 
-          {/* Rank change for movers — bottom-left */}
+          {/* Rank change for movers */}
           {isDelta && rankChange !== null && rankChange !== 0 && (
             <div className={cn(
               "absolute bottom-2 left-2 text-[10px] font-bold tabular-nums",
@@ -163,54 +177,75 @@ export function FranchiseCard({
           {/* Momentum indicator */}
           {!isDelta && momentumRising && (
             <div className="absolute bottom-2 left-2">
-              <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
+              <TrendingUp className="w-3.5 h-3.5" style={{ color: '#22C55E' }} />
             </div>
           )}
         </div>
 
         {/* Info section — right */}
-        <div className="flex-1 min-w-0 px-3 py-2.5 flex flex-col justify-center">
-          {/* Row 1 — College name */}
-          <h3 className="text-[15px] font-semibold text-foreground truncate leading-tight group-hover:text-primary transition-colors">
+        <div className="flex-1 min-w-0 flex flex-col justify-center" style={{ padding: '14px 12px 14px 0', paddingLeft: 14 }}>
+          {/* College name — 16px, 600 */}
+          <h3
+            className="text-foreground truncate leading-tight group-hover:text-primary transition-colors"
+            style={{ fontSize: 16, fontWeight: 600, letterSpacing: '-0.1px' }}
+          >
             {displayName}
           </h3>
 
-          {/* Row 2 — Stats inline */}
-          <div className="flex items-center gap-1 mt-1 flex-wrap">
+          {/* Stats inline — 12px, 500 */}
+          <div className="flex items-center gap-1 flex-wrap" style={{ marginTop: 4 }}>
             {statItems.map((item, i) => (
               <span key={i} className="flex items-center">
-                {i > 0 && <span className="text-muted-foreground/30 mx-0.5 text-[10px]">·</span>}
-                <span className={cn(
-                  "text-[12px] tabular-nums",
-                  item.isAccent
-                    ? "font-semibold text-[hsl(var(--tab-orange))]"
-                    : item.color || "font-medium text-muted-foreground"
-                )}>
+                {i > 0 && <span className="text-muted-foreground/30 mx-0.5" style={{ fontSize: 10 }}>·</span>}
+                <span
+                  className={cn(
+                    'tabular-nums',
+                    item.isAccent
+                      ? 'text-[#f59e0b]'
+                      : item.color || 'text-muted-foreground'
+                  )}
+                  style={{
+                    fontSize: 12,
+                    fontWeight: item.isAccent ? 600 : 500,
+                  }}
+                >
                   {item.value}{item.label ? ` ${item.label}` : ''}
                 </span>
               </span>
             ))}
-            {/* Alumni count always shown */}
+            {/* Alumni count */}
             <span className="flex items-center">
-              <span className="text-muted-foreground/30 mx-0.5 text-[10px]">·</span>
-              <Users className="w-3 h-3 text-muted-foreground/50 mr-0.5" />
-              <span className="text-[12px] text-muted-foreground tabular-nums">{stats.player_count}</span>
+              <span className="text-muted-foreground/30 mx-0.5" style={{ fontSize: 10 }}>·</span>
+              <Users className="w-3 h-3 text-muted-foreground mr-0.5" />
+              <span className="text-muted-foreground tabular-nums" style={{ fontSize: 12 }}>{stats.player_count}</span>
             </span>
           </div>
 
-          {/* Row 3 — Alumni face thumbnails */}
+          {/* Alumni face thumbnails — 24×24 circular */}
           {alumni && alumni.length > 0 && (
-            <div className="flex items-center mt-1.5">
-              <div className="flex -space-x-1.5">
-                {alumni.slice(0, 3).map(a => {
+            <div className="flex items-center" style={{ marginTop: 6 }}>
+              <div className="flex items-center">
+                {alumni.slice(0, 3).map((a, i) => {
                   const photoUrl = resolvePhotoUrl(a.photo_url, a.pga_tour_id);
                   return (
-                    <div key={a.id} className="w-5 overflow-hidden bg-muted" style={{ borderRadius: '34%', aspectRatio: '1 / 1.05', border: '1px solid #D1D5DB' }}>
+                    <div
+                      key={a.id}
+                      className="bg-muted overflow-hidden"
+                      style={{
+                        width: 24,
+                        height: 24,
+                        borderRadius: '50%',
+                        border: '1.5px solid white',
+                        marginLeft: i === 0 ? 0 : -6,
+                        zIndex: 3 - i,
+                        position: 'relative',
+                      }}
+                    >
                       {photoUrl ? (
                         <img src={photoUrl} alt={a.full_name} className="w-full h-full object-cover object-top" loading="lazy" />
                       ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/30 flex items-center justify-center">
-                          <span className="text-[6px] font-bold text-muted-foreground/70 leading-none">
+                        <div className="w-full h-full bg-muted flex items-center justify-center">
+                          <span className="text-[6px] font-bold text-muted-foreground/70">
                             {getInitials(a.full_name)}
                           </span>
                         </div>
@@ -220,7 +255,7 @@ export function FranchiseCard({
                 })}
               </div>
               {stats.player_count > 3 && (
-                <span className="text-[10px] text-muted-foreground/50 ml-1.5 tabular-nums">
+                <span className="text-muted-foreground/40 ml-1.5 tabular-nums" style={{ fontSize: 11, fontWeight: 500 }}>
                   +{stats.player_count - 3}
                 </span>
               )}
@@ -230,7 +265,7 @@ export function FranchiseCard({
 
         {/* Chevron */}
         <div className="flex items-center pr-3 shrink-0">
-          <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary transition-colors" />
+          <ChevronRight className="w-4 h-4" style={{ color: 'hsl(var(--muted-foreground) / 0.25)' }} />
         </div>
       </Link>
     </motion.div>

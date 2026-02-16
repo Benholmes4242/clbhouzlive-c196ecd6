@@ -81,7 +81,6 @@ export function CollegeGolfHubPage() {
     sessionStorage.setItem('college-scroll', String(window.scrollY));
   }, []);
 
-  // Save scroll position when navigating away via any link click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       const anchor = (e.target as HTMLElement).closest('a');
@@ -93,15 +92,12 @@ export function CollegeGolfHubPage() {
     return () => document.removeEventListener('click', handler);
   }, [saveScroll]);
 
-  // Determine #1 college for the active metric
   const topCollege = useMemo(() => {
     if (!allStats?.length) return null;
     return [...allStats].sort((a, b) => getMetricValue(b, activeMetric) - getMetricValue(a, activeMetric))[0];
   }, [allStats, activeMetric]);
 
   const topCollegeMedia = topCollege ? collegeMap?.get(topCollege.normalized_name) ?? null : null;
-
-  // Alumni for hero face strip
   const { data: heroAlumni } = useHeroAlumni(topCollege?.normalized_name);
 
   return (
@@ -119,21 +115,31 @@ export function CollegeGolfHubPage() {
           </div>
         )}
 
-        {/* Back Link — floating over hero with safe area */}
+        {/* Back Link — pill style, bg-white/15, backdrop-blur */}
         <div
-          className="absolute left-4 z-20"
-          style={{ top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
+          className="absolute z-20"
+          style={{ top: 56, left: 16 }}
         >
           <Link
             to="/tourhub"
-            className="inline-flex items-center gap-1.5 text-sm text-white/70 hover:text-white transition-colors backdrop-blur-sm bg-black/20 rounded-full px-3 py-1.5"
+            className="inline-flex items-center gap-1.5 transition-colors active:scale-95"
+            style={{
+              background: 'rgba(255,255,255,0.15)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              borderRadius: 9999,
+              padding: '8px 14px',
+              color: 'white',
+              fontSize: 13,
+              fontWeight: 500,
+            }}
           >
             <ArrowLeft className="w-4 h-4" />
             Tour Hub
           </Link>
         </div>
 
-        {/* Immersive Hero — adapts per active metric tab */}
+        {/* Immersive Hero */}
         {topCollege && (
           <CollegeHeroBanner
             stats={topCollege}
@@ -151,27 +157,35 @@ export function CollegeGolfHubPage() {
           />
         )}
 
-        {/* Content area — Overview-matched rhythm */}
-        <div className="px-4 space-y-section pt-5 pb-24">
-          {/* Search Section */}
-          <CollegeSearch />
+        {/* Content area */}
+        <div className="px-4" style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
+          {/* Search — 16px gap from alumni strip */}
+          <div style={{ marginTop: 16 }}>
+            <CollegeSearch />
+          </div>
 
-          {/* Franchise Leaderboard (includes sticky tabs) */}
-          <section>
-            <div className="flex items-center gap-2 mb-4">
-              <Trophy className="w-4 h-4 text-[hsl(var(--tab-orange))]" />
-              <h2 className="text-[16px] font-semibold text-foreground tracking-tight">
+          {/* Franchise Leaderboard section — 24px gap */}
+          <section style={{ marginTop: 24 }}>
+            <div className="flex items-center gap-2" style={{ marginBottom: 12 }}>
+              <Trophy className="w-4 h-4 text-muted-foreground" />
+              <h2
+                className="text-foreground"
+                style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.3px' }}
+              >
                 Franchise Leaderboard
               </h2>
             </div>
             <FranchiseLeaderboard limit={25} />
           </section>
 
-          {/* Weekly Movers */}
-          <section>
-            <div className="flex items-center gap-2 mb-4">
-              <TrendingUp className="w-4 h-4 text-[hsl(var(--tab-orange))]" />
-              <h2 className="text-[16px] font-semibold text-foreground tracking-tight">
+          {/* Weekly Movers section — 28px gap */}
+          <section style={{ marginTop: 28 }}>
+            <div className="flex items-center gap-2" style={{ marginBottom: 12 }}>
+              <TrendingUp className="w-4 h-4" style={{ color: '#22C55E' }} />
+              <h2
+                className="text-foreground"
+                style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.3px' }}
+              >
                 This Week's Movers
               </h2>
             </div>
