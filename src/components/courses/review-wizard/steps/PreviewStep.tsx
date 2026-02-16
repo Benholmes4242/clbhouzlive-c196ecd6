@@ -131,7 +131,7 @@ export function PreviewStep({
           </ReviewPostViewer>
         </div>
       ) : (
-        <div className="flex-1 flex flex-col px-4 pb-4 relative" style={{ backgroundColor: '#F8FAFC' }}>
+        <div className="flex-1 flex flex-col px-4 pb-4 relative" style={{ background: 'linear-gradient(to bottom, rgba(254,243,199,0.3), white, white)' }}>
           <button
             onClick={onClose}
             className="absolute top-0 right-0 z-50 w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors active:scale-[0.97]"

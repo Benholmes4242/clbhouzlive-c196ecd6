@@ -69,7 +69,7 @@ export function PostSuccessScreen({
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
       className="light fixed inset-0 z-[9999] flex flex-col items-center justify-center p-6 pt-safe pb-safe"
-      style={{ backgroundColor: '#F8FAFC' }}
+      style={{ background: 'linear-gradient(to bottom, rgba(254,243,199,0.3), white, white)' }}
     >
       {/* Decorative background glow — amber */}
       <div 

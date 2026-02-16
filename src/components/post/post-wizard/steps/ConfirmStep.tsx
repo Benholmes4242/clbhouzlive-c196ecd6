@@ -345,7 +345,7 @@ export function ConfirmStep({
   const cardBaseDelay = 0.1;
 
   return (
-    <div className="h-full flex flex-col overflow-y-auto" style={{ backgroundColor: '#F8FAFC' }}>
+    <div className="h-full flex flex-col overflow-y-auto" style={{ background: 'linear-gradient(to bottom, rgba(254,243,199,0.3), white, white)' }}>
       {/* Ready to share header — amber sparkle */}
       <motion.div 
         className="flex items-center gap-2 px-4 pt-4 pb-2"

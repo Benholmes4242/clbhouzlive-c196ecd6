@@ -247,7 +247,7 @@ export function MediaStep({
       exit={{ opacity: 0, x: -300 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       className="flex flex-col h-full overflow-hidden relative"
-      style={{ background: 'linear-gradient(to bottom, rgba(254,243,199,0.4), white 85%)' }}
+      style={{ background: 'linear-gradient(to bottom, rgba(254,243,199,0.3), white, white)' }}
     >
       {fileInput}
       
@@ -256,7 +256,6 @@ export function MediaStep({
         <motion.div 
           className="shrink-0 flex items-center gap-3 px-4 py-2.5 border-b"
           style={{ 
-            backgroundColor: '#FFF8E1',
             borderColor: 'rgba(251, 191, 36, 0.15)',
           }}
           initial={{ opacity: 0, y: -4 }}
@@ -322,7 +321,6 @@ export function MediaStep({
           <div 
             className="flex-shrink-0 border-t border-amber-200/30 px-4 py-3"
             style={{ 
-              backgroundColor: '#FFF8E1',
               paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
             }}
           >
