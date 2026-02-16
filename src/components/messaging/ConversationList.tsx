@@ -255,7 +255,7 @@ export function ConversationList({
 
   if (loading) {
     return (
-      <div className="overflow-hidden">
+      <div>
         {[1, 2, 3, 4, 5].map(i => (
           <ConversationSkeleton key={i} />
         ))}
@@ -404,8 +404,8 @@ export function ConversationList({
         </div>
       )}
 
-      {/* Conversations card — warm glass container */}
-      <div className="overflow-hidden">
+      {/* Conversations — directly on page background */}
+      <div>
         {filteredConversations.map((conversation, index) => 
           renderConversationItem(conversation, false, index, filteredConversations.length)
         )}
