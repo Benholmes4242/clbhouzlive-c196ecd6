@@ -28,15 +28,9 @@ export function ConversationSearchBar({
       {/* Search Input - warm glass pill */}
       <div className="relative flex-1">
         <div className={cn(
-          "flex items-center gap-3 h-[40px] rounded-[12px] px-4 transition-all",
-          isFocused && "ring-2 ring-[#EA580C]/15"
-        )}
-          style={{
-            background: 'rgba(255,255,255,0.55)',
-            border: '1px solid rgba(234,88,12,0.08)',
-            boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-          }}
-        >
+          "flex items-center gap-3 h-[40px] rounded-xl px-4 transition-all bg-white/70 border border-amber-200/30",
+          isFocused && "ring-1 ring-amber-200 border-amber-300"
+        )}>
           <Search className="w-4 h-4 flex-shrink-0" style={{ color: '#A8A29E' }} />
           <input
             type="text"

@@ -136,17 +136,17 @@ function ConversationSkeleton() {
 function EmptyState({ onNewConversation }: { onNewConversation?: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
-      <div className="w-16 h-16 rounded-full bg-[#E5E5EA] flex items-center justify-center mb-4">
-        <MessageCircle className="h-8 w-8 text-[#8E8E93]" />
+      <div className="w-16 h-16 rounded-full bg-amber-100/50 flex items-center justify-center mb-4">
+        <MessageCircle className="h-8 w-8 text-amber-300" />
       </div>
-      <h3 className="font-semibold text-[#1D1D1F] text-lg mb-1">No messages yet</h3>
-      <p className="text-sm text-[#8E8E93] mb-6 max-w-[240px]">
+      <h3 className="font-semibold text-gray-900 text-lg mb-1">No messages yet</h3>
+      <p className="text-sm text-gray-400 mb-6 max-w-[240px]">
         Start a conversation with your golf buddies
       </p>
       {onNewConversation && (
         <button 
           onClick={onNewConversation}
-          className="flex items-center gap-2 px-6 py-3 bg-[#E8F5E1] text-[#1D1D1F] rounded-full font-semibold active:scale-95 transition-transform"
+          className="flex items-center gap-2 px-6 py-3 bg-amber-500 text-white rounded-full font-semibold active:scale-95 transition-transform"
         >
           <Plus className="h-4 w-4" />
           Start a Chat
@@ -159,11 +159,11 @@ function EmptyState({ onNewConversation }: { onNewConversation?: () => void }) {
 function NoResults({ query }: { query: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-      <div className="w-12 h-12 rounded-full bg-[#E5E5EA] flex items-center justify-center mb-3">
-        <MessageCircle className="h-6 w-6 text-[#8E8E93]" />
+      <div className="w-12 h-12 rounded-full bg-amber-100/50 flex items-center justify-center mb-3">
+        <MessageCircle className="h-6 w-6 text-amber-300" />
       </div>
-      <h3 className="font-medium text-[#1D1D1F] mb-1">No results found</h3>
-      <p className="text-sm text-[#8E8E93]">
+      <h3 className="font-medium text-gray-900 mb-1">No results found</h3>
+      <p className="text-sm text-gray-400">
         No conversations match "{query}"
       </p>
     </div>
@@ -255,7 +255,7 @@ export function ConversationList({
 
   if (loading) {
     return (
-      <div className="rounded-[16px] overflow-hidden" style={{ background: 'rgba(255,255,255,0.55)', border: '1px solid rgba(234,88,12,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+      <div className="overflow-hidden">
         {[1, 2, 3, 4, 5].map(i => (
           <ConversationSkeleton key={i} />
         ))}
@@ -298,9 +298,9 @@ export function ConversationList({
               onSelectConversation(conversation.id);
             }}
             className={cn(
-              "w-full px-4 py-3 flex items-center gap-3 text-left transition-colors",
-              "active:bg-[#F5F5F5]",
-              isSelected && "bg-[#F5F5F5]",
+              "w-full px-4 py-3.5 flex items-center gap-3 text-left transition-colors",
+              "active:bg-amber-100/30",
+              isSelected && "bg-amber-50/50",
               isArchived && "opacity-70"
             )}
           >
@@ -327,7 +327,7 @@ export function ConversationList({
                 <div className="flex items-center gap-1.5 min-w-0 flex-1">
                   {/* Unread dot */}
                   {hasUnread && (
-                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#EA580C' }} />
+                    <span className="w-2 h-2 rounded-full bg-amber-500 flex-shrink-0" />
                   )}
                   <span className={cn(
                     "text-[14px] truncate",
@@ -345,7 +345,7 @@ export function ConversationList({
                   <span className={cn(
                     "text-[12px] font-normal",
                   )}
-                    style={{ color: hasUnread ? '#EA580C' : '#A8A29E' }}
+                    style={{ color: hasUnread ? '#F59E0B' : '#A8A29E' }}
                   >
                     {formatRelativeTime(conversation.last_message_at)}
                   </span>
@@ -365,7 +365,7 @@ export function ConversationList({
                 </p>
                 
                 {hasUnread && (
-                  <span className="ml-2 min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center" style={{ backgroundColor: '#EA580C' }}>
+                  <span className="ml-2 min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center bg-amber-500">
                     <span className="text-[12px] font-bold text-white">
                       {conversation.unread_count > 99 ? '99+' : conversation.unread_count}
                     </span>
@@ -377,7 +377,7 @@ export function ConversationList({
           
           {/* Divider - inset after avatar, Apple Messages style */}
           {showDivider && (
-            <div className="h-px ml-[76px]" style={{ backgroundColor: 'rgba(0,0,0,0.06)' }} />
+            <div className="h-px ml-[76px] bg-amber-200/15" />
           )}
         </div>
       </SwipeableConversationItem>
@@ -388,7 +388,7 @@ export function ConversationList({
     <div>
       {/* Swipe hint */}
       {showSwipeHint && filteredConversations.length > 0 && (
-        <div className="px-4 py-2 rounded-[16px] mb-3 text-center text-[13px] flex items-center justify-center gap-2" style={{ background: 'rgba(255,255,255,0.55)', border: '1px solid rgba(234,88,12,0.08)', color: '#A8A29E' }}>
+        <div className="px-4 py-2 rounded-xl mb-3 text-center text-[13px] flex items-center justify-center gap-2 bg-amber-50 border border-amber-200/20 text-gray-400">
           <span>← Swipe left to delete</span>
           <span>•</span>
           <span>Swipe right to archive →</span>
@@ -397,8 +397,7 @@ export function ConversationList({
               setShowSwipeHint(false);
               localStorage.setItem('swipeHintDismissed', 'true');
             }}
-            className="ml-2 font-medium"
-            style={{ color: '#EA580C' }}
+            className="ml-2 font-medium text-amber-600"
           >
             Got it
           </button>
@@ -406,7 +405,7 @@ export function ConversationList({
       )}
 
       {/* Conversations card — warm glass container */}
-      <div className="rounded-[16px] overflow-hidden" style={{ background: 'rgba(255,255,255,0.55)', border: '1px solid rgba(234,88,12,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+      <div className="overflow-hidden">
         {filteredConversations.map((conversation, index) => 
           renderConversationItem(conversation, false, index, filteredConversations.length)
         )}
@@ -417,18 +416,18 @@ export function ConversationList({
         <div className="mt-4">
           <button
             onClick={() => setShowArchived(!showArchived)}
-            className="w-full flex items-center justify-between px-4 py-3 bg-white rounded-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.08)] text-[#8E8E93]"
+            className="w-full flex items-center justify-between px-4 py-3 bg-amber-50 rounded-xl text-gray-500"
           >
             <div className="flex items-center gap-2">
               <Archive size={18} />
               <span className="font-medium">Archived</span>
-              <span className="text-sm text-[#8E8E93]/70">({archivedConversations.length})</span>
+              <span className="text-sm text-gray-400">({archivedConversations.length})</span>
             </div>
             {showArchived ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
           </button>
           
           {showArchived && (
-            <div className="mt-2 bg-white rounded-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.08)] overflow-hidden">
+            <div className="mt-2 overflow-hidden">
               {archivedConversations.map((conversation, index) => 
                 renderConversationItem(conversation, true, index, archivedConversations.length)
               )}
