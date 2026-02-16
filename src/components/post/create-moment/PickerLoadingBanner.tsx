@@ -38,7 +38,7 @@ export function PickerLoadingBanner({ isVisible }: PickerLoadingBannerProps) {
             {Array.from({ length: 5 }).map((_, i) => (
               <div
                 key={i}
-                className="w-16 h-16 rounded-xl bg-gray-200 animate-pulse"
+                className="w-16 h-16 rounded-xl bg-amber-200/50 animate-pulse"
                 style={{ animationDelay: `${i * 150}ms` }}
               />
             ))}
@@ -49,7 +49,7 @@ export function PickerLoadingBanner({ isVisible }: PickerLoadingBannerProps) {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="text-xs text-gray-400 text-center mt-2"
+                className="text-xs text-amber-400/70 text-center mt-2"
               >
                 Large videos from iCloud may take a few minutes
               </motion.p>
