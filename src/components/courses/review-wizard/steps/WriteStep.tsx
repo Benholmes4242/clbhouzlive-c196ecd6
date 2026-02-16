@@ -186,7 +186,7 @@ export function WriteStep({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
           className={cn(
-            "flex flex-col rounded-2xl border bg-amber-50/50 transition-all duration-200 shadow-sm shrink-0",
+            "flex flex-col rounded-2xl border bg-white transition-all duration-200 shadow-sm shrink-0",
             isTitleFocused ? "border-amber-300 ring-1 ring-amber-200 shadow-amber-100/50" : "border-amber-200/30"
           )}
         >
@@ -229,7 +229,7 @@ export function WriteStep({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className={cn(
-            "flex-1 flex flex-col rounded-2xl border bg-amber-50/50 transition-all duration-200 shadow-sm min-h-[160px]",
+            "flex-1 flex flex-col rounded-2xl border bg-white transition-all duration-200 shadow-sm min-h-[160px]",
             isReviewFocused ? "border-amber-300 ring-1 ring-amber-200 shadow-amber-100/50" : "border-amber-200/30"
           )}
         >
