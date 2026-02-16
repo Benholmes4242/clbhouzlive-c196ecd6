@@ -305,7 +305,8 @@ export function NewConversationModal({
       onClose={handleClose}
       className="flex flex-col"
       style={{
-        background: 'linear-gradient(180deg, #FFF8F0 0%, #FFF5EB 40%, #FFECD2 100%)',
+        backgroundColor: '#FFFBEB',
+        backgroundImage: 'linear-gradient(to bottom, rgba(254,243,199,0.3) 0%, rgba(254,243,199,0.2) 45%, white 75%, white 100%)',
         borderRadius: '20px 20px 0 0',
       }}
       ariaLabelledBy="new-message-title"
