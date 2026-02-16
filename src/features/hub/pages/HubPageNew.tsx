@@ -558,7 +558,7 @@ export function HubPageNew() {
                     className="w-[38px] h-[38px] rounded-full flex items-center justify-center"
                     style={{
                       background: '#F59E0B',
-                      animation: prefersReduced ? 'none' : 'warmPulseGlow 2s ease-in-out infinite',
+                      animation: 'none',
                     }}
                   >
                     <div className="flex items-center gap-[2px]">
