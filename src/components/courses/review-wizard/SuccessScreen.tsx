@@ -1,9 +1,6 @@
 /**
- * Success Screen after review submission
- * Two variants: 'standard' (skipped share) and 'shared' (posted to Clubhouse)
- * Amber-themed confetti celebration with double-pulse ring animation
- * 
- * Review-specific: shows rating summary, course thumbnail, smart button labels
+ * Success Screen — Amber-themed, matching Post Wizard success
+ * Rating summary, confetti, radial glow
  */
 
 import React, { useEffect } from 'react';
@@ -41,7 +38,6 @@ export function SuccessScreen({
   const tierData = rating ? getScoreTier(rating) : null;
   const isOutstanding = rating != null && rating >= 9.0;
   
-  // Fire confetti on mount — more celebratory for shared, subdued for edits
   useEffect(() => {
     const timer = setTimeout(() => {
       confetti({
@@ -62,18 +58,22 @@ export function SuccessScreen({
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-      className="relative flex-1 flex flex-col items-center justify-center p-6 text-center bg-background"
+      className="relative flex-1 flex flex-col items-center justify-center p-6 text-center"
+      style={{ 
+        backgroundColor: '#F8FAFC',
+        backgroundImage: 'radial-gradient(ellipse at center, rgba(251, 191, 36, 0.08) 0%, transparent 70%)',
+      }}
     >
       {/* Close button */}
       <button
         onClick={onDone}
-        className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-muted flex items-center justify-center text-foreground hover:bg-muted/80 transition-colors"
+        className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-foreground hover:bg-gray-200 transition-colors active:scale-[0.97]"
         aria-label="Close"
       >
         <X className="h-5 w-5" />
       </button>
 
-      {/* Course thumbnail — visual anchor */}
+      {/* Course thumbnail */}
       {course?.thumbnail_image && (
         <motion.img
           src={course.thumbnail_image}
@@ -85,28 +85,25 @@ export function SuccessScreen({
         />
       )}
 
-      {/* Success icon with double-pulse rings — tier-aware: amber for Outstanding, slate for rest */}
+      {/* Success icon with pulse rings */}
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.15 }}
         className="mb-6 relative"
       >
-        {/* First pulse ring */}
         <motion.div
           initial={{ scale: 0.8, opacity: 0.6 }}
           animate={{ scale: 1.8, opacity: 0 }}
           transition={{ duration: 0.8, delay: 0.35 }}
           className={`absolute inset-0 w-20 h-20 rounded-full ${isOutstanding ? 'bg-amber-300/40' : 'bg-slate-300/40'}`}
         />
-        {/* Second pulse ring (staggered) */}
         <motion.div
           initial={{ scale: 0.8, opacity: 0.5 }}
           animate={{ scale: 1.5, opacity: 0 }}
           transition={{ duration: 0.7, delay: 0.55 }}
           className={`absolute inset-0 w-20 h-20 rounded-full ${isOutstanding ? 'bg-amber-200/30' : 'bg-slate-200/30'}`}
         />
-        {/* Main icon circle */}
         <div className={`w-20 h-20 rounded-full flex items-center justify-center relative z-10 ${isOutstanding ? 'bg-amber-100' : 'bg-slate-100'}`}>
           <CheckCircle2 className={`h-10 w-10 ${isOutstanding ? 'text-amber-500' : 'text-slate-500'}`} />
         </div>
@@ -122,7 +119,7 @@ export function SuccessScreen({
         <h2 className="text-xl font-semibold text-foreground">
           {isShared ? 'Posted to Clubhouse!' : (isEditMode ? 'Review Updated!' : 'Review Saved!')}
         </h2>
-        <p className="text-muted-foreground max-w-xs mx-auto">
+        <p className="text-gray-500 max-w-xs mx-auto">
           {isShared 
             ? `Your review of ${course?.name || 'the course'} has been shared to your profile and the Clubhouse feed.`
             : isEditMode
@@ -132,7 +129,7 @@ export function SuccessScreen({
         </p>
       </motion.div>
 
-      {/* Rating summary — the defining output of the review flow */}
+      {/* Rating summary */}
       {rating != null && tierData && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -149,10 +146,9 @@ export function SuccessScreen({
           </span>
         </motion.div>
       )}
-      {/* Fallback spacer when no rating */}
       {(rating == null || !tierData) && <div className="mb-8" />}
 
-      {/* Actions - Primary (brand), Secondary (ghost) */}
+      {/* Actions */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -160,29 +156,26 @@ export function SuccessScreen({
         className="flex flex-col w-full gap-3 max-w-xs"
       >
         {isShared ? (
-          <Button
+          <button
             onClick={onViewPost}
-            className="w-full h-12 gap-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full active:scale-[0.97] transition-all duration-200"
+            className="w-full h-12 gap-2 text-white font-semibold rounded-full active:scale-[0.97] transition-all duration-200 flex items-center justify-center"
+            style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)' }}
           >
             <ExternalLink className="h-4 w-4" />
             View Post
-          </Button>
+          </button>
         ) : (
-          <Button
+          <button
             onClick={onViewReview}
-            className="w-full h-12 gap-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full active:scale-[0.97] transition-all duration-200"
+            className="w-full h-12 gap-2 text-white font-semibold rounded-full active:scale-[0.97] transition-all duration-200 flex items-center justify-center"
+            style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)' }}
           >
             <Eye className="h-4 w-4" />
             View Review
-          </Button>
+          </button>
         )}
         
-        {/* Done button - ghost style */}
-        <Button
-          variant="ghost"
-          onClick={onDone}
-          className="w-full h-12 text-muted-foreground hover:text-foreground"
-        >
+        <Button variant="ghost" onClick={onDone} className="w-full h-12 text-gray-500 hover:text-foreground">
           Done
         </Button>
       </motion.div>
