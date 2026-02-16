@@ -92,6 +92,8 @@ export interface PostWizardProps {
   initialCourses?: GolfCourse[];
   /** One-time actor override */
   initialActorOverride?: ActorRef;
+  /** Called when user taps "Leave a Review" on success screen — passes the course and media files */
+  onRequestReview?: (course: GolfCourse, mediaFiles: File[]) => void;
 }
 
 // Props for individual step components

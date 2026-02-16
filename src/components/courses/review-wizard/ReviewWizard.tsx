@@ -48,6 +48,7 @@ export function ReviewWizard({
   isEditMode = false,
   existingRating,
   onRemoveFromPlayed,
+  initialMediaFiles,
 }: ReviewWizardProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -152,6 +153,7 @@ export function ReviewWizard({
     course: activeCourse,
     isEditMode,
     existingRating,
+    initialMediaFiles,
     onSuccess: () => {
       // For edit mode - go directly to success
       wizard.goToStep('success');
