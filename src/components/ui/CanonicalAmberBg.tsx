@@ -14,8 +14,8 @@ export function CanonicalAmberBg({ className = '' }: CanonicalAmberBgProps) {
       className={`fixed inset-0 ${className}`}
       aria-hidden="true"
       style={{
-        backgroundColor: '#FFFBEB',
-        backgroundImage: 'linear-gradient(to bottom, rgba(254,243,199,0.3) 0%, rgba(254,243,199,0.2) 45%, white 75%, white 100%)',
+        backgroundColor: '#FEFDFB',
+        backgroundImage: 'linear-gradient(to bottom, rgba(254,243,199,0.15) 0%, rgba(254,243,199,0.08) 30%, white 50%, white 100%)',
       }}
     />
   );
