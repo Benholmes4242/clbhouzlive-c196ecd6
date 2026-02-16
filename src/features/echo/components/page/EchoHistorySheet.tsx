@@ -151,9 +151,9 @@ function HistorySkeleton() {
           dragConstraints={{ left: -80, right: 0 }}
           dragElastic={{ left: 0.1, right: 0 }}
           onDragEnd={handleDragEnd}
-          style={{ x }}
+          style={{ x, backgroundColor: '#FFFBEB' }}
           onClick={handleSelect}
-          className="relative bg-transparent px-4 py-3.5 flex items-center gap-3 active:bg-amber-100/50 transition-colors cursor-pointer"
+          className="relative px-4 py-3.5 flex items-center gap-3 active:bg-amber-100/50 transition-colors cursor-pointer"
           role="listitem"
           aria-label={`Open conversation: ${displayTitle}`}
         >
