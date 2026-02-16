@@ -478,17 +478,24 @@ export function WatchShortsGrid({
     );
   }
 
-  // P2: Shimmer-down skeleton with staggered delays
+  // P2: Dark media shimmer skeleton with staggered delays
   if (isLoading && shorts.length === 0) {
     return (
       <div className="pt-1 pb-4">
         <div className="grid grid-cols-3 gap-[2px]">
           {Array.from({ length: 9 }).map((_, i) => (
-            <Skeleton 
+            <div 
               key={i} 
-              className={`aspect-[4/5] ${prefersReducedMotion ? '' : 'animate-shimmer-down'}`}
-              style={prefersReducedMotion ? undefined : { animationDelay: `${i * 50}ms` }}
-            />
+              className="aspect-[4/5] relative overflow-hidden"
+              style={{ backgroundColor: 'hsl(220, 10%, 18%)' }}
+            >
+              {!prefersReducedMotion && (
+                <div 
+                  className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-white/[0.12] to-transparent"
+                  style={{ animationDelay: `${i * 50}ms` }}
+                />
+              )}
+            </div>
           ))}
         </div>
       </div>
