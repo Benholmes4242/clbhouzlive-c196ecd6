@@ -45,21 +45,21 @@ function CollegeSide({ college, value, metric, isWinner }: CollegeSideProps) {
   
   return (
     <div className="flex flex-col items-center flex-1">
-      <div className={cn(
-        "relative w-16 h-16 rounded-full mb-3",
-        "bg-background border-2",
-        isWinner ? "border-primary shadow-lg shadow-primary/20" : "border-border/50",
-        "flex items-center justify-center overflow-hidden",
-        "transition-all duration-300"
-      )}>
-        {isWinner && (
-          <div className="absolute inset-0 rounded-full bg-primary/10 animate-pulse" />
-        )}
+      {/* Logo with circular muted bg — 72px logo, 88px bg */}
+      <div
+        className="rounded-full flex items-center justify-center overflow-hidden"
+        style={{
+          width: '88px',
+          height: '88px',
+          backgroundColor: 'hsl(var(--muted) / 0.2)',
+        }}
+      >
         {college?.logo_url ? (
           <img 
             src={college.logo_url} 
             alt={displayName}
-            className="w-12 h-12 object-contain relative z-10"
+            className="object-contain relative z-10"
+            style={{ width: '72px', height: '72px' }}
           />
         ) : (
           <span className="text-xl font-bold text-muted-foreground/60 relative z-10">
@@ -68,19 +68,25 @@ function CollegeSide({ college, value, metric, isWinner }: CollegeSideProps) {
         )}
       </div>
       
-      <h4 className="text-sm font-medium text-foreground text-center mb-2 line-clamp-1">
+      {/* Name — 14px, weight 600, centered */}
+      <h4 className="text-foreground text-center line-clamp-1" style={{ fontSize: '14px', fontWeight: 600, marginTop: '8px' }}>
         {displayName}
       </h4>
       
+      {/* Stat value — JetBrains Mono, 22px, weight 800 */}
       <motion.div
         key={`${college?.normalized_name}-${metric}`}
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.2 }}
-        className={cn(
-          "text-xl tabular-nums",
-          isWinner ? "font-bold text-primary" : "font-medium text-muted-foreground"
-        )}
+        style={{
+          fontFamily: "'JetBrains Mono', monospace",
+          fontSize: '22px',
+          fontWeight: 800,
+          fontVariantNumeric: 'tabular-nums',
+          marginTop: '4px',
+        }}
+        className={isWinner ? 'text-foreground' : 'text-muted-foreground'}
       >
         {formatValue(value, metric)}
       </motion.div>
@@ -102,30 +108,32 @@ function RivalChip({ normalizedName, college, isSelected, onClick }: RivalChipPr
     <button
       onClick={onClick}
       className={cn(
-        "shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl",
+        "shrink-0 flex items-center rounded-xl",
         "border transition-all duration-200",
         "active:scale-95 min-h-[44px]",
         isSelected 
-          ? "bg-muted border-border shadow-sm" 
-          : "bg-card border-border hover:bg-muted/80"
+          ? "bg-muted/30 border-border" 
+          : "bg-card border-border/50 hover:bg-muted/80"
       )}
+      style={{ padding: '10px 16px', gap: '8px' }}
     >
-      <div className="w-7 h-7 rounded-lg flex items-center justify-center overflow-hidden bg-muted">
+      {/* College logo — 24×24px */}
+      <div className="flex items-center justify-center overflow-hidden" style={{ width: '24px', height: '24px' }}>
         {college?.logo_url ? (
-          <img src={college.logo_url} alt={displayName} className="w-5 h-5 object-contain" />
+          <img src={college.logo_url} alt={displayName} className="w-6 h-6 object-contain" />
         ) : (
           <span className="text-xs font-bold text-muted-foreground">{displayName.charAt(0)}</span>
         )}
       </div>
       
       <span className={cn(
-        "text-xs font-medium whitespace-nowrap",
+        "whitespace-nowrap",
         isSelected ? "text-foreground" : "text-muted-foreground"
-      )}>
+      )} style={{ fontSize: '13px', fontWeight: 500 }}>
         {displayName}
       </span>
       
-      {isSelected && <Check className="w-3.5 h-3.5 text-foreground" />}
+      {isSelected && <Check className="w-4 h-4 text-foreground" />}
     </button>
   );
 }
@@ -216,18 +224,20 @@ export function CollegeCompareSheet({
               "max-h-[85vh] overflow-hidden"
             )}
           >
-            {/* Drag handle */}
-            <div className="flex justify-center pt-3 pb-2">
-              <div className="w-10 h-1 rounded-full bg-border" />
+            {/* Drag handle — 40×4px */}
+            <div className="flex justify-center" style={{ paddingTop: '8px', paddingBottom: '4px' }}>
+              <div className="rounded-full" style={{ width: '40px', height: '4px', backgroundColor: 'hsl(var(--muted-foreground) / 0.2)', borderRadius: '2px' }} />
             </div>
             
-            <div className="flex items-center justify-between px-4 pb-3">
-              <h3 className="text-lg font-semibold text-foreground">Head to Head</h3>
+            {/* Title — 18px, weight 700 */}
+            <div className="flex items-center justify-between" style={{ padding: '20px 20px 16px' }}>
+              <h3 className="text-foreground" style={{ fontSize: '18px', fontWeight: 700 }}>Head to Head</h3>
               <button
                 onClick={onClose}
-                className="p-2 -m-2 text-muted-foreground hover:text-foreground transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                className="text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center"
+                style={{ width: '36px', height: '36px' }}
               >
-                <X className="w-5 h-5" />
+                <X style={{ width: '20px', height: '20px' }} />
               </button>
             </div>
             
@@ -256,10 +266,11 @@ export function CollegeCompareSheet({
               </div>
             )}
 
+            {/* Rival selector */}
             {!hasError && rivals.length > 0 && (
-              <div className="px-4 pb-4">
-                <p className="text-xs font-medium text-muted-foreground mb-2">Select Rival</p>
-                <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide">
+              <div style={{ padding: '0 20px 16px' }}>
+                <p className="text-muted-foreground" style={{ fontSize: '13px', fontWeight: 500, marginBottom: '10px' }}>Select Rival</p>
+                <div className="flex overflow-x-auto scrollbar-hide -mx-5 px-5" style={{ gap: '8px' }}>
                   {rivals.map((rivalSlug) => (
                     <RivalChip
                       key={rivalSlug}
@@ -273,21 +284,26 @@ export function CollegeCompareSheet({
               </div>
             )}
             
-            {/* Metric pills — clean text, no icons */}
+            {/* Metric chips — 13px */}
             {!hasError && !hasNoRivals && (
-              <div className="flex gap-2 px-4 pb-4">
+              <div className="flex" style={{ padding: '0 20px 16px', gap: '8px', marginTop: '0px' }}>
                 {METRICS.map(({ key, label }) => (
                   <button
                     key={key}
                     onClick={() => setActiveMetric(key)}
                     className={cn(
-                      "flex-1 flex items-center justify-center py-2 px-3 rounded-lg",
-                      "text-xs font-medium transition-all min-h-[40px]",
+                      "flex-1 flex items-center justify-center rounded-xl",
+                      "transition-all min-h-[40px]",
                       "active:scale-95",
                       activeMetric === key
-                        ? "bg-card text-foreground border border-border shadow-sm"
-                        : "bg-muted text-muted-foreground border border-transparent hover:bg-muted/80"
+                        ? "bg-muted/40 text-foreground border border-transparent"
+                        : "bg-card text-muted-foreground border border-border/50 hover:bg-muted/80"
                     )}
+                    style={{
+                      fontSize: '13px',
+                      fontWeight: activeMetric === key ? 600 : 500,
+                      padding: '10px 18px',
+                    }}
                   >
                     {label}
                   </button>
@@ -297,26 +313,31 @@ export function CollegeCompareSheet({
             
             {/* VS comparison */}
             {!hasError && !hasNoRivals && hasValidComparison && (
-              <div className="flex items-center justify-around px-6 py-6">
+              <div className="flex items-center justify-around" style={{ padding: '0 24px', marginTop: '32px' }}>
                 <CollegeSide college={media1} value={value1} metric={activeMetric} isWinner={value1 > value2} />
-                <div className="mx-4 px-3 py-1.5 rounded-full bg-muted text-xs font-bold text-muted-foreground">VS</div>
+                <div className="text-muted-foreground" style={{ fontSize: '13px', fontWeight: 500 }}>vs</div>
                 <CollegeSide college={media2} value={value2} metric={activeMetric} isWinner={value2 > value1} />
               </div>
             )}
             
+            {/* Full Comparison button */}
             {!hasError && !hasNoRivals && (
-              <div className="px-4 pb-8" style={{ paddingBottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))' }}>
+              <div style={{ padding: '24px 20px', paddingBottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))' }}>
                 {hasValidComparison ? (
                   <Link to={`/tourhub/college-golf/compare?c1=${college1}&c2=${selectedCollege2}`}>
-                    <Button className="w-full gap-2" onClick={onClose}>
+                    <button
+                      onClick={onClose}
+                      className="w-full rounded-2xl border border-border/50 bg-card flex items-center justify-center active:scale-[0.98] transition-all text-foreground"
+                      style={{ padding: '14px', fontSize: '14px', fontWeight: 600, gap: '6px' }}
+                    >
                       Full Comparison
                       <ArrowRight className="w-4 h-4" />
-                    </Button>
+                    </button>
                   </Link>
                 ) : (
-                  <Button className="w-full gap-2" disabled>
+                  <button className="w-full rounded-2xl border border-border/50 bg-muted text-muted-foreground" style={{ padding: '14px', fontSize: '14px', fontWeight: 600 }} disabled>
                     Select a rival to compare
-                  </Button>
+                  </button>
                 )}
               </div>
             )}

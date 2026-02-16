@@ -34,15 +34,16 @@ function HeadToHeadChip({ winsA, winsB, earningsDiff, winner }: HeadToHeadChipPr
   const isTied = winner === 'tie';
   
   return (
-    <div className={cn(
-      "px-2 py-0.5 rounded-full text-[10px] font-semibold",
-      "border",
-      isWinning 
-        ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-600" 
-        : isTied 
-          ? "bg-muted border-border/50 text-muted-foreground"
-          : "bg-rose-500/10 border-rose-500/30 text-rose-600"
-    )}>
+    <div
+      className="rounded-full"
+      style={{
+        fontSize: '11px',
+        fontWeight: 600,
+        padding: '4px 10px',
+        backgroundColor: isWinning ? 'rgba(34,197,94,0.1)' : isTied ? 'hsl(var(--muted))' : 'rgba(239,68,68,0.1)',
+        color: isWinning ? '#22C55E' : isTied ? 'hsl(var(--muted-foreground))' : 'hsl(var(--destructive))',
+      }}
+    >
       {isTied ? 'Tied' : isWinning ? `W ${winsA}–${winsB}` : `L ${winsA}–${winsB}`}
     </div>
   );
@@ -93,9 +94,9 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
   
   if (isLoading) {
     return (
-      <div className={cn('flex gap-3 overflow-x-auto pb-2', className)}>
+      <div className={cn('flex gap-2 overflow-x-auto pb-2 px-4 -mx-4', className)} style={{ touchAction: 'pan-x pan-y' }}>
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="shrink-0 w-28 h-36 bg-card border border-border rounded-xl animate-pulse" />
+          <div key={i} className="shrink-0 h-44 bg-card border border-border/50 rounded-2xl animate-pulse" style={{ width: '160px' }} />
         ))}
       </div>
     );
@@ -115,7 +116,7 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
   }
   
   return (
-    <div className={cn('flex gap-3 overflow-x-auto pb-2 -mx-4 px-4', className)}>
+    <div className={cn('flex overflow-x-auto pb-2 -mx-4 px-4', className)} style={{ gap: '8px', touchAction: 'pan-x pan-y' }}>
       {enrichedRivalries.map((rivalry) => {
         const rivalName = rivalry.rivalNormalizedName;
         const college = rivalry.college;
@@ -123,13 +124,14 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
         
         const cardContent = (
           <>
-            <div className="relative w-12 h-12 rounded-xl bg-muted flex items-center justify-center overflow-hidden mb-2 shadow-sm">
-              <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
+            {/* Logo with circular muted background */}
+            <div className="relative flex items-center justify-center rounded-full bg-muted/20" style={{ width: '72px', height: '72px' }}>
               {college?.logo_url ? (
                 <img 
                   src={college.logo_url} 
                   alt={displayName}
-                  className="w-10 h-10 object-contain relative z-10"
+                  className="object-contain relative z-10"
+                  style={{ width: '56px', height: '56px' }}
                   loading="lazy"
                 />
               ) : (
@@ -139,25 +141,28 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
               )}
             </div>
             
-            <p className="text-xs font-semibold text-foreground truncate w-full group-hover:text-primary transition-colors">
+            {/* Name — 14px, weight 600, centered */}
+            <p className="text-foreground truncate w-full group-hover:text-primary transition-colors text-center" style={{ fontSize: '14px', fontWeight: 600, marginTop: '10px' }}>
               {displayName}
             </p>
             
+            {/* Record pill */}
             {rivalry.h2h && (
-              <div className="mt-1.5">
+              <div style={{ marginTop: '6px' }}>
                 <HeadToHeadChip {...rivalry.h2h} />
               </div>
             )}
             
-            <span className="text-[10px] text-muted-foreground mt-1.5 flex items-center gap-0.5 group-hover:text-primary transition-colors">
+            {/* Compare → */}
+            <span className="text-muted-foreground flex items-center gap-0.5 group-hover:text-primary transition-colors" style={{ fontSize: '12px', fontWeight: 500, marginTop: '8px' }}>
               Compare <ArrowRight className="w-2.5 h-2.5" />
             </span>
           </>
         );
         
         const cardStyles = cn(
-          'shrink-0 w-28 p-3 rounded-xl',
-          'bg-card border border-border',
+          'shrink-0 rounded-2xl',
+          'bg-card border border-border/50',
           'hover:border-primary/30 hover:bg-card/90 transition-all duration-200',
           'active:scale-[0.98]',
           'flex flex-col items-center text-center group'
@@ -169,6 +174,7 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
               key={rivalry.id}
               onClick={() => onCompare(rivalName)}
               className={cardStyles}
+              style={{ width: '160px', padding: '16px' }}
             >
               {cardContent}
             </button>
@@ -180,6 +186,7 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
             key={rivalry.id}
             to={`/tourhub/college-golf/compare?c1=${normalizedName}&c2=${rivalName}`}
             className={cardStyles}
+            style={{ width: '160px', padding: '16px' }}
           >
             {cardContent}
           </Link>
