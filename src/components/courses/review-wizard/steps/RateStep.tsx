@@ -242,7 +242,7 @@ export function RateStep({
                 transition={{ delay: index * 0.06, duration: 0.25 }}
               >
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-sm font-medium text-foreground">{label}</span>
+                  <span className="text-sm font-semibold text-gray-800">{label}</span>
                   <AnimatePresence mode="wait">
                     <motion.span
                       key={isTouched && score != null ? score.toFixed(1) : 'empty'}

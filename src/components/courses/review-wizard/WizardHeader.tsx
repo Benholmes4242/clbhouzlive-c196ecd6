@@ -5,7 +5,6 @@
 
 import React from 'react';
 import { X, ChevronLeft, ChevronDown, Trash2, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { cn } from '@/lib/utils';
@@ -103,12 +102,10 @@ export function WizardHeader({
       {/* Left: Close/Back + Trash (edit mode only) */}
       <div className="flex items-center gap-1 min-w-[72px]">
         {hasHeroAbove ? (
-          /* Steps 1-2: Keep existing ghost style since header sits below hero */
-          <Button
-            variant="ghost"
-            size="icon"
+          /* Steps 1-2: Amber pill style below hero */
+          <button
             onClick={handleBackOrClose}
-            className="h-8 w-8 rounded-full"
+            className="w-9 h-9 rounded-full bg-amber-100/80 text-amber-700 flex items-center justify-center active:bg-amber-200/80 active:scale-[0.97] transition-all duration-100 disabled:opacity-50"
             aria-label={isFirstStep ? 'Close' : 'Back'}
             disabled={isSubmitting || isDeleting}
           >
@@ -117,7 +114,7 @@ export function WizardHeader({
             ) : (
               <ChevronLeft className="h-5 w-5" />
             )}
-          </Button>
+          </button>
         ) : (
           /* Steps 3-4: Amber treatment */
           <button
@@ -136,16 +133,14 @@ export function WizardHeader({
         
         {/* Trash icon - Edit Mode only */}
         {isEditMode && (
-          <Button
-            variant="ghost"
-            size="icon"
+          <button
             onClick={onDelete}
-            className="h-8 w-8 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50"
             aria-label="Delete review"
             disabled={isSubmitting || isDeleting}
           >
             <Trash2 className="h-4 w-4" />
-          </Button>
+          </button>
         )}
       </div>
       
