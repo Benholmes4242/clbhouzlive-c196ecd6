@@ -576,7 +576,7 @@ export function MediaStep({
       
       {/* Bottom footer bar — counter + 3 buttons */}
       <div 
-        className="flex-shrink-0 border-t border-amber-200/30 px-4 py-3"
+        className="flex-shrink-0 border-t border-amber-200/30 px-4 py-3 bg-amber-50/80"
         style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}
       >
         {/* Non-blocking processing progress banner */}

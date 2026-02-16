@@ -46,7 +46,7 @@ function SectionCard({
 }) {
   return (
     <motion.div 
-      className={cn("bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden", className)}
+      className={cn("bg-white/70 backdrop-blur-sm rounded-2xl shadow-sm border border-amber-200/20 overflow-hidden", className)}
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: 'easeOut', delay }}
@@ -70,7 +70,7 @@ function SectionHeader({
     <div className="flex items-center justify-between px-4 pt-3 pb-1">
       <div className="flex items-center gap-1.5">
         <Icon className="h-3.5 w-3.5 text-amber-500" />
-        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+        <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">
           {label}
         </span>
       </div>
@@ -432,8 +432,8 @@ export function ConfirmStep({
           transition={{ delay: 0.1 }}
         >
           <div className="flex items-center gap-1.5 mb-2">
-            <GripVertical className="h-3 w-3 text-gray-400" />
-            <span className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Hold & drag to reorder</span>
+            <GripVertical className="h-3 w-3 text-gray-300" />
+            <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">Hold & drag to reorder</span>
           </div>
           <DndContext
             sensors={sensors}
