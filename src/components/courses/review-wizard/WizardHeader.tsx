@@ -92,7 +92,7 @@ export function WizardHeader({
       style={{ 
         paddingTop: hasHeroAbove ? '0px' : 'max(env(safe-area-inset-top, 0px), 47px)',
         minHeight: hasHeroAbove ? '48px' : 'calc(48px + max(env(safe-area-inset-top, 0px), 47px))',
-        background: 'rgba(254,243,199,0.4)'
+        background: 'transparent'
       }}
     >
       {/* Left: Close/Back + Trash (edit mode only) */}
