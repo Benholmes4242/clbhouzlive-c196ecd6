@@ -383,7 +383,7 @@ export function MediaStep({
         /* Empty state — amber-themed, matching Post Wizard */
         <div 
           className="h-full flex items-center justify-center p-5 relative"
-          style={{ background: 'linear-gradient(to bottom, rgba(254,243,199,0.3), #FFFBEB 60%)' }}
+          style={{ background: 'linear-gradient(to bottom, rgba(254,243,199,0.3), white, white)' }}
         >
           {permissionDenied ? (
             <PermissionDeniedCard
