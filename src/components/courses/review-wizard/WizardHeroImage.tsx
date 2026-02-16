@@ -31,7 +31,7 @@ export function WizardHeroImage({ course, currentStep, onBack, onClose, hideBack
 
   return (
     <div 
-      className="relative overflow-hidden bg-slate-50 shrink-0"
+      className="relative overflow-hidden shrink-0"
       style={{ 
         // Hero extends into safe area for immersive bleed effect
         // Uses var(--sat) for portal reliability (env() returns 0 in portal contexts)
