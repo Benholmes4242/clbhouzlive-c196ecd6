@@ -28,7 +28,6 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
   const { data: allStats } = useCollegeSeasonStats();
   const statusMap = useCollegeStatusMap();
 
-  // Build a lookup for season stats by normalized_name
   const statsMap = useMemo(() => {
     if (!allStats) return new Map();
     return new Map(allStats.map(s => [s.normalized_name, s]));
@@ -40,7 +39,6 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
     stats: statsMap.get(mover.normalized_name) || null,
   }));
 
-  // Batch alumni
   const slugs = useMemo(() => enrichedMovers.map(m => m.normalized_name), [enrichedMovers]);
   const { data: alumniMap } = useBatchCollegeAlumni(slugs, 3);
 
@@ -57,18 +55,27 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
   return (
     <div className={cn('', className)}>
       {weekLabel && (
-        <div className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground/50 uppercase tracking-wider mb-3">
+        <div className="flex items-center gap-1.5 text-muted-foreground/50 uppercase mb-3" style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.8px' }}>
           <CalendarDays className="w-3.5 h-3.5" />
           {weekLabel}
         </div>
       )}
 
-      {/* Rising / Falling toggle — keep existing segmented style */}
-      <div className="flex items-stretch rounded-xl overflow-hidden bg-secondary mb-3">
+      {/* Rising / Falling toggle — rounded-2xl container */}
+      <div
+        className="flex items-stretch overflow-hidden"
+        style={{
+          borderRadius: 16,
+          background: 'hsl(var(--muted) / 0.3)',
+          border: '1px solid hsl(var(--border) / 0.5)',
+          padding: 4,
+          marginBottom: 12,
+        }}
+      >
         {[
-          { value: 'up' as Direction, label: 'Rising', icon: TrendingUp },
-          { value: 'down' as Direction, label: 'Falling', icon: TrendingDown },
-        ].map(({ value, label, icon: Icon }) => {
+          { value: 'up' as Direction, label: 'Rising', icon: TrendingUp, iconColor: '#22C55E' },
+          { value: 'down' as Direction, label: 'Falling', icon: TrendingDown, iconColor: '#EF4444' },
+        ].map(({ value, label, icon: Icon, iconColor }) => {
           const isSelected = direction === value;
           return (
             <button
@@ -77,20 +84,27 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
               aria-selected={isSelected}
               onClick={() => setDirection(value)}
               className={cn(
-                "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98] flex items-center justify-center gap-1.5",
-                isSelected
-                  ? "bg-card text-foreground shadow-sm m-1 rounded-lg"
-                  : "text-muted-foreground hover:text-foreground rounded-lg active:bg-card/50"
+                'relative flex-1 flex items-center justify-center gap-1.5 whitespace-nowrap active:scale-[0.98] transition-all duration-200',
               )}
+              style={{
+                borderRadius: 12,
+                padding: 10,
+                minHeight: 44,
+                fontSize: 14,
+                fontWeight: isSelected ? 600 : 500,
+                color: isSelected ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
+                background: isSelected ? 'hsl(var(--card))' : 'transparent',
+                boxShadow: isSelected ? '0 1px 3px rgba(0,0,0,0.06)' : 'none',
+              }}
             >
-              <Icon className="w-3.5 h-3.5" />
+              <Icon className="w-4 h-4" style={{ color: iconColor }} />
               {label}
             </button>
           );
         })}
       </div>
 
-      {/* Movers List — uses unified FranchiseCard */}
+      {/* Movers List */}
       <AnimatePresence mode="wait">
         <motion.div
           key={direction}
@@ -98,11 +112,12 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.2 }}
-          className="space-y-2"
+          className="flex flex-col"
+          style={{ gap: 10 }}
         >
           {isLoading ? (
             Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-[110px] bg-card/50 border border-border/30 rounded-xl animate-pulse" />
+              <div key={i} className="bg-card/50 border border-border/30 animate-pulse" style={{ height: 110, borderRadius: 16 }} />
             ))
           ) : enrichedMovers.length > 0 ? (
             enrichedMovers.map((mover, idx) => {
@@ -129,9 +144,9 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
               );
             })
           ) : (
-            <div className="flex flex-col items-center py-12 text-center">
-              <p className="text-sm font-medium text-foreground mb-1">No movement this week</p>
-              <p className="text-xs text-muted-foreground">Check back after the next tournament.</p>
+            <div className="flex flex-col items-center text-center" style={{ paddingTop: 32 }}>
+              <p style={{ fontSize: 16, fontWeight: 600 }} className="text-foreground/60">No movement this week</p>
+              <p style={{ fontSize: 13, fontWeight: 400, marginTop: 4 }} className="text-muted-foreground">Check back after the next tournament.</p>
             </div>
           )}
         </motion.div>

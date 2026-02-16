@@ -1,6 +1,6 @@
 /**
  * FranchiseLeaderboard - Premium college leaderboard
- * Simple text tabs with underline active state (no dark track)
+ * Simple text tabs with underline active state
  */
 
 import { useMemo } from 'react';
@@ -67,8 +67,15 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
 
   return (
     <div className={cn('', className)}>
-      {/* Simple text tabs with underline — no dark track */}
-      <div className="border-b border-border/60 mb-3" role="tablist" aria-label="Franchise Leaderboard Sort">
+      {/* Tabs — underline style, 4-column even, 14px */}
+      <div
+        role="tablist"
+        aria-label="Franchise Leaderboard Sort"
+        style={{
+          borderBottom: '1px solid hsl(var(--border) / 0.1)',
+          marginBottom: 12,
+        }}
+      >
         <div className="flex">
           {METRIC_TABS.map(({ value, label }) => {
             const isSelected = activeMetric === value;
@@ -79,17 +86,24 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
                 aria-selected={isSelected}
                 onClick={() => setActiveMetric(value)}
                 className={cn(
-                  "relative flex-1 py-2.5 text-[13px] transition-colors duration-200 whitespace-nowrap min-h-[40px] active:scale-[0.98]",
+                  'relative flex-1 whitespace-nowrap active:scale-[0.98] transition-colors duration-200',
                   isSelected
-                    ? "font-semibold text-foreground"
-                    : "font-medium text-muted-foreground hover:text-foreground"
+                    ? 'text-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
                 )}
+                style={{
+                  fontSize: 14,
+                  fontWeight: isSelected ? 600 : 500,
+                  paddingBottom: 10,
+                  minHeight: 40,
+                }}
               >
                 {label}
                 {isSelected && (
                   <motion.div
                     layoutId="franchise-tab-underline"
-                    className="absolute bottom-0 left-1/4 right-1/4 h-[2px] bg-foreground rounded-full"
+                    className="absolute bottom-0 left-1/4 right-1/4 bg-foreground rounded-full"
+                    style={{ height: 2 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                   />
                 )}
@@ -99,7 +113,7 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
         </div>
       </div>
 
-      {/* Leaderboard List */}
+      {/* Leaderboard List — 10px gap between cards */}
       <AnimatePresence mode="wait">
         <motion.div
           key={activeMetric}
@@ -107,11 +121,12 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.2 }}
-          className="space-y-2"
+          className="flex flex-col"
+          style={{ gap: 10 }}
         >
           {isLoading ? (
             Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="h-[110px] bg-card/50 border border-border/30 rounded-xl animate-pulse" />
+              <div key={i} className="bg-card/50 border border-border/30 animate-pulse" style={{ height: 110, borderRadius: 16 }} />
             ))
           ) : error ? (
             <div className="text-center py-12 text-sm text-muted-foreground">Failed to load leaderboard</div>

@@ -21,10 +21,11 @@ export function CollegeSearch({ className }: CollegeSearchProps) {
   
   return (
     <div className={cn('relative', className)}>
-      {/* Search Input — matches Players page design */}
+      {/* Search Input — rounded-2xl, bg-card, border/50 */}
       <div className="relative">
-        <Search 
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-muted-foreground w-[18px] h-[18px]"
+        <Search
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-5 h-5"
+          style={{ color: 'hsl(var(--muted-foreground) / 0.5)' }}
           strokeWidth={2.5}
         />
         <input
@@ -32,7 +33,15 @@ export function CollegeSearch({ className }: CollegeSearchProps) {
           placeholder="Search colleges..."
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          className="w-full h-12 pl-11 pr-10 rounded-xl text-[14px] transition-all duration-200 bg-card/80 backdrop-blur-sm border text-foreground placeholder:text-muted-foreground border-border/60 ring-transparent shadow-sm focus:outline-none focus:ring-2 focus:border-border focus:ring-border/50 focus:shadow-lg focus:bg-card"
+          className="w-full pl-11 pr-10 text-foreground focus:outline-none focus:ring-2 focus:ring-border/50"
+          style={{
+            height: 48,
+            fontSize: 13,
+            background: 'hsl(var(--card))',
+            border: '1px solid hsl(var(--border) / 0.5)',
+            borderRadius: 16,
+            padding: '12px 16px 12px 44px',
+          }}
         />
         {searchInput && (
           <motion.button

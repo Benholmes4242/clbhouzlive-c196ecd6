@@ -1,7 +1,6 @@
 /**
  * CollegeHeroBanner - Full-bleed immersive hero for the #1 college.
  * Adapts per active leaderboard tab with AnimatePresence crossfade.
- * Ken Burns subtle animation on background.
  */
 
 import { Link } from 'react-router-dom';
@@ -65,7 +64,7 @@ export function CollegeHeroBanner({ stats, college, className }: CollegeHeroBann
           className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-8 pt-20"
           style={{ minHeight: 'clamp(282px, 53vh, 422px)' }}
         >
-          {/* Logo */}
+          {/* Logo — 110×110 centered */}
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -78,8 +77,8 @@ export function CollegeHeroBanner({ stats, college, className }: CollegeHeroBann
                 alt={displayName}
                 className="object-contain"
                 style={{
-                  width: '110px',
-                  height: '110px',
+                  width: 110,
+                  height: 110,
                   filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.3))',
                 }}
               />
@@ -92,39 +91,64 @@ export function CollegeHeroBanner({ stats, college, className }: CollegeHeroBann
             )}
           </motion.div>
 
-          {/* #1 Badge */}
+          {/* #1 Badge — 11px, 700, amber, uppercase, tracking 1.2px */}
           <motion.div
             initial={{ y: 8, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.2 }}
-            className="flex items-center gap-1.5 mb-2"
+            className="flex items-center gap-1.5"
+            style={{ marginBottom: 8 }}
           >
-            <Trophy className="w-3.5 h-3.5 text-amber-400" />
-            <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">
+            <Trophy className="w-3.5 h-3.5" style={{ color: '#f59e0b' }} />
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '1.2px',
+                textTransform: 'uppercase',
+                color: '#f59e0b',
+              }}
+            >
               #1 This Season
             </span>
           </motion.div>
 
-          {/* College Name */}
+          {/* College Name — 28px, 700, white, tracking -0.4px */}
           <motion.h1
             initial={{ y: 8, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.25 }}
-            className="text-2xl md:text-3xl font-bold text-white text-center tracking-tight mb-4"
+            className="text-center"
+            style={{
+              fontSize: 28,
+              fontWeight: 700,
+              color: 'white',
+              letterSpacing: '-0.4px',
+              marginBottom: 16,
+            }}
           >
             {displayName}
           </motion.h1>
 
-          {/* Stat Pills */}
+          {/* Stats Grid — 3 cols in dark container */}
           <motion.div
             initial={{ y: 8, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.3 }}
-            className="flex items-center gap-3"
+            className="flex items-stretch mx-4"
+            style={{
+              background: 'rgba(0,0,0,0.12)',
+              borderRadius: 12,
+              padding: '12px 0',
+              width: '100%',
+              maxWidth: 320,
+            }}
           >
-            <StatPill label="EARNINGS" value={formatCurrency(stats.earnings_total)} />
-            <StatPill label="WINS" value={String(stats.wins_total)} />
-            <StatPill label="ALUMNI" value={String(stats.player_count)} icon={<Users className="w-3 h-3" />} />
+            <StatCell label="EARNINGS" value={formatCurrency(stats.earnings_total)} />
+            <div style={{ width: 1, background: 'rgba(255,255,255,0.1)' }} />
+            <StatCell label="WINS" value={String(stats.wins_total)} />
+            <div style={{ width: 1, background: 'rgba(255,255,255,0.1)' }} />
+            <StatCell label="ALUMNI" value={String(stats.player_count)} icon={<Users style={{ width: 14, height: 14, color: 'rgba(255,255,255,0.5)' }} />} />
           </motion.div>
         </Link>
       </motion.div>
@@ -132,15 +156,31 @@ export function CollegeHeroBanner({ stats, college, className }: CollegeHeroBann
   );
 }
 
-function StatPill({ label, value, icon }: { label: string; value: string; icon?: React.ReactNode }) {
+function StatCell({ label, value, icon }: { label: string; value: string; icon?: React.ReactNode }) {
   return (
-    <div className="flex flex-col items-center px-4 py-2 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 min-w-[72px]">
-      <span className="text-[10px] font-medium text-white/50 uppercase tracking-wider mb-0.5">
+    <div className="flex-1 flex flex-col items-center justify-center">
+      <span
+        style={{
+          fontSize: 10,
+          fontWeight: 700,
+          letterSpacing: '0.5px',
+          textTransform: 'uppercase',
+          color: 'rgba(255,255,255,0.5)',
+        }}
+      >
         {label}
       </span>
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 mt-1">
         {icon}
-        <span className="text-sm font-bold text-white font-mono tabular-nums">
+        <span
+          style={{
+            fontFamily: 'ui-monospace, "JetBrains Mono", monospace',
+            fontSize: 17,
+            fontWeight: 700,
+            color: 'white',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
           {value}
         </span>
       </div>

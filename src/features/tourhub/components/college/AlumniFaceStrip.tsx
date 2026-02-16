@@ -1,7 +1,6 @@
 /**
  * AlumniFaceStrip - Horizontal strip of alumni headshots.
- * Overlaps the hero by 20px for visual impact.
- * Tappable → navigates to the college detail page.
+ * Overlaps the hero by 20px. bg-card, rounded-2xl, border.
  */
 
 import { Link } from 'react-router-dom';
@@ -47,24 +46,31 @@ export function AlumniFaceStrip({ alumni, collegeName, collegeSlug, totalAlumniC
     >
       <Link
         to={`/tourhub/college-golf/${collegeSlug}`}
-        className={cn(
-          'flex items-center gap-3 px-4 py-3 rounded-2xl',
-          'bg-card/90 backdrop-blur-xl',
-          'border border-border/40',
-          'shadow-lg shadow-black/5',
-          'hover:border-primary/30 transition-all duration-200',
-          'active:scale-[0.99] group'
-        )}
+        className="flex items-center gap-3 active:scale-[0.99] transition-all duration-200 group"
+        style={{
+          background: 'hsl(var(--card))',
+          border: '1px solid hsl(var(--border) / 0.5)',
+          borderRadius: 16,
+          padding: '12px 16px',
+        }}
       >
-        {/* Stacked headshots — squircle with 1px neutral border */}
-        <div className="flex items-center -space-x-2.5 shrink-0">
+        {/* Stacked circular avatars — 32×32, 50% radius, 2px white border, -8px overlap */}
+        <div className="flex items-center shrink-0" style={{ marginLeft: 0 }}>
           {visible.map((alum, i) => {
             const photoUrl = resolvePhotoUrl(alum.photo_url, alum.pga_tour_id);
             return (
               <div
                 key={alum.id}
-                className="w-9 overflow-hidden bg-muted shadow-sm"
-                style={{ zIndex: MAX_VISIBLE - i, borderRadius: '34%', aspectRatio: '1 / 1.05', border: '1px solid #D1D5DB' }}
+                className="bg-muted overflow-hidden"
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '50%',
+                  border: '2px solid white',
+                  marginLeft: i === 0 ? 0 : -8,
+                  zIndex: MAX_VISIBLE - i,
+                  position: 'relative',
+                }}
               >
                 {photoUrl ? (
                   <img
@@ -74,8 +80,8 @@ export function AlumniFaceStrip({ alumni, collegeName, collegeSlug, totalAlumniC
                     loading="lazy"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/30 flex items-center justify-center">
-                    <span className="text-[9px] font-bold text-muted-foreground/70 leading-none">
+                  <div className="w-full h-full bg-muted flex items-center justify-center">
+                    <span className="text-[8px] font-bold text-muted-foreground/70">
                       {getInitials(alum.full_name)}
                     </span>
                   </div>
@@ -84,8 +90,18 @@ export function AlumniFaceStrip({ alumni, collegeName, collegeSlug, totalAlumniC
             );
           })}
           {overflow > 0 && (
-            <div className="w-9 bg-muted flex items-center justify-center shadow-sm" style={{ borderRadius: '34%', aspectRatio: '1 / 1.05', border: '1px solid #D1D5DB' }}>
-              <span className="text-[10px] font-bold text-muted-foreground">
+            <div
+              className="bg-muted flex items-center justify-center"
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: '50%',
+                border: '2px solid white',
+                marginLeft: -8,
+                position: 'relative',
+              }}
+            >
+              <span style={{ fontSize: 12, fontWeight: 600 }} className="text-muted-foreground">
                 +{overflow}
               </span>
             </div>
@@ -94,15 +110,15 @@ export function AlumniFaceStrip({ alumni, collegeName, collegeSlug, totalAlumniC
 
         {/* Text */}
         <div className="flex-1 min-w-0">
-          <p className="text-xs text-muted-foreground truncate">
+          <p style={{ fontSize: 13, fontWeight: 500 }} className="text-foreground truncate">
             {namePreview} …
           </p>
-          <p className="text-[11px] text-muted-foreground/60 mt-0.5">
+          <p style={{ fontSize: 11, fontWeight: 400 }} className="text-muted-foreground mt-0.5">
             {totalAlumniCount} alumni on tour this season
           </p>
         </div>
 
-        <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary transition-colors shrink-0" />
+        <ChevronRight className="w-4 h-4 shrink-0" style={{ color: 'hsl(var(--muted-foreground) / 0.3)' }} />
       </Link>
     </motion.div>
   );
