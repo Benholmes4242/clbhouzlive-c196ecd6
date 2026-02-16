@@ -232,9 +232,9 @@ export const WatchShortCard = React.memo(function WatchShortCard({
         }
       }}
     >
-      {/* Shimmer loading placeholder — stays until poster fades in on top */}
-      <div className="absolute inset-0 bg-muted/50 overflow-hidden">
-        <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+      {/* Shimmer loading placeholder — dark charcoal base with visible sweep */}
+      <div className="absolute inset-0 overflow-hidden" style={{ backgroundColor: 'hsl(220, 10%, 18%)' }}>
+        <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-white/[0.12] to-transparent" />
       </div>
       
       {/* Poster with fade-in on load, stays until video plays */}
