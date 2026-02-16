@@ -223,7 +223,7 @@ export function RateStep({
       </div>
 
       {/* Detail Ratings — wrapped in card */}
-      <div className="bg-amber-50/50 rounded-2xl border border-amber-200/30 shadow-sm p-4">
+      <div className="rounded-2xl border border-amber-200/30 shadow-sm p-4" style={{ background: 'linear-gradient(to bottom, rgba(254,243,199,0.4), white 70%)' }}>
         <h3 className="text-base font-semibold text-gray-800 mb-4">
           Rate each area
         </h3>
