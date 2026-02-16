@@ -150,14 +150,14 @@
      <>
        <DropdownMenu>
        <DropdownMenuTrigger asChild>
-         <button className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors focus:outline-none">
-           <MoreVertical className="w-5 h-5 text-[#1D1D1F]" />
-         </button>
-       </DropdownMenuTrigger>
-       <DropdownMenuContent 
-         align="end" 
-         className="w-56 bg-white border border-[#E5E5EA] shadow-lg rounded-xl z-50"
-       >
+          <button className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center active:bg-amber-50 transition-colors focus:outline-none">
+            <MoreVertical className="w-5 h-5 text-amber-700" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent 
+          align="end" 
+          className="w-56 bg-white border border-amber-200/20 shadow-lg rounded-xl z-50"
+        >
          {isGroupChat ? (
            <>
              {/* Group Chat Menu */}

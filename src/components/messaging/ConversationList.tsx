@@ -405,7 +405,7 @@ export function ConversationList({
       )}
 
       {/* Conversations card — warm glass container */}
-      <div className="overflow-hidden">
+      <div className="overflow-hidden rounded-2xl">
         {filteredConversations.map((conversation, index) => 
           renderConversationItem(conversation, false, index, filteredConversations.length)
         )}
