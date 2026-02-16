@@ -283,7 +283,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
                 {toughestHoles.map((hole, idx) => (
                   <div
                     key={hole.holeNumber}
-                    className="flex-1 bg-red-50 dark:bg-red-950/20 rounded-xl border border-red-100 dark:border-red-900/30 p-3 text-center"
+                    className="flex-1 bg-red-50 dark:bg-red-950/20 rounded-2xl border border-red-100 dark:border-red-900/30 p-3 text-center"
                   >
                     <div className="text-sm font-bold text-red-500">#{idx + 1}</div>
                     <div className="text-xl font-bold text-foreground font-mono tabular-nums">
@@ -314,7 +314,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
                 {easiestHoles.map((hole, idx) => (
                   <div
                     key={hole.holeNumber}
-                    className="flex-1 bg-green-50 dark:bg-green-950/20 rounded-xl border border-green-100 dark:border-green-900/30 p-3 text-center"
+                    className="flex-1 bg-green-50 dark:bg-green-950/20 rounded-2xl border border-green-100 dark:border-green-900/30 p-3 text-center"
                   >
                     <div className="text-sm font-bold text-green-600">#{idx + 1}</div>
                     <div className="text-xl font-bold text-foreground font-mono tabular-nums">
@@ -412,7 +412,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
 
 // Extracted hole row for performance
 const HoleRow = ({ hole, total }: { hole: ProcessedHole; total: number }) => (
-  <div className="flex items-start gap-3 py-5 px-4 border-b border-border">
+  <div className="flex items-start gap-3 py-4 px-4 border-b border-border/50">
     {/* Hole badge */}
     <div className={cn(
       "w-11 h-11 rounded-full flex items-center justify-center text-sm font-bold shrink-0",

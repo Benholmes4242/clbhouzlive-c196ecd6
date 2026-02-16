@@ -38,14 +38,14 @@ export function StatusBar({
     return (
       <motion.div
         className={cn(
-          "flex items-center gap-3 px-3 py-2 rounded-xl border-l-[3px] border-l-slate-400",
+          "flex items-center gap-3 px-3 py-2 rounded-2xl",
           className
         )}
         style={{
           background: 'rgba(var(--muted-rgb, 241, 245, 249), 0.7)',
           backdropFilter: 'blur(8px)',
           border: '1px solid hsl(var(--border))',
-          borderLeft: '3px solid rgb(148, 163, 184)',
+          borderLeft: '3px solid hsl(var(--border))',
         }}
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -67,7 +67,7 @@ export function StatusBar({
     return (
       <motion.div
         className={cn(
-          "flex items-center gap-3 px-3 py-2 rounded-xl",
+          "flex items-center gap-3 px-3 py-2 rounded-2xl",
           className
         )}
         style={{
@@ -98,14 +98,14 @@ export function StatusBar({
   return (
     <motion.div
       className={cn(
-        "flex items-center gap-3 px-3 py-2 rounded-xl",
+        "flex items-center gap-3 px-3 py-2 rounded-2xl",
         className
       )}
       style={{
         background: 'rgba(236, 253, 245, 0.7)',
         backdropFilter: 'blur(8px)',
-        border: '1px solid rgba(16, 185, 129, 0.15)',
-        borderLeft: '3px solid rgb(16, 185, 129)',
+        border: '1px solid rgba(34, 197, 94, 0.15)',
+        borderLeft: '3px solid #22C55E',
       }}
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}

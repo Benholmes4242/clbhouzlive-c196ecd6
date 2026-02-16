@@ -44,8 +44,8 @@ function ScoreToPar({ score, className }: { score: number | null; className?: st
         color: score < 0 
           ? TOUR_COLORS.scoreUnderPar 
           : score > 0 
-            ? TOUR_COLORS.scoreOverPar 
-            : TOUR_COLORS.scoreEven 
+            ? 'hsl(var(--foreground))' 
+            : 'hsl(var(--muted-foreground))' 
       }}
     >
       {formatted}
@@ -179,14 +179,14 @@ export function LeaderboardCard({
       {showHeader && (
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Trophy className="w-4 h-4 text-amber-600" />
-            <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+            <Trophy className="w-3.5 h-3.5 text-amber-600" />
+            <h3 className="text-[16px] font-semibold text-foreground">{title}</h3>
           </div>
           
           {onViewAll && hasMore && (
             <button 
               onClick={onViewAll}
-              className="text-xs font-semibold text-amber-600 hover:text-amber-700 flex items-center gap-0.5 active:scale-[0.97] transition-transform"
+              className="text-[13px] font-medium text-muted-foreground hover:text-foreground flex items-center gap-0.5 active:scale-[0.97] transition-transform"
             >
               View All
               <ChevronRight className="w-3.5 h-3.5" />
@@ -211,7 +211,7 @@ export function LeaderboardCard({
       {onViewAll && hasMore && (
         <button 
           onClick={onViewAll}
-          className="w-full py-3 mt-3 text-[13px] font-semibold text-amber-600 rounded-xl hover:bg-muted/40 transition-colors flex items-center justify-center gap-1 active:scale-[0.97] transition-transform"
+          className="w-full py-3 mt-3 text-[14px] font-semibold text-foreground/60 rounded-xl hover:bg-muted/40 transition-colors flex items-center justify-center gap-1 active:scale-[0.97] transition-transform"
         >
           View Full Leaderboard
           <ChevronRight className="w-4 h-4" />

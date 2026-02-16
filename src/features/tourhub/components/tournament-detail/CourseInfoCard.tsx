@@ -32,7 +32,7 @@ export function CourseInfoCard({ tournament, courseImage, courseId }: CourseInfo
     >
       {/* Course image */}
       {courseImage && (
-        <div className="relative w-full aspect-[16/7] overflow-hidden rounded-xl mb-4 group">
+        <div className="relative w-full aspect-[16/7] overflow-hidden rounded-2xl mb-4 group">
           <img 
             src={courseImage} 
             alt={tournament.venue_course_name || 'Course'} 
@@ -49,12 +49,12 @@ export function CourseInfoCard({ tournament, courseImage, courseId }: CourseInfo
           {tournament.venue_course_name && (
             courseLink ? (
               <Link to={courseLink} className="group/link">
-                <h3 className="text-lg font-semibold text-foreground group-hover/link:text-primary transition-colors truncate">
+                <h3 className="text-[17px] font-semibold text-foreground group-hover/link:text-primary transition-colors truncate">
                   {tournament.venue_course_name}
                 </h3>
               </Link>
             ) : (
-              <h3 className="text-lg font-semibold text-foreground truncate">
+              <h3 className="text-[17px] font-semibold text-foreground truncate">
                 {tournament.venue_course_name}
               </h3>
             )
@@ -70,7 +70,7 @@ export function CourseInfoCard({ tournament, courseImage, courseId }: CourseInfo
         {courseLink && (
           <Link 
             to={courseLink}
-            className="text-xs font-semibold text-primary hover:text-primary/80 flex items-center gap-0.5 active:scale-[0.97] transition-transform shrink-0 ml-3"
+            className="text-[13px] font-medium text-muted-foreground hover:text-foreground flex items-center gap-0.5 active:scale-[0.97] transition-transform shrink-0 ml-3"
           >
             View Course
             <ChevronRight className="w-3.5 h-3.5" />

@@ -82,17 +82,17 @@ export function TournamentInfoGrid({ tournament, fieldSize }: TournamentInfoGrid
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.35 }}
     >
-      <h3 className="text-xs font-semibold tracking-widest uppercase text-muted-foreground mb-4">
+      <h3 className="text-[10px] font-bold tracking-[0.8px] uppercase text-muted-foreground/50 mb-4">
         Tournament Details
       </h3>
       
-      <div className="divide-y divide-border">
+      <div className="divide-y divide-border/50">
         {items.map((item) => (
           <div 
             key={item.label}
             className="flex items-center gap-3 py-3"
           >
-            <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0 text-muted-foreground">
+            <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0 text-muted-foreground">
               {item.icon}
             </div>
             <div className="flex-1 min-w-0">

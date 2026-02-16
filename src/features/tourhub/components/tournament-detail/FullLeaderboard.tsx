@@ -61,8 +61,8 @@ function ScoreToPar({ score, className }: { score: number | null; className?: st
         color: score < 0
           ? TOUR_COLORS.scoreUnderPar
           : score > 0
-            ? TOUR_COLORS.scoreOverPar
-            : TOUR_COLORS.scoreEven,
+          ? 'hsl(var(--foreground))'
+            : 'hsl(var(--muted-foreground))',
       }}
     >
       {formatted}
@@ -194,7 +194,7 @@ export function FullLeaderboard({
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className={cn(
-            "w-full h-12 pl-10 pr-10 rounded-xl text-[14px] text-foreground placeholder:text-muted-foreground/50",
+            "w-full h-12 pl-10 pr-10 rounded-2xl text-[14px] text-foreground placeholder:text-muted-foreground/50",
             "bg-muted/50 border border-border",
             "focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30",
             "transition-all duration-200"
@@ -405,7 +405,7 @@ export function FullLeaderboard({
 
       {/* Results count */}
       <div className="py-4 border-t border-border/20 text-center">
-        <span className="text-xs text-muted-foreground tabular-nums">
+        <span className="text-xs text-muted-foreground tabular-nums font-mono">
           {sortedEntries.length} player{sortedEntries.length !== 1 ? 's' : ''}
           {searchQuery && ` matching "${searchQuery}"`}
         </span>

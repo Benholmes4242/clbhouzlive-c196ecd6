@@ -234,8 +234,8 @@ export function TournamentDetailPage() {
                 transition={{ duration: 0.4 }}
               >
                 <div className="flex flex-col items-center text-center py-6 space-y-3">
-                  <Trophy className="w-8 h-8 text-amber-500/60" />
-                  <h3 className="text-sm font-semibold text-foreground">Champion unlocking soon</h3>
+                  <Trophy className="w-12 h-12 text-amber-500/60" />
+                  <h3 className="text-base font-semibold text-foreground">Champion unlocking soon</h3>
                   <p className="text-xs text-muted-foreground max-w-[260px]">
                     Official results will appear once the event concludes
                   </p>
@@ -360,7 +360,7 @@ export function TournamentDetailPage() {
           imageUrl={heroImageUrl}
         />
         
-        <div className="px-4 pb-24">
+        <div className="px-4" style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
           {/* Status bar */}
           <div className="pt-5">
             {isLive && (
@@ -396,7 +396,7 @@ export function TournamentDetailPage() {
           </AnimatePresence>
           
           {/* Data source footer */}
-          <div className="mt-12 pt-6 border-t border-border/40 flex items-center justify-center gap-2 text-[11px] text-muted-foreground/30 pb-8">
+          <div className="mt-8 pt-6 border-t border-border/40 flex items-center justify-center gap-2 text-[11px] text-muted-foreground/30 pb-8">
             <Globe className="w-3.5 h-3.5" />
             <span>Powered by SportsRadar</span>
           </div>
