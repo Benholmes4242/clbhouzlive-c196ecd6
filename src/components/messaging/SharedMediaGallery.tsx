@@ -90,7 +90,7 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
   }, [conversationId]);
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col" style={{ backgroundColor: '#FEFDFB' }}>
+    <div className="fixed inset-0 bg-[#FFFBEB] z-50 flex flex-col">
       {/* Header */}
       <div className="flex items-center h-14 px-4 border-b border-amber-200/20">
         <button

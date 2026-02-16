@@ -467,7 +467,7 @@ export function MediaStep({
     }
     
     return (
-      <div className="h-full flex flex-col items-center justify-center px-8 relative" style={{ background: 'linear-gradient(to bottom, rgba(254,243,199,0.15), rgba(254,243,199,0.08) 30%, white 50%, white)' }}>
+      <div className="h-full flex flex-col items-center justify-center px-8 relative" style={{ background: 'linear-gradient(to bottom, rgba(254,243,199,0.3), white, white)' }}>
         {/* Skeleton loading banner */}
         <PickerLoadingBanner isVisible={isPickerOpen} />
         
@@ -553,7 +553,7 @@ export function MediaStep({
   }
 
   return (
-    <div className="h-full flex flex-col relative" style={{ background: 'linear-gradient(to bottom, rgba(254,243,199,0.15), rgba(254,243,199,0.08) 30%, white 50%, white)' }}>
+    <div className="h-full flex flex-col relative" style={{ background: 'linear-gradient(to bottom, rgba(254,243,199,0.3), white, white)' }}>
       {/* Non-blocking picker loading banner */}
       <PickerLoadingBanner isVisible={isPickerOpen} />
       

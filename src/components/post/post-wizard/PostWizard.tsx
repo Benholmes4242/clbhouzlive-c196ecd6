@@ -562,8 +562,8 @@ export function PostWizard({
               touchAction: 'pan-y pinch-zoom',
               overscrollBehavior: 'contain',
             },
-            backgroundColor: '#FEFDFB',
-            backgroundImage: 'linear-gradient(to bottom, rgba(254,243,199,0.15) 0%, rgba(254,243,199,0.08) 30%, white 50%, white 100%)',
+            backgroundColor: '#FFFBEB',
+            backgroundImage: 'linear-gradient(to bottom, rgba(254,243,199,0.3) 0%, rgba(254,243,199,0.2) 45%, white 75%, white 100%)',
           }}
         >
           {showSuccess ? (
@@ -583,7 +583,7 @@ export function PostWizard({
           ) : (
             <>
               {/* Header + progress bar — single amber surface that bleeds behind status bar */}
-              <div className="flex-shrink-0" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)', background: 'rgba(254,243,199,0.15)' }}>
+              <div className="flex-shrink-0 bg-amber-50" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}>
                 <PostWizardHeader
                   currentStep={state.currentStep}
                   currentStepIndex={currentStepIndex}

@@ -113,7 +113,7 @@ export function PostWizardHeader({
 
   return (
     <header 
-      className="sticky top-0 z-10 flex items-center justify-between px-3"
+      className="sticky top-0 z-10 flex items-center justify-between px-3 bg-amber-50"
       style={{ 
         height: hasHeroAbove ? '55px' : 'calc(55px + max(env(safe-area-inset-top, 0px), 47px))',
         paddingTop: hasHeroAbove ? '0px' : 'max(env(safe-area-inset-top, 0px), 47px)',

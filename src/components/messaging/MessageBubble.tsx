@@ -321,7 +321,7 @@ export function MessageBubble({
           style={
             isOwnMessage
               ? {
-                  background: 'rgba(254,243,199,0.25)',
+                  background: 'rgba(254,243,199,0.5)',
                   border: 'none',
                 }
               : {
