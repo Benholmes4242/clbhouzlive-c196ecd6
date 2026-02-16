@@ -507,10 +507,6 @@ export function HubPageNew() {
                         <span className="text-[17px] font-bold block" style={{ color: '#1C1917' }}>{top100Count}</span>
                         <span className="text-[9px] font-medium uppercase tracking-wider" style={{ color: '#A8A29E' }}>Top 100</span>
                       </button>
-                      <button onClick={() => { haptic('light'); navigate('/top100?tab=my-progress'); }} className="text-center active:scale-95 transition-transform">
-                        <span className="text-[17px] font-bold block" style={{ color: '#1C1917' }}>{streak}</span>
-                        <span className="text-[9px] font-medium uppercase tracking-wider" style={{ color: '#A8A29E' }}>Streak</span>
-                      </button>
                       <button onClick={() => { haptic('light'); navigate('/top100'); }} className="text-center active:scale-95 transition-transform">
                         <span className="text-[17px] font-bold block" style={{ color: '#1C1917' }}>{avgRating ?? '—'}</span>
                         <span className="text-[9px] font-medium uppercase tracking-wider" style={{ color: '#A8A29E' }}>Avg</span>
