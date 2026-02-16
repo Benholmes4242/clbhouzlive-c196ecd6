@@ -127,7 +127,7 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by name or username..."
-            className="pl-10"
+            className="pl-10 border border-amber-200/30 focus:border-amber-300 focus:ring-1 focus:ring-amber-200"
           />
         </div>
         

@@ -132,7 +132,7 @@ export function MessageBubble({
 
         <div className={cn("flex flex-col max-w-[280px]", isOwnMessage ? "items-end" : "items-start")}>
           {!isOwnMessage && showSenderInfo && (
-            <span className="text-[13px] font-semibold text-[#2A9D5C] mb-1 px-1">
+          <span className="text-[13px] font-semibold text-amber-600 mb-1 px-1">
               {senderName}
             </span>
           )}
@@ -304,7 +304,7 @@ export function MessageBubble({
       <div className={cn("flex flex-col max-w-[75%]", isOwnMessage ? "items-end" : "items-start")}>
         {/* Sender name for groups */}
         {!isOwnMessage && showSenderInfo && (
-          <span className="text-[13px] font-semibold text-[#2A9D5C] mb-0.5 px-1">
+          <span className="text-[13px] font-semibold text-amber-600 mb-0.5 px-1">
             {senderName}
           </span>
         )}
@@ -333,8 +333,8 @@ export function MessageBubble({
         >
           {/* Reply preview */}
           {replyToMessage && (
-            <div className="mb-2 pl-2 border-l-2 border-[#2A9D5C] bg-[#00000008] rounded-r-lg py-1.5 pr-2">
-              <p className="text-[12px] font-semibold text-[#2A9D5C]">
+            <div className="mb-2 pl-2 border-l-2 border-amber-500 bg-[#00000008] rounded-r-lg py-1.5 pr-2">
+              <p className="text-[12px] font-semibold text-amber-600">
                 {replyToMessage.sender?.display_name || replyToMessage.sender?.username || 'You'}
               </p>
               <p className="text-[13px] text-[#8E8E93] truncate">
@@ -404,14 +404,14 @@ export function MessageBubble({
       <ContextMenuTrigger asChild>{bubbleContent}</ContextMenuTrigger>
       <ContextMenuContent className="w-48 bg-white border border-amber-200/20 shadow-lg rounded-xl z-50">
         {/* Quick reactions row */}
-        <div className="flex items-center justify-around py-2 px-3 border-b border-[#E5E5EA]">
+        <div className="flex items-center justify-around py-2 px-3 border-b border-amber-200/20">
           {['👍', '🔥', '⛳', '😂', '❤️', '🏌️'].map((emoji) => (
             <button
               key={emoji}
               onClick={() => {
                 handleEmojiSelect(emoji);
               }}
-              className="w-8 h-8 flex items-center justify-center text-lg hover:bg-[#F5F5F5] rounded-full active:scale-90 transition-transform"
+              className="w-8 h-8 flex items-center justify-center text-lg hover:bg-amber-50/50 rounded-full active:scale-90 transition-transform"
             >
               {emoji}
             </button>
