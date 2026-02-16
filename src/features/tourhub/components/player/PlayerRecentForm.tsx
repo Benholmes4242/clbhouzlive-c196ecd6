@@ -4,7 +4,6 @@
  */
 
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { usePlayerResults } from '../../hooks/usePlayerResults';
 
 interface PlayerRecentFormProps {
@@ -24,31 +23,45 @@ export function PlayerRecentForm({ playerId }: PlayerRecentFormProps) {
   );
 
   let formLabel: string;
-  let stripClass: string;
+  let textColor: string;
+  let bgColor: string;
+  let borderColor: string;
   let Icon: React.ElementType;
 
-  if (avgPosition <= 5) {
-    formLabel = 'Excellent';
-    stripClass = 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400';
-    Icon = TrendingUp;
-  } else if (avgPosition <= 10) {
-    formLabel = 'Strong';
-    stripClass = 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/8 dark:text-emerald-400';
+  if (avgPosition <= 10) {
+    formLabel = avgPosition <= 5 ? 'Excellent' : 'Strong';
+    textColor = '#22C55E';
+    bgColor = 'rgba(34,197,94,0.08)';
+    borderColor = '#22C55E';
     Icon = TrendingUp;
   } else if (avgPosition <= 25) {
     formLabel = 'Steady';
-    stripClass = 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400';
+    textColor = 'hsl(var(--muted-foreground))';
+    bgColor = 'hsl(var(--muted) / 0.2)';
+    borderColor = 'hsl(var(--muted-foreground) / 0.3)';
     Icon = Minus;
   } else {
     formLabel = 'Struggling';
-    stripClass = 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400';
+    textColor = '#DC2626';
+    bgColor = 'rgba(220,38,38,0.08)';
+    borderColor = '#DC2626';
     Icon = TrendingDown;
   }
 
   return (
-    <div className={cn("px-4 py-3 flex items-center gap-2", stripClass)}>
-      <Icon className="w-4 h-4 shrink-0" />
-      <span className="text-sm font-semibold">
+    <div
+      style={{
+        padding: '12px 16px',
+        backgroundColor: bgColor,
+        borderLeft: `3px solid ${borderColor}`,
+        borderBottom: '1px solid hsl(var(--border) / 0.1)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+      }}
+    >
+      <Icon style={{ width: '16px', height: '16px', color: textColor, flexShrink: 0 }} />
+      <span style={{ fontSize: '13px', fontWeight: 600, color: textColor }}>
         {formLabel} · avg. T{avgPosition} in last {completedResults.length} events
       </span>
     </div>

@@ -25,10 +25,13 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-        <Activity className="w-5 h-5 text-muted-foreground" />
-        Recent Tournaments
-      </h2>
+      {/* Section header — 22px / 700 */}
+      <div className="flex items-center gap-2" style={{ marginBottom: '12px' }}>
+        <Activity className="w-4 h-4 text-muted-foreground" />
+        <h2 className="text-foreground" style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}>
+          Recent Tournaments
+        </h2>
+      </div>
 
       {isLoading ? (
         <div className="space-y-3">
@@ -49,34 +52,48 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
                 <Link
                   key={result.id}
                   to={`/tourhub/tournament/${result.tournament_id}`}
-                  className="flex items-center py-3 border-b border-border gap-3 group active:scale-[0.98] transition-transform"
+                  className="flex items-center gap-3 group active:scale-[0.98] transition-transform"
+                  style={{ padding: '12px 0', borderBottom: '1px solid hsl(var(--border) / 0.08)' }}
                 >
-                  {/* Position */}
-                  <span className={cn(
-                    "text-sm font-bold font-mono tabular-nums w-[50px] shrink-0",
-                    isWin ? "text-amber-500" : "text-foreground"
-                  )}>
-                    {isWin ? <Trophy className="w-4 h-4 text-amber-500 inline" /> : pos}
+                  {/* Position — 14px, weight 700 */}
+                  <span
+                    className="shrink-0"
+                    style={{
+                      width: '64px',
+                      fontSize: '14px',
+                      fontWeight: 700,
+                      fontFamily: "'JetBrains Mono', monospace",
+                      fontVariantNumeric: 'tabular-nums',
+                      color: isWin ? '#f59e0b' : 'hsl(var(--foreground))',
+                    }}
+                  >
+                    {isWin ? <Trophy className="w-4 h-4 inline" style={{ color: '#f59e0b' }} /> : pos}
                   </span>
 
-                  {/* Tournament name */}
-                  <span className="text-sm text-foreground flex-1 min-w-0 truncate group-hover:text-primary transition-colors">
+                  {/* Tournament name — 14px, weight 500 */}
+                  <span className="text-foreground flex-1 min-w-0 truncate group-hover:text-primary transition-colors" style={{ fontSize: '14px', fontWeight: 500 }}>
                     {result.tournament_name}
                   </span>
 
-                  {/* Date */}
-                  <span className="text-xs text-muted-foreground shrink-0">
+                  {/* Date — 13px, weight 400 */}
+                  <span className="text-muted-foreground shrink-0" style={{ fontSize: '13px', fontWeight: 400, width: '56px', textAlign: 'right' }}>
                     {result.tournament_end_date
                       ? format(new Date(result.tournament_end_date), 'MMM d')
                       : '—'}
                   </span>
 
-                  {/* Score */}
+                  {/* Score — JetBrains Mono, 14px, weight 700 */}
                   <span
-                    className="text-sm font-semibold font-mono tabular-nums w-[40px] text-right shrink-0"
+                    className="shrink-0"
                     style={{
+                      width: '40px',
+                      textAlign: 'right',
+                      fontFamily: "'JetBrains Mono', monospace",
+                      fontSize: '14px',
+                      fontWeight: 700,
+                      fontVariantNumeric: 'tabular-nums',
                       color: score !== null && score < 0
-                        ? TOUR_COLORS.scoreUnderPar
+                        ? '#f59e0b'
                         : score !== null && score > 0
                           ? TOUR_COLORS.scoreOverPar
                           : TOUR_COLORS.scoreEven,
@@ -92,7 +109,8 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
           {hasMore && (
             <button
               onClick={() => setShowAll(prev => !prev)}
-              className="mt-4 w-full flex items-center justify-center gap-1.5 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground active:scale-[0.97] transition-all"
+              className="mt-4 w-full flex items-center justify-center gap-1.5 text-muted-foreground hover:text-foreground active:scale-[0.97] transition-all min-h-[44px]"
+              style={{ fontSize: '14px', fontWeight: 600 }}
             >
               {showAll ? (
                 <>Show Less <ChevronUp className="w-4 h-4" /></>

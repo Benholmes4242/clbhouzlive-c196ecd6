@@ -1,6 +1,6 @@
 /**
- * PlayerInfoCard - Clean biographical grid without icons.
- * No card container — editorial layout on page background.
+ * PlayerInfoCard - Clean biographical grid.
+ * Editorial layout on page background.
  */
 
 import { Link } from 'react-router-dom';
@@ -44,8 +44,8 @@ interface InfoFieldProps {
 function InfoField({ label, value }: InfoFieldProps) {
   return (
     <div>
-      <p className="text-[10px] font-semibold tracking-widest uppercase text-muted-foreground mb-0.5">{label}</p>
-      <div className="text-sm font-medium text-foreground">{value}</div>
+      <p className="text-muted-foreground/50" style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase' }}>{label}</p>
+      <div className="text-foreground" style={{ fontSize: '14px', fontWeight: 500, marginTop: '2px' }}>{value}</div>
     </div>
   );
 }
@@ -60,7 +60,6 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
   const height = formatHeight(player.height);
   const weight = formatWeight(player.weight);
 
-  // Build personal fields, skip empty
   const personalFields: { label: string; value: React.ReactNode }[] = [];
   if (player.birth_date) {
     personalFields.push({
@@ -73,7 +72,6 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
   if (birthPlace) personalFields.push({ label: 'Birth Place', value: birthPlace });
   if (player.residence) personalFields.push({ label: 'Residence', value: player.residence });
 
-  // Build career fields, skip empty
   const careerFields: { label: string; value: React.ReactNode }[] = [];
   careerFields.push({
     label: 'Tour',
@@ -103,15 +101,24 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
 
   return (
     <div>
-      <h2 className="text-xs font-semibold tracking-widest uppercase text-muted-foreground mb-4 flex items-center gap-2">
-        <User className="w-4 h-4" />
-        Player Info
-      </h2>
+      {/* Section divider above */}
+      <div style={{ borderTop: '1px solid hsl(var(--border) / 0.08)', paddingTop: '0' }} />
+      
+      {/* Section header — 11px / 700 / uppercase / muted */}
+      <div className="flex items-center gap-2" style={{ marginBottom: '16px' }}>
+        <User className="w-4 h-4 text-muted-foreground" />
+        <h2 className="text-muted-foreground/50" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+          Player Info
+        </h2>
+      </div>
 
       {personalFields.length > 0 && (
         <div>
-          <p className="text-[10px] font-semibold tracking-widest uppercase text-muted-foreground/60 mb-3">Personal</p>
-          <div className="grid grid-cols-2 gap-y-4 gap-x-8">
+          {/* Sub-section: PERSONAL — amber */}
+          <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase', color: '#f59e0b', marginBottom: '12px' }}>
+            Personal
+          </p>
+          <div className="grid grid-cols-2" style={{ gap: '16px' }}>
             {personalFields.map((f) => (
               <InfoField key={f.label} label={f.label} value={f.value} />
             ))}
@@ -120,13 +127,16 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
       )}
 
       {personalFields.length > 0 && careerFields.length > 0 && (
-        <div className="border-t border-border my-5" />
+        <div style={{ borderTop: '1px solid hsl(var(--border) / 0.08)', margin: '16px 0' }} />
       )}
 
       {careerFields.length > 0 && (
         <div>
-          <p className="text-[10px] font-semibold tracking-widest uppercase text-muted-foreground/60 mb-3">Golf Career</p>
-          <div className="grid grid-cols-2 gap-y-4 gap-x-8">
+          {/* Sub-section: GOLF CAREER — amber */}
+          <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase', color: '#f59e0b', marginBottom: '12px' }}>
+            Golf Career
+          </p>
+          <div className="grid grid-cols-2" style={{ gap: '16px' }}>
             {careerFields.map((f) => (
               <InfoField key={f.label} label={f.label} value={f.value} />
             ))}

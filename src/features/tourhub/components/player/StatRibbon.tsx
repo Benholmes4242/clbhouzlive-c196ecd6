@@ -1,10 +1,9 @@
 /**
  * StatRibbon - Full-width stats strip directly below hero.
- * No card container — sits on page background with top/bottom borders.
+ * No card container — sits on page background with bottom border.
  */
 
 import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
 import type { TourPlayerStatistics } from '../../hooks/useTourHubData';
 
 interface StatRibbonProps {
@@ -29,8 +28,8 @@ export function StatRibbon({ playerStats }: StatRibbonProps) {
   ];
 
   return (
-    <div className="border-t border-b border-border px-4 py-4">
-      <div className="flex justify-between items-center">
+    <div className="bg-card" style={{ padding: '14px 4px', borderBottom: '1px solid hsl(var(--border) / 0.1)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)' }}>
         {stats.map((stat, i) => (
           <motion.div
             key={stat.label}
@@ -39,15 +38,28 @@ export function StatRibbon({ playerStats }: StatRibbonProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 + i * 0.04, duration: 0.3 }}
           >
-            <span className="text-[10px] font-semibold tracking-widest uppercase text-muted-foreground block mb-1">
+            <span style={{
+              fontSize: '9px',
+              fontWeight: 700,
+              letterSpacing: '0.5px',
+              textTransform: 'uppercase' as const,
+            }} className="text-muted-foreground/50 block" >
               {stat.label}
             </span>
-            <span className={cn(
-              "text-lg font-bold font-mono tabular-nums block",
-              stat.value
-                ? stat.highlight ? "text-amber-500" : "text-foreground"
-                : "text-muted-foreground"
-            )}>
+            <span
+              style={{
+                fontSize: '17px',
+                fontWeight: 700,
+                fontFamily: "'JetBrains Mono', monospace",
+                fontVariantNumeric: 'tabular-nums',
+                marginTop: '2px',
+                display: 'block',
+                color: stat.value
+                  ? stat.highlight ? '#f59e0b' : undefined
+                  : undefined,
+              }}
+              className={stat.value ? (stat.highlight ? '' : 'text-foreground') : 'text-muted-foreground'}
+            >
               {stat.value || '—'}
             </span>
           </motion.div>

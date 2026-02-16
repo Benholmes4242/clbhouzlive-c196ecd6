@@ -38,7 +38,7 @@ export function PlayerProfilePage() {
   const { data: player, isLoading: playerLoading, refetch } = useTourPlayer(playerId || '');
   const { data: playerStats } = useSinglePlayerStatistics(playerId);
 
-  // ── Pull-to-refresh (PD-01) ──
+  // Pull-to-refresh
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
   const touchStartY = useRef(0);
@@ -74,12 +74,10 @@ export function PlayerProfilePage() {
     touchStartY.current = 0;
   }, [pullDistance, isRefreshing, queryClient, playerId]);
 
-  // Scroll to top on mount
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [playerId]);
 
-  // Immersive mode
   useEffect(() => {
     hideHeader();
     return () => {
@@ -100,14 +98,16 @@ export function PlayerProfilePage() {
     return (
       <PageRoot className="min-h-screen w-full bg-background" immersive immersiveStatusBar>
         <div className="animate-pulse">
-          <div className="h-[53vh] bg-muted" />
-          <div className="border-t border-b border-border px-4 py-4 flex justify-between">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="text-center space-y-1">
-                <div className="h-3 w-10 bg-muted rounded mx-auto" />
-                <div className="h-5 w-8 bg-muted rounded mx-auto" />
-              </div>
-            ))}
+          <div style={{ height: 'clamp(380px, 55dvh, 550px)' }} className="bg-muted" />
+          <div className="bg-card" style={{ padding: '14px 4px', borderBottom: '1px solid hsl(var(--border) / 0.1)' }}>
+            <div className="flex justify-between px-4">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="text-center space-y-1">
+                  <div className="h-3 w-10 bg-muted rounded mx-auto" />
+                  <div className="h-5 w-8 bg-muted rounded mx-auto" />
+                </div>
+              ))}
+            </div>
           </div>
           <div className="px-4 mt-6 space-y-6">
             <div className="h-48 bg-muted/30 rounded" />
@@ -118,7 +118,6 @@ export function PlayerProfilePage() {
     );
   }
 
-  // ── Error / not-found state with retry (PD-02) ──
   if (!player) {
     return (
       <PageRoot className="min-h-screen w-full bg-background">
@@ -184,17 +183,17 @@ export function PlayerProfilePage() {
         {/* Hero */}
         <PlayerHero player={player} playerStats={playerStats ?? null} />
 
-        {/* Stats Strip — full width, no card */}
+        {/* Stats Strip — flush below hero */}
         <StatRibbon playerStats={playerStats ?? null} />
 
-        {/* Recent Form — full width tinted strip */}
+        {/* Momentum Strip — flush, 0 gap from stats */}
         {playerId && <PlayerRecentForm playerId={playerId} />}
 
-        {/* Content sections — no cards, editorial flow */}
-        <div className="w-full max-w-5xl mx-auto px-4 pb-8">
-          {/* Season Performance */}
+        {/* Content sections */}
+        <div className="w-full max-w-5xl mx-auto px-4" style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
+          {/* Season Performance — 24px from momentum strip */}
           <motion.div
-            className="py-6 border-t border-border"
+            style={{ marginTop: '24px' }}
             variants={sectionVariants}
             initial="hidden"
             whileInView="visible"
@@ -216,10 +215,10 @@ export function PlayerProfilePage() {
             )}
           </motion.div>
 
-          {/* Skill Build */}
+          {/* Skill Build — 28px gap */}
           {playerId && (
             <motion.div
-              className="py-6 border-t border-border"
+              style={{ marginTop: '28px' }}
               variants={sectionVariants}
               initial="hidden"
               whileInView="visible"
@@ -230,10 +229,10 @@ export function PlayerProfilePage() {
             </motion.div>
           )}
 
-          {/* Recent Tournaments */}
+          {/* Recent Tournaments — 28px gap */}
           {playerId && (
             <motion.div
-              className="py-6 border-t border-border"
+              style={{ marginTop: '28px' }}
               variants={sectionVariants}
               initial="hidden"
               whileInView="visible"
@@ -244,9 +243,9 @@ export function PlayerProfilePage() {
             </motion.div>
           )}
 
-          {/* Player Info */}
+          {/* Player Info — 28px gap */}
           <motion.div
-            className="py-6 border-t border-border"
+            style={{ marginTop: '28px' }}
             variants={sectionVariants}
             initial="hidden"
             whileInView="visible"
@@ -257,10 +256,12 @@ export function PlayerProfilePage() {
           </motion.div>
 
           {/* Footer */}
-          <div className="py-8 text-center border-t border-border">
-            <div className="flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground/30">
-              <Globe className="w-3.5 h-3.5" />
-              <span>Powered by SportsRadar</span>
+          <div style={{ marginTop: '24px' }}>
+            <div className="flex items-center justify-center gap-2">
+              <Globe className="w-4 h-4" style={{ color: 'hsl(var(--muted-foreground) / 0.2)' }} />
+              <span style={{ fontSize: '11px', fontWeight: 400, color: 'hsl(var(--muted-foreground) / 0.3)' }}>
+                Powered by SportsRadar
+              </span>
             </div>
           </div>
         </div>
