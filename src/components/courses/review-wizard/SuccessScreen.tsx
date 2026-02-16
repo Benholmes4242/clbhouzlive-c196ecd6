@@ -64,7 +64,7 @@ export function SuccessScreen({
       {/* Close button */}
       <button
         onClick={onDone}
-        className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-foreground hover:bg-gray-200 transition-colors active:scale-[0.97]"
+        className="absolute top-4 right-4 z-50 w-9 h-9 rounded-full bg-amber-100/80 flex items-center justify-center text-amber-700 hover:bg-amber-200/80 transition-colors active:scale-[0.97]"
         aria-label="Close"
       >
         <X className="h-5 w-5" />

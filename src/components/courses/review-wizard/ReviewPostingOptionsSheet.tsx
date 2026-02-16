@@ -37,7 +37,7 @@ const VISIBILITY_OPTIONS: VisibilityOption[] = [
     label: 'Anyone',
     description: 'Visible to everyone on Clbhouz',
     icon: <Globe className="w-5 h-5" />,
-    selectedColor: 'bg-emerald-100 text-emerald-600',
+    selectedColor: 'bg-amber-100 text-amber-600',
     defaultColor: 'bg-muted/50 text-muted-foreground',
   },
   {
@@ -83,8 +83,8 @@ function RadioDot({ selected }: { selected: boolean }) {
       className={cn(
         "w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200 border-2",
         selected
-          ? "border-primary bg-primary"
-          : "border-muted-foreground/30 bg-transparent"
+          ? "border-amber-500 bg-amber-500"
+          : "border-gray-300 bg-transparent"
       )}
     >
       <AnimatePresence>
@@ -149,8 +149,9 @@ export function ReviewPostingOptionsSheet({
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-          className="absolute bottom-0 left-0 right-0 rounded-t-3xl overflow-hidden bg-card"
+          className="absolute bottom-0 left-0 right-0 rounded-t-3xl overflow-hidden"
           style={{ 
+            backgroundColor: '#FFFBEB',
             paddingBottom: 'env(safe-area-inset-bottom, 16px)',
             maxHeight: '85vh',
           }}
@@ -158,7 +159,7 @@ export function ReviewPostingOptionsSheet({
         >
           {/* Handle */}
           <div className="flex justify-center pt-3 pb-1">
-            <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+            <div className="w-10 h-1 rounded-full bg-amber-300/50" />
           </div>
 
           {/* Scrollable Content */}
@@ -223,7 +224,7 @@ export function ReviewPostingOptionsSheet({
             </div>
 
             {/* Divider */}
-            <div className="h-px bg-border/30 mx-5" />
+            <div className="h-px mx-5" style={{ backgroundColor: 'hsla(38, 92%, 80%, 0.2)' }} />
 
             {/* Who Can See Section */}
             <div className="px-5 pt-4 pb-2">
