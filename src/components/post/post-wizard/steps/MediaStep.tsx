@@ -552,14 +552,12 @@ export function MediaStep({
     );
   }
 
-  const useDoubleRow = state.mediaItems.length >= 5;
-
   return (
     <div className="h-full flex flex-col relative" style={{ backgroundColor: '#FFF8E1' }}>
       {/* Non-blocking picker loading banner */}
       <PickerLoadingBanner isVisible={isPickerOpen} />
       
-      {/* Zone 1: Large media preview stage — takes remaining space above thumbnail grid */}
+      {/* Large media preview stage — takes all remaining space */}
       <div className="flex-1 min-h-0">
         <CreateMomentMediaStage
           media={state.mediaItems}
@@ -576,108 +574,7 @@ export function MediaStep({
         />
       </div>
       
-      {/* Zone 2: Thumbnail grid — adaptive rows, amber background */}
-      <div 
-        className="flex-shrink-0 border-t border-amber-200/20 px-2 py-2"
-        style={{ backgroundColor: '#FFF8E1' }}
-      >
-        <div 
-          className="overflow-x-auto media-grid-scroll"
-          style={{ 
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-          }}
-        >
-          <style dangerouslySetInnerHTML={{ __html: `
-            .media-grid-scroll::-webkit-scrollbar { display: none; }
-          `}} />
-          <div 
-            className="grid gap-2"
-            style={{
-              gridTemplateRows: useDoubleRow ? 'repeat(2, 80px)' : '80px',
-              gridAutoFlow: 'column',
-              gridAutoColumns: '80px',
-            }}
-          >
-            {state.mediaItems.map((item) => {
-              const isRemoving = removingMediaIds.has(item.id);
-              const isProcessing = processingMediaIds.has(item.id);
-              const isActive = item.id === activeMediaId;
-              
-              return (
-                <motion.div
-                  key={item.id}
-                  className="relative overflow-hidden cursor-pointer rounded-xl w-20 h-20"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ 
-                    opacity: isRemoving ? 0 : 1, 
-                    scale: isRemoving ? 0.5 : 1,
-                  }}
-                  transition={{ duration: 0.2 }}
-                  onClick={() => handleActiveMediaChange(item.id)}
-                >
-                  {item.type === 'image' ? (
-                    <img 
-                      src={item.previewUrl} 
-                      alt="" 
-                      className="w-full h-full object-cover rounded-xl"
-                    />
-                  ) : (
-                    <>
-                      <img 
-                        src={item.thumbnailUrl || item.previewUrl} 
-                        alt="" 
-                        className="w-full h-full object-cover rounded-xl"
-                      />
-                      <div className="absolute bottom-1 left-1 w-5 h-5 rounded-full flex items-center justify-center"
-                        style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
-                      >
-                        <Play className="w-2.5 h-2.5 text-white fill-white" />
-                      </div>
-                    </>
-                  )}
-                  
-                  {/* Remove button */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      animateAndRemove(item.id);
-                    }}
-                    className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-black/40 text-white flex items-center justify-center"
-                  >
-                    <X className="w-2.5 h-2.5" />
-                  </button>
-                  
-                  {/* Active ring */}
-                  {isActive && (
-                    <div className="absolute inset-0 ring-2 ring-amber-400 rounded-xl pointer-events-none" />
-                  )}
-                  
-                  {/* Processing overlay */}
-                  {isProcessing && (
-                    <div className="absolute inset-0 bg-black/30 rounded-xl flex items-center justify-center">
-                      <div className="w-4 h-4 border-2 border-white/60 border-t-white rounded-full animate-spin" />
-                    </div>
-                  )}
-                </motion.div>
-              );
-            })}
-            
-            {/* "+ Add More" cell */}
-            {canAddMore && (
-              <button
-                onClick={handleGallery}
-                disabled={isPickerOpen}
-                className="w-20 h-20 rounded-xl border-2 border-dashed border-amber-300/60 flex items-center justify-center bg-amber-50/30 active:bg-amber-100/40 transition-colors disabled:opacity-50"
-              >
-                <Plus className="w-5 h-5 text-amber-400" />
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-      
-      {/* Zone 3: Fixed bottom bar — Add/Studio/Badges */}
+      {/* Bottom footer bar — counter + 3 buttons */}
       <div 
         className="flex-shrink-0 border-t border-amber-200/30 px-4 py-3"
         style={{ backgroundColor: '#FFF8E1', paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}
@@ -688,53 +585,52 @@ export function MediaStep({
           completedVideos={batchCompleted} 
         />
         
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {/* Add more media */}
-            <button
-              onClick={handleGallery}
-              disabled={!canAddMore || isPickerOpen}
-              className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-amber-100/80 text-sm font-medium text-amber-700 active:bg-amber-200/80 transition-colors ${!canAddMore ? 'opacity-30 cursor-not-allowed' : ''}`}
-            >
-              <Plus className="h-4 w-4" />
-              Add
-            </button>
-            
-            {/* Studio button */}
-            <button
-              onClick={() => {
-                studioFirstRun.markSeen();
-                onOpenStudio();
-              }}
-              className="relative flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-amber-100/80 text-sm font-medium text-amber-700 active:bg-amber-200/80 transition-colors"
-            >
-              <Wand2 className="h-4 w-4" />
-              Studio
-              {!studioFirstRun.hasSeen && (
-                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-              )}
-            </button>
-            
-            {/* Badges button */}
-            <button
-              onClick={() => {
-                badgesFirstRun.markSeen();
-                onOpenBadges();
-              }}
-              className="relative flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-amber-100/80 text-sm font-medium text-amber-700 active:bg-amber-200/80 transition-colors"
-            >
-              <Award className="h-4 w-4" />
-              Badges
-              {!badgesFirstRun.hasSeen && (
-                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-              )}
-            </button>
-          </div>
+        {/* Counter — centered */}
+        <p className="text-sm text-amber-600 font-medium tabular-nums text-center mb-2">
+          {state.mediaItems.length}/{POST_LIMITS.MAX_MEDIA_COUNT}
+        </p>
+        
+        {/* Three buttons row */}
+        <div className="flex items-center justify-center gap-4">
+          {/* Add button */}
+          <button
+            onClick={handleGallery}
+            disabled={!canAddMore || isPickerOpen}
+            className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-amber-100/80 text-sm font-medium text-amber-700 active:bg-amber-200/80 transition-colors ${!canAddMore ? 'opacity-30 cursor-not-allowed' : ''}`}
+          >
+            <Plus className="h-4 w-4" />
+            Add
+          </button>
           
-          {/* Media count */}
-          <span className="text-xs text-amber-600 font-medium tabular-nums">
-            {state.mediaItems.length}/{POST_LIMITS.MAX_MEDIA_COUNT}
-          </span>
+          {/* Studio button */}
+          <button
+            onClick={() => {
+              studioFirstRun.markSeen();
+              onOpenStudio();
+            }}
+            className="relative flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-amber-100/80 text-sm font-medium text-amber-700 active:bg-amber-200/80 transition-colors"
+          >
+            <Wand2 className="h-4 w-4" />
+            Studio
+            {!studioFirstRun.hasSeen && (
+              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+            )}
+          </button>
+          
+          {/* Badges button */}
+          <button
+            onClick={() => {
+              badgesFirstRun.markSeen();
+              onOpenBadges();
+            }}
+            className="relative flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-amber-100/80 text-sm font-medium text-amber-700 active:bg-amber-200/80 transition-colors"
+          >
+            <Award className="h-4 w-4" />
+            Badges
+            {!badgesFirstRun.hasSeen && (
+              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+            )}
+          </button>
         </div>
       </div>
     </div>
