@@ -1,5 +1,6 @@
 /**
  * PlayerSortControl - Compact pill-style sort dropdown
+ * Aligned with Tour Overview audit specs.
  */
 
 import { Check, ChevronDown } from 'lucide-react';
@@ -41,9 +42,9 @@ export function PlayerSortControl({ value, onChange }: PlayerSortControlProps) {
       <DropdownMenuTrigger asChild>
         <button
           className={cn(
-            "flex items-center gap-1.5 h-11 px-4",
-            "bg-card border border-border rounded-xl",
-            "text-sm font-medium text-foreground",
+            "flex items-center gap-1.5 px-3.5 py-2",
+            "bg-card border border-border/60 rounded-xl",
+            "text-[13px] font-medium text-foreground",
             "shadow-[0_1px_3px_rgba(0,0,0,0.06)]",
             "hover:bg-muted active:scale-[0.98] transition-all duration-150",
             "outline-none focus:outline-none focus-visible:ring-0"

@@ -1,7 +1,6 @@
 /**
  * PlayerCardV2 - Redesigned player card with photo filling the left side.
- * PL-04: Stats line reorders based on active sort.
- * PL-05: aria-label for screen readers.
+ * Aligned with Tour Overview audit specs.
  */
 
 import { Link } from 'react-router-dom';
@@ -29,9 +28,7 @@ interface PlayerCardV2Props {
   batchHeadshotUrl?: string | null;
   showTourBadge?: boolean;
   index?: number;
-  /** Active sort — determines stats line order (PL-04) */
   activeSort?: PlayerSortType;
-  /** Called before navigating to save scroll position (PL-03) */
   onNavigate?: () => void;
 }
 
@@ -73,7 +70,7 @@ export function PlayerCardV2({
   const winCount = wins ?? 0;
   const winsPart = winCount > 0 ? `${winCount} ${winCount === 1 ? 'win' : 'wins'}` : null;
 
-  // PL-04: Reorder stats based on active sort
+  // Reorder stats based on active sort
   let metaParts: string[] = [];
   let primaryIndex = -1;
 
@@ -88,13 +85,11 @@ export function PlayerCardV2({
     if (rankPart) metaParts.push(rankPart);
     if (winsPart) metaParts.push(winsPart);
   } else {
-    // Default / world-rank / alpha
     if (rankPart) metaParts.push(rankPart);
     if (earningsPart) metaParts.push(earningsPart);
     if (winsPart) metaParts.push(winsPart);
   }
 
-  // PL-05: Build aria-label
   const ariaLabel = [
     player.fullName,
     countryName,
@@ -115,14 +110,14 @@ export function PlayerCardV2({
         aria-label={ariaLabel}
         className={cn(
           "flex overflow-hidden",
-          "bg-card rounded-xl border border-border/40 shadow-sm",
-          "hover:border-primary/30 hover:shadow-md",
+          "bg-card rounded-2xl border border-border/50",
+          "shadow-[0_1px_3px_rgba(0,0,0,0.04)]",
           "active:scale-[0.98] transition-all"
         )}
-        style={{ height: '110px' }}
+        style={{ minHeight: '100px' }}
       >
-        {/* Photo section — left ~35% */}
-        <div className="relative w-[110px] shrink-0 bg-muted overflow-hidden">
+        {/* Photo section — left 140px */}
+        <div className="relative shrink-0 bg-muted overflow-hidden" style={{ width: '140px', borderRadius: '16px 0 0 16px' }}>
           {photoUrl ? (
             <img
               src={photoUrl}
@@ -132,27 +127,30 @@ export function PlayerCardV2({
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20 flex items-center justify-center">
-              <span className="text-2xl font-bold text-muted-foreground/40">{initials}</span>
+              <span className="text-2xl font-bold text-muted-foreground/30">{initials}</span>
             </div>
           )}
         </div>
 
-        {/* Info section — right ~65% */}
-        <div className="flex-1 min-w-0 px-3.5 py-3 flex flex-col justify-center">
-          <h3 className="text-base font-semibold text-foreground truncate leading-tight">
+        {/* Info section */}
+        <div className="flex-1 min-w-0 p-4 flex flex-col justify-center">
+          <h3 
+            className="text-foreground truncate"
+            style={{ fontSize: '16px', fontWeight: 600, letterSpacing: '-0.1px' }}
+          >
             {player.fullName}
           </h3>
 
           {countryName && (
-            <div className="flex items-center gap-1.5 mt-1">
+            <div className="flex items-center gap-1.5" style={{ marginTop: '2px' }}>
               {flag && <span className="text-xs leading-none">{flag}</span>}
-              <span className="text-sm text-muted-foreground truncate">{countryName}</span>
+              <span style={{ fontSize: '13px', fontWeight: 400 }} className="text-muted-foreground truncate">{countryName}</span>
             </div>
           )}
 
-          {/* Meta line — PL-04: primary metric is bold */}
+          {/* Meta line — primary metric is bold */}
           {metaParts.length > 0 && (
-            <p className="text-xs text-muted-foreground mt-1.5 tabular-nums truncate">
+            <p className="text-muted-foreground truncate" style={{ fontSize: '13px', fontWeight: 500, marginTop: '4px', fontVariantNumeric: 'tabular-nums' }}>
               {metaParts.map((part, i) => (
                 <span key={i}>
                   {i > 0 && ' · '}
@@ -169,7 +167,7 @@ export function PlayerCardV2({
 
         {/* Chevron */}
         <div className="flex items-center pr-3 shrink-0">
-          <ChevronRight className="w-4 h-4 text-muted-foreground/40" />
+          <ChevronRight className="w-4 h-4 text-muted-foreground/30" />
         </div>
       </Link>
     </motion.div>

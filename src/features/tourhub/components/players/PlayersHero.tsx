@@ -1,6 +1,6 @@
 /**
  * PlayersHero - Immersive full-bleed #1 player hero.
- * Runner row matches WorldRankingsShowcase style (photo-first horizontal scroll).
+ * Aligned with Tour Overview audit typography & spacing.
  */
 
 import { Link, useNavigate } from 'react-router-dom';
@@ -26,7 +26,7 @@ function formatEarningsCompact(amount: number | null | undefined): string | null
   return `$${amount}`;
 }
 
-/** Runner card — matches TourHubNavOverlay World Rankings row style */
+/** Runner card — #2 amber, #3 silver */
 function RunnerCard({ player, index }: { player: ElitePlayer; index: number }) {
   const pgaHeadshot = player.pgaTourId ? getPgaTourHeadshotUrl(player.pgaTourId) : null;
   const photoUrl = pgaHeadshot || resolvePhotoUrl(player.photoUrl, player.pgaTourId);
@@ -35,35 +35,32 @@ function RunnerCard({ player, index }: { player: ElitePlayer; index: number }) {
   const lastName = player.playerName.split(' ').slice(-1)[0];
   const country = titleCaseCountry(player.country);
 
-  // PL-07: #2 = amber/gold, #3 = silver/slate
-  const rankColors = isFirst
-    ? 'linear-gradient(135deg, #D97706 0%, #B45309 100%)'
-    : 'linear-gradient(135deg, #94A3B8 0%, #64748B 100%)';
+  const rankBg = isFirst
+    ? '#f59e0b'
+    : '#94A3B8';
 
   return (
     <Link
       to={`/tourhub/player/${player.playerId}`}
-      className="flex-shrink-0 flex items-center gap-2.5 px-3 py-2.5 rounded-2xl active:scale-[0.97] transition-transform"
+      className="flex items-center gap-2 px-3.5 py-2.5 rounded-2xl active:scale-[0.97] transition-transform"
       style={{
-        scrollSnapAlign: 'start',
         background: 'hsl(var(--card))',
-        border: '1px solid hsl(var(--border) / 0.4)',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06), 0 0 1px rgba(0, 0, 0, 0.08)',
+        border: '1px solid hsl(var(--border) / 0.5)',
         flex: '1 1 0%',
       }}
     >
-      {/* Rank Badge */}
+      {/* Rank circle */}
       <div
-        className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center"
-        style={{ background: rankColors, boxShadow: '0 1px 3px rgba(0, 0, 0, 0.12)' }}
+        className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
+        style={{ background: rankBg }}
       >
-        <span className="text-xs font-bold text-white">{rank}</span>
+        <span style={{ fontSize: '14px', fontWeight: 700, color: 'white' }}>{rank}</span>
       </div>
 
-      {/* Avatar — squircle */}
+      {/* Avatar */}
       <div
-        className="flex-shrink-0 overflow-hidden border border-border/50"
-        style={{ width: '36px', height: '36px', borderRadius: '11px' }}
+        className="flex-shrink-0 overflow-hidden"
+        style={{ width: '36px', height: '36px', borderRadius: '34%', border: '1px solid hsl(var(--border) / 0.4)' }}
       >
         {photoUrl ? (
           <div className="relative w-full h-full">
@@ -83,8 +80,8 @@ function RunnerCard({ player, index }: { player: ElitePlayer; index: number }) {
 
       {/* Name & Country */}
       <div className="flex-1 min-w-0 text-left">
-        <p className="text-sm font-semibold text-foreground truncate">{lastName}</p>
-        <p className="text-[10px] text-muted-foreground truncate">{country || 'Unknown'}</p>
+        <p style={{ fontSize: '14px', fontWeight: 600 }} className="text-foreground truncate">{lastName}</p>
+        <p style={{ fontSize: '11px', fontWeight: 400 }} className="text-muted-foreground truncate">{country || 'Unknown'}</p>
       </div>
     </Link>
   );
@@ -109,12 +106,11 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
     metaParts.push(`${champStats.wins} ${champStats.wins === 1 ? 'win' : 'wins'}`);
   }
 
-  // 10% taller hero: clamp(282px, 53vh, 422px)
   const navigate = useNavigate();
 
   return (
     <div className="relative">
-      {/* Glass back button - matches CourseDetailPage */}
+      {/* Back button */}
       <button
         type="button"
         onClick={() => navigate(-1)}
@@ -136,7 +132,6 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
             to={`/tourhub/player/${champion.playerId}`}
             className="block active:scale-[0.995] transition-transform"
           >
-            {/* Straight-edge hero (no rounded corners) */}
             <div className="relative w-full overflow-hidden" style={{ height: 'clamp(282px, 53vh, 422px)' }}>
               {photoUrl ? (
                 <motion.img
@@ -152,9 +147,9 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
                 <div className="absolute inset-0 w-full h-full bg-muted" />
               )}
 
-              {/* Subtle gradient for text legibility */}
+              {/* Strong bottom gradient for text legibility */}
               <div className="absolute inset-0" style={{
-                background: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.55) 100%)',
+                background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%)',
               }} />
 
               <div className="absolute bottom-0 left-0 right-0 p-5 pb-6 space-y-1.5">
@@ -162,7 +157,8 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2, duration: 0.4 }}
-                  className="text-3xl font-bold text-white leading-tight"
+                  className="text-white"
+                  style={{ fontSize: '22px', fontWeight: 800, letterSpacing: '-0.3px', lineHeight: 1.2 }}
                 >
                   {champion.playerName}
                 </motion.h2>
@@ -174,7 +170,7 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
                   className="flex items-center gap-1.5"
                 >
                   {flag && <span className="text-lg">{flag}</span>}
-                  <span className="text-sm text-white/80">{country}</span>
+                  <span style={{ fontSize: '13px', fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>{country}</span>
                 </motion.div>
 
                 <motion.div
@@ -182,7 +178,16 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.26, duration: 0.4 }}
                 >
-                  <span className="inline-block px-3 py-1 rounded-md bg-black/20 backdrop-blur-sm text-sm font-medium text-amber-400">
+                  <span 
+                    className="inline-block text-white"
+                    style={{ 
+                      fontSize: '13px', fontWeight: 600, 
+                      background: 'rgba(245,158,11,0.85)', 
+                      borderRadius: '20px', 
+                      padding: '6px 14px',
+                      letterSpacing: '0.3px',
+                    }}
+                  >
                     {metaParts.join(' · ')}
                   </span>
                 </motion.div>
@@ -190,16 +195,16 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
             </div>
           </Link>
 
-          {/* Runner row — overlaps the hero by ~20% */}
+          {/* Runner row — overlaps hero bottom */}
           {runners.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.35 }}
               className="px-4"
-              style={{ marginTop: '-8px', position: 'relative', zIndex: 10 }}
+              style={{ marginTop: '-20px', position: 'relative', zIndex: 10 }}
             >
-              <div className="flex gap-2.5">
+              <div className="flex gap-2">
                 {runners.slice(0, 2).map((player, index) => (
                   <RunnerCard key={player.playerId} player={player} index={index} />
                 ))}

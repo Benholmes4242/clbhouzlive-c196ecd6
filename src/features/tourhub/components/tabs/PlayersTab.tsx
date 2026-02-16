@@ -1,12 +1,6 @@
 /**
  * PlayersTab - Redesigned Players page.
- * 
- * - Hero: #1 player for every tour filter
- * - No category tabs (Field/Elite/On Tour/Rising removed)
- * - Sort dropdown (world rank, alpha, events, earnings)
- * - Card layout with player photo filling left side
- * - Load More pagination (50 per batch)
- * - Tour filter pills (dark active, matches schedule style)
+ * Aligned with Tour Overview audit spacing & typography.
  */
 
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
@@ -51,7 +45,7 @@ export function PlayersTab() {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [sort, setSort] = useState<PlayerSortType>('world-rank-desc');
 
-  // PL-03: Scroll-to-top on mount / restore on back nav
+  // Scroll-to-top on mount / restore on back nav
   useEffect(() => {
     const saved = sessionStorage.getItem('players-scroll');
     if (saved) {
@@ -62,7 +56,7 @@ export function PlayersTab() {
     }
   }, []);
 
-  // PL-02: Pull-to-refresh state
+  // Pull-to-refresh state
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
   const touchStartY = useRef(0);
@@ -243,10 +237,10 @@ export function PlayersTab() {
       <div className="space-y-4 py-6">
         <div className="bg-muted/40 animate-pulse" style={{ height: 'clamp(282px, 53vh, 422px)' }} />
         <div className="px-4 space-y-3">
-          <div className="bg-muted/40 h-12 rounded-xl animate-pulse" />
-          <div className="bg-muted/40 h-11 rounded-xl animate-pulse" />
+          <div className="bg-muted/40 h-12 rounded-2xl animate-pulse" />
+          <div className="bg-muted/40 h-11 rounded-2xl animate-pulse" />
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-[110px] bg-muted/20 rounded-xl animate-pulse" />
+            <div key={i} className="h-[100px] bg-muted/20 rounded-2xl animate-pulse" />
           ))}
         </div>
       </div>
@@ -255,12 +249,11 @@ export function PlayersTab() {
 
   return (
     <div
-      className="pb-6"
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
-      {/* Pull-to-refresh indicator — PL-02 */}
+      {/* Pull-to-refresh indicator */}
       <AnimatePresence>
         {(pullDistance > 0 || isRefreshing) && (
           <motion.div
@@ -280,14 +273,15 @@ export function PlayersTab() {
           </motion.div>
         )}
       </AnimatePresence>
+
       {/* Hero */}
       {showHero && heroPlayers.length > 0 && (
         <PlayersHero players={heroPlayers} activeTour={activeTour} statsMap={statsMap} />
       )}
 
-      {/* Search Bar — matches schedule page width/style (inside px-4 wrapper) */}
-      <div className="px-4 pt-4">
-        <div className="relative mb-4">
+      {/* Search Bar — 32px gap from runner-up overlap */}
+      <div className="px-4" style={{ marginTop: showHero ? '32px' : '16px' }}>
+        <div className="relative">
           <Search 
             className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-muted-foreground w-[18px] h-[18px]"
             strokeWidth={2.5}
@@ -298,10 +292,10 @@ export function PlayersTab() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className={cn(
-              "w-full h-12 pl-11 pr-10 rounded-xl text-[14px] transition-all duration-200",
-              "bg-card/80 backdrop-blur-sm border text-foreground placeholder:text-muted-foreground",
+              "w-full h-12 pl-11 pr-10 rounded-2xl text-[13px] transition-all duration-200",
+              "bg-card border text-foreground placeholder:text-muted-foreground",
               "focus:outline-none focus:ring-2 focus:bg-card",
-              "border-border/60 ring-transparent shadow-sm",
+              "border-border/50 ring-transparent shadow-sm",
               "focus:border-border focus:ring-border/50 focus:shadow-lg"
             )}
           />
@@ -321,7 +315,7 @@ export function PlayersTab() {
         </div>
       </div>
 
-      {/* Sticky toolbar — tour selector button + safe-area notch fill */}
+      {/* Sticky toolbar — tour selector + safe-area notch fill */}
       <div
         className={cn(
           "sticky top-0 z-20",
@@ -330,22 +324,24 @@ export function PlayersTab() {
         )}
         style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
       >
-        <PlayersTourFilterSheet
-          activeTour={activeTour}
-          onTourChange={setActiveTour}
-          tourCounts={tourCounts}
-        />
+        {/* Tour dropdown — 20px from search */}
+        <div style={{ marginTop: '20px' }}>
+          <PlayersTourFilterSheet
+            activeTour={activeTour}
+            onTourChange={setActiveTour}
+            tourCounts={tourCounts}
+          />
+        </div>
       </div>
 
       {/* Content */}
-      <div className="space-y-3 mt-4 px-4">
-        {/* Count + sort row */}
-        <div className="flex items-center justify-between px-0.5">
-          <div />
+      <div className="px-4">
+        {/* Sort row — 16px from tour dropdown */}
+        <div className="flex items-center justify-end" style={{ marginTop: '16px' }}>
           <PlayerSortControl value={sort} onChange={(v) => { setSort(v); setVisibleCount(PAGE_SIZE); }} />
         </div>
 
-        {/* Player cards */}
+        {/* Player cards — 12px from sort */}
         <AnimatePresence mode="wait">
           <motion.div
             key={contentKey}
@@ -353,7 +349,8 @@ export function PlayersTab() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="space-y-2.5"
+            className="flex flex-col gap-2"
+            style={{ marginTop: '12px' }}
           >
             {displayRows.length > 0 ? (
               <>
@@ -392,29 +389,39 @@ export function PlayersTab() {
 
         {/* Load More */}
         {hasMore && (
-          <div className="flex flex-col items-center gap-2 pt-2">
+          <div className="flex flex-col items-center gap-2" style={{ marginTop: '16px' }}>
             <button
               onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
               className={cn(
-                "w-full max-w-md h-12 flex items-center justify-center gap-1.5",
-                "rounded-xl border border-border bg-muted",
-                "text-sm font-medium text-foreground",
-                "hover:bg-muted/80 active:scale-[0.97] transition-all",
+                "w-full flex flex-col items-center justify-center gap-1",
+                "rounded-2xl border border-border/50 bg-muted/40",
+                "py-3.5",
+                "active:scale-[0.97] transition-all",
               )}
             >
-              Show More Players ({visibleCount + 1}-{Math.min(visibleCount + PAGE_SIZE, totalCount)} of {totalCount})
-              <ChevronDown className="w-4 h-4 text-muted-foreground" />
+              <span className="flex items-center gap-1.5">
+                <span style={{ fontSize: '14px', fontWeight: 600, color: 'hsl(var(--foreground) / 0.6)' }}>
+                  Show More Players
+                </span>
+                <span style={{ fontSize: '14px', fontWeight: 400, color: 'hsl(var(--foreground) / 0.6)' }}>
+                  ({visibleCount + 1}-{Math.min(visibleCount + PAGE_SIZE, totalCount)} of {totalCount})
+                </span>
+              </span>
+              <ChevronDown className="w-4 h-4 text-muted-foreground/40" />
             </button>
           </div>
         )}
 
         {/* Showing count */}
         {totalCount > 0 && (
-          <p className="text-center text-[11px] text-muted-foreground/50 tabular-nums">
+          <p className="text-center text-muted-foreground/40 tabular-nums" style={{ fontSize: '12px', fontWeight: 400, marginTop: '8px' }}>
             Showing {Math.min(visibleCount, totalCount)} of {totalCount}
           </p>
         )}
       </div>
+
+      {/* Bottom safe area */}
+      <div style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }} />
     </div>
   );
 }
