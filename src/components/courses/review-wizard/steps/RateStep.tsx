@@ -131,7 +131,7 @@ export function RateStep({
       exit={{ opacity: 0, x: -300 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       className="shrink-0 px-4 pt-6"
-      style={{ backgroundColor: '#F8FAFC' }}
+      style={{ backgroundColor: '#FFFBEB' }}
     >
       {/* Main Rating Section */}
       <div className="mb-10">
