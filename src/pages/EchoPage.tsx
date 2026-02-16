@@ -17,7 +17,7 @@ import { EchoPageMessageList } from '@/features/echo/components/page/EchoPageMes
 import { EchoPageComposer } from '@/features/echo/components/page/EchoPageComposer';
 import { EchoHistorySheet } from '@/features/echo/components/page/EchoHistorySheet';
 import { EchoPendingState } from '@/features/echo/components/page/EchoPendingState';
-import { WarmGradientBg } from '@/components/hub-warm/WarmGradientBg';
+import { CanonicalAmberBg } from '@/components/ui/CanonicalAmberBg';
 
 export default function EchoPage() {
   const navigate = useNavigate();
@@ -152,8 +152,8 @@ export default function EchoPage() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
     >
-      {/* Warm gradient background */}
-      <WarmGradientBg />
+      {/* Canonical amber background */}
+      <CanonicalAmberBg />
       
       <div className="relative z-10 flex flex-col h-full">
         {/* Header - Glass style */}

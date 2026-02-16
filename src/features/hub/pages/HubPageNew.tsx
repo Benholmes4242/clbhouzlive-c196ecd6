@@ -23,7 +23,7 @@ import { AnimatedNumber } from '@/components/ui/motion';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { Skeleton } from '@/components/ui/skeleton';
 import { startOfMonth, endOfMonth, isWithinInterval, subMonths } from 'date-fns';
-import { WarmGradientBg } from '@/components/hub-warm/WarmGradientBg';
+import { CanonicalAmberBg } from '@/components/ui/CanonicalAmberBg';
 import { GlassCard } from '@/components/hub-warm/GlassCard';
 import { usePresence } from '@/hooks/usePresence';
 import { cn } from '@/lib/utils';
@@ -273,7 +273,7 @@ export function HubPageNew() {
   if (isLoading) {
     return (
       <div className="h-[100dvh] overflow-hidden relative">
-        <WarmGradientBg />
+        <CanonicalAmberBg />
         <div className="relative z-10 flex-1 flex flex-col px-5 font-dm-sans" style={{ paddingTop: 'max(var(--sat, env(safe-area-inset-top, 0px)), 47px)' }}>
           <Skeleton className="h-4 w-28 mb-2 bg-white/30" />
           <Skeleton className="h-9 w-40 mb-8 bg-white/30" />
@@ -289,7 +289,7 @@ export function HubPageNew() {
   if (hasError && !sessionLoading) {
     return (
       <div className="h-[100dvh] overflow-hidden relative">
-        <WarmGradientBg />
+        <CanonicalAmberBg />
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 h-full font-dm-sans">
           <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4 bg-white/40">
             <RefreshCw className="w-8 h-8" style={{ color: '#EA580C' }} />
@@ -311,7 +311,7 @@ export function HubPageNew() {
   // ============ Main Render ============
   return (
     <div className="h-[100dvh] overflow-hidden relative hub-warm-page font-dm-sans">
-      <WarmGradientBg />
+      <CanonicalAmberBg />
 
       {/* Content layer */}
       <div
