@@ -246,7 +246,7 @@ export function EchoSheetV2({
               height: '90svh', 
               maxHeight: '90svh',
               backgroundColor: '#FFFBEB',
-              backgroundImage: 'linear-gradient(to bottom, rgba(254,243,199,0.3) 0%, rgba(254,243,199,0.2) 45%, white 75%, white 100%)',
+              backgroundImage: 'linear-gradient(to bottom, rgba(254,243,199,0.3), white, white)',
             }}
             onClick={(e) => e.stopPropagation()}
           >

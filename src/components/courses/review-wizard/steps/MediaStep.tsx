@@ -247,7 +247,7 @@ export function MediaStep({
       exit={{ opacity: 0, x: -300 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       className="flex flex-col h-full overflow-hidden relative"
-      style={{ background: 'linear-gradient(to bottom, rgba(254,243,199,0.3), white, white)' }}
+      style={{ background: 'transparent' }}
     >
       {fileInput}
       
@@ -381,7 +381,7 @@ export function MediaStep({
         /* Empty state — amber-themed, matching Post Wizard */
         <div 
           className="h-full flex items-center justify-center p-5 relative"
-          style={{ background: 'linear-gradient(to bottom, rgba(254,243,199,0.3), white, white)' }}
+          style={{ background: 'transparent' }}
         >
           {permissionDenied ? (
             <PermissionDeniedCard

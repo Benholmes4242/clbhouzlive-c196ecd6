@@ -59,7 +59,7 @@ export function SuccessScreen({
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
       className="relative flex-1 flex flex-col items-center justify-center p-6 text-center"
-      style={{ backgroundColor: '#FFFBEB', backgroundImage: 'linear-gradient(to bottom, rgba(254,243,199,0.3) 0%, rgba(254,243,199,0.2) 45%, white 75%, white 100%)' }}
+      style={{ backgroundColor: 'transparent' }}
     >
       {/* Close button */}
       <button
