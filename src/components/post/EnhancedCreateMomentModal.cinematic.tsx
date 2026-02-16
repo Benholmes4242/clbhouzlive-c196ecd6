@@ -1,7 +1,7 @@
 // Thin wrapper for backwards compatibility
 // Uses the new PostWizard component
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { PostWizard } from "./post-wizard";
 import { ReviewWizard } from "@/components/courses/review-wizard";
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
@@ -31,7 +31,30 @@ export default function EnhancedCreateMomentModalCinematic(props: Props) {
   const [reviewMediaFiles, setReviewMediaFiles] = useState<File[]>([]);
   const [showReviewWizard, setShowReviewWizard] = useState(false);
 
+  // Bridge handoff guard — keeps modal mounted during the 300ms gap
+  const [showPostWizard, setShowPostWizard] = useState(true);
+  const reviewHandoffInProgress = useRef(false);
+
+  // Reset showPostWizard when modal re-opens
+  useEffect(() => {
+    if (props.isOpen) {
+      setShowPostWizard(true);
+    }
+  }, [props.isOpen]);
+
+  const handleClose = useCallback(() => {
+    if (reviewHandoffInProgress.current) {
+      // Don't close the modal — just hide the PostWizard visually
+      setShowPostWizard(false);
+      return;
+    }
+    // Normal close — pass through to parent
+    props.onClose();
+  }, [props.onClose]);
+
   const handleRequestReview = useCallback((course: GolfCourse, mediaFiles: File[]) => {
+    reviewHandoffInProgress.current = true;
+
     setReviewCourse({
       id: course.id,
       name: course.name,
@@ -46,14 +69,16 @@ export default function EnhancedCreateMomentModalCinematic(props: Props) {
     setShowReviewWizard(false);
     setReviewCourse(null);
     setReviewMediaFiles([]);
+    reviewHandoffInProgress.current = false;
+    // NOW close the modal
     props.onClose();
   }, [props.onClose]);
 
   return (
     <>
       <PostWizard
-        isOpen={props.isOpen}
-        onClose={props.onClose}
+        isOpen={showPostWizard && props.isOpen}
+        onClose={handleClose}
         initialMedia={props.mediaItems}
         initialCourses={props.selectedCourse ? [props.selectedCourse] : undefined}
         initialActorOverride={props.initialActorOverride}

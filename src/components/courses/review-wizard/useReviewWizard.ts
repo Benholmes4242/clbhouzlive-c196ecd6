@@ -138,6 +138,35 @@ export function useReviewWizard({
   
   // Track pending files selected in MediaStep (uploaded on submit)
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+
+  // Stable blob URL cache — one URL per File, revoked on removal/unmount
+  const blobUrlCache = useRef<Map<File, string>>(new Map());
+
+  const getOrCreateBlobUrl = useCallback((file: File): string => {
+    const existing = blobUrlCache.current.get(file);
+    if (existing) return existing;
+    const url = URL.createObjectURL(file);
+    blobUrlCache.current.set(file, url);
+    return url;
+  }, []);
+
+  // Revoke blob URLs for files no longer in pendingFiles
+  useEffect(() => {
+    const currentFiles = new Set(pendingFiles);
+    for (const [file, url] of blobUrlCache.current.entries()) {
+      if (!currentFiles.has(file)) {
+        URL.revokeObjectURL(url);
+        blobUrlCache.current.delete(file);
+      }
+    }
+  }, [pendingFiles]);
+
+  const cleanupBlobUrls = useCallback(() => {
+    for (const [, url] of blobUrlCache.current.entries()) {
+      URL.revokeObjectURL(url);
+    }
+    blobUrlCache.current.clear();
+  }, []);
   
   // Process initial media files from Post Wizard bridge flow
   const hasProcessedInitialMedia = useRef(false);
@@ -351,11 +380,11 @@ export function useReviewWizard({
     // Existing media from edit mode
     ...state.media.filter(m => m.status === 'existing'),
     // Pending files (local previews, not uploaded yet)
-    // Create blob URL for immediate preview display in both carousel AND thumbnail strip
+    // Use cached blob URLs to prevent memory leaks on recompute
     ...pendingFiles.map((file, index) => ({
       id: `pending-${index}`,
       type: (file.type.startsWith('video/') ? 'video' : 'image') as 'image' | 'video',
-      previewUrl: URL.createObjectURL(file),  // Create blob URL for thumbnail display
+      previewUrl: getOrCreateBlobUrl(file),  // Cached — one URL per File
       uploadedUrl: null,
       status: 'pending' as const,
       isCover: state.coverMediaId === `pending-${index}`,
@@ -364,7 +393,7 @@ export function useReviewWizard({
       posterUrl: null,
       file: file,  // Keep file reference for stable blob URL in CarouselSlide
     } as ReviewMediaItem)),
-  ], [state.media, pendingFiles, state.coverMediaId]);
+  ], [state.media, pendingFiles, state.coverMediaId, getOrCreateBlobUrl]);
 
   // Navigation - handles extended step types
   const goToStep = useCallback((step: WizardStepExtended) => {
@@ -698,18 +727,12 @@ export function useReviewWizard({
     },
   });
 
-  // Cleanup on unmount - revoke object URLs for pending files
+  // Cleanup on unmount - revoke all cached blob URLs
   const cleanup = useCallback(async () => {
-    // Revoke object URLs for pending files
-    pendingFiles.forEach((file, index) => {
-      const mediaItem = allMedia.find(m => m.id === `pending-${index}`);
-      if (mediaItem?.previewUrl.startsWith('blob:')) {
-        URL.revokeObjectURL(mediaItem.previewUrl);
-      }
-    });
+    cleanupBlobUrls();
     setPendingFiles([]);
     setPendingDeletions([]); // Discard deferred deletions on cancel
-  }, [pendingFiles, allMedia]);
+  }, [cleanupBlobUrls]);
 
   // Check if can proceed to next step
   // Step 1: requires rating; Step 3: requires media (shows Skip when empty); others: always true
@@ -758,6 +781,7 @@ export function useReviewWizard({
     deleteReview: deleteMutation.mutateAsync,
     cleanup,
     reset: () => {
+      cleanupBlobUrls();
       setState(INITIAL_STATE);
       setPendingFiles([]);
       setPendingDeletions([]);
