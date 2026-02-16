@@ -15,7 +15,7 @@ export function CanonicalAmberBg({ className = '' }: CanonicalAmberBgProps) {
       aria-hidden="true"
       style={{
         backgroundColor: '#FFFBEB',
-        backgroundImage: 'linear-gradient(to bottom, rgba(254,243,199,0.3) 0%, rgba(254,243,199,0.2) 55%, white 85%, white 100%)',
+        backgroundImage: 'linear-gradient(to bottom, rgba(254,243,199,0.3) 0%, rgba(254,243,199,0.2) 45%, white 75%, white 100%)',
       }}
     />
   );
