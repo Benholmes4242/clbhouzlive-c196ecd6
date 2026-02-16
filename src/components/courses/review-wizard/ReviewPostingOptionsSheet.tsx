@@ -151,7 +151,7 @@ export function ReviewPostingOptionsSheet({
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
           className="absolute bottom-0 left-0 right-0 rounded-t-3xl overflow-hidden"
           style={{ 
-            backgroundColor: '#FFFBEB',
+            backgroundColor: '#FEFDFB',
             paddingBottom: 'env(safe-area-inset-bottom, 16px)',
             maxHeight: '85vh',
           }}

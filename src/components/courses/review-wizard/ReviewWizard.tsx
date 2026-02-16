@@ -405,8 +405,8 @@ export function ReviewWizard({
             )}
             style={{ 
               touchAction: 'pan-y',
-              backgroundColor: wizard.state.step === 'preview' ? undefined : '#FFFBEB',
-              backgroundImage: wizard.state.step === 'preview' ? undefined : 'linear-gradient(to bottom, rgba(254,243,199,0.3) 0%, rgba(254,243,199,0.2) 45%, white 75%, white 100%)',
+              backgroundColor: wizard.state.step === 'preview' ? undefined : '#FEFDFB',
+              backgroundImage: wizard.state.step === 'preview' ? undefined : 'linear-gradient(to bottom, rgba(254,243,199,0.15) 0%, rgba(254,243,199,0.08) 30%, white 50%, white 100%)',
             }}
           >
             {/* Hero image - extends into safe area */}
