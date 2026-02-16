@@ -32,6 +32,8 @@ interface UseReviewWizardOptions {
   existingRating?: ExistingRating;
   onSuccess?: (ratingId: string) => void;
   onPreview?: (ratingId: string) => void;
+  /** Pre-populated media files from Post Wizard bridge flow */
+  initialMediaFiles?: File[];
 }
 
 /**
@@ -111,6 +113,7 @@ export function useReviewWizard({
   existingRating,
   onSuccess,
   onPreview,
+  initialMediaFiles,
 }: UseReviewWizardOptions) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -135,6 +138,17 @@ export function useReviewWizard({
   
   // Track pending files selected in MediaStep (uploaded on submit)
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  
+  // Process initial media files from Post Wizard bridge flow
+  const hasProcessedInitialMedia = useRef(false);
+  useEffect(() => {
+    if (initialMediaFiles && initialMediaFiles.length > 0 && !hasProcessedInitialMedia.current && !isEditMode) {
+      hasProcessedInitialMedia.current = true;
+      setPendingFiles(initialMediaFiles);
+      // Auto-set first as cover
+      setState(prev => ({ ...prev, coverMediaId: 'pending-0' }));
+    }
+  }, [initialMediaFiles, isEditMode]);
   
   // Track existing media deletions to defer until submit (prevents data loss on cancel)
   const [pendingDeletions, setPendingDeletions] = useState<string[]>([]);

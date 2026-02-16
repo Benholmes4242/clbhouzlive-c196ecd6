@@ -87,6 +87,8 @@ export interface ReviewWizardProps {
   isEditMode?: boolean;
   existingRating?: ExistingRating;
   onRemoveFromPlayed?: () => void;
+  /** Pre-populated media files from Post Wizard bridge flow */
+  initialMediaFiles?: File[];
 }
 
 export type WizardStep = 'rate' | 'write' | 'media' | 'confirm';

@@ -1,9 +1,13 @@
 // Thin wrapper for backwards compatibility
 // Uses the new PostWizard component
 
+import { useState, useCallback } from "react";
 import { PostWizard } from "./post-wizard";
+import { ReviewWizard } from "@/components/courses/review-wizard";
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
 import { ActorRef } from "./post-wizard/types";
+import type { GolfCourse } from "./create-moment/types";
+import type { ReviewWizardCourse } from "@/components/courses/review-wizard/types";
 
 type Props = { 
   theme?: "dark" | "light";
@@ -22,15 +26,47 @@ type Props = {
 };
 
 export default function EnhancedCreateMomentModalCinematic(props: Props) {
-  // Note: onSubmit and isSubmitting are intentionally not passed through
-  // The wizard handles submission internally via enqueuePostUploadWithResilience
+  // Review Wizard bridge state
+  const [reviewCourse, setReviewCourse] = useState<ReviewWizardCourse | null>(null);
+  const [reviewMediaFiles, setReviewMediaFiles] = useState<File[]>([]);
+  const [showReviewWizard, setShowReviewWizard] = useState(false);
+
+  const handleRequestReview = useCallback((course: GolfCourse, mediaFiles: File[]) => {
+    setReviewCourse({
+      id: course.id,
+      name: course.name,
+      country: course.country,
+      region: course.region,
+    });
+    setReviewMediaFiles(mediaFiles);
+    setTimeout(() => setShowReviewWizard(true), 300);
+  }, []);
+
+  const handleReviewClose = useCallback(() => {
+    setShowReviewWizard(false);
+    setReviewCourse(null);
+    setReviewMediaFiles([]);
+    props.onClose();
+  }, [props.onClose]);
+
   return (
-    <PostWizard
-      isOpen={props.isOpen}
-      onClose={props.onClose}
-      initialMedia={props.mediaItems}
-      initialCourses={props.selectedCourse ? [props.selectedCourse] : undefined}
-      initialActorOverride={props.initialActorOverride}
-    />
+    <>
+      <PostWizard
+        isOpen={props.isOpen}
+        onClose={props.onClose}
+        initialMedia={props.mediaItems}
+        initialCourses={props.selectedCourse ? [props.selectedCourse] : undefined}
+        initialActorOverride={props.initialActorOverride}
+        onRequestReview={handleRequestReview}
+      />
+      {reviewCourse && (
+        <ReviewWizard
+          course={reviewCourse}
+          isOpen={showReviewWizard}
+          onClose={handleReviewClose}
+          initialMediaFiles={reviewMediaFiles}
+        />
+      )}
+    </>
   );
 }

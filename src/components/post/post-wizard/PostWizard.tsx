@@ -74,6 +74,7 @@ export function PostWizard({
   initialMedia,
   initialCourses,
   initialActorOverride,
+  onRequestReview,
 }: PostWizardProps) {
   const {
     state,
@@ -515,6 +516,17 @@ export function PostWizard({
     onClose();
   }, [onClose]);
 
+  // Handle "Leave a Review" from success screen
+  const handleLeaveReview = useCallback((course: { id: string; name: string; country: string; region?: string }) => {
+    // Capture media files BEFORE closing (reset would revoke blob URLs)
+    const mediaFiles: File[] = state.mediaItems
+      .map(item => item.file)
+      .filter(Boolean) as File[];
+    
+    onClose();
+    onRequestReview?.(course, mediaFiles);
+  }, [onClose, onRequestReview, state.mediaItems]);
+
   if (!isOpen) return null;
 
   // Show success screen if post was successful
@@ -529,6 +541,9 @@ export function PostWizard({
         onViewPost={handleViewPost}
         onCreateAnother={handleCreateAnother}
         onDone={handleSuccessDone}
+        taggedCourse={state.selectedCourses[0] || null}
+        onLeaveReview={onRequestReview ? handleLeaveReview : undefined}
+        isBusinessActor={state.actor.type === 'business'}
       />,
       document.body
     );
