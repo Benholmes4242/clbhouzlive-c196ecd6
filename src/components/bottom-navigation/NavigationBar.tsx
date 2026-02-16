@@ -10,6 +10,8 @@ interface NavigationBarProps {
   onPrefetch?: (path: string) => void;
   variant?: 'default' | 'clubhouse';
   isDimmed?: boolean;
+  /** When true, use amber accent for active tab (Hub/warm pages only) */
+  useAmberActive?: boolean;
   /**
    * When NavigationBar is wrapped by GlobalBottomNavigation (which already draws a hairline),
    * set this to false to avoid a double-thick border.
@@ -23,6 +25,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   onPrefetch,
   variant = 'default',
   isDimmed = false,
+  useAmberActive = false,
   showBorder = true,
 }) => {
   const isLightTheme = variant === 'default';
@@ -76,8 +79,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
               "relative flex flex-col items-center justify-center gap-1 flex-1 py-1.5 mx-0.5 rounded-xl",
               "active:scale-95",
               "focus:outline-none",
-              // Active background for light theme — amber tint matching canonical page top
-              isLightTheme && isActive && "bg-amber-100/60",
+              // Active background for light theme — amber tint only on Hub/warm pages
+              isLightTheme && isActive && useAmberActive && "bg-amber-100/60",
               // Active background for dark/clubhouse theme - enhanced
               isClubhouseTheme && isActive && "bg-[hsl(var(--clubhouse-active-bg))]",
               // Hover states
@@ -96,7 +99,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                   "h-[24px] w-[24px] [stroke-width:1.5]",
                   isLightTheme
                     ? isActive 
-                      ? "text-amber-700 opacity-100" 
+                      ? useAmberActive ? "text-amber-700 opacity-100" : "text-slate-800 opacity-100"
                       : "text-slate-500 opacity-90"
                     : isDimmed 
                       ? "text-[hsl(var(--clubhouse-text-dimmed))]" 
@@ -121,7 +124,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                 "text-[10px] leading-none font-medium",
                 isLightTheme
                   ? isActive 
-                    ? "text-amber-700" 
+                    ? useAmberActive ? "text-amber-700" : "text-slate-800"
                     : "text-slate-500"
                   : isDimmed 
                     ? "text-[hsl(var(--clubhouse-text-dimmed))]" 
