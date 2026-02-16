@@ -583,7 +583,7 @@ export function PostWizard({
           ) : (
             <>
               {/* Header + progress bar — single amber surface that bleeds behind status bar */}
-              <div className="flex-shrink-0 bg-amber-50" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}>
+              <div className="flex-shrink-0" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}>
                 <PostWizardHeader
                   currentStep={state.currentStep}
                   currentStepIndex={currentStepIndex}
