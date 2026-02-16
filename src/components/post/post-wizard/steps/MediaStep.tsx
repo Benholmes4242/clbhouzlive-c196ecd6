@@ -467,7 +467,7 @@ export function MediaStep({
     }
     
     return (
-      <div className="h-full flex flex-col items-center justify-center px-8 relative">
+      <div className="h-full flex flex-col items-center justify-center px-8 relative" style={{ background: 'linear-gradient(to bottom, rgba(254,243,199,0.3), white, white)' }}>
         {/* Skeleton loading banner */}
         <PickerLoadingBanner isVisible={isPickerOpen} />
         
@@ -553,7 +553,7 @@ export function MediaStep({
   }
 
   return (
-    <div className="h-full flex flex-col relative">
+    <div className="h-full flex flex-col relative" style={{ backgroundColor: '#FFF8E1' }}>
       {/* Non-blocking picker loading banner */}
       <PickerLoadingBanner isVisible={isPickerOpen} />
       
@@ -577,7 +577,7 @@ export function MediaStep({
       {/* Bottom footer bar — counter + 3 buttons */}
       <div 
         className="flex-shrink-0 border-t border-amber-200/30 px-4 py-3"
-        style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}
+        style={{ backgroundColor: '#FFF8E1', paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}
       >
         {/* Non-blocking processing progress banner */}
         <MediaProcessingBanner 

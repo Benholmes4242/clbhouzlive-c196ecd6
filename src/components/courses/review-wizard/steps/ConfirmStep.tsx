@@ -171,7 +171,7 @@ export function ConfirmStep({
       exit={{ opacity: 0, x: -300 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       className="shrink-0 px-4 pt-6 pb-8 min-h-full"
-      style={{  }}
+      style={{ background: 'linear-gradient(to bottom, rgba(254,243,199,0.4), white 85%)' }}
     >
       {/* Header */}
       <div className="text-center mb-5">
