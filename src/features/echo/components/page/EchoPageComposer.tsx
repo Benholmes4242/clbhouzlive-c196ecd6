@@ -86,7 +86,7 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
         className="relative flex items-center gap-2 h-[50px] rounded-[22px] px-[14px]"
         style={{
           background: 'rgba(255,255,255,0.6)',
-          border: '1px solid rgba(234,88,12,0.08)',
+          border: '1px solid rgba(217,119,6,0.12)',
         }}
       >
         <input
@@ -125,7 +125,7 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
           <button
             onClick={handleButtonClick}
             className="w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-95"
-            style={{ backgroundColor: '#EA580C' }}
+            style={{ backgroundColor: '#F59E0B' }}
             aria-label="Stop generating"
           >
             <Square className="w-3.5 h-3.5 text-white fill-white" />
@@ -134,7 +134,7 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
           <button
             onClick={handleButtonClick}
             className="w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-95"
-            style={{ backgroundColor: '#EA580C' }}
+            style={{ backgroundColor: '#F59E0B' }}
             aria-label="Send message"
           >
             <ArrowUp className="w-4 h-4 text-white" />
@@ -146,7 +146,7 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
               "w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-95",
               isListening && "animate-pulse"
             )}
-            style={{ backgroundColor: isListening ? '#EF4444' : '#EA580C' }}
+            style={{ backgroundColor: isListening ? '#EF4444' : '#F59E0B' }}
             aria-label={isListening ? "Stop listening" : "Voice input"}
           >
             <Mic className="w-4 h-4 text-white" />
