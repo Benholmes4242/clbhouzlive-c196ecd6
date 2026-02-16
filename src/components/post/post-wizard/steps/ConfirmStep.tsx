@@ -251,7 +251,7 @@ function SortableConfirmThumbnail({
     <motion.div
       ref={setNodeRef}
       style={style}
-      className="relative flex-shrink-0 cursor-pointer touch-none overflow-hidden"
+      className="relative flex-shrink-0 cursor-pointer touch-none"
       whileTap={{ scale: 0.95 }}
       onClick={onSelect}
       {...attributes}
@@ -447,7 +447,7 @@ export function ConfirmStep({
               items={state.mediaItems.map(item => item.id)}
               strategy={rectSortingStrategy}
             >
-              <div className="grid grid-cols-4 gap-1.5 w-full">
+              <div className="grid grid-cols-4 gap-1.5 w-full p-1">
                 {state.mediaItems.map((item, index) => (
                   <SortableConfirmThumbnail
                     key={item.id}
