@@ -24,8 +24,6 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
 
   const heroPhotoUrl = resolvePhotoUrl(player.photo_url, player.pga_tour_id, 'hero');
 
-  // No initials fallback per SDS rules
-
   const age = player.birth_date
     ? Math.floor((Date.now() - new Date(player.birth_date).getTime()) / (365.25 * 24 * 60 * 60 * 1000))
     : null;
@@ -39,7 +37,6 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
   const imageY = useTransform(scrollY, [0, 400], [0, 80]);
 
   const handleBack = useCallback(() => {
-    // If we have history, go back — otherwise fallback to players tab
     if (location.key !== 'default') {
       navigate(-1);
     } else {
@@ -54,12 +51,16 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
         url: window.location.href,
       });
     } catch {
-      // User cancelled or not supported — silently ignore
+      // User cancelled or not supported
     }
   }, [player.full_name]);
 
   return (
-    <div ref={heroRef} className="relative w-full overflow-hidden" style={{ height: 'calc(clamp(282px, 53vh, 422px) + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}>
+    <div
+      ref={heroRef}
+      className="relative w-full overflow-hidden"
+      style={{ height: 'clamp(380px, 55dvh, 550px)' }}
+    >
       {/* Hero Image or Fallback Gradient */}
       {heroPhotoUrl ? (
         <motion.img
@@ -77,82 +78,118 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-800 via-emerald-900 to-slate-900" />
       )}
 
-      {/* Gradient scrim */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10" />
+      {/* Gradient scrim — per spec */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 40%, transparent 70%)',
+        }}
+      />
 
-      {/* Glass Back button — 44px squircle matching standard */}
+      {/* Back button — rounded-full, bg-white/10, backdrop-blur 8px */}
       <button
         onClick={handleBack}
-        className="absolute z-10 h-11 w-11 rounded-md flex items-center justify-center bg-black/20 backdrop-blur-sm hover:bg-black/40 active:scale-95 transition-all"
+        className="absolute z-10 rounded-full flex items-center justify-center active:scale-95 transition-all"
         style={{
           top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
           left: '16px',
+          width: '44px',
+          height: '44px',
+          background: 'rgba(255,255,255,0.1)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
         }}
       >
-        <ArrowLeft className="w-5 h-5 text-white" />
+        <ArrowLeft
+          className="text-white"
+          style={{
+            width: '22px',
+            height: '22px',
+            filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))',
+          }}
+        />
       </button>
 
-      {/* Share button — top right */}
+      {/* Share button — identical styling, top right */}
       <motion.button
         onClick={handleShare}
-        className="absolute z-10 flex items-center justify-center w-9 h-9 rounded-full"
+        className="absolute z-10 rounded-full flex items-center justify-center"
         style={{
-          top: 'calc(max(var(--sat, env(safe-area-inset-top, 0px)), 47px) + 4px)',
+          top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
           right: '16px',
-          background: 'rgba(0,0,0,0.3)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255,255,255,0.15)',
+          width: '44px',
+          height: '44px',
+          background: 'rgba(255,255,255,0.1)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
         }}
         whileTap={{ scale: 0.9 }}
       >
-        <Share2 className="w-4 h-4 text-white" />
+        <Share2
+          className="text-white"
+          style={{
+            width: '20px',
+            height: '20px',
+            filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))',
+          }}
+        />
       </motion.button>
 
       {/* Overlay Content — bottom of hero */}
       <motion.div
-        className="absolute bottom-0 left-0 right-0 px-5 pb-8 z-10"
+        className="absolute bottom-0 left-0 right-0 z-10 px-4"
+        style={{ paddingBottom: '16px' }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, duration: 0.5 }}
       >
-        {/* Player Name */}
-        <h1 className="text-3xl font-bold text-white mb-1.5 leading-tight">
+        {/* Player Name — 26px, weight 800, tracking -0.3px */}
+        <h1
+          className="text-white"
+          style={{
+            fontSize: '26px',
+            fontWeight: 800,
+            letterSpacing: '-0.3px',
+            lineHeight: 1.15,
+            marginBottom: '4px',
+          }}
+        >
           {player.full_name}
         </h1>
 
-        {/* Country + Age */}
-        <div className="flex items-center gap-2 text-sm text-white/80 mb-3">
+        {/* Country + Age — 13px, weight 500 */}
+        <div className="flex items-center gap-2" style={{ marginBottom: '8px' }}>
           {countryDisplay && (
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center gap-1.5" style={{ fontSize: '13px', fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>
               {flag ? (
                 <span className="text-lg leading-none">{flag}</span>
               ) : (
-                <Globe className="w-4 h-4" />
+                <Globe className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.7)' }} />
               )}
               {countryDisplay}
             </span>
           )}
           {age && (
             <>
-              <span className="text-white/40">•</span>
-              <span>Age {age}</span>
+              <span style={{ color: 'rgba(255,255,255,0.4)' }}>·</span>
+              <span style={{ fontSize: '13px', fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>Age {age}</span>
             </>
           )}
         </div>
 
-        {/* Glass Rank Pills */}
-        <div className="flex flex-wrap gap-2">
+        {/* Glass Rank Pills — rounded-full, bg-white/15, backdrop-blur 8px */}
+        <div className="flex flex-wrap" style={{ gap: '8px' }}>
           {playerStats?.world_rank && playerStats.world_rank > 0 && (
             <motion.span
-              className={cn(
-                "inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold text-white",
-              )}
+              className="inline-flex items-center text-white rounded-full"
               style={{
+                fontSize: '13px',
+                fontWeight: 600,
+                padding: '6px 14px',
                 background: 'rgba(255,255,255,0.15)',
                 backdropFilter: 'blur(8px)',
                 WebkitBackdropFilter: 'blur(8px)',
-                border: '1px solid rgba(255,255,255,0.2)',
+                border: '1px solid rgba(255,255,255,0.15)',
                 ...(isWorldNo1 ? {
                   boxShadow: '0 0 12px rgba(245,158,11,0.4)',
                   borderColor: 'rgba(245,158,11,0.5)',
@@ -167,12 +204,15 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
           )}
           {playerStats?.fedex_rank && playerStats.fedex_rank > 0 && (
             <motion.span
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold text-white"
+              className="inline-flex items-center text-white rounded-full"
               style={{
+                fontSize: '13px',
+                fontWeight: 600,
+                padding: '6px 14px',
                 background: 'rgba(255,255,255,0.15)',
                 backdropFilter: 'blur(8px)',
                 WebkitBackdropFilter: 'blur(8px)',
-                border: '1px solid rgba(255,255,255,0.2)',
+                border: '1px solid rgba(255,255,255,0.15)',
               }}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -184,7 +224,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
         </div>
       </motion.div>
 
-      {/* World #1 gold shimmer at bottom edge */}
+      {/* World #1 gold shimmer */}
       {isWorldNo1 && (
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-400" />
       )}
