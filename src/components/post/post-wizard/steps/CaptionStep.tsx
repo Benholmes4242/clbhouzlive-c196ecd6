@@ -177,7 +177,7 @@ export function CaptionStep({
       ref={scrollContainerRef}
       data-caption-scroll
       className="h-full flex flex-col overflow-y-auto"
-      style={{ background: 'linear-gradient(to bottom, rgba(254,243,199,0.3), white, white)' }}
+      style={{ background: 'linear-gradient(to bottom, rgba(254,243,199,0.15), rgba(254,243,199,0.08) 30%, white 50%, white)' }}
     >
       <div className="flex flex-col space-y-3 py-4 pb-32">
         {/* Media Preview Strip */}
