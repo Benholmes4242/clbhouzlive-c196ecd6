@@ -12,7 +12,7 @@ import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { useInAppNotifications } from '@/hooks/useInAppNotifications';
 import { useDebouncedCallback } from '@/hooks/useDebouncedCallback';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
-import { WarmGradientBg } from '@/components/hub-warm/WarmGradientBg';
+import { CanonicalAmberBg } from '@/components/ui/CanonicalAmberBg';
 
 const MessagesPage = () => {
   const navigate = useNavigate();
@@ -102,7 +102,7 @@ const MessagesPage = () => {
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center relative">
-        <WarmGradientBg />
+        <CanonicalAmberBg />
         <div className="text-center relative z-10">
           <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(255,255,255,0.5)' }}>
             <MessageCircle className="h-8 w-8 text-warm-stone-500" />
@@ -123,7 +123,7 @@ const MessagesPage = () => {
   if (isMobile && selectedConversationId) {
     return (
       <div className="fixed inset-0 z-50 flex flex-col">
-        <WarmGradientBg />
+        <CanonicalAmberBg />
         <div className="relative z-10 flex flex-col h-full">
           <OfflineBanner />
           <ChatView 
@@ -139,7 +139,7 @@ const MessagesPage = () => {
   if (isMobile) {
     return (
       <div className="min-h-screen flex flex-col relative">
-        <WarmGradientBg />
+        <CanonicalAmberBg />
         <div className="relative z-10 flex flex-col min-h-screen">
           <OfflineBanner />
           {/* Glass Header */}
@@ -215,7 +215,7 @@ const MessagesPage = () => {
   // Desktop: Side-by-side layout
   return (
     <div className="min-h-screen relative">
-      <WarmGradientBg />
+      <CanonicalAmberBg />
       <div className="relative z-10 h-screen max-w-6xl mx-auto px-4 py-4 flex flex-col">
         <header 
           className="flex-none px-4 flex items-center justify-between mb-4 rounded-2xl"
