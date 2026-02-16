@@ -151,7 +151,7 @@ function HistorySkeleton() {
           dragConstraints={{ left: -80, right: 0 }}
           dragElastic={{ left: 0.1, right: 0 }}
           onDragEnd={handleDragEnd}
-          style={{ x, backgroundColor: '#FFFBEB' }}
+          style={{ x, backgroundColor: '#FEFDFB' }}
           onClick={handleSelect}
           className="relative px-4 py-3.5 flex items-center gap-3 active:bg-amber-100/50 transition-colors cursor-pointer"
           role="listitem"
@@ -249,7 +249,7 @@ function HistorySkeleton() {
               dragConstraints={{ top: 0, bottom: 0 }}
               dragElastic={{ top: 0, bottom: 0.5 }}
               onDragEnd={handleSheetDragEnd}
-              style={{ y: sheetY, backgroundColor: '#FFFBEB' }}
+              style={{ y: sheetY, backgroundColor: '#FEFDFB' }}
               className="fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl h-[75vh] flex flex-col"
               initial={sheetAnimProps.initial}
               animate={{ y: 0 }}
