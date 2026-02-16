@@ -148,10 +148,10 @@ const MessagesPage = () => {
             style={{
               paddingTop: 'calc(54px + env(safe-area-inset-top, 0px))',
               height: 'calc(56px + 54px + env(safe-area-inset-top, 0px))',
-              background: 'rgba(255,253,248,0.5)',
+              background: 'rgba(255,251,235,0.85)',
               backdropFilter: 'blur(24px)',
               WebkitBackdropFilter: 'blur(24px)',
-              borderBottom: '1px solid rgba(255,255,255,0.25)',
+              borderBottom: '1px solid rgba(217,119,6,0.08)',
             }}
           >
             <button
@@ -159,7 +159,7 @@ const MessagesPage = () => {
               className="w-11 h-11 -ml-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
               aria-label="Back to Hub"
             >
-              <ChevronLeft className="w-5 h-5" style={{ color: '#EA580C' }} />
+              <ChevronLeft className="w-5 h-5 text-amber-700" />
             </button>
 
             <span className="text-[16px] font-semibold" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>Messages</span>
@@ -169,7 +169,7 @@ const MessagesPage = () => {
               className="w-11 h-11 -mr-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
               aria-label="New conversation"
             >
-              <Plus className="w-5 h-5" style={{ color: '#EA580C' }} />
+              <Plus className="w-5 h-5 text-amber-700" />
             </button>
           </header>
           
@@ -231,7 +231,7 @@ const MessagesPage = () => {
             className="w-11 h-11 -ml-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
             aria-label="Back to Hub"
           >
-            <ChevronLeft className="w-5 h-5" style={{ color: '#EA580C' }} />
+            <ChevronLeft className="w-5 h-5 text-amber-700" />
           </button>
 
           <span className="text-[16px] font-semibold" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>Messages</span>
@@ -241,7 +241,7 @@ const MessagesPage = () => {
             className="w-11 h-11 -mr-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
             aria-label="New conversation"
           >
-            <Plus className="w-5 h-5" style={{ color: '#EA580C' }} />
+            <Plus className="w-5 h-5 text-amber-700" />
           </button>
         </header>
         
