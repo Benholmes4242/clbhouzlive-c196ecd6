@@ -608,18 +608,6 @@ export function PostWizard({
                   onNext={handleNext}
                   hasHeroAbove
                 />
-                {/* Progress bar inside amber surface */}
-                  <div className="h-2 w-full bg-amber-200/50 overflow-hidden">
-                    <motion.div
-                      className="h-full shadow-sm"
-                      style={{ background: 'linear-gradient(to right, #fbbf24, #f59e0b)' }}
-                      initial={{ width: 0 }}
-                      animate={{
-                        width: `${((currentStepIndex + 1) / totalSteps) * 100}%`,
-                      }}
-                      transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-                    />
-                  </div>
               </div>
 
               {/* Step content - fills remaining space */}

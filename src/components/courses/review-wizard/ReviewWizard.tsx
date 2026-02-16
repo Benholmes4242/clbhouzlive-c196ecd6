@@ -420,12 +420,8 @@ export function ReviewWizard({
               />
             )}
 
-            {/* Steps with hero (1 & 2): Progress Bar first, then Header */}
+            {/* Steps with hero (1 & 2): Header below hero */}
             {showStepUI && showHeroImage && (
-              <>
-                <div className="shrink-0">
-                  <WizardProgress currentStep={wizard.state.step} />
-                </div>
                 <WizardHeader
                   currentStep={wizard.state.step}
                   totalSteps={4}
@@ -443,12 +439,10 @@ export function ReviewWizard({
                   onDelete={handleRemoveReviewClick}
                   onOpenProfileSelector={() => setShowPostingOptions(true)}
                 />
-              </>
             )}
 
-            {/* Steps without hero (3 & 4): Header first (handles safe area), then Progress */}
+            {/* Steps without hero (3 & 4): Header with safe area */}
             {showStepUI && !showHeroImage && (
-              <>
                 <WizardHeader
                   currentStep={wizard.state.step}
                   totalSteps={4}
@@ -466,10 +460,6 @@ export function ReviewWizard({
                   onDelete={handleRemoveReviewClick}
                   onOpenProfileSelector={() => setShowPostingOptions(true)}
                 />
-                <div className="shrink-0">
-                  <WizardProgress currentStep={wizard.state.step} />
-                </div>
-              </>
             )}
 
             {/* Content Area - flex-1 with internal structure */}
