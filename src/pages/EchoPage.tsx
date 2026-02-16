@@ -195,7 +195,7 @@ export default function EchoPage() {
           className="flex-none px-4 pt-2"
           style={{ 
             paddingBottom: 'calc(32px + env(safe-area-inset-bottom, 0px))',
-            background: 'rgba(255,245,235,0.85)',
+            background: 'rgba(255,251,235,0.65)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             borderTop: '1px solid rgba(234,88,12,0.06)',
