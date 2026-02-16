@@ -233,7 +233,7 @@
  
    const sheetAnimProps = prefersReduced
      ? { initial: false as const, exit: undefined, transition: { duration: 0 } }
-     : { initial: { y: '100%' }, exit: { y: '100%' }, transition: { type: 'spring' as const, damping: 28, stiffness: 300 } };
+     : { initial: { y: '100%' }, exit: { y: '100%' }, transition: { type: 'tween' as const, duration: 0.3, ease: 'easeOut' as const } };
  
    return (
      <AnimatePresence>
