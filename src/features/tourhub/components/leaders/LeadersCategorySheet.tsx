@@ -53,29 +53,27 @@ export function LeadersCategorySheet({
 
   return (
     <>
-      {/* Selector Button */}
+      {/* Selector Button — rounded-2xl, bg-card, border */}
       <button
         onClick={() => setOpen(true)}
-        className={cn(
-          'w-full flex items-center justify-between',
-          'bg-card border border-border/50 rounded-[14px]',
-          'px-4 py-3.5',
-          'shadow-[0_1px_4px_rgba(0,0,0,0.04)]',
-          'transition-all duration-200',
-          'hover:border-[hsl(var(--accent-amber))] hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)]',
-          'active:scale-[0.99]'
-        )}
+        className="w-full flex items-center justify-between active:scale-[0.99] transition-all duration-200"
+        style={{
+          background: 'hsl(var(--card))',
+          border: '1px solid hsl(var(--border) / 0.5)',
+          borderRadius: 16,
+          padding: '12px 16px',
+        }}
         aria-haspopup="dialog"
         aria-expanded={open}
       >
         <div className="flex items-center gap-2.5">
-          <ActiveIcon className="w-4 h-4 text-muted-foreground" />
-          <span className="text-sm font-bold text-foreground">{activeCategory.shortLabel}</span>
-          <span className="text-[10px] font-semibold uppercase tracking-[1.2px] text-muted-foreground">
+          <ActiveIcon className="w-5 h-5 text-muted-foreground" />
+          <span style={{ fontSize: 14, fontWeight: 600 }} className="text-foreground">{activeCategory.shortLabel}</span>
+          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase' as const }} className="text-muted-foreground">
             Leaderboard
           </span>
         </div>
-        <ChevronDown className="w-4 h-4 text-muted-foreground" />
+        <ChevronDown className="w-4 h-4 text-muted-foreground opacity-60" />
       </button>
 
       {/* Bottom Sheet */}
@@ -85,23 +83,25 @@ export function LeadersCategorySheet({
         ariaLabelledBy="leaders-category-sheet-title"
       >
         <div
-          className="overflow-y-auto overscroll-contain px-5 pb-6"
-          style={{ maxHeight: 'calc(70vh - 60px)' }}
+          className="overflow-y-auto overscroll-contain pb-6"
+          style={{ maxHeight: 'calc(70vh - 60px)', padding: '0 20px' }}
         >
           {/* Header */}
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center justify-between" style={{ padding: '20px 0 16px' }}>
             <h2
               id="leaders-category-sheet-title"
-              className="text-lg font-bold text-foreground"
+              style={{ fontSize: 18, fontWeight: 700 }}
+              className="text-foreground"
             >
               Leaderboard Category
             </h2>
             <button
               onClick={() => setOpen(false)}
-              className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"
+              className="flex items-center justify-center rounded-full bg-muted"
+              style={{ width: 36, height: 36 }}
               aria-label="Close"
             >
-              <X className="w-4 h-4 text-muted-foreground" />
+              <X style={{ width: 20, height: 20 }} className="text-muted-foreground" />
             </button>
           </div>
 
@@ -109,10 +109,21 @@ export function LeadersCategorySheet({
           <div className="space-y-5">
             {groups.map((group) => (
               <div key={group.label}>
-                <p className="text-[11px] font-bold uppercase tracking-[1.5px] text-muted-foreground mb-2">
+                {/* Section label */}
+                <p
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    letterSpacing: '0.8px',
+                    textTransform: 'uppercase' as const,
+                    marginTop: 20,
+                    marginBottom: 10,
+                  }}
+                  className="text-muted-foreground/60"
+                >
                   {group.label}
                 </p>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2" style={{ gap: 8 }}>
                   {group.categories.map((cat) => {
                     const isActive = activeKey === cat.key;
                     const Icon = cat.icon;
@@ -121,25 +132,30 @@ export function LeadersCategorySheet({
                         key={cat.key}
                         onClick={() => handleSelect(cat.key)}
                         className={cn(
-                          'flex items-center gap-2.5 rounded-[14px] px-4 py-3.5',
-                          'text-left transition-all duration-150',
-                          'border',
-                          isActive
-                            ? 'bg-[#1a472a] border-[#1a472a] text-white'
-                            : 'bg-card border-border/40 text-foreground hover:border-border'
+                          'flex items-center gap-2.5 text-left transition-all duration-150',
                         )}
+                        style={{
+                          borderRadius: 12,
+                          padding: '14px 16px',
+                          border: isActive
+                            ? '1px solid hsl(142 76% 36%)'
+                            : '1px solid hsl(var(--border) / 0.5)',
+                          background: isActive ? 'hsl(142 76% 36%)' : 'hsl(var(--card))',
+                          color: isActive ? 'white' : 'hsl(var(--foreground))',
+                          fontWeight: isActive ? 600 : 500,
+                        }}
                       >
                         <Icon
-                          className={cn(
-                            'w-4 h-4 shrink-0',
-                            isActive ? 'text-white/80' : 'text-muted-foreground'
-                          )}
+                          className="w-5 h-5 shrink-0"
+                          style={{
+                            color: isActive ? 'white' : 'hsl(var(--muted-foreground) / 0.5)',
+                          }}
                         />
-                        <span className="text-sm font-semibold flex-1 truncate">
+                        <span style={{ fontSize: 14 }} className="flex-1 truncate">
                           {cat.shortLabel}
                         </span>
                         {isActive && (
-                          <Check className="w-4 h-4 text-[#f59e0b] shrink-0" />
+                          <Check className="w-4 h-4 shrink-0" style={{ color: 'white' }} />
                         )}
                       </button>
                     );

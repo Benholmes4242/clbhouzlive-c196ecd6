@@ -220,8 +220,8 @@ export function LeadersTab() {
         />
       )}
 
-      {/* Content area — tight spacing */}
-      <div className="px-4 sm:px-6 space-y-3 pt-4 pb-6">
+      {/* Content area */}
+      <div className="px-4" style={{ paddingTop: 24, paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
         {/* Category selector button + bottom sheet */}
         <LeadersCategorySheet
           categories={LEADER_CATEGORIES}
@@ -229,50 +229,60 @@ export function LeadersTab() {
           onCategoryChange={setCategory}
         />
 
-        {/* Rankings list (#4–50) */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={category.key}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.25 }}
-          >
-            {listPlayers.length > 0 && (
-              <div className="divide-y divide-border/30">
-                {listPlayers.map((item, idx) => (
-                  <LeaderRow
-                    key={item.playerId}
-                    rank={idx + 4}
-                    overrideRank={isWorldCategory ? item.rank : undefined}
-                    player={{
-                      id: item.playerId,
-                      fullName: item.player.full_name,
-                      country: item.player.country,
-                      countryCode: item.player.country_code,
-                      photoUrl: item.player.photo_url,
-                      pgaTourId: item.player.pga_tour_id,
-                    }}
-                    value={item.value}
-                    leaderValue={rankedPlayers[0]?.value ?? item.value}
-                    category={category}
-                    formatOverride={worldFormatOverride}
-                    unitOverride={worldUnitOverride}
-                    index={idx}
-                  />
-                ))}
-              </div>
-            )}
+        {/* Rankings list (#4–50) — 12px gap from dropdown */}
+        <div style={{ marginTop: 12 }}>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={category.key}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25 }}
+            >
+              {listPlayers.length > 0 && (
+                <div>
+                  {listPlayers.map((item, idx) => (
+                    <LeaderRow
+                      key={item.playerId}
+                      rank={idx + 4}
+                      overrideRank={isWorldCategory ? item.rank : undefined}
+                      player={{
+                        id: item.playerId,
+                        fullName: item.player.full_name,
+                        country: item.player.country,
+                        countryCode: item.player.country_code,
+                        photoUrl: item.player.photo_url,
+                        pgaTourId: item.player.pga_tour_id,
+                      }}
+                      value={item.value}
+                      leaderValue={rankedPlayers[0]?.value ?? item.value}
+                      category={category}
+                      formatOverride={worldFormatOverride}
+                      unitOverride={worldUnitOverride}
+                      index={idx}
+                    />
+                  ))}
+                </div>
+              )}
 
-            {/* Empty state */}
-            {rankedPlayers.length === 0 && <LeadersEmptyState />}
-          </motion.div>
-        </AnimatePresence>
+              {/* Empty state */}
+              {rankedPlayers.length === 0 && <LeadersEmptyState />}
+            </motion.div>
+          </AnimatePresence>
+        </div>
 
         {/* Footer */}
-        <div className="text-center">
-          <p className="text-[10px] font-medium text-muted-foreground/50 uppercase tracking-wider">
-            Season leaders • available tournament data
+        <div className="text-center" style={{ marginTop: 20 }}>
+          <p
+            style={{
+              fontSize: 10,
+              fontWeight: 600,
+              letterSpacing: '0.5px',
+              textTransform: 'uppercase',
+            }}
+            className="text-muted-foreground/30"
+          >
+            Season leaders · available tournament data
           </p>
         </div>
       </div>

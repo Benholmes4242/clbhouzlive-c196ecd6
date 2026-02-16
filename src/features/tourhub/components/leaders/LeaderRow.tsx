@@ -1,6 +1,6 @@
 /**
  * LeaderRow — Matches OWGR leaderboard style on overview page.
- * No progression bar. Stat value is focal point. Centered meta.
+ * 44×44 avatars, 13px border-radius, JetBrains Mono stat values.
  */
 
 import { Link } from 'react-router-dom';
@@ -59,45 +59,103 @@ export function LeaderRow({
     >
       <Link
         to={`/tourhub/player/${player.id}`}
-        className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30 border-b border-border/20 last:border-0 active:scale-[0.98] transition-transform"
+        className="flex items-center hover:bg-muted/30 active:scale-[0.98] transition-transform"
+        style={{
+          padding: '12px 16px',
+          minHeight: 64,
+          borderBottom: '1px solid hsl(var(--border) / 0.08)',
+          gap: 12,
+        }}
         aria-label={ariaLabel}
       >
-        {/* Rank */}
-        <span className="w-7 text-center font-mono text-[13px] font-bold text-muted-foreground/70 tabular-nums">
+        {/* Rank — 14px, 600, muted/50, 32px wide, centered */}
+        <span
+          style={{
+            width: 32,
+            textAlign: 'center',
+            fontFamily: 'ui-monospace, "JetBrains Mono", monospace',
+            fontSize: 14,
+            fontWeight: 600,
+            fontVariantNumeric: 'tabular-nums',
+            color: 'hsl(var(--muted-foreground) / 0.5)',
+          }}
+        >
           {displayRank}
         </span>
 
-        {/* Avatar */}
-        <SquircleAvatar
-          src={photoUrl}
-          alt={player.fullName}
-          size="sm"
-          hideRing
-        />
-
-        {/* Info — no progression bar */}
-        <div className="flex-1 min-w-0 flex flex-col justify-center">
-          <p className="text-[14px] font-semibold text-foreground truncate leading-tight">
-            {player.fullName}
-          </p>
-          <div className="flex items-center gap-1.5 mt-0.5">
-            {flag && <span className="text-xs leading-none">{flag}</span>}
-            <span className="text-[12px] text-muted-foreground/80 truncate">{countryName}</span>
-          </div>
-        </div>
-
-        {/* Stat value — bigger, focal point */}
-        <div className="text-right shrink-0">
-          <span className="font-mono text-[15px] font-bold text-foreground tabular-nums">
-            {formattedStat}
-          </span>
-          {unit && (
-            <p className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{unit}</p>
+        {/* Avatar — 44×44, border-radius 13px */}
+        <div className="shrink-0" style={{ width: 44, height: 44 }}>
+          {photoUrl ? (
+            <img
+              src={photoUrl}
+              alt={player.fullName}
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 13,
+                objectFit: 'cover',
+                border: '1px solid hsl(var(--border) / 0.5)',
+              }}
+            />
+          ) : (
+            <div
+              className="flex items-center justify-center bg-muted"
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 13,
+                border: '1px solid hsl(var(--border) / 0.5)',
+              }}
+            >
+              <span className="text-muted-foreground text-xs font-semibold">
+                {player.fullName.split(' ').map(n => n[0]).join('').slice(0, 2)}
+              </span>
+            </div>
           )}
         </div>
 
-        {/* Chevron */}
-        <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0" />
+        {/* Info */}
+        <div className="flex-1 min-w-0 flex flex-col justify-center" style={{ gap: 1 }}>
+          <p style={{ fontSize: 14, fontWeight: 600 }} className="text-foreground truncate leading-tight">
+            {player.fullName}
+          </p>
+          <div className="flex items-center gap-1.5">
+            {flag && <span className="text-xs leading-none">{flag}</span>}
+            <span style={{ fontSize: 11, fontWeight: 400 }} className="text-muted-foreground truncate">{countryName}</span>
+          </div>
+        </div>
+
+        {/* Stat value — JetBrains Mono, 15px, 700, tabular-nums */}
+        <div className="text-right shrink-0">
+          <span
+            style={{
+              fontFamily: 'ui-monospace, "JetBrains Mono", monospace',
+              fontSize: 15,
+              fontWeight: 700,
+              fontVariantNumeric: 'tabular-nums',
+            }}
+            className="text-foreground"
+          >
+            {formattedStat}
+          </span>
+          {unit && (
+            <p
+              style={{
+                fontSize: 9,
+                fontWeight: 600,
+                letterSpacing: '0.5px',
+                textTransform: 'uppercase' as const,
+                marginTop: 2,
+              }}
+              className="text-muted-foreground/40"
+            >
+              {unit}
+            </p>
+          )}
+        </div>
+
+        {/* Chevron — 3.5, muted/25 */}
+        <ChevronRight className="shrink-0" style={{ width: 14, height: 14, color: 'hsl(var(--muted-foreground) / 0.25)' }} />
       </Link>
     </motion.div>
   );
