@@ -1,13 +1,12 @@
 /**
  * Step 3: Add Photos & Videos
  * Uses native OS picker via pickMediaFiles utility
- * Amber-themed empty state, three-zone layout, max 10 media
+ * Amber-themed empty state, media stage + footer with Studio & Badges
  */
 
 import React, { useRef, useCallback, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Camera, AlertCircle, Images, Loader2, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Plus, Camera, AlertCircle, Images, Loader2, Check, Wand2, Award } from 'lucide-react';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import type { ReviewMediaItem } from '../types';
 import type { ReviewWizardCourse } from '../types';
@@ -16,6 +15,8 @@ import { ComposerMediaItem } from '@/hooks/useSnapModal';
 import { pickMediaFiles, validateMediaFiles } from '@/utils/media/pickMediaFiles';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { PermissionDeniedCard } from '@/components/post/post-wizard/components/PermissionDeniedCard';
+import { useFirstRunFlag } from '@/hooks/useFirstRunFlag';
+import { StudioEdits } from '@/types/studio';
 
 interface MediaStepProps {
   media: ReviewMediaItem[];
@@ -27,6 +28,11 @@ interface MediaStepProps {
   onSetCover: (id: string) => void;
   onRetryMedia?: (id: string) => void;
   onReorderMedia: (fromIndex: number, toIndex: number) => void;
+  onOpenStudio: () => void;
+  onOpenBadges: () => void;
+  studioEditsByMediaId?: Record<string, StudioEdits>;
+  activeMediaId: string | null;
+  onActiveMediaChange: (mediaId: string) => void;
 }
 
 const MAX_MEDIA_ITEMS = 10;
@@ -43,15 +49,21 @@ export function MediaStep({
   onSetCover,
   onRetryMedia = () => {},
   onReorderMedia,
+  onOpenStudio,
+  onOpenBadges,
+  studioEditsByMediaId = {},
+  activeMediaId,
+  onActiveMediaChange,
 }: MediaStepProps) {
   const mediaInputRef = useRef<HTMLInputElement>(null);
-  const [activeMediaId, setActiveMediaId] = useState<string | null>(
-    coverMediaId || (media.length > 0 ? media[0].id : null)
-  );
   
   // Loading states
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [permissionDenied, setPermissionDenied] = useState<'camera' | 'photos' | null>(null);
+  
+  // First-run flags for Studio & Badges discovery
+  const studioFirstRun = useFirstRunFlag('reviewWizard:studio');
+  const badgesFirstRun = useFirstRunFlag('reviewWizard:badges');
   
   // Track previous media count to detect max reached
   const prevMediaCountRef = useRef(media.length);
@@ -60,13 +72,13 @@ export function MediaStep({
   // Keep activeMediaId in sync when media changes
   useEffect(() => {
     if (media.length === 0) {
-      setActiveMediaId(null);
+      // no-op, parent handles
     } else if (activeMediaId && !media.find(m => m.id === activeMediaId)) {
-      setActiveMediaId(media[0]?.id || null);
+      onActiveMediaChange(media[0]?.id || '');
     } else if (!activeMediaId && media.length > 0) {
-      setActiveMediaId(media[0].id);
+      onActiveMediaChange(media[0].id);
     }
-  }, [media, activeMediaId]);
+  }, [media, activeMediaId, onActiveMediaChange]);
   
   // Detect when max is reached for pulse animation
   useEffect(() => {
@@ -199,18 +211,15 @@ export function MediaStep({
     uploadProgress: item.progress?.percent,
   }));
 
-  // Handlers for CreateMomentMediaStage
-  const handleActiveMediaChange = useCallback((mediaId: string) => {
-    setActiveMediaId(mediaId);
-  }, []);
-
   const handleReorder = useCallback((fromIndex: number, toIndex: number) => {
     onReorderMedia(fromIndex, toIndex);
     triggerHaptic('selection');
   }, [onReorderMedia]);
 
-  // Stub getEdits - review wizard doesn't have studio edits
-  const getEdits = useCallback(() => ({}), []);
+  // Get edits for a specific media item
+  const getEdits = useCallback((mediaId: string): StudioEdits => {
+    return studioEditsByMediaId[mediaId] ?? {};
+  }, [studioEditsByMediaId]);
 
   // Hidden file input for images and videos
   const fileInput = (
@@ -287,12 +296,12 @@ export function MediaStep({
       {media.length > 0 ? (
         <div className="flex-1 flex flex-col min-h-0">
           {/* Media stage - takes remaining space */}
-          <div className="flex-1 min-h-0 relative" style={{ maxHeight: 'calc(100% - 24px)' }}>
+          <div className="flex-1 min-h-0 relative">
             <CreateMomentMediaStage
               media={composerMedia}
               activeMediaId={activeMediaId}
               coverMediaId={coverMediaId}
-              onActiveMediaChange={handleActiveMediaChange}
+              onActiveMediaChange={onActiveMediaChange}
               onSetCover={onSetCover}
               onRemoveMedia={onRemoveMedia}
               onReorder={handleReorder}
@@ -309,60 +318,64 @@ export function MediaStep({
             )}
           </div>
           
-          {/* Bottom action bar — amber themed */}
+          {/* Bottom footer bar — counter + 3 buttons, matching Post Wizard */}
           <div 
-            className="flex-shrink-0 px-4 py-3"
+            className="flex-shrink-0 border-t border-amber-200/30 px-4 py-3"
             style={{ 
               backgroundColor: '#FFF8E1',
-              borderTop: '1px solid rgba(251, 191, 36, 0.15)',
               paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
             }}
           >
-            {/* Media counter */}
-            <div className="text-center mb-2">
-              <p className="text-xs text-amber-600 font-medium tabular-nums">
-                {media.length}/{MAX_MEDIA_ITEMS}
-                {!canAddMore && (
-                  <motion.span 
-                    className="text-amber-600 ml-1"
-                    initial={showMaxPulse ? { scale: 1 } : false}
-                    animate={showMaxPulse ? { scale: [1, 1.05, 1] } : { scale: 1 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    · Maximum reached
-                  </motion.span>
-                )}
-                {processingCount > 0 && (
-                  <span className="text-amber-500 ml-1">· Processing {processingCount}...</span>
-                )}
-              </p>
-            </div>
+            {/* Counter — centered */}
+            <p className="text-sm text-amber-600 font-medium tabular-nums text-center mb-2">
+              {media.length}/{MAX_MEDIA_ITEMS}
+            </p>
             
-            <div className="flex items-center justify-center gap-2">
-              {canAddMore ? (
-                <button
-                  onClick={handleGallery}
-                  disabled={isPickerOpen}
-                  className="gap-1.5 px-4 py-2.5 rounded-full bg-amber-100/80 text-sm font-medium text-amber-700 active:bg-amber-200/80 active:scale-[0.97] transition-all duration-100 disabled:opacity-30 disabled:cursor-not-allowed inline-flex items-center"
-                >
-                  {isPickerOpen ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Plus className="h-4 w-4" />
-                  )}
-                  Add Media
-                </button>
-              ) : (
-                <motion.div 
-                  className="flex items-center gap-1.5 text-sm text-amber-600 font-semibold py-2.5"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Check className="h-4 w-4" />
-                  All slots filled
-                </motion.div>
-              )}
+            {/* Three buttons row */}
+            <div className="flex items-center justify-center gap-4">
+              {/* Add button */}
+              <button
+                onClick={handleGallery}
+                disabled={!canAddMore || isPickerOpen}
+                className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-amber-100/80 text-sm font-medium text-amber-700 active:bg-amber-200/80 transition-colors ${!canAddMore ? 'opacity-30 cursor-not-allowed' : ''}`}
+              >
+                {isPickerOpen ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Plus className="h-4 w-4" />
+                )}
+                Add
+              </button>
+              
+              {/* Studio button */}
+              <button
+                onClick={() => {
+                  studioFirstRun.markSeen();
+                  onOpenStudio();
+                }}
+                className="relative flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-amber-100/80 text-sm font-medium text-amber-700 active:bg-amber-200/80 transition-colors"
+              >
+                <Wand2 className="h-4 w-4" />
+                Studio
+                {!studioFirstRun.hasSeen && (
+                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                )}
+              </button>
+              
+              {/* Badges button */}
+              <button
+                onClick={() => {
+                  badgesFirstRun.markSeen();
+                  onOpenBadges();
+                }}
+                className="relative flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-amber-100/80 text-sm font-medium text-amber-700 active:bg-amber-200/80 transition-colors"
+              >
+                <Award className="h-4 w-4" />
+                Badges
+                {!badgesFirstRun.hasSeen && (
+                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                )}
+              </button>
             </div>
           </div>
         </div>

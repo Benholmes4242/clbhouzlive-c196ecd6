@@ -9,7 +9,7 @@
  * Steps 1-4 → Submit → Success (skips preview)
  */
 
-import React, { useState, useEffect, useCallback, useLayoutEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useLayoutEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -26,6 +26,9 @@ import { useShareReview } from '@/hooks/useShareReview';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { Loader2 } from 'lucide-react';
+import { StudioTool, StudioEdits } from '@/types/studio';
+import StudioShelf from '@/components/studio/StudioShelf';
+import { MomentBadgesSheet } from '@/components/post/create-moment/sheets';
 
 import { WizardHeader } from './WizardHeader';
 import { WizardHeroImage } from './WizardHeroImage';
@@ -60,6 +63,16 @@ export function ReviewWizard({
   const [showPostingOptions, setShowPostingOptions] = useState(false);
   const [activeCourse, setActiveCourse] = useState<ReviewWizardCourse | null>(course);
   const [sharedPostId, setSharedPostId] = useState<string | null>(null);
+  
+  // Studio & Badges state
+  const [showStudio, setShowStudio] = useState(false);
+  const [studioTool, setStudioTool] = useState<StudioTool>(null);
+  const [isPositioningText, setIsPositioningText] = useState(false);
+  const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
+  const [showBadgesSheet, setShowBadgesSheet] = useState(false);
+  const [selectedBadges, setSelectedBadges] = useState<string[]>([]);
+  const [studioEditsByMediaId, setStudioEditsByMediaId] = useState<Record<string, StudioEdits>>({});
+  const [reviewActiveMediaId, setReviewActiveMediaId] = useState<string | null>(null);
   
   // Actor and visibility state (local to this wizard, not persisted globally)
   const [selectedActor, setSelectedActor] = useState(activeActor);
@@ -309,6 +322,47 @@ export function ReviewWizard({
     }
   }, [wizard, hasUnsavedChanges, handleClose]);
 
+  // Studio handlers
+  const handleOpenStudio = useCallback(() => {
+    if (!reviewActiveMediaId && wizard.allMedia.length > 0) {
+      setReviewActiveMediaId(wizard.allMedia[0].id);
+    }
+    setShowStudio(true);
+  }, [reviewActiveMediaId, wizard.allMedia]);
+
+  const handleCloseStudio = useCallback(() => {
+    setShowStudio(false);
+    setStudioTool(null);
+    setIsPositioningText(false);
+  }, []);
+
+  const handleUpdateStudioEdits = useCallback((patch: Partial<StudioEdits>) => {
+    if (!reviewActiveMediaId) return;
+    setStudioEditsByMediaId(prev => ({
+      ...prev,
+      [reviewActiveMediaId]: { ...(prev[reviewActiveMediaId] || {}), ...patch },
+    }));
+  }, [reviewActiveMediaId]);
+
+  const handleClearStudioEdits = useCallback(() => {
+    if (!reviewActiveMediaId) return;
+    setStudioEditsByMediaId(prev => ({
+      ...prev,
+      [reviewActiveMediaId]: {},
+    }));
+  }, [reviewActiveMediaId]);
+
+  // Get active media info for studio
+  const activeMedia = useMemo(() => {
+    if (!reviewActiveMediaId) return null;
+    return wizard.allMedia.find(m => m.id === reviewActiveMediaId) || null;
+  }, [reviewActiveMediaId, wizard.allMedia]);
+
+  const activeMediaEdits = useMemo((): StudioEdits => {
+    if (!reviewActiveMediaId) return {};
+    return studioEditsByMediaId[reviewActiveMediaId] || {};
+  }, [reviewActiveMediaId, studioEditsByMediaId]);
+
   // Handle done from success screens
   const handleDone = useCallback(() => {
     wizard.cleanup();
@@ -494,6 +548,11 @@ export function ReviewWizard({
                         onSetCover={wizard.setCoverMedia}
                         onRetryMedia={wizard.retryMedia}
                         onReorderMedia={wizard.reorderMedia}
+                        onOpenStudio={handleOpenStudio}
+                        onOpenBadges={() => setShowBadgesSheet(true)}
+                        studioEditsByMediaId={studioEditsByMediaId}
+                        activeMediaId={reviewActiveMediaId}
+                        onActiveMediaChange={setReviewActiveMediaId}
                       />
                     ) : (
                       <ConfirmStep
@@ -556,6 +615,35 @@ export function ReviewWizard({
             onClose={() => setShowCourseSearch(false)}
             onSelectCourse={() => {}}
           />
+
+          {/* Badges Sheet */}
+          <MomentBadgesSheet
+            isOpen={showBadgesSheet}
+            onClose={() => setShowBadgesSheet(false)}
+            selectedBadges={selectedBadges}
+            onBadgesChange={setSelectedBadges}
+          />
+
+          {/* Studio Shelf */}
+          {activeMedia && (
+            <StudioShelf
+              open={showStudio}
+              onClose={handleCloseStudio}
+              activeTool={studioTool}
+              setActiveTool={setStudioTool}
+              activeMediaId={activeMedia.id}
+              activeMediaType={activeMedia.type}
+              activeMediaPreviewUrl={activeMedia.previewUrl}
+              activeMediaThumbnailUrl={activeMedia.posterUrl || activeMedia.previewUrl}
+              edits={activeMediaEdits}
+              updateEdits={handleUpdateStudioEdits}
+              clearEdits={handleClearStudioEdits}
+              isPositioningText={isPositioningText}
+              onTogglePositionMode={() => setIsPositioningText(!isPositioningText)}
+              activeOverlayId={activeOverlayId}
+              onSelectOverlay={setActiveOverlayId}
+            />
+          )}
         </>
       )}
     </AnimatePresence>,
