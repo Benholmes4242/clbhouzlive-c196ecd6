@@ -33,23 +33,13 @@ export function PickerLoadingBanner({ isVisible }: PickerLoadingBannerProps) {
           transition={{ duration: 0.2 }}
           className="absolute top-0 left-0 right-0 z-40 px-4 py-3 flex flex-col items-center"
         >
-          {/* Skeleton filmstrip */}
-          <div className="flex gap-2 justify-center">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div
-                key={i}
-                className="w-16 h-16 rounded-xl bg-amber-200/50 animate-pulse"
-                style={{ animationDelay: `${i * 150}ms` }}
-              />
-            ))}
-          </div>
           <AnimatePresence>
             {showICloudHint && (
               <motion.p
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="text-xs text-amber-400/70 text-center mt-2"
+                className="text-xs text-amber-400/70 text-center"
               >
                 Large videos from iCloud may take a few minutes
               </motion.p>
