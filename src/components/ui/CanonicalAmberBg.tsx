@@ -1,7 +1,7 @@
 /**
  * CanonicalAmberBg — Standard warm amber background with gradient overlay
  * Used across wizards, Hub, Echo, Messages, and Chat pages.
- * Solid #FFFBEB base + linear-gradient(to bottom, rgba(254,243,199,0.3), white, white) overlay.
+ * Solid #FFFBEB base + 3-stop even gradient: amber at 0%, white at 50%, white at 100%.
  */
 
 interface CanonicalAmberBgProps {
@@ -15,7 +15,7 @@ export function CanonicalAmberBg({ className = '' }: CanonicalAmberBgProps) {
       aria-hidden="true"
       style={{
         backgroundColor: '#FFFBEB',
-        backgroundImage: 'linear-gradient(to bottom, rgba(254,243,199,0.3) 0%, rgba(254,243,199,0.2) 45%, white 75%, white 100%)',
+        backgroundImage: 'linear-gradient(to bottom, rgba(254,243,199,0.3), white, white)',
       }}
     />
   );
