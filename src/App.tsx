@@ -129,6 +129,7 @@ const FollowingListPage = lazy(() => import("./pages/FollowingListPage"));
 const FriendsListPage = lazy(() => import("./pages/FriendsListPage"));
 const FriendsActivityPage = lazy(() => import("./pages/FriendsActivityPage"));
 const CreateProfileRedirect = lazy(() => import("./components/redirects/CreateProfileRedirect"));
+const DesignTest = lazy(() => import("./pages/DesignTest"));
 
 const Top100Hub = lazy(() => import("./pages/Top100Hub"));
 const Top100List = lazy(() => import("./pages/Top100List"));
@@ -351,6 +352,7 @@ function AppRoutes() {
         <Route path="/creators/*" element={<Navigate to="/" replace />} />
 <Route path="/season-shop" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><SeasonShop /></Suspense>} />
         <Route path="/challenges" element={<Suspense fallback={<GenericPageSkeleton />}><ChallengesPage /></Suspense>} />
+        <Route path="/design-test" element={<Suspense fallback={null}><DesignTest /></Suspense>} />
         <Route path="/insights" element={<Suspense fallback={<GenericPageSkeleton />}><InsightsPage /></Suspense>} />
         
         <Route path="/messages" element={<Suspense fallback={<GenericPageSkeleton />}><MessagesPage /></Suspense>} />
