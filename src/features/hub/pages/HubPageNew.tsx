@@ -373,7 +373,7 @@ export function HubPageNew() {
                 onMouseEnter={prefetchHandlers?.onMouseEnter}
                 className="w-[38px] h-[38px] rounded-full overflow-hidden active:scale-[0.93] transition-transform"
                 style={{
-                  background: profile?.profile_photo_url ? undefined : 'linear-gradient(135deg, #F97316, #FBBF24)',
+                  background: profile?.profile_photo_url ? undefined : 'linear-gradient(135deg, #F59E0B, #FBBF24)',
                   border: '1px solid rgba(255,255,255,0.4)',
                 }}
                 aria-label="View profile"
@@ -557,7 +557,7 @@ export function HubPageNew() {
                   <div
                     className="w-[38px] h-[38px] rounded-full flex items-center justify-center"
                     style={{
-                      background: 'linear-gradient(135deg, #F97316, #FBBF24)',
+                      background: '#F59E0B',
                       animation: prefersReduced ? 'none' : 'warmPulseGlow 2s ease-in-out infinite',
                     }}
                   >
@@ -569,7 +569,7 @@ export function HubPageNew() {
                   </div>
                   <div>
                     <span className="text-[17px] font-bold block" style={{ color: '#1C1917' }}>Echo</span>
-                    <span className="text-[12px]" style={{ color: 'rgba(146,64,14,0.65)' }}>Your personal caddie</span>
+                    <span className="text-[12px]" style={{ color: '#B45309' }}>Your personal caddie</span>
                   </div>
                 </div>
                 <span className="text-[16px]" style={{ color: '#D97706' }}>→</span>
