@@ -88,7 +88,7 @@ export function WizardHeader({
 
   return (
     <header 
-      className="sticky top-0 z-10 flex items-center justify-between px-3 bg-amber-50"
+      className={`sticky top-0 z-10 flex items-center justify-between px-3 ${hasHeroAbove ? 'bg-transparent' : 'bg-amber-50'}`}
       style={{ 
         paddingTop: hasHeroAbove ? '0px' : 'max(env(safe-area-inset-top, 0px), 47px)',
         minHeight: hasHeroAbove ? '48px' : 'calc(48px + max(env(safe-area-inset-top, 0px), 47px))'
