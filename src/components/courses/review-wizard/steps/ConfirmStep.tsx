@@ -1,14 +1,13 @@
 /**
  * Step 4: Review & Submit (Confirmation)
- * A* Polish: text-contrast rating colors, media thumbnails, edit actions,
- * breakdown bars, review tags, staggered animations, amber accent strips
+ * Amber-themed cards, staggered animations, section headers with Edit buttons
  */
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Image as ImageIcon, Video, Loader2, Pencil } from 'lucide-react';
+import { MapPin, Pencil, Loader2, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { getScoreTier, type ScoreTier } from '@/utils/getScoreTier';
+import { getScoreTier } from '@/utils/getScoreTier';
 import type { ReviewWizardCourse, ReviewBreakdowns, ReviewMediaItem, ReviewTaggableEntity } from '../types';
 
 interface ConfirmStepProps {
@@ -24,19 +23,14 @@ interface ConfirmStepProps {
   onGoToStep: (step: 1 | 2 | 3) => void;
 }
 
-/**
- * 2-tier rating text color: amber for Outstanding (9.0+), slate for everything else.
- */
 function getRatingTextColor(score: number): string {
   return score >= 9.0 ? 'text-amber-500' : 'text-slate-600';
 }
 
-/** Fill color for breakdown bars: amber 9.0+, slate below */
 function getRatingFillColor(score: number): string {
   return score >= 9.0 ? 'bg-amber-500' : 'bg-slate-400';
 }
 
-/** Whether score qualifies for Outstanding tier */
 function isOutstandingScore(score: number): boolean {
   return score >= 9.0;
 }
@@ -67,7 +61,7 @@ function RatingDisplay({ value, size = 'lg' }: { value: number; size?: 'sm' | 'l
         {value.toFixed(1)}
       </span>
       <span className={cn(
-        "text-muted-foreground",
+        "text-gray-400",
         size === 'lg' ? "text-sm" : "text-[10px]"
       )}>
         /10
@@ -95,12 +89,11 @@ function RatingDisplay({ value, size = 'lg' }: { value: number; size?: 'sm' | 'l
   );
 }
 
-/** Small inline bar for breakdown scores — tier-aware fill */
 function BreakdownBar({ value }: { value: number }) {
   const percent = (value / 10) * 100;
   const fillClass = getRatingFillColor(value);
   return (
-    <div className="w-full h-1.5 rounded-full bg-muted/30 mt-1">
+    <div className="w-full h-1.5 rounded-full bg-gray-100 mt-1">
       <div
         className={cn("h-full rounded-full transition-all duration-300", fillClass)}
         style={{ width: `${percent}%` }}
@@ -109,28 +102,30 @@ function BreakdownBar({ value }: { value: number }) {
   );
 }
 
-/** Edit button positioned top-right of a card */
-function EditButton({ onClick, label }: { onClick: () => void; label: string }) {
+/** Section header with Edit button */
+function SectionHeader({ label, onEdit, editLabel }: { label: string; onEdit: () => void; editLabel: string }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="absolute top-2.5 right-2.5 flex items-center gap-1 text-primary text-[11px] font-medium hover:opacity-70 transition-opacity"
-      aria-label={label}
-    >
-      <Pencil className="h-3 w-3" />
-      Edit
-    </button>
+    <div className="flex items-center justify-between mb-2">
+      <p className="text-[11px] text-gray-400 uppercase tracking-wider font-semibold">{label}</p>
+      <button
+        type="button"
+        onClick={onEdit}
+        className="flex items-center gap-1 text-amber-600 text-[11px] font-medium hover:opacity-70 transition-opacity active:scale-[0.97]"
+        aria-label={editLabel}
+      >
+        <Pencil className="h-3 w-3" />
+        Edit
+      </button>
+    </div>
   );
 }
 
-// Card entrance animation variants
 const cardVariants = {
-  hidden: { opacity: 0, y: 8 },
+  hidden: { opacity: 0, y: 15 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.1, duration: 0.25, ease: [0, 0, 0.2, 1] as const },
+    transition: { delay: 0.1 + i * 0.08, type: "spring" as const, stiffness: 300, damping: 25 },
   }),
 };
 
@@ -160,57 +155,53 @@ export function ConfirmStep({
   const hasTags = selectedTags.length > 0;
   const hasReviewText = !!(title || review);
 
-  // Build summary stats for bottom message
   const statParts: string[] = [];
   const breakdownCount = Object.values(breakdowns).filter(v => v !== null).length;
   if (breakdownCount > 0) statParts.push(`${breakdownCount} category rating${breakdownCount > 1 ? 's' : ''}`);
   if (totalMedia > 0) statParts.push(`${totalMedia} photo${totalMedia > 1 ? 's' : ''}`);
   if (hasReviewText) statParts.push('a written verdict');
 
-  // Thumbnails for media preview (first 4)
   const mediaThumbnails = media.slice(0, 4);
   const remainingMedia = totalMedia - mediaThumbnails.length;
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: 20 }}
+      initial={{ opacity: 0, x: 300 }}
       animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
+      exit={{ opacity: 0, x: -300 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       className="shrink-0 px-4 pt-6 pb-8"
+      style={{ backgroundColor: '#F8FAFC' }}
     >
       {/* Header */}
       <div className="text-center mb-5">
-        <h2 className="text-lg font-semibold text-foreground">
-          {isEditMode ? 'Update Review' : 'Final Verdict'}
-        </h2>
-        <p className="text-sm text-muted-foreground">
+        <div className="flex items-center justify-center gap-1.5 mb-1">
+          <Sparkles className="h-4 w-4 text-amber-500" />
+          <span className="text-xs font-medium text-amber-600">Looking good</span>
+        </div>
+        <h2 className="text-xl font-bold tracking-tight text-gray-900">
           {isEditMode ? 'Review your changes' : 'Review your verdict'}
-        </p>
+        </h2>
       </div>
 
-      {/* Content cards - staggered entrance */}
+      {/* Content cards */}
       <div className="space-y-3">
-        {/* Course header - non-interactive context */}
+        {/* Course header */}
         {course && (
           <motion.div
             custom={0}
             initial="hidden"
             animate="visible"
             variants={cardVariants}
-            className={cn("flex items-center gap-3 p-3 bg-card rounded-2xl border border-border/40 shadow-sm border-l-2", rating != null && rating >= 9.0 ? 'border-l-amber-400' : 'border-l-slate-300')}
+            className="flex items-center gap-3 p-3 bg-white rounded-2xl border border-gray-100 shadow-sm"
           >
             {course.thumbnail_image && (
-              <img
-                src={course.thumbnail_image}
-                alt={course.name}
-                loading="eager"
-                className="w-12 h-12 rounded-lg object-cover"
-              />
+              <img src={course.thumbnail_image} alt={course.name} loading="eager" className="w-12 h-12 rounded-lg object-cover" />
             )}
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-sm text-foreground truncate">{course.name}</h3>
               {(course.sub_country || course.country) && (
-                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                <p className="text-xs text-gray-400 flex items-center gap-1">
                   <MapPin className="h-3 w-3" />
                   {[course.sub_country, course.country].filter(Boolean).join(', ')}
                 </p>
@@ -219,110 +210,75 @@ export function ConfirmStep({
           </motion.div>
         )}
 
-        {/* Rating + Media Row */}
-        <motion.div
-          custom={1}
-          initial="hidden"
-          animate="visible"
-          variants={cardVariants}
-          className="flex gap-3"
+        {/* Rating card */}
+        <motion.div custom={1} initial="hidden" animate="visible" variants={cardVariants}
+          className="p-3 bg-white rounded-2xl border border-gray-100 shadow-sm"
         >
-          {/* Rating card - tap to edit */}
-          <div className={cn("flex-1 p-3 bg-card rounded-2xl border border-border/40 shadow-sm border-l-2 relative", rating != null && rating >= 9.0 ? 'border-l-amber-400' : 'border-l-slate-300')}>
-            <EditButton onClick={() => onGoToStep(1)} label="Edit rating" />
-            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Your Rating</p>
-            {rating !== null ? (
-              <RatingDisplay value={rating} size="lg" />
-            ) : (
-              <span className="text-muted-foreground">Not set</span>
-            )}
-          </div>
-
-          {/* Media card - tap to edit */}
-          <div className={cn("min-w-[110px] flex-shrink-0 p-3 bg-card rounded-2xl border border-border/40 shadow-sm border-l-2 relative", rating != null && rating >= 9.0 ? 'border-l-amber-400' : 'border-l-slate-300')}>
-            {totalMedia > 0 && (
-              <EditButton onClick={() => onGoToStep(3)} label="Edit media" />
-            )}
-            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1.5">Media</p>
-            {totalMedia > 0 ? (
-              <>
-                {/* Thumbnail strip */}
-                <div className="flex gap-1 mb-1.5">
-                  {mediaThumbnails.map((item, idx) => (
-                    <div key={item.id} className="relative w-10 h-10 rounded-lg overflow-hidden bg-muted shrink-0">
-                      <img
-                        src={item.previewUrl || item.posterUrl || ''}
-                        alt=""
-                        className="w-full h-full object-cover"
-                      />
-                      {/* +N badge on last thumbnail */}
-                      {idx === mediaThumbnails.length - 1 && remainingMedia > 0 && (
-                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                          <span className="text-white text-[11px] font-semibold">+{remainingMedia}</span>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-                <p className="text-[11px] text-muted-foreground">
-                  {imageCount > 0 && `${imageCount} photo${imageCount > 1 ? 's' : ''}`}
-                  {imageCount > 0 && videoCount > 0 && ', '}
-                  {videoCount > 0 && `${videoCount} video${videoCount > 1 ? 's' : ''}`}
-                </p>
-              </>
-            ) : (
-              <span className="text-sm text-muted-foreground">No photos</span>
-            )}
-            {hasUploadsInProgress && (
-              <div className="flex items-center gap-1 mt-1">
-                <Loader2 className="h-3 w-3 animate-spin text-primary" />
-                <p className="text-[11px] text-primary">Uploading…</p>
-              </div>
-            )}
-          </div>
+          <SectionHeader label="Your Rating" onEdit={() => onGoToStep(1)} editLabel="Edit rating" />
+          {rating !== null ? (
+            <RatingDisplay value={rating} size="lg" />
+          ) : (
+            <span className="text-gray-400">Not set</span>
+          )}
         </motion.div>
 
-        {/* Review text (if present) */}
-        {hasReviewText && (
-          <motion.div
-            custom={2}
-            initial="hidden"
-            animate="visible"
-            variants={cardVariants}
-            className={cn("p-3 bg-card rounded-2xl border border-border/40 shadow-sm border-l-2 space-y-1 relative", rating != null && rating >= 9.0 ? 'border-l-amber-400' : 'border-l-slate-300')}
+        {/* Media card */}
+        {totalMedia > 0 && (
+          <motion.div custom={2} initial="hidden" animate="visible" variants={cardVariants}
+            className="p-3 bg-white rounded-2xl border border-gray-100 shadow-sm"
           >
-            <EditButton onClick={() => onGoToStep(2)} label="Edit review" />
-            {title && (
-              <h4 className="font-medium text-sm text-foreground pr-12">{title}</h4>
+            <SectionHeader label="Media" onEdit={() => onGoToStep(3)} editLabel="Edit media" />
+            <div className="flex gap-1 mb-1.5">
+              {mediaThumbnails.map((item, idx) => (
+                <div key={item.id} className="relative w-10 h-10 rounded-lg overflow-hidden bg-gray-100 shrink-0">
+                  <img src={item.previewUrl || item.posterUrl || ''} alt="" className="w-full h-full object-cover" />
+                  {idx === mediaThumbnails.length - 1 && remainingMedia > 0 && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                      <span className="text-white text-[11px] font-semibold">+{remainingMedia}</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+            <p className="text-[11px] text-gray-400">
+              {imageCount > 0 && `${imageCount} photo${imageCount > 1 ? 's' : ''}`}
+              {imageCount > 0 && videoCount > 0 && ', '}
+              {videoCount > 0 && `${videoCount} video${videoCount > 1 ? 's' : ''}`}
+            </p>
+            {hasUploadsInProgress && (
+              <div className="flex items-center gap-1 mt-1">
+                <Loader2 className="h-3 w-3 animate-spin text-amber-500" />
+                <p className="text-[11px] text-amber-500">Uploading…</p>
+              </div>
             )}
-            {review && (
-              <p className="text-xs text-muted-foreground line-clamp-3">{review}</p>
-            )}
+          </motion.div>
+        )}
+
+        {/* Review text */}
+        {hasReviewText && (
+          <motion.div custom={3} initial="hidden" animate="visible" variants={cardVariants}
+            className="p-3 bg-white rounded-2xl border border-gray-100 shadow-sm"
+          >
+            <SectionHeader label="Review" onEdit={() => onGoToStep(2)} editLabel="Edit review" />
+            {title && <h4 className="font-medium text-sm text-foreground">{title}</h4>}
+            {review && <p className="text-xs text-gray-400 line-clamp-3 mt-0.5">{review}</p>}
           </motion.div>
         )}
 
         {/* Breakdown ratings */}
         {hasBreakdowns && (
-          <motion.div
-            custom={3}
-            initial="hidden"
-            animate="visible"
-            variants={cardVariants}
-            className={cn("p-3 bg-card rounded-2xl border border-border/40 shadow-sm border-l-2 relative", rating != null && rating >= 9.0 ? 'border-l-amber-400' : 'border-l-slate-300')}
+          <motion.div custom={4} initial="hidden" animate="visible" variants={cardVariants}
+            className="p-3 bg-white rounded-2xl border border-gray-100 shadow-sm"
           >
-            <EditButton onClick={() => onGoToStep(1)} label="Edit detailed ratings" />
-            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2.5">Detailed Ratings</p>
+            <SectionHeader label="Detailed Ratings" onEdit={() => onGoToStep(1)} editLabel="Edit detailed ratings" />
             <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
               {(Object.entries(breakdowns) as [keyof ReviewBreakdowns, number | null][]).map(
                 ([key, value]) =>
                   value !== null && (
                     <div key={key}>
                       <div className="flex justify-between items-baseline">
-                        <span className="text-muted-foreground text-xs">{BREAKDOWN_LABELS[key]}</span>
-                        <span className={cn(
-                          "font-semibold tabular-nums text-sm",
-                          getRatingTextColor(value)
-                        )}>
+                        <span className="text-gray-400 text-xs">{BREAKDOWN_LABELS[key]}</span>
+                        <span className={cn("font-semibold tabular-nums text-sm", getRatingTextColor(value))}>
                           {value.toFixed(1)}
                         </span>
                       </div>
@@ -336,18 +292,11 @@ export function ConfirmStep({
 
         {/* Review tags */}
         {hasTags && (
-          <motion.div
-            custom={4}
-            initial="hidden"
-            animate="visible"
-            variants={cardVariants}
+          <motion.div custom={5} initial="hidden" animate="visible" variants={cardVariants}
             className="flex flex-wrap gap-1.5"
           >
             {selectedTags.map(tag => (
-              <span
-                key={tag.id || tag.username}
-                className="bg-muted/30 text-muted-foreground text-[11px] rounded-full px-2.5 py-1"
-              >
+              <span key={tag.id || tag.username} className="bg-amber-50 text-amber-700 text-[11px] rounded-full px-2.5 py-1">
                 @{tag.username}
               </span>
             ))}
@@ -355,26 +304,16 @@ export function ConfirmStep({
         )}
       </div>
 
-      {/* Review completeness summary */}
+      {/* Summary */}
       {statParts.length > 0 && (
-        <motion.p
-          custom={5}
-          initial="hidden"
-          animate="visible"
-          variants={cardVariants}
-          className="text-[12px] text-muted-foreground/50 text-center mt-6"
+        <motion.p custom={6} initial="hidden" animate="visible" variants={cardVariants}
+          className="text-xs text-gray-400 text-center mt-6"
         >
           Your review includes {statParts.join(', ')}
         </motion.p>
       )}
-
-      {/* Motivational prompt */}
-      <motion.p
-        custom={6}
-        initial="hidden"
-        animate="visible"
-        variants={cardVariants}
-        className="text-[12px] text-muted-foreground/50 text-center mt-2"
+      <motion.p custom={7} initial="hidden" animate="visible" variants={cardVariants}
+        className="text-xs text-amber-600/60 text-center mt-2"
       >
         Your review helps fellow golfers discover great courses
       </motion.p>

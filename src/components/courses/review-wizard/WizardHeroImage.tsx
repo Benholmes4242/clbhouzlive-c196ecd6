@@ -51,8 +51,8 @@ export function WizardHeroImage({ course, currentStep, onBack, onClose, hideBack
         <div className="absolute inset-0 h-full w-full bg-gradient-to-br from-green-400 to-blue-500" />
       )}
       
-      {/* Dark gradient overlay for text legibility - matches GolfClubView */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+      {/* Dark gradient overlay for text legibility - enhanced scrim */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
       
       {/* Glass back/close button - positioned below safe area */}
       {/* Hidden when header handles navigation */}
@@ -60,7 +60,7 @@ export function WizardHeroImage({ course, currentStep, onBack, onClose, hideBack
         <button
           type="button"
           onClick={isFirstStep ? onClose : onBack}
-          className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-10"
+          className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/40 transition-colors active:scale-[0.97] z-10"
           style={{ top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
           aria-label={isFirstStep ? 'Close' : 'Back'}
         >

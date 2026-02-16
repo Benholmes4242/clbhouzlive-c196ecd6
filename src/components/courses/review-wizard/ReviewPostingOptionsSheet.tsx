@@ -279,7 +279,8 @@ export function ReviewPostingOptionsSheet({
           <div className="px-5 pt-3 pb-4 border-t border-border">
             <button
               onClick={handleDone}
-              className="w-full h-12 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[0.98] bg-primary text-primary-foreground hover:bg-primary/90"
+              className="w-full h-12 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[0.98] text-white"
+              style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)' }}
             >
               Done
             </button>

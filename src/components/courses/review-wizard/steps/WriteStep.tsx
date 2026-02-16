@@ -1,6 +1,7 @@
 /**
  * Step 2: Write Your Review (The Verdict)
  * Card-based inputs with @mention support, prompt chips, auto-expanding textarea
+ * Amber-themed focus states matching Post Wizard
  */
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
@@ -59,7 +60,7 @@ export function WriteStep({
   const autoResize = useCallback(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${Math.max(120, textareaRef.current.scrollHeight)}px`;
+      textareaRef.current.style.height = `${Math.max(150, textareaRef.current.scrollHeight)}px`;
     }
   }, []);
 
@@ -139,15 +140,15 @@ export function WriteStep({
 
   // Counter color logic
   const getTitleCounterColor = () => {
-    if (titleLength >= MAX_TITLE_LENGTH * (TITLE_DANGER_THRESHOLD / 100)) return 'text-destructive font-medium';
+    if (titleLength >= MAX_TITLE_LENGTH * (TITLE_DANGER_THRESHOLD / 100)) return 'text-red-500 font-medium';
     if (titleLength >= TITLE_WARN_THRESHOLD) return 'text-amber-500';
-    return 'text-muted-foreground';
+    return 'text-gray-400';
   };
 
   const getReviewCounterColor = () => {
-    if (reviewLength >= MAX_REVIEW_LENGTH * REVIEW_DANGER_THRESHOLD) return 'text-destructive font-medium';
+    if (reviewLength >= MAX_REVIEW_LENGTH * REVIEW_DANGER_THRESHOLD) return 'text-red-500 font-medium';
     if (reviewLength >= MAX_REVIEW_LENGTH * REVIEW_WARN_THRESHOLD) return 'text-amber-500';
-    return 'text-muted-foreground';
+    return 'text-gray-400';
   };
 
   // Show prompt chips when textarea is focused, empty or very short content
@@ -155,42 +156,44 @@ export function WriteStep({
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: 20 }}
+      initial={{ opacity: 0, x: 300 }}
       animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
+      exit={{ opacity: 0, x: -300 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       className="flex-1 flex flex-col min-h-0 px-4 pt-6 pb-6"
+      style={{ backgroundColor: '#F8FAFC' }}
     >
       {/* Header */}
       <div className="text-center mb-5">
-        <h2 className="text-lg font-semibold text-foreground">
+        <h2 className="text-xl font-bold tracking-tight text-gray-900">
           The Verdict
         </h2>
-        <p className="text-sm text-muted-foreground mt-0.5">
+        <p className="text-sm font-medium text-gray-500 mt-0.5">
           Tell the story of your experience
         </p>
         {reviewLength === 0 && titleLength === 0 && (
-          <p className="text-[11px] text-muted-foreground/50 mt-1">
+          <p className="text-xs text-gray-400 mt-1">
             Optional — skip if you prefer to let your ratings speak
           </p>
         )}
       </div>
 
       {/* Form Fields */}
-      <div className="flex-1 flex flex-col gap-4 min-h-0">
+      <div className="flex-1 flex flex-col gap-3 min-h-0">
         {/* Summary Title - Compact card, single-line feel */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0 }}
+          transition={{ delay: 0.05 }}
           className={cn(
-            "flex flex-col rounded-2xl border bg-card transition-all duration-200 shadow-sm shrink-0",
-            isTitleFocused ? "border-primary/30 ring-1 ring-primary/20" : "border-border"
+            "flex flex-col rounded-2xl border bg-white transition-all duration-200 shadow-sm shrink-0",
+            isTitleFocused ? "border-amber-300 ring-1 ring-amber-200 shadow-amber-100/50" : "border-gray-200"
           )}
         >
           <input
             id="review-title"
             type="text"
-            className="w-full text-base font-medium leading-relaxed bg-transparent placeholder:text-muted-foreground/60 placeholder:font-medium focus:outline-none px-4 pt-3.5 pb-2 text-foreground"
+            className="w-full text-base font-medium leading-relaxed bg-transparent placeholder:text-gray-400 placeholder:font-medium focus:outline-none px-4 pt-3.5 pb-2 text-foreground"
             placeholder="Sum up your experience in a few words"
             value={title}
             onChange={(e) => onTitleChange(e.target.value.slice(0, MAX_TITLE_LENGTH))}
@@ -200,7 +203,7 @@ export function WriteStep({
           />
           {/* Footer — no heavy divider */}
           <div className="flex items-center justify-between px-4 pb-2.5">
-            <span className="text-[11px] text-muted-foreground">
+            <span className="text-[11px] text-gray-400">
               Your take in one line
             </span>
             {/* Counter: only show when typing */}
@@ -226,8 +229,8 @@ export function WriteStep({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className={cn(
-            "flex-1 flex flex-col rounded-2xl border bg-card transition-all duration-200 shadow-sm min-h-[160px]",
-            isReviewFocused ? "border-primary/30 ring-1 ring-primary/20" : "border-border"
+            "flex-1 flex flex-col rounded-2xl border bg-white transition-all duration-200 shadow-sm min-h-[160px]",
+            isReviewFocused ? "border-amber-300 ring-1 ring-amber-200 shadow-amber-100/50" : "border-gray-200"
           )}
         >
           {/* Textarea wrapper */}
@@ -243,10 +246,10 @@ export function WriteStep({
               className={cn(
                 "w-full bg-transparent border-0 resize-none",
                 "focus:outline-none focus-visible:ring-0",
-                "placeholder:text-muted-foreground text-sm leading-relaxed p-4 text-foreground"
+                "placeholder:text-gray-400 text-sm leading-relaxed p-4 text-foreground"
               )}
               maxLength={MAX_REVIEW_LENGTH + 100}
-              style={{ minHeight: '120px' }}
+              style={{ minHeight: '150px' }}
             />
 
             {/* Prompt chips — visible when focused & empty/short */}
@@ -268,7 +271,7 @@ export function WriteStep({
                         e.preventDefault();
                         handlePromptChipClick(chip.insert);
                       }}
-                      className="text-[11px] bg-muted/40 text-muted-foreground rounded-full px-2.5 py-1 transition-colors hover:bg-muted/60 active:bg-muted/80"
+                      className="text-[11px] bg-amber-50 text-amber-700 rounded-full px-2.5 py-1 transition-colors hover:bg-amber-100 active:bg-amber-200/80 active:scale-[0.97]"
                     >
                       {chip.label}
                     </button>
@@ -281,12 +284,12 @@ export function WriteStep({
           {/* Tagged entities chips */}
           {selectedTags.length > 0 && (
             <div className="px-4 pb-2 flex flex-wrap items-center gap-1.5 shrink-0">
-              <span className="text-xs text-muted-foreground/60">Tagged:</span>
+              <span className="text-xs text-gray-400">Tagged:</span>
               {selectedTags.map(tag => (
                 <button
                   key={tag.id}
                   onClick={() => handleRemoveTag(tag.id)}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors bg-primary/10 text-primary hover:bg-primary/20"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors bg-amber-50 text-amber-700 hover:bg-amber-100 active:scale-[0.97]"
                 >
                   @{(tag.username || tag.name).charAt(0).toUpperCase() + (tag.username || tag.name).slice(1)}
                   <X className="w-3 h-3 opacity-60 hover:opacity-100" />
@@ -295,8 +298,8 @@ export function WriteStep({
             </div>
           )}
           
-          {/* Footer — counter only, no @mention hint (placeholder handles discovery) */}
-          <div className="flex items-center justify-end px-4 py-2 border-t border-border/20 shrink-0 mt-auto">
+          {/* Footer — counter only */}
+          <div className="flex items-center justify-end px-4 py-2 border-t border-gray-100 shrink-0 mt-auto">
             <AnimatePresence>
               {reviewLength > 0 && (
                 <motion.span

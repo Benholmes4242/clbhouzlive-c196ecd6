@@ -154,7 +154,7 @@ export function ReviewWizard({
   const isImmersiveStep = isOpen && typeof wizard.state.step === 'number' && (wizard.state.step === 1 || wizard.state.step === 2);
   useMedianStatusBar(
     isImmersiveStep ? "dark" : "light",
-    isImmersiveStep ? "transparent" : "#F8FAFC",
+    "transparent",
     isOpen,
     false
   );
@@ -343,11 +343,14 @@ export function ReviewWizard({
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
             className={cn(
               "light fixed inset-0 z-[9999]",
-              wizard.state.step === 'preview' ? "bg-black" : "bg-background",
+              wizard.state.step === 'preview' ? "bg-black" : "",
               "flex flex-col",
               "overscroll-contain"
             )}
-            style={{ touchAction: 'pan-y' }}
+            style={{ 
+              touchAction: 'pan-y',
+              backgroundColor: wizard.state.step === 'preview' ? undefined : '#FFFBEB',
+            }}
           >
             {/* Hero image - extends into safe area */}
             {showHeroImage && typeof wizard.state.step === 'number' && (

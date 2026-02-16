@@ -1,14 +1,13 @@
 /**
  * Step 3: Add Photos & Videos
  * Uses native OS picker via pickMediaFiles utility
- * Polish: Amber-themed empty state, course context bar, max-media completion, tip chips
+ * Amber-themed empty state, three-zone layout, max 10 media
  */
 
 import React, { useRef, useCallback, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Camera, AlertCircle, Images, Loader2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import type { ReviewMediaItem } from '../types';
 import type { ReviewWizardCourse } from '../types';
@@ -30,7 +29,7 @@ interface MediaStepProps {
   onReorderMedia: (fromIndex: number, toIndex: number) => void;
 }
 
-const MAX_MEDIA_ITEMS = 6;
+const MAX_MEDIA_ITEMS = 10;
 
 const TIP_CHIPS = ['Fairways & greens', 'Signature holes', 'Clubhouse & views'];
 
@@ -78,8 +77,6 @@ export function MediaStep({
     }
     prevMediaCountRef.current = media.length;
   }, [media.length]);
-  
-  // NOTE: Auto-launch removed - iOS blocks programmatic input.click() without user gesture
 
   const handleMediaSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -227,24 +224,6 @@ export function MediaStep({
     />
   );
 
-  // Loading overlay component
-  const LoadingOverlay = () => (
-    <motion.div 
-      className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      <Loader2 className="w-10 h-10 text-white animate-spin" />
-      <p className="mt-3 text-white text-sm font-medium">
-        Loading from your library...
-      </p>
-      <p className="mt-1 text-white/70 text-xs text-center px-8">
-        Large videos from iCloud may take a few minutes
-      </p>
-    </motion.div>
-  );
-
   // Course location text for context bar
   const locationText = course ? formatCourseLocation({
     sub_country: course.sub_country,
@@ -254,17 +233,23 @@ export function MediaStep({
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: 20 }}
+      initial={{ opacity: 0, x: 300 }}
       animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
-      className="flex flex-col h-full overflow-hidden bg-background relative"
+      exit={{ opacity: 0, x: -300 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+      className="flex flex-col h-full overflow-hidden relative"
+      style={{ backgroundColor: media.length > 0 ? '#FFF8E1' : undefined }}
     >
       {fileInput}
       
       {/* Course context bar — visual continuity from Steps 1-2 hero */}
       {course && (
         <motion.div 
-          className="shrink-0 flex items-center gap-3 px-4 py-2.5 bg-muted/20 border-b border-border/20"
+          className="shrink-0 flex items-center gap-3 px-4 py-2.5 border-b"
+          style={{ 
+            backgroundColor: '#FFF8E1',
+            borderColor: 'rgba(251, 191, 36, 0.15)',
+          }}
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25 }}
@@ -287,11 +272,6 @@ export function MediaStep({
           </div>
         </motion.div>
       )}
-      
-      {/* Loading overlay */}
-      <AnimatePresence>
-        {isPickerOpen && <LoadingOverlay />}
-      </AnimatePresence>
 
       {/* Status info - show failed count if any */}
       {failedCount > 0 && (
@@ -329,15 +309,22 @@ export function MediaStep({
             )}
           </div>
           
-          {/* Bottom action bar */}
-          <div className="flex-shrink-0 border-t border-border bg-background px-4 py-3 pb-safe">
+          {/* Bottom action bar — amber themed */}
+          <div 
+            className="flex-shrink-0 px-4 py-3"
+            style={{ 
+              backgroundColor: '#FFF8E1',
+              borderTop: '1px solid rgba(251, 191, 36, 0.15)',
+              paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
+            }}
+          >
             {/* Media counter */}
             <div className="text-center mb-2">
-              <p className="text-xs text-muted-foreground">
-                {media.length}/{MAX_MEDIA_ITEMS} items selected
+              <p className="text-xs text-amber-600 font-medium tabular-nums">
+                {media.length}/{MAX_MEDIA_ITEMS}
                 {!canAddMore && (
                   <motion.span 
-                    className="text-emerald-600 ml-1"
+                    className="text-amber-600 ml-1"
                     initial={showMaxPulse ? { scale: 1 } : false}
                     animate={showMaxPulse ? { scale: [1, 1.05, 1] } : { scale: 1 }}
                     transition={{ duration: 0.3 }}
@@ -346,19 +333,17 @@ export function MediaStep({
                   </motion.span>
                 )}
                 {processingCount > 0 && (
-                  <span className="text-blue-600 ml-1">· Processing {processingCount}...</span>
+                  <span className="text-amber-500 ml-1">· Processing {processingCount}...</span>
                 )}
               </p>
             </div>
             
             <div className="flex items-center justify-center gap-2">
               {canAddMore ? (
-                <Button
-                  variant="ghost"
-                  size="sm"
+                <button
                   onClick={handleGallery}
                   disabled={isPickerOpen}
-                  className="gap-1.5 px-4 py-2.5 h-auto rounded-full bg-muted hover:bg-muted/80 text-sm font-medium transition-colors text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="gap-1.5 px-4 py-2.5 rounded-full bg-amber-100/80 text-sm font-medium text-amber-700 active:bg-amber-200/80 active:scale-[0.97] transition-all duration-100 disabled:opacity-30 disabled:cursor-not-allowed inline-flex items-center"
                 >
                   {isPickerOpen ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -366,24 +351,27 @@ export function MediaStep({
                     <Plus className="h-4 w-4" />
                   )}
                   Add Media
-                </Button>
+                </button>
               ) : (
                 <motion.div 
-                  className="flex items-center gap-1.5 text-sm text-emerald-600 font-medium py-2.5"
+                  className="flex items-center gap-1.5 text-sm text-amber-600 font-semibold py-2.5"
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.2 }}
                 >
                   <Check className="h-4 w-4" />
-                  All {MAX_MEDIA_ITEMS} slots filled
+                  All slots filled
                 </motion.div>
               )}
             </div>
           </div>
         </div>
       ) : (
-        /* Empty state — amber-themed, full-width, no card container */
-        <div className="h-full flex items-center justify-center p-5 relative">
+        /* Empty state — amber-themed, matching Post Wizard */
+        <div 
+          className="h-full flex items-center justify-center p-5 relative"
+          style={{ background: 'linear-gradient(to bottom, rgba(254,243,199,0.3), white, white)' }}
+        >
           {permissionDenied ? (
             <PermissionDeniedCard
               type={permissionDenied}
@@ -403,42 +391,51 @@ export function MediaStep({
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
             >
-              {/* Amber-themed icon with pulse */}
-              <motion.div 
-                className="h-16 w-16 rounded-full bg-amber-50 flex items-center justify-center mb-5"
-                animate={{ scale: [1, 1.04, 1] }}
-                transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <Camera className="h-7 w-7 text-amber-500" />
-              </motion.div>
+              {/* Amber-themed icon with ping */}
+              <div className="relative mb-5">
+                <motion.div 
+                  className="h-20 w-20 bg-amber-100 flex items-center justify-center"
+                  style={{ borderRadius: '28%' }}
+                >
+                  <Camera className="h-9 w-9 text-amber-600" />
+                </motion.div>
+                {/* Ping animation */}
+                <div 
+                  className="absolute inset-0 bg-amber-50 animate-ping"
+                  style={{ borderRadius: '28%', animationDuration: '3s' }}
+                />
+              </div>
               
               {/* Text - visible hierarchy */}
-              <h3 className="text-lg font-semibold text-foreground mb-1.5">
-                Course highlights
+              <h3 className="text-xl font-bold tracking-tight text-gray-900 mb-1.5">
+                Course Highlights
               </h3>
-              <p className="text-sm text-muted-foreground text-center mb-6">
-                Show off the course — up to {MAX_MEDIA_ITEMS} photos & videos
+              <p className="text-sm font-medium text-gray-500 text-center mb-1">
+                Show off the course
+              </p>
+              <p className="text-xs text-gray-400 text-center mb-6">
+                Up to {MAX_MEDIA_ITEMS} photos & videos
               </p>
               
-              {/* CTA buttons — differentiated */}
-              <div className="flex gap-3 mb-5">
-                <Button
+              {/* CTA cards — matching Post Wizard */}
+              <div className="flex gap-3 mb-5 w-full">
+                <button
                   onClick={handleCamera}
                   disabled={isPickerOpen}
-                  className="gap-2 rounded-xl px-6 py-2.5 h-auto bg-primary text-primary-foreground hover:bg-primary/90"
+                  className="flex-1 py-5 rounded-2xl text-white font-medium shadow-sm active:scale-[0.97] transition-all duration-100 flex items-center justify-center gap-2 disabled:opacity-50"
+                  style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)' }}
                 >
-                  <Camera className="h-4 w-4" />
+                  <Camera className="h-5 w-5" />
                   Camera
-                </Button>
-                <Button
-                  variant="outline"
+                </button>
+                <button
                   onClick={handleGallery}
                   disabled={isPickerOpen}
-                  className="gap-2 rounded-xl px-6 py-2.5 h-auto border-border text-foreground hover:bg-muted/60"
+                  className="flex-1 py-5 rounded-2xl bg-white border border-gray-200 text-gray-700 font-medium shadow-sm active:scale-[0.97] transition-all duration-100 flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  <Images className="h-4 w-4" />
+                  <Images className="h-5 w-5" />
                   Gallery
-                </Button>
+                </button>
               </div>
               
               {/* Review-specific tip chips */}
@@ -446,7 +443,7 @@ export function MediaStep({
                 {TIP_CHIPS.map(chip => (
                   <span 
                     key={chip}
-                    className="text-[11px] bg-muted/30 text-muted-foreground rounded-full px-3 py-1"
+                    className="text-[11px] bg-amber-50 text-amber-700 rounded-full px-3 py-1"
                   >
                     {chip}
                   </span>
@@ -454,7 +451,7 @@ export function MediaStep({
               </div>
               
               {/* Optional indicator */}
-              <p className="text-[11px] text-muted-foreground/50">
+              <p className="text-[11px] text-gray-400">
                 Optional — your ratings and review speak for themselves
               </p>
             </motion.div>

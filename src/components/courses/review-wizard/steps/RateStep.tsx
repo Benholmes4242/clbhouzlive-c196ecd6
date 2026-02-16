@@ -1,7 +1,7 @@
 /**
  * Step 1: Rate Your Experience
  * Uses 0-10 scale sliders with 0.1 precision
- * Semantic tokens for typography, untouched/touched states, tick marks
+ * Amber-themed with card-wrapped breakdowns, stagger entrance
  */
 
 import React, { useRef, useState, useEffect } from 'react';
@@ -126,15 +126,17 @@ export function RateStep({
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: 20 }}
+      initial={{ opacity: 0, x: 300 }}
       animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
+      exit={{ opacity: 0, x: -300 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       className="shrink-0 px-4 pt-6"
+      style={{ backgroundColor: '#F8FAFC' }}
     >
       {/* Main Rating Section */}
       <div className="mb-10">
         <div className="flex items-baseline justify-between mb-2">
-          <h2 className="text-lg font-semibold text-foreground">
+          <h2 className="text-xl font-bold tracking-tight text-gray-900">
             Your verdict on this course?
           </h2>
           <span 
@@ -144,7 +146,7 @@ export function RateStep({
             style={{
               ...(isOutstanding
                 ? { color: '#f59e0b', textShadow: '0 1px 8px rgba(245, 158, 11, 0.25)' }
-                : { color: '#6b7280' }
+                : { color: '#374151' }
               ),
             }}
           >
@@ -173,7 +175,7 @@ export function RateStep({
               style={{ left: `${(tick / 10) * 100}%`, transform: 'translateX(-50%)' }}
             >
               <div className="w-px h-2 bg-border/50" />
-              <span className="text-[9px] text-muted-foreground/40 tabular-nums mt-0.5">
+              <span className="text-[9px] text-gray-400 tabular-nums mt-0.5">
                 {tick}
               </span>
             </div>
@@ -182,7 +184,7 @@ export function RateStep({
         
         {/* Rating label - shows "–" until first touch, then tier label with pulse */}
         <div className="mt-1 flex items-center justify-center gap-2">
-          <span className="text-xs text-muted-foreground tracking-wide uppercase font-medium">
+          <span className="text-xs text-gray-500 tracking-wide uppercase font-medium">
             Rating:
           </span>
           <AnimatePresence mode="wait">
@@ -196,11 +198,11 @@ export function RateStep({
                 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.2 }}
-                className="text-sm font-semibold uppercase tracking-wide"
+                className="text-sm uppercase tracking-wider"
                 style={{
                   ...(isOutstanding
-                    ? { color: '#f59e0b' }
-                    : { color: '#6b7280' }
+                    ? { color: '#f59e0b', fontWeight: 600 }
+                    : { color: '#6b7280', fontWeight: 500 }
                   ),
                 }}
               >
@@ -211,7 +213,7 @@ export function RateStep({
                 key="unrated"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="text-sm font-semibold text-muted-foreground/50"
+                className="text-sm font-semibold text-gray-300"
               >
                 –
               </motion.span>
@@ -220,20 +222,25 @@ export function RateStep({
         </div>
       </div>
 
-      {/* Detail Ratings */}
-      <div>
-        <h3 className="text-base font-semibold text-foreground mb-4">
+      {/* Detail Ratings — wrapped in card */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+        <h3 className="text-base font-semibold text-gray-800 mb-4">
           Rate each area
         </h3>
         
         <div className="space-y-6">
-          {BREAKDOWN_FIELDS.map(({ key, label, description }) => {
+          {BREAKDOWN_FIELDS.map(({ key, label, description }, index) => {
             const score = breakdowns[key];
             const isTouched = touchedFields[key];
             const scoreIsOutstanding = isTouched && score !== null && score >= 9;
             
             return (
-              <div key={key}>
+              <motion.div 
+                key={key}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.06, duration: 0.25 }}
+              >
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="text-sm font-medium text-foreground">{label}</span>
                   <AnimatePresence mode="wait">
@@ -267,11 +274,11 @@ export function RateStep({
                 />
                 {/* Endpoint labels */}
                 <div className="flex justify-between mt-1" aria-hidden="true">
-                  <span className="text-[9px] text-muted-foreground/30 tabular-nums">0</span>
-                  <span className="text-[9px] text-muted-foreground/30 tabular-nums">10</span>
+                  <span className="text-[9px] text-gray-400 tabular-nums">0</span>
+                  <span className="text-[9px] text-gray-400 tabular-nums">10</span>
                 </div>
-                <p className="text-xs text-muted-foreground/70 mt-0.5">{description}</p>
-              </div>
+                <p className="text-xs text-gray-400 mt-0.5">{description}</p>
+              </motion.div>
             );
           })}
         </div>

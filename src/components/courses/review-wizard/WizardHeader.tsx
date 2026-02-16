@@ -1,5 +1,5 @@
 /**
- * Review Wizard Header - Post Wizard-style header
+ * Review Wizard Header - Amber-themed, Post Wizard-aligned
  * Profile selector, trash icon (edit mode only), Next/Submit button
  */
 
@@ -89,7 +89,12 @@ export function WizardHeader({
 
   return (
     <header 
-      className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background/95 backdrop-blur-md px-3"
+      className={cn(
+        "sticky top-0 z-10 flex items-center justify-between px-3",
+        hasHeroAbove 
+          ? "bg-background/95 backdrop-blur-md border-b border-border"
+          : "bg-amber-50"
+      )}
       style={{ 
         paddingTop: hasHeroAbove ? '0px' : 'max(env(safe-area-inset-top, 0px), 47px)',
         minHeight: hasHeroAbove ? '48px' : 'calc(48px + max(env(safe-area-inset-top, 0px), 47px))'
@@ -97,20 +102,37 @@ export function WizardHeader({
     >
       {/* Left: Close/Back + Trash (edit mode only) */}
       <div className="flex items-center gap-1 min-w-[72px]">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleBackOrClose}
-          className="h-8 w-8 rounded-full"
-          aria-label={isFirstStep ? 'Close' : 'Back'}
-          disabled={isSubmitting || isDeleting}
-        >
-          {isFirstStep ? (
-            <X className="h-4 w-4" />
-          ) : (
-            <ChevronLeft className="h-5 w-5" />
-          )}
-        </Button>
+        {hasHeroAbove ? (
+          /* Steps 1-2: Keep existing ghost style since header sits below hero */
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleBackOrClose}
+            className="h-8 w-8 rounded-full"
+            aria-label={isFirstStep ? 'Close' : 'Back'}
+            disabled={isSubmitting || isDeleting}
+          >
+            {isFirstStep ? (
+              <X className="h-4 w-4" />
+            ) : (
+              <ChevronLeft className="h-5 w-5" />
+            )}
+          </Button>
+        ) : (
+          /* Steps 3-4: Amber treatment */
+          <button
+            onClick={handleBackOrClose}
+            className="w-9 h-9 rounded-full bg-amber-100/80 text-amber-700 flex items-center justify-center active:bg-amber-200/80 active:scale-[0.97] transition-all duration-100 disabled:opacity-50"
+            aria-label={isFirstStep ? 'Close' : 'Back'}
+            disabled={isSubmitting || isDeleting}
+          >
+            {isFirstStep ? (
+              <X className="h-4 w-4" />
+            ) : (
+              <ChevronLeft className="h-5 w-5" />
+            )}
+          </button>
+        )}
         
         {/* Trash icon - Edit Mode only */}
         {isEditMode && (
@@ -140,37 +162,44 @@ export function WizardHeader({
             alt={selectedActor?.name || 'Profile'}
             fallback={getInitials(selectedActor?.name || 'U')}
             hideRing
+            className="shadow-sm"
           />
           <span className="font-medium text-sm max-w-[140px] truncate text-foreground">
             {selectedActor?.name || 'Select'}
           </span>
           {selectedActor?.verified && <VerifiedBadge size="sm" />}
-          <ChevronDown className="h-3 w-3 text-muted-foreground" />
+          <ChevronDown className="h-3.5 w-3.5 text-gray-400" />
         </button>
       </div>
       
-      {/* Right: Next/Submit button */}
+      {/* Right: Next/Skip/Submit button */}
       <div className="flex items-center min-w-[72px] justify-end">
-        <Button
-          size="sm"
+        <button
           onClick={handleNextOrSubmit}
           disabled={!isNextEnabled}
           className={cn(
-            'px-4 py-1.5 h-8 rounded-full text-sm font-medium transition-all duration-200',
+            'px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 active:scale-[0.97]',
             isNextEnabled
-              ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-              : 'bg-muted text-muted-foreground'
+              ? isLastStep 
+                ? 'text-white'
+                : 'text-white'
+              : 'bg-amber-100/80 text-amber-700 cursor-not-allowed'
           )}
+          style={isNextEnabled ? {
+            background: isLastStep 
+              ? 'linear-gradient(135deg, #fbbf24, #f59e0b)' 
+              : '#f59e0b',
+          } : undefined}
         >
           {isSubmitting ? (
-            <>
-              <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+            <span className="flex items-center gap-1.5">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
               {isEditMode ? 'Updating...' : 'Submitting...'}
-            </>
+            </span>
           ) : (
             nextButtonText
           )}
-        </Button>
+        </button>
       </div>
     </header>
   );
