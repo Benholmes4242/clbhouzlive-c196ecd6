@@ -310,16 +310,15 @@ export function HubPageNew() {
 
   // ============ Main Render ============
   return (
-    <div className="h-[100dvh] relative hub-warm-page font-dm-sans">
+    <div className="h-[100dvh] overflow-hidden relative hub-warm-page font-dm-sans">
       <CanonicalAmberBg />
 
-      {/* Content layer — scrollable so content isn't clipped on small screens */}
+      {/* Content layer */}
       <div
-        className="relative z-10 flex flex-col h-full max-w-lg mx-auto w-full overflow-y-auto"
+        className="relative z-10 flex flex-col h-full max-w-lg mx-auto w-full"
         style={{
           paddingTop: 'max(var(--sat, env(safe-area-inset-top, 0px)), 47px)',
           paddingBottom: 'calc(82px + env(safe-area-inset-bottom, 0px))',
-          WebkitOverflowScrolling: 'touch',
         }}
       >
         {/* Offline banner */}
