@@ -88,12 +88,7 @@ export function WizardHeader({
 
   return (
     <header 
-      className={cn(
-        "sticky top-0 z-10 flex items-center justify-between px-3",
-        hasHeroAbove 
-          ? "bg-background/95 backdrop-blur-md border-b border-border"
-          : "bg-amber-50"
-      )}
+      className="sticky top-0 z-10 flex items-center justify-between px-3 bg-amber-50"
       style={{ 
         paddingTop: hasHeroAbove ? '0px' : 'max(env(safe-area-inset-top, 0px), 47px)',
         minHeight: hasHeroAbove ? '48px' : 'calc(48px + max(env(safe-area-inset-top, 0px), 47px))'
@@ -159,9 +154,6 @@ export function WizardHeader({
             hideRing
             className="shadow-sm"
           />
-          <span className="font-medium text-sm max-w-[140px] truncate text-foreground">
-            {selectedActor?.name || 'Select'}
-          </span>
           {selectedActor?.verified && <VerifiedBadge size="sm" />}
           <ChevronDown className="h-3.5 w-3.5 text-gray-400" />
         </button>
