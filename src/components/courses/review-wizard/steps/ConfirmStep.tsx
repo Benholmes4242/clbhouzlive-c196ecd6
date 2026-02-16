@@ -193,7 +193,8 @@ export function ConfirmStep({
             initial="hidden"
             animate="visible"
             variants={cardVariants}
-            className="flex items-center gap-3 p-3 bg-white/70 backdrop-blur-sm rounded-2xl border border-amber-200/20 shadow-sm"
+            className="flex items-center gap-3 p-3 bg-white rounded-2xl border border-amber-600/[0.12]"
+            style={{ boxShadow: '0 2px 8px rgba(217,119,6,0.1)' }}
           >
             {course.thumbnail_image && (
               <img src={course.thumbnail_image} alt={course.name} loading="eager" className="w-12 h-12 rounded-lg object-cover" />
@@ -212,7 +213,8 @@ export function ConfirmStep({
 
         {/* Rating card */}
         <motion.div custom={1} initial="hidden" animate="visible" variants={cardVariants}
-          className="p-3 bg-white/70 backdrop-blur-sm rounded-2xl border border-amber-200/20 shadow-sm"
+          className="p-3 bg-white rounded-2xl border border-amber-600/[0.12]"
+          style={{ boxShadow: '0 2px 8px rgba(217,119,6,0.1)' }}
         >
           <SectionHeader label="Your Rating" onEdit={() => onGoToStep(1)} editLabel="Edit rating" />
           {rating !== null ? (
@@ -225,7 +227,8 @@ export function ConfirmStep({
         {/* Media card */}
         {totalMedia > 0 && (
           <motion.div custom={2} initial="hidden" animate="visible" variants={cardVariants}
-            className="p-3 bg-white/70 backdrop-blur-sm rounded-2xl border border-amber-200/20 shadow-sm"
+            className="p-3 bg-white rounded-2xl border border-amber-600/[0.12]"
+            style={{ boxShadow: '0 2px 8px rgba(217,119,6,0.1)' }}
           >
             <SectionHeader label="Media" onEdit={() => onGoToStep(3)} editLabel="Edit media" />
             <div className="flex gap-1 mb-1.5">
@@ -257,7 +260,8 @@ export function ConfirmStep({
         {/* Review text */}
         {hasReviewText && (
           <motion.div custom={3} initial="hidden" animate="visible" variants={cardVariants}
-            className="p-3 bg-white/70 backdrop-blur-sm rounded-2xl border border-amber-200/20 shadow-sm"
+            className="p-3 bg-white rounded-2xl border border-amber-600/[0.12]"
+            style={{ boxShadow: '0 2px 8px rgba(217,119,6,0.1)' }}
           >
             <SectionHeader label="Review" onEdit={() => onGoToStep(2)} editLabel="Edit review" />
             {title && <h4 className="font-medium text-sm text-foreground">{title}</h4>}
@@ -268,7 +272,8 @@ export function ConfirmStep({
         {/* Breakdown ratings */}
         {hasBreakdowns && (
           <motion.div custom={4} initial="hidden" animate="visible" variants={cardVariants}
-            className="p-3 bg-white/70 backdrop-blur-sm rounded-2xl border border-amber-200/20 shadow-sm"
+            className="p-3 bg-white rounded-2xl border border-amber-600/[0.12]"
+            style={{ boxShadow: '0 2px 8px rgba(217,119,6,0.1)' }}
           >
             <SectionHeader label="Detailed Ratings" onEdit={() => onGoToStep(1)} editLabel="Edit detailed ratings" />
             <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">

@@ -46,7 +46,8 @@ function SectionCard({
 }) {
   return (
     <motion.div 
-      className={cn("bg-white/70 backdrop-blur-sm rounded-2xl shadow-sm border border-amber-200/20 overflow-hidden", className)}
+      className={cn("bg-white rounded-2xl border border-amber-600/[0.12] overflow-hidden", className)}
+      style={{ boxShadow: '0 2px 8px rgba(217,119,6,0.1)' }}
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: 'easeOut', delay }}

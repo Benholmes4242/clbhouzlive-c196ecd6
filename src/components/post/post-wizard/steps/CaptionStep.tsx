@@ -35,7 +35,8 @@ function SectionCard({ children, delay = 0 }: { children: React.ReactNode; delay
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, type: 'spring', stiffness: 300, damping: 25 }}
-      className="bg-white/70 backdrop-blur-sm rounded-2xl border border-amber-200/20 shadow-sm p-4 mx-4"
+      className="bg-white rounded-2xl border border-amber-600/[0.12] p-4 mx-4"
+      style={{ boxShadow: '0 2px 8px rgba(217,119,6,0.1)' }}
     >
       {children}
     </motion.div>

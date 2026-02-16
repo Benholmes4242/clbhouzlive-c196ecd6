@@ -186,9 +186,10 @@ export function WriteStep({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
           className={cn(
-            "flex flex-col rounded-2xl border bg-white/70 backdrop-blur-sm transition-all duration-200 shadow-sm shrink-0",
-            isTitleFocused ? "border-amber-300 ring-1 ring-amber-200 shadow-amber-100/50" : "border-amber-200/30"
+            "flex flex-col rounded-2xl border bg-white transition-all duration-200 shrink-0",
+            isTitleFocused ? "border-amber-300 ring-1 ring-amber-200 shadow-amber-100/50" : "border-amber-600/[0.12]"
           )}
+          style={{ boxShadow: isTitleFocused ? undefined : '0 2px 8px rgba(217,119,6,0.1)' }}
         >
           <input
             id="review-title"
@@ -229,9 +230,10 @@ export function WriteStep({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className={cn(
-            "flex-1 flex flex-col rounded-2xl border bg-white/70 backdrop-blur-sm transition-all duration-200 shadow-sm min-h-[160px]",
-            isReviewFocused ? "border-amber-300 ring-1 ring-amber-200 shadow-amber-100/50" : "border-amber-200/30"
+            "flex-1 flex flex-col rounded-2xl border bg-white transition-all duration-200 min-h-[160px]",
+            isReviewFocused ? "border-amber-300 ring-1 ring-amber-200 shadow-amber-100/50" : "border-amber-600/[0.12]"
           )}
+          style={{ boxShadow: isReviewFocused ? undefined : '0 2px 8px rgba(217,119,6,0.1)' }}
         >
           {/* Textarea wrapper */}
           <div className="flex-1 flex flex-col min-h-0">
