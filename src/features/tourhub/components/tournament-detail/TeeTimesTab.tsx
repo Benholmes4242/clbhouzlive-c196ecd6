@@ -202,7 +202,7 @@ export function TeeTimesTab({ tournamentId, isCompleted }: TeeTimesTabProps) {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className={cn(
-            "w-full h-12 pl-10 pr-10 rounded-xl text-sm text-foreground placeholder:text-muted-foreground/50",
+            "w-full h-12 pl-10 pr-10 rounded-2xl text-sm text-foreground placeholder:text-muted-foreground/50",
             "bg-muted/50 border border-border",
             "focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30",
             "transition-all duration-200"
@@ -263,7 +263,7 @@ function TeeTimeGroupCard({ group, index, searchQuery }: { group: TeeTimeGroup; 
   return (
     <motion.div
       className={cn(
-        "bg-card rounded-xl border border-border shadow-sm overflow-hidden",
+        "bg-card rounded-2xl border border-border overflow-hidden",
         hasMatchingPlayer && "ring-2 ring-amber-400"
       )}
       initial={{ opacity: 0, y: 8 }}

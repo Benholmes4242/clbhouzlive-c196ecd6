@@ -71,7 +71,7 @@ function HeroPill({ children, className }: { children: React.ReactNode; classNam
         className
       )}
       style={{ 
-        background: 'rgba(0,0,0,0.30)', 
+        background: 'rgba(0,0,0,0.35)', 
         backdropFilter: 'blur(12px)',
       }}
     >
@@ -135,7 +135,7 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
         {/* Glass Back Button - top-left */}
         <motion.button
           onClick={() => navigate(-1)}
-          className="absolute left-4 z-20 flex items-center gap-2 rounded-full"
+          className="absolute left-4 z-20 flex items-center gap-2 rounded-full min-h-[44px] min-w-[44px]"
           style={{
             top: 'calc(max(var(--sat, env(safe-area-inset-top, 0px)), 47px) + 8px)',
             background: 'rgba(0,0,0,0.40)',
@@ -167,9 +167,10 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
           <motion.h1 
             className="font-extrabold text-white mb-3"
             style={{ 
-              fontSize: 'clamp(28px, 6vw, 40px)',
-              lineHeight: 1.05,
-              letterSpacing: '-0.03em',
+              fontSize: '24px',
+              fontWeight: 800,
+              lineHeight: 1.1,
+              letterSpacing: '-0.3px',
               textShadow: '0 4px 24px rgba(0,0,0,0.6)',
               display: '-webkit-box',
               WebkitLineClamp: 2,
@@ -193,7 +194,7 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
               className="flex items-center gap-1.5 text-sm font-medium text-white"
               style={{ textShadow: '0 2px 8px rgba(0,0,0,0.4)' }}
             >
-              <Calendar className="w-4 h-4 text-white/70" />
+              <Calendar className="w-3.5 h-3.5 text-white/70" />
               {format(new Date(tournament.start_date), 'MMM d')} – {format(new Date(tournament.end_date), 'd, yyyy')}
             </span>
             
@@ -202,7 +203,7 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
                 className="flex items-center gap-1.5 text-sm text-white/80"
                 style={{ textShadow: '0 2px 8px rgba(0,0,0,0.4)' }}
               >
-                <MapPin className="w-4 h-4 text-white/70" />
+                <MapPin className="w-3.5 h-3.5 text-white/70" />
                 {[tournament.venue_city, tournament.venue_country].filter(Boolean).join(', ')}
               </span>
             )}
@@ -225,7 +226,7 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
             {tournament.venue_course_name && (
               <HeroPill>
                 <Flag className="w-3.5 h-3.5" />
-                <span className="max-w-[150px] truncate">{tournament.venue_course_name}</span>
+                <span className="max-w-[180px] truncate">{tournament.venue_course_name}</span>
               </HeroPill>
             )}
             

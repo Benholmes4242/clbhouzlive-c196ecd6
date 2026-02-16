@@ -59,8 +59,8 @@ function ScoreToPar({ score }: { score: number | null }) {
         color: score < 0
           ? TOUR_COLORS.scoreUnderPar
           : score > 0
-            ? TOUR_COLORS.scoreOverPar
-            : TOUR_COLORS.scoreEven,
+            ? 'hsl(var(--foreground))'
+            : 'hsl(var(--muted-foreground))',
       }}
     >
       {formatted}
@@ -107,7 +107,7 @@ function WinnerCard({ winner, runnerUp, headshotMap }: {
         </Link>
         <div className="flex-1 min-w-0">
           <Link to={`/tourhub/player/${winner.player?.id}`}>
-            <h4 className="text-2xl font-bold text-foreground truncate hover:text-primary transition-colors">
+            <h4 className="text-[22px] font-extrabold text-foreground truncate hover:text-primary transition-colors" style={{ letterSpacing: '-0.3px' }}>
               {winner.player?.full_name || 'Unknown'}
             </h4>
           </Link>
@@ -117,7 +117,7 @@ function WinnerCard({ winner, runnerUp, headshotMap }: {
             </p>
           )}
           <div className="flex items-baseline gap-3">
-            <span className="score-mono text-3xl font-bold" style={{ color: TOUR_COLORS.scoreUnderPar }}>
+            <span className="score-mono text-[28px] font-bold" style={{ color: TOUR_COLORS.scoreUnderPar }}>
               {winner.score === 0 ? 'E' : winner.score > 0 ? `+${winner.score}` : String(winner.score)}
             </span>
             <span className="score-mono text-sm text-muted-foreground">
@@ -253,7 +253,7 @@ export function SummaryTab({
             const segments = [
               { label: 'Eagles', count: t.eagles, color: 'bg-amber-400', pct: (t.eagles / total * 100).toFixed(1) },
               { label: 'Birdies', count: t.birdies, color: 'bg-green-500', pct: (t.birdies / total * 100).toFixed(1) },
-              { label: 'Pars', count: t.pars, color: 'bg-muted-foreground/30', pct: (t.pars / total * 100).toFixed(1) },
+              { label: 'Pars', count: t.pars, color: 'bg-blue-400', pct: (t.pars / total * 100).toFixed(1) },
               { label: 'Bogeys', count: t.bogeys, color: 'bg-orange-400', pct: (t.bogeys / total * 100).toFixed(1) },
               { label: 'Double+', count: t.doubleBogeys, color: 'bg-destructive', pct: (t.doubleBogeys / total * 100).toFixed(1) },
             ];
@@ -327,7 +327,7 @@ export function SummaryTab({
                       headshotMap={headshotMap}
                       size="sm"
                     />
-                    <span className="flex-1 text-[14px] font-medium text-foreground truncate">
+                    <span className="flex-1 text-[14px] font-semibold text-foreground truncate">
                       {entry.player?.full_name || 'Unknown'}
                     </span>
                     <ScoreToPar score={entry.score} />
