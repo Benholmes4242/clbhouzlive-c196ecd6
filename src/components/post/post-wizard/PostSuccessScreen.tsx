@@ -130,7 +130,7 @@ export function PostSuccessScreen({
   return (
     <div
       className="light flex-1 flex flex-col items-center justify-center p-6 pt-safe pb-safe relative"
-      style={{ background: 'linear-gradient(to bottom, rgba(254,243,199,0.3), white, white)' }}
+      style={{ backgroundColor: '#FFFBEB', backgroundImage: 'linear-gradient(to bottom, rgba(254,243,199,0.3) 0%, rgba(254,243,199,0.2) 45%, white 75%, white 100%)' }}
     >
       {/* Decorative background glow — amber */}
       <div 
