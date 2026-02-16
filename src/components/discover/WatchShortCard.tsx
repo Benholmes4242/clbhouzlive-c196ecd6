@@ -304,14 +304,6 @@ export const WatchShortCard = React.memo(function WatchShortCard({
         </div>
       )}
 
-      {/* Fix 5: Duration Badge - Bottom Right */}
-      {durationSeconds != null && durationSeconds > 0 && (
-        <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm rounded-md px-1.5 py-0.5 z-30">
-          <span className="text-[10px] font-medium text-white">
-            {formatDuration(durationSeconds)}
-          </span>
-        </div>
-      )}
 
       {/* Creator Name - Bottom */}
       <div className="absolute bottom-2 left-2 right-14 z-30">

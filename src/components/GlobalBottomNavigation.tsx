@@ -264,6 +264,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 onPrefetch={handleNavPrefetch}
                 variant={isClubhouseRoute ? 'clubhouse' : 'default'}
                 isDimmed={isDimmed}
+                useAmberActive={isWarmGradientRoute}
                 showBorder={false}
               />
             </div>
