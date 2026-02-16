@@ -23,10 +23,10 @@ export function EchoPageHeader({ onBack, onNewChat, onOpenHistory, hasMessages }
       style={{
         paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
         height: 'calc(56px + max(env(safe-area-inset-top, 0px), 47px))',
-        background: 'rgba(255,251,235,0.65)',
+        background: 'rgba(255,251,235,0.85)',
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
-        borderBottom: '1px solid rgba(255,255,255,0.25)',
+        borderBottom: '1px solid rgba(217,119,6,0.08)',
       }}
     >
       {/* Back button */}
@@ -35,7 +35,7 @@ export function EchoPageHeader({ onBack, onNewChat, onOpenHistory, hasMessages }
         className="w-11 h-11 -ml-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
         aria-label="Go back to Hub"
       >
-        <ChevronLeft className="w-5 h-5" style={{ color: '#B45309' }} />
+        <ChevronLeft className="w-5 h-5 text-amber-700" />
       </button>
 
       {/* Center - show orb + title when in conversation */}
@@ -77,7 +77,7 @@ export function EchoPageHeader({ onBack, onNewChat, onOpenHistory, hasMessages }
           className="w-11 h-11 -mr-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
           aria-label="Start new conversation"
         >
-          <Plus className="w-[22px] h-[22px]" style={{ color: '#B45309' }} />
+          <Plus className="w-[22px] h-[22px] text-amber-700" />
         </button>
       ) : (
         <button
@@ -85,7 +85,7 @@ export function EchoPageHeader({ onBack, onNewChat, onOpenHistory, hasMessages }
           className="w-11 h-11 -mr-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
           aria-label="View conversation history"
         >
-          <Clock className="w-5 h-5" style={{ color: '#B45309' }} />
+          <Clock className="w-5 h-5 text-amber-700" />
         </button>
       )}
     </header>

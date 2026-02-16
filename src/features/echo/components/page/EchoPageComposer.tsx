@@ -85,8 +85,9 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
       <div 
         className="relative flex items-center gap-2 h-[50px] rounded-[22px] px-[14px]"
         style={{
-          background: 'rgba(255,255,255,0.45)',
+          background: 'rgba(255,255,255,0.8)',
           border: '1px solid rgba(217,119,6,0.12)',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
         }}
       >
         <input
