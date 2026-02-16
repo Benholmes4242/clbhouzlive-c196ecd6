@@ -12,12 +12,7 @@ export function EchoThinkingCard() {
   return (
     <div className="flex justify-start" role="status" aria-label="Echo is thinking">
       <div 
-        className="px-4 py-3 rounded-[16px_16px_16px_4px] backdrop-blur-[16px]"
-        style={{
-          background: 'rgba(255,245,235,0.7)',
-          border: '1px solid rgba(234,88,12,0.06)',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
-        }}
+        className="px-4 py-3 rounded-2xl backdrop-blur-sm bg-white/70 border border-amber-200/20"
       >
         {/* Animated typing indicator - three pulsing dots */}
         <div className="flex items-center gap-1">
@@ -26,7 +21,7 @@ export function EchoThinkingCard() {
               key={i}
               className={`w-[7px] h-[7px] rounded-full ${prefersReduced ? '' : 'animate-bounce'}`}
               style={{
-                background: '#EA580C',
+                background: '#F59E0B',
                 ...(prefersReduced ? { opacity: 0.7 } : {
                   opacity: 0.7,
                   animationDelay: `${i * 0.15}s`,

@@ -87,12 +87,7 @@ export function EchoResponseCard({
       <div className="max-w-[90%]">
         {/* Main bubble - warm amber tint */}
         <div 
-          className="px-4 py-2.5 rounded-[16px_16px_16px_4px] backdrop-blur-[16px]"
-          style={{
-            background: 'rgba(255,245,235,0.7)',
-            border: '1px solid rgba(234,88,12,0.06)',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
-          }}
+          className="px-4 py-4 rounded-2xl backdrop-blur-sm bg-white/70 border border-amber-200/20"
         >
           <div className="text-[14px] prose prose-sm prose-neutral max-w-none" style={{ color: '#1C1917', lineHeight: 1.6, fontFamily: "'DM Sans', sans-serif" }}>
             <ReactMarkdown
@@ -175,13 +170,12 @@ export function EchoResponseCard({
         {!isStreaming && (
           <button
             onClick={handleCopy}
-            className="flex items-center gap-1 mt-1.5 px-2 py-1 text-[12px] font-medium active:opacity-70 transition-all"
-            style={{ color: copied ? '#EA580C' : '#A8A29E' }}
+            className={`flex items-center gap-1 mt-1.5 px-2 py-1 rounded-lg text-[12px] font-medium active:bg-amber-50 transition-all ${copied ? 'text-amber-600' : 'text-amber-500'}`}
             aria-label="Copy response to clipboard"
           >
             {copied ? (
               <>
-                <Check className="w-3.5 h-3.5" style={{ color: '#EA580C' }} />
+                <Check className="w-3.5 h-3.5 text-amber-600" />
                 <span>Copied</span>
               </>
             ) : (
@@ -200,17 +194,12 @@ export function EchoResponseCard({
               <button
                 key={chip}
                 onClick={() => handleFollowUp(chip)}
-                className="flex items-center justify-between gap-2 px-[14px] py-[9px] rounded-[12px] text-[13px] font-medium active:scale-[0.98] transition-transform backdrop-blur-[8px]"
-                style={{
-                  background: 'rgba(234,88,12,0.06)',
-                  border: '1px solid rgba(234,88,12,0.12)',
-                  color: '#EA580C',
-                  fontFamily: "'DM Sans', sans-serif",
-                }}
+                className="flex items-center justify-between gap-2 px-4 py-3 rounded-xl text-sm font-medium active:bg-amber-100/50 transition-all bg-amber-50 border border-amber-200/30 text-amber-700"
+                style={{ fontFamily: "'DM Sans', sans-serif" }}
                 aria-label={`Ask: ${chip}`}
               >
                 <span>{chip}</span>
-                <ChevronRight className="w-[14px] h-[14px] flex-shrink-0" style={{ color: '#EA580C' }} />
+                <ChevronRight className="w-[14px] h-[14px] flex-shrink-0 text-amber-400" />
               </button>
             ))}
           </div>
