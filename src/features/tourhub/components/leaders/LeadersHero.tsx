@@ -45,23 +45,28 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
       exit={{ opacity: 0 }}
       transition={{ duration: 0.4 }}
     >
-      {/* Glass back button - matches CourseDetailPage */}
+      {/* Back button — 44×44 touch target, 22px icon */}
       <button
         type="button"
         onClick={() => navigate(-1)}
-        className="absolute z-30 left-4 flex h-11 w-11 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 active:scale-95 transition-all"
-        style={{ top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
+        className="absolute z-30 flex items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 active:scale-95 transition-all"
+        style={{
+          top: 56,
+          left: 16,
+          width: 44,
+          height: 44,
+        }}
         aria-label="Back"
       >
-        <ArrowLeft className="h-5 w-5 text-white" />
+        <ArrowLeft style={{ width: 22, height: 22, filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }} className="text-white" />
       </button>
 
       <Link
         to={`/tourhub/player/${player.id}`}
         className="block active:scale-[0.995] transition-transform"
       >
-        {/* Straight-edge hero (no rounded corners) — matches PlayersHero */}
-        <div className="relative w-full overflow-hidden" style={{ height: 'clamp(282px, 53vh, 422px)' }}>
+        {/* Hero — 65dvh, min 400px, max 600px */}
+        <div className="relative w-full overflow-hidden" style={{ height: 'clamp(400px, 65dvh, 600px)' }}>
           {photoUrl ? (
             <motion.img
               src={photoUrl}
@@ -80,29 +85,45 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
             </div>
           )}
 
-          {/* Gradient for text legibility — matches PlayersHero */}
+          {/* Gradient — stronger for text legibility */}
           <div className="absolute inset-0" style={{
-            background: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.55) 100%)',
+            background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%)',
           }} />
 
           <div className="absolute bottom-0 left-0 right-0 px-4 pb-6 space-y-1.5">
+            {/* Category label — 11px, 700, amber, uppercase, wide tracking */}
             <motion.p
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15, duration: 0.4 }}
-              className="text-xs font-bold uppercase tracking-widest text-amber-400"
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '1.2px',
+                textTransform: 'uppercase' as const,
+                color: '#f59e0b',
+              }}
             >
               {category.label} Leader
             </motion.p>
+
+            {/* Player name — 22px, 800, white */}
             <motion.h2
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.4 }}
-              className="text-3xl font-bold text-white leading-tight"
+              style={{
+                fontSize: 22,
+                fontWeight: 800,
+                color: 'white',
+                letterSpacing: '-0.3px',
+                lineHeight: 1.2,
+              }}
             >
               {player.full_name}
             </motion.h2>
 
+            {/* Country — 13px, 500 */}
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
@@ -110,15 +131,27 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
               className="flex items-center gap-1.5"
             >
               {flag && <span className="text-lg">{flag}</span>}
-              <span className="text-sm text-white/80">{countryName}</span>
+              <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>{countryName}</span>
             </motion.div>
 
+            {/* Stats pill — amber bg, white text, 13px/600 */}
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.26, duration: 0.4 }}
             >
-              <span className="inline-block px-3 py-1 rounded-md bg-black/20 backdrop-blur-sm text-sm font-medium text-amber-400">
+              <span
+                className="inline-block"
+                style={{
+                  background: 'rgba(245,158,11,0.85)',
+                  color: 'white',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  borderRadius: 20,
+                  padding: '6px 14px',
+                  letterSpacing: '0.3px',
+                }}
+              >
                 {fmt(value)}{unit ? ` ${unit}` : ''}
               </span>
             </motion.div>
