@@ -403,9 +403,10 @@ export function ReviewWizard({
             )}
             style={{ 
               touchAction: 'pan-y',
-              background: wizard.state.step === 'preview' 
+              backgroundColor: wizard.state.step === 'preview' ? undefined : '#FFFBEB',
+              backgroundImage: wizard.state.step === 'preview' 
                 ? undefined 
-                : 'linear-gradient(to bottom, rgba(254,243,199,0.4) 0%, white 85%) #FFFBEB',
+                : 'linear-gradient(to bottom, rgba(254,243,199,0.4) 0%, white 85%)',
             }}
           >
             {/* Hero image - extends into safe area */}
