@@ -292,14 +292,14 @@ export function HubPageNew() {
         <CanonicalAmberBg />
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 h-full font-dm-sans">
           <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4 bg-white/40">
-            <RefreshCw className="w-8 h-8" style={{ color: '#EA580C' }} />
+            <RefreshCw className="w-8 h-8" style={{ color: '#D97706' }} />
           </div>
           <h2 className="text-xl font-semibold mb-2" style={{ color: '#1C1917' }}>Couldn't load your Hub</h2>
           <p className="text-[15px] text-center mb-6" style={{ color: '#78716C' }}>Check your connection and try again</p>
           <button
             onClick={() => window.location.reload()}
             className="px-6 py-3 text-white rounded-full text-[15px] font-semibold active:scale-95 transition-transform"
-            style={{ background: 'linear-gradient(135deg, #F97316, #EA580C)' }}
+            style={{ background: 'linear-gradient(135deg, #F59E0B, #D97706)' }}
           >
             Try Again
           </button>
@@ -357,12 +357,12 @@ export function HubPageNew() {
               >
                 <Bell className="w-[18px] h-[18px]" style={{ color: '#78716C' }} />
                 {hasUnreadNotifications && (
-                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-orange-500 flex items-center justify-center px-1">
+                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-amber-500 flex items-center justify-center px-1">
                     <span className="text-[10px] font-bold text-white leading-none">{formatCount(unreadNotificationCount || 0)}</span>
                   </span>
                 )}
                 {unreadCount > 0 && (
-                  <span className="absolute -bottom-0.5 -right-0.5 min-w-[16px] h-[16px] rounded-full bg-emerald-500 border-2 border-white/60 flex items-center justify-center">
+                  <span className="absolute -bottom-0.5 -right-0.5 min-w-[16px] h-[16px] rounded-full bg-amber-500 border-2 border-white/60 flex items-center justify-center">
                     <span className="text-[9px] font-bold text-white leading-none">{formatCount(unreadCount)}</span>
                   </span>
                 )}
@@ -413,12 +413,12 @@ export function HubPageNew() {
                   <span className="text-base">💬</span>
                   <span className="text-[16px] font-semibold" style={{ color: '#1C1917' }}>Messages</span>
                   {unreadCount > 0 && (
-                    <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-emerald-500 flex items-center justify-center">
+                     <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-amber-500 flex items-center justify-center">
                       <span className="text-[10px] font-bold text-white">{unreadCount}</span>
                     </span>
                   )}
                 </div>
-                <span className="text-[13px] font-medium" style={{ color: '#EA580C' }}>
+                <span className="text-[13px] font-medium" style={{ color: '#D97706' }}>
                   See all →
                 </span>
               </button>
@@ -463,14 +463,14 @@ export function HubPageNew() {
                 <button
                   onClick={() => { haptic('light'); navigate('/messages?new=dm'); }}
                   className="flex-1 py-2.5 rounded-[10px] text-[12px] font-semibold active:scale-[0.97] transition-transform"
-                  style={{ background: 'rgba(249,115,22,0.05)', border: '1px solid rgba(249,115,22,0.08)', color: '#EA580C' }}
+                  style={{ background: 'rgba(217,119,6,0.06)', border: '1px solid rgba(217,119,6,0.12)', color: '#B45309' }}
                 >
                   New Chat
                 </button>
                 <button
                   onClick={() => { haptic('light'); navigate('/messages?new=group'); }}
                   className="flex-1 py-2.5 rounded-[10px] text-[12px] font-semibold active:scale-[0.97] transition-transform"
-                  style={{ background: 'rgba(249,115,22,0.05)', border: '1px solid rgba(249,115,22,0.08)', color: '#EA580C' }}
+                  style={{ background: 'rgba(217,119,6,0.06)', border: '1px solid rgba(217,119,6,0.12)', color: '#B45309' }}
                 >
                   New Group
                 </button>
@@ -521,7 +521,7 @@ export function HubPageNew() {
                     onClick={() => { haptic('light'); navigate('/profile'); }}
                     className="active:scale-95 transition-transform"
                   >
-                    <ChevronRight className="w-4 h-4" style={{ color: '#A8A29E' }} />
+                    <ChevronRight className="w-4 h-4" style={{ color: '#D97706' }} />
                   </button>
                 </div>
               </div>
@@ -537,7 +537,7 @@ export function HubPageNew() {
                       <span className="font-semibold">{progressData.next_milestone.remaining} more</span>
                       <span style={{ color: '#78716C' }}> to {progressData.next_milestone.tierName}</span>
                     </span>
-                    <span className="text-[12px] font-medium ml-auto" style={{ color: '#EA580C' }}>View Details</span>
+                    <span className="text-[12px] font-medium ml-auto" style={{ color: '#D97706' }}>View Details</span>
                   </button>
                 </div>
               )}
