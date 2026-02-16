@@ -249,7 +249,7 @@ function HistorySkeleton() {
               dragConstraints={{ top: 0, bottom: 0 }}
               dragElastic={{ top: 0, bottom: 0.5 }}
               onDragEnd={handleSheetDragEnd}
-              style={{ y: sheetY, backgroundColor: '#FFFBEB' }}
+              style={{ y: sheetY, backgroundColor: '#FFFBEB', backgroundImage: 'linear-gradient(to bottom, rgba(254,243,199,0.3) 0%, rgba(254,243,199,0.2) 45%, white 75%, white 100%)' }}
               className="fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl h-[75vh] flex flex-col"
               initial={sheetAnimProps.initial}
               animate={{ y: 0 }}
