@@ -128,11 +128,8 @@ export function PostSuccessScreen({
   }, [taggedCourse]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-      className="light fixed inset-0 z-[9999] flex flex-col items-center justify-center p-6 pt-safe pb-safe"
+    <div
+      className="light flex-1 flex flex-col items-center justify-center p-6 pt-safe pb-safe relative"
       style={{ background: 'linear-gradient(to bottom, rgba(254,243,199,0.3), white, white)' }}
     >
       {/* Decorative background glow — amber */}
@@ -142,6 +139,13 @@ export function PostSuccessScreen({
           background: 'radial-gradient(ellipse at 50% 40%, rgba(251, 191, 36, 0.08) 0%, transparent 60%)',
         }}
       />
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}
+        className="flex flex-col items-center justify-center w-full"
+      >
 
       {/* Media thumbnail with success badge */}
       {firstMediaUrl && (
@@ -336,7 +340,8 @@ export function PostSuccessScreen({
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 }
 
