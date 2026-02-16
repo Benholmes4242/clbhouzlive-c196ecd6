@@ -272,7 +272,7 @@ export function HubPageNew() {
   // ============ Loading ============
   if (isLoading) {
     return (
-      <div className="h-[100dvh] overflow-hidden relative">
+      <div className="min-h-[100dvh] relative">
         <CanonicalAmberBg />
         <div className="relative z-10 flex-1 flex flex-col px-5 font-dm-sans" style={{ paddingTop: 'max(var(--sat, env(safe-area-inset-top, 0px)), 47px)' }}>
           <Skeleton className="h-4 w-28 mb-2 bg-white/30" />
@@ -288,7 +288,7 @@ export function HubPageNew() {
   // ============ Error ============
   if (hasError && !sessionLoading) {
     return (
-      <div className="h-[100dvh] overflow-hidden relative">
+      <div className="min-h-[100dvh] relative">
         <CanonicalAmberBg />
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 h-full font-dm-sans">
           <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4 bg-white/40">
@@ -310,12 +310,12 @@ export function HubPageNew() {
 
   // ============ Main Render ============
   return (
-    <div className="h-[100dvh] overflow-hidden relative hub-warm-page font-dm-sans">
+    <div className="min-h-[100dvh] relative hub-warm-page font-dm-sans">
       <CanonicalAmberBg />
 
       {/* Content layer */}
       <div
-        className="relative z-10 flex flex-col h-full max-w-lg mx-auto w-full"
+        className="relative z-10 flex flex-col max-w-lg mx-auto w-full"
         style={{
           paddingTop: 'max(var(--sat, env(safe-area-inset-top, 0px)), 47px)',
           paddingBottom: 'calc(82px + env(safe-area-inset-bottom, 0px))',
@@ -396,7 +396,7 @@ export function HubPageNew() {
 
         {/* === Cards Container (flex-1 to fill remaining space) === */}
         <motion.div
-          className="flex-1 flex flex-col gap-3 px-5 min-h-0"
+          className="flex flex-col gap-3 px-5"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
