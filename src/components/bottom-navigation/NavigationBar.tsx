@@ -79,8 +79,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
               "relative flex flex-col items-center justify-center gap-1 flex-1 py-1.5 mx-0.5 rounded-xl",
               "active:scale-95",
               "focus:outline-none",
-              // Active background for light theme — amber tint only on Hub/warm pages
-              isLightTheme && isActive && useAmberActive && "bg-amber-100/60",
+              // Active background highlight removed — clean flat style everywhere
               // Active background for dark/clubhouse theme - enhanced
               isClubhouseTheme && isActive && "bg-[hsl(var(--clubhouse-active-bg))]",
               // Hover states
