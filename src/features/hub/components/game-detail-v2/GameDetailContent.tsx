@@ -298,7 +298,7 @@ export function GameDetailContent({
               <div 
                 className="p-4 rounded-2xl"
                 style={{
-                  background: 'linear-gradient(180deg, #FFFBEB 0%, #FEF3C7 100%)',
+                  background: 'linear-gradient(180deg, #FEFDFB 0%, rgba(254,243,199,0.15) 100%)',
                   boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.02)',
                   border: '1px solid rgba(251, 191, 36, 0.15)',
                 }}

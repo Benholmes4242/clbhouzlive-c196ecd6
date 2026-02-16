@@ -87,7 +87,7 @@ function DateSeparator({ date }: { date: string }) {
       <span 
         className="px-[14px] py-[8px] rounded-full text-[11px] font-medium"
         style={{
-          background: 'rgba(254,243,199,0.6)',
+          background: 'rgba(254,243,199,0.3)',
           border: '1px solid rgba(217,119,6,0.12)',
           color: '#B45309',
           fontFamily: "'DM Sans', sans-serif",
