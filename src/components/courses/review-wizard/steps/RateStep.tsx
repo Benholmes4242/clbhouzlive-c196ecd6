@@ -131,7 +131,7 @@ export function RateStep({
       exit={{ opacity: 0, x: -300 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       className="shrink-0 px-4 pt-6"
-      style={{ backgroundColor: '#FFFBEB' }}
+      style={{ background: 'linear-gradient(to bottom, rgba(254,243,199,0.4), #FFFBEB 30%)' }}
     >
       {/* Main Rating Section */}
       <div className="mb-10">
@@ -223,7 +223,7 @@ export function RateStep({
       </div>
 
       {/* Detail Ratings — wrapped in card */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+      <div className="bg-amber-50/50 rounded-2xl border border-amber-200/30 shadow-sm p-4">
         <h3 className="text-base font-semibold text-gray-800 mb-4">
           Rate each area
         </h3>
