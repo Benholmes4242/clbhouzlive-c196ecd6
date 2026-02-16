@@ -247,7 +247,7 @@ export function MediaStep({
       exit={{ opacity: 0, x: -300 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       className="flex flex-col h-full overflow-hidden relative"
-      style={{ backgroundColor: media.length > 0 ? '#FFF8E1' : undefined }}
+      style={{ background: 'linear-gradient(to bottom, rgba(254,243,199,0.4), white 85%)' }}
     >
       {fileInput}
       
