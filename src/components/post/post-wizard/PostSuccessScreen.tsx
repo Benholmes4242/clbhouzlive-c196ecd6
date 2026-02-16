@@ -159,8 +159,8 @@ export function PostSuccessScreen({
             <img
               src={firstMediaUrl}
               alt="Your post"
-              className="w-20 h-20 rounded-2xl object-cover shadow-lg"
-              style={{ boxShadow: '0 8px 32px -8px rgba(0,0,0,0.15)' }}
+              className="w-20 h-20 rounded-2xl object-cover shadow-lg border-2 border-amber-200/50"
+              style={{ boxShadow: '0 8px 32px -8px rgba(245,158,11,0.3)' }}
             />
             <div className="absolute inset-0 rounded-2xl" style={{
               background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%)',
@@ -264,7 +264,7 @@ export function PostSuccessScreen({
         {/* Secondary - Create Another */}
         <button
           onClick={onCreateAnother}
-          className="w-full h-12 rounded-xl bg-white text-gray-800 font-semibold text-[15px] flex items-center justify-center gap-2 border border-gray-200 shadow-sm active:scale-[0.97] transition-transform"
+          className="w-full h-12 rounded-xl bg-white/80 text-gray-800 font-semibold text-[15px] flex items-center justify-center gap-2 border border-amber-200/30 shadow-sm active:scale-[0.97] transition-transform"
         >
           <Plus className="h-4 w-4" />
           Create Another
