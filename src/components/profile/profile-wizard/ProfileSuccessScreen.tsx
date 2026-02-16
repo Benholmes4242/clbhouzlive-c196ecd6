@@ -24,7 +24,7 @@ export function ProfileSuccessScreen({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="fixed inset-0 z-[9999] flex flex-col items-center justify-center px-6 pt-safe pb-safe"
-      style={{ backgroundColor: '#FFFBEB', backgroundImage: 'linear-gradient(to bottom, rgba(254,243,199,0.3) 0%, rgba(254,243,199,0.2) 45%, white 75%, white 100%)' }}
+      style={{ backgroundColor: '#FFFBEB', backgroundImage: 'linear-gradient(to bottom, rgba(254,243,199,0.3), white, white)' }}
     >
       {/* Success icon */}
       <motion.div
