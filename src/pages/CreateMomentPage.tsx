@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { PostWizard } from '@/components/post/post-wizard';
 import { ReviewWizard } from '@/components/courses/review-wizard';
@@ -21,13 +21,22 @@ export default function CreateMomentPage() {
   // Force hide chrome (header, footer, HUD) while this page is open
   useChromeState({ forceHidden: true });
 
+  // Post Wizard open state (needed so we can close it without navigating during review handoff)
+  const [showPostWizard, setShowPostWizard] = useState(true);
+
   // Review Wizard bridge state
   const [reviewCourse, setReviewCourse] = useState<ReviewWizardCourse | null>(null);
   const [reviewMediaFiles, setReviewMediaFiles] = useState<File[]>([]);
   const [showReviewWizard, setShowReviewWizard] = useState(false);
+  const reviewHandoffInProgress = useRef(false);
 
   const handleClose = useCallback(() => {
-    // Navigate back to previous location or clubhouse
+    if (reviewHandoffInProgress.current) {
+      // Don't navigate — we're handing off to the Review Wizard
+      setShowPostWizard(false);
+      return;
+    }
+    // Normal close — navigate back
     const backgroundLocation = (location.state as any)?.backgroundLocation;
     if (backgroundLocation) {
       navigate(backgroundLocation.pathname + backgroundLocation.search, { replace: true });
@@ -38,6 +47,8 @@ export default function CreateMomentPage() {
 
   // Post-to-Review bridge: receive course + media from PostWizard success screen
   const handleRequestReview = useCallback((course: GolfCourse, mediaFiles: File[]) => {
+    reviewHandoffInProgress.current = true;
+
     const reviewCourseData: ReviewWizardCourse = {
       id: course.id,
       name: course.name,
@@ -58,14 +69,20 @@ export default function CreateMomentPage() {
     setShowReviewWizard(false);
     setReviewCourse(null);
     setReviewMediaFiles([]);
-    // Navigate away after review wizard closes
-    handleClose();
-  }, [handleClose]);
+    reviewHandoffInProgress.current = false;
+    // NOW navigate away
+    const backgroundLocation = (location.state as any)?.backgroundLocation;
+    if (backgroundLocation) {
+      navigate(backgroundLocation.pathname + backgroundLocation.search, { replace: true });
+    } else {
+      navigate('/clubhouse', { replace: true });
+    }
+  }, [location.state, navigate]);
 
   return (
     <AccessControl requireAuth={true}>
       <PostWizard
-        isOpen={true}
+        isOpen={showPostWizard}
         onClose={handleClose}
         initialMedia={mediaItems}
         initialCourses={selectedCourse ? [selectedCourse] : undefined}
