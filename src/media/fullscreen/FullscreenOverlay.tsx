@@ -8,7 +8,7 @@
  * points get working interactions without the caller needing to pass callbacks.
  */
 
-import React, { useCallback, useMemo, useEffect } from 'react';
+import React, { useCallback, useMemo, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useFullscreenViewerContext } from '../hooks/useFullscreenViewer';
 import { useNavigate } from 'react-router-dom';
@@ -19,7 +19,19 @@ import { useAudioFade } from '@/hooks/useAudioFade';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { useFollow } from '@/hooks/useFollow';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { toast } from 'sonner';
+import { Trash2, Flag } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 
 export interface FullscreenOverlayProps {
   showComments?: boolean;
@@ -49,9 +61,14 @@ export const FullscreenOverlay: React.FC<FullscreenOverlayProps> = ({
   const viewer = useFullscreenViewerContext();
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
+  const { deletePost } = usePostDeletion();
   
   const { fadeIn, fadeOut } = useAudioFade({ duration: 150, easing: 'easeOut' });
   const item = viewer.currentItem;
+
+  // ─── Delete confirmation state ───
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // ─── Live engagement hook ───
   const postId = item?.postId || item?.id || null;
@@ -135,8 +152,26 @@ export const FullscreenOverlay: React.FC<FullscreenOverlayProps> = ({
   }, [toggleFollow, parentOnFollow]);
 
   const handleMore = useCallback(() => {
-    toast('More options coming soon');
-  }, []);
+    if (isOwnPost) {
+      setShowDeleteConfirm(true);
+    } else {
+      toast('Report & moderation coming soon');
+    }
+  }, [isOwnPost]);
+
+  const handleConfirmDelete = useCallback(async () => {
+    if (isDeleting || !postId) return;
+    setIsDeleting(true);
+    try {
+      const result = await deletePost(postId);
+      if (result.success) {
+        setShowDeleteConfirm(false);
+        viewer.close();
+      }
+    } finally {
+      setIsDeleting(false);
+    }
+  }, [isDeleting, postId, deletePost, viewer]);
 
   // Navigate to creator profile
   const handleViewProfile = useCallback(() => {
@@ -235,6 +270,28 @@ export const FullscreenOverlay: React.FC<FullscreenOverlayProps> = ({
           />
         </div>
       )}
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent className="z-[10003] pointer-events-auto">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Post?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. Your post and all its media will be permanently deleted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmDelete}
+              disabled={isDeleting}
+            >
+              {isDeleting ? 'Deleting...' : 'Delete'}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
