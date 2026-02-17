@@ -274,9 +274,6 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
         aspectRatio: containerAspect,
         touchAction: 'pan-y',
         minHeight: '200px',
-        ...(isWizardContext ? { 
-          backgroundColor: '#FFFBEB',
-        } : {}),
       }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
