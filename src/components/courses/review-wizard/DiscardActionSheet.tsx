@@ -77,7 +77,7 @@ export function DiscardActionSheet({
             >
               <button
                 onClick={onKeepEditing}
-                className="w-full py-4 text-center text-amber-500 text-lg font-semibold active:bg-gray-100 transition-colors"
+                className="w-full py-4 text-center text-primary text-lg font-semibold active:bg-gray-100 transition-colors"
               >
                 Keep Editing
               </button>

@@ -111,8 +111,8 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size }: Segme
         )}
         {size === 'hero' && touched && (
           <span
-            className="block text-[11px] font-semibold uppercase tracking-wider mt-0.5"
-            style={{ color: '#92400E', whiteSpace: 'nowrap' }}
+            className="block text-[11px] font-semibold uppercase tracking-wider mt-0.5 text-muted-foreground"
+            style={{ whiteSpace: 'nowrap' }}
           >
             YOUR RATING
           </span>
@@ -129,10 +129,7 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size }: Segme
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
-              className="text-[13px] font-bold uppercase"
-              style={{
-                color: isOutstanding ? '#f59e0b' : '#D97706',
-              }}
+              className={`text-[13px] font-bold uppercase ${isOutstanding ? 'text-amber-500' : 'text-foreground/60'}`}
             >
               {tierData.label.toUpperCase()}
             </motion.span>
@@ -163,11 +160,10 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size }: Segme
         />
         {/* Track fill */}
         <div
-          className="absolute left-0"
+          className="absolute left-0 bg-primary"
           style={{
             height: trackHeight,
             borderRadius: trackHeight / 2,
-            background: 'linear-gradient(to right, #F59E0B, #D97706)',
             width: `${percent}%`,
             top: '50%',
             transform: 'translateY(-50%)',
@@ -176,13 +172,14 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size }: Segme
         />
         {/* Thumb */}
         <div
-          className="absolute"
+          className="absolute border-primary"
           style={{
             width: isDragging ? thumbActiveSize : thumbSize,
             height: isDragging ? thumbActiveSize : thumbSize,
             borderRadius: '50%',
             backgroundColor: 'white',
-            border: `${isDragging ? 3 : 2}px solid #D97706`,
+            borderWidth: isDragging ? 3 : 2,
+            borderStyle: 'solid',
             boxShadow: isDragging
               ? '0 2px 6px rgba(0,0,0,0.2)'
               : '0 1px 3px rgba(0,0,0,0.15)',
@@ -255,7 +252,7 @@ export function RateStep({
     >
       {/* Main Rating Section */}
       <div className="mb-6">
-        <h2 className="text-xl font-bold tracking-tight text-gray-900 mb-6 text-center">
+        <h2 className="text-xl font-bold tracking-tight text-foreground mb-6 text-center">
           Your overall rating
         </h2>
         
@@ -268,12 +265,12 @@ export function RateStep({
         />
       </div>
 
-      {/* Amber section divider */}
-      <div className="mx-0 h-px my-4" style={{ backgroundColor: '#FCD34D' }} />
+      {/* Section divider */}
+      <div className="mx-0 h-px my-4 bg-border" />
 
       {/* Sub-Category Ratings */}
       <div>
-        <h3 className="text-base font-semibold text-gray-800 mb-5">
+        <h3 className="text-base font-semibold text-foreground mb-5">
           Rate each area
         </h3>
         
@@ -285,7 +282,7 @@ export function RateStep({
             return (
               <React.Fragment key={key}>
                 {index > 0 && (
-                  <div className="h-px my-1" style={{ backgroundColor: 'rgba(252, 211, 77, 0.4)' }} />
+                  <div className="h-px my-1 bg-border/40" />
                 )}
                 <motion.div 
                   initial={{ opacity: 0, y: 8 }}
@@ -293,7 +290,7 @@ export function RateStep({
                   transition={{ delay: index * 0.06, duration: 0.25 }}
                   style={{ paddingTop: 12, paddingBottom: 12 }}
                 >
-                  <p className="text-[15px] font-bold text-gray-900 mb-0.5">{label}</p>
+                  <p className="text-[15px] font-bold text-foreground mb-0.5">{label}</p>
                   
                   <SegmentedSlider
                     value={score ?? 5}
@@ -303,7 +300,7 @@ export function RateStep({
                     size="compact"
                   />
                   
-                  <p className="text-[13px] text-gray-400 mt-0.5">{description}</p>
+                  <p className="text-[13px] text-muted-foreground mt-0.5">{description}</p>
                 </motion.div>
               </React.Fragment>
             );

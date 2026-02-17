@@ -254,10 +254,7 @@ export function MediaStep({
       {/* Course context bar — visual continuity from Steps 1-2 hero */}
       {course && (
         <motion.div 
-          className="shrink-0 flex items-center gap-3 px-4 py-2.5 border-b"
-          style={{ 
-            borderColor: 'rgba(251, 191, 36, 0.15)',
-          }}
+          className="shrink-0 flex items-center gap-3 px-4 py-2.5 border-b border-border/30"
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25 }}
@@ -317,15 +314,15 @@ export function MediaStep({
             )}
           </div>
           
-          {/* Bottom footer bar — counter + 3 buttons, matching Post Wizard */}
+          {/* Bottom footer bar */}
           <div 
-            className="flex-shrink-0 border-t border-amber-200/30 px-4 py-3"
+            className="flex-shrink-0 border-t border-border/30 px-4 py-3"
             style={{ 
               paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
             }}
           >
             {/* Counter — centered */}
-            <p className="text-sm text-amber-600 font-medium tabular-nums text-center mb-2">
+            <p className="text-sm text-muted-foreground font-medium tabular-nums text-center mb-2">
               {media.length}/{MAX_MEDIA_ITEMS}
             </p>
             
@@ -335,7 +332,7 @@ export function MediaStep({
               <button
                 onClick={handleGallery}
                 disabled={!canAddMore || isPickerOpen}
-                className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-amber-100/80 text-sm font-medium text-amber-700 active:bg-amber-200/80 transition-colors ${!canAddMore ? 'opacity-30 cursor-not-allowed' : ''}`}
+                className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-muted text-sm font-medium text-foreground active:bg-muted/80 transition-colors ${!canAddMore ? 'opacity-30 cursor-not-allowed' : ''}`}
               >
                 {isPickerOpen ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -351,12 +348,12 @@ export function MediaStep({
                   studioFirstRun.markSeen();
                   onOpenStudio();
                 }}
-                className="relative flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-amber-100/80 text-sm font-medium text-amber-700 active:bg-amber-200/80 transition-colors"
+                className="relative flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-muted text-sm font-medium text-foreground active:bg-muted/80 transition-colors"
               >
                 <Wand2 className="h-4 w-4" />
                 Studio
                 {!studioFirstRun.hasSeen && (
-                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-primary animate-pulse" />
                 )}
               </button>
               
@@ -366,12 +363,12 @@ export function MediaStep({
                   badgesFirstRun.markSeen();
                   onOpenBadges();
                 }}
-                className="relative flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-amber-100/80 text-sm font-medium text-amber-700 active:bg-amber-200/80 transition-colors"
+                className="relative flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-muted text-sm font-medium text-foreground active:bg-muted/80 transition-colors"
               >
                 <Award className="h-4 w-4" />
                 Badges
                 {!badgesFirstRun.hasSeen && (
-                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-primary animate-pulse" />
                 )}
               </button>
             </div>
@@ -402,39 +399,39 @@ export function MediaStep({
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
             >
-              {/* Amber-themed icon with ping */}
+              {/* Icon with ping */}
               <div className="relative mb-5">
                 <motion.div 
-                  className="h-20 w-20 bg-amber-100 flex items-center justify-center"
+                  className="h-20 w-20 bg-muted flex items-center justify-center"
                   style={{ borderRadius: '28%' }}
                 >
-                  <Camera className="h-9 w-9 text-amber-600" />
+                  <Camera className="h-9 w-9 text-muted-foreground" />
                 </motion.div>
                 {/* Ping animation */}
                 <div 
-                  className="absolute inset-0 bg-amber-50 animate-ping"
+                  className="absolute inset-0 bg-muted/50 animate-ping"
                   style={{ borderRadius: '28%', animationDuration: '3s' }}
                 />
               </div>
               
               {/* Text - visible hierarchy */}
-              <h3 className="text-xl font-bold tracking-tight text-gray-900 mb-1.5">
+              <h3 className="text-xl font-bold tracking-tight text-foreground mb-1.5">
                 Course Highlights
               </h3>
-              <p className="text-sm font-medium text-gray-500 text-center mb-1">
+              <p className="text-sm font-medium text-muted-foreground text-center mb-1">
                 Show off the course
               </p>
-              <p className="text-xs text-gray-400 text-center mb-6">
+              <p className="text-xs text-muted-foreground/70 text-center mb-6">
                 Up to {MAX_MEDIA_ITEMS} photos & videos
               </p>
               
-              {/* CTA cards — matching Post Wizard */}
+              {/* CTA buttons */}
               <div className="flex gap-3 mb-5 w-full">
                 <button
                   onClick={handleCamera}
                   disabled={isPickerOpen}
-                  className="flex-1 flex items-center justify-center gap-2 text-white font-medium active:scale-[0.97] transition-all duration-100 disabled:opacity-50"
-                  style={{ height: 56, borderRadius: 16, backgroundColor: '#F59E0B' }}
+                  className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground font-medium active:scale-[0.97] transition-all duration-100 disabled:opacity-50"
+                  style={{ height: 56, borderRadius: 16 }}
                 >
                   <Camera className="h-5 w-5" />
                   Camera
@@ -442,20 +439,20 @@ export function MediaStep({
                 <button
                   onClick={handleGallery}
                   disabled={isPickerOpen}
-                  className="flex-1 flex items-center justify-center gap-2 font-medium active:scale-[0.97] transition-all duration-100 disabled:opacity-50"
-                  style={{ height: 56, borderRadius: 16, border: '2px solid #FCD34D', backgroundColor: 'transparent', color: '#D97706' }}
+                  className="flex-1 flex items-center justify-center gap-2 font-medium text-foreground border-2 border-border active:scale-[0.97] transition-all duration-100 disabled:opacity-50"
+                  style={{ height: 56, borderRadius: 16 }}
                 >
                   <Images className="h-5 w-5" />
                   Gallery
                 </button>
               </div>
               
-              {/* Review-specific tip chips */}
+              {/* Tip chips */}
               <div className="flex flex-wrap justify-center gap-2 mb-4">
                 {TIP_CHIPS.map(chip => (
                   <span 
                     key={chip}
-                    className="text-[11px] bg-amber-50 text-amber-700 rounded-full px-3 py-1"
+                    className="text-[11px] bg-muted text-muted-foreground rounded-full px-3 py-1"
                   >
                     {chip}
                   </span>
@@ -463,7 +460,7 @@ export function MediaStep({
               </div>
               
               {/* Optional indicator */}
-              <p className="text-[11px] text-gray-400">
+              <p className="text-[11px] text-muted-foreground/70">
                 Optional — your ratings and review speak for themselves
               </p>
             </motion.div>
