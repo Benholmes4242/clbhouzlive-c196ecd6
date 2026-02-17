@@ -134,6 +134,8 @@ export const exploreFeedAdapter: FeedAdapter<ExploreContentItem> = {
     };
   },
 
+  getAchievementId: (item) => (item as any).achievement_id ?? null,
+
   getCategories: (item) => item.categories || [],
 
   getCreatedAt: (item) => item.createdAt,

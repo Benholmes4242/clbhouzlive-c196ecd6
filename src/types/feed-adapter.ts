@@ -136,6 +136,9 @@ export interface FeedAdapter<T> {
   getCategories?: (item: T) => string[];
   getCreatedAt?: (item: T) => string | Date | undefined;
   
+  // Optional: Achievement post detection
+  getAchievementId?: (item: T) => string | null | undefined;
+  
   // Optional: Type checking
   getType?: (item: T) => 'video' | 'image';
   getDuration?: (item: T) => number | undefined;

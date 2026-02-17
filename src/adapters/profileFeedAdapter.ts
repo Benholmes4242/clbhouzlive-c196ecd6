@@ -92,6 +92,8 @@ export const profileFeedAdapter: FeedAdapter<ActivityPost> = {
     };
   },
 
+  getAchievementId: (item) => item.achievement_id ?? null,
+
   getCategories: (item) => item.categories || [],
 
   getCreatedAt: (item) => item.created_at,
