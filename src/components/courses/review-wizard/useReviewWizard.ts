@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useReviewUpload } from '@/uploads/useReviewUpload';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { useOptimisticReviewUpdate } from '@/hooks/useOptimisticReviewUpdate';
 import type { 
   WizardState, 
   ReviewWizardCourse, 
@@ -117,6 +118,7 @@ export function useReviewWizard({
 }: UseReviewWizardOptions) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { optimisticDeleteReview, rollback: rollbackOptimistic, confirmUpdate } = useOptimisticReviewUpdate();
   
   // Use existing auth session hook
   const { user, loading: isLoadingUser } = useSupabaseSession();
@@ -675,30 +677,20 @@ export function useReviewWizard({
 
       return reviewId;
     },
-    onSuccess: () => {
-      // FIX #2: Use complete query keys for proper invalidation on delete
-      if (course?.id) {
-        // Reviews list
-        queryClient.invalidateQueries({ 
-          queryKey: ['course-reviews-full', course.id],
-          exact: false 
-        });
-        
-        // User's rating
-        if (currentUserId) {
-          queryClient.invalidateQueries({ 
-            queryKey: ['user-course-rating', course.id, currentUserId] 
-          });
-        }
-        
-        // Aggregates and distribution
-        queryClient.invalidateQueries({ queryKey: ['course-rating-aggregates', course.id] });
-        queryClient.invalidateQueries({ queryKey: ['course-rating-distribution', course.id] });
-        
-        // Media tab
-        queryClient.invalidateQueries({ queryKey: ['club-media', course.id] });
+    onMutate: async () => {
+      // Optimistically remove the review from all caches before the server call
+      if (course?.id && currentUserId) {
+        const snapshot = await optimisticDeleteReview(course.id, currentUserId);
+        return { snapshot };
       }
-      
+      return {};
+    },
+    onSuccess: () => {
+      // Confirm optimistic update with server truth
+      if (course?.id && currentUserId) {
+        confirmUpdate(course.id, currentUserId);
+      }
+
       // Global queries
       queryClient.invalidateQueries({ queryKey: ['course-ratings'] });
       queryClient.invalidateQueries({ queryKey: ['user-course-rating'] });
@@ -713,12 +705,19 @@ export function useReviewWizard({
       queryClient.invalidateQueries({ queryKey: ['clubhouse-posts'] });
       queryClient.invalidateQueries({ queryKey: ['explore-feed'] });
       queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
-      // Invalidate exploration stats for map updates
       queryClient.invalidateQueries({ queryKey: ['user-exploration-status'] });
       queryClient.invalidateQueries({ queryKey: ['exploration-leaderboard'] });
+      // Profile page queries (previously missing)
+      queryClient.invalidateQueries({ queryKey: ['user-course-ratings-breakdown'] });
+      queryClient.invalidateQueries({ queryKey: ['user-played-courses-full'] });
+      queryClient.invalidateQueries({ queryKey: ['user-course-activity'] });
     },
-    onError: (error) => {
+    onError: (error, _variables, context) => {
       console.error('[ReviewWizard] Delete error:', error);
+      // Rollback optimistic update
+      if (context?.snapshot && course?.id && currentUserId) {
+        rollbackOptimistic(course.id, currentUserId, context.snapshot);
+      }
       toast({
         title: 'Error',
         description: 'Failed to remove your review. Please try again.',
