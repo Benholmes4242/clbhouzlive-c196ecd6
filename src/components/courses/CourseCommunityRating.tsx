@@ -1,5 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { courseDetailTokens } from '@/styles/course-detail-tokens';
+import { getTierKeyFromScore } from '@/hooks/useTierStyles';
 
 interface CourseCommunityRatingProps {
   rating: number;
@@ -8,12 +10,8 @@ interface CourseCommunityRatingProps {
 }
 
 /**
- * Displays the community rating score.
+ * Displays the community rating score with tier-aware coloring.
  * This is the SINGLE source of truth for rating display in course cards.
- * 
- * Rating tier colors:
- * - Outstanding (9.0+): amber-500 (brand accent)
- * - Standard (< 9.0): foreground (neutral)
  */
 export const CourseCommunityRating: React.FC<CourseCommunityRatingProps> = ({
   rating,
@@ -26,15 +24,15 @@ export const CourseCommunityRating: React.FC<CourseCommunityRatingProps> = ({
     lg: 'text-base',
   }[size];
 
-  const isOutstanding = rating >= 9.0;
+  const tierKey = getTierKeyFromScore(rating);
+  const tier = courseDetailTokens.tiers[tierKey];
 
   return (
     <div className={`flex items-center flex-shrink-0 ${className}`}>
-      <span className={cn(
-        textClasses,
-        'font-semibold tabular-nums',
-        isOutstanding ? 'text-amber-500' : 'text-foreground'
-      )}>
+      <span
+        className={cn(textClasses, 'font-semibold tabular-nums')}
+        style={{ color: tier.numberColor }}
+      >
         {rating.toFixed(1)}
       </span>
     </div>

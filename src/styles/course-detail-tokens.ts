@@ -2,67 +2,102 @@
  * Course Detail Page Design Tokens
  * Premium, world-class golf course profile styling
  * 
- * NEW COLOR SYSTEM (Jan 2026): Gray for Fair→Excellent, Amber/Orange gradient for Outstanding
+ * COLOR SYSTEM (Feb 2026): Warm color progression from cool gray to full amber
+ * Fair → Good → Very Good → Excellent → Outstanding
  */
 
 export const courseDetailTokens = {
-  // Rating tier colors - AMBER/ORANGE RESERVED FOR OUTSTANDING (9+) ONLY
-  // All other tiers use GRAY for a clean, neutral feel
+  // Rating tier colors - warm progression from gray to amber
   tiers: {
     outstanding: {
       bg: 'bg-[#f59e0b]/10',
       border: 'border-[#f59e0b]/30',
       text: 'text-[#d97706]',
       fill: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
-      badge: 'bg-[#f59e0b] text-white',
-      activeBg: 'bg-[#f59e0b]',
+      badge: 'bg-[#d97706] text-white',
+      activeBg: 'bg-[#d97706]',
       activeText: 'text-white',
       chipBg: 'bg-[#f59e0b]/10',
       chipText: 'text-[#d97706]',
+      numberColor: '#D97706',
+      labelColor: '#D97706',
+      sliderFrom: '#F59E0B',
+      sliderTo: '#D97706',
+      barFrom: '#F59E0B',
+      barTo: '#FBBF24',
+      circleFill: '#D97706',
     },
     excellent: {
-      bg: 'bg-[#9ca3af]/5',
-      border: 'border-[#9ca3af]/20',
-      text: 'text-[#6b7280]',
-      fill: 'bg-[#d1d5db]',
-      badge: 'bg-[#9ca3af] text-white',
-      activeBg: 'bg-[#9ca3af]',
+      bg: 'bg-[#B45309]/10',
+      border: 'border-[#B45309]/30',
+      text: 'text-[#B45309]',
+      fill: 'bg-gradient-to-r from-[#D97706] to-[#F59E0B]',
+      badge: 'bg-[#B45309] text-white',
+      activeBg: 'bg-[#B45309]',
       activeText: 'text-white',
-      chipBg: 'bg-[#9ca3af]/5',
-      chipText: 'text-[#6b7280]',
+      chipBg: 'bg-[#B45309]/10',
+      chipText: 'text-[#B45309]',
+      numberColor: '#B45309',
+      labelColor: '#B45309',
+      sliderFrom: '#FBBF24',
+      sliderTo: '#F59E0B',
+      barFrom: '#D97706',
+      barTo: '#F59E0B',
+      circleFill: '#B45309',
     },
     veryGood: {
-      bg: 'bg-[#9ca3af]/5',
-      border: 'border-[#9ca3af]/20',
-      text: 'text-[#6b7280]',
-      fill: 'bg-[#d1d5db]',
-      badge: 'bg-[#9ca3af] text-white',
-      activeBg: 'bg-[#9ca3af]',
+      bg: 'bg-[#92400E]/10',
+      border: 'border-[#92400E]/30',
+      text: 'text-[#92400E]',
+      fill: 'bg-gradient-to-r from-[#FBBF24] to-[#D97706]',
+      badge: 'bg-[#92400E] text-white',
+      activeBg: 'bg-[#92400E]',
       activeText: 'text-white',
-      chipBg: 'bg-[#9ca3af]/5',
-      chipText: 'text-[#6b7280]',
+      chipBg: 'bg-[#92400E]/10',
+      chipText: 'text-[#92400E]',
+      numberColor: '#92400E',
+      labelColor: '#92400E',
+      sliderFrom: '#FCD34D',
+      sliderTo: '#FBBF24',
+      barFrom: '#B45309',
+      barTo: '#D97706',
+      circleFill: '#92400E',
     },
     good: {
-      bg: 'bg-[#9ca3af]/5',
-      border: 'border-[#9ca3af]/20',
-      text: 'text-[#6b7280]',
-      fill: 'bg-[#d1d5db]',
-      badge: 'bg-[#9ca3af] text-white',
-      activeBg: 'bg-[#9ca3af]',
+      bg: 'bg-[#78716C]/10',
+      border: 'border-[#78716C]/20',
+      text: 'text-[#78716C]',
+      fill: 'bg-gradient-to-r from-[#78716C] to-[#A8A29E]',
+      badge: 'bg-[#78716C] text-white',
+      activeBg: 'bg-[#78716C]',
       activeText: 'text-white',
-      chipBg: 'bg-[#9ca3af]/5',
-      chipText: 'text-[#6b7280]',
+      chipBg: 'bg-[#78716C]/10',
+      chipText: 'text-[#78716C]',
+      numberColor: '#78716C',
+      labelColor: '#78716C',
+      sliderFrom: '#D6D3D1',
+      sliderTo: '#A8A29E',
+      barFrom: '#78716C',
+      barTo: '#A8A29E',
+      circleFill: '#78716C',
     },
     fair: {
-      bg: 'bg-[#9ca3af]/5',
-      border: 'border-[#9ca3af]/20',
-      text: 'text-[#6b7280]',
-      fill: 'bg-[#d1d5db]',
-      badge: 'bg-[#9ca3af] text-white',
-      activeBg: 'bg-[#9ca3af]',
+      bg: 'bg-[#9CA3AF]/5',
+      border: 'border-[#9CA3AF]/20',
+      text: 'text-[#9CA3AF]',
+      fill: 'bg-gradient-to-r from-[#9CA3AF] to-[#D1D5DB]',
+      badge: 'bg-[#9CA3AF] text-white',
+      activeBg: 'bg-[#9CA3AF]',
       activeText: 'text-white',
-      chipBg: 'bg-[#9ca3af]/5',
-      chipText: 'text-[#6b7280]',
+      chipBg: 'bg-[#9CA3AF]/5',
+      chipText: 'text-[#9CA3AF]',
+      numberColor: '#9CA3AF',
+      labelColor: '#9CA3AF',
+      sliderFrom: '#E5E7EB',
+      sliderTo: '#D1D5DB',
+      barFrom: '#9CA3AF',
+      barTo: '#D1D5DB',
+      circleFill: '#9CA3AF',
     },
   },
 
@@ -99,23 +134,23 @@ export const courseDetailTokens = {
     chipActive: 'ring-2 ring-offset-2',
   },
 
-  // Score ring gradient colors - AMBER FOR OUTSTANDING ONLY, Gray for rest
+  // Score ring gradient colors - per tier
   scoreRing: {
-    outstanding: { from: '#f59e0b', to: '#fbbf24' }, // Amber gradient
-    excellent: { from: '#d1d5db', to: '#d1d5db' },   // Gray-300
-    veryGood: { from: '#d1d5db', to: '#d1d5db' },    // Gray-300
-    good: { from: '#d1d5db', to: '#d1d5db' },        // Gray-300
-    fair: { from: '#d1d5db', to: '#d1d5db' },        // Gray-300
+    outstanding: { from: '#F59E0B', to: '#FBBF24' },
+    excellent: { from: '#D97706', to: '#F59E0B' },
+    veryGood: { from: '#B45309', to: '#D97706' },
+    good: { from: '#78716C', to: '#A8A29E' },
+    fair: { from: '#9CA3AF', to: '#D1D5DB' },
   },
 } as const;
 
-// Tier gradient mapping for distribution bars - AMBER FOR OUTSTANDING ONLY, Gray for rest
+// Tier gradient mapping for distribution bars - warm progression
 export const tierGradients: Record<string, string> = {
-  Outstanding: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
-  Excellent: 'bg-[#d1d5db]',
-  'Very Good': 'bg-[#d1d5db]',
-  Good: 'bg-[#d1d5db]',
-  Fair: 'bg-[#d1d5db]',
+  Outstanding: 'bg-gradient-to-r from-[#F59E0B] to-[#FBBF24]',
+  Excellent: 'bg-gradient-to-r from-[#D97706] to-[#F59E0B]',
+  'Very Good': 'bg-gradient-to-r from-[#B45309] to-[#D97706]',
+  Good: 'bg-gradient-to-r from-[#78716C] to-[#A8A29E]',
+  Fair: 'bg-gradient-to-r from-[#9CA3AF] to-[#D1D5DB]',
 };
 
 export type TierKey = keyof typeof courseDetailTokens.tiers;
