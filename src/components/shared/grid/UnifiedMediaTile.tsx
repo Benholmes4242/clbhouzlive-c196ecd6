@@ -9,7 +9,7 @@
 import React, { useCallback, useRef, useEffect, useState, memo, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { UnifiedMediaItem, UnifiedGridConfig, GridSurface } from './types';
-import { OverlayCorners, ReviewTileOverlay } from '@/components/shared/overlay';
+import { OverlayCorners } from '@/components/shared/overlay';
 import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
 import type { MediaSurface } from '@/media/runtime/MediaRuntime';
 import { Images, Trophy, Loader2 } from 'lucide-react';
@@ -113,16 +113,6 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
     return uid || item.postId;
   }, [item.playbackUrl, item.url, item.postId]);
 
-  // Memoize user info for ReviewTileOverlay to prevent inline object re-creation
-  const reviewUserInfo = useMemo(() => {
-    if (!item.creator) return undefined;
-    return {
-      id: item.creator.id,
-      name: item.creator.name,
-      username: item.creator.username,
-      avatar: item.creator.avatar,
-    };
-  }, [item.creator?.id, item.creator?.name, item.creator?.username, item.creator?.avatar]);
 
   // Log mount/unmount - with audit timeline
   useEffect(() => {
@@ -348,7 +338,7 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
       <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
       {/* Course name as text for profile surfaces (Watch tab standard) */}
-      {isProfileSurface && item.courseName && !item.isReview && (
+      {isProfileSurface && item.courseName && (
         <div className="absolute bottom-2 left-2 right-2 z-10">
           <p className="text-white/60 text-[10px] leading-tight truncate">
             {item.courseName}
@@ -358,34 +348,23 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
 
       {/* DEBUG: Log review fields - disabled after debugging */}
 
-      {/* Review overlay for review posts - takes priority over standard overlay */}
-      {item.isReview && item.courseName && typeof item.reviewRating === 'number' ? (
-        <ReviewTileOverlay
-          courseName={item.courseName}
-          courseLocation={item.courseLocation}
-          rating={item.reviewRating}
-          courseId={item.golfCourseId}
-          user={reviewUserInfo}
-        />
-      ) : (
-        /* Unified overlay system for non-review posts */
-        <OverlayCorners
-          surface="tile"
-          variant={variant}
-          club={clubData}
-          durationSeconds={isVideo ? resolvedDurationSeconds : undefined}
-          durationPlacement="top-left"
-          creatorName={item.creator?.name}
-          creatorAvatar={item.creator?.avatar}
-          likes={item.likes}
-          showCreator={config.showCreator}
-          showLikes={config.showLikes}
-          showAvatar={config.showCreator}
-          onCreatorClick={handleAuthorClick}
-          topLeftOverride={topLeftOverride}
-          hideRankingIfOverride={true}
-        />
-      )}
+      {/* Unified overlay system for all posts (including reviews) */}
+      <OverlayCorners
+        surface="tile"
+        variant={variant}
+        club={clubData}
+        durationSeconds={isVideo ? resolvedDurationSeconds : undefined}
+        durationPlacement="top-left"
+        creatorName={item.creator?.name}
+        creatorAvatar={item.creator?.avatar}
+        likes={item.likes}
+        showCreator={config.showCreator}
+        showLikes={config.showLikes}
+        showAvatar={config.showCreator}
+        onCreatorClick={handleAuthorClick}
+        topLeftOverride={topLeftOverride}
+        hideRankingIfOverride={true}
+      />
 
       {/* Options menu for own posts - top right */}
       {isOwnPost && onDelete && (
