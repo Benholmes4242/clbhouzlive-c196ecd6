@@ -433,8 +433,8 @@ export function MediaStep({
                 <button
                   onClick={handleCamera}
                   disabled={isPickerOpen}
-                  className="flex-1 py-5 rounded-2xl text-white font-medium shadow-sm active:scale-[0.97] transition-all duration-100 flex items-center justify-center gap-2 disabled:opacity-50"
-                  style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)' }}
+                  className="flex-1 flex items-center justify-center gap-2 text-white font-medium active:scale-[0.97] transition-all duration-100 disabled:opacity-50"
+                  style={{ height: 56, borderRadius: 16, backgroundColor: '#F59E0B' }}
                 >
                   <Camera className="h-5 w-5" />
                   Camera
@@ -442,7 +442,8 @@ export function MediaStep({
                 <button
                   onClick={handleGallery}
                   disabled={isPickerOpen}
-                  className="flex-1 py-5 rounded-2xl bg-white border border-gray-200 text-gray-700 font-medium shadow-sm active:scale-[0.97] transition-all duration-100 flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="flex-1 flex items-center justify-center gap-2 font-medium active:scale-[0.97] transition-all duration-100 disabled:opacity-50"
+                  style={{ height: 56, borderRadius: 16, border: '2px solid #FCD34D', backgroundColor: 'transparent', color: '#D97706' }}
                 >
                   <Images className="h-5 w-5" />
                   Gallery
