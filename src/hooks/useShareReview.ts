@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useQueryClient } from '@tanstack/react-query';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 interface ReviewMedia {
@@ -28,6 +29,7 @@ interface ShareReviewResult {
 export function useShareReview() {
   const [isSharing, setIsSharing] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const shareReview = async ({
     ratingId,
@@ -122,7 +124,26 @@ export function useShareReview() {
         }
       }
 
-      // 5) Analytics
+      // 5) Invalidate all post-related query keys so feeds refresh immediately
+      queryClient.invalidateQueries({ queryKey: ['trending-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['infinite-followed-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['actor-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['activity-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['userPosts'] });
+      queryClient.invalidateQueries({ queryKey: ['followedUsersPosts'] });
+      queryClient.invalidateQueries({ queryKey: ['explore-content'] });
+      queryClient.invalidateQueries({ queryKey: ['profile-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['pinned-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['featured-post'] });
+      queryClient.invalidateQueries({ queryKey: ['creator-features'] });
+      queryClient.invalidateQueries({ queryKey: ['clubhouse-shorts'] });
+      queryClient.invalidateQueries({ queryKey: ['friends-shorts'] });
+
+      // 6) Dispatch window events so any listening components refresh
+      window.dispatchEvent(new CustomEvent('refreshFeed'));
+      window.dispatchEvent(new CustomEvent('postCreated'));
+
+      // 7) Analytics
       analyticsEvents.track('ratings.review_shared', {
         courseId,
         ratingId,

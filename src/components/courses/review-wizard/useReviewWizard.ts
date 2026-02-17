@@ -313,6 +313,11 @@ export function useReviewWizard({
       }
       queryClient.invalidateQueries({ queryKey: ['review-media'] });
 
+      // Profile Courses tab — immediate refresh for own reviews
+      queryClient.invalidateQueries({ queryKey: ['user-course-activity'] });
+      queryClient.invalidateQueries({ queryKey: ['user-course-ratings-breakdown'] });
+      queryClient.invalidateQueries({ queryKey: ['user-played-courses-full'] });
+
       // For edit mode, go directly to success
       // For new reviews, go to preview step first
       if (isEditMode) {
