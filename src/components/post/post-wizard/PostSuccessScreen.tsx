@@ -8,6 +8,7 @@ import type { GolfCourse } from '@/components/post/create-moment/types';
 import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
+import { getScoreTier } from '@/utils/getScoreTier';
 
 interface PostSuccessScreenProps {
   isScheduled?: boolean;
@@ -39,6 +40,7 @@ export function PostSuccessScreen({
   const { user } = useSupabaseSession();
   const [dismissed, setDismissed] = useState(false);
   const [courseThumbnail, setCourseThumbnail] = useState<string | null>(null);
+  const [communityRating, setCommunityRating] = useState<number | null>(null);
 
   // Check if user already reviewed this course
   const { data: existingRating, isError: ratingCheckError } = useUserCourseRating(
@@ -46,7 +48,7 @@ export function PostSuccessScreen({
     user?.id
   );
 
-  // Fetch course thumbnail
+  // Fetch course thumbnail and community rating
   useEffect(() => {
     if (!taggedCourse?.id) return;
     supabase
@@ -56,6 +58,15 @@ export function PostSuccessScreen({
       .single()
       .then(({ data }) => {
         if (data?.thumbnail_image) setCourseThumbnail(data.thumbnail_image);
+      });
+    // Fetch community average rating
+    supabase
+      .from('course_rating_aggregates')
+      .select('avg_overall_score')
+      .eq('course_id', taggedCourse.id)
+      .single()
+      .then(({ data }) => {
+        if (data?.avg_overall_score) setCommunityRating(data.avg_overall_score);
       });
   }, [taggedCourse?.id]);
 
@@ -115,17 +126,12 @@ export function PostSuccessScreen({
 
   const handleLeaveReviewTap = useCallback(() => {
     if (!taggedCourse) return;
-    // Set localStorage so we don't show again
     localStorage.setItem(`clbhouz:reviewPromptDismissed:${taggedCourse.id}`, 'true');
     onLeaveReview?.(taggedCourse);
   }, [taggedCourse, onLeaveReview]);
 
-  const handleDismissReviewPrompt = useCallback(() => {
-    if (taggedCourse) {
-      localStorage.setItem(`clbhouz:reviewPromptDismissed:${taggedCourse.id}`, 'true');
-    }
-    setDismissed(true);
-  }, [taggedCourse]);
+  // Community rating tier
+  const ratingTier = communityRating ? getScoreTier(communityRating) : null;
 
   return (
     <div
@@ -244,7 +250,7 @@ export function PostSuccessScreen({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.55 }}
-        className="flex flex-col gap-3 w-full max-w-[280px] z-10"
+        className="flex flex-col w-full max-w-[280px] z-10"
       >
         {/* Primary - View Post — amber gradient */}
         {onViewPost && !isScheduled && (
@@ -261,10 +267,71 @@ export function PostSuccessScreen({
           </button>
         )}
 
+        {/* Rate Course Card — bold amber gradient prompt */}
+        {showReviewPrompt && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.3 }}
+            className="mt-3"
+          >
+            <button
+              onClick={handleLeaveReviewTap}
+              className="w-full rounded-2xl px-5 py-4 text-left active:scale-[0.98] transition-transform overflow-hidden"
+              style={{
+                background: 'linear-gradient(to right, #F59E0B, #FBBF24)',
+                boxShadow: '0 10px 25px -5px rgba(245, 158, 11, 0.20)',
+              }}
+            >
+              <div className="flex items-center gap-3.5">
+                {/* Course thumbnail */}
+                <div className="w-14 h-14 rounded-xl flex-shrink-0 overflow-hidden ring-2 ring-white/30">
+                  {courseThumbnail ? (
+                    <img
+                      src={courseThumbnail}
+                      className="w-14 h-14 rounded-xl object-cover"
+                      alt=""
+                    />
+                  ) : (
+                    <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
+                      <Flag className="w-6 h-6 text-white/80" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Text stack */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-base font-bold text-white leading-snug">
+                    Rate {taggedCourse!.name}
+                  </p>
+                  {communityRating && ratingTier ? (
+                    <>
+                      <p className="text-sm font-semibold text-white/90 mt-0.5">
+                        Rated {communityRating.toFixed(1)} · {ratingTier.label.toUpperCase()} by the community
+                      </p>
+                      <p className="text-xs text-white/60 mt-0.5">Share your verdict</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm font-semibold text-white/90 mt-0.5">
+                        Be the first to rate this course
+                      </p>
+                      <p className="text-xs text-white/60 mt-0.5">Help fellow golfers discover it</p>
+                    </>
+                  )}
+                </div>
+
+                {/* Chevron */}
+                <ChevronRight className="w-5 h-5 text-white/80 flex-shrink-0" />
+              </div>
+            </button>
+          </motion.div>
+        )}
+
         {/* Secondary - Create Another */}
         <button
           onClick={onCreateAnother}
-          className="w-full h-12 rounded-xl bg-white/80 text-gray-800 font-semibold text-[15px] flex items-center justify-center gap-2 border border-amber-200/30 shadow-sm active:scale-[0.97] transition-transform"
+          className="w-full h-12 rounded-xl bg-white/80 text-gray-800 font-semibold text-[15px] flex items-center justify-center gap-2 border border-amber-200/30 shadow-sm active:scale-[0.97] transition-transform mt-3"
         >
           <Plus className="h-4 w-4" />
           Create Another
@@ -273,73 +340,11 @@ export function PostSuccessScreen({
         {/* Tertiary - Done */}
         <button
           onClick={onDone}
-          className="w-full h-12 rounded-xl text-gray-500 font-medium text-[15px] active:bg-gray-100 transition-colors"
+          className="w-full h-12 rounded-xl text-gray-500 font-medium text-[15px] active:bg-gray-100 transition-colors mt-3"
         >
           Done
         </button>
       </motion.div>
-
-      {/* Review Prompt Card — appears after delay */}
-      <AnimatePresence>
-        {showReviewPrompt && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ delay: 0.8, type: 'spring', stiffness: 200, damping: 20 }}
-            className="w-full max-w-[280px] mt-6 z-10"
-          >
-            {/* Subtle divider */}
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex-1 h-px bg-amber-200/40" />
-              <span className="text-[10px] font-medium text-amber-400 uppercase tracking-wider">
-                One more thing
-              </span>
-              <div className="flex-1 h-px bg-amber-200/40" />
-            </div>
-
-            {/* Review prompt card */}
-            <button
-              onClick={handleLeaveReviewTap}
-              className="w-full p-4 rounded-2xl bg-amber-50/80 border border-amber-200/50 text-left active:scale-[0.98] transition-transform"
-            >
-              <div className="flex items-start gap-3">
-                {/* Course thumbnail or flag icon */}
-                <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                  {courseThumbnail ? (
-                    <img 
-                      src={courseThumbnail} 
-                      className="w-10 h-10 rounded-xl object-cover" 
-                      alt=""
-                    />
-                  ) : (
-                    <Flag className="w-5 h-5 text-amber-600" />
-                  )}
-                </div>
-                
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 truncate">
-                    Rate {taggedCourse.name}?
-                  </p>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    Help other golfers discover this course
-                  </p>
-                </div>
-
-                <ChevronRight className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
-              </div>
-            </button>
-
-            {/* Dismiss link */}
-            <button
-              onClick={handleDismissReviewPrompt}
-              className="w-full text-center mt-2 text-xs text-gray-400 py-1"
-            >
-              Not now
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
       </motion.div>
     </div>
   );
