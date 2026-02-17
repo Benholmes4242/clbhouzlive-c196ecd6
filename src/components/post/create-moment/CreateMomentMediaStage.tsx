@@ -164,7 +164,7 @@ export default function CreateMomentMediaStage({
       data-ecm-no-dismiss="true"
     >
       {/* Main carousel area - flex-1 min-h-0 to constrain within available space */}
-      <div ref={stageContainerRef} className="flex-1 min-h-0 relative overflow-hidden" style={{ background: 'transparent' }} data-ecm-no-dismiss="true">
+      <div ref={stageContainerRef} className="flex-1 min-h-0 relative" style={{ background: 'transparent', overflow: displayMode === 'fit' ? 'visible' : 'hidden' }} data-ecm-no-dismiss="true">
         {/* Media container wrapper for drag calculations */}
         <div ref={mediaContainerRef} className="relative h-full w-full flex items-center justify-center" style={{ background: 'transparent' }}>
             <MediaCarousel
