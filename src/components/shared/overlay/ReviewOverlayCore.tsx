@@ -139,7 +139,7 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
           <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/30 via-black/15 to-transparent" />
           
           {/* TOP PANEL - Scaled for ~195px grid tiles */}
-          <TappableWrapper className="absolute top-2 left-2 right-2 z-10">
+          <TappableWrapper className="absolute top-2 left-2 right-10 z-10">
             <div
               className={cn(
                 "rounded-lg border",
@@ -176,7 +176,7 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
                     {formattedRating}
                   </span>
                   <span 
-                    className="text-[8px] font-medium tracking-wider"
+                    className="text-[8px] font-medium tracking-wider truncate max-w-[48px]"
                     style={{ color: isOutstanding ? 'rgba(245, 158, 11, 0.6)' : 'rgba(196, 200, 206, 0.6)' }}
                   >
                     {theme.label}
