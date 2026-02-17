@@ -271,12 +271,13 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
         className
       )}
       style={{ 
-        // Use aspect ratio only as fallback when not in flex container
         aspectRatio: containerAspect,
         touchAction: 'pan-y',
         minHeight: '200px',
-        // DEBUG: make it bright green to confirm this IS the problematic area
-        ...(isWizardContext ? { backgroundColor: 'lime' } : {}),
+        ...(isWizardContext ? { 
+          backgroundColor: '#FFFBEB',
+          backgroundImage: 'linear-gradient(to bottom, rgba(254,243,199,0.3), white, white)',
+        } : {}),
       }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
