@@ -27,6 +27,7 @@ export interface ActivityPost {
   badges?: string[] | null;
   categories?: string[] | null;
   source_review_id?: string | null;
+  achievement_id?: string | null;
   isReview?: boolean;
   rating?: number;
   course?: {

@@ -190,6 +190,9 @@ export function activityPostToUnified(post: ActivityPost, overallIndex: number):
     // Achievement badges
     badges: post.badges,
     
+    // Achievement post flag
+    achievementId: post.achievement_id ?? null,
+    
     // Review post data for overlay display
     isReview: post.isReview ?? false,
     reviewRating: post.rating,

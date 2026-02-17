@@ -159,7 +159,7 @@ export function useCommunityFeed({
       let query = supabase
         .from('posts')
         .select(`
-          id, content, created_at, user_id, badges, categories, actor_type, actor_id, source_review_id, course_id, visibility,
+          id, content, created_at, user_id, badges, categories, actor_type, actor_id, source_review_id, achievement_id, course_id, visibility,
           post_media (id, media_type, media_url, duration_seconds, width, height, display_order),
           post_likes (count),
           post_comments!post_comments_post_id_fkey (count),
@@ -356,6 +356,7 @@ export function useCommunityFeed({
             commentCount,
             badges: post.badges || [],
             categories: post.categories || [], // Include categories for client-side filtering
+            achievementId: (post as any).achievement_id ?? null,
             // Include full media array for carousel
             media: mediaArray,
             // Review fields

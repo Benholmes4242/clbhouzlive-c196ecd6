@@ -246,7 +246,7 @@ export function PostWizardHeader({
             {isSubmitting ? (
               <span className="flex items-center gap-1.5">
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                {hasSchedule ? 'Scheduling…' : 'Posting…'}
+                {isEditMode ? 'Saving…' : hasSchedule ? 'Scheduling…' : 'Posting…'}
               </span>
             ) : (
               <span className="flex items-center gap-1.5">

@@ -379,8 +379,8 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
         hideRankingIfOverride={true}
       />
 
-      {/* Options menu for own posts - top right */}
-      {isOwnPost && (onEdit || onDelete) && (
+      {/* Options menu for own posts - top right (not for achievement posts) */}
+      {isOwnPost && !item.achievementId && (onEdit || onDelete) && (
         <TileOptionsMenu 
           onEdit={onEdit ? () => onEdit(item.postId) : undefined}
           onDelete={onDelete ? () => onDelete(item.postId) : undefined}

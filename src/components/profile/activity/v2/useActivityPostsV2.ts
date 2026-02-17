@@ -49,6 +49,7 @@ export function useActivityPostsV2(actorId?: string) {
           badges,
           categories,
           source_review_id,
+          achievement_id,
           post_media (
             id,
             media_type,
@@ -156,6 +157,7 @@ export function useActivityPostsV2(actorId?: string) {
             badges: post.badges || [],
             categories: post.categories || [],
             source_review_id: post.source_review_id || null,
+            achievement_id: post.achievement_id || null,
             isReview,
             rating,
             course: course

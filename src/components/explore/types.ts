@@ -90,6 +90,7 @@ export interface ExploreContentItem {
   height?: number; // Encoded media height
   categories?: string[]; // Category IDs from Create Moment (e.g., 'funny', 'tips-coaching')
   badges?: string[]; // Achievement badges (e.g., 'birdie', 'eagle', 'hio')
+  achievementId?: string | null; // Non-null = achievement post (not editable)
   
   // Review post fields
   isReview?: boolean; // True if this is a shared review post

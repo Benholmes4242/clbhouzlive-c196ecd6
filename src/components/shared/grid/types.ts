@@ -99,6 +99,9 @@ export interface UnifiedMediaItem {
   // Achievement badges
   badges?: string[] | null;
   
+  // Achievement post flag (non-editable posts)
+  achievementId?: string | null;
+  
   // Review post data (for overlay display)
   isReview?: boolean;
   reviewRating?: number;

@@ -2,6 +2,7 @@
 // Multi-step post creation wizard following Review Wizard pattern
 
 import React, { useEffect, useCallback, useState, useMemo } from 'react';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -19,6 +20,7 @@ import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { enqueuePostUploadWithResilience } from '@/hooks/usePostUploadResilience';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
+import { postKeys } from '@/queryKeys/posts';
 import { toast } from 'sonner';
 import { StudioTool, StudioEdits } from '@/types/studio';
 import type { DraftWithMedia } from '@/services/drafts';
@@ -83,6 +85,7 @@ export function PostWizard({
 }: PostWizardProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { user } = useSupabaseSession();
   const {
     state,
     dispatch,
@@ -235,13 +238,19 @@ export function PostWizard({
     try {
       // EDIT MODE: Run UPDATE instead of INSERT
       if (state.isEditMode && state.editPostId) {
+        if (!user?.id) {
+          toast.error('You must be logged in to edit a post.');
+          setSubmitting(false);
+          return;
+        }
         // Convert categories to string IDs
         const categoryIds = state.selectedCategories.map(cat => 
           typeof cat === 'string' ? cat : cat.id
         );
         
         // Safe UPDATE — only user-controlled fields, with ownership guard
-        const { error } = await supabase
+        // Use auth user ID (not actor ID) since posts.user_id = auth.uid()
+        const { data: updatedRows, error } = await supabase
           .from('posts')
           .update({
             content: state.caption.trim() || null,
@@ -251,10 +260,18 @@ export function PostWizard({
             updated_at: new Date().toISOString(),
           })
           .eq('id', state.editPostId)
-          .eq('user_id', state.actor.id); // CRITICAL: ownership guard
+          .eq('user_id', user.id) // CRITICAL: use auth user ID, not actor ID
+          .select('id');
         
         if (error) {
           throw new Error(`Failed to update post: ${error.message}`);
+        }
+
+        // Check if the update actually modified a row
+        if (!updatedRows || updatedRows.length === 0) {
+          toast.error('This post could not be updated. It may have been deleted.');
+          dispatch({ type: 'SET_SUBMITTING', payload: false });
+          return;
         }
 
         // Invalidate caches (same keys as usePostDeletion)
@@ -269,7 +286,15 @@ export function PostWizard({
         queryClient.invalidateQueries({ queryKey: ['pinned-posts'] });
         queryClient.invalidateQueries({ queryKey: ['featured-post'] });
         queryClient.invalidateQueries({ queryKey: ['creator-features'] });
+        // Fix 7: Actor-specific cache invalidation
+        queryClient.invalidateQueries({ 
+          queryKey: postKeys.actorPosts(state.actor.type as 'personal' | 'business', state.actor.id) 
+        });
+        // Fix 8: Single-post cache invalidation
+        queryClient.invalidateQueries({ queryKey: ['post', state.editPostId] });
         
+        // Fix 6: Dispatch postUpdated event (matches delete flow pattern)
+        window.dispatchEvent(new CustomEvent('postUpdated'));
         window.dispatchEvent(new CustomEvent('refreshFeed'));
         
         toast.success('Post updated');
