@@ -80,8 +80,6 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
               "active:scale-95",
               "focus:outline-none",
               // Active background highlight removed — clean flat style everywhere
-              // Active background for dark/clubhouse theme - enhanced
-              isClubhouseTheme && isActive && "bg-[hsl(var(--clubhouse-active-bg))]",
               // Hover states
               isLightTheme && !isActive && "hover:bg-slate-50",
               isClubhouseTheme && !isActive && "hover:bg-[hsl(var(--clubhouse-hover-bg))]"
