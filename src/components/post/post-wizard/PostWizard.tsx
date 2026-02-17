@@ -611,7 +611,7 @@ export function PostWizard({
               </div>
 
               {/* Step content - fills remaining space */}
-              <main className="flex-1 min-h-0 overflow-y-auto">
+              <main className="flex-1 min-h-0 overflow-y-auto" style={{ background: 'transparent' }}>
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={state.currentStep}
