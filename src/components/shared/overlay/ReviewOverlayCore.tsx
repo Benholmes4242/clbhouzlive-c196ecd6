@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { getReviewOverlayTheme } from '@/lib/postHelpers';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { ChevronRight } from 'lucide-react';
+
 
 export type ReviewOverlayVariant = 'fullscreen' | 'tile';
 
@@ -138,11 +138,11 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
           {/* Bottom gradient for legibility */}
           <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/30 via-black/15 to-transparent" />
           
-          {/* TOP PANEL - Refined: lighter glass, reduced visual weight */}
-          <TappableWrapper className="absolute top-2.5 left-2.5 right-2.5 z-10">
+          {/* TOP PANEL - Scaled for ~195px grid tiles */}
+          <TappableWrapper className="absolute top-2 left-2 right-2 z-10">
             <div
               className={cn(
-                "rounded-xl border",
+                "rounded-lg border",
                 "shadow-[0_2px_12px_rgba(0,0,0,0.2)]"
               )}
               style={{
@@ -150,18 +150,18 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
                 backdropFilter: 'blur(12px) saturate(130%)',
                 WebkitBackdropFilter: 'blur(12px) saturate(130%)',
                 borderColor: 'rgba(255, 255, 255, 0.06)',
-                padding: '8px 10px',
+                padding: '6px 8px',
               }}
             >
               {/* Two-column: Left (course info) / Right (rating) */}
-              <div className="flex justify-between items-start gap-2">
+              <div className="flex justify-between items-start gap-1.5">
                 {/* Left: Course name + location */}
                 <div className="flex-1 min-w-0 space-y-0">
-                  <div className="text-white font-semibold text-[15px] leading-tight line-clamp-1">
+                  <div className="text-white font-semibold text-[13px] leading-tight line-clamp-1">
                     {courseName}
                   </div>
                   {courseLocation && (
-                    <div className="text-white/50 text-[12px] line-clamp-1 font-normal">
+                    <div className="text-white/50 text-[10px] line-clamp-1 font-normal">
                       {courseLocation}
                     </div>
                   )}
@@ -170,13 +170,13 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
                 {/* Right: Rating (vertical stack, compact) */}
                 <div className="flex flex-col items-center gap-0 flex-shrink-0">
                   <span 
-                    className="text-2xl font-bold tabular-nums leading-none"
+                    className="text-lg font-bold tabular-nums leading-none"
                     style={{ color: isOutstanding ? '#f59e0b' : '#c4c8ce' }}
                   >
                     {formattedRating}
                   </span>
                   <span 
-                    className="text-[9px] font-medium tracking-wider"
+                    className="text-[8px] font-medium tracking-wider"
                     style={{ color: isOutstanding ? 'rgba(245, 158, 11, 0.6)' : 'rgba(196, 200, 206, 0.6)' }}
                   >
                     {theme.label}
@@ -186,12 +186,12 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
             </div>
           </TappableWrapper>
           
-          {/* BOTTOM PANEL - User info (content-width) */}
-          <div className="absolute bottom-3 left-2.5 z-10 pointer-events-auto">
+          {/* BOTTOM PANEL - User info (bounded both sides) */}
+          <div className="absolute bottom-2 left-2 right-2 z-10 pointer-events-auto">
             <div
               className={cn(
-                "inline-flex items-center gap-2",
-                "rounded-xl border",
+                "flex items-center gap-2",
+                "rounded-lg border",
                 "shadow-[0_2px_12px_rgba(0,0,0,0.2)]"
               )}
               style={{
@@ -199,38 +199,27 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
                 backdropFilter: 'blur(12px) saturate(130%)',
                 WebkitBackdropFilter: 'blur(12px) saturate(130%)',
                 borderColor: 'rgba(255, 255, 255, 0.06)',
-                padding: '8px 10px',
+                padding: '6px 8px',
               }}
             >
               {/* Tappable avatar + name - navigates to profile */}
               <button
                 type="button"
                 onClick={handleUserTap}
-                className="flex items-center gap-2 cursor-pointer transition-opacity active:opacity-80"
+                className="flex items-center gap-2 flex-1 min-w-0 cursor-pointer transition-opacity active:opacity-80"
                 aria-label={`View ${user?.name || 'Golfer'}'s profile`}
               >
                 <SquircleAvatar
-                  size={26}
+                  size={22}
                   src={user?.avatar}
                   alt={user?.name || 'Golfer'}
                   fallback={initials}
                   hideRing
                 />
-                <div className="text-white font-medium text-[12px] truncate leading-tight max-w-[120px]">
+                <div className="text-white font-medium text-[11px] truncate leading-tight flex-1">
                   {user?.name || 'Golfer'}
                 </div>
               </button>
-              {/* Read review CTA - separate from user tap */}
-              <div className={cn(
-                "flex items-center gap-0.5",
-                "text-[10px] font-medium",
-                isOutstanding 
-                  ? "text-amber-400/80"
-                  : "text-white/50"
-              )}>
-                <span>Read review</span>
-                <ChevronRight className="w-3 h-3" />
-              </div>
             </div>
           </div>
         </>
