@@ -524,17 +524,19 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
                   <Share2 className="h-4 w-4 mr-2" />
                   Send
                 </DropdownMenuItem>
-                {isOwnPost && !item.achievementId && (
+                {isOwnPost && (
                   <>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem 
-                      onClick={() => {
-                        navigate('/create-moment', { state: { editPostId: item.id, backgroundLocation: location } });
-                      }}
-                    >
-                      <Pencil className="h-4 w-4 mr-2" />
-                      Edit post
-                    </DropdownMenuItem>
+                    {!item.achievementId && (
+                      <DropdownMenuItem 
+                        onClick={() => {
+                          navigate('/create-moment', { state: { editPostId: item.id, backgroundLocation: location } });
+                        }}
+                      >
+                        <Pencil className="h-4 w-4 mr-2" />
+                        Edit post
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem 
                       onClick={() => setDeleteDialogOpen(true)} 
                       className="text-destructive focus:text-destructive"

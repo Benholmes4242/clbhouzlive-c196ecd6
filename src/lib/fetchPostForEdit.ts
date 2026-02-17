@@ -53,6 +53,12 @@ export async function fetchPostForEdit(
     return null;
   }
 
+  // Safety net: achievement posts are not editable
+  if (post.achievement_id) {
+    console.warn('[fetchPostForEdit] Rejected edit of achievement post:', postId);
+    return null;
+  }
+
   // Fetch media
   const { data: media } = await supabase
     .from('post_media')

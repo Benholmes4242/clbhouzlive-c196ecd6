@@ -265,13 +265,13 @@ export const FullscreenMediaViewer: React.FC<FullscreenMediaViewerProps> = ({
           </button>
 
           {/* Options menu - right (only for own posts, not achievement posts) */}
-          {isOwnPost && !viewer.currentItem?.achievementId && (onEdit || onDelete) && (
+          {isOwnPost && (onEdit || onDelete) && (
             <div 
               className="absolute right-4 z-[10001]"
               style={{ top: 'max(env(safe-area-inset-top, 0px), 47px)' }}
             >
               <PostOptionsMenu
-                onEdit={onEdit ? handleEdit : undefined}
+                onEdit={!viewer.currentItem?.achievementId && onEdit ? handleEdit : undefined}
                 onDelete={onDelete ? handleDelete : undefined}
               />
             </div>
