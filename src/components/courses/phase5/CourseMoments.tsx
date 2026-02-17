@@ -2,12 +2,14 @@
  * CourseMoments - User's own media/content at this course
  * Phase 5: Emotional anchor, turns courses into chapters
  */
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { Camera } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUserCourseMoments } from '@/hooks/useUserCourseMoments';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
+import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface CourseMomentsProps {
   courseId: string;
@@ -22,6 +24,34 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
 }) => {
   const { data: moments, isLoading } = useUserCourseMoments(courseId);
   const navigate = useNavigate();
+  const { user } = useSupabaseSession();
+  const { openFullscreen } = useUnifiedFullscreen('course');
+
+  // Build fullscreen items from moments
+  const fullscreenItems = useMemo(() => {
+    if (!moments?.length) return [];
+    return moments.map((moment, index) => ({
+      id: moment.id,
+      postId: moment.id,
+      mediaIndex: index,
+      mediaUrl: moment.mediaUrl,
+      mediaType: moment.mediaType as 'video' | 'image',
+      posterUrl: moment.posterUrl,
+      creatorId: user?.id || '',
+      creatorName: 'Golfer',
+      creatorUsername: '',
+      creatorAvatar: undefined,
+      likeCount: 0,
+      commentCount: 0,
+      courseName,
+    }));
+  }, [moments, user?.id, courseName]);
+
+  const handleMomentTap = useCallback((index: number) => {
+    if (fullscreenItems.length > 0) {
+      openFullscreen(fullscreenItems, index);
+    }
+  }, [fullscreenItems, openFullscreen]);
 
   if (isLoading) {
     return (
@@ -57,9 +87,10 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
 
       {/* Gallery-style carousel */}
       <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-        {moments.slice(0, 6).map((moment) => (
+        {moments.slice(0, 6).map((moment, index) => (
           <div
             key={moment.id}
+            onClick={() => handleMomentTap(index)}
             className={cn(
               "relative flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden",
               "shadow-sm hover:shadow-md transition-shadow cursor-pointer active:scale-[0.98]",
@@ -68,11 +99,11 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
           >
             {moment.mediaType === 'video' ? (
               <>
-                <video
-                  src={moment.mediaUrl}
+                <img
+                  src={moment.posterUrl || moment.mediaUrl}
+                  alt="Video moment"
                   className="w-full h-full object-cover"
-                  muted
-                  playsInline
+                  loading="lazy"
                 />
                 <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                   <div className="w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center">
@@ -95,7 +126,10 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
 
         {/* Show more indicator */}
         {moments.length > 6 && (
-          <div className="flex-shrink-0 w-20 h-20 rounded-xl bg-black/50 backdrop-blur-sm flex items-center justify-center ring-1 ring-black/5">
+          <div
+            onClick={() => handleMomentTap(6)}
+            className="flex-shrink-0 w-20 h-20 rounded-xl bg-black/50 backdrop-blur-sm flex items-center justify-center ring-1 ring-black/5 cursor-pointer"
+          >
             <span className="text-white text-lg font-semibold">
               +{moments.length - 6}
             </span>

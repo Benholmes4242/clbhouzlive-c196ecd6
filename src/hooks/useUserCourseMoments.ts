@@ -10,6 +10,7 @@ export interface CourseMoment {
   type: 'post' | 'review_media';
   mediaUrl: string;
   mediaType: 'image' | 'video';
+  posterUrl?: string;
   createdAt: string;
   caption?: string;
 }
@@ -59,6 +60,7 @@ export function useUserCourseMoments(courseId: string | undefined) {
           type: 'review_media',
           mediaUrl: media.media_url,
           mediaType: media.media_type === 'video' ? 'video' : 'image',
+          posterUrl: media.poster_url ?? undefined,
           createdAt: media.created_at,
         });
       });
