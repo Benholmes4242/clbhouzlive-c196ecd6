@@ -449,7 +449,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       )}
 
       {/* 7. Filters - Scope Toggle */}
-      <div className="flex justify-center">
+      <div className="w-full">
         <ChampionshipFilters
           arenaMode={arenaMode}
           divisionFilter={divisionFilter}
