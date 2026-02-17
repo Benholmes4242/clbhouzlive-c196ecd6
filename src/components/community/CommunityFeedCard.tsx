@@ -13,7 +13,7 @@
  */
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
-import { MoreHorizontal, MapPin, Copy, Share2, Flag, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
+import { MoreHorizontal, MapPin, Copy, Share2, Flag, ChevronLeft, ChevronRight, Trash2, Pencil } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { PostActionBar } from '@/components/posts/PostActionBar';
@@ -532,7 +532,7 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
                         navigate('/create-moment', { state: { editPostId: item.id, backgroundLocation: location } });
                       }}
                     >
-                      <Copy className="h-4 w-4 mr-2" />
+                      <Pencil className="h-4 w-4 mr-2" />
                       Edit post
                     </DropdownMenuItem>
                     <DropdownMenuItem 

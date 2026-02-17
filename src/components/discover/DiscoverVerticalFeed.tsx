@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { InlineSpinner } from '@/components/ui/InlineSpinner';
 import { useModalState } from '@/hooks/useModalDetector';
@@ -535,10 +536,10 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   };
 
   // Handle post editing
+  const discoverNavigate = useNavigate();
   const handleEditPost = (postId: string) => {
-    // TODO: Implement edit functionality
-    console.log('Edit post:', postId);
     onClose();
+    discoverNavigate('/create-moment', { state: { editPostId: postId } });
   };
 
   // Handle media navigation for posts with multiple media

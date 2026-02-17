@@ -35,6 +35,8 @@ interface MediaTileProps {
   onFirstFrameReady?: (itemId: string) => void;
   /** Whether this is the current user's own post */
   isOwnPost?: boolean;
+  /** Called when edit action triggered (only for own posts) */
+  onEdit?: (itemId: string) => void;
   /** Called when delete action triggered (only for own posts) */
   onDelete?: (itemId: string) => void;
 }
@@ -48,6 +50,7 @@ const MediaTile = memo<MediaTileProps>(({
   onAuthorClick,
   onFirstFrameReady,
   isOwnPost = false,
+  onEdit,
   onDelete,
 }) => {
   const playerRef = useRef<HLSPlayerRef>(null);
@@ -273,9 +276,10 @@ const MediaTile = memo<MediaTileProps>(({
       )}
 
       {/* Options menu for own posts - top right */}
-      {isOwnPost && onDelete && (
+      {isOwnPost && (onEdit || onDelete) && (
         <TileOptionsMenu 
-          onDelete={() => onDelete(item.postId)}
+          onEdit={onEdit ? () => onEdit(item.postId) : undefined}
+          onDelete={onDelete ? () => onDelete(item.postId) : undefined}
         />
       )}
     </motion.button>

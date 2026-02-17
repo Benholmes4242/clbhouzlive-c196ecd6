@@ -30,6 +30,7 @@ interface ActivityGridV2Props {
   onReady?: (id: string) => void;
   isFeedReady?: boolean;
   isOwnProfile?: boolean;
+  onEditPost?: (postId: string) => void;
   onDeletePost?: (postId: string) => void;
 }
 
@@ -49,6 +50,7 @@ const ActivityGridV2Inner: React.FC<ActivityGridV2Props> = ({
   onReady,
   isFeedReady = true,
   isOwnProfile = false,
+  onEditPost,
   onDeletePost,
 }) => {
   const config = { ...DEFAULT_ACTIVITY_GRID_CONFIG, ...configOverrides };
@@ -317,6 +319,7 @@ const ActivityGridV2Inner: React.FC<ActivityGridV2Props> = ({
                   })()}
                   onReady={onReady}
                   isOwnPost={isOwnProfile}
+                  onEdit={onEditPost}
                   onDelete={onDeletePost}
                 />
               </div>
