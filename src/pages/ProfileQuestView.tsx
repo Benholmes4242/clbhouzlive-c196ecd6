@@ -346,7 +346,7 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
       />
 
       {/* Milestone Unlock Sheet */}
-      <MilestoneUnlockSheet totalPlayed={totalPlayed} />
+      <MilestoneUnlockSheet totalPlayed={totalPlayed} isOwnProfile={isOwnProfile} firstName={profileFirstName} />
 
 
       {/* First Course Celebration Sheet */}
