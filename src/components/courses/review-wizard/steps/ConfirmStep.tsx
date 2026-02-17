@@ -1,6 +1,6 @@
 /**
  * Step 4: Review & Submit (Confirmation)
- * Amber-themed cards, staggered animations, section headers with Edit buttons
+ * Card-free layout with amber dividers, section labels + Edit links on background
  */
 
 import React from 'react';
@@ -25,10 +25,6 @@ interface ConfirmStepProps {
 
 function getRatingTextColor(score: number): string {
   return score >= 9.0 ? 'text-amber-500' : 'text-slate-600';
-}
-
-function getRatingFillColor(score: number): string {
-  return score >= 9.0 ? 'bg-amber-500' : 'bg-slate-400';
 }
 
 function isOutstandingScore(score: number): boolean {
@@ -89,28 +85,16 @@ function RatingDisplay({ value, size = 'lg' }: { value: number; size?: 'sm' | 'l
   );
 }
 
-function BreakdownBar({ value }: { value: number }) {
-  const percent = (value / 10) * 100;
-  const fillClass = getRatingFillColor(value);
-  return (
-    <div className="w-full h-1.5 rounded-full bg-gray-100 mt-1">
-      <div
-        className={cn("h-full rounded-full transition-all duration-300", fillClass)}
-        style={{ width: `${percent}%` }}
-      />
-    </div>
-  );
-}
-
-/** Section header with Edit button */
+/** Section header with Edit button — on background */
 function SectionHeader({ label, onEdit, editLabel }: { label: string; onEdit: () => void; editLabel: string }) {
   return (
     <div className="flex items-center justify-between mb-2">
-      <p className="text-[11px] text-gray-400 uppercase tracking-wider font-semibold">{label}</p>
+      <p className="text-[11px] uppercase tracking-wider font-semibold" style={{ color: '#92400E' }}>{label}</p>
       <button
         type="button"
         onClick={onEdit}
-        className="flex items-center gap-1 text-amber-600 text-[11px] font-medium hover:opacity-70 transition-opacity active:scale-[0.97]"
+        className="flex items-center gap-1 text-[11px] font-medium hover:opacity-70 transition-opacity active:scale-[0.97]"
+        style={{ color: '#D97706' }}
         aria-label={editLabel}
       >
         <Pencil className="h-3 w-3" />
@@ -120,14 +104,10 @@ function SectionHeader({ label, onEdit, editLabel }: { label: string; onEdit: ()
   );
 }
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 15 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: 0.1 + i * 0.08, type: "spring" as const, stiffness: 300, damping: 25 },
-  }),
-};
+/** Amber section divider */
+function SectionDivider() {
+  return <div className="h-px" style={{ backgroundColor: '#FCD34D' }} />;
+}
 
 const BREAKDOWN_LABELS: Record<keyof ReviewBreakdowns, string> = {
   design: 'Design',
@@ -135,6 +115,15 @@ const BREAKDOWN_LABELS: Record<keyof ReviewBreakdowns, string> = {
   clubhouse: 'Clubhouse',
   facilities: 'Facilities',
 };
+
+const staggerDelay = (i: number) => ({
+  hidden: { opacity: 0, y: 15 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { delay: 0.1 + i * 0.08, type: "spring" as const, stiffness: 300, damping: 25 },
+  },
+});
 
 export function ConfirmStep({
   course,
@@ -164,6 +153,8 @@ export function ConfirmStep({
   const mediaThumbnails = media.slice(0, 4);
   const remainingMedia = totalMedia - mediaThumbnails.length;
 
+  let sectionIndex = 0;
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 300 }}
@@ -184,17 +175,16 @@ export function ConfirmStep({
         </h2>
       </div>
 
-      {/* Content cards */}
-      <div className="space-y-3">
-        {/* Course header */}
+      {/* Content sections — card-free, on background with dividers */}
+      <div>
+        {/* Course summary row */}
         {course && (
           <motion.div
-            custom={0}
+            custom={sectionIndex}
             initial="hidden"
             animate="visible"
-            variants={cardVariants}
-            className="flex items-center gap-3 p-3 bg-white rounded-2xl border border-amber-600/[0.12]"
-            style={{ boxShadow: '0 2px 8px rgba(217,119,6,0.1)' }}
+            variants={staggerDelay(sectionIndex++)}
+            className="flex items-center gap-3 py-3"
           >
             {course.thumbnail_image && (
               <img src={course.thumbnail_image} alt={course.name} loading="eager" className="w-12 h-12 rounded-lg object-cover" />
@@ -211,10 +201,15 @@ export function ConfirmStep({
           </motion.div>
         )}
 
-        {/* Rating card */}
-        <motion.div custom={1} initial="hidden" animate="visible" variants={cardVariants}
-          className="p-3 bg-white rounded-2xl border border-amber-600/[0.12]"
-          style={{ boxShadow: '0 2px 8px rgba(217,119,6,0.1)' }}
+        <SectionDivider />
+
+        {/* Rating summary */}
+        <motion.div
+          custom={sectionIndex}
+          initial="hidden"
+          animate="visible"
+          variants={staggerDelay(sectionIndex++)}
+          className="py-4"
         >
           <SectionHeader label="Your Rating" onEdit={() => onGoToStep(1)} editLabel="Edit rating" />
           {rating !== null ? (
@@ -224,56 +219,75 @@ export function ConfirmStep({
           )}
         </motion.div>
 
-        {/* Media card */}
+        <SectionDivider />
+
+        {/* Media summary */}
         {totalMedia > 0 && (
-          <motion.div custom={2} initial="hidden" animate="visible" variants={cardVariants}
-            className="p-3 bg-white rounded-2xl border border-amber-600/[0.12]"
-            style={{ boxShadow: '0 2px 8px rgba(217,119,6,0.1)' }}
-          >
-            <SectionHeader label="Media" onEdit={() => onGoToStep(3)} editLabel="Edit media" />
-            <div className="flex gap-1 mb-1.5">
-              {mediaThumbnails.map((item, idx) => (
-                <div key={item.id} className="relative w-10 h-10 rounded-lg overflow-hidden bg-gray-100 shrink-0">
-                  <img src={item.previewUrl || item.posterUrl || ''} alt="" className="w-full h-full object-cover" />
-                  {idx === mediaThumbnails.length - 1 && remainingMedia > 0 && (
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                      <span className="text-white text-[11px] font-semibold">+{remainingMedia}</span>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-            <p className="text-[11px] text-gray-400">
-              {imageCount > 0 && `${imageCount} photo${imageCount > 1 ? 's' : ''}`}
-              {imageCount > 0 && videoCount > 0 && ', '}
-              {videoCount > 0 && `${videoCount} video${videoCount > 1 ? 's' : ''}`}
-            </p>
-            {hasUploadsInProgress && (
-              <div className="flex items-center gap-1 mt-1">
-                <Loader2 className="h-3 w-3 animate-spin text-amber-500" />
-                <p className="text-[11px] text-amber-500">Uploading…</p>
+          <>
+            <motion.div
+              custom={sectionIndex}
+              initial="hidden"
+              animate="visible"
+              variants={staggerDelay(sectionIndex++)}
+              className="py-4"
+            >
+              <SectionHeader label="Media" onEdit={() => onGoToStep(3)} editLabel="Edit media" />
+              <div className="flex gap-1 mb-1.5">
+                {mediaThumbnails.map((item, idx) => (
+                  <div key={item.id} className="relative w-10 h-10 rounded-lg overflow-hidden bg-gray-100 shrink-0">
+                    <img src={item.previewUrl || item.posterUrl || ''} alt="" className="w-full h-full object-cover" />
+                    {idx === mediaThumbnails.length - 1 && remainingMedia > 0 && (
+                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                        <span className="text-white text-[11px] font-semibold">+{remainingMedia}</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
-            )}
-          </motion.div>
+              <p className="text-[11px] text-gray-400">
+                {imageCount > 0 && `${imageCount} photo${imageCount > 1 ? 's' : ''}`}
+                {imageCount > 0 && videoCount > 0 && ', '}
+                {videoCount > 0 && `${videoCount} video${videoCount > 1 ? 's' : ''}`}
+              </p>
+              {hasUploadsInProgress && (
+                <div className="flex items-center gap-1 mt-1">
+                  <Loader2 className="h-3 w-3 animate-spin text-amber-500" />
+                  <p className="text-[11px] text-amber-500">Uploading…</p>
+                </div>
+              )}
+            </motion.div>
+
+            <SectionDivider />
+          </>
         )}
 
         {/* Review text */}
         {hasReviewText && (
-          <motion.div custom={3} initial="hidden" animate="visible" variants={cardVariants}
-            className="p-3 bg-white rounded-2xl border border-amber-600/[0.12]"
-            style={{ boxShadow: '0 2px 8px rgba(217,119,6,0.1)' }}
-          >
-            <SectionHeader label="Review" onEdit={() => onGoToStep(2)} editLabel="Edit review" />
-            {title && <h4 className="font-medium text-sm text-foreground">{title}</h4>}
-            {review && <p className="text-xs text-gray-400 line-clamp-3 mt-0.5">{review}</p>}
-          </motion.div>
+          <>
+            <motion.div
+              custom={sectionIndex}
+              initial="hidden"
+              animate="visible"
+              variants={staggerDelay(sectionIndex++)}
+              className="py-4"
+            >
+              <SectionHeader label="Review" onEdit={() => onGoToStep(2)} editLabel="Edit review" />
+              {title && <h4 className="font-medium text-sm text-foreground">{title}</h4>}
+              {review && <p className="text-xs text-gray-400 line-clamp-3 mt-0.5">{review}</p>}
+            </motion.div>
+
+            <SectionDivider />
+          </>
         )}
 
         {/* Breakdown ratings */}
         {hasBreakdowns && (
-          <motion.div custom={4} initial="hidden" animate="visible" variants={cardVariants}
-            className="p-3 bg-white rounded-2xl border border-amber-600/[0.12]"
-            style={{ boxShadow: '0 2px 8px rgba(217,119,6,0.1)' }}
+          <motion.div
+            custom={sectionIndex}
+            initial="hidden"
+            animate="visible"
+            variants={staggerDelay(sectionIndex++)}
+            className="py-4"
           >
             <SectionHeader label="Detailed Ratings" onEdit={() => onGoToStep(1)} editLabel="Edit detailed ratings" />
             <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
@@ -287,7 +301,16 @@ export function ConfirmStep({
                           {value.toFixed(1)}
                         </span>
                       </div>
-                      <BreakdownBar value={value} />
+                      {/* Mini track bar */}
+                      <div className="w-full h-1.5 rounded-full mt-1" style={{ backgroundColor: '#E5E7EB' }}>
+                        <div
+                          className="h-full rounded-full transition-all duration-300"
+                          style={{
+                            width: `${(value / 10) * 100}%`,
+                            background: value >= 9 ? 'linear-gradient(to right, #F59E0B, #D97706)' : '#94a3b8',
+                          }}
+                        />
+                      </div>
                     </div>
                   )
               )}
@@ -297,8 +320,12 @@ export function ConfirmStep({
 
         {/* Review tags */}
         {hasTags && (
-          <motion.div custom={5} initial="hidden" animate="visible" variants={cardVariants}
-            className="flex flex-wrap gap-1.5"
+          <motion.div
+            custom={sectionIndex}
+            initial="hidden"
+            animate="visible"
+            variants={staggerDelay(sectionIndex++)}
+            className="flex flex-wrap gap-1.5 py-3"
           >
             {selectedTags.map(tag => (
               <span key={tag.id || tag.username} className="bg-amber-50 text-amber-700 text-[11px] rounded-full px-2.5 py-1">
@@ -311,13 +338,21 @@ export function ConfirmStep({
 
       {/* Summary */}
       {statParts.length > 0 && (
-        <motion.p custom={6} initial="hidden" animate="visible" variants={cardVariants}
+        <motion.p
+          custom={sectionIndex}
+          initial="hidden"
+          animate="visible"
+          variants={staggerDelay(sectionIndex++)}
           className="text-xs text-gray-400 text-center mt-6"
         >
           Your review includes {statParts.join(', ')}
         </motion.p>
       )}
-      <motion.p custom={7} initial="hidden" animate="visible" variants={cardVariants}
+      <motion.p
+        custom={sectionIndex}
+        initial="hidden"
+        animate="visible"
+        variants={staggerDelay(sectionIndex++)}
         className="text-xs text-amber-600/60 text-center mt-2"
       >
         Your review helps fellow golfers discover great courses

@@ -1,7 +1,7 @@
 /**
  * Step 2: Write Your Review (The Verdict)
- * Card-based inputs with @mention support, prompt chips, auto-expanding textarea
- * Amber-themed focus states matching Post Wizard
+ * Card-free layout — borderless inputs with focus-only 2px amber bottom border
+ * Amber dividers between sections, @mention support
  */
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
@@ -31,11 +31,10 @@ const PROMPT_CHIPS = [
   { label: 'Tips for visitors', insert: 'Tips for visitors:\n' },
 ];
 
-// Character counter threshold percentages
-const TITLE_WARN_THRESHOLD = 80; // 80%
-const TITLE_DANGER_THRESHOLD = 95; // 95%
-const REVIEW_WARN_THRESHOLD = 0.8; // 80%
-const REVIEW_DANGER_THRESHOLD = 0.95; // 95%
+const TITLE_WARN_THRESHOLD = 80;
+const TITLE_DANGER_THRESHOLD = 95;
+const REVIEW_WARN_THRESHOLD = 0.8;
+const REVIEW_DANGER_THRESHOLD = 0.95;
 
 export function WriteStep({
   title,
@@ -56,11 +55,11 @@ export function WriteStep({
   const [cursorPosition, setCursorPosition] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Auto-expand textarea as user types
+  // Auto-expand textarea
   const autoResize = useCallback(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${Math.max(150, textareaRef.current.scrollHeight)}px`;
+      textareaRef.current.style.height = `${Math.max(200, textareaRef.current.scrollHeight)}px`;
     }
   }, []);
 
@@ -68,7 +67,6 @@ export function WriteStep({
     autoResize();
   }, [review, autoResize]);
 
-  // Handle review change with mention detection
   const handleReviewChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     const cursor = e.target.selectionStart || 0;
@@ -76,7 +74,6 @@ export function WriteStep({
     onReviewChange(value.slice(0, MAX_REVIEW_LENGTH));
     setCursorPosition(cursor);
     
-    // Detect @mention trigger
     const textBeforeCursor = value.slice(0, cursor);
     const mentionMatch = textBeforeCursor.match(/@(\w*)$/);
     
@@ -89,12 +86,10 @@ export function WriteStep({
     }
   }, [onReviewChange]);
 
-  // Handle mention selection
   const handleMentionSelect = useCallback((mention: MentionSuggestion) => {
     const textBeforeCursor = review.slice(0, cursorPosition);
     const textAfterCursor = review.slice(cursorPosition);
     
-    // Replace the @query with @username
     const beforeMention = textBeforeCursor.replace(/@\w*$/, '');
     const displayName = mention.username || mention.name;
     const newReview = `${beforeMention}@${displayName} ${textAfterCursor}`;
@@ -103,12 +98,10 @@ export function WriteStep({
     setShowMentions(false);
     setMentionQuery('');
     
-    // Add to tags if not already present
     if (!selectedTags.some(t => t.id === mention.id)) {
       onTagsChange([...selectedTags, mention]);
     }
     
-    // Focus back on textarea and set cursor position
     setTimeout(() => {
       if (textareaRef.current) {
         textareaRef.current.focus();
@@ -118,17 +111,14 @@ export function WriteStep({
     }, 100);
   }, [review, cursorPosition, selectedTags, onReviewChange, onTagsChange]);
 
-  // Remove a tag
   const handleRemoveTag = useCallback((tagId: string) => {
     onTagsChange(selectedTags.filter(t => t.id !== tagId));
   }, [selectedTags, onTagsChange]);
 
-  // Insert a prompt chip as section header
   const handlePromptChipClick = useCallback((insert: string) => {
     const newReview = review + insert;
     onReviewChange(newReview);
     
-    // Focus textarea and place cursor at end
     setTimeout(() => {
       if (textareaRef.current) {
         textareaRef.current.focus();
@@ -138,7 +128,6 @@ export function WriteStep({
     }, 50);
   }, [review, onReviewChange]);
 
-  // Counter color logic
   const getTitleCounterColor = () => {
     if (titleLength >= MAX_TITLE_LENGTH * (TITLE_DANGER_THRESHOLD / 100)) return 'text-red-500 font-medium';
     if (titleLength >= TITLE_WARN_THRESHOLD) return 'text-amber-500';
@@ -151,7 +140,6 @@ export function WriteStep({
     return 'text-gray-400';
   };
 
-  // Show prompt chips when textarea is focused, empty or very short content
   const showPromptChips = isReviewFocused && reviewLength < 50;
 
   return (
@@ -178,23 +166,23 @@ export function WriteStep({
         )}
       </div>
 
-      {/* Form Fields */}
-      <div className="flex-1 flex flex-col gap-3 min-h-0">
-        {/* Summary Title - Compact card, single-line feel */}
+      {/* Form Fields — card-free, directly on background */}
+      <div className="flex-1 flex flex-col min-h-0">
+        {/* Headline Input — borderless, on background */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
-          className={cn(
-            "flex flex-col rounded-2xl border bg-white transition-all duration-200 shrink-0",
-            isTitleFocused ? "border-amber-300 ring-1 ring-amber-200 shadow-amber-100/50" : "border-amber-600/[0.12]"
-          )}
-          style={{ boxShadow: isTitleFocused ? undefined : '0 2px 8px rgba(217,119,6,0.1)' }}
+          className="shrink-0"
         >
           <input
             id="review-title"
             type="text"
-            className="w-full text-base font-medium leading-relaxed bg-transparent placeholder:text-gray-400 placeholder:font-medium focus:outline-none px-4 pt-3.5 pb-2 text-foreground"
+            className="w-full text-base font-medium leading-relaxed bg-transparent focus:outline-none py-3 text-foreground transition-all duration-200 placeholder:text-amber-600/50"
+            style={{
+              borderBottom: isTitleFocused ? '2px solid #F59E0B' : '1px solid transparent',
+              paddingBottom: isTitleFocused ? 11 : 12,
+            }}
             placeholder="Sum up your experience in a few words"
             value={title}
             onChange={(e) => onTitleChange(e.target.value.slice(0, MAX_TITLE_LENGTH))}
@@ -202,12 +190,10 @@ export function WriteStep({
             onBlur={() => setIsTitleFocused(false)}
             maxLength={MAX_TITLE_LENGTH}
           />
-          {/* Footer — no heavy divider */}
-          <div className="flex items-center justify-between px-4 pb-2.5">
+          <div className="flex items-center justify-between mt-1 mb-1">
             <span className="text-[11px] text-gray-400">
               Your take in one line
             </span>
-            {/* Counter: only show when typing */}
             <AnimatePresence>
               {titleLength > 0 && (
                 <motion.span
@@ -224,68 +210,62 @@ export function WriteStep({
           </div>
         </motion.div>
 
-        {/* Review Textarea Card */}
+        {/* Amber divider */}
+        <div className="h-px my-2" style={{ backgroundColor: '#FCD34D' }} />
+
+        {/* Review Textarea — borderless, on background */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className={cn(
-            "flex-1 flex flex-col rounded-2xl border bg-white transition-all duration-200 min-h-[160px]",
-            isReviewFocused ? "border-amber-300 ring-1 ring-amber-200 shadow-amber-100/50" : "border-amber-600/[0.12]"
-          )}
-          style={{ boxShadow: isReviewFocused ? undefined : '0 2px 8px rgba(217,119,6,0.1)' }}
+          className="flex-1 flex flex-col min-h-0"
         >
-          {/* Textarea wrapper */}
-          <div className="flex-1 flex flex-col min-h-0">
-            <textarea
-              ref={textareaRef}
-              id="review-body"
-              value={review}
-              onChange={handleReviewChange}
-              onFocus={() => setIsReviewFocused(true)}
-              onBlur={() => setIsReviewFocused(false)}
-              placeholder="Share what other golfers should expect?"
-              className={cn(
-                "w-full bg-transparent border-0 resize-none",
-                "focus:outline-none focus-visible:ring-0",
-                "placeholder:text-gray-400 text-sm leading-relaxed p-4 text-foreground"
-              )}
-              maxLength={MAX_REVIEW_LENGTH + 100}
-              style={{ minHeight: '150px' }}
-            />
+          <textarea
+            ref={textareaRef}
+            id="review-body"
+            value={review}
+            onChange={handleReviewChange}
+            onFocus={() => setIsReviewFocused(true)}
+            onBlur={() => setIsReviewFocused(false)}
+            placeholder="Share what other golfers should expect?"
+            className="w-full bg-transparent border-0 resize-none focus:outline-none focus-visible:ring-0 text-sm leading-relaxed py-3 text-foreground transition-all duration-200"
+            style={{
+              minHeight: '200px',
+              borderBottom: isReviewFocused ? '2px solid #F59E0B' : '1px solid transparent',
+            }}
+            maxLength={MAX_REVIEW_LENGTH + 100}
+          />
 
-            {/* Prompt chips — visible when focused & empty/short */}
-            <AnimatePresence>
-              {showPromptChips && (
-                <motion.div
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 4 }}
-                  transition={{ duration: 0.2 }}
-                  className="px-4 pb-3 flex flex-wrap gap-1.5"
-                >
-                  {PROMPT_CHIPS.map((chip) => (
-                    <button
-                      key={chip.label}
-                      type="button"
-                      onMouseDown={(e) => {
-                        // Prevent blur on textarea
-                        e.preventDefault();
-                        handlePromptChipClick(chip.insert);
-                      }}
-                      className="text-[11px] bg-amber-50 text-amber-700 rounded-full px-2.5 py-1 transition-colors hover:bg-amber-100 active:bg-amber-200/80 active:scale-[0.97]"
-                    >
-                      {chip.label}
-                    </button>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+          {/* Prompt chips */}
+          <AnimatePresence>
+            {showPromptChips && (
+              <motion.div
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 4 }}
+                transition={{ duration: 0.2 }}
+                className="flex flex-wrap gap-1.5 mt-2"
+              >
+                {PROMPT_CHIPS.map((chip) => (
+                  <button
+                    key={chip.label}
+                    type="button"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handlePromptChipClick(chip.insert);
+                    }}
+                    className="text-[11px] bg-amber-50 text-amber-700 rounded-full px-2.5 py-1 transition-colors hover:bg-amber-100 active:bg-amber-200/80 active:scale-[0.97]"
+                  >
+                    {chip.label}
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
           
           {/* Tagged entities chips */}
           {selectedTags.length > 0 && (
-            <div className="px-4 pb-2 flex flex-wrap items-center gap-1.5 shrink-0">
+            <div className="flex flex-wrap items-center gap-1.5 mt-2 shrink-0">
               <span className="text-xs text-gray-400">Tagged:</span>
               {selectedTags.map(tag => (
                 <button
@@ -300,8 +280,8 @@ export function WriteStep({
             </div>
           )}
           
-          {/* Footer — counter only */}
-          <div className="flex items-center justify-end px-4 py-2 border-t border-gray-100 shrink-0 mt-auto">
+          {/* Counter — right-aligned on background */}
+          <div className="flex items-center justify-end mt-2 shrink-0">
             <AnimatePresence>
               {reviewLength > 0 && (
                 <motion.span
