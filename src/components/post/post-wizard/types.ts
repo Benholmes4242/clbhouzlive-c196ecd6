@@ -45,6 +45,10 @@ export interface PostWizardState {
   // Scheduling
   scheduledAt: Date | null;
   
+  // Edit mode
+  isEditMode: boolean;
+  editPostId: string | null;
+  
   // UI State
   isSubmitting: boolean;
   isDirty: boolean;
@@ -80,7 +84,8 @@ export type PostWizardAction =
   | { type: 'SET_SCHEDULED_AT'; payload: Date | null }
   | { type: 'SET_SUBMITTING'; payload: boolean }
   | { type: 'RESET' }
-  | { type: 'LOAD_DRAFT'; payload: Partial<PostWizardState> };
+  | { type: 'LOAD_DRAFT'; payload: Partial<PostWizardState> }
+  | { type: 'LOAD_EXISTING_POST'; payload: { postId: string; state: Partial<PostWizardState> } };
 
 // Props for the main wizard component
 export interface PostWizardProps {
@@ -94,6 +99,8 @@ export interface PostWizardProps {
   initialActorOverride?: ActorRef;
   /** Called when user taps "Leave a Review" on success screen — passes the course and media files */
   onRequestReview?: (course: GolfCourse, mediaFiles: File[]) => void;
+  /** Pre-loaded post data for edit mode */
+  editPostData?: import('@/lib/fetchPostForEdit').PostForEdit;
 }
 
 // Props for individual step components

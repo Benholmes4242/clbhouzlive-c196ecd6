@@ -40,6 +40,7 @@ export interface PostWizardHeaderProps {
   onNext: () => void;
   
   hasHeroAbove?: boolean;
+  isEditMode?: boolean;
 }
 
 export function PostWizardHeader({
@@ -65,6 +66,7 @@ export function PostWizardHeader({
   isSubmitting,
   onNext,
   hasHeroAbove = false,
+  isEditMode = false,
 }: PostWizardHeaderProps) {
   const getInitials = (name: string) => name.charAt(0).toUpperCase();
   const [showTooltip, setShowTooltip] = useState(false);
@@ -107,9 +109,11 @@ export function PostWizardHeader({
   };
   
   const hasSchedule = !!scheduledAt;
-  const nextButtonText = hasSchedule
-    ? 'Schedule'
-    : isLastStep ? 'Post' : 'Next';
+  const nextButtonText = isEditMode
+    ? (isLastStep ? 'Save Changes' : 'Next')
+    : hasSchedule
+      ? 'Schedule'
+      : isLastStep ? 'Post' : 'Next';
 
   return (
     <header 
@@ -133,7 +137,7 @@ export function PostWizardHeader({
           )}
         </button>
         
-        {isFirstStep && draftCount > 0 && (
+        {!isEditMode && isFirstStep && draftCount > 0 && (
           <button
             onClick={onOpenDrafts}
             className="w-8 h-8 rounded-full flex items-center justify-center relative transition-colors hover:bg-muted"
@@ -147,27 +151,31 @@ export function PostWizardHeader({
         )}
       </div>
       
-      {/* Center: Avatar-only profile selector */}
+      {/* Center: Avatar-only profile selector (hidden in edit mode) */}
       <div className="flex-1 flex justify-center">
-        <button 
-          onClick={onOpenProfileSelector}
-          className="flex items-center gap-1 px-2 py-1 rounded-full transition-colors hover:bg-muted/60 active:bg-muted/80"
-        >
-          <SquircleAvatar
-            size={28}
-            src={actorAvatarUrl}
-            alt={actorName}
-            fallback={getInitials(actorName)}
-            hideRing
-          />
-          {actorVerified && <VerifiedBadge size="sm" />}
-          <ChevronDown className="h-3 w-3 text-amber-700" />
-        </button>
+        {isEditMode ? (
+          <span className="text-sm font-semibold text-amber-900">Edit Post</span>
+        ) : (
+          <button 
+            onClick={onOpenProfileSelector}
+            className="flex items-center gap-1 px-2 py-1 rounded-full transition-colors hover:bg-muted/60 active:bg-muted/80"
+          >
+            <SquircleAvatar
+              size={28}
+              src={actorAvatarUrl}
+              alt={actorName}
+              fallback={getInitials(actorName)}
+              hideRing
+            />
+            {actorVerified && <VerifiedBadge size="sm" />}
+            <ChevronDown className="h-3 w-3 text-amber-700" />
+          </button>
+        )}
       </div>
       
       {/* Right: Context-aware CTA */}
       <div className="flex items-center gap-1 min-w-[72px] justify-end">
-        {isFirstStep && (
+        {!isEditMode && isFirstStep && (
           <div className="relative">
             <button
               onClick={handleClockTap}
@@ -203,7 +211,7 @@ export function PostWizardHeader({
           </div>
         )}
 
-        {isLastStep && !isFirstStep && (
+        {!isEditMode && isLastStep && !isFirstStep && (
           <button
             onClick={onOpenScheduleSheet}
             className={cn(
