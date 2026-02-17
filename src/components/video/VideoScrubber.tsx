@@ -16,14 +16,14 @@ import React, { useRef, useEffect, useState, useCallback, memo } from 'react';
 import { cn } from '@/lib/utils';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
-type ScrubberVariant = 'default' | 'wizard';
+type ScrubberVariant = 'default' | 'wizard' | 'fullscreen';
 
 interface VideoScrubberProps {
   videoEl: HTMLVideoElement | null;
   mediaId?: string; // For runtime intent tracking
   height?: number;
   className?: string;
-  /** Visual variant: 'default' (white for feed) or 'wizard' (amber for wizard context) */
+  /** Visual variant: 'default' (white for feed), 'wizard' (amber), or 'fullscreen' (subtle white) */
   variant?: ScrubberVariant;
   // Buffering state (from HLSPlayer)
   bufferedPct?: number;      // 0..1
@@ -49,6 +49,14 @@ const COLORS = {
     glow: '0 0 10px rgba(245, 158, 11, 0.4)',
     ghostShimmer: 'rgba(217,119,6,0.1)',
     bufferShimmer: 'rgba(217,119,6,0.2)',
+  },
+  fullscreen: {
+    track: 'rgba(255, 255, 255, 0.15)',
+    buffered: 'rgba(255, 255, 255, 0.3)',
+    fill: '#FFFFFF',
+    glow: '0 0 8px rgba(255, 255, 255, 0.45)',
+    ghostShimmer: 'rgba(255,255,255,0.1)',
+    bufferShimmer: 'rgba(255,255,255,0.2)',
   },
 } as const;
 
