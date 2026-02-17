@@ -196,6 +196,7 @@ export default function CreateMomentMediaStage({
             hideVideoOverlays={true}
             displayMode={displayMode}
             onDisplayModeChange={setDisplayMode}
+            isWizardContext={true}
           />
 
           {/* Text overlays for current media - editable only in position mode */}

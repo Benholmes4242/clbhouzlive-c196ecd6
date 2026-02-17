@@ -40,6 +40,8 @@ interface MediaCarouselProps {
   displayMode?: 'fill' | 'fit';
   /** Callback when display mode changes */
   onDisplayModeChange?: (mode: 'fill' | 'fit') => void;
+  /** When true, fit mode shows transparent bg instead of blur (wizard context) */
+  isWizardContext?: boolean;
 }
 
 export interface MediaCarouselRef {
@@ -60,6 +62,7 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
   hideVideoOverlays = false,
   displayMode = 'fill',
   onDisplayModeChange,
+  isWizardContext = false,
 }, ref) => {
   const [activeIndex, setActiveIndex] = useState(initialIndex);
   const [isDragging, setIsDragging] = useState(false);
@@ -280,8 +283,8 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
       aria-label="Post media carousel"
       tabIndex={0}
     >
-      {/* Blurred background layer - only in fit mode for letterboxing */}
-      {isFitMode && blurBackgroundUrl && (
+      {/* In wizard context, fit mode shows transparent bg so page background shows through */}
+      {isFitMode && blurBackgroundUrl && !isWizardContext && (
         <BlurredMediaBackground 
           src={blurBackgroundUrl}
           isVideo={currentItem?.type === 'video'}
