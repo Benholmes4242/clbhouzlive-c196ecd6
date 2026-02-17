@@ -47,16 +47,15 @@ function SectionHeader({
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-1.5">
-        <Icon className="h-3.5 w-3.5 text-amber-500" />
-        <span className="text-[11px] font-semibold uppercase tracking-[0.05em]" style={{ color: '#92400E' }}>
+        <Icon className="h-3.5 w-3.5 text-muted-foreground" />
+        <span className="text-[11px] font-semibold uppercase tracking-[0.05em] text-foreground/60">
           {label}
         </span>
       </div>
       {onEdit && (
         <button
           onClick={onEdit}
-          className="flex items-center gap-1 px-2 py-1 -mr-1 text-xs font-medium rounded-lg active:bg-amber-50/50 transition-colors"
-          style={{ color: '#D97706' }}
+          className="flex items-center gap-1 px-2 py-1 -mr-1 text-xs font-medium text-primary rounded-lg active:bg-muted/50 transition-colors"
         >
           <PenLine className="h-3 w-3" />
           Edit
@@ -66,9 +65,9 @@ function SectionHeader({
   );
 }
 
-// Amber divider
+// Neutral divider
 function SectionDivider() {
-  return <div className="mx-4 h-px" style={{ backgroundColor: '#FCD34D' }} />;
+  return <div className="mx-4 h-px bg-border/60" />;
 }
 
 // Thumbnail content - shared between sortable and overlay
@@ -161,7 +160,7 @@ function ConfirmThumbnailContent({
       <div className={cn(
         "absolute inset-0 overflow-hidden rounded-xl transition-all duration-150",
         isActive 
-          ? 'ring-2 ring-amber-400 ring-offset-1 ring-offset-transparent shadow-md' 
+          ? 'ring-2 ring-primary ring-offset-1 ring-offset-transparent shadow-md' 
           : 'opacity-70 hover:opacity-100'
       )}>
         {item.type === 'image' ? (
@@ -332,12 +331,10 @@ export function ConfirmStep({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <div className="h-6 w-6 rounded-full flex items-center justify-center"
-          style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)' }}
-        >
-          <Sparkles className="h-3.5 w-3.5 text-white" />
+        <div className="h-6 w-6 rounded-full flex items-center justify-center bg-primary/10">
+          <Sparkles className="h-3.5 w-3.5 text-primary" />
         </div>
-        <span className="text-sm font-semibold" style={{ color: '#92400E' }}>Looking good — review your moment</span>
+        <span className="text-sm font-semibold text-foreground/80">Looking good — review your moment</span>
       </motion.div>
 
       {/* Hero preview — edge-to-edge, no card */}
@@ -480,10 +477,10 @@ export function ConfirmStep({
               <div className="space-y-1.5 mt-2">
                 {state.selectedCourses.map((course) => (
                   <div key={course.id} className="flex items-center gap-2 text-sm">
-                    <div className="h-6 w-6 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
-                      <MapPin className="h-3 w-3 text-amber-500" />
+                    <div className="h-6 w-6 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+                      <MapPin className="h-3 w-3 text-muted-foreground" />
                     </div>
-                    <span className="font-medium" style={{ color: '#1f2937' }}>{course.name}</span>
+                    <span className="font-medium text-foreground">{course.name}</span>
                   </div>
                 ))}
               </div>
@@ -500,11 +497,7 @@ export function ConfirmStep({
               {state.selectedCategories.map((cat) => (
                 <span 
                   key={typeof cat === 'string' ? cat : cat.id}
-                  className="px-2.5 py-1 text-xs rounded-full font-medium"
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.12), rgba(245, 158, 11, 0.12))',
-                    color: '#92400e',
-                  }}
+                  className="px-2.5 py-1 text-xs rounded-full font-medium bg-muted text-foreground/70"
                 >
                   {typeof cat === 'string' ? cat : cat.label}
                 </span>

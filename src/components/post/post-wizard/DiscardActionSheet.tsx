@@ -82,8 +82,7 @@ export function DiscardActionSheet({
                 <button
                   onClick={onSaveToDrafts}
                   disabled={isSaving}
-                  className="w-full py-4 text-center text-lg font-normal flex items-center justify-center gap-2 disabled:opacity-50 transition-colors active:bg-gray-50"
-                  style={{ color: '#d97706' }}
+                  className="w-full py-4 text-center text-lg font-normal flex items-center justify-center gap-2 disabled:opacity-50 transition-colors active:bg-gray-50 text-primary"
                 >
                   {isSaving ? (
                     <>
@@ -112,8 +111,7 @@ export function DiscardActionSheet({
               <button
                 onClick={onKeepEditing}
                 disabled={isSaving}
-                className="w-full py-4 text-center text-lg font-semibold disabled:opacity-50 transition-colors active:bg-gray-50"
-                style={{ color: '#f59e0b' }}
+                className="w-full py-4 text-center text-lg font-semibold disabled:opacity-50 transition-colors active:bg-gray-50 text-primary"
               >
                 Keep Editing
               </button>
