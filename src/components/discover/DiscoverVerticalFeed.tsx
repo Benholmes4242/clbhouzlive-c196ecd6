@@ -539,7 +539,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   const discoverNavigate = useNavigate();
   const handleEditPost = (postId: string) => {
     onClose();
-    discoverNavigate('/create-moment', { state: { editPostId: postId } });
+    discoverNavigate('/create-moment', { state: { editPostId: postId, backgroundLocation: location } });
   };
 
   // Handle media navigation for posts with multiple media

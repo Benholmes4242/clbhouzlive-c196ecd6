@@ -380,9 +380,9 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
       />
 
       {/* Options menu for own posts - top right (not for achievement posts) */}
-      {isOwnPost && !item.achievementId && (onEdit || onDelete) && (
+      {isOwnPost && (onEdit || onDelete) && (
         <TileOptionsMenu 
-          onEdit={onEdit ? () => onEdit(item.postId) : undefined}
+          onEdit={!item.achievementId && onEdit ? () => onEdit(item.postId) : undefined}
           onDelete={onDelete ? () => onDelete(item.postId) : undefined}
         />
       )}
