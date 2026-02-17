@@ -104,41 +104,41 @@
    GLASS CARD
    ======================================== */
 .warm-glass-card {
-  background: rgba(255, 255, 255, 0.70);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 20px;
-  border: 1px solid rgba(217, 119, 6, 0.10);
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.04);
 }
 
 /* Fallback for devices without backdrop-filter */
 @supports not (backdrop-filter: blur(1px)) {
   .warm-glass-card {
-    background: rgba(255, 255, 255, 0.88);
+    background: rgba(255, 255, 255, 0.96);
   }
   .warm-tab-bar {
-    background: rgba(255, 253, 248, 0.92);
+    background: rgba(248, 250, 252, 0.96);
   }
   .warm-suggestion-chip {
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.96);
   }
   .warm-input-bar {
-    background: rgba(255, 255, 255, 0.88);
+    background: rgba(255, 255, 255, 0.96);
   }
   .warm-echo-gradient {
-    background: linear-gradient(135deg, rgba(255,237,213,0.95) 0%, rgba(254,215,170,0.85) 50%, rgba(253,186,116,0.75) 100%);
+    background: rgba(255, 255, 255, 0.96);
   }
 }
 
 /* ========================================
-   ECHO CARD GRADIENT (warm variant)
+   ECHO CARD (neutral variant)
    ======================================== */
 .warm-echo-gradient {
-  background: rgba(255, 255, 255, 0.70);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(217,119,6,0.10);
+  border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 20px;
   position: relative;
   overflow: hidden;
@@ -160,7 +160,7 @@
 }
 
 /* ========================================
-   WARM CONVERSATION BADGE CHIPS
+   CONVERSATION BADGE CHIPS
    ======================================== */
 .warm-conv-badge {
   display: inline-flex;
@@ -168,23 +168,23 @@
   gap: 6px;
   padding: 4px 10px 4px 4px;
   border-radius: 20px;
-  background: rgba(249,115,22,0.06);
-  border: 1px solid rgba(249,115,22,0.08);
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.06);
   font-size: 13px;
   font-weight: 500;
-  color: #44403C;
+  color: hsl(var(--foreground));
   white-space: nowrap;
   cursor: pointer;
   transition: background 0.15s ease;
 }
 
 .warm-conv-badge:active {
-  background: rgba(249,115,22,0.12);
+  background: rgba(0, 0, 0, 0.08);
   transform: scale(0.97);
 }
 
 /* ========================================
-   WARM SUGGESTION CHIP
+   SUGGESTION CHIP
    ======================================== */
 .warm-suggestion-chip {
   display: flex;
@@ -192,32 +192,32 @@
   gap: 8px;
   padding: 9px 13px;
   border-radius: 12px;
-  background: rgba(255,255,255,0.5);
+  background: rgba(0, 0, 0, 0.03);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(217,119,6,0.10);
+  border: 1px solid rgba(0, 0, 0, 0.06);
   font-size: 13px;
   font-weight: 500;
-  color: #44403C;
+  color: hsl(var(--foreground));
   cursor: pointer;
   transition: background 0.15s ease, transform 0.1s ease;
 }
 
 .warm-suggestion-chip:active {
-  background: rgba(255,255,255,0.7);
+  background: rgba(0, 0, 0, 0.06);
   transform: scale(0.97);
 }
 
 /* ========================================
-   WARM INPUT BAR
+   INPUT BAR
    ======================================== */
 .warm-input-bar {
   display: flex;
   align-items: center;
   gap: 8px;
   border-radius: 22px;
-  background: rgba(255,255,255,0.6);
-  border: 1px solid rgba(255,255,255,0.5);
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   padding: 9px 14px;
 }
 
@@ -227,19 +227,19 @@
   border: none;
   outline: none;
   font-size: 13px;
-  color: #1C1917;
+  color: hsl(var(--foreground));
 }
 
 .warm-input-bar input::placeholder {
-  color: #A8A29E;
+  color: hsl(var(--muted-foreground));
 }
 
-/* Mic button gradient */
+/* Action button (send / mic) */
 .warm-mic-btn {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #F59E0B, #FBBF24);
+  background: hsl(var(--primary));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -253,13 +253,13 @@
 }
 
 /* ========================================
-   WARM TAB BAR (glass)
+   TAB BAR (glass)
    ======================================== */
 .warm-tab-bar {
-  background: rgba(255,253,248,0.55);
+  background: rgba(248, 250, 252, 0.85);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border-top: 1px solid rgba(255,255,255,0.3);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 /* Scrollbar hide utility */
