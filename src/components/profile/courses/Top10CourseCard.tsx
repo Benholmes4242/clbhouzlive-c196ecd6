@@ -163,10 +163,17 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
             <div 
               className="inline-flex items-center gap-2 px-3 py-2 rounded-full"
               style={{
-                background: 'rgba(255,255,255,0.12)',
+                background: isOutstanding 
+                  ? 'rgba(245, 158, 11, 0.12)' 
+                  : 'rgba(255,255,255,0.12)',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255,255,255,0.15)',
+                border: isOutstanding 
+                  ? '1px solid rgba(245, 158, 11, 0.35)' 
+                  : '1px solid rgba(255,255,255,0.15)',
+                boxShadow: isOutstanding 
+                  ? '0 0 16px rgba(245, 158, 11, 0.25), inset 0 1px 0 rgba(245, 158, 11, 0.2)' 
+                  : 'none',
               }}
             >
               <span 
