@@ -146,13 +146,10 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
     }),
   }) : null;
 
-  // Sort earned achievements by oldest first (so newest appears on right)
+  // Sort earned achievements by threshold descending (most impressive first)
   const sortedEarnedAchievements = useMemo(() => {
     return [...(achievements || [])].sort((a, b) => {
-      const aDate = a.unlockedAt ? new Date(a.unlockedAt).getTime() : 0;
-      const bDate = b.unlockedAt ? new Date(b.unlockedAt).getTime() : 0;
-      // Oldest first (so most recent ends up on the right)
-      return aDate - bDate;
+      return (b.threshold || 0) - (a.threshold || 0);
     });
   }, [achievements]);
 
