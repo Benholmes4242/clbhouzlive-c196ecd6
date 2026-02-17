@@ -427,7 +427,7 @@ export default function CarouselSlide({
     <div className={cn(cropClass, "select-none w-full h-full flex items-center justify-center")} {...longPressProps}>
       {/* Skeleton loading state */}
       <div className={`absolute inset-0 ${showSkeleton ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}>
-        <div className="w-full h-full animate-pulse bg-white/10" />
+        <div className="w-full h-full animate-pulse bg-muted/10" />
       </div>
 
       <img

@@ -222,11 +222,15 @@ export default function CreateMomentMediaStage({
           </div>
         )}
 
-        {/* Top scrim for badges - subtle */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/20 to-transparent z-10" />
+        {/* Top scrim for badges - only in fill mode */}
+        {displayMode === 'fill' && (
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/20 to-transparent z-10" />
+        )}
 
-        {/* Bottom scrim - subtle */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/15 to-transparent z-10" />
+        {/* Bottom scrim - only in fill mode */}
+        {displayMode === 'fill' && (
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/15 to-transparent z-10" />
+        )}
 
         {/* Achievement badges overlay - top left below header */}
         <AchievementBadgesOverlay 
