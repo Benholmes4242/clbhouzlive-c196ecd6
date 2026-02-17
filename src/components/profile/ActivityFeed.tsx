@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
 import { useRealtimePersonalPosts } from '@/hooks/useRealtimePersonalPosts';
 import { ActivityGridV2, useActivityPostsV2 } from './activity/v2';
@@ -307,6 +308,12 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   const handleDeletePost = useCallback(async (postId: string) => {
     await deletePost(postId, 'personal', userId);
   }, [deletePost, userId]);
+  const navigate = useNavigate();
+
+  // Edit handler - navigate to post wizard in edit mode
+  const handleEditPost = useCallback((postId: string) => {
+    navigate('/create-moment', { state: { editPostId: postId } });
+  }, [navigate]);
 
   // Use unified fullscreen player for activity items
   const { openFullscreen } = useUnifiedFullscreen('profile', {
@@ -350,8 +357,9 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     hasMore,
     isLoadingMore: isFetchingNextPage,
     
-    // Delete functionality for own posts
+    // Edit/Delete functionality for own posts
     currentUserId: user?.id,
+    onEdit: isOwnProfile ? handleEditPost : undefined,
     onDelete: isOwnProfile ? handleDeletePost : undefined,
   });
 
@@ -436,6 +444,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
             onReady={(id) => markReadyRef.current(id)}
             isFeedReady={isFeedReady}
             isOwnProfile={isOwnProfile}
+            onEditPost={handleEditPost}
             onDeletePost={handleDeletePost}
           />
         ) : (

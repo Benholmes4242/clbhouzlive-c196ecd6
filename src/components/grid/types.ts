@@ -143,8 +143,9 @@ export interface UniversalMediaGridProps {
   // Context
   currentUserId?: string;
   
-  // Ownership - for delete functionality
+  // Ownership - for edit/delete functionality
   isOwnProfile?: boolean;
+  onEditPost?: (postId: string) => void;
   onDeletePost?: (postId: string) => void;
   
   // Hero (if hasHero: true)

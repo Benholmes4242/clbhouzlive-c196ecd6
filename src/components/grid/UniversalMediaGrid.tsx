@@ -65,6 +65,7 @@ export function UniversalMediaGrid({
   onAuthorClick,
   currentUserId,
   isOwnProfile = false,
+  onEditPost,
   onDeletePost,
   heroItem,
   onHeroClick,
@@ -344,6 +345,7 @@ export function UniversalMediaGrid({
                   onAuthorClick={handleAuthorClick}
                   onFirstFrameReady={markReady}
                   isOwnPost={isOwnProfile}
+                  onEdit={onEditPost}
                   onDelete={onDeletePost}
                 />
               );
@@ -369,6 +371,7 @@ export function UniversalMediaGrid({
                   onAuthorClick={handleAuthorClick}
                   onFirstFrameReady={markReady}
                   isOwnPost={isOwnProfile}
+                  onEdit={onEditPost}
                   onDelete={onDeletePost}
                 />
               );
@@ -402,6 +405,7 @@ export function UniversalMediaGrid({
                   onAuthorClick={handleAuthorClick}
                   onFirstFrameReady={markReady}
                   isOwnPost={isOwnProfile}
+                  onEdit={onEditPost}
                   onDelete={onDeletePost}
                 />
               );

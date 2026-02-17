@@ -57,6 +57,8 @@ interface UnifiedMediaTileProps {
   onReady?: (id: string) => void;    // Video ready callback
   /** Whether this is the current user's own post */
   isOwnPost?: boolean;
+  /** Called when edit action triggered (only for own posts) */
+  onEdit?: (postId: string) => void;
   /** Called when delete action triggered (only for own posts) */
   onDelete?: (postId: string) => void;
 }
@@ -79,6 +81,7 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   isVideoReady = false,
   onReady,
   isOwnPost = false,
+  onEdit,
   onDelete,
 }) => {
   const playerRef = useRef<UnifiedVideoPlayerRef>(null);
@@ -377,9 +380,10 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
       />
 
       {/* Options menu for own posts - top right */}
-      {isOwnPost && onDelete && (
+      {isOwnPost && (onEdit || onDelete) && (
         <TileOptionsMenu 
-          onDelete={() => onDelete(item.postId)}
+          onEdit={onEdit ? () => onEdit(item.postId) : undefined}
+          onDelete={onDelete ? () => onDelete(item.postId) : undefined}
         />
       )}
     </motion.button>
