@@ -61,9 +61,9 @@ const RatingConfirmationView = React.memo(function RatingConfirmationView(props:
   // Navigate to Clubhouse with deep link to specific post
   const handleViewInClubhouse = () => {
     if (sharedPostId) {
-      navigate(`/discover?main=channels&focusPostId=${sharedPostId}`);
+      navigate(`/clubhouse?focusPostId=${sharedPostId}`);
     } else {
-      navigate('/discover?main=channels');
+      navigate('/clubhouse');
     }
   };
 

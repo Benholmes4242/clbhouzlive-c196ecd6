@@ -2,6 +2,7 @@
 // Multi-step post creation wizard following Review Wizard pattern
 
 import React, { useEffect, useCallback, useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, AlertTriangle, RefreshCw } from 'lucide-react';
@@ -76,6 +77,7 @@ export function PostWizard({
   initialActorOverride,
   onRequestReview,
 }: PostWizardProps) {
+  const navigate = useNavigate();
   const {
     state,
     dispatch,
@@ -501,11 +503,13 @@ export function PostWizard({
     return found || null;
   }, [availableActors, state.actor.id]);
 
-  // Handle success actions
+  // Handle success actions — navigate to Clubhouse feed
+  // Note: Post upload is fire-and-forget (background), so we can't deep-link to the specific post.
+  // We navigate to /clubhouse so the user sees the feed where their post will appear.
   const handleViewPost = useCallback(() => {
-    // TODO: Navigate to the post
     onClose();
-  }, [onClose]);
+    navigate('/clubhouse');
+  }, [onClose, navigate]);
 
   const handleCreateAnother = useCallback(() => {
     reset();
