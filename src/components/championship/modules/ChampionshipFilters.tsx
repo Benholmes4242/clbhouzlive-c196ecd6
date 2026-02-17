@@ -34,7 +34,7 @@ export function ChampionshipFilters({
   const { data: divisions } = useDivisionConfig();
 
   return (
-    <div className={cn('py-2 space-y-3', className)}>
+    <div className={cn('py-2 space-y-3 w-full', className)}>
       {/* Arena Mode - Pill Toggle */}
       <div className="flex justify-center overflow-x-auto pb-1">
         <PillToggle 
