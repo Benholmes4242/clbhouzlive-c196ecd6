@@ -1,7 +1,7 @@
 /**
  * Step 1: Rate Your Experience
  * Modern segmented amber-fill track sliders with large numeric displays
- * 0.5 increment snap, tier labels, premium custom feel
+ * 0.1 increment snap, tier labels, premium custom feel
  */
 
 import React, { useRef, useState, useEffect, useCallback } from 'react';
@@ -23,19 +23,9 @@ const BREAKDOWN_FIELDS = [
   { key: 'facilities' as const, label: 'Practice Facilities', description: 'Range, putting green, and amenities' },
 ];
 
-function getTierLabel(value: number): string {
-  if (value >= 10) return 'PERFECT';
-  if (value >= 9) return 'EXCELLENT';
-  if (value >= 7.5) return 'VERY GOOD';
-  if (value >= 6) return 'GOOD';
-  if (value >= 4) return 'FAIR';
-  if (value >= 2) return 'BELOW AVERAGE';
-  return 'POOR';
-}
-
-/** Snap to nearest 0.5 */
-function snapToHalf(value: number): number {
-  return Math.round(value * 2) / 2;
+/** Snap to nearest 0.1 */
+function snapToTenth(value: number): number {
+  return Math.round(value * 10) / 10;
 }
 
 /* ─── Segmented Track Slider ─── */
@@ -50,22 +40,17 @@ interface SegmentedSliderProps {
 function SegmentedSlider({ value, onChange, touched, onFirstTouch, size }: SegmentedSliderProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [showNumber, setShowNumber] = useState(touched);
 
   const trackHeight = size === 'hero' ? 8 : 6;
   const thumbSize = size === 'hero' ? 24 : 20;
   const thumbActiveSize = size === 'hero' ? 28 : 24;
   const numberSize = size === 'hero' ? 48 : 32;
 
-  useEffect(() => {
-    if (touched) setShowNumber(true);
-  }, [touched]);
-
   const getValueFromPosition = useCallback((clientX: number) => {
     if (!trackRef.current) return value;
     const rect = trackRef.current.getBoundingClientRect();
     const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-    return snapToHalf(ratio * 10);
+    return snapToTenth(ratio * 10);
   }, [value]);
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
@@ -75,7 +60,6 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size }: Segme
     setIsDragging(true);
     if (!touched) {
       onFirstTouch();
-      setShowNumber(true);
     }
     const newValue = getValueFromPosition(e.clientX);
     onChange(newValue);
@@ -95,46 +79,47 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size }: Segme
   }, []);
 
   const percent = (value / 10) * 100;
-  const displayValue = touched ? value.toFixed(1) : '—';
-  const tierLabel = touched ? getTierLabel(value) : '';
-  const isOutstanding = touched && value >= 9;
+  const tierData = touched ? getScoreTier(value) : null;
+  const isOutstanding = tierData?.isOutstanding ?? false;
 
   return (
     <div className="relative w-full select-none" style={{ touchAction: 'none' }}>
-      {/* Number display above slider */}
-      <div className="flex flex-col items-center mb-2" style={{ marginLeft: `calc(${percent}% - 30px)`, width: 60 }}>
-        <AnimatePresence mode="wait">
-          <motion.span
-            key={displayValue}
-            initial={touched ? { opacity: 0, scale: 0.8 } : false}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.2 }}
-            className="font-bold tabular-nums leading-none"
-            style={{
-              fontSize: numberSize,
-              color: isOutstanding ? '#f59e0b' : '#1F2937',
-              ...(isOutstanding ? { textShadow: '0 1px 8px rgba(245, 158, 11, 0.25)' } : {}),
-            }}
-          >
-            {displayValue}
-          </motion.span>
-        </AnimatePresence>
-        {size === 'hero' && (
+      {/* Number display — ALWAYS centered, not following thumb */}
+      <div className="w-full text-center mb-1">
+        {touched && (
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={value.toFixed(1)}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.2 }}
+              className="font-bold tabular-nums leading-none inline-block"
+              style={{
+                fontSize: numberSize,
+                color: isOutstanding ? '#f59e0b' : '#1F2937',
+                ...(isOutstanding ? { textShadow: '0 1px 8px rgba(245, 158, 11, 0.25)' } : {}),
+              }}
+            >
+              {value.toFixed(1)}
+            </motion.span>
+          </AnimatePresence>
+        )}
+        {size === 'hero' && touched && (
           <span
-            className="text-[11px] font-semibold uppercase tracking-wider mt-0.5"
-            style={{ color: '#92400E' }}
+            className="block text-[11px] font-semibold uppercase tracking-wider mt-0.5"
+            style={{ color: '#92400E', whiteSpace: 'nowrap' }}
           >
-            {touched ? 'YOUR RATING' : ''}
+            YOUR RATING
           </span>
         )}
       </div>
 
       {/* Tier label (hero only) */}
-      {size === 'hero' && touched && (
+      {size === 'hero' && touched && tierData && (
         <div className="flex justify-center mb-3">
           <AnimatePresence mode="wait">
             <motion.span
-              key={tierLabel}
+              key={tierData.label}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -144,7 +129,7 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size }: Segme
                 color: isOutstanding ? '#f59e0b' : '#D97706',
               }}
             >
-              {tierLabel}
+              {tierData.label.toUpperCase()}
             </motion.span>
           </AnimatePresence>
         </div>
