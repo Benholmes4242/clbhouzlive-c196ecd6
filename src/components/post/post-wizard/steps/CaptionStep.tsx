@@ -226,17 +226,14 @@ export function CaptionStep({
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
               placeholder={PLACEHOLDERS[placeholderIndex]}
-              className={cn(
-                "min-h-[120px] bg-transparent border-0 border-b-2 rounded-none resize-none",
-                "focus-visible:ring-0 focus-visible:outline-none",
-                "text-base leading-relaxed p-0 py-3",
-                isFocused
-                  ? "border-b-amber-500"
-                  : "border-b-transparent"
-              )}
+              className="min-h-[120px] bg-transparent rounded-none resize-none focus-visible:ring-0 focus-visible:outline-none text-base leading-relaxed p-0 py-3"
               style={{
                 color: '#1f2937',
-                // Placeholder color via CSS custom property
+                border: 'none',
+                borderBottom: `2px solid ${isFocused ? '#F59E0B' : 'transparent'}`,
+                outline: 'none',
+                boxShadow: 'none',
+                WebkitAppearance: 'none',
               }}
               maxLength={CAPTION_MAX_LENGTH + 100}
             />
