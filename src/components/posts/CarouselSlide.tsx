@@ -348,7 +348,7 @@ export default function CarouselSlide({
             loop
             className={cn(
               "w-full h-full transition-all duration-150 block",
-              objectFit === 'contain' ? 'object-contain' : 'object-cover',
+              'object-contain',
               loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
               filterClass
             )}
@@ -357,7 +357,7 @@ export default function CarouselSlide({
               width: '100%',
               height: '100%',
               minHeight: '200px',
-              objectFit: objectFit,
+              objectFit: 'contain',
               display: 'block',
             }}
             onLoadedMetadata={() => {
@@ -447,9 +447,7 @@ export default function CarouselSlide({
         }}
         className={cn(
           "transition-all duration-300",
-          objectFit === 'contain' 
-            ? 'max-w-full max-h-full object-contain' 
-            : 'w-full h-full object-cover',
+          'max-w-full max-h-full object-contain',
           loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
           filterClass
         )}

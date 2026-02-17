@@ -10,7 +10,7 @@ import SoundtrackStrip from "@/components/studio/SoundtrackStrip";
 import TextOverlayRenderer from "@/components/studio/TextOverlayRenderer";
 import { useToast } from "@/hooks/use-toast";
 import { AchievementBadgesOverlay } from "@/components/post/badges/AchievementBadgesOverlay";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
+
 
 interface CreateMomentMediaStageProps {
   media: ComposerMediaItem[];
@@ -67,8 +67,6 @@ export default function CreateMomentMediaStage({
   const mediaContainerRef = useRef<HTMLDivElement>(null);
   const carouselRef = useRef<{ scrollToIndex: (index: number) => void } | null>(null);
   
-  // Persist display mode preference (Fill vs Fit)
-  const [displayMode, setDisplayMode] = useLocalStorage<'fill' | 'fit'>('mediaDisplayMode', 'fill');
 
   // Derive activeIndex from activeMediaId
   const activeIndex = useMemo(() => {
@@ -194,8 +192,6 @@ export default function CreateMomentMediaStage({
             forceVideoMuted={hasMusic}
             onMuteBlocked={handleMuteBlocked}
             hideVideoOverlays={true}
-            displayMode={displayMode}
-            onDisplayModeChange={setDisplayMode}
             isWizardContext={true}
           />
 
@@ -222,15 +218,6 @@ export default function CreateMomentMediaStage({
           </div>
         )}
 
-        {/* Top scrim for badges - only in fill mode */}
-        {displayMode === 'fill' && (
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/20 to-transparent z-10" />
-        )}
-
-        {/* Bottom scrim - only in fill mode */}
-        {displayMode === 'fill' && (
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/15 to-transparent z-10" />
-        )}
 
         {/* Achievement badges overlay - top left below header */}
         <AchievementBadgesOverlay 
