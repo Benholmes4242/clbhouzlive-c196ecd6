@@ -86,7 +86,7 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size }: Segme
     <div className="relative w-full select-none" style={{ touchAction: 'none' }}>
       {/* Number display — ALWAYS centered, not following thumb */}
       <div className="w-full text-center mb-1">
-        {touched && (
+        {touched ? (
           <AnimatePresence mode="wait">
             <motion.span
               key={value.toFixed(1)}
@@ -103,6 +103,13 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size }: Segme
               {value.toFixed(1)}
             </motion.span>
           </AnimatePresence>
+        ) : (
+          <span
+            className="font-bold tabular-nums leading-none inline-block"
+            style={{ fontSize: numberSize, color: '#D1D5DB' }}
+          >
+            —
+          </span>
         )}
         {size === 'hero' && touched && (
           <span
