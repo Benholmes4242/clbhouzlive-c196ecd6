@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { CourseRatingAggregate } from '@/hooks/useCourseRatingAggregates';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { cn } from '@/lib/utils';
+import { courseDetailTokens } from '@/styles/course-detail-tokens';
+import { getTierKeyFromScore } from '@/hooks/useTierStyles';
 
 import { RatingTierDistribution, RatingTierDistributionData } from '@/components/courses/review/RatingTierDistribution';
 
@@ -140,6 +142,11 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
 
   const circumference = 2 * Math.PI * 42;
   const progress = isVisible ? (communityAverage / 10) * circumference : 0;
+  
+  // Tier-aware colors
+  const tierKey = getTierKeyFromScore(communityAverage);
+  const tierTokens = courseDetailTokens.tiers[tierKey];
+  const ringColors = courseDetailTokens.scoreRing[tierKey];
 
   return (
     <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
@@ -158,7 +165,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
             )}
           </div>
           
-          {/* Large animated score ring */}
+          {/* Large animated score ring — tier-colored */}
           <div className="flex flex-col items-center">
             <div className="relative w-24 h-24">
               <svg className="w-24 h-24 -rotate-90">
@@ -172,17 +179,8 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                 />
                 <defs>
                   <linearGradient id="communityScoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    {communityAverage >= 9 ? (
-                      <>
-                       <stop offset="0%" stopColor="#f59e0b" />
-                       <stop offset="100%" stopColor="#fbbf24" />
-                      </>
-                    ) : (
-                      <>
-                       <stop offset="0%" stopColor="#d1d5db" />
-                       <stop offset="100%" stopColor="#d1d5db" />
-                      </>
-                    )}
+                    <stop offset="0%" stopColor={ringColors.from} />
+                    <stop offset="100%" stopColor={ringColors.to} />
                   </linearGradient>
                 </defs>
               </svg>
@@ -193,10 +191,8 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
               </div>
             </div>
             <span 
-              className={cn(
-                "mt-2 text-base font-semibold uppercase tracking-wide",
-                communityAverage >= 9 ? "text-[#d97706]" : "text-muted-foreground"
-              )}
+              className="mt-2 text-base font-semibold uppercase tracking-wide"
+              style={{ color: tierTokens.circleFill }}
             >
               {tierLabel}
             </span>
@@ -243,21 +239,22 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         <div className="border-t border-border p-5 grid grid-cols-2 gap-4">
           {categories.map((cat) => {
             const score = cat.score || 0;
-            const isOutstandingCat = score >= 9;
-            const barColorClass = isOutstandingCat 
-             ? 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]' 
-             : 'bg-[#d1d5db]';
+            const catTierKey = getTierKeyFromScore(score);
+            const catTier = courseDetailTokens.tiers[catTierKey];
             
             return (
               <div key={cat.id} className="space-y-1.5">
                 <div className="flex justify-between text-xs">
                   <span className="text-muted-foreground">{cat.label}</span>
-                  <span className="font-semibold text-foreground tabular-nums">{formatScore(score)}</span>
+                  <span className="font-semibold tabular-nums" style={{ color: catTier.numberColor }}>{formatScore(score)}</span>
                 </div>
                 <div className="h-2 bg-secondary rounded-full overflow-hidden">
                   <div 
-                    className={`h-full ${barColorClass} rounded-full transition-all duration-700`}
-                    style={{ width: `${(score / 10) * 100}%` }}
+                    className="h-full rounded-full transition-all duration-700"
+                    style={{ 
+                      width: `${(score / 10) * 100}%`,
+                      background: `linear-gradient(to right, ${catTier.barFrom}, ${catTier.barTo})`,
+                    }}
                   />
                 </div>
               </div>

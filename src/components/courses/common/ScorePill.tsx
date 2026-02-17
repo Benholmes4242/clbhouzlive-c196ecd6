@@ -1,6 +1,7 @@
 import React from 'react';
-import { getScoreTier } from '@/utils/getScoreTier';
 import { cn } from '@/lib/utils';
+import { courseDetailTokens } from '@/styles/course-detail-tokens';
+import { getTierKeyFromScore } from '@/hooks/useTierStyles';
 
 interface ScorePillProps {
   score: number;
@@ -8,13 +9,11 @@ interface ScorePillProps {
 }
 
 /**
- * Score pill component
- * Uses gray styling for Fair→Excellent, amber only for Outstanding.
- * Matches RatingPill visual standard.
+ * Score pill component — uses warm tier color progression.
  */
 export const ScorePill: React.FC<ScorePillProps> = ({ score, size = 'md' }) => {
-  const tierData = getScoreTier(score);
-  const isOutstanding = tierData.tier === 'outstanding';
+  const tierKey = getTierKeyFromScore(score);
+  const tier = courseDetailTokens.tiers[tierKey];
   
   const baseClasses =
     size === 'sm'
@@ -26,9 +25,9 @@ export const ScorePill: React.FC<ScorePillProps> = ({ score, size = 'md' }) => {
       className={cn(
         'inline-flex items-center rounded-sq-sm border transition-colors',
         baseClasses,
-        isOutstanding 
-          ? 'bg-[#f59e0b]/10 border-[#f59e0b]/30 text-[#d97706]'
-          : 'bg-[#9ca3af]/5 border-[#9ca3af]/20 text-[#6b7280]'
+        tier.bg,
+        tier.border,
+        tier.text,
       )}
     >
       {score === 10 ? '10' : score.toFixed(1)}
