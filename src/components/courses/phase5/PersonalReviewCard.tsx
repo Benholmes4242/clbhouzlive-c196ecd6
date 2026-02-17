@@ -9,7 +9,6 @@ import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { getScoreRingColors, getTierKeyFromScore } from '@/hooks/useTierStyles';
-import { courseDetailTokens } from '@/styles/course-detail-tokens';
 
 // ReviewText component with line clamping and "Read more"
 const ReviewText: React.FC<{ text: string }> = ({ text }) => {
@@ -130,22 +129,21 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
         {categories.length > 0 && (
           <div className="flex-1 grid grid-cols-2 gap-x-4 gap-y-2">
             {categories.map(cat => {
-              const catTierKey = getTierKeyFromScore(cat.score);
-              const catTier = courseDetailTokens.tiers[catTierKey];
+              const isOutstanding = cat.score >= 9;
+              const barColorClass = isOutstanding 
+               ? 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]' 
+               : 'bg-[#d1d5db]';
               
               return (
                 <div key={cat.label} className="space-y-1">
                   <div className="flex justify-between text-xs">
                     <span className="text-muted-foreground">{cat.label}</span>
-                    <span className="font-medium tabular-nums" style={{ color: catTier.numberColor }}>{cat.score.toFixed(1)}</span>
+                    <span className="font-medium text-foreground">{cat.score.toFixed(1)}</span>
                   </div>
                   <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
                     <div 
-                      className="h-full rounded-full transition-all duration-500"
-                      style={{ 
-                        width: `${(cat.score / 10) * 100}%`,
-                        background: `linear-gradient(to right, ${catTier.barFrom}, ${catTier.barTo})`,
-                      }}
+                      className={`h-full ${barColorClass} rounded-full transition-all duration-500`}
+                      style={{ width: `${(cat.score / 10) * 100}%` }}
                     />
                   </div>
                 </div>

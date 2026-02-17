@@ -2,14 +2,11 @@
  * Step 1: Rate Your Experience
  * Modern segmented amber-fill track sliders with large numeric displays
  * 0.5 increment snap, tier labels, premium custom feel
- * 
- * Tier Color System (Feb 2026): Warm progression from gray to amber
  */
 
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { courseDetailTokens } from '@/styles/course-detail-tokens';
-import { getTierKeyFromScore } from '@/hooks/useTierStyles';
+import { getScoreTier } from '@/utils/getScoreTier';
 import type { ReviewBreakdowns } from '../types';
 
 interface RateStepProps {
@@ -27,23 +24,13 @@ const BREAKDOWN_FIELDS = [
 ];
 
 function getTierLabel(value: number): string {
-  if (value >= 9) return 'OUTSTANDING';
-  if (value >= 8) return 'EXCELLENT';
-  if (value >= 7) return 'VERY GOOD';
+  if (value >= 10) return 'PERFECT';
+  if (value >= 9) return 'EXCELLENT';
+  if (value >= 7.5) return 'VERY GOOD';
   if (value >= 6) return 'GOOD';
-  return 'FAIR';
-}
-
-/** Get tier colors for slider based on current value */
-function getTierColors(value: number) {
-  const key = getTierKeyFromScore(value);
-  const tier = courseDetailTokens.tiers[key];
-  return {
-    numberColor: tier.numberColor,
-    labelColor: tier.labelColor,
-    sliderFrom: tier.sliderFrom,
-    sliderTo: tier.sliderTo,
-  };
+  if (value >= 4) return 'FAIR';
+  if (value >= 2) return 'BELOW AVERAGE';
+  return 'POOR';
 }
 
 /** Snap to nearest 0.5 */
@@ -63,11 +50,16 @@ interface SegmentedSliderProps {
 function SegmentedSlider({ value, onChange, touched, onFirstTouch, size }: SegmentedSliderProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [showNumber, setShowNumber] = useState(touched);
 
   const trackHeight = size === 'hero' ? 8 : 6;
   const thumbSize = size === 'hero' ? 24 : 20;
   const thumbActiveSize = size === 'hero' ? 28 : 24;
   const numberSize = size === 'hero' ? 48 : 32;
+
+  useEffect(() => {
+    if (touched) setShowNumber(true);
+  }, [touched]);
 
   const getValueFromPosition = useCallback((clientX: number) => {
     if (!trackRef.current) return value;
@@ -83,6 +75,7 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size }: Segme
     setIsDragging(true);
     if (!touched) {
       onFirstTouch();
+      setShowNumber(true);
     }
     const newValue = getValueFromPosition(e.clientX);
     onChange(newValue);
@@ -102,46 +95,36 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size }: Segme
   }, []);
 
   const percent = (value / 10) * 100;
-  const tierColors = getTierColors(value);
+  const displayValue = touched ? value.toFixed(1) : '—';
   const tierLabel = touched ? getTierLabel(value) : '';
+  const isOutstanding = touched && value >= 9;
 
   return (
     <div className="relative w-full select-none" style={{ touchAction: 'none' }}>
-      {/* Number display — CENTERED, not following thumb */}
-      <div className="flex flex-col items-center w-full mb-2">
-        {touched ? (
-          <AnimatePresence mode="wait">
-            <motion.span
-              key={value.toFixed(1)}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.2 }}
-              className="font-bold tabular-nums leading-none"
-              style={{
-                fontSize: numberSize,
-                color: tierColors.numberColor,
-              }}
-            >
-              {value.toFixed(1)}
-            </motion.span>
-          </AnimatePresence>
-        ) : (
-          /* Hidden until user interacts — no dash placeholder */
-          size === 'hero' ? (
-            <span
-              className="font-bold tabular-nums leading-none"
-              style={{ fontSize: numberSize, color: '#9CA3AF' }}
-            >
-              —
-            </span>
-          ) : null
-        )}
-        {size === 'hero' && touched && (
-          <span
-            className="font-semibold uppercase tracking-wider mt-0.5 whitespace-nowrap"
-            style={{ fontSize: 11, letterSpacing: '0.05em', color: tierColors.labelColor }}
+      {/* Number display above slider */}
+      <div className="flex flex-col items-center mb-2" style={{ marginLeft: `calc(${percent}% - 30px)`, width: 60 }}>
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={displayValue}
+            initial={touched ? { opacity: 0, scale: 0.8 } : false}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.2 }}
+            className="font-bold tabular-nums leading-none"
+            style={{
+              fontSize: numberSize,
+              color: isOutstanding ? '#f59e0b' : '#1F2937',
+              ...(isOutstanding ? { textShadow: '0 1px 8px rgba(245, 158, 11, 0.25)' } : {}),
+            }}
           >
-            YOUR RATING
+            {displayValue}
+          </motion.span>
+        </AnimatePresence>
+        {size === 'hero' && (
+          <span
+            className="text-[11px] font-semibold uppercase tracking-wider mt-0.5"
+            style={{ color: '#92400E' }}
+          >
+            {touched ? 'YOUR RATING' : ''}
           </span>
         )}
       </div>
@@ -157,7 +140,9 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size }: Segme
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
               className="text-[13px] font-bold uppercase"
-              style={{ color: tierColors.labelColor }}
+              style={{
+                color: isOutstanding ? '#f59e0b' : '#D97706',
+              }}
             >
               {tierLabel}
             </motion.span>
@@ -186,20 +171,20 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size }: Segme
             transform: 'translateY(-50%)',
           }}
         />
-        {/* Track fill — gradient changes per tier */}
+        {/* Track fill */}
         <div
           className="absolute left-0"
           style={{
             height: trackHeight,
             borderRadius: trackHeight / 2,
-            background: `linear-gradient(to right, ${tierColors.sliderFrom}, ${tierColors.sliderTo})`,
+            background: 'linear-gradient(to right, #F59E0B, #D97706)',
             width: `${percent}%`,
             top: '50%',
             transform: 'translateY(-50%)',
             transition: isDragging ? 'none' : 'width 50ms ease',
           }}
         />
-        {/* Thumb — border color matches tier */}
+        {/* Thumb */}
         <div
           className="absolute"
           style={{
@@ -207,7 +192,7 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size }: Segme
             height: isDragging ? thumbActiveSize : thumbSize,
             borderRadius: '50%',
             backgroundColor: 'white',
-            border: `${isDragging ? 3 : 2}px solid ${tierColors.numberColor}`,
+            border: `${isDragging ? 3 : 2}px solid #D97706`,
             boxShadow: isDragging
               ? '0 2px 6px rgba(0,0,0,0.2)'
               : '0 1px 3px rgba(0,0,0,0.15)',
