@@ -12,6 +12,7 @@ import CourseMediaTab from '@/components/courses/course-detail/CourseMediaTab';
 import CourseRankBadges from '@/components/courses/CourseRankBadges';
 import { CourseTabs } from '@/components/courses/course-detail/CourseTabs';
 import { formatCourseLocation } from '@/utils/courseLocation';
+import { safeGoBack } from '@/utils/navigation';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import CourseClaimBadge from '@/components/courses/course-detail/CourseClaimBadge';
@@ -129,7 +130,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         {!isInModal && (
           <button
             type="button"
-            onClick={() => navigate(-1)}
+            onClick={() => safeGoBack(navigate, '/courses')}
             className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 active:scale-95 transition-all z-10"
             style={{ top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
             aria-label="Back"
