@@ -45,16 +45,11 @@ export async function fetchPostForEdit(
     .from('posts')
     .select('id, content, categories, badges, visibility, course_id, actor_type, actor_id, source_review_id, achievement_id, user_id')
     .eq('id', postId)
+    .eq('user_id', currentUserId) // Ownership check at DB level (belt-and-suspenders with RLS)
     .single();
 
   if (postError || !post) {
-    console.error('[fetchPostForEdit] Post not found:', postError);
-    return null;
-  }
-
-  // CRITICAL: Ownership check
-  if (post.user_id !== currentUserId) {
-    console.error('[fetchPostForEdit] Ownership check failed');
+    console.error('[fetchPostForEdit] Post not found or ownership check failed:', postError);
     return null;
   }
 

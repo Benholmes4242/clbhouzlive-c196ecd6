@@ -3,7 +3,7 @@
  */
 
 import React, { useState } from 'react';
-import { MoreVertical, Edit, Trash2 } from 'lucide-react';
+import { MoreVertical, Pencil, Trash2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -76,7 +76,7 @@ export const PostOptionsMenu: React.FC<PostOptionsMenuProps> = ({
               onClick={onEdit}
               className="cursor-pointer"
             >
-              <Edit className="h-4 w-4 mr-2" />
+              <Pencil className="h-4 w-4 mr-2" />
               Edit Post
             </DropdownMenuItem>
           )}

@@ -222,12 +222,14 @@ export const FullscreenMediaViewer: React.FC<FullscreenMediaViewerProps> = ({
     return viewer.currentItem.creatorId === currentUserId;
   }, [currentUserId, viewer.currentItem]);
 
-  // Handle edit callback
+  // Handle edit callback — close viewer first (same pattern as delete)
   const handleEdit = useCallback(() => {
     if (viewer.currentItem) {
-      onEdit?.(viewer.currentItem.postId);
+      const postId = viewer.currentItem.postId;
+      handleClose();
+      onEdit?.(postId);
     }
-  }, [viewer.currentItem, onEdit]);
+  }, [viewer.currentItem, onEdit, handleClose]);
 
   // Handle delete callback
   const handleDelete = useCallback(async () => {
@@ -262,8 +264,8 @@ export const FullscreenMediaViewer: React.FC<FullscreenMediaViewerProps> = ({
             <X className="w-5 h-5 text-white" />
           </button>
 
-          {/* Options menu - right (only for own posts) */}
-          {isOwnPost && (onEdit || onDelete) && (
+          {/* Options menu - right (only for own posts, not achievement posts) */}
+          {isOwnPost && !viewer.currentItem?.achievementId && (onEdit || onDelete) && (
             <div 
               className="absolute right-4 z-[10001]"
               style={{ top: 'max(env(safe-area-inset-top, 0px), 47px)' }}

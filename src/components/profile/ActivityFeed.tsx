@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
 import { useRealtimePersonalPosts } from '@/hooks/useRealtimePersonalPosts';
 import { ActivityGridV2, useActivityPostsV2 } from './activity/v2';
@@ -309,11 +309,12 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     await deletePost(postId, 'personal', userId);
   }, [deletePost, userId]);
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Edit handler - navigate to post wizard in edit mode
   const handleEditPost = useCallback((postId: string) => {
-    navigate('/create-moment', { state: { editPostId: postId } });
-  }, [navigate]);
+    navigate('/create-moment', { state: { editPostId: postId, backgroundLocation: location } });
+  }, [navigate, location]);
 
   // Use unified fullscreen player for activity items
   const { openFullscreen } = useUnifiedFullscreen('profile', {

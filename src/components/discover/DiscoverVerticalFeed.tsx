@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { InlineSpinner } from '@/components/ui/InlineSpinner';
 import { useModalState } from '@/hooks/useModalDetector';
-import { MapPin, UserPlus, UserCheck, Loader2, Minimize2, MoreHorizontal, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MapPin, UserPlus, UserCheck, Loader2, Minimize2, MoreHorizontal, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { PaperAirplaneIcon, HeartIcon, SpeakerXMarkIcon, SpeakerWaveIcon, ChatBubbleOvalLeftEllipsisIcon } from '@heroicons/react/24/solid';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -879,7 +879,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 onComment={() => handleComment(item.id)}
                 onShare={handleShare}
                 isOwnPost={user && item.user?.id === user.id}
-                onEdit={() => handleEditPost(item.id)}
+                onEdit={!item.achievementId ? () => handleEditPost(item.id) : undefined}
                 onDelete={() => handleDeletePost(item.id)}
                 className="absolute bottom-[50px] right-4 z-35"
               />

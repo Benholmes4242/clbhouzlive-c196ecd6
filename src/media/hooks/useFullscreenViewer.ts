@@ -72,6 +72,8 @@ export interface FullscreenMediaItem {
   reviewData?: any;
   // NEW: Full media array for carousel navigation
   allMedia?: FullscreenMediaItemMedia[];
+  // Achievement post flag (non-editable)
+  achievementId?: string | null;
 }
 
 export interface UseFullscreenViewerOptions {
