@@ -16,11 +16,15 @@ import React, { useRef, useEffect, useState, useCallback, memo } from 'react';
 import { cn } from '@/lib/utils';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
+type ScrubberVariant = 'default' | 'wizard';
+
 interface VideoScrubberProps {
   videoEl: HTMLVideoElement | null;
   mediaId?: string; // For runtime intent tracking
   height?: number;
   className?: string;
+  /** Visual variant: 'default' (white for feed) or 'wizard' (amber for wizard context) */
+  variant?: ScrubberVariant;
   // Buffering state (from HLSPlayer)
   bufferedPct?: number;      // 0..1
   isBuffering?: boolean;     // true when waiting/stalled
@@ -28,16 +32,38 @@ interface VideoScrubberProps {
   isAttached?: boolean;      // true when HLS is attached
 }
 
+// Color palettes per variant
+const COLORS = {
+  default: {
+    track: 'rgba(255, 255, 255, 0.5)',
+    buffered: 'rgba(255, 255, 255, 0.6)',
+    fill: '#FFFFFF',
+    glow: '0 0 10px rgba(255, 255, 255, 0.8)',
+    ghostShimmer: 'rgba(255,255,255,0.15)',
+    bufferShimmer: 'rgba(255,255,255,0.3)',
+  },
+  wizard: {
+    track: 'rgba(217, 119, 6, 0.15)',
+    buffered: 'rgba(217, 119, 6, 0.25)',
+    fill: '#F59E0B',
+    glow: '0 0 10px rgba(245, 158, 11, 0.4)',
+    ghostShimmer: 'rgba(217,119,6,0.1)',
+    bufferShimmer: 'rgba(217,119,6,0.2)',
+  },
+} as const;
+
 export const VideoScrubber = memo(function VideoScrubber({ 
   videoEl, 
   mediaId,
   height = 3,
   className,
+  variant = 'default',
   bufferedPct,
   isBuffering,
   hasFirstFrame,
   isAttached = true,
 }: VideoScrubberProps) {
+  const colors = COLORS[variant];
   const trackRef = useRef<HTMLDivElement>(null);
   const fillRef = useRef<HTMLDivElement>(null);
   const bufferedRef = useRef<HTMLDivElement>(null);
@@ -279,17 +305,17 @@ export const VideoScrubber = memo(function VideoScrubber({
       onPointerCancel={handlePointerUp}
       onClick={(e) => e.stopPropagation()}
     >
-      {/* Track background - visible white (50% opacity for clarity against video) */}
+      {/* Track background */}
       <div 
         className="absolute inset-0 overflow-hidden rounded-full"
-        style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
+        style={{ backgroundColor: colors.track }}
       >
         {/* Ghost shimmer (before first frame) */}
         {showGhostShimmer && (
           <div 
             className="absolute inset-0 animate-shimmer-slide"
             style={{
-              background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%)',
+              background: `linear-gradient(90deg, transparent 0%, ${colors.ghostShimmer} 50%, transparent 100%)`,
               backgroundSize: '200% 100%',
             }}
           />
@@ -302,7 +328,7 @@ export const VideoScrubber = memo(function VideoScrubber({
         className="absolute inset-0 origin-left will-change-transform overflow-hidden rounded-full"
         style={{ 
           transform: `scaleX(${effectiveBufferedPct})`,
-          backgroundColor: 'rgba(255, 255, 255, 0.6)',
+          backgroundColor: colors.buffered,
         }}
       >
         {/* Buffering shimmer (when stalled) */}
@@ -310,21 +336,21 @@ export const VideoScrubber = memo(function VideoScrubber({
           <div 
             className="absolute inset-0 animate-shimmer-slide"
             style={{
-              background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)',
+              background: `linear-gradient(90deg, transparent 0%, ${colors.bufferShimmer} 50%, transparent 100%)`,
               backgroundSize: '200% 100%',
             }}
           />
         )}
       </div>
       
-      {/* Progress fill (top layer) - solid white with enhanced glow */}
+      {/* Progress fill (top layer) */}
       <div
         ref={fillRef}
         className="absolute inset-0 origin-left will-change-transform rounded-full"
         style={{ 
           transform: 'scaleX(0)',
-          backgroundColor: '#FFFFFF',
-          boxShadow: '0 0 10px rgba(255, 255, 255, 0.8)',
+          backgroundColor: colors.fill,
+          boxShadow: colors.glow,
         }}
       />
       
