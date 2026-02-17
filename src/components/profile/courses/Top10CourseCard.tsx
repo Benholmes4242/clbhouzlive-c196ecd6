@@ -169,10 +169,16 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
                 border: '1px solid rgba(255,255,255,0.15)',
               }}
             >
-              <span className="text-white font-bold text-lg">
+              <span 
+                className="font-bold text-lg"
+                style={{ color: isOutstanding ? '#f59e0b' : '#ffffff' }}
+              >
                 {rating === 10 ? '10' : rating.toFixed(1)}
               </span>
-              <span className="text-white/60 text-xs font-medium tracking-wide uppercase">
+              <span 
+                className="text-xs font-medium tracking-wide uppercase"
+                style={{ color: isOutstanding ? 'rgba(245, 158, 11, 0.8)' : 'rgba(255, 255, 255, 0.6)' }}
+              >
                 {tierData.label}
               </span>
             </div>
