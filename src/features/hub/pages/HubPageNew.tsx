@@ -23,7 +23,6 @@ import { AnimatedNumber } from '@/components/ui/motion';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { Skeleton } from '@/components/ui/skeleton';
 import { startOfMonth, endOfMonth, isWithinInterval, subMonths } from 'date-fns';
-import { CanonicalAmberBg } from '@/components/ui/CanonicalAmberBg';
 import { GlassCard } from '@/components/hub-warm/GlassCard';
 import { usePresence } from '@/hooks/usePresence';
 import { cn } from '@/lib/utils';
@@ -72,13 +71,12 @@ const WHISPER_PROMPTS = [
 ];
 
 function PromptIcon({ type }: { type: string }) {
-  const cls = "w-3.5 h-3.5 flex-shrink-0";
-  const style = { color: '#D97706' };
+  const cls = "w-3.5 h-3.5 flex-shrink-0 text-primary";
   switch (type) {
-    case 'flag': return <Flag className={cls} style={style} />;
-    case 'compass': return <Compass className={cls} style={style} />;
-    case 'target': return <Target className={cls} style={style} />;
-    default: return <Flag className={cls} style={style} />;
+    case 'flag': return <Flag className={cls} />;
+    case 'compass': return <Compass className={cls} />;
+    case 'target': return <Target className={cls} />;
+    default: return <Flag className={cls} />;
   }
 }
 
@@ -272,14 +270,13 @@ export function HubPageNew() {
   // ============ Loading ============
   if (isLoading) {
     return (
-      <div className="min-h-[100dvh] relative">
-        <CanonicalAmberBg />
-        <div className="relative z-10 flex-1 flex flex-col px-5 font-dm-sans" style={{ paddingTop: 'max(var(--sat, env(safe-area-inset-top, 0px)), 47px)' }}>
-          <Skeleton className="h-4 w-28 mb-2 bg-white/30" />
-          <Skeleton className="h-9 w-40 mb-8 bg-white/30" />
-          <Skeleton className="h-[120px] w-full rounded-[20px] mb-4 bg-white/30" />
-          <Skeleton className="h-[56px] w-full rounded-[20px] mb-4 bg-white/30" />
-          <Skeleton className="flex-1 w-full rounded-[20px] bg-white/30" />
+      <div className="min-h-[100dvh] relative" style={{ backgroundColor: '#F8FAFC' }}>
+        <div className="flex-1 flex flex-col px-5 font-dm-sans" style={{ paddingTop: 'max(var(--sat, env(safe-area-inset-top, 0px)), 47px)' }}>
+          <Skeleton className="h-4 w-28 mb-2" />
+          <Skeleton className="h-9 w-40 mb-8" />
+          <Skeleton className="h-[120px] w-full rounded-[20px] mb-4" />
+          <Skeleton className="h-[56px] w-full rounded-[20px] mb-4" />
+          <Skeleton className="flex-1 w-full rounded-[20px]" />
         </div>
       </div>
     );
@@ -288,18 +285,16 @@ export function HubPageNew() {
   // ============ Error ============
   if (hasError && !sessionLoading) {
     return (
-      <div className="min-h-[100dvh] relative">
-        <CanonicalAmberBg />
-        <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 h-full font-dm-sans">
-          <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4 bg-white/40">
-            <RefreshCw className="w-8 h-8" style={{ color: '#D97706' }} />
+      <div className="min-h-[100dvh] relative" style={{ backgroundColor: '#F8FAFC' }}>
+        <div className="flex-1 flex flex-col items-center justify-center px-6 h-full font-dm-sans">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4 bg-muted">
+            <RefreshCw className="w-8 h-8 text-muted-foreground" />
           </div>
-          <h2 className="text-xl font-semibold mb-2" style={{ color: '#1C1917' }}>Couldn't load your Hub</h2>
-          <p className="text-[15px] text-center mb-6" style={{ color: '#78716C' }}>Check your connection and try again</p>
+          <h2 className="text-xl font-semibold mb-2 text-foreground">Couldn't load your Hub</h2>
+          <p className="text-[15px] text-center mb-6 text-muted-foreground">Check your connection and try again</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-6 py-3 text-white rounded-full text-[15px] font-semibold active:scale-95 transition-transform"
-            style={{ background: 'linear-gradient(135deg, #F59E0B, #D97706)' }}
+            className="px-6 py-3 text-primary-foreground rounded-full text-[15px] font-semibold active:scale-95 transition-transform bg-primary"
           >
             Try Again
           </button>
@@ -310,8 +305,7 @@ export function HubPageNew() {
 
   // ============ Main Render ============
   return (
-    <div className="min-h-[100dvh] relative hub-warm-page font-dm-sans">
-      <CanonicalAmberBg />
+    <div className="min-h-[100dvh] relative hub-warm-page font-dm-sans" style={{ backgroundColor: '#F8FAFC' }}>
 
       {/* Content layer */}
       <div
@@ -323,9 +317,9 @@ export function HubPageNew() {
       >
         {/* Offline banner */}
         {!isOnline && (
-          <div className="flex-none flex items-center justify-center gap-2 py-2 px-4 mx-6 rounded-full bg-white/40 mb-2">
-            <WifiOff className="w-4 h-4" style={{ color: '#92400E' }} />
-            <span className="text-[13px] font-medium" style={{ color: '#92400E' }}>You're offline</span>
+          <div className="flex-none flex items-center justify-center gap-2 py-2 px-4 mx-6 rounded-full bg-muted mb-2">
+            <WifiOff className="w-4 h-4 text-muted-foreground" />
+            <span className="text-[13px] font-medium text-muted-foreground">You're offline</span>
           </div>
         )}
 
@@ -339,10 +333,10 @@ export function HubPageNew() {
           <div className="flex items-center justify-between">
             {/* Greeting */}
             <div className="flex-1 min-w-0 mr-4">
-              <p className="text-[13px] font-medium mb-0.5" style={{ color: 'rgba(120,90,60,0.45)' }}>
+              <p className="text-[13px] font-medium mb-0.5 text-muted-foreground">
                 {getGreeting()}
               </p>
-              <h1 className="font-playfair text-[30px] font-bold truncate" style={{ color: '#1C1917', lineHeight: 1.15 }}>
+              <h1 className="font-playfair text-[30px] font-bold truncate text-foreground" style={{ lineHeight: 1.15 }}>
                 {firstName}
               </h1>
             </div>
@@ -351,19 +345,18 @@ export function HubPageNew() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => { haptic('light'); navigate('/activity'); }}
-                className="relative w-[38px] h-[38px] rounded-full flex items-center justify-center active:scale-[0.93] transition-transform"
-                style={{ background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.4)' }}
+                className="relative w-[38px] h-[38px] rounded-full flex items-center justify-center active:scale-[0.93] transition-transform bg-muted border border-border"
                 aria-label={`Notifications${hasUnreadNotifications ? `, ${unreadNotificationCount} unread` : ''}`}
               >
-                <Bell className="w-[18px] h-[18px]" style={{ color: '#78716C' }} />
+                <Bell className="w-[18px] h-[18px] text-muted-foreground" />
                 {hasUnreadNotifications && (
-                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-amber-500 flex items-center justify-center px-1">
-                    <span className="text-[10px] font-bold text-white leading-none">{formatCount(unreadNotificationCount || 0)}</span>
+                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-primary flex items-center justify-center px-1">
+                    <span className="text-[10px] font-bold text-primary-foreground leading-none">{formatCount(unreadNotificationCount || 0)}</span>
                   </span>
                 )}
                 {unreadCount > 0 && (
-                  <span className="absolute -bottom-0.5 -right-0.5 min-w-[16px] h-[16px] rounded-full bg-amber-500 border-2 border-white/60 flex items-center justify-center">
-                    <span className="text-[9px] font-bold text-white leading-none">{formatCount(unreadCount)}</span>
+                  <span className="absolute -bottom-0.5 -right-0.5 min-w-[16px] h-[16px] rounded-full bg-primary border-2 border-background flex items-center justify-center">
+                    <span className="text-[9px] font-bold text-primary-foreground leading-none">{formatCount(unreadCount)}</span>
                   </span>
                 )}
               </button>
@@ -371,10 +364,9 @@ export function HubPageNew() {
               <button
                 onClick={() => { prefetchHandlers?.onTouchStart(); haptic('light'); navigate('/profile'); }}
                 onMouseEnter={prefetchHandlers?.onMouseEnter}
-                className="w-[38px] h-[38px] rounded-full overflow-hidden active:scale-[0.93] transition-transform"
+                className="w-[38px] h-[38px] rounded-full overflow-hidden active:scale-[0.93] transition-transform border border-border"
                 style={{
-                  background: profile?.profile_photo_url ? undefined : 'linear-gradient(135deg, #F59E0B, #FBBF24)',
-                  border: '1px solid rgba(255,255,255,0.4)',
+                  background: profile?.profile_photo_url ? undefined : 'hsl(var(--primary))',
                 }}
                 aria-label="View profile"
               >
@@ -385,7 +377,7 @@ export function HubPageNew() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <span className="text-white text-sm font-semibold flex items-center justify-center w-full h-full">
+                  <span className="text-primary-foreground text-sm font-semibold flex items-center justify-center w-full h-full">
                     {firstName.charAt(0).toUpperCase()}
                   </span>
                 )}
@@ -411,14 +403,14 @@ export function HubPageNew() {
               >
                 <div className="flex items-center gap-2">
                   <span className="text-base">💬</span>
-                  <span className="text-[16px] font-semibold" style={{ color: '#1C1917' }}>Messages</span>
+                  <span className="text-[16px] font-semibold text-foreground">Messages</span>
                   {unreadCount > 0 && (
-                     <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-amber-500 flex items-center justify-center">
-                      <span className="text-[10px] font-bold text-white">{unreadCount}</span>
+                     <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-primary flex items-center justify-center">
+                      <span className="text-[10px] font-bold text-primary-foreground">{unreadCount}</span>
                     </span>
                   )}
                 </div>
-                <span className="text-[13px] font-medium" style={{ color: '#D97706' }}>
+                <span className="text-[13px] font-medium text-primary">
                   See all →
                 </span>
               </button>
@@ -426,8 +418,8 @@ export function HubPageNew() {
               {/* Conversation badge chips */}
               {conversationsLoading && !conversations?.length ? (
                 <div className="flex flex-wrap gap-2">
-                  <Skeleton className="h-8 w-32 rounded-full bg-white/30" />
-                  <Skeleton className="h-8 w-28 rounded-full bg-white/30" />
+                  <Skeleton className="h-8 w-32 rounded-full" />
+                  <Skeleton className="h-8 w-28 rounded-full" />
                 </div>
               ) : conversationBadges.length > 0 ? (
                 <div className="flex flex-wrap gap-2 mb-3">
@@ -449,28 +441,26 @@ export function HubPageNew() {
                           <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-green-500 border border-white/80" />
                         )}
                       </div>
-                      <span className="text-[13px] font-medium" style={{ color: '#44403C' }}>{conv.name.split(' ')[0]}</span>
-                      <span className="text-[11px]" style={{ color: '#A8A29E' }}>{conv.time}</span>
+                      <span className="text-[13px] font-medium text-foreground">{conv.name.split(' ')[0]}</span>
+                      <span className="text-[11px] text-muted-foreground">{conv.time}</span>
                     </button>
                   ))}
                 </div>
               ) : (
-                <p className="text-[13px] mb-3" style={{ color: '#A8A29E' }}>No conversations yet</p>
+                <p className="text-[13px] mb-3 text-muted-foreground">No conversations yet</p>
               )}
 
               {/* Action buttons */}
               <div className="flex gap-2">
                 <button
                   onClick={() => { haptic('light'); navigate('/messages?new=dm'); }}
-                  className="flex-1 py-2.5 rounded-[10px] text-[12px] font-semibold active:scale-[0.97] transition-transform"
-                  style={{ background: 'rgba(217,119,6,0.06)', border: '1px solid rgba(217,119,6,0.12)', color: '#B45309' }}
+                  className="flex-1 py-2.5 rounded-[10px] text-[12px] font-semibold active:scale-[0.97] transition-transform bg-muted text-foreground border border-border"
                 >
                   New Chat
                 </button>
                 <button
                   onClick={() => { haptic('light'); navigate('/messages?new=group'); }}
-                  className="flex-1 py-2.5 rounded-[10px] text-[12px] font-semibold active:scale-[0.97] transition-transform"
-                  style={{ background: 'rgba(217,119,6,0.06)', border: '1px solid rgba(217,119,6,0.12)', color: '#B45309' }}
+                  className="flex-1 py-2.5 rounded-[10px] text-[12px] font-semibold active:scale-[0.97] transition-transform bg-muted text-foreground border border-border"
                 >
                   New Group
                 </button>
@@ -485,31 +475,31 @@ export function HubPageNew() {
                 {/* Left: label */}
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <span className="text-sm">⛳</span>
-                  <span className="text-[14px] font-semibold" style={{ color: '#1C1917' }}>At a Glance</span>
+                  <span className="text-[14px] font-semibold text-foreground">At a Glance</span>
                 </div>
 
                 {/* Right: stats inline */}
                 <div className="flex items-center gap-4">
                   {progressLoading ? (
                     <>
-                      <Skeleton className="h-5 w-8 bg-white/30" />
-                      <Skeleton className="h-5 w-8 bg-white/30" />
+                      <Skeleton className="h-5 w-8" />
+                      <Skeleton className="h-5 w-8" />
                     </>
                   ) : (
                     <>
                       <button onClick={() => { haptic('light'); navigate('/profile'); }} className="text-center active:scale-95 transition-transform">
-                        <span className="text-[17px] font-bold block" style={{ color: '#1C1917' }}>
+                        <span className="text-[17px] font-bold block text-foreground">
                           {profile?.eg_handicap_index != null ? profile.eg_handicap_index.toFixed(1) : '—'}
                         </span>
-                        <span className="text-[9px] font-medium uppercase tracking-wider" style={{ color: '#A8A29E' }}>HCP</span>
+                        <span className="text-[9px] font-medium uppercase tracking-wider text-muted-foreground">HCP</span>
                       </button>
                       <button onClick={() => { haptic('light'); navigate('/top100'); }} className="text-center active:scale-95 transition-transform">
-                        <span className="text-[17px] font-bold block" style={{ color: '#1C1917' }}>{top100Count}</span>
-                        <span className="text-[9px] font-medium uppercase tracking-wider" style={{ color: '#A8A29E' }}>Top 100</span>
+                        <span className="text-[17px] font-bold block text-foreground">{top100Count}</span>
+                        <span className="text-[9px] font-medium uppercase tracking-wider text-muted-foreground">Top 100</span>
                       </button>
                       <button onClick={() => { haptic('light'); navigate('/top100'); }} className="text-center active:scale-95 transition-transform">
-                        <span className="text-[17px] font-bold block" style={{ color: '#1C1917' }}>{avgRating ?? '—'}</span>
-                        <span className="text-[9px] font-medium uppercase tracking-wider" style={{ color: '#A8A29E' }}>Avg</span>
+                        <span className="text-[17px] font-bold block text-foreground">{avgRating ?? '—'}</span>
+                        <span className="text-[9px] font-medium uppercase tracking-wider text-muted-foreground">Avg</span>
                       </button>
                     </>
                   )}
@@ -517,23 +507,23 @@ export function HubPageNew() {
                     onClick={() => { haptic('light'); navigate('/profile'); }}
                     className="active:scale-95 transition-transform"
                   >
-                    <ChevronRight className="w-4 h-4" style={{ color: '#D97706' }} />
+                    <ChevronRight className="w-4 h-4 text-primary" />
                   </button>
                 </div>
               </div>
 
               {/* Next milestone (compact) */}
               {progressData?.next_milestone && (
-                <div className="mt-2 pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.3)' }}>
+                <div className="mt-2 pt-2 border-t border-border">
                   <button
                     onClick={() => { haptic('light'); navigate('/achievements'); }}
                     className="flex items-center gap-2 w-full text-left active:scale-[0.98] transition-transform"
                   >
-                    <span className="text-[13px]" style={{ color: '#1C1917' }}>
+                    <span className="text-[13px] text-foreground">
                       <span className="font-semibold">{progressData.next_milestone.remaining} more</span>
-                      <span style={{ color: '#78716C' }}> to {progressData.next_milestone.tierName}</span>
+                      <span className="text-muted-foreground"> to {progressData.next_milestone.tierName}</span>
                     </span>
-                    <span className="text-[12px] font-medium ml-auto" style={{ color: '#D97706' }}>View Details</span>
+                    <span className="text-[12px] font-medium ml-auto text-primary">View Details</span>
                   </button>
                 </div>
               )}
@@ -551,28 +541,25 @@ export function HubPageNew() {
                 <div className="flex items-center gap-3">
                   {/* Echo orb */}
                   <div
-                    className="w-[38px] h-[38px] rounded-full flex items-center justify-center"
-                    style={{
-                      background: '#F59E0B',
-                      animation: prefersReduced ? 'none' : 'warmPulseGlow 2s ease-in-out infinite',
-                    }}
+                    className="w-[38px] h-[38px] rounded-full flex items-center justify-center bg-primary"
+                    style={{ animation: prefersReduced ? 'none' : 'warmPulseGlow 2s ease-in-out infinite' }}
                   >
                     <div className="flex items-center gap-[2px]">
-                      <div className="w-[2px] h-2 bg-white rounded-full" style={prefersReduced ? {} : { animation: 'gentleWave 3s ease-in-out infinite' }} />
-                      <div className="w-[2px] h-3 bg-white rounded-full" style={prefersReduced ? {} : { animation: 'gentleWave 3s ease-in-out infinite', animationDelay: '0.5s' }} />
-                      <div className="w-[2px] h-2 bg-white rounded-full" style={prefersReduced ? {} : { animation: 'gentleWave 3s ease-in-out infinite', animationDelay: '1s' }} />
+                      <div className="w-[2px] h-2 bg-primary-foreground rounded-full" style={prefersReduced ? {} : { animation: 'gentleWave 3s ease-in-out infinite' }} />
+                      <div className="w-[2px] h-3 bg-primary-foreground rounded-full" style={prefersReduced ? {} : { animation: 'gentleWave 3s ease-in-out infinite', animationDelay: '0.5s' }} />
+                      <div className="w-[2px] h-2 bg-primary-foreground rounded-full" style={prefersReduced ? {} : { animation: 'gentleWave 3s ease-in-out infinite', animationDelay: '1s' }} />
                     </div>
                   </div>
                   <div>
-                    <span className="text-[17px] font-bold block" style={{ color: '#1C1917' }}>Echo</span>
-                    <span className="text-[12px]" style={{ color: '#B45309' }}>Your personal caddie</span>
+                    <span className="text-[17px] font-bold block text-foreground">Echo</span>
+                    <span className="text-[12px] text-muted-foreground">Your personal caddie</span>
                   </div>
                 </div>
-                <span className="text-[16px]" style={{ color: '#D97706' }}>→</span>
+                <span className="text-[16px] text-primary">→</span>
               </button>
 
               {/* Greeting text — fills the gap */}
-              <p className="text-[13px] font-normal mb-2" style={{ color: 'rgba(146,64,14,0.5)' }}>
+              <p className="text-[13px] font-normal mb-2 text-muted-foreground">
                 How can I help today?
               </p>
 
@@ -586,7 +573,7 @@ export function HubPageNew() {
                   >
                     <PromptIcon type={prompt.icon} />
                     <span className="flex-1 text-left line-clamp-1">{prompt.text}</span>
-                    <span className="text-[11px] flex-shrink-0" style={{ color: '#D97706' }}>→</span>
+                    <span className="text-[11px] flex-shrink-0 text-primary">→</span>
                   </button>
                 ))}
               </div>
@@ -608,7 +595,7 @@ export function HubPageNew() {
                       className="warm-mic-btn"
                       aria-label="Send"
                     >
-                      <ArrowUp className="w-3.5 h-3.5 text-white" />
+                      <ArrowUp className="w-3.5 h-3.5 text-primary-foreground" />
                     </button>
                   ) : isSupported ? (
                     <button
@@ -617,7 +604,7 @@ export function HubPageNew() {
                       style={isListening ? { background: '#EF4444' } : {}}
                       aria-label={isListening ? "Stop listening" : "Voice input"}
                     >
-                      <Mic className="w-3.5 h-3.5 text-white" />
+                      <Mic className="w-3.5 h-3.5 text-primary-foreground" />
                     </button>
                   ) : null}
                 </div>
