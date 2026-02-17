@@ -21,12 +21,16 @@ interface CoursesContentProps {
 const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }) => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   
   // Default to 'explore' since we're removing my-courses tab
   const [activeTab, setActiveTab] = useState(() => {
     if (username) return 'my-courses'; // Keep for user profile pages
+    const tabParam = new URLSearchParams(window.location.search).get('tab');
+    if (tabParam && ['explore', 'top100', 'leaderboards'].includes(tabParam)) {
+      return tabParam;
+    }
     return 'explore'; // Default to explore for main courses page
   });
 
@@ -60,6 +64,14 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
       return;
     }
     setActiveTab(value);
+    // Persist tab to URL so it survives remount on back navigation
+    const params = new URLSearchParams(searchParams);
+    if (value === 'explore') {
+      params.delete('tab'); // 'explore' is the default, keep URL clean
+    } else {
+      params.set('tab', value);
+    }
+    setSearchParams(params, { replace: true }); // replace to avoid polluting history
   };
 
   // Dynamic subtitle logic

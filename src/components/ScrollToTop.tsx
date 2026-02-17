@@ -1,27 +1,20 @@
 import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigationType } from 'react-router-dom';
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
+  const navigationType = useNavigationType();
 
   useEffect(() => {
-    // Scroll to top immediately when route changes
-    window.scrollTo(0, 0);
-    
-    // For mobile devices, ensure body scroll is also reset
-    document.body.scrollTop = 0;
-    document.documentElement.scrollTop = 0;
-    
-    // Additional mobile-specific handling
-    if (window.innerWidth <= 768) {
-      // Use requestAnimationFrame to ensure DOM is ready
-      requestAnimationFrame(() => {
-        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-        document.body.scrollTop = 0;
-        document.documentElement.scrollTop = 0;
-      });
+    // Only scroll to top on PUSH navigation (user clicked a link/button)
+    // Skip on POP (back/forward) so ScrollRestoration can restore position
+    // Skip on REPLACE as well (tab changes, redirects)
+    if (navigationType === 'PUSH') {
+      window.scrollTo(0, 0);
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
     }
-  }, [pathname]);
+  }, [pathname, navigationType]);
 
   return null;
 };
