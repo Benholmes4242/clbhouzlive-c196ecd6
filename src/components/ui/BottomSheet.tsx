@@ -118,6 +118,7 @@ export function BottomSheet({
         style={{ 
           zIndex: zIndexBase + 1,
           maxHeight: '90vh',
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
           ...style,
         }}
         role="dialog"
