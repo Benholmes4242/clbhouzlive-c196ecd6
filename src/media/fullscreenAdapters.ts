@@ -75,6 +75,8 @@ export function adaptItemsToFullscreen<T>(
       isReview: adapter.getReviewData(item) !== null,
       reviewRating: adapter.getReviewData(item)?.rating,
       reviewData: adapter.getReviewData(item),
+      // Achievement post flag
+      achievementId: adapter.getAchievementId?.(item) ?? null,
       // NEW: Include full media array for carousel navigation
       allMedia,
     };
