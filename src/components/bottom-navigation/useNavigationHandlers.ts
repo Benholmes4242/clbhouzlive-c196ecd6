@@ -46,15 +46,15 @@ export const useNavigationHandlers = () => {
       } else if (tab.path === '/profile') {
         // Profile tab: navigate to business profile when acting as business
         if (activeActor?.type === 'business' && activeActor?.slug) {
-          navigate(`/business/${activeActor.slug}`);
+          navigate(`/business/${activeActor.slug}`, { replace: true });
         } else {
-          navigate(tab.path);
+          navigate(tab.path, { replace: true });
         }
         setTimeout(() => {
           window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
         }, 50);
       } else {
-        navigate(tab.path);
+        navigate(tab.path, { replace: true });
         // Only scroll to top when navigating to different pages, not when staying on profile or hub
         setTimeout(() => {
           window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });

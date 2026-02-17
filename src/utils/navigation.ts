@@ -35,3 +35,16 @@ export function appNavigate(to: string) {
 export function isNavigateReady(): boolean {
   return navigateRef !== null;
 }
+
+/**
+ * Safe back navigation with fallback for deep links.
+ * If there's no prior history (e.g. user opened a shared link directly),
+ * navigates to a fallback path instead of doing nothing or exiting the app.
+ */
+export function safeGoBack(navigate: NavigateFunction, fallbackPath: string) {
+  if (window.history.length > 1) {
+    navigate(-1);
+  } else {
+    navigate(fallbackPath, { replace: true });
+  }
+}

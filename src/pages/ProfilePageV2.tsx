@@ -27,6 +27,7 @@ import { EliteGameCard, type EliteCardTier } from '@/components/achievements/Eli
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+import { safeGoBack } from '@/utils/navigation';
 
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
 import {
@@ -282,7 +283,7 @@ const ProfilePageV2Content: React.FC = () => {
             This profile doesn't exist or is no longer available.
           </p>
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => safeGoBack(navigate, '/clubhouse')}
             className="px-6 py-2 bg-foreground text-background rounded-full text-sm font-medium hover:opacity-90 transition-colors"
           >
             Go back
@@ -383,7 +384,7 @@ const ProfilePageV2Content: React.FC = () => {
         {/* Glass back button - positioned below safe area */}
         <button
           type="button"
-          onClick={() => navigate(-1)}
+          onClick={() => safeGoBack(navigate, '/clubhouse')}
           className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 active:scale-95 transition-all z-10 pointer-events-auto"
           style={{ top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
           aria-label="Back"

@@ -217,7 +217,7 @@ export function ReviewWizard({
     if (wizard.submittedRatingId && activeCourse) {
       wizard.cleanup();
       onClose();
-      navigate(`/courses/${activeCourse.id}?tab=reviews&review=${wizard.submittedRatingId}`);
+      navigate(`/courses/${activeCourse.id}?tab=reviews&review=${wizard.submittedRatingId}`, { replace: true });
     }
   }, [wizard.submittedRatingId, activeCourse, wizard, onClose, navigate]);
 
