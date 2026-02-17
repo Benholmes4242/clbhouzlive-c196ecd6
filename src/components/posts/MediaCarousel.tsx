@@ -271,6 +271,7 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
         className
       )}
       style={{ 
+        // Use aspect ratio only as fallback when not in flex container
         aspectRatio: containerAspect,
         touchAction: 'pan-y',
         minHeight: '200px',

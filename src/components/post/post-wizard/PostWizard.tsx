@@ -583,7 +583,7 @@ export function PostWizard({
           ) : (
             <>
               {/* Header + progress bar — single amber surface that bleeds behind status bar */}
-              <div className="flex-shrink-0" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)', backgroundColor: '#FFFBEB' }}>
+              <div className="flex-shrink-0" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}>
                 <PostWizardHeader
                   currentStep={state.currentStep}
                   currentStepIndex={currentStepIndex}
@@ -611,7 +611,7 @@ export function PostWizard({
               </div>
 
               {/* Step content - fills remaining space */}
-              <main className="flex-1 min-h-0 overflow-y-auto" style={{ backgroundColor: '#FFFBEB' }}>
+              <main className="flex-1 min-h-0 overflow-y-auto">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={state.currentStep}
