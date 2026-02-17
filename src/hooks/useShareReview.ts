@@ -76,6 +76,7 @@ export function useShareReview() {
           visibility: 'anyone',
           source_review_id: ratingId,
           categories: ['review'],
+          status: 'published',
         })
         .select('id')
         .single();
@@ -140,7 +141,6 @@ export function useShareReview() {
       queryClient.invalidateQueries({ queryKey: ['friends-shorts'] });
 
       // 6) Dispatch window events so any listening components refresh
-      window.dispatchEvent(new CustomEvent('refreshFeed'));
       window.dispatchEvent(new CustomEvent('postCreated'));
 
       // 7) Analytics

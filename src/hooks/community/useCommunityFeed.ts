@@ -262,7 +262,7 @@ export function useCommunityFeed({
           
           // For reviews, prioritize review media; otherwise use post media
           const allMedia = reviewMedia.length > 0 ? reviewMedia : postMedia;
-          const m = allMedia[0];
+          const m = allMedia.find(item => item.media_type === 'video') || allMedia[0];
           if (!m) return null;
 
           const kind = m.media_type === 'video' ? 'video' : 'image';
