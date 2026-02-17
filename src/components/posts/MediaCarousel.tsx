@@ -275,6 +275,8 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
         aspectRatio: containerAspect,
         touchAction: 'pan-y',
         minHeight: '200px',
+        // In wizard context, ensure fully transparent so page gradient shows through
+        ...(isWizardContext ? { background: 'transparent' } : {}),
       }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
