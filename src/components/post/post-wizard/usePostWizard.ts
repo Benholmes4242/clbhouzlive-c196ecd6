@@ -32,6 +32,8 @@ const createInitialState = (userId?: string): PostWizardState => ({
   visibility: 'anyone',
   actor: { type: 'personal', id: userId || '' },
   scheduledAt: null,
+  isEditMode: false,
+  editPostId: null,
   isSubmitting: false,
   isDirty: false,
 });
@@ -201,6 +203,16 @@ function postWizardReducer(
 
     case 'LOAD_DRAFT':
       return { ...state, ...action.payload, isDirty: false };
+
+    case 'LOAD_EXISTING_POST':
+      return {
+        ...state,
+        ...action.payload.state,
+        isEditMode: true,
+        editPostId: action.payload.postId,
+        isDirty: false,
+        currentStep: 'caption', // Skip media step in Phase 1
+      };
 
     default:
       return state;
@@ -415,11 +427,57 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
     });
   }, []);
 
+  // Load existing post into wizard for editing
+  const loadExistingPost = useCallback((postData: import('@/lib/fetchPostForEdit').PostForEdit) => {
+    const { post, media, courses } = postData;
+
+    // Convert post_media rows to OrderedMediaItems (read-only in Phase 1)
+    const mediaItems: OrderedMediaItem[] = media.map((m, idx) => ({
+      id: m.id,
+      type: m.media_type as 'image' | 'video',
+      previewUrl: m.media_url,
+      posterUrl: m.poster_url || undefined,
+      file: undefined, // Existing media — no File object
+      order: m.display_order ?? idx,
+      width: m.width ?? undefined,
+      height: m.height ?? undefined,
+      aspectRatio: m.aspect_ratio ?? undefined,
+      duration: m.duration_seconds ?? undefined,
+    }));
+
+    dispatch({
+      type: 'LOAD_EXISTING_POST',
+      payload: {
+        postId: post.id,
+        state: {
+          mediaItems,
+          activeMediaId: mediaItems.length > 0 ? mediaItems[0].id : null,
+          caption: post.content || '',
+          selectedCourses: courses.map(c => ({
+            id: c.id,
+            name: c.name,
+            country: c.country,
+            region: c.region || undefined,
+          })),
+          selectedCategories: (post.categories || []) as unknown as MomentCategory[],
+          selectedBadges: post.badges || [],
+          visibility: (post.visibility || 'anyone') as MomentVisibility,
+          actor: {
+            type: post.actor_type as 'personal' | 'business',
+            id: post.actor_id,
+          },
+          coverIndex: 0,
+        },
+      },
+    });
+  }, []);
+
   // Validation
   const canProceedFromMedia = state.mediaItems.length > 0;
   // Caption step now requires at least 1 category to proceed
   const canProceedFromCaption = state.selectedCategories.length > 0;
-  const canSubmit = state.mediaItems.length > 0 && !state.isSubmitting && !!user;
+  // In edit mode, allow submit even without new media files (existing media is kept)
+  const canSubmit = (state.mediaItems.length > 0 || state.isEditMode) && !state.isSubmitting && !!user;
 
   // Step index for progress display
   const currentStepIndex = STEP_ORDER.indexOf(state.currentStep);
@@ -467,6 +525,7 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
     setSubmitting,
     reset,
     loadDraft,
+    loadExistingPost,
     
     // Validation
     canProceedFromMedia,

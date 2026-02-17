@@ -9,6 +9,7 @@ import { X, AlertTriangle, RefreshCw } from 'lucide-react';
 import { ErrorBoundary as ReactErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { PostWizardProps } from './types';
 import { usePostWizard } from './usePostWizard';
+import type { PostForEdit } from '@/lib/fetchPostForEdit';
 import { PostWizardHeader } from './PostWizardHeader';
 import { PostSuccessScreen } from './PostSuccessScreen';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -16,6 +17,8 @@ import { useDrafts } from '@/hooks/useDrafts';
 import { useScheduledPosts } from '@/hooks/useScheduledPosts';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { enqueuePostUploadWithResilience } from '@/hooks/usePostUploadResilience';
+import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { StudioTool, StudioEdits } from '@/types/studio';
 import type { DraftWithMedia } from '@/services/drafts';
@@ -76,8 +79,10 @@ export function PostWizard({
   initialCourses,
   initialActorOverride,
   onRequestReview,
+  editPostData,
 }: PostWizardProps) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const {
     state,
     dispatch,
@@ -101,6 +106,7 @@ export function PostWizard({
     setStudioEdits,
     setActiveMediaId,
     loadDraft,
+    loadExistingPost,
   } = usePostWizard({
     initialMedia,
     initialCourses,
@@ -173,6 +179,13 @@ export function PostWizard({
     }
   }, [isOpen, reset]);
 
+  // Load existing post data for edit mode
+  useEffect(() => {
+    if (isOpen && editPostData && !state.isEditMode) {
+      loadExistingPost(editPostData);
+    }
+  }, [isOpen, editPostData, state.isEditMode, loadExistingPost]);
+
   // Sync actor from context
   useEffect(() => {
     if (activeActor && !initialActorOverride) {
@@ -220,13 +233,57 @@ export function PostWizard({
     setSubmitting(true);
     
     try {
+      // EDIT MODE: Run UPDATE instead of INSERT
+      if (state.isEditMode && state.editPostId) {
+        // Convert categories to string IDs
+        const categoryIds = state.selectedCategories.map(cat => 
+          typeof cat === 'string' ? cat : cat.id
+        );
+        
+        // Safe UPDATE — only user-controlled fields, with ownership guard
+        const { error } = await supabase
+          .from('posts')
+          .update({
+            content: state.caption.trim() || null,
+            categories: categoryIds,
+            badges: state.selectedBadges,
+            visibility: state.visibility,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', state.editPostId)
+          .eq('user_id', state.actor.id); // CRITICAL: ownership guard
+        
+        if (error) {
+          throw new Error(`Failed to update post: ${error.message}`);
+        }
+
+        // Invalidate caches (same keys as usePostDeletion)
+        queryClient.invalidateQueries({ queryKey: ['trending-posts'] });
+        queryClient.invalidateQueries({ queryKey: ['infinite-followed-posts'] });
+        queryClient.invalidateQueries({ queryKey: ['actor-posts'] });
+        queryClient.invalidateQueries({ queryKey: ['activity-posts'] });
+        queryClient.invalidateQueries({ queryKey: ['userPosts'] });
+        queryClient.invalidateQueries({ queryKey: ['followedUsersPosts'] });
+        queryClient.invalidateQueries({ queryKey: ['explore-content'] });
+        queryClient.invalidateQueries({ queryKey: ['profile-posts'] });
+        queryClient.invalidateQueries({ queryKey: ['pinned-posts'] });
+        queryClient.invalidateQueries({ queryKey: ['featured-post'] });
+        queryClient.invalidateQueries({ queryKey: ['creator-features'] });
+        
+        window.dispatchEvent(new CustomEvent('refreshFeed'));
+        
+        toast.success('Post updated');
+        onClose();
+        return;
+      }
+
+      // CREATE MODE: Normal insert flow
       // Extract files from media items
       const files = state.mediaItems
         .filter(item => item.file)
         .map(item => item.file as File);
       
       // Build course info from first selected course (for backwards compat)
-      // Defensive null checks to prevent white screen crashes
       const firstCourse = state.selectedCourses[0];
       const courseInfo = firstCourse?.id && firstCourse?.name
         ? {
@@ -253,7 +310,7 @@ export function PostWizard({
         actorId: state.actor.id,
         caption: state.caption,
         courseInfo,
-        courseIds, // Multi-course support for junction table
+        courseIds,
         selectedTags: state.selectedTags,
         files,
         mediaItems: state.mediaItems,
@@ -269,11 +326,11 @@ export function PostWizard({
       
     } catch (error) {
       console.error('[PostWizard] Submission failed:', error);
-      toast.error('Failed to post. Please try again.');
+      toast.error(state.isEditMode ? 'Failed to update post.' : 'Failed to post. Please try again.');
     } finally {
       setSubmitting(false);
     }
-  }, [state, canSubmit, setSubmitting]);
+  }, [state, canSubmit, setSubmitting, onClose]);
 
   // Handle next/submit
   const handleNext = useCallback(() => {
@@ -611,6 +668,7 @@ export function PostWizard({
                   isSubmitting={state.isSubmitting}
                   onNext={handleNext}
                   hasHeroAbove
+                  isEditMode={state.isEditMode}
                 />
               </div>
 

@@ -3,7 +3,7 @@
  */
 
 import React, { useState } from 'react';
-import { MoreVertical, Trash2 } from 'lucide-react';
+import { MoreVertical, Trash2, Pencil } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,11 +23,13 @@ import { Button } from '@/components/ui/button';
 
 interface TileOptionsMenuProps {
   onDelete?: () => void;
+  onEdit?: () => void;
   className?: string;
 }
 
 export const TileOptionsMenu: React.FC<TileOptionsMenuProps> = ({
   onDelete,
+  onEdit,
   className,
 }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -90,6 +92,15 @@ export const TileOptionsMenu: React.FC<TileOptionsMenuProps> = ({
             className="w-40 bg-background/95 backdrop-blur-sm border border-border shadow-xl z-[100]"
             sideOffset={5}
           >
+            {onEdit && (
+              <DropdownMenuItem 
+                onClick={(e) => { e.stopPropagation(); onEdit(); }}
+                className="cursor-pointer"
+              >
+                <Pencil className="h-4 w-4 mr-2" />
+                Edit post
+              </DropdownMenuItem>
+            )}
             {onDelete && (
               <DropdownMenuItem 
                 onClick={handleDeleteClick}

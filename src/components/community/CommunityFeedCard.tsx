@@ -528,6 +528,14 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 
+                      onClick={() => {
+                        navigate('/create-moment', { state: { editPostId: item.id, backgroundLocation: location } });
+                      }}
+                    >
+                      <Copy className="h-4 w-4 mr-2" />
+                      Edit post
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
                       onClick={() => setDeleteDialogOpen(true)} 
                       className="text-destructive focus:text-destructive"
                     >
