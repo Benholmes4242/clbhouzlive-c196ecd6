@@ -642,14 +642,13 @@ export function PostWizard({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="light fixed inset-0 z-[9999] flex flex-col overflow-hidden pb-safe"
-          style={{ 
-            ...{
-              touchAction: 'pan-y pinch-zoom',
-              overscrollBehavior: 'contain',
-            },
-            backgroundColor: '#FFFBEB',
-            backgroundImage: 'linear-gradient(to bottom, rgba(254,243,199,0.3), white, white)',
-          }}
+            style={{ 
+              ...{
+                touchAction: 'pan-y pinch-zoom',
+                overscrollBehavior: 'contain',
+              },
+              backgroundColor: '#F8FAFC',
+            }}
         >
           {showSuccess ? (
             <PostSuccessScreen

@@ -477,11 +477,11 @@ export function MediaStep({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
         >
-          {/* Branded camera icon — amber */}
-          <div className="relative h-20 w-20 rounded-[28%] bg-amber-100 flex items-center justify-center mb-6">
-            <Camera className="h-9 w-9 text-amber-600" />
+          {/* Branded camera icon */}
+          <div className="relative h-20 w-20 rounded-[28%] bg-muted flex items-center justify-center mb-6">
+            <Camera className="h-9 w-9 text-muted-foreground" />
             <div 
-              className="absolute inset-0 rounded-[28%] bg-amber-50 animate-ping" 
+              className="absolute inset-0 rounded-[28%] bg-muted/50 animate-ping" 
               style={{ animationDuration: '3s' }} 
             />
           </div>
@@ -496,13 +496,12 @@ export function MediaStep({
             Up to {POST_LIMITS.MAX_MEDIA_COUNT} photos & videos
           </p>
           
-          {/* Action buttons — Camera (solid amber) & Gallery (outlined) */}
+          {/* Action buttons — Camera (primary) & Gallery (outlined) */}
           <div className="flex gap-3 w-full max-w-[280px]">
             <button
               onClick={handleCamera}
               disabled={isPickerOpen}
-              className="flex-1 flex items-center justify-center gap-2 h-14 rounded-2xl text-white font-semibold text-sm active:scale-[0.97] transition-all disabled:opacity-50"
-              style={{ background: '#F59E0B' }}
+              className="flex-1 flex items-center justify-center gap-2 h-14 rounded-2xl bg-primary text-primary-foreground font-semibold text-sm active:scale-[0.97] transition-all disabled:opacity-50"
             >
               <Camera className="h-5 w-5" />
               Camera
@@ -510,9 +509,9 @@ export function MediaStep({
             <button
               onClick={handleGallery}
               disabled={isPickerOpen}
-              className="flex-1 flex items-center justify-center gap-2 h-14 rounded-2xl bg-transparent border-2 border-amber-300 text-amber-700 font-semibold text-sm active:scale-[0.97] transition-all disabled:opacity-50"
+              className="flex-1 flex items-center justify-center gap-2 h-14 rounded-2xl bg-transparent border-2 border-border text-foreground font-semibold text-sm active:scale-[0.97] transition-all disabled:opacity-50"
             >
-              <Images className="h-5 w-5 text-amber-500" />
+              <Images className="h-5 w-5 text-muted-foreground" />
               Gallery
             </button>
           </div>
@@ -526,18 +525,18 @@ export function MediaStep({
             />
           </div>
           
-          {/* Quick action chips — amber icons */}
+          {/* Quick action chips */}
           <div className="flex flex-wrap justify-center gap-2 mt-6">
             <span className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-white border border-gray-200 shadow-sm text-sm font-medium text-gray-600 active:bg-gray-50 transition-colors">
-              <Camera className="h-4 w-4 text-amber-500" />
+              <Camera className="h-4 w-4 text-muted-foreground" />
               Best shots
             </span>
             <span className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-white border border-gray-200 shadow-sm text-sm font-medium text-gray-600 active:bg-gray-50 transition-colors">
-              <AtSign className="h-4 w-4 text-amber-500" />
+              <AtSign className="h-4 w-4 text-muted-foreground" />
               Tag partners
             </span>
             <span className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-white border border-gray-200 shadow-sm text-sm font-medium text-gray-600 active:bg-gray-50 transition-colors">
-              <MapPin className="h-4 w-4 text-amber-500" />
+              <MapPin className="h-4 w-4 text-muted-foreground" />
               Add location
             </span>
           </div>
@@ -570,7 +569,7 @@ export function MediaStep({
       
       {/* Bottom footer bar — counter + 3 buttons */}
       <div 
-        className="flex-shrink-0 border-t border-amber-200/30 px-4 py-3 bg-amber-50/80"
+        className="flex-shrink-0 border-t border-border/30 px-4 py-3 bg-[#F8FAFC]"
         style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}
       >
         {/* Non-blocking processing progress banner */}
@@ -580,7 +579,7 @@ export function MediaStep({
         />
         
         {/* Counter — centered */}
-        <p className="text-sm text-amber-600 font-medium tabular-nums text-center mb-2">
+        <p className="text-sm text-muted-foreground font-medium tabular-nums text-center mb-2">
           {state.mediaItems.length}/{POST_LIMITS.MAX_MEDIA_COUNT}
         </p>
         
@@ -590,7 +589,7 @@ export function MediaStep({
           <button
             onClick={handleGallery}
             disabled={!canAddMore || isPickerOpen}
-            className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-amber-100/80 text-sm font-medium text-amber-700 active:bg-amber-200/80 transition-colors ${!canAddMore ? 'opacity-30 cursor-not-allowed' : ''}`}
+            className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-muted text-sm font-medium text-foreground active:bg-muted/80 transition-colors ${!canAddMore ? 'opacity-30 cursor-not-allowed' : ''}`}
           >
             <Plus className="h-4 w-4" />
             Add
@@ -602,12 +601,12 @@ export function MediaStep({
               studioFirstRun.markSeen();
               onOpenStudio();
             }}
-            className="relative flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-amber-100/80 text-sm font-medium text-amber-700 active:bg-amber-200/80 transition-colors"
+            className="relative flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-muted text-sm font-medium text-foreground active:bg-muted/80 transition-colors"
           >
             <Wand2 className="h-4 w-4" />
             Studio
             {!studioFirstRun.hasSeen && (
-              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-primary animate-pulse" />
             )}
           </button>
           
@@ -617,12 +616,12 @@ export function MediaStep({
               badgesFirstRun.markSeen();
               onOpenBadges();
             }}
-            className="relative flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-amber-100/80 text-sm font-medium text-amber-700 active:bg-amber-200/80 transition-colors"
+            className="relative flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-muted text-sm font-medium text-foreground active:bg-muted/80 transition-colors"
           >
             <Award className="h-4 w-4" />
             Badges
             {!badgesFirstRun.hasSeen && (
-              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-primary animate-pulse" />
             )}
           </button>
         </div>

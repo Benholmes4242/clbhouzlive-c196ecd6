@@ -117,7 +117,7 @@ export function PostWizardHeader({
 
   return (
     <header 
-      className="sticky top-0 z-10 flex items-center justify-between px-3 bg-amber-50"
+      className="sticky top-0 z-10 flex items-center justify-between px-3 bg-[#F8FAFC]"
       style={{ 
         height: hasHeroAbove ? '55px' : 'calc(55px + max(env(safe-area-inset-top, 0px), 47px))',
         paddingTop: hasHeroAbove ? '0px' : 'max(env(safe-area-inset-top, 0px), 47px)',
@@ -127,7 +127,7 @@ export function PostWizardHeader({
       <div className="flex items-center gap-1 min-w-[72px]">
         <button
           onClick={onBack}
-          className="w-9 h-9 rounded-full bg-amber-100/80 text-amber-700 flex items-center justify-center active:bg-amber-200/80 transition-colors"
+          className="w-9 h-9 rounded-full bg-muted text-foreground flex items-center justify-center active:bg-muted/80 transition-colors"
           aria-label={isFirstStep ? 'Close' : 'Back'}
         >
           {isFirstStep ? (
@@ -143,8 +143,8 @@ export function PostWizardHeader({
             className="w-8 h-8 rounded-full flex items-center justify-center relative transition-colors hover:bg-muted"
             aria-label={`View ${draftCount} drafts`}
           >
-            <FileEdit className="h-3.5 w-3.5 text-amber-700" />
-            <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-[14px] rounded-full bg-amber-500 text-white text-[8px] font-semibold flex items-center justify-center">
+            <FileEdit className="h-3.5 w-3.5 text-muted-foreground" />
+            <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-[14px] rounded-full bg-primary text-primary-foreground text-[8px] font-semibold flex items-center justify-center">
               {draftCount > 9 ? '9+' : draftCount}
             </span>
           </button>
@@ -154,7 +154,7 @@ export function PostWizardHeader({
       {/* Center: Avatar-only profile selector (hidden in edit mode) */}
       <div className="flex-1 flex justify-center">
         {isEditMode ? (
-          <span className="text-sm font-semibold text-amber-900">Edit Post</span>
+          <span className="text-sm font-semibold text-foreground">Edit Post</span>
         ) : (
           <button 
             onClick={onOpenProfileSelector}
@@ -168,7 +168,7 @@ export function PostWizardHeader({
               hideRing
             />
             {actorVerified && <VerifiedBadge size="sm" />}
-            <ChevronDown className="h-3 w-3 text-amber-700" />
+            <ChevronDown className="h-3 w-3 text-muted-foreground" />
           </button>
         )}
       </div>
@@ -185,7 +185,7 @@ export function PostWizardHeader({
               )}
               aria-label={scheduledCount > 0 ? `View ${scheduledCount} scheduled posts` : "Schedule post"}
             >
-              <Clock className="h-4 w-4 text-amber-700" />
+              <Clock className="h-4 w-4 text-muted-foreground" />
               {scheduledCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] rounded-full bg-primary text-primary-foreground text-[9px] font-semibold flex items-center justify-center">
                   {scheduledCount > 9 ? '9+' : scheduledCount}
@@ -234,14 +234,9 @@ export function PostWizardHeader({
             className={cn(
               'px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 active:scale-[0.97]',
               !canProceed || isSubmitting
-                ? 'bg-amber-100/80 text-amber-700 cursor-not-allowed'
-                : 'text-white shadow-sm'
+                ? 'bg-muted text-muted-foreground cursor-not-allowed'
+                : 'bg-primary text-primary-foreground shadow-sm'
             )}
-            style={canProceed && !isSubmitting ? {
-              background: isLastStep && !hasSchedule 
-                ? 'linear-gradient(135deg, #fbbf24, #f59e0b)' 
-                : '#f59e0b',
-            } : undefined}
           >
             {isSubmitting ? (
               <span className="flex items-center gap-1.5">

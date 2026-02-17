@@ -90,7 +90,7 @@ export function PostTemplateSelector({
               whileTap={{ scale: 0.97 }}
               className={`flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-full border shadow-sm transition-colors ${
                 isActive
-                  ? 'bg-amber-50 border-amber-300 text-amber-700'
+                  ? 'bg-primary/10 border-primary/30 text-primary'
                   : 'bg-white border-gray-200 text-gray-700'
               }`}
             >

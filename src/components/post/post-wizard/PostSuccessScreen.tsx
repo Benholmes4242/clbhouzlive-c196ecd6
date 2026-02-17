@@ -77,7 +77,7 @@ export function PostSuccessScreen({
         particleCount: 60,
         spread: 55,
         origin: { y: 0.65, x: 0.5 },
-        colors: ['#fbbf24', '#f59e0b', '#fde68a', '#ffffff', '#d97706'],
+        colors: ['#94a3b8', '#64748b', '#cbd5e1', '#ffffff', '#475569'],
         disableForReducedMotion: true,
       });
       setTimeout(() => {
@@ -85,7 +85,7 @@ export function PostSuccessScreen({
           particleCount: 40,
           spread: 80,
           origin: { y: 0.55, x: 0.5 },
-          colors: ['#fbbf24', '#f59e0b', '#fef3c7'],
+          colors: ['#94a3b8', '#64748b', '#e2e8f0'],
           disableForReducedMotion: true,
         });
       }, 200);
@@ -138,11 +138,11 @@ export function PostSuccessScreen({
       className="light flex-1 flex flex-col items-center justify-center p-6 pt-safe pb-safe relative"
       style={{ backgroundColor: 'transparent' }}
     >
-      {/* Decorative background glow — amber */}
+      {/* Decorative background glow — neutral */}
       <div 
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse at 50% 40%, rgba(251, 191, 36, 0.08) 0%, transparent 60%)',
+          background: 'radial-gradient(ellipse at 50% 40%, rgba(148, 163, 184, 0.08) 0%, transparent 60%)',
         }}
       />
 
@@ -165,27 +165,25 @@ export function PostSuccessScreen({
             <img
               src={firstMediaUrl}
               alt="Your post"
-              className="w-20 h-20 rounded-2xl object-cover shadow-lg border-2 border-amber-200/50"
-              style={{ boxShadow: '0 8px 32px -8px rgba(245,158,11,0.3)' }}
+              className="w-20 h-20 rounded-2xl object-cover shadow-lg border-2 border-border/30"
+              style={{ boxShadow: '0 8px 32px -8px rgba(0,0,0,0.12)' }}
             />
             <div className="absolute inset-0 rounded-2xl" style={{
               background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%)',
             }} />
           </div>
-          {/* Success check overlay — amber */}
+          {/* Success check overlay */}
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 300, damping: 15, delay: 0.4 }}
-            className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full flex items-center justify-center shadow-md"
-            style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)' }}
+            className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full flex items-center justify-center shadow-md bg-primary"
           >
-            <Check className="h-4 w-4 text-white" strokeWidth={3} />
+            <Check className="h-4 w-4 text-primary-foreground" strokeWidth={3} />
           </motion.div>
           {mediaCount > 1 && (
             <div 
-              className="absolute -top-1.5 -right-1.5 text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center text-white shadow-sm"
-              style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)' }}
+              className="absolute -top-1.5 -right-1.5 text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center text-primary-foreground shadow-sm bg-primary"
             >
               +{mediaCount - 1}
             </div>
@@ -205,14 +203,12 @@ export function PostSuccessScreen({
             initial={{ scale: 0.8, opacity: 0.6 }}
             animate={{ scale: 2, opacity: 0 }}
             transition={{ duration: 1, delay: 0.4 }}
-            className="absolute inset-0 w-20 h-20 rounded-full"
-            style={{ background: 'rgba(251, 191, 36, 0.2)' }}
+            className="absolute inset-0 w-20 h-20 rounded-full bg-primary/10"
           />
           <div 
-            className="w-20 h-20 rounded-full flex items-center justify-center relative z-10"
-            style={{ background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.1))' }}
+            className="w-20 h-20 rounded-full flex items-center justify-center relative z-10 bg-primary/10"
           >
-            <Check className="h-10 w-10 text-amber-600" strokeWidth={2.5} />
+            <Check className="h-10 w-10 text-primary" strokeWidth={2.5} />
           </div>
         </motion.div>
       )}
@@ -252,22 +248,18 @@ export function PostSuccessScreen({
         transition={{ delay: 0.55 }}
         className="flex flex-col w-full max-w-[280px] z-10"
       >
-        {/* Primary - View Post — amber gradient */}
+        {/* Primary - View Post */}
         {onViewPost && !isScheduled && (
           <button
             onClick={onViewPost}
-            className="w-full h-12 rounded-xl text-white font-semibold text-[15px] flex items-center justify-center gap-2 active:scale-[0.97] transition-transform shadow-lg"
-            style={{ 
-              background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
-              boxShadow: '0 4px 16px -4px rgba(245, 158, 11, 0.4)',
-            }}
+            className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-semibold text-[15px] flex items-center justify-center gap-2 active:scale-[0.97] transition-transform shadow-md"
           >
             View Post
             <ArrowRight className="h-4 w-4" />
           </button>
         )}
 
-        {/* Rate Course Card — bold amber gradient prompt */}
+        {/* Rate Course Card */}
         {showReviewPrompt && (
           <motion.div
             initial={{ opacity: 0, y: 8 }}
@@ -277,11 +269,8 @@ export function PostSuccessScreen({
           >
             <button
               onClick={handleLeaveReviewTap}
-              className="w-full rounded-2xl px-5 py-4 text-left active:scale-[0.98] transition-transform overflow-hidden"
-              style={{
-                background: 'linear-gradient(to right, #F59E0B, #FBBF24)',
-                boxShadow: '0 10px 25px -5px rgba(245, 158, 11, 0.20)',
-              }}
+              className="w-full rounded-2xl px-5 py-4 text-left active:scale-[0.98] transition-transform overflow-hidden bg-foreground"
+              style={{ boxShadow: '0 10px 25px -5px rgba(0,0,0,0.15)' }}
             >
               <div className="flex items-center gap-3.5">
                 {/* Course thumbnail */}
@@ -301,28 +290,28 @@ export function PostSuccessScreen({
 
                 {/* Text stack */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-base font-bold text-white leading-snug">
+                  <p className="text-base font-bold text-background leading-snug">
                     Rate {taggedCourse!.name}
                   </p>
                   {communityRating && ratingTier ? (
                     <>
-                      <p className="text-sm font-semibold text-white/90 mt-0.5">
+                      <p className="text-sm font-semibold text-background/80 mt-0.5">
                         Rated {communityRating.toFixed(1)} · {ratingTier.label.toUpperCase()} by the community
                       </p>
-                      <p className="text-xs text-white/60 mt-0.5">Share your verdict</p>
+                      <p className="text-xs text-background/50 mt-0.5">Share your verdict</p>
                     </>
                   ) : (
                     <>
-                      <p className="text-sm font-semibold text-white/90 mt-0.5">
+                      <p className="text-sm font-semibold text-background/80 mt-0.5">
                         Be the first to rate this course
                       </p>
-                      <p className="text-xs text-white/60 mt-0.5">Help fellow golfers discover it</p>
+                      <p className="text-xs text-background/50 mt-0.5">Help fellow golfers discover it</p>
                     </>
                   )}
                 </div>
 
                 {/* Chevron */}
-                <ChevronRight className="w-5 h-5 text-white/80 flex-shrink-0" />
+                <ChevronRight className="w-5 h-5 text-background/70 flex-shrink-0" />
               </div>
             </button>
           </motion.div>
@@ -331,7 +320,7 @@ export function PostSuccessScreen({
         {/* Secondary - Create Another */}
         <button
           onClick={onCreateAnother}
-          className="w-full h-12 rounded-xl bg-white/80 text-gray-800 font-semibold text-[15px] flex items-center justify-center gap-2 border border-amber-200/30 shadow-sm active:scale-[0.97] transition-transform mt-3"
+          className="w-full h-12 rounded-xl bg-white text-gray-800 font-semibold text-[15px] flex items-center justify-center gap-2 border border-border shadow-sm active:scale-[0.97] transition-transform mt-3"
         >
           <Plus className="h-4 w-4" />
           Create Another
