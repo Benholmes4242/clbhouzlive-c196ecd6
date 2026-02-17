@@ -1,14 +1,14 @@
 /**
- * FullscreenControls - Apple-style progress bar for video playback
+ * FullscreenControls - Video progress bar for fullscreen playback
  * 
- * Uses AppleProgressBar from Clubhouse for visual parity.
- * Mute button removed — now handled by CinematicActionRail in FullscreenOverlay.
+ * Uses the unified VideoScrubber component for visual and interaction parity
+ * across all surfaces (feed, wizard, fullscreen).
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import { cn } from '@/lib/utils';
 import { useFullscreenViewerContext } from '../hooks/useFullscreenViewer';
-import { AppleProgressBar } from '@/components/clubhouse/AppleProgressBar';
+import { VideoScrubber } from '@/components/video/VideoScrubber';
 
 export interface FullscreenControlsProps {
   className?: string;
@@ -18,64 +18,10 @@ export const FullscreenControls: React.FC<FullscreenControlsProps> = ({
   className,
 }) => {
   const viewer = useFullscreenViewerContext();
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [isScrubbing, setIsScrubbing] = useState(false);
-  const [scrubProgress, setScrubProgress] = useState(0);
-  
-  const videoRef = viewer.activeVideoRef;
+  const videoEl = viewer.activeVideoRef?.current ?? null;
   const isVideo = viewer.currentItem?.mediaType === 'video';
 
-  // Subscribe to video time updates
-  useEffect(() => {
-    const video = videoRef?.current;
-    if (!video) {
-      setCurrentTime(0);
-      setDuration(0);
-      return;
-    }
-    
-    const handleTimeUpdate = () => setCurrentTime(video.currentTime);
-    const handleLoadedMetadata = () => setDuration(video.duration || 0);
-    const handleDurationChange = () => setDuration(video.duration || 0);
-    
-    video.addEventListener('timeupdate', handleTimeUpdate);
-    video.addEventListener('loadedmetadata', handleLoadedMetadata);
-    video.addEventListener('durationchange', handleDurationChange);
-    
-    if (video.duration && !isNaN(video.duration)) {
-      setDuration(video.duration);
-    }
-    setCurrentTime(video.currentTime || 0);
-    
-    return () => {
-      video.removeEventListener('timeupdate', handleTimeUpdate);
-      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      video.removeEventListener('durationchange', handleDurationChange);
-    };
-  }, [videoRef, videoRef?.current]);
-
   if (!isVideo) return null;
-
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
-  const displayProgress = isScrubbing ? scrubProgress : progress;
-
-  const handleScrubStart = () => {
-    setIsScrubbing(true);
-  };
-
-  const handleScrubMove = (percent: number) => {
-    setScrubProgress(percent);
-    // Live seek while scrubbing
-    const video = videoRef?.current;
-    if (video && duration > 0) {
-      video.currentTime = (percent / 100) * duration;
-    }
-  };
-
-  const handleScrubEnd = () => {
-    setIsScrubbing(false);
-  };
 
   return (
     <div
@@ -86,12 +32,12 @@ export const FullscreenControls: React.FC<FullscreenControlsProps> = ({
       style={{
         bottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)',
       }}
+      onClick={(e) => e.stopPropagation()}
     >
-      <AppleProgressBar
-        progress={displayProgress}
-        onScrubStart={handleScrubStart}
-        onScrubMove={handleScrubMove}
-        onScrubEnd={handleScrubEnd}
+      <VideoScrubber
+        videoEl={videoEl}
+        variant="fullscreen"
+        height={3}
       />
     </div>
   );

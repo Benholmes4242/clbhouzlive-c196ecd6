@@ -6,7 +6,6 @@
 import React from 'react';
 import { AppleMetadataCapsule } from './AppleMetadataCapsule';
 import { AppleEngagementRail } from './AppleEngagementRail';
-import { AppleProgressBar } from './AppleProgressBar';
 import { cn } from '@/lib/utils';
 
 interface AppleHUDOverlayProps {
@@ -105,9 +104,6 @@ const AppleHUDOverlayBase = ({
             onProfileSheetOpen={onProfileSheetOpen}
             onMoreClick={onMoreClick}
           />
-          <div className="px-4">
-            <AppleProgressBar progress={videoProgress} />
-          </div>
         </div>
       </div>
 

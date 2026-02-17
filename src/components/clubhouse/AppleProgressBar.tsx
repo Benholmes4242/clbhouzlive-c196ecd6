@@ -1,6 +1,7 @@
 /**
- * AppleProgressBar - Horizontal gradient progress bar with scrubbing
- * Part of the Apple-style Clubhouse redesign
+ * @deprecated Use VideoScrubber.tsx instead — this component is no longer used.
+ * Kept for reference only. VideoScrubber provides GPU-accelerated scaleX animation,
+ * buffered indicator, shimmer states, expanded touch targets, and MediaRuntime integration.
  */
 
 import React, { useRef } from 'react';
