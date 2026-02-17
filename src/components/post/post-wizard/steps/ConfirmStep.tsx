@@ -1,5 +1,5 @@
 // ConfirmStep - Step 3: Review & Post (Read-Only Confirmation)
-// All inputs are now on CaptionStep - this is review only with Edit links
+// Card-free surface design — summary rows on amber background with dividers
 import { useMemo, useCallback, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Tag, Image, Play, PenLine, GripVertical, Sparkles } from 'lucide-react';
@@ -34,30 +34,7 @@ interface ConfirmStepProps extends StepProps {
   onEditLocation?: () => void;
 }
 
-// Section Card wrapper
-function SectionCard({ 
-  children, 
-  delay = 0,
-  className,
-}: { 
-  children: React.ReactNode; 
-  delay?: number;
-  className?: string;
-}) {
-  return (
-    <motion.div 
-      className={cn("bg-white rounded-2xl border border-amber-600/[0.12] overflow-hidden", className)}
-      style={{ boxShadow: '0 2px 8px rgba(217,119,6,0.1)' }}
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: 'easeOut', delay }}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-// Section header with edit action — amber accents
+// Section header with icon + label (left) and Edit link (right)
 function SectionHeader({ 
   icon: Icon, 
   label, 
@@ -68,17 +45,18 @@ function SectionHeader({
   onEdit?: () => void;
 }) {
   return (
-    <div className="flex items-center justify-between px-4 pt-3 pb-1">
+    <div className="flex items-center justify-between">
       <div className="flex items-center gap-1.5">
         <Icon className="h-3.5 w-3.5 text-amber-500" />
-        <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.05em]" style={{ color: '#92400E' }}>
           {label}
         </span>
       </div>
       {onEdit && (
         <button
           onClick={onEdit}
-          className="flex items-center gap-1 px-2 py-1 -mr-1 text-xs font-medium text-amber-600 rounded-lg active:bg-amber-50 transition-colors"
+          className="flex items-center gap-1 px-2 py-1 -mr-1 text-xs font-medium rounded-lg active:bg-amber-50/50 transition-colors"
+          style={{ color: '#D97706' }}
         >
           <PenLine className="h-3 w-3" />
           Edit
@@ -88,7 +66,12 @@ function SectionHeader({
   );
 }
 
-// Thumbnail content - shared between sortable and overlay — amber accents
+// Amber divider
+function SectionDivider() {
+  return <div className="mx-4 h-px" style={{ backgroundColor: '#FCD34D' }} />;
+}
+
+// Thumbnail content - shared between sortable and overlay
 function ConfirmThumbnailContent({
   item,
   index,
@@ -153,7 +136,7 @@ function ConfirmThumbnailContent({
 
   return (
     <div className="relative aspect-square flex-shrink-0 w-full">
-      {/* Cover badge — amber, only on ConfirmStep */}
+      {/* Cover badge */}
       {isFirst && !isDragOverlay && (
         <span 
           className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-md text-[10px] font-semibold z-30"
@@ -178,7 +161,7 @@ function ConfirmThumbnailContent({
       <div className={cn(
         "absolute inset-0 overflow-hidden rounded-xl transition-all duration-150",
         isActive 
-          ? 'ring-2 ring-amber-400 ring-offset-1 ring-offset-white shadow-md' 
+          ? 'ring-2 ring-amber-400 ring-offset-1 ring-offset-transparent shadow-md' 
           : 'opacity-70 hover:opacity-100'
       )}>
         {item.type === 'image' ? (
@@ -279,12 +262,10 @@ export function ConfirmStep({
   const [activePreviewIndex, setActivePreviewIndex] = useState(0);
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
   
-  // Get the active image for preview
   const activeItem = useMemo(() => {
     return state.mediaItems[activePreviewIndex] || state.mediaItems[0];
   }, [state.mediaItems, activePreviewIndex]);
 
-  // Drag-and-drop sensors with delay for touch devices
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -316,7 +297,6 @@ export function ConfirmStep({
         dispatch({ type: 'REORDER_MEDIA', payload: newItems });
         triggerHaptic('light');
         
-        // Update active preview index to follow the selected item
         if (activePreviewIndex === oldIndex) {
           setActivePreviewIndex(newIndex);
         } else if (oldIndex < activePreviewIndex && newIndex >= activePreviewIndex) {
@@ -343,11 +323,9 @@ export function ConfirmStep({
     setActivePreviewIndex(index);
   }, []);
 
-  const cardBaseDelay = 0.1;
-
   return (
     <div className="h-full flex flex-col overflow-y-auto">
-      {/* Ready to share header — amber sparkle */}
+      {/* Ready to share header */}
       <motion.div 
         className="flex items-center gap-2 px-4 pt-4 pb-2"
         initial={{ opacity: 0, y: -8 }}
@@ -359,11 +337,11 @@ export function ConfirmStep({
         >
           <Sparkles className="h-3.5 w-3.5 text-white" />
         </div>
-        <span className="text-sm font-semibold text-gray-800">Looking good — review your moment</span>
+        <span className="text-sm font-semibold" style={{ color: '#92400E' }}>Looking good — review your moment</span>
       </motion.div>
 
-      {/* Hero preview — 4:3 aspect, crossfade between items */}
-      <div className="flex-shrink-0 mx-4 rounded-2xl overflow-hidden shadow-sm">
+      {/* Hero preview — edge-to-edge, no card */}
+      <div className="flex-shrink-0 mx-4 rounded-2xl overflow-hidden">
         <div className="w-full aspect-[4/3] max-h-[55vh] bg-muted relative overflow-hidden">
           <AnimatePresence mode="wait">
             {activeItem ? (
@@ -479,58 +457,60 @@ export function ConfirmStep({
         </motion.div>
       )}
       
-      {/* Review cards */}
-      <div className="flex-shrink-0 p-4 space-y-3">
-        {/* Caption review card */}
+      {/* ── Summary Sections (card-free) ── */}
+      <div className="flex-shrink-0 pt-5 pb-4">
+        {/* Caption summary row */}
         {state.caption && (
-          <SectionCard delay={cardBaseDelay}>
-            <SectionHeader icon={PenLine} label="Caption" onEdit={onEditCaption} />
-            <div className="px-4 pb-3">
-              <p className="text-sm text-gray-700 whitespace-pre-wrap line-clamp-3 leading-relaxed">
+          <>
+            <div className="px-4 mb-5">
+              <SectionHeader icon={PenLine} label="Caption" onEdit={onEditCaption} />
+              <p className="text-sm text-gray-700 whitespace-pre-wrap line-clamp-3 leading-relaxed mt-2">
                 {state.caption}
               </p>
             </div>
-          </SectionCard>
+            {(state.selectedCourses.length > 0 || hasCategories) && <SectionDivider />}
+          </>
         )}
         
-        {/* Location review card */}
+        {/* Location summary row */}
         {state.selectedCourses.length > 0 && (
-          <SectionCard delay={cardBaseDelay + 0.08}>
-            <SectionHeader icon={MapPin} label={state.selectedCourses.length === 1 ? 'Location' : 'Locations'} onEdit={onEditLocation} />
-            <div className="px-4 pb-3 space-y-1.5">
-              {state.selectedCourses.map((course) => (
-                <div key={course.id} className="flex items-center gap-2 text-sm">
-                  <div className="h-6 w-6 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
-                    <MapPin className="h-3 w-3 text-amber-500" />
+          <>
+            <div className="px-4 py-5">
+              <SectionHeader icon={MapPin} label={state.selectedCourses.length === 1 ? 'Location' : 'Locations'} onEdit={onEditLocation} />
+              <div className="space-y-1.5 mt-2">
+                {state.selectedCourses.map((course) => (
+                  <div key={course.id} className="flex items-center gap-2 text-sm">
+                    <div className="h-6 w-6 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
+                      <MapPin className="h-3 w-3 text-amber-500" />
+                    </div>
+                    <span className="font-medium" style={{ color: '#1f2937' }}>{course.name}</span>
                   </div>
-                  <span className="font-medium text-gray-800">{course.name}</span>
-                </div>
-              ))}
-            </div>
-          </SectionCard>
-        )}
-        
-        {/* Categories card — amber pills */}
-        {hasCategories && (
-          <SectionCard delay={cardBaseDelay + 0.16}>
-            <SectionHeader icon={Tag} label="Categories" onEdit={onOpenCategories} />
-            <div className="px-4 pb-3">
-              <div className="flex flex-wrap gap-1.5">
-                {state.selectedCategories.map((cat) => (
-                  <span 
-                    key={typeof cat === 'string' ? cat : cat.id}
-                    className="px-2.5 py-1 text-xs rounded-full font-medium"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.12), rgba(245, 158, 11, 0.12))',
-                      color: '#92400e',
-                    }}
-                  >
-                    {typeof cat === 'string' ? cat : cat.label}
-                  </span>
                 ))}
               </div>
             </div>
-          </SectionCard>
+            {hasCategories && <SectionDivider />}
+          </>
+        )}
+        
+        {/* Categories summary row */}
+        {hasCategories && (
+          <div className="px-4 pt-5">
+            <SectionHeader icon={Tag} label="Categories" onEdit={onOpenCategories} />
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {state.selectedCategories.map((cat) => (
+                <span 
+                  key={typeof cat === 'string' ? cat : cat.id}
+                  className="px-2.5 py-1 text-xs rounded-full font-medium"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.12), rgba(245, 158, 11, 0.12))',
+                    color: '#92400e',
+                  }}
+                >
+                  {typeof cat === 'string' ? cat : cat.label}
+                </span>
+              ))}
+            </div>
+          </div>
         )}
       </div>
     </div>
