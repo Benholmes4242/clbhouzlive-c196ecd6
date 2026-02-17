@@ -162,7 +162,7 @@ export function useUserTopTenCourses(userId: string | undefined) {
 
       return combined;
     },
-    staleTime: 30_000,
+    staleTime: 5_000,
   });
 
   const invalidateTopTenQueries = async () => {
@@ -258,15 +258,13 @@ export function useUserTopTenCourses(userId: string | undefined) {
     onSuccess: invalidateTopTenQueries,
   });
 
-  // Reorder - pins all courses at new positions
+  // Reorder - preserves is_pinned status per course
   const reorderMutation = useMutation({
-    mutationFn: async (updates: { course_id: string; position: number }[]) => {
+    mutationFn: async (updates: { course_id: string; position: number; is_pinned: boolean }[]) => {
       if (!userId) throw new Error('No user ID');
 
-      // Sort by position and extract course IDs in order
-      const courseIds = [...updates]
-        .sort((a, b) => a.position - b.position)
-        .map((u) => u.course_id);
+      // Sort by position
+      const sorted = [...updates].sort((a, b) => a.position - b.position);
 
       // Delete all existing pinned entries
       await supabase
@@ -274,21 +272,25 @@ export function useUserTopTenCourses(userId: string | undefined) {
         .delete()
         .eq('user_id', userId);
 
-      // Insert all with new positions as pinned
-      const entries = courseIds.map((courseId, idx) => ({
-        user_id: userId,
-        course_id: courseId,
-        position: idx + 1,
-        is_pinned: true,
-      }));
+      // Insert only pinned courses (auto-populated ones don't need DB rows)
+      const pinnedEntries = sorted
+        .filter(u => u.is_pinned)
+        .map(u => ({
+          user_id: userId,
+          course_id: u.course_id,
+          position: u.position,
+          is_pinned: true,
+        }));
 
-      const { error } = await supabase
-        .from('user_top_ten_courses')
-        .insert(entries);
-
-      if (error) throw error;
+      if (pinnedEntries.length > 0) {
+        const { error } = await supabase
+          .from('user_top_ten_courses')
+          .insert(pinnedEntries);
+        if (error) throw error;
+      }
 
       // Remove any of these from exclusions
+      const courseIds = sorted.map(u => u.course_id);
       await supabase
         .from('user_top10_exclusions')
         .delete()

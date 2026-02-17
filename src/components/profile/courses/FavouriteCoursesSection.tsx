@@ -143,6 +143,7 @@ export const FavouriteCoursesSection: React.FC<FavouriteCoursesSectionProps> = (
     const updates = reordered.map((course, idx) => ({
       course_id: course.course_id,
       position: idx + 1,
+      is_pinned: course.is_pinned || (course.position !== idx + 1),
     }));
 
     reorderTopTen(updates);

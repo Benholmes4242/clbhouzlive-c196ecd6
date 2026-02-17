@@ -13,9 +13,9 @@ import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useUserCourseActivity } from '@/hooks/useUserCourseActivity';
 import { useUserTopTenCourses } from '@/hooks/useUserTopTenCourses';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, X, Star, Plus, Trash2, ChevronUp, ChevronDown, GripVertical } from 'lucide-react';
+import { Search, X, Star, Plus, Trash2, ChevronUp, ChevronDown, GripVertical, Trophy, RotateCcw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -220,11 +220,13 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
   preSelectedCourseId,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  // Default to 'add' tab if we have a pre-selected course
   const [activeTab, setActiveTab] = useState<'manage' | 'add'>(preSelectedCourseId ? 'add' : 'manage');
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   
   const { data: userActivity = [] } = useUserCourseActivity(userId);
   const { addCourse, removeCourse, reorderTopTen, topTen, isRemoving, isReordering } = useUserTopTenCourses(userId);
@@ -269,7 +271,11 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
 
       if (oldIndex !== -1 && newIndex !== -1) {
         const newOrder = arrayMove(topTen, oldIndex, newIndex);
-        reorderTopTen(newOrder.map((c, i) => ({ course_id: c.course_id, position: i + 1 })));
+        reorderTopTen(newOrder.map((c, i) => ({
+          course_id: c.course_id,
+          position: i + 1,
+          is_pinned: c.is_pinned || (c.position !== i + 1),
+        })));
       }
     }
   }, [topTen, reorderTopTen]);
@@ -364,14 +370,48 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
     if (index === 0) return;
     const newOrder = [...topTen];
     [newOrder[index - 1], newOrder[index]] = [newOrder[index], newOrder[index - 1]];
-    reorderTopTen(newOrder.map((c, i) => ({ course_id: c.course_id, position: i + 1 })));
+    reorderTopTen(newOrder.map((c, i) => ({
+      course_id: c.course_id,
+      position: i + 1,
+      is_pinned: c.is_pinned || (c.position !== i + 1),
+    })));
   };
 
   const handleMoveDown = (index: number) => {
     if (index === topTen.length - 1) return;
     const newOrder = [...topTen];
     [newOrder[index], newOrder[index + 1]] = [newOrder[index + 1], newOrder[index]];
-    reorderTopTen(newOrder.map((c, i) => ({ course_id: c.course_id, position: i + 1 })));
+    reorderTopTen(newOrder.map((c, i) => ({
+      course_id: c.course_id,
+      position: i + 1,
+      is_pinned: c.is_pinned || (c.position !== i + 1),
+    })));
+  };
+
+  const handleResetToAutoSort = async () => {
+    if (!userId) return;
+    setIsResetting(true);
+    try {
+      await supabase.from('user_top_ten_courses').delete().eq('user_id', userId);
+      await supabase.from('user_top10_exclusions').delete().eq('user_id', userId);
+      
+      await queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses'], refetchType: 'all' });
+      
+      toast({
+        title: 'Reset complete',
+        description: 'Your Top 10 now shows your highest-rated courses',
+      });
+      setShowResetConfirm(false);
+      onClose();
+    } catch (err) {
+      toast({
+        title: 'Error',
+        description: 'Failed to reset. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsResetting(false);
+    }
   };
 
   return (
@@ -455,6 +495,40 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
               <p className="text-sm mt-1">Switch to "Add Course" to get started.</p>
             </div>
           ) : (
+            <>
+              {/* Reset button - only show if at least 1 course is pinned */}
+              {topTen.some(c => c.is_pinned) && (
+                showResetConfirm ? (
+                  <div className="mb-3 p-3 rounded-xl border border-amber-500/30 bg-amber-500/5">
+                    <p className="text-sm text-foreground mb-3">
+                      Reset to highest rated? Your custom order will be replaced with your top-rated courses.
+                    </p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleResetToAutoSort}
+                        disabled={isResetting}
+                        className="flex-1 py-2 text-sm font-medium rounded-lg bg-amber-500 text-white min-h-[44px] active:scale-[0.98] disabled:opacity-50"
+                      >
+                        {isResetting ? 'Resetting...' : 'Reset'}
+                      </button>
+                      <button
+                        onClick={() => setShowResetConfirm(false)}
+                        className="flex-1 py-2 text-sm font-medium rounded-lg border border-border text-foreground min-h-[44px] active:scale-[0.98]"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setShowResetConfirm(true)}
+                    className="w-full mb-3 py-2.5 text-sm font-medium rounded-xl border border-amber-500/30 text-amber-600 hover:bg-amber-500/5 transition-colors flex items-center justify-center gap-2 min-h-[44px] active:scale-[0.98]"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    Sort by highest rated
+                  </button>
+                )
+              )}
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
@@ -482,6 +556,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                 </div>
               </SortableContext>
             </DndContext>
+            </>
           )
         ) : (
           /* Add courses tab */

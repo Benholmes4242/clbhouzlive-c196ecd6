@@ -299,7 +299,17 @@ export function useReviewWizard({
       queryClient.invalidateQueries({ queryKey: ['course-ratings'] });
       queryClient.invalidateQueries({ queryKey: ['user-course-rating'] });
       if (currentUserId) {
-        queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses', currentUserId] });
+        queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses', currentUserId], refetchType: 'all' });
+        
+        // Clear exclusion for this course so it can auto-populate back
+        if (course?.id) {
+          supabase
+            .from('user_top10_exclusions')
+            .delete()
+            .eq('user_id', currentUserId)
+            .eq('course_id', course.id)
+            .then(() => {});
+        }
       }
       queryClient.invalidateQueries({ queryKey: ['review-media'] });
 
@@ -696,7 +706,17 @@ export function useReviewWizard({
       queryClient.invalidateQueries({ queryKey: ['user-course-rating'] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews-full'] });
       if (currentUserId) {
-        queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses', currentUserId] });
+        queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses', currentUserId], refetchType: 'all' });
+        
+        // Clear exclusion for this course on delete too
+        if (course?.id) {
+          supabase
+            .from('user_top10_exclusions')
+            .delete()
+            .eq('user_id', currentUserId)
+            .eq('course_id', course.id)
+            .then(() => {});
+        }
       }
       queryClient.invalidateQueries({ queryKey: ['review-media'] });
       queryClient.invalidateQueries({ queryKey: ['posts'] });
