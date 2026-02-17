@@ -357,6 +357,7 @@ const ClubhouseContent = () => {
         {/* Always render feed when posts exist (skeleton handles loading UI) */}
         {posts.length > 0 ? (
           <ClubhouseVerticalGrid
+            key={activeTab}
             posts={posts}
             onLike={handleLike}
             onLoadMore={loadMore}

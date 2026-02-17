@@ -69,6 +69,7 @@ export async function fetchFriendsPosts(
         actor_id,
         course_id,
         categories,
+        source_review_id,
         badges,
         post_media!inner (
           id,
