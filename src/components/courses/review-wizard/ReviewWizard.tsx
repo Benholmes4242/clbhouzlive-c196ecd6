@@ -212,24 +212,23 @@ export function ReviewWizard({
     onClose();
   }, [wizard, onClose]);
 
-  // Handle view review - navigate with reviewId query param for deep linking
+  // Handle view review - navigate to course page Reviews tab with deep link
   const handleViewReview = useCallback(() => {
     if (wizard.submittedRatingId && activeCourse) {
       wizard.cleanup();
       onClose();
-      navigate(`/courses/${activeCourse.id}?reviewId=${wizard.submittedRatingId}`);
+      navigate(`/courses/${activeCourse.id}?tab=reviews&review=${wizard.submittedRatingId}`);
     }
   }, [wizard.submittedRatingId, activeCourse, wizard, onClose, navigate]);
 
-  // Handle view post - navigate to the shared post
+  // Handle view post - navigate to the shared post in Clubhouse
   const handleViewPost = useCallback(() => {
     wizard.cleanup();
     onClose();
-    // Navigate to clubhouse/profile where the post would appear
     if (sharedPostId) {
-      navigate('/clubhouse');
+      navigate(`/clubhouse?focusPostId=${sharedPostId}`);
     } else if (wizard.submittedRatingId && activeCourse) {
-      navigate(`/courses/${activeCourse.id}?reviewId=${wizard.submittedRatingId}`);
+      navigate(`/courses/${activeCourse.id}?tab=reviews&review=${wizard.submittedRatingId}`);
     }
   }, [sharedPostId, wizard.submittedRatingId, activeCourse, wizard, onClose, navigate]);
 
