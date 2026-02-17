@@ -105,11 +105,9 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size }: Segme
           </AnimatePresence>
         ) : (
           <span
-            className="font-bold tabular-nums leading-none inline-block"
-            style={{ fontSize: numberSize, color: '#D1D5DB' }}
-          >
-            —
-          </span>
+            className="inline-block rounded-full"
+            style={{ width: 20, height: 2, backgroundColor: '#E5E7EB' }}
+          />
         )}
         {size === 'hero' && touched && (
           <span
