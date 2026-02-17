@@ -3,7 +3,7 @@
  * Uses shared badge config for images and names.
  */
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Trophy, Share2, ChevronRight, Sparkles, X } from 'lucide-react';
@@ -17,6 +17,8 @@ import { MILESTONE_BADGE_IMAGES, MILESTONE_NAMES } from '@/config/badgeImages';
 interface MilestoneUnlockSheetProps {
   totalPlayed: number;
   onShare?: () => void;
+  isOwnProfile?: boolean;
+  firstName?: string;
 }
 
 const SNOOZE_STORAGE_KEY = 'quest-milestone-snooze-until';
@@ -45,23 +47,27 @@ const TIER_CONFETTI_COLORS: Record<number, string[]> = {
   400: ['#FBBF24', '#F59E0B', '#FCD34D', '#D97706'],
 };
 
-// Build milestones from single source of truth
-const MILESTONES: Milestone[] = MILESTONE_TIER_META.map(meta => {
-  const paletteKey = MILESTONE_PALETTE_MAP[meta.threshold];
-  const accentColor = paletteKey ? CLBHOUZ_ACHIEVEMENT_PALETTE[paletteKey] : '#D2B461';
-  
-  return {
-    id: `${meta.threshold}-club`,
-    name: MILESTONE_NAMES[meta.threshold] || `${meta.threshold} Club`,
-    threshold: meta.threshold,
-    description: meta.threshold === 100 
-      ? 'You have completed the Top 100 Quest'
-      : `You have played ${meta.threshold} Top 100 courses`,
-    tierName: meta.tierName,
-    accentColor,
-    badgeImage: MILESTONE_BADGE_IMAGES[meta.threshold],
-  };
-});
+// Build milestones from single source of truth (without description — computed at render time)
+function buildMilestones(isOwnProfile: boolean, firstName?: string): Milestone[] {
+  return MILESTONE_TIER_META.map(meta => {
+    const paletteKey = MILESTONE_PALETTE_MAP[meta.threshold];
+    const accentColor = paletteKey ? CLBHOUZ_ACHIEVEMENT_PALETTE[paletteKey] : '#D2B461';
+    const subject = isOwnProfile ? 'You' : (firstName || 'They');
+    const verb = isOwnProfile ? 'have' : 'has';
+
+    return {
+      id: `${meta.threshold}-club`,
+      name: MILESTONE_NAMES[meta.threshold] || `${meta.threshold} Club`,
+      threshold: meta.threshold,
+      description: meta.threshold === 100
+        ? `${subject} ${verb} completed the Top 100 Quest`
+        : `${subject} ${verb} played ${meta.threshold} Top 100 courses`,
+      tierName: meta.tierName,
+      accentColor,
+      badgeImage: MILESTONE_BADGE_IMAGES[meta.threshold],
+    };
+  });
+}
 
 function getSeenMilestones(): Set<string> {
   try {
@@ -104,7 +110,10 @@ function activateSnooze(): void {
 export const MilestoneUnlockSheet: React.FC<MilestoneUnlockSheetProps> = ({
   totalPlayed,
   onShare,
+  isOwnProfile = true,
+  firstName,
 }) => {
+  const milestones = useMemo(() => buildMilestones(isOwnProfile, firstName), [isOwnProfile, firstName]);
   const [unlockedMilestone, setUnlockedMilestone] = useState<Milestone | null>(null);
   const [progress, setProgress] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -119,7 +128,7 @@ export const MilestoneUnlockSheet: React.FC<MilestoneUnlockSheetProps> = ({
     
     const seen = getSeenMilestones();
     
-    for (const milestone of MILESTONES) {
+    for (const milestone of milestones) {
       if (totalPlayed >= milestone.threshold && !seen.has(milestone.id)) {
         setUnlockedMilestone(milestone);
         haptic('medium');
@@ -132,7 +141,7 @@ export const MilestoneUnlockSheet: React.FC<MilestoneUnlockSheetProps> = ({
         break;
       }
     }
-  }, [totalPlayed]);
+  }, [totalPlayed, milestones]);
 
   const handleClose = useCallback(() => {
     if (unlockedMilestone) {
