@@ -348,6 +348,16 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
 
       {/* DEBUG: Log review fields - disabled after debugging */}
 
+      {/* Small rating badge for review posts */}
+      {item.isReview && typeof item.reviewRating === 'number' && (
+        <div
+          className="absolute top-2 left-2 z-10 flex items-center justify-center rounded-full min-w-[28px] h-[28px] px-1.5 text-[10px] font-bold text-white"
+          style={{ backgroundColor: 'rgba(217, 119, 6, 0.9)' }}
+        >
+          {item.reviewRating.toFixed(1)}
+        </div>
+      )}
+
       {/* Unified overlay system for all posts (including reviews) */}
       <OverlayCorners
         surface="tile"
