@@ -47,7 +47,7 @@ export function ChampionshipFilters({
 
       {/* Division Filter (only show in division mode) */}
       {arenaMode === 'division' && divisions && (
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-4 px-4">
           <button
             onClick={() => onDivisionFilterChange('all')}
             className={cn(
