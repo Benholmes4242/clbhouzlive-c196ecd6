@@ -21,7 +21,32 @@ import {
 import { AppSelect, AppSelectOption } from '@/components/ui/AppSelect';
 import { EXPLORE_PAGE_SIZE } from '@/config/pagination';
 
-type SortOption = 'popular' | 'rating_desc' | 'recently_added' | 'trending';
+type SortOption = 'official_rating' | 'community_rating' | 'recently_added' | 'name_asc' | 'name_desc';
+
+/** Apply the current sort option to a Supabase query builder. */
+function applySortToQuery(query: any, sortOption: SortOption) {
+  switch (sortOption) {
+    case 'community_rating':
+      query = query.order('avg_overall_score', { referencedTable: 'course_rating_aggregates', ascending: false, nullsFirst: false });
+      query = query.order('name', { ascending: true });
+      break;
+    case 'recently_added':
+      query = query.order('created_at', { ascending: false });
+      break;
+    case 'name_asc':
+      query = query.order('name', { ascending: true });
+      break;
+    case 'name_desc':
+      query = query.order('name', { ascending: false });
+      break;
+    case 'official_rating':
+    default:
+      query = query.order('global_rank', { ascending: true, nullsFirst: false });
+      query = query.order('name', { ascending: true });
+      break;
+  }
+  return query;
+}
 
 const CourseExplorer = () => {
   const listTopRef = useRef<HTMLDivElement>(null);
@@ -79,7 +104,7 @@ const CourseExplorer = () => {
     return '';
   });
   const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
-  const [sortOption, setSortOption] = useState<SortOption>('popular');
+  const [sortOption, setSortOption] = useState<SortOption>('official_rating');
   
   // Load-more pagination state
   const [displayedCourses, setDisplayedCourses] = useState<any[]>([]);
@@ -177,23 +202,7 @@ const CourseExplorer = () => {
         }
 
         // Apply sorting
-        switch (sortOption) {
-          case 'rating_desc':
-            query = query.order('global_rank', { ascending: true, nullsFirst: false });
-            break;
-          case 'recently_added':
-            query = query.order('created_at', { ascending: false });
-            break;
-          case 'trending':
-            // For now, use a combination of rating recency
-            query = query.order('updated_at', { ascending: false });
-            break;
-          case 'popular':
-          default:
-            query = query.order('global_rank', { ascending: true, nullsFirst: false });
-            query = query.order('name', { ascending: true });
-            break;
-        }
+        query = applySortToQuery(query, sortOption);
         
         // Get first page
         query = query.range(0, EXPLORE_PAGE_SIZE - 1);
@@ -271,22 +280,7 @@ const CourseExplorer = () => {
       }
 
       // Apply same sorting
-      switch (sortOption) {
-        case 'rating_desc':
-          query = query.order('global_rank', { ascending: true, nullsFirst: false });
-          break;
-        case 'recently_added':
-          query = query.order('created_at', { ascending: false });
-          break;
-        case 'trending':
-          query = query.order('updated_at', { ascending: false });
-          break;
-        case 'popular':
-        default:
-          query = query.order('global_rank', { ascending: true, nullsFirst: false });
-          query = query.order('name', { ascending: true });
-          break;
-      }
+      query = applySortToQuery(query, sortOption);
       
       query = query.range(nextOffset, nextOffset + EXPLORE_PAGE_SIZE - 1);
 
@@ -377,10 +371,11 @@ const CourseExplorer = () => {
   };
 
   const sortOptions: AppSelectOption<SortOption>[] = [
-    { value: 'popular', label: 'Most popular' },
-    { value: 'rating_desc', label: 'Highest rated' },
-    { value: 'recently_added', label: 'Recently added' },
-    { value: 'trending', label: 'Trending' },
+    { value: 'official_rating', label: 'Official Rating' },
+    { value: 'community_rating', label: 'Community Rating' },
+    { value: 'recently_added', label: 'Recently Added' },
+    { value: 'name_asc', label: 'A – Z' },
+    { value: 'name_desc', label: 'Z – A' },
   ];
 
   const showLoadMoreButton = displayedCourses.length > 0 && !hasReachedEnd && displayedCourses.length < totalCount;
