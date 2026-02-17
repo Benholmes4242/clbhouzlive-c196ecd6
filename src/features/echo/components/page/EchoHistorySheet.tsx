@@ -82,13 +82,13 @@ function HistorySkeleton() {
     return (
       <div className="px-4">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="flex items-center gap-3 px-0 py-3.5 border-b border-amber-200/20">
-            <div className="w-10 h-10 rounded-full bg-amber-200/40 animate-pulse flex-shrink-0" />
+          <div key={i} className="flex items-center gap-3 px-0 py-3.5 border-b border-border/40">
+            <div className="w-10 h-10 rounded-full bg-muted/60 animate-pulse flex-shrink-0" />
             <div className="flex-1 space-y-2">
-              <div className="h-4 bg-amber-200/30 animate-pulse rounded-full w-3/4" />
-              <div className="h-3 bg-amber-100/30 animate-pulse rounded-full w-1/2" />
+              <div className="h-4 bg-muted/40 animate-pulse rounded-full w-3/4" />
+              <div className="h-3 bg-muted/30 animate-pulse rounded-full w-1/2" />
             </div>
-            <div className="h-3 bg-amber-100/30 animate-pulse rounded-full w-12" />
+            <div className="h-3 bg-muted/30 animate-pulse rounded-full w-12" />
           </div>
         ))}
       </div>
@@ -151,9 +151,9 @@ function HistorySkeleton() {
           dragConstraints={{ left: -80, right: 0 }}
           dragElastic={{ left: 0.1, right: 0 }}
           onDragEnd={handleDragEnd}
-          style={{ x, backgroundColor: '#FFFBEB' }}
+          style={{ x, backgroundColor: '#F8FAFC' }}
           onClick={handleSelect}
-          className="relative px-4 py-3.5 flex items-center gap-3 active:bg-amber-100/50 transition-colors cursor-pointer"
+          className="relative px-4 py-3.5 flex items-center gap-3 active:bg-muted/50 transition-colors cursor-pointer"
           role="listitem"
           aria-label={`Open conversation: ${displayTitle}`}
         >
@@ -178,10 +178,10 @@ function HistorySkeleton() {
             {formatRelativeDate(conv.last_message_at || conv.created_at)}
           </span>
           
-          <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: '#FBBF24' }} />
+          <ChevronRight className="w-4 h-4 flex-shrink-0 text-muted-foreground" />
         </motion.div>
         
-        {showDivider && <div className="h-px bg-amber-200/20 ml-[58px]" />}
+        {showDivider && <div className="h-px bg-border/40 ml-[58px]" />}
       </div>
     );
  }
@@ -249,8 +249,8 @@ function HistorySkeleton() {
               dragConstraints={{ top: 0, bottom: 0 }}
               dragElastic={{ top: 0, bottom: 0.5 }}
               onDragEnd={handleSheetDragEnd}
-              style={{ y: sheetY, backgroundColor: '#FFFBEB' }}
-              className="fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl h-[75vh] flex flex-col"
+               style={{ y: sheetY, backgroundColor: '#F8FAFC' }}
+               className="fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl h-[75vh] flex flex-col"
               initial={sheetAnimProps.initial}
               animate={{ y: 0 }}
               exit={sheetAnimProps.exit}
@@ -262,7 +262,7 @@ function HistorySkeleton() {
                 className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none"
                 aria-label="Drag to close"
               >
-                <div className="w-10 h-1 rounded-full bg-amber-300/50" />
+                <div className="w-10 h-1 rounded-full bg-muted-foreground/20" />
               </div>
               
               <div className="px-5 pb-3">
@@ -278,8 +278,8 @@ function HistorySkeleton() {
                   <HistorySkeleton />
                 ) : !conversations || conversations.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-16">
-                    <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mb-4">
-                      <Clock className="w-7 h-7 text-amber-400" />
+                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                      <Clock className="w-7 h-7 text-muted-foreground" />
                     </div>
                     <h3 className="text-base font-semibold text-gray-900 mb-1">No history yet</h3>
                     <p className="text-sm text-gray-400 text-center px-8">

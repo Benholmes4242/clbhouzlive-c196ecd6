@@ -71,10 +71,10 @@ export const EchoComposer = forwardRef<HTMLInputElement, EchoComposerProps>(({
       className="flex-none px-5 pt-3"
       style={{ 
         paddingBottom: 'calc(32px + env(safe-area-inset-bottom, 0px))',
-        background: 'rgba(255,245,235,0.85)',
+        background: 'rgba(248,250,252,0.9)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        borderTop: '1px solid rgba(234,88,12,0.06)',
+        borderTop: '1px solid rgba(0,0,0,0.06)',
       }}
     >
       <div
@@ -84,8 +84,8 @@ export const EchoComposer = forwardRef<HTMLInputElement, EchoComposerProps>(({
           disabled && "opacity-60"
         )}
         style={{
-          background: 'rgba(255,255,255,0.6)',
-          border: '1px solid rgba(234,88,12,0.08)',
+          background: 'rgba(255,255,255,0.8)',
+          border: '1px solid rgba(0,0,0,0.08)',
         }}
       >
         <input

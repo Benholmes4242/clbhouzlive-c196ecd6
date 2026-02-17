@@ -132,7 +132,7 @@ export function MessageBubble({
 
         <div className={cn("flex flex-col max-w-[280px]", isOwnMessage ? "items-end" : "items-start")}>
           {!isOwnMessage && showSenderInfo && (
-          <span className="text-[13px] font-semibold text-amber-600 mb-1 px-1">
+          <span className="text-[13px] font-semibold text-foreground/70 mb-1 px-1">
               {senderName}
             </span>
           )}
@@ -186,7 +186,7 @@ export function MessageBubble({
                 {communityRating && communityRating > 0 && (
                   <div className="flex items-center gap-1.5 flex-shrink-0">
                     <ClubhouseLogo size="xs" />
-                    <span className="text-[14px] font-bold text-amber-600">{communityRating.toFixed(1)}</span>
+                    <span className="text-[14px] font-bold text-foreground/80">{communityRating.toFixed(1)}</span>
                   </div>
                 )}
               </div>
@@ -304,7 +304,7 @@ export function MessageBubble({
       <div className={cn("flex flex-col max-w-[75%]", isOwnMessage ? "items-end" : "items-start")}>
         {/* Sender name for groups */}
         {!isOwnMessage && showSenderInfo && (
-          <span className="text-[13px] font-semibold text-amber-600 mb-0.5 px-1">
+          <span className="text-[13px] font-semibold text-foreground/70 mb-0.5 px-1">
             {senderName}
           </span>
         )}
@@ -321,20 +321,20 @@ export function MessageBubble({
           style={
             isOwnMessage
               ? {
-                  background: 'rgba(254,243,199,0.5)',
+                  background: 'rgba(0,0,0,0.06)',
                   border: 'none',
                 }
               : {
                   background: 'rgba(255,255,255,0.8)',
-                  border: '1px solid rgba(217,119,6,0.08)',
+                  border: '1px solid rgba(0,0,0,0.07)',
                 }
           }
           onTouchCancel={() => setIsPressed(false)}
         >
           {/* Reply preview */}
           {replyToMessage && (
-            <div className="mb-2 pl-2 border-l-2 border-amber-500 bg-[#00000008] rounded-r-lg py-1.5 pr-2">
-              <p className="text-[12px] font-semibold text-amber-600">
+            <div className="mb-2 pl-2 border-l-2 border-primary/40 bg-[#00000008] rounded-r-lg py-1.5 pr-2">
+              <p className="text-[12px] font-semibold text-primary/70">
                 {replyToMessage.sender?.display_name || replyToMessage.sender?.username || 'You'}
               </p>
               <p className="text-[13px] text-[#8E8E93] truncate">

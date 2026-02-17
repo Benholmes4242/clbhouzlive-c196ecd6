@@ -24,16 +24,16 @@ interface NewConversationModalProps {
   initialTab?: 'direct' | 'group';
 }
 
-// Warm input style object shared across all inputs
+// Input style shared across all inputs
 const warmInputStyle: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.7)',
-  border: '1px solid rgba(217,119,6,0.12)',
+  background: 'rgba(255,255,255,0.8)',
+  border: '1px solid rgba(0,0,0,0.09)',
   borderRadius: '12px',
   fontSize: '13px',
   color: '#1C1917',
 };
 
-const warmInputClass = "w-full h-10 px-3 outline-none placeholder:text-[13px] placeholder:font-normal placeholder:text-gray-400 focus:ring-1 focus:ring-amber-200 focus:border-amber-300 transition-shadow";
+const warmInputClass = "w-full h-10 px-3 outline-none placeholder:text-[13px] placeholder:font-normal placeholder:text-gray-400 focus:ring-1 focus:ring-border transition-shadow";
 
 export function NewConversationModal({
   open,
@@ -304,8 +304,7 @@ export function NewConversationModal({
       onClose={handleClose}
       className="flex flex-col"
       style={{
-        backgroundColor: '#FFFBEB',
-        backgroundImage: 'linear-gradient(to bottom, rgba(254,243,199,0.3), white, white)',
+        backgroundColor: '#F8FAFC',
         borderRadius: '20px 20px 0 0',
       }}
       ariaLabelledBy="new-message-title"
@@ -325,7 +324,7 @@ export function NewConversationModal({
         {/* Tab Switcher */}
         <div className="px-5 pb-4">
           <div
-            className="flex rounded-full p-1 bg-amber-100/50"
+            className="flex rounded-full p-1 bg-muted/60"
           >
             <button
               onClick={() => setMode('direct')}

@@ -38,21 +38,21 @@ export const SystemMessage: React.FC<SystemMessageProps> = ({
     
     switch (metadata.event_type) {
       case 'user_added':
-        return <UserPlus className={cn(iconClass, "text-amber-500")} />;
+        return <UserPlus className={cn(iconClass, "text-primary/70")} />;
       case 'user_left':
-        return <LogOut className={cn(iconClass, "text-amber-700/60")} />;
+        return <LogOut className={cn(iconClass, "text-muted-foreground")} />;
       case 'user_ejected':
         return <UserMinus className={cn(iconClass, "text-[#FF3B30]")} />;
       case 'admin_promoted':
-        return <Shield className={cn(iconClass, "text-amber-600")} />;
+        return <Shield className={cn(iconClass, "text-primary/80")} />;
       case 'admin_demoted':
-        return <ShieldOff className={cn(iconClass, "text-amber-700/60")} />;
+        return <ShieldOff className={cn(iconClass, "text-muted-foreground")} />;
       case 'group_created':
-        return <Users className={cn(iconClass, "text-amber-600")} />;
+        return <Users className={cn(iconClass, "text-primary/80")} />;
       case 'name_changed':
-        return <Edit className={cn(iconClass, "text-amber-700/60")} />;
+        return <Edit className={cn(iconClass, "text-muted-foreground")} />;
       case 'photo_changed':
-        return <Camera className={cn(iconClass, "text-amber-700/60")} />;
+        return <Camera className={cn(iconClass, "text-muted-foreground")} />;
       default:
         return null;
     }
@@ -67,13 +67,13 @@ export const SystemMessage: React.FC<SystemMessageProps> = ({
     <div className="flex justify-center my-3">
       <div className={cn(
         "flex items-center gap-1.5 px-4 py-1.5 rounded-full",
-        "bg-amber-50/60 text-amber-700/60 text-[12px]"
+        "bg-muted/60 text-muted-foreground text-[12px]"
       )}
-      style={{ boxShadow: '0 1px 2px rgba(217,119,6,0.06)' }}
+      style={{ boxShadow: '0 1px 2px rgba(0,0,0,0.06)' }}
       >
         {getIcon()}
         <span>{content}</span>
-        <span className="text-amber-700/40 ml-1">
+        <span className="text-muted-foreground/60 ml-1">
           {formatTime(timestamp)}
         </span>
       </div>

@@ -90,14 +90,14 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
   }, [conversationId]);
 
   return (
-    <div className="fixed inset-0 bg-[#FFFBEB] z-50 flex flex-col">
+    <div className="fixed inset-0 bg-[#F8FAFC] z-50 flex flex-col">
       {/* Header */}
-      <div className="flex items-center h-14 px-4 border-b border-amber-200/20">
+      <div className="flex items-center h-14 px-4 border-b border-border/40">
         <button
           onClick={onClose}
-          className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center hover:bg-amber-50/50"
+          className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center hover:bg-muted/50"
         >
-          <ChevronLeft className="w-6 h-6 text-amber-700" />
+          <ChevronLeft className="w-6 h-6 text-foreground/60" />
         </button>
         <h1 className="flex-1 text-center text-lg font-semibold">
           Media, Links, and Courses
@@ -107,7 +107,7 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
 
       {/* Tabs */}
       <Tabs defaultValue="media" className="flex-1 flex flex-col">
-        <TabsList className="mx-4 mt-4 grid grid-cols-3 h-10 bg-amber-100/50 rounded-full p-1">
+        <TabsList className="mx-4 mt-4 grid grid-cols-3 h-10 bg-muted/60 rounded-full p-1">
           <TabsTrigger
             value="media"
             className="rounded-full text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm"

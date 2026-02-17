@@ -245,8 +245,7 @@ export function EchoSheetV2({
             style={{ 
               height: '90svh', 
               maxHeight: '90svh',
-              backgroundColor: '#FFFBEB',
-              backgroundImage: 'linear-gradient(to bottom, rgba(254,243,199,0.3), white, white)',
+              backgroundColor: '#F8FAFC',
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -260,8 +259,8 @@ export function EchoSheetV2({
               <div 
                 className="flex rounded-[12px] p-1"
                 style={{
-                  background: 'rgba(255,255,255,0.55)',
-                  border: '1px solid rgba(234,88,12,0.08)',
+                  background: 'rgba(255,255,255,0.8)',
+                  border: '1px solid rgba(0,0,0,0.07)',
                 }}
               >
                 <button
@@ -312,7 +311,7 @@ export function EchoSheetV2({
                 {shouldShowFullScreenPrompt && (
                   <button
                     onClick={handleContinueFullScreen}
-                    className="flex items-center justify-center gap-2 flex-1 py-2.5 rounded-[10px] bg-[#FFBF66] text-[14px] font-semibold text-white shadow-sm transition-all duration-150 hover:bg-[#FFB04D] active:scale-[0.98]"
+                    className="flex items-center justify-center gap-2 flex-1 py-2.5 rounded-[10px] bg-primary text-[14px] font-semibold text-primary-foreground shadow-sm transition-all duration-150 hover:opacity-90 active:scale-[0.98]"
                   >
                     <Maximize2 className="w-4 h-4" />
                     Full Screen
