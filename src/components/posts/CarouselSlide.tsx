@@ -45,6 +45,8 @@ interface CarouselSlideProps {
   hideVideoOverlays?: boolean;
   /** Object fit mode: 'cover' crops to fill, 'contain' shows full media */
   objectFit?: 'cover' | 'contain';
+  /** Visual variant for scrubber: 'default' (white) or 'wizard' (amber) */
+  scrubberVariant?: 'default' | 'wizard';
   /** Callback when media dimensions are loaded */
   onDimensionsLoaded?: (id: string, width: number, height: number) => void;
 }
@@ -61,6 +63,7 @@ export default function CarouselSlide({
   studioEdits,
   hideVideoOverlays = false,
   objectFit = 'cover',
+  scrubberVariant = 'default',
   onDimensionsLoaded,
 }: CarouselSlideProps) {
   const [loaded, setLoaded] = useState(false);
@@ -68,6 +71,7 @@ export default function CarouselSlide({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [generatedPosterUrl, setGeneratedPosterUrl] = useState<string | null>(null);
+  const [videoDims, setVideoDims] = useState<{ w: number; h: number } | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsPlayerRef = useRef<UnifiedVideoPlayerRef>(null);
   const objectUrlRef = useRef<string | null>(null);
@@ -281,10 +285,149 @@ export default function CarouselSlide({
   // Determine if we need UnifiedVideoPlayer (for Cloudflare Stream URLs) vs native video (for blob URLs)
   const needsUnifiedPlayer = item.type === 'video' && isHlsUrl(baseUrl);
 
+  // Track video dimensions for fitted wrapper
+  const handleVideoDimsCapture = useCallback((videoEl: HTMLVideoElement) => {
+    if (videoEl.videoWidth && videoEl.videoHeight) {
+      setVideoDims({ w: videoEl.videoWidth, h: videoEl.videoHeight });
+    }
+  }, []);
+
+  // Use contain mode: wrap video + overlays in aspect-ratio-matched container
+  const useFittedWrapper = objectFit === 'contain' && videoDims;
+
   if (item.type === 'video') {
+    // The video player element (shared between both render paths)
+    const videoPlayer = needsUnifiedPlayer ? (
+      <UnifiedVideoPlayer
+        ref={hlsPlayerRef}
+        src={baseUrl}
+        posterUrl={resolvedPosterUrl}
+        autoplay={false}
+        muted={forceVideoMuted}
+        loop
+        className={cn(
+          "w-full h-full transition-all duration-150",
+          loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
+          filterClass
+        )}
+        objectFit={useFittedWrapper ? 'cover' : objectFit}
+        showMuteButton={false}
+        surface="grid"
+        onLoadedData={() => {
+          console.log('[CarouselSlide] Video loaded successfully');
+          setLoaded(true);
+          const player = hlsPlayerRef.current;
+          if (player) {
+            setDuration(player.getDuration());
+            const videoEl = player.getVideoElement();
+            if (videoEl) {
+              handleVideoDimsCapture(videoEl);
+              onDimensionsLoaded?.(item.id, videoEl.videoWidth, videoEl.videoHeight);
+            }
+          }
+        }}
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        onEnded={() => {
+          setIsPlaying(false);
+          setCurrentTime(0);
+        }}
+        onTimeUpdate={(current, dur) => {
+          setCurrentTime(current);
+          if (dur > 0) setDuration(dur);
+        }}
+        onError={(error) => console.error('[CarouselSlide] Video error:', error)}
+      />
+    ) : (
+      <video
+        ref={videoRef}
+        src={baseUrl}
+        poster={resolvedPosterUrl}
+        preload="metadata"
+        playsInline
+        controls={false}
+        muted={forceVideoMuted}
+        loop
+        className={cn(
+          "w-full h-full transition-all duration-150 block",
+          loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
+          filterClass
+        )}
+        style={{ 
+          ...pixelStyle,
+          width: '100%',
+          height: '100%',
+          objectFit: useFittedWrapper ? 'cover' : 'contain',
+          display: 'block',
+        }}
+        onLoadedMetadata={() => {
+          console.log('[CarouselSlide] Video metadata loaded successfully');
+          handleLoadedMetadata();
+          const video = videoRef.current;
+          if (video) {
+            handleVideoDimsCapture(video);
+            onDimensionsLoaded?.(item.id, video.videoWidth, video.videoHeight);
+          }
+        }}
+        onCanPlay={() => console.log('[CarouselSlide] Video can play')}
+        onError={(e) => console.error('[CarouselSlide] Video error:', e.currentTarget.error)}
+        onTimeUpdate={handleTimeUpdate}
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        onEnded={() => {
+          setIsPlaying(false);
+          setCurrentTime(0);
+        }}
+        onVolumeChange={(e) => {
+          if (forceVideoMuted && !e.currentTarget.muted) {
+            e.currentTarget.muted = true;
+            onMuteBlocked?.();
+          }
+        }}
+      />
+    );
+
+    // Overlays that sit on the video
+    const videoOverlays = (
+      <>
+        {/* Play icon overlay - ONLY visible when paused */}
+        {loaded && !isPlaying && !hideVideoOverlays && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+            <div className="w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center">
+              <Play className="w-3 h-3 text-white/90 fill-white/90 ml-0.5" />
+            </div>
+          </div>
+        )}
+
+        {/* Video scrubber - positioned at bottom of video */}
+        {loaded && duration > 0 && (
+          <VideoScrubber
+            videoEl={needsUnifiedPlayer ? hlsPlayerRef.current?.getVideoElement() ?? null : videoRef.current}
+            height={3}
+            variant={scrubberVariant}
+            className="absolute left-0 right-0 bottom-10 z-30"
+          />
+        )}
+
+        {/* Video badge - bottom-right of video */}
+        {!hideVideoOverlays && (
+          <div className="absolute bottom-2 right-2 z-20 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-[10px] font-medium uppercase tracking-wide text-white">
+            Video
+          </div>
+        )}
+
+        {/* Countdown timer - bottom-left of video */}
+        {loaded && duration > 0 && !hideVideoOverlays && (
+          <div className="absolute bottom-2 left-2 z-20 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-xs font-medium text-white">
+            {isPlaying ? formatTime(remainingTime) : formatTime(duration)}
+          </div>
+        )}
+      </>
+    );
+
     return (
       <div 
-        className={cn(cropClass, "select-none relative w-full h-full")} 
+        className={cn(cropClass, "select-none relative w-full h-full flex items-center justify-center")} 
         style={{ minHeight: '200px' }}
         {...longPressProps}
         onClick={handleVideoTap}
@@ -294,130 +437,23 @@ export default function CarouselSlide({
           <div className="w-full h-full motion-safe:animate-shimmer-down bg-muted/10" />
         </div>
 
-        {/* Use UnifiedVideoPlayer for Cloudflare Stream URLs, native video for blob URLs */}
-        {needsUnifiedPlayer ? (
-          <UnifiedVideoPlayer
-            ref={hlsPlayerRef}
-            src={baseUrl}
-            posterUrl={resolvedPosterUrl}
-            autoplay={false}
-            muted={forceVideoMuted}
-            loop
-            className={cn(
-              "w-full h-full transition-all duration-150",
-              loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
-              filterClass
-            )}
-            objectFit={objectFit}
-            showMuteButton={false}
-            surface="grid"
-            onLoadedData={() => {
-              console.log('[CarouselSlide] Video loaded successfully');
-              setLoaded(true);
-              const player = hlsPlayerRef.current;
-              if (player) {
-                setDuration(player.getDuration());
-                // Report dimensions if available
-                const videoEl = player.getVideoElement();
-                if (videoEl && videoEl.videoWidth && videoEl.videoHeight) {
-                  onDimensionsLoaded?.(item.id, videoEl.videoWidth, videoEl.videoHeight);
-                }
-              }
-            }}
-            onPlay={() => setIsPlaying(true)}
-            onPause={() => setIsPlaying(false)}
-            onEnded={() => {
-              setIsPlaying(false);
-              setCurrentTime(0);
-            }}
-            onTimeUpdate={(current, dur) => {
-              setCurrentTime(current);
-              if (dur > 0) setDuration(dur);
-            }}
-            onError={(error) => console.error('[CarouselSlide] Video error:', error)}
-          />
+        {useFittedWrapper ? (
+          /* Fitted wrapper: sizes to video's natural aspect ratio, centered in container.
+             Video uses object-cover since the wrapper IS the exact fitted size.
+             All overlays (scrubber, badges) position relative to this wrapper. */
+          <div
+            className="relative max-w-full max-h-full overflow-hidden"
+            style={{ aspectRatio: `${videoDims.w} / ${videoDims.h}` }}
+          >
+            {videoPlayer}
+            {videoOverlays}
+          </div>
         ) : (
-          <video
-            ref={videoRef}
-            src={baseUrl}
-            poster={resolvedPosterUrl}
-            preload="metadata"
-            playsInline
-            controls={false}
-            muted={forceVideoMuted}
-            loop
-            className={cn(
-              "w-full h-full transition-all duration-150 block",
-              'object-contain',
-              loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
-              filterClass
-            )}
-            style={{ 
-              ...pixelStyle,
-              width: '100%',
-              height: '100%',
-              minHeight: '200px',
-              objectFit: 'contain',
-              display: 'block',
-            }}
-            onLoadedMetadata={() => {
-              console.log('[CarouselSlide] Video metadata loaded successfully');
-              handleLoadedMetadata();
-              // Report dimensions
-              const video = videoRef.current;
-              if (video && video.videoWidth && video.videoHeight) {
-                onDimensionsLoaded?.(item.id, video.videoWidth, video.videoHeight);
-              }
-            }}
-            onCanPlay={() => console.log('[CarouselSlide] Video can play')}
-            onError={(e) => console.error('[CarouselSlide] Video error:', e.currentTarget.error)}
-            onTimeUpdate={handleTimeUpdate}
-            onPlay={() => setIsPlaying(true)}
-            onPause={() => setIsPlaying(false)}
-            onEnded={() => {
-              setIsPlaying(false);
-              setCurrentTime(0);
-            }}
-            onVolumeChange={(e) => {
-              // If music is active and user tries to unmute, force mute and notify
-              if (forceVideoMuted && !e.currentTarget.muted) {
-                e.currentTarget.muted = true;
-                onMuteBlocked?.();
-              }
-            }}
-          />
-        )}
-
-        {/* Play icon overlay - ONLY visible when paused - circle container */}
-        {loaded && !isPlaying && !hideVideoOverlays && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center">
-              <Play className="w-3 h-3 text-white/90 fill-white/90 ml-0.5" />
-            </div>
-          </div>
-        )}
-
-        {/* Video scrubber - edge-to-edge, z-30 to sit above gradient overlays */}
-        {loaded && duration > 0 && (
-          <VideoScrubber
-            videoEl={needsUnifiedPlayer ? hlsPlayerRef.current?.getVideoElement() ?? null : videoRef.current}
-            height={3}
-            className="absolute left-0 right-0 bottom-10 z-30"
-          />
-        )}
-
-        {/* Video badge in corner - DARK GLASS consistent - z-20 to sit above parent gradient scrims */}
-        {!hideVideoOverlays && (
-          <div className="absolute bottom-2 right-2 z-20 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-[10px] font-medium uppercase tracking-wide text-white">
-            Video
-          </div>
-        )}
-
-        {/* Countdown timer - bottom left - DARK GLASS - z-20 to sit above parent gradient scrims */}
-        {loaded && duration > 0 && !hideVideoOverlays && (
-          <div className="absolute bottom-2 left-2 z-20 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-xs font-medium text-white">
-            {isPlaying ? formatTime(remainingTime) : formatTime(duration)}
-          </div>
+          /* Full container mode (cover): video + overlays fill the entire container */
+          <>
+            {videoPlayer}
+            {videoOverlays}
+          </>
         )}
       </div>
     );

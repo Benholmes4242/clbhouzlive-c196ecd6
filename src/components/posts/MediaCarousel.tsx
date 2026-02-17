@@ -265,6 +265,7 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
           studioEdits={currentItem.studioEdits}
           hideVideoOverlays={hideVideoOverlays}
           objectFit="contain"
+          scrubberVariant={isWizardContext ? 'wizard' : 'default'}
           onDimensionsLoaded={handleMediaDimensions}
         />
       </div>
