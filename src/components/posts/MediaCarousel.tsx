@@ -275,10 +275,8 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
         aspectRatio: containerAspect,
         touchAction: 'pan-y',
         minHeight: '200px',
-        // In wizard context, ensure fully transparent so page gradient shows through
-        ...(isWizardContext ? { background: 'transparent' } : {}),
-        // DEBUG: green border to identify this element
-        border: '3px solid green',
+        // DEBUG: make it bright green to confirm this IS the problematic area
+        ...(isWizardContext ? { backgroundColor: 'lime' } : {}),
       }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
