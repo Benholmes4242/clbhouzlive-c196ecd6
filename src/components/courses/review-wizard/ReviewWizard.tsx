@@ -416,7 +416,7 @@ export function ReviewWizard({
                 currentStep={wizard.state.step as 1 | 2 | 3 | 4}
                 onBack={wizard.prevStep}
                 onClose={handleClose}
-                hideBackButton={false}
+                hideBackButton={true}
               />
             )}
 
