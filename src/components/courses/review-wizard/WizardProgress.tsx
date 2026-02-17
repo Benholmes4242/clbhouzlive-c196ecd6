@@ -21,12 +21,10 @@ export function WizardProgress({ currentStep, totalSteps = 4 }: WizardProgressPr
 
   const progressPercent = (currentStep / totalSteps) * 100;
 
-  // Amber gradient progress bar — intentional brand differentiation from Post Wizard's emerald
   return (
-    <div className="h-2 w-full bg-amber-200/50">
+    <div className="h-1 w-full bg-muted/50">
       <motion.div
-        className="h-full"
-        style={{ background: 'linear-gradient(to right, #fbbf24, #f59e0b)' }}
+        className="h-full bg-primary"
         initial={{ width: '0%' }}
         animate={{ width: `${progressPercent}%` }}
         transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}

@@ -85,16 +85,14 @@ function RatingDisplay({ value, size = 'lg' }: { value: number; size?: 'sm' | 'l
   );
 }
 
-/** Section header with Edit button — on background */
 function SectionHeader({ label, onEdit, editLabel }: { label: string; onEdit: () => void; editLabel: string }) {
   return (
     <div className="flex items-center justify-between mb-2">
-      <p className="text-[11px] uppercase tracking-wider font-semibold" style={{ color: '#92400E' }}>{label}</p>
+      <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">{label}</p>
       <button
         type="button"
         onClick={onEdit}
-        className="flex items-center gap-1 text-[11px] font-medium hover:opacity-70 transition-opacity active:scale-[0.97]"
-        style={{ color: '#D97706' }}
+        className="flex items-center gap-1 text-[11px] font-medium text-primary hover:opacity-70 transition-opacity active:scale-[0.97]"
         aria-label={editLabel}
       >
         <Pencil className="h-3 w-3" />
@@ -104,9 +102,9 @@ function SectionHeader({ label, onEdit, editLabel }: { label: string; onEdit: ()
   );
 }
 
-/** Amber section divider */
+/** Section divider */
 function SectionDivider() {
-  return <div className="h-px" style={{ backgroundColor: '#FCD34D' }} />;
+  return <div className="h-px bg-border" />;
 }
 
 const BREAKDOWN_LABELS: Record<keyof ReviewBreakdowns, string> = {
@@ -167,10 +165,10 @@ export function ConfirmStep({
       {/* Header */}
       <div className="text-center mb-5">
         <div className="flex items-center justify-center gap-1.5 mb-1">
-          <Sparkles className="h-4 w-4 text-amber-500" />
-          <span className="text-xs font-medium text-amber-600">Looking good</span>
+          <Sparkles className="h-4 w-4 text-primary" />
+          <span className="text-xs font-medium text-primary">Looking good</span>
         </div>
-        <h2 className="text-xl font-bold tracking-tight text-gray-900">
+        <h2 className="text-xl font-bold tracking-tight text-foreground">
           {isEditMode ? 'Review your changes' : 'Review your verdict'}
         </h2>
       </div>
@@ -192,8 +190,8 @@ export function ConfirmStep({
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-sm text-foreground truncate">{course.name}</h3>
               {(course.sub_country || course.country) && (
-                <p className="text-xs text-gray-400 flex items-center gap-1">
-                  <MapPin className="h-3 w-3 text-amber-500" />
+                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                  <MapPin className="h-3 w-3 text-muted-foreground" />
                   {[course.sub_country, course.country].filter(Boolean).join(', ')}
                 </p>
               )}
@@ -215,7 +213,7 @@ export function ConfirmStep({
           {rating !== null ? (
             <RatingDisplay value={rating} size="lg" />
           ) : (
-            <span className="text-gray-400">Not set</span>
+            <span className="text-muted-foreground">Not set</span>
           )}
         </motion.div>
 
@@ -234,7 +232,7 @@ export function ConfirmStep({
               <SectionHeader label="Media" onEdit={() => onGoToStep(3)} editLabel="Edit media" />
               <div className="flex gap-1 mb-1.5">
                 {mediaThumbnails.map((item, idx) => (
-                  <div key={item.id} className="relative w-10 h-10 rounded-lg overflow-hidden bg-gray-100 shrink-0">
+                  <div key={item.id} className="relative w-10 h-10 rounded-lg overflow-hidden bg-muted shrink-0">
                     <img src={item.previewUrl || item.posterUrl || ''} alt="" className="w-full h-full object-cover" />
                     {idx === mediaThumbnails.length - 1 && remainingMedia > 0 && (
                       <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
@@ -244,15 +242,15 @@ export function ConfirmStep({
                   </div>
                 ))}
               </div>
-              <p className="text-[11px] text-gray-400">
+              <p className="text-[11px] text-muted-foreground">
                 {imageCount > 0 && `${imageCount} photo${imageCount > 1 ? 's' : ''}`}
                 {imageCount > 0 && videoCount > 0 && ', '}
                 {videoCount > 0 && `${videoCount} video${videoCount > 1 ? 's' : ''}`}
               </p>
               {hasUploadsInProgress && (
                 <div className="flex items-center gap-1 mt-1">
-                  <Loader2 className="h-3 w-3 animate-spin text-amber-500" />
-                  <p className="text-[11px] text-amber-500">Uploading…</p>
+                  <Loader2 className="h-3 w-3 animate-spin text-primary" />
+                  <p className="text-[11px] text-primary">Uploading…</p>
                 </div>
               )}
             </motion.div>
@@ -273,7 +271,7 @@ export function ConfirmStep({
             >
               <SectionHeader label="Review" onEdit={() => onGoToStep(2)} editLabel="Edit review" />
               {title && <h4 className="font-medium text-sm text-foreground">{title}</h4>}
-              {review && <p className="text-xs text-gray-400 line-clamp-3 mt-0.5">{review}</p>}
+              {review && <p className="text-xs text-muted-foreground line-clamp-3 mt-0.5">{review}</p>}
             </motion.div>
 
             <SectionDivider />
@@ -296,18 +294,18 @@ export function ConfirmStep({
                   value !== null && (
                     <div key={key}>
                       <div className="flex justify-between items-baseline">
-                        <span className="text-gray-400 text-xs">{BREAKDOWN_LABELS[key]}</span>
+                        <span className="text-muted-foreground text-xs">{BREAKDOWN_LABELS[key]}</span>
                         <span className={cn("font-semibold tabular-nums text-sm", getRatingTextColor(value))}>
                           {value.toFixed(1)}
                         </span>
                       </div>
                       {/* Mini track bar */}
-                      <div className="w-full h-1.5 rounded-full mt-1" style={{ backgroundColor: '#E5E7EB' }}>
+                      <div className="w-full h-1.5 rounded-full mt-1 bg-muted">
                         <div
                           className="h-full rounded-full transition-all duration-300"
                           style={{
                             width: `${(value / 10) * 100}%`,
-                            background: value >= 9 ? 'linear-gradient(to right, #F59E0B, #D97706)' : '#94a3b8',
+                            background: value >= 9 ? 'linear-gradient(to right, #F59E0B, #D97706)' : 'hsl(var(--primary))',
                           }}
                         />
                       </div>
@@ -328,7 +326,7 @@ export function ConfirmStep({
             className="flex flex-wrap gap-1.5 py-3"
           >
             {selectedTags.map(tag => (
-              <span key={tag.id || tag.username} className="bg-amber-50 text-amber-700 text-[11px] rounded-full px-2.5 py-1">
+              <span key={tag.id || tag.username} className="bg-muted text-muted-foreground text-[11px] rounded-full px-2.5 py-1">
                 @{tag.username}
               </span>
             ))}
@@ -343,7 +341,7 @@ export function ConfirmStep({
           initial="hidden"
           animate="visible"
           variants={staggerDelay(sectionIndex++)}
-          className="text-xs text-gray-400 text-center mt-6"
+          className="text-xs text-muted-foreground text-center mt-6"
         >
           Your review includes {statParts.join(', ')}
         </motion.p>
@@ -353,7 +351,7 @@ export function ConfirmStep({
         initial="hidden"
         animate="visible"
         variants={staggerDelay(sectionIndex++)}
-        className="text-xs text-amber-600/60 text-center mt-2"
+        className="text-xs text-muted-foreground/60 text-center mt-2"
       >
         Your review helps fellow golfers discover great courses
       </motion.p>

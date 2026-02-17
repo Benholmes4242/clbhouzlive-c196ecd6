@@ -153,14 +153,14 @@ export function WriteStep({
     >
       {/* Header */}
       <div className="text-center mb-5">
-        <h2 className="text-xl font-bold tracking-tight text-gray-900">
+        <h2 className="text-xl font-bold tracking-tight text-foreground">
           The Verdict
         </h2>
-        <p className="text-sm font-medium text-gray-500 mt-0.5">
+        <p className="text-sm font-medium text-muted-foreground mt-0.5">
           Tell the story of your experience
         </p>
         {reviewLength === 0 && titleLength === 0 && (
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-muted-foreground/70 mt-1">
             Optional — skip if you prefer to let your ratings speak
           </p>
         )}
@@ -178,9 +178,9 @@ export function WriteStep({
           <input
             id="review-title"
             type="text"
-            className="w-full text-base font-medium leading-relaxed bg-transparent focus:outline-none py-3 text-foreground transition-all duration-200 placeholder:text-amber-600/50"
+            className="w-full text-base font-medium leading-relaxed bg-transparent focus:outline-none py-3 text-foreground transition-all duration-200 placeholder:text-muted-foreground/50"
             style={{
-              borderBottom: isTitleFocused ? '2px solid #F59E0B' : '1px solid transparent',
+              borderBottom: isTitleFocused ? '2px solid hsl(var(--primary))' : '1px solid transparent',
               paddingBottom: isTitleFocused ? 11 : 12,
             }}
             placeholder="Sum up your experience in a few words"
@@ -191,7 +191,7 @@ export function WriteStep({
             maxLength={MAX_TITLE_LENGTH}
           />
           <div className="flex items-center justify-between mt-1 mb-1">
-            <span className="text-[11px] text-gray-400">
+            <span className="text-[11px] text-muted-foreground">
               Your take in one line
             </span>
             <AnimatePresence>
@@ -210,8 +210,8 @@ export function WriteStep({
           </div>
         </motion.div>
 
-        {/* Amber divider */}
-        <div className="h-px my-2" style={{ backgroundColor: '#FCD34D' }} />
+        {/* Section divider */}
+        <div className="h-px my-2 bg-border" />
 
         {/* Review Textarea — borderless, on background */}
         <motion.div
@@ -231,7 +231,7 @@ export function WriteStep({
             className="w-full bg-transparent border-0 resize-none focus:outline-none focus-visible:ring-0 text-sm leading-relaxed py-3 text-foreground transition-all duration-200"
             style={{
               minHeight: '200px',
-              borderBottom: isReviewFocused ? '2px solid #F59E0B' : '1px solid transparent',
+              borderBottom: isReviewFocused ? '2px solid hsl(var(--primary))' : '1px solid transparent',
             }}
             maxLength={MAX_REVIEW_LENGTH + 100}
           />
@@ -254,7 +254,7 @@ export function WriteStep({
                       e.preventDefault();
                       handlePromptChipClick(chip.insert);
                     }}
-                    className="text-[11px] bg-amber-50 text-amber-700 rounded-full px-2.5 py-1 transition-colors hover:bg-amber-100 active:bg-amber-200/80 active:scale-[0.97]"
+                    className="text-[11px] bg-muted text-muted-foreground rounded-full px-2.5 py-1 transition-colors hover:bg-muted/80 active:scale-[0.97]"
                   >
                     {chip.label}
                   </button>
@@ -266,12 +266,12 @@ export function WriteStep({
           {/* Tagged entities chips */}
           {selectedTags.length > 0 && (
             <div className="flex flex-wrap items-center gap-1.5 mt-2 shrink-0">
-              <span className="text-xs text-gray-400">Tagged:</span>
+              <span className="text-xs text-muted-foreground">Tagged:</span>
               {selectedTags.map(tag => (
                 <button
                   key={tag.id}
                   onClick={() => handleRemoveTag(tag.id)}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors bg-amber-50 text-amber-700 hover:bg-amber-100 active:scale-[0.97]"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors bg-muted text-foreground hover:bg-muted/80 active:scale-[0.97]"
                 >
                   @{(tag.username || tag.name).charAt(0).toUpperCase() + (tag.username || tag.name).slice(1)}
                   <X className="w-3 h-3 opacity-60 hover:opacity-100" />

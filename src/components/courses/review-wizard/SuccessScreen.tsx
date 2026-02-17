@@ -64,7 +64,7 @@ export function SuccessScreen({
       {/* Close button */}
       <button
         onClick={onDone}
-        className="absolute top-4 right-4 z-50 w-9 h-9 rounded-full bg-amber-100/80 flex items-center justify-center text-amber-700 hover:bg-amber-200/80 transition-colors active:scale-[0.97]"
+        className="absolute top-4 right-4 z-50 w-9 h-9 rounded-full bg-muted/80 flex items-center justify-center text-foreground hover:bg-muted transition-colors active:scale-[0.97]"
         aria-label="Close"
       >
         <X className="h-5 w-5" />
@@ -116,7 +116,7 @@ export function SuccessScreen({
         <h2 className="text-xl font-semibold text-foreground">
           {isShared ? 'Posted to Clubhouse!' : (isEditMode ? 'Review Updated!' : 'Review Saved!')}
         </h2>
-        <p className="text-gray-500 max-w-xs mx-auto">
+        <p className="text-muted-foreground max-w-xs mx-auto">
           {isShared 
             ? `Your review of ${course?.name || 'the course'} has been shared to your profile and the Clubhouse feed.`
             : isEditMode
@@ -155,8 +155,7 @@ export function SuccessScreen({
         {isShared ? (
           <button
             onClick={onViewPost}
-            className="w-full h-12 gap-2 text-white font-semibold rounded-full active:scale-[0.97] transition-all duration-200 flex items-center justify-center"
-            style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)' }}
+            className="w-full h-12 gap-2 bg-primary text-primary-foreground font-semibold rounded-full active:scale-[0.97] transition-all duration-200 flex items-center justify-center"
           >
             <ExternalLink className="h-4 w-4" />
             View Post
@@ -164,15 +163,14 @@ export function SuccessScreen({
         ) : (
           <button
             onClick={onViewReview}
-            className="w-full h-12 gap-2 text-white font-semibold rounded-full active:scale-[0.97] transition-all duration-200 flex items-center justify-center"
-            style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)' }}
+            className="w-full h-12 gap-2 bg-primary text-primary-foreground font-semibold rounded-full active:scale-[0.97] transition-all duration-200 flex items-center justify-center"
           >
             <Eye className="h-4 w-4" />
             View Review
           </button>
         )}
         
-        <Button variant="ghost" onClick={onDone} className="w-full h-12 text-gray-500 hover:text-foreground">
+        <Button variant="ghost" onClick={onDone} className="w-full h-12 text-muted-foreground hover:text-foreground">
           Done
         </Button>
       </motion.div>

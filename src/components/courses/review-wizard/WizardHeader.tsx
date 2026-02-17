@@ -98,10 +98,10 @@ export function WizardHeader({
       {/* Left: Close/Back + Trash (edit mode only) */}
       <div className="flex items-center gap-1 min-w-[72px]">
         {hasHeroAbove ? (
-          /* Steps 1-2: Amber pill style below hero */
+          /* Steps 1-2: Pill below hero */
           <button
             onClick={handleBackOrClose}
-            className="w-9 h-9 rounded-full bg-amber-100/80 text-amber-700 flex items-center justify-center active:bg-amber-200/80 active:scale-[0.97] transition-all duration-100 disabled:opacity-50"
+            className="w-9 h-9 rounded-full bg-muted/80 text-foreground flex items-center justify-center active:bg-muted active:scale-[0.97] transition-all duration-100 disabled:opacity-50"
             aria-label={isFirstStep ? 'Close' : 'Back'}
             disabled={isSubmitting || isDeleting}
           >
@@ -112,10 +112,10 @@ export function WizardHeader({
             )}
           </button>
         ) : (
-          /* Steps 3-4: Amber treatment */
+          /* Steps 3-4 */
           <button
             onClick={handleBackOrClose}
-            className="w-9 h-9 rounded-full bg-amber-100/80 text-amber-700 flex items-center justify-center active:bg-amber-200/80 active:scale-[0.97] transition-all duration-100 disabled:opacity-50"
+            className="w-9 h-9 rounded-full bg-muted/80 text-foreground flex items-center justify-center active:bg-muted active:scale-[0.97] transition-all duration-100 disabled:opacity-50"
             aria-label={isFirstStep ? 'Close' : 'Back'}
             disabled={isSubmitting || isDeleting}
           >
@@ -168,16 +168,9 @@ export function WizardHeader({
           className={cn(
             'px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 active:scale-[0.97]',
             isNextEnabled
-              ? isLastStep 
-                ? 'text-white'
-                : 'text-white'
-              : 'bg-amber-100/80 text-amber-700 cursor-not-allowed'
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-muted text-muted-foreground cursor-not-allowed'
           )}
-          style={isNextEnabled ? {
-            background: isLastStep 
-              ? 'linear-gradient(135deg, #fbbf24, #f59e0b)' 
-              : '#f59e0b',
-          } : undefined}
         >
           {isSubmitting ? (
             <span className="flex items-center gap-1.5">
