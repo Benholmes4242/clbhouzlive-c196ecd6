@@ -33,7 +33,7 @@ export { ActivityNudgeRow } from './ActivityNudgeRow';
 export { PromotionStatusBanner } from './PromotionStatusBanner';
 export { DivisionLadderPanel } from './DivisionLadderPanel';
 export { LeaderboardRowV2 } from './LeaderboardRowV2';
-export { DivisionPillFilter } from './DivisionPillFilter';
+
 export { TimeModeToggle } from './TimeModeToggle';
 export { HallOfFameHeader } from './HallOfFameHeader';
 
