@@ -496,30 +496,24 @@ export function MediaStep({
             Up to {POST_LIMITS.MAX_MEDIA_COUNT} photos & videos
           </p>
           
-          {/* Action cards — Camera (amber) & Gallery */}
+          {/* Action buttons — Camera (solid amber) & Gallery (outlined) */}
           <div className="flex gap-3 w-full max-w-[280px]">
             <button
               onClick={handleCamera}
               disabled={isPickerOpen}
-              className="flex-1 flex flex-col items-center gap-2 py-5 rounded-2xl text-white font-medium shadow-sm active:scale-[0.97] transition-all disabled:opacity-50"
-              style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)' }}
+              className="flex-1 flex items-center justify-center gap-2 h-14 rounded-2xl text-white font-semibold text-sm active:scale-[0.97] transition-all disabled:opacity-50"
+              style={{ background: '#F59E0B' }}
             >
-              <Camera className="h-6 w-6" />
-              <div>
-                <div className="text-sm font-semibold">Camera</div>
-                <div className="text-[10px] opacity-80">Capture now</div>
-              </div>
+              <Camera className="h-5 w-5" />
+              Camera
             </button>
             <button
               onClick={handleGallery}
               disabled={isPickerOpen}
-              className="flex-1 flex flex-col items-center gap-2 py-5 rounded-2xl bg-white border border-gray-200 text-gray-800 font-medium shadow-sm active:scale-[0.97] transition-all disabled:opacity-50"
+              className="flex-1 flex items-center justify-center gap-2 h-14 rounded-2xl bg-transparent border-2 border-amber-300 text-amber-700 font-semibold text-sm active:scale-[0.97] transition-all disabled:opacity-50"
             >
-              <Images className="h-6 w-6 text-amber-500" />
-              <div>
-                <div className="text-sm font-semibold">Gallery</div>
-                <div className="text-[10px] text-gray-400">Choose media</div>
-              </div>
+              <Images className="h-5 w-5 text-amber-500" />
+              Gallery
             </button>
           </div>
 

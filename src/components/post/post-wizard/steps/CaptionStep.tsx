@@ -1,5 +1,5 @@
 // CaptionStep - Step 2: Caption + Course Tag + Categories + @Mentions
-// Redesigned with section cards, rotating placeholders, enhanced counter
+// Card-free surface design — content sits directly on amber gradient background
 import { useCallback, useRef, useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, X, Tag, ChevronRight, Pencil, Play } from 'lucide-react';
@@ -21,34 +21,25 @@ const CAPTION_MAX_LENGTH = 2200;
 
 const PLACEHOLDERS = [
   "How was the back nine?",
-  "Tell us about that shot...",
+  "Tell us about the shot...",
   "What made this round special?",
   "Describe the course conditions today",
   "Any highlights from your round?",
   "What's the story behind these shots?",
 ];
 
-// Section card wrapper
-function SectionCard({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+// Section label — uppercase tracking label on amber background
+function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, type: 'spring', stiffness: 300, damping: 25 }}
-      className="bg-white rounded-2xl border border-amber-600/[0.12] p-4 mx-4"
-      style={{ boxShadow: '0 2px 8px rgba(217,119,6,0.1)' }}
-    >
+    <span className="text-[11px] font-semibold uppercase tracking-[0.05em]" style={{ color: '#92400E' }}>
       {children}
-    </motion.div>
+    </span>
   );
 }
 
-function SectionHeader({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-3">
-      {children}
-    </div>
-  );
+// Amber divider between sections
+function SectionDivider() {
+  return <div className="mx-4 h-px" style={{ backgroundColor: '#FCD34D' }} />;
 }
 
 export function CaptionStep({ 
@@ -70,7 +61,7 @@ export function CaptionStep({
   const [placeholderIndex, setPlaceholderIndex] = useState(() => Math.floor(Math.random() * PLACEHOLDERS.length));
 
   useEffect(() => {
-    if (state.caption.length > 0) return; // Don't cycle when user has typed
+    if (state.caption.length > 0) return;
     const interval = setInterval(() => {
       setPlaceholderIndex(prev => (prev + 1) % PLACEHOLDERS.length);
     }, 3000);
@@ -179,14 +170,14 @@ export function CaptionStep({
       className="h-full flex flex-col overflow-y-auto"
       style={{ background: 'transparent' }}
     >
-      <div className="flex flex-col space-y-3 py-4 pb-32">
+      <div className="flex flex-col py-4 pb-32">
         {/* Media Preview Strip */}
         {state.mediaItems.length > 0 && (
           <motion.div
             initial={{ opacity: 0, x: -12 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="px-4"
+            className="px-4 mb-6"
           >
             <button onClick={handleEditMedia} className="flex items-center gap-2 group">
               {previewMedia.map((item, idx) => (
@@ -219,15 +210,15 @@ export function CaptionStep({
           </motion.div>
         )}
 
-        {/* Caption Card */}
-        <SectionCard delay={0.05}>
-          <SectionHeader>Caption</SectionHeader>
-          <div className={cn(
-            "rounded-2xl border p-4 transition-all duration-200",
-            isFocused 
-              ? "border-amber-300 shadow-amber-100/50 ring-1 ring-amber-200" 
-              : "border-amber-200/30"
-          )}>
+        {/* ── Caption Section ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05, type: 'spring', stiffness: 300, damping: 25 }}
+          className="px-4 mb-6"
+        >
+          <SectionLabel>Caption</SectionLabel>
+          <div className="mt-2">
             <Textarea
               ref={textareaRef}
               value={state.caption}
@@ -236,18 +227,31 @@ export function CaptionStep({
               onBlur={() => setIsFocused(false)}
               placeholder={PLACEHOLDERS[placeholderIndex]}
               className={cn(
-                "min-h-[100px] bg-transparent border-0 resize-none",
+                "min-h-[120px] bg-transparent border-0 border-b-2 rounded-none resize-none",
                 "focus-visible:ring-0 focus-visible:outline-none",
-                "placeholder:text-gray-400 placeholder:italic",
-                "text-base text-gray-800 leading-relaxed p-0"
+                "text-base leading-relaxed p-0 py-3",
+                isFocused
+                  ? "border-b-amber-500"
+                  : "border-b-transparent"
               )}
+              style={{
+                color: '#1f2937',
+                // Placeholder color via CSS custom property
+              }}
               maxLength={CAPTION_MAX_LENGTH + 100}
             />
+            {/* Placeholder styling override */}
+            <style>{`
+              [data-caption-scroll] textarea::placeholder {
+                color: rgba(217, 119, 6, 0.5);
+                font-style: italic;
+              }
+            `}</style>
 
-            {/* Tagged entities chips — amber */}
+            {/* Tagged entities chips */}
             {state.selectedTags.length > 0 && (
-              <div className="pt-2 flex flex-wrap items-center gap-1.5 border-t border-gray-100 mt-2">
-                <span className="text-xs text-gray-400">Tagged:</span>
+              <div className="pt-2 flex flex-wrap items-center gap-1.5 mt-2">
+                <span className="text-xs" style={{ color: '#92400E' }}>Tagged:</span>
                 {state.selectedTags.map(tag => (
                   <button
                     key={tag.id}
@@ -261,14 +265,14 @@ export function CaptionStep({
               </div>
             )}
 
-            {/* Character counter — amber circle */}
+            {/* Character counter */}
             {hasContent && (
               <div className="flex items-center justify-end gap-1.5 pt-2">
                 <svg className="w-4 h-4" viewBox="0 0 16 16">
                   <circle cx="8" cy="8" r="6" fill="none" stroke="hsl(36, 92%, 82%)" strokeWidth="2" />
                   <circle
                     cx="8" cy="8" r="6" fill="none"
-                    stroke={charPercent >= 0.95 ? '#ef4444' : charPercent >= 0.8 ? '#f59e0b' : '#f59e0b'}
+                    stroke={charPercent >= 0.95 ? '#ef4444' : '#f59e0b'}
                     strokeWidth="2"
                     strokeDasharray={circumference}
                     strokeDashoffset={strokeDashoffset}
@@ -283,12 +287,19 @@ export function CaptionStep({
               </div>
             )}
           </div>
-        </SectionCard>
+        </motion.div>
         
-        {/* Tagged Courses Card — amber accents */}
-        <SectionCard delay={0.08}>
+        <SectionDivider />
+        
+        {/* ── Tagged Courses Section ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.08, type: 'spring', stiffness: 300, damping: 25 }}
+          className="px-4 py-6"
+        >
           <div className="flex items-center justify-between mb-3">
-            <SectionHeader>Tagged Courses</SectionHeader>
+            <SectionLabel>Tagged Courses</SectionLabel>
             {hasSelectedCourses && (
               <span className="text-xs text-gray-400">
                 {state.selectedCourses.length} course{state.selectedCourses.length !== 1 ? 's' : ''}
@@ -328,12 +339,19 @@ export function CaptionStep({
             </span>
             <ChevronRight className="h-4 w-4 text-amber-400 ml-auto" />
           </button>
-        </SectionCard>
+        </motion.div>
         
-        {/* Categories Card — amber accents */}
-        <SectionCard delay={0.1}>
+        <SectionDivider />
+        
+        {/* ── Categories Section ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 25 }}
+          className="px-4 pt-6"
+        >
           <div className="flex items-center justify-between mb-3">
-            <SectionHeader>Categories</SectionHeader>
+            <SectionLabel>Categories</SectionLabel>
             {!hasCategories && (
               <span className="inline-flex items-center gap-1.5 text-xs text-red-500 font-medium">
                 <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
@@ -348,7 +366,7 @@ export function CaptionStep({
               "w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors text-left active:scale-[0.98]",
               hasCategories 
                 ? "bg-amber-50 border-amber-200 hover:bg-amber-100" 
-                : "border-gray-200 hover:border-amber-300"
+                : "border-dashed border-amber-300/50 hover:border-amber-300"
             )}
           >
             <Tag className={cn(
@@ -381,7 +399,7 @@ export function CaptionStep({
             </span>
             <ChevronRight className="h-4 w-4 text-amber-400" />
           </button>
-        </SectionCard>
+        </motion.div>
       </div>
       
       {/* Mention Bottom Sheet */}
