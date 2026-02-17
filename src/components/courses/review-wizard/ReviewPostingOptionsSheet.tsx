@@ -151,7 +151,7 @@ export function ReviewPostingOptionsSheet({
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
           className="absolute bottom-0 left-0 right-0 rounded-t-3xl overflow-hidden"
           style={{ 
-            backgroundColor: '#FFFBEB',
+            backgroundColor: '#F8FAFC',
             paddingBottom: 'env(safe-area-inset-bottom, 16px)',
             maxHeight: '85vh',
           }}
@@ -159,7 +159,7 @@ export function ReviewPostingOptionsSheet({
         >
           {/* Handle */}
           <div className="flex justify-center pt-3 pb-1">
-            <div className="w-10 h-1 rounded-full bg-amber-300/50" />
+            <div className="w-10 h-1 rounded-full bg-muted-foreground/20" />
           </div>
 
           {/* Scrollable Content */}

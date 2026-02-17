@@ -32,8 +32,8 @@ export function EchoEmptyState({ onChipClick, onFocusInput }: EchoEmptyStateProp
       <div 
         className="rounded-[20px] p-6"
         style={{
-          background: 'rgba(255,255,255,0.55)',
-          border: '1px solid rgba(234,88,12,0.08)',
+          background: 'rgba(255,255,255,0.7)',
+          border: '1px solid rgba(0,0,0,0.07)',
         }}
       >
         {/* Central orb */}
@@ -61,8 +61,8 @@ export function EchoEmptyState({ onChipClick, onFocusInput }: EchoEmptyStateProp
               onClick={() => handleChipClick(prompt)}
               className="w-full py-3 px-4 rounded-[12px] text-[13px] font-medium text-left transition-all duration-150 active:scale-[0.98] flex items-center justify-between gap-2"
               style={{
-                background: 'rgba(255,255,255,0.45)',
-                border: '1px solid rgba(234,88,12,0.08)',
+                background: 'rgba(255,255,255,0.6)',
+                border: '1px solid rgba(0,0,0,0.07)',
                 color: '#44403C',
               }}
             >

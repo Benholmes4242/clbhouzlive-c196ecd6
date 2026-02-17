@@ -136,15 +136,15 @@ export function EchoPageWelcome({ onPromptClick, onFocusInput }: EchoPageWelcome
             onClick={() => handleChipClick(prompt)}
             className="px-[14px] py-[10px] rounded-[12px] text-[13px] font-medium text-left active:scale-[0.98] transition-all backdrop-blur-[8px] flex items-center justify-between gap-2"
             style={{
-              background: 'rgba(255,255,255,0.45)',
-              border: '1px solid rgba(217,119,6,0.12)',
+              background: 'rgba(255,255,255,0.6)',
+              border: '1px solid rgba(0,0,0,0.07)',
               color: '#44403C',
               fontFamily: "'DM Sans', sans-serif",
             }}
             aria-label={`Ask Echo: ${prompt}`}
           >
             <span>{prompt}</span>
-            <ChevronRight className="w-[14px] h-[14px] flex-shrink-0" style={{ color: '#D97706' }} />
+            <ChevronRight className="w-[14px] h-[14px] flex-shrink-0 text-muted-foreground" />
           </button>
         ))}
       </div>

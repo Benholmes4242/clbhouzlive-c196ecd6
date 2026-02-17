@@ -55,7 +55,7 @@ export function ChatSearchBar({
   }, [query]);
 
   return (
-    <div className="flex items-center gap-2 px-4 py-2 bg-white/80 border-b border-amber-200/20">
+    <div className="flex items-center gap-2 px-4 py-2 bg-white/80 border-b border-border/40">
       {/* Search input */}
       <div className="relative flex-1">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8E8E93]" />
@@ -63,7 +63,7 @@ export function ChatSearchBar({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search in conversation..."
-          className="pl-10 pr-4 h-9 rounded-full bg-amber-50/50 border border-amber-200/30 text-sm focus:border-amber-300 focus:ring-1 focus:ring-amber-200"
+          className="pl-10 pr-4 h-9 rounded-full bg-muted/40 border-border/40 text-sm focus:border-primary/40 focus:ring-1 focus:ring-primary/20"
           autoFocus
         />
       </div>
@@ -84,7 +84,7 @@ export function ChatSearchBar({
             className={cn(
               "w-8 h-8 flex items-center justify-center rounded-full",
               matches.length > 0
-                ? "hover:bg-amber-50/50 active:bg-amber-100/30"
+                ? "hover:bg-muted/50 active:bg-muted"
                 : "opacity-30"
             )}
           >
@@ -97,7 +97,7 @@ export function ChatSearchBar({
             className={cn(
               "w-8 h-8 flex items-center justify-center rounded-full",
               matches.length > 0
-                ? "hover:bg-amber-50/50 active:bg-amber-100/30"
+                ? "hover:bg-muted/50 active:bg-muted"
                 : "opacity-30"
             )}
           >
@@ -109,7 +109,7 @@ export function ChatSearchBar({
       {/* Close button */}
       <button
         onClick={onClose}
-        className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-amber-50/50 active:bg-amber-100/30"
+        className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted/50 active:bg-muted"
       >
         <X className="w-4 h-4 text-[#8E8E93]" />
       </button>

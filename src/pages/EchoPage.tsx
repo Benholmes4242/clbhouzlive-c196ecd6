@@ -17,7 +17,7 @@ import { EchoPageMessageList } from '@/features/echo/components/page/EchoPageMes
 import { EchoPageComposer } from '@/features/echo/components/page/EchoPageComposer';
 import { EchoHistorySheet } from '@/features/echo/components/page/EchoHistorySheet';
 import { EchoPendingState } from '@/features/echo/components/page/EchoPendingState';
-import { CanonicalAmberBg } from '@/components/ui/CanonicalAmberBg';
+
 
 export default function EchoPage() {
   const navigate = useNavigate();
@@ -148,13 +148,11 @@ export default function EchoPage() {
   return (
     <motion.div 
       className="fixed inset-0 flex flex-col"
+      style={{ backgroundColor: '#F8FAFC' }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
     >
-      {/* Canonical amber background */}
-      <CanonicalAmberBg />
-      
       <div className="relative z-10 flex flex-col h-full">
         {/* Header - Glass style */}
         <EchoPageHeader
@@ -195,10 +193,10 @@ export default function EchoPage() {
           className="flex-none px-4 pt-2"
           style={{ 
             paddingBottom: 'calc(32px + env(safe-area-inset-bottom, 0px))',
-            background: 'rgba(255,251,235,0.65)',
+            background: 'rgba(248,250,252,0.9)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
-            borderTop: '1px solid rgba(234,88,12,0.06)',
+            borderTop: '1px solid rgba(0,0,0,0.06)',
           }}
         >
           <EchoPageComposer
