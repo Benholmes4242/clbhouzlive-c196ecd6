@@ -191,11 +191,6 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size }: Segme
         />
       </div>
 
-      {/* Scale labels — 0 and 10 only */}
-      <div className="flex justify-between mt-1" aria-hidden="true">
-        <span className="text-[9px] text-gray-400 tabular-nums">0</span>
-        <span className="text-[9px] text-gray-400 tabular-nums">10</span>
-      </div>
     </div>
   );
 }
@@ -291,7 +286,7 @@ export function RateStep({
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.06, duration: 0.25 }}
-                  style={{ paddingTop: 12, paddingBottom: 4 }}
+                  style={{ paddingTop: 12, paddingBottom: 12 }}
                 >
                   <p className="text-[15px] font-bold text-gray-900 mb-0.5">{label}</p>
                   
