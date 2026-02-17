@@ -276,7 +276,6 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
         minHeight: '200px',
         ...(isWizardContext ? { 
           backgroundColor: '#FFFBEB',
-          backgroundImage: 'linear-gradient(to bottom, rgba(254,243,199,0.3), white, white)',
         } : {}),
       }}
       onPointerDown={handlePointerDown}
