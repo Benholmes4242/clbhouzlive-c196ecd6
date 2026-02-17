@@ -277,6 +277,8 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
         minHeight: '200px',
         // In wizard context, ensure fully transparent so page gradient shows through
         ...(isWizardContext ? { background: 'transparent' } : {}),
+        // DEBUG: green border to identify this element
+        border: '3px solid green',
       }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
