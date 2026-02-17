@@ -82,9 +82,6 @@ export const usePostDeletion = () => {
         detail: { postId, actorType, actorId } 
       }));
 
-      // Also broadcast a general feed refresh event
-      window.dispatchEvent(new CustomEvent('refreshFeed'));
-
       return { success: true };
     } catch (error: any) {
       console.error('Error deleting post:', error);

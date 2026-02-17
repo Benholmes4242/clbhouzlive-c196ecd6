@@ -4,7 +4,7 @@ export const broadcastPostSuccess = (postId: string, optimisticId: string) => {
     detail: { postId, optimisticId } 
   }));
   
-  window.dispatchEvent(new CustomEvent('refreshFeed'));
+  
 };
 
 export const broadcastPostError = (optimisticId: string) => {

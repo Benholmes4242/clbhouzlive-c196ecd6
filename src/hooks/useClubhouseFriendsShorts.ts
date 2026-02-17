@@ -30,6 +30,10 @@ export const useClubhouseFriendsShorts = () => {
       
       // Filter to shorts only (≤120s) and apply vertical-only filter if enabled
       const filteredPosts = posts.filter(post => {
+        // Review posts bypass all shorts filters (matches verticalFilter.ts pattern)
+        const isReviewPost = post.sourceReviewId != null || (post.categories && post.categories.includes('review'));
+        if (isReviewPost) return true;
+
         // Allow both videos and images (vertical content from friends)
         if (post.type !== 'video' && post.type !== 'image') return false;
         

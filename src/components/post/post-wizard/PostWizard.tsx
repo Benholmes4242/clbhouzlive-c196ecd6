@@ -295,7 +295,6 @@ export function PostWizard({
         
         // Fix 6: Dispatch postUpdated event (matches delete flow pattern)
         window.dispatchEvent(new CustomEvent('postUpdated'));
-        window.dispatchEvent(new CustomEvent('refreshFeed'));
         
         toast.success('Post updated');
         onClose();
