@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import CarouselSlide from './CarouselSlide';
 import { haptic } from '@/utils/haptics';
 import { StudioEdits } from '@/types/studio';
-import { BlurredMediaBackground } from '@/components/media/BlurredMediaBackground';
 import { cn } from '@/lib/utils';
+
 interface MediaItem {
   id: string;
   type: 'image' | 'video';
@@ -36,11 +36,7 @@ interface MediaCarouselProps {
   onMuteBlocked?: () => void;
   /** Hide video overlays (VIDEO badge and center play icon) */
   hideVideoOverlays?: boolean;
-  /** Display mode: 'fill' crops to fill 4:5, 'fit' shows full media with blur background */
-  displayMode?: 'fill' | 'fit';
-  /** Callback when display mode changes */
-  onDisplayModeChange?: (mode: 'fill' | 'fit') => void;
-  /** When true, fit mode shows transparent bg instead of blur (wizard context) */
+  /** When true, uses transparent bg for wizard context (fit mode always) */
   isWizardContext?: boolean;
 }
 
@@ -60,8 +56,6 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
   forceVideoMuted = false,
   onMuteBlocked,
   hideVideoOverlays = false,
-  displayMode = 'fill',
-  onDisplayModeChange,
   isWizardContext = false,
 }, ref) => {
   const [activeIndex, setActiveIndex] = useState(initialIndex);
@@ -93,7 +87,6 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
       const item = items[i];
       if (!item) return;
       
-      // Only preload images, not videos (saves memory)
       if (item.type === 'image') {
         const img = new Image();
         const baseUrl = item.previewUrl || item.url || (item.file ? URL.createObjectURL(item.file) : '');
@@ -103,7 +96,6 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
           /\/thumbnails\/thumbnail\.jpg/i.test(baseUrl) &&
           (baseUrl.includes('videodelivery.net') || baseUrl.includes('cloudflarestream.com'));
 
-        // Preload thumbnail, not full-res
         if (baseUrl.startsWith('blob:') || isStreamThumb) {
           img.src = baseUrl;
         } else {
@@ -114,11 +106,10 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
     });
   }, [activeIndex, items]);
 
-  // Cleanup: pause videos when slide changes (cleanup only, not playback control)
+  // Cleanup: pause videos when slide changes
   useEffect(() => {
     videoRefs.current.forEach((video, index) => {
       if (index !== activeIndex && !video.paused) {
-        // Allow pause for cleanup of non-visible slides
         video.pause();
       }
     });
@@ -128,7 +119,6 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
   const hasMountedRef = useRef(false);
   useEffect(() => {
     onIndexChange?.(activeIndex);
-    // Fire haptic only on user-driven changes (not initial mount)
     if (hasMountedRef.current) {
       haptic('light');
     } else {
@@ -188,7 +178,6 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
     const deltaX = e.clientX - dragStart.x;
     const deltaY = e.clientY - dragStart.y;
     
-    // Only prevent default if horizontal movement is dominant
     if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
       e.preventDefault();
     }
@@ -200,7 +189,6 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
     const deltaX = e.clientX - dragStart.x;
     const deltaY = e.clientY - dragStart.y;
     
-    // Only trigger swipe if horizontal movement is dominant and significant
     if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 40) {
       if (deltaX > 0) {
         handlePrevious();
@@ -221,17 +209,10 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
     }
   };
 
-  // Calculate aspect ratio for current media item
   const currentItem = items[activeIndex];
   
   // Fixed 4:5 aspect ratio for consistent, professional look
   const containerAspect = 4 / 5;
-
-  // Get blur background URL
-  const blurBackgroundUrl = useMemo(() => {
-    if (!currentItem) return '';
-    return currentItem.thumbnailUrl || currentItem.previewUrl || currentItem.url || '';
-  }, [currentItem]);
 
   // Handler to receive dimensions from CarouselSlide
   const handleMediaDimensions = (id: string, width: number, height: number) => {
@@ -241,16 +222,6 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
       return newMap;
     });
   };
-  
-  // Toggle display mode
-  const handleToggleDisplayMode = () => {
-    const newMode = displayMode === 'fill' ? 'fit' : 'fill';
-    onDisplayModeChange?.(newMode);
-    haptic('light');
-  };
-
-  // Determine if we're in fit mode (showing full media)
-  const isFitMode = displayMode === 'fit';
 
   if (!items?.length) {
     return (
@@ -260,18 +231,15 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
     );
   }
 
-
   return (
     <div 
       ref={containerRef}
       className={cn(
         "relative w-full h-full overflow-hidden",
-        // No rounded corners at top - flush with header
         "rounded-none",
         className
       )}
       style={{ 
-        // Use aspect ratio only as fallback when not in flex container
         aspectRatio: containerAspect,
         touchAction: 'pan-y',
         minHeight: '200px',
@@ -283,15 +251,7 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
       aria-label="Post media carousel"
       tabIndex={0}
     >
-      {/* In wizard context, fit mode shows transparent bg so page background shows through */}
-      {isFitMode && blurBackgroundUrl && !isWizardContext && (
-        <BlurredMediaBackground 
-          src={blurBackgroundUrl}
-          isVideo={currentItem?.type === 'video'}
-        />
-      )}
-      
-      {/* Carousel content */}
+      {/* Carousel content — always fit mode, transparent background */}
       <div className="absolute inset-0 z-[1] flex items-center justify-center">
         <CarouselSlide
           item={currentItem}
@@ -304,7 +264,7 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
           onMuteBlocked={onMuteBlocked}
           studioEdits={currentItem.studioEdits}
           hideVideoOverlays={hideVideoOverlays}
-          objectFit={isFitMode ? 'contain' : 'cover'}
+          objectFit="contain"
           onDimensionsLoaded={handleMediaDimensions}
         />
       </div>
@@ -340,42 +300,10 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
         </>
       )}
 
-      {/* Fit/Fill Toggle Button - Apple-style */}
-      <button
-        onClick={handleToggleDisplayMode}
-        className={cn(
-          "absolute top-3 right-3 z-20",
-          "flex items-center gap-1 px-2 py-1 rounded-full",
-          "bg-black/60 backdrop-blur-xl",
-          "border border-white/10",
-          "text-white text-[10px] font-medium",
-          "shadow-lg shadow-black/20",
-          "transition-all duration-200",
-          "hover:bg-black/70 active:scale-95"
-        )}
-        aria-label={isFitMode ? "Switch to fill mode" : "Switch to fit mode"}
-      >
-        {isFitMode ? (
-          <>
-            <Minimize2 className="w-3 h-3" />
-            <span>Fill</span>
-          </>
-        ) : (
-          <>
-            <Maximize2 className="w-3 h-3" />
-            <span>Fit</span>
-          </>
-        )}
-      </button>
-
       {/* Screen reader status */}
       <p className="sr-only" aria-live="polite">
         Item {activeIndex + 1} of {items.length}
       </p>
-
-      {/* Gradient overlays — subtle to avoid doubling with parent scrims */}
-      <div className="absolute inset-x-0 top-0 h-8 bg-gradient-to-b from-black/15 to-transparent pointer-events-none z-10" />
-      <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-black/15 to-transparent pointer-events-none z-10" />
     </div>
   );
 });
