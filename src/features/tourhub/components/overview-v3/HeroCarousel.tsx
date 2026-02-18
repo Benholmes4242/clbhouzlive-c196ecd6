@@ -319,7 +319,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
       <AnimatePresence mode="wait">
         {isActive && (
           <motion.div
-            layout
             style={{ 
               position: 'absolute',
               bottom: '20px',
