@@ -20,7 +20,8 @@ interface MentionBottomSheetProps {
   onOpenChange: (open: boolean) => void;
   query: string;
   onSelect: (mention: MentionSuggestion) => void;
-  zIndex?: number; // Optional override for stacking contexts (e.g. inside portals)
+  zIndex?: number;       // Optional override for stacking contexts (e.g. inside portals)
+  bottomOffset?: number; // Pixels to lift the sheet above the bottom (e.g. above input bar)
 }
 
 export function MentionBottomSheet({ 
@@ -29,6 +30,7 @@ export function MentionBottomSheet({
   query, 
   onSelect,
   zIndex,
+  bottomOffset = 0,
 }: MentionBottomSheetProps) {
   const [suggestions, setSuggestions] = useState<MentionSuggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -81,14 +83,14 @@ export function MentionBottomSheet({
 
   return (
     <div
-      className="fixed inset-x-0 bottom-0 pb-safe"
-      style={{ zIndex: resolvedZ }}
+      className="fixed inset-x-0 pb-safe"
+      style={{ zIndex: resolvedZ, bottom: bottomOffset }}
     >
       {/* Backdrop to close — sits just below the sheet, above everything else */}
       <div 
         className="fixed inset-0"
         style={{ zIndex: resolvedZ - 1 }}
-        onMouseDown={() => onOpenChange(false)}
+        onPointerDown={() => onOpenChange(false)}
       />
       
       <div className="bg-white rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.1)] 
@@ -124,8 +126,13 @@ export function MentionBottomSheet({
               <button
                 key={suggestion.id}
                 type="button"
-                onMouseDown={(e) => {
-                  e.preventDefault(); // CRITICAL: Prevents textarea blur
+                onPointerDown={(e) => {
+                  e.preventDefault(); // prevent input blur on desktop/pointer devices
+                }}
+                onTouchStart={(e) => {
+                  e.preventDefault(); // prevent input blur on iOS WKWebView
+                }}
+                onClick={() => {
                   onSelect(suggestion);
                   onOpenChange(false);
                 }}
