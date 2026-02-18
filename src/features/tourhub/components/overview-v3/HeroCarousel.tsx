@@ -30,7 +30,7 @@ import { getTourLogo } from '../../utils/tourLogos';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
-import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, RunnerUpRow, TiedAvatarStack, calcWinningMargin } from '../shared/TourHeroHelpers';
+import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, RunnerUpRow, calcWinningMargin } from '../shared/TourHeroHelpers';
 import '@/styles/hero-glass.css';
 
 function getStartLabel(date: string): string {
@@ -204,12 +204,12 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
   const isPodiumPositionTied = (position: number) =>
     allFetched.filter(f => f.position === position).length > 1;
 
-  // Extra tied players at the last shown position not shown on card
-  const lastShownPos = podiumThird?.position ?? podiumRunnerUp?.position;
-  const podiumExtraTiedFinishers = lastShownPos != null
-    ? allFetched.filter(
-        f => f.position === lastShownPos && !topFinishers.some(t => t.playerId === f.playerId)
-      )
+  // Extra tied finishers per runner-up position (not already shown)
+  const podiumExtraForRunnerUp = podiumRunnerUp
+    ? allFetched.filter(f => f.position === podiumRunnerUp.position && f.playerId !== podiumRunnerUp.playerId && f.playerId !== podiumThird?.playerId)
+    : [];
+  const podiumExtraForThird = podiumThird
+    ? allFetched.filter(f => f.position === podiumThird.position && f.playerId !== podiumThird.playerId && f.playerId !== podiumRunnerUp?.playerId)
     : [];
 
   const winningMargin = podiumWinner && podiumRunnerUp
@@ -518,6 +518,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           <RunnerUpRow
                             finisher={podiumRunnerUp}
                             isTied={isPodiumPositionTied(podiumRunnerUp.position)}
+                            extraTiedFinishers={!podiumThird ? podiumExtraForRunnerUp : []}
                             onPlayerTap={handlePlayerTap(podiumRunnerUp.playerId)}
                           />
                         )}
@@ -525,10 +526,10 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           <RunnerUpRow
                             finisher={podiumThird}
                             isTied={isPodiumPositionTied(podiumThird.position)}
+                            extraTiedFinishers={podiumExtraForThird}
                             onPlayerTap={handlePlayerTap(podiumThird.playerId)}
                           />
                         )}
-                        <TiedAvatarStack extraFinishers={podiumExtraTiedFinishers} />
                       </div>
                     )}
                   </div>

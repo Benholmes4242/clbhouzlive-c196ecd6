@@ -60,13 +60,18 @@ export function PlayerAvatar({
 export function RunnerUpRow({
   finisher,
   isTied = false,
+  extraTiedFinishers = [],
   onPlayerTap,
 }: {
   finisher: TournamentFinisher;
   isTied?: boolean;
+  extraTiedFinishers?: TournamentFinisher[];
   onPlayerTap?: (e: React.MouseEvent) => void;
 }) {
   const handleTap = onPlayerTap ?? ((e: React.MouseEvent) => e.stopPropagation());
+  const shownExtras = extraTiedFinishers.slice(0, 3);
+  const moreCount = extraTiedFinishers.length - shownExtras.length;
+
   return (
     <div
       style={{
@@ -90,15 +95,63 @@ export function RunnerUpRow({
         {isTied ? `T${finisher.position}` : finisher.position}
       </span>
 
-      {/* Avatar */}
-      <button onClick={handleTap} className="transition-opacity active:opacity-70" style={{ flexShrink: 0 }}>
-        <PlayerAvatar
-          photoUrl={finisher.photoUrl}
-          pgaTourId={finisher.pgaTourId}
-          displayName={finisher.displayName}
-          size={26}
-        />
-      </button>
+      {/* Avatar cluster — main avatar + extra tied avatars overlapping behind */}
+      <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+        {/* Main player avatar — always on top */}
+        <button
+          onClick={handleTap}
+          className="transition-opacity active:opacity-70"
+          style={{ position: 'relative', zIndex: 10, flexShrink: 0 }}
+        >
+          <PlayerAvatar
+            photoUrl={finisher.photoUrl}
+            pgaTourId={finisher.pgaTourId}
+            displayName={finisher.displayName}
+            size={26}
+          />
+        </button>
+
+        {/* Extra tied avatars — smaller, overlapping behind the main avatar */}
+        {shownExtras.map((extra, i) => (
+          <div
+            key={extra.playerId || i}
+            style={{
+              marginLeft: -8,
+              position: 'relative',
+              zIndex: 9 - i,
+              flexShrink: 0,
+            }}
+          >
+            <PlayerAvatar
+              photoUrl={extra.photoUrl}
+              pgaTourId={extra.pgaTourId}
+              displayName={extra.displayName}
+              size={20}
+            />
+          </div>
+        ))}
+
+        {/* "+X" pill if more than 3 extras */}
+        {moreCount > 0 && (
+          <div style={{
+            marginLeft: -6,
+            zIndex: 5,
+            width: 20,
+            height: 20,
+            borderRadius: '34%',
+            background: 'rgba(255,255,255,0.12)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 9,
+            fontWeight: 600,
+            color: 'rgba(255,255,255,0.6)',
+            flexShrink: 0,
+          }}>
+            +{moreCount}
+          </div>
+        )}
+      </div>
 
       {/* Name */}
       <button
@@ -122,65 +175,6 @@ export function RunnerUpRow({
         }}
       >
         {finisher.displayScore || 'E'}
-      </span>
-    </div>
-  );
-}
-
-/** Overlapping avatar stack for extra tied players */
-export function TiedAvatarStack({
-  extraFinishers,
-}: {
-  extraFinishers: TournamentFinisher[];
-}) {
-  if (extraFinishers.length === 0) return null;
-
-  const avatarSize = 22;
-  const overlap = 8;
-
-  const shown = extraFinishers.slice(0, 4);
-  const remaining = extraFinishers.length - shown.length;
-
-  return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      paddingLeft: 54, // aligns with player names (20px pos + 8px gap + 26px avatar)
-      marginTop: 4,
-    }}>
-      {/* Overlapping avatars */}
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        {shown.map((finisher, i) => (
-          <div
-            key={finisher.playerId || i}
-            style={{
-              marginLeft: i === 0 ? 0 : -overlap,
-              zIndex: shown.length - i,
-              position: 'relative',
-              borderRadius: '34%',
-              flexShrink: 0,
-              overflow: 'hidden',
-            }}
-          >
-            <PlayerAvatar
-              photoUrl={finisher.photoUrl}
-              pgaTourId={finisher.pgaTourId}
-              displayName={finisher.displayName}
-              size={avatarSize}
-            />
-          </div>
-        ))}
-      </div>
-
-      {/* Label */}
-      <span style={{
-        fontSize: 11,
-        fontWeight: 500,
-        color: 'rgba(255,255,255,0.45)',
-        marginLeft: 6,
-        whiteSpace: 'nowrap',
-      }}>
-        {remaining > 0 ? `+${remaining} more tied` : 'also tied'}
       </span>
     </div>
   );
