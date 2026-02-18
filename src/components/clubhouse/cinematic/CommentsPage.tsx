@@ -1763,137 +1763,142 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                 )}
               </AnimatePresence>
 
-              <div className="flex items-end gap-3">
-                {/* Current user avatar */}
-                <SquircleAvatar
-                  size={32}
-                  src={activeActor?.avatarUrl}
-                  alt={activeActor?.name || 'You'}
-                  fallback={activeActor?.name?.charAt(0) || '?'}
-                  hideRing
-                />
+              <div className="flex items-end gap-2">
+                {/* Current user avatar — aligned to bottom of the pill */}
+                <div className="mb-1.5 flex-shrink-0">
+                  <SquircleAvatar
+                    size={32}
+                    src={activeActor?.avatarUrl}
+                    alt={activeActor?.name || 'You'}
+                    fallback={activeActor?.name?.charAt(0) || '?'}
+                    hideRing
+                  />
+                </div>
                 
-                <div className="flex-1">
-                  {/* Input pill - expands subtly when typing for "you're participating" moment */}
-                  <motion.div 
-                    className={cn(
-                      "flex items-center gap-2 rounded-[22px] pl-4 pr-3",
-                      "transition-all duration-200",
-                      editingComment
-                        ? "border border-amber-300 bg-amber-50 focus-within:border-amber-400"
-                        : isDark 
-                          ? "bg-white/10 border border-white/15 focus-within:border-white/25 focus-within:bg-white/12" 
-                          : "bg-background border border-border/50 focus-within:border-border focus-within:shadow-sm"
-                    )}
-                    animate={{}}
-                    transition={{ duration: 0.15, ease: 'easeOut' }}
-                    style={{ paddingTop: 10, paddingBottom: 10 }}
-                  >
-                    {/* Overlay pattern: transparent textarea on top, styled mirror div behind.
-                        The overlay renders @mentions as amber spans while the textarea
-                        handles all cursor / keyboard behaviour normally. */}
-                    <div className="flex-1 relative" style={{ fontSize: 14 }}>
-                      {/* Mirror overlay — aria-hidden, not interactive */}
-                      <div
-                        aria-hidden="true"
-                        className={cn(
-                          "absolute inset-0 pointer-events-none",
-                          "text-[14px] leading-[20px] whitespace-pre-wrap break-words overflow-hidden"
-                        )}
-                        style={{ height: inputRef.current?.style.height }}
-                      >
-                        {newComment
-                          ? newComment.split(/(@\w+)/).map((part, i) =>
-                              /^@\w+$/.test(part)
-                                ? <span key={i} style={{ color: '#f59e0b' }}>{part}</span>
-                                : <span key={i} className={editingComment ? 'text-amber-900' : isDark ? 'text-white' : 'text-foreground'}>{part}</span>
-                            )
-                          : null
-                        }
-                      </div>
-                      {/* Actual textarea — transparent text so the overlay shows through */}
-                      <textarea
-                        ref={inputRef}
-                        placeholder={
-                          editingComment
-                            ? "Edit your comment..."
-                            : replyingTo
-                              ? `Reply to ${replyingTo.displayName}...`
-                              : "Add a comment... (@ to mention)"
-                        }
-                        value={newComment}
-                        onChange={handleCommentChange}
-                        onKeyDown={handleKeyPress}
-                        onFocus={() => setShowEmojiPicker(false)}
-                        rows={1}
-                        className={cn(
-                          'relative w-full bg-transparent resize-none',
-                          'text-[14px] leading-[20px]',
-                          'outline-none border-none',
-                          newComment
-                            ? 'text-transparent caret-current'
-                            : editingComment
-                              ? 'text-amber-700 placeholder:text-amber-400'
-                              : isDark
-                                ? 'text-white placeholder:text-white/40'
-                                : 'text-foreground placeholder:text-muted-foreground',
-                          isDark && !editingComment ? '[caret-color:white]' : '[caret-color:theme(colors.foreground)]'
-                        )}
-                        style={{
-                          maxHeight: '100px',
-                          overflowY: 'hidden',
-                          transition: 'height 0.1s ease-out',
-                        }}
-                      />
+                {/* Input pill — full width, textarea + stacked buttons inside */}
+                <motion.div 
+                  className={cn(
+                    "flex-1 flex items-end rounded-[22px] pl-4 pr-1.5",
+                    "transition-all duration-200",
+                    editingComment
+                      ? "border border-amber-300 bg-amber-50 focus-within:border-amber-400"
+                      : isDark 
+                        ? "bg-white/10 border border-white/15 focus-within:border-white/25 focus-within:bg-white/12" 
+                        : "bg-background border border-border/50 focus-within:border-border focus-within:shadow-sm"
+                  )}
+                  animate={{}}
+                  transition={{ duration: 0.15, ease: 'easeOut' }}
+                  style={{ paddingTop: 8, paddingBottom: 8 }}
+                >
+                  {/* Overlay pattern: transparent textarea on top, styled mirror div behind.
+                      The overlay renders @mentions as amber spans while the textarea
+                      handles all cursor / keyboard behaviour normally. */}
+                  <div className="flex-1 relative py-1" style={{ fontSize: 14 }}>
+                    {/* Mirror overlay — aria-hidden, not interactive */}
+                    <div
+                      aria-hidden="true"
+                      className={cn(
+                        "absolute inset-0 pointer-events-none",
+                        "text-[14px] leading-[20px] whitespace-pre-wrap break-words overflow-hidden"
+                      )}
+                      style={{ height: inputRef.current?.style.height }}
+                    >
+                      {newComment
+                        ? newComment.split(/(@\w+)/).map((part, i) =>
+                            /^@\w+$/.test(part)
+                              ? <span key={i} style={{ color: '#f59e0b' }}>{part}</span>
+                              : <span key={i} className={editingComment ? 'text-amber-900' : isDark ? 'text-white' : 'text-foreground'}>{part}</span>
+                          )
+                        : null
+                      }
                     </div>
+                    {/* Actual textarea — transparent text so the overlay shows through */}
+                    <textarea
+                      ref={inputRef}
+                      placeholder={
+                        editingComment
+                          ? "Edit your comment..."
+                          : replyingTo
+                            ? `Reply to ${replyingTo.displayName}...`
+                            : "Add a comment... (@ to mention)"
+                      }
+                      value={newComment}
+                      onChange={handleCommentChange}
+                      onKeyDown={handleKeyPress}
+                      onFocus={() => setShowEmojiPicker(false)}
+                      rows={1}
+                      className={cn(
+                        'relative w-full bg-transparent resize-none',
+                        'text-[14px] leading-[20px]',
+                        'outline-none border-none',
+                        newComment
+                          ? 'text-transparent caret-current'
+                          : editingComment
+                            ? 'text-amber-700 placeholder:text-amber-400'
+                            : isDark
+                              ? 'text-white placeholder:text-white/40'
+                              : 'text-foreground placeholder:text-muted-foreground',
+                        isDark && !editingComment ? '[caret-color:white]' : '[caret-color:theme(colors.foreground)]'
+                      )}
+                      style={{
+                        maxHeight: '100px',
+                        overflowY: 'hidden',
+                        transition: 'height 0.1s ease-out',
+                      }}
+                    />
+                  </div>
+
+                  {/* Right button stack — emoji top, send bottom, anchored to bottom of pill */}
+                  <div className="flex flex-col items-center justify-end gap-0.5 pb-0.5 flex-shrink-0">
+                    {/* Emoji button */}
                     <motion.button 
                       whileTap={{ scale: 0.9 }}
                       onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                       className={cn(
-                        "w-11 h-11 flex items-center justify-center rounded-full transition-colors emoji-button",
+                        "w-8 h-8 flex items-center justify-center rounded-full transition-colors emoji-button",
                         isDark 
                           ? "text-white/40 hover:text-white/60" 
                           : "text-muted-foreground hover:text-foreground",
                         showEmojiPicker && (isDark ? "text-white/80" : "text-foreground")
                       )}
                     >
-                      <Smile className="w-5 h-5" />
+                      <Smile className="w-4 h-4" />
                     </motion.button>
-                  </motion.div>
-                </div>
-                
-                {/* Send / Save button */}
-                <motion.button
-                  whileTap={{ scale: 0.88 }}
-                  animate={{ 
-                    rotate: (isAddingComment || isUpdatingComment) ? 45 : 0,
-                    scale: newComment.trim() ? 1.02 : 1,
-                  }}
-                  onClick={handleSubmitComment}
-                  disabled={!newComment.trim() || isAddingComment || isUpdatingComment}
-                  className={cn(
-                    'w-11 h-11 rounded-full relative overflow-hidden',
-                    'flex items-center justify-center',
-                    'transition-all duration-200',
-                    newComment.trim() 
-                      ? editingComment
-                        ? 'bg-amber-500 text-white hover:bg-amber-600 shadow-lg shadow-amber-500/25'
-                        : isDark 
-                          ? 'bg-white text-black hover:bg-white/90 shadow-lg shadow-white/15' 
-                          : 'bg-primary text-primary-foreground hover:opacity-90 shadow-lg shadow-primary/25'
-                      : isDark 
-                        ? 'bg-white/12 text-white/35' 
-                        : 'bg-muted text-muted-foreground/35',
-                    'disabled:cursor-not-allowed'
-                  )}
-                >
-                  <motion.div
-                    animate={(isAddingComment || isUpdatingComment) ? { scale: 0.9, opacity: 0.7 } : { scale: 1, opacity: 1 }}
-                    transition={{ duration: 0.15 }}
-                  >
-                    {editingComment ? <Check className="w-4 h-4" /> : <Send className="w-4 h-4" />}
-                  </motion.div>
-                </motion.button>
+
+                    {/* Send / Save button */}
+                    <motion.button
+                      whileTap={{ scale: 0.88 }}
+                      animate={{ 
+                        rotate: (isAddingComment || isUpdatingComment) ? 45 : 0,
+                        scale: newComment.trim() ? 1.02 : 1,
+                      }}
+                      onClick={handleSubmitComment}
+                      disabled={!newComment.trim() || isAddingComment || isUpdatingComment}
+                      className={cn(
+                        'w-8 h-8 rounded-full relative overflow-hidden',
+                        'flex items-center justify-center',
+                        'transition-all duration-200',
+                        newComment.trim() 
+                          ? editingComment
+                            ? 'bg-amber-500 text-white hover:bg-amber-600 shadow-lg shadow-amber-500/25'
+                            : isDark 
+                              ? 'bg-white text-black hover:bg-white/90 shadow-lg shadow-white/15' 
+                              : 'bg-primary text-primary-foreground hover:opacity-90 shadow-lg shadow-primary/25'
+                          : isDark 
+                            ? 'bg-white/12 text-white/35' 
+                            : 'bg-muted text-muted-foreground/35',
+                        'disabled:cursor-not-allowed'
+                      )}
+                    >
+                      <motion.div
+                        animate={(isAddingComment || isUpdatingComment) ? { scale: 0.9, opacity: 0.7 } : { scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.15 }}
+                      >
+                        {editingComment ? <Check className="w-4 h-4" /> : <Send className="w-4 h-4" />}
+                      </motion.div>
+                    </motion.button>
+                  </div>
+                </motion.div>
               </div>
             </motion.div>
           </motion.div>
