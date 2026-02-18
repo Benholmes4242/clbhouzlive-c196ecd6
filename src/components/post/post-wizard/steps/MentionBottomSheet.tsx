@@ -127,10 +127,7 @@ export function MentionBottomSheet({
                 key={suggestion.id}
                 type="button"
                 onPointerDown={(e) => {
-                  e.preventDefault(); // prevent input blur on desktop/pointer devices
-                }}
-                onTouchStart={(e) => {
-                  e.preventDefault(); // prevent input blur on iOS WKWebView
+                  e.preventDefault(); // prevents input blur on all platforms (desktop + iOS)
                 }}
                 onClick={() => {
                   onSelect(suggestion);
