@@ -8,21 +8,21 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import type { TournamentFinisher } from '../../hooks/useTournamentLeadersWinners';
 
-/** Score color for LIVE state only — green under par, red over par */
+/** Score color — amber under par (matches .score-under CSS), red over par, dimmed white for even */
 export function getScoreColor(score: number | null): string {
   if (score === null || score === undefined) return 'rgba(255,255,255,0.7)';
-  if (score < 0) return '#22C55E';
+  if (score < 0) return '#f59e0b';  // amber-500 — canonical under-par color per design system
   if (score > 0) return '#EF4444';
   return 'rgba(255,255,255,0.7)';
 }
 
 /**
- * Score color for FINISHED state — amber matches the 'FINISHED' badge.
- * Under par: amber. Even/over par: dimmed white.
+ * Score color for FINISHED state — same amber palette, but even/over par is more dimmed
+ * to complement the gold FINISHED badge aesthetic.
  */
 export function getFinishedScoreColor(score: number | null): string {
   if (score === null || score === undefined) return 'rgba(255,255,255,0.55)';
-  if (score < 0) return '#FACC15';
+  if (score < 0) return '#FACC15';  // yellow-400 — matches FINISHED badge color exactly
   if (score > 0) return 'rgba(255,255,255,0.55)';
   return 'rgba(255,255,255,0.55)';
 }
