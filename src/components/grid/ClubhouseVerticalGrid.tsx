@@ -1207,6 +1207,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
         <CommentsPage
           isOpen={commentsModalOpen}
           postId={selectedPostId}
+          theme="light"
           videoThumbnail={(() => {
             const post = filteredPosts[currentIndex];
             const currentMediaIdx = mediaIndices[post?.id] || 0;

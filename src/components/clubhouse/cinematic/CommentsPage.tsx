@@ -322,7 +322,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
         </div>
 
         {/* Reactions and Like button area */}
-        <div className="flex items-center gap-1.5 flex-shrink-0">
+        <div className="flex items-center gap-1.5 flex-shrink-0 pr-1">
           {/* Show reaction emojis if any */}
           {reactionCounts && reactionCounts.length > 0 && (
             <ReactionDisplay
@@ -371,7 +371,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                   transition={{ duration: 0.35, ease: 'easeOut' }}
                   className="absolute inset-0 flex items-center justify-center"
                 >
-                  <div className="w-6 h-6 rounded-full bg-red-500/20" />
+                  <div className="w-6 h-6 rounded-full bg-like/20" />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -385,7 +385,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                   transition={{ duration: 0.4, ease: 'easeOut' }}
                   className="absolute inset-0 flex items-center justify-center"
                 >
-                  <Heart className="w-5 h-5 fill-red-500 text-red-500" />
+                  <Heart className="w-5 h-5 fill-like text-like" />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -397,10 +397,10 @@ const CommentItem: React.FC<CommentItemProps> = ({
                 className={cn(
                   "w-4 h-4 transition-colors",
                   comment.has_liked
-                    ? "fill-red-500 text-red-500"
+                    ? "fill-like text-like"
                     : isDark 
-                      ? "text-white/40 group-hover:text-red-400" 
-                      : "text-muted-foreground/50 group-hover:text-red-400"
+                      ? "text-white/40 group-hover:text-like/70" 
+                      : "text-muted-foreground/50 group-hover:text-like/70"
                 )}
               />
             </motion.div>
@@ -409,7 +409,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
             <span className={cn(
               "text-xs -ml-2",
               comment.has_liked 
-                ? "text-red-500" 
+                ? "text-like" 
                 : isDark ? "text-white/50" : "text-muted-foreground/70"
             )}>
               {comment.likes_count}
@@ -1414,7 +1414,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                           }
                         }}
                         className={cn(
-                          "w-11 h-11 rounded-full flex items-center justify-center text-lg transition-colors",
+                          "w-10 h-10 rounded-full flex items-center justify-center text-base transition-colors",
                           isDark 
                             ? "bg-white/5 hover:bg-white/10 border border-white/8" 
                             : "bg-muted/50 hover:bg-muted border border-border/30"
