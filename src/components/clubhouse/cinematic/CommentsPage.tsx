@@ -1050,9 +1050,11 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
     const mentionMatch = value.match(/@(\w*)$/);
     
     if (mentionMatch) {
+      console.log('[MENTION] @ detected, opening sheet. Query:', mentionMatch[1]);
       setMentionQuery(mentionMatch[1]);
       setShowMentions(true);
     } else {
+      console.log('[MENTION] No @ match, closing sheet');
       setShowMentions(false);
       setMentionQuery('');
     }
@@ -1061,16 +1063,28 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   // Handle mention selection from bottom sheet
   // Uses a ref to avoid stale closure on newComment — ref always holds latest value
   const handleMentionSelect = useCallback((mention: MentionSuggestion) => {
+    console.log('[MENTION] handleMentionSelect CALLED with:', {
+      name: mention.name,
+      username: mention.username,
+      entity_id: mention.entity_id,
+      currentInputValue: newCommentRef.current,
+    });
+
     const currentText = newCommentRef.current;
-    // Prefer username for insertion (safe with /@(\w+)/g mention regex); fall back to name
     const displayName = mention.username || mention.name;
     const newValue = currentText.replace(/@\w*$/, `@${displayName} `);
+
+    console.log('[MENTION] Replacement result:', {
+      currentText,
+      displayName,
+      regexMatch: currentText.match(/@\w*$/),
+      newValue,
+    });
 
     setNewComment(newValue);
     setShowMentions(false);
     setMentionQuery('');
 
-    // Refocus input after a short delay
     setTimeout(() => {
       inputRef.current?.focus();
     }, 100);
@@ -1752,9 +1766,15 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
           {/* Mention Bottom Sheet — z-[110] sits above portal, bottomOffset keeps it above the input bar */}
           <MentionBottomSheet
             open={showMentions}
-            onOpenChange={setShowMentions}
+            onOpenChange={(open) => {
+              console.log('[MENTION] onOpenChange called with:', open);
+              setShowMentions(open);
+            }}
             query={mentionQuery}
-            onSelect={handleMentionSelect}
+            onSelect={(mention) => {
+              console.log('[MENTION] onSelect callback received in CommentsPage:', mention.name);
+              handleMentionSelect(mention);
+            }}
             zIndex={110}
             bottomOffset={72 + keyboardOffset}
           />
