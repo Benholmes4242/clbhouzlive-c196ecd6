@@ -75,10 +75,13 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
       : '3px solid transparent';
 
   return (
-    <motion.button
+    <motion.div
+      role="button"
+      tabIndex={0}
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/tourhub/tournament/${tournament.id}`); }}
       className="w-full flex items-center gap-3 px-3.5 py-2.5 bg-card rounded-2xl border border-border/50 text-left transition-all active:scale-[0.98]"
-      style={{ borderLeft: leftBorderStyle }}
+      style={{ borderLeft: leftBorderStyle, cursor: 'pointer' }}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: 0.05 * index, ease: [0.16, 1, 0.3, 1] }}
@@ -113,16 +116,25 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
           {tournament.name}
         </p>
         {venue && (
-          <button
+          <span
+            role="button"
+            tabIndex={0}
             onClick={(e) => {
               e.stopPropagation();
               navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`);
             }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.stopPropagation();
+                navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`);
+              }
+            }}
             className="flex items-center gap-1 mt-0.5 text-[0.8125rem] text-muted-foreground active:opacity-70 transition-opacity"
+            style={{ cursor: 'pointer' }}
           >
             <MapPin className="w-3 h-3 flex-shrink-0 opacity-60" />
             <span className="line-clamp-1">{venue}</span>
-          </button>
+          </span>
         )}
       </div>
 
@@ -142,7 +154,7 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
           />
         </div>
       )}
-    </motion.button>
+    </motion.div>
   );
 }
 
