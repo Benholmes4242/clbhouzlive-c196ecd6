@@ -343,7 +343,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
               top: 'auto',
               minWidth: '280px',
               maxWidth: 'min(350px, calc(100% - 32px))',
-              padding: '20px 20px 12px 20px',
+              padding: '20px 20px 14px 20px',
             }}
             variants={cardVariants}
             initial="enter"
@@ -352,7 +352,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: 0.08 }}
           >
             {/* Row 1: Status | Tour Badge (right-aligned) */}
-            <div className="flex items-center justify-between" style={{ marginBottom: '8px' }}>
+            <div className="flex items-center justify-between" style={{ marginBottom: '6px' }}>
               {/* Status Badge - left */}
               {isLive ? (
               <div className="flex items-center gap-1.5">
@@ -469,7 +469,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
               <>
                 {/* Winner row — horizontal: photo beside name + score */}
                 {podiumWinner ? (
-                  <div style={{ marginTop: 10 }}>
+                  <div style={{ marginTop: 14 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <button
                         onClick={handlePlayerTap(podiumWinner.playerId)}
@@ -505,7 +505,14 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
 
                     {/* Runners-up */}
                     {(podiumRunnerUp || podiumThird) && (
-                      <div style={{ marginTop: 6 }}>
+                      <div style={{
+                        marginTop: 10,
+                        paddingTop: 10,
+                        borderTop: '1px solid rgba(255,255,255,0.08)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 8,
+                      }}>
                         {podiumRunnerUp && (
                           <RunnerUpRow
                             finisher={podiumRunnerUp}
@@ -527,7 +534,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                             color: 'rgba(255,255,255,0.4)',
                             display: 'block',
                             marginTop: 2,
-                            paddingLeft: 28,
+                            paddingLeft: 54,
                           }}>
                             +{podiumExtraTied} {podiumExtraTied === 1 ? 'other' : 'others'} tied
                           </span>
@@ -557,7 +564,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                 ) : null}
 
                 {/* View Results text CTA */}
-                <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta w-full" style={{ marginTop: '8px' }}>
+                <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta w-full" style={{ marginTop: '14px' }}>
                   <span>View Results</span>
                   <ChevronRight className="w-4 h-4 cta-chevron" />
                 </Link>
