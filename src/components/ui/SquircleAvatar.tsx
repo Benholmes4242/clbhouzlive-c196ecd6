@@ -159,13 +159,24 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   const fallbackFontSize = Math.round(pixelSize * 0.38);
 
   // Inner avatar content (image or fallback)
+  // Fallback is shown immediately (even while image is loading) so the avatar
+  // is never invisible. The image cross-fades in on top once loaded.
   const avatarContent = (
     <>
+      {/* Fallback always visible until image has fully loaded */}
+      {(!imageLoaded || showFallback) && (
+        <div
+          className="absolute inset-0 flex items-center justify-center bg-muted text-muted-foreground font-semibold select-none"
+          style={{ fontSize: `${fallbackFontSize}px` }}
+        >
+          {fallbackContent}
+        </div>
+      )}
       {imageSrc && !showFallback && (
         <img
           src={imageSrc}
           alt={alt}
-          className="w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover"
           style={{
             opacity: imageLoaded ? 1 : 0,
             transition: 'opacity 0.2s ease',
@@ -174,14 +185,6 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
           onLoad={handleImageLoad}
           onError={handleImageError}
         />
-      )}
-      {showFallback && (
-        <div
-          className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground font-semibold select-none"
-          style={{ fontSize: `${fallbackFontSize}px` }}
-        >
-          {fallbackContent}
-        </div>
       )}
     </>
   );
