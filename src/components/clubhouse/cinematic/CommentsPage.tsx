@@ -1740,12 +1740,13 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
             )}
           </AnimatePresence>
 
-          {/* Mention Bottom Sheet */}
+          {/* Mention Bottom Sheet — z-[110] to sit above the CommentsPage portal (z-[101]) */}
           <MentionBottomSheet
             open={showMentions}
             onOpenChange={setShowMentions}
             query={mentionQuery}
             onSelect={handleMentionSelect}
+            zIndex={110}
           />
 
           {/* Action Sheet */}
