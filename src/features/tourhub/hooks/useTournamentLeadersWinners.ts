@@ -73,10 +73,11 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
         return new Map();
       }
 
-      console.log('[LEADERS] Raw rows from sr_leaderboards:', data?.map(r => ({
-        tournament: r.tournament_id.slice(0, 8),
+      console.log('[LEADERS] Raw rows:', data?.map(r => ({
+        tournamentId: r.tournament_id.slice(0, 8),
         position: r.position,
-        name: (r.player as any)?.last_name
+        name: (r.player as any)?.last_name,
+        score: r.score
       })));
 
       // Group by tournament_id, then by position (take first occurrence per position)
