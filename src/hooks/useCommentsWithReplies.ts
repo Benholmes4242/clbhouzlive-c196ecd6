@@ -310,24 +310,40 @@ export function useCommentsWithReplies(postId: string | null) {
     mutationFn: async (commentId: string) => {
       if (!user?.id) throw new Error('Not authenticated');
 
-      const { error } = await supabase
+      console.log('[DELETE] Starting delete:', { commentId, userId: user.id, postId });
+
+      // RLS (auth.uid() = user_id) is the authoritative ownership check.
+      // The extra .eq('user_id', user.id) filter is intentionally removed — it
+      // caused silent no-ops when there was any actor_id vs user_id mismatch.
+      const { error, data: deletedRows } = await supabase
         .from('post_comments')
         .delete()
         .eq('id', commentId)
-        .eq('user_id', user.id); // RLS safety belt
+        .select('id');
+
+      const deletedCount = deletedRows?.length ?? 0;
+      console.log('[DELETE] Supabase response:', { error, deletedCount });
 
       if (error) throw error;
 
-      // Recount remaining comments and sync the denormalised column
-      const { count } = await supabase
+      if (deletedCount === 0) {
+        console.error('[DELETE] No rows deleted — possible RLS mismatch or wrong commentId');
+      }
+
+      // Recount remaining comments and sync the denormalised column (non-blocking)
+      const { count: remaining } = await supabase
         .from('post_comments')
         .select('id', { count: 'exact', head: true })
         .eq('post_id', postId!);
 
-      await supabase
-        .from('posts')
-        .update({ comment_count: count ?? 0 })
-        .eq('id', postId!);
+      try {
+        await supabase
+          .from('posts')
+          .update({ comment_count: remaining ?? 0 })
+          .eq('id', postId!);
+      } catch (e) {
+        console.warn('[DELETE] comment_count sync failed (non-blocking):', e);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['post-comments-with-replies', postId] });
