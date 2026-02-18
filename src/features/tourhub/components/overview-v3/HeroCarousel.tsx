@@ -30,7 +30,7 @@ import { getTourLogo } from '../../utils/tourLogos';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
-import { getScoreColor, formatPurse, PlayerAvatar, RunnerUpRow, calcWinningMargin } from '../shared/TourHeroHelpers';
+import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, RunnerUpRow, calcWinningMargin } from '../shared/TourHeroHelpers';
 import '@/styles/hero-glass.css';
 
 function getStartLabel(date: string): string {
@@ -477,6 +477,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                       >
                         <PlayerAvatar
                           photoUrl={podiumWinner.photoUrl}
+                          pgaTourId={podiumWinner.pgaTourId}
                           displayName={podiumWinner.displayName}
                           size={44}
                         />
@@ -490,7 +491,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           >
                             {podiumWinner.displayName}
                           </button>
-                          <span style={{ fontFamily: "'JetBrains Mono','SF Mono',monospace", fontSize: '16px', fontWeight: 700, color: getScoreColor(podiumWinner.score), flexShrink: 0 }}>
+                          <span style={{ fontFamily: "'JetBrains Mono','SF Mono',monospace", fontSize: '16px', fontWeight: 700, color: getFinishedScoreColor(podiumWinner.score), flexShrink: 0 }}>
                             {podiumWinner.displayScore}
                           </span>
                         </div>

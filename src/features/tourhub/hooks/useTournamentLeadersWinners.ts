@@ -19,6 +19,7 @@ export interface TournamentFinisher {
   money: number | null;
   position: number;
   photoUrl: string | null;
+  pgaTourId: string | null;
   /** Formatted display: "S. Scheffler" */
   displayName: string;
   /** Formatted score: "-12" or "E" or "+3" */
@@ -62,7 +63,8 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
           player:sr_players!inner (
             first_name,
             last_name,
-            photo_url
+            photo_url,
+            pga_tour_id
           )
         `)
         .in('tournament_id', tournamentIds)
@@ -98,6 +100,7 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
           money: entry.money,
           position: entry.position,
           photoUrl: player?.photo_url || null,
+          pgaTourId: player?.pga_tour_id || null,
           displayName: formatDisplayName(firstName, lastName),
           displayScore: formatScore(entry.score),
         });
