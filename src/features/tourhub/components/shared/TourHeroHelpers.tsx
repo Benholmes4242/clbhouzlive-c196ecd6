@@ -56,125 +56,157 @@ export function PlayerAvatar({
   );
 }
 
-/** Compact runner-up row (positions 2–3) — finished state uses amber scores */
-export function RunnerUpRow({
-  finisher,
-  isTied = false,
-  extraTiedFinishers = [],
+// ─── Podium Row Types & Builder ───────────────────────────────────────────────
+
+export interface PodiumRow {
+  position: number;
+  players: TournamentFinisher[];
+  isTied: boolean;
+  sharedScore: number | null;
+  sharedDisplayScore: string | null;
+}
+
+/** Groups allFetched finishers by distinct position, returns up to 3 rows. */
+export function buildPodiumRows(allFetched: TournamentFinisher[]): PodiumRow[] {
+  if (allFetched.length === 0) return [];
+  const distinctPositions = [...new Set(allFetched.map(f => f.position))].sort((a, b) => a - b);
+  return distinctPositions.slice(0, 3).map(pos => {
+    const players = allFetched.filter(f => f.position === pos);
+    return {
+      position: pos,
+      players,
+      isTied: players.length > 1,
+      sharedScore: players[0].score ?? null,
+      sharedDisplayScore: players[0].displayScore ?? null,
+    };
+  });
+}
+
+// ─── PodiumRunnerRow — one row per distinct position ──────────────────────────
+
+export function PodiumRunnerRow({
+  row,
   onPlayerTap,
 }: {
-  finisher: TournamentFinisher;
-  isTied?: boolean;
-  extraTiedFinishers?: TournamentFinisher[];
-  onPlayerTap?: (e: React.MouseEvent) => void;
+  row: PodiumRow;
+  onPlayerTap?: (playerId: string | null | undefined) => (e: React.MouseEvent) => void;
 }) {
-  const handleTap = onPlayerTap ?? ((e: React.MouseEvent) => e.stopPropagation());
-  const shownExtras = extraTiedFinishers.slice(0, 3);
-  const moreCount = extraTiedFinishers.length - shownExtras.length;
+  const isSingle = row.players.length === 1;
+  const player = row.players[0];
+  const shownAvatars = row.players.slice(0, 5);
+  const moreCount = row.players.length - shownAvatars.length;
+
+  const noop = (e: React.MouseEvent) => e.stopPropagation();
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 8,
-      }}
-    >
-      {/* Position — "T2" for ties, "2" for clean */}
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+
+      {/* Position label */}
       <span
         style={{
-          fontFamily: "'JetBrains Mono', 'SF Mono', monospace",
-          fontSize: 11,
+          minWidth: 24,
+          fontSize: row.isTied ? 10 : 12,
           fontWeight: 600,
-          color: 'rgba(255,255,255,0.40)',
-          width: 20,
+          color: row.isTied ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.5)',
           textAlign: 'center',
           flexShrink: 0,
+          ...(row.isTied ? {
+            background: 'rgba(255,255,255,0.08)',
+            borderRadius: 6,
+            padding: '2px 5px',
+            letterSpacing: 0.3,
+          } : {}),
         }}
       >
-        {isTied ? `T${finisher.position}` : finisher.position}
+        {row.isTied ? `T${row.position}` : row.position}
       </span>
 
-      {/* Avatar cluster — main avatar + extra tied avatars overlapping behind */}
-      <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-        {/* Main player avatar — always on top */}
+      {/* Avatar section */}
+      {isSingle ? (
         <button
-          onClick={handleTap}
+          onClick={onPlayerTap?.(player.playerId) ?? noop}
           className="transition-opacity active:opacity-70"
-          style={{ position: 'relative', zIndex: 10, flexShrink: 0 }}
+          style={{ flexShrink: 0 }}
         >
           <PlayerAvatar
-            photoUrl={finisher.photoUrl}
-            pgaTourId={finisher.pgaTourId}
-            displayName={finisher.displayName}
+            photoUrl={player.photoUrl}
+            pgaTourId={player.pgaTourId}
+            displayName={player.displayName}
             size={26}
           />
         </button>
-
-        {/* Extra tied avatars — smaller, overlapping behind the main avatar */}
-        {shownExtras.map((extra, i) => (
-          <div
-            key={extra.playerId || i}
-            style={{
-              marginLeft: -8,
-              position: 'relative',
-              zIndex: 9 - i,
+      ) : (
+        <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+          {shownAvatars.map((p, i) => (
+            <div
+              key={p.playerId || i}
+              style={{
+                marginLeft: i === 0 ? 0 : -8,
+                position: 'relative',
+                zIndex: shownAvatars.length - i,
+                flexShrink: 0,
+              }}
+            >
+              <PlayerAvatar
+                photoUrl={p.photoUrl}
+                pgaTourId={p.pgaTourId}
+                displayName={p.displayName}
+                size={26}
+              />
+            </div>
+          ))}
+          {moreCount > 0 && (
+            <div style={{
+              marginLeft: -6,
+              zIndex: 1,
+              width: 22,
+              height: 22,
+              borderRadius: '34%',
+              background: 'rgba(255,255,255,0.12)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 9,
+              fontWeight: 600,
+              color: 'rgba(255,255,255,0.6)',
               flexShrink: 0,
-            }}
-          >
-            <PlayerAvatar
-              photoUrl={extra.photoUrl}
-              pgaTourId={extra.pgaTourId}
-              displayName={extra.displayName}
-              size={20}
-            />
-          </div>
-        ))}
+            }}>
+              +{moreCount}
+            </div>
+          )}
+        </div>
+      )}
 
-        {/* "+X" pill if more than 3 extras */}
-        {moreCount > 0 && (
-          <div style={{
-            marginLeft: -6,
-            zIndex: 5,
-            width: 20,
-            height: 20,
-            borderRadius: '34%',
-            background: 'rgba(255,255,255,0.12)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 9,
-            fontWeight: 600,
-            color: 'rgba(255,255,255,0.6)',
-            flexShrink: 0,
-          }}>
-            +{moreCount}
-          </div>
-        )}
-      </div>
+      {/* Name — only for single-player rows */}
+      {isSingle ? (
+        <button
+          onClick={onPlayerTap?.(player.playerId) ?? noop}
+          className="flex-1 text-left transition-opacity active:opacity-70"
+          style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.72)', minWidth: 0 }}
+        >
+          <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {player.displayName}
+          </span>
+        </button>
+      ) : (
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.40)' }}>
+            {row.players.length} players tied
+          </span>
+        </div>
+      )}
 
-      {/* Name */}
-      <button
-        onClick={handleTap}
-        className="flex-1 text-left transition-opacity active:opacity-70"
-        style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.72)', minWidth: 0 }}
-      >
-        <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {finisher.displayName}
-        </span>
-      </button>
-
-      {/* Score — amber for under par in finished state */}
+      {/* Score — shared for this position */}
       <span
         style={{
           fontFamily: "'JetBrains Mono', 'SF Mono', monospace",
           fontSize: 13,
           fontWeight: 600,
-          color: getFinishedScoreColor(finisher.score),
+          color: getFinishedScoreColor(row.sharedScore),
           flexShrink: 0,
         }}
       >
-        {finisher.displayScore || 'E'}
+        {row.sharedDisplayScore || 'E'}
       </span>
     </div>
   );

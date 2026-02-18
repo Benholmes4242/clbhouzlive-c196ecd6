@@ -19,7 +19,7 @@ import type { TourTournament } from '../../hooks/useTourHubData';
 import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
 import { useSingleCourseImage } from '../../hooks/useCourseImageResolver';
 import { getCourseImage } from '../../utils/placeholders';
-import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, RunnerUpRow } from '../shared/TourHeroHelpers';
+import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows } from '../shared/TourHeroHelpers';
 import '@/styles/hero-glass.css';
 
 interface ScheduleHeroCardProps {
@@ -64,31 +64,19 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
     if (tournament.venue_name) navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venue_name)}`);
   };
 
-  // Podium data for finished state
-  const topFinishers = leaderWinner?.topFinishers ?? [];
-  const allFetched = leaderWinner?.allFetched ?? topFinishers;
-  const winner = topFinishers[0] ?? leaderWinner;
-  const runnerUp = topFinishers[1];
-  const third = topFinishers[2];
-
-  // Helper: is this position tied?
-  const isPositionTied = (position: number) =>
-    allFetched.filter(f => f.position === position).length > 1;
-
-  // Extra tied finishers per runner-up position (not already shown)
-  const extraTiedForRunnerUp = runnerUp
-    ? allFetched.filter(f => f.position === runnerUp.position && f.playerId !== runnerUp.playerId && f.playerId !== third?.playerId)
-    : [];
-  const extraTiedForThird = third
-    ? allFetched.filter(f => f.position === third.position && f.playerId !== third.playerId && f.playerId !== runnerUp?.playerId)
-    : [];
+  // Podium data for finished state — position-based rows
+  const allFetched = leaderWinner?.allFetched ?? leaderWinner?.topFinishers ?? [];
+  const podiumRows = buildPodiumRows(allFetched);
+  const winnerRow = podiumRows[0];
+  const runnerRows = podiumRows.slice(1);
+  const winner = winnerRow?.players[0] ?? leaderWinner;
 
   const winningMargin = (() => {
-    if (!winner || !runnerUp) return null;
-    if (winner.score === null || runnerUp.score === null) return null;
-    // Co-winners — both at position 1
-    if ((winner as any).position === (runnerUp as any).position) return 'Co-winners';
-    const margin = runnerUp.score - winner.score;
+    if (!winnerRow || podiumRows.length < 2) return null;
+    if (winnerRow.isTied) return 'Co-winners';
+    const row2 = podiumRows[1];
+    if (winnerRow.sharedScore === null || row2.sharedScore === null) return null;
+    const margin = row2.sharedScore - winnerRow.sharedScore;
     if (margin === 0) return 'Won in playoff';
     return `Won by ${margin} stroke${margin === 1 ? '' : 's'}`;
   })();
@@ -281,8 +269,8 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
                   </div>
                 </div>
 
-                {/* Runners-up — positions 2 and 3 */}
-                {(runnerUp || third) && (
+                {/* Runners-up — one row per distinct position */}
+                {runnerRows.length > 0 && (
                   <div style={{
                     marginTop: 10,
                     paddingTop: 10,
@@ -291,22 +279,13 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
                     flexDirection: 'column',
                     gap: 8,
                   }}>
-                    {runnerUp && (
-                      <RunnerUpRow
-                        finisher={runnerUp}
-                        isTied={isPositionTied(runnerUp.position)}
-                        extraTiedFinishers={!third ? extraTiedForRunnerUp : []}
-                        onPlayerTap={handlePlayerTap(runnerUp.playerId)}
+                    {runnerRows.map(row => (
+                      <PodiumRunnerRow
+                        key={row.position}
+                        row={row}
+                        onPlayerTap={handlePlayerTap}
                       />
-                    )}
-                    {third && (
-                      <RunnerUpRow
-                        finisher={third}
-                        isTied={isPositionTied(third.position)}
-                        extraTiedFinishers={extraTiedForThird}
-                        onPlayerTap={handlePlayerTap(third.playerId)}
-                      />
-                    )}
+                    ))}
                   </div>
                 )}
               </div>

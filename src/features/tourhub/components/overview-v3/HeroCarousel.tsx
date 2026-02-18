@@ -30,7 +30,7 @@ import { getTourLogo } from '../../utils/tourLogos';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
-import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, RunnerUpRow, calcWinningMargin } from '../shared/TourHeroHelpers';
+import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows } from '../shared/TourHeroHelpers';
 import '@/styles/hero-glass.css';
 
 function getStartLabel(date: string): string {
@@ -192,34 +192,23 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
   const isCompleted = type === 'completed';
   const isUpcoming = type === 'upcoming';
   
-  // Podium data for completed slides
+  // Podium data for completed slides — position-based rows
   const podiumData = isCompleted ? leadersWinnersMap?.get(tournament.id) : undefined;
-  const topFinishers = podiumData?.topFinishers ?? [];
-  const allFetched = podiumData?.allFetched ?? topFinishers;
-  const podiumWinner = topFinishers[0];
-  const podiumRunnerUp = topFinishers[1];
-  const podiumThird = topFinishers[2];
+  const allFetchedData = podiumData?.allFetched ?? podiumData?.topFinishers ?? [];
+  const podiumRows = buildPodiumRows(allFetchedData);
+  const winnerRow = podiumRows[0];
+  const runnerRows = podiumRows.slice(1);
+  const podiumWinner = winnerRow?.players[0];
 
-  // Helper: is this position tied?
-  const isPodiumPositionTied = (position: number) =>
-    allFetched.filter(f => f.position === position).length > 1;
-
-  // Extra tied finishers per runner-up position (not already shown)
-  const podiumExtraForRunnerUp = podiumRunnerUp
-    ? allFetched.filter(f => f.position === podiumRunnerUp.position && f.playerId !== podiumRunnerUp.playerId && f.playerId !== podiumThird?.playerId)
-    : [];
-  const podiumExtraForThird = podiumThird
-    ? allFetched.filter(f => f.position === podiumThird.position && f.playerId !== podiumThird.playerId && f.playerId !== podiumRunnerUp?.playerId)
-    : [];
-
-  const winningMargin = podiumWinner && podiumRunnerUp
-    ? calcWinningMargin(
-        podiumWinner.score ?? null,
-        podiumRunnerUp.score ?? null,
-        podiumWinner.position,
-        podiumRunnerUp.position,
-      )
-    : null;
+  const winningMargin = (() => {
+    if (!winnerRow || podiumRows.length < 2) return null;
+    if (winnerRow.isTied) return 'Co-winners';
+    const row2 = podiumRows[1];
+    if (winnerRow.sharedScore === null || row2.sharedScore === null) return null;
+    const margin = row2.sharedScore - winnerRow.sharedScore;
+    if (margin === 0) return 'Won in playoff';
+    return `Won by ${margin} stroke${margin === 1 ? '' : 's'}`;
+  })();
 
   const handlePlayerTap = (playerId: string | null | undefined) => (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -504,8 +493,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                       </div>
                     </div>
 
-                    {/* Runners-up */}
-                    {(podiumRunnerUp || podiumThird) && (
+                    {/* Runners-up — one row per distinct position */}
+                    {runnerRows.length > 0 && (
                       <div style={{
                         marginTop: 10,
                         paddingTop: 10,
@@ -514,22 +503,13 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         flexDirection: 'column',
                         gap: 8,
                       }}>
-                        {podiumRunnerUp && (
-                          <RunnerUpRow
-                            finisher={podiumRunnerUp}
-                            isTied={isPodiumPositionTied(podiumRunnerUp.position)}
-                            extraTiedFinishers={!podiumThird ? podiumExtraForRunnerUp : []}
-                            onPlayerTap={handlePlayerTap(podiumRunnerUp.playerId)}
+                        {runnerRows.map(row => (
+                          <PodiumRunnerRow
+                            key={row.position}
+                            row={row}
+                            onPlayerTap={handlePlayerTap}
                           />
-                        )}
-                        {podiumThird && (
-                          <RunnerUpRow
-                            finisher={podiumThird}
-                            isTied={isPodiumPositionTied(podiumThird.position)}
-                            extraTiedFinishers={podiumExtraForThird}
-                            onPlayerTap={handlePlayerTap(podiumThird.playerId)}
-                          />
-                        )}
+                        ))}
                       </div>
                     )}
                   </div>
