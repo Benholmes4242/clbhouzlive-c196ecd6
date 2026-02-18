@@ -135,7 +135,7 @@
 .leaderboard-name {
   font-size: 14px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
+  color: #FFFFFF;
 }
 
 .leaderboard-score {
@@ -157,9 +157,9 @@
   text-align: right;
 }
 
-.score-under { color: #f59e0b; }  /* amber-500 = under par */
-.score-over { color: #D62828; }   /* red = over par */
-.score-even { color: rgba(255, 255, 255, 0.7); }
+.score-under { color: #FFFFFF; }
+.score-over { color: #FFFFFF; }
+.score-even { color: #FFFFFF; }
 
 /* ============================================
    4. LIVE INDICATOR - Animated Pulse with Glow
