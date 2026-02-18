@@ -35,11 +35,11 @@ interface VideoScrubberProps {
 // Color palettes per variant
 const COLORS = {
   default: {
-    track: 'rgba(255, 255, 255, 0.5)',
-    buffered: 'rgba(255, 255, 255, 0.6)',
+    track: 'rgba(255, 255, 255, 0.15)',
+    buffered: 'rgba(255, 255, 255, 0.25)',
     fill: '#FFFFFF',
-    glow: '0 0 10px rgba(255, 255, 255, 0.8)',
-    ghostShimmer: 'rgba(255,255,255,0.15)',
+    glow: 'none',
+    ghostShimmer: 'rgba(255,255,255,0.05)',
     bufferShimmer: 'rgba(255,255,255,0.3)',
   },
   wizard: {
