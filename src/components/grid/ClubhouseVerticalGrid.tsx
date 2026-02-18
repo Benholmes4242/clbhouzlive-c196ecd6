@@ -463,6 +463,8 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
   const [commentsModalOpen, setCommentsModalOpen] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string>('');
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
+  // Tracks the vertical centre of the right chevron so the left chevron can match it
+  const [leftChevronTop, setLeftChevronTop] = useState<number | null>(null);
   
   const [showTapHeart, setShowTapHeart] = useState<Record<string, boolean>>({});
   const [videoControlsVisible, setVideoControlsVisible] = useState<Record<string, boolean>>({});
@@ -1147,7 +1149,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                     className="fixed left-4 z-30 p-0 flex items-center justify-center rounded-full"
                     style={{
                       width: 44, height: 44,
-                      top: '45%',
+                      top: leftChevronTop !== null ? `${leftChevronTop}px` : '45%',
                       transform: 'translateY(-50%)',
                       background: 'rgba(0, 0, 0, 0.35)',
                       backdropFilter: 'blur(20px)',
@@ -1341,6 +1343,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
             }}
             hasNextMedia={hasNextMedia}
             hasPrevMedia={hasPrevMedia}
+            onChevronPositionChange={setLeftChevronTop}
           />
         );
       })()}
