@@ -17,7 +17,17 @@ import { toast } from 'sonner';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Smile, ChevronLeft, ChevronRight, Heart, X, MessageCircle, MoreHorizontal, Copy, Flag, Ban, Trash2, Eye } from 'lucide-react';
+import { Send, Smile, ChevronLeft, ChevronRight, Heart, X, MessageCircle, MoreHorizontal, Copy, Flag, Ban, Trash2, Eye, Pencil, Check } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import CourseLocationRow from '@/components/posts/CourseLocationRow';
 import { cn } from '@/lib/utils';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
@@ -296,6 +306,15 @@ const CommentItem: React.FC<CommentItemProps> = ({
             )}>
               {relativeTime(comment.created_at)}
             </span>
+            {/* Edited indicator — shown when updated_at is >2 seconds after created_at */}
+            {comment.updated_at && (new Date(comment.updated_at).getTime() - new Date(comment.created_at).getTime() > 2000) && (
+              <span className={cn(
+                "text-[11px] flex-shrink-0",
+                isDark ? "text-white/25" : "text-muted-foreground/40"
+              )}>
+                · edited
+              </span>
+            )}
           </div>
           
           {/* Comment body - proper spacing from name row, with @mention highlighting */}
@@ -442,6 +461,7 @@ interface ActionSheetProps {
   isDark: boolean;
   isOwnComment: boolean;
   onDelete?: () => void;
+  onEdit?: () => void;
   onCopy?: () => void;
   onReport?: () => void;
   onBlock?: () => void;
@@ -458,6 +478,7 @@ const ActionSheet: React.FC<ActionSheetProps> = ({
   isDark,
   isOwnComment,
   onDelete,
+  onEdit,
   onCopy,
   onReport,
   onBlock,
@@ -524,6 +545,17 @@ const ActionSheet: React.FC<ActionSheetProps> = ({
         {isOwnComment ? (
           <>
             <button
+              onClick={() => { onEdit?.(); onClose(); }}
+              className={cn(
+                "w-full flex items-center gap-3 px-5 py-4 transition-colors",
+                isDark ? "hover:bg-white/5" : "hover:bg-muted/50"
+              )}
+            >
+              <Pencil className={cn("w-5 h-5", isDark ? "text-white/70" : "text-muted-foreground")} />
+              <span className={cn("text-[15px]", isDark ? "text-white" : "text-foreground")}>Edit comment</span>
+            </button>
+            <div className={cn("h-px mx-4", isDark ? "bg-white/10" : "bg-border/50")} />
+            <button
               onClick={() => { onCopy?.(); onClose(); }}
               className={cn(
                 "w-full flex items-center gap-3 px-5 py-4 transition-colors",
@@ -538,11 +570,11 @@ const ActionSheet: React.FC<ActionSheetProps> = ({
               onClick={() => { onDelete?.(); onClose(); }}
               className={cn(
                 "w-full flex items-center gap-3 px-5 py-4 transition-colors",
-                "text-red-500 hover:bg-red-500/10"
+                "text-destructive hover:bg-destructive/10"
               )}
             >
               <Trash2 className="w-5 h-5" />
-              <span className="text-[15px]">Delete</span>
+              <span className="text-[15px]">Delete comment</span>
             </button>
           </>
         ) : (
@@ -873,6 +905,8 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   const [showActionSheet, setShowActionSheet] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [showBlockModal, setShowBlockModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [editingComment, setEditingComment] = useState<CommentWithReplies | CommentReply | null>(null);
   const [listVisible, setListVisible] = useState(false);
   const [highlightedCommentId, setHighlightedCommentId] = useState<string | null>(null);
   const [keyboardOffset, setKeyboardOffset] = useState(0);
@@ -902,6 +936,10 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
     isAddingComment,
     toggleCommentLike,
     isTogglingLike,
+    deleteComment,
+    isDeletingComment,
+    updateComment,
+    isUpdatingComment,
   } = useCommentsWithReplies(postId);
 
   // Hidden comments management (soft-hide for reporter)
@@ -1082,37 +1120,47 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   }, []); // no dependency on newComment — reads from ref
 
   const handleSubmitComment = useCallback(async () => {
-    if (!newComment.trim() || isAddingComment) return;
-    
-    // For replies, always attach to top-level parent (one-level threading)
-    // topLevelId is guaranteed to be a parent comment ID, never a reply ID
+    const content = newComment.trim();
+    if (!content || isAddingComment || isUpdatingComment) return;
+
+    // --- EDIT MODE ---
+    if (editingComment) {
+      const commentId = editingComment.id;
+      setNewComment('');
+      setEditingComment(null);
+      setShowEmojiPicker(false);
+      setShowMentions(false);
+      triggerHaptic('success');
+      try {
+        await updateComment(commentId, content);
+        toast.success('Comment updated');
+      } catch (error) {
+        console.error('Failed to update comment:', error);
+        toast.error('Failed to update comment');
+      }
+      return;
+    }
+
+    // --- NEW COMMENT / REPLY ---
     const parentId = replyingTo?.topLevelId ?? undefined;
-    
-    // Store current content before clearing
-    const content = newComment;
     setNewComment('');
     setReplyingTo(null);
     setShowEmojiPicker(false);
     setShowMentions(false);
     triggerHaptic('success');
-    
+
     try {
-      // Add comment and get the exact new comment ID
       const newCommentId = await addComment(content, parentId);
-      
-      // If this is a reply, expand the parent thread first
       if (parentId) {
         setExpandedReplies(prev => new Set(prev).add(parentId));
       }
-      
-      // Wait for query invalidation to complete, then highlight
       setTimeout(() => {
         highlightComment(newCommentId, true);
       }, 150);
     } catch (error) {
       console.error('Failed to add comment:', error);
     }
-  }, [newComment, isAddingComment, addComment, replyingTo, highlightComment]);
+  }, [newComment, isAddingComment, isUpdatingComment, editingComment, updateComment, addComment, replyingTo, highlightComment]);
 
   const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -1212,9 +1260,18 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   }, []);
 
   const handleDelete = useCallback(() => {
-    toast.info('Delete coming soon');
     setShowActionSheet(false);
+    // Small delay so action sheet closes before the confirm dialog appears
+    setTimeout(() => setShowDeleteConfirm(true), 200);
   }, []);
+
+  const handleStartEdit = useCallback(() => {
+    if (!selectedComment) return;
+    setEditingComment(selectedComment);
+    setNewComment(selectedComment.content);
+    setReplyingTo(null); // cancel any pending reply
+    setTimeout(() => inputRef.current?.focus(), 300);
+  }, [selectedComment]);
 
   // Prevent body scroll when open
   useEffect(() => {
@@ -1611,9 +1668,36 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               {/* CommentingAsIndicator - Shows when acting as business */}
               <CommentingAsIndicator isDark={isDark} />
 
+              {/* Edit indicator bar — shown above the input when editing a comment */}
+              <AnimatePresence>
+                {editingComment && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 36 }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.16, ease: 'easeOut' }}
+                    className="flex items-center justify-between mb-2 px-1 overflow-hidden"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Pencil className="w-3.5 h-3.5 text-amber-600" />
+                      <span className="text-[13px] text-amber-700 font-medium">Editing comment</span>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setEditingComment(null);
+                        setNewComment('');
+                      }}
+                      className="w-11 h-11 flex items-center justify-center rounded-full -mr-1 hover:bg-amber-100 transition-colors"
+                    >
+                      <X className="w-4 h-4 text-amber-600" />
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               {/* Reply indicator bar - 28-32px height */}
               <AnimatePresence>
-                {replyingTo && (
+                {replyingTo && !editingComment && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 28 }}
@@ -1661,9 +1745,11 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                     className={cn(
                       "flex items-center gap-2 rounded-[22px] pl-4 pr-3",
                       "transition-all duration-200",
-                      isDark 
-                        ? "bg-white/10 border border-white/15 focus-within:border-white/25 focus-within:bg-white/12" 
-                        : "bg-background border border-border/50 focus-within:border-border focus-within:shadow-sm"
+                      editingComment
+                        ? "border border-amber-300 bg-amber-50 focus-within:border-amber-400"
+                        : isDark 
+                          ? "bg-white/10 border border-white/15 focus-within:border-white/25 focus-within:bg-white/12" 
+                          : "bg-background border border-border/50 focus-within:border-border focus-within:shadow-sm"
                     )}
                     animate={{ 
                       height: newComment.trim() ? 48 : 44,
@@ -1688,7 +1774,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                           ? newComment.split(/(@\w+)/).map((part, i) =>
                               /^@\w+$/.test(part)
                                 ? <span key={i} style={{ color: '#f59e0b' }}>{part}</span>
-                                : <span key={i} className={isDark ? 'text-white' : 'text-foreground'}>{part}</span>
+                                : <span key={i} className={editingComment ? 'text-amber-900' : isDark ? 'text-white' : 'text-foreground'}>{part}</span>
                             )
                           : null
                         }
@@ -1697,7 +1783,13 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                       <input
                         ref={inputRef}
                         type="text"
-                        placeholder={replyingTo ? `Reply to ${replyingTo.displayName}...` : "Add a comment... (@ to mention)"}
+                        placeholder={
+                          editingComment
+                            ? "Edit your comment..."
+                            : replyingTo
+                              ? `Reply to ${replyingTo.displayName}...`
+                              : "Add a comment... (@ to mention)"
+                        }
                         value={newComment}
                         onChange={handleCommentChange}
                         onKeyDown={handleKeyPress}
@@ -1706,15 +1798,14 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                           'relative w-full bg-transparent',
                           'text-[14px] leading-none',
                           'outline-none border-none',
-                          // Text is transparent when there's content so the overlay shows through.
-                          // When empty the placeholder is visible normally.
                           newComment
                             ? 'text-transparent caret-current'
-                            : isDark
-                              ? 'text-white placeholder:text-white/40'
-                              : 'text-foreground placeholder:text-muted-foreground',
-                          // Caret colour must be set explicitly since text is transparent
-                          isDark ? '[caret-color:white]' : '[caret-color:theme(colors.foreground)]'
+                            : editingComment
+                              ? 'text-amber-700 placeholder:text-amber-400'
+                              : isDark
+                                ? 'text-white placeholder:text-white/40'
+                                : 'text-foreground placeholder:text-muted-foreground',
+                          isDark && !editingComment ? '[caret-color:white]' : '[caret-color:theme(colors.foreground)]'
                         )}
                       />
                     </div>
@@ -1734,23 +1825,25 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                   </motion.div>
                 </div>
                 
-                {/* Send button - emphasis state when content present */}
+                {/* Send / Save button */}
                 <motion.button
                   whileTap={{ scale: 0.88 }}
                   animate={{ 
-                    rotate: isAddingComment ? 45 : 0,
+                    rotate: (isAddingComment || isUpdatingComment) ? 45 : 0,
                     scale: newComment.trim() ? 1.02 : 1,
                   }}
                   onClick={handleSubmitComment}
-                  disabled={!newComment.trim() || isAddingComment}
+                  disabled={!newComment.trim() || isAddingComment || isUpdatingComment}
                   className={cn(
                     'w-11 h-11 rounded-full relative overflow-hidden',
                     'flex items-center justify-center',
                     'transition-all duration-200',
                     newComment.trim() 
-                      ? isDark 
-                        ? 'bg-white text-black hover:bg-white/90 shadow-lg shadow-white/15' 
-                        : 'bg-primary text-primary-foreground hover:opacity-90 shadow-lg shadow-primary/25'
+                      ? editingComment
+                        ? 'bg-amber-500 text-white hover:bg-amber-600 shadow-lg shadow-amber-500/25'
+                        : isDark 
+                          ? 'bg-white text-black hover:bg-white/90 shadow-lg shadow-white/15' 
+                          : 'bg-primary text-primary-foreground hover:opacity-90 shadow-lg shadow-primary/25'
                       : isDark 
                         ? 'bg-white/12 text-white/35' 
                         : 'bg-muted text-muted-foreground/35',
@@ -1758,10 +1851,10 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                   )}
                 >
                   <motion.div
-                    animate={isAddingComment ? { scale: 0.9, opacity: 0.7 } : { scale: 1, opacity: 1 }}
+                    animate={(isAddingComment || isUpdatingComment) ? { scale: 0.9, opacity: 0.7 } : { scale: 1, opacity: 1 }}
                     transition={{ duration: 0.15 }}
                   >
-                    <Send className="w-4 h-4" />
+                    {editingComment ? <Check className="w-4 h-4" /> : <Send className="w-4 h-4" />}
                   </motion.div>
                 </motion.button>
               </div>
@@ -1839,6 +1932,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                 isDark={isDark}
                 isOwnComment={currentUserId === selectedComment?.user_id}
                 onDelete={handleDelete}
+                onEdit={handleStartEdit}
                 onCopy={handleCopyText}
                 onReport={() => {
                   setShowActionSheet(false);
@@ -1855,6 +1949,44 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               />
             )}
           </AnimatePresence>
+
+          {/* Delete Confirmation Dialog */}
+          <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+            <AlertDialogContent className="z-[220]">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete comment?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will permanently delete your comment
+                  {selectedComment && 'replies' in selectedComment && selectedComment.replies.length > 0
+                    ? ` and all ${selectedComment.replies.length} ${selectedComment.replies.length === 1 ? 'reply' : 'replies'} to it`
+                    : ''
+                  }. This can't be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setShowDeleteConfirm(false)}>
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  onClick={async () => {
+                    if (selectedComment) {
+                      try {
+                        await deleteComment(selectedComment.id);
+                        toast.success('Comment deleted');
+                      } catch {
+                        toast.error('Failed to delete comment');
+                      }
+                      setShowDeleteConfirm(false);
+                      setSelectedComment(null);
+                    }
+                  }}
+                >
+                  {isDeletingComment ? 'Deleting…' : 'Delete'}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 
           {/* Report Modal */}
           <AnimatePresence>

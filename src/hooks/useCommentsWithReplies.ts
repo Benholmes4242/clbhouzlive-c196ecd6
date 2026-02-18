@@ -17,6 +17,7 @@ export interface CommentReply {
   avatar_url: string | null;
   content: string;
   created_at: string;
+  updated_at?: string;
   likes_count: number;
   has_liked: boolean;
 }
@@ -30,6 +31,7 @@ export interface CommentWithReplies {
   avatar_url: string | null;
   content: string;
   created_at: string;
+  updated_at?: string;
   likes_count: number;
   has_liked: boolean;
   replies: CommentReply[];
@@ -55,7 +57,7 @@ export function useCommentsWithReplies(postId: string | null) {
       // Fetch all comments for this post (including actor info)
       const { data: allComments, error } = await supabase
         .from('post_comments')
-        .select('id, user_id, actor_type, actor_id, content, created_at, parent_id')
+        .select('id, user_id, actor_type, actor_id, content, created_at, updated_at, parent_id')
         .eq('post_id', postId)
         .order('created_at', { ascending: true });
 
@@ -159,6 +161,7 @@ export function useCommentsWithReplies(postId: string | null) {
               avatar_url: replyActorInfo.avatar_url,
               content: reply.content,
               created_at: reply.created_at,
+              updated_at: reply.updated_at,
               likes_count: likesCount.get(reply.id) || 0,
               has_liked: userLikes.has(reply.id),
             };
@@ -173,6 +176,7 @@ export function useCommentsWithReplies(postId: string | null) {
           avatar_url: actorInfo.avatar_url,
           content: comment.content,
           created_at: comment.created_at,
+          updated_at: comment.updated_at,
           likes_count: likesCount.get(comment.id) || 0,
           has_liked: userLikes.has(comment.id),
           replies: commentReplies,
@@ -301,14 +305,70 @@ export function useCommentsWithReplies(postId: string | null) {
     },
   });
 
+  // Delete comment mutation
+  const deleteCommentMutation = useMutation({
+    mutationFn: async (commentId: string) => {
+      if (!user?.id) throw new Error('Not authenticated');
+
+      const { error } = await supabase
+        .from('post_comments')
+        .delete()
+        .eq('id', commentId)
+        .eq('user_id', user.id); // RLS safety belt
+
+      if (error) throw error;
+
+      // Recount remaining comments and sync the denormalised column
+      const { count } = await supabase
+        .from('post_comments')
+        .select('id', { count: 'exact', head: true })
+        .eq('post_id', postId!);
+
+      await supabase
+        .from('posts')
+        .update({ comment_count: count ?? 0 })
+        .eq('id', postId!);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['post-comments-with-replies', postId] });
+      queryClient.invalidateQueries({ queryKey: ['post-engagement', postId] });
+    },
+  });
+
+  // Update (edit) comment mutation
+  const updateCommentMutation = useMutation({
+    mutationFn: async ({ commentId, content }: { commentId: string; content: string }) => {
+      if (!user?.id) throw new Error('Not authenticated');
+
+      const { error } = await supabase
+        .from('post_comments')
+        .update({ content, updated_at: new Date().toISOString() })
+        .eq('id', commentId)
+        .eq('user_id', user.id); // RLS safety belt
+
+      if (error) throw error;
+
+      // Re-extract mentions from updated content
+      await createMentionNotifications(content, user.id, 'comment', commentId, postId!);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['post-comments-with-replies', postId] });
+    },
+  });
+
   return {
     comments,
     commentsLoading,
-    addComment: (content: string, parentId?: string): Promise<string> => 
+    addComment: (content: string, parentId?: string): Promise<string> =>
       addCommentMutation.mutateAsync({ content, parentId }),
     isAddingComment: addCommentMutation.isPending,
     toggleCommentLike: (commentId: string) => toggleLikeMutation.mutate(commentId),
     isTogglingLike: toggleLikeMutation.isPending,
+    deleteComment: (commentId: string) => deleteCommentMutation.mutateAsync(commentId),
+    isDeletingComment: deleteCommentMutation.isPending,
+    updateComment: (commentId: string, content: string) =>
+      updateCommentMutation.mutateAsync({ commentId, content }),
+    isUpdatingComment: updateCommentMutation.isPending,
     refetchComments: refetch,
   };
 }
