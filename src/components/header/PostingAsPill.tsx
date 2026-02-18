@@ -86,7 +86,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
           className={cn(
             "flex items-center gap-1.5 pl-1 pr-2 h-11",
             "rounded-xl transition-all duration-500",
-            "max-w-[180px]",
+            "max-w-[160px] min-w-0",
             "active:scale-[0.97]",
             useLightTheme 
               ? "hover:opacity-90" 
@@ -131,7 +131,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
         
         {/* Name */}
         <span className={cn(
-          "text-sm font-medium truncate max-w-[120px] leading-none",
+          "text-sm font-medium truncate max-w-[100px] leading-none",
           useLightTheme ? "text-foreground" : "text-white"
         )}>
           {activeActor.name}

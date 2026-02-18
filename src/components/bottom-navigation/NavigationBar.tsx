@@ -118,7 +118,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
             {/* Label */}
             <span 
               className={cn(
-                "text-[10px] leading-none font-medium",
+                "text-[9px] min-[375px]:text-[10px] leading-none font-medium whitespace-nowrap overflow-hidden text-ellipsis w-full text-center",
                 isLightTheme
                   ? isActive 
                     ? useAmberActive ? "text-amber-700" : "text-slate-800"
