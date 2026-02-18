@@ -23,21 +23,15 @@ import {
   type HeroTournament,
 } from '../../hooks/useHeroCarouselData';
 import { useTournamentTopLeaders, TOUR_CONFIG, type LeaderEntry } from '../../hooks/useOverviewData';
+import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
 
 import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 import { getTourLogo } from '../../utils/tourLogos';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
+import { getScoreColor, formatPurse, PlayerAvatar, RunnerUpRow, calcWinningMargin } from '../shared/TourHeroHelpers';
 import '@/styles/hero-glass.css';
-
-function formatPurse(purse: number | null): string {
-  if (!purse) return '';
-  if (purse >= 1000000) {
-    return `$${(purse / 1000000).toFixed(purse % 1000000 === 0 ? 0 : 1)}M`;
-  }
-  return `$${(purse / 1000).toFixed(0)}K`;
-}
 
 function getStartLabel(date: string): string {
   const startDate = new Date(date);
@@ -170,6 +164,7 @@ interface HeroSlideProps {
   totalSlides: number;
   currentIndex: number;
   onDotClick: (index: number) => void;
+  leadersWinnersMap?: Map<string, import('../../hooks/useTournamentLeadersWinners').TournamentLeaderWinner>;
 }
 
 // Card animation variants - using layout animation to prevent jumping
@@ -185,8 +180,9 @@ const cardVariants = {
   }
 };
 
-function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: HeroSlideProps) {
+function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap }: HeroSlideProps) {
   const { tournament, type } = slide;
+  const navigate = useNavigate();
   const tourConfig = TOUR_CONFIG[tournament.tourSlug] || TOUR_CONFIG.pga;
   
   // Fetch real venue image
@@ -196,6 +192,22 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
   const isCompleted = type === 'completed';
   const isUpcoming = type === 'upcoming';
   
+  // Podium data for completed slides
+  const podiumData = isCompleted ? leadersWinnersMap?.get(tournament.id) : undefined;
+  const topFinishers = podiumData?.topFinishers ?? [];
+  const podiumWinner = topFinishers[0];
+  const podiumRunnerUp = topFinishers[1];
+  const podiumThird = topFinishers[2];
+  const winningMargin = calcWinningMargin(
+    podiumWinner?.score ?? null,
+    podiumRunnerUp?.score ?? null,
+  );
+
+  const handlePlayerTap = (playerId: string | null | undefined) => (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (playerId) navigate(`/tourhub/player/${playerId}`);
+  };
+
   // Fetch top 5 leaders for live tournaments only
   const { data: leaders = [], isLoading: leadersLoading } = useTournamentTopLeaders(
     isLive ? tournament.id : null
@@ -435,42 +447,75 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
               </>
             )}
             
-            {/* ─── COMPLETED CARD LAYOUT ─── */}
+            {/* ─── COMPLETED CARD LAYOUT ─── Podium design */}
             {isCompleted && (
               <>
-                {/* Winner - Large centered presentation */}
-                {winnerInfo?.winnerName && (
-                  <div className="winner-section">
-                    <div className="winner-avatar">
-                      {(() => {
-                        const photoUrl = resolvePhotoUrl(winnerInfo.winnerPhotoUrl, winnerInfo.winnerPgaTourId);
-                        if (photoUrl) {
-                          return (
-                            <img 
-                              src={photoUrl}
-                              alt={winnerInfo.winnerName}
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.style.display = 'none';
-                                target.nextElementSibling?.classList.remove('hidden');
-                              }}
-                            />
-                          );
-                        }
-                        const initials = winnerInfo.winnerName.split(' ').map(n => n[0]).join('').toUpperCase();
-                        return <div className="winner-avatar-fallback">{initials}</div>;
-                      })()}
+                {/* Winner row — horizontal: photo beside name + score */}
+                {podiumWinner ? (
+                  <div style={{ marginTop: 10 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <button
+                        onClick={handlePlayerTap(podiumWinner.playerId)}
+                        className="transition-opacity active:opacity-70"
+                      >
+                        <PlayerAvatar
+                          photoUrl={podiumWinner.photoUrl}
+                          displayName={podiumWinner.displayName}
+                          size={44}
+                        />
+                      </button>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <button
+                            onClick={handlePlayerTap(podiumWinner.playerId)}
+                            className="transition-opacity active:opacity-70"
+                            style={{ fontSize: '16px', fontWeight: 700, color: '#FFFFFF' }}
+                          >
+                            {podiumWinner.displayName}
+                          </button>
+                          <span style={{ fontFamily: "'JetBrains Mono','SF Mono',monospace", fontSize: '16px', fontWeight: 700, color: getScoreColor(podiumWinner.score), flexShrink: 0 }}>
+                            {podiumWinner.displayScore}
+                          </span>
+                        </div>
+                        {winningMargin && (
+                          <span style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.50)', marginTop: 2, display: 'block' }}>
+                            {winningMargin}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <span className="winner-name-large">{winnerInfo.winnerName}</span>
-                    {winnerInfo.winnerScore && (
-                      <span className="winner-score-large">({winnerInfo.winnerScore})</span>
+
+                    {/* Runners-up */}
+                    {(podiumRunnerUp || podiumThird) && (
+                      <div style={{ marginTop: 6 }}>
+                        {podiumRunnerUp && <RunnerUpRow finisher={podiumRunnerUp} onPlayerTap={handlePlayerTap(podiumRunnerUp.playerId)} />}
+                        {podiumThird && <RunnerUpRow finisher={podiumThird} onPlayerTap={handlePlayerTap(podiumThird.playerId)} />}
+                      </div>
                     )}
                   </div>
-                )}
-                
+                ) : winnerInfo?.winnerName ? (
+                  /* Fallback to basic winner if topFinishers not yet loaded */
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10 }}>
+                    <PlayerAvatar
+                      photoUrl={resolvePhotoUrl(winnerInfo.winnerPhotoUrl, winnerInfo.winnerPgaTourId)}
+                      displayName={winnerInfo.winnerName}
+                      size={44}
+                    />
+                    <div>
+                      <span style={{ fontSize: '16px', fontWeight: 700, color: '#FFFFFF', display: 'block' }}>
+                        {winnerInfo.winnerName}
+                      </span>
+                      {winnerInfo.winnerScore && (
+                        <span style={{ fontFamily: "'JetBrains Mono','SF Mono',monospace", fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>
+                          {winnerInfo.winnerScore}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ) : null}
 
                 {/* View Results text CTA */}
-                <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta w-full">
+                <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta w-full" style={{ marginTop: '8px' }}>
                   <span>View Results</span>
                   <ChevronRight className="w-4 h-4 cta-chevron" />
                 </Link>
@@ -544,6 +589,12 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+
+  // Wire up top-3 podium data for completed slides
+  const completedIds = slides
+    .filter(s => s.type === 'completed')
+    .map(s => s.tournament.id);
+  const { data: leadersWinnersMap } = useTournamentLeadersWinners(completedIds);
   
   // Touch swipe state
   const touchStartRef = React.useRef<{ x: number; y: number; time: number } | null>(null);
@@ -591,8 +642,6 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     );
     const threshold = 50;
 
-    // Only treat as swipe if horizontal movement exceeds threshold
-    // Otherwise let the tap pass through to interactive children
     if (Math.abs(deltaX) > threshold && Math.abs(deltaX) > deltaY) {
       if (deltaX < -threshold && currentIndex < slides.length - 1) {
         setCurrentIndex(prev => prev + 1);
@@ -604,7 +653,6 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     touchStartRef.current = null;
     touchMoveRef.current = 0;
     
-    // Resume auto-advance after 5s (spec: 5s after last interaction)
     setTimeout(() => setIsPaused(false), 5000);
   };
 
@@ -644,16 +692,9 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Menu Icon - positioned on hero, below safe area */}
-      {/* Menu Icon - containerless with drop-shadow for legibility */}
       <button 
         className="absolute z-20 flex items-center justify-center"
-        style={{ 
-          top: '56px',
-          left: '16px',
-          width: '44px',
-          height: '44px',
-        }}
+        style={{ top: '56px', left: '16px', width: '44px', height: '44px' }}
         onClick={openTourNav}
         aria-label="Open tour menu"
       >
@@ -673,6 +714,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
             totalSlides={slides.length}
             currentIndex={currentIndex}
             onDotClick={setCurrentIndex}
+            leadersWinnersMap={leadersWinnersMap}
           />
         ))}
       </AnimatePresence>
