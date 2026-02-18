@@ -924,6 +924,8 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   const [showReportModal, setShowReportModal] = useState(false);
   const [showBlockModal, setShowBlockModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  // Ref to hold the comment being deleted — survives the onClose → setSelectedComment(null) race
+  const pendingDeleteRef = useRef<CommentWithReplies | CommentReply | null>(null);
   const [editingComment, setEditingComment] = useState<CommentWithReplies | CommentReply | null>(null);
   const [listVisible, setListVisible] = useState(false);
   const [highlightedCommentId, setHighlightedCommentId] = useState<string | null>(null);
@@ -1278,10 +1280,12 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   }, []);
 
   const handleDelete = useCallback(() => {
+    // Snapshot the comment before onClose nulls selectedComment
+    pendingDeleteRef.current = selectedComment;
     setShowActionSheet(false);
     // Small delay so action sheet closes before the confirm dialog appears
     setTimeout(() => setShowDeleteConfirm(true), 200);
-  }, []);
+  }, [selectedComment]);
 
   const handleStartEdit = useCallback(() => {
     if (!selectedComment) return;
@@ -1975,8 +1979,8 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                 <AlertDialogTitle>Delete comment?</AlertDialogTitle>
                 <AlertDialogDescription>
                   This will permanently delete your comment
-                  {selectedComment && 'replies' in selectedComment && selectedComment.replies.length > 0
-                    ? ` and all ${selectedComment.replies.length} ${selectedComment.replies.length === 1 ? 'reply' : 'replies'} to it`
+                  {pendingDeleteRef.current && 'replies' in pendingDeleteRef.current && (pendingDeleteRef.current as CommentWithReplies).replies.length > 0
+                    ? ` and all ${(pendingDeleteRef.current as CommentWithReplies).replies.length} ${(pendingDeleteRef.current as CommentWithReplies).replies.length === 1 ? 'reply' : 'replies'} to it`
                     : ''
                   }. This can't be undone.
                 </AlertDialogDescription>
@@ -1988,15 +1992,16 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                 <AlertDialogAction
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   onClick={async () => {
-                    if (selectedComment) {
+                    const commentToDelete = pendingDeleteRef.current;
+                    if (commentToDelete) {
                       try {
-                        await deleteComment(selectedComment.id);
+                        await deleteComment(commentToDelete.id);
                         toast.success('Comment deleted');
                       } catch {
                         toast.error('Failed to delete comment');
                       }
                       setShowDeleteConfirm(false);
-                      setSelectedComment(null);
+                      pendingDeleteRef.current = null;
                     }
                   }}
                 >
