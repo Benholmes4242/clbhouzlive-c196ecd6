@@ -1472,7 +1472,10 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                           reactionCounts={getReactionsForComment(comment.id).reactions}
                           userReactions={getReactionsForComment(comment.id).userReactions}
                           onReactionToggle={(commentId, type) => toggleReaction({ commentId, reactionType: type })}
-                          onMentionTap={(username) => resolveAndNavigate(username, navigate)}
+                          onMentionTap={(username) => {
+                            onClose?.();
+                            setTimeout(() => resolveAndNavigate(username, navigate), 300);
+                          }}
                         />
                         
                         {/* Replies - thread rail layout with subtle gradient connector */}
@@ -1515,7 +1518,10 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                                   reactionCounts={getReactionsForComment(reply.id).reactions}
                                   userReactions={getReactionsForComment(reply.id).userReactions}
                                   onReactionToggle={(commentId, type) => toggleReaction({ commentId, reactionType: type })}
-                                  onMentionTap={(username) => resolveAndNavigate(username, navigate)}
+                                   onMentionTap={(username) => {
+                                    onClose?.();
+                                    setTimeout(() => resolveAndNavigate(username, navigate), 300);
+                                  }}
                                 />
                               ))}
                               
