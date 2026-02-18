@@ -1321,34 +1321,37 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
     <AnimatePresence mode="wait">
       {isOpen && (
         <>
-          {/* Backdrop */}
+          {/* Backdrop — frosted glass over feed, tap to close */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className={cn(
-              "fixed inset-0 z-[100] backdrop-blur-sm",
-              isDark ? "bg-black/70" : "bg-black/40"
-            )}
+            className="fixed inset-0 z-[100]"
+            style={{
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              backgroundColor: 'rgba(0, 0, 0, 0.3)',
+            }}
             onClick={onClose}
           />
 
-          {/* Comments Panel */}
+          {/* Comments Panel — 80vw slide-over anchored to right edge */}
           <motion.div
-            initial={{ x: '100%', opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: '100%', opacity: 0 }}
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
             transition={SPRING_SNAPPY}
             className={cn(
               'fixed inset-y-0 right-0 z-[101]',
-              'w-full sm:w-[420px] max-w-full',
               'flex flex-col',
               !isDark && (isGrey ? 'bg-muted' : 'bg-[#f8fafc]')
             )}
-            style={isDark ? {
-              background: '#0d0d0d',
-            } : undefined}
+            style={{
+              width: 'min(80vw, 420px)',
+              boxShadow: '-8px 0 32px rgba(0, 0, 0, 0.15)',
+              ...(isDark ? { background: '#0d0d0d' } : {}),
+            }}
           >
             {/* Vignette overlay - darkens edges (matches /auth page) */}
             {isDark && (
