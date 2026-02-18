@@ -1632,23 +1632,54 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                     }}
                     transition={{ duration: 0.15, ease: 'easeOut' }}
                   >
-                    <input
-                      ref={inputRef}
-                      type="text"
-                      placeholder={replyingTo ? `Reply to ${replyingTo.displayName}...` : "Add a comment... (@ to mention)"}
-                      value={newComment}
-                      onChange={handleCommentChange}
-                      onKeyDown={handleKeyPress}
-                      onFocus={() => setShowEmojiPicker(false)}
-                      className={cn(
-                        'flex-1 bg-transparent',
-                        'text-[14px]',
-                        'outline-none border-none',
-                        isDark 
-                          ? 'text-white placeholder:text-white/40' 
-                          : 'text-foreground placeholder:text-muted-foreground'
-                      )}
-                    />
+                    {/* Overlay pattern: invisible input on top, styled mirror div behind.
+                        The overlay renders @mentions as amber spans while the input
+                        handles all cursor / keyboard behaviour normally. */}
+                    <div className="flex-1 relative overflow-hidden" style={{ fontSize: 14 }}>
+                      {/* Mirror overlay — aria-hidden, not interactive */}
+                      <div
+                        aria-hidden="true"
+                        className={cn(
+                          "absolute inset-0 flex items-center pointer-events-none",
+                          "text-[14px] whitespace-pre overflow-hidden",
+                          // Match the input's line-height so text aligns
+                          "leading-none"
+                        )}
+                      >
+                        {newComment
+                          ? newComment.split(/(@\w+)/).map((part, i) =>
+                              /^@\w+$/.test(part)
+                                ? <span key={i} style={{ color: '#f59e0b' }}>{part}</span>
+                                : <span key={i} className={isDark ? 'text-white' : 'text-foreground'}>{part}</span>
+                            )
+                          : null
+                        }
+                      </div>
+                      {/* Actual input — transparent text so the overlay shows through */}
+                      <input
+                        ref={inputRef}
+                        type="text"
+                        placeholder={replyingTo ? `Reply to ${replyingTo.displayName}...` : "Add a comment... (@ to mention)"}
+                        value={newComment}
+                        onChange={handleCommentChange}
+                        onKeyDown={handleKeyPress}
+                        onFocus={() => setShowEmojiPicker(false)}
+                        className={cn(
+                          'relative w-full bg-transparent',
+                          'text-[14px] leading-none',
+                          'outline-none border-none',
+                          // Text is transparent when there's content so the overlay shows through.
+                          // When empty the placeholder is visible normally.
+                          newComment
+                            ? 'text-transparent caret-current'
+                            : isDark
+                              ? 'text-white placeholder:text-white/40'
+                              : 'text-foreground placeholder:text-muted-foreground',
+                          // Caret colour must be set explicitly since text is transparent
+                          isDark ? '[caret-color:white]' : '[caret-color:theme(colors.foreground)]'
+                        )}
+                      />
+                    </div>
                     <motion.button 
                       whileTap={{ scale: 0.9 }}
                       onClick={() => setShowEmojiPicker(!showEmojiPicker)}
