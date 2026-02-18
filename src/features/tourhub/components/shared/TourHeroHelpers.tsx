@@ -191,7 +191,7 @@ export function PodiumRunnerRow({
       ) : (
         <div style={{ flex: 1, minWidth: 0 }}>
           <span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.40)' }}>
-            {row.players.length} players tied
+            {row.players.length}-way tie
           </span>
         </div>
       )}
