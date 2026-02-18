@@ -346,6 +346,24 @@ const CommentItem: React.FC<CommentItemProps> = ({
 
         {/* Reactions and Like button area */}
         <div className="flex items-center gap-1.5 flex-shrink-0 pr-1">
+          {/* Three-dot menu — only on own comments */}
+          {isOwnComment && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onLongPress?.(comment);
+              }}
+              className={cn(
+                "w-8 h-8 flex items-center justify-center rounded-full transition-colors",
+                isDark
+                  ? "text-white/40 hover:text-white/60 hover:bg-white/10"
+                  : "text-muted-foreground/40 hover:text-muted-foreground/60 hover:bg-muted/50"
+              )}
+            >
+              <MoreHorizontal className="w-4 h-4" />
+            </button>
+          )}
+
           {/* Show reaction emojis if any */}
           {reactionCounts && reactionCounts.length > 0 && (
             <ReactionDisplay
