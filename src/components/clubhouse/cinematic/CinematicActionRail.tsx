@@ -67,6 +67,8 @@ interface ActionSlotProps {
   isLikeButton?: boolean;
   /** Reduced opacity for idle state */
   idleOpacity?: number;
+  /** Opacity applied directly to the icon (e.g. 0.5 for muted state) */
+  iconOpacity?: number;
 }
 
 /**
@@ -83,6 +85,7 @@ const ActionSlot: React.FC<ActionSlotProps> = ({
   showCount = true,
   isLikeButton = false,
   idleOpacity = 1,
+  iconOpacity = 1,
 }) => {
   const [isPressed, setIsPressed] = useState(false);
   const [showLikePop, setShowLikePop] = useState(false);
@@ -131,8 +134,8 @@ const ActionSlot: React.FC<ActionSlotProps> = ({
           background: 'rgba(0, 0, 0, 0.35)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+          border: '1px solid rgba(255, 255, 255, 0.10)',
+          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
         }}
       >
         {/* Ripple effect */}
@@ -152,6 +155,7 @@ const ActionSlot: React.FC<ActionSlotProps> = ({
         <motion.div
           animate={showLikePop && !prefersReducedMotion() ? likePop : {}}
           className="relative z-10"
+          style={{ opacity: iconOpacity, transition: 'opacity 150ms ease' }}
         >
           <Icon
             className={cn(
@@ -291,6 +295,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
           }
           onClick={onMuteToggle}
           idleOpacity={idleOpacity}
+          iconOpacity={isMuted ? 0.5 : 1.0}
           ariaLabel={isMuted ? 'Unmute' : 'Mute'}
           showCount={false}
         />

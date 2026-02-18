@@ -24,8 +24,8 @@ export default function CarouselDots({ count, activeIndex, onDotClick }: Carouse
             haptic('light');
           }}
           className={`h-2 w-2 rounded-full transition-colors ${
-            i === activeIndex ? "bg-white" : "bg-white/50"
-          } ${onDotClick ? 'hover:bg-white/80 cursor-pointer' : 'cursor-default'}`}
+            i === activeIndex ? "bg-white" : "bg-white/40"
+          } ${onDotClick ? 'hover:bg-white/70 cursor-pointer' : 'cursor-default'}`}
           role="tab"
           aria-selected={i === activeIndex}
           aria-label={`Go to media ${i + 1}`}
