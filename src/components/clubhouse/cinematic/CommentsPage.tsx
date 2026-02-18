@@ -1788,12 +1788,12 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                   )}
                   animate={{}}
                   transition={{ duration: 0.15, ease: 'easeOut' }}
-                  style={{ paddingTop: 4, paddingBottom: 4 }}
+                  style={{ paddingTop: 8, paddingBottom: 8 }}
                 >
                   {/* Overlay pattern: transparent textarea on top, styled mirror div behind.
                       The overlay renders @mentions as amber spans while the textarea
                       handles all cursor / keyboard behaviour normally. */}
-                  <div className="flex-1 relative" style={{ fontSize: 14 }}>
+                  <div className="flex-1 relative py-1" style={{ fontSize: 14 }}>
                     {/* Mirror overlay — aria-hidden, not interactive */}
                     <div
                       aria-hidden="true"
@@ -1849,7 +1849,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                   </div>
 
                   {/* Right button stack — emoji top, send bottom, anchored to bottom of pill */}
-                  <div className="flex flex-col items-center justify-end gap-0.5 flex-shrink-0">
+                  <div className="flex flex-col items-center justify-end gap-0.5 pb-0.5 flex-shrink-0">
                     {/* Emoji button */}
                     <motion.button 
                       whileTap={{ scale: 0.9 }}
@@ -1862,7 +1862,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                         showEmojiPicker && (isDark ? "text-white/80" : "text-foreground")
                       )}
                     >
-                      <Smile className="w-5 h-5" />
+                      <Smile className="w-4 h-4" />
                     </motion.button>
 
                     {/* Send / Save button */}
