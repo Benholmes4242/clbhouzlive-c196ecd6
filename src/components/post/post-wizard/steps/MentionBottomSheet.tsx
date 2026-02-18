@@ -48,7 +48,7 @@ export function MentionBottomSheet({
           .from('taggable_entities')
           .select('id, entity_id, entity_type, name, username, profile_image_url')
           .or(`name.ilike.%${query}%,username.ilike.%${query}%`)
-          .in('entity_type', ['user', 'business']) // Only users and businesses
+          .in('entity_type', ['user', 'business'])
           .limit(8);
 
         if (error) throw error;
@@ -82,38 +82,44 @@ export function MentionBottomSheet({
   const resolvedZ = zIndex ?? 50;
 
   return (
+    /*
+     * Outer wrapper: fixed full-viewport at resolvedZ, anchored at bottomOffset.
+     * Taps on the wrapper itself (i.e. outside the sheet panel) close the sheet.
+     * Taps on the sheet panel bubble normally — stopPropagation on the inner div
+     * prevents them from reaching the wrapper's onClick.
+     */
     <div
-      className="fixed inset-x-0 pb-safe"
+      className="fixed inset-0"
       style={{ zIndex: resolvedZ, bottom: bottomOffset }}
+      onClick={(e) => {
+        // Only close if the tap landed directly on this wrapper, not on a child
+        if (e.target === e.currentTarget) {
+          onOpenChange(false);
+        }
+      }}
     >
-      {/* Backdrop to close — onClick fires AFTER pointerup, so button clicks resolve first */}
-      <div 
-        className="fixed inset-0"
-        style={{ zIndex: resolvedZ - 1 }}
-        onClick={() => { console.log('[MENTION] BACKDROP onClick fired — closing sheet'); onOpenChange(false); }}
-        onPointerDown={() => { console.log('[MENTION] BACKDROP onPointerDown fired'); }}
-        onTouchStart={() => { console.log('[MENTION] BACKDROP onTouchStart fired'); }}
-        onTouchEnd={() => { console.log('[MENTION] BACKDROP onTouchEnd fired'); }}
-      />
-      
-      <div className="bg-white rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.1)] 
-        border-t border-border/40 max-h-[50vh] overflow-hidden">
-        
+      {/* Sheet panel — stopPropagation so taps here don't trigger the wrapper's close */}
+      <div
+        className="absolute inset-x-0 bottom-0 bg-background rounded-t-2xl
+          shadow-[0_-4px_20px_rgba(0,0,0,0.1)] border-t border-border/40
+          max-h-[50vh] overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Handle bar */}
         <div className="w-12 h-1 bg-muted rounded-full mx-auto mt-3 mb-4" />
-        
+
         {/* Search context */}
         <p className="text-sm text-muted-foreground px-4 mb-3">
           {query ? `Searching for "@${query}"` : 'Type to search people and businesses'}
         </p>
-        
+
         {/* Loading state */}
         {isLoading && (
           <div className="flex items-center justify-center py-8">
             <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
           </div>
         )}
-        
+
         {/* Empty state */}
         {!isLoading && suggestions.length === 0 && query.length > 0 && (
           <div className="text-center py-8">
@@ -121,7 +127,7 @@ export function MentionBottomSheet({
             <p className="text-sm text-muted-foreground">No results for "@{query}"</p>
           </div>
         )}
-        
+
         {/* Results list */}
         {!isLoading && suggestions.length > 0 && (
           <div className="px-4 pb-4 space-y-2 overflow-y-auto max-h-[calc(50vh-80px)]">
@@ -130,24 +136,22 @@ export function MentionBottomSheet({
                 key={suggestion.id}
                 type="button"
                 onMouseDown={(e) => {
-                  console.log('[MENTION] onMouseDown fired for:', suggestion.name);
+                  // Prevent input blur on desktop without killing click synthesis
                   e.preventDefault();
                 }}
-                onPointerDown={() => { console.log('[MENTION] onPointerDown fired for:', suggestion.name); }}
-                onPointerUp={() => { console.log('[MENTION] onPointerUp fired for:', suggestion.name); }}
-                onTouchStart={() => { console.log('[MENTION] onTouchStart fired for:', suggestion.name); }}
                 onTouchEnd={(e) => {
-                  console.log('[MENTION] onTouchEnd fired for:', suggestion.name);
+                  // Primary tap handler for iOS WKWebView.
+                  // preventDefault here cancels ghost mouse events — does NOT suppress click.
                   e.preventDefault();
                   onSelect(suggestion);
                   onOpenChange(false);
                 }}
                 onClick={() => {
-                  console.log('[MENTION] onClick fired for:', suggestion.name);
+                  // Desktop / non-touch fallback
                   onSelect(suggestion);
                   onOpenChange(false);
                 }}
-                className="w-full flex items-center gap-3 p-3 
+                className="w-full flex items-center gap-3 p-3
                   bg-muted/20 border border-border/40 rounded-xl
                   hover:bg-muted/30 active:bg-muted/50 transition-colors text-left"
               >
@@ -159,7 +163,7 @@ export function MentionBottomSheet({
                   fallback={suggestion.name.charAt(0).toUpperCase()}
                   hideRing
                 />
-                
+
                 {/* Name & username */}
                 <div className="flex-1 text-left min-w-0">
                   <p className="font-medium text-foreground truncate">
@@ -169,7 +173,7 @@ export function MentionBottomSheet({
                     @{suggestion.username || suggestion.name}
                   </p>
                 </div>
-                
+
                 {/* Entity type badge */}
                 {suggestion.entity_type === 'business' && (
                   <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full flex-shrink-0">
