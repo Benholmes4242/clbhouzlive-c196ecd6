@@ -653,14 +653,8 @@ const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, g
 
   const typeStyles = getTypeStyles();
 
-  // Extract ranking from subtitle if present (e.g., "California, USA • #7")
-  const extractRanking = (subtitle: string) => {
-    const match = subtitle.match(/#(\d+)/);
-    return match ? match[1] : null;
-  };
-
-  const ranking = item.type === 'course' ? extractRanking(item.subtitle) : null;
-  const subtitleWithoutRanking = ranking ? item.subtitle.replace(/\s*•\s*#\d+/, '') : item.subtitle;
+  // Strip ranking from subtitle if present (e.g., "California, USA • #7" → "California, USA")
+  const subtitleWithoutRanking = item.subtitle.replace(/\s*•\s*#\d+/, '');
 
   return (
     <button
@@ -695,13 +689,6 @@ const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, g
             </div>
           )}
         </div>
-        
-        {/* Ranking badge for courses */}
-        {ranking && (
-          <div className="absolute bottom-[-4px] left-[-4px] min-w-[22px] h-[22px] px-1 bg-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 shadow-sm" style={{ borderColor: '#F8FAFC' }}>
-            #{ranking}
-          </div>
-        )}
         
         {/* Business indicator badge */}
         {item.type === 'business' && (
