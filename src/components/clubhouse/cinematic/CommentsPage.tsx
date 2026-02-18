@@ -1849,7 +1849,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                   </div>
 
                   {/* Right button stack — emoji top, send bottom, anchored to bottom of pill */}
-                  <div className="flex flex-col items-center justify-center gap-0.5 flex-shrink-0">
+                  <div className="flex flex-col items-center justify-end gap-0.5 flex-shrink-0">
                     {/* Emoji button */}
                     <motion.button 
                       whileTap={{ scale: 0.9 }}
