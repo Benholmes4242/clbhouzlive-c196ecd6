@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { Heart, MessageSquare, Send, Bookmark, Volume2, VolumeX, ChevronRight, Music, MoreHorizontal } from 'lucide-react';
+import { Heart, MessageSquare, Send, Bookmark, Volume2, VolumeX, Music, MoreHorizontal } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { MOTION_FAST, EASE_OUT, pressFeedback, likePop } from '@/lib/motionTokens';
@@ -207,8 +207,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   const GAP = 12;
   let slotCount = onSave ? 5 : 4; // base: mute, like, comment, share (+ optional save)
   if (onMore) slotCount++; // add more button slot
-  const hasNextMediaSlot = isReviewPost && onNextMedia && hasNextMedia;
-  if (hasNextMediaSlot) slotCount++; // add next media button slot
+  // Note: ChevronRight (next media) slot removed — navigation handled by standalone chevrons
   
   const totalHeight = slotCount * SLOT_HEIGHT + (slotCount - 1) * GAP;
 
@@ -238,15 +237,8 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
       }}
     >
       {/* Slot 1: Next Media (for review posts with more media ahead - at top) */}
-      {isReviewPost && onNextMedia && hasNextMedia && (
-        <ActionSlot
-          icon={ChevronRight}
-          onClick={onNextMedia}
-          ariaLabel="Next media"
-          showCount={false}
-          idleOpacity={idleOpacity}
-        />
-      )}
+      {/* Slot 1: ChevronRight removed — media navigation is handled by
+          the standalone absolute-positioned chevrons in ClubhouseVerticalGrid */}
 
       {/* Slot 2: Mute/Unmute — shows Music icon when music_only mode is active */}
       <ActionSlot

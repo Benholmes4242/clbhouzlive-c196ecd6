@@ -1136,12 +1136,12 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                   </div>
                 )}
 
-                {/* Navigation Arrows - centered vertically in media area, above action rail */}
+                {/* Navigation Arrows - absolute within media container, clear of action rail */}
                 {hasMultipleMedia && (() => {
                   const isReviewItem = isReviewPost(item);
                   return (
                     <>
-                      {/* Left arrow - vertically centered in content area */}
+                      {/* Left arrow - absolute, vertically centered */}
                       {currentMediaIndex > 0 && (
                         <motion.button
                           key="chevron-left"
@@ -1149,11 +1149,8 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                           data-control="media-nav"
                           onClick={handlePrevMedia}
-                          className="fixed left-4 z-30 p-0 flex items-center justify-center rounded-full"
+                          className="absolute left-3 top-1/2 -translate-y-1/2 z-10 p-0 flex items-center justify-center rounded-full min-[360px]:w-11 min-[360px]:h-11 w-9 h-9"
                           style={{
-                            width: 44, height: 44,
-                            top: '45%',
-                            y: '-50%',
                             background: 'rgba(0, 0, 0, 0.35)',
                             backdropFilter: 'blur(20px)',
                             WebkitBackdropFilter: 'blur(20px)',
@@ -1164,7 +1161,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           <ChevronLeft className="w-6 h-6 text-white" />
                         </motion.button>
                       )}
-                      {/* Right arrow - only for non-review posts (review posts use CinematicActionRail) */}
+                      {/* Right arrow - offset right-14 (56px) to stay clear of action rail band */}
                       {!isReviewItem && currentMediaIndex < mediaItems.length - 1 && (
                         <motion.button
                           key="chevron-right"
@@ -1172,11 +1169,8 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                           data-control="media-nav"
                           onClick={handleNextMedia}
-                          className="fixed right-4 z-30 p-0 flex items-center justify-center rounded-full"
+                          className="absolute top-1/2 -translate-y-1/2 z-10 p-0 flex items-center justify-center rounded-full min-[360px]:w-11 min-[360px]:h-11 w-9 h-9 right-14 max-[359px]:right-16"
                           style={{
-                            width: 44, height: 44,
-                            top: '45%',
-                            y: '-50%',
                             background: 'rgba(0, 0, 0, 0.35)',
                             backdropFilter: 'blur(20px)',
                             WebkitBackdropFilter: 'blur(20px)',
