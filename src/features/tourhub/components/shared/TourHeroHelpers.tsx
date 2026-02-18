@@ -127,6 +127,66 @@ export function RunnerUpRow({
   );
 }
 
+/** Overlapping avatar stack for extra tied players */
+export function TiedAvatarStack({
+  extraFinishers,
+}: {
+  extraFinishers: TournamentFinisher[];
+}) {
+  if (extraFinishers.length === 0) return null;
+
+  const avatarSize = 22;
+  const overlap = 8;
+
+  const shown = extraFinishers.slice(0, 4);
+  const remaining = extraFinishers.length - shown.length;
+
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      paddingLeft: 54, // aligns with player names (20px pos + 8px gap + 26px avatar)
+      marginTop: 4,
+    }}>
+      {/* Overlapping avatars */}
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        {shown.map((finisher, i) => (
+          <div
+            key={finisher.playerId || i}
+            style={{
+              marginLeft: i === 0 ? 0 : -overlap,
+              zIndex: shown.length - i,
+              position: 'relative',
+              borderRadius: '50%',
+              border: '1.5px solid rgba(0,0,0,0.45)',
+              flexShrink: 0,
+              overflow: 'hidden',
+            }}
+          >
+            <PlayerAvatar
+              photoUrl={finisher.photoUrl}
+              pgaTourId={finisher.pgaTourId}
+              displayName={finisher.displayName}
+              size={avatarSize}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Label */}
+      <span style={{
+        fontSize: 11,
+        fontWeight: 500,
+        color: 'rgba(255,255,255,0.45)',
+        marginLeft: 6,
+        whiteSpace: 'nowrap',
+      }}>
+        {remaining > 0 ? `+${remaining} more tied` : 'also tied'}
+      </span>
+    </div>
+  );
+}
+
 /** Calculate winning margin string from top finishers */
 export function calcWinningMargin(
   winnerScore: number | null,
