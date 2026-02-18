@@ -3,15 +3,28 @@
  * Used by: HeroCarousel (overview) + ScheduleHeroCard (schedule tab)
  */
 
-import React, { useState } from 'react';
+import React from 'react';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import type { TournamentFinisher } from '../../hooks/useTournamentLeadersWinners';
 
-/** Canonical score color — green under par, red over par, neutral even */
+/** Score color for LIVE state only — green under par, red over par */
 export function getScoreColor(score: number | null): string {
   if (score === null || score === undefined) return 'rgba(255,255,255,0.7)';
   if (score < 0) return '#22C55E';
   if (score > 0) return '#EF4444';
   return 'rgba(255,255,255,0.7)';
+}
+
+/**
+ * Score color for FINISHED state — amber matches the 'FINISHED' badge.
+ * Under par: amber. Even/over par: dimmed white.
+ */
+export function getFinishedScoreColor(score: number | null): string {
+  if (score === null || score === undefined) return 'rgba(255,255,255,0.55)';
+  if (score < 0) return '#FACC15';
+  if (score > 0) return 'rgba(255,255,255,0.55)';
+  return 'rgba(255,255,255,0.55)';
 }
 
 export function formatPurse(purse: number | null): string {
@@ -21,57 +34,38 @@ export function formatPurse(purse: number | null): string {
     : `$${(purse / 1_000).toFixed(0)}K`;
 }
 
-/** Circle avatar — photo with initials fallback */
+/** Squircle avatar matching the global SDS spec (34% radius, 1:1.05 aspect) */
 export function PlayerAvatar({
   photoUrl,
+  pgaTourId,
   displayName,
   size = 44,
 }: {
   photoUrl: string | null;
+  pgaTourId?: string | null;
   displayName: string;
   size?: number;
 }) {
-  const [imgError, setImgError] = useState(false);
+  const resolved = resolvePhotoUrl(photoUrl, pgaTourId);
   const initials = displayName
     .split(/[\s.]/)
     .filter(Boolean)
     .map(w => w[0]?.toUpperCase() || '')
     .slice(0, 2)
-    .join('');
-  const fontSize = size <= 28 ? 10 : 14;
+    .join('') || '?';
 
   return (
-    <div
-      style={{
-        width: size,
-        height: size,
-        borderRadius: '50%',
-        overflow: 'hidden',
-        flexShrink: 0,
-        border: '1.5px solid rgba(255,255,255,0.25)',
-        background: 'rgba(255,255,255,0.10)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      {photoUrl && !imgError ? (
-        <img
-          src={photoUrl}
-          alt={displayName}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }}
-          onError={() => setImgError(true)}
-        />
-      ) : (
-        <span style={{ fontSize, fontWeight: 700, color: 'rgba(255,255,255,0.65)', lineHeight: 1 }}>
-          {initials || '?'}
-        </span>
-      )}
-    </div>
+    <SquircleAvatar
+      size={size}
+      src={resolved}
+      alt={displayName}
+      fallback={initials}
+      hideRing
+    />
   );
 }
 
-/** Compact runner-up row (positions 2–3) */
+/** Compact runner-up row (positions 2–3) — finished state uses amber scores */
 export function RunnerUpRow({
   finisher,
   isTied = false,
@@ -109,8 +103,13 @@ export function RunnerUpRow({
       </span>
 
       {/* Avatar */}
-      <button onClick={handleTap} className="transition-opacity active:opacity-70">
-        <PlayerAvatar photoUrl={finisher.photoUrl} displayName={finisher.displayName} size={26} />
+      <button onClick={handleTap} className="transition-opacity active:opacity-70" style={{ flexShrink: 0 }}>
+        <PlayerAvatar
+          photoUrl={finisher.photoUrl}
+          pgaTourId={finisher.pgaTourId}
+          displayName={finisher.displayName}
+          size={26}
+        />
       </button>
 
       {/* Name */}
@@ -124,13 +123,13 @@ export function RunnerUpRow({
         </span>
       </button>
 
-      {/* Score */}
+      {/* Score — amber for under par in finished state */}
       <span
         style={{
           fontFamily: "'JetBrains Mono', 'SF Mono', monospace",
           fontSize: 13,
           fontWeight: 600,
-          color: getScoreColor(finisher.score),
+          color: getFinishedScoreColor(finisher.score),
           flexShrink: 0,
         }}
       >

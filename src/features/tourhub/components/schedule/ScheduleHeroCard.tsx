@@ -19,7 +19,7 @@ import type { TourTournament } from '../../hooks/useTourHubData';
 import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
 import { useSingleCourseImage } from '../../hooks/useCourseImageResolver';
 import { getCourseImage } from '../../utils/placeholders';
-import { getScoreColor, formatPurse, PlayerAvatar, RunnerUpRow } from '../shared/TourHeroHelpers';
+import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, RunnerUpRow } from '../shared/TourHeroHelpers';
 import '@/styles/hero-glass.css';
 
 interface ScheduleHeroCardProps {
@@ -199,6 +199,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
                 >
                   <PlayerAvatar
                     photoUrl={leaderWinner.photoUrl}
+                    pgaTourId={leaderWinner.pgaTourId}
                     displayName={leaderWinner.displayName}
                     size={44}
                   />
@@ -246,6 +247,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
                   >
                     <PlayerAvatar
                       photoUrl={winner.photoUrl}
+                      pgaTourId={winner.pgaTourId}
                       displayName={winner.displayName}
                       size={44}
                     />
@@ -262,7 +264,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
                       </button>
                       <span
                         className="score-mono"
-                        style={{ fontSize: '16px', fontWeight: 700, color: getScoreColor(winner.score), flexShrink: 0 }}
+                        style={{ fontSize: '16px', fontWeight: 700, color: getFinishedScoreColor(winner.score), flexShrink: 0 }}
                       >
                         {winner.displayScore}
                       </span>
