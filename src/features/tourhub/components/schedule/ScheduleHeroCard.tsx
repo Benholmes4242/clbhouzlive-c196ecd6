@@ -75,10 +75,12 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
 
   // Winner scorecard stats (finished state only)
   const winnerPlayerId = isRecent ? (winner as any)?.playerId : undefined;
+  console.log('[HERO-STATS] ScheduleHeroCard winnerStats:', { winnerPlayerId, tournamentId: tournament.id, isRecent, winner });
   const { data: winnerStats } = useWinnerScorecardStats(
     isRecent ? tournament.id : undefined,
     winnerPlayerId
   );
+  console.log('[HERO-STATS] ScheduleHeroCard winnerStats result:', winnerStats);
 
   const winningMargin = (() => {
     if (!winnerRow || podiumRows.length < 2) return null;
