@@ -18,7 +18,7 @@ import type { TourTournament } from '../../hooks/useTourHubData';
 import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
 import { useSingleCourseImage } from '../../hooks/useCourseImageResolver';
 import { getCourseImage } from '../../utils/placeholders';
-import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows } from '../shared/TourHeroHelpers';
+import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows, WinnerStatsPanel } from '../shared/TourHeroHelpers';
 import { useWinnerScorecardStats } from '../../hooks/useWinnerScorecardStats';
 import { useWinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
 import '@/styles/hero-glass.css';
@@ -37,9 +37,6 @@ function getTourLabel(tourCode?: string): string {
   return labels[tourCode || ''] || 'TOUR';
 }
 
-const DOT = (
-  <span style={{ color: 'rgba(255,255,255,0.25)', margin: '0 3px', userSelect: 'none' }}>·</span>
-);
 
 export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHeroCardProps) {
   const navigate = useNavigate();
@@ -213,37 +210,6 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
                       </span>
                     )}
 
-                    {/* Tournament stats line */}
-                    {winnerStats && (
-                      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', marginTop: 4, gap: 0 }}>
-                        {winnerStats.holesInOne > 0 && (
-                          <><span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, fontWeight: 500 }}>
-                            {winnerStats.holesInOne} hole-in-one{winnerStats.holesInOne > 1 ? 's' : ''}
-                          </span>{DOT}</>
-                        )}
-                        {winnerStats.eagles > 0 && (
-                          <><span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, fontWeight: 500 }}>
-                            {winnerStats.eagles} {winnerStats.eagles === 1 ? 'eagle' : 'eagles'}
-                          </span>{DOT}</>
-                        )}
-                        <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, fontWeight: 500 }}>
-                          {winnerStats.birdies} birdies
-                        </span>
-                        {DOT}
-                        <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, fontWeight: 500 }}>
-                          {winnerStats.pars} pars
-                        </span>
-                        {winnerStats.bogeys > 0 && (
-                          <>{DOT}<span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, fontWeight: 500 }}>
-                            {winnerStats.bogeys} bogeys
-                          </span></>
-                        )}
-                        {DOT}
-                        <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, fontWeight: 500 }}>
-                          {winnerStats.rounds} rounds
-                        </span>
-                      </div>
-                    )}
                   </div>
                 </div>
               ) : (
@@ -251,31 +217,11 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
               )}
             </div>
 
-            {/* Season stats row */}
-            {winnerSeasonStats && (winnerSeasonStats.drivingDistance || winnerSeasonStats.drivingAccuracy || winnerSeasonStats.greensInReg || winnerSeasonStats.puttingAverage) && (
-              <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', marginTop: 6, gap: 0 }}>
-                {winnerSeasonStats.drivingDistance && (
-                  <><span style={{ color: 'rgba(255,255,255,0.30)', fontSize: 11, fontWeight: 500 }}>
-                    {Math.round(winnerSeasonStats.drivingDistance)} avg drive
-                  </span>{DOT}</>
-                )}
-                {winnerSeasonStats.drivingAccuracy && (
-                  <><span style={{ color: 'rgba(255,255,255,0.30)', fontSize: 11, fontWeight: 500 }}>
-                    {winnerSeasonStats.drivingAccuracy.toFixed(1)}% fairways
-                  </span>{DOT}</>
-                )}
-                {winnerSeasonStats.greensInReg && (
-                  <><span style={{ color: 'rgba(255,255,255,0.30)', fontSize: 11, fontWeight: 500 }}>
-                    {winnerSeasonStats.greensInReg.toFixed(1)}% GIR
-                  </span>{DOT}</>
-                )}
-                {winnerSeasonStats.puttingAverage && (
-                  <span style={{ color: 'rgba(255,255,255,0.30)', fontSize: 11, fontWeight: 500 }}>
-                    {winnerSeasonStats.puttingAverage.toFixed(2)} putts avg
-                  </span>
-                )}
-              </div>
-            )}
+            {/* Stats panel — tournament chips + season averages chips */}
+            <WinnerStatsPanel
+              tournamentStats={winnerStats}
+              seasonStats={winnerSeasonStats}
+            />
 
             {/* Runners-up */}
             <div style={{
