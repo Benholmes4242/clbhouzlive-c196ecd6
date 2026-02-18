@@ -435,18 +435,6 @@ export function ScheduleTab() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           >
-      {(() => {
-              if (heroItems[0]) {
-                console.log('[SCHEDULE] Featured tournament:', {
-                  name: heroItems[0].tournament?.name,
-                  type: heroItems[0].type,
-                  id: heroItems[0].tournament?.id,
-                  leaderWinner: leadersWinnersMap?.get(heroItems[0].tournament.id),
-                  mapSize: leadersWinnersMap?.size ?? 0,
-                });
-              }
-              return null;
-            })()}
           {heroItems.length === 1 ? (
             <ScheduleHeroCard 
               tournament={heroItems[0].tournament} 
