@@ -1862,7 +1862,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                         showEmojiPicker && (isDark ? "text-white/80" : "text-foreground")
                       )}
                     >
-                      <Smile className="w-4 h-4" />
+                      <Smile className="w-5 h-5" />
                     </motion.button>
 
                     {/* Send / Save button */}
