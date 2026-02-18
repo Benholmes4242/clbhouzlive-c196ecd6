@@ -1263,6 +1263,8 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
             return 0.5625; // 9:16 portrait default
           })()}
           isReview={isReviewPost(filteredPosts[currentIndex])}
+          currentUserId={user?.id}
+          creatorUserId={filteredPosts[currentIndex]?.user?.id}
           creatorName={filteredPosts[currentIndex]?.user?.name}
           creatorAvatar={filteredPosts[currentIndex]?.user?.avatar}
           creatorHomeClub={filteredPosts[currentIndex]?.user?.homeClub}
