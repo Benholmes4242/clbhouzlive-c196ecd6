@@ -97,8 +97,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // Routes that should show back arrow instead of logo
   const isBackArrowRoute = isDiscoverSubPage || isTop100Route || isEditProfileRoute || isFriendsActivityRoute || isAchievementsRoute || isMessagesRoute;
   
-  // Use light theme for non-clubhouse pages
-  const useLightTheme = !isClubhouseRoute;
+  // Search overlay always uses light mode app-wide
+  const useLightTheme = true;
   
   // Determine if header should be dimmed (either dark or light theme)
   const shouldDim = isDarkDimmed || (isLightDimmablePage && isLightDimmed);

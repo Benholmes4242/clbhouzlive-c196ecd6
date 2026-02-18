@@ -100,7 +100,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
           <SearchOverlay
             isOpen={searchOpen}
             onClose={() => setSearchOpen(false)}
-            useLightTheme={false}
+            useLightTheme={true}
           />
         )}
       </AnimatePresence>
