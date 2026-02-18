@@ -86,11 +86,11 @@ export function MentionBottomSheet({
       className="fixed inset-x-0 pb-safe"
       style={{ zIndex: resolvedZ, bottom: bottomOffset }}
     >
-      {/* Backdrop to close — sits just below the sheet, above everything else */}
+      {/* Backdrop to close — onClick fires AFTER pointerup, so button clicks resolve first */}
       <div 
         className="fixed inset-0"
         style={{ zIndex: resolvedZ - 1 }}
-        onPointerDown={() => onOpenChange(false)}
+        onClick={() => onOpenChange(false)}
       />
       
       <div className="bg-white rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.1)] 
@@ -126,13 +126,20 @@ export function MentionBottomSheet({
               <button
                 key={suggestion.id}
                 type="button"
-                onPointerDown={(e) => {
-                  e.preventDefault(); // prevent input blur on desktop/pointer devices
+                onMouseDown={(e) => {
+                  // Desktop: prevent input blur without killing click synthesis
+                  e.preventDefault();
                 }}
-                onTouchStart={(e) => {
-                  e.preventDefault(); // prevent input blur on iOS WKWebView
+                onTouchEnd={(e) => {
+                  // iOS WKWebView: onTouchEnd is the most reliable tap signal.
+                  // e.preventDefault() here does NOT suppress click; it just
+                  // prevents the 300ms delay and ghost mouse events.
+                  e.preventDefault();
+                  onSelect(suggestion);
+                  onOpenChange(false);
                 }}
                 onClick={() => {
+                  // Desktop / non-touch fallback
                   onSelect(suggestion);
                   onOpenChange(false);
                 }}
