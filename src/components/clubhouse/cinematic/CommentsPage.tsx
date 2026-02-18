@@ -1062,9 +1062,14 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   // Uses a ref to avoid stale closure on newComment — ref always holds latest value
   const handleMentionSelect = useCallback((mention: MentionSuggestion) => {
     const currentText = newCommentRef.current;
-    // Prefer username for insertion (safe with /@(\w+)/g mention regex); fall back to name
-    const displayName = mention.username || mention.name;
-    const newValue = currentText.replace(/@\w*$/, `@${displayName} `);
+    // Sanitise to \w-only slug so /@(\w+)/g always captures the full username.
+    // danny holmes → danny_holmes | twhprofserviceshotmail.com → twhprofserviceshotmailcom
+    const rawUsername = mention.username || mention.name;
+    const slugUsername = rawUsername
+      .toLowerCase()
+      .replace(/\s+/g, '_')   // spaces → underscores
+      .replace(/[^\w]/g, ''); // strip dots and any other non-word chars
+    const newValue = currentText.replace(/@\w*$/, `@${slugUsername} `);
 
     setNewComment(newValue);
     setShowMentions(false);

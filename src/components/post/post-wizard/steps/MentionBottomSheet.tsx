@@ -164,13 +164,16 @@ export function MentionBottomSheet({
                   hideRing
                 />
 
-                {/* Name & username */}
+                {/* Name & username — show the slug that will actually be inserted */}
                 <div className="flex-1 text-left min-w-0">
                   <p className="font-medium text-foreground truncate">
                     {suggestion.name}
                   </p>
                   <p className="text-sm text-muted-foreground truncate">
-                    @{suggestion.username || suggestion.name}
+                    @{(suggestion.username || suggestion.name)
+                        .toLowerCase()
+                        .replace(/\s+/g, '_')
+                        .replace(/[^\w]/g, '')}
                   </p>
                 </div>
 
