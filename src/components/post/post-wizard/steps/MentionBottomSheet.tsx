@@ -20,13 +20,15 @@ interface MentionBottomSheetProps {
   onOpenChange: (open: boolean) => void;
   query: string;
   onSelect: (mention: MentionSuggestion) => void;
+  zIndex?: number; // Optional override for stacking contexts (e.g. inside portals)
 }
 
 export function MentionBottomSheet({ 
   open, 
   onOpenChange, 
   query, 
-  onSelect 
+  onSelect,
+  zIndex,
 }: MentionBottomSheetProps) {
   const [suggestions, setSuggestions] = useState<MentionSuggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -75,11 +77,17 @@ export function MentionBottomSheet({
 
   if (!open) return null;
 
+  const resolvedZ = zIndex ?? 50;
+
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 pb-safe">
-      {/* Backdrop to close */}
+    <div
+      className="fixed inset-x-0 bottom-0 pb-safe"
+      style={{ zIndex: resolvedZ }}
+    >
+      {/* Backdrop to close — sits just below the sheet, above everything else */}
       <div 
-        className="fixed inset-0 -z-10" 
+        className="fixed inset-0"
+        style={{ zIndex: resolvedZ - 1 }}
         onMouseDown={() => onOpenChange(false)}
       />
       
