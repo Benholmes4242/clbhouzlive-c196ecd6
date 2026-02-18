@@ -30,7 +30,7 @@ import { getTourLogo } from '../../utils/tourLogos';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
-import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, RunnerUpRow, calcWinningMargin } from '../shared/TourHeroHelpers';
+import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, RunnerUpRow, TiedAvatarStack, calcWinningMargin } from '../shared/TourHeroHelpers';
 import '@/styles/hero-glass.css';
 
 function getStartLabel(date: string): string {
@@ -204,12 +204,13 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
   const isPodiumPositionTied = (position: number) =>
     allFetched.filter(f => f.position === position).length > 1;
 
-  // Count extra tied players not shown on card
+  // Extra tied players at the last shown position not shown on card
   const lastShownPos = podiumThird?.position ?? podiumRunnerUp?.position;
-  const podiumExtraTied = lastShownPos != null
-    ? allFetched.filter(f => f.position === lastShownPos).length
-      - topFinishers.filter(f => f.position === lastShownPos).length
-    : 0;
+  const podiumExtraTiedFinishers = lastShownPos != null
+    ? allFetched.filter(
+        f => f.position === lastShownPos && !topFinishers.some(t => t.playerId === f.playerId)
+      )
+    : [];
 
   const winningMargin = podiumWinner && podiumRunnerUp
     ? calcWinningMargin(
@@ -527,18 +528,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                             onPlayerTap={handlePlayerTap(podiumThird.playerId)}
                           />
                         )}
-                        {podiumExtraTied > 0 && (
-                          <span style={{
-                            fontSize: 11,
-                            fontWeight: 500,
-                            color: 'rgba(255,255,255,0.4)',
-                            display: 'block',
-                            marginTop: 2,
-                            paddingLeft: 54,
-                          }}>
-                            +{podiumExtraTied} {podiumExtraTied === 1 ? 'other' : 'others'} tied
-                          </span>
-                        )}
+                        <TiedAvatarStack extraFinishers={podiumExtraTiedFinishers} />
                       </div>
                     )}
                   </div>

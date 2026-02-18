@@ -19,7 +19,7 @@ import type { TourTournament } from '../../hooks/useTourHubData';
 import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
 import { useSingleCourseImage } from '../../hooks/useCourseImageResolver';
 import { getCourseImage } from '../../utils/placeholders';
-import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, RunnerUpRow } from '../shared/TourHeroHelpers';
+import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, RunnerUpRow, TiedAvatarStack } from '../shared/TourHeroHelpers';
 import '@/styles/hero-glass.css';
 
 interface ScheduleHeroCardProps {
@@ -75,12 +75,13 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
   const isPositionTied = (position: number) =>
     allFetched.filter(f => f.position === position).length > 1;
 
-  // Count extra tied players at the last shown position not shown on the card
+  // Extra tied players at the last shown position not shown on the card
   const lastShownPosition = third?.position ?? runnerUp?.position;
-  const extraTied = lastShownPosition != null
-    ? allFetched.filter(f => f.position === lastShownPosition).length
-      - topFinishers.filter(f => f.position === lastShownPosition).length
-    : 0;
+  const extraTiedFinishers = lastShownPosition != null
+    ? allFetched.filter(
+        f => f.position === lastShownPosition && !topFinishers.some(t => t.playerId === f.playerId)
+      )
+    : [];
 
   const winningMargin = (() => {
     if (!winner || !runnerUp) return null;
@@ -304,18 +305,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
                         onPlayerTap={handlePlayerTap(third.playerId)}
                       />
                     )}
-                    {extraTied > 0 && (
-                      <span style={{
-                        fontSize: 11,
-                        fontWeight: 500,
-                        color: 'rgba(255,255,255,0.4)',
-                        display: 'block',
-                        marginTop: 2,
-                        paddingLeft: 54,
-                      }}>
-                        +{extraTied} {extraTied === 1 ? 'other' : 'others'} tied
-                      </span>
-                    )}
+                    <TiedAvatarStack extraFinishers={extraTiedFinishers} />
                   </div>
                 )}
               </div>
