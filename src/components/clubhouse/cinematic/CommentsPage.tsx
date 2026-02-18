@@ -944,7 +944,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
     commentId: null,
     position: { x: 0, y: 0 },
   });
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const commentsListRef = useRef<HTMLDivElement>(null);
   const commentRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const hasHandledInitialLinkRef = useRef(false);
@@ -1101,7 +1101,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   }, [isOpen, initialCommentId, initialParentCommentId, commentsLoading, highlightComment]);
 
   // Handle comment input change with @mention detection
-  const handleCommentChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCommentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     setNewComment(value);
 
@@ -1188,6 +1188,15 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
       handleSubmitComment();
     }
   }, [handleSubmitComment]);
+
+  // Auto-resize textarea on every content change
+  useEffect(() => {
+    const textarea = inputRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.min(textarea.scrollHeight, 100) + 'px';
+    }
+  }, [newComment]);
 
   const handleReply = useCallback((commentId: string, userName: string) => {
     // commentId is always a top-level comment ID (Reply button only appears on parent comments)
@@ -1754,7 +1763,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                 )}
               </AnimatePresence>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-end gap-3">
                 {/* Current user avatar */}
                 <SquircleAvatar
                   size={32}
@@ -1776,24 +1785,22 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                           ? "bg-white/10 border border-white/15 focus-within:border-white/25 focus-within:bg-white/12" 
                           : "bg-background border border-border/50 focus-within:border-border focus-within:shadow-sm"
                     )}
-                    animate={{ 
-                      height: newComment.trim() ? 48 : 44,
-                    }}
+                    animate={{}}
                     transition={{ duration: 0.15, ease: 'easeOut' }}
+                    style={{ paddingTop: 10, paddingBottom: 10 }}
                   >
-                    {/* Overlay pattern: invisible input on top, styled mirror div behind.
-                        The overlay renders @mentions as amber spans while the input
+                    {/* Overlay pattern: transparent textarea on top, styled mirror div behind.
+                        The overlay renders @mentions as amber spans while the textarea
                         handles all cursor / keyboard behaviour normally. */}
-                    <div className="flex-1 relative overflow-hidden" style={{ fontSize: 14 }}>
+                    <div className="flex-1 relative" style={{ fontSize: 14 }}>
                       {/* Mirror overlay — aria-hidden, not interactive */}
                       <div
                         aria-hidden="true"
                         className={cn(
-                          "absolute inset-0 flex items-center pointer-events-none",
-                          "text-[14px] whitespace-pre overflow-hidden",
-                          // Match the input's line-height so text aligns
-                          "leading-none"
+                          "absolute inset-0 pointer-events-none",
+                          "text-[14px] leading-[20px] whitespace-pre-wrap break-words overflow-hidden"
                         )}
+                        style={{ height: inputRef.current?.style.height }}
                       >
                         {newComment
                           ? newComment.split(/(@\w+)/).map((part, i) =>
@@ -1804,10 +1811,9 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                           : null
                         }
                       </div>
-                      {/* Actual input — transparent text so the overlay shows through */}
-                      <input
+                      {/* Actual textarea — transparent text so the overlay shows through */}
+                      <textarea
                         ref={inputRef}
-                        type="text"
                         placeholder={
                           editingComment
                             ? "Edit your comment..."
@@ -1819,9 +1825,10 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                         onChange={handleCommentChange}
                         onKeyDown={handleKeyPress}
                         onFocus={() => setShowEmojiPicker(false)}
+                        rows={1}
                         className={cn(
-                          'relative w-full bg-transparent',
-                          'text-[14px] leading-none',
+                          'relative w-full bg-transparent resize-none',
+                          'text-[14px] leading-[20px]',
                           'outline-none border-none',
                           newComment
                             ? 'text-transparent caret-current'
@@ -1832,6 +1839,11 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                                 : 'text-foreground placeholder:text-muted-foreground',
                           isDark && !editingComment ? '[caret-color:white]' : '[caret-color:theme(colors.foreground)]'
                         )}
+                        style={{
+                          maxHeight: '100px',
+                          overflowY: 'hidden',
+                          transition: 'height 0.1s ease-out',
+                        }}
                       />
                     </div>
                     <motion.button 
