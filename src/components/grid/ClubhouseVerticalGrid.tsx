@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { InlineSpinner } from '@/components/ui/InlineSpinner';
 import { LoadingBoundary } from '@/components/ui/LoadingBoundary';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -1136,54 +1136,30 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                   </div>
                 )}
 
-                {/* Navigation Arrows - absolute within media container, clear of action rail */}
-                {hasMultipleMedia && (() => {
-                  const isReviewItem = isReviewPost(item);
-                  return (
-                    <>
-                      {/* Left arrow - absolute, vertically centered */}
-                      {currentMediaIndex > 0 && (
-                        <motion.button
-                          key="chevron-left"
-                          whileTap={{ scale: 0.93 }}
-                          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                          data-control="media-nav"
-                          onClick={handlePrevMedia}
-                          className="absolute left-3 top-1/2 -translate-y-1/2 z-10 p-0 flex items-center justify-center rounded-full min-[360px]:w-11 min-[360px]:h-11 w-9 h-9"
-                          style={{
-                            background: 'rgba(0, 0, 0, 0.35)',
-                            backdropFilter: 'blur(20px)',
-                            WebkitBackdropFilter: 'blur(20px)',
-                            border: '1px solid rgba(255, 255, 255, 0.12)',
-                          }}
-                          aria-label="Previous media"
-                        >
-                          <ChevronLeft className="w-6 h-6 text-white" />
-                        </motion.button>
-                      )}
-                      {/* Right arrow - offset right-14 (56px) to stay clear of action rail band */}
-                      {!isReviewItem && currentMediaIndex < mediaItems.length - 1 && (
-                        <motion.button
-                          key="chevron-right"
-                          whileTap={{ scale: 0.93 }}
-                          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                          data-control="media-nav"
-                          onClick={handleNextMedia}
-                          className="absolute top-1/2 -translate-y-1/2 z-10 p-0 flex items-center justify-center rounded-full min-[360px]:w-11 min-[360px]:h-11 w-9 h-9 right-14 max-[359px]:right-16"
-                          style={{
-                            background: 'rgba(0, 0, 0, 0.35)',
-                            backdropFilter: 'blur(20px)',
-                            WebkitBackdropFilter: 'blur(20px)',
-                            border: '1px solid rgba(255, 255, 255, 0.12)',
-                          }}
-                          aria-label="Next media"
-                        >
-                          <ChevronRight className="w-6 h-6 text-white" />
-                        </motion.button>
-                      )}
-                    </>
-                  );
-                })()}
+                {/* Left chevron — fixed left side, only shown when not on first slide */}
+                {hasMultipleMedia && currentMediaIndex > 0 && (
+                  <motion.button
+                    key="chevron-left"
+                    whileTap={{ scale: 0.93 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                    data-control="media-nav"
+                    onClick={handlePrevMedia}
+                    className="fixed left-4 z-30 p-0 flex items-center justify-center rounded-full"
+                    style={{
+                      width: 44, height: 44,
+                      top: '45%',
+                      transform: 'translateY(-50%)',
+                      background: 'rgba(0, 0, 0, 0.35)',
+                      backdropFilter: 'blur(20px)',
+                      WebkitBackdropFilter: 'blur(20px)',
+                      border: '1px solid rgba(255, 255, 255, 0.12)',
+                    }}
+                    aria-label="Previous media"
+                  >
+                    <ChevronLeft className="w-6 h-6 text-white" />
+                  </motion.button>
+                )}
+                {/* Right chevron lives inside CinematicActionRail as the top slot */}
               </div>
 
               {/* Overlay layer above video (not clipped) */}
@@ -1310,7 +1286,10 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
         const currentMediaIdx = mediaIndices[currentPost.id] || 0;
         const hasNextMedia = currentMediaIdx < mediaItems.length - 1;
         const hasPrevMedia = currentMediaIdx > 0;
-        
+        // Determine if the currently-visible media item is a video
+        const activeMedia = mediaItems[currentMediaIdx] || mediaItems[0];
+        const activeMediaIsVideo = (activeMedia as any)?.media_type === 'video';
+
         return (
           <CinematicActionRail
             postId={currentPost.id}
@@ -1318,6 +1297,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
             commentsCount={currentPostEngagement.commentsCount}
             hasLiked={currentPostEngagement.hasLiked}
             isMuted={isGloballyMuted}
+            isVideo={activeMediaIsVideo}
             isVisible={true}
             onLike={() => {
               currentPostEngagement.toggleLike();
@@ -1337,11 +1317,11 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
             }}
             isReviewPost={isReviewPost(currentPost)}
             audioMode={(() => {
-              const mi = currentPost.media?.[0] as any;
+              const mi = currentPost.media?.[currentMediaIdx] as any;
               return mi?.studio_edits?.audioMode || 'original';
             })()}
             postHasMusic={(() => {
-              const mi = currentPost.media?.[0] as any;
+              const mi = currentPost.media?.[currentMediaIdx] as any;
               const md = mi?.studio_edits?.music;
               return !!md?.url || !!md?.r2Key;
             })()}

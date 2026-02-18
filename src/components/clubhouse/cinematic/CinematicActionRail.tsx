@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { Heart, MessageSquare, Send, Bookmark, Volume2, VolumeX, Music, MoreHorizontal } from 'lucide-react';
+import { Heart, MessageSquare, Send, Bookmark, Volume2, VolumeX, Music, MoreHorizontal, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { MOTION_FAST, EASE_OUT, pressFeedback, likePop } from '@/lib/motionTokens';
@@ -29,6 +29,8 @@ interface CinematicActionRailProps {
   onPrevMedia?: () => void;
   hasNextMedia?: boolean;
   hasPrevMedia?: boolean;
+  /** Whether the current media item is a video (controls mute button visibility) */
+  isVideo?: boolean;
   /** Whether user has interacted (reduces idle opacity until interaction) */
   hasInteracted?: boolean;
   /** Audio mode from studio edits (e.g., 'music_only', 'original') */
@@ -195,6 +197,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   onPrevMedia,
   hasNextMedia = false,
   hasPrevMedia = false,
+  isVideo = false,
   hasInteracted = false,
   audioMode,
   postHasMusic = false,
@@ -202,27 +205,15 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
 }) => {
   // Idle opacity: 75% when not interacted, full when interacted or active
   const idleOpacity = hasInteracted ? 1 : 0.75;
-  
-  // Calculate slot count dynamically based on what's actually rendered
-  const GAP = 12;
-  let slotCount = onSave ? 5 : 4; // base: mute, like, comment, share (+ optional save)
-  if (onMore) slotCount++; // add more button slot
-  // Note: ChevronRight (next media) slot removed — navigation handled by standalone chevrons
-  
-  const totalHeight = slotCount * SLOT_HEIGHT + (slotCount - 1) * GAP;
 
-  // Align the *circular button* bottom (not the full slot) with CreatorCapsule bottom.
-  // Each slot reserves COUNT_HEIGHT + 4px under the circle even when showCount=false,
-  // so the circle sits (SLOT_HEIGHT - ICON_SIZE) px above the rail's bottom.
   const CAPSULE_BOTTOM_OFFSET = bottomOffset || `calc(30px + 80px - ${SLOT_HEIGHT - ICON_SIZE}px)`;
-
 
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
-      animate={{ 
-        opacity: isVisible ? 1 : 0, 
-        x: isVisible ? 0 : 20 
+      animate={{
+        opacity: isVisible ? 1 : 0,
+        x: isVisible ? 0 : 20
       }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
       className={cn(
@@ -232,28 +223,22 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
       )}
       style={{
         bottom: CAPSULE_BOTTOM_OFFSET,
-        gap: GAP,
-        height: totalHeight,
+        gap: 12,
+        // No fixed height — gap handles spacing, icons collapse naturally when hidden
       }}
     >
-      {/* Slot 1: Next Media (for review posts with more media ahead - at top) */}
-      {/* Slot 1: ChevronRight removed — media navigation is handled by
-          the standalone absolute-positioned chevrons in ClubhouseVerticalGrid */}
+      {/* Slot 1: Right chevron — top of rail, only when there's a next media item */}
+      {onNextMedia && hasNextMedia && (
+        <ActionSlot
+          icon={ChevronRight}
+          onClick={onNextMedia}
+          ariaLabel="Next media"
+          showCount={false}
+          idleOpacity={idleOpacity}
+        />
+      )}
 
-      {/* Slot 2: Mute/Unmute — shows Music icon when music_only mode is active */}
-      <ActionSlot
-        icon={
-          audioMode === 'music_only' && postHasMusic
-            ? Music
-            : isMuted ? VolumeX : Volume2
-        }
-        onClick={onMuteToggle}
-        idleOpacity={idleOpacity}
-        ariaLabel={isMuted ? 'Unmute' : 'Mute'}
-        showCount={false}
-      />
-
-      {/* Slot 3: Like */}
+      {/* Slot 2: Like */}
       <ActionSlot
         icon={Heart}
         count={likesCount}
@@ -264,6 +249,21 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         isLikeButton
         idleOpacity={hasLiked ? 1 : idleOpacity}
       />
+
+      {/* Slot 3: Mute/Unmute — only shown on video content */}
+      {isVideo && onMuteToggle && (
+        <ActionSlot
+          icon={
+            audioMode === 'music_only' && postHasMusic
+              ? Music
+              : isMuted ? VolumeX : Volume2
+          }
+          onClick={onMuteToggle}
+          idleOpacity={idleOpacity}
+          ariaLabel={isMuted ? 'Unmute' : 'Mute'}
+          showCount={false}
+        />
+      )}
 
       {/* Slot 4: Comment */}
       <ActionSlot
