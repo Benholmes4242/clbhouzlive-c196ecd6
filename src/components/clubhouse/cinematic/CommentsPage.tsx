@@ -33,6 +33,7 @@ import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { MentionBottomSheet, MentionSuggestion } from '@/components/post/post-wizard/steps/MentionBottomSheet';
 import { MentionText, resolveAndNavigate } from '@/components/comments/MentionText';
+import { supabase } from '@/integrations/supabase/client';
 import { CommentingAsIndicator } from '@/components/comments/CommentingAsIndicator';
 import { CaddiePickBadge } from '@/components/comments/CaddiePickBadge';
 import { GolfReactionPicker, GolfReactionType } from '@/components/comments/GolfReactionPicker';
@@ -1472,9 +1473,22 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                           reactionCounts={getReactionsForComment(comment.id).reactions}
                           userReactions={getReactionsForComment(comment.id).userReactions}
                           onReactionToggle={(commentId, type) => toggleReaction({ commentId, reactionType: type })}
-                          onMentionTap={(username) => {
-                            onClose?.();
-                            setTimeout(() => resolveAndNavigate(username, navigate), 300);
+                          onMentionTap={async (username) => {
+                            const cleaned = username.toLowerCase();
+                            const withSpaces = cleaned.replace(/_/g, ' ');
+                            const { data } = await supabase
+                              .from('taggable_entities')
+                              .select('entity_id, entity_type')
+                              .or(`username.eq.${cleaned},username.ilike.${withSpaces}`)
+                              .limit(1)
+                              .maybeSingle();
+                            if (data) {
+                              const route = data.entity_type === 'business'
+                                ? `/business/${data.entity_id}`
+                                : `/profile/${data.entity_id}`;
+                              navigate(route);
+                              setTimeout(() => onClose?.(), 50);
+                            }
                           }}
                         />
                         
@@ -1518,9 +1532,22 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                                   reactionCounts={getReactionsForComment(reply.id).reactions}
                                   userReactions={getReactionsForComment(reply.id).userReactions}
                                   onReactionToggle={(commentId, type) => toggleReaction({ commentId, reactionType: type })}
-                                   onMentionTap={(username) => {
-                                    onClose?.();
-                                    setTimeout(() => resolveAndNavigate(username, navigate), 300);
+                                   onMentionTap={async (username) => {
+                                    const cleaned = username.toLowerCase();
+                                    const withSpaces = cleaned.replace(/_/g, ' ');
+                                    const { data } = await supabase
+                                      .from('taggable_entities')
+                                      .select('entity_id, entity_type')
+                                      .or(`username.eq.${cleaned},username.ilike.${withSpaces}`)
+                                      .limit(1)
+                                      .maybeSingle();
+                                    if (data) {
+                                      const route = data.entity_type === 'business'
+                                        ? `/business/${data.entity_id}`
+                                        : `/profile/${data.entity_id}`;
+                                      navigate(route);
+                                      setTimeout(() => onClose?.(), 50);
+                                    }
                                   }}
                                 />
                               ))}
