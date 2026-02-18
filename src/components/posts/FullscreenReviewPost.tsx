@@ -329,7 +329,7 @@ export function FullscreenReviewPost({
               {courseName}
             </h2>
             {heroSubtitle && (
-              <p className="text-white/50 text-xs mt-0.5 font-normal">
+              <p className="text-white/50 text-xs mt-0.5 font-normal truncate">
                 {heroSubtitle}
               </p>
             )}

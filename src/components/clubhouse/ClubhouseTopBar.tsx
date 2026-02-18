@@ -38,26 +38,28 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
     <>
       {/* Floating bar - fixed position below the notch/safe area */}
       <div
-        className="fixed left-4 right-4 z-40 pointer-events-auto flex items-center justify-between lg:hidden"
+        className="fixed left-4 right-4 z-40 pointer-events-auto flex items-center justify-between gap-2 min-w-0 lg:hidden"
         style={{
           top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
         }}
       >
-        {/* Left: Tab Toggle */}
-        <ClubhouseTabToggle
-          activeTab={activeTab}
-          onTabChange={onTabChange}
-          isBusinessActor={isBusinessActor}
-        />
+        {/* Left: Tab Toggle — can compress slightly on very small screens */}
+        <div className="flex-shrink-1 min-w-0">
+          <ClubhouseTabToggle
+            activeTab={activeTab}
+            onTabChange={onTabChange}
+            isBusinessActor={isBusinessActor}
+          />
+        </div>
 
-        {/* Right: Search + Profile Pill */}
-        <div className="flex items-center gap-1.5">
+        {/* Right: Search + Profile Pill — shrink-0 on search, pill compresses */}
+        <div className="flex items-center gap-1 flex-shrink-0">
           <Button
             variant="ghost"
             size="icon"
             className={cn(
               "p-0 flex items-center justify-center rounded-full active:scale-[0.97] transition-all",
-              "h-11 w-11",
+              "h-11 w-11 flex-shrink-0",
               "bg-transparent hover:bg-transparent border-0 shadow-none",
               "text-white/70"
             )}
@@ -68,14 +70,16 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
           </Button>
 
           {user && (
-            <PostingAsPill
-              ref={pillRef}
-              onClick={() => setMenuOpen((v) => !v)}
-              isOpen={menuOpen}
-              hasUnreadNotifications={hasUnread}
-              useLightTheme={false}
-              isDimmed={false}
-            />
+            <div className="flex-shrink-1 min-w-0">
+              <PostingAsPill
+                ref={pillRef}
+                onClick={() => setMenuOpen((v) => !v)}
+                isOpen={menuOpen}
+                hasUnreadNotifications={hasUnread}
+                useLightTheme={false}
+                isDimmed={false}
+              />
+            </div>
           )}
         </div>
       </div>
