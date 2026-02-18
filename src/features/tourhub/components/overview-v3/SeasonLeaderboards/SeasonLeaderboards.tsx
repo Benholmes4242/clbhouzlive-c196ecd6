@@ -6,7 +6,7 @@
  */
 
 import { useState, memo, useEffect } from 'react';
-import { ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronRight, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSeasonLeaderboards, CATEGORY_CONFIG as CATEGORY_DATA_CONFIG } from '@/features/tourhub/hooks/useSeasonLeaderboards';
@@ -16,7 +16,7 @@ import { ChasingPack } from './ChasingPack';
 import { LeaderboardList } from './LeaderboardList';
 import { SeasonToggle } from './SeasonToggle';
 import { CATEGORY_CONFIG, CATEGORY_ACCENT_COLORS } from './constants';
-import { CATEGORY_ICONS, BarChartIcon, type CategoryId } from './StatCategoryIcons';
+import { BarChartIcon, type CategoryId } from './StatCategoryIcons';
 
 /** Discipline context lines — one cinematic stat per discipline */
 const DISCIPLINE_CONTEXT: Record<CategoryId, string> = {
@@ -104,9 +104,11 @@ export function SeasonLeaderboards() {
 
   const { data, isLoading, error } = useSeasonLeaderboards(selectedYear);
 
+  // Default to 2026 if available, otherwise the newest season with data
   useEffect(() => {
     if (data && selectedYear === undefined) {
-      setSelectedYear(data.year);
+      const has2026 = data.availableSeasons.some((s) => s.year === 2026);
+      setSelectedYear(has2026 ? 2026 : data.year);
     }
   }, [data, selectedYear]);
 
@@ -122,15 +124,20 @@ export function SeasonLeaderboards() {
   };
 
   if (isLoading) return <SeasonLeaderboardsSkeleton />;
-  if (error || !data?.categories?.length) return <SeasonLeaderboardsEmpty />;
 
-  const activeCategoryData = data.categories.find((c) => c.id === activeCategory);
+  // Show empty state when there's no data at all (no seasons found)
+  if (error && !data) return <SeasonLeaderboardsEmpty />;
+
+  // When a selected year has no stats yet, show a graceful in-section message
+  const hasNoCategories = !data?.categories?.length;
+  const displayYear = selectedYear ?? data?.year;
+
+  const activeCategoryData = data?.categories.find((c) => c.id === activeCategory);
   const leader = activeCategoryData?.players[0];
   const chasers = activeCategoryData?.players.slice(1, 3) || [];
   const restOfList = activeCategoryData?.players.slice(3, 10) || [];
   const categoryConfig = CATEGORY_DATA_CONFIG[activeCategory];
   const accent = CATEGORY_ACCENT_COLORS[activeCategory];
-  const IconComponent = CATEGORY_ICONS[activeCategory];
   const contextLine = DISCIPLINE_CONTEXT[activeCategory];
 
   return (
@@ -147,14 +154,16 @@ export function SeasonLeaderboards() {
       >
         <div>
           <div className="flex items-center gap-2">
-          <p className="m-0 text-muted-foreground" style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              {data.year} Season
+            <p className="m-0 text-muted-foreground" style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              {displayYear} Season
             </p>
-            <SeasonToggle
-              availableSeasons={data.availableSeasons}
-              selectedYear={selectedYear ?? data.year}
-              onYearChange={setSelectedYear}
-            />
+            {data?.availableSeasons && (
+              <SeasonToggle
+                availableSeasons={data.availableSeasons}
+                selectedYear={selectedYear ?? data.year}
+                onYearChange={setSelectedYear}
+              />
+            )}
           </div>
           <h2 className="m-0 mt-1 text-foreground" style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}>
             Performance Rankings
@@ -183,85 +192,104 @@ export function SeasonLeaderboards() {
         />
       </motion.div>
 
-      {/* ═══ CINEMATIC CONTENT (no card wrapper) ═══ */}
-      <AnimatePresence mode="wait">
+      {/* ═══ NO DATA FOR SELECTED YEAR ═══ */}
+      {hasNoCategories ? (
         <motion.div
-          key={activeCategory}
-          className="px-4"
+          className="mx-4 mt-4 p-8 text-center rounded-2xl"
           initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: isTransitioning ? 0.6 : 1, y: isTransitioning ? -4 : 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-          style={{ marginTop: '16px' }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          style={{ background: 'rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.06)' }}
         >
-          {/* Stat context line — no icon badge */}
-          <p className="m-0 text-muted-foreground mb-4" style={{ fontSize: '14px', fontWeight: 500, fontStyle: 'italic' }}>
-            {contextLine}
-          </p>
-
-          {/* ═══ CHAMPION SPOTLIGHT ═══ */}
-          {leader && (
-            <div style={{ marginBottom: '12px' }}>
-              <LeaderHero player={leader} accentColor={activeCategory} />
-            </div>
-          )}
-
-          {/* ═══ THE CHASERS (#2 & #3) ═══ */}
-          {chasers.length > 0 && leader && (
-            <ChasingPack
-              players={chasers}
-              leaderValue={leader.statValue}
-              higherIsBetter={categoryConfig?.higherIsBetter ?? true}
-              unit={leader.statUnit}
-              accentColor={activeCategory}
-            />
-          )}
-
-          {/* ═══ VIEW FULL RANKINGS (expandable) ═══ */}
-          {restOfList.length > 0 && (
-            <div style={{ marginTop: '16px' }}>
-              <button
-                onClick={() => setShowFullList(!showFullList)}
-                className="w-full flex items-center justify-center gap-1.5 py-3 rounded-xl transition-all duration-200 active:scale-[0.98]"
-                style={{
-                  background: showFullList ? accent.bgMedium : 'rgba(0,0,0,0.03)',
-                  border: `1px solid ${showFullList ? accent.border : 'rgba(0,0,0,0.06)'}`,
-                  transition: 'all 0.25s ease',
-                }}
-              >
-                <span style={{ fontSize: '13px', fontWeight: 600, color: showFullList ? accent.primary : 'rgba(0,0,0,0.4)' }}>
-                  {showFullList ? 'Hide Rankings' : 'View Full Rankings'}
-                </span>
-                <motion.div
-                  animate={{ rotate: showFullList ? 180 : 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <ChevronDown size={14} style={{ color: showFullList ? accent.primary : 'rgba(0,0,0,0.3)' }} />
-                </motion.div>
-              </button>
-
-              <AnimatePresence>
-                {showFullList && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                    style={{ overflow: 'hidden' }}
-                  >
-                    <div
-                      className="mt-3 rounded-xl overflow-hidden bg-card"
-                      style={{ border: '1px solid hsl(var(--border) / 0.5)' }}
-                    >
-                      <LeaderboardList players={restOfList} accentColor={activeCategory} />
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          )}
+          <div className="flex flex-col items-center gap-3">
+            <BarChartIcon size={32} style={{ color: 'rgba(0,0,0,0.2)' }} />
+            <h3 className="font-semibold text-foreground m-0">{displayYear} Stats Coming Soon</h3>
+            <p className="text-sm text-muted-foreground m-0">
+              {displayYear} season statistics will be available shortly.
+            </p>
+          </div>
         </motion.div>
-      </AnimatePresence>
+      ) : (
+        /* ═══ CINEMATIC CONTENT (no card wrapper) ═══ */
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeCategory}
+            className="px-4"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: isTransitioning ? 0.6 : 1, y: isTransitioning ? -4 : 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+            style={{ marginTop: '16px' }}
+          >
+            {/* Stat context line — no icon badge */}
+            <p className="m-0 text-muted-foreground mb-4" style={{ fontSize: '14px', fontWeight: 500, fontStyle: 'italic' }}>
+              {contextLine}
+            </p>
+
+            {/* ═══ CHAMPION SPOTLIGHT ═══ */}
+            {leader && (
+              <div style={{ marginBottom: '12px' }}>
+                <LeaderHero player={leader} accentColor={activeCategory} />
+              </div>
+            )}
+
+            {/* ═══ THE CHASERS (#2 & #3) ═══ */}
+            {chasers.length > 0 && leader && (
+              <ChasingPack
+                players={chasers}
+                leaderValue={leader.statValue}
+                higherIsBetter={categoryConfig?.higherIsBetter ?? true}
+                unit={leader.statUnit}
+                accentColor={activeCategory}
+              />
+            )}
+
+            {/* ═══ VIEW FULL RANKINGS (expandable) ═══ */}
+            {restOfList.length > 0 && (
+              <div style={{ marginTop: '16px' }}>
+                <button
+                  onClick={() => setShowFullList(!showFullList)}
+                  className="w-full flex items-center justify-center gap-1.5 py-3 rounded-xl transition-all duration-200 active:scale-[0.98]"
+                  style={{
+                    background: showFullList ? accent.bgMedium : 'rgba(0,0,0,0.03)',
+                    border: `1px solid ${showFullList ? accent.border : 'rgba(0,0,0,0.06)'}`,
+                    transition: 'all 0.25s ease',
+                  }}
+                >
+                  <span style={{ fontSize: '13px', fontWeight: 600, color: showFullList ? accent.primary : 'rgba(0,0,0,0.4)' }}>
+                    {showFullList ? 'Hide Rankings' : 'View Full Rankings'}
+                  </span>
+                  <motion.div
+                    animate={{ rotate: showFullList ? 180 : 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ChevronDown size={14} style={{ color: showFullList ? accent.primary : 'rgba(0,0,0,0.3)' }} />
+                  </motion.div>
+                </button>
+
+                <AnimatePresence>
+                  {showFullList && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                      style={{ overflow: 'hidden' }}
+                    >
+                      <div
+                        className="mt-3 rounded-xl overflow-hidden bg-card"
+                        style={{ border: '1px solid hsl(var(--border) / 0.5)' }}
+                      >
+                        <LeaderboardList players={restOfList} accentColor={activeCategory} />
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      )}
     </section>
   );
 }
