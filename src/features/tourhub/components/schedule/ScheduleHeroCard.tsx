@@ -210,7 +210,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
                     <button
                       onClick={handlePlayerTap(leaderWinner.playerId)}
                       className="transition-opacity active:opacity-70"
-                      style={{ fontSize: '15px', fontWeight: 700, color: 'rgba(255,255,255,0.95)' }}
+                      style={{ fontSize: '15px', fontWeight: 700, color: '#FFFFFF' }}
                     >
                       {leaderWinner.displayName}
                     </button>
