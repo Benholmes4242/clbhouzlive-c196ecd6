@@ -171,6 +171,12 @@ function RunnerUpRow({ finisher, onPlayerTap }: { finisher: TournamentFinisher; 
 }
 
 export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHeroCardProps) {
+  console.log('[HERO] ScheduleHeroCard mounted:', {
+    name: tournament.name,
+    type,
+    hasLeaderWinner: !!leaderWinner,
+    topFinishers: leaderWinner?.topFinishers?.length ?? 0,
+  });
   const navigate = useNavigate();
   const [imgError, setImgError] = useState(false);
   const { courseImage } = useSingleCourseImage(
