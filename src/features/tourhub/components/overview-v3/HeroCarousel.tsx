@@ -31,6 +31,8 @@ import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
 import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows } from '../shared/TourHeroHelpers';
+import { useWinnerScorecardStats } from '../../hooks/useWinnerScorecardStats';
+import { WinnerStatsLine } from '../shared/WinnerStatsLine';
 import '@/styles/hero-glass.css';
 
 function getStartLabel(date: string): string {
@@ -264,6 +266,12 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
 
   // Winner info for completed tournaments
   const winnerInfo = isCompleted && tournament.winnerName ? tournament : null;
+
+  // Winner scorecard stats — only fetched for completed slides
+  const { data: winnerStats } = useWinnerScorecardStats(
+    isCompleted ? tournament.id : undefined,
+    isCompleted ? podiumWinner?.playerId : undefined
+  );
 
   return (
     <motion.div
@@ -521,6 +529,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                               {winningMargin}
                             </span>
                           )}
+                          {/* Winner stats line */}
+                          <WinnerStatsLine stats={winnerStats} />
                         </div>
                       </motion.div>
                     ) : winnerInfo?.winnerName ? (

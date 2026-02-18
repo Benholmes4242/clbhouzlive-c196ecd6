@@ -20,6 +20,8 @@ import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWin
 import { useSingleCourseImage } from '../../hooks/useCourseImageResolver';
 import { getCourseImage } from '../../utils/placeholders';
 import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows } from '../shared/TourHeroHelpers';
+import { useWinnerScorecardStats } from '../../hooks/useWinnerScorecardStats';
+import { WinnerStatsLine } from '../shared/WinnerStatsLine';
 import '@/styles/hero-glass.css';
 
 interface ScheduleHeroCardProps {
@@ -70,6 +72,13 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
   const winnerRow = podiumRows[0];
   const runnerRows = podiumRows.slice(1);
   const winner = winnerRow?.players[0] ?? leaderWinner;
+
+  // Winner scorecard stats (finished state only)
+  const winnerPlayerId = isRecent ? (winner as any)?.playerId : undefined;
+  const { data: winnerStats } = useWinnerScorecardStats(
+    isRecent ? tournament.id : undefined,
+    winnerPlayerId
+  );
 
   const winningMargin = (() => {
     if (!winnerRow || podiumRows.length < 2) return null;
@@ -270,6 +279,8 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
                           ? `${formatPurse(winner.money)} winner's share`
                           : null}
                       </span>
+                      {/* Winner stats line */}
+                      <WinnerStatsLine stats={winnerStats} />
                     </div>
                   </div>
                 </>
