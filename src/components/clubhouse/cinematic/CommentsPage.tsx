@@ -32,7 +32,7 @@ import { MOTION_MED, EASE_OUT, SPRING_SNAPPY } from '@/lib/motionTokens';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { MentionBottomSheet, MentionSuggestion } from '@/components/post/post-wizard/steps/MentionBottomSheet';
-import { MentionText } from '@/components/comments/MentionText';
+import { MentionText, resolveAndNavigate } from '@/components/comments/MentionText';
 import { CommentingAsIndicator } from '@/components/comments/CommentingAsIndicator';
 import { CaddiePickBadge } from '@/components/comments/CaddiePickBadge';
 import { GolfReactionPicker, GolfReactionType } from '@/components/comments/GolfReactionPicker';
@@ -102,6 +102,7 @@ interface CommentItemProps {
   userReactions?: GolfReactionType[];
   onReactionToggle?: (commentId: string, type: GolfReactionType) => void;
   onLongPressReaction?: (commentId: string, position: { x: number; y: number }) => void;
+  onMentionTap?: (username: string) => void;
 }
 
 // Haptic feedback utility
@@ -138,6 +139,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
   userReactions,
   onReactionToggle,
   onLongPressReaction,
+  onMentionTap,
 }) => {
   const [showLikeAnim, setShowLikeAnim] = useState(false);
   const [showRipple, setShowRipple] = useState(false);
@@ -302,6 +304,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
               "mt-1 text-[14px] leading-[20px] block",
               isDark ? "text-white/90" : "text-foreground/90"
             )}
+            onMentionTap={onMentionTap}
           />
           
           {/* Reply action - inline, consistent alignment */}
@@ -859,6 +862,8 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   caddiePickCommentId,
 }) => {
   const [newComment, setNewComment] = useState('');
+  const newCommentRef = useRef('');
+  newCommentRef.current = newComment;
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [replyingTo, setReplyingTo] = useState<ReplyingToState | null>(null);
   const [expandedCaption, setExpandedCaption] = useState(false);
@@ -1054,20 +1059,21 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   }, []);
 
   // Handle mention selection from bottom sheet
+  // Uses a ref to avoid stale closure on newComment — ref always holds latest value
   const handleMentionSelect = useCallback((mention: MentionSuggestion) => {
-    // Replace the @query with the selected mention
+    const currentText = newCommentRef.current;
     const displayName = mention.username || mention.name;
-    const newValue = newComment.replace(/@\w*$/, `@${displayName} `);
-    
+    const newValue = currentText.replace(/@\w*$/, `@${displayName} `);
+
     setNewComment(newValue);
     setShowMentions(false);
     setMentionQuery('');
-    
+
     // Refocus input after a short delay
     setTimeout(() => {
       inputRef.current?.focus();
     }, 100);
-  }, [newComment]);
+  }, []); // no dependency on newComment — reads from ref
 
   const handleSubmitComment = useCallback(async () => {
     if (!newComment.trim() || isAddingComment) return;
@@ -1461,6 +1467,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                           reactionCounts={getReactionsForComment(comment.id).reactions}
                           userReactions={getReactionsForComment(comment.id).userReactions}
                           onReactionToggle={(commentId, type) => toggleReaction({ commentId, reactionType: type })}
+                          onMentionTap={(username) => resolveAndNavigate(username, navigate)}
                         />
                         
                         {/* Replies - thread rail layout with subtle gradient connector */}
@@ -1503,6 +1510,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                                   reactionCounts={getReactionsForComment(reply.id).reactions}
                                   userReactions={getReactionsForComment(reply.id).userReactions}
                                   onReactionToggle={(commentId, type) => toggleReaction({ commentId, reactionType: type })}
+                                  onMentionTap={(username) => resolveAndNavigate(username, navigate)}
                                 />
                               ))}
                               

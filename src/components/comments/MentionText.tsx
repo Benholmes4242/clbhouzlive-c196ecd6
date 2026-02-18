@@ -65,7 +65,7 @@ function parseTextWithMentions(text: string): TextPart[] {
 /**
  * Resolve a username to its entity type and navigate accordingly
  */
-async function resolveAndNavigate(
+export async function resolveAndNavigate(
   username: string,
   navigate: ReturnType<typeof useNavigate>
 ): Promise<void> {
@@ -133,7 +133,7 @@ export function MentionText({
               type="button"
               onClick={(e) => handleMentionClick(part.username!, e)}
               className={cn(
-                "text-[#F7931E] font-medium hover:underline cursor-pointer",
+                "text-amber-500 font-medium hover:underline cursor-pointer",
                 "inline bg-transparent border-none p-0",
                 mentionClassName
               )}
