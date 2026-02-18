@@ -146,7 +146,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
           top: 'auto',
           minWidth: '280px',
           maxWidth: 'min(350px, calc(100% - 32px))',
-          padding: '20px 20px 12px 20px',
+          padding: '20px 20px 14px 20px',
           borderTop: finishedBorderTop,
         }}
         initial={{ opacity: 0 }}
@@ -154,7 +154,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: 0.08 }}
       >
         {/* Row 1: Status | Tour Badge */}
-        <div className="flex items-center justify-between" style={{ marginBottom: '8px' }}>
+        <div className="flex items-center justify-between" style={{ marginBottom: '6px' }}>
           {isLive ? (
             <div className="flex items-center gap-1.5">
               <span className="live-dot" />
@@ -238,7 +238,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
         {isRecent && (
           <>
             {winner && (
-              <div style={{ marginTop: 10 }}>
+              <div style={{ marginTop: 14 }}>
                 {/* Winner row — horizontal, photo beside name/score */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <button
@@ -282,7 +282,14 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
 
                 {/* Runners-up — positions 2 and 3 */}
                 {(runnerUp || third) && (
-                  <div style={{ marginTop: 6 }}>
+                  <div style={{
+                    marginTop: 10,
+                    paddingTop: 10,
+                    borderTop: '1px solid rgba(255,255,255,0.08)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 8,
+                  }}>
                     {runnerUp && (
                       <RunnerUpRow
                         finisher={runnerUp}
@@ -304,7 +311,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
                         color: 'rgba(255,255,255,0.4)',
                         display: 'block',
                         marginTop: 2,
-                        paddingLeft: 28,
+                        paddingLeft: 54,
                       }}>
                         +{extraTied} {extraTied === 1 ? 'other' : 'others'} tied
                       </span>
@@ -314,7 +321,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
               </div>
             )}
 
-            <div className="hero-text-cta w-full" style={{ marginTop: '8px' }}>
+            <div className="hero-text-cta w-full" style={{ marginTop: '14px' }}>
               <span>View Results</span>
               <ChevronRight className="w-4 h-4 cta-chevron" />
             </div>

@@ -73,9 +73,6 @@ export function RunnerUpRow({
         display: 'flex',
         alignItems: 'center',
         gap: 8,
-        paddingTop: 5,
-        paddingBottom: 5,
-        borderTop: '1px solid rgba(255,255,255,0.07)',
       }}
     >
       {/* Position — "T2" for ties, "2" for clean */}
