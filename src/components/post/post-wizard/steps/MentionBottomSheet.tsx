@@ -90,7 +90,10 @@ export function MentionBottomSheet({
       <div 
         className="fixed inset-0"
         style={{ zIndex: resolvedZ - 1 }}
-        onClick={() => onOpenChange(false)}
+        onClick={() => { console.log('[MENTION] BACKDROP onClick fired — closing sheet'); onOpenChange(false); }}
+        onPointerDown={() => { console.log('[MENTION] BACKDROP onPointerDown fired'); }}
+        onTouchStart={() => { console.log('[MENTION] BACKDROP onTouchStart fired'); }}
+        onTouchEnd={() => { console.log('[MENTION] BACKDROP onTouchEnd fired'); }}
       />
       
       <div className="bg-white rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.1)] 
@@ -127,19 +130,20 @@ export function MentionBottomSheet({
                 key={suggestion.id}
                 type="button"
                 onMouseDown={(e) => {
-                  // Desktop: prevent input blur without killing click synthesis
+                  console.log('[MENTION] onMouseDown fired for:', suggestion.name);
                   e.preventDefault();
                 }}
+                onPointerDown={() => { console.log('[MENTION] onPointerDown fired for:', suggestion.name); }}
+                onPointerUp={() => { console.log('[MENTION] onPointerUp fired for:', suggestion.name); }}
+                onTouchStart={() => { console.log('[MENTION] onTouchStart fired for:', suggestion.name); }}
                 onTouchEnd={(e) => {
-                  // iOS WKWebView: onTouchEnd is the most reliable tap signal.
-                  // e.preventDefault() here does NOT suppress click; it just
-                  // prevents the 300ms delay and ghost mouse events.
+                  console.log('[MENTION] onTouchEnd fired for:', suggestion.name);
                   e.preventDefault();
                   onSelect(suggestion);
                   onOpenChange(false);
                 }}
                 onClick={() => {
-                  // Desktop / non-touch fallback
+                  console.log('[MENTION] onClick fired for:', suggestion.name);
                   onSelect(suggestion);
                   onOpenChange(false);
                 }}
