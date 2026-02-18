@@ -167,17 +167,11 @@ interface HeroSlideProps {
   leadersWinnersMap?: Map<string, import('../../hooks/useTournamentLeadersWinners').TournamentLeaderWinner>;
 }
 
-// Card animation variants - using layout animation to prevent jumping
+// Card animation variants — matches CreatorCapsule entrance/exit
 const cardVariants = {
-  enter: {
-    opacity: 0,
-  },
-  center: {
-    opacity: 1,
-  },
-  exit: {
-    opacity: 0,
-  }
+  enter: { opacity: 0, y: 20 },
+  center: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: 20 },
 };
 
 function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap }: HeroSlideProps) {
@@ -321,11 +315,11 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
         }}
       />
 
-      {/* Glass Card - Bottom Left with entrance animation */}
+      {/* Glass Card - Bottom Left — canonical Creator Capsule glass + animation spec */}
       <AnimatePresence mode="wait">
         {isActive && (
-          <motion.div 
-            className="glass-card"
+          <motion.div
+            layout
             style={{ 
               position: 'absolute',
               bottom: '20px',
@@ -334,20 +328,26 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
               minWidth: '280px',
               maxWidth: 'min(350px, calc(100% - 32px))',
               padding: '20px 20px 14px 20px',
-              minHeight: isCompleted ? 260 : undefined,
-              transition: 'min-height 0.2s ease-out',
+              // Glass spec — matches CreatorCapsule exactly
+              background: 'rgba(0, 0, 0, 0.35)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.10)',
+              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
+              borderRadius: '12px',
+              overflow: 'hidden',
             }}
             variants={cardVariants}
             initial="enter"
             animate="center"
             exit="exit"
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: 0.08 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
           >
             {/* Row 1: Status | Tour Badge (right-aligned) */}
             <div className="flex items-center justify-between" style={{ marginBottom: '6px' }}>
               {/* Status Badge - left */}
               {isLive ? (
-              <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5">
                   <span className="live-dot" />
                   <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: '#22C55E' }}>LIVE</span>
                 </div>
@@ -372,7 +372,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                    tournament.tourSlug === 'euro' ? 'DP WORLD' : 
                    tournament.tourSlug === 'lpga' ? 'LPGA' : 
                    tournament.tourSlug === 'champ' ? 'CHAMPIONS' : 
-                   'PGA DEV'}
+                   'KORN FERRY'}
                 </span>
               </div>
             </div>
@@ -395,195 +395,245 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
               {tournament.venueName}
               {tournament.venueCity && ` · ${tournament.venueCity}`}
             </button>
-            
-            {/* ─── LIVE CARD LAYOUT ─── */}
-            {isLive && (
-              <>
-                {/* Round progress instead of course stats */}
-                <p className="hero-meta">
-                  {(() => {
-                    // Compute approximate round based on tournament dates
-                    const start = new Date(tournament.startDate);
-                    const now = new Date();
-                    const dayIndex = Math.max(0, Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
-                    const totalRounds = 4; // Standard PGA
-                    const currentRound = Math.min(dayIndex + 1, totalRounds);
-                    return currentRound >= totalRounds ? 'Final Round' : `Round ${currentRound} of ${totalRounds}`;
-                  })()}
-                </p>
-                
-                {/* Mini Leaderboard or Loading/Starting Soon */}
-                {leadersLoading ? (
-                  <LeaderboardSkeleton />
-                ) : leaders.length > 0 ? (
-                  <div className="leaderboard-container">
+
+            {/* ─── State-specific content — each section uses Capsule spring easing ─── */}
+            <AnimatePresence mode="popLayout">
+
+              {/* LIVE LAYOUT */}
+              {isLive && (
+                <motion.div
+                  key="live-content"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
+                  style={{ overflow: 'hidden' }}
+                >
+                  {/* Round progress */}
+                  <p className="hero-meta">
                     {(() => {
-                      const tiedLeaderCount = leaders.filter(l => l.position === 1).length;
-                      const hasTiedLeaders = tiedLeaderCount > 1;
-                      return leaders.map((leader, idx) => (
-                          <MiniLeaderboardRow
-                            key={`row-${leader.position}-${leader.player.id}`}
-                            leader={leader}
-                            isFirst={idx === 0}
-                            index={idx}
-                            isActive={isActive}
-                            isLeader={leader.position === 1}
-                            hasTiedLeaders={hasTiedLeaders}
-                            showTieBefore={hasTiedLeaders && leader.position === 1 && idx > 0}
-                            scoreFlash={scoreFlashes[leader.player.id] || null}
-                            positionDelta={positionDeltas[leader.player.id] || 0}
-                          />
-                      ));
+                      const start = new Date(tournament.startDate);
+                      const now = new Date();
+                      const dayIndex = Math.max(0, Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
+                      const totalRounds = 4;
+                      const currentRound = Math.min(dayIndex + 1, totalRounds);
+                      return currentRound >= totalRounds ? 'Final Round' : `Round ${currentRound} of ${totalRounds}`;
                     })()}
-                  </div>
-                ) : (
-                  <div style={{ marginBottom: '4px' }}>
-                    <span style={{ fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>
-                      Starting Soon
-                    </span>
-                  </div>
-                )}
-                
+                  </p>
 
-                {/* See All - right-aligned text CTA */}
-                <Link 
-                  to={`/tourhub/tournament/${tournament.id}`} 
-                  className="hero-text-cta w-full"
-                >
-                  <span>See All</span>
-                  <ChevronRight className="w-4 h-4 cta-chevron" />
-                </Link>
-              </>
-            )}
-            
-            {/* ─── COMPLETED CARD LAYOUT ─── Podium design */}
-            {isCompleted && (
-              <>
-                {/* Winner row — always reserved, skeleton when loading */}
-                <div style={{ marginTop: 14, minHeight: 52 }}>
-                  {podiumWinner ? (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <button
-                        onClick={handlePlayerTap(podiumWinner.playerId)}
-                        className="transition-opacity active:opacity-70"
+                  {/* Mini Leaderboard */}
+                  <AnimatePresence mode="wait">
+                    {leadersLoading ? (
+                      <motion.div
+                        key="skeleton"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.15 }}
                       >
-                        <PlayerAvatar
-                          photoUrl={podiumWinner.photoUrl}
-                          pgaTourId={podiumWinner.pgaTourId}
-                          displayName={podiumWinner.displayName}
-                          size={44}
-                        />
-                      </button>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                          <button
-                            onClick={handlePlayerTap(podiumWinner.playerId)}
-                            className="transition-opacity active:opacity-70"
-                            style={{ fontSize: '16px', fontWeight: 700, color: '#FFFFFF' }}
-                          >
-                            {podiumWinner.displayName}
-                          </button>
-                          <span style={{ fontFamily: "'JetBrains Mono','SF Mono',monospace", fontSize: '16px', fontWeight: 700, color: getFinishedScoreColor(podiumWinner.score), flexShrink: 0 }}>
-                            {podiumWinner.displayScore}
-                          </span>
-                        </div>
-                        {winningMargin && (
-                          <span style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.50)', marginTop: 2, display: 'block' }}>
-                            {winningMargin}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  ) : winnerInfo?.winnerName ? (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <PlayerAvatar
-                        photoUrl={resolvePhotoUrl(winnerInfo.winnerPhotoUrl, winnerInfo.winnerPgaTourId)}
-                        displayName={winnerInfo.winnerName}
-                        size={44}
-                      />
-                      <div>
-                        <span style={{ fontSize: '16px', fontWeight: 700, color: '#FFFFFF', display: 'block' }}>
-                          {winnerInfo.winnerName}
+                        <LeaderboardSkeleton />
+                      </motion.div>
+                    ) : leaders.length > 0 ? (
+                      <motion.div
+                        key="leaders"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
+                        className="leaderboard-container"
+                      >
+                        {(() => {
+                          const tiedLeaderCount = leaders.filter(l => l.position === 1).length;
+                          const hasTiedLeaders = tiedLeaderCount > 1;
+                          return leaders.map((leader, idx) => (
+                            <MiniLeaderboardRow
+                              key={`row-${leader.position}-${leader.player.id}`}
+                              leader={leader}
+                              isFirst={idx === 0}
+                              index={idx}
+                              isActive={isActive}
+                              isLeader={leader.position === 1}
+                              hasTiedLeaders={hasTiedLeaders}
+                              showTieBefore={hasTiedLeaders && leader.position === 1 && idx > 0}
+                              scoreFlash={scoreFlashes[leader.player.id] || null}
+                              positionDelta={positionDeltas[leader.player.id] || 0}
+                            />
+                          ));
+                        })()}
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="starting-soon"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.15 }}
+                        style={{ marginBottom: '4px' }}
+                      >
+                        <span style={{ fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>
+                          Starting Soon
                         </span>
-                        {winnerInfo.winnerScore && (
-                          <span style={{ fontFamily: "'JetBrains Mono','SF Mono',monospace", fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>
-                            {winnerInfo.winnerScore}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    <div style={{ height: 44, borderRadius: 10, background: 'rgba(255,255,255,0.04)', width: 200 }} />
-                  )}
-                </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
 
-                {/* Runners-up — always rendered to hold space, skeleton when loading */}
-                <div style={{
-                  marginTop: 10,
-                  paddingTop: 10,
-                  borderTop: '1px solid rgba(255,255,255,0.08)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 8,
-                  minHeight: 72,
-                }}>
-                  {runnerRows.length > 0 ? (
-                    runnerRows.map(row => (
-                      <PodiumRunnerRow
-                        key={row.position}
-                        row={row}
-                        onPlayerTap={handlePlayerTap}
-                      />
-                    ))
-                  ) : (
-                    <>
-                      <div style={{ height: 26, borderRadius: 8, background: 'rgba(255,255,255,0.04)' }} />
-                      <div style={{ height: 26, borderRadius: 8, background: 'rgba(255,255,255,0.04)' }} />
-                    </>
-                  )}
-                </div>
+                  <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta w-full">
+                    <span>See All</span>
+                    <ChevronRight className="w-4 h-4 cta-chevron" />
+                  </Link>
+                </motion.div>
+              )}
 
-                {/* View Results text CTA */}
-                <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta w-full" style={{ marginTop: '14px' }}>
-                  <span>View Results</span>
-                  <ChevronRight className="w-4 h-4 cta-chevron" />
-                </Link>
-              </>
-            )}
-            
-            {/* ─── UPCOMING CARD LAYOUT ─── */}
-            {isUpcoming && (
-              <>
-                {/* Course stats */}
-                <p style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: '8px', marginTop: '8px' }}>
-                  {[
-                    tournament.purse && formatPurse(tournament.purse),
-                    tournament.venuePar && `PAR ${tournament.venuePar}`,
-                    tournament.venueYardage && `${tournament.venueYardage.toLocaleString()} YDS`
-                  ].filter(Boolean).join(' · ')}
-                </p>
-                
-                {/* Defending Champion — if available */}
-                {tournament.defendingChampion && (
-                  <div className="flex items-center gap-2" style={{ marginBottom: '12px' }}>
-                    <Trophy className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.6)' }} />
-                    <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>
-                      Defending: <span style={{ fontWeight: 700, color: 'white' }}>{tournament.defendingChampion}</span>
-                    </span>
-                  </div>
-                )}
-                
-                {/* CTA - text link style like See All */}
-                <Link 
-                  to={`/tourhub/tournament/${tournament.id}`} 
-                  className="hero-text-cta w-full"
+              {/* COMPLETED LAYOUT */}
+              {isCompleted && (
+                <motion.div
+                  key="completed-content"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
+                  style={{ overflow: 'hidden' }}
                 >
-                  <span>View Tournament</span>
-                  <ChevronRight className="w-4 h-4 cta-chevron" />
-                </Link>
-              </>
-            )}
-            
+                  {/* Winner row */}
+                  <AnimatePresence mode="wait">
+                    {podiumWinner ? (
+                      <motion.div
+                        key="podium-winner"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
+                        style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 8 }}
+                      >
+                        <button onClick={handlePlayerTap(podiumWinner.playerId)} className="transition-opacity active:opacity-70">
+                          <PlayerAvatar photoUrl={podiumWinner.photoUrl} pgaTourId={podiumWinner.pgaTourId} displayName={podiumWinner.displayName} size={44} />
+                        </button>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <button onClick={handlePlayerTap(podiumWinner.playerId)} className="transition-opacity active:opacity-70" style={{ fontSize: '16px', fontWeight: 700, color: '#FFFFFF' }}>
+                              {podiumWinner.displayName}
+                            </button>
+                            <span style={{ fontFamily: "'JetBrains Mono','SF Mono',monospace", fontSize: '16px', fontWeight: 700, color: getFinishedScoreColor(podiumWinner.score), flexShrink: 0 }}>
+                              {podiumWinner.displayScore}
+                            </span>
+                          </div>
+                          {winningMargin && (
+                            <span style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.50)', marginTop: 2, display: 'block' }}>
+                              {winningMargin}
+                            </span>
+                          )}
+                        </div>
+                      </motion.div>
+                    ) : winnerInfo?.winnerName ? (
+                      <motion.div
+                        key="fallback-winner"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
+                        style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 8 }}
+                      >
+                        <PlayerAvatar photoUrl={resolvePhotoUrl(winnerInfo.winnerPhotoUrl, winnerInfo.winnerPgaTourId)} displayName={winnerInfo.winnerName} size={44} />
+                        <div>
+                          <span style={{ fontSize: '16px', fontWeight: 700, color: '#FFFFFF', display: 'block' }}>{winnerInfo.winnerName}</span>
+                          {winnerInfo.winnerScore && (
+                            <span style={{ fontFamily: "'JetBrains Mono','SF Mono',monospace", fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>
+                              {winnerInfo.winnerScore}
+                            </span>
+                          )}
+                        </div>
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="winner-skeleton"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.15 }}
+                        style={{ marginTop: 14, height: 44, borderRadius: 10, background: 'rgba(255,255,255,0.04)', width: 200 }}
+                      />
+                    )}
+                  </AnimatePresence>
+
+                  {/* Runners-up */}
+                  <AnimatePresence mode="wait">
+                    {runnerRows.length > 0 ? (
+                      <motion.div
+                        key="runners"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1], delay: 0.06 }}
+                        style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', gap: 8 }}
+                      >
+                        {runnerRows.map(row => (
+                          <PodiumRunnerRow key={row.position} row={row} onPlayerTap={handlePlayerTap} />
+                        ))}
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="runners-skeleton"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.15 }}
+                        style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', gap: 8 }}
+                      >
+                        <div style={{ height: 26, borderRadius: 8, background: 'rgba(255,255,255,0.04)' }} />
+                        <div style={{ height: 26, borderRadius: 8, background: 'rgba(255,255,255,0.04)' }} />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta w-full" style={{ marginTop: '14px' }}>
+                    <span>View Results</span>
+                    <ChevronRight className="w-4 h-4 cta-chevron" />
+                  </Link>
+                </motion.div>
+              )}
+
+              {/* UPCOMING LAYOUT */}
+              {isUpcoming && (
+                <motion.div
+                  key="upcoming-content"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
+                  style={{ overflow: 'hidden' }}
+                >
+                  <p style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: '8px', marginTop: '8px' }}>
+                    {[
+                      tournament.purse && formatPurse(tournament.purse),
+                      tournament.venuePar && `PAR ${tournament.venuePar}`,
+                      tournament.venueYardage && `${tournament.venueYardage.toLocaleString()} YDS`
+                    ].filter(Boolean).join(' · ')}
+                  </p>
+
+                  {tournament.defendingChampion && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1], delay: 0.05 }}
+                      className="flex items-center gap-2"
+                      style={{ marginBottom: '12px' }}
+                    >
+                      <Trophy className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.6)' }} />
+                      <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>
+                        Defending: <span style={{ fontWeight: 700, color: 'white' }}>{tournament.defendingChampion}</span>
+                      </span>
+                    </motion.div>
+                  )}
+
+                  <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta w-full">
+                    <span>View Tournament</span>
+                    <ChevronRight className="w-4 h-4 cta-chevron" />
+                  </Link>
+                </motion.div>
+              )}
+
+            </AnimatePresence>
+
             {/* Carousel Dots - Inside card, below CTA */}
             {totalSlides > 1 && (
               <div className="flex items-center justify-center" style={{ gap: '6px', marginTop: '8px' }}>
