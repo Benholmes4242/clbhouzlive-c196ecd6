@@ -1820,7 +1820,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                           ? "Edit your comment..."
                           : replyingTo
                             ? `Reply to ${replyingTo.displayName}...`
-                            : "Add a comment... (@ to mention)"
+                            : "Share your thoughts…use @ to mention"
                       }
                       value={newComment}
                       onChange={handleCommentChange}
