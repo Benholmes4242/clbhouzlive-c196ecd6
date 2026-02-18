@@ -1778,7 +1778,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                 {/* Input pill — full width, textarea + stacked buttons inside */}
                 <motion.div 
                   className={cn(
-                    "flex-1 flex items-end rounded-[22px] pl-4 pr-1.5",
+                    "flex-1 flex items-center rounded-[22px] pl-4 pr-1.5",
                     "transition-all duration-200",
                     editingComment
                       ? "border border-amber-300 bg-amber-50 focus-within:border-amber-400"
@@ -1862,7 +1862,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                         showEmojiPicker && (isDark ? "text-white/80" : "text-foreground")
                       )}
                     >
-                      <Smile className="w-4 h-4" />
+                      <Smile className="w-5 h-5" />
                     </motion.button>
 
                     {/* Send / Save button */}
