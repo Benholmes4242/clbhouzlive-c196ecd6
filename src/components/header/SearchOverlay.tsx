@@ -698,7 +698,7 @@ const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, g
         
         {/* Ranking badge for courses */}
         {ranking && (
-          <div className="absolute bottom-[-4px] left-[-4px] min-w-[22px] h-[22px] px-1 bg-gradient-to-br from-primary to-primary/80 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-black/80 shadow-sm">
+          <div className="absolute bottom-[-4px] left-[-4px] min-w-[22px] h-[22px] px-1 bg-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white shadow-sm">
             #{ranking}
           </div>
         )}
