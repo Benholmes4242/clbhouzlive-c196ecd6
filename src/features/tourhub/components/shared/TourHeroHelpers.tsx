@@ -366,14 +366,14 @@ export function WinnerStatsPanel({
             marginTop: hasTournament ? 10 : 0,
             marginBottom: 6,
           }}>
-            Season Averages
+            Performance Averages
           </div>
           <div style={{ display: 'flex', gap: 6 }}>
             {seasonStats!.drivingDistance && (
               <StatChip
                 value={Math.round(seasonStats!.drivingDistance)}
-                label="Drive"
-                suffix=" yd"
+                label="Driver"
+                suffix=" yds"
               />
             )}
             {seasonStats!.drivingAccuracy && (
