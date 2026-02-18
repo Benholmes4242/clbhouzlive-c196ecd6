@@ -334,6 +334,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
               minWidth: '280px',
               maxWidth: 'min(350px, calc(100% - 32px))',
               padding: '20px 20px 14px 20px',
+              minHeight: isCompleted ? 260 : undefined,
+              transition: 'min-height 0.2s ease-out',
             }}
             variants={cardVariants}
             initial="enter"
@@ -457,9 +459,9 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             {/* ─── COMPLETED CARD LAYOUT ─── Podium design */}
             {isCompleted && (
               <>
-                {/* Winner row — horizontal: photo beside name + score */}
-                {podiumWinner ? (
-                  <div style={{ marginTop: 14 }}>
+                {/* Winner row — always reserved, skeleton when loading */}
+                <div style={{ marginTop: 14, minHeight: 52 }}>
+                  {podiumWinner ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <button
                         onClick={handlePlayerTap(podiumWinner.playerId)}
@@ -492,47 +494,54 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         )}
                       </div>
                     </div>
-
-                    {/* Runners-up — one row per distinct position */}
-                    {runnerRows.length > 0 && (
-                      <div style={{
-                        marginTop: 10,
-                        paddingTop: 10,
-                        borderTop: '1px solid rgba(255,255,255,0.08)',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 8,
-                      }}>
-                        {runnerRows.map(row => (
-                          <PodiumRunnerRow
-                            key={row.position}
-                            row={row}
-                            onPlayerTap={handlePlayerTap}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ) : winnerInfo?.winnerName ? (
-                  /* Fallback to basic winner if topFinishers not yet loaded */
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10 }}>
-                    <PlayerAvatar
-                      photoUrl={resolvePhotoUrl(winnerInfo.winnerPhotoUrl, winnerInfo.winnerPgaTourId)}
-                      displayName={winnerInfo.winnerName}
-                      size={44}
-                    />
-                    <div>
-                      <span style={{ fontSize: '16px', fontWeight: 700, color: '#FFFFFF', display: 'block' }}>
-                        {winnerInfo.winnerName}
-                      </span>
-                      {winnerInfo.winnerScore && (
-                        <span style={{ fontFamily: "'JetBrains Mono','SF Mono',monospace", fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>
-                          {winnerInfo.winnerScore}
+                  ) : winnerInfo?.winnerName ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <PlayerAvatar
+                        photoUrl={resolvePhotoUrl(winnerInfo.winnerPhotoUrl, winnerInfo.winnerPgaTourId)}
+                        displayName={winnerInfo.winnerName}
+                        size={44}
+                      />
+                      <div>
+                        <span style={{ fontSize: '16px', fontWeight: 700, color: '#FFFFFF', display: 'block' }}>
+                          {winnerInfo.winnerName}
                         </span>
-                      )}
+                        {winnerInfo.winnerScore && (
+                          <span style={{ fontFamily: "'JetBrains Mono','SF Mono',monospace", fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>
+                            {winnerInfo.winnerScore}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ) : null}
+                  ) : (
+                    <div style={{ height: 44, borderRadius: 10, background: 'rgba(255,255,255,0.04)', width: 200 }} />
+                  )}
+                </div>
+
+                {/* Runners-up — always rendered to hold space, skeleton when loading */}
+                <div style={{
+                  marginTop: 10,
+                  paddingTop: 10,
+                  borderTop: '1px solid rgba(255,255,255,0.08)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 8,
+                  minHeight: 72,
+                }}>
+                  {runnerRows.length > 0 ? (
+                    runnerRows.map(row => (
+                      <PodiumRunnerRow
+                        key={row.position}
+                        row={row}
+                        onPlayerTap={handlePlayerTap}
+                      />
+                    ))
+                  ) : (
+                    <>
+                      <div style={{ height: 26, borderRadius: 8, background: 'rgba(255,255,255,0.04)' }} />
+                      <div style={{ height: 26, borderRadius: 8, background: 'rgba(255,255,255,0.04)' }} />
+                    </>
+                  )}
+                </div>
 
                 {/* View Results text CTA */}
                 <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta w-full" style={{ marginTop: '14px' }}>
