@@ -361,7 +361,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                 </div>
               ) : isCompleted ? (
                 <div className="flex items-center gap-1.5">
-                  <Trophy className="w-3.5 h-3.5 text-amber-400" />
+                  <Trophy className="w-3.5 h-3.5" style={{ color: '#FACC15' }} />
                   <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: '#FACC15' }}>FINISHED</span>
                 </div>
               ) : isUpcoming ? (
