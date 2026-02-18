@@ -348,8 +348,18 @@ export function useCommentsWithReplies(postId: string | null) {
 
       if (error) throw error;
 
-      // Re-extract mentions from updated content
-      await createMentionNotifications(content, user.id, 'comment', commentId, postId!);
+      // Clear existing mentions before re-inserting to avoid duplicates / RLS conflicts
+      await supabase
+        .from('comment_mentions')
+        .delete()
+        .eq('comment_id', commentId);
+
+      // Re-extract mentions from updated content (non-blocking)
+      try {
+        await createMentionNotifications(content, user.id, 'comment', commentId, postId!);
+      } catch (err) {
+        console.warn('[useCommentsWithReplies] Mention extraction failed (non-blocking):', err);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['post-comments-with-replies', postId] });
