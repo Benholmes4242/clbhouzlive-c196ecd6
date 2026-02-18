@@ -1332,7 +1332,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: listVisible ? 1 : 0 }}
               transition={{ duration: 0.15 }}
-              className="flex-1 overflow-y-auto px-4"
+              className="flex-1 overflow-y-auto pl-5 pr-4"
               style={{ 
                 WebkitOverflowScrolling: 'touch',
                 paddingBottom: Math.max(16, keyboardOffset + 72), // 72px = composer height approx
