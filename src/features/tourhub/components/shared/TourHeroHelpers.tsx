@@ -157,7 +157,7 @@ export function TiedAvatarStack({
               marginLeft: i === 0 ? 0 : -overlap,
               zIndex: shown.length - i,
               position: 'relative',
-              borderRadius: '50%',
+              borderRadius: '34%',
               border: '1.5px solid rgba(0,0,0,0.45)',
               flexShrink: 0,
               overflow: 'hidden',
