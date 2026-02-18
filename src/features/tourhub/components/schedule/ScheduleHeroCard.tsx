@@ -137,6 +137,8 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
           maxWidth: 'min(350px, calc(100% - 32px))',
           padding: '20px 20px 14px 20px',
           borderTop: finishedBorderTop,
+          minHeight: isRecent ? 260 : undefined,
+          transition: 'min-height 0.2s ease-out',
         }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -226,70 +228,81 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
         {/* ─── FINISHED (COMPLETED) LAYOUT ─── */}
         {isRecent && (
           <>
-            {winner && (
-              <div style={{ marginTop: 14 }}>
-                {/* Winner row — horizontal, photo beside name/score */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <button
-                    onClick={handlePlayerTap(winner.playerId)}
-                    className="transition-opacity active:opacity-70"
-                  >
-                    <PlayerAvatar
-                      photoUrl={winner.photoUrl}
-                      pgaTourId={winner.pgaTourId}
-                      displayName={winner.displayName}
-                      size={44}
-                    />
-                  </button>
+            {/* Winner section — always reserves space */}
+            <div style={{ marginTop: 14, minHeight: 52 }}>
+              {winner ? (
+                <>
+                  {/* Winner row — horizontal, photo beside name/score */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <button
+                      onClick={handlePlayerTap(winner.playerId)}
+                      className="transition-opacity active:opacity-70"
+                    >
+                      <PlayerAvatar
+                        photoUrl={winner.photoUrl}
+                        pgaTourId={winner.pgaTourId}
+                        displayName={winner.displayName}
+                        size={44}
+                      />
+                    </button>
 
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <button
-                        onClick={handlePlayerTap(winner.playerId)}
-                        className="transition-opacity active:opacity-70"
-                        style={{ fontSize: '16px', fontWeight: 700, color: '#FFFFFF' }}
-                      >
-                        {winner.displayName}
-                      </button>
-                      <span
-                        className="score-mono"
-                        style={{ fontSize: '16px', fontWeight: 700, color: getFinishedScoreColor(winner.score), flexShrink: 0 }}
-                      >
-                        {winner.displayScore}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <button
+                          onClick={handlePlayerTap(winner.playerId)}
+                          className="transition-opacity active:opacity-70"
+                          style={{ fontSize: '16px', fontWeight: 700, color: '#FFFFFF' }}
+                        >
+                          {winner.displayName}
+                        </button>
+                        <span
+                          className="score-mono"
+                          style={{ fontSize: '16px', fontWeight: 700, color: getFinishedScoreColor(winner.score), flexShrink: 0 }}
+                        >
+                          {winner.displayScore}
+                        </span>
+                      </div>
+                      {/* Winning margin / headline stat */}
+                      <span style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.50)', marginTop: 2, display: 'block' }}>
+                        {winningMargin
+                          ? winningMargin
+                          : winner.money
+                          ? `${formatPurse(winner.money)} winner's share`
+                          : null}
                       </span>
                     </div>
-                    {/* Winning margin / headline stat */}
-                    <span style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.50)', marginTop: 2, display: 'block' }}>
-                      {winningMargin
-                        ? winningMargin
-                        : winner.money
-                        ? `${formatPurse(winner.money)} winner's share`
-                        : null}
-                    </span>
                   </div>
-                </div>
+                </>
+              ) : (
+                <div style={{ height: 44, borderRadius: 10, background: 'rgba(255,255,255,0.04)', width: 200 }} />
+              )}
+            </div>
 
-                {/* Runners-up — one row per distinct position */}
-                {runnerRows.length > 0 && (
-                  <div style={{
-                    marginTop: 10,
-                    paddingTop: 10,
-                    borderTop: '1px solid rgba(255,255,255,0.08)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 8,
-                  }}>
-                    {runnerRows.map(row => (
-                      <PodiumRunnerRow
-                        key={row.position}
-                        row={row}
-                        onPlayerTap={handlePlayerTap}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+            {/* Runners-up — always rendered to hold space, skeleton when loading */}
+            <div style={{
+              marginTop: 10,
+              paddingTop: 10,
+              borderTop: '1px solid rgba(255,255,255,0.08)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 8,
+              minHeight: 72,
+            }}>
+              {runnerRows.length > 0 ? (
+                runnerRows.map(row => (
+                  <PodiumRunnerRow
+                    key={row.position}
+                    row={row}
+                    onPlayerTap={handlePlayerTap}
+                  />
+                ))
+              ) : (
+                <>
+                  <div style={{ height: 26, borderRadius: 8, background: 'rgba(255,255,255,0.04)' }} />
+                  <div style={{ height: 26, borderRadius: 8, background: 'rgba(255,255,255,0.04)' }} />
+                </>
+              )}
+            </div>
 
             <div className="hero-text-cta w-full" style={{ marginTop: '14px' }}>
               <span>View Results</span>
