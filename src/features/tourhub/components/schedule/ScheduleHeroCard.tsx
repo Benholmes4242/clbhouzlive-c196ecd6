@@ -19,7 +19,7 @@ import type { TourTournament } from '../../hooks/useTourHubData';
 import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
 import { useSingleCourseImage } from '../../hooks/useCourseImageResolver';
 import { getCourseImage } from '../../utils/placeholders';
-import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, RunnerUpRow, TiedAvatarStack } from '../shared/TourHeroHelpers';
+import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, RunnerUpRow } from '../shared/TourHeroHelpers';
 import '@/styles/hero-glass.css';
 
 interface ScheduleHeroCardProps {
@@ -75,12 +75,12 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
   const isPositionTied = (position: number) =>
     allFetched.filter(f => f.position === position).length > 1;
 
-  // Extra tied players at the last shown position not shown on the card
-  const lastShownPosition = third?.position ?? runnerUp?.position;
-  const extraTiedFinishers = lastShownPosition != null
-    ? allFetched.filter(
-        f => f.position === lastShownPosition && !topFinishers.some(t => t.playerId === f.playerId)
-      )
+  // Extra tied finishers per runner-up position (not already shown)
+  const extraTiedForRunnerUp = runnerUp
+    ? allFetched.filter(f => f.position === runnerUp.position && f.playerId !== runnerUp.playerId && f.playerId !== third?.playerId)
+    : [];
+  const extraTiedForThird = third
+    ? allFetched.filter(f => f.position === third.position && f.playerId !== third.playerId && f.playerId !== runnerUp?.playerId)
     : [];
 
   const winningMargin = (() => {
@@ -295,6 +295,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
                       <RunnerUpRow
                         finisher={runnerUp}
                         isTied={isPositionTied(runnerUp.position)}
+                        extraTiedFinishers={!third ? extraTiedForRunnerUp : []}
                         onPlayerTap={handlePlayerTap(runnerUp.playerId)}
                       />
                     )}
@@ -302,10 +303,10 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
                       <RunnerUpRow
                         finisher={third}
                         isTied={isPositionTied(third.position)}
+                        extraTiedFinishers={extraTiedForThird}
                         onPlayerTap={handlePlayerTap(third.playerId)}
                       />
                     )}
-                    <TiedAvatarStack extraFinishers={extraTiedFinishers} />
                   </div>
                 )}
               </div>
