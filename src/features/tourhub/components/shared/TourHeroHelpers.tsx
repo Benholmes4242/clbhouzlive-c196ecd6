@@ -74,9 +74,11 @@ export function PlayerAvatar({
 /** Compact runner-up row (positions 2–3) */
 export function RunnerUpRow({
   finisher,
+  isTied = false,
   onPlayerTap,
 }: {
   finisher: TournamentFinisher;
+  isTied?: boolean;
   onPlayerTap?: (e: React.MouseEvent) => void;
 }) {
   const handleTap = onPlayerTap ?? ((e: React.MouseEvent) => e.stopPropagation());
@@ -91,19 +93,19 @@ export function RunnerUpRow({
         borderTop: '1px solid rgba(255,255,255,0.07)',
       }}
     >
-      {/* Position */}
+      {/* Position — "T2" for ties, "2" for clean */}
       <span
         style={{
           fontFamily: "'JetBrains Mono', 'SF Mono', monospace",
           fontSize: 11,
           fontWeight: 600,
           color: 'rgba(255,255,255,0.40)',
-          width: 14,
+          width: 20,
           textAlign: 'center',
           flexShrink: 0,
         }}
       >
-        {finisher.position}
+        {isTied ? `T${finisher.position}` : finisher.position}
       </span>
 
       {/* Avatar */}
@@ -142,8 +144,14 @@ export function RunnerUpRow({
 export function calcWinningMargin(
   winnerScore: number | null,
   runnerUpScore: number | null,
+  winnerPosition?: number,
+  runnerUpPosition?: number,
 ): string | null {
   if (winnerScore === null || runnerUpScore === null) return null;
+  // Co-winners — both at position 1
+  if (winnerPosition !== undefined && runnerUpPosition !== undefined && winnerPosition === runnerUpPosition) {
+    return 'Co-winners';
+  }
   const margin = runnerUpScore - winnerScore;
   if (margin === 0) return 'Won in playoff';
   return `Won by ${margin} stroke${margin === 1 ? '' : 's'}`;

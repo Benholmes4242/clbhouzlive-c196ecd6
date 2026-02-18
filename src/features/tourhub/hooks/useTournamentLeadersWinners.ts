@@ -26,8 +26,10 @@ export interface TournamentFinisher {
 }
 
 export interface TournamentLeaderWinner extends TournamentFinisher {
-  /** All top 3 finishers (positions 1–3), winner/leader first */
+  /** Top 3 finishers displayed on the card (first 3 people, regardless of position) */
   topFinishers: TournamentFinisher[];
+  /** All fetched rows for this tournament (for tie overflow counting) */
+  allFetched: TournamentFinisher[];
 }
 
 function formatScore(score: number | null): string {
@@ -64,7 +66,7 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
           )
         `)
         .in('tournament_id', tournamentIds)
-        .lte('position', 3)
+        .lte('position', 10)
         .order('tournament_id', { ascending: true })
         .order('position', { ascending: true });
 
@@ -73,14 +75,7 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
         return new Map();
       }
 
-      console.log('[LEADERS] Raw rows:', data?.map(r => ({
-        tournamentId: r.tournament_id.slice(0, 8),
-        position: r.position,
-        name: (r.player as any)?.last_name,
-        score: r.score
-      })));
-
-      // Group by tournament_id, then by position (take first occurrence per position)
+      // Group by tournament_id, take the first 3 people (not first 3 positions)
       const byTournament = new Map<string, TournamentFinisher[]>();
 
       for (const entry of data || []) {
@@ -88,8 +83,8 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
         if (!byTournament.has(tid)) byTournament.set(tid, []);
         
         const existing = byTournament.get(tid)!;
-        // Skip if we already have this position for this tournament
-        if (existing.some(f => f.position === entry.position)) continue;
+        // Stop after collecting 10 rows per tournament (for tie overflow counting)
+        if (existing.length >= 10) continue;
 
         const player = entry.player as any;
         const firstName = player?.first_name || null;
@@ -117,7 +112,8 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
 
         result.set(tid, {
           ...leader,
-          topFinishers: sorted,
+          topFinishers: sorted.slice(0, 3),  // first 3 people shown on card
+          allFetched: sorted,                 // all rows for tie overflow counting
         });
       }
 

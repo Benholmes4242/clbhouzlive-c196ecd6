@@ -66,13 +66,27 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
 
   // Podium data for finished state
   const topFinishers = leaderWinner?.topFinishers ?? [];
+  const allFetched = leaderWinner?.allFetched ?? topFinishers;
   const winner = topFinishers[0] ?? leaderWinner;
   const runnerUp = topFinishers[1];
   const third = topFinishers[2];
 
+  // Helper: is this position tied?
+  const isPositionTied = (position: number) =>
+    allFetched.filter(f => f.position === position).length > 1;
+
+  // Count extra tied players at the last shown position not shown on the card
+  const lastShownPosition = third?.position ?? runnerUp?.position;
+  const extraTied = lastShownPosition != null
+    ? allFetched.filter(f => f.position === lastShownPosition).length
+      - topFinishers.filter(f => f.position === lastShownPosition).length
+    : 0;
+
   const winningMargin = (() => {
     if (!winner || !runnerUp) return null;
     if (winner.score === null || runnerUp.score === null) return null;
+    // Co-winners — both at position 1
+    if ((winner as any).position === (runnerUp as any).position) return 'Co-winners';
     const margin = runnerUp.score - winner.score;
     if (margin === 0) return 'Won in playoff';
     return `Won by ${margin} stroke${margin === 1 ? '' : 's'}`;
@@ -270,14 +284,28 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
                     {runnerUp && (
                       <RunnerUpRow
                         finisher={runnerUp}
+                        isTied={isPositionTied(runnerUp.position)}
                         onPlayerTap={handlePlayerTap(runnerUp.playerId)}
                       />
                     )}
                     {third && (
                       <RunnerUpRow
                         finisher={third}
+                        isTied={isPositionTied(third.position)}
                         onPlayerTap={handlePlayerTap(third.playerId)}
                       />
+                    )}
+                    {extraTied > 0 && (
+                      <span style={{
+                        fontSize: 11,
+                        fontWeight: 500,
+                        color: 'rgba(255,255,255,0.4)',
+                        display: 'block',
+                        marginTop: 2,
+                        paddingLeft: 28,
+                      }}>
+                        +{extraTied} {extraTied === 1 ? 'other' : 'others'} tied
+                      </span>
                     )}
                   </div>
                 )}
