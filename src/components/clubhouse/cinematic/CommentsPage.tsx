@@ -1763,9 +1763,9 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                 )}
               </AnimatePresence>
 
-              <div className="flex items-end gap-2">
-                {/* Current user avatar — aligned to bottom of the pill */}
-                <div className="mb-1.5 flex-shrink-0">
+              <div className="flex items-center gap-2">
+                {/* Current user avatar — vertically centered */}
+                <div className="flex-shrink-0">
                   <SquircleAvatar
                     size={32}
                     src={activeActor?.avatarUrl}
