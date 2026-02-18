@@ -185,7 +185,7 @@ html.lightbox-open {
   --clubhouse-text-dimmed: 0 0% 100% / 0.55;
   
   /* Dark borders */
-  --clubhouse-border: 0 0% 100% / 0.06;
+  --clubhouse-border: 0 0% 100% / 0.08;
   --clubhouse-border-light: 0 0% 100% / 0.10;
   
   /* Cinema dim mode overrides */

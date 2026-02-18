@@ -106,7 +106,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                   transform: isActive ? 'scale(1.1)' : 'scale(1)',
                   transition: 'all var(--motion-fast) var(--ease-pop)',
                   // Active Clubhouse icons: amber for warm routes, white for everything else
-                  ...(isClubhouseTheme && isActive && { color: useAmberActive ? '#F79E1B' : 'rgba(255,255,255,0.92)' })
+                  ...(isClubhouseTheme && isActive && { color: useAmberActive ? '#F79E1B' : 'rgba(255,255,255,1.0)' })
                 }}
               />
               {/* Unread badge for Hub tab */}
@@ -130,7 +130,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
               style={{
                 transition: 'color var(--motion-fast) var(--ease-standard)',
                 // Active Clubhouse labels: amber for warm routes, white for everything else
-                ...(isClubhouseTheme && isActive && { color: useAmberActive ? '#F79E1B' : 'rgba(255,255,255,0.92)' })
+                ...(isClubhouseTheme && isActive && { color: useAmberActive ? '#F79E1B' : 'rgba(255,255,255,1.0)' })
               }}
             >
               {tab.label}

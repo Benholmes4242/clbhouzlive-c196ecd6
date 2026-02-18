@@ -1140,7 +1140,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
 
                 {/* Left chevron — fixed left side, only shown when not on first slide */}
                 {hasMultipleMedia && currentMediaIndex > 0 && (
-                  <motion.button
+                   <motion.button
                     key="chevron-left"
                     whileTap={{ scale: 0.93 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 25 }}
@@ -1154,11 +1154,13 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                       background: 'rgba(0, 0, 0, 0.35)',
                       backdropFilter: 'blur(20px)',
                       WebkitBackdropFilter: 'blur(20px)',
-                      border: '1px solid rgba(255, 255, 255, 0.12)',
+                      border: '1px solid rgba(255, 255, 255, 0.10)',
+                      boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
+                      opacity: videoControlsVisible[currentPost?.id] ? 1 : 0.75,
                     }}
                     aria-label="Previous media"
                   >
-                    <ChevronLeft className="w-6 h-6 text-white" />
+                    <ChevronLeft className="w-5 h-5 text-white" />
                   </motion.button>
                 )}
                 {/* Right chevron lives inside CinematicActionRail as the top slot */}
