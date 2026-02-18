@@ -1062,6 +1062,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   // Uses a ref to avoid stale closure on newComment — ref always holds latest value
   const handleMentionSelect = useCallback((mention: MentionSuggestion) => {
     const currentText = newCommentRef.current;
+    // Prefer username for insertion (safe with /@(\w+)/g mention regex); fall back to name
     const displayName = mention.username || mention.name;
     const newValue = currentText.replace(/@\w*$/, `@${displayName} `);
 
@@ -1748,13 +1749,14 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
             )}
           </AnimatePresence>
 
-          {/* Mention Bottom Sheet — z-[110] to sit above the CommentsPage portal (z-[101]) */}
+          {/* Mention Bottom Sheet — z-[110] sits above portal, bottomOffset keeps it above the input bar */}
           <MentionBottomSheet
             open={showMentions}
             onOpenChange={setShowMentions}
             query={mentionQuery}
             onSelect={handleMentionSelect}
             zIndex={110}
+            bottomOffset={72 + keyboardOffset}
           />
 
           {/* Action Sheet */}
