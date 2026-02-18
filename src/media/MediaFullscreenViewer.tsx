@@ -21,6 +21,7 @@ import { useMediaSystemSafe } from './MediaSystemProvider';
 import { runtimeSetModalOpen, runtimeUserMute, runtimeClearOnFullscreenClose } from './runtime';
 import { MediaRuntime } from './runtime/MediaRuntime';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
+import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 
 // Warm pool size: preload ±1 adjacent videos
 const WARM_POOL_SIZE = 1;
@@ -93,7 +94,10 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
   const playerRef = useRef<UnifiedVideoPlayerRef>(null);
   const prevPlayerRef = useRef<UnifiedVideoPlayerRef>(null);
   const nextPlayerRef = useRef<UnifiedVideoPlayerRef>(null);
-  const { isMuted, setMuted, pauseAll } = useMediaSystemSafe();
+  // CHANGE 5: Use GlobalAudioContext as single source of truth for mute state.
+  // Previously used useMediaSystemSafe().isMuted which is a separate, unsynchronised system.
+  const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
+  const { pauseAll } = useMediaSystemSafe();
   
   const currentItem = items[currentIndex];
   const prevItem = items[currentIndex - 1];
@@ -144,7 +148,7 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
         case 'm':
         case 'M':
           runtimeUserMute();
-          setMuted(!isMuted);
+          setGlobalMute(!isGloballyMuted);
           break;
         case ' ':
           e.preventDefault();
@@ -162,7 +166,7 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
     
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose, goToNext, goToPrevious, isMuted, setMuted]);
+  }, [isOpen, onClose, goToNext, goToPrevious, isGloballyMuted, setGlobalMute]);
   
   const swipeHandlers = useSwipeable({
     onSwipedUp: orientation === 'vertical' ? goToNext : undefined,
@@ -257,7 +261,7 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
             src={currentItem.src}
             posterUrl={currentItem.poster}
             autoplay
-            muted={isMuted}
+            muted={isGloballyMuted}
             loop
             showMuteButton={false}
             objectFit="contain"
@@ -327,12 +331,12 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
         <button
           onClick={() => {
             runtimeUserMute();
-            setMuted(!isMuted);
+            setGlobalMute(!isGloballyMuted);
           }}
           className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-black/65 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white hover:bg-black/80 transition-colors"
-          aria-label={isMuted ? 'Unmute' : 'Mute'}
+          aria-label={isGloballyMuted ? 'Unmute' : 'Mute'}
         >
-          {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+          {isGloballyMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
         </button>
       )}
       
