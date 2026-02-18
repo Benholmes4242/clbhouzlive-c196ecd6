@@ -525,7 +525,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                         key={search.id}
                         onClick={() => handleRecentSearchClick(search.query)}
                         className={cn(
-                          "px-4 py-2.5 text-sm font-medium rounded-full transition-all active:scale-[0.97]",
+                          "max-w-[200px] truncate px-4 py-2.5 text-sm font-medium rounded-full transition-all active:scale-[0.97]",
                           useLightTheme 
                             ? "bg-muted hover:bg-muted/80 text-foreground hover:shadow-sm" 
                             : "bg-white/10 hover:bg-white/15 text-white/80"
@@ -705,12 +705,7 @@ const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, g
         
         {/* Business indicator badge */}
         {item.type === 'business' && (
-          <div className={cn(
-            "absolute bottom-[-4px] left-[-4px] w-5 h-5 rounded-full flex items-center justify-center border-2",
-            useLightTheme 
-              ? "bg-purple-500 border-background" 
-              : "bg-purple-500 border-black/80"
-          )}>
+          <div className="absolute bottom-[-4px] left-[-4px] w-5 h-5 rounded-full flex items-center justify-center border-2 bg-purple-500" style={{ borderColor: '#F8FAFC' }}>
             <Building className="w-2.5 h-2.5 text-white" />
           </div>
         )}
