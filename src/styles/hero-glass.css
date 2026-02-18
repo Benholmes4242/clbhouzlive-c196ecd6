@@ -253,12 +253,12 @@
    7. WINNER STATE - Large Hero Treatment
    ============================================ */
 
-/* Winner section - Centered hero treatment */
+/* Winner section - Left-aligned (matches upcoming and live states) */
 .winner-section {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 12px 0 0;
+  align-items: flex-start;
+  padding: 8px 0 0;
 }
 
 .winner-avatar {
@@ -292,16 +292,17 @@
 
 .winner-name-large {
   font-weight: 700;
-  font-size: 17px;
+  font-size: 16px;
   color: #FFFFFF;
-  margin-top: 8px;
+  margin-top: 0;
 }
 
+/* Note: winner-score-large color is now set inline via getScoreColor() — not hardcoded here */
 .winner-score-large {
   font-family: 'JetBrains Mono', 'SF Mono', 'Courier New', monospace;
   font-weight: 700;
   font-size: 16px;
-  color: #FACC15;
+  /* color intentionally NOT set here — use getScoreColor() inline */
   margin-top: 2px;
 }
 

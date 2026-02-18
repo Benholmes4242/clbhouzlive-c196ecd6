@@ -19,6 +19,35 @@ import { useSingleCourseImage } from '../../hooks/useCourseImageResolver';
 import { getCourseImage } from '../../utils/placeholders';
 import '@/styles/hero-glass.css';
 
+/** Canonical score color */
+function getScoreColor(score: number | null): string {
+  if (score === null || score === undefined) return 'rgba(255,255,255,0.7)';
+  if (score < 0) return '#22C55E';
+  if (score > 0) return '#EF4444';
+  return 'rgba(255,255,255,0.7)';
+}
+
+/** Player avatar for carousel live card */
+function PlayerAvatar({ photoUrl, displayName, size = 44 }: { photoUrl: string | null; displayName: string; size?: number }) {
+  const [imgError, setImgError] = useState(false);
+  const initials = displayName.split(/[\s.]/).filter(Boolean).map(w => w[0]?.toUpperCase() || '').slice(0, 2).join('');
+  return (
+    <div style={{
+      width: size, height: size, borderRadius: '50%', overflow: 'hidden', flexShrink: 0,
+      border: '1.5px solid rgba(255,255,255,0.25)', background: 'rgba(255,255,255,0.10)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+    }}>
+      {photoUrl && !imgError ? (
+        <img src={photoUrl} alt={displayName}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }}
+          onError={() => setImgError(true)} />
+      ) : (
+        <span style={{ fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.65)', lineHeight: 1 }}>{initials || '?'}</span>
+      )}
+    </div>
+  );
+}
+
 interface LiveHeroCarouselProps {
   tournaments: TourTournament[];
   leadersMap?: Map<string, TournamentLeaderWinner>;
@@ -32,12 +61,7 @@ function getTourLabel(tourCode?: string): string {
   return labels[tourCode || ''] || 'TOUR';
 }
 
-function getScoreClass(score: number | null): string {
-  if (score === null || score === undefined) return '';
-  if (score < 0) return 'score-under';
-  if (score > 0) return 'score-over';
-  return 'score-even';
-}
+// getScoreClass removed — using getScoreColor() directly
 
 function LiveSlide({ tournament, leader }: { tournament: TourTournament; leader?: TournamentLeaderWinner }) {
   const navigate = useNavigate();
@@ -144,22 +168,30 @@ function LiveSlide({ tournament, leader }: { tournament: TourTournament; leader?
           {tournament.venue_city && ` · ${tournament.venue_city}`}
         </button>
 
-        {/* Row 4: Leader */}
+        {/* Row 4: Leader with photo */}
         {leader && (
-          <div className="flex items-center gap-1.5" style={{ marginTop: '8px' }}>
-            <span style={{ fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>
-              Leader:{' '}
-            </span>
-            <button
-              onClick={handlePlayerTap}
-              className="transition-opacity active:opacity-70"
-              style={{ fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}
-            >
-              {leader.displayName}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10 }}>
+            <button onClick={handlePlayerTap} className="transition-opacity active:opacity-70">
+              <PlayerAvatar photoUrl={leader.photoUrl ?? null} displayName={leader.displayName} size={44} />
             </button>
-            <span className={`score-mono ${getScoreClass(leader.score)}`} style={{ fontSize: '16px', fontWeight: 700 }}>
-              {leader.displayScore}
-            </span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <button
+                  onClick={handlePlayerTap}
+                  className="transition-opacity active:opacity-70"
+                  style={{ fontSize: '15px', fontWeight: 700, color: 'rgba(255,255,255,0.95)' }}
+                >
+                  {leader.displayName}
+                </button>
+                <span
+                  className="score-mono"
+                  style={{ fontSize: '16px', fontWeight: 700, color: getScoreColor(leader.score), flexShrink: 0 }}
+                >
+                  {leader.displayScore}
+                </span>
+              </div>
+              <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)', marginTop: 1, display: 'block' }}>Leader</span>
+            </div>
           </div>
         )}
 

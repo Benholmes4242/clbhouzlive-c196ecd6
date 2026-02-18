@@ -1,26 +1,33 @@
 /**
- * useTournamentLeadersWinners - Fetches position=1 entries for live & completed tournaments
+ * useTournamentLeadersWinners - Fetches top 3 positions for live & completed tournaments
  * 
- * Returns a map of tournament_id → { name, score } for:
- * - Live tournaments: current leader
- * - Completed tournaments: winner
+ * Returns a map of tournament_id → { leader/winner + topFinishers[1-3] }
+ * - Live tournaments: current leader + top 3
+ * - Completed tournaments: winner + podium top 3
  * 
- * Single query, minimal payload.
+ * Includes player photo_url for avatar rendering.
  */
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-export interface TournamentLeaderWinner {
+export interface TournamentFinisher {
   playerId: string | null;
   firstName: string;
   lastName: string;
   score: number | null;
   money: number | null;
+  position: number;
+  photoUrl: string | null;
   /** Formatted display: "S. Scheffler" */
   displayName: string;
   /** Formatted score: "-12" or "E" or "+3" */
   displayScore: string;
+}
+
+export interface TournamentLeaderWinner extends TournamentFinisher {
+  /** All top 3 finishers (positions 1–3), winner/leader first */
+  topFinishers: TournamentFinisher[];
 }
 
 function formatScore(score: number | null): string {
@@ -38,7 +45,7 @@ function formatDisplayName(firstName: string | null, lastName: string | null): s
 
 export function useTournamentLeadersWinners(tournamentIds: string[]) {
   return useQuery({
-    queryKey: ['tourhub', 'tournament-leaders-winners', tournamentIds.sort().join(',')],
+    queryKey: ['tourhub', 'tournament-leaders-winners-v2', tournamentIds.sort().join(',')],
     queryFn: async (): Promise<Map<string, TournamentLeaderWinner>> => {
       if (tournamentIds.length === 0) return new Map();
 
@@ -52,43 +59,66 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
           player_id,
           player:sr_players!sr_leaderboards_player_id_fkey (
             first_name,
-            last_name
+            last_name,
+            photo_url
           )
         `)
         .in('tournament_id', tournamentIds)
-        .eq('position', 1);
+        .lte('position', 3)
+        .order('tournament_id', { ascending: true })
+        .order('position', { ascending: true });
 
       if (error) {
         console.error('[useTournamentLeadersWinners]', error.message);
         return new Map();
       }
 
-      const result = new Map<string, TournamentLeaderWinner>();
+      // Group by tournament_id, then by position (take first occurrence per position)
+      const byTournament = new Map<string, TournamentFinisher[]>();
 
       for (const entry of data || []) {
-        // Skip if we already have an entry for this tournament (take first position=1)
-        if (result.has(entry.tournament_id)) continue;
+        const tid = entry.tournament_id;
+        if (!byTournament.has(tid)) byTournament.set(tid, []);
+        
+        const existing = byTournament.get(tid)!;
+        // Skip if we already have this position for this tournament
+        if (existing.some(f => f.position === entry.position)) continue;
 
         const player = entry.player as any;
         const firstName = player?.first_name || null;
         const lastName = player?.last_name || null;
 
-        result.set(entry.tournament_id, {
+        existing.push({
           playerId: entry.player_id || null,
           firstName: firstName || '',
           lastName: lastName || '',
           score: entry.score,
           money: entry.money,
+          position: entry.position,
+          photoUrl: player?.photo_url || null,
           displayName: formatDisplayName(firstName, lastName),
           displayScore: formatScore(entry.score),
+        });
+      }
+
+      const result = new Map<string, TournamentLeaderWinner>();
+
+      for (const [tid, finishers] of byTournament) {
+        const sorted = finishers.sort((a, b) => a.position - b.position);
+        const leader = sorted[0];
+        if (!leader) continue;
+
+        result.set(tid, {
+          ...leader,
+          topFinishers: sorted,
         });
       }
 
       return result;
     },
     enabled: tournamentIds.length > 0,
-    staleTime: 5_000,              // 5s — Realtime handles freshness
-    refetchInterval: false,        // No polling — Realtime pushes updates
+    staleTime: 5_000,
+    refetchInterval: false,
     refetchOnWindowFocus: true,
   });
 }
