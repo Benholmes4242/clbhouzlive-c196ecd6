@@ -4,6 +4,8 @@
  */
 
 import React from 'react';
+import type { WinnerStats } from '../../hooks/useWinnerScorecardStats';
+import type { WinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import type { TournamentFinisher } from '../../hooks/useTournamentLeadersWinners';
@@ -227,4 +229,176 @@ export function calcWinningMargin(
   const margin = runnerUpScore - winnerScore;
   if (margin === 0) return 'Won in playoff';
   return `Won by ${margin} stroke${margin === 1 ? '' : 's'}`;
+}
+
+// ─── StatChip ────────────────────────────────────────────────────────────────
+
+export function StatChip({
+  value,
+  label,
+  suffix,
+  color,
+}: {
+  value: string | number;
+  label: string;
+  suffix?: string;
+  color?: string;
+}) {
+  return (
+    <div style={{
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: 3,
+      padding: '8px 4px',
+      background: 'rgba(255,255,255,0.06)',
+      border: '1px solid rgba(255,255,255,0.08)',
+      borderRadius: 10,
+      minWidth: 0,
+    }}>
+      <span style={{
+        fontSize: 15,
+        fontWeight: 700,
+        color: color ?? '#FFFFFF',
+        fontFamily: "'JetBrains Mono','SF Mono',monospace",
+        lineHeight: 1,
+        whiteSpace: 'nowrap',
+      }}>
+        {value}{suffix && (
+          <span style={{ fontSize: 10, fontWeight: 500, opacity: 0.65 }}>{suffix}</span>
+        )}
+      </span>
+      <span style={{
+        fontSize: 9,
+        fontWeight: 600,
+        color: 'rgba(255,255,255,0.45)',
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
+        lineHeight: 1,
+        textAlign: 'center',
+      }}>
+        {label}
+      </span>
+    </div>
+  );
+}
+
+// ─── WinnerStatsPanel ─────────────────────────────────────────────────────────
+
+export function WinnerStatsPanel({
+  tournamentStats,
+  seasonStats,
+}: {
+  tournamentStats: WinnerStats | null | undefined;
+  seasonStats: WinnerSeasonStats | null | undefined;
+}) {
+  const hasTournament = !!tournamentStats;
+  const hasSeason = !!(
+    seasonStats &&
+    (seasonStats.drivingDistance || seasonStats.drivingAccuracy || seasonStats.greensInReg || seasonStats.puttingAverage)
+  );
+
+  if (!hasTournament && !hasSeason) return null;
+
+  return (
+    <div style={{
+      marginTop: 12,
+      padding: 12,
+      background: 'rgba(255,255,255,0.04)',
+      border: '1px solid rgba(255,255,255,0.06)',
+      borderRadius: 14,
+    }}>
+      {/* Tournament Stats */}
+      {hasTournament && (
+        <>
+          <div style={{
+            fontSize: 9,
+            fontWeight: 700,
+            letterSpacing: 1.5,
+            textTransform: 'uppercase' as const,
+            color: 'rgba(255,255,255,0.25)',
+            marginBottom: 6,
+          }}>
+            Tournament
+          </div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            {tournamentStats!.holesInOne > 0 && (
+              <StatChip
+                value={tournamentStats!.holesInOne}
+                label={tournamentStats!.holesInOne === 1 ? 'Hole-in-1' : 'Holes-in-1'}
+                color="rgba(250,204,21,0.95)"
+              />
+            )}
+            {tournamentStats!.eagles > 0 && (
+              <StatChip
+                value={tournamentStats!.eagles}
+                label={tournamentStats!.eagles === 1 ? 'Eagle' : 'Eagles'}
+                color="rgba(250,204,21,0.9)"
+              />
+            )}
+            <StatChip
+              value={tournamentStats!.birdies}
+              label="Birdies"
+              color="rgba(74,222,128,0.9)"
+            />
+            <StatChip value={tournamentStats!.pars} label="Pars" />
+            {tournamentStats!.bogeys > 0 && (
+              <StatChip
+                value={tournamentStats!.bogeys}
+                label="Bogeys"
+                color="rgba(251,146,60,0.75)"
+              />
+            )}
+          </div>
+        </>
+      )}
+
+      {/* Season Averages */}
+      {hasSeason && (
+        <>
+          <div style={{
+            fontSize: 9,
+            fontWeight: 700,
+            letterSpacing: 1.5,
+            textTransform: 'uppercase' as const,
+            color: 'rgba(255,255,255,0.25)',
+            marginTop: hasTournament ? 10 : 0,
+            marginBottom: 6,
+          }}>
+            Season Averages
+          </div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            {seasonStats!.drivingDistance && (
+              <StatChip
+                value={Math.round(seasonStats!.drivingDistance)}
+                label="Drive"
+                suffix=" yd"
+              />
+            )}
+            {seasonStats!.drivingAccuracy && (
+              <StatChip
+                value={seasonStats!.drivingAccuracy.toFixed(1)}
+                label="Fairways"
+                suffix="%"
+              />
+            )}
+            {seasonStats!.greensInReg && (
+              <StatChip
+                value={seasonStats!.greensInReg.toFixed(1)}
+                label="GIR"
+                suffix="%"
+              />
+            )}
+            {seasonStats!.puttingAverage && (
+              <StatChip
+                value={seasonStats!.puttingAverage.toFixed(2)}
+                label="Putts"
+              />
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  );
 }
