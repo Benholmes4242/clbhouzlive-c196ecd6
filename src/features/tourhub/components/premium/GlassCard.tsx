@@ -20,7 +20,7 @@ export const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
         className={cn(
           'th-glass rounded-3xl',
           variant === 'elevated' && 'shadow-[var(--th-shadow-elevated)]',
-          variant === 'subtle' && 'bg-white/5 border-white/8',
+          variant === 'subtle' && 'opacity-80',
           hover && 'th-glass-hover transition-all duration-300',
           className
         )}

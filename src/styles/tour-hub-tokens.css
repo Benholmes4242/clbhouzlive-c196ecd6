@@ -45,13 +45,13 @@
   --th-status-complete: linear-gradient(135deg, #8E8E93 0%, #636366 100%);
 
   /* ========================================
-     TOUR HUB GLASSMORPHISM
+     TOUR HUB GLASSMORPHISM — aligned to canonical glass spec
      ======================================== */
-  --th-glass-bg: rgba(255, 255, 255, 0.08);
-  --th-glass-bg-hover: rgba(255, 255, 255, 0.12);
-  --th-glass-border: rgba(255, 255, 255, 0.12);
-  --th-glass-border-light: rgba(255, 255, 255, 0.2);
-  --th-glass-blur: 40px;
+  --th-glass-bg: var(--glass-bg);           /* rgba(0,0,0,0.35) */
+  --th-glass-bg-hover: rgba(0, 0, 0, 0.45);
+  --th-glass-border: var(--glass-border);   /* rgba(255,255,255,0.10) */
+  --th-glass-border-light: rgba(255, 255, 255, 0.15);
+  --th-glass-blur: var(--glass-blur);       /* 20px */
 
   /* ========================================
      TOUR HUB SHADOWS & DEPTH
@@ -94,12 +94,13 @@
    TOUR HUB UTILITY CLASSES
    ============================================================================ */
 
-/* Glass morphism cards */
+/* Glass morphism cards — canonical spec */
 .th-glass {
   background: var(--th-glass-bg);
   backdrop-filter: blur(var(--th-glass-blur));
   -webkit-backdrop-filter: blur(var(--th-glass-blur));
   border: 1px solid var(--th-glass-border);
+  box-shadow: var(--glass-shadow);
 }
 
 .th-glass-hover:hover {

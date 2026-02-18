@@ -27,9 +27,11 @@ export const GlassCard: React.FC<GlassCardProps> = ({
         className
       )}
       style={{
-        background: 'var(--glass-bg, hsl(var(--muted) / 0.85))',
-        borderColor: 'var(--border-hairline, rgba(255, 255, 255, 0.15))',
-        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
+        background: 'var(--glass-bg)',
+        backdropFilter: 'blur(var(--glass-blur))',
+        WebkitBackdropFilter: 'blur(var(--glass-blur))',
+        borderColor: 'var(--glass-border)',
+        boxShadow: 'var(--glass-shadow)',
         ...props.style
       }}
       {...props}
