@@ -10,6 +10,7 @@ interface PostingAsPillProps {
   isOpen: boolean;
   hasUnreadNotifications?: boolean;
   useLightTheme?: boolean;
+  useGlassTheme?: boolean; // Clubhouse frosted-glass treatment
   isDimmed?: boolean; // When true, pill becomes transparent
 }
 
@@ -18,7 +19,7 @@ interface PostingAsPillProps {
  * Uses forwardRef to allow parent to get anchor position for desktop popover
  */
 export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
-  ({ onClick, isOpen, hasUnreadNotifications = false, useLightTheme = false, isDimmed = false }, ref) => {
+  ({ onClick, isOpen, hasUnreadNotifications = false, useLightTheme = false, useGlassTheme = false, isDimmed = false }, ref) => {
     const { activeActor, isLoading } = useActiveActor();
     
     // Get unread messages count from messaging system
@@ -60,12 +61,20 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
     // Get styles based on theme and dim state
     const getPillStyles = () => {
       if (isDimmed) {
-        // Transparent when dimmed (both light and dark themes)
         return {
           background: 'transparent',
           border: '1px solid transparent',
           backdropFilter: 'none',
           WebkitBackdropFilter: 'none',
+        };
+      }
+      if (useGlassTheme) {
+        return {
+          background: 'rgba(0, 0, 0, 0.35)',
+          border: '1px solid rgba(255, 255, 255, 0.10)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
         };
       }
       if (useLightTheme) {
@@ -88,11 +97,13 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
             "rounded-xl transition-all duration-500",
             "max-w-[160px] min-w-0",
             "active:scale-[0.97]",
-            useLightTheme 
-              ? "hover:opacity-90" 
-              : isDimmed
-                ? "" // No bg classes when dimmed
-                : "bg-white/5 border border-white/10 hover:bg-white/10 active:bg-white/15"
+            useGlassTheme
+              ? "hover:brightness-110"
+              : useLightTheme 
+                ? "hover:opacity-90" 
+                : isDimmed
+                  ? ""
+                  : "bg-white/5 border border-white/10 hover:bg-white/10 active:bg-white/15"
           )}
           style={getPillStyles()}
         >
@@ -132,7 +143,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
         {/* Name */}
         <span className={cn(
           "text-sm font-medium truncate max-w-[100px] leading-none",
-          useLightTheme ? "text-foreground" : "text-white"
+          (useLightTheme && !useGlassTheme) ? "text-foreground" : "text-white"
         )}>
           {activeActor.name}
         </span>
@@ -141,7 +152,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
         <ChevronDown 
           className={cn(
             "h-3 w-3 flex-shrink-0 transition-transform duration-200",
-            useLightTheme ? "text-muted-foreground" : "text-white/50",
+            (useLightTheme && !useGlassTheme) ? "text-muted-foreground" : "text-white/70",
             isOpen && "rotate-180"
           )} 
         />
