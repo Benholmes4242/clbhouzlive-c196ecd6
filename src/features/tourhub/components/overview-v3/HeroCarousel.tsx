@@ -195,13 +195,30 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
   // Podium data for completed slides
   const podiumData = isCompleted ? leadersWinnersMap?.get(tournament.id) : undefined;
   const topFinishers = podiumData?.topFinishers ?? [];
+  const allFetched = podiumData?.allFetched ?? topFinishers;
   const podiumWinner = topFinishers[0];
   const podiumRunnerUp = topFinishers[1];
   const podiumThird = topFinishers[2];
-  const winningMargin = calcWinningMargin(
-    podiumWinner?.score ?? null,
-    podiumRunnerUp?.score ?? null,
-  );
+
+  // Helper: is this position tied?
+  const isPodiumPositionTied = (position: number) =>
+    allFetched.filter(f => f.position === position).length > 1;
+
+  // Count extra tied players not shown on card
+  const lastShownPos = podiumThird?.position ?? podiumRunnerUp?.position;
+  const podiumExtraTied = lastShownPos != null
+    ? allFetched.filter(f => f.position === lastShownPos).length
+      - topFinishers.filter(f => f.position === lastShownPos).length
+    : 0;
+
+  const winningMargin = podiumWinner && podiumRunnerUp
+    ? calcWinningMargin(
+        podiumWinner.score ?? null,
+        podiumRunnerUp.score ?? null,
+        podiumWinner.position,
+        podiumRunnerUp.position,
+      )
+    : null;
 
   const handlePlayerTap = (playerId: string | null | undefined) => (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -488,8 +505,32 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     {/* Runners-up */}
                     {(podiumRunnerUp || podiumThird) && (
                       <div style={{ marginTop: 6 }}>
-                        {podiumRunnerUp && <RunnerUpRow finisher={podiumRunnerUp} onPlayerTap={handlePlayerTap(podiumRunnerUp.playerId)} />}
-                        {podiumThird && <RunnerUpRow finisher={podiumThird} onPlayerTap={handlePlayerTap(podiumThird.playerId)} />}
+                        {podiumRunnerUp && (
+                          <RunnerUpRow
+                            finisher={podiumRunnerUp}
+                            isTied={isPodiumPositionTied(podiumRunnerUp.position)}
+                            onPlayerTap={handlePlayerTap(podiumRunnerUp.playerId)}
+                          />
+                        )}
+                        {podiumThird && (
+                          <RunnerUpRow
+                            finisher={podiumThird}
+                            isTied={isPodiumPositionTied(podiumThird.position)}
+                            onPlayerTap={handlePlayerTap(podiumThird.playerId)}
+                          />
+                        )}
+                        {podiumExtraTied > 0 && (
+                          <span style={{
+                            fontSize: 11,
+                            fontWeight: 500,
+                            color: 'rgba(255,255,255,0.4)',
+                            display: 'block',
+                            marginTop: 2,
+                            paddingLeft: 28,
+                          }}>
+                            +{podiumExtraTied} {podiumExtraTied === 1 ? 'other' : 'others'} tied
+                          </span>
+                        )}
                       </div>
                     )}
                   </div>
