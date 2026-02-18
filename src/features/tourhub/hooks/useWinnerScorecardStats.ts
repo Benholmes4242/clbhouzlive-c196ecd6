@@ -18,26 +18,30 @@ export function useWinnerScorecardStats(
   return useQuery({
     queryKey: ['winner-scorecard-stats', tournamentId, playerId],
     queryFn: async (): Promise<WinnerStats | null> => {
-      console.log('[WINNER-STATS] Fetching for tournament:', tournamentId, 'player:', playerId);
       if (!tournamentId || !playerId) return null;
 
       const { data, error } = await supabase
-        .from('sr_scorecards')
-        .select('birdies, eagles, pars, bogeys, double_bogeys, holes_in_one, round_score')
+        .from('sr_leaderboards')
+        .select('raw_data')
         .eq('tournament_id', tournamentId)
-        .eq('player_id', playerId);
+        .eq('player_id', playerId)
+        .maybeSingle();
 
-      console.log('[WINNER-STATS] Result:', { rows: data?.length, error: error?.message });
-      if (error || !data || data.length === 0) return null;
+      if (error || !data?.raw_data) return null;
+
+      const rawData = data.raw_data as any;
+      const rounds: any[] = rawData?.rounds ?? [];
+
+      if (rounds.length === 0) return null;
 
       return {
-        birdies:     data.reduce((sum, r) => sum + (r.birdies      ?? 0), 0),
-        eagles:      data.reduce((sum, r) => sum + (r.eagles       ?? 0), 0),
-        pars:        data.reduce((sum, r) => sum + (r.pars         ?? 0), 0),
-        bogeys:      data.reduce((sum, r) => sum + (r.bogeys       ?? 0), 0),
-        doubleBogeys:data.reduce((sum, r) => sum + (r.double_bogeys ?? 0), 0),
-        holesInOne:  data.reduce((sum, r) => sum + (r.holes_in_one  ?? 0), 0),
-        rounds:      data.length,
+        birdies:      rounds.reduce((sum, r) => sum + (r.birdies       ?? 0), 0),
+        eagles:       rounds.reduce((sum, r) => sum + (r.eagles        ?? 0), 0),
+        pars:         rounds.reduce((sum, r) => sum + (r.pars          ?? 0), 0),
+        bogeys:       rounds.reduce((sum, r) => sum + (r.bogeys        ?? 0), 0),
+        doubleBogeys: rounds.reduce((sum, r) => sum + (r.double_bogeys ?? 0), 0),
+        holesInOne:   rounds.reduce((sum, r) => sum + (r.holes_in_one  ?? 0), 0),
+        rounds:       rounds.length,
       };
     },
     enabled: !!tournamentId && !!playerId,
