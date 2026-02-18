@@ -1,8 +1,9 @@
 /**
  * useAudioFade - Smooth audio volume transitions
  * 
- * FIX #10: Implements smooth 150ms volume fade instead of abrupt mute/unmute.
- * Uses requestAnimationFrame for butter-smooth transitions.
+ * MUTE ARCHITECTURE FIX: This hook ONLY manipulates video.volume, NEVER video.muted.
+ * The .muted property is exclusively controlled by GlobalAudioContext → UnifiedVideoPlayer's
+ * useEffect sync. This prevents drift between DOM state and React state.
  */
 
 import { useCallback, useRef } from 'react';
@@ -17,7 +18,7 @@ interface UseAudioFadeOptions {
 interface AudioFadeControls {
   /** Fade in from 0 to target volume */
   fadeIn: (video: HTMLVideoElement, targetVolume?: number) => Promise<void>;
-  /** Fade out from current volume to 0 */
+  /** Fade out from current volume to 0, then pause */
   fadeOut: (video: HTMLVideoElement) => Promise<void>;
   /** Cancel any ongoing fade */
   cancel: () => void;
@@ -37,26 +38,34 @@ export const useAudioFade = (options: UseAudioFadeOptions = {}): AudioFadeContro
   
   const animationFrameRef = useRef<number | null>(null);
   const isFadingRef = useRef(false);
+  // Cancellation flag checked on every rAF frame to stop mid-fade overrides
+  const cancelledRef = useRef(false);
 
   const cancel = useCallback(() => {
     if (animationFrameRef.current !== null) {
       cancelAnimationFrame(animationFrameRef.current);
       animationFrameRef.current = null;
     }
+    cancelledRef.current = true;
     isFadingRef.current = false;
   }, []);
 
+  /**
+   * Fade volume from 0 → targetVolume.
+   * IMPORTANT: Does NOT touch video.muted — that is GlobalAudioContext's responsibility.
+   * Caller should ensure video.muted = false BEFORE calling fadeIn (done by the mute sync effect).
+   */
   const fadeIn = useCallback((video: HTMLVideoElement, targetVolume: number = 1): Promise<void> => {
     return new Promise((resolve) => {
       cancel(); // Cancel any existing fade
+      cancelledRef.current = false;
       
       if (!video) {
         resolve();
         return;
       }
 
-      // Unmute first, then fade volume
-      video.muted = false;
+      // Only manipulate volume — never .muted
       const startVolume = 0;
       video.volume = startVolume;
       
@@ -64,6 +73,12 @@ export const useAudioFade = (options: UseAudioFadeOptions = {}): AudioFadeContro
       isFadingRef.current = true;
       
       const animate = (currentTime: number) => {
+        // Check cancellation on every frame — prevents stale rAF overriding a new user tap
+        if (cancelledRef.current) {
+          resolve();
+          return;
+        }
+
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
         const easedProgress = easings[easing](progress);
@@ -84,9 +99,16 @@ export const useAudioFade = (options: UseAudioFadeOptions = {}): AudioFadeContro
     });
   }, [duration, easing, cancel]);
 
+  /**
+   * Fade volume from current → 0, then pause the video.
+   * IMPORTANT: Does NOT set video.muted = true — that is GlobalAudioContext's responsibility.
+   * Pausing the video (rather than muting) is the correct scroll-away behaviour:
+   * it silences audio without lying to the global mute state.
+   */
   const fadeOut = useCallback((video: HTMLVideoElement): Promise<void> => {
     return new Promise((resolve) => {
       cancel(); // Cancel any existing fade
+      cancelledRef.current = false;
       
       if (!video) {
         resolve();
@@ -94,12 +116,10 @@ export const useAudioFade = (options: UseAudioFadeOptions = {}): AudioFadeContro
       }
 
       const startVolume = video.volume;
-      const targetVolume = 0;
       
-      // If already at 0, just mute and resolve
+      // If already silent, just pause and resolve — no need to animate
       if (startVolume <= 0.01) {
-        video.muted = true;
-        video.volume = 0;
+        video.pause();
         resolve();
         return;
       }
@@ -108,17 +128,24 @@ export const useAudioFade = (options: UseAudioFadeOptions = {}): AudioFadeContro
       isFadingRef.current = true;
       
       const animate = (currentTime: number) => {
+        // Check cancellation on every frame
+        if (cancelledRef.current) {
+          resolve();
+          return;
+        }
+
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
         const easedProgress = easings[easing](progress);
         
-        video.volume = startVolume - (startVolume - targetVolume) * easedProgress;
+        video.volume = startVolume - (startVolume - 0) * easedProgress;
         
         if (progress < 1) {
           animationFrameRef.current = requestAnimationFrame(animate);
         } else {
           video.volume = 0;
-          video.muted = true; // Mute after fade completes
+          // Pause instead of muting — keeps DOM .muted in sync with GlobalAudioContext
+          video.pause();
           isFadingRef.current = false;
           animationFrameRef.current = null;
           resolve();
@@ -140,7 +167,8 @@ export const useAudioFade = (options: UseAudioFadeOptions = {}): AudioFadeContro
 };
 
 /**
- * Standalone fade functions for use outside React components
+ * Standalone fade functions for use outside React components.
+ * Same contract: only manipulate .volume, never .muted.
  */
 export const audioFadeIn = (
   video: HTMLVideoElement, 
@@ -153,7 +181,7 @@ export const audioFadeIn = (
       return;
     }
 
-    video.muted = false;
+    // Do NOT set video.muted = false here — GlobalAudioContext owns that
     video.volume = 0;
     
     const startTime = performance.now();
@@ -190,8 +218,8 @@ export const audioFadeOut = (
     const startVolume = video.volume;
     
     if (startVolume <= 0.01) {
-      video.muted = true;
-      video.volume = 0;
+      // Already silent — just pause, don't touch .muted
+      video.pause();
       resolve();
       return;
     }
@@ -209,7 +237,8 @@ export const audioFadeOut = (
         requestAnimationFrame(animate);
       } else {
         video.volume = 0;
-        video.muted = true;
+        // Pause instead of muting — keeps DOM .muted in sync with GlobalAudioContext
+        video.pause();
         resolve();
       }
     };

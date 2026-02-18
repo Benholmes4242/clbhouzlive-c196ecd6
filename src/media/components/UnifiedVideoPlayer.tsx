@@ -365,11 +365,39 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
     }), [playbackState, isMutedState, hlsUrl]);
 
     // ============ Sync Muted State ============
+    // Belt-and-suspenders: keep DOM .muted in sync with the muted prop from GlobalAudioContext.
+    // This effect is the primary mechanism — the playing enforcer below is the safety net.
     useEffect(() => {
       setIsMutedState(muted);
       if (videoRef.current) {
         videoRef.current.muted = muted;
+        // Restore volume when unmuting so audio is audible
+        if (!muted && videoRef.current.volume === 0) {
+          videoRef.current.volume = 1;
+        }
       }
+    }, [muted]);
+
+    // ============ Change 7: Playing Event Enforcer ============
+    // Every time the video transitions to "playing" (including after buffering stalls,
+    // seeks, gesture retries, or source changes), re-apply the global mute state.
+    // This is the ultimate safety net against any drift from any source.
+    useEffect(() => {
+      const video = videoRef.current;
+      if (!video) return;
+
+      const enforceGlobalMute = () => {
+        if (video.muted !== muted) {
+          video.muted = muted;
+        }
+        // Also ensure volume is non-zero when unmuted
+        if (!muted && video.volume === 0) {
+          video.volume = 1;
+        }
+      };
+
+      video.addEventListener('playing', enforceGlobalMute);
+      return () => video.removeEventListener('playing', enforceGlobalMute);
     }, [muted]);
 
     // ============ Video Element Lifecycle Logging ============

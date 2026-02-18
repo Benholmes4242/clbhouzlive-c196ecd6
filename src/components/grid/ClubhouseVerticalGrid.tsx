@@ -1312,7 +1312,19 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
               onMeaningfulInteraction?.();
             }}
             onMuteToggle={() => {
-              setGlobalMute(!isGloballyMuted);
+              const newMuted = !isGloballyMuted;
+              // Update global state (drives all future renders via prop)
+              setGlobalMute(newMuted);
+              // Synchronous DOM mutation — takes effect immediately within the gesture call stack,
+              // critical for iOS WebView which requires synchronous unmute inside a user gesture.
+              const currentPostId = filteredPosts[currentIndex]?.id;
+              if (currentPostId) {
+                const activeVideoEl = videoRefs.current[currentPostId];
+                if (activeVideoEl) {
+                  activeVideoEl.muted = newMuted;
+                  activeVideoEl.volume = newMuted ? 0 : 1;
+                }
+              }
               onMeaningfulInteraction?.();
             }}
             onMore={() => {
