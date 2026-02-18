@@ -204,6 +204,8 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
   const runnerUp = topFinishers[1];
   const third = topFinishers[2];
 
+  console.log('[HERO] isRecent:', isRecent, 'leaderWinner:', JSON.stringify(leaderWinner), 'topFinishers count:', topFinishers.length);
+
   const winningMargin = (() => {
     if (!winner || runnerUp === undefined) return null;
     if (winner.score === null || runnerUp.score === null) return null;
