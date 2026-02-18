@@ -39,27 +39,47 @@ export async function resolveUsernames(usernames: string[]): Promise<{ id: strin
 }
 
 /**
- * Resolve usernames against taggable_entities to get both users AND businesses
+ * Resolve slug usernames against taggable_entities.
+ * Handles both exact matches (tomholmes42) and slug variants
+ * (danny_holmes → "danny holmes" or "dannyholmes").
  */
 async function resolveAllMentions(usernames: string[]): Promise<ResolvedMention[]> {
   if (usernames.length === 0) return [];
 
-  const { data, error } = await supabase
-    .from('taggable_entities')
-    .select('entity_id, entity_type, username')
-    .in('username', usernames)
-    .in('entity_type', ['user', 'business']);
+  const results: ResolvedMention[] = [];
 
-  if (error) {
-    console.error('Error resolving mentions from taggable_entities:', error);
-    return [];
+  for (const slug of usernames) {
+    const withSpaces = slug.replace(/_/g, ' ');
+    const withoutSeparators = slug.replace(/_/g, '');
+
+    // Build OR clause covering exact slug, space variant, and no-separator variant
+    const orClause = [slug, withSpaces, withoutSeparators]
+      .filter((v, i, arr) => arr.indexOf(v) === i) // dedupe
+      .map(v => `username.ilike.${v}`)
+      .join(',');
+
+    const { data, error } = await supabase
+      .from('taggable_entities')
+      .select('entity_id, entity_type, username')
+      .or(orClause)
+      .in('entity_type', ['user', 'business'])
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error resolving mention for', slug, error);
+      continue;
+    }
+    if (data) {
+      results.push({
+        entity_id: data.entity_id,
+        entity_type: data.entity_type as 'user' | 'business',
+        username: data.username || slug,
+      });
+    }
   }
 
-  return (data || []).map(d => ({
-    entity_id: d.entity_id,
-    entity_type: d.entity_type as 'user' | 'business',
-    username: d.username || '',
-  }));
+  return results;
 }
 
 /**

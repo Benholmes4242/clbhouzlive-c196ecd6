@@ -1,8 +1,7 @@
 /**
- * MentionText - Renders text with @mentions highlighted
- * User mentions: orange (#F7931E), navigate to /profile/{username}
- * Business mentions: primary green, navigate to /business/{entity_id}
- * Resolves entity type on tap via taggable_entities lookup
+ * MentionText - Renders text with @mentions highlighted in amber.
+ * Mentions are stored as slug-safe \w-only usernames (e.g. @danny_holmes).
+ * On tap: resolves entity_id via taggable_entities, navigates by entity_id (not raw username).
  */
 
 import React, { useMemo, useCallback } from 'react';
@@ -24,7 +23,8 @@ interface TextPart {
 }
 
 /**
- * Parse text into parts (regular text and mentions)
+ * Parse text into regular text and mention parts.
+ * Regex matches slug-safe \w-only usernames (e.g. @danny_holmes).
  */
 function parseTextWithMentions(text: string): TextPart[] {
   const parts: TextPart[] = [];
@@ -33,65 +33,71 @@ function parseTextWithMentions(text: string): TextPart[] {
   let match;
 
   while ((match = mentionRegex.exec(text)) !== null) {
-    // Add text before the mention
     if (match.index > lastIndex) {
-      parts.push({
-        type: 'text',
-        content: text.slice(lastIndex, match.index),
-      });
+      parts.push({ type: 'text', content: text.slice(lastIndex, match.index) });
     }
-
-    // Add the mention
     parts.push({
       type: 'mention',
-      content: match[0], // Full match including @
-      username: match[1], // Just the username without @
+      content: match[0],  // full match including @
+      username: match[1], // slug without @
     });
-
     lastIndex = match.index + match[0].length;
   }
 
-  // Add remaining text after last mention
   if (lastIndex < text.length) {
-    parts.push({
-      type: 'text',
-      content: text.slice(lastIndex),
-    });
+    parts.push({ type: 'text', content: text.slice(lastIndex) });
   }
 
   return parts;
 }
 
 /**
- * Resolve a username to its entity type and navigate accordingly
+ * Resolve a slug username to its entity and navigate by entity_id.
+ * Lookup order:
+ *  1. Exact match on username column (handles clean slugs like tomholmes42)
+ *  2. Underscore→space variant (danny_holmes → "danny holmes")
+ *  3. Underscore→removed variant (danny_holmes → "dannyholmes")
+ * Always navigates by entity_id (UUID) — never by raw username string.
  */
 export async function resolveAndNavigate(
-  username: string,
+  slugUsername: string,
   navigate: ReturnType<typeof useNavigate>
 ): Promise<void> {
   try {
-    const { data, error } = await supabase
+    const cleaned = slugUsername.toLowerCase();
+    const withSpaces = cleaned.replace(/_/g, ' ');
+    const withoutSeparators = cleaned.replace(/_/g, '');
+
+    // 1. Exact match
+    let { data } = await supabase
       .from('taggable_entities')
       .select('entity_id, entity_type')
-      .eq('username', username.toLowerCase())
+      .eq('username', cleaned)
       .in('entity_type', ['user', 'business'])
       .limit(1)
       .maybeSingle();
 
-    if (error || !data) {
-      // Fallback to profile page
-      navigate(`/profile/${username}`);
-      return;
+    // 2 & 3. Normalised fallback (space or no-separator variants)
+    if (!data && withSpaces !== cleaned) {
+      const { data: fuzzy } = await supabase
+        .from('taggable_entities')
+        .select('entity_id, entity_type')
+        .or(`username.ilike.${withSpaces},username.ilike.${withoutSeparators}`)
+        .in('entity_type', ['user', 'business'])
+        .limit(1)
+        .maybeSingle();
+      data = fuzzy;
     }
+
+    if (!data) return; // no match — don't navigate to a broken route
 
     if (data.entity_type === 'business') {
       navigate(`/business/${data.entity_id}`);
     } else {
-      navigate(`/profile/${username}`);
+      navigate(`/profile/${data.entity_id}`);
     }
   } catch {
-    // Fallback on any error
-    navigate(`/profile/${username}`);
+    // Silent — avoid broken navigations
   }
 }
 
@@ -108,11 +114,9 @@ export function MentionText({
   const handleMentionClick = useCallback(
     (username: string, e: React.MouseEvent) => {
       e.stopPropagation();
-
       if (onMentionTap) {
         onMentionTap(username);
       } else {
-        // Resolve entity type then navigate
         resolveAndNavigate(username, navigate);
       }
     },
@@ -133,8 +137,8 @@ export function MentionText({
               type="button"
               onClick={(e) => handleMentionClick(part.username!, e)}
               className={cn(
-                "text-amber-500 font-medium hover:underline cursor-pointer",
-                "inline bg-transparent border-none p-0",
+                'text-amber-500 font-medium hover:underline cursor-pointer',
+                'inline bg-transparent border-none p-0',
                 mentionClassName
               )}
             >
