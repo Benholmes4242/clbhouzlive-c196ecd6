@@ -1136,14 +1136,34 @@ async function syncPlayerProfile(supabase: any, apiKey: string, playerSrId: stri
 // Captures new fields
 // ============================================================================
 async function syncPlayerStatistics(supabase: any, apiKey: string, tour: string, year: number) {
-  const url = `${getTourBaseUrl(tour)}/${year}/players/statistics.json`;
+  // Map incoming tourId param → Sportradar URL path slug
+  const tourUrlMap: Record<string, string> = {
+    pga: 'pga',
+    lpga: 'lpga',
+    eur: 'eur',
+    euro: 'eur',
+    'champions-tour': 'champions-tour',
+    champ: 'champions-tour',
+    liv: 'liv',
+  };
+  const tourUrlSlug = tourUrlMap[tour] || tour;
+  const url = `${getTourBaseUrl(tourUrlSlug)}/${year}/players/statistics.json`;
   const data = await fetchSportradar(url, apiKey, 'Player Statistics');
   const players = data.players || [];
   let totalRecords = 0;
 
   // Filter by both year AND tour_name to avoid maybeSingle() returning null
   // when multiple tours exist for the same year
-  const tourNameMap: Record<string, string> = { pga: 'pga', lpga: 'LPGA', eur: 'EURO', 'champions-tour': 'CHAMP' };
+  // Keys = tourId param values; Values = tour_name in sr_seasons table
+  const tourNameMap: Record<string, string> = {
+    pga: 'pga',
+    lpga: 'LPGA',
+    eur: 'EURO',
+    euro: 'EURO',
+    'champions-tour': 'CHAMP',
+    champ: 'CHAMP',
+    liv: 'LIV',
+  };
   const tourName = tourNameMap[tour] || tour;
   const { data: season } = await supabase
     .from('sr_seasons')
