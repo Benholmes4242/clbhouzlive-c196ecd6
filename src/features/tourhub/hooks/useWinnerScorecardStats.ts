@@ -18,6 +18,7 @@ export function useWinnerScorecardStats(
   return useQuery({
     queryKey: ['winner-scorecard-stats', tournamentId, playerId],
     queryFn: async (): Promise<WinnerStats | null> => {
+      console.log('[WINNER-STATS] Fetching for tournament:', tournamentId, 'player:', playerId);
       if (!tournamentId || !playerId) return null;
 
       const { data, error } = await supabase
@@ -26,6 +27,7 @@ export function useWinnerScorecardStats(
         .eq('tournament_id', tournamentId)
         .eq('player_id', playerId);
 
+      console.log('[WINNER-STATS] Result:', { rows: data?.length, error: error?.message });
       if (error || !data || data.length === 0) return null;
 
       return {

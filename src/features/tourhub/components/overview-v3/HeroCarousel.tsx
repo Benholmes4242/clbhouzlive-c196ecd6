@@ -268,10 +268,12 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
   const winnerInfo = isCompleted && tournament.winnerName ? tournament : null;
 
   // Winner scorecard stats — only fetched for completed slides
+  console.log('[HERO-STATS] HeroCarousel slide:', { isCompleted, tournamentId: tournament.id, podiumWinnerId: podiumWinner?.playerId });
   const { data: winnerStats } = useWinnerScorecardStats(
     isCompleted ? tournament.id : undefined,
     isCompleted ? podiumWinner?.playerId : undefined
   );
+  console.log('[HERO-STATS] HeroCarousel winnerStats result:', winnerStats);
 
   return (
     <motion.div
