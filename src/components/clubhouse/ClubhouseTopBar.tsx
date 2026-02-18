@@ -76,8 +76,8 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
                 onClick={() => setMenuOpen((v) => !v)}
                 isOpen={menuOpen}
                 hasUnreadNotifications={hasUnread}
-                useLightTheme={false}
-                isDimmed={false}
+              useLightTheme={true}
+              isDimmed={false}
               />
             </div>
           )}
