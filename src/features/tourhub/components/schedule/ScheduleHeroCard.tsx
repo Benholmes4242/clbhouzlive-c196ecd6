@@ -31,7 +31,7 @@ interface ScheduleHeroCardProps {
 function getTourLabel(tourCode?: string): string {
   const labels: Record<string, string> = {
     pga: 'PGA TOUR', EURO: 'DP WORLD', LPGA: 'LPGA',
-    CHAMP: 'CHAMPIONS', PGAD: 'PGA DEV', LIV: 'LIV GOLF',
+    CHAMP: 'CHAMPIONS', PGAD: 'KORN FERRY', LIV: 'LIV GOLF',
   };
   return labels[tourCode || ''] || 'TOUR';
 }
