@@ -98,12 +98,15 @@ async function storeCommentMentions(
     mentioned_username: m.username,
   }));
 
-  const { error } = await supabase
-    .from('comment_mentions' as any)
-    .upsert(rows, { onConflict: 'comment_id,mentioned_entity_type,mentioned_entity_id', ignoreDuplicates: true });
-
-  if (error) {
-    console.error('Error storing comment mentions:', error);
+  try {
+    const { error } = await supabase
+      .from('comment_mentions' as any)
+      .upsert(rows, { onConflict: 'comment_id,mentioned_entity_type,mentioned_entity_id', ignoreDuplicates: true });
+    if (error) {
+      console.warn('[MENTIONS] Mention storage failed (non-blocking):', error.message);
+    }
+  } catch (err) {
+    console.warn('[MENTIONS] Mention storage failed (non-blocking):', err);
   }
 }
 
@@ -194,11 +197,14 @@ export async function createMentionNotifications(
   
   if (notifications.length === 0) return;
 
-  const { error } = await supabase
-    .from('notifications')
-    .upsert(notifications, { onConflict: 'user_id,type,actor_id', ignoreDuplicates: true });
-  
-  if (error) {
-    console.error('Error creating mention notifications:', error);
+  try {
+    const { error } = await supabase
+      .from('notifications')
+      .upsert(notifications, { onConflict: 'user_id,type,actor_id', ignoreDuplicates: true });
+    if (error) {
+      console.warn('[MENTIONS] Notification upsert failed (non-blocking):', error.message);
+    }
+  } catch (err) {
+    console.warn('[MENTIONS] Notification creation failed (non-blocking):', err);
   }
 }
