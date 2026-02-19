@@ -50,7 +50,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
       countryCode: c.countryCode,
       avatarUrl: c.avatarUrl,
       confidenceTier: c.confidenceTier ?? ('medium' as const),
-      bullets: c.description ? [c.description] : [],
+      bullets: c.fitBullets?.slice(0, 3) || (c.description ? [c.description] : []),
     })),
   ];
 

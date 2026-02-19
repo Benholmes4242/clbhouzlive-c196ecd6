@@ -68,6 +68,7 @@ export interface ContenderCard {
   rank?: number;
   traitLabel?: string;
   confidenceTier?: ConfidenceTier;
+  fitBullets?: string[];
 }
 
 export type ImportanceTier = 'critical' | 'significant' | 'useful';
