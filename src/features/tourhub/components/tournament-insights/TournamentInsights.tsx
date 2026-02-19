@@ -5,7 +5,7 @@
  * Completed: Falls back to next tournament or results recap
  */
 
-import { memo, useState } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Brain, ChevronRight } from 'lucide-react';
 import { useTournamentInsights } from './hooks/useTournamentInsights';
@@ -42,13 +42,32 @@ export const TournamentInsights = memo(function TournamentInsights() {
     nextTournamentInsights,
   } = useTournamentInsights();
 
+  // Derived phase booleans — computed before early returns so hooks below are valid
+  const isLive = tournamentPhase === 'in-progress';
+  const isCompleted = tournamentPhase === 'completed';
+  const hasUpcoming = !!nextTournamentInsights;
+
+  // True when at least one player has posted a score
+  const hasLiveScores = tracker?.predictions?.some(
+    p => p.actualPosition !== null && p.actualPosition !== undefined
+  ) ?? false;
+
+  // Tournament is officially "inprogress" but nobody has posted a score yet
+  const isWaitingForPlay = isLive && !hasLiveScores;
+
   const [activeTab, setActiveTab] = useState<IntelligenceTab>('courseDNA');
   const [intelligenceView, setIntelligenceView] = useState<IntelligenceView>('live');
   const [showCourseDNA, setShowCourseDNA] = useState(false);
 
+  // Auto-expand Course DNA while waiting for play to begin
+  useEffect(() => {
+    if (isWaitingForPlay) {
+      setShowCourseDNA(true);
+    }
+  }, [isWaitingForPlay]);
+
   if (isLoading) return <TournamentInsightsSkeleton />;
   if (error || !data) {
-    // FIX 08: Show error state for intelligence section (silent fail is fine for no data)
     if (error) {
       return (
         <section aria-label="Tournament intelligence" className="px-4">
@@ -61,10 +80,6 @@ export const TournamentInsights = memo(function TournamentInsights() {
     }
     return null;
   }
-
-  const isLive = tournamentPhase === 'in-progress';
-  const isCompleted = tournamentPhase === 'completed';
-  const hasUpcoming = !!nextTournamentInsights;
 
   // Determine which tournament data to show for the hero card
   const heroData = isLive && intelligenceView === 'upcoming' && nextTournamentInsights
@@ -129,7 +144,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
           >
-            <TournamentHeroCard tournament={heroData} isLive={heroIsLive} />
+            <TournamentHeroCard tournament={heroData} isLive={heroIsLive} isCompleted={isCompleted} />
           </motion.div>
         </AnimatePresence>
       </div>
@@ -267,9 +282,74 @@ export const TournamentInsights = memo(function TournamentInsights() {
             className="mt-0 pt-5 bg-background"
             style={{ borderTop: '1px solid rgba(0, 0, 0, 0.05)' }}
           >
-            {tracker ? (
+            {isWaitingForPlay ? (
+              /* ── WAITING FOR PLAY: show predictions + Course DNA, not empty tracker ── */
+              <div className="space-y-4 pb-6">
+                {/* Amber "play begins shortly" banner */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    padding: '10px 16px',
+                    borderRadius: '12px',
+                    background: 'rgba(245, 158, 11, 0.08)',
+                    border: '1px solid rgba(245, 158, 11, 0.15)',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '7px',
+                      height: '7px',
+                      borderRadius: '50%',
+                      backgroundColor: 'rgba(245, 158, 11, 0.8)',
+                      animation: 'pulse 2s ease-in-out infinite',
+                      flexShrink: 0,
+                    }}
+                  />
+                  <span
+                    style={{
+                      fontSize: '12.5px',
+                      fontWeight: 600,
+                      color: 'hsl(var(--foreground) / 0.6)',
+                    }}
+                  >
+                    Play begins shortly — tracking starts when scores are in
+                  </span>
+                </div>
+
+                {/* AI predicted contenders with confidence bars */}
+                {data.winners.length > 0 && (
+                  <LikelyWinnersCarousel featured={data.winners[0]} cards={data.contenderCards} />
+                )}
+
+                {/* Course DNA — auto-expanded via useEffect */}
+                <AnimatePresence>
+                  {showCourseDNA && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                      className="overflow-hidden"
+                    >
+                      <div
+                        className="rounded-2xl bg-card border border-border overflow-hidden"
+                        style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)' }}
+                      >
+                        {data.courseDNA.length > 0 && (
+                          <CourseDNACard items={data.courseDNA} courseName={data.tournament.courseName} inline />
+                        )}
+                        <ClubhouseIntelligence insight={data.clubhouseIntelligence} inline />
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : tracker ? (
+              /* ── LIVE SCORES IN: show live tracking table ── */
               <div className="space-y-4">
-                {/* Unified leaderboard table */}
                 <PredictionLeaderboard allPicks={tracker.allPicks} />
 
                 {/* Course DNA toggle */}
@@ -313,6 +393,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
                 <div className="h-64 bg-black/[0.04] rounded-2xl" />
               </div>
             ) : (
+              /* ── NO TRACKER: fallback to predictions carousel ── */
               <div className="pb-6">
                 {data.winners.length > 0 && (
                   <LikelyWinnersCarousel featured={data.winners[0]} cards={data.contenderCards} />

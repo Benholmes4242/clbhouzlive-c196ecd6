@@ -19,11 +19,13 @@ interface TournamentHeroCardProps {
     heroImageUrl: string;
   };
   isLive?: boolean;
+  isCompleted?: boolean;
 }
 
 export const TournamentHeroCard = memo(function TournamentHeroCard({
   tournament,
   isLive = false,
+  isCompleted = false,
 }: TournamentHeroCardProps) {
   // Try to fetch actual venue image
   const venueImageQuery = useVenueImage(tournament.courseName, null);
@@ -56,7 +58,7 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
             border: '1px solid rgba(255, 255, 255, 0.15)',
           }}
         >
-          {isLive ? 'Live Tournament' : 'Next PGA Event'}
+          {isLive ? 'LIVE TOURNAMENT' : isCompleted ? 'LATEST RESULTS' : 'NEXT TOURNAMENT'}
         </span>
       </div>
 
