@@ -120,30 +120,22 @@ export const BarChartIcon: React.FC<IconProps> = ({ className = '', size = 13, s
 export type CategoryId =
   | 'sg_total'
   | 'scoring_avg'
+  | 'earnings'
   | 'distance'
   | 'accuracy'
   | 'gir_pct'
-  | 'scrambling'
-  | 'sand_saves'
   | 'putting'
-  | 'world_rank'
-  | 'events_played'
-  | 'cuts_made'
-  | 'top_10'
-  | 'earnings';
+  | 'scrambling'
+  | 'sand_saves';
 
 export const CATEGORY_ICONS: Record<CategoryId, React.FC<IconProps>> = {
   sg_total: OverallIcon,
   scoring_avg: ScoringIcon,
+  earnings: EarningsIcon,
   distance: DistanceIcon,
   accuracy: AccuracyIcon,
   gir_pct: GirIcon,
+  putting: PuttingIcon,
   scrambling: ScramblingIcon,
   sand_saves: SandSavesIcon,
-  putting: PuttingIcon,
-  world_rank: WorldRankIcon,
-  events_played: EventsIcon,
-  cuts_made: CutsMadeIcon,
-  top_10: Top10Icon,
-  earnings: EarningsIcon,
 };

@@ -18,34 +18,26 @@ const AMBER_ACCENT = {
 export const CATEGORY_ACCENT_COLORS: Record<CategoryId, typeof AMBER_ACCENT> = {
   sg_total: AMBER_ACCENT,
   scoring_avg: AMBER_ACCENT,
+  earnings: AMBER_ACCENT,
   distance: AMBER_ACCENT,
   accuracy: AMBER_ACCENT,
   gir_pct: AMBER_ACCENT,
+  putting: AMBER_ACCENT,
   scrambling: AMBER_ACCENT,
   sand_saves: AMBER_ACCENT,
-  putting: AMBER_ACCENT,
-  world_rank: AMBER_ACCENT,
-  events_played: AMBER_ACCENT,
-  cuts_made: AMBER_ACCENT,
-  top_10: AMBER_ACCENT,
-  earnings: AMBER_ACCENT,
 };
 
 /** Pill order: overall → tee-to-green → short game → career/season */
 export const CATEGORY_CONFIG: { id: CategoryId; name: string }[] = [
   { id: 'sg_total', name: 'Strokes Gained' },
   { id: 'scoring_avg', name: 'Scoring' },
+  { id: 'earnings', name: 'Earnings' },
   { id: 'distance', name: 'Driving Distance' },
   { id: 'accuracy', name: 'Driving Accuracy' },
   { id: 'gir_pct', name: 'Greens in Reg' },
+  { id: 'putting', name: 'Putting' },
   { id: 'scrambling', name: 'Scrambling' },
   { id: 'sand_saves', name: 'Sand Saves' },
-  { id: 'putting', name: 'Putting' },
-  { id: 'world_rank', name: 'World Ranking' },
-  { id: 'events_played', name: 'Events Played' },
-  { id: 'cuts_made', name: 'Cuts Made' },
-  { id: 'top_10', name: 'Top 10 Finishes' },
-  { id: 'earnings', name: 'Earnings' },
 ];
 
 export const SPRING_CONFIG = {

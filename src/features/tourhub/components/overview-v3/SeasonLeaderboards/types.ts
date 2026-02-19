@@ -3,17 +3,13 @@
 export type CategoryId =
   | 'sg_total'
   | 'scoring_avg'
+  | 'earnings'
   | 'distance'
   | 'accuracy'
   | 'gir_pct'
-  | 'scrambling'
-  | 'sand_saves'
   | 'putting'
-  | 'world_rank'
-  | 'events_played'
-  | 'cuts_made'
-  | 'top_10'
-  | 'earnings';
+  | 'scrambling'
+  | 'sand_saves';
 
 export interface LeaderboardPlayer {
   rank: number;
