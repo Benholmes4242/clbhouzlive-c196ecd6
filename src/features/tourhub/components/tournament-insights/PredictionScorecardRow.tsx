@@ -33,9 +33,10 @@ function formatActual(prediction: TrackedPrediction, isCompleted?: boolean): str
 }
 
 interface OffLeadDisplay {
-  text: string;
+  text: string | number;
   color: string;
   fontWeight?: number;
+  isDownArrow?: boolean;
 }
 
 function formatScore(score: number | null): string {
@@ -62,8 +63,8 @@ function getOffLeadDisplay(prediction: TrackedPrediction, isCompleted?: boolean)
     return { text: formatScore(prediction.score), color: 'rgba(22,163,74,0.9)', fontWeight: 700 };
   }
 
-  // Behind the leader — show ↓N in red
-  return { text: `↓${offLead}`, color: 'rgba(220,38,38,0.75)', fontWeight: 600 };
+  // Behind the leader — show ▼N in red
+  return { text: offLead, color: 'rgba(220,38,38,0.75)', fontWeight: 600, isDownArrow: true };
 }
 
 export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
@@ -123,7 +124,7 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
           </p>
           {/* Score line — only when player has posted a real score */}
           {prediction.actualPosition !== null && prediction.score !== null && (
-            <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">
+            <p className="text-[11px] text-muted-foreground leading-tight" style={{ marginTop: '3px' }}>
               {prediction.score === 0 ? 'E' : prediction.score > 0 ? `+${prediction.score}` : prediction.score}
               {prediction.thru !== null && prediction.thru > 0 ? ` · thru ${prediction.thru}` : ''}
               {prediction.currentRound ? ` · R${prediction.currentRound}` : ''}
@@ -147,10 +148,11 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
         transition={{ delay: 0.3 + index * 0.05 }}
       >
         <span
-          className="text-xs"
-          style={{ color: offLead.color, fontWeight: offLead.fontWeight ?? 600 }}
+          style={{ color: offLead.color, fontWeight: offLead.fontWeight ?? 600, fontSize: '13px' }}
         >
-          {offLead.text}
+          {offLead.isDownArrow ? (
+            <><span style={{ fontSize: '10px', marginRight: '1px' }}>▼</span>{offLead.text}</>
+          ) : offLead.text}
         </span>
       </motion.div>
     </motion.div>

@@ -107,6 +107,9 @@ export function OverviewPageV3() {
             <TournamentInsights />
           </LazySection>
 
+          {/* Divider between Intelligence and World Rankings */}
+          <div style={{ height: '1px', background: 'rgba(0,0,0,0.06)', margin: '28px 16px' }} />
+
           {/* 5. Unified World Rankings (Movers + OWGR Table) */}
           <LazySection minHeight={400}>
             <UnifiedWorldRankings />

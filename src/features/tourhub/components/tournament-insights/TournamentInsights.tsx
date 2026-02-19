@@ -399,18 +399,40 @@ export const TournamentInsights = memo(function TournamentInsights() {
               <div className="space-y-4">
                 <PredictionLeaderboard allPicks={tracker.allPicks} isCompleted={false} />
 
-                {/* Course DNA toggle */}
-                <button
+                {/* Course DNA toggle card */}
+                <div
                   onClick={() => setShowCourseDNA(!showCourseDNA)}
-                  className="flex items-center gap-1 text-xs font-medium active:opacity-70 transition-opacity"
-                  style={{ color: '#78716C' }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '14px 16px',
+                    margin: '12px 0',
+                    borderRadius: '12px',
+                    background: 'rgba(0,0,0,0.03)',
+                    border: '1px solid rgba(0,0,0,0.06)',
+                    cursor: 'pointer',
+                  }}
+                  className="active:scale-[0.98] transition-transform"
                 >
-                  <span>{showCourseDNA ? 'Hide' : 'View'} Course DNA</span>
-                  <ChevronRight
-                    className="w-3 h-3 transition-transform"
-                    style={{ transform: showCourseDNA ? 'rotate(90deg)' : undefined }}
-                  />
-                </button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '14px' }}>🧬</span>
+                    <span style={{ fontSize: '13.5px', fontWeight: 600, color: 'rgba(0,0,0,0.7)' }}>
+                      {showCourseDNA ? 'Hide Course DNA' : 'View Course DNA'}
+                    </span>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: '16px',
+                      color: 'rgba(0,0,0,0.3)',
+                      transform: showCourseDNA ? 'rotate(90deg)' : 'rotate(0deg)',
+                      transition: 'transform 0.2s ease',
+                      display: 'inline-block',
+                    }}
+                  >
+                    ›
+                  </span>
+                </div>
 
                 <AnimatePresence>
                   {showCourseDNA && (

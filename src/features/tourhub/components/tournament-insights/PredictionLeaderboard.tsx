@@ -32,17 +32,28 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
     >
       {/* Column header row */}
       <div
-        className="flex items-center px-4 py-2.5 border-b"
-        style={{ borderColor: 'rgba(0, 0, 0, 0.06)', backgroundColor: 'rgba(0, 0, 0, 0.015)' }}
+        className="flex items-center px-4"
+        style={{
+          padding: '10px 16px',
+          borderBottom: '1px solid rgba(0,0,0,0.08)',
+          background: 'rgba(0,0,0,0.02)',
+          borderRadius: '8px 8px 0 0',
+        }}
       >
         <div className="flex-1 min-w-0">
-          <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Player</span>
+          <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' as const, color: 'rgba(0,0,0,0.35)' }}>
+            PLAYER
+          </span>
         </div>
         <div className="w-[52px] flex-shrink-0 text-center">
-          <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Actual</span>
+          <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1px', color: 'rgba(0,0,0,0.35)' }}>
+            ACTUAL
+          </span>
         </div>
         <div className="w-[56px] flex-shrink-0 text-right">
-          <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Off Lead</span>
+          <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1px', color: 'rgba(0,0,0,0.35)' }}>
+            OFF LEAD
+          </span>
         </div>
       </div>
 
