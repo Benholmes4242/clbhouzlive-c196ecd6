@@ -166,7 +166,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
 
         {/* Live/Upcoming toggle — matches CourseTabs wrapper */}
         {(isLive || hasUpcoming) && (
-          <div className="-mx-4 px-4 py-3 bg-muted">
+          <div className="py-3">
             <LiveUpcomingToggle
               activeView={intelligenceView}
               onViewChange={setIntelligenceView}
