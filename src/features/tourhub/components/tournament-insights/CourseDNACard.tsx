@@ -1,6 +1,6 @@
 /**
- * CourseDNACard - What wins here with light theme treatment
- * White card with subtle shadow, continuous progress bars with glow
+ * CourseDNACard - What wins here
+ * Renders flat on page background (no card wrapper)
  */
 
 import { memo } from 'react';
@@ -83,10 +83,7 @@ export const CourseDNACard = memo(function CourseDNACard({ items, inline, course
   if (items.length === 0) return null;
 
   return (
-    <div 
-      className={inline ? "p-5" : "rounded-2xl p-5 bg-card border border-border"}
-      style={inline ? undefined : { boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)' }}
-    >
+    <div className="px-4 py-5">
       <h3 className="mb-4" style={{ fontSize: '16px', fontWeight: 600, color: '#1C1917' }}>
         What Matters{courseName ? ` at ${courseName}` : ''}
       </h3>

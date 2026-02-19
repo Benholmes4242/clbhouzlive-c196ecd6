@@ -1,6 +1,6 @@
 /**
- * ClubhouseIntelligence - Course breakdown card
- * Light theme with white card and gold accent
+ * ClubhouseIntelligence - Course breakdown
+ * Renders flat on page background (no card wrapper)
  */
 
 import { memo, useState } from 'react';
@@ -14,8 +14,6 @@ interface ClubhouseIntelligenceProps {
   };
   inline?: boolean;
 }
-
-// Keep interface, use inline prop below
 
 export const ClubhouseIntelligence = memo(function ClubhouseIntelligence({ 
   insight,
@@ -31,8 +29,7 @@ export const ClubhouseIntelligence = memo(function ClubhouseIntelligence({
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
       viewport={{ once: true }}
-      className={inline ? "px-4 pb-5 pt-0" : "rounded-2xl p-5 bg-card border border-border"}
-      style={inline ? undefined : { boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)' }}
+      className="px-4 pb-5 pt-0"
     >
       <h3 className="mb-2.5" style={{ fontSize: '17px', fontWeight: 600, color: '#1C1917' }}>
         Course Breakdown
