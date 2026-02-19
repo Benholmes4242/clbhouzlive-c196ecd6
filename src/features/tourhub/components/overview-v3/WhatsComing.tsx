@@ -38,8 +38,9 @@ function getVenueString(tournament: SeasonTournament): string {
 function EventRow({ tournament, index }: { tournament: SeasonTournament; index: number }) {
   const navigate = useNavigate();
   const contextLabel = getContextLabel(tournament);
-  const isSignature = contextLabel === 'SIGNATURE EVENT';
+  const isSpecialEvent = ['MAJOR CHAMPIONSHIP', 'SIGNATURE EVENT', 'ROLEX SERIES', 'PLAYOFF EVENT'].includes(contextLabel);
   const isMajor = contextLabel === 'MAJOR CHAMPIONSHIP';
+  const isSignature = contextLabel === 'SIGNATURE EVENT';
   const isRolex = contextLabel === 'ROLEX SERIES';
   const venue = getVenueString(tournament);
   const tourSlug = TOUR_NAME_TO_SLUG[tournament.tourName || ''] || '';
@@ -51,6 +52,13 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
     : (isSignature || isRolex)
       ? '3px solid rgba(16, 185, 129, 0.8)'
       : '3px solid transparent';
+
+  // Label colour — only used when isSpecialEvent is true
+  const labelColor = isMajor
+    ? 'rgba(245, 158, 11, 0.9)'
+    : contextLabel === 'PLAYOFF EVENT'
+      ? 'rgba(99, 102, 241, 0.8)'
+      : 'rgba(16, 185, 129, 0.9)'; // emerald for SIGNATURE EVENT + ROLEX SERIES
 
   return (
     <motion.div
@@ -77,21 +85,20 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <p
-          className="uppercase leading-none text-[0.5625rem] font-medium tracking-wide"
-          style={{
-            color: isMajor
-              ? '#f59e0b'
-              : (isSignature || isRolex)
-                ? 'rgba(16, 185, 129, 0.9)'
-                : undefined,
-          }}
-        >
-          {!isMajor && !isSignature && !isRolex && (
-            <span className="text-muted-foreground/70">{contextLabel}</span>
-          )}
-          {(isMajor || isSignature || isRolex) && contextLabel}
-        </p>
+        {isSpecialEvent && (
+          <span style={{
+            fontSize: '10px',
+            fontWeight: 700,
+            letterSpacing: '1.2px',
+            textTransform: 'uppercase',
+            color: labelColor,
+            display: 'block',
+            lineHeight: 1,
+            marginBottom: '3px',
+          }}>
+            {contextLabel}
+          </span>
+        )}
         <p className="mt-1 text-[1.0625rem] font-semibold text-foreground" style={{ letterSpacing: '-0.15px' }}>
           {tournament.name}
         </p>
@@ -205,7 +212,7 @@ export function WhatsComing() {
       {/* Header */}
       <div className="flex items-center justify-between px-4 mb-3">
         <h2 className="text-foreground text-[1.375rem] font-bold" style={{ letterSpacing: '-0.3px' }}>
-          What's Coming
+          What's Coming Up
         </h2>
 
         <button
