@@ -141,7 +141,7 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, hasTie
           {formatThruDisplay(leader.thru, leader.round_1, leader.round_2, leader.round_3, leader.round_4, leader.status, leader.thruUpdatedAt, leader.tournamentTimezone)}
         </span>
         <span className={cn(
-          "leaderboard-score flex-shrink-0",
+          "leaderboard-score flex-shrink-0 pr-2",
           getScoreClass(leader.scoreToPar),
           scoreFlash === 'birdie' && 'score-flash-birdie',
           scoreFlash === 'bogey' && 'score-flash-bogey',
