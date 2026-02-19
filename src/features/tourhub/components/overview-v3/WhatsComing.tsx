@@ -6,7 +6,7 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronRight, MapPin } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useUpcomingTournaments } from '../../hooks/useUpcomingTournaments';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SectionErrorState } from '../SectionErrorState';
@@ -74,11 +74,11 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
       aria-label={`${tournament.name}, ${getMonthAbbr(tournament.startDate)} ${getDayNum(tournament.startDate)}${venue ? `, at ${venue}` : ''}`}
     >
       {/* Date block */}
-      <div className="flex-shrink-0 w-12 text-center">
-        <p className="uppercase leading-none text-[0.5625rem] font-medium tracking-wide text-muted-foreground/70">
+      <div className="flex-shrink-0 w-9 text-center">
+        <p className="uppercase leading-none text-[0.5rem] font-medium tracking-wide text-muted-foreground/70">
           {getMonthAbbr(tournament.startDate)}
         </p>
-        <p className="leading-none mt-0.5 text-[1.0625rem] font-bold text-foreground">
+        <p className="leading-none mt-0.5 text-[0.9375rem] font-bold text-foreground">
           {getDayNum(tournament.startDate)}
         </p>
       </div>
@@ -87,51 +87,35 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
       <div className="flex-1 min-w-0">
         {isSpecialEvent && (
           <span style={{
-            fontSize: '10px',
+            fontSize: '9.5px',
             fontWeight: 700,
-            letterSpacing: '1.2px',
+            letterSpacing: '1.1px',
             textTransform: 'uppercase',
             color: labelColor,
             display: 'block',
             lineHeight: 1,
-            marginBottom: '3px',
+            marginBottom: '2px',
           }}>
             {contextLabel}
           </span>
         )}
-        <p className="mt-1 text-[1.0625rem] font-semibold text-foreground" style={{ letterSpacing: '-0.15px' }}>
+        <p className="text-[0.8125rem] font-semibold text-foreground truncate" style={{ letterSpacing: '-0.1px' }}>
           {tournament.name}
         </p>
         {venue && (
-          <span
-            role="button"
-            tabIndex={0}
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.stopPropagation();
-                navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`);
-              }
-            }}
-            className="flex items-center gap-1 mt-0.5 text-[0.8125rem] text-muted-foreground active:opacity-70 transition-opacity"
-            style={{ cursor: 'pointer' }}
-          >
-            <MapPin className="w-3 h-3 flex-shrink-0 opacity-60" />
-            <span className="line-clamp-1">{venue}</span>
-          </span>
+          <p className="text-[0.6875rem] text-muted-foreground/70 truncate mt-0.5 leading-none">
+            {venue}
+          </p>
         )}
       </div>
 
       {/* Tour logo */}
       {tourLogoSrc && (
         <div
-          className="flex-shrink-0 flex items-center justify-center opacity-50"
+          className="flex-shrink-0 flex items-center justify-center opacity-45"
           style={{
-            width: ['euro', 'pgad', 'liv'].includes(tourSlug) ? 48 : 40,
-            height: ['euro', 'pgad', 'liv'].includes(tourSlug) ? 48 : 40,
+            width: ['pga', 'lpga'].includes(tourSlug) ? 26 : 32,
+            height: ['pga', 'lpga'].includes(tourSlug) ? 26 : 32,
           }}
         >
           <img
