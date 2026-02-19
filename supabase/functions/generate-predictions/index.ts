@@ -792,9 +792,9 @@ Return a JSON object with this exact structure:
 ## IMPORTANT RULES
 
 1. **Use exact player IDs from the data provided** - do not make up IDs
-2. **Provide 10 top contenders** ranked 1-10
-3. **Provide 3 dark horses** ranked 30-100 in world rankings
-4. **Win probabilities should sum to approximately 70-80%** for top 10
+2. **Provide exactly 3 top contenders** ranked 1-3
+3. **Provide exactly 1 dark horse** ranked 30-100 in world rankings
+4. **Win probabilities should sum to approximately 50-60%** for top 3
 5. **Be specific in reasons** - cite actual statistics
 6. **Course fit scores should be 1-100**
 7. **Return ONLY valid JSON** - no markdown, no explanation outside the JSON

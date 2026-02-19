@@ -101,13 +101,14 @@ function buildTrackedPrediction(
   } else if (status === 'wd') {
     performanceStatus = 'withdrawn';
   } else if (actualPosition !== null) {
-    positionDelta = predictedRank - actualPosition;
-    if (actualPosition < predictedRank) {
-      performanceStatus = 'outperforming';
-    } else if (actualPosition === predictedRank) {
-      performanceStatus = 'matching';
+    // OFF LEAD: how far from the leader (position 1)?
+    positionDelta = actualPosition - 1;
+    if (actualPosition === 1) {
+      performanceStatus = 'outperforming'; // Leading
+    } else if (actualPosition <= 5) {
+      performanceStatus = 'matching'; // Close to lead
     } else {
-      performanceStatus = 'underperforming';
+      performanceStatus = 'underperforming'; // Behind
     }
   }
 
