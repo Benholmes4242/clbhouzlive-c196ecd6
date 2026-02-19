@@ -2,13 +2,12 @@
  * SeasonToggle - Year Selection Component
  * 
  * Features:
- * - Compact inline display
- * - Animated selection indicator
- * - Matches slate design language
+ * - Matches category pill styling (amber active, subtle border inactive)
+ * - Consistent design language
  */
 
 import { memo } from 'react';
-import { motion } from 'framer-motion';
+import { CATEGORY_ACCENT_COLORS } from './constants';
 import type { AvailableSeason } from '@/features/tourhub/hooks/useSeasonLeaderboards';
 
 interface SeasonToggleProps {
@@ -22,13 +21,14 @@ export const SeasonToggle = memo(function SeasonToggle({
   selectedYear,
   onYearChange,
 }: SeasonToggleProps) {
-  // Don't render if only one season available
   if (availableSeasons.length <= 1) {
     return null;
   }
 
+  const accent = CATEGORY_ACCENT_COLORS['sg_total'];
+
   return (
-    <div className="flex items-center gap-0.5 bg-slate-100 rounded-full p-0.5">
+    <div className="flex items-center" style={{ gap: '6px' }}>
       {availableSeasons.map((season) => {
         const isSelected = season.year === selectedYear;
 
@@ -36,19 +36,25 @@ export const SeasonToggle = memo(function SeasonToggle({
           <button
             key={season.id}
             onClick={() => onYearChange(season.year)}
-            className="relative px-2.5 py-1 rounded-full text-[12px] font-medium transition-colors duration-200"
+            className="flex-shrink-0 active:scale-95 transition-transform"
             style={{
-              color: isSelected ? 'white' : '#64748b',
+              padding: '8px 14px',
+              fontSize: '12px',
+              fontWeight: isSelected ? 600 : 500,
+              borderRadius: '10px',
+              background: isSelected ? accent.primary : '#FFFFFF',
+              border: isSelected
+                ? `1px solid ${accent.primary}`
+                : '1px solid rgba(0, 0, 0, 0.08)',
+              color: isSelected ? '#FFFFFF' : 'rgba(0, 0, 0, 0.45)',
+              boxShadow: isSelected
+                ? `0 2px 8px ${accent.shadow}`
+                : 'none',
+              transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+              cursor: 'pointer',
             }}
           >
-            {isSelected && (
-              <motion.div
-                layoutId="season-toggle-indicator"
-                className="absolute inset-0 bg-slate-700 rounded-full"
-                transition={{ type: 'spring', bounce: 0.2, duration: 0.4 }}
-              />
-            )}
-            <span className="relative z-10">{season.year}</span>
+            {season.year}
           </button>
         );
       })}

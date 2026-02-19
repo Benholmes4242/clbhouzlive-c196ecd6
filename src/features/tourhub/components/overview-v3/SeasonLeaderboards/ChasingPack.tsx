@@ -117,7 +117,6 @@ const ChaserCard = memo(function ChaserCard({
           <div className="flex items-baseline justify-center mt-1.5" style={{ gap: '2px' }}>
             <span
               style={{
-                fontFamily: "'JetBrains Mono', monospace",
                 fontSize: '18px',
                 fontWeight: 700,
                 color: 'hsl(var(--foreground))',

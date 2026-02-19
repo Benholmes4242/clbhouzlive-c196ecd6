@@ -136,7 +136,6 @@ export const LeaderboardRow = memo(function LeaderboardRow({
       {/* Stat Value - monospace */}
       <div className="flex items-baseline flex-shrink-0" style={{ gap: '2px' }}>
         <span style={{ 
-          fontFamily: "'JetBrains Mono', monospace",
           fontSize: '15px', 
           fontWeight: 700, 
           color: '#111827' 
