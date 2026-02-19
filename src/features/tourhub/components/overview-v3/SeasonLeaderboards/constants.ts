@@ -33,18 +33,18 @@ export const CATEGORY_ACCENT_COLORS: Record<CategoryId, typeof AMBER_ACCENT> = {
 
 /** Pill order: overall → tee-to-green → short game → career/season */
 export const CATEGORY_CONFIG: { id: CategoryId; name: string }[] = [
-  { id: 'sg_total', name: 'Overall' },
+  { id: 'sg_total', name: 'Strokes Gained' },
   { id: 'scoring_avg', name: 'Scoring' },
-  { id: 'distance', name: 'Distance' },
-  { id: 'accuracy', name: 'Accuracy' },
-  { id: 'gir_pct', name: 'GIR' },
+  { id: 'distance', name: 'Driving Distance' },
+  { id: 'accuracy', name: 'Driving Accuracy' },
+  { id: 'gir_pct', name: 'Greens in Reg' },
   { id: 'scrambling', name: 'Scrambling' },
   { id: 'sand_saves', name: 'Sand Saves' },
   { id: 'putting', name: 'Putting' },
-  { id: 'world_rank', name: 'World Rank' },
-  { id: 'events_played', name: 'Events' },
+  { id: 'world_rank', name: 'World Ranking' },
+  { id: 'events_played', name: 'Events Played' },
   { id: 'cuts_made', name: 'Cuts Made' },
-  { id: 'top_10', name: 'Top 10s' },
+  { id: 'top_10', name: 'Top 10 Finishes' },
   { id: 'earnings', name: 'Earnings' },
 ];
 
