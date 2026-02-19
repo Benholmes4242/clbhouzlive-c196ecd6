@@ -15,7 +15,21 @@ import type { SeasonTournament } from '../../hooks/useSeasonTournaments';
 
 // ============ Context Label Logic ============
 
-const MAJOR_KEYWORDS = ['masters', 'u.s. open', 'us open', 'open championship', 'pga championship'];
+const MAJOR_KEYWORDS = [
+  'masters tournament',
+  'the open championship',
+  'u.s. open',
+  'us open',
+  'pga championship',
+  'chevron championship',
+  "women's pga",
+  "womens pga",
+  'u.s. women',
+  'us women',
+  'aig women',
+  'evian championship',
+  'amundi evian',
+];
 const SIGNATURE_KEYWORDS = ['invitational', 'genesis', 'arnold palmer', 'memorial', 'players'];
 const PLAYOFF_KEYWORDS = ['playoff', 'tour championship', 'fedexcup'];
 
