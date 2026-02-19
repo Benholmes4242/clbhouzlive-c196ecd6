@@ -26,7 +26,7 @@ export const LiveUpcomingToggle: React.FC<LiveUpcomingToggleProps> = ({
   ];
 
   return (
-    <div className="flex items-stretch rounded-xl overflow-hidden" style={{ backgroundColor: 'rgba(0,0,0,0.04)' }}>
+    <div className="flex items-stretch rounded-xl overflow-hidden bg-transparent">
       {tabs.map((tab) => {
         if (tab.id === 'upcoming' && !hasUpcoming) return null;
         const isActive = activeView === tab.id;
