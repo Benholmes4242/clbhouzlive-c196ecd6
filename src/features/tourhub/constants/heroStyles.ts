@@ -14,7 +14,7 @@
 export const HEADER_HEIGHT = 55;
 
 /** Base hero height values */
-export const HERO_HEIGHT = '85dvh';
+export const HERO_HEIGHT = '90dvh';
 export const HERO_MIN_HEIGHT = 420;
 export const HERO_MAX_HEIGHT = 650;
 
