@@ -120,6 +120,21 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
 
   // ── Ball Striking & Short Game ──
   {
+    key: 'strokes_gained_total',
+    label: 'Strokes Gained Total',
+    shortLabel: 'SG Total',
+    section: 'stats',
+    icon: Trophy,
+    emoji: '⚡',
+    sortDirection: 'desc',
+    unit: '',
+    description: 'Total strokes gained versus the field average per round. The most comprehensive measure of overall performance.',
+    tourAverage: '0.00',
+    accentColor: '#f59e0b',
+    accessor: (s) => s.strokes_gained_total,
+    format: (v) => (v >= 0 ? '+' : '') + v.toFixed(2),
+  },
+  {
     key: 'scoring_avg',
     label: 'Scoring Average',
     shortLabel: 'Scoring',
