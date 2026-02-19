@@ -15,12 +15,16 @@ import type { SeasonTournament } from '../../hooks/useSeasonTournaments';
 
 // ============ Context Label Logic ============
 
-const MAJOR_KEYWORDS = [
+// --- MAJORS (by tour) ---
+const PGA_MAJOR_KEYWORDS = [
   'masters tournament',
   'the open championship',
   'u.s. open',
   'us open',
   'pga championship',
+];
+
+const LPGA_MAJOR_KEYWORDS = [
   'chevron championship',
   "women's pga",
   "womens pga",
@@ -30,8 +34,57 @@ const MAJOR_KEYWORDS = [
   'evian championship',
   'amundi evian',
 ];
-const SIGNATURE_KEYWORDS = ['invitational', 'genesis', 'arnold palmer', 'memorial', 'players'];
-const PLAYOFF_KEYWORDS = ['playoff', 'tour championship', 'fedexcup'];
+
+const CHAMPIONS_MAJOR_KEYWORDS = [
+  'senior pga championship',
+  'regions tradition',
+  'u.s. senior open',
+  'us senior open',
+  'senior open',
+  'kaulig companies',
+  'senior players',
+];
+
+// --- SIGNATURE EVENTS (by tour) ---
+const PGA_SIGNATURE_KEYWORDS = [
+  'pebble beach pro-am',
+  'at&t pebble beach',
+  'genesis invitational',
+  'arnold palmer invitational',
+  'the players championship',
+  'players championship',
+  'rbc heritage',
+  'cadillac championship',
+  'memorial tournament',
+  'travelers championship',
+];
+
+const LPGA_SIGNATURE_KEYWORDS = [
+  'cme group',
+  'fm championship',
+  'aramco championship',
+  'lotte championship',
+  'cognizant founders',
+  'founders cup',
+];
+
+const DPWORLD_SIGNATURE_KEYWORDS = [
+  'dubai desert classic',
+  'hero dubai',
+  'genesis scottish open',
+  'scottish open',
+  'bmw pga championship',
+  'abu dhabi championship',
+  'dp world tour championship',
+];
+
+// --- PLAYOFFS ---
+const PGA_PLAYOFF_KEYWORDS = [
+  'tour championship',
+  'fedexcup',
+  'fedex st. jude',
+  'bmw championship',
+];
 
 const TOUR_NAME_TO_SLUG: Record<string, string> = {
   'PGA Tour': 'pga',
@@ -44,11 +97,35 @@ const TOUR_NAME_TO_SLUG: Record<string, string> = {
 
 function getContextLabel(tournament: SeasonTournament): string {
   const nameLower = tournament.name.toLowerCase();
-  const tourPrefix = tournament.tourName?.toUpperCase() || 'TOUR';
-  if (MAJOR_KEYWORDS.some((k) => nameLower.includes(k))) return 'MAJOR CHAMPIONSHIP';
-  if (PLAYOFF_KEYWORDS.some((k) => nameLower.includes(k))) return 'PLAYOFF EVENT';
-  if (SIGNATURE_KEYWORDS.some((k) => nameLower.includes(k))) return 'SIGNATURE EVENT';
-  return `${tourPrefix} EVENT`;
+  const tourSlug = TOUR_NAME_TO_SLUG[tournament.tourName || ''] || '';
+
+  if (tourSlug === 'pga') {
+    if (PGA_MAJOR_KEYWORDS.some((k) => nameLower.includes(k))) return 'MAJOR CHAMPIONSHIP';
+    if (PGA_PLAYOFF_KEYWORDS.some((k) => nameLower.includes(k))) return 'PLAYOFF EVENT';
+    if (PGA_SIGNATURE_KEYWORDS.some((k) => nameLower.includes(k))) return 'SIGNATURE EVENT';
+    return 'PGA TOUR EVENT';
+  }
+
+  if (tourSlug === 'lpga') {
+    if (LPGA_MAJOR_KEYWORDS.some((k) => nameLower.includes(k))) return 'MAJOR CHAMPIONSHIP';
+    if (LPGA_SIGNATURE_KEYWORDS.some((k) => nameLower.includes(k))) return 'SIGNATURE EVENT';
+    return 'LPGA TOUR EVENT';
+  }
+
+  if (tourSlug === 'champ') {
+    if (CHAMPIONS_MAJOR_KEYWORDS.some((k) => nameLower.includes(k))) return 'MAJOR CHAMPIONSHIP';
+    return 'CHAMPIONS TOUR EVENT';
+  }
+
+  if (tourSlug === 'euro') {
+    if (DPWORLD_SIGNATURE_KEYWORDS.some((k) => nameLower.includes(k))) return 'ROLEX SERIES';
+    return 'DP WORLD TOUR EVENT';
+  }
+
+  if (tourSlug === 'liv') return 'LIV GOLF EVENT';
+  if (tourSlug === 'pgad') return 'KORN FERRY TOUR EVENT';
+
+  return 'TOUR EVENT';
 }
 
 // ============ Date formatting helpers ============
