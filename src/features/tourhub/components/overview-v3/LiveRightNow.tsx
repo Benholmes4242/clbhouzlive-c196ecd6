@@ -7,22 +7,11 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLiveRightNow, type LiveTournamentWithLeader } from '../../hooks/useOverviewModules';
 import { SectionErrorState } from '../SectionErrorState';
-
-function getTourLabel(tourSlug: string): string {
-  const labels: Record<string, string> = {
-    pga: 'PGA TOUR',
-    euro: 'DP WORLD',
-    lpga: 'LPGA',
-    liv: 'LIV',
-    pgad: 'KORN FERRY',
-    champ: 'CHAMPIONS',
-  };
-  return labels[tourSlug?.toLowerCase()] ?? tourSlug?.toUpperCase() ?? 'TOUR';
-}
+import { getTourLogo } from '../../utils/tourLogos';
 
 const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tournament }) => {
   const navigate = useNavigate();
-  const tourLabel = getTourLabel(tournament.tourSlug);
+  const tourLogoSrc = getTourLogo(tournament.tourSlug?.toLowerCase() ?? '');
 
   return (
     <div
@@ -64,7 +53,7 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
           {tournament.name}
         </div>
 
-        {/* Line 2: Leader name · score · tour badge */}
+        {/* Line 2: Leader name · score · tour logo */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -96,24 +85,27 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
             {tournament.leader?.scoreDisplay ?? '—'}
           </span>
 
-          {/* Spacer pushes badge right */}
+          {/* Spacer pushes logo right */}
           <div style={{ flex: 1 }} />
 
-          {/* Tour badge */}
-          <span style={{
-            flexShrink: 0,
-            fontSize: '9px',
-            fontWeight: 700,
-            letterSpacing: '1px',
-            textTransform: 'uppercase',
-            color: 'rgba(0,0,0,0.4)',
-            padding: '2px 6px',
-            borderRadius: '5px',
-            background: 'rgba(0,0,0,0.04)',
-            border: '1px solid rgba(0,0,0,0.06)',
-          }}>
-            {tourLabel}
-          </span>
+          {/* Tour logo */}
+          <div
+            style={{
+              flexShrink: 0,
+              width: 32,
+              height: 32,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: 0.45,
+            }}
+          >
+            <img
+              src={tourLogoSrc}
+              alt={tournament.tourSlug ?? 'Tour'}
+              style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -15,9 +15,9 @@ export function getScoreColor(_score: number | null): string {
   return '#FFFFFF';
 }
 
-/** Score color for FINISHED state — all scores use #FACC15 (matches FINISHED badge + trophy) */
+/** Score color for FINISHED state — white to match live leaderboard */
 export function getFinishedScoreColor(_score: number | null): string {
-  return '#FACC15';
+  return '#FFFFFF';
 }
 
 export function formatPurse(purse: number | null): string {
