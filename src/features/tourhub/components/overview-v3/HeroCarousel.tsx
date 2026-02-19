@@ -232,8 +232,14 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
         if (prevEntry) {
           if (leader.scoreToPar < prevEntry.scoreToPar) newFlashes[leader.player.id] = 'birdie';
           else if (leader.scoreToPar > prevEntry.scoreToPar) newFlashes[leader.player.id] = 'bogey';
-          if (leader.position !== prevEntry.position) {
-            newDeltas[leader.player.id] = prevEntry.position - leader.position; // positive = moved up
+          const delta = prevEntry.position - leader.position; // positive = moved up
+          console.log('[LIVE-DELTA]', leader.player.lastName, {
+            position: leader.position,
+            prevPosition: prevEntry.position,
+            positionDelta: delta,
+          });
+          if (delta !== 0) {
+            newDeltas[leader.player.id] = delta;
           }
         }
       }
@@ -243,7 +249,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
       }
       if (Object.keys(newDeltas).length > 0) {
         setPositionDeltas(newDeltas);
-        setTimeout(() => setPositionDeltas({}), 3000);
+        setTimeout(() => setPositionDeltas({}), 8000); // Extended: 8s for observability
       }
     }
     prevLeadersRef.current = leaders;
