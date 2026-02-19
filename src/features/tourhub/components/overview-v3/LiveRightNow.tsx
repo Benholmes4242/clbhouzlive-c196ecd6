@@ -8,8 +8,21 @@ import { useNavigate } from 'react-router-dom';
 import { useLiveRightNow, type LiveTournamentWithLeader } from '../../hooks/useOverviewModules';
 import { SectionErrorState } from '../SectionErrorState';
 
+function getTourLabel(tourSlug: string): string {
+  const labels: Record<string, string> = {
+    pga: 'PGA TOUR',
+    euro: 'DP WORLD',
+    lpga: 'LPGA',
+    liv: 'LIV',
+    pgad: 'KORN FERRY',
+    champ: 'CHAMPIONS',
+  };
+  return labels[tourSlug?.toLowerCase()] ?? tourSlug?.toUpperCase() ?? 'TOUR';
+}
+
 const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tournament }) => {
   const navigate = useNavigate();
+  const tourLabel = getTourLabel(tournament.tourSlug);
 
   return (
     <div
@@ -38,8 +51,8 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
 
       {/* Left: two lines stacked */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        {/* Line 1: Tournament name */}
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        {/* Line 1: Tournament name + tour badge */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span style={{
             fontSize: '13.5px',
             fontWeight: 600,
@@ -51,6 +64,20 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
             flex: 1,
           }}>
             {tournament.name}
+          </span>
+          <span style={{
+            flexShrink: 0,
+            fontSize: '9px',
+            fontWeight: 700,
+            letterSpacing: '1px',
+            textTransform: 'uppercase',
+            color: 'rgba(0,0,0,0.4)',
+            padding: '2px 6px',
+            borderRadius: '5px',
+            background: 'rgba(0,0,0,0.04)',
+            border: '1px solid rgba(0,0,0,0.06)',
+          }}>
+            {tourLabel}
           </span>
         </div>
 
