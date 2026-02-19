@@ -11,17 +11,13 @@ import { resolvePhotoUrl } from '../utils/resolvePhotoUrl';
 export type CategoryId =
   | 'sg_total'
   | 'scoring_avg'
+  | 'earnings'
   | 'distance'
   | 'accuracy'
   | 'gir_pct'
-  | 'scrambling'
-  | 'sand_saves'
   | 'putting'
-  | 'world_rank'
-  | 'events_played'
-  | 'cuts_made'
-  | 'top_10'
-  | 'earnings';
+  | 'scrambling'
+  | 'sand_saves';
 
 export interface LeaderboardPlayer {
   rank: number;
@@ -146,42 +142,6 @@ export const CATEGORY_CONFIG: Record<CategoryId, {
     higherIsBetter: false,
     formatValue: (val) => val.toFixed(2),
   },
-  world_rank: {
-    name: 'World Rank',
-    icon: '🌍',
-    description: 'Official World Golf Ranking position',
-    dbKey: 'world_rank',
-    unit: '',
-    higherIsBetter: false,
-    formatValue: (val) => `#${Math.round(val)}`,
-  },
-  events_played: {
-    name: 'Events',
-    icon: '📅',
-    description: 'Number of events played this season',
-    dbKey: 'events_played',
-    unit: '',
-    higherIsBetter: true,
-    formatValue: (val) => Math.round(val).toString(),
-  },
-  cuts_made: {
-    name: 'Cuts Made',
-    icon: '✂️',
-    description: 'Number of cuts made this season',
-    dbKey: 'cuts_made',
-    unit: '',
-    higherIsBetter: true,
-    formatValue: (val) => Math.round(val).toString(),
-  },
-  top_10: {
-    name: 'Top 10s',
-    icon: '⭐',
-    description: 'Number of top-10 finishes this season',
-    dbKey: 'top_10s',
-    unit: '',
-    higherIsBetter: true,
-    formatValue: (val) => Math.round(val).toString(),
-  },
   earnings: {
     name: 'Earnings',
     icon: '💰',
@@ -204,17 +164,13 @@ export const CATEGORY_CONFIG: Record<CategoryId, {
 const PERCENTILE_THRESHOLDS: Record<CategoryId, { min: number; max: number }> = {
   sg_total: { min: -1, max: 2.5 },
   scoring_avg: { min: 72, max: 68 },
+  earnings: { min: 100_000, max: 15_000_000 },
   distance: { min: 280, max: 330 },
   accuracy: { min: 50, max: 75 },
   gir_pct: { min: 55, max: 75 },
+  putting: { min: 30, max: 27 },
   scrambling: { min: 50, max: 70 },
   sand_saves: { min: 35, max: 65 },
-  putting: { min: 30, max: 27 },
-  world_rank: { min: 200, max: 1 },
-  events_played: { min: 5, max: 30 },
-  cuts_made: { min: 2, max: 25 },
-  top_10: { min: 0, max: 10 },
-  earnings: { min: 100_000, max: 15_000_000 },
 };
 
 function calculateSkillLevel(

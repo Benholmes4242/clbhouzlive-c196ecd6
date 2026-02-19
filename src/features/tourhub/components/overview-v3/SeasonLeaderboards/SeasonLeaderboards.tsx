@@ -21,17 +21,13 @@ import { BarChartIcon, type CategoryId } from './StatCategoryIcons';
 const DISCIPLINE_CONTEXT: Record<CategoryId, string> = {
   sg_total: 'Best strokes gained vs field',
   scoring_avg: 'Lowest scoring average on tour',
+  earnings: 'Highest earners this season',
   distance: 'Longest season driving average',
   accuracy: 'Most fairways hit this season',
   gir_pct: 'Highest greens in regulation rate',
+  putting: 'Fewest putts per round',
   scrambling: 'Best recovery rate on tour',
   sand_saves: 'Best bunker save percentage',
-  putting: 'Fewest putts per round',
-  world_rank: 'Highest ranked players in the world',
-  events_played: 'Most active players this season',
-  cuts_made: 'Most cuts made this season',
-  top_10: 'Most top-10 finishes this season',
-  earnings: 'Highest earners this season',
 };
 
 const animationStyles = `
@@ -178,19 +174,15 @@ export function SeasonLeaderboards() {
             const categoryMap: Record<string, string> = {
               'sg_total': 'strokes_gained_total',
               'scoring_avg': 'scoring_avg',
+              'earnings': 'earnings',
               'distance': 'drive_avg',
               'accuracy': 'drive_acc',
               'gir_pct': 'gir_pct',
+              'putting': 'putt_avg',
               'scrambling': 'scrambling_pct',
               'sand_saves': 'sand_saves_pct',
-              'putting': 'putt_avg',
-              'world_rank': 'world_rank',
-              'events_played': 'events_played',
-              'cuts_made': 'cuts_made',
-              'top_10': 'top_10',
-              'earnings': 'earnings',
             };
-            const leaderCategory = categoryMap[activeCategory] || 'world_rank';
+            const leaderCategory = categoryMap[activeCategory] || 'strokes_gained_total';
             navigate(`/tourhub?tab=leaderboards&category=${leaderCategory}`);
           }}
           className="flex items-center gap-0.5 transition-all duration-300 bg-transparent border-none cursor-pointer group text-muted-foreground"
@@ -272,19 +264,15 @@ export function SeasonLeaderboards() {
                 const categoryMap: Record<string, string> = {
                   'sg_total': 'strokes_gained_total',
                   'scoring_avg': 'scoring_avg',
+                  'earnings': 'earnings',
                   'distance': 'drive_avg',
                   'accuracy': 'drive_acc',
                   'gir_pct': 'gir_pct',
+                  'putting': 'putt_avg',
                   'scrambling': 'scrambling_pct',
                   'sand_saves': 'sand_saves_pct',
-                  'putting': 'putt_avg',
-                  'world_rank': 'world_rank',
-                  'events_played': 'events_played',
-                  'cuts_made': 'cuts_made',
-                  'top_10': 'top_10',
-                  'earnings': 'earnings',
                 };
-                const leaderCategory = categoryMap[activeCategory] || 'world_rank';
+                const leaderCategory = categoryMap[activeCategory] || 'strokes_gained_total';
                 navigate(`/tourhub?tab=leaderboards&category=${leaderCategory}`);
               }}
               style={{
