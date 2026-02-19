@@ -6,6 +6,8 @@
  */
 
 import React, { memo, useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Brain, ChevronRight } from 'lucide-react';
 import { useTournamentInsights } from './hooks/useTournamentInsights';
@@ -64,12 +66,26 @@ export const TournamentInsights = memo(function TournamentInsights() {
   const isLive = tournamentPhase === 'in-progress';
   const isCompleted = tournamentPhase === 'completed';
 
-  // True when at least one player has posted a score
-  const hasLiveScores = tracker?.predictions?.some(
-    p => p.actualPosition !== null && p.actualPosition !== undefined
-  ) ?? false;
+  // Independent live-score check — does NOT depend on tracker matching predictions.
+  // A lightweight HEAD count against sr_leaderboards; polls every 30s.
+  const currentTournamentId = data?.tournament?.id ?? null;
+  const { data: liveScoreCount } = useQuery({
+    queryKey: ['live-score-check', currentTournamentId],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from('sr_leaderboards')
+        .select('id', { count: 'exact', head: true })
+        .eq('tournament_id', currentTournamentId!)
+        .not('position', 'is', null)
+        .gt('strokes', 0);
+      return count ?? 0;
+    },
+    enabled: isLive && !!currentTournamentId,
+    refetchInterval: 30_000,
+    staleTime: 15_000,
+  });
 
-  // Tournament is officially "inprogress" but nobody has posted a score yet
+  const hasLiveScores = (liveScoreCount ?? 0) > 0;
   const isWaitingForPlay = isLive && !hasLiveScores;
 
   const [activeTab, setActiveTab] = useState<IntelligenceTab>('courseDNA');
