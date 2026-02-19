@@ -13,9 +13,10 @@ export const TOUR_NAME_TO_SLUG: Record<string, string> = {
   'Korn Ferry Tour': 'pgad',
   'Champions Tour': 'champ',
   'LPGA Tour': 'lpga',
-  // Raw lowercase DB fallbacks
+  // Raw DB fallbacks — both cases
   'pga': 'pga',
   'liv': 'liv',
+  'LIV': 'liv',
   'euro': 'euro',
   'pgad': 'pgad',
   'champ': 'champ',
@@ -100,6 +101,24 @@ const PGA_PLAYOFF_KEYWORDS = [
 export function getContextLabel(tournament: { name: string; tourName?: string | null }): string {
   const nameLower = tournament.name.toLowerCase();
   const tourSlug = TOUR_NAME_TO_SLUG[tournament.tourName || ''] || '';
+
+  // Cross-tour majors — The 4 Grand Slams are co-sanctioned and may be stored under
+  // any tour in Sportradar (e.g. Masters under EURO for Race to Dubai).
+  // Always label them MAJOR CHAMPIONSHIP regardless of tour slug.
+  // Exclusions prevent catching Senior PGA Championship or U.S. Women's Open here
+  // (those are handled correctly by their own tour branches below).
+  const CROSS_TOUR_MAJOR_KEYWORDS = [
+    'masters tournament',
+    'the open championship',
+    'u.s. open',
+    'us open',
+    'pga championship',
+  ];
+  const isCrossTourMajor =
+    CROSS_TOUR_MAJOR_KEYWORDS.some((k) => nameLower.includes(k)) &&
+    !nameLower.includes('senior') &&
+    !nameLower.includes('women');
+  if (isCrossTourMajor) return 'MAJOR CHAMPIONSHIP';
 
   if (tourSlug === 'pga') {
     if (PGA_MAJOR_KEYWORDS.some((k) => nameLower.includes(k))) return 'MAJOR CHAMPIONSHIP';
