@@ -168,7 +168,7 @@ function MomentumPill({ entry, index, direction }: MomentumPillProps) {
               <span className="whitespace-nowrap text-[0.625rem] font-medium" style={{
                 color: isUp ? '#16A34A' : '#DC2626',
               }}>
-                {isUp ? '↑' : '↓'}{isUp ? '+' : '−'}{absChange}
+                <span style={{ fontSize: '10px' }}>{isUp ? '▲' : '▼'}</span>{isUp ? '+' : '−'}{absChange}
               </span>
             </div>
         </div>
@@ -434,9 +434,9 @@ export function UnifiedWorldRankings() {
                       {entry.rank}
                     </span>
                     {rankChange > 0 ? (
-                      <span className="text-[11px] font-extrabold text-emerald-700">↑</span>
+                      <span style={{ fontSize: '10px', color: 'rgba(22,163,74,0.9)' }}>▲</span>
                     ) : rankChange < 0 ? (
-                      <span className="text-[11px] font-extrabold text-red-500">↓</span>
+                      <span style={{ fontSize: '10px', color: 'rgba(220,38,38,0.75)' }}>▼</span>
                     ) : (
                       <span className="text-[10px] text-muted-foreground/30 font-bold">—</span>
                     )}

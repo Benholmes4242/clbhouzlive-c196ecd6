@@ -186,7 +186,7 @@ export function MoversThisWeek() {
                     ease: [0.34, 1.56, 0.64, 1], // Spring-like ease
                   }}
                 >
-                  <span className="text-[10px]">{isUp ? '↑' : '↓'}</span>
+                  <span style={{ fontSize: '10px' }}>{isUp ? '▲' : '▼'}</span>
                   {Math.abs(entry.rankChange)}
                 </motion.div>
               </div>
