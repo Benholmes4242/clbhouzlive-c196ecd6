@@ -87,12 +87,20 @@ const PGA_PLAYOFF_KEYWORDS = [
 ];
 
 const TOUR_NAME_TO_SLUG: Record<string, string> = {
+  // Display name variants (from TOUR_KEY_MAP lookup)
   'PGA Tour': 'pga',
   'LIV Golf': 'liv',
   'DP World Tour': 'euro',
   'Korn Ferry Tour': 'pgad',
   'Champions Tour': 'champ',
   'LPGA Tour': 'lpga',
+  // Raw lowercase DB fallbacks (when TOUR_KEY_MAP has no match)
+  'pga': 'pga',
+  'liv': 'liv',
+  'euro': 'euro',
+  'pgad': 'pgad',
+  'champ': 'champ',
+  'lpga': 'lpga',
 };
 
 function getContextLabel(tournament: SeasonTournament): string {
