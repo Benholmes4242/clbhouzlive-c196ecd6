@@ -35,26 +35,35 @@ async function fetchTrackerData(
   tournamentId: string,
   predictions: AIPredictionData
 ): Promise<PredictionTrackerData> {
-  // Fetch leaderboard data
+  // Fetch leaderboard data — join sr_players to get the Sportradar sr_id
+  // This is critical: ai_predictions stores Sportradar sr_id, but sr_leaderboards.player_id
+  // is the internal Supabase UUID (sr_players.id). We must key the map by sr_id.
   const { data: leaderboard } = await supabase
     .from('sr_leaderboards')
-    .select('player_id, position, position_tied, score, strokes, thru, status, round_1, round_2, round_3, round_4')
+    .select('player_id, position, position_tied, score, strokes, thru, status, round_1, round_2, round_3, round_4, sr_players!inner(sr_id, full_name)')
     .eq('tournament_id', tournamentId);
 
+  // Key by Sportradar sr_id so predictions can be matched correctly
   const leaderboardMap = new Map<string, any>();
+  const leaderboardByName = new Map<string, any>();
   (leaderboard || []).forEach(row => {
-    leaderboardMap.set(row.player_id, row);
+    const srId = (row.sr_players as any)?.sr_id;
+    const fullName = (row.sr_players as any)?.full_name;
+    if (srId) leaderboardMap.set(srId, row);
+    if (fullName) leaderboardByName.set(fullName.toLowerCase(), row);
   });
 
-  // Match top contenders
+  // Match top contenders — try sr_id first, fall back to name
   const trackedPredictions: TrackedPrediction[] = predictions.topContenders.map((p, i) => {
-    const lb = leaderboardMap.get(p.playerId);
+    const lb = leaderboardMap.get(p.playerId)
+      ?? leaderboardByName.get(p.playerName?.toLowerCase() ?? '');
     return buildTrackedPrediction(p, i + 1, lb, false);
   });
 
-  // Match dark horses
+  // Match dark horses — try sr_id first, fall back to name
   const trackedDarkHorses: TrackedPrediction[] = predictions.darkHorses.map((dh, i) => {
-    const lb = leaderboardMap.get(dh.playerId);
+    const lb = leaderboardMap.get(dh.playerId)
+      ?? leaderboardByName.get(dh.playerName?.toLowerCase() ?? '');
     return buildTrackedPrediction(
       { ...dh, reasons: [dh.hook], winProbability: 0 },
       predictions.topContenders.length + i + 1,
