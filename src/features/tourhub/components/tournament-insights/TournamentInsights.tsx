@@ -164,14 +164,16 @@ export const TournamentInsights = memo(function TournamentInsights() {
           </div>
         </div>
 
-        {/* Live/Upcoming toggle — shown when live OR when there's upcoming data */}
+        {/* Live/Upcoming toggle — matches CourseTabs wrapper */}
         {(isLive || hasUpcoming) && (
-          <LiveUpcomingToggle
-            activeView={intelligenceView}
-            onViewChange={setIntelligenceView}
-            hasUpcoming={hasUpcoming}
-            isLive={isLive}
-          />
+          <div className="-mx-4 px-4 py-3 bg-muted">
+            <LiveUpcomingToggle
+              activeView={intelligenceView}
+              onViewChange={setIntelligenceView}
+              hasUpcoming={hasUpcoming}
+              isLive={isLive}
+            />
+          </div>
         )}
       </motion.div>
 
