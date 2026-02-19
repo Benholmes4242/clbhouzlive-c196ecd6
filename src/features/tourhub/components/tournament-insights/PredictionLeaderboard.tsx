@@ -39,7 +39,7 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
       >
         <div className="flex-1 min-w-0">
           <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' as const, color: 'rgba(0,0,0,0.35)' }}>
-            PLAYER
+            TOP PICKS
           </span>
         </div>
         <div className="w-[52px] flex-shrink-0 text-center">

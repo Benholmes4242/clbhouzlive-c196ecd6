@@ -42,7 +42,7 @@ export const LiveUpcomingToggle: React.FC<LiveUpcomingToggleProps> = ({
                 : "text-muted-foreground hover:text-foreground rounded-lg active:bg-card/50"
             )}
           >
-            {tab.id === 'live' && isActive && isLive && (
+            {tab.id === 'live' && isLive && (
               <span
                 className="w-[6px] h-[6px] rounded-full flex-shrink-0"
                 style={{

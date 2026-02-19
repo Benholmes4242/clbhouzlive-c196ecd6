@@ -1,9 +1,10 @@
 /**
- * IntelligenceTabSwitcher - Premium tactile pill selector
- * Light themed with elevated active state
+ * IntelligenceTabSwitcher - Matches LiveUpcomingToggle style
+ * Transparent track, white active pill with shadow
  */
 
 import React from 'react';
+import { cn } from '@/lib/utils';
 
 type IntelligenceTab = 'courseDNA' | 'predictions';
 
@@ -15,31 +16,24 @@ interface IntelligenceTabSwitcherProps {
 const IntelligenceTabSwitcher: React.FC<IntelligenceTabSwitcherProps> = ({ activeTab, onTabChange }) => {
   const tabs: { id: IntelligenceTab; label: string }[] = [
     { id: 'courseDNA', label: 'Course DNA' },
-    { id: 'predictions', label: 'Predictions' },
+    { id: 'predictions', label: 'Top Picks' },
   ];
 
   return (
-    <div 
-      className="flex p-1 rounded-[14px] mb-4 border border-border"
-      style={{ background: '#F1F3F5' }}
-    >
+    <div className="flex items-stretch rounded-xl overflow-hidden bg-transparent mb-4">
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
-        
+
         return (
           <button
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
-            className="flex-1 py-2.5 text-center rounded-[11px] transition-all duration-300 active:scale-95"
-            style={{
-              fontSize: '12px',
-              fontWeight: isActive ? 600 : 500,
-              color: isActive ? '#1C1917' : '#78716C',
-              background: isActive ? 'hsl(var(--card))' : 'transparent',
-              border: isActive ? '1px solid hsl(var(--border))' : '1px solid transparent',
-              boxShadow: isActive ? '0 1px 3px rgba(0, 0, 0, 0.06)' : 'none',
-              transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
-            }}
+            className={cn(
+              "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98] flex items-center justify-center",
+              isActive
+                ? "bg-card text-foreground shadow-sm m-1 rounded-lg"
+                : "text-muted-foreground hover:text-foreground rounded-lg active:bg-card/50"
+            )}
           >
             {tab.label}
           </button>
