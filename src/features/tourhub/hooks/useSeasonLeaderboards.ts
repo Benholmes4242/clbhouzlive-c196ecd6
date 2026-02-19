@@ -8,7 +8,20 @@ import { resolvePhotoUrl } from '../utils/resolvePhotoUrl';
 // TYPES
 // ============================================
 
-export type CategoryId = 'distance' | 'accuracy' | 'scrambling' | 'putting' | 'sg_total';
+export type CategoryId =
+  | 'sg_total'
+  | 'scoring_avg'
+  | 'distance'
+  | 'accuracy'
+  | 'gir_pct'
+  | 'scrambling'
+  | 'sand_saves'
+  | 'putting'
+  | 'world_rank'
+  | 'events_played'
+  | 'cuts_made'
+  | 'top_10'
+  | 'earnings';
 
 export interface LeaderboardPlayer {
   rank: number;
@@ -61,6 +74,24 @@ export const CATEGORY_CONFIG: Record<CategoryId, {
   higherIsBetter: boolean;
   formatValue: (val: number) => string;
 }> = {
+  sg_total: {
+    name: 'SG: Total',
+    icon: '📊',
+    description: 'Total strokes gained vs field average',
+    dbKey: 'strokes_gained_total',
+    unit: '',
+    higherIsBetter: true,
+    formatValue: (val) => (val >= 0 ? '+' : '') + val.toFixed(2),
+  },
+  scoring_avg: {
+    name: 'Scoring',
+    icon: '📋',
+    description: 'Average score per round',
+    dbKey: 'scoring_average',
+    unit: '',
+    higherIsBetter: false,
+    formatValue: (val) => val.toFixed(2),
+  },
   distance: {
     name: 'Distance',
     icon: '🏌️',
@@ -79,11 +110,29 @@ export const CATEGORY_CONFIG: Record<CategoryId, {
     higherIsBetter: true,
     formatValue: (val) => val.toFixed(1),
   },
+  gir_pct: {
+    name: 'GIR',
+    icon: '✅',
+    description: 'Greens in regulation percentage',
+    dbKey: 'greens_in_reg',
+    unit: '%',
+    higherIsBetter: true,
+    formatValue: (val) => val.toFixed(1),
+  },
   scrambling: {
     name: 'Scrambling',
     icon: '🔄',
     description: 'Percentage of pars or better when missing GIR',
     dbKey: 'scrambling_pct',
+    unit: '%',
+    higherIsBetter: true,
+    formatValue: (val) => val.toFixed(1),
+  },
+  sand_saves: {
+    name: 'Sand Saves',
+    icon: '🏖️',
+    description: 'Sand save percentage from greenside bunkers',
+    dbKey: 'sand_saves',
     unit: '%',
     higherIsBetter: true,
     formatValue: (val) => val.toFixed(1),
@@ -97,14 +146,54 @@ export const CATEGORY_CONFIG: Record<CategoryId, {
     higherIsBetter: false,
     formatValue: (val) => val.toFixed(2),
   },
-  sg_total: {
-    name: 'SG: Total',
-    icon: '📊',
-    description: 'Total strokes gained vs field average',
-    dbKey: 'strokes_gained_total',
+  world_rank: {
+    name: 'World Rank',
+    icon: '🌍',
+    description: 'Official World Golf Ranking position',
+    dbKey: 'world_rank',
+    unit: '',
+    higherIsBetter: false,
+    formatValue: (val) => `#${Math.round(val)}`,
+  },
+  events_played: {
+    name: 'Events',
+    icon: '📅',
+    description: 'Number of events played this season',
+    dbKey: 'events_played',
     unit: '',
     higherIsBetter: true,
-    formatValue: (val) => (val >= 0 ? '+' : '') + val.toFixed(2),
+    formatValue: (val) => Math.round(val).toString(),
+  },
+  cuts_made: {
+    name: 'Cuts Made',
+    icon: '✂️',
+    description: 'Number of cuts made this season',
+    dbKey: 'cuts_made',
+    unit: '',
+    higherIsBetter: true,
+    formatValue: (val) => Math.round(val).toString(),
+  },
+  top_10: {
+    name: 'Top 10s',
+    icon: '⭐',
+    description: 'Number of top-10 finishes this season',
+    dbKey: 'top_10s',
+    unit: '',
+    higherIsBetter: true,
+    formatValue: (val) => Math.round(val).toString(),
+  },
+  earnings: {
+    name: 'Earnings',
+    icon: '💰',
+    description: 'Total season earnings',
+    dbKey: 'earnings',
+    unit: '',
+    higherIsBetter: true,
+    formatValue: (val) => {
+      if (val >= 1_000_000) return `$${(val / 1_000_000).toFixed(1)}M`;
+      if (val >= 1_000) return `$${(val / 1_000).toFixed(0)}K`;
+      return `$${Math.round(val)}`;
+    },
   },
 };
 
@@ -113,11 +202,19 @@ export const CATEGORY_CONFIG: Record<CategoryId, {
 // ============================================
 
 const PERCENTILE_THRESHOLDS: Record<CategoryId, { min: number; max: number }> = {
+  sg_total: { min: -1, max: 2.5 },
+  scoring_avg: { min: 72, max: 68 },
   distance: { min: 280, max: 330 },
   accuracy: { min: 50, max: 75 },
+  gir_pct: { min: 55, max: 75 },
   scrambling: { min: 50, max: 70 },
+  sand_saves: { min: 35, max: 65 },
   putting: { min: 30, max: 27 },
-  sg_total: { min: -1, max: 2.5 },
+  world_rank: { min: 200, max: 1 },
+  events_played: { min: 5, max: 30 },
+  cuts_made: { min: 2, max: 25 },
+  top_10: { min: 0, max: 10 },
+  earnings: { min: 100_000, max: 15_000_000 },
 };
 
 function calculateSkillLevel(
@@ -160,7 +257,7 @@ async function fetchSeasonLeaderboards(requestedYear?: number): Promise<SeasonLe
     throw new Error('Failed to fetch seasons');
   }
 
-  // Step 2: Check which seasons have statistics data (parallel for efficiency)
+  // Step 2: Check which seasons have statistics data
   const seasonsWithStatsCheck = await Promise.all(
     allSeasons.map(async (season) => {
       const { count, error: countError } = await supabase
@@ -176,7 +273,6 @@ async function fetchSeasonLeaderboards(requestedYear?: number): Promise<SeasonLe
     })
   );
 
-  // Filter to only seasons with stats, deduplicate by year (take first/newest id per year)
   const seenYears = new Set<number>();
   const availableSeasons = seasonsWithStatsCheck
     .filter((s) => {
@@ -186,7 +282,7 @@ async function fetchSeasonLeaderboards(requestedYear?: number): Promise<SeasonLe
       }
       return false;
     })
-    .sort((a, b) => b.year - a.year); // Newest first
+    .sort((a, b) => b.year - a.year);
 
   if (availableSeasons.length === 0) {
     throw new Error('No seasons with statistics data found');
@@ -196,15 +292,13 @@ async function fetchSeasonLeaderboards(requestedYear?: number): Promise<SeasonLe
   let seasonData: AvailableSeason;
 
   if (requestedYear) {
-    // User requested a specific year
     const requested = availableSeasons.find((s) => s.year === requestedYear);
-    seasonData = requested || availableSeasons[0]; // Fallback to newest if requested not found
+    seasonData = requested || availableSeasons[0];
   } else {
-    // Default to newest season with stats
     seasonData = availableSeasons[0];
   }
 
-  // Step 4: Fetch all player statistics for this valid season
+  // Step 4: Fetch all player statistics for this season
   const { data: statsData, error: statsError } = await supabase
     .from('sr_player_statistics')
     .select(`
@@ -284,7 +378,6 @@ async function fetchSeasonLeaderboards(requestedYear?: number): Promise<SeasonLe
       rank: index + 1,
     }));
 
-    // Calculate top 10 average
     const topTenAverage =
       top10.length > 0
         ? top10.reduce((sum, p) => sum + p.statValue, 0) / top10.length

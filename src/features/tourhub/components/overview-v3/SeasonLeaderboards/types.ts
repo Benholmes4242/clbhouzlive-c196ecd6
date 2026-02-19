@@ -1,6 +1,19 @@
 // src/features/tourhub/components/overview-v3/SeasonLeaderboards/types.ts
 
-export type CategoryId = 'distance' | 'accuracy' | 'scrambling' | 'putting' | 'sg_total';
+export type CategoryId =
+  | 'sg_total'
+  | 'scoring_avg'
+  | 'distance'
+  | 'accuracy'
+  | 'gir_pct'
+  | 'scrambling'
+  | 'sand_saves'
+  | 'putting'
+  | 'world_rank'
+  | 'events_played'
+  | 'cuts_made'
+  | 'top_10'
+  | 'earnings';
 
 export interface LeaderboardPlayer {
   rank: number;
