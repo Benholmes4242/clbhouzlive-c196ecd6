@@ -66,6 +66,7 @@ export function ScheduleTournamentCard({
   const contextLabel = getContextLabel({ name: tournament.name, tourName: tourName ?? undefined });
   const isMajor = contextLabel === 'MAJOR CHAMPIONSHIP';
   const isSignature = contextLabel === 'SIGNATURE EVENT';
+  const isRolex = contextLabel === 'ROLEX SERIES';
   
   const venue = [venueName, venueCity].filter(Boolean).join(' · ');
 
@@ -106,8 +107,8 @@ export function ScheduleTournamentCard({
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
       className={`w-full flex items-center gap-3 px-3.5 py-2.5 bg-card rounded-2xl border border-border/50 text-left transition-all active:scale-[0.98] ${className || ''}`}
       style={{
-        borderLeftWidth: (isMajor || isSignature) ? '3px' : undefined,
-        borderLeftColor: isMajor ? 'hsl(142, 76%, 36%)' : isSignature ? '#f59e0b' : undefined,
+        borderLeftWidth: (isMajor || isSignature || isRolex) ? '3px' : undefined,
+        borderLeftColor: isMajor ? '#f59e0b' : (isSignature || isRolex) ? 'rgba(16, 185, 129, 0.8)' : undefined,
       }}
       whileTap={{ scale: 0.98 }}
       aria-label={ariaLabel}
@@ -132,7 +133,7 @@ export function ScheduleTournamentCard({
               fontSize: '9px',
               fontWeight: 500,
               letterSpacing: '0.05em',
-              color: isMajor ? '#f59e0b' : isSignature ? '#f59e0b' : isLive ? '#22C55E' : 'hsl(var(--muted-foreground) / 0.7)',
+              color: isMajor ? '#f59e0b' : (isSignature || isRolex) ? 'rgba(16, 185, 129, 0.9)' : isLive ? '#22C55E' : 'hsl(var(--muted-foreground) / 0.7)',
             }}
           >
             {isLive ? '● LIVE' : contextLabel}
