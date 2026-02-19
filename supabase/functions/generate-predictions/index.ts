@@ -68,16 +68,6 @@ interface PredictionOutput {
     reasons: string[];
     concern: string;
   }[];
-  darkHorses: {
-    playerId: string;
-    playerName: string;
-    photoUrl: string | null;
-    pgaTourId: string | null;
-    country: string;
-    worldRanking: number;
-    hook: string;
-    keyStat: string;
-  }[];
   courseAnalysis: {
     winnerProfile: string;
     keyStats: string[];
@@ -425,21 +415,16 @@ ${injuryNews}
     // STEP 5: Enrich with Photo URLs & PGA Tour IDs
     // =============================================
 
-    // Create maps for both UUID and name-based lookups
-    // Claude sometimes returns slug-style IDs instead of UUIDs
     const playerByIdMap = new Map(players.map(p => [p.player_id, p]));
     const playerByNameMap = new Map(players.map(p => [
       `${p.first_name} ${p.last_name}`.toLowerCase(), 
       p
     ]));
 
-    // Helper to find player by ID or name
     function findPlayer(playerId: string, playerName: string): PlayerStats | undefined {
-      // Try UUID first
       let player = playerByIdMap.get(playerId);
       if (player) return player;
       
-      // Fallback: try name lookup
       const normalizedName = playerName?.toLowerCase()?.trim();
       if (normalizedName) {
         player = playerByNameMap.get(normalizedName);
@@ -457,19 +442,9 @@ ${injuryNews}
       const player = findPlayer(tc.playerId, tc.playerName);
       return {
         ...tc,
-        playerId: player?.player_id || tc.playerId,  // Fix the ID too
+        playerId: player?.player_id || tc.playerId,
         photoUrl: player?.photo_url || tc.photoUrl,
         pgaTourId: player?.pga_tour_id || tc.pgaTourId,
-      };
-    });
-
-    predictions.darkHorses = predictions.darkHorses.map(dh => {
-      const player = findPlayer(dh.playerId, dh.playerName);
-      return {
-        ...dh,
-        playerId: player?.player_id || dh.playerId,  // Fix the ID too
-        photoUrl: player?.photo_url || dh.photoUrl,
-        pgaTourId: player?.pga_tour_id || dh.pgaTourId,
       };
     });
 
@@ -482,7 +457,7 @@ ${injuryNews}
       .upsert({
         tournament_id: tournament.id,
         predictions: predictions.topContenders,
-        dark_horses: predictions.darkHorses,
+        dark_horses: [],
         course_analysis: predictions.courseAnalysis,
         confidence: predictions.confidence,
         model_version: 'claude-sonnet-4-20250514',
@@ -558,7 +533,7 @@ function isPredictionStale(prediction: any): boolean {
 function formatStoredPredictions(stored: any) {
   return {
     topContenders: stored.predictions || [],
-    darkHorses: stored.dark_horses || [],
+    darkHorses: [],
     courseAnalysis: stored.course_analysis || {},
     confidence: stored.confidence || 0.7,
     reasoning: '',
@@ -690,14 +665,21 @@ For the "skillsAnalysis" in courseAnalysis, provide a detailed 2-3 sentence expl
 Good example: "At TPC Scottsdale, approach play is paramount - the small, firm greens demand precision with mid-irons from 150-180 yards. Putting becomes the separator on Sunday, as the slick, undulating surfaces reward exceptional distance control."
 Bad example: "Players who are good at golf will do well here."
 
+## CRITICAL: NO GAMBLING LANGUAGE
+
+Do NOT reference betting odds, spreads, lines, prices, or any gambling-related language anywhere in your response. Do not use terms like "+2000", "longshot", "odds", "favorite to win at", "betting", "wager", or "payout". Focus exclusively on player form, statistics, course fit, and historical performance.
+
 ## CRITICAL: TEXT LENGTH RULES - READ CAREFULLY
 
 You MUST write COMPLETE sentences that fit within character limits.
 Do NOT write long sentences. Every sentence must be self-contained and make sense on its own.
 
 === FOR topContenders "reasons" array ===
-Each reason MUST be a COMPLETE sentence of 50 characters or less.
-The sentence must make sense on its own - do not write partial thoughts.
+Each contender MUST have exactly 3 reasons. Each reason MUST be a COMPLETE sentence of 50 characters or less.
+The 3 reasons should cover distinct insights:
+1. Recent form or momentum (e.g. "Won last week at Pebble Beach")
+2. Course fit or key stat (e.g. "71% GIR leads field in precision")
+3. Historical performance (e.g. "Three top-10s in last four starts")
 
 GOOD EXAMPLES (complete sentences under 50 chars):
 - "Won here in 2022 and 2023" (25 chars) ✓
@@ -706,39 +688,11 @@ GOOD EXAMPLES (complete sentences under 50 chars):
 - "Hot form after winning American Express" (40 chars) ✓
 - "Three top-10s in last four starts" (34 chars) ✓
 - "Leads tour in strokes gained approach" (38 chars) ✓
-- "Two-time champ here (2022, 2023)" (32 chars) ✓
 
 BAD EXAMPLES (too long or incomplete):
-- "Two-time Phoenix Open winner (2022, 2023) with exceptional course history including T-3 and T-7 finishes" ✗ (WAY too long - 103 chars)
-- "Expert models project him as top-2 contender with huge payout potential" ✗ (71 chars - too long)
+- "Two-time Phoenix Open winner (2022, 2023) with exceptional course history including T-3 and T-7 finishes" ✗ (WAY too long)
+- "Expert models project him as top-2 contender with huge payout potential" ✗ (gambling language)
 - "Two-time Phoenix Open champion (2016, 2017) with" ✗ (incomplete sentence)
-
-=== FOR darkHorses "keyStat" ===
-MUST be 25 characters or less. Clean skill description, NO numbers or stats.
-
-GOOD EXAMPLES:
-- "Elite putting" (13 chars) ✓
-- "Great ball striker" (18 chars) ✓
-- "Iron specialist" (15 chars) ✓
-- "Deadly from 150 yards" (21 chars) ✓
-
-BAD EXAMPLES:
-- "1.677 PUTTING AVERAGE" ✗ (has numbers)
-- "66.42% DRIVING ACCURACY" ✗ (has percentage)
-- "Elite putting combined with scrambling" ✗ (38 chars - too long)
-
-=== FOR darkHorses "hook" ===
-MUST be a COMPLETE sentence of 50 characters or less.
-
-GOOD EXAMPLES:
-- "Local favorite who knows these greens" (37 chars) ✓
-- "Won last month, confidence is high" (35 chars) ✓
-- "Three straight top-20s at this venue" (37 chars) ✓
-- "Putter is hot, ranked #3 this season" (37 chars) ✓
-
-BAD EXAMPLES:
-- "Elite putting combined with excellent scrambling makes him a serious threat on these greens" ✗ (91 chars - way too long)
-- "Former elite player showing signs of return to form with" ✗ (incomplete sentence)
 
 REMEMBER: Write SHORT, COMPLETE sentences. Quality over quantity. Every word must earn its place.
 
@@ -759,30 +713,18 @@ Return a JSON object with this exact structure:
       "winProbability": 15.5,
       "courseFitScore": 92,
       "reasons": [
-        "MAX 50 CHARS. Example: 'Won here in 2022 and 2023'",
-        "MAX 50 CHARS. Example: 'Elite iron play this season'",
-        "MAX 50 CHARS. Example: 'Recent win shows peak form'"
+        "MAX 50 CHARS. Recent form insight",
+        "MAX 50 CHARS. Course fit or key stat",
+        "MAX 50 CHARS. Historical performance"
       ],
       "concern": "One potential weakness or risk"
-    }
-  ],
-  "darkHorses": [
-    {
-      "playerId": "uuid-from-data",
-      "playerName": "Full Name",
-      "photoUrl": null,
-      "pgaTourId": null,
-      "country": "USA",
-      "worldRanking": 45,
-      "hook": "MAX 50 CHARS. Example: 'Course specialist with three top-10s here'",
-      "keyStat": "MAX 25 CHARS. Clean skill name only. Example: 'Elite putting'"
     }
   ],
   "courseAnalysis": {
     "winnerProfile": "Description of typical winner at this venue",
     "keyStats": ["stat1", "stat2", "stat3"],
     "insight": "One compelling insight about course history and who tends to win here",
-    "skillsAnalysis": "A detailed 2-3 sentence explanation of what parts of a player's game are most important at THIS specific course and why. Be specific about which skills matter (approach play, putting, driving, scrambling), why they matter at this course (green size, rough severity, fairway width, wind exposure, etc.), and what type of player profile succeeds here.",
+    "skillsAnalysis": "A detailed 2-3 sentence explanation of what parts of a player's game are most important at THIS specific course and why.",
     "difficulty": "Easy/Moderate/Difficult"
   },
   "confidence": 0.75,
@@ -792,12 +734,14 @@ Return a JSON object with this exact structure:
 ## IMPORTANT RULES
 
 1. **Use exact player IDs from the data provided** - do not make up IDs
-2. **Provide exactly 3 top contenders** ranked 1-3
-3. **Provide exactly 1 dark horse** ranked 30-100 in world rankings
-4. **Win probabilities should sum to approximately 50-60%** for top 3
-5. **Be specific in reasons** - cite actual statistics
-6. **Course fit scores should be 1-100**
-7. **Return ONLY valid JSON** - no markdown, no explanation outside the JSON
+2. **Provide exactly 4 top contenders** ranked 1-4
+3. **Do NOT provide any dark horses** - only 4 top contenders
+4. **Each contender MUST have exactly 3 reasons**
+5. **Win probabilities should sum to approximately 50-60%** for all 4
+6. **Be specific in reasons** - cite actual statistics
+7. **Course fit scores should be 1-100**
+8. **Return ONLY valid JSON** - no markdown, no explanation outside the JSON
+9. **No gambling language** - no odds, betting, lines, spreads, or wagering terms
 
 Provide your analysis now:`;
 }

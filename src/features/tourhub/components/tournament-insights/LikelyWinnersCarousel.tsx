@@ -1,12 +1,12 @@
 /**
  * TopPicksCarousel (formerly LikelyWinnersCarousel)
- * Single-card swipeable carousel: 3 top picks + 1 dark horse
+ * Single-card swipeable carousel: 4 top picks, no dark horses
  * Each card full-width, peek next card, dot indicators
  */
 
 import { memo, useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, Info } from 'lucide-react';
+import { Info } from 'lucide-react';
 import type { WinnerProfile, ContenderCard } from './types';
 import ConfidenceProgress from './components/ConfidenceProgress';
 
@@ -22,7 +22,6 @@ interface PickCard {
   avatarUrl: string;
   confidenceTier: 'elite' | 'high' | 'medium';
   bullets: string[];
-  isDarkHorse: boolean;
 }
 
 export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
@@ -33,9 +32,8 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Build unified pick list: featured + 2 contenders + 1 dark horse
-  const contenderCards = cards.filter(c => c.type === 'contender').slice(0, 2);
-  const threatCards = cards.filter(c => c.type === 'threat').slice(0, 1);
+  // Build unified pick list: featured + 3 contenders = 4 total
+  const contenderCards = cards.filter(c => c.type === 'contender').slice(0, 3);
 
   const allPicks: PickCard[] = [
     {
@@ -45,7 +43,6 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
       avatarUrl: featured.avatarUrl,
       confidenceTier: featured.confidenceTier,
       bullets: featured.fitBullets.slice(0, 3),
-      isDarkHorse: false,
     },
     ...contenderCards.map(c => ({
       id: c.id,
@@ -54,16 +51,6 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
       avatarUrl: c.avatarUrl,
       confidenceTier: c.confidenceTier ?? ('medium' as const),
       bullets: c.description ? [c.description] : [],
-      isDarkHorse: false,
-    })),
-    ...threatCards.map(c => ({
-      id: c.id,
-      name: c.name,
-      countryCode: c.countryCode,
-      avatarUrl: c.avatarUrl,
-      confidenceTier: c.confidenceTier ?? ('medium' as const),
-      bullets: c.description ? [c.description] : [],
-      isDarkHorse: true,
     })),
   ];
 
@@ -71,7 +58,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
-    const cardWidth = el.offsetWidth - 20; // account for peek
+    const cardWidth = el.offsetWidth - 20;
     const idx = Math.round(el.scrollLeft / cardWidth);
     setActiveIndex(Math.min(idx, allPicks.length - 1));
   }, [allPicks.length]);
@@ -139,6 +126,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
           WebkitOverflowScrolling: 'touch',
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
+          scrollPaddingLeft: '16px',
         }}
       >
         {allPicks.map((pick, i) => (
@@ -184,20 +172,6 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                   >
                     {pick.countryCode}
                   </span>
-                )}
-                {pick.isDarkHorse && (
-                  <div
-                    className="inline-flex items-center gap-1 text-[9px] font-bold uppercase px-2 py-0.5 rounded-md mt-1.5"
-                    style={{
-                      background: 'rgba(245, 158, 11, 0.1)',
-                      border: '1px solid rgba(245, 158, 11, 0.15)',
-                      color: '#D97706',
-                      letterSpacing: '0.8px',
-                    }}
-                  >
-                    <Zap className="w-2.5 h-2.5" />
-                    DARK HORSE
-                  </div>
                 )}
               </div>
             </div>

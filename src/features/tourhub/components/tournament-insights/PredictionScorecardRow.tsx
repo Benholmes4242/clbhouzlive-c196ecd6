@@ -1,6 +1,7 @@
 /**
  * PredictionScorecardRow - OWGR-style row: PLAYER | ACTUAL | OFF LEAD
  * OFF LEAD = actualPosition - 1 (how far from the leader)
+ * No dark horse logic — all rows identical.
  */
 
 import React from 'react';
@@ -12,17 +13,12 @@ interface PredictionScorecardRowProps {
   prediction: TrackedPrediction;
   index: number;
   isCompleted?: boolean;
-  isDarkHorse?: boolean;
 }
 
 function getOrdinalSuffix(n: number): string {
   const s = ['th', 'st', 'nd', 'rd'];
   const v = n % 100;
   return s[(v - 20) % 10] || s[v] || s[0];
-}
-
-function formatOrdinal(n: number): string {
-  return `${n}${getOrdinalSuffix(n)}`;
 }
 
 function formatActual(prediction: TrackedPrediction, isCompleted?: boolean): string {
@@ -70,12 +66,10 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
   prediction,
   index,
   isCompleted,
-  isDarkHorse,
 }) => {
   const offLead = getOffLeadDisplay(prediction, isCompleted);
   const isCut = prediction.performanceStatus === 'cut';
   const isWD = prediction.performanceStatus === 'withdrawn';
-  const isDimmed = isCut || isWD;
   const avatarUrl = prediction.pgaTourId
     ? getPgaTourHeadshotUrl(prediction.pgaTourId)
     : null;
@@ -129,22 +123,6 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
               {prediction.thru !== null && prediction.thru > 0 ? ` · thru ${prediction.thru}` : ''}
               {prediction.currentRound ? ` · R${prediction.currentRound}` : ''}
             </p>
-          )}
-          {/* Dark Horse inline badge */}
-          {isDarkHorse && (
-            <span style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '3px',
-              fontSize: '10px',
-              fontWeight: 700,
-              letterSpacing: '0.5px',
-              textTransform: 'uppercase' as const,
-              color: 'rgba(245,158,11,0.85)',
-              marginTop: '2px',
-            }}>
-              ⚡ Dark Horse
-            </span>
           )}
         </div>
       </div>

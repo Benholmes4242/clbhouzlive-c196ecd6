@@ -318,16 +318,37 @@ function formatPredictions(
   isAIPowered: boolean,
   generatedAt?: string
 ): AIPredictionData {
-  const topContenders = (predictions.topContenders || predictions).map((p: any, index: number) => ({
+  // Backwards compat: merge contenders + dark horses into one list, take 4
+  const rawContenders = (predictions.topContenders || predictions || []).map((p: any, index: number) => ({
     ...p,
     rank: p.rank || index + 1,
     photoUrl: resolvePlayerPhotoUrl(p.photoUrl, p.pgaTourId),
+    reasons: ensureThreeReasons(p.reasons),
   }));
 
-  const darkHorses = (predictions.darkHorses || []).map((dh: any) => ({
-    ...dh,
-    photoUrl: resolvePlayerPhotoUrl(dh.photoUrl, dh.pgaTourId),
-  }));
+  // If old format had < 4 contenders but had dark horses, merge them
+  const rawDarkHorses = predictions.darkHorses || [];
+  let allPicks = [...rawContenders];
+  if (allPicks.length < 4 && rawDarkHorses.length > 0) {
+    const remaining = 4 - allPicks.length;
+    rawDarkHorses.slice(0, remaining).forEach((dh: any) => {
+      allPicks.push({
+        ...dh,
+        rank: allPicks.length + 1,
+        photoUrl: resolvePlayerPhotoUrl(dh.photoUrl, dh.pgaTourId),
+        courseFitScore: dh.courseFitScore || 70,
+        winProbability: dh.winProbability || 5,
+        concern: dh.concern || '',
+        reasons: ensureThreeReasons(dh.reasons || [
+          dh.hook,
+          dh.keyStat ? `Key strength: ${dh.keyStat}` : 'Strong overall form',
+          'Proven competitor on tour',
+        ]),
+      });
+    });
+  }
+
+  const topContenders = allPicks.slice(0, 4);
 
   return {
     tournament: {
@@ -344,7 +365,7 @@ function formatPredictions(
       status: tournament.status,
     },
     topContenders,
-    darkHorses,
+    darkHorses: [],
     courseAnalysis: predictions.courseAnalysis || {
       winnerProfile: '',
       keyStats: [],
@@ -355,6 +376,29 @@ function formatPredictions(
     generatedAt: generatedAt || new Date().toISOString(),
     isAIPowered,
   };
+}
+
+/**
+ * Ensures exactly 3 reasons per pick, strips odds/betting language
+ */
+function ensureThreeReasons(reasons: string[]): string[] {
+  const cleaned = (reasons || []).filter(r =>
+    r &&
+    !/[+-]\d{3,}/.test(r) &&
+    !r.toLowerCase().includes('odds') &&
+    !r.toLowerCase().includes('betting') &&
+    !r.toLowerCase().includes('longshot') &&
+    !r.toLowerCase().includes('payout')
+  );
+  const fallbacks = [
+    'Strong recent form on tour',
+    'Course profile suits their game',
+    'Proven record at similar venues',
+  ];
+  while (cleaned.length < 3) {
+    cleaned.push(fallbacks[cleaned.length]);
+  }
+  return cleaned.slice(0, 3);
 }
 
 // =============================================

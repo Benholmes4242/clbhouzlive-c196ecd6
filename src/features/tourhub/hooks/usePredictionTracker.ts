@@ -62,33 +62,36 @@ async function fetchTrackerData(
   ).length;
   const fieldCompletionPct = totalInField > 0 ? playersWithScores / totalInField : 0;
 
-  // Match top contenders — try sr_id first, fall back to name
-  const trackedPredictions: TrackedPrediction[] = predictions.topContenders.map((p, i) => {
+  // Match top contenders (all 4 picks, no dark horses)
+  const trackedPredictions: TrackedPrediction[] = predictions.topContenders.slice(0, 4).map((p, i) => {
     const lb = leaderboardMap.get(p.playerId)
       ?? leaderboardByName.get(p.playerName?.toLowerCase() ?? '');
     return buildTrackedPrediction(p, i + 1, lb, false, fieldCompletionPct);
   });
 
-  // Match dark horses — try sr_id first, fall back to name
-  const trackedDarkHorses: TrackedPrediction[] = predictions.darkHorses.map((dh, i) => {
-    const lb = leaderboardMap.get(dh.playerId)
-      ?? leaderboardByName.get(dh.playerName?.toLowerCase() ?? '');
-    return buildTrackedPrediction(
-      { ...dh, reasons: [dh.hook], winProbability: 0 },
-      predictions.topContenders.length + i + 1,
-      lb,
-      true,
-      fieldCompletionPct
-    );
-  });
+  // Backwards compat: if old data had dark horses but < 4 contenders, merge them in
+  if (trackedPredictions.length < 4 && predictions.darkHorses?.length > 0) {
+    const remaining = 4 - trackedPredictions.length;
+    predictions.darkHorses.slice(0, remaining).forEach((dh, i) => {
+      const lb = leaderboardMap.get(dh.playerId)
+        ?? leaderboardByName.get(dh.playerName?.toLowerCase() ?? '');
+      trackedPredictions.push(buildTrackedPrediction(
+        { ...dh, reasons: [dh.hook], winProbability: 0 },
+        trackedPredictions.length + 1,
+        lb,
+        false,
+        fieldCompletionPct
+      ));
+    });
+  }
 
-  // Calculate accuracy metrics (based on top contenders only)
+  // Calculate accuracy metrics
   const accuracy = calculateAccuracy(trackedPredictions);
 
   return {
     predictions: trackedPredictions,
-    darkHorses: trackedDarkHorses,
-    allPicks: [...trackedPredictions, ...trackedDarkHorses],
+    darkHorses: [],
+    allPicks: trackedPredictions,
     accuracy,
     lastUpdated: new Date().toISOString(),
   };
@@ -142,7 +145,7 @@ function buildTrackedPrediction(
     predictedRank,
     winProbability: player.winProbability || 0,
     reasons: player.reasons || [],
-    isDarkHorse,
+    isDarkHorse: false,
     actualPosition,
     actualPositionTied: lb?.position_tied ?? false,
     score: lb?.score ?? null,

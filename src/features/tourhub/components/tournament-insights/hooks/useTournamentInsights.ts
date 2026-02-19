@@ -112,7 +112,7 @@ function transformPredictions(aiData: AIPredictionData): TournamentInsightsData 
       expandedText: (courseAnalysis as any)?.skillsAnalysis || generateSkillsAnalysis(courseAnalysis?.keyStats),
     },
 
-    winners: topContenders.slice(0, 5).map((p, i) => ({
+    winners: topContenders.slice(0, 4).map((p, i) => ({
       id: p.playerId,
       name: p.playerName,
       countryCode: p.country,
@@ -122,16 +122,9 @@ function transformPredictions(aiData: AIPredictionData): TournamentInsightsData 
       keyTag: extractKeyTag(p.reasons?.[0]),
     })),
 
-    dangerous: darkHorses.slice(0, 4).map(dh => ({
-      id: dh.playerId,
-      name: dh.playerName,
-      avatarUrl: dh.photoUrl || '',
-      worldRankText: dh.worldRanking ? `#${dh.worldRanking}` : undefined,
-      traitLabel: extractTraitLabel(dh.keyStat),
-      oneLiner: dh.hook,
-    })),
+    dangerous: [],
 
-    contenderCards: buildContenderCards(topContenders, darkHorses),
+    contenderCards: buildContenderCards(topContenders),
   };
 }
 
@@ -173,32 +166,19 @@ function limitText(text: string, maxLength: number): string {
 }
 
 function buildContenderCards(
-  topContenders: any[],
-  darkHorses: any[]
+  topContenders: any[]
 ): ContenderCard[] {
-  // Contenders #2-5 (skip #1, that's the featured card)
-  const contenders: ContenderCard[] = topContenders.slice(1, 5).map((p, i) => ({
+  // All 4 picks as contender cards (skip #1, that's the featured card in carousel)
+  return topContenders.slice(1, 4).map((p, i) => ({
     id: p.playerId,
     name: p.playerName,
     countryCode: p.country,
     avatarUrl: p.photoUrl || '',
-    description: limitText(p.reasons?.[0] || '', 50), // 50 char max
+    description: limitText(p.reasons?.[0] || '', 50),
     type: 'contender' as const,
     rank: i + 2,
     confidenceTier: getConfidenceTier(i + 1),
   }));
-
-  // Threats (formerly Dangerous Profiles)
-  const threats: ContenderCard[] = darkHorses.slice(0, 3).map((dh) => ({
-    id: dh.playerId,
-    name: dh.playerName,
-    avatarUrl: dh.photoUrl || '',
-    description: limitText(dh.hook, 50), // 50 char max
-    type: 'threat' as const,
-    traitLabel: extractTraitLabel(dh.keyStat), // 25 char max via function
-  }));
-
-  return [...contenders, ...threats];
 }
 
 function getConfidenceTier(rank: number): ConfidenceTier {
