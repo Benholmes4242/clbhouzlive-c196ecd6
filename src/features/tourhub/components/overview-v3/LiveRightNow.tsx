@@ -1,174 +1,124 @@
 /**
- * LiveRightNow - Multi-Tour Live Snapshot
- * Premium light-mode cards with horizontal scroll
- * 
- * FIX 07: Theme tokens
- * FIX 08: Error state
- * FIX 13: Accessibility labels
- * FIX 21: iPhone SE responsive width
+ * LiveRightNow - Compact Live Ticker Strip
+ * Single-line-per-tournament vertical stack for scannable at-a-glance live view.
  */
 
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { useLiveRightNow, type LiveTournamentWithLeader } from '../../hooks/useOverviewModules';
-import { useVenueImage } from '../../hooks/useVenueImage';
 import { SectionErrorState } from '../SectionErrorState';
-import '@/styles/hero-glass.css';
 
-// Score color helper - unified palette
-function getScoreColor(scoreDisplay: string): string {
-  if (scoreDisplay.startsWith('-')) return '#f59e0b'; // Amber/gold = under par
-  if (scoreDisplay.startsWith('+')) return '#D62828'; // Red = over par
-  return 'hsl(var(--muted-foreground))';
+function getTourLabel(tourSlug: string): string {
+  const labels: Record<string, string> = {
+    pga: 'PGA TOUR',
+    euro: 'DP WORLD',
+    lpga: 'LPGA',
+    liv: 'LIV',
+    pgad: 'KORN FERRY',
+    champ: 'CHAMPIONS',
+  };
+  return labels[tourSlug?.toLowerCase()] ?? tourSlug?.toUpperCase() ?? 'TOUR';
 }
 
-/**
- * Individual Live Tournament Card with venue image fetching
- */
-function LiveTournamentCard({ 
-  tournament, 
-  index 
-}: { 
-  tournament: LiveTournamentWithLeader; 
-  index: number;
-}) {
+const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tournament }) => {
   const navigate = useNavigate();
-  
-  const { data: venueImage, isLoading: imageLoading } = useVenueImage(tournament.venueName, tournament.venueCity);
-  
-  const hasRealImage = !!venueImage?.imageUrl;
+  const tourLabel = getTourLabel(tournament.tourSlug);
 
   return (
-    <motion.button
+    <div
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
-      className="w-[min(280px,80vw)] flex-shrink-0 rounded-2xl overflow-hidden text-left cursor-pointer transition-all duration-300 bg-card border border-border"
       style={{
-        boxShadow: '0 2px 8px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)',
-        scrollSnapAlign: 'start',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
+        padding: '10px 14px',
+        borderRadius: '14px',
+        background: 'rgba(255,255,255,0.05)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        cursor: 'pointer',
       }}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ 
-        delay: 0.1 + (index * 0.1), 
-        duration: 0.6, 
-        ease: [0.16, 1, 0.3, 1] 
-      }}
-      whileHover={{ 
-        y: -2,
-        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-      }}
-      whileTap={{ scale: 0.98 }}
-      aria-label={`${tournament.name}, live${tournament.leader ? `, leader ${tournament.leader.name} at ${tournament.leader.scoreDisplay}` : ''}`}
     >
-      {/* Image Area */}
-      <div className="relative h-[140px] w-full overflow-hidden">
-        {imageLoading ? (
-          <div 
-            className="w-full h-full animate-shimmer bg-muted"
-            style={{
-              backgroundSize: '200% 100%',
-            }}
-          />
-        ) : hasRealImage ? (
-          <img
-            src={venueImage.imageUrl}
-            alt={tournament.venueName || tournament.name}
-            className="w-full h-full object-cover"
-            loading="lazy"
-          />
-        ) : (
-          <div 
-            className="w-full h-full"
-            style={{
-              background: 'linear-gradient(135deg, #2D5A3D 0%, #1A4D2E 50%, #2D5A3D 100%)'
-            }}
-          />
-        )}
-        
-        {/* Protective gradient overlay */}
-        <div 
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: 'linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.20) 100%), linear-gradient(90deg, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0) 55%)'
-          }}
-        />
-        
-        {/* LIVE Badge */}
-        <div 
-          className="absolute top-2.5 right-2.5 px-[10px] py-[4px] rounded-[8px] flex items-center gap-[5px]"
-          style={{
-            background: 'rgba(0, 0, 0, 0.55)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-          }}
-        >
-          <span 
-            className="w-[5px] h-[5px] rounded-full animate-live-pulse"
-            style={{ background: '#22C55E' }}
-          />
-          <span 
-            className="uppercase font-bold text-[10px]"
-            style={{ 
-              letterSpacing: '0.8px',
-              color: '#22C55E',
-            }}
-          >
-            LIVE
-          </span>
-        </div>
+      {/* Green live dot */}
+      <div style={{
+        width: '7px',
+        height: '7px',
+        borderRadius: '50%',
+        backgroundColor: 'rgba(74,222,128,0.9)',
+        flexShrink: 0,
+        animation: 'live-pulse 2s ease-in-out infinite',
+      }} />
+
+      {/* Tournament name — takes available space */}
+      <div style={{
+        flex: 1,
+        minWidth: 0,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+        fontSize: '13px',
+        fontWeight: 600,
+        color: 'rgba(255,255,255,0.88)',
+      }}>
+        {tournament.name}
       </div>
 
-      {/* Body Content */}
-      <div className="p-3.5 flex items-end justify-between">
-        <div className="flex-1 min-w-0">
-          <h3 
-            className="text-[17px] font-semibold mb-[3px] truncate text-foreground"
-            style={{ letterSpacing: '-0.2px' }}
-          >
-            {tournament.name}
-          </h3>
-          
-          {/* Leader name — tappable to player profile */}
-          {tournament.leader ? (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/tourhub/player/${tournament.leader!.id}`);
-              }}
-              className="text-[14px] font-normal truncate block text-muted-foreground text-left active:opacity-70 transition-opacity"
-              aria-label={`View ${tournament.leader.name}'s profile`}
-            >
-              {tournament.leader.name}
-            </button>
-          ) : (
-            <span className="text-[12.5px] italic truncate block text-muted-foreground/60">
-              Starting Soon
-            </span>
-          )}
-        </div>
-        
-        {/* Score */}
-        {tournament.leader && (
-          <span 
-            className="flex-shrink-0 ml-3 font-mono text-2xl font-bold leading-none"
-            style={{ 
-              color: getScoreColor(tournament.leader.scoreDisplay),
-              letterSpacing: '-1px',
-            }}
-          >
-            {tournament.leader.scoreDisplay}
-          </span>
-        )}
+      {/* Tour badge pill */}
+      <div style={{
+        flexShrink: 0,
+        fontSize: '9px',
+        fontWeight: 700,
+        letterSpacing: '1px',
+        textTransform: 'uppercase',
+        color: 'rgba(255,255,255,0.45)',
+        padding: '3px 7px',
+        borderRadius: '6px',
+        background: 'rgba(255,255,255,0.06)',
+        border: '1px solid rgba(255,255,255,0.06)',
+      }}>
+        {tourLabel}
       </div>
-    </motion.button>
+
+      {/* Leader name */}
+      <div style={{
+        flexShrink: 0,
+        fontSize: '12px',
+        fontWeight: 500,
+        color: 'rgba(255,255,255,0.5)',
+        maxWidth: '90px',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+      }}>
+        {tournament.leader?.name ?? 'Starting soon'}
+      </div>
+
+      {/* Leader score */}
+      <div style={{
+        flexShrink: 0,
+        fontSize: '16px',
+        fontWeight: 700,
+        fontFamily: "'JetBrains Mono', monospace",
+        color: tournament.leader
+          ? tournament.leader.score < 0
+            ? 'rgba(74,222,128,0.9)'
+            : tournament.leader.score > 0
+              ? 'rgba(248,113,113,0.85)'
+              : 'rgba(255,255,255,0.4)'
+          : 'rgba(255,255,255,0.3)',
+        minWidth: '36px',
+        textAlign: 'right',
+      }}>
+        {tournament.leader?.scoreDisplay ?? '—'}
+      </div>
+    </div>
   );
-}
-
+};
 
 export function LiveRightNow() {
   const { data: liveTournaments, isLoading, error, refetch } = useLiveRightNow();
 
-  // FIX 08: Show error state on failure
   if (error) {
     return (
       <section aria-label="Live tournaments">
@@ -177,18 +127,17 @@ export function LiveRightNow() {
     );
   }
 
-  // Hide the entire section when loading or no live tournaments
   if (isLoading || !liveTournaments || liveTournaments.length === 0) {
     return null;
   }
 
   return (
     <section className="bg-background" aria-label="Live tournaments">
-      {/* Header */}
+      {/* Header — unchanged */}
       <div className="flex items-center gap-2 mb-4 px-4">
-        <span 
+        <span
           className="w-2 h-2 rounded-full animate-live-pulse"
-          style={{ 
+          style={{
             background: '#22C55E',
             boxShadow: '0 0 10px rgba(34, 197, 94, 0.45)',
           }}
@@ -198,44 +147,17 @@ export function LiveRightNow() {
         </h2>
       </div>
 
-      {/* Scroll Container */}
-      <div className="relative">
-        <div
-          className="flex gap-3 overflow-x-auto pb-2"
-          style={{
-            scrollSnapType: 'x mandatory',
-            scrollPaddingLeft: '16px',
-            scrollPaddingRight: '16px',
-            WebkitOverflowScrolling: 'touch',
-            scrollbarWidth: 'none',
-            overscrollBehavior: 'contain',
-            touchAction: 'pan-x pan-y',
-          }}
-          role="list"
-          aria-label="Live tournament cards"
-        >
-          <div className="w-4 flex-shrink-0" aria-hidden />
-
-          {liveTournaments!.map((tournament, idx) => (
-            <LiveTournamentCard
-              key={tournament.id}
-              tournament={tournament}
-              index={idx}
-            />
-          ))}
-
-          <div className="w-4 flex-shrink-0" aria-hidden />
-        </div>
-
-        {/* Right edge fade hint */}
-        <div
-          className="absolute top-0 right-0 bottom-0 pointer-events-none z-10"
-          style={{
-            width: '16px',
-            background:
-              'linear-gradient(to left, hsl(var(--background) / 0.2) 0%, transparent 100%)',
-          }}
-        />
+      {/* Ticker rows */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '6px',
+        padding: '0 16px',
+        marginTop: '10px',
+      }}>
+        {liveTournaments.map((tournament) => (
+          <LiveTickerRow key={tournament.id} tournament={tournament} />
+        ))}
       </div>
     </section>
   );
