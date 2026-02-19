@@ -82,8 +82,8 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
       <div
         style={{
           flexShrink: 0,
-          width: 36,
-          height: 36,
+          width: ['pga', 'lpga'].includes(tournament.tourSlug?.toLowerCase() ?? '') ? 26 : 36,
+          height: ['pga', 'lpga'].includes(tournament.tourSlug?.toLowerCase() ?? '') ? 26 : 36,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
