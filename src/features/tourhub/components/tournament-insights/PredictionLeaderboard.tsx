@@ -59,12 +59,12 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
 
       {/* Main prediction rows */}
       {mainPicks.map((prediction, i) => (
-        <React.Fragment key={prediction.playerId}>
+        <div key={prediction.playerId}>
           <PredictionScorecardRow prediction={prediction} index={i} isCompleted={isCompleted} />
           {i < mainPicks.length - 1 && (
             <div className="border-b" style={{ borderColor: 'rgba(0, 0, 0, 0.04)' }} />
           )}
-        </React.Fragment>
+        </div>
       ))}
 
       {/* Dark Horse Divider Row */}
@@ -85,12 +85,12 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
 
           {/* Dark horse rows */}
           {darkHorses.map((dh, i) => (
-            <React.Fragment key={dh.playerId}>
+            <div key={dh.playerId}>
               <PredictionScorecardRow prediction={dh} index={mainPicks.length + i} isCompleted={isCompleted} />
               {i < darkHorses.length - 1 && (
                 <div className="border-b" style={{ borderColor: 'rgba(0, 0, 0, 0.04)' }} />
               )}
-            </React.Fragment>
+            </div>
           ))}
         </>
       )}
