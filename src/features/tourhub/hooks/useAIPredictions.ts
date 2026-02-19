@@ -175,13 +175,13 @@ async function fetchActiveTournamentPredictions(): Promise<ActiveTournamentResul
   }
 
   // Check for recently completed tournament (within 24h)
-  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const threeDaysAgo = new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString();
   const { data: completedTournament } = await supabase
     .from('sr_tournaments')
     .select('*')
     .eq('season_id', pgaSeasonId)
     .in('status', ['closed', 'complete'])
-    .gte('end_date', oneDayAgo)
+    .gte('end_date', threeDaysAgo)
     .order('end_date', { ascending: false })
     .limit(1)
     .maybeSingle();
