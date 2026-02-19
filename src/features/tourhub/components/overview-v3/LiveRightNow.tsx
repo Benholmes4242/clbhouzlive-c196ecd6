@@ -16,16 +16,8 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
   return (
     <div
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px',
-        padding: '10px 14px',
-        borderRadius: '14px',
-        background: 'rgba(0,0,0,0.03)',
-        border: '1px solid rgba(0,0,0,0.06)',
-        cursor: 'pointer',
-      }}
+      className="w-full flex items-center gap-3 px-3.5 py-2.5 bg-card rounded-2xl border border-border/50 text-left transition-all active:scale-[0.98]"
+      style={{ cursor: 'pointer' }}
     >
       {/* Green live dot */}
       <div style={{
@@ -34,7 +26,6 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
         borderRadius: '50%',
         backgroundColor: 'rgba(22,163,74,0.8)',
         flexShrink: 0,
-        alignSelf: 'center',
         animation: 'live-pulse 2s ease-in-out infinite',
       }} />
 
@@ -53,12 +44,12 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
           {tournament.name}
         </div>
 
-        {/* Line 2: Leader name · score · tour logo */}
+        {/* Line 2: Leader name · score */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
           gap: '6px',
-          marginTop: '3px',
+          marginTop: '1px',
         }}>
           {/* Leader name */}
           <span style={{
@@ -84,29 +75,26 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
           }}>
             {tournament.leader?.scoreDisplay ?? '—'}
           </span>
-
-          {/* Spacer pushes logo right */}
-          <div style={{ flex: 1 }} />
-
-          {/* Tour logo */}
-          <div
-            style={{
-              flexShrink: 0,
-              width: 32,
-              height: 32,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              opacity: 0.45,
-            }}
-          >
-            <img
-              src={tourLogoSrc}
-              alt={tournament.tourSlug ?? 'Tour'}
-              style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
-            />
-          </div>
         </div>
+      </div>
+
+      {/* Tour logo — flex sibling so it centers against both text lines */}
+      <div
+        style={{
+          flexShrink: 0,
+          width: 36,
+          height: 36,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          opacity: 0.45,
+        }}
+      >
+        <img
+          src={tourLogoSrc}
+          alt={tournament.tourSlug ?? 'Tour'}
+          style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+        />
       </div>
     </div>
   );
