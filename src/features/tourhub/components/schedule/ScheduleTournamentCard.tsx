@@ -13,6 +13,7 @@ import { motion } from 'framer-motion';
 import type { TourTournament } from '../../hooks/useTourHubData';
 import type { SeasonTournament } from '../../hooks/useSeasonTournaments';
 import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
+import { getContextLabel } from '../../utils/tournamentClassification';
 
 interface ScheduleTournamentCardProps {
   tournament: TourTournament | SeasonTournament;
@@ -24,18 +25,6 @@ interface ScheduleTournamentCardProps {
 
 function isSeasonTournament(t: TourTournament | SeasonTournament): t is SeasonTournament {
   return 'startDate' in t;
-}
-
-const MAJOR_KEYWORDS = ['masters', 'u.s. open', 'us open', 'open championship', 'pga championship'];
-const SIGNATURE_KEYWORDS = ['invitational', 'genesis', 'arnold palmer', 'memorial', 'players'];
-const PLAYOFF_KEYWORDS = ['playoff', 'tour championship', 'fedexcup'];
-
-function getContextLabel(name: string, tourName?: string): string {
-  const nameLower = name.toLowerCase();
-  if (MAJOR_KEYWORDS.some(k => nameLower.includes(k))) return 'MAJOR CHAMPIONSHIP';
-  if (PLAYOFF_KEYWORDS.some(k => nameLower.includes(k))) return 'PLAYOFF EVENT';
-  if (SIGNATURE_KEYWORDS.some(k => nameLower.includes(k))) return 'SIGNATURE EVENT';
-  return `${(tourName || 'TOUR').toUpperCase()} EVENT`;
 }
 
 function getMonthAbbr(dateStr: string): string {
@@ -74,7 +63,7 @@ export function ScheduleTournamentCard({
   const isFinal = tournament.status === 'closed' || tournament.status === 'complete';
   const isLive = tournament.status === 'inprogress';
   
-  const contextLabel = getContextLabel(tournament.name, tourName ?? undefined);
+  const contextLabel = getContextLabel({ name: tournament.name, tourName: tourName ?? undefined });
   const isMajor = contextLabel === 'MAJOR CHAMPIONSHIP';
   const isSignature = contextLabel === 'SIGNATURE EVENT';
   
