@@ -175,6 +175,7 @@ function buildContenderCards(
     countryCode: p.country,
     avatarUrl: p.photoUrl || '',
     description: limitText(p.reasons?.[0] || '', 50),
+    fitBullets: p.reasons?.slice(0, 3) || [],
     type: 'contender' as const,
     rank: i + 2,
     confidenceTier: getConfidenceTier(i + 1),
