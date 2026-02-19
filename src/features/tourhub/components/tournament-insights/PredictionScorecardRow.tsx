@@ -35,6 +35,13 @@ function formatActual(prediction: TrackedPrediction, isCompleted?: boolean): str
 interface OffLeadDisplay {
   text: string;
   color: string;
+  fontWeight?: number;
+}
+
+function formatScore(score: number | null): string {
+  if (score === null) return 'E';
+  if (score === 0) return 'E';
+  return score > 0 ? `+${score}` : `${score}`;
 }
 
 function getOffLeadDisplay(prediction: TrackedPrediction, isCompleted?: boolean): OffLeadDisplay {
@@ -51,20 +58,12 @@ function getOffLeadDisplay(prediction: TrackedPrediction, isCompleted?: boolean)
   const offLead = prediction.actualPosition - 1;
 
   if (offLead === 0) {
-    // Leader / winner
-    if (isCompleted) {
-      return { text: 'WINNER', color: 'rgba(245,158,11,1)' };
-    }
-    return { text: 'LEADING', color: 'rgba(22,163,74,0.9)' };
+    // Leader — show their actual score in green
+    return { text: formatScore(prediction.score), color: 'rgba(22,163,74,0.9)', fontWeight: 700 };
   }
 
-  if (offLead <= 4) {
-    return { text: `+${offLead}`, color: 'rgba(22,163,74,0.7)' };
-  }
-  if (offLead <= 19) {
-    return { text: `+${offLead}`, color: 'rgba(245,158,11,0.8)' };
-  }
-  return { text: `+${offLead}`, color: 'rgba(220,38,38,0.7)' };
+  // Behind the leader — show ↓N in red
+  return { text: `↓${offLead}`, color: 'rgba(220,38,38,0.75)', fontWeight: 600 };
 }
 
 export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
@@ -148,8 +147,8 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
         transition={{ delay: 0.3 + index * 0.05 }}
       >
         <span
-          className="text-xs font-semibold"
-          style={{ color: offLead.color }}
+          className="text-xs"
+          style={{ color: offLead.color, fontWeight: offLead.fontWeight ?? 600 }}
         >
           {offLead.text}
         </span>
