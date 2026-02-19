@@ -30,7 +30,7 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '10px',
+        gap: '12px',
         padding: '10px 14px',
         borderRadius: '14px',
         background: 'rgba(0,0,0,0.03)',
@@ -43,59 +43,59 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
         width: '7px',
         height: '7px',
         borderRadius: '50%',
-        backgroundColor: 'rgba(74,222,128,0.9)',
+        backgroundColor: 'rgba(22,163,74,0.8)',
         flexShrink: 0,
+        alignSelf: 'center',
         animation: 'live-pulse 2s ease-in-out infinite',
       }} />
 
-      {/* Tournament name — takes available space */}
-      <div style={{
-        flex: 1,
-        minWidth: 0,
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-        fontSize: '13px',
-        fontWeight: 600,
-        color: 'rgba(0,0,0,0.85)',
-      }}>
-        {tournament.name}
+      {/* Left: two lines stacked */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        {/* Line 1: Tournament name + tour badge */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{
+            fontSize: '13.5px',
+            fontWeight: 600,
+            color: 'rgba(0,0,0,0.85)',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            minWidth: 0,
+            flex: 1,
+          }}>
+            {tournament.name}
+          </span>
+          <span style={{
+            flexShrink: 0,
+            fontSize: '9px',
+            fontWeight: 700,
+            letterSpacing: '1px',
+            textTransform: 'uppercase',
+            color: 'rgba(0,0,0,0.4)',
+            padding: '2px 6px',
+            borderRadius: '5px',
+            background: 'rgba(0,0,0,0.04)',
+            border: '1px solid rgba(0,0,0,0.06)',
+          }}>
+            {tourLabel}
+          </span>
+        </div>
+
+        {/* Line 2: Leader name */}
+        <div style={{
+          fontSize: '12px',
+          fontWeight: 500,
+          color: 'rgba(0,0,0,0.45)',
+          marginTop: '2px',
+        }}>
+          {tournament.leader?.name ?? 'Starting soon'}
+        </div>
       </div>
 
-      {/* Tour badge pill */}
+      {/* Right: Score */}
       <div style={{
         flexShrink: 0,
-        fontSize: '9px',
-        fontWeight: 700,
-        letterSpacing: '1px',
-        textTransform: 'uppercase',
-        color: 'rgba(0,0,0,0.4)',
-        padding: '3px 7px',
-        borderRadius: '6px',
-        background: 'rgba(0,0,0,0.04)',
-        border: '1px solid rgba(0,0,0,0.06)',
-      }}>
-        {tourLabel}
-      </div>
-
-      {/* Leader name */}
-      <div style={{
-        flexShrink: 0,
-        fontSize: '12px',
-        fontWeight: 500,
-        color: 'rgba(0,0,0,0.45)',
-        maxWidth: '90px',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-      }}>
-        {tournament.leader?.name ?? 'Starting soon'}
-      </div>
-
-      {/* Leader score */}
-      <div style={{
-        flexShrink: 0,
-        fontSize: '16px',
+        fontSize: '18px',
         fontWeight: 700,
         fontFamily: "'JetBrains Mono', monospace",
         color: tournament.leader
@@ -106,7 +106,7 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
               : 'rgba(0,0,0,0.35)'
           : 'rgba(0,0,0,0.25)',
         minWidth: '36px',
-        textAlign: 'right',
+        textAlign: 'right' as const,
       }}>
         {tournament.leader?.scoreDisplay ?? '—'}
       </div>
