@@ -168,7 +168,7 @@ export function SeasonLeaderboards() {
         <button
           onClick={() => {
             const categoryMap: Record<string, string> = {
-              'sg_total': 'world_rank',
+              'sg_total': 'strokes_gained_total',
               'distance': 'drive_avg',
               'accuracy': 'drive_acc',
               'scrambling': 'scrambling_pct',
@@ -254,7 +254,7 @@ export function SeasonLeaderboards() {
             <button
               onClick={() => {
                 const categoryMap: Record<string, string> = {
-                  'sg_total': 'world_rank',
+                  'sg_total': 'strokes_gained_total',
                   'distance': 'drive_avg',
                   'accuracy': 'drive_acc',
                   'scrambling': 'scrambling_pct',
