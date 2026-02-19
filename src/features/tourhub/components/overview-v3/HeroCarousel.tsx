@@ -83,8 +83,6 @@ interface LeaderboardRowProps {
 function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, hasTiedLeaders, showTieBefore, scoreFlash, positionDelta = 0 }: LeaderboardRowProps) {
   const navigate = useNavigate();
   const abbreviatedName = `${leader.player.firstName[0]}. ${leader.player.lastName}`;
-  // Diagnostic: always log render so we can confirm component mounts and delta value
-  console.log('[LIVE-DELTA]', leader.player.lastName, { position: leader.position, positionDelta });
   const photoUrl = resolvePhotoUrl(leader.player.photoUrl ?? null, leader.player.pgaTourId);
   const initials = `${leader.player.firstName[0]}${leader.player.lastName[0]}`.toUpperCase();
   
@@ -226,12 +224,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
   useEffect(() => {
     if (leaders.length === 0) return;
     const prev = prevLeadersRef.current;
-    console.log('[LIVE-DELTA] leaders effect fired', {
-      tournamentId: tournament.id,
-      leaderCount: leaders.length,
-      hasPrev: prev.length > 0,
-      isFirstLoad: prev.length === 0,
-    });
     if (prev.length > 0) {
       const newFlashes: Record<string, 'birdie' | 'bogey'> = {};
       const newDeltas: Record<string, number> = {};
@@ -241,11 +233,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
           if (leader.scoreToPar < prevEntry.scoreToPar) newFlashes[leader.player.id] = 'birdie';
           else if (leader.scoreToPar > prevEntry.scoreToPar) newFlashes[leader.player.id] = 'bogey';
           const delta = prevEntry.position - leader.position;
-          console.log('[LIVE-DELTA] position compare', leader.player.lastName, {
-            position: leader.position,
-            prevPosition: prevEntry.position,
-            positionDelta: delta,
-          });
           if (delta !== 0) {
             newDeltas[leader.player.id] = delta;
           }
