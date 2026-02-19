@@ -9,18 +9,25 @@ export const TOUR_NAME_TO_SLUG: Record<string, string> = {
   // Display name variants
   'PGA Tour': 'pga',
   'LIV Golf': 'liv',
+  'LIV Golf League': 'liv',
+  'LIV GOLF': 'liv',
+  'LIV GOLF LEAGUE': 'liv',
   'DP World Tour': 'euro',
   'Korn Ferry Tour': 'pgad',
   'Champions Tour': 'champ',
   'LPGA Tour': 'lpga',
-  // Raw DB fallbacks — both cases
+  // Raw DB fallbacks — various casings observed in Sportradar data
   'pga': 'pga',
   'liv': 'liv',
   'LIV': 'liv',
   'euro': 'euro',
+  'EURO': 'euro',
   'pgad': 'pgad',
+  'PGAD': 'pgad',
   'champ': 'champ',
+  'CHAMP': 'champ',
   'lpga': 'lpga',
+  'LPGA': 'lpga',
 };
 
 // --- MAJORS (by tour) ---
@@ -117,7 +124,8 @@ export function getContextLabel(tournament: { name: string; tourName?: string | 
   const isCrossTourMajor =
     CROSS_TOUR_MAJOR_KEYWORDS.some((k) => nameLower.includes(k)) &&
     !nameLower.includes('senior') &&
-    !nameLower.includes('women');
+    !nameLower.includes('women') &&
+    !nameLower.includes('bmw');
   if (isCrossTourMajor) return 'MAJOR CHAMPIONSHIP';
 
   if (tourSlug === 'pga') {
