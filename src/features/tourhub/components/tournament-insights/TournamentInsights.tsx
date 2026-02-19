@@ -5,7 +5,7 @@
  * Completed: Falls back to next tournament or results recap
  */
 
-import { memo, useState, useEffect } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Brain, ChevronRight } from 'lucide-react';
 import { useTournamentInsights } from './hooks/useTournamentInsights';
@@ -21,6 +21,21 @@ import IntelligenceTabSwitcher from './components/IntelligenceTabSwitcher';
 import type { IntelligenceView } from './types';
 
 type IntelligenceTab = 'courseDNA' | 'predictions';
+
+const GeneratingPredictionsSkeleton: React.FC<{ label?: string }> = ({ label = 'Generating AI predictions…' }) => (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    className="flex flex-col items-center gap-3 py-10 px-4"
+  >
+    <div className="space-y-2 w-full animate-pulse">
+      <div className="h-24 bg-black/[0.04] rounded-2xl" />
+      <div className="h-16 bg-black/[0.04] rounded-2xl" />
+      <div className="h-16 bg-black/[0.04] rounded-2xl" />
+    </div>
+    <p className="text-xs text-muted-foreground font-medium mt-1">{label}</p>
+  </motion.div>
+);
 
 const TournamentInsightsSkeleton = () => (
   <div className="space-y-4 animate-pulse px-4">
@@ -40,12 +55,14 @@ export const TournamentInsights = memo(function TournamentInsights() {
     trackerLoading,
     nextTournament,
     nextTournamentInsights,
+    nextTournamentPreview,
+    nextTournamentPredictionsLoading,
+    hasUpcoming,
   } = useTournamentInsights();
 
   // Derived phase booleans — computed before early returns so hooks below are valid
   const isLive = tournamentPhase === 'in-progress';
   const isCompleted = tournamentPhase === 'completed';
-  const hasUpcoming = !!nextTournamentInsights;
 
   // True when at least one player has posted a score
   const hasLiveScores = tracker?.predictions?.some(
@@ -82,9 +99,17 @@ export const TournamentInsights = memo(function TournamentInsights() {
   }
 
   // Determine which tournament data to show for the hero card
-  const heroData = isLive && intelligenceView === 'upcoming' && nextTournamentInsights
-    ? nextTournamentInsights.tournament
-    : data.tournament;
+  // When upcoming is selected, use full insights if available, else preview as minimal fallback
+  const upcomingHeroData = nextTournamentInsights?.tournament ?? (nextTournamentPreview ? {
+    id: nextTournamentPreview.id,
+    name: nextTournamentPreview.name,
+    courseName: nextTournamentPreview.courseName,
+    dateRangeText: nextTournamentPreview.startDate,
+    heroImageUrl: '',
+  } : null);
+  const heroData = isLive && intelligenceView === 'upcoming' && upcomingHeroData
+    ? upcomingHeroData
+    : data?.tournament ?? null;
   const heroIsLive = isLive && intelligenceView === 'live';
 
   return (
@@ -135,19 +160,21 @@ export const TournamentInsights = memo(function TournamentInsights() {
       </motion.div>
 
       {/* Hero Card — full bleed */}
-      <div className="-mx-4 relative">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={heroIsLive ? 'live-hero' : 'upcoming-hero'}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-          >
-            <TournamentHeroCard tournament={heroData} isLive={heroIsLive} isCompleted={isCompleted} />
-          </motion.div>
-        </AnimatePresence>
-      </div>
+      {heroData && (
+        <div className="-mx-4 relative">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={heroIsLive ? 'live-hero' : 'upcoming-hero'}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+            >
+              <TournamentHeroCard tournament={heroData} isLive={heroIsLive} isCompleted={isCompleted} />
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      )}
 
       {/* ═══ Content area — phase & view dependent ═══ */}
       <AnimatePresence mode="wait">
@@ -263,6 +290,10 @@ export const TournamentInsights = memo(function TournamentInsights() {
                   </motion.div>
                 )}
               </>
+            ) : nextTournamentPredictionsLoading ? (
+              <GeneratingPredictionsSkeleton />
+            ) : nextTournamentPreview ? (
+              <GeneratingPredictionsSkeleton label="Generating predictions…" />
             ) : (
               <p className="text-sm text-muted-foreground text-center py-8">
                 No upcoming tournament data available yet.
@@ -459,6 +490,10 @@ export const TournamentInsights = memo(function TournamentInsights() {
                   </motion.div>
                 )}
               </>
+            ) : nextTournamentPredictionsLoading ? (
+              <GeneratingPredictionsSkeleton />
+            ) : nextTournamentPreview ? (
+              <GeneratingPredictionsSkeleton label="Generating predictions for this tournament…" />
             ) : (
               <p className="text-sm text-muted-foreground text-center py-8">
                 No upcoming tournament data available yet.
@@ -523,6 +558,10 @@ export const TournamentInsights = memo(function TournamentInsights() {
                   </motion.div>
                 )}
               </>
+            ) : nextTournamentPredictionsLoading ? (
+              <GeneratingPredictionsSkeleton />
+            ) : nextTournamentPreview ? (
+              <GeneratingPredictionsSkeleton label="Generating predictions for this tournament…" />
             ) : (
               <p className="text-sm text-muted-foreground text-center py-8">
                 No upcoming tournament data available yet.
@@ -546,8 +585,8 @@ export const TournamentInsights = memo(function TournamentInsights() {
               <ResultsRecap
                 predictions={{
                   tournament: {
-                    id: data.tournament.id, name: data.tournament.name,
-                    venueName: data.tournament.courseName, venueCity: '', venueState: '',
+                    id: data?.tournament.id ?? '', name: data?.tournament.name ?? '',
+                    venueName: data?.tournament.courseName ?? '', venueCity: '', venueState: '',
                     startDate: '', endDate: '', purse: 0, par: 0, yardage: 0, status: 'complete',
                   },
                   topContenders: [], darkHorses: [],
