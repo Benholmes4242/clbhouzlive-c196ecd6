@@ -74,11 +74,11 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
       aria-label={`${tournament.name}, ${getMonthAbbr(tournament.startDate)} ${getDayNum(tournament.startDate)}${venue ? `, at ${venue}` : ''}`}
     >
       {/* Date block */}
-      <div className="flex-shrink-0 w-9 text-center">
-        <p className="uppercase leading-none text-[0.5rem] font-medium tracking-wide text-muted-foreground/70">
+      <div className="flex-shrink-0 w-11 text-center">
+        <p className="uppercase leading-none text-[0.5625rem] font-medium tracking-wide text-muted-foreground/70">
           {getMonthAbbr(tournament.startDate)}
         </p>
-        <p className="leading-none mt-0.5 text-[0.9375rem] font-bold text-foreground">
+        <p className="leading-none mt-0.5 text-[1.125rem] font-bold text-foreground">
           {getDayNum(tournament.startDate)}
         </p>
       </div>
@@ -87,23 +87,23 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
       <div className="flex-1 min-w-0">
         {isSpecialEvent && (
           <span style={{
-            fontSize: '9.5px',
+            fontSize: '10px',
             fontWeight: 700,
-            letterSpacing: '1.1px',
+            letterSpacing: '1.2px',
             textTransform: 'uppercase',
             color: labelColor,
             display: 'block',
             lineHeight: 1,
-            marginBottom: '2px',
+            marginBottom: '3px',
           }}>
             {contextLabel}
           </span>
         )}
-        <p className="text-[0.8125rem] font-semibold text-foreground truncate" style={{ letterSpacing: '-0.1px' }}>
+        <p className="text-[0.9375rem] font-semibold text-foreground truncate" style={{ letterSpacing: '-0.2px' }}>
           {tournament.name}
         </p>
         {venue && (
-          <p className="text-[0.6875rem] text-muted-foreground/70 truncate mt-0.5 leading-none">
+          <p className="text-[0.75rem] text-muted-foreground/60 truncate mt-0.5 leading-none">
             {venue}
           </p>
         )}
@@ -114,8 +114,8 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
         <div
           className="flex-shrink-0 flex items-center justify-center opacity-45"
           style={{
-            width: ['pga', 'lpga'].includes(tourSlug) ? 26 : 32,
-            height: ['pga', 'lpga'].includes(tourSlug) ? 26 : 32,
+            width: ['pga', 'lpga'].includes(tourSlug) ? 30 : 36,
+            height: ['pga', 'lpga'].includes(tourSlug) ? 30 : 36,
           }}
         >
           <img

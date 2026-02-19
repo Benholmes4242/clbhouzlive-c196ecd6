@@ -16,13 +16,13 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
   return (
     <div
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
-      className="w-full flex items-center gap-3 px-3.5 py-2.5 bg-card rounded-2xl border border-border/50 text-left transition-all active:scale-[0.98]"
+      className="w-full flex items-center gap-2.5 px-3 py-2 bg-card rounded-xl border border-border/40 text-left transition-all active:scale-[0.98]"
       style={{ cursor: 'pointer' }}
     >
       {/* Green live dot */}
       <div style={{
-        width: '7px',
-        height: '7px',
+        width: '6px',
+        height: '6px',
         borderRadius: '50%',
         backgroundColor: 'rgba(22,163,74,0.8)',
         flexShrink: 0,
@@ -32,11 +32,11 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
       {/* Content: two lines */}
       <div style={{ flex: 1, minWidth: 0 }}>
 
-        {/* Line 1: Tournament name — full width */}
+        {/* Line 1: Tournament name */}
         <div style={{
-          fontSize: '13.5px',
+          fontSize: '12.5px',
           fontWeight: 600,
-          color: 'rgba(0,0,0,0.85)',
+          color: 'rgba(0,0,0,0.8)',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -48,21 +48,19 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '6px',
+          gap: '5px',
           marginTop: '1px',
         }}>
-          {/* Leader name */}
           <span style={{
-            fontSize: '12px',
+            fontSize: '11px',
             fontWeight: 500,
-            color: 'rgba(0,0,0,0.45)',
+            color: 'rgba(0,0,0,0.4)',
           }}>
             {tournament.leader?.name ?? 'Starting soon'}
           </span>
 
-          {/* Score */}
           <span style={{
-            fontSize: '13px',
+            fontSize: '11.5px',
             fontWeight: 700,
             fontFamily: "'JetBrains Mono', monospace",
             color: tournament.leader
@@ -78,16 +76,16 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
         </div>
       </div>
 
-      {/* Tour logo — flex sibling so it centers against both text lines */}
+      {/* Tour logo */}
       <div
         style={{
           flexShrink: 0,
-          width: ['pga', 'lpga'].includes(tournament.tourSlug?.toLowerCase() ?? '') ? 26 : 32,
-          height: ['pga', 'lpga'].includes(tournament.tourSlug?.toLowerCase() ?? '') ? 26 : 32,
+          width: ['pga', 'lpga'].includes(tournament.tourSlug?.toLowerCase() ?? '') ? 20 : 24,
+          height: ['pga', 'lpga'].includes(tournament.tourSlug?.toLowerCase() ?? '') ? 20 : 24,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          opacity: 0.45,
+          opacity: 0.4,
         }}
       >
         <img
