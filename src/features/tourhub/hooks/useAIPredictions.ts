@@ -79,6 +79,9 @@ export interface UseAIPredictionsResult {
   activeTournamentId: string | null;
   nextTournament: NextTournamentPreview | null;
   nextTournamentPredictions: AIPredictionData | null;
+  /** Raw preview object — populated even before predictions exist */
+  nextTournamentPreview: NextTournamentPreview | null;
+  nextTournamentPredictionsLoading: boolean;
 }
 
 // =============================================
@@ -140,6 +143,8 @@ export function useAIPredictions(): UseAIPredictionsResult {
     activeTournamentId,
     nextTournament: nextQuery.data?.preview ?? null,
     nextTournamentPredictions: nextQuery.data?.predictions ?? null,
+    nextTournamentPreview: nextQuery.data?.preview ?? null,
+    nextTournamentPredictionsLoading: nextQuery.isLoading,
   };
 }
 
@@ -242,26 +247,17 @@ async function fetchNextTournamentPreview(): Promise<NextTournamentResult> {
 
   if (!nextTournament) return { preview: null, predictions: null };
 
-  // Check if predictions exist
-  const { data: aiPredictions } = await supabase
-    .from('ai_predictions')
-    .select('id')
-    .eq('tournament_id', nextTournament.id)
-    .maybeSingle();
-
   const preview: NextTournamentPreview = {
     id: nextTournament.id,
     name: nextTournament.name,
     courseName: nextTournament.venue_name || '',
     startDate: nextTournament.start_date,
-    hasPredictions: !!aiPredictions,
+    hasPredictions: false, // updated below
   };
 
-  // Fetch full predictions if available
-  let predictions: AIPredictionData | null = null;
-  if (aiPredictions) {
-    predictions = await fetchPredictionsForTournament(nextTournament);
-  }
+  // Fetch (or generate) full predictions — same pattern as active tournament
+  const predictions = await fetchPredictionsForTournament(nextTournament);
+  preview.hasPredictions = !!predictions;
 
   return { preview, predictions };
 }

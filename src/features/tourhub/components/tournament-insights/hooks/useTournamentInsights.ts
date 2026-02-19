@@ -29,6 +29,8 @@ export function useTournamentInsights() {
     activeTournamentId,
     nextTournament,
     nextTournamentPredictions,
+    nextTournamentPreview,
+    nextTournamentPredictionsLoading,
   } = useAIPredictions();
 
   // Fetch live tracker data when tournament is in-progress or completed
@@ -59,6 +61,11 @@ export function useTournamentInsights() {
     nextTournament,
     nextTournamentPredictions,
     nextTournamentInsights,
+    /** Raw preview — populated even before predictions are generated */
+    nextTournamentPreview,
+    nextTournamentPredictionsLoading,
+    /** Tab shows whenever a next tournament exists, regardless of predictions */
+    hasUpcoming: !!nextTournamentPreview,
   };
 }
 
