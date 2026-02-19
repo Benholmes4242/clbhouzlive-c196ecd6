@@ -33,10 +33,8 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
         gap: '10px',
         padding: '10px 14px',
         borderRadius: '14px',
-        background: 'rgba(255,255,255,0.05)',
-        border: '1px solid rgba(255,255,255,0.08)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
+        background: 'rgba(0,0,0,0.03)',
+        border: '1px solid rgba(0,0,0,0.06)',
         cursor: 'pointer',
       }}
     >
@@ -59,7 +57,7 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
         whiteSpace: 'nowrap',
         fontSize: '13px',
         fontWeight: 600,
-        color: 'rgba(255,255,255,0.88)',
+        color: 'rgba(0,0,0,0.85)',
       }}>
         {tournament.name}
       </div>
@@ -71,11 +69,11 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
         fontWeight: 700,
         letterSpacing: '1px',
         textTransform: 'uppercase',
-        color: 'rgba(255,255,255,0.45)',
+        color: 'rgba(0,0,0,0.4)',
         padding: '3px 7px',
         borderRadius: '6px',
-        background: 'rgba(255,255,255,0.06)',
-        border: '1px solid rgba(255,255,255,0.06)',
+        background: 'rgba(0,0,0,0.04)',
+        border: '1px solid rgba(0,0,0,0.06)',
       }}>
         {tourLabel}
       </div>
@@ -85,7 +83,7 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
         flexShrink: 0,
         fontSize: '12px',
         fontWeight: 500,
-        color: 'rgba(255,255,255,0.5)',
+        color: 'rgba(0,0,0,0.45)',
         maxWidth: '90px',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
@@ -102,11 +100,11 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
         fontFamily: "'JetBrains Mono', monospace",
         color: tournament.leader
           ? tournament.leader.score < 0
-            ? 'rgba(74,222,128,0.9)'
+            ? 'rgba(22,163,74,0.9)'
             : tournament.leader.score > 0
-              ? 'rgba(248,113,113,0.85)'
-              : 'rgba(255,255,255,0.4)'
-          : 'rgba(255,255,255,0.3)',
+              ? 'rgba(220,38,38,0.85)'
+              : 'rgba(0,0,0,0.35)'
+          : 'rgba(0,0,0,0.25)',
         minWidth: '36px',
         textAlign: 'right',
       }}>
