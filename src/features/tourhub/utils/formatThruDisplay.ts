@@ -18,10 +18,11 @@ export function getCurrentRound(
   r3: number | null | undefined,
   r4: number | null | undefined
 ): { number: number; isComplete: boolean; currentRound: number; lastCompletedRound: number | null } {
-  if (r4 != null) return { number: 4, isComplete: true, currentRound: 4, lastCompletedRound: 4 };
-  if (r3 != null) return { number: 3, isComplete: true, currentRound: 4, lastCompletedRound: 3 };
-  if (r2 != null) return { number: 2, isComplete: true, currentRound: 3, lastCompletedRound: 2 };
-  if (r1 != null) return { number: 1, isComplete: true, currentRound: 2, lastCompletedRound: 1 };
+  // Treat 0 as "not played" — only count rounds with strokes > 0
+  if (r4 != null && r4 > 0) return { number: 4, isComplete: true, currentRound: 4, lastCompletedRound: 4 };
+  if (r3 != null && r3 > 0) return { number: 3, isComplete: true, currentRound: 4, lastCompletedRound: 3 };
+  if (r2 != null && r2 > 0) return { number: 2, isComplete: true, currentRound: 3, lastCompletedRound: 2 };
+  if (r1 != null && r1 > 0) return { number: 1, isComplete: true, currentRound: 2, lastCompletedRound: 1 };
   return { number: 0, isComplete: false, currentRound: 1, lastCompletedRound: null };
 }
 
