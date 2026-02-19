@@ -113,8 +113,8 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
           >
             {prediction.playerName}
           </p>
-          {/* Score line — compact */}
-          {prediction.score !== null && (
+          {/* Score line — only shown when player has actually posted a score (actualPosition !== null) */}
+          {prediction.actualPosition !== null && prediction.score !== null && (
             <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">
               {prediction.score === 0 ? 'E' : prediction.score > 0 ? `+${prediction.score}` : prediction.score}
               {prediction.thru !== null && prediction.thru > 0 ? ` · thru ${prediction.thru}` : ''}
