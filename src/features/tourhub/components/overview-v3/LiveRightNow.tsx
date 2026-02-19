@@ -16,13 +16,13 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
   return (
     <div
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
-      className="w-full flex items-center gap-2.5 px-3 py-2 bg-card rounded-xl border border-border/40 text-left transition-all active:scale-[0.98]"
+      className="w-full flex items-center gap-3 px-3.5 py-2.5 bg-card rounded-2xl border border-border/50 text-left transition-all active:scale-[0.98]"
       style={{ cursor: 'pointer' }}
     >
       {/* Green live dot */}
       <div style={{
-        width: '6px',
-        height: '6px',
+        width: '7px',
+        height: '7px',
         borderRadius: '50%',
         backgroundColor: 'rgba(22,163,74,0.8)',
         flexShrink: 0,
@@ -34,9 +34,9 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
 
         {/* Line 1: Tournament name */}
         <div style={{
-          fontSize: '12.5px',
+          fontSize: '13.5px',
           fontWeight: 600,
-          color: 'rgba(0,0,0,0.8)',
+          color: 'rgba(0,0,0,0.85)',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -48,19 +48,19 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '5px',
+          gap: '6px',
           marginTop: '1px',
         }}>
           <span style={{
-            fontSize: '11px',
+            fontSize: '12px',
             fontWeight: 500,
-            color: 'rgba(0,0,0,0.4)',
+            color: 'rgba(0,0,0,0.45)',
           }}>
             {tournament.leader?.name ?? 'Starting soon'}
           </span>
 
           <span style={{
-            fontSize: '11.5px',
+            fontSize: '13px',
             fontWeight: 700,
             fontFamily: "'JetBrains Mono', monospace",
             color: tournament.leader
@@ -80,12 +80,12 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
       <div
         style={{
           flexShrink: 0,
-          width: ['pga', 'lpga'].includes(tournament.tourSlug?.toLowerCase() ?? '') ? 20 : 24,
-          height: ['pga', 'lpga'].includes(tournament.tourSlug?.toLowerCase() ?? '') ? 20 : 24,
+          width: ['pga', 'lpga'].includes(tournament.tourSlug?.toLowerCase() ?? '') ? 26 : 32,
+          height: ['pga', 'lpga'].includes(tournament.tourSlug?.toLowerCase() ?? '') ? 26 : 32,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          opacity: 0.4,
+          opacity: 0.45,
         }}
       >
         <img

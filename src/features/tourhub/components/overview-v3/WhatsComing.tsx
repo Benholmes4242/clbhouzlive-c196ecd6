@@ -99,7 +99,7 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
             {contextLabel}
           </span>
         )}
-        <p className="text-[0.9375rem] font-semibold text-foreground truncate" style={{ letterSpacing: '-0.2px' }}>
+        <p className="text-[0.9375rem] font-semibold text-foreground line-clamp-2" style={{ letterSpacing: '-0.2px' }}>
           {tournament.name}
         </p>
         {venue && (
