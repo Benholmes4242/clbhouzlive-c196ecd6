@@ -1,6 +1,6 @@
 /**
  * PredictionLeaderboard - Unified OWGR-style table
- * Top 3 picks + 1 dark horse row. OFF LEAD column.
+ * 4 picks, all identical styling. OFF LEAD column.
  */
 
 import React from 'react';
@@ -19,10 +19,8 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
 }) => {
   if (allPicks.length === 0) return null;
 
-  // Top 3 picks + 1 dark horse — all in one flat list
-  const mainPicks = allPicks.filter(p => !p.isDarkHorse).slice(0, 3);
-  const darkHorses = allPicks.filter(p => p.isDarkHorse).slice(0, 1);
-  const allRows = [...mainPicks, ...darkHorses];
+  // All 4 picks in one flat list — no dark horse separation
+  const rows = allPicks.slice(0, 4);
 
   return (
     <motion.div
@@ -56,16 +54,15 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
         </div>
       </div>
 
-      {/* All rows — no divider between main and dark horse */}
-      {allRows.map((prediction, i) => (
+      {/* All 4 rows — identical styling */}
+      {rows.map((prediction, i) => (
         <div key={prediction.playerId}>
           <PredictionScorecardRow
             prediction={prediction}
             index={i}
             isCompleted={isCompleted}
-            isDarkHorse={prediction.isDarkHorse}
           />
-          {i < allRows.length - 1 && (
+          {i < rows.length - 1 && (
             <div className="border-b" style={{ borderColor: 'rgba(0, 0, 0, 0.04)' }} />
           )}
         </div>
