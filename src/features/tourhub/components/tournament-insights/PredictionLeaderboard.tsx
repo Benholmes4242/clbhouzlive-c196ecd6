@@ -36,8 +36,6 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
         style={{
           padding: '10px 16px',
           borderBottom: '1px solid rgba(0,0,0,0.08)',
-          background: 'rgba(0,0,0,0.02)',
-          borderRadius: '8px 8px 0 0',
         }}
       >
         <div className="flex-1 min-w-0">
@@ -67,23 +65,16 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
         </div>
       ))}
 
-      {/* Dark Horse Divider Row */}
+      {/* Dark Horse rows */}
       {darkHorses.length > 0 && (
         <>
-          <div
-            className="flex items-center gap-1.5 px-4 py-2.5 border-t border-b"
-            style={{
-              backgroundColor: 'rgba(255, 251, 235, 0.5)',
-              borderColor: 'rgba(0, 0, 0, 0.06)',
-            }}
-          >
+          <div className="border-t" style={{ borderColor: 'rgba(0, 0, 0, 0.06)' }} />
+          <div className="flex items-center gap-1.5 px-4 py-2">
             <span className="text-sm">⚡</span>
             <span className="text-xs font-semibold" style={{ color: '#b45309' }}>
               Dark Horse Watch
             </span>
           </div>
-
-          {/* Dark horse rows */}
           {darkHorses.map((dh, i) => (
             <div key={dh.playerId}>
               <PredictionScorecardRow prediction={dh} index={mainPicks.length + i} isCompleted={isCompleted} />

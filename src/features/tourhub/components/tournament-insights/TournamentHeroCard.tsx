@@ -32,7 +32,7 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
   const imageUrl = venueImageQuery.data?.imageUrl || tournament.heroImageUrl;
 
   return (
-    <div className="relative h-[306px] overflow-hidden">
+    <div className="relative overflow-hidden" style={{ height: `${Math.round(306 * 0.8)}px` }}>
       {/* Background Image - full bleed, pointed corners */}
       <img
         src={imageUrl}
