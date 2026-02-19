@@ -222,10 +222,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
                 transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
                 className="pb-6"
               >
-                <div
-                  className="rounded-2xl bg-card border border-border overflow-hidden"
-                  style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)' }}
-                >
+                <div>
                   {data.courseDNA.length > 0 && (
                     <CourseDNACard items={data.courseDNA} courseName={data.tournament.courseName} inline />
                   )}
@@ -273,10 +270,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
                     transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
                     className="pb-6"
                   >
-                    <div
-                      className="rounded-2xl bg-card border border-border overflow-hidden"
-                      style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)' }}
-                    >
+                    <div>
                       {nextTournamentInsights.courseDNA.length > 0 && (
                         <CourseDNACard
                           items={nextTournamentInsights.courseDNA}
@@ -381,10 +375,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
                       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                       className="overflow-hidden"
                     >
-                      <div
-                        className="rounded-2xl bg-card border border-border overflow-hidden"
-                        style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)' }}
-                      >
+                      <div>
                         {data.courseDNA.length > 0 && (
                           <CourseDNACard items={data.courseDNA} courseName={data.tournament.courseName} inline />
                         )}
@@ -443,10 +434,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
                       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                       className="overflow-hidden"
                     >
-                      <div
-                        className="rounded-2xl bg-card border border-border overflow-hidden"
-                        style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)' }}
-                      >
+                      <div>
                         {data.courseDNA.length > 0 && (
                           <CourseDNACard items={data.courseDNA} courseName={data.tournament.courseName} inline />
                         )}
@@ -495,10 +483,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
                     transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
                     className="pb-6"
                   >
-                    <div
-                      className="rounded-2xl bg-card border border-border overflow-hidden"
-                      style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)' }}
-                    >
+                    <div>
                       {nextTournamentInsights.courseDNA.length > 0 && (
                         <CourseDNACard
                           items={nextTournamentInsights.courseDNA}
@@ -563,10 +548,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
                     transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
                     className="pb-6"
                   >
-                    <div
-                      className="rounded-2xl bg-card border border-border overflow-hidden"
-                      style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)' }}
-                    >
+                    <div>
                       {nextTournamentInsights.courseDNA.length > 0 && (
                         <CourseDNACard
                           items={nextTournamentInsights.courseDNA}

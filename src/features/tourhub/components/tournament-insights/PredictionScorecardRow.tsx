@@ -12,6 +12,7 @@ interface PredictionScorecardRowProps {
   prediction: TrackedPrediction;
   index: number;
   isCompleted?: boolean;
+  isDarkHorse?: boolean;
 }
 
 function getOrdinalSuffix(n: number): string {
@@ -59,11 +60,9 @@ function getOffLeadDisplay(prediction: TrackedPrediction, isCompleted?: boolean)
   const offLead = prediction.actualPosition - 1;
 
   if (offLead === 0) {
-    // Leader — show their actual score in green
     return { text: formatScore(prediction.score), color: 'rgba(22,163,74,0.9)', fontWeight: 700 };
   }
 
-  // Behind the leader — show ▼N in red
   return { text: offLead, color: 'rgba(220,38,38,0.75)', fontWeight: 600, isDownArrow: true };
 }
 
@@ -71,6 +70,7 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
   prediction,
   index,
   isCompleted,
+  isDarkHorse,
 }) => {
   const offLead = getOffLeadDisplay(prediction, isCompleted);
   const isCut = prediction.performanceStatus === 'cut';
@@ -130,6 +130,22 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
               {prediction.currentRound ? ` · R${prediction.currentRound}` : ''}
             </p>
           )}
+          {/* Dark Horse inline badge */}
+          {isDarkHorse && (
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '3px',
+              fontSize: '10px',
+              fontWeight: 700,
+              letterSpacing: '0.5px',
+              textTransform: 'uppercase' as const,
+              color: 'rgba(245,158,11,0.85)',
+              marginTop: '2px',
+            }}>
+              ⚡ Dark Horse
+            </span>
+          )}
         </div>
       </div>
 
@@ -140,9 +156,9 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
         </span>
       </div>
 
-      {/* OFF LEAD */}
+      {/* OFF LEAD — matches header width of 75px, centred */}
       <motion.div
-        className="w-[56px] flex-shrink-0 text-right"
+        className="w-[75px] flex-shrink-0 text-center"
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.3 + index * 0.05 }}
