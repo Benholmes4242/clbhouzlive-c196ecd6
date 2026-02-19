@@ -1,17 +1,12 @@
 /**
- * tournament-live-sync - Round-robin single-tournament sync
- * 
- * Called by pg_cron every minute. Syncs ONE live tournament per invocation,
- * picking the stalest (oldest last_live_sync). Leaderboard-only — secondary
- * data (tee times, hole stats, scorecards) handled by daily-schedule-sync
- * and tournament-round-complete.
- * 
- * Per-tournament timezone gating: Each tournament's IANA timezone (stored in
- * sr_tournaments.timezone) determines the playing hours window (5 AM – 9 PM local).
- * The tournament's start_date/end_date replace the old Mon–Wed day-of-week check.
- * Housekeeping (stale-close, status resolver) runs every invocation regardless.
- * 
- * With N live tournaments, each gets synced every ~N minutes.
+ * tournament-live-sync — Sync ALL in-hours live tournaments per invocation
+ *
+ * Called by pg_cron every minute. Fetches every inprogress tournament,
+ * filters to those within playing hours (5 AM – 9 PM local), and syncs
+ * ALL of them in parallel. Gated tournaments get their last_live_sync
+ * stamped so the round-robin debt is cleared.
+ *
+ * With N live tournaments, every in-hours one is synced every minute.
  * Supabase Realtime broadcasts DB changes instantly to all connected clients.
  */
 
@@ -39,6 +34,17 @@ interface StatusResolverResult {
   tournamentName: string;
   resolved: boolean;
   reason: string;
+}
+
+interface TournamentSyncResult {
+  name: string;
+  records: number;
+  gated: boolean;
+  gateReason?: string;
+  transitionedToClosed: boolean;
+  roundCompleteTriggered: boolean;
+  error?: string;
+  durationMs: number;
 }
 
 Deno.serve(async (req) => {
@@ -87,20 +93,18 @@ Deno.serve(async (req) => {
     }
 
     // 2. Status resolver — uses 1 API call per pending tournament
-    //    (runs regardless of gating — uses its own lightweight check)
     const statusResolverResults = await resolveToLiveStatus(supabase, sportradarApiKey, today);
     const resolved = statusResolverResults.filter(r => r.resolved).length;
     if (resolved > 0) {
       console.log(`[LiveSync] Status resolver: ${resolved} tournament(s) transitioned to inprogress`);
     }
 
-    // ── Round-robin: pick the ONE stalest live tournament ─────────────
+    // ── Fetch ALL live tournaments ────────────────────────────────────
     const { data: liveTournaments, error: queryError } = await supabase
       .from('sr_tournaments')
       .select('id, sr_id, name, status, start_date, end_date, season_id, last_live_sync, timezone')
       .eq('status', 'inprogress')
-      .order('last_live_sync', { ascending: true, nullsFirst: true })
-      .limit(1);
+      .order('last_live_sync', { ascending: true, nullsFirst: true });
 
     if (queryError) {
       throw new Error(`Failed to query live tournaments: ${queryError.message}`);
@@ -122,133 +126,40 @@ Deno.serve(async (req) => {
       );
     }
 
-    const tournament = liveTournaments[0];
-    const tournamentTz = tournament.timezone || 'America/New_York';
+    console.log(`[LiveSync] Found ${liveTournaments.length} inprogress tournament(s)`);
 
-    // ── Per-tournament time-of-day gate ───────────────────────────────
-    const timeCheck = isWithinPlayingHoursForTimezone(tournamentTz);
-    const dateCheck = isTournamentDay(tournament.start_date, tournament.end_date, tournamentTz);
+    // ── Sync all tournaments (gated ones get stamped, not skipped) ────
+    const syncResults = await Promise.all(
+      liveTournaments.map(tournament => syncTournament(supabase, sportradarApiKey, tournament))
+    );
 
-    if (!timeCheck.allowed) {
-      console.log(`[LiveSync] Skipping ${tournament.name} — ${timeCheck.reason}`);
-      if (syncLogId) {
-        await supabase.from('sr_sync_log').update({
-          status: 'success', records_synced: 0, completed_at: new Date().toISOString(),
-          error_message: `Gated: ${timeCheck.reason}`
-        }).eq('id', syncLogId);
-      }
-      return new Response(
-        JSON.stringify({
-          success: true, message: timeCheck.reason,
-          tournament: tournament.name, timezone: tournamentTz,
-          gated: true, duration: Date.now() - startTime,
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Date check is informational — trust inprogress status over date range
-    // (handles rain delays, Monday finishes)
-    if (!dateCheck.isActive) {
-      console.log(`[LiveSync] Note: ${dateCheck.reason} — but status is inprogress, syncing anyway`);
-    }
-
-    console.log(`[LiveSync] Round-robin selected: ${tournament.name} (tz: ${tournamentTz}, last sync: ${tournament.last_live_sync || 'never'})`);
-
-    // Get season info
-    const { data: seasonData } = await supabase
-      .from('sr_seasons')
-      .select('id, year, tour_name')
-      .eq('id', tournament.season_id)
-      .maybeSingle();
-
-    const year = seasonData?.year || new Date().getFullYear();
-    const tour = mapTourName(seasonData?.tour_name || 'pga');
-
-    // ── Sync leaderboard ─────────────────────────────────────────────
-    let leaderboardRecords = 0;
-    let sportradarStatus: string | undefined;
-
-    try {
-      const result = await syncLeaderboard(supabase, sportradarApiKey, tour, year, tournament.sr_id, tournament.id);
-      leaderboardRecords = result.records;
-      sportradarStatus = result.sportradarStatus;
-    } catch (error) {
-      console.error(`[LiveSync] Leaderboard error for ${tournament.name}:`, error.message);
-    }
-
-    // ── Round-completion detection ───────────────────────────────────
-    let roundCompleteTriggered = false;
-    if (leaderboardRecords > 0) {
-      try {
-        roundCompleteTriggered = await checkAndTriggerRoundComplete(supabase, tournament.id, tournament.name);
-      } catch (err) {
-        console.error(`[LiveSync] Round-complete check error:`, err.message);
-      }
-    }
-
-    // ── Lifecycle: check if Sportradar reports tournament as closed ───
-    let transitionedToClosed = false;
-    const closedStatuses = ['closed', 'complete', 'completed', 'official'];
-
-    if (sportradarStatus && closedStatuses.includes(sportradarStatus.toLowerCase())) {
-      console.log(`[LiveSync] Sportradar reports ${tournament.name} as '${sportradarStatus}' — transitioning to closed`);
-
-      let winnerId: string | null = null;
-      const { data: winnerEntry } = await supabase
-        .from('sr_leaderboards')
-        .select('player_id, sr_players!inner(sr_id)')
-        .eq('tournament_id', tournament.id)
-        .eq('position', 1)
-        .gt('strokes', 0)
-        .order('strokes', { ascending: true })
-        .limit(1)
-        .maybeSingle();
-
-      if (winnerEntry?.sr_players?.sr_id) {
-        winnerId = winnerEntry.sr_players.sr_id;
-      }
-
-      const updatePayload: any = { status: 'closed', last_live_sync: new Date().toISOString() };
-      if (winnerId) updatePayload.winner_id = winnerId;
-
-      const { error: closeError } = await supabase
-        .from('sr_tournaments')
-        .update(updatePayload)
-        .eq('id', tournament.id);
-
-      if (!closeError) {
-        transitionedToClosed = true;
-        console.log(`[LiveSync] ✓ Transitioned ${tournament.name} to closed${winnerId ? ` (winner: ${winnerId})` : ''}`);
-      }
-    } else {
-      // Update last_live_sync timestamp
-      await supabase
-        .from('sr_tournaments')
-        .update({ last_live_sync: new Date().toISOString() })
-        .eq('id', tournament.id);
-    }
-
+    const totalRecords = syncResults.reduce((sum, r) => sum + r.records, 0);
+    const inHoursCount = syncResults.filter(r => !r.gated).length;
+    const gatedCount = syncResults.filter(r => r.gated).length;
     const totalDuration = Date.now() - startTime;
 
     if (syncLogId) {
       await supabase.from('sr_sync_log').update({
-        status: 'success', records_synced: leaderboardRecords, completed_at: new Date().toISOString(),
+        status: 'success', records_synced: totalRecords, completed_at: new Date().toISOString(),
       }).eq('id', syncLogId);
     }
 
-    console.log(`[LiveSync] ✓ ${tournament.name}: ${leaderboardRecords} records in ${totalDuration}ms${roundCompleteTriggered ? ' [round-complete triggered]' : ''}`);
+    console.log(`[LiveSync] ✓ Complete: ${inHoursCount} synced, ${gatedCount} gated, ${totalRecords} records in ${totalDuration}ms`);
 
     return new Response(
       JSON.stringify({
         success: true,
-        tournament: tournament.name,
-        timezone: tournamentTz,
-        playingHours: timeCheck.reason,
-        records: leaderboardRecords,
-        duration: totalDuration,
-        transitionedToClosed,
-        roundCompleteTriggered,
+        tournaments: syncResults.map(r => ({
+          name: r.name,
+          records: r.records,
+          gated: r.gated,
+          gateReason: r.gateReason,
+          transitionedToClosed: r.transitionedToClosed,
+          roundCompleteTriggered: r.roundCompleteTriggered,
+          error: r.error,
+          durationMs: r.durationMs,
+        })),
+        summary: { inHoursCount, gatedCount, totalRecords, totalDuration },
         staleClosed: staleTournaments?.length || 0,
         statusResolved: resolved,
       }),
@@ -263,6 +174,133 @@ Deno.serve(async (req) => {
     );
   }
 });
+
+// ── Per-tournament sync (FIX 1 + FIX 2) ──────────────────────────────
+// FIX 1: Gated tournaments stamp last_live_sync so round-robin advances.
+// FIX 2: Called for ALL tournaments per invocation, not just the stalest.
+
+async function syncTournament(
+  supabase: any,
+  sportradarApiKey: string,
+  tournament: any
+): Promise<TournamentSyncResult> {
+  const tStart = Date.now();
+  const tournamentTz = tournament.timezone || 'America/New_York';
+  const timeCheck = isWithinPlayingHoursForTimezone(tournamentTz);
+  const dateCheck = isTournamentDay(tournament.start_date, tournament.end_date, tournamentTz);
+
+  // ── FIX 1: Stamp gated tournaments so round-robin advances ───────
+  if (!timeCheck.allowed) {
+    console.log(`[LiveSync] Gated: ${tournament.name} — ${timeCheck.reason}`);
+    await supabase
+      .from('sr_tournaments')
+      .update({ last_live_sync: new Date().toISOString() })
+      .eq('id', tournament.id);
+    return {
+      name: tournament.name,
+      records: 0,
+      gated: true,
+      gateReason: timeCheck.reason,
+      transitionedToClosed: false,
+      roundCompleteTriggered: false,
+      durationMs: Date.now() - tStart,
+    };
+  }
+
+  // Date check is informational only — trust inprogress status over date range
+  if (!dateCheck.isActive) {
+    console.log(`[LiveSync] Note: ${dateCheck.reason} — but status is inprogress, syncing anyway`);
+  }
+
+  // Get season info
+  const { data: seasonData } = await supabase
+    .from('sr_seasons')
+    .select('id, year, tour_name')
+    .eq('id', tournament.season_id)
+    .maybeSingle();
+
+  const year = seasonData?.year || new Date().getFullYear();
+  const tour = mapTourName(seasonData?.tour_name || 'pga');
+
+  // ── Sync leaderboard ─────────────────────────────────────────────
+  let leaderboardRecords = 0;
+  let sportradarStatus: string | undefined;
+  let syncError: string | undefined;
+
+  try {
+    const result = await syncLeaderboard(supabase, sportradarApiKey, tour, year, tournament.sr_id, tournament.id);
+    leaderboardRecords = result.records;
+    sportradarStatus = result.sportradarStatus;
+  } catch (error) {
+    syncError = error.message;
+    console.error(`[LiveSync] Leaderboard error for ${tournament.name}:`, error.message);
+  }
+
+  // ── Round-completion detection ────────────────────────────────────
+  let roundCompleteTriggered = false;
+  if (leaderboardRecords > 0) {
+    try {
+      roundCompleteTriggered = await checkAndTriggerRoundComplete(supabase, tournament.id, tournament.name);
+    } catch (err) {
+      console.error(`[LiveSync] Round-complete check error:`, err.message);
+    }
+  }
+
+  // ── Lifecycle: check if Sportradar reports tournament as closed ───
+  let transitionedToClosed = false;
+  const closedStatuses = ['closed', 'complete', 'completed', 'official'];
+
+  if (sportradarStatus && closedStatuses.includes(sportradarStatus.toLowerCase())) {
+    console.log(`[LiveSync] Sportradar reports ${tournament.name} as '${sportradarStatus}' — transitioning to closed`);
+
+    let winnerId: string | null = null;
+    const { data: winnerEntry } = await supabase
+      .from('sr_leaderboards')
+      .select('player_id, sr_players!inner(sr_id)')
+      .eq('tournament_id', tournament.id)
+      .eq('position', 1)
+      .gt('strokes', 0)
+      .order('strokes', { ascending: true })
+      .limit(1)
+      .maybeSingle();
+
+    if (winnerEntry?.sr_players?.sr_id) {
+      winnerId = winnerEntry.sr_players.sr_id;
+    }
+
+    const updatePayload: any = { status: 'closed', last_live_sync: new Date().toISOString() };
+    if (winnerId) updatePayload.winner_id = winnerId;
+
+    const { error: closeError } = await supabase
+      .from('sr_tournaments')
+      .update(updatePayload)
+      .eq('id', tournament.id);
+
+    if (!closeError) {
+      transitionedToClosed = true;
+      console.log(`[LiveSync] ✓ Transitioned ${tournament.name} to closed${winnerId ? ` (winner: ${winnerId})` : ''}`);
+    }
+  } else {
+    // Update last_live_sync timestamp
+    await supabase
+      .from('sr_tournaments')
+      .update({ last_live_sync: new Date().toISOString() })
+      .eq('id', tournament.id);
+  }
+
+  const durationMs = Date.now() - tStart;
+  console.log(`[LiveSync] ✓ ${tournament.name}: ${leaderboardRecords} records in ${durationMs}ms${roundCompleteTriggered ? ' [round-complete triggered]' : ''}`);
+
+  return {
+    name: tournament.name,
+    records: leaderboardRecords,
+    gated: false,
+    transitionedToClosed,
+    roundCompleteTriggered,
+    error: syncError,
+    durationMs,
+  };
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────
 
@@ -368,19 +406,15 @@ async function checkForLiveLeaderboard(
 // ── Sportradar fetch helper ──────────────────────────────────────────
 
 async function fetchSportradar(url: string, apiKey: string, description: string) {
-  console.log(`[LiveSync] Fetching URL: ${url}`);
   const response = await fetch(url, {
     headers: { 'x-api-key': apiKey, 'Accept': 'application/json' }
   });
   if (!response.ok) {
     const errorText = await response.text();
-    console.error(`[LiveSync] API error for ${description}: HTTP ${response.status}, body: ${errorText.substring(0, 300)}`);
+    console.error(`[LiveSync] API error for ${description}: HTTP ${response.status}`);
     throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 200)}`);
   }
-  const data = await response.json();
-  const bodyStr = JSON.stringify(data);
-  console.log(`[LiveSync] API response: ${response.status}, body length: ${bodyStr.length}, keys: ${Object.keys(data).join(',')}`);
-  return data;
+  return response.json();
 }
 
 // ── Leaderboard sync ─────────────────────────────────────────────────
@@ -395,23 +429,10 @@ async function syncLeaderboard(
   tournamentSrId: string, tournamentDbId: string
 ): Promise<LeaderboardSyncResult> {
   const url = `${getTourBaseUrl(tour)}/${year}/tournaments/${tournamentSrId}/leaderboard.json`;
-  console.log(`[LiveSync] syncLeaderboard → tour=${tour}, year=${year}, sr_id=${tournamentSrId}`);
   const data = await fetchSportradar(url, apiKey, 'Leaderboard');
 
   const sportradarStatus = data.status || data.tournament?.status;
   const leaderboard = data.leaderboard || [];
-  console.log(`[LiveSync] Leaderboard entries: ${leaderboard.length}, sportradar status: ${sportradarStatus}, tournament.name: ${data.tournament?.name || 'N/A'}`);
-
-  if (leaderboard.length === 0) {
-    console.warn(`[LiveSync] ⚠ EMPTY leaderboard! Data keys: ${Object.keys(data).join(',')}, tournament keys: ${Object.keys(data.tournament || {}).join(',')}`);
-    if (data.tournament) {
-      console.log(`[LiveSync] Tournament from API: id=${data.tournament.id}, name=${data.tournament.name}, status=${data.tournament.status}`);
-    }
-  }
-
-  if (leaderboard[0]) {
-    console.log(`[LiveSync] Sample entry: ${JSON.stringify(leaderboard[0]).substring(0, 300)}`);
-  }
 
   let records = 0;
 
