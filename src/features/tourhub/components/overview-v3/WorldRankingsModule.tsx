@@ -283,8 +283,8 @@ export function WorldRankingsModule() {
                       entry.rank_change < 0 && "text-red-500",
                       entry.rank_change === 0 && "text-slate-300"
                     )} role="cell">
-                      {entry.rank_change > 0 && `↑${entry.rank_change}`}
-                      {entry.rank_change < 0 && `↓${Math.abs(entry.rank_change)}`}
+                      {entry.rank_change > 0 && <><span style={{ fontSize: '10px' }}>▲</span>{entry.rank_change}</>}
+                      {entry.rank_change < 0 && <><span style={{ fontSize: '10px' }}>▼</span>{Math.abs(entry.rank_change)}</>}
                       {entry.rank_change === 0 && '—'}
                     </div>
 
