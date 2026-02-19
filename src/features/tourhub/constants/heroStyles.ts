@@ -14,9 +14,9 @@
 export const HEADER_HEIGHT = 55;
 
 /** Base hero height values */
-export const HERO_HEIGHT = '72dvh';
-export const HERO_MIN_HEIGHT = 336;
-export const HERO_MAX_HEIGHT = 520;
+export const HERO_HEIGHT = '90dvh';
+export const HERO_MIN_HEIGHT = 420;
+export const HERO_MAX_HEIGHT = 650;
 
 /** For pages WITH a header (hero bleeds behind header + safe area) */
 export const HERO_BLEED_MARGIN_WITH_HEADER = `calc(-${HEADER_HEIGHT}px - env(safe-area-inset-top, 0px))`;
