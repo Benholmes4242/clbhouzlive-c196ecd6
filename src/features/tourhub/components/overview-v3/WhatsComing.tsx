@@ -40,15 +40,16 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
   const contextLabel = getContextLabel(tournament);
   const isSignature = contextLabel === 'SIGNATURE EVENT';
   const isMajor = contextLabel === 'MAJOR CHAMPIONSHIP';
+  const isRolex = contextLabel === 'ROLEX SERIES';
   const venue = getVenueString(tournament);
   const tourSlug = TOUR_NAME_TO_SLUG[tournament.tourName || ''] || '';
   const tourLogoSrc = tourSlug ? getTourLogo(tourSlug) : null;
 
-  // FIX 17: Left border accent for Signature/Major events
+  // Left border accent: amber for majors, emerald for signature/rolex
   const leftBorderStyle = isMajor
-    ? '3px solid hsl(142 76% 36%)'
-    : isSignature
-      ? '3px solid hsl(45 93% 47%)'
+    ? '3px solid #f59e0b'
+    : (isSignature || isRolex)
+      ? '3px solid rgba(16, 185, 129, 0.8)'
       : '3px solid transparent';
 
   return (
@@ -79,15 +80,17 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
         <p
           className="uppercase leading-none text-[0.5625rem] font-medium tracking-wide"
           style={{
-            color: isMajor || isSignature
-              ? 'hsl(var(--primary))'
-              : undefined,
+            color: isMajor
+              ? '#f59e0b'
+              : (isSignature || isRolex)
+                ? 'rgba(16, 185, 129, 0.9)'
+                : undefined,
           }}
         >
-          {!isMajor && !isSignature && (
+          {!isMajor && !isSignature && !isRolex && (
             <span className="text-muted-foreground/70">{contextLabel}</span>
           )}
-          {(isMajor || isSignature) && contextLabel}
+          {(isMajor || isSignature || isRolex) && contextLabel}
         </p>
         <p className="mt-1 text-[1.0625rem] font-semibold text-foreground" style={{ letterSpacing: '-0.15px' }}>
           {tournament.name}
