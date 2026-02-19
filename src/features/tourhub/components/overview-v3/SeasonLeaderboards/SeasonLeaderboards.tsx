@@ -6,14 +6,13 @@
  */
 
 import { useState, memo, useEffect } from 'react';
-import { ChevronRight, ChevronDown } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSeasonLeaderboards, CATEGORY_CONFIG as CATEGORY_DATA_CONFIG } from '@/features/tourhub/hooks/useSeasonLeaderboards';
 import { CategoryTabs } from './CategoryTabs';
 import { LeaderHero } from './LeaderHero';
 import { ChasingPack } from './ChasingPack';
-import { LeaderboardList } from './LeaderboardList';
 import { SeasonToggle } from './SeasonToggle';
 import { CATEGORY_CONFIG, CATEGORY_ACCENT_COLORS } from './constants';
 import { BarChartIcon, type CategoryId } from './StatCategoryIcons';
@@ -99,7 +98,6 @@ export function SeasonLeaderboards() {
   const navigate = useNavigate();
   const [selectedYear, setSelectedYear] = useState<number | undefined>(undefined);
   const [activeCategory, setActiveCategory] = useState<CategoryId>('sg_total');
-  const [showFullList, setShowFullList] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   const { data, isLoading, error } = useSeasonLeaderboards(selectedYear);
@@ -116,7 +114,6 @@ export function SeasonLeaderboards() {
   const handleCategoryChange = (newCategory: CategoryId) => {
     if (newCategory === activeCategory) return;
     setIsTransitioning(true);
-    setShowFullList(false);
     setTimeout(() => {
       setActiveCategory(newCategory);
       setIsTransitioning(false);
@@ -135,7 +132,6 @@ export function SeasonLeaderboards() {
   const activeCategoryData = data?.categories.find((c) => c.id === activeCategory);
   const leader = activeCategoryData?.players[0];
   const chasers = activeCategoryData?.players.slice(1, 3) || [];
-  const restOfList = activeCategoryData?.players.slice(3, 10) || [];
   const categoryConfig = CATEGORY_DATA_CONFIG[activeCategory];
   const accent = CATEGORY_ACCENT_COLORS[activeCategory];
   const contextLine = DISCIPLINE_CONTEXT[activeCategory];
@@ -170,7 +166,17 @@ export function SeasonLeaderboards() {
           </h2>
         </div>
         <button
-          onClick={() => navigate('/tourhub/stats')}
+          onClick={() => {
+            const categoryMap: Record<string, string> = {
+              'sg_total': 'world_rank',
+              'distance': 'drive_avg',
+              'accuracy': 'drive_acc',
+              'scrambling': 'scrambling_pct',
+              'putting': 'putt_avg',
+            };
+            const leaderCategory = categoryMap[activeCategory] || 'world_rank';
+            navigate(`/tourhub?tab=leaderboards&category=${leaderCategory}`);
+          }}
           className="flex items-center gap-0.5 transition-all duration-300 bg-transparent border-none cursor-pointer group text-muted-foreground"
           style={{ fontSize: '13px', fontWeight: 500, minHeight: '44px' }}
         >
@@ -244,49 +250,35 @@ export function SeasonLeaderboards() {
               />
             )}
 
-            {/* ═══ VIEW FULL RANKINGS (expandable) ═══ */}
-            {restOfList.length > 0 && (
-              <div style={{ marginTop: '16px' }}>
-                <button
-                  onClick={() => setShowFullList(!showFullList)}
-                  className="w-full flex items-center justify-center gap-1.5 py-3 rounded-xl transition-all duration-200 active:scale-[0.98]"
-                  style={{
-                    background: showFullList ? accent.bgMedium : 'rgba(0,0,0,0.03)',
-                    border: `1px solid ${showFullList ? accent.border : 'rgba(0,0,0,0.06)'}`,
-                    transition: 'all 0.25s ease',
-                  }}
-                >
-                  <span style={{ fontSize: '13px', fontWeight: 600, color: showFullList ? accent.primary : 'rgba(0,0,0,0.4)' }}>
-                    {showFullList ? 'Hide Rankings' : 'View Full Rankings'}
-                  </span>
-                  <motion.div
-                    animate={{ rotate: showFullList ? 180 : 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <ChevronDown size={14} style={{ color: showFullList ? accent.primary : 'rgba(0,0,0,0.3)' }} />
-                  </motion.div>
-                </button>
-
-                <AnimatePresence>
-                  {showFullList && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                      style={{ overflow: 'hidden' }}
-                    >
-                      <div
-                        className="mt-3 rounded-xl overflow-hidden bg-card"
-                        style={{ border: '1px solid hsl(var(--border) / 0.5)' }}
-                      >
-                        <LeaderboardList players={restOfList} accentColor={activeCategory} />
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            )}
+            {/* ═══ VIEW FULL RANKINGS — navigates to Leaders page ═══ */}
+            <button
+              onClick={() => {
+                const categoryMap: Record<string, string> = {
+                  'sg_total': 'world_rank',
+                  'distance': 'drive_avg',
+                  'accuracy': 'drive_acc',
+                  'scrambling': 'scrambling_pct',
+                  'putting': 'putt_avg',
+                };
+                const leaderCategory = categoryMap[activeCategory] || 'world_rank';
+                navigate(`/tourhub?tab=leaderboards&category=${leaderCategory}`);
+              }}
+              style={{
+                width: '100%',
+                padding: '14px',
+                borderRadius: '12px',
+                border: '1px solid rgba(0,0,0,0.08)',
+                background: 'rgba(0,0,0,0.02)',
+                fontSize: '13.5px',
+                fontWeight: 600,
+                color: 'rgba(0,0,0,0.5)',
+                cursor: 'pointer',
+                marginTop: '12px',
+              }}
+              className="active:scale-[0.98] transition-transform duration-150"
+            >
+              View Full Rankings ›
+            </button>
           </motion.div>
         </AnimatePresence>
       )}

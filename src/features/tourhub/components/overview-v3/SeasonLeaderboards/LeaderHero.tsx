@@ -45,14 +45,7 @@ export const LeaderHero = memo(function LeaderHero({ player, accentColor }: Lead
       }}
       aria-label={`Season leader: ${player.playerName}, ${player.statDisplayValue} ${player.statUnit}`}
     >
-      {/* Subtle discipline-tinted gradient glow */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: `linear-gradient(135deg, ${accent.bgLight} 0%, transparent 50%)`,
-          borderRadius: '20px',
-        }}
-      />
+      {/* Clean card — no gradient overlay */}
 
       {/* Horizontal split: Avatar left, Info right */}
       <div className="relative flex" style={{ gap: '18px' }}>
@@ -107,13 +100,11 @@ export const LeaderHero = memo(function LeaderHero({ player, accentColor }: Lead
           <div className="flex items-baseline justify-center" style={{ marginTop: '12px', gap: '4px' }}>
             <span
               style={{
-                fontFamily: "'JetBrains Mono', monospace",
                 fontSize: '36px',
                 fontWeight: 800,
                 letterSpacing: '-1.5px',
                 lineHeight: 1,
-                color: accent.primary,
-                transition: 'color 0.3s ease',
+                color: 'hsl(var(--foreground))',
               }}
             >
               {player.statDisplayValue}
@@ -137,8 +128,7 @@ export const LeaderHero = memo(function LeaderHero({ player, accentColor }: Lead
               fontWeight: 600,
               letterSpacing: '1.2px',
               textTransform: 'uppercase' as const,
-              color: accent.textMuted,
-              transition: 'color 0.3s ease',
+              color: 'rgba(0,0,0,0.4)',
             }}
           >
             Season Leader
