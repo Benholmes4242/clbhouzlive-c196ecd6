@@ -90,7 +90,7 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
         delay: index * 0.05,
       }}
       className="flex items-center px-4"
-      style={{ opacity: isDimmed ? 0.6 : 1, height: '68px' }}
+      style={{ opacity: isWD ? 0.5 : isCut ? 0.6 : 1, height: '68px' }}
     >
       {/* PLAYER — Avatar + Name */}
       <div className="flex items-center gap-2.5 flex-1 min-w-0">

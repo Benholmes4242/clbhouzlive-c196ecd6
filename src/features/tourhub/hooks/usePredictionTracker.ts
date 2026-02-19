@@ -53,11 +53,20 @@ async function fetchTrackerData(
     if (fullName) leaderboardByName.set(fullName.toLowerCase(), row);
   });
 
+  // Calculate field completion percentage to detect pre-tournament withdrawals.
+  // If > 50% of the field has posted scores and a predicted player has NO leaderboard
+  // entry at all, they're likely a pre-tournament withdrawal (not just a late tee time).
+  const totalInField = leaderboard?.length ?? 0;
+  const playersWithScores = (leaderboard ?? []).filter(
+    lb => lb.position !== null && lb.strokes > 0
+  ).length;
+  const fieldCompletionPct = totalInField > 0 ? playersWithScores / totalInField : 0;
+
   // Match top contenders — try sr_id first, fall back to name
   const trackedPredictions: TrackedPrediction[] = predictions.topContenders.map((p, i) => {
     const lb = leaderboardMap.get(p.playerId)
       ?? leaderboardByName.get(p.playerName?.toLowerCase() ?? '');
-    return buildTrackedPrediction(p, i + 1, lb, false);
+    return buildTrackedPrediction(p, i + 1, lb, false, fieldCompletionPct);
   });
 
   // Match dark horses — try sr_id first, fall back to name
@@ -68,7 +77,8 @@ async function fetchTrackerData(
       { ...dh, reasons: [dh.hook], winProbability: 0 },
       predictions.topContenders.length + i + 1,
       lb,
-      true
+      true,
+      fieldCompletionPct
     );
   });
 
@@ -88,7 +98,8 @@ function buildTrackedPrediction(
   player: any,
   predictedRank: number,
   lb: any | undefined,
-  isDarkHorse: boolean
+  isDarkHorse: boolean,
+  fieldCompletionPct: number = 0
 ): TrackedPrediction {
   const actualPosition = lb?.position ?? null;
   const status = lb?.status ?? null;
@@ -100,6 +111,11 @@ function buildTrackedPrediction(
     performanceStatus = 'cut';
   } else if (status === 'wd') {
     performanceStatus = 'withdrawn';
+  } else if (lb === undefined) {
+    // Player has NO leaderboard entry at all.
+    // If > 50% of the field has already posted scores, this player almost certainly
+    // withdrew before the tournament started (not just a late tee time).
+    performanceStatus = fieldCompletionPct > 0.5 ? 'withdrawn' : 'not-started';
   } else if (actualPosition !== null) {
     // OFF LEAD: how far from the leader (position 1)?
     positionDelta = actualPosition - 1;
