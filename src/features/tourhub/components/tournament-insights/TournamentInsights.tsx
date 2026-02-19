@@ -397,7 +397,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
             ) : tracker ? (
               /* ── LIVE SCORES IN: show live tracking table ── */
               <div className="space-y-4">
-                <PredictionLeaderboard allPicks={tracker.allPicks} />
+                <PredictionLeaderboard allPicks={tracker.allPicks} isCompleted={false} />
 
                 {/* Course DNA toggle */}
                 <button

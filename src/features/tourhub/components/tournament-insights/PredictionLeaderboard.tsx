@@ -1,7 +1,6 @@
 /**
  * PredictionLeaderboard - Unified OWGR-style table
- * Top 5 predictions → Dark Horse divider → Dark horse rows
- * All in a single card.
+ * Top 3 picks + 1 dark horse row. OFF LEAD column.
  */
 
 import React from 'react';
@@ -11,15 +10,18 @@ import type { TrackedPrediction } from './types';
 
 interface PredictionLeaderboardProps {
   allPicks: TrackedPrediction[];
+  isCompleted?: boolean;
 }
 
 export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
   allPicks,
+  isCompleted,
 }) => {
   if (allPicks.length === 0) return null;
 
-  const mainPicks = allPicks.filter(p => !p.isDarkHorse).slice(0, 5);
-  const darkHorses = allPicks.filter(p => p.isDarkHorse);
+  // Top 3 picks + 1 dark horse
+  const mainPicks = allPicks.filter(p => !p.isDarkHorse).slice(0, 3);
+  const darkHorses = allPicks.filter(p => p.isDarkHorse).slice(0, 1);
 
   return (
     <motion.div
@@ -39,15 +41,15 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
         <div className="w-[52px] flex-shrink-0 text-center">
           <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Actual</span>
         </div>
-        <div className="w-[48px] flex-shrink-0 text-right">
-          <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">+/-</span>
+        <div className="w-[56px] flex-shrink-0 text-right">
+          <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Off Lead</span>
         </div>
       </div>
 
       {/* Main prediction rows */}
       {mainPicks.map((prediction, i) => (
         <React.Fragment key={prediction.playerId}>
-          <PredictionScorecardRow prediction={prediction} index={i} />
+          <PredictionScorecardRow prediction={prediction} index={i} isCompleted={isCompleted} />
           {i < mainPicks.length - 1 && (
             <div className="border-b" style={{ borderColor: 'rgba(0, 0, 0, 0.04)' }} />
           )}
@@ -73,7 +75,7 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
           {/* Dark horse rows */}
           {darkHorses.map((dh, i) => (
             <React.Fragment key={dh.playerId}>
-              <PredictionScorecardRow prediction={dh} index={mainPicks.length + i} />
+              <PredictionScorecardRow prediction={dh} index={mainPicks.length + i} isCompleted={isCompleted} />
               {i < darkHorses.length - 1 && (
                 <div className="border-b" style={{ borderColor: 'rgba(0, 0, 0, 0.04)' }} />
               )}

@@ -1,6 +1,6 @@
 /**
- * PredictionScorecardRow - OWGR-style row with columns: # | PLAYER | PREDICTED | ACTUAL | +/-
- * Matches WorldRankingsModule row density and styling
+ * PredictionScorecardRow - OWGR-style row: PLAYER | ACTUAL | OFF LEAD
+ * OFF LEAD = actualPosition - 1 (how far from the leader)
  */
 
 import React from 'react';
@@ -11,6 +11,7 @@ import type { TrackedPrediction } from './types';
 interface PredictionScorecardRowProps {
   prediction: TrackedPrediction;
   index: number;
+  isCompleted?: boolean;
 }
 
 function getOrdinalSuffix(n: number): string {
@@ -23,52 +24,61 @@ function formatOrdinal(n: number): string {
   return `${n}${getOrdinalSuffix(n)}`;
 }
 
-function formatActual(prediction: TrackedPrediction): string {
+function formatActual(prediction: TrackedPrediction, isCompleted?: boolean): string {
   if (prediction.performanceStatus === 'cut') return 'MC';
   if (prediction.performanceStatus === 'withdrawn') return 'WD';
   if (prediction.actualPosition === null) return '—';
-  return prediction.actualPositionTied ? `T${prediction.actualPosition}` : formatOrdinal(prediction.actualPosition);
+  const prefix = prediction.actualPositionTied ? 'T' : '';
+  return `${prefix}${prediction.actualPosition}`;
 }
 
-function getDeltaDisplay(prediction: TrackedPrediction): {
+interface OffLeadDisplay {
   text: string;
   color: string;
-  arrow?: string;
-} {
-  switch (prediction.performanceStatus) {
-    case 'outperforming':
-      return { text: `${Math.abs(prediction.positionDelta!)}`, color: '#059669', arrow: '↑' };
-    case 'matching':
-      return { text: '—', color: '#9ca3af' };
-    case 'underperforming':
-      return { text: `${Math.abs(prediction.positionDelta!)}`, color: '#ef4444', arrow: '↓' };
-    case 'cut':
-      return { text: 'MC', color: '#ef4444' };
-    case 'withdrawn':
-      return { text: 'WD', color: '#9ca3af' };
-    case 'not-started':
-    default:
-      return { text: '—', color: '#d1d5db' };
+}
+
+function getOffLeadDisplay(prediction: TrackedPrediction, isCompleted?: boolean): OffLeadDisplay {
+  if (prediction.performanceStatus === 'cut') {
+    return { text: 'CUT', color: 'rgba(0,0,0,0.3)' };
   }
+  if (prediction.performanceStatus === 'withdrawn') {
+    return { text: 'WD', color: 'rgba(0,0,0,0.3)' };
+  }
+  if (prediction.actualPosition === null || prediction.performanceStatus === 'not-started') {
+    return { text: '—', color: 'rgba(0,0,0,0.2)' };
+  }
+
+  const offLead = prediction.actualPosition - 1;
+
+  if (offLead === 0) {
+    // Leader / winner
+    if (isCompleted) {
+      return { text: 'WINNER', color: 'rgba(245,158,11,1)' };
+    }
+    return { text: 'LEADING', color: 'rgba(22,163,74,0.9)' };
+  }
+
+  if (offLead <= 4) {
+    return { text: `+${offLead}`, color: 'rgba(22,163,74,0.7)' };
+  }
+  if (offLead <= 19) {
+    return { text: `+${offLead}`, color: 'rgba(245,158,11,0.8)' };
+  }
+  return { text: `+${offLead}`, color: 'rgba(220,38,38,0.7)' };
 }
 
 export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
   prediction,
   index,
+  isCompleted,
 }) => {
-  const delta = getDeltaDisplay(prediction);
+  const offLead = getOffLeadDisplay(prediction, isCompleted);
   const isCut = prediction.performanceStatus === 'cut';
   const isWD = prediction.performanceStatus === 'withdrawn';
   const isDimmed = isCut || isWD;
   const avatarUrl = prediction.pgaTourId
     ? getPgaTourHeadshotUrl(prediction.pgaTourId)
     : null;
-  const initials = prediction.playerName
-    .split(' ')
-    .map(w => w[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
 
   return (
     <motion.div
@@ -84,7 +94,6 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
     >
       {/* PLAYER — Avatar + Name */}
       <div className="flex items-center gap-2.5 flex-1 min-w-0">
-        {/* Avatar matching world rankings style: squircle with border */}
         <div
           className="overflow-hidden border border-border/50 flex-shrink-0"
           style={{ width: '40px', height: '40px', borderRadius: '13px' }}
@@ -113,7 +122,7 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
           >
             {prediction.playerName}
           </p>
-          {/* Score line — only shown when player has actually posted a score (actualPosition !== null) */}
+          {/* Score line — only when player has posted a real score */}
           {prediction.actualPosition !== null && prediction.score !== null && (
             <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">
               {prediction.score === 0 ? 'E' : prediction.score > 0 ? `+${prediction.score}` : prediction.score}
@@ -127,19 +136,22 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
       {/* ACTUAL */}
       <div className="w-[52px] flex-shrink-0 text-center">
         <span className="text-sm font-semibold text-foreground">
-          {formatActual(prediction)}
+          {formatActual(prediction, isCompleted)}
         </span>
       </div>
 
-      {/* +/- Delta */}
+      {/* OFF LEAD */}
       <motion.div
-        className="w-[48px] flex-shrink-0 text-right"
+        className="w-[56px] flex-shrink-0 text-right"
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.3 + index * 0.05 }}
       >
-        <span className="text-xs font-semibold" style={{ color: delta.color }}>
-          {delta.arrow ? `${delta.arrow}${delta.text}` : delta.text}
+        <span
+          className="text-xs font-semibold"
+          style={{ color: offLead.color }}
+        >
+          {offLead.text}
         </span>
       </motion.div>
     </motion.div>
