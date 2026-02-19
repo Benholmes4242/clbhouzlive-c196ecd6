@@ -11,7 +11,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRankingMovers, useWorldRankingsFull } from '../../hooks/useOverviewModules';
 import { SectionErrorState } from '../SectionErrorState';
@@ -289,7 +289,7 @@ export function UnifiedWorldRankings() {
       {/* ═══ 1. Section Header ═══ */}
       <div className="flex items-start justify-between mb-0.5">
         <h2 className="tracking-tight leading-snug text-foreground text-[1.375rem] font-bold" style={{ letterSpacing: '-0.3px' }}>
-          Official World Golf Ranking
+          World Rankings
         </h2>
         <button
           onClick={() => navigate('/tourhub?tab=players')}
@@ -315,46 +315,27 @@ export function UnifiedWorldRankings() {
       <div className="border-b mb-4" style={{ borderColor: 'hsl(var(--border) / 0.1)' }} />
 
 
-      {/* ═══ 3. This Week's Momentum + Biggest Drops ═══ */}
+      {/* ═══ 3. This Week's Movers (consolidated) ═══ */}
       {hasMovers && (
-        <div className="mb-5 space-y-4">
-          {/* Up movers */}
-          <div>
-            <div className="flex items-center gap-1.5 mb-2">
-              <TrendingUp className="w-3.5 h-3.5 text-emerald-700" />
-              <span className="text-[0.9375rem] font-semibold text-foreground">This Week's Momentum</span>
-            </div>
-            <div
-              className="flex gap-2 overflow-x-auto scrollbar-hide pb-1"
-              style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory', touchAction: 'pan-x pan-y' }}
-              role="list"
-              aria-label="Players gaining ranking positions"
-            >
-              {upwardMovers.map((entry, idx) => (
-                <MomentumPill key={entry.playerId} entry={entry} index={idx} direction="up" />
-              ))}
-            </div>
+        <div className="mb-5">
+          <div className="flex items-center gap-1.5 mb-2">
+            <span style={{ color: 'rgba(22,163,74,0.8)', fontSize: '12px' }}>▲</span>
+            <span style={{ color: 'rgba(220,38,38,0.7)', fontSize: '12px' }}>▼</span>
+            <span className="text-[0.9375rem] font-semibold text-foreground">This Week's Movers</span>
           </div>
-
-          {/* Down movers */}
-          {downwardMovers.length > 0 && (
-            <div>
-              <div className="flex items-center gap-1.5 mb-2">
-                <TrendingDown className="w-3.5 h-3.5 text-red-500" />
-                <span className="text-[0.9375rem] font-semibold text-foreground">Biggest Fallers This Week</span>
-              </div>
-              <div
-                className="flex gap-2 overflow-x-auto scrollbar-hide pb-1"
-                style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory', touchAction: 'pan-x pan-y' }}
-                role="list"
-                aria-label="Players losing ranking positions"
-              >
-                {downwardMovers.map((entry, idx) => (
-                  <MomentumPill key={entry.playerId} entry={entry} index={idx} direction="down" />
-                ))}
-              </div>
-            </div>
-          )}
+          <div
+            className="flex gap-2 overflow-x-auto scrollbar-hide pb-1"
+            style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory', touchAction: 'pan-x pan-y' }}
+            role="list"
+            aria-label="Players with biggest ranking changes this week"
+          >
+            {upwardMovers.map((entry, idx) => (
+              <MomentumPill key={entry.playerId} entry={entry} index={idx} direction="up" />
+            ))}
+            {downwardMovers.map((entry, idx) => (
+              <MomentumPill key={entry.playerId} entry={entry} index={upwardMovers.length + idx} direction="down" />
+            ))}
+          </div>
         </div>
       )}
 
