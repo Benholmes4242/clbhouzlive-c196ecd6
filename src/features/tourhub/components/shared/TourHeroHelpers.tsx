@@ -107,17 +107,11 @@ export function PodiumRunnerRow({
       <span
         style={{
           minWidth: 24,
-          fontSize: row.isTied ? 10 : 12,
+          fontSize: 12,
           fontWeight: 600,
-          color: row.isTied ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.5)',
+          color: 'rgba(255,255,255,0.5)',
           textAlign: 'center',
           flexShrink: 0,
-          ...(row.isTied ? {
-            background: 'rgba(255,255,255,0.08)',
-            borderRadius: 6,
-            padding: '2px 5px',
-            letterSpacing: 0.3,
-          } : {}),
         }}
       >
         {row.isTied ? `T${row.position}` : row.position}
