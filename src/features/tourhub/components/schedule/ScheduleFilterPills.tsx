@@ -53,10 +53,10 @@ export function ScheduleFilterPills({
               aria-selected={isActive}
               onClick={() => onFilterChange(option.value)}
               className={cn(
-                "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98] flex items-center justify-center gap-1.5",
+                "relative flex-1 py-2.5 text-[14px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98] flex items-center justify-center gap-1.5",
                 isActive
-                  ? "bg-card text-foreground shadow-sm m-1 rounded-lg"
-                  : "text-muted-foreground hover:text-foreground rounded-lg active:bg-card/50"
+                  ? "bg-foreground text-background m-1 rounded-lg"
+                  : "text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted/50 active:bg-muted/70"
               )}
             >
               {option.label}
@@ -65,10 +65,10 @@ export function ScheduleFilterPills({
                 <>
                   <span className="text-[11px]">({counts.live})</span>
                   <span className="relative flex h-[6px] w-[6px]">
-                    <span className={cn(
-                      "absolute inline-flex h-full w-full rounded-full opacity-75",
-                      isActive ? "animate-ping" : ""
-                    )} style={{ background: '#22C55E' }} />
+                    <span
+                      className="absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping"
+                      style={{ background: '#22C55E' }}
+                    />
                     <span className="relative inline-flex rounded-full h-[6px] w-[6px]" style={{ background: '#22C55E' }} />
                   </span>
                 </>

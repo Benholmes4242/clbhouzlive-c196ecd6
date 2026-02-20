@@ -105,20 +105,26 @@ export function ScheduleTournamentCard({
   return (
     <motion.button
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
-      className={`w-full flex items-center gap-3 px-3.5 py-2.5 bg-card rounded-2xl border border-border/50 text-left transition-all active:scale-[0.98] ${className || ''}`}
+      className={`w-full flex items-center gap-3 px-4 py-3 bg-card rounded-2xl border border-border/50 text-left transition-all active:scale-[0.98] ${className || ''}`}
       style={{
-        borderLeftWidth: (isMajor || isSignature || isRolex) ? '3px' : undefined,
-        borderLeftColor: isMajor ? '#f59e0b' : (isSignature || isRolex) ? 'rgba(16, 185, 129, 0.8)' : undefined,
+        borderLeftWidth: (isLive || isMajor || isSignature || isRolex) ? '3px' : undefined,
+        borderLeftColor: isLive
+          ? '#22C55E'
+          : isMajor
+          ? '#f59e0b'
+          : (isSignature || isRolex)
+          ? 'rgba(16, 185, 129, 0.8)'
+          : undefined,
       }}
       whileTap={{ scale: 0.98 }}
       aria-label={ariaLabel}
     >
       {/* Date block */}
       <div className="flex-shrink-0 w-12 text-center">
-        <p className="uppercase leading-none text-muted-foreground/70" style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.05em' }}>
+        <p className="uppercase leading-none text-muted-foreground/70" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em' }}>
           {getMonthAbbr(startDate)}
         </p>
-        <p className="leading-none mt-0.5 text-foreground" style={{ fontSize: '17px', fontWeight: 700 }}>
+        <p className="leading-none mt-0.5 text-foreground" style={{ fontSize: '20px', fontWeight: 700 }}>
           {getDayNum(startDate)}
         </p>
       </div>
@@ -130,8 +136,8 @@ export function ScheduleTournamentCard({
           <p
             className="uppercase leading-none"
             style={{
-              fontSize: '9px',
-              fontWeight: 500,
+              fontSize: '10px',
+              fontWeight: 600,
               letterSpacing: '0.05em',
               color: isMajor ? '#f59e0b' : (isSignature || isRolex) ? 'rgba(16, 185, 129, 0.9)' : isLive ? '#22C55E' : 'hsl(var(--muted-foreground) / 0.7)',
             }}
@@ -143,7 +149,7 @@ export function ScheduleTournamentCard({
         {/* Tournament name */}
         <p
           className="mt-1 line-clamp-1 text-foreground"
-          style={{ fontSize: '17px', fontWeight: 600, letterSpacing: '-0.15px' }}
+          style={{ fontSize: '17px', fontWeight: 700, letterSpacing: '-0.15px' }}
         >
           {tournament.name}
         </p>
@@ -153,10 +159,10 @@ export function ScheduleTournamentCard({
           <p className="flex items-center gap-1 mt-0.5" style={{ fontSize: '13px', fontWeight: 500 }}>
             {isFinal && winnerDisplay && (
               <span className="text-muted-foreground">
-                <Trophy className="w-3 h-3 inline mr-0.5" style={{ color: '#f59e0b' }} />
+                <Trophy className="w-3.5 h-3.5 inline mr-0.5" style={{ color: '#f59e0b' }} />
                 <button
                   onClick={handlePlayerTap}
-                  className="transition-opacity active:opacity-70 inline"
+                  className="transition-opacity active:opacity-70 inline font-semibold"
                 >
                   {winnerDisplay}
                 </button>

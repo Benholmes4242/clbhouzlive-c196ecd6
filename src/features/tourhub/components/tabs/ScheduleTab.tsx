@@ -473,7 +473,7 @@ export function ScheduleTab() {
       )}
 
       {/* Content below hero */}
-      <div className="bg-background pt-6">
+      <div className="bg-background pt-4">
         {/* Search Bar */}
         <div className="px-4">
           <motion.div 
@@ -494,12 +494,12 @@ export function ScheduleTab() {
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
               className={cn(
-                "w-full h-12 pl-11 pr-10 rounded-2xl text-[13px] transition-all duration-200",
+                "w-full h-12 pl-11 pr-10 rounded-2xl text-[14px] transition-all duration-200",
                 "bg-card border text-foreground placeholder:text-muted-foreground",
                 "focus:outline-none focus:ring-2 focus:bg-card",
                 isSearchFocused 
                   ? "border-border ring-border/50 shadow-lg" 
-                  : "border-border/50 ring-transparent shadow-sm"
+                  : "border-border/50 ring-transparent shadow-[0_1px_4px_rgba(0,0,0,0.06)]"
               )}
             />
             <AnimatePresence>
@@ -520,20 +520,23 @@ export function ScheduleTab() {
 
         {/* Sticky Filter Toolbar */}
         <motion.div
-          className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm px-4 pb-2"
-          style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+          className="sticky top-0 z-20 bg-background/95 backdrop-blur-md px-4 pb-2"
+          style={{
+            paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+            borderBottom: '1px solid hsl(var(--border) / 0.3)',
+          }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.3 }}
         >
-          <div style={{ marginTop: '20px' }}>
+          <div style={{ marginTop: '14px' }}>
             <ScheduleFilterPills
               activeFilter={filter}
               onFilterChange={setFilter}
               counts={filterStats}
             />
           </div>
-          <div style={{ marginTop: '12px' }}>
+          <div style={{ marginTop: '8px' }}>
             <ScheduleTourFilter
               activeTour={activeTour}
               onTourChange={setActiveTour}
@@ -585,8 +588,8 @@ export function ScheduleTab() {
                     />
                   </div>
 
-                  {/* Tournament list — 12px gap from header, 8px between cards */}
-                  <div className="flex flex-col gap-2 px-4 mt-3">
+                  {/* Tournament list — 12px gap from header, 12px between cards */}
+                  <div className="flex flex-col gap-3 px-4 mt-3">
                     {group.tournaments.map((tournament) => (
                       <InViewCard key={tournament.id}>
                         <ScheduleTournamentCard 

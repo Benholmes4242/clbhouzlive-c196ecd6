@@ -64,8 +64,8 @@ export function ScheduleMonthHeader({
         </span>
       </div>
 
-      {breakdownParts.length > 1 && (
-        <p className="mt-0.5 text-muted-foreground/60" style={{ fontSize: '12px', fontWeight: 400 }}>
+      {breakdownParts.length > 0 && (
+        <p className="mt-0.5 text-muted-foreground/70" style={{ fontSize: '12px', fontWeight: 400 }}>
           {breakdownParts.join(' · ')}
         </p>
       )}
