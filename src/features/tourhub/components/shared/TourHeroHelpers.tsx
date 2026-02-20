@@ -128,7 +128,7 @@ export function PodiumRunnerRow({
             photoUrl={player.photoUrl}
             pgaTourId={player.pgaTourId}
             displayName={player.displayName}
-            size={26}
+            size={30}
           />
         </button>
       ) : (
@@ -178,7 +178,7 @@ export function PodiumRunnerRow({
         <button
           onClick={onPlayerTap?.(player.playerId) ?? noop}
           className="flex-1 text-left transition-opacity active:opacity-70"
-          style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.72)', minWidth: 0 }}
+          style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.85)', minWidth: 0 }}
         >
           <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {player.displayName}
@@ -186,7 +186,7 @@ export function PodiumRunnerRow({
         </button>
       ) : (
         <div style={{ flex: 1, minWidth: 0 }}>
-          <span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.40)' }}>
+          <span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.35)' }}>
             {row.players.length}-way tie
           </span>
         </div>
@@ -196,8 +196,8 @@ export function PodiumRunnerRow({
       <span
         style={{
           fontFamily: "'JetBrains Mono', 'SF Mono', monospace",
-          fontSize: 13,
-          fontWeight: 600,
+          fontSize: isSingle ? 14 : 13,
+          fontWeight: isSingle ? 700 : 600,
           color: getFinishedScoreColor(row.sharedScore),
           flexShrink: 0,
         }}
