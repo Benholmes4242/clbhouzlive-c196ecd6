@@ -29,15 +29,15 @@ const MiniProfileSheetWithData: React.FC<MiniProfileSheetWithDataProps> = ({
         <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
         
         {/* Loading Sheet with Same Dimensions */}
-        <div className="mini-profile-sheet-loading relative flex flex-col overflow-hidden bg-black/20 backdrop-blur-xl border border-white/10 rounded-t-3xl shadow-2xl shadow-black/50">
+        <div className="mini-profile-sheet-loading relative flex flex-col overflow-hidden rounded-t-3xl" style={{ background: '#F8FAFC', boxShadow: '0 -4px 30px rgba(0,0,0,0.12)' }}>
           {/* Handle */}
           <div className="flex justify-center pt-4 pb-2">
-            <div className="w-12 h-1.5 bg-white/30 rounded-full" />
+            <div className="w-12 h-1.5 rounded-full" style={{ background: 'rgba(0,0,0,0.15)' }} />
           </div>
           
           {/* Loading Content */}
           <div className="flex-1 flex items-center justify-center">
-            <div className="text-white">Loading...</div>
+            <div className="text-foreground">Loading...</div>
           </div>
         </div>
       </div>

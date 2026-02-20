@@ -60,7 +60,7 @@ function RecentPostTile({
 
   if (isVideo) {
     return (
-      <div className="recent-post-tile relative aspect-square bg-white/5 rounded-2xl overflow-hidden">
+      <div className="recent-post-tile relative aspect-square rounded-2xl overflow-hidden" style={{ background: 'rgba(0,0,0,0.04)' }}>
         <VideoThumbPlayer
           url={media.url}
           ioRoot={ioRoot}
@@ -83,10 +83,11 @@ function RecentPostTile({
     <div
       onClick={onTileClick}
       className={cn(
-        "recent-post-tile relative aspect-square bg-white/5 rounded-2xl overflow-hidden cursor-pointer",
-        "transition-all duration-200 hover:scale-105 hover:bg-white/10",
-        "focus:outline-none focus:ring-2 focus:ring-white/30"
+        "recent-post-tile relative aspect-square rounded-2xl overflow-hidden cursor-pointer",
+        "transition-all duration-200 hover:scale-105",
+        "focus:outline-none focus:ring-2 focus:ring-black/10"
       )}
+      style={{ background: 'rgba(0,0,0,0.04)' }}
       tabIndex={0}
       role="button"
       onKeyDown={(e) => {
@@ -260,10 +261,10 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
         onClick={handleBackdropClick}
       />
       
-      {/* Dark Glass Sheet */}
+      {/* Light Mode Sheet */}
       <div 
         className={cn(
-          "clubhouse-profile-sheet glass-dark rounded-t-[24px] relative flex flex-col overflow-hidden",
+          "clubhouse-profile-sheet rounded-t-[24px] relative flex flex-col overflow-hidden",
           "transition-all ease-in-out",
           isClosing ? "duration-500 translate-y-4 opacity-0" : "duration-500 translate-y-0 opacity-100"
         )}
@@ -272,18 +273,18 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
           maxHeight: '72vh',
           width: '100%',
           maxWidth: '100vw',
-          boxShadow: 'none'
+          boxShadow: '0 -4px 30px rgba(0,0,0,0.12)',
+          background: '#F8FAFC',
         }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex flex-col h-full px-4 pt-3 pb-6 md:px-6">
           {/* Handle */}
           <div className="flex justify-center pb-3">
-            <div className="w-12 h-1 bg-white/30 rounded-full" />
+            <div className="w-12 h-1 rounded-full" style={{ background: 'rgba(0,0,0,0.15)' }} />
           </div>
 
-          {/* Header / Hero Row */}
-          <div ref={headerRef} className="flex items-start justify-between gap-3 pb-3 border-b border-white/5">
+          <div ref={headerRef} className="flex items-start justify-between gap-3 pb-3" style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
             {/* Left: avatar + name + meta */}
             <div className="flex flex-1 items-start gap-3 min-w-0">
               {/* Avatar */}
@@ -310,31 +311,30 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
                 <button
                   type="button"
                   onClick={handleNameClick}
-                  className="text-left text-[16px] font-semibold text-white truncate hover:text-white/80 transition-colors"
+                  className="text-left text-[16px] font-semibold text-foreground truncate hover:text-foreground/80 transition-colors"
                   disabled={!user?.id}
                 >
                   {user.name}
-                  {user.isVerified && <CheckCircle className="inline-block w-4 h-4 ml-1 text-blue-400" />}
+                  {user.isVerified && <CheckCircle className="inline-block w-4 h-4 ml-1 text-blue-500" />}
                 </button>
                 
-                {/* Row 2: @handle + handicap (personal) OR business badge (business) */}
-                <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[13px] text-white/70">
+                <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[13px]" style={{ color: 'rgba(0,0,0,0.5)' }}>
                   {user.username && <span>@{user.username}</span>}
                   
                   {isBusiness ? (
                     <>
-                      <span className="inline-flex items-center gap-1 rounded-full border border-white/30 px-1.5 py-[1px] text-[11px]">
+                      <span className="inline-flex items-center gap-1 rounded-full border px-1.5 py-[1px] text-[11px]" style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'rgba(0,0,0,0.5)' }}>
                         <Building2 className="w-2.5 h-2.5" />
                         Business
                       </span>
                       {user.isVerifiedBusiness && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/20 px-1.5 py-[1px] text-[11px] text-emerald-400">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-1.5 py-[1px] text-[11px] text-emerald-600">
                           <CheckCircle2 className="w-2.5 h-2.5" />
                           Verified
                         </span>
                       )}
                       {user.businessCategory && (
-                        <span className="truncate max-w-[100px] text-[11px] text-white/60">
+                        <span className="truncate max-w-[100px] text-[11px]" style={{ color: 'rgba(0,0,0,0.4)' }}>
                           {user.businessCategory}
                         </span>
                       )}
@@ -352,13 +352,13 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
                 {/* Row 3: home club (personal) or location (business) */}
                 {isBusiness ? (
                   user.businessLocation && (
-                    <div className="mt-0.5 text-[13px] text-white/70 truncate">
+                    <div className="mt-0.5 text-[13px] truncate" style={{ color: 'rgba(0,0,0,0.45)' }}>
                       {user.businessLocation}
                     </div>
                   )
                 ) : (
                   user.homeClub && user.homeClub !== 'Example Golf Club' && (
-                    <div className="mt-0.5 text-[13px] text-white/70 truncate">
+                    <div className="mt-0.5 text-[13px] truncate" style={{ color: 'rgba(0,0,0,0.45)' }}>
                       {user.homeClub}
                     </div>
                   )
@@ -372,14 +372,17 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
               onClick={handleFollowClick}
               disabled={followBusy}
               className={cn(
-                "btn-frosted-white px-4 py-1.5 text-[13px] font-semibold rounded-full",
-                "bg-white/16 backdrop-blur-[18px] border border-white/45 text-white",
-                "shadow-[0_0_12px_rgba(0,0,0,0.35)]",
+                "px-4 py-1.5 text-[13px] font-semibold rounded-full",
                 "transition-all duration-150",
-                "hover:bg-white/22 hover:-translate-y-px hover:shadow-[0_6px_14px_rgba(0,0,0,0.45)]",
-                "active:translate-y-0 active:shadow-[0_2px_8px_rgba(0,0,0,0.35)]",
-                "disabled:opacity-50 disabled:cursor-not-allowed"
+                "disabled:opacity-50 disabled:cursor-not-allowed",
+                isFollowing
+                  ? "border text-foreground"
+                  : "text-white"
               )}
+              style={isFollowing
+                ? { background: 'transparent', borderColor: 'rgba(0,0,0,0.12)' }
+                : { background: 'rgba(0,0,0,0.85)' }
+              }
             >
               {followBusy ? '...' : (isFollowing ? 'Following' : 'Follow')}
             </button>
@@ -394,7 +397,7 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
                 scrollBehavior: 'smooth'
               }}
             >
-              <h3 className="pb-2 text-[14px] font-semibold text-white">Recent Posts</h3>
+              <h3 className="pb-2 text-[14px] font-semibold text-foreground">Recent Posts</h3>
               
               {/* Loading State */}
               {postsLoading && (
@@ -402,7 +405,7 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
                   {Array.from({ length: 6 }).map((_, i) => (
                     <div
                       key={i}
-                      className="aspect-square bg-black/40 rounded-[18px] animate-pulse"
+                      className="aspect-square rounded-[18px] animate-pulse" style={{ background: 'rgba(0,0,0,0.06)' }}
                     />
                   ))}
                 </div>
@@ -410,11 +413,11 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
 
               {/* Error State */}
               {postsError && !postsLoading && (
-                <div className="text-center py-8 text-white/60">
+                <div className="text-center py-8" style={{ color: 'rgba(0,0,0,0.4)' }}>
                   <p className="mb-2">Couldn't load posts</p>
                   <button 
                     onClick={() => window.location.reload()}
-                    className="text-sm text-white/80 hover:text-white transition-colors"
+                    className="text-sm transition-colors" style={{ color: 'rgba(0,0,0,0.55)' }}
                   >
                     Retry
                   </button>
@@ -423,7 +426,7 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
 
               {/* Empty State */}
               {isEmpty && !postsLoading && !postsError && (
-                <div className="text-center py-8 text-white/60">
+                <div className="text-center py-8" style={{ color: 'rgba(0,0,0,0.4)' }}>
                   <p>No posts yet</p>
                 </div>
               )}
@@ -440,7 +443,7 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
                         key={post.id}
                         type="button"
                         onClick={() => handlePostClick(post)}
-                        className="relative overflow-hidden rounded-[18px] bg-black/40 aspect-square"
+                        className="relative overflow-hidden rounded-[18px] aspect-square" style={{ background: 'rgba(0,0,0,0.04)' }}
                       >
                         <RecentPostTile
                           media={media}
