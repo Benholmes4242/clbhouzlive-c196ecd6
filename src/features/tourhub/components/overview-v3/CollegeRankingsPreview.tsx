@@ -199,11 +199,11 @@ function PodiumCard({
             <p
               className="m-0"
               style={{
-                fontSize: '9px',
+                fontSize: '10px',
                 fontWeight: 600,
                 letterSpacing: '1px',
                 textTransform: 'uppercase' as const,
-                color: 'rgba(255,255,255,0.5)',
+                color: 'rgba(255,255,255,0.6)',
                 marginBottom: '6px',
               }}
             >
@@ -235,7 +235,7 @@ function PodiumCard({
               <p
                 className="m-0"
                 style={{
-                  fontSize: isFirst ? '11px' : '9px',
+                  fontSize: isFirst ? '11px' : '10px',
                   fontWeight: 600,
                   color: 'rgba(255,255,255,0.5)',
                 }}
@@ -657,7 +657,7 @@ export function CollegeRankingsPreview() {
         <div>
           <h2
             className="m-0 text-foreground"
-            style={{ fontSize: '24px', fontWeight: 700, letterSpacing: '-0.5px' }}
+            style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}
           >
             Franchise Rankings
           </h2>
@@ -776,12 +776,12 @@ export function CollegeRankingsPreview() {
           className="w-full flex items-center justify-center active:scale-[0.97] transition-transform"
           style={{
             padding: '14px',
-            background: 'rgba(0,0,0,0.02)',
+            background: 'rgba(0,0,0,0.03)',
             border: '1px solid rgba(0,0,0,0.08)',
             borderRadius: '12px',
           }}
         >
-          <span style={{ fontSize: '13.5px', fontWeight: 600, color: 'rgba(0,0,0,0.5)' }}>
+          <span style={{ fontSize: '14px', fontWeight: 600, color: 'rgba(0,0,0,0.55)' }}>
             View Full Franchise Rankings ›
           </span>
         </button>

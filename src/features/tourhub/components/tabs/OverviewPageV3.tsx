@@ -99,15 +99,21 @@ export function OverviewPageV3() {
           {/* 2. Live Right Now (conditional - hides if no live) */}
           <LiveRightNow />
 
+          {/* Divider: Live Right Now → What's Coming Up */}
+          <div style={{ height: '1px', background: 'rgba(0,0,0,0.06)', margin: '28px 16px' }} />
+
           {/* 3. What's Coming - upcoming tournaments across all tours */}
           <WhatsComing />
+
+          {/* Divider: What's Coming Up → Intelligence */}
+          <div style={{ height: '1px', background: 'rgba(0,0,0,0.06)', margin: '28px 16px' }} />
 
           {/* 4. Tournament Insights - AI Predictions (CLBHOUZ Intelligence) */}
           <LazySection minHeight={250}>
             <TournamentInsights />
           </LazySection>
 
-          {/* Divider between Intelligence and World Rankings */}
+          {/* Divider: Intelligence → World Rankings */}
           <div style={{ height: '1px', background: 'rgba(0,0,0,0.06)', margin: '28px 16px' }} />
 
           {/* 5. Unified World Rankings (Movers + OWGR Table) */}
@@ -115,10 +121,16 @@ export function OverviewPageV3() {
             <UnifiedWorldRankings />
           </LazySection>
 
+          {/* Divider: World Rankings → Performance Rankings */}
+          <div style={{ height: '1px', background: 'rgba(0,0,0,0.06)', margin: '28px 16px' }} />
+
           {/* 6. Season Leaderboards */}
           <LazySection minHeight={300}>
             <SeasonLeaderboards />
           </LazySection>
+
+          {/* Divider: Performance Rankings → Franchise Rankings */}
+          <div style={{ height: '1px', background: 'rgba(0,0,0,0.06)', margin: '28px 16px' }} />
 
           {/* 7. College Golf Rankings */}
           <LazySection minHeight={350}>

@@ -415,8 +415,8 @@ export function UnifiedWorldRankings() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: Math.min(index, 10) * 0.03, ease: [0.16, 1, 0.3, 1] }}
                   style={{
-                    padding: '10px 0',
-                    minHeight: '60px',
+                    padding: '12px 0',
+                    minHeight: '64px',
                     borderBottom: '1px solid hsl(var(--border) / 0.08)',
                     borderLeft: isMover ? '3px solid hsl(142 76% 36%)' : '3px solid transparent',
                     background: rowBg,
@@ -497,7 +497,7 @@ export function UnifiedWorldRankings() {
               <ChevronLeft className="w-4 h-4 text-muted-foreground" />
             </button>
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center" style={{ gap: '6px' }}>
               {Array.from({ length: dotRange.end - dotRange.start }).map((_, i) => {
                 const dotIndex = dotRange.start + i;
                 const isActive = dotIndex === currentPage;
@@ -507,12 +507,12 @@ export function UnifiedWorldRankings() {
                     onClick={() => setCurrentPage(dotIndex)}
                     className="transition-all duration-300"
                     style={{
-                      height: '4px',
-                      width: isActive ? '16px' : '4px',
-                      borderRadius: '2px',
+                      height: '6px',
+                      width: isActive ? '20px' : '6px',
+                      borderRadius: '3px',
                       background: isActive
-                        ? 'hsl(var(--foreground))'
-                        : 'hsl(var(--muted-foreground) / 0.15)',
+                        ? 'rgba(0,0,0,0.7)'
+                        : 'rgba(0,0,0,0.12)',
                     }}
                     aria-label={`Page ${dotIndex + 1} of ${totalPages}`}
                   />

@@ -124,12 +124,12 @@
 }
 
 .leaderboard-position {
-  font-family: 'JetBrains Mono', 'SF Mono', 'Courier New', monospace;
   font-size: 12px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.5);
   width: 22px;
   text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 
 .leaderboard-name {

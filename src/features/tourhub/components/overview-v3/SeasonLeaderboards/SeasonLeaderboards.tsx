@@ -280,10 +280,10 @@ export function SeasonLeaderboards() {
                 padding: '14px',
                 borderRadius: '12px',
                 border: '1px solid rgba(0,0,0,0.08)',
-                background: 'rgba(0,0,0,0.02)',
-                fontSize: '13.5px',
+                background: 'rgba(0,0,0,0.03)',
+                fontSize: '14px',
                 fontWeight: 600,
-                color: 'rgba(0,0,0,0.5)',
+                color: 'rgba(0,0,0,0.55)',
                 cursor: 'pointer',
                 marginTop: '12px',
               }}

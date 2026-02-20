@@ -75,7 +75,7 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
     >
       {/* Date block */}
       <div className="flex-shrink-0 w-11 text-center">
-        <p className="uppercase leading-none text-[0.5625rem] font-medium tracking-wide text-muted-foreground/70">
+        <p className="uppercase leading-none text-[0.625rem] font-medium tracking-wide text-muted-foreground/70">
           {getMonthAbbr(tournament.startDate)}
         </p>
         <p className="leading-none mt-0.5 text-[1.125rem] font-bold text-foreground">
