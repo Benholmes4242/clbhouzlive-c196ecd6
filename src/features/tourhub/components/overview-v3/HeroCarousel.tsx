@@ -701,7 +701,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1], delay: 0.06 }}
-                        style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', gap: 8 }}
+                        style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', gap: 6 }}
                       >
                         {runnerRows.map(row => (
                           <PodiumRunnerRow key={row.position} row={row} onPlayerTap={handlePlayerTap} />
@@ -714,7 +714,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.15 }}
-                        style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', gap: 8 }}
+                        style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', gap: 6 }}
                       >
                         <div style={{ height: 26, borderRadius: 8, background: 'rgba(255,255,255,0.04)' }} />
                         <div style={{ height: 26, borderRadius: 8, background: 'rgba(255,255,255,0.04)' }} />
@@ -734,9 +734,9 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                          'KORN FERRY'}
                       </span>
                     </div>
-                    <Link to={`/tourhub/tournament/${tournament.id}`} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.9)', textDecoration: 'none' }}>
-                      View Results
-                      <ChevronRight className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.5)' }} />
+                    <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta" style={{ fontSize: 13, textDecoration: 'none' }}>
+                      <span>View Results</span>
+                      <ChevronRight className="w-4 h-4 cta-chevron" style={{ color: 'rgba(255,255,255,0.5)' }} />
                     </Link>
                   </div>
                 </motion.div>
@@ -752,7 +752,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
                   style={{ overflow: 'hidden' }}
                 >
-                  <p style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: '8px', marginTop: '8px' }}>
+                  <p style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: '8px', marginTop: '6px', letterSpacing: '0.3px' }}>
                     {[
                       tournament.purse && formatPurse(tournament.purse),
                       tournament.venuePar && `PAR ${tournament.venuePar}`,
@@ -766,16 +766,16 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1], delay: 0.05 }}
                       className="flex items-center gap-2"
-                      style={{ marginBottom: '12px' }}
+                      style={{ marginBottom: '10px' }}
                     >
-                      <Trophy className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.6)' }} />
-                      <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>
-                        Defending: <span style={{ fontWeight: 700, color: 'white' }}>{tournament.defendingChampion}</span>
+                      <Trophy className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'rgba(250,204,21,0.7)' }} />
+                      <span style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.45)' }}>
+                        Defending: <span style={{ fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>{tournament.defendingChampion}</span>
                       </span>
                     </motion.div>
                   )}
 
-                  <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta w-full">
+                  <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta w-full" style={{ justifyContent: 'center' }}>
                     <span>View Tournament</span>
                     <ChevronRight className="w-4 h-4 cta-chevron" />
                   </Link>
