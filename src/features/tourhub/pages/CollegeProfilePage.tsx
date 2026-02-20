@@ -11,6 +11,7 @@ import {
   CollegeRivalsCarousel,
   CollegeCompareSheet,
 } from '../components/college';
+import { FollowCollegeButton } from '../components/college/FollowCollegeButton';
 import { useCollegeStats, useCollegeSeasonStats } from '../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
 import { useCollegeRivalries } from '../hooks/useCollegeMovers';
@@ -313,6 +314,21 @@ export function CollegeProfilePage() {
               >
                 {subtitleText}
               </motion.p>
+            )}
+
+            {/* Follow button */}
+            {collegeSlug && (
+              <motion.div
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.35 }}
+                style={{ marginTop: '12px' }}
+              >
+                <FollowCollegeButton
+                  normalizedName={collegeSlug}
+                  className="bg-white/15 border-white/20 text-white hover:bg-white/25"
+                />
+              </motion.div>
             )}
           </div>
         ) : null}

@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { Users, ChevronRight, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
+import { FollowCollegeButton } from './FollowCollegeButton';
 import type { CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import type { CollegeMedia } from '../../hooks/useCollegeMedia';
 import type { CollegeStatus, CollegeMomentum } from '../../hooks/useCollegeStatus';
@@ -263,8 +264,9 @@ export function FranchiseCard({
           )}
         </div>
 
-        {/* Chevron */}
-        <div className="flex items-center pr-3 shrink-0">
+        {/* Follow button + Chevron */}
+        <div className="flex items-center pr-3 shrink-0 gap-2">
+          <FollowCollegeButton normalizedName={slug} className="h-7 text-xs px-3" />
           <ChevronRight className="w-4 h-4" style={{ color: 'hsl(var(--muted-foreground) / 0.25)' }} />
         </div>
       </Link>

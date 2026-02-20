@@ -361,6 +361,16 @@ export function PersonalProfileWizard() {
 
       if (error) throw error;
 
+      // Auto-follow the attended college
+      if (formData.collegeNormalized) {
+        await supabase
+          .from('user_followed_colleges')
+          .upsert(
+            { user_id: user.id, normalized_name: formData.collegeNormalized },
+            { onConflict: 'user_id,normalized_name' }
+          );
+      }
+
       // Deferred additional club operations
       if (formData.removedClubIds.length > 0) {
         const { error: removeError } = await supabase

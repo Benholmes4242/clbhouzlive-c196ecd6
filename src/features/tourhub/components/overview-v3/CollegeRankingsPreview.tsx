@@ -5,7 +5,7 @@
  * Leaderboard rows (4–8), Franchise Leaders carousel, chase metric, squad captains.
  */
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRight, Trophy } from 'lucide-react';
@@ -19,6 +19,7 @@ import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { PickFranchiseSheet } from '../college/PickFranchiseSheet';
 import {
   getCollegePodiumGradient,
   getCollegeAccentBg,
@@ -91,12 +92,13 @@ function generateChaseMetric(colleges: CollegeSeasonStats[], mediaMap: Map<strin
 // PODIUM CARD
 // ============================================================================
 function PodiumCard({
-  stats, media, rank, captain,
+  stats, media, rank, captain, isUserFranchise = false,
 }: {
   stats: CollegeSeasonStats;
   media: CollegeMedia | undefined;
   rank: 1 | 2 | 3;
   captain: FranchiseCaptain | undefined;
+  isUserFranchise?: boolean;
 }) {
   const navigate = useNavigate();
   const isFirst = rank === 1;
@@ -105,7 +107,7 @@ function PodiumCard({
 
   return (
     <button
-      onClick={() => navigate('/tourhub/college?sort=earnings')}
+      onClick={() => navigate('/tourhub/college-golf?sort=earnings')}
       className="flex flex-col text-left overflow-hidden active:scale-[0.97] transition-transform"
       style={{
         flex: isFirst ? '1 1 45%' : '1 1 27.5%',
@@ -119,6 +121,11 @@ function PodiumCard({
         className="flex-1 flex flex-col items-center justify-center text-center"
         style={{ padding: isFirst ? '20px 12px 0' : '14px 8px 0' }}
       >
+        {isUserFranchise && (
+          <div className="mb-1">
+            <YourFranchiseBadge />
+          </div>
+        )}
         <div className="flex items-center mb-2" style={{ gap: '4px' }}>
           {isFirst && <span style={{ fontSize: '14px' }}>🏆</span>}
           <span
@@ -249,9 +256,11 @@ function PodiumCard({
 function LeaderboardRows({
   rows,
   mediaMap,
+  userFranchiseName,
 }: {
   rows: CollegeSeasonStats[];
   mediaMap: Map<string, CollegeMedia> | undefined;
+  userFranchiseName?: string;
 }) {
   const navigate = useNavigate();
   if (!rows.length) return null;
@@ -280,7 +289,7 @@ function LeaderboardRows({
         return (
           <button
             key={stats.id}
-            onClick={() => navigate('/tourhub/college?sort=earnings')}
+            onClick={() => navigate('/tourhub/college-golf?sort=earnings')}
             className="w-full flex items-center bg-transparent active:bg-black/[0.02] transition-colors"
             style={{
               padding: '14px 16px',
@@ -298,6 +307,9 @@ function LeaderboardRows({
                 />
               )}
               <span className="truncate text-foreground" style={{ fontSize: '14px', fontWeight: 600 }}>{displayName}</span>
+              {userFranchiseName === stats.normalized_name && (
+                <span style={{ fontSize: '8px', color: '#D97706', marginLeft: '2px' }}>⭐</span>
+              )}
             </div>
             <span className="text-foreground" style={{ fontSize: '13px', fontWeight: 600, textAlign: 'right' as const, width: '80px' }}>
               {formatCurrency(stats.earnings_total)}
@@ -444,8 +456,7 @@ function FranchiseLeadersCarousel({ leaders }: { leaders: FranchiseLeader[] }) {
 // ============================================================================
 // PICK YOUR FRANCHISE CTA
 // ============================================================================
-function PickFranchiseCTA() {
-  const navigate = useNavigate();
+function PickFranchiseCTA({ onOpen }: { onOpen: () => void }) {
   const { user } = useSupabaseSession();
   const { data: profile } = useUserProfile(user?.id);
   const { data: followed } = useFollowedColleges(user?.id);
@@ -457,7 +468,7 @@ function PickFranchiseCTA() {
 
   return (
     <button
-      onClick={() => navigate('/tourhub/college')}
+      onClick={onOpen}
       className="w-full flex items-center text-left active:scale-[0.97] transition-transform"
       style={{
         background: 'rgba(0,0,0,0.02)',
@@ -484,10 +495,102 @@ function PickFranchiseCTA() {
 // ============================================================================
 // MAIN COMPONENT
 // ============================================================================
+// ============================================================================
+// YOUR FRANCHISE BADGE (shown on podium/leaderboard if user follows)
+// ============================================================================
+function YourFranchiseBadge() {
+  return (
+    <span
+      style={{
+        fontSize: '9px',
+        fontWeight: 700,
+        letterSpacing: '0.8px',
+        textTransform: 'uppercase' as const,
+        background: 'rgba(245,158,11,0.15)',
+        color: '#D97706',
+        borderRadius: '4px',
+        padding: '2px 6px',
+        lineHeight: 1,
+      }}
+    >
+      Your Franchise
+    </span>
+  );
+}
+
+// ============================================================================
+// YOUR FRANCHISE COMPACT CARD (outside top 8)
+// ============================================================================
+function YourFranchiseCard({
+  stats,
+  media,
+  rank,
+}: {
+  stats: CollegeSeasonStats;
+  media: CollegeMedia | undefined;
+  rank: number;
+}) {
+  const displayName = media?.short_name || media?.college_name || stats.normalized_name;
+
+  return (
+    <div
+      className="mx-4 mb-4"
+      style={{
+        background: 'rgba(0,0,0,0.02)',
+        border: '1px solid rgba(0,0,0,0.06)',
+        borderRadius: '12px',
+        padding: '14px 16px',
+      }}
+    >
+      <span
+        style={{
+          fontSize: '9px',
+          fontWeight: 700,
+          letterSpacing: '0.8px',
+          textTransform: 'uppercase' as const,
+          color: '#D97706',
+          marginBottom: '8px',
+          display: 'block',
+        }}
+      >
+        Your Franchise
+      </span>
+      <div className="flex items-center" style={{ gap: '10px' }}>
+        {media?.logo_url && (
+          <img
+            src={media.logo_url}
+            alt={displayName}
+            className="object-contain rounded-full"
+            style={{ width: '28px', height: '28px' }}
+          />
+        )}
+        <div className="flex-1 min-w-0">
+          <span className="text-foreground truncate block" style={{ fontSize: '15px', fontWeight: 600 }}>
+            {displayName}
+          </span>
+          <span style={{ fontSize: '12px', color: 'rgba(0,0,0,0.4)' }}>
+            {formatCurrency(stats.earnings_total)} earnings · {stats.player_count} pros on tour
+          </span>
+        </div>
+        <span style={{ fontSize: '18px', fontWeight: 700, color: 'rgba(0,0,0,0.3)' }}>
+          #{rank}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
 export function CollegeRankingsPreview() {
   const navigate = useNavigate();
+  const { user } = useSupabaseSession();
+  const [sheetOpen, setSheetOpen] = useState(false);
   const { data: allStats, isLoading: statsLoading, error: statsError, refetch: refetchStats } = useCollegeSeasonStats();
   const { data: collegeMap, isLoading: mediaLoading, error: mediaError, refetch: refetchMedia } = useCollegeMediaMap();
+  const { data: followed } = useFollowedColleges(user?.id);
+  const { data: profile } = useUserProfile(user?.id);
 
   // Sort by earnings → top 8
   const top8 = useMemo(() => {
@@ -508,6 +611,26 @@ export function CollegeRankingsPreview() {
 
   // Franchise leaders
   const franchiseLeaders = useFranchiseLeaders(allStats, collegeMap);
+
+  // User's followed franchise (highest-ranked)
+  const userFranchise = useMemo(() => {
+    if (!followed?.length || !allStats?.length) return null;
+    const attendedCollege = (profile as any)?.college_normalized;
+    const followedNames = followed.map(f => f.normalized_name);
+    if (attendedCollege && !followedNames.includes(attendedCollege)) {
+      followedNames.push(attendedCollege);
+    }
+
+    const sorted = [...allStats].sort((a, b) => b.earnings_total - a.earnings_total);
+    for (let i = 0; i < sorted.length; i++) {
+      if (followedNames.includes(sorted[i].normalized_name)) {
+        return { stats: sorted[i], rank: i + 1 };
+      }
+    }
+    return null;
+  }, [followed, allStats, profile]);
+
+  const userFranchiseInTop8 = userFranchise ? userFranchise.rank <= 8 : false;
 
   if (statsLoading || mediaLoading) return <CollegePreviewSkeleton />;
 
@@ -546,7 +669,7 @@ export function CollegeRankingsPreview() {
           </p>
         </div>
         <button
-          onClick={() => navigate('/tourhub/college')}
+          onClick={() => navigate('/tourhub/college-golf')}
           className="flex items-center gap-0.5 bg-transparent border-none cursor-pointer text-muted-foreground"
           style={{ fontSize: '13px', fontWeight: 500, minHeight: '44px' }}
         >
@@ -600,6 +723,7 @@ export function CollegeRankingsPreview() {
               media={collegeMap?.get(podium[1].normalized_name)}
               rank={2}
               captain={captainMap?.get(podium[1].normalized_name)}
+              isUserFranchise={userFranchise?.stats.normalized_name === podium[1].normalized_name}
             />
           )}
           <PodiumCard
@@ -607,6 +731,7 @@ export function CollegeRankingsPreview() {
             media={collegeMap?.get(podium[0].normalized_name)}
             rank={1}
             captain={captainMap?.get(podium[0].normalized_name)}
+            isUserFranchise={userFranchise?.stats.normalized_name === podium[0].normalized_name}
           />
           {podium[2] && (
             <PodiumCard
@@ -614,26 +739,40 @@ export function CollegeRankingsPreview() {
               media={collegeMap?.get(podium[2].normalized_name)}
               rank={3}
               captain={captainMap?.get(podium[2].normalized_name)}
+              isUserFranchise={userFranchise?.stats.normalized_name === podium[2].normalized_name}
             />
           )}
         </div>
       </motion.div>
 
       {/* 4. LEADERBOARD ROWS (4th–8th) */}
-      <LeaderboardRows rows={leaderboardRows} mediaMap={collegeMap} />
+      <LeaderboardRows
+        rows={leaderboardRows}
+        mediaMap={collegeMap}
+        userFranchiseName={userFranchise?.stats.normalized_name}
+      />
+
+      {/* 4b. YOUR FRANCHISE (if outside top 8) */}
+      {userFranchise && !userFranchiseInTop8 && (
+        <YourFranchiseCard
+          stats={userFranchise.stats}
+          media={collegeMap?.get(userFranchise.stats.normalized_name)}
+          rank={userFranchise.rank}
+        />
+      )}
 
       {/* 5. FRANCHISE LEADERS CAROUSEL */}
       <FranchiseLeadersCarousel leaders={franchiseLeaders} />
 
       {/* 6. PICK YOUR FRANCHISE CTA */}
       <div className="px-4 mb-3">
-        <PickFranchiseCTA />
+        <PickFranchiseCTA onOpen={() => setSheetOpen(true)} />
       </div>
 
       {/* 7. VIEW FULL FRANCHISE RANKINGS */}
       <div className="px-4">
         <button
-          onClick={() => navigate('/tourhub/college')}
+          onClick={() => navigate('/tourhub/college-golf')}
           className="w-full flex items-center justify-center active:scale-[0.97] transition-transform"
           style={{
             padding: '14px',
@@ -647,6 +786,9 @@ export function CollegeRankingsPreview() {
           </span>
         </button>
       </div>
+
+      {/* Bottom Sheet */}
+      <PickFranchiseSheet open={sheetOpen} onOpenChange={setSheetOpen} />
     </section>
   );
 }
