@@ -106,7 +106,7 @@ export function ScheduleTourFilter({
           </div>
 
           {/* Tour options */}
-          <div className="space-y-1.5" role="listbox">
+          <div className="space-y-2" role="listbox">
             {TOUR_OPTIONS.map((tour) => {
               const isActive = activeTour === tour.code;
               const count = tour.code === 'all'
@@ -139,7 +139,7 @@ export function ScheduleTourFilter({
                   <div className="flex-1 text-left">
                     <p
                       className={cn(
-                        'font-medium text-[13px]',
+                        'font-semibold text-[14px]',
                         isActive ? 'text-foreground' : 'text-muted-foreground'
                       )}
                     >
