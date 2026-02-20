@@ -60,9 +60,9 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
           </span>
 
           <span style={{
-            fontSize: '13px',
+            fontSize: '14px',
             fontWeight: 700,
-            fontFamily: "'JetBrains Mono', monospace",
+            fontVariantNumeric: 'tabular-nums',
             color: tournament.leader
               ? tournament.leader.score < 0
                 ? 'rgba(22,163,74,0.9)'
@@ -124,7 +124,7 @@ export function LiveRightNow() {
             boxShadow: '0 0 10px rgba(34, 197, 94, 0.45)',
           }}
         />
-        <h2 className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+        <h2 className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground">
           Live Right Now
         </h2>
       </div>

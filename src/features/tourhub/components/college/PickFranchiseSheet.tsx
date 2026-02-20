@@ -48,7 +48,7 @@ function FollowBtn({
         fontSize: '13px',
         fontWeight: 600,
         borderRadius: '20px',
-        padding: '6px 16px',
+        padding: '8px 18px',
         border: isFollowed ? 'none' : '1px solid rgba(0,0,0,0.12)',
         background: isFollowed ? 'rgba(0,0,0,0.85)' : 'white',
         color: isFollowed ? 'white' : 'hsl(var(--foreground))',
@@ -130,7 +130,7 @@ export function PickFranchiseSheet({ open, onOpenChange }: PickFranchiseSheetPro
           {!isSearching && (
             <p
               style={{
-                fontSize: '10px',
+                fontSize: '11px',
                 fontWeight: 600,
                 letterSpacing: '0.5px',
                 textTransform: 'uppercase' as const,
@@ -226,7 +226,7 @@ function CollegeRow({
     <div
       className="flex items-center"
       style={{
-        padding: '12px 0',
+        padding: '14px 0',
         borderBottom: '1px solid rgba(0,0,0,0.04)',
         gap: '12px',
       }}

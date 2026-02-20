@@ -73,7 +73,6 @@ export function LeaderRow({
           style={{
             width: 32,
             textAlign: 'center',
-            fontFamily: 'ui-monospace, "JetBrains Mono", monospace',
             fontSize: 14,
             fontWeight: 600,
             fontVariantNumeric: 'tabular-nums',
