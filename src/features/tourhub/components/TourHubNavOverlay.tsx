@@ -376,8 +376,9 @@ export function TourHubNavOverlay({
                   haptic('light');
                   onClose();
                 }}
-                className="w-11 h-11 flex items-center justify-center rounded-full transition-all outline-none focus:outline-none focus-visible:ring-0"
+                className="w-11 h-11 flex items-center justify-center transition-all outline-none focus:outline-none focus-visible:ring-0"
                 style={{ 
+                  borderRadius: '34%',
                   background: 'hsl(var(--card) / 0.7)',
                   backdropFilter: 'blur(12px)',
                   WebkitBackdropFilter: 'blur(12px)',
