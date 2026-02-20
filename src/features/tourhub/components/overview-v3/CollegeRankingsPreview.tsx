@@ -19,14 +19,11 @@ import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
-
-// ============================================================================
-// GRADIENTS
-// ============================================================================
-const PODIUM_GRADIENTS = {
-  first: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
-  runner: 'linear-gradient(135deg, #2d2d3a 0%, #3d3d4a 100%)',
-};
+import {
+  getCollegePodiumGradient,
+  getCollegeAccentBg,
+  getCollegeAccentBorder,
+} from '../../config/collegeBrandColors';
 
 // ============================================================================
 // FRANCHISE LEADER CATEGORIES
@@ -112,7 +109,7 @@ function PodiumCard({
       className="flex flex-col text-left overflow-hidden active:scale-[0.97] transition-transform"
       style={{
         flex: isFirst ? '1 1 45%' : '1 1 27.5%',
-        background: isFirst ? PODIUM_GRADIENTS.first : PODIUM_GRADIENTS.runner,
+        background: getCollegePodiumGradient(stats.normalized_name),
         borderRadius: isFirst ? '16px' : '12px',
         minHeight: isFirst ? '240px' : '200px',
         alignSelf: 'flex-end',
@@ -166,7 +163,6 @@ function PodiumCard({
           style={{
             fontSize: isFirst ? '16px' : '13px',
             fontWeight: 700,
-            fontFamily: "'JetBrains Mono', monospace",
           }}
         >
           {formatCurrency(stats.earnings_total)}
@@ -180,7 +176,7 @@ function PodiumCard({
             marginTop: '4px',
           }}
         >
-          {stats.wins_total} {stats.wins_total === 1 ? 'win' : 'wins'} · {stats.player_count} alumni
+          {stats.wins_total} {stats.wins_total === 1 ? 'win' : 'wins'} · {stats.player_count} on tour
         </p>
       </div>
 
@@ -235,7 +231,6 @@ function PodiumCard({
                   fontSize: isFirst ? '11px' : '9px',
                   fontWeight: 600,
                   color: 'rgba(255,255,255,0.5)',
-                  fontFamily: "'JetBrains Mono', monospace",
                 }}
               >
                 {formatCurrency(captain.earnings)}
@@ -249,7 +244,7 @@ function PodiumCard({
 }
 
 // ============================================================================
-// LEADERBOARD ROWS (4th–8th)
+// LEADERBOARD ROWS (4th–8th) — flat on page background
 // ============================================================================
 function LeaderboardRows({
   rows,
@@ -262,26 +257,25 @@ function LeaderboardRows({
   if (!rows.length) return null;
 
   return (
-    <div className="mx-4 mb-4 overflow-hidden" style={{ borderRadius: '12px', border: '1px solid rgba(0,0,0,0.06)' }}>
+    <div className="mx-4 mb-4">
       {/* Header row */}
       <div
         className="flex items-center"
         style={{
           padding: '8px 16px',
-          background: 'rgba(0,0,0,0.02)',
           borderBottom: '1px solid rgba(0,0,0,0.06)',
         }}
       >
         <span style={{ width: '30px', fontSize: '10px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' as const, color: 'rgba(0,0,0,0.35)' }}>#</span>
         <span className="flex-1" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' as const, color: 'rgba(0,0,0,0.35)' }}>Franchise</span>
-        <span style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' as const, color: 'rgba(0,0,0,0.35)', textAlign: 'right' as const, width: '70px' }}>Earnings</span>
-        <span style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' as const, color: 'rgba(0,0,0,0.35)', textAlign: 'right' as const, width: '50px' }}>Alumni</span>
+        <span style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' as const, color: 'rgba(0,0,0,0.35)', textAlign: 'right' as const, width: '80px' }}>Earnings</span>
+        <span style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' as const, color: 'rgba(0,0,0,0.35)', textAlign: 'right' as const, width: '55px' }}>On Tour</span>
       </div>
 
       {rows.map((stats, i) => {
         const media = mediaMap?.get(stats.normalized_name);
         const displayName = media?.short_name || media?.college_name || stats.normalized_name;
-        const rank = i + 4; // starts at 4th
+        const rank = i + 4;
 
         return (
           <button
@@ -305,10 +299,10 @@ function LeaderboardRows({
               )}
               <span className="truncate text-foreground" style={{ fontSize: '14px', fontWeight: 600 }}>{displayName}</span>
             </div>
-            <span style={{ fontSize: '13px', fontWeight: 600, textAlign: 'right' as const, width: '70px', fontFamily: "'JetBrains Mono', monospace" }}>
+            <span className="text-foreground" style={{ fontSize: '13px', fontWeight: 600, textAlign: 'right' as const, width: '80px' }}>
               {formatCurrency(stats.earnings_total)}
             </span>
-            <span style={{ fontSize: '12px', color: 'rgba(0,0,0,0.4)', textAlign: 'right' as const, width: '50px' }}>
+            <span style={{ fontSize: '12px', color: 'rgba(0,0,0,0.4)', textAlign: 'right' as const, width: '55px' }}>
               {stats.player_count}
             </span>
           </button>
@@ -371,7 +365,7 @@ function FranchiseLeadersCarousel({ leaders }: { leaders: FranchiseLeader[] }) {
           Franchise Leaders
         </h3>
         <p className="m-0" style={{ fontSize: '12px', color: 'rgba(0,0,0,0.4)', fontStyle: 'italic', marginTop: '2px' }}>
-          Which college dominates each stat?
+          Which franchise leads each category?
         </p>
       </div>
 
@@ -391,12 +385,12 @@ function FranchiseLeadersCarousel({ leaders }: { leaders: FranchiseLeader[] }) {
         {leaders.map((leader) => (
           <div
             key={leader.title}
-            className="flex-shrink-0 flex flex-col"
+            className="flex-shrink-0 flex flex-col items-center text-center"
             style={{
               width: '160px',
               minHeight: '140px',
-              background: '#FFFFFF',
-              border: '1px solid rgba(0,0,0,0.06)',
+              background: getCollegeAccentBg(leader.college.normalized_name),
+              border: `1px solid ${getCollegeAccentBorder(leader.college.normalized_name)}`,
               borderRadius: '12px',
               padding: '14px',
               scrollSnapAlign: 'start',
@@ -432,13 +426,13 @@ function FranchiseLeadersCarousel({ leaders }: { leaders: FranchiseLeader[] }) {
             </span>
 
             {/* Stat value */}
-            <span style={{ fontSize: '18px', fontWeight: 700, color: 'rgba(0,0,0,0.85)', fontFamily: "'JetBrains Mono', monospace", marginBottom: '2px' }}>
+            <span style={{ fontSize: '18px', fontWeight: 700, color: 'rgba(0,0,0,0.85)', marginBottom: '2px' }}>
               {leader.value}
             </span>
 
             {/* Alumni count */}
             <span style={{ fontSize: '11px', color: 'rgba(0,0,0,0.35)' }}>
-              {leader.alumni} alumni
+              {leader.alumni} on tour
             </span>
           </div>
         ))}
