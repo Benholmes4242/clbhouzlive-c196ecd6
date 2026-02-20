@@ -67,6 +67,36 @@ function LeaderboardSkeleton() {
   );
 }
 
+// ── Live tie-condensing logic ──
+interface LiveLeaderboardRow {
+  position: number;
+  players: LeaderEntry[];
+  isTied: boolean;
+}
+
+function buildLiveLeaderboardRows(
+  leaders: LeaderEntry[],
+  maxRows: number = 4
+): LiveLeaderboardRow[] {
+  if (!leaders?.length) return [];
+  
+  const positionMap = new Map<number, LeaderEntry[]>();
+  for (const leader of leaders) {
+    const pos = leader.position;
+    if (!positionMap.has(pos)) positionMap.set(pos, []);
+    positionMap.get(pos)!.push(leader);
+  }
+  
+  const sortedPositions = [...positionMap.keys()].sort((a, b) => a - b);
+  const rows: LiveLeaderboardRow[] = [];
+  for (const pos of sortedPositions) {
+    if (rows.length >= maxRows) break;
+    const players = positionMap.get(pos)!;
+    rows.push({ position: pos, players, isTied: players.length > 1 });
+  }
+  return rows;
+}
+
 // Mini leaderboard row for live tournaments
 interface LeaderboardRowProps {
   leader: LeaderEntry;
@@ -74,17 +104,16 @@ interface LeaderboardRowProps {
   index: number;
   isActive: boolean;
   isLeader: boolean;
-  hasTiedLeaders: boolean;
-  showTieBefore: boolean;
   scoreFlash?: 'birdie' | 'bogey' | null;
   positionDelta?: number;
 }
 
-function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, hasTiedLeaders, showTieBefore, scoreFlash, positionDelta = 0 }: LeaderboardRowProps) {
+function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreFlash, positionDelta = 0 }: LeaderboardRowProps) {
   const navigate = useNavigate();
   const abbreviatedName = `${leader.player.firstName[0]}. ${leader.player.lastName}`;
   const photoUrl = resolvePhotoUrl(leader.player.photoUrl ?? null, leader.player.pgaTourId);
   const initials = `${leader.player.firstName[0]}${leader.player.lastName[0]}`.toUpperCase();
+  const thruDisplay = formatThruDisplay(leader.thru, leader.round_1, leader.round_2, leader.round_3, leader.round_4, leader.status, leader.thruUpdatedAt, leader.tournamentTimezone);
   
   const handlePlayerTap = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -92,70 +121,120 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, hasTie
   };
   
   return (
-    <>
-      <motion.div
-        initial={{ opacity: 0, y: 14 }}
-        animate={isActive ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
-        transition={{ duration: 0.35, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
-        className={cn(
-          "leaderboard-row flex items-center justify-between",
-          !isFirst && !showTieBefore && "border-t border-white/[0.04]",
-          isLeader && "leader-row-highlight"
-        )}
-      >
-        <div className="flex items-center gap-2 min-w-0 flex-1">
-          <span className="leaderboard-position flex-shrink-0">
-            {leader.position}
-          </span>
-          {/* Player headshot + name — tappable to profile */}
-          <button
-            onClick={handlePlayerTap}
-            className="flex items-center gap-2 min-w-0 active:opacity-70 transition-opacity"
+    <motion.div
+      initial={{ opacity: 0, y: 14 }}
+      animate={isActive ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
+      transition={{ duration: 0.35, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
+      className={cn(
+        "leaderboard-row flex items-center justify-between",
+        isLeader && "leader-row-highlight"
+      )}
+    >
+      <div className="flex items-center gap-2 min-w-0 flex-1">
+        <span className="leaderboard-position flex-shrink-0">
+          {leader.position}
+        </span>
+        <button
+          onClick={handlePlayerTap}
+          className="flex items-center gap-2 min-w-0 active:opacity-70 transition-opacity"
+        >
+          <div
+            className="overflow-hidden flex-shrink-0 border border-white/10"
+            style={{ width: '32px', height: '33px', borderRadius: '34%' }}
           >
+            {photoUrl ? (
+              <img
+                src={photoUrl}
+                alt={abbreviatedName}
+                className="w-full h-full object-cover object-top"
+                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+              />
+            ) : (
+              <div className="w-full h-full bg-white/10 flex items-center justify-center text-white/60 text-[10px] font-semibold">{initials}</div>
+            )}
+          </div>
+          <span className={cn("leaderboard-name truncate", isFirst && "font-bold")}>
+            {abbreviatedName}
+            {thruDisplay && (
+              <span className="leaderboard-thru-inline">{thruDisplay}</span>
+            )}
+          </span>
+        </button>
+      </div>
+      <span className={cn(
+        "leaderboard-score flex-shrink-0 pr-2",
+        getScoreClass(leader.scoreToPar),
+        scoreFlash === 'birdie' && 'score-flash-birdie',
+        scoreFlash === 'bogey' && 'score-flash-bogey',
+      )}>
+        {leader.scoreDisplay}
+      </span>
+      {positionDelta > 0 && (
+        <span className="movement-up">▲{positionDelta}</span>
+      )}
+      {positionDelta < 0 && (
+        <span className="movement-down">▼{Math.abs(positionDelta)}</span>
+      )}
+    </motion.div>
+  );
+}
+
+// Condensed tie row for live leaderboard
+function CondensedTieRow({ row, index, isActive }: { row: LiveLeaderboardRow; index: number; isActive: boolean }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 14 }}
+      animate={isActive ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
+      transition={{ duration: 0.35, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
+      className="leaderboard-row flex items-center justify-between"
+    >
+      <div className="flex items-center gap-2 min-w-0 flex-1">
+        <span className="leaderboard-position flex-shrink-0">
+          T{row.position}
+        </span>
+        {/* Stacked avatars */}
+        <div className="flex items-center flex-shrink-0">
+          {row.players.slice(0, 4).map((player, i) => {
+            const photoUrl = resolvePhotoUrl(player.player.photoUrl ?? null, player.player.pgaTourId);
+            const initials = `${player.player.firstName[0]}${player.player.lastName[0]}`.toUpperCase();
+            return (
+              <div
+                key={player.player.id}
+                className="overflow-hidden border-2 border-black/30 flex-shrink-0"
+                style={{
+                  width: '28px',
+                  height: '29px',
+                  borderRadius: '34%',
+                  marginLeft: i > 0 ? -8 : 0,
+                  zIndex: 4 - i,
+                  position: 'relative',
+                }}
+              >
+                {photoUrl ? (
+                  <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                ) : (
+                  <div className="w-full h-full bg-white/10 flex items-center justify-center text-white/60 text-[8px] font-semibold">{initials}</div>
+                )}
+              </div>
+            );
+          })}
+          {row.players.length > 4 && (
             <div
-              className="overflow-hidden flex-shrink-0 border border-white/10"
-              style={{
-                width: '32px',
-                height: '33px',
-                borderRadius: '34%',
-              }}
+              className="flex-shrink-0 bg-white/10 flex items-center justify-center text-white/50 text-[9px] font-semibold border-2 border-black/30"
+              style={{ width: '28px', height: '29px', borderRadius: '34%', marginLeft: -8, position: 'relative', zIndex: 0 }}
             >
-              {photoUrl ? (
-                <img
-                  src={photoUrl}
-                  alt={abbreviatedName}
-                  className="w-full h-full object-cover object-top"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                />
-              ) : (
-                <div className="w-full h-full bg-white/10 flex items-center justify-center text-white/60 text-[10px] font-semibold">{initials}</div>
-              )}
+              +{row.players.length - 4}
             </div>
-            <span className={cn("leaderboard-name truncate", isFirst && "font-bold")}>
-              {abbreviatedName}
-            </span>
-          </button>
+          )}
         </div>
-        {/* Thru indicator */}
-        <span className="leaderboard-thru flex-shrink-0">
-          {formatThruDisplay(leader.thru, leader.round_1, leader.round_2, leader.round_3, leader.round_4, leader.status, leader.thruUpdatedAt, leader.tournamentTimezone)}
+        <span className="text-[11px] text-white/50 font-medium truncate">
+          {row.players.length}-way tie
         </span>
-        <span className={cn(
-          "leaderboard-score flex-shrink-0 pr-2",
-          getScoreClass(leader.scoreToPar),
-          scoreFlash === 'birdie' && 'score-flash-birdie',
-          scoreFlash === 'bogey' && 'score-flash-bogey',
-        )}>
-          {leader.scoreDisplay}
-        </span>
-        {positionDelta > 0 && (
-          <span className="movement-up">▲{positionDelta}</span>
-        )}
-        {positionDelta < 0 && (
-          <span className="movement-down">▼{Math.abs(positionDelta)}</span>
-        )}
-      </motion.div>
-    </>
+      </div>
+      <span className="leaderboard-score flex-shrink-0 pr-2">
+        {row.players[0].scoreDisplay}
+      </span>
+    </motion.div>
   );
 }
 
@@ -461,22 +540,51 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         className="leaderboard-container"
                       >
                         {(() => {
-                          const tiedLeaderCount = leaders.filter(l => l.position === 1).length;
-                          const hasTiedLeaders = tiedLeaderCount > 1;
-                          return leaders.map((leader, idx) => (
-                            <MiniLeaderboardRow
-                              key={`row-${leader.position}-${leader.player.id}`}
-                              leader={leader}
-                              isFirst={idx === 0}
-                              index={idx}
-                              isActive={isActive}
-                              isLeader={leader.position === 1}
-                              hasTiedLeaders={hasTiedLeaders}
-                              showTieBefore={hasTiedLeaders && leader.position === 1 && idx > 0}
-                              scoreFlash={scoreFlashes[leader.player.id] || null}
-                              positionDelta={positionDeltas[leader.player.id] || 0}
-                            />
-                          ));
+                          const rows = buildLiveLeaderboardRows(leaders, 4);
+                          let rowIndex = 0;
+                          return rows.map((row, rIdx) => {
+                            const isFirst = rIdx === 0;
+
+                            // Tied at #1 — show each individually with leader highlight
+                            if (row.isTied && isFirst) {
+                              return row.players.slice(0, 2).map((player, i) => {
+                                const idx = rowIndex++;
+                                return (
+                                  <MiniLeaderboardRow
+                                    key={`row-${player.position}-${player.player.id}`}
+                                    leader={player}
+                                    isFirst={idx === 0}
+                                    index={idx}
+                                    isActive={isActive}
+                                    isLeader={true}
+                                    scoreFlash={scoreFlashes[player.player.id] || null}
+                                    positionDelta={positionDeltas[player.player.id] || 0}
+                                  />
+                                );
+                              });
+                            }
+
+                            // Tied chasers — condensed row
+                            if (row.isTied && !isFirst) {
+                              const idx = rowIndex++;
+                              return <CondensedTieRow key={`tie-${row.position}`} row={row} index={idx} isActive={isActive} />;
+                            }
+
+                            // Single player row
+                            const idx = rowIndex++;
+                            return (
+                              <MiniLeaderboardRow
+                                key={`row-${row.players[0].position}-${row.players[0].player.id}`}
+                                leader={row.players[0]}
+                                isFirst={idx === 0}
+                                index={idx}
+                                isActive={isActive}
+                                isLeader={row.players[0].position === 1}
+                                scoreFlash={scoreFlashes[row.players[0].player.id] || null}
+                                positionDelta={positionDeltas[row.players[0].player.id] || 0}
+                              />
+                            );
+                          });
                         })()}
                       </motion.div>
                     ) : (
