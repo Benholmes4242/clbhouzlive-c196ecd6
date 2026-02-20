@@ -139,19 +139,23 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
           className="flex items-center gap-2 min-w-0 active:opacity-70 transition-opacity"
         >
           <div
-            className="overflow-hidden flex-shrink-0 border border-white/10"
-            style={{ width: '32px', height: '33px', borderRadius: '34%' }}
+            className="overflow-hidden flex-shrink-0"
+            style={{
+              width: '32px', height: '33px', borderRadius: '34%',
+              border: '1.5px solid rgba(255,255,255,0.2)',
+              background: 'rgba(255,255,255,0.08)',
+              position: 'relative',
+            }}
           >
-            {photoUrl ? (
+            {/* Initials always underneath */}
+            <div className="absolute inset-0 flex items-center justify-center text-white/65 text-[10px] font-semibold">{initials}</div>
+            {photoUrl && (
               <img
                 src={photoUrl}
                 alt={abbreviatedName}
-                className="w-full h-full object-cover object-top"
-                style={{ backgroundColor: 'rgba(255,255,255,0.08)' }}
+                className="absolute inset-0 w-full h-full object-cover object-top"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
               />
-            ) : (
-              <div className="w-full h-full bg-white/10 flex items-center justify-center text-white/60 text-[10px] font-semibold">{initials}</div>
             )}
           </div>
           <span className={cn("leaderboard-name truncate", isFirst && "font-bold")}>
@@ -207,15 +211,16 @@ function CondensedTieRow({ row, index, isActive }: { row: LiveLeaderboardRow; in
                   height: 29,
                   borderRadius: '34%',
                   border: '1.5px solid rgba(255,255,255,0.2)',
+                  background: 'rgba(255,255,255,0.08)',
                   marginLeft: i > 0 ? -8 : 0,
                   zIndex: 4 - i,
                   position: 'relative',
                 }}
               >
-                {photoUrl ? (
-                  <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                ) : (
-                  <div style={{ width: '100%', height: '100%', background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>{initials}</div>
+                {/* Initials always underneath */}
+                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>{initials}</div>
+                {photoUrl && (
+                  <img src={photoUrl} alt="" className="absolute inset-0 w-full h-full object-cover object-top" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                 )}
               </div>
             );
