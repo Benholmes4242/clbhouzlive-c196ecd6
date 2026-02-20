@@ -37,14 +37,14 @@ interface LeaderCategory {
 }
 
 const LEADER_CATEGORIES: LeaderCategory[] = [
-  { key: 'avg_driving_distance', title: 'Longest Hitters', sort: 'desc', format: (v) => `${v} yds` },
-  { key: 'avg_driving_accuracy', title: 'Most Accurate', sort: 'desc', format: (v) => `${v}%` },
-  { key: 'avg_gir', title: 'Best GIR', sort: 'desc', format: (v) => `${v}%` },
-  { key: 'avg_putting', title: 'Best Putters', sort: 'asc', format: (v) => `${v}` },
+  { key: 'avg_driving_distance', title: 'Longest Drivers', sort: 'desc', format: (v) => `${v} yds` },
+  { key: 'avg_driving_accuracy', title: 'Fairways Hit', sort: 'desc', format: (v) => `${v}%` },
+  { key: 'avg_gir', title: 'Greens in Reg', sort: 'desc', format: (v) => `${v}%` },
+  { key: 'avg_putting', title: 'Average Putts', sort: 'asc', format: (v) => `${v}` },
   { key: 'avg_scrambling', title: 'Best Scramblers', sort: 'desc', format: (v) => `${v}%` },
-  { key: 'avg_sand_saves', title: 'Best from Sand', sort: 'desc', format: (v) => `${v}%` },
-  { key: 'avg_sg_total', title: 'Best Overall', sort: 'desc', format: (v) => `+${v}` },
-  { key: 'avg_scoring', title: 'Lowest Scorers', sort: 'asc', format: (v) => `${v}` },
+  { key: 'avg_sand_saves', title: 'Sand Saves', sort: 'desc', format: (v) => `${v}%` },
+  { key: 'avg_sg_total', title: 'Strokes Gained', sort: 'desc', format: (v) => `+${v}` },
+  { key: 'avg_scoring', title: 'Lowest Avg Scoring', sort: 'asc', format: (v) => `${v}` },
 ];
 
 // ============================================================================
@@ -127,7 +127,6 @@ function PodiumCard({
           </div>
         )}
         <div className="flex items-center mb-2" style={{ gap: '4px' }}>
-          {isFirst && <span style={{ fontSize: '14px' }}>🏆</span>}
           <span
             style={{
               fontSize: isFirst ? '11px' : '10px',
@@ -195,21 +194,19 @@ function PodiumCard({
             marginTop: 'auto',
           }}
         >
-          {isFirst && (
-            <p
-              className="m-0"
-              style={{
-                fontSize: '10px',
-                fontWeight: 600,
-                letterSpacing: '1px',
-                textTransform: 'uppercase' as const,
-                color: 'rgba(255,255,255,0.6)',
-                marginBottom: '6px',
-              }}
-            >
-              Squad Captain
-            </p>
-          )}
+          <p
+            className="m-0"
+            style={{
+              fontSize: isFirst ? '10px' : '9px',
+              fontWeight: 600,
+              letterSpacing: '1px',
+              textTransform: 'uppercase' as const,
+              color: 'rgba(255,255,255,0.5)',
+              marginBottom: isFirst ? '6px' : '4px',
+            }}
+          >
+            Squad Captain
+          </p>
           <div className="flex items-center" style={{ gap: '6px' }}>
             <SquircleAvatar
               size={isFirst ? 28 : 22}
