@@ -2,13 +2,13 @@
  * CollegeRankingsPreview — Franchise Rankings (Phase 1 redesign)
  *
  * Podium layout: #1 centre (tallest), #2 left, #3 right.
- * Dynamic chase-metric narrative, squad captains, pick-your-franchise CTA.
+ * Leaderboard rows (4–8), Franchise Leaders carousel, chase metric, squad captains.
  */
 
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronRight, Trophy, DollarSign, Users } from 'lucide-react';
+import { ChevronRight, Trophy } from 'lucide-react';
 import { SectionErrorState } from '../SectionErrorState';
 import { useCollegeSeasonStats, type CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useCollegeMediaMap, type CollegeMedia } from '../../hooks/useCollegeMedia';
@@ -27,6 +27,27 @@ const PODIUM_GRADIENTS = {
   first: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
   runner: 'linear-gradient(135deg, #2d2d3a 0%, #3d3d4a 100%)',
 };
+
+// ============================================================================
+// FRANCHISE LEADER CATEGORIES
+// ============================================================================
+interface LeaderCategory {
+  key: keyof CollegeSeasonStats;
+  title: string;
+  sort: 'asc' | 'desc';
+  format: (v: number) => string;
+}
+
+const LEADER_CATEGORIES: LeaderCategory[] = [
+  { key: 'avg_driving_distance', title: 'Longest Hitters', sort: 'desc', format: (v) => `${v} yds` },
+  { key: 'avg_driving_accuracy', title: 'Most Accurate', sort: 'desc', format: (v) => `${v}%` },
+  { key: 'avg_gir', title: 'Best GIR', sort: 'desc', format: (v) => `${v}%` },
+  { key: 'avg_putting', title: 'Best Putters', sort: 'asc', format: (v) => `${v}` },
+  { key: 'avg_scrambling', title: 'Best Scramblers', sort: 'desc', format: (v) => `${v}%` },
+  { key: 'avg_sand_saves', title: 'Best from Sand', sort: 'desc', format: (v) => `${v}%` },
+  { key: 'avg_sg_total', title: 'Best Overall', sort: 'desc', format: (v) => `+${v}` },
+  { key: 'avg_scoring', title: 'Lowest Scorers', sort: 'asc', format: (v) => `${v}` },
+];
 
 // ============================================================================
 // SKELETON
@@ -73,10 +94,7 @@ function generateChaseMetric(colleges: CollegeSeasonStats[], mediaMap: Map<strin
 // PODIUM CARD
 // ============================================================================
 function PodiumCard({
-  stats,
-  media,
-  rank,
-  captain,
+  stats, media, rank, captain,
 }: {
   stats: CollegeSeasonStats;
   media: CollegeMedia | undefined;
@@ -100,12 +118,10 @@ function PodiumCard({
         alignSelf: 'flex-end',
       }}
     >
-      {/* Main content */}
       <div
         className="flex-1 flex flex-col items-center justify-center text-center"
         style={{ padding: isFirst ? '20px 12px 0' : '14px 8px 0' }}
       >
-        {/* Rank badge */}
         <div className="flex items-center mb-2" style={{ gap: '4px' }}>
           {isFirst && <span style={{ fontSize: '14px' }}>🏆</span>}
           <span
@@ -121,7 +137,6 @@ function PodiumCard({
           </span>
         </div>
 
-        {/* Logo */}
         {media?.logo_url && (
           <img
             src={media.logo_url}
@@ -135,7 +150,6 @@ function PodiumCard({
           />
         )}
 
-        {/* Name */}
         <h3
           className="text-white leading-tight m-0 mb-1"
           style={{
@@ -147,7 +161,6 @@ function PodiumCard({
           {displayName}
         </h3>
 
-        {/* Earnings */}
         <p
           className="m-0 text-white"
           style={{
@@ -159,7 +172,6 @@ function PodiumCard({
           {formatCurrency(stats.earnings_total)}
         </p>
 
-        {/* Wins + Alumni */}
         <p
           className="m-0"
           style={{
@@ -172,7 +184,6 @@ function PodiumCard({
         </p>
       </div>
 
-      {/* Squad Captain */}
       {captain && (
         <div
           style={{
@@ -238,6 +249,205 @@ function PodiumCard({
 }
 
 // ============================================================================
+// LEADERBOARD ROWS (4th–8th)
+// ============================================================================
+function LeaderboardRows({
+  rows,
+  mediaMap,
+}: {
+  rows: CollegeSeasonStats[];
+  mediaMap: Map<string, CollegeMedia> | undefined;
+}) {
+  const navigate = useNavigate();
+  if (!rows.length) return null;
+
+  return (
+    <div className="mx-4 mb-4 overflow-hidden" style={{ borderRadius: '12px', border: '1px solid rgba(0,0,0,0.06)' }}>
+      {/* Header row */}
+      <div
+        className="flex items-center"
+        style={{
+          padding: '8px 16px',
+          background: 'rgba(0,0,0,0.02)',
+          borderBottom: '1px solid rgba(0,0,0,0.06)',
+        }}
+      >
+        <span style={{ width: '30px', fontSize: '10px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' as const, color: 'rgba(0,0,0,0.35)' }}>#</span>
+        <span className="flex-1" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' as const, color: 'rgba(0,0,0,0.35)' }}>Franchise</span>
+        <span style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' as const, color: 'rgba(0,0,0,0.35)', textAlign: 'right' as const, width: '70px' }}>Earnings</span>
+        <span style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' as const, color: 'rgba(0,0,0,0.35)', textAlign: 'right' as const, width: '50px' }}>Alumni</span>
+      </div>
+
+      {rows.map((stats, i) => {
+        const media = mediaMap?.get(stats.normalized_name);
+        const displayName = media?.short_name || media?.college_name || stats.normalized_name;
+        const rank = i + 4; // starts at 4th
+
+        return (
+          <button
+            key={stats.id}
+            onClick={() => navigate('/tourhub/college?sort=earnings')}
+            className="w-full flex items-center bg-transparent active:bg-black/[0.02] transition-colors"
+            style={{
+              padding: '14px 16px',
+              borderBottom: i < rows.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none',
+            }}
+          >
+            <span style={{ width: '30px', fontSize: '14px', fontWeight: 600, color: 'rgba(0,0,0,0.4)' }}>{rank}</span>
+            <div className="flex items-center flex-1 min-w-0" style={{ gap: '8px' }}>
+              {media?.logo_url && (
+                <img
+                  src={media.logo_url}
+                  alt={displayName}
+                  className="object-contain rounded-full"
+                  style={{ width: '24px', height: '24px' }}
+                />
+              )}
+              <span className="truncate text-foreground" style={{ fontSize: '14px', fontWeight: 600 }}>{displayName}</span>
+            </div>
+            <span style={{ fontSize: '13px', fontWeight: 600, textAlign: 'right' as const, width: '70px', fontFamily: "'JetBrains Mono', monospace" }}>
+              {formatCurrency(stats.earnings_total)}
+            </span>
+            <span style={{ fontSize: '12px', color: 'rgba(0,0,0,0.4)', textAlign: 'right' as const, width: '50px' }}>
+              {stats.player_count}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// ============================================================================
+// FRANCHISE LEADERS CAROUSEL
+// ============================================================================
+interface FranchiseLeader {
+  title: string;
+  college: CollegeSeasonStats;
+  media: CollegeMedia | undefined;
+  value: string;
+  alumni: number;
+}
+
+function useFranchiseLeaders(
+  allStats: CollegeSeasonStats[] | undefined,
+  mediaMap: Map<string, CollegeMedia> | undefined,
+): FranchiseLeader[] {
+  return useMemo(() => {
+    if (!allStats?.length) return [];
+    const eligible = allStats.filter(c => c.player_count >= 2);
+
+    return LEADER_CATEGORIES.map(cat => {
+      const sorted = [...eligible]
+        .filter(c => (c[cat.key] as number | null) != null)
+        .sort((a, b) =>
+          cat.sort === 'desc'
+            ? (b[cat.key] as number) - (a[cat.key] as number)
+            : (a[cat.key] as number) - (b[cat.key] as number)
+        );
+
+      const leader = sorted[0];
+      if (!leader) return null;
+
+      return {
+        title: cat.title,
+        college: leader,
+        media: mediaMap?.get(leader.normalized_name),
+        value: cat.format(leader[cat.key] as number),
+        alumni: leader.player_count,
+      };
+    }).filter(Boolean) as FranchiseLeader[];
+  }, [allStats, mediaMap]);
+}
+
+function FranchiseLeadersCarousel({ leaders }: { leaders: FranchiseLeader[] }) {
+  if (!leaders.length) return null;
+
+  return (
+    <div className="mb-4">
+      {/* Section heading */}
+      <div className="px-4 mb-3">
+        <h3 className="m-0 text-foreground" style={{ fontSize: '18px', fontWeight: 700 }}>
+          Franchise Leaders
+        </h3>
+        <p className="m-0" style={{ fontSize: '12px', color: 'rgba(0,0,0,0.4)', fontStyle: 'italic', marginTop: '2px' }}>
+          Which college dominates each stat?
+        </p>
+      </div>
+
+      {/* Scroll container */}
+      <div
+        className="flex overflow-x-auto"
+        style={{
+          paddingLeft: '16px',
+          paddingRight: '16px',
+          gap: '10px',
+          scrollSnapType: 'x mandatory',
+          WebkitOverflowScrolling: 'touch',
+          msOverflowStyle: 'none',
+          scrollbarWidth: 'none',
+        }}
+      >
+        {leaders.map((leader) => (
+          <div
+            key={leader.title}
+            className="flex-shrink-0 flex flex-col"
+            style={{
+              width: '160px',
+              minHeight: '140px',
+              background: '#FFFFFF',
+              border: '1px solid rgba(0,0,0,0.06)',
+              borderRadius: '12px',
+              padding: '14px',
+              scrollSnapAlign: 'start',
+            }}
+          >
+            {/* Category title */}
+            <span
+              style={{
+                fontSize: '11px',
+                fontWeight: 600,
+                letterSpacing: '0.3px',
+                color: 'rgba(0,0,0,0.45)',
+                textTransform: 'uppercase' as const,
+                marginBottom: '12px',
+              }}
+            >
+              {leader.title}
+            </span>
+
+            {/* Logo */}
+            {leader.media?.logo_url && (
+              <img
+                src={leader.media.logo_url}
+                alt={leader.media.college_name}
+                className="object-contain mb-2"
+                style={{ width: '36px', height: '36px' }}
+              />
+            )}
+
+            {/* College name */}
+            <span className="text-foreground" style={{ fontSize: '15px', fontWeight: 700, lineHeight: 1.2, marginBottom: '2px' }}>
+              {leader.media?.short_name || leader.media?.college_name || leader.college.normalized_name}
+            </span>
+
+            {/* Stat value */}
+            <span style={{ fontSize: '18px', fontWeight: 700, color: 'rgba(0,0,0,0.85)', fontFamily: "'JetBrains Mono', monospace", marginBottom: '2px' }}>
+              {leader.value}
+            </span>
+
+            {/* Alumni count */}
+            <span style={{ fontSize: '11px', color: 'rgba(0,0,0,0.35)' }}>
+              {leader.alumni} alumni
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
 // PICK YOUR FRANCHISE CTA
 // ============================================================================
 function PickFranchiseCTA() {
@@ -285,19 +495,25 @@ export function CollegeRankingsPreview() {
   const { data: allStats, isLoading: statsLoading, error: statsError, refetch: refetchStats } = useCollegeSeasonStats();
   const { data: collegeMap, isLoading: mediaLoading, error: mediaError, refetch: refetchMedia } = useCollegeMediaMap();
 
-  // Sort by earnings → top 3
-  const top3 = useMemo(() => {
+  // Sort by earnings → top 8
+  const top8 = useMemo(() => {
     if (!allStats?.length) return [];
-    return [...allStats].sort((a, b) => b.earnings_total - a.earnings_total).slice(0, 3);
+    return [...allStats].sort((a, b) => b.earnings_total - a.earnings_total).slice(0, 8);
   }, [allStats]);
 
-  const topCollegeSlugs = useMemo(() => top3.map(s => s.normalized_name), [top3]);
+  const podium = top8.slice(0, 3);
+  const leaderboardRows = top8.slice(3, 8);
+
+  const topCollegeSlugs = useMemo(() => podium.map(s => s.normalized_name), [podium]);
 
   // Squad captains for top 3
   const { data: captainMap } = useFranchiseCaptains(topCollegeSlugs);
 
   // Chase metric
-  const chaseMetric = useMemo(() => generateChaseMetric(top3, collegeMap), [top3, collegeMap]);
+  const chaseMetric = useMemo(() => generateChaseMetric(podium, collegeMap), [podium, collegeMap]);
+
+  // Franchise leaders
+  const franchiseLeaders = useFranchiseLeaders(allStats, collegeMap);
 
   if (statsLoading || mediaLoading) return <CollegePreviewSkeleton />;
 
@@ -309,11 +525,11 @@ export function CollegeRankingsPreview() {
     );
   }
 
-  if (!top3.length) return null;
+  if (!podium.length) return null;
 
   return (
     <section>
-      {/* SECTION HEADER */}
+      {/* 1. SECTION HEADER */}
       <motion.div
         className="flex items-end justify-between px-4 mb-1"
         initial={{ opacity: 0, y: 12 }}
@@ -348,7 +564,7 @@ export function CollegeRankingsPreview() {
       {/* Hairline divider */}
       <div className="mx-4 mb-3" style={{ borderBottom: '1px solid hsl(var(--border) / 0.1)' }} />
 
-      {/* CHASE METRIC */}
+      {/* 2. CHASE METRIC */}
       {chaseMetric && (
         <motion.div
           className="px-4 mb-4"
@@ -375,7 +591,7 @@ export function CollegeRankingsPreview() {
         </motion.div>
       )}
 
-      {/* PODIUM — #2 left, #1 centre (tallest), #3 right */}
+      {/* 3. PODIUM — #2 left, #1 centre (tallest), #3 right */}
       <motion.div
         className="px-4 mb-4"
         initial={{ opacity: 0, y: 16 }}
@@ -384,40 +600,43 @@ export function CollegeRankingsPreview() {
         transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
       >
         <div className="flex items-end" style={{ gap: '8px' }}>
-          {/* #2 — left */}
-          {top3[1] && (
+          {podium[1] && (
             <PodiumCard
-              stats={top3[1]}
-              media={collegeMap?.get(top3[1].normalized_name)}
+              stats={podium[1]}
+              media={collegeMap?.get(podium[1].normalized_name)}
               rank={2}
-              captain={captainMap?.get(top3[1].normalized_name)}
+              captain={captainMap?.get(podium[1].normalized_name)}
             />
           )}
-          {/* #1 — centre */}
           <PodiumCard
-            stats={top3[0]}
-            media={collegeMap?.get(top3[0].normalized_name)}
+            stats={podium[0]}
+            media={collegeMap?.get(podium[0].normalized_name)}
             rank={1}
-            captain={captainMap?.get(top3[0].normalized_name)}
+            captain={captainMap?.get(podium[0].normalized_name)}
           />
-          {/* #3 — right */}
-          {top3[2] && (
+          {podium[2] && (
             <PodiumCard
-              stats={top3[2]}
-              media={collegeMap?.get(top3[2].normalized_name)}
+              stats={podium[2]}
+              media={collegeMap?.get(podium[2].normalized_name)}
               rank={3}
-              captain={captainMap?.get(top3[2].normalized_name)}
+              captain={captainMap?.get(podium[2].normalized_name)}
             />
           )}
         </div>
       </motion.div>
 
-      {/* PICK YOUR FRANCHISE CTA */}
+      {/* 4. LEADERBOARD ROWS (4th–8th) */}
+      <LeaderboardRows rows={leaderboardRows} mediaMap={collegeMap} />
+
+      {/* 5. FRANCHISE LEADERS CAROUSEL */}
+      <FranchiseLeadersCarousel leaders={franchiseLeaders} />
+
+      {/* 6. PICK YOUR FRANCHISE CTA */}
       <div className="px-4 mb-3">
         <PickFranchiseCTA />
       </div>
 
-      {/* VIEW FULL FRANCHISE RANKINGS */}
+      {/* 7. VIEW FULL FRANCHISE RANKINGS */}
       <div className="px-4">
         <button
           onClick={() => navigate('/tourhub/college')}

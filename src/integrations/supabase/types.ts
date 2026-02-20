@@ -1946,6 +1946,14 @@ export type Database = {
       }
       college_season_stats: {
         Row: {
+          avg_driving_accuracy: number | null
+          avg_driving_distance: number | null
+          avg_gir: number | null
+          avg_putting: number | null
+          avg_sand_saves: number | null
+          avg_scoring: number | null
+          avg_scrambling: number | null
+          avg_sg_total: number | null
           created_at: string
           cuts_total: number
           earnings_total: number
@@ -1960,6 +1968,14 @@ export type Database = {
           wins_total: number
         }
         Insert: {
+          avg_driving_accuracy?: number | null
+          avg_driving_distance?: number | null
+          avg_gir?: number | null
+          avg_putting?: number | null
+          avg_sand_saves?: number | null
+          avg_scoring?: number | null
+          avg_scrambling?: number | null
+          avg_sg_total?: number | null
           created_at?: string
           cuts_total?: number
           earnings_total?: number
@@ -1974,6 +1990,14 @@ export type Database = {
           wins_total?: number
         }
         Update: {
+          avg_driving_accuracy?: number | null
+          avg_driving_distance?: number | null
+          avg_gir?: number | null
+          avg_putting?: number | null
+          avg_sand_saves?: number | null
+          avg_scoring?: number | null
+          avg_scrambling?: number | null
+          avg_sg_total?: number | null
           created_at?: string
           cuts_total?: number
           earnings_total?: number
@@ -14908,9 +14932,9 @@ export type Database = {
       }
       refresh_college_season_stats: {
         Args: { target_season_id: string }
-        Returns: number
+        Returns: undefined
       }
-      refresh_college_season_stats_auto: { Args: never; Returns: number }
+      refresh_college_season_stats_auto: { Args: never; Returns: undefined }
       refresh_college_weekly_movers: { Args: never; Returns: undefined }
       register_push_token: {
         Args: { p_platform: string; p_token: string }
