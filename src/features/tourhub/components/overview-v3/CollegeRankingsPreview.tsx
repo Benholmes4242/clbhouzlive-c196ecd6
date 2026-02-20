@@ -277,8 +277,7 @@ function LeaderboardRows({
       >
         <span style={{ width: '30px', fontSize: '10px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' as const, color: 'rgba(0,0,0,0.35)' }}>#</span>
         <span className="flex-1" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' as const, color: 'rgba(0,0,0,0.35)' }}>Franchise</span>
-        <span style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' as const, color: 'rgba(0,0,0,0.35)', textAlign: 'right' as const, width: '80px' }}>Earnings</span>
-        <span style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' as const, color: 'rgba(0,0,0,0.35)', textAlign: 'right' as const, width: '55px' }}>On Tour</span>
+        <span style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' as const, color: 'rgba(0,0,0,0.35)', textAlign: 'right' as const }}>Earnings on Tour</span>
       </div>
 
       {rows.map((stats, i) => {
@@ -311,11 +310,8 @@ function LeaderboardRows({
                 <span style={{ fontSize: '8px', color: '#D97706', marginLeft: '2px' }}>⭐</span>
               )}
             </div>
-            <span className="text-foreground" style={{ fontSize: '13px', fontWeight: 600, textAlign: 'right' as const, width: '80px' }}>
+            <span className="text-foreground" style={{ fontSize: '13px', fontWeight: 600, textAlign: 'right' as const }}>
               {formatCurrency(stats.earnings_total)}
-            </span>
-            <span style={{ fontSize: '12px', color: 'rgba(0,0,0,0.4)', textAlign: 'right' as const, width: '55px' }}>
-              {stats.player_count}
             </span>
           </button>
         );
