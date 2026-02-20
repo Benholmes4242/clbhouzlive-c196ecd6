@@ -361,12 +361,24 @@ export function PersonalProfileWizard() {
 
       if (error) throw error;
 
+      // Auto-follow cleanup: remove old college follow if changed
+      const previousCollege = initialFormData?.collegeNormalized;
+      const newCollege = formData.collegeNormalized;
+
+      if (previousCollege && previousCollege !== newCollege) {
+        await supabase
+          .from('user_followed_colleges')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('normalized_name', previousCollege);
+      }
+
       // Auto-follow the attended college
-      if (formData.collegeNormalized) {
+      if (newCollege) {
         await supabase
           .from('user_followed_colleges')
           .upsert(
-            { user_id: user.id, normalized_name: formData.collegeNormalized },
+            { user_id: user.id, normalized_name: newCollege },
             { onConflict: 'user_id,normalized_name' }
           );
       }
