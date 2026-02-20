@@ -1,12 +1,12 @@
 /**
- * LiveHeroCarousel - Swipeable hero for live tournaments
- * 
+ * LiveHeroCarousel - Swipeable hero for live tournaments (compact Schedule page version)
+ *
  * Features:
  * - Full-bleed course image with gradient overlay + glass card
- * - LIVE badge, tour badge, tournament name, venue, leader + score
+ * - LIVE badge, tour badge, tournament name, venue, round indicator, leader + score
  * - Horizontal swipe (50px threshold), pagination dots, auto-advance 7s
  * - Tappable player/venue names with stopPropagation
- * - Score color-coded (green under, red over, neutral even)
+ * - Leader scores always white inside glass cards for consistency
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
@@ -19,22 +19,14 @@ import { useSingleCourseImage } from '../../hooks/useCourseImageResolver';
 import { getCourseImage } from '../../utils/placeholders';
 import '@/styles/hero-glass.css';
 
-/** Canonical score color */
-function getScoreColor(score: number | null): string {
-  if (score === null || score === undefined) return 'rgba(255,255,255,0.7)';
-  if (score < 0) return '#22C55E';
-  if (score > 0) return '#EF4444';
-  return 'rgba(255,255,255,0.7)';
-}
-
 /** Player avatar for carousel live card */
-function PlayerAvatar({ photoUrl, displayName, size = 44 }: { photoUrl: string | null; displayName: string; size?: number }) {
+function PlayerAvatar({ photoUrl, displayName, size = 36 }: { photoUrl: string | null; displayName: string; size?: number }) {
   const [imgError, setImgError] = useState(false);
   const initials = displayName.split(/[\s.]/).filter(Boolean).map(w => w[0]?.toUpperCase() || '').slice(0, 2).join('');
   return (
     <div style={{
-      width: size, height: size, borderRadius: '50%', overflow: 'hidden', flexShrink: 0,
-      border: '1.5px solid rgba(255,255,255,0.25)', background: 'rgba(255,255,255,0.10)',
+      width: size, height: size, borderRadius: '34%', overflow: 'hidden', flexShrink: 0,
+      border: '1.5px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.1)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
       {photoUrl && !imgError ? (
@@ -42,7 +34,7 @@ function PlayerAvatar({ photoUrl, displayName, size = 44 }: { photoUrl: string |
           style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }}
           onError={() => setImgError(true)} />
       ) : (
-        <span style={{ fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.65)', lineHeight: 1 }}>{initials || '?'}</span>
+        <span style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.65)', lineHeight: 1 }}>{initials || '?'}</span>
       )}
     </div>
   );
@@ -60,8 +52,6 @@ function getTourLabel(tourCode?: string): string {
   };
   return labels[tourCode || ''] || 'TOUR';
 }
-
-// getScoreClass removed — using getScoreColor() directly
 
 function LiveSlide({ tournament, leader }: { tournament: TourTournament; leader?: TournamentLeaderWinner }) {
   const navigate = useNavigate();
@@ -91,10 +81,13 @@ function LiveSlide({ tournament, leader }: { tournament: TourTournament; leader?
     }
   };
 
+  // Round indicator
+  const currentRound = (tournament as any).current_round;
+
   return (
     <div
       className="relative w-full cursor-pointer"
-      style={{ height: 'clamp(282px, 53vh, 422px)' }}
+      style={{ height: 'clamp(260px, 45vh, 380px)' }}
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
     >
       {/* Background image */}
@@ -134,12 +127,12 @@ function LiveSlide({ tournament, leader }: { tournament: TourTournament; leader?
         className="glass-card"
         style={{
           position: 'absolute',
-          bottom: '20px',
+          bottom: '16px',
           left: '16px',
           top: 'auto',
-          minWidth: '280px',
-          maxWidth: 'min(350px, calc(100% - 32px))',
-          padding: '20px 20px 12px 20px',
+          minWidth: '260px',
+          maxWidth: 'min(330px, calc(100% - 32px))',
+          padding: '16px 16px 12px 16px',
         }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -168,24 +161,48 @@ function LiveSlide({ tournament, leader }: { tournament: TourTournament; leader?
           {tournament.venue_city && ` · ${tournament.venue_city}`}
         </button>
 
-        {/* Row 4: Leader with photo */}
+        {/* Row 3b: Round indicator */}
+        {currentRound && (
+          <span style={{
+            fontSize: '11px',
+            fontWeight: 700,
+            letterSpacing: '1.2px',
+            color: 'rgba(255,255,255,0.6)',
+            textTransform: 'uppercase',
+            display: 'block',
+            marginTop: '2px',
+          }}>
+            ROUND {currentRound} OF 4
+          </span>
+        )}
+
+        {/* Row 4: Leader with frosted highlight */}
         {leader && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10 }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            marginTop: 10,
+            background: 'rgba(255,255,255,0.08)',
+            borderRadius: '8px',
+            padding: '8px',
+            margin: '10px -8px 0 -8px',
+          }}>
             <button onClick={handlePlayerTap} className="transition-opacity active:opacity-70">
-              <PlayerAvatar photoUrl={leader.photoUrl ?? null} displayName={leader.displayName} size={44} />
+              <PlayerAvatar photoUrl={leader.photoUrl ?? null} displayName={leader.displayName} size={36} />
             </button>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <button
                   onClick={handlePlayerTap}
                   className="transition-opacity active:opacity-70"
-                  style={{ fontSize: '15px', fontWeight: 700, color: 'rgba(255,255,255,0.95)' }}
+                  style={{ fontSize: '15px', fontWeight: 700, color: '#FFFFFF' }}
                 >
                   {leader.displayName}
                 </button>
                 <span
                   className="score-mono"
-                  style={{ fontSize: '16px', fontWeight: 700, color: getScoreColor(leader.score), flexShrink: 0 }}
+                  style={{ fontSize: '18px', fontWeight: 800, color: '#FFFFFF', flexShrink: 0 }}
                 >
                   {leader.displayScore}
                 </span>
@@ -195,7 +212,7 @@ function LiveSlide({ tournament, leader }: { tournament: TourTournament; leader?
           </div>
         )}
 
-        {/* CTA */}
+        {/* CTA — centered */}
         <div className="hero-text-cta w-full" style={{ marginTop: '8px' }}>
           <span>See Leaderboard</span>
           <ChevronRight className="w-4 h-4 cta-chevron" />
