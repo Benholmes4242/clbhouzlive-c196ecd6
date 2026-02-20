@@ -377,12 +377,10 @@ function FranchiseLeadersCarousel({ leaders }: { leaders: FranchiseLeader[] }) {
         </p>
       </div>
 
-      {/* Scroll container */}
+      {/* Scroll container — breakout pattern for edge-to-edge scroll with 16px inset */}
       <div
-        className="flex overflow-x-auto"
+        className="flex overflow-x-auto -mx-4 px-4"
         style={{
-          paddingLeft: '16px',
-          paddingRight: '16px',
           gap: '10px',
           scrollSnapType: 'x mandatory',
           WebkitOverflowScrolling: 'touch',
