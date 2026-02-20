@@ -1,11 +1,10 @@
 /**
- * ScheduleHeroCard - Immersive glass-card hero with tappable names + score colors
+ * ScheduleHeroCard - Compact glass-card hero for Schedule page
  *
  * States: live | upcoming | recent (finished)
- *  - Finished: Winner spotlight — name top, winner photo (60px), tournament stats, season stats, podium runners
- *  - Live: player photo on leader row
- *  - Upcoming: defending champion line
- *  - All: consistent left-align, consistent status badge spacing
+ *  - Finished: Compact winner spotlight — no stats panel, 48px avatar, max 2 runners
+ *  - Live: player photo on leader row with frosted highlight
+ *  - Upcoming: defending champion, tight spacing, centered CTA
  *  - Helpers: shared from TourHeroHelpers (no duplication)
  */
 
@@ -18,9 +17,7 @@ import type { TourTournament } from '../../hooks/useTourHubData';
 import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
 import { useSingleCourseImage } from '../../hooks/useCourseImageResolver';
 import { getCourseImage } from '../../utils/placeholders';
-import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows, WinnerStatsPanel } from '../shared/TourHeroHelpers';
-import { useWinnerScorecardStats } from '../../hooks/useWinnerScorecardStats';
-import { useWinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
+import { getFinishedScoreColor, formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows } from '../shared/TourHeroHelpers';
 import '@/styles/hero-glass.css';
 
 interface ScheduleHeroCardProps {
@@ -70,18 +67,8 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
   const allFetched = leaderWinner?.allFetched ?? leaderWinner?.topFinishers ?? [];
   const podiumRows = buildPodiumRows(allFetched);
   const winnerRow = podiumRows[0];
-  const runnerRows = podiumRows.slice(1);
+  const runnerRows = podiumRows.slice(1, 3); // Max 2 runners for compact layout
   const winner = winnerRow?.players[0] ?? leaderWinner;
-
-  // Winner scorecard stats (finished state only)
-  const winnerPlayerId = isRecent ? (winner as any)?.playerId : undefined;
-  const { data: winnerStats } = useWinnerScorecardStats(
-    isRecent ? tournament.id : undefined,
-    winnerPlayerId
-  );
-  const { data: winnerSeasonStats } = useWinnerSeasonStats(
-    isRecent ? winnerPlayerId : undefined
-  );
 
   const winningMargin = (() => {
     if (!winnerRow || podiumRows.length < 2) return null;
@@ -97,7 +84,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
     <Link
       to={`/tourhub/tournament/${tournament.id}`}
       className="block relative overflow-hidden active:scale-[0.98] transition-transform"
-      style={{ height: 'clamp(282px, 53vh, 422px)' }}
+      style={{ height: 'clamp(260px, 45vh, 380px)' }}
     >
       {/* Background with Ken Burns */}
       <motion.div
@@ -139,20 +126,18 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
         className="glass-card"
         style={{
           position: 'absolute',
-          bottom: '20px',
+          bottom: '16px',
           left: '16px',
           top: 'auto',
-          minWidth: '280px',
-          maxWidth: 'min(350px, calc(100% - 32px))',
-          padding: '20px 20px 14px 20px',
-          minHeight: isRecent ? 260 : undefined,
-          transition: 'min-height 0.2s ease-out',
+          minWidth: '260px',
+          maxWidth: 'min(330px, calc(100% - 32px))',
+          padding: '16px 16px 12px 16px',
         }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: 0.08 }}
       >
-        {/* ─── FINISHED: tournament name goes straight to top, no badge ─── */}
+        {/* ─── FINISHED: compact winner spotlight ─── */}
         {isRecent ? (
           <>
             {/* Tournament Name — top of card */}
@@ -167,11 +152,10 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
               {tournament.venue_city && ` · ${tournament.venue_city}`}
             </button>
 
-            {/* Winner section */}
-            <div style={{ marginTop: 14, minHeight: 52 }}>
+            {/* Winner section — compact 48px avatar */}
+            <div style={{ marginTop: 12, minHeight: 48 }}>
               {winner ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  {/* 60px photo */}
                   <button
                     onClick={handlePlayerTap(winner.playerId)}
                     className="transition-opacity active:opacity-70"
@@ -181,12 +165,11 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
                       photoUrl={winner.photoUrl}
                       pgaTourId={winner.pgaTourId}
                       displayName={winner.displayName}
-                      size={60}
+                      size={48}
                     />
                   </button>
 
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    {/* Name + score */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap' }}>
                       <button
                         onClick={handlePlayerTap(winner.playerId)}
@@ -203,54 +186,40 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
                       </span>
                     </div>
 
-                    {/* Winning margin */}
                     {(winningMargin || winner.money) && (
                       <span style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.50)', marginTop: 2, display: 'block' }}>
                         {winningMargin ?? `${formatPurse(winner.money!)} winner's share`}
                       </span>
                     )}
-
                   </div>
                 </div>
               ) : (
-                <div style={{ height: 60, borderRadius: 10, background: 'rgba(255,255,255,0.04)', width: 200 }} />
+                <div style={{ height: 48, borderRadius: 10, background: 'rgba(255,255,255,0.04)', width: 200 }} />
               )}
             </div>
 
-            {/* Stats panel — tournament chips + season averages chips */}
-            <WinnerStatsPanel
-              tournamentStats={winnerStats}
-              seasonStats={winnerSeasonStats}
-            />
-
-            {/* Runners-up */}
-            <div style={{
-              marginTop: 10,
-              paddingTop: 10,
-              borderTop: '1px solid rgba(255,255,255,0.08)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 8,
-              minHeight: 72,
-            }}>
-              {runnerRows.length > 0 ? (
-                runnerRows.map(row => (
+            {/* Runners-up — max 2 rows */}
+            {runnerRows.length > 0 && (
+              <div style={{
+                marginTop: 8,
+                paddingTop: 8,
+                borderTop: '1px solid rgba(255,255,255,0.08)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 6,
+              }}>
+                {runnerRows.map(row => (
                   <PodiumRunnerRow
                     key={row.position}
                     row={row}
                     onPlayerTap={handlePlayerTap}
                   />
-                ))
-              ) : (
-                <>
-                  <div style={{ height: 26, borderRadius: 8, background: 'rgba(255,255,255,0.04)' }} />
-                  <div style={{ height: 26, borderRadius: 8, background: 'rgba(255,255,255,0.04)' }} />
-                </>
-              )}
-            </div>
+                ))}
+              </div>
+            )}
 
             {/* Footer: tour badge left, View Results right */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
               <div className="tour-badge">
                 <span>{getTourLabel(tournament.tour_code)}</span>
               </div>
@@ -277,7 +246,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
                   <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: '#22C55E' }}>LIVE</span>
                 </div>
               ) : (
-                <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase' }}>
+                <span className="countdown-label">
                   {format(new Date(tournament.start_date), 'MMM d')}
                 </span>
               )}
@@ -302,7 +271,15 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
             {isLive && (
               <>
                 {leaderWinner && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10 }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    background: 'rgba(255,255,255,0.08)',
+                    borderRadius: '8px',
+                    padding: '8px',
+                    margin: '10px -8px 0 -8px',
+                  }}>
                     <button
                       onClick={handlePlayerTap(leaderWinner.playerId)}
                       className="transition-opacity active:opacity-70"
@@ -311,7 +288,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
                         photoUrl={leaderWinner.photoUrl}
                         pgaTourId={leaderWinner.pgaTourId}
                         displayName={leaderWinner.displayName}
-                        size={44}
+                        size={36}
                       />
                     </button>
                     <div style={{ flex: 1, minWidth: 0 }}>
@@ -325,7 +302,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
                         </button>
                         <span
                           className="score-mono"
-                          style={{ fontSize: '16px', fontWeight: 700, color: getScoreColor(leaderWinner.score), flexShrink: 0 }}
+                          style={{ fontSize: '18px', fontWeight: 800, color: '#FFFFFF', flexShrink: 0 }}
                         >
                           {leaderWinner.displayScore}
                         </span>
@@ -343,10 +320,10 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
               </>
             )}
 
-            {/* ─── UPCOMING LAYOUT ─── */}
+            {/* ─── UPCOMING LAYOUT — tight spacing ─── */}
             {isUpcoming && (
               <>
-                <p style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: '4px', marginTop: '8px' }}>
+                <p style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: '4px', marginTop: '6px' }}>
                   {[
                     tournament.purse && formatPurse(tournament.purse),
                     tournament.venue_par && `PAR ${tournament.venue_par}`,
@@ -361,7 +338,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
                     </span>
                   </div>
                 )}
-                <p className="hero-meta">
+                <p className="hero-meta" style={{ marginBottom: '6px' }}>
                   {format(new Date(tournament.start_date), 'MMM d')} – {format(new Date(tournament.end_date), 'd, yyyy')}
                 </p>
                 <div className="hero-text-cta w-full" style={{ marginTop: '8px' }}>
