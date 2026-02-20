@@ -184,7 +184,7 @@ function MomentumPill({ entry, index, direction }: MomentumPillProps) {
 export function UnifiedWorldRankings() {
   const navigate = useNavigate();
   const { data: movers, isLoading: moversLoading, error: moversError, refetch: refetchMovers } = useRankingMovers();
-  const { data: rankings, isLoading: rankingsLoading, error: rankingsError, refetch: refetchRankings, dataUpdatedAt } = useWorldRankingsFull();
+  const { data: rankings, isLoading: rankingsLoading, error: rankingsError, refetch: refetchRankings } = useWorldRankingsFull();
 
   const [currentPage, setCurrentPage] = useState(0);
   const [highlightedPlayerId, setHighlightedPlayerId] = useState<string | null>(null);
@@ -303,15 +303,17 @@ export function UnifiedWorldRankings() {
         </button>
       </div>
       <p className="text-[11px] text-muted-foreground leading-tight mb-2.5">
-        {dataUpdatedAt
-          ? `Updated ${(() => {
-              const diff = Date.now() - dataUpdatedAt;
-              const days = Math.floor(diff / 86400000);
-              if (days === 0) return 'today';
-              if (days === 1) return 'yesterday';
-              return `${days} days ago`;
-            })()} · Official OWGR data`
-          : 'Updated weekly · Official OWGR data'}
+        {(() => {
+          const rankingDate = (rankings as any)?.[0]?.ranking_date;
+          if (!rankingDate) return 'Updated weekly · Official OWGR data';
+          const date = new Date(rankingDate + 'T00:00:00');
+          const now = new Date();
+          const diffDays = Math.floor((now.getTime() - date.getTime()) / 86400000);
+          if (diffDays === 0) return 'Updated today · Official OWGR data';
+          if (diffDays === 1) return 'Updated yesterday · Official OWGR data';
+          if (diffDays <= 7) return `Updated ${diffDays} days ago · Official OWGR data`;
+          return `Updated ${rankingDate} · Official OWGR data`;
+        })()}
       </p>
       <div className="border-b mb-4" style={{ borderColor: 'hsl(var(--border) / 0.1)' }} />
 

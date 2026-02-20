@@ -262,18 +262,33 @@ export function useRankingMovers() {
   return useQuery({
     queryKey: ['overview-ranking-movers'],
     queryFn: async () => {
-      // First, get all rankings with prior_rank
-      const { data, error } = await supabase
+      // Get the latest ranking_date to avoid mixing old and new data
+      const { data: latestDateRow } = await supabase
+        .from('sr_world_rankings')
+        .select('ranking_date')
+        .order('ranking_date', { ascending: false })
+        .limit(1)
+        .single();
+      
+      const latestDate = latestDateRow?.ranking_date;
+
+      let query = supabase
         .from('sr_world_rankings')
         .select(`
           rank,
           prior_rank,
           avg_points,
-        player:sr_players!inner(id, first_name, last_name, country, photo_url, pga_tour_id)
-      `)
-      .not('prior_rank', 'is', null)
-      .order('rank', { ascending: true })
-      .limit(200);
+          player:sr_players!inner(id, first_name, last_name, country, photo_url, pga_tour_id)
+        `)
+        .not('prior_rank', 'is', null)
+        .order('rank', { ascending: true })
+        .limit(200);
+      
+      if (latestDate) {
+        query = query.eq('ranking_date', latestDate);
+      }
+
+      const { data, error } = await query;
 
     if (error) throw error;
 
@@ -912,6 +927,7 @@ export interface WorldRankingEntry {
   events_played: number | null;
   points_gained: number | null;
   points_lost: number | null;
+  ranking_date: string | null;
   player: {
     id: string;
     first_name: string;
@@ -926,7 +942,17 @@ export function useWorldRankingsFull() {
   return useQuery({
     queryKey: ['world-rankings-full'],
     queryFn: async (): Promise<WorldRankingEntry[]> => {
-      const { data, error } = await supabase
+      // First get the latest ranking_date to avoid duplicate rows from older syncs
+      const { data: latestDateRow } = await supabase
+        .from('sr_world_rankings')
+        .select('ranking_date')
+        .order('ranking_date', { ascending: false })
+        .limit(1)
+        .single();
+      
+      const latestDate = latestDateRow?.ranking_date;
+
+      let query = supabase
         .from('sr_world_rankings')
         .select(`
           rank,
@@ -935,6 +961,7 @@ export function useWorldRankingsFull() {
           avg_points,
           events_played,
           tied,
+          ranking_date,
           raw_data,
           player:sr_players!inner(
             id,
@@ -948,6 +975,12 @@ export function useWorldRankingsFull() {
         .gte('rank', 1)
         .lte('rank', 200)
         .order('rank', { ascending: true });
+      
+      if (latestDate) {
+        query = query.eq('ranking_date', latestDate);
+      }
+
+      const { data, error } = await query;
       
       if (error) {
         console.error('[WorldRankings] Query error:', error);
@@ -995,6 +1028,7 @@ export function useWorldRankingsFull() {
           events_played: eventsPlayed,
           points_gained: pointsGained,
           points_lost: pointsLost,
+          ranking_date: entry.ranking_date ?? null,
           player: entry.player,
         };
       });
