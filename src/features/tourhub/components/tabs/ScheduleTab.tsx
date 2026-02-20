@@ -576,11 +576,8 @@ export function ScheduleTab() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: groupIndex * 0.05, duration: 0.3 }}
                 >
-                  {/* SC-12: Sticky month header */}
-                  <div 
-                    className="sticky z-10 bg-background/95 backdrop-blur-sm"
-                    style={{ top: '140px' }} 
-                  >
+                  {/* Month header (non-sticky) */}
+                  <div>
                     <ScheduleMonthHeader 
                       monthLabel={group.monthLabel}
                       eventCount={group.tournaments.length}
