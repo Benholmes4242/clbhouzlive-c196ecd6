@@ -185,7 +185,7 @@ export function TourHubNavOverlay({
 
   // Generate dynamic subtitle for Schedule
   const scheduleSubtitle = hasLive
-    ? `${liveCount} tournament${(liveCount ?? 0) > 1 ? 's' : ''} live right now`
+    ? `${liveCount} tournament${(liveCount ?? 0) > 1 ? 's' : ''} live right now.`
     : "What's happening — past, present, and upcoming.";
 
   // TM-08: aria-labels for each card
@@ -419,7 +419,7 @@ export function TourHubNavOverlay({
                   </motion.button>
                 </div>
                 
-                {/* Glass Cards Row */}
+                {/* Glass Cards Row — with right-side fade overlay */}
                 <div className="relative">
                   <div
                     ref={scrollRef}
@@ -504,6 +504,20 @@ export function TourHubNavOverlay({
                       );
                     })}
                   </div>
+                  {/* Right-side fade — matches panel background */}
+                  <div
+                    aria-hidden="true"
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      right: 0,
+                      bottom: 0,
+                      width: 40,
+                      background: 'linear-gradient(to right, transparent, hsl(var(--background) / 0.85))',
+                      pointerEvents: 'none',
+                      zIndex: 1,
+                    }}
+                  />
                 </div>
               </motion.div>
             )}
@@ -568,22 +582,23 @@ export function TourHubNavOverlay({
                       
                       {/* Text content */}
                       <div className="flex-1 min-w-0">
-                        <div 
-                          className="text-[15px] font-semibold"
-                          style={{ 
-                            color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--foreground) / 0.8)',
-                          }}
-                        >
-                          {item.label}
+                        {/* Title row — badge inline on the right */}
+                        <div className="flex items-center justify-between gap-2">
+                          <div 
+                            className="text-[15px] font-semibold"
+                            style={{ 
+                              color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--foreground) / 0.8)',
+                            }}
+                          >
+                            {item.label}
+                          </div>
+                          {renderBadge(item)}
                         </div>
                         <div className="text-[13px] mt-0.5 leading-relaxed text-muted-foreground">
                           {dynamicSubtitle}
                         </div>
                         {renderTeaser(item)}
                       </div>
-                      
-                      {/* Right badge */}
-                      {renderBadge(item)}
                     </motion.button>
                   );
                 })}
