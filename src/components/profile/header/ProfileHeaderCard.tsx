@@ -3,6 +3,8 @@ import { Globe, Pencil, Building2, MapPin, CheckCircle2 } from 'lucide-react';
 import { BUSINESS_CATEGORIES, BusinessCategory } from '@/types/profile';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import CollegeStamp from '../CollegeStamp';
+import { useFollowedColleges } from '@/features/tourhub/hooks/useCollegeMovers';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface ProfileHeaderCardProps {
   displayName: string;
@@ -46,6 +48,13 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   isOwnProfile,
   onCustomiseClick,
 }) => {
+  const { user } = useSupabaseSession();
+  const { data: followedColleges } = useFollowedColleges(user?.id);
+
+  // Determine the top followed college that isn't the attended one
+  const followedFranchise = followedColleges?.find(
+    f => f.normalized_name !== collegeNormalized
+  )?.normalized_name ?? null;
   // Format website URL for display
   const formatWebsiteUrl = (url: string) => {
     return url.replace(/^https?:\/\//, '').replace(/\/$/, '');
@@ -112,9 +121,12 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
         </div>
       )}
       
-      {/* Row 3b: College stamp (personal only) */}
+      {/* Row 3b: College stamps (personal only) */}
       {isPersonal && collegeNormalized && (
-        <CollegeStamp normalizedName={collegeNormalized} className="justify-center" />
+        <CollegeStamp normalizedName={collegeNormalized} className="justify-center" variant="alumni" />
+      )}
+      {isPersonal && !collegeNormalized && followedFranchise && (
+        <CollegeStamp normalizedName={followedFranchise} className="justify-center" variant="supporter" />
       )}
       
       {!isPersonal && effectiveLocation && (

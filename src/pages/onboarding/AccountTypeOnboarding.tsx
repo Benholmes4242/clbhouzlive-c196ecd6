@@ -93,6 +93,16 @@ const AccountTypeOnboarding: React.FC = () => {
 
       if (error) throw error;
 
+      // Auto-follow the attended college
+      if (selectedType === 'individual' && selectedCollege) {
+        await supabase
+          .from('user_followed_colleges')
+          .upsert(
+            { user_id: user.id, normalized_name: selectedCollege.normalized_name },
+            { onConflict: 'user_id,normalized_name' }
+          );
+      }
+
       // Show appropriate success message
       if (selectedType === 'individual' && selectedCollege) {
         toast.success('College badge added');
