@@ -100,9 +100,20 @@ export function useTopCollegeTeaser() {
   return useQuery({
     queryKey: ['top-college-teaser'],
     queryFn: async () => {
+      // Get the latest season_id (same approach as useCurrentSeasonId)
+      const { data: latestSeason } = await supabase
+        .from('college_season_stats')
+        .select('season_id')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!latestSeason?.season_id) return null;
+
       const { data } = await supabase
         .from('college_season_stats')
         .select('normalized_name, earnings_total')
+        .eq('season_id', latestSeason.season_id)
         .order('earnings_total', { ascending: false })
         .limit(1)
         .maybeSingle();
