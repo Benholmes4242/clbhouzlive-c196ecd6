@@ -12,6 +12,15 @@ export interface CollegeSeasonStats {
   top10_total: number;
   top25_total: number;
   events_total: number;
+  // Category averages
+  avg_driving_distance: number | null;
+  avg_driving_accuracy: number | null;
+  avg_gir: number | null;
+  avg_putting: number | null;
+  avg_scrambling: number | null;
+  avg_sand_saves: number | null;
+  avg_sg_total: number | null;
+  avg_scoring: number | null;
   // Joined from college_media
   college_name?: string;
   short_name?: string;
@@ -70,7 +79,15 @@ export function useCollegeSeasonStats() {
           cuts_total,
           top10_total,
           top25_total,
-          events_total
+          events_total,
+          avg_driving_distance,
+          avg_driving_accuracy,
+          avg_gir,
+          avg_putting,
+          avg_scrambling,
+          avg_sand_saves,
+          avg_sg_total,
+          avg_scoring
         `)
         .eq('season_id', seasonId);
       
