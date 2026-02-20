@@ -30,40 +30,18 @@ export function formatPurse(purse: number | null): string {
 /** Frosted glass avatar — for use inside dark/photo glass cards */
 function FrostedAvatar({ src, displayName, size }: { src: string | null; displayName: string; size: number }) {
   const [imgError, setImgError] = React.useState(false);
-  const [imgLoaded, setImgLoaded] = React.useState(false);
   const initials = displayName.split(/[\s.]/).filter(Boolean).map(w => w[0]?.toUpperCase() || '').slice(0, 2).join('') || '?';
-  const showPhoto = src && !imgError;
   return (
     <div style={{
       width: size, height: size, borderRadius: '34%', overflow: 'hidden', flexShrink: 0,
       border: '1.5px solid rgba(255,255,255,0.2)',
-      // Dark frosted background — prevents opaque white page background bleeding through
-      background: 'rgba(255,255,255,0.08)',
+      background: 'rgba(255,255,255,0.1)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      position: 'relative',
     }}>
-      {/* Initials always underneath — prevents transparent void when photo is loading/missing */}
-      <span
-        style={{
-          position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: Math.round(size * 0.35), fontWeight: 700, color: 'rgba(255,255,255,0.65)', lineHeight: 1,
-        }}
-      >
-        {initials}
-      </span>
-      {showPhoto && (
-        <img
-          src={src}
-          alt={displayName}
-          style={{
-            position: 'absolute', inset: 0, width: '100%', height: '100%',
-            objectFit: 'cover', objectPosition: 'top',
-            opacity: imgLoaded ? 1 : 0,
-            transition: 'opacity 0.2s ease',
-          }}
-          onLoad={() => setImgLoaded(true)}
-          onError={() => setImgError(true)}
-        />
+      {src && !imgError ? (
+        <img src={src} alt={displayName} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} onError={() => setImgError(true)} />
+      ) : (
+        <span style={{ fontSize: Math.round(size * 0.35), fontWeight: 700, color: 'rgba(255,255,255,0.65)', lineHeight: 1 }}>{initials}</span>
       )}
     </div>
   );
