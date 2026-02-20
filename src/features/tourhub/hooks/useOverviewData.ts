@@ -728,7 +728,7 @@ export function useTournamentTopLeaders(tournamentId: string | null) {
         .gt('strokes', 0)
         .not('position', 'is', null)
         .order('position', { ascending: true })
-        .limit(5);
+        .limit(10);
 
       if (error || !data) return [];
 

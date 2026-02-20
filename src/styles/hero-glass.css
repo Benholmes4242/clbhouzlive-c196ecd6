@@ -147,14 +147,12 @@
   font-variant-numeric: tabular-nums;
 }
 
-.leaderboard-thru {
+.leaderboard-thru-inline {
   font-size: 10px;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.35);
   font-weight: 400;
-  margin-right: 8px;
+  margin-left: 4px;
   white-space: nowrap;
-  min-width: 36px;
-  text-align: right;
 }
 
 .score-under { color: #FFFFFF; }
@@ -235,18 +233,28 @@
   border: none;
   border-radius: 0;
   padding: 0;
-  margin-top: 10px;
+  margin-top: 8px;
   margin-bottom: 0;
   position: relative;
   z-index: 1;
 }
 
 .leaderboard-row {
-  padding: 7px 0;
+  padding: 5px 0;
 }
 
-.leaderboard-row:not(:first-child) {
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+/* Chaser styling — dimmed relative to leader */
+.leaderboard-row:not(.leader-row-highlight) .leaderboard-score {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.leaderboard-row:not(.leader-row-highlight) .leaderboard-name {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.leaderboard-row:not(.leader-row-highlight) .leaderboard-position {
+  color: rgba(255, 255, 255, 0.35);
 }
 
 /* ============================================
@@ -349,7 +357,7 @@
 .hero-text-cta {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 4px;
   font-size: 14px;
   font-weight: 600;
@@ -850,26 +858,20 @@
 /* ============================================
    GAMIFICATION: Leader Row Emphasis
    ============================================ */
-@keyframes leaderShimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
+.leader-row-highlight {
+  position: relative;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  margin: 0 -8px;
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
 }
 
-.leader-row-highlight {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(250, 204, 21, 0.06) 25%,
-    rgba(250, 204, 21, 0.12) 50%,
-    rgba(250, 204, 21, 0.06) 75%,
-    transparent 100%
-  );
-  background-size: 200% 100%;
-  animation: leaderShimmer 3s ease-in-out infinite;
-  border-radius: 8px;
-  margin: 0 -6px;
-  padding-left: 6px;
-  padding-right: 6px;
+.leader-row-highlight .leaderboard-score {
+  font-size: 22px;
+  font-weight: 800;
 }
 
 @keyframes crownPulse {
