@@ -16,6 +16,7 @@ import { useCollegeStats, useCollegeSeasonStats } from '../hooks/useCollegeStats
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
 import { useCollegeRivalries } from '../hooks/useCollegeMovers';
 import { getCollegeGradientCSS } from '../config/collegeBrandColors';
+import { useTourSeason } from '../hooks/useTourHubData';
 import { Button } from '@/components/ui/button';
 
 const SCROLL_KEY = 'college-detail-scroll';
@@ -35,6 +36,8 @@ export function CollegeProfilePage() {
   const { data: collegeMap, isLoading: mediaLoading } = useCollegeMediaMap();
   const { data: rivalries } = useCollegeRivalries(collegeSlug);
   const { data: allSeasonStats } = useCollegeSeasonStats();
+  const { data: season } = useTourSeason();
+  const seasonYear = season?.year || new Date().getFullYear();
   
   const [compareOpen, setCompareOpen] = useState(false);
   const [heroImgError, setHeroImgError] = useState(false);
@@ -231,7 +234,7 @@ export function CollegeProfilePage() {
                 marginBottom: '4px',
               }}
             >
-              2024-25 Season
+              {seasonYear} Season
             </motion.span>
 
             {/* Rank badge */}
@@ -518,7 +521,6 @@ function StatPill({ label, value, highlight = false }: { label: string; value: s
       <span style={{
         fontSize: '15px',
         fontWeight: 700,
-        fontFamily: "'JetBrains Mono', monospace",
         fontVariantNumeric: 'tabular-nums',
         color: highlight ? '#f59e0b' : undefined,
       }} className={highlight ? '' : 'text-foreground'}>

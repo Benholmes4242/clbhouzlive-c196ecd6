@@ -3,7 +3,7 @@ export { FranchiseCard } from './FranchiseCard';
 export { CollegeSearch } from './CollegeSearch';
 export { FranchiseLeaderboard } from './FranchiseLeaderboard';
 export { AlumniDepthChart } from './AlumniDepthChart';
-export { FranchiseHero } from './FranchiseHero';
+
 export { FranchiseStoryStrip } from './FranchiseStoryStrip';
 export { FranchiseMovers } from './FranchiseMovers';
 export { CollegeRivalsCarousel } from './CollegeRivalsCarousel';

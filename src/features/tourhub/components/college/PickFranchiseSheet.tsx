@@ -21,13 +21,13 @@ interface PickFranchiseSheetProps {
 function FollowBtn({
   normalizedName,
   userId,
+  isFollowed,
 }: {
   normalizedName: string;
   userId: string | undefined;
+  isFollowed: boolean;
 }) {
-  const { data: followed } = useFollowedColleges(userId);
   const { follow, unfollow } = useFollowCollegeMutations(userId);
-  const isFollowed = followed?.some(f => f.normalized_name === normalizedName) ?? false;
   const isPending = follow.isPending || unfollow.isPending;
 
   const handleClick = async (e: React.MouseEvent) => {
@@ -70,6 +70,13 @@ export function PickFranchiseSheet({ open, onOpenChange }: PickFranchiseSheetPro
   const { data: allStats } = useCollegeSeasonStats();
   const { data: collegeMap } = useCollegeMediaMap();
   const { data: searchResults } = useCollegeMediaSearch(searchQuery);
+
+  // Single query for follow state — shared across all rows
+  const { data: followed } = useFollowedColleges(user?.id);
+  const followedSet = useMemo(
+    () => new Set(followed?.map(f => f.normalized_name) || []),
+    [followed]
+  );
 
   // Top 20 colleges by earnings for "Popular" list
   const popularColleges = useMemo(() => {
@@ -153,6 +160,7 @@ export function PickFranchiseSheet({ open, onOpenChange }: PickFranchiseSheetPro
                     logoUrl={college.logo_url}
                     playerCount={stats?.player_count ?? 0}
                     userId={user?.id}
+                    isFollowed={followedSet.has(college.normalized_name)}
                   />
                 );
               })
@@ -170,6 +178,7 @@ export function PickFranchiseSheet({ open, onOpenChange }: PickFranchiseSheetPro
                   logoUrl={media?.logo_url ?? null}
                   playerCount={stats.player_count}
                   userId={user?.id}
+                  isFollowed={followedSet.has(stats.normalized_name)}
                 />
               );
             })
@@ -204,12 +213,14 @@ function CollegeRow({
   logoUrl,
   playerCount,
   userId,
+  isFollowed,
 }: {
   normalizedName: string;
   displayName: string;
   logoUrl: string | null;
   playerCount: number;
   userId: string | undefined;
+  isFollowed: boolean;
 }) {
   return (
     <div
@@ -250,7 +261,7 @@ function CollegeRow({
       </div>
 
       {/* Follow button */}
-      <FollowBtn normalizedName={normalizedName} userId={userId} />
+      <FollowBtn normalizedName={normalizedName} userId={userId} isFollowed={isFollowed} />
     </div>
   );
 }
