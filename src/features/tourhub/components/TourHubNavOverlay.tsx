@@ -206,7 +206,7 @@ export function TourHubNavOverlay({
         ? (leaderTeaser.score < 0 ? `${leaderTeaser.score}` : `${leaderTeaser.score > 0 ? '+' : ''}${leaderTeaser.score}`)
         : null;
       return (
-        <p className="text-xs mt-1 text-muted-foreground">
+        <p className="text-[13px] mt-1 text-muted-foreground">
           <span 
             className="font-medium transition-opacity active:opacity-70 cursor-pointer"
             onClick={(e) => {
@@ -255,7 +255,7 @@ export function TourHubNavOverlay({
             transition={{ duration: 1.5, repeat: Infinity }}
           />
           <span 
-            className="text-[10px] font-bold uppercase tracking-wide"
+            className="text-[11px] font-bold uppercase tracking-wide"
             style={{ color: TOUR_COLORS.liveGreen }}
           >
             {liveCount} LIVE
@@ -266,7 +266,7 @@ export function TourHubNavOverlay({
     // TM-09: Players card count badge
     if (item.value === 'players' && playerCount) {
       return (
-        <span className="text-xs text-muted-foreground flex-shrink-0">
+        <span className="text-[13px] text-muted-foreground flex-shrink-0">
           {playerCount > 800 ? '800+' : playerCount} players
         </span>
       );
@@ -276,7 +276,7 @@ export function TourHubNavOverlay({
       const lastName = worldNumber1.playerName.split(' ').slice(-1)[0];
       return (
         <span 
-          className="text-xs text-muted-foreground flex-shrink-0 transition-opacity active:opacity-70 cursor-pointer"
+          className="text-[13px] text-muted-foreground flex-shrink-0 transition-opacity active:opacity-70 cursor-pointer"
           onClick={(e) => {
             e.stopPropagation();
             handlePlayerClick(worldNumber1.playerId);
@@ -381,7 +381,7 @@ export function TourHubNavOverlay({
                   background: 'hsl(var(--card) / 0.7)',
                   backdropFilter: 'blur(12px)',
                   WebkitBackdropFilter: 'blur(12px)',
-                  border: '1px solid hsl(var(--border) / 0.3)',
+                  border: '1px solid hsl(var(--border) / 0.15)',
                 }}
                 aria-label="Close menu"
               >
@@ -403,7 +403,7 @@ export function TourHubNavOverlay({
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <Trophy className="w-4 h-4" style={{ color: TOUR_COLORS.intelligenceGoldLight }} />
-                    <h3 className="text-sm font-semibold text-foreground">
+                    <h3 className="text-[15px] font-bold text-foreground">
                       World Rankings
                     </h3>
                   </div>
@@ -411,7 +411,7 @@ export function TourHubNavOverlay({
                   <motion.button
                     onClick={handleViewAllRankings}
                     whileTap={{ scale: 0.95 }}
-                    className="flex items-center gap-0.5 text-xs font-medium text-muted-foreground transition-opacity active:opacity-70"
+                    className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground transition-opacity active:opacity-70"
                   >
                     View all
                     <ChevronRight className="w-3.5 h-3.5" />
@@ -455,7 +455,7 @@ export function TourHubNavOverlay({
                               ? '1.5px solid rgba(245, 158, 11, 0.35)'
                               : '1px solid hsl(var(--border) / 0.3)',
                             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04), 0 0 1px rgba(0, 0, 0, 0.08)',
-                            minWidth: '140px',
+                            minWidth: '155px',
                           }}
                         >
                           {/* Rank Badge */}
@@ -495,7 +495,7 @@ export function TourHubNavOverlay({
                             <p className="text-sm font-semibold text-foreground truncate">
                               {lastName}
                             </p>
-                            <p className="text-[10px] text-muted-foreground truncate">
+                            <p className="text-[11px] text-muted-foreground truncate">
                               {country || 'Unknown'}
                             </p>
                           </div>
@@ -508,7 +508,7 @@ export function TourHubNavOverlay({
             )}
             
             {/* Divider */}
-            <div className="h-px mx-5 border-t border-border/60" />
+            <div className="h-px mx-5 border-t border-border/30" />
             
             {/* Menu Items — TM-03: bottom safe area padding */}
             <div 
@@ -518,7 +518,7 @@ export function TourHubNavOverlay({
                 paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)',
               }}
             >
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {NAV_ITEMS.map((item, index) => {
                   const isActive = activeTab === item.value;
                   const dynamicSubtitle = item.value === 'schedule' ? scheduleSubtitle : item.subtitle;
@@ -556,7 +556,7 @@ export function TourHubNavOverlay({
                         style={{
                           background: isActive 
                             ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(245, 158, 11, 0.06))'
-                            : 'hsl(var(--muted) / 0.5)',
+                            : 'hsl(var(--muted) / 0.7)',
                           color: isActive ? '#D97706' : undefined,
                         }}
                       >
@@ -568,14 +568,14 @@ export function TourHubNavOverlay({
                       {/* Text content */}
                       <div className="flex-1 min-w-0">
                         <div 
-                          className="text-base font-semibold"
+                          className="text-[15px] font-semibold"
                           style={{ 
                             color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--foreground) / 0.8)',
                           }}
                         >
                           {item.label}
                         </div>
-                        <div className="text-[12px] mt-0.5 leading-relaxed text-muted-foreground">
+                        <div className="text-[13px] mt-0.5 leading-relaxed text-muted-foreground">
                           {dynamicSubtitle}
                         </div>
                         {renderTeaser(item)}
@@ -589,10 +589,10 @@ export function TourHubNavOverlay({
                </div>
 
               {/* Divider before link items */}
-              <div className="h-px my-4 border-t border-border/60" />
+              <div className="h-px my-4 border-t border-border/30" />
 
               {/* Link Items (College Golf, etc.) */}
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {LINK_ITEMS.map((item, index) => (
                   <motion.button
                     key={item.id}
@@ -616,7 +616,7 @@ export function TourHubNavOverlay({
                     {/* Icon in circle */}
                     <div 
                       className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-muted-foreground"
-                      style={{ background: 'hsl(var(--muted) / 0.5)' }}
+                      style={{ background: 'hsl(var(--muted) / 0.7)' }}
                     >
                       {item.icon}
                     </div>
@@ -625,7 +625,7 @@ export function TourHubNavOverlay({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span 
-                          className="text-base font-semibold"
+                          className="text-[15px] font-semibold"
                           style={{ color: 'hsl(var(--foreground) / 0.8)' }}
                         >
                           {item.label}
@@ -639,12 +639,12 @@ export function TourHubNavOverlay({
                           </span>
                         )}
                       </div>
-                      <div className="text-[12px] mt-0.5 leading-relaxed text-muted-foreground">
+                      <div className="text-[13px] mt-0.5 leading-relaxed text-muted-foreground">
                         {item.subtitle}
                       </div>
                       {/* TM-06: College #1 teaser — school name tappable */}
                       {item.id === 'college-golf' && topCollege && (
-                        <p className="text-xs mt-1 text-muted-foreground flex items-center gap-1.5">
+                        <p className="text-[13px] mt-1 text-muted-foreground flex items-center gap-1.5">
                           <span 
                             className="inline-flex items-center gap-1.5 transition-opacity active:opacity-70 cursor-pointer"
                             onClick={(e) => {
@@ -666,7 +666,7 @@ export function TourHubNavOverlay({
                           </span>
                           <span>
                             {' leads • '}
-                            {formatCurrency(topCollege.earnings)} in earnings
+                            {formatCurrency(topCollege.earnings)} earned
                           </span>
                         </p>
                       )}
@@ -674,7 +674,7 @@ export function TourHubNavOverlay({
                     
                     {/* Chevron */}
                     <ChevronRight 
-                      className="w-4.5 h-4.5 flex-shrink-0 text-muted-foreground"
+                      className="w-4.5 h-4.5 flex-shrink-0 text-muted-foreground/60"
                     />
                   </motion.button>
                 ))}
