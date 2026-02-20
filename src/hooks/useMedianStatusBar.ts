@@ -63,10 +63,49 @@ export function useMedianStatusBar(
     const t2 = window.setTimeout(apply, 750);
     const t3 = window.setTimeout(apply, 1500);
 
+    // 4) Re-apply on app resume — Median bridge resets status bar when backgrounded
+    const reapplyOnResume = () => {
+      if (document.visibilityState === 'visible') {
+        setTimeout(() => {
+          try {
+            if (window.median?.statusbar?.set) {
+              window.median.statusbar.set({
+                style,
+                color: toAARRGGBB(hexColor),
+                overlay,
+                blur,
+              });
+            }
+          } catch {
+            // Silent catch — bridge may not be ready
+          }
+        }, 50);
+      }
+    };
+
+    document.addEventListener('visibilitychange', reapplyOnResume);
+
+    // 5) Update theme-color meta tag to match status bar for iOS compositing
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) {
+      if (hexColor === 'transparent' || hexColor === '#00000000') {
+        metaThemeColor.setAttribute('content', '#000000');
+      } else {
+        metaThemeColor.setAttribute('content', hexColor || '#F8FAFC');
+      }
+    }
+
     return () => {
       window.clearTimeout(t1);
       window.clearTimeout(t2);
       window.clearTimeout(t3);
+      document.removeEventListener('visibilitychange', reapplyOnResume);
+
+      // Restore default theme-color on unmount
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) {
+        meta.setAttribute('content', '#F8FAFC');
+      }
     };
   }, [style, hexColor, overlay, blur, enabled]);
 }
