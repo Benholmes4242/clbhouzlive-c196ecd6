@@ -7,15 +7,15 @@ declare global {
   }
 }
 
+// FIX 4: Handle 8-char hex, fallback to opaque black (not white)
 function toAARRGGBB(hex: string) {
-  // Handle transparent specially
-  if (hex.toLowerCase() === "transparent") {
-    return "00000000"; // Fully transparent AARRGGBB
-  }
-  // Input: "#F8FAFC" or "F8FAFC"
+  if (hex.toLowerCase() === "transparent") return "00000000";
   const clean = hex.replace("#", "").trim();
-  if (clean.length !== 6) return "FFFFFFFF"; // fallback white
-  // Median expects AARRGGBB, e.g. "FFF8FAFC"
+  if (clean.length === 8) {
+    // Already AARRGGBB format — pass through
+    return clean.toUpperCase();
+  }
+  if (clean.length !== 6) return "FF000000"; // fallback to opaque black
   return `FF${clean.toUpperCase()}`;
 }
 
@@ -27,17 +27,14 @@ export function useMedianStatusBar(
   enabled = true  // When false, hook does nothing - lets underlying page control status bar
 ) {
   useEffect(() => {
-    // EXIT EARLY if not enabled - don't touch status bar at all
     if (!enabled) return;
-    
-    // Only attempt in Median app runtime
     if (!navigator.userAgent.toLowerCase().includes("median")) return;
 
-    const apply = () => {
+    const applyStatusBar = () => {
       try {
         if (window.median?.statusbar?.set) {
           window.median.statusbar.set({
-            style,                 // 'light' = black icons, 'dark' = white icons, 'auto' = follows device
+            style,
             color: toAARRGGBB(hexColor),
             overlay,
             blur,
@@ -48,42 +45,45 @@ export function useMedianStatusBar(
       }
     };
 
-    // 1) Try immediately (sometimes bridge is already ready)
-    apply();
+    // 1) Apply immediately
+    applyStatusBar();
 
-    // 2) Also register Median's ready callback (bridge loads async)
+    // 2) Register Median's ready callback (bridge loads async)
     const prev = window.median_library_ready;
     window.median_library_ready = () => {
       if (typeof prev === "function") prev();
-      apply();
+      applyStatusBar();
     };
 
-    // 3) Failsafe: retry a few times in case ready callback doesn't fire for SPA navigation
-    const t1 = window.setTimeout(apply, 250);
-    const t2 = window.setTimeout(apply, 750);
-    const t3 = window.setTimeout(apply, 1500);
+    // 3) Failsafe retries for SPA navigation
+    const t1 = window.setTimeout(applyStatusBar, 250);
+    const t2 = window.setTimeout(applyStatusBar, 750);
+    const t3 = window.setTimeout(applyStatusBar, 1500);
 
-    // 4) Re-apply on app resume — Median bridge resets status bar when backgrounded
+    // FIX 1: Dual-fire on resume — t=0 (instant) + t=100ms + t=300ms retries
+    // FIX 5: Listen to both visibilitychange AND focus for broader iOS WebView coverage
     const reapplyOnResume = () => {
-      if (document.visibilityState === 'visible') {
-        setTimeout(() => {
-          try {
-            if (window.median?.statusbar?.set) {
-              window.median.statusbar.set({
-                style,
-                color: toAARRGGBB(hexColor),
-                overlay,
-                blur,
-              });
-            }
-          } catch {
-            // Silent catch — bridge may not be ready
-          }
-        }, 50);
-      }
+      if (!enabled) return;
+
+      // Fire immediately — catches cases where bridge is ready
+      applyStatusBar();
+
+      // Fire again after 100ms — catches cases where bridge needs time to reinitialize
+      window.setTimeout(applyStatusBar, 100);
+
+      // Fire once more after 300ms — belt and suspenders for slow resume
+      window.setTimeout(applyStatusBar, 300);
     };
 
     document.addEventListener('visibilitychange', reapplyOnResume);
+    window.addEventListener('focus', reapplyOnResume);
+
+    // FIX 3: For immersive/overlay pages, set html + body to black to prevent
+    // grey (#F8FAFC) bleeding through the iOS compositing gap on resume
+    if (overlay) {
+      document.documentElement.style.backgroundColor = '#000000';
+      document.body.style.backgroundColor = '#000000';
+    }
 
     // 5) Update theme-color meta tag to match status bar for iOS compositing
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
@@ -100,6 +100,11 @@ export function useMedianStatusBar(
       window.clearTimeout(t2);
       window.clearTimeout(t3);
       document.removeEventListener('visibilitychange', reapplyOnResume);
+      window.removeEventListener('focus', reapplyOnResume);
+
+      // Restore default backgrounds
+      document.documentElement.style.backgroundColor = '';
+      document.body.style.backgroundColor = '';
 
       // Restore default theme-color on unmount
       const meta = document.querySelector('meta[name="theme-color"]');
