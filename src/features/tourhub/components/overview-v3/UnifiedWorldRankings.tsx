@@ -204,11 +204,12 @@ export function UnifiedWorldRankings() {
   const no1TotalPoints = rankings?.[0]?.total_points ?? 0;
 
   const moverPlayerIds = useMemo(() => new Set(movers?.map(m => m.playerId) || []), [movers]);
-  const upwardMovers = useMemo(() => (movers || []).filter(m => m.rankChange > 0), [movers]);
-  const downwardMovers = useMemo(() => {
-    const downs = (movers || []).filter(m => m.rankChange < 0);
-    return [...downs].sort((a, b) => a.rankChange - b.rankChange).slice(0, upwardMovers.length || 10);
-  }, [movers, upwardMovers.length]);
+  const upwardMovers = useMemo(() => 
+    (movers || []).filter(m => m.rankChange > 0).sort((a, b) => b.rankChange - a.rankChange).slice(0, 5), 
+  [movers]);
+  const downwardMovers = useMemo(() => 
+    (movers || []).filter(m => m.rankChange < 0).sort((a, b) => a.rankChange - b.rankChange).slice(0, 5), 
+  [movers]);
   const narrative = useMemo(() => generateNarrative(rankings, movers), [rankings, movers]);
 
   useEffect(() => {
@@ -315,27 +316,41 @@ export function UnifiedWorldRankings() {
       <div className="border-b mb-4" style={{ borderColor: 'hsl(var(--border) / 0.1)' }} />
 
 
-      {/* ═══ 3. This Week's Movers (consolidated) ═══ */}
+      {/* ═══ 3. Risers & Fallers ═══ */}
       {hasMovers && (
-        <div className="mb-5">
-          <div className="flex items-center gap-1.5 mb-2">
-            <span style={{ color: 'rgba(22,163,74,0.8)', fontSize: '12px' }}>▲</span>
-            <span style={{ color: 'rgba(220,38,38,0.7)', fontSize: '12px' }}>▼</span>
-            <span className="text-[0.9375rem] font-semibold text-foreground">This Week's Movers</span>
-          </div>
-          <div
-            className="flex gap-2 overflow-x-auto scrollbar-hide pb-1"
-            style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory', touchAction: 'pan-x pan-y' }}
-            role="list"
-            aria-label="Players with biggest ranking changes this week"
-          >
-            {upwardMovers.map((entry, idx) => (
-              <MomentumPill key={entry.playerId} entry={entry} index={idx} direction="up" />
-            ))}
-            {downwardMovers.map((entry, idx) => (
-              <MomentumPill key={entry.playerId} entry={entry} index={upwardMovers.length + idx} direction="down" />
-            ))}
-          </div>
+        <div className="mb-5 flex flex-col" style={{ gap: '8px' }}>
+          {/* Row 1 — Risers */}
+          {upwardMovers.length > 0 && (
+            <div>
+              <span className="font-semibold" style={{ color: 'rgba(22,163,74,0.8)', fontSize: '12px' }}>▲ Risers</span>
+              <div
+                className="flex gap-2 overflow-x-auto scrollbar-hide mt-1.5 pb-0.5"
+                style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory', touchAction: 'pan-x pan-y' }}
+                role="list"
+                aria-label="Players with biggest ranking gains this week"
+              >
+                {upwardMovers.map((entry, idx) => (
+                  <MomentumPill key={entry.playerId} entry={entry} index={idx} direction="up" />
+                ))}
+              </div>
+            </div>
+          )}
+          {/* Row 2 — Fallers */}
+          {downwardMovers.length > 0 && (
+            <div>
+              <span className="font-semibold" style={{ color: 'rgba(220,38,38,0.75)', fontSize: '12px' }}>▼ Fallers</span>
+              <div
+                className="flex gap-2 overflow-x-auto scrollbar-hide mt-1.5 pb-0.5"
+                style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory', touchAction: 'pan-x pan-y' }}
+                role="list"
+                aria-label="Players with biggest ranking drops this week"
+              >
+                {downwardMovers.map((entry, idx) => (
+                  <MomentumPill key={entry.playerId} entry={entry} index={idx} direction="down" />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
