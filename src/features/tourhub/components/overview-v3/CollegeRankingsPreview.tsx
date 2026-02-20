@@ -382,7 +382,7 @@ function FranchiseLeadersCarousel({ leaders }: { leaders: FranchiseLeader[] }) {
         className="flex overflow-x-auto -mx-4 px-4"
         style={{
           gap: '10px',
-          scrollSnapType: 'x mandatory',
+          
           WebkitOverflowScrolling: 'touch',
           msOverflowStyle: 'none',
           scrollbarWidth: 'none',
@@ -399,7 +399,7 @@ function FranchiseLeadersCarousel({ leaders }: { leaders: FranchiseLeader[] }) {
               border: `1px solid ${getCollegeAccentBorder(leader.college.normalized_name)}`,
               borderRadius: '12px',
               padding: '14px',
-              scrollSnapAlign: 'start',
+              
             }}
           >
             {/* Category title */}
