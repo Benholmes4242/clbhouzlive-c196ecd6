@@ -118,16 +118,16 @@ export const CategoryTabs = memo(function CategoryTabs({
                 fontSize: '12px',
                 fontWeight: isActive ? 600 : 500,
                 borderRadius: '10px',
-                background: isActive ? categoryAccent.primary : '#FFFFFF',
+                background: isActive ? 'hsl(var(--foreground))' : '#FFFFFF',
                 border: isActive 
-                  ? `1px solid ${categoryAccent.primary}` 
+                  ? '1px solid hsl(var(--foreground))' 
                   : '1px solid rgba(0, 0, 0, 0.08)',
                 color: isActive ? '#FFFFFF' : 'rgba(0, 0, 0, 0.45)',
                 boxShadow: isActive 
-                  ? `0 2px 8px ${categoryAccent.shadow}` 
+                  ? '0 2px 8px rgba(0, 0, 0, 0.15)' 
                   : 'none',
                 transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                outlineColor: categoryAccent.primary,
+                outlineColor: 'hsl(var(--foreground))',
               }}
             >
               <IconComponent size={14} />
