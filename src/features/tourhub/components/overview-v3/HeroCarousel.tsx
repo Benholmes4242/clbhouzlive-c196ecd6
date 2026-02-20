@@ -636,7 +636,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         >
                           {/* 60px photo */}
                           <button onClick={handlePlayerTap(podiumWinner.playerId)} className="transition-opacity active:opacity-70" style={{ flexShrink: 0 }}>
-                            <PlayerAvatar photoUrl={podiumWinner.photoUrl} pgaTourId={podiumWinner.pgaTourId} displayName={podiumWinner.displayName} size={60} />
+                            <PlayerAvatar photoUrl={podiumWinner.photoUrl} pgaTourId={podiumWinner.pgaTourId} displayName={podiumWinner.displayName} size={60} frosted />
                           </button>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             {/* Name + score */}
@@ -665,7 +665,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
                           style={{ display: 'flex', alignItems: 'center', gap: 10 }}
                         >
-                          <PlayerAvatar photoUrl={resolvePhotoUrl(winnerInfo.winnerPhotoUrl, winnerInfo.winnerPgaTourId)} displayName={winnerInfo.winnerName} size={60} />
+                          <PlayerAvatar photoUrl={resolvePhotoUrl(winnerInfo.winnerPhotoUrl, winnerInfo.winnerPgaTourId)} displayName={winnerInfo.winnerName} size={60} frosted />
                           <div>
                             <span style={{ fontSize: '17px', fontWeight: 700, color: '#FFFFFF', display: 'block' }}>{winnerInfo.winnerName}</span>
                             {winnerInfo.winnerScore && (

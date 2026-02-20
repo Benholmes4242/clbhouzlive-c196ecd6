@@ -161,12 +161,13 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
                     className="transition-opacity active:opacity-70"
                     style={{ flexShrink: 0 }}
                   >
-                    <PlayerAvatar
-                      photoUrl={winner.photoUrl}
-                      pgaTourId={winner.pgaTourId}
-                      displayName={winner.displayName}
-                      size={48}
-                    />
+                     <PlayerAvatar
+                        photoUrl={winner.photoUrl}
+                        pgaTourId={winner.pgaTourId}
+                        displayName={winner.displayName}
+                        size={48}
+                        frosted
+                      />
                   </button>
 
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -284,12 +285,13 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
                       onClick={handlePlayerTap(leaderWinner.playerId)}
                       className="transition-opacity active:opacity-70"
                     >
-                      <PlayerAvatar
-                        photoUrl={leaderWinner.photoUrl}
-                        pgaTourId={leaderWinner.pgaTourId}
-                        displayName={leaderWinner.displayName}
-                        size={36}
-                      />
+                       <PlayerAvatar
+                          photoUrl={leaderWinner.photoUrl}
+                          pgaTourId={leaderWinner.pgaTourId}
+                          displayName={leaderWinner.displayName}
+                          size={36}
+                          frosted
+                        />
                     </button>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap' }}>

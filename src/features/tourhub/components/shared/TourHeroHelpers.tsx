@@ -27,17 +27,40 @@ export function formatPurse(purse: number | null): string {
     : `$${(purse / 1_000).toFixed(0)}K`;
 }
 
+/** Frosted glass avatar — for use inside dark/photo glass cards */
+function FrostedAvatar({ src, displayName, size }: { src: string | null; displayName: string; size: number }) {
+  const [imgError, setImgError] = React.useState(false);
+  const initials = displayName.split(/[\s.]/).filter(Boolean).map(w => w[0]?.toUpperCase() || '').slice(0, 2).join('') || '?';
+  return (
+    <div style={{
+      width: size, height: size, borderRadius: '34%', overflow: 'hidden', flexShrink: 0,
+      border: '1.5px solid rgba(255,255,255,0.2)',
+      background: 'rgba(255,255,255,0.1)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+    }}>
+      {src && !imgError ? (
+        <img src={src} alt={displayName} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} onError={() => setImgError(true)} />
+      ) : (
+        <span style={{ fontSize: Math.round(size * 0.35), fontWeight: 700, color: 'rgba(255,255,255,0.65)', lineHeight: 1 }}>{initials}</span>
+      )}
+    </div>
+  );
+}
+
 /** Squircle avatar matching the global SDS spec (34% radius, 1:1.05 aspect) */
 export function PlayerAvatar({
   photoUrl,
   pgaTourId,
   displayName,
   size = 44,
+  frosted = false,
 }: {
   photoUrl: string | null;
   pgaTourId?: string | null;
   displayName: string;
   size?: number;
+  /** Use frosted glass styling (rgba(255,255,255,0.1) bg + frosted border) — for glass card contexts */
+  frosted?: boolean;
 }) {
   const resolved = resolvePhotoUrl(photoUrl, pgaTourId);
   const initials = displayName
@@ -46,6 +69,10 @@ export function PlayerAvatar({
     .map(w => w[0]?.toUpperCase() || '')
     .slice(0, 2)
     .join('') || '?';
+
+  if (frosted) {
+    return <FrostedAvatar src={resolved} displayName={displayName} size={size} />;
+  }
 
   return (
     <SquircleAvatar
@@ -124,11 +151,12 @@ export function PodiumRunnerRow({
           className="transition-opacity active:opacity-70"
           style={{ flexShrink: 0 }}
         >
-          <PlayerAvatar
+        <PlayerAvatar
             photoUrl={player.photoUrl}
             pgaTourId={player.pgaTourId}
             displayName={player.displayName}
             size={30}
+            frosted
           />
         </button>
       ) : (
@@ -148,6 +176,7 @@ export function PodiumRunnerRow({
                 pgaTourId={p.pgaTourId}
                 displayName={p.displayName}
                 size={26}
+                frosted
               />
             </div>
           ))}
