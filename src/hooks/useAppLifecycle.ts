@@ -36,6 +36,17 @@ export function useAppLifecycle() {
         const backgroundDuration = Date.now() - backgroundTimeRef.current;
         console.log('[AppLifecycle] App foregrounded after', backgroundDuration, 'ms');
 
+        // Force repaint to fix iOS compositing artifacts (grey safe area)
+        requestAnimationFrame(() => {
+          const root = document.getElementById('root');
+          if (root) {
+            root.style.transform = 'translateZ(0)';
+            requestAnimationFrame(() => {
+              root.style.transform = '';
+            });
+          }
+        });
+
         // Determine rehydration level
         let level: RehydrationLevel = 'none';
         
