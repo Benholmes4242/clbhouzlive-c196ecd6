@@ -147,6 +147,7 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
                 src={photoUrl}
                 alt={abbreviatedName}
                 className="w-full h-full object-cover object-top"
+                style={{ backgroundColor: 'rgba(255,255,255,0.08)' }}
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
               />
             ) : (
@@ -200,28 +201,29 @@ function CondensedTieRow({ row, index, isActive }: { row: LiveLeaderboardRow; in
             return (
               <div
                 key={player.player.id}
-                className="overflow-hidden border-2 border-black/30 flex-shrink-0"
+                className="overflow-hidden flex-shrink-0"
                 style={{
-                  width: '28px',
-                  height: '29px',
+                  width: 28,
+                  height: 29,
                   borderRadius: '34%',
+                  border: '1.5px solid rgba(255,255,255,0.2)',
                   marginLeft: i > 0 ? -8 : 0,
                   zIndex: 4 - i,
                   position: 'relative',
                 }}
               >
                 {photoUrl ? (
-                  <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                  <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                 ) : (
-                  <div className="w-full h-full bg-white/10 flex items-center justify-center text-white/60 text-[8px] font-semibold">{initials}</div>
+                  <div style={{ width: '100%', height: '100%', background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>{initials}</div>
                 )}
               </div>
             );
           })}
           {row.players.length > 4 && (
             <div
-              className="flex-shrink-0 bg-white/10 flex items-center justify-center text-white/50 text-[9px] font-semibold border-2 border-black/30"
-              style={{ width: '28px', height: '29px', borderRadius: '34%', marginLeft: -8, position: 'relative', zIndex: 0 }}
+              className="flex-shrink-0 flex items-center justify-center"
+              style={{ width: 22, height: 22, borderRadius: '34%', background: 'rgba(255,255,255,0.12)', border: '1.5px solid rgba(255,255,255,0.2)', marginLeft: -6, position: 'relative', zIndex: 0, fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}
             >
               +{row.players.length - 4}
             </div>
