@@ -9848,6 +9848,72 @@ export type Database = {
         }
         Relationships: []
       }
+      tour_season_rankings: {
+        Row: {
+          country: string | null
+          created_at: string | null
+          id: string
+          manual_player_id: string | null
+          player_id: string | null
+          player_name: string
+          points: number | null
+          position: number
+          position_change: string | null
+          scraped_at: string | null
+          season_year: number
+          tour_code: string
+          tournaments_played: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string | null
+          id?: string
+          manual_player_id?: string | null
+          player_id?: string | null
+          player_name: string
+          points?: number | null
+          position: number
+          position_change?: string | null
+          scraped_at?: string | null
+          season_year: number
+          tour_code: string
+          tournaments_played?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          country?: string | null
+          created_at?: string | null
+          id?: string
+          manual_player_id?: string | null
+          player_id?: string | null
+          player_name?: string
+          points?: number | null
+          position?: number
+          position_change?: string | null
+          scraped_at?: string | null
+          season_year?: number
+          tour_code?: string
+          tournaments_played?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_season_rankings_manual_player_id_fkey"
+            columns: ["manual_player_id"]
+            isOneToOne: false
+            referencedRelation: "sr_players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_season_rankings_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "sr_players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tourhub_event_enrichment: {
         Row: {
           created_at: string

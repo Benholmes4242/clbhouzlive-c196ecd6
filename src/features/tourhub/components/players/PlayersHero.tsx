@@ -16,8 +16,8 @@ import type { PlayerTourCode } from './PlayersTourFilter';
 interface PlayersHeroProps {
   players: ElitePlayer[];
   activeTour: PlayerTourCode;
-  /** Stats map: playerId → { earnings, wins, tourRank } */
-  statsMap?: Map<string, { earnings: number | null; wins: number | null; tourRank: number | null }>;
+  /** Stats map: playerId → { earnings, wins, tourRank, points, tournamentsPlayed } */
+  statsMap?: Map<string, { earnings: number | null; wins: number | null; tourRank: number | null; points?: number | null; tournamentsPlayed?: number | null }>;
 }
 
 function formatEarningsCompact(amount: number | null | undefined): string | null {
@@ -106,19 +106,31 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
   const flag = countryCodeToFlag(champion.countryCode);
   const country = titleCaseCountry(champion.country);
 
-  // Build meta line: rank · earnings · wins
+  // Build meta line: rank · earnings/points · wins/events
   const champStats = statsMap?.get(champion.playerId);
   const champTourRank = champStats?.tourRank;
+  const isEuro = activeTour === 'EURO';
   const metaParts: string[] = [];
-  if (activeTour === 'all' || !champTourRank) {
-    metaParts.push(`#${champion.worldRank} OWGR`);
-  } else {
+  
+  if (isEuro && champTourRank) {
     metaParts.push(`#${champTourRank}`);
-  }
-  const earningsStr = formatEarningsCompact(champStats?.earnings);
-  if (earningsStr) metaParts.push(earningsStr);
-  if (champStats?.wins && champStats.wins > 0) {
-    metaParts.push(`${champStats.wins} ${champStats.wins === 1 ? 'win' : 'wins'}`);
+    if (champStats?.points != null && champStats.points > 0) {
+      metaParts.push(`${champStats.points.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} pts`);
+    }
+    if (champStats?.tournamentsPlayed != null && champStats.tournamentsPlayed > 0) {
+      metaParts.push(`${champStats.tournamentsPlayed} ${champStats.tournamentsPlayed === 1 ? 'event' : 'events'}`);
+    }
+  } else {
+    if (activeTour === 'all' || !champTourRank) {
+      metaParts.push(`#${champion.worldRank} OWGR`);
+    } else {
+      metaParts.push(`#${champTourRank}`);
+    }
+    const earningsStr = formatEarningsCompact(champStats?.earnings);
+    if (earningsStr) metaParts.push(earningsStr);
+    if (champStats?.wins && champStats.wins > 0) {
+      metaParts.push(`${champStats.wins} ${champStats.wins === 1 ? 'win' : 'wins'}`);
+    }
   }
 
   return (
