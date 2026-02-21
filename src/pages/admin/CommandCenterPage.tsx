@@ -6,8 +6,7 @@ import {
   PlatformHealthSection, 
   ActionQueuesSection, 
   TrendsSection,
-  RecentActivitySection,
-  TourRankingsHealthSection
+  RecentActivitySection 
 } from '@/components/admin/command-center';
 import { QuickActionsGrid } from '@/components/admin/overview/QuickActionsGrid';
 import { track } from '@/lib/telemetry';
@@ -63,9 +62,6 @@ export function CommandCenterPage() {
           isLoading={platformHealth.isLoading}
           systemStatusLoading={systemStatus.isLoading}
         />
-
-        {/* Tour Rankings Health */}
-        <TourRankingsHealthSection />
 
         {/* Action Queues */}
         <ActionQueuesSection

@@ -9,4 +9,3 @@ export { PlatformHealthSection } from './sections/PlatformHealthSection';
 export { ActionQueuesSection } from './sections/ActionQueuesSection';
 export { TrendsSection } from './sections/TrendsSection';
 export { RecentActivitySection } from './sections/RecentActivitySection';
-export { TourRankingsHealthSection } from './sections/TourRankingsHealthSection';
