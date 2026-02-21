@@ -185,7 +185,11 @@ export function PlayersTab() {
         .sort((a, b) => {
           const aRank = statsMap.get(a.playerId)?.tourRank ?? a.worldRank ?? Infinity;
           const bRank = statsMap.get(b.playerId)?.tourRank ?? b.worldRank ?? Infinity;
-          return aRank - bRank;
+          if (aRank !== bRank) return aRank - bRank;
+          const aEarnings = statsMap.get(a.playerId)?.earnings ?? 0;
+          const bEarnings = statsMap.get(b.playerId)?.earnings ?? 0;
+          if (bEarnings !== aEarnings) return bEarnings - aEarnings;
+          return a.playerName.localeCompare(b.playerName);
         })
         .slice(0, 5);
     }
@@ -390,7 +394,7 @@ export function PlayersTab() {
       <div className="px-4">
         {/* Sort row — 24px from tour dropdown */}
         <div className="flex items-center justify-end" style={{ marginTop: '24px' }}>
-          <PlayerSortControl value={sort} onChange={(v) => { setSort(v); setVisibleCount(PAGE_SIZE); }} />
+          <PlayerSortControl value={sort} onChange={(v) => { setSort(v); setVisibleCount(PAGE_SIZE); }} activeTour={activeTour} />
         </div>
 
         {/* Player cards — 12px from sort */}
@@ -430,6 +434,7 @@ export function PlayersTab() {
                       showTourBadge={activeTour === 'all'}
                       index={index}
                       activeSort={sort}
+                      activeTour={activeTour}
                       onNavigate={() => sessionStorage.setItem('players-scroll', String(window.scrollY))}
                     />
                   );

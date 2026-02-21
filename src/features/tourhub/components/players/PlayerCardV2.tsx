@@ -29,6 +29,7 @@ interface PlayerCardV2Props {
   showTourBadge?: boolean;
   index?: number;
   activeSort?: PlayerSortType;
+  activeTour?: string;
   onNavigate?: () => void;
 }
 
@@ -48,6 +49,7 @@ export function PlayerCardV2({
   showTourBadge = true,
   index = 0,
   activeSort = 'world-rank-desc',
+  activeTour = 'all',
   onNavigate,
 }: PlayerCardV2Props) {
   const filteredBatchUrl = batchHeadshotUrl && !batchHeadshotUrl.includes('ui-avatars.com') ? batchHeadshotUrl : null;
@@ -65,7 +67,9 @@ export function PlayerCardV2({
   const staggerDelay = Math.min(index, 20) * 0.015;
 
   // Build meta parts
-  const rankPart = worldRank != null && worldRank > 0 ? `#${worldRank} OWGR` : null;
+  const rankPart = worldRank != null && worldRank > 0
+    ? (activeTour === 'all' ? `#${worldRank} OWGR` : `#${worldRank}`)
+    : null;
   const earningsPart = earnings != null && earnings > 0 ? formatEarnings(earnings) : null;
   const winCount = wins ?? 0;
   const winsPart = winCount > 0 ? `${winCount} ${winCount === 1 ? 'win' : 'wins'}` : null;
