@@ -248,12 +248,17 @@ export function PlayersTab() {
 
       switch (sort) {
         case 'world-rank-desc':
-          return aRank - bRank;
+          if (aRank === Infinity && bRank === Infinity) return a.full_name.localeCompare(b.full_name);
+          if (aRank === Infinity) return 1;
+          if (bRank === Infinity) return -1;
+          if (aRank !== bRank) return aRank - bRank;
+          return a.full_name.localeCompare(b.full_name);
         case 'world-rank-asc':
           if (aRank === Infinity && bRank === Infinity) return a.full_name.localeCompare(b.full_name);
           if (aRank === Infinity) return 1;
           if (bRank === Infinity) return -1;
-          return bRank - aRank;
+          if (aRank !== bRank) return bRank - aRank;
+          return a.full_name.localeCompare(b.full_name);
         case 'alpha-az':
           return a.full_name.localeCompare(b.full_name);
         case 'alpha-za':

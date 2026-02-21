@@ -53,8 +53,16 @@ export function useElitePlayers(limit: number = 50) {
         return [];
       }
       
+      // Deduplicate by player_id — keep first occurrence (lowest rank due to ORDER BY rank ASC)
+      const seen = new Set<string>();
+      const deduplicated = rankings.filter(row => {
+        if (seen.has(row.player_id)) return false;
+        seen.add(row.player_id);
+        return true;
+      });
+      
       // Get player IDs
-      const playerIds = rankings.map(r => r.player_id);
+      const playerIds = deduplicated.map(r => r.player_id);
       
       // Fetch player details
       const { data: players, error: playersError } = await supabase
@@ -70,7 +78,7 @@ export function useElitePlayers(limit: number = 50) {
       const playerMap = new Map(players?.map(p => [p.id, p]) || []);
       
       // Map rankings to elite players
-      const elitePlayers: ElitePlayer[] = rankings.map(ranking => {
+      const elitePlayers: ElitePlayer[] = deduplicated.map(ranking => {
         const player = playerMap.get(ranking.player_id);
         const rawData = ranking.raw_data as any;
         
