@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Check, Plus, User, Bell, Upload, Settings, Building2, Shield, LogOut, ChevronRight, Sparkles, MessageCircle } from 'lucide-react';
+import { Check, Plus, User, Bell, Upload, Settings, Building2, Shield, LogOut, ChevronRight, Sparkles, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
@@ -358,17 +358,6 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
             </div>
           </div>
           
-          {/* Close button - glass circle with tap feedback */}
-          <button
-            onClick={handleClose}
-            className="w-11 h-11 rounded-full flex items-center justify-center transition-all flex-shrink-0 active:scale-[0.95]"
-            style={{
-              background: colors.closeBg,
-              border: `1px solid ${colors.cardBorder}`,
-            }}
-          >
-            <X className="w-[18px] h-[18px]" style={{ color: colors.closeIcon }} />
-          </button>
         </div>
 
         {/* Scrollable Content */}
