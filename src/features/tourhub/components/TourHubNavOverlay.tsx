@@ -8,7 +8,6 @@ import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  X, 
   ChevronRight, 
   LayoutGrid, 
   Calendar, 
@@ -365,32 +364,8 @@ export function TourHubNavOverlay({
               />
             </div>
             
-            {/* Header with glass close button */}
-            <div className="flex items-center justify-between px-5 py-4" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}>
-              <motion.button
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.05, duration: 0.2 }}
-                whileTap={{ scale: 0.93 }}
-                onClick={() => {
-                  haptic('light');
-                  onClose();
-                }}
-                className="w-11 h-11 flex items-center justify-center transition-all outline-none focus:outline-none focus-visible:ring-0"
-                style={{ 
-                  borderRadius: '34%',
-                  background: 'hsl(var(--card) / 0.7)',
-                  backdropFilter: 'blur(12px)',
-                  WebkitBackdropFilter: 'blur(12px)',
-                  border: '1px solid hsl(var(--border) / 0.15)',
-                }}
-                aria-label="Close menu"
-              >
-                <X className="w-5 h-5 text-muted-foreground" />
-              </motion.button>
-              
-              <div className="w-11" />
-            </div>
+            {/* Header spacer for safe area */}
+            <div style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }} />
             
             {/* World Rankings Strip */}
             {displayPlayers.length > 0 && (
