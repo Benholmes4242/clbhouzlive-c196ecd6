@@ -20,6 +20,8 @@ export const useNavigationHandlers = () => {
       setActiveTab(currentTab.id);
     } else if (location.pathname === '/' || location.pathname === '/clubhouse') {
       setActiveTab('clubhouse');
+    } else if (location.pathname.startsWith('/tourhub')) {
+      setActiveTab('tourhub');
     } else if (location.pathname.startsWith('/hub')) {
       // Keep hub icon active for all /hub/* routes
       setActiveTab('hub');
@@ -54,7 +56,12 @@ export const useNavigationHandlers = () => {
           window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
         }, 50);
       } else {
-        navigate(tab.path, { replace: true });
+        // Tours tab: if already on a sub-route, navigate back to overview
+        if (tab.id === 'tourhub' && location.pathname.startsWith('/tourhub') && location.pathname !== '/tourhub') {
+          navigate('/tourhub', { replace: true });
+        } else {
+          navigate(tab.path, { replace: true });
+        }
         // Only scroll to top when navigating to different pages, not when staying on profile or hub
         setTimeout(() => {
           window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
