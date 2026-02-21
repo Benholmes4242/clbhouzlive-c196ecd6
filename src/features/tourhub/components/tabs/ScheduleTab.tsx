@@ -574,7 +574,7 @@ export function ScheduleTab() {
         <AnimatePresence mode="wait">
           {monthGroups.length > 0 ? (
             <motion.div 
-              className="mt-6"
+              className="mt-4"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
