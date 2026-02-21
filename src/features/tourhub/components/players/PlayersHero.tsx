@@ -149,7 +149,7 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
 
               {/* Strong bottom gradient for text legibility */}
               <div className="absolute inset-0" style={{
-                background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%)',
+                background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.2) 35%, transparent 70%)',
               }} />
 
               <div className="absolute bottom-0 left-0 right-0 p-5 pb-6 space-y-1.5">
