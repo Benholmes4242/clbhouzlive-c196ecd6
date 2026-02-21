@@ -123,11 +123,9 @@ export function PlayersTab() {
   const { data: season } = useTourSeason();
   const { data: playerStats } = useTourPlayerStatistics(season?.id);
 
-  // Euro Race to Dubai rankings
-  const { data: euroRankings } = useTourSeasonRankings(
-    activeTour === 'EURO' ? 'euro' : '',
-    2026
-  );
+  // Tour season rankings (Race to Dubai / Race to CME Globe)
+  const tourRankingsCode = activeTour === 'EURO' ? 'euro' : (activeTour === 'LPGA' ? 'lpga' : '');
+  const { data: tourRankings } = useTourSeasonRankings(tourRankingsCode, 2026);
 
   // Reset pagination on search/sort change
   useEffect(() => {
@@ -165,9 +163,9 @@ export function PlayersTab() {
         });
       });
     }
-    // Merge euro Race to Dubai rankings
-    if (activeTour === 'EURO' && euroRankings) {
-      euroRankings.forEach(r => {
+    // Merge tour season rankings (Race to Dubai / Race to CME Globe)
+    if ((activeTour === 'EURO' || activeTour === 'LPGA') && tourRankings) {
+      tourRankings.forEach(r => {
         const playerId = r.player_id || r.manual_player_id;
         if (playerId) {
           const existing = map.get(playerId);
@@ -182,7 +180,7 @@ export function PlayersTab() {
       });
     }
     return map;
-  }, [playerStats, activeTour, euroRankings]);
+  }, [playerStats, activeTour, tourRankings]);
 
   // Tour-level filtering
   const tourFilteredPlayers = useMemo(() => {
@@ -229,7 +227,8 @@ export function PlayersTab() {
             const bRank = bStats?.tourRank ?? b.worldRank ?? Infinity;
             return aRank - bRank;
           }
-          case 'race-to-dubai': {
+          case 'race-to-dubai':
+          case 'race-to-cme': {
             const aRank = aStats?.tourRank ?? Infinity;
             const bRank = bStats?.tourRank ?? Infinity;
             if (aRank !== bRank) return aRank - bRank;
@@ -343,8 +342,9 @@ export function PlayersTab() {
           const bEarn = statsMap.get(b.id)?.earnings ?? 0;
           return bEarn - aEarn || aRank - bRank;
         }
-        case 'race-to-dubai': {
-          // Sort by R2D position (tourRank), unranked to bottom
+        case 'race-to-dubai':
+        case 'race-to-cme': {
+          // Sort by tour ranking position, unranked to bottom
           if (aRank === Infinity && bRank === Infinity) return a.full_name.localeCompare(b.full_name);
           if (aRank === Infinity) return 1;
           if (bRank === Infinity) return -1;

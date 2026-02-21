@@ -19,7 +19,8 @@ export type PlayerSortType =
   | 'alpha-za'
   | 'most-wins'
   | 'highest-earnings'
-  | 'race-to-dubai';
+  | 'race-to-dubai'
+  | 'race-to-cme';
 
 interface PlayerSortControlProps {
   value: PlayerSortType;
@@ -32,6 +33,7 @@ export function getDefaultSortForTour(tour: string): PlayerSortType {
   switch (tour) {
     case 'all': return 'world-rank-desc';
     case 'EURO': return 'race-to-dubai';
+    case 'LPGA': return 'race-to-cme';
     default: return 'highest-earnings';
   }
 }
@@ -57,10 +59,17 @@ const EURO_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string }
   { value: 'alpha-za', label: 'Alphabetical Z-A', shortLabel: 'Z-A' },
 ];
 
+const LPGA_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string }[] = [
+  { value: 'race-to-cme', label: 'Race to CME Globe', shortLabel: 'CME Globe' },
+  { value: 'alpha-az', label: 'Alphabetical A-Z', shortLabel: 'A-Z' },
+  { value: 'alpha-za', label: 'Alphabetical Z-A', shortLabel: 'Z-A' },
+];
+
 export function PlayerSortControl({ value, onChange, activeTour = 'all' }: PlayerSortControlProps) {
   const isTourSpecific = activeTour !== 'all';
   const isEuro = activeTour === 'EURO';
-  const SORT_OPTIONS = isEuro ? EURO_OPTIONS : (isTourSpecific ? TOUR_SPECIFIC_OPTIONS : ALL_TOURS_OPTIONS);
+  const isLPGA = activeTour === 'LPGA';
+  const SORT_OPTIONS = isLPGA ? LPGA_OPTIONS : (isEuro ? EURO_OPTIONS : (isTourSpecific ? TOUR_SPECIFIC_OPTIONS : ALL_TOURS_OPTIONS));
   const activeOption = SORT_OPTIONS.find(o => o.value === value) || SORT_OPTIONS[0];
 
   return (
