@@ -156,68 +156,56 @@ async function scrapeLPGA(browser, supabase) {
   try {
     await page.goto(LPGA_URL, { waitUntil: 'networkidle2', timeout: 30000 });
 
-    // Wait for rankings content to load
-    await page.waitForSelector('[class*="ranking"], [class*="standings"], table, [class*="player"]', { timeout: 15000 });
+    // Wait for player links to appear (JS-rendered table)
+    await page.waitForFunction(() => {
+      return document.querySelectorAll('a[href*="/athletes/"]').length > 5;
+    }, { timeout: 20000 });
     await new Promise(r => setTimeout(r, 3000));
 
     const players = await page.evaluate(() => {
       const data = [];
+      const seen = new Set();
 
-      // Try table rows first
-      const rows = document.querySelectorAll('[class*="ranking-row"], [class*="standings-row"], tr, [class*="player-row"]');
+      // The rankings page renders rows with: rank, photo, name (as link), country, fav star, CME points, total points, events, wins, top10, points rank
+      const rows = document.querySelectorAll('tr, [class*="row"], [class*="item"]');
+
       rows.forEach(row => {
-        const text = row.textContent.trim();
-        if (!text || (text.includes('Rank') && text.includes('Player'))) return;
+        const link = row.querySelector('a[href*="/athletes/"]');
+        if (!link) return;
 
-        const cells = row.querySelectorAll('td, [class*="cell"], [class*="rank"], [class*="name"], [class*="points"]');
-        if (cells.length < 3) return;
+        const name = link.textContent.trim().replace(/\s+/g, ' ');
+        if (!name || name.length < 3 || seen.has(name)) return;
 
-        const cellTexts = Array.from(cells).map(c => c.textContent.trim());
-        let rank = null, name = null, country = null, points = null;
+        const cells = row.querySelectorAll('td, [class*="cell"], [class*="col"], span, div');
+        const values = Array.from(cells).map(c => c.textContent.trim()).filter(Boolean);
 
-        for (const t of cellTexts) {
-          const num = parseInt(t);
-          if (!rank && !isNaN(num) && num > 0 && num < 500) { rank = num; continue; }
-          if (!name && t.length > 3 && isNaN(parseInt(t)) && !t.match(/^[A-Z]{2,3}$/)) { name = t; continue; }
-          if (!country && t.match(/^[A-Z]{2,3}$/)) { country = t; continue; }
-          const pt = parseFloat(t.replace(/,/g, ''));
-          if (!points && !isNaN(pt) && pt > 0) { points = pt; continue; }
+        // Find rank: first small number (1-200)
+        let rank = null;
+        for (const v of values) {
+          const n = parseInt(v);
+          if (!isNaN(n) && n > 0 && n < 300 && v === String(n)) { rank = n; break; }
         }
 
-        if (rank && name && points) {
-          data.push({ position: rank, name, country: country || '', points });
+        // Find points: number with exactly 3 decimal places (CME format: 500.000, 67.833)
+        let points = null;
+        for (const v of values) {
+          const match = v.match(/^([\d,]+\.\d{3})$/);
+          if (match) { points = parseFloat(match[1].replace(/,/g, '')); break; }
+        }
+
+        // Find country: 3-letter uppercase code
+        let country = '';
+        for (const v of values) {
+          if (/^[A-Z]{3}$/.test(v)) { country = v; break; }
+        }
+
+        if (rank && name && points !== null) {
+          seen.add(name);
+          data.push({ position: rank, name, country, points });
         }
       });
 
-      // Fallback: overview-style cards
-      if (data.length === 0) {
-        const entries = document.querySelectorAll('a[href*="/athletes/"]');
-        let currentRank = 0;
-        entries.forEach(entry => {
-          const parent = entry.closest('[class*="ranking"], [class*="row"], li, div');
-          if (!parent) return;
-          const text = parent.textContent;
-          const rankMatch = text.match(/^(\d+)/);
-          const pointsMatch = text.match(/([\d,]+\.\d{3})/);
-          const nameEl = entry.querySelector('h2, h3, [class*="name"], strong') || entry;
-          const name = nameEl.textContent.trim();
-          const countryMatch = text.match(/([A-Z]{3})/);
-
-          if (rankMatch && name && name.length > 2 && pointsMatch) {
-            const rank = parseInt(rankMatch[1]);
-            if (rank > currentRank || rank === currentRank) {
-              currentRank = rank;
-              data.push({
-                position: rank,
-                name: name.replace(/\s+/g, ' ').trim(),
-                country: countryMatch ? countryMatch[1] : '',
-                points: parseFloat(pointsMatch[1].replace(/,/g, ''))
-              });
-            }
-          }
-        });
-      }
-
+      data.sort((a, b) => a.position - b.position || b.points - a.points);
       return data;
     });
 
