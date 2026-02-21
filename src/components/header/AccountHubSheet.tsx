@@ -239,21 +239,21 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
   // and CSS variables may not match the sheet's visual context
   const colors = {
     bg: useLightTheme 
-      ? 'linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background)) 100%)'
+      ? 'linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 100%)'
       : 'linear-gradient(180deg, rgba(28,28,30,0.96) 0%, rgba(18,18,20,0.98) 100%)',
     shadow: useLightTheme
       ? '0 -8px 40px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.9)'
       : '0 -8px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06)',
-    border: useLightTheme ? 'hsl(var(--border) / 0.3)' : 'rgba(255,255,255,0.06)',
-    text: useLightTheme ? 'hsl(var(--foreground))' : 'rgba(255,255,255,0.92)',
-    textMuted: useLightTheme ? 'hsl(var(--muted-foreground))' : 'rgba(255,255,255,0.64)',
-    sectionLabel: useLightTheme ? 'hsl(var(--muted-foreground) / 0.6)' : 'rgba(255,255,255,0.40)',
-    cardBg: useLightTheme ? 'hsl(var(--card))' : 'rgba(255,255,255,0.05)',
-    cardBorder: useLightTheme ? 'hsl(var(--border) / 0.3)' : 'rgba(255,255,255,0.06)',
+    border: useLightTheme ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255,255,255,0.06)',
+    text: useLightTheme ? '#0F172A' : 'rgba(255,255,255,0.92)',
+    textMuted: useLightTheme ? '#64748B' : 'rgba(255,255,255,0.64)',
+    sectionLabel: useLightTheme ? 'rgba(100, 116, 139, 0.6)' : 'rgba(255,255,255,0.40)',
+    cardBg: useLightTheme ? '#F8FAFC' : 'rgba(255,255,255,0.05)',
+    cardBorder: useLightTheme ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255,255,255,0.06)',
     grabHandle: useLightTheme ? 'rgba(0,0,0,0.20)' : 'rgba(255,255,255,0.30)',
-    closeBg: useLightTheme ? 'hsl(var(--card))' : 'rgba(255,255,255,0.08)',
-    closeHover: useLightTheme ? 'hsl(var(--muted))' : 'rgba(255,255,255,0.12)',
-    closeIcon: useLightTheme ? 'hsl(var(--muted-foreground))' : 'rgba(255,255,255,0.64)',
+    closeBg: useLightTheme ? '#F8FAFC' : 'rgba(255,255,255,0.08)',
+    closeHover: useLightTheme ? 'rgba(241, 245, 249, 0.8)' : 'rgba(255,255,255,0.12)',
+    closeIcon: useLightTheme ? '#64748B' : 'rgba(255,255,255,0.64)',
   };
 
   // Sheet content padding constant for alignment
