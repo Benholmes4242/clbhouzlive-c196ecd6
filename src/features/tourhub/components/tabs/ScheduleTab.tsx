@@ -543,7 +543,7 @@ export function ScheduleTab() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.3 }}
         >
-          <div style={{ marginTop: '10px' }}>
+          <div style={{ marginTop: '4px' }}>
             <ScheduleFilterPills
               activeFilter={filter}
               onFilterChange={setFilter}
