@@ -73,7 +73,8 @@ async function signR2Request(
 async function uploadToR2(imageData: Uint8Array, normalizedName: string, contentType: string): Promise<string> {
   // Determine extension from content type
   let extension = 'png';
-  if (contentType.includes('svg')) extension = 'svg';
+  if (contentType.includes('webp')) extension = 'webp';
+  else if (contentType.includes('svg')) extension = 'svg';
   else if (contentType.includes('jpeg') || contentType.includes('jpg')) extension = 'jpg';
 
   const path = `colleges/${normalizedName}.${extension}`;
