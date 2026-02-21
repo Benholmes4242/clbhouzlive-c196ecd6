@@ -12,9 +12,10 @@ import { cn } from '@/lib/utils';
 import { useTourPlayers, useTourSeason, useTourPlayerStatistics, type TourPlayer } from '../../hooks/useTourHubData';
 import { useElitePlayers, type ElitePlayer } from '../../hooks/useElitePlayers';
 import { usePlayerHeadshots } from '../../hooks/usePlayerMedia';
+import { useTourSeasonRankings } from '../../hooks/useTourSeasonRankings';
 import { PlayersHero } from '../players/PlayersHero';
 import { type PlayerTourCode } from '../players/PlayersTourFilter';
-import { PlayerSortControl, type PlayerSortType } from '../players/PlayerSortControl';
+import { PlayerSortControl, type PlayerSortType, getDefaultSortForTour } from '../players/PlayerSortControl';
 import { PlayersTourFilterSheet } from '../players/PlayersTourFilterSheet';
 import { PlayerCardV2 } from '../players/PlayerCardV2';
 import { PlayersEmptyState } from '../players/PlayersEmptyState';
@@ -44,7 +45,7 @@ export function PlayersTab() {
   const debouncedSearch = useDebouncedValue(search, 200);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const initialTour = searchParams.get('tour') || 'all';
-  const [sort, setSort] = useState<PlayerSortType>(initialTour === 'all' ? 'world-rank-desc' : 'highest-earnings');
+  const [sort, setSort] = useState<PlayerSortType>(getDefaultSortForTour(initialTour));
 
   // Scroll-to-top on mount / restore on back nav
   useEffect(() => {
@@ -69,6 +70,7 @@ export function PlayersTab() {
       queryClient.invalidateQueries({ queryKey: ['tourhub', 'players'] }),
       queryClient.invalidateQueries({ queryKey: ['elite-players'] }),
       queryClient.invalidateQueries({ queryKey: ['tourhub', 'player-statistics'] }),
+      queryClient.invalidateQueries({ queryKey: ['tour-season-rankings'] }),
     ]);
     setIsRefreshing(false);
   }, [queryClient]);
@@ -112,7 +114,7 @@ export function PlayersTab() {
     setSearchParams(params, { replace: true });
     setVisibleCount(PAGE_SIZE);
     // Auto-switch sort default per tour context
-    setSort(tour === 'all' ? 'world-rank-desc' : 'highest-earnings');
+    setSort(getDefaultSortForTour(tour));
   }, [searchParams, setSearchParams]);
 
   // Data hooks
@@ -120,6 +122,12 @@ export function PlayersTab() {
   const { data: elitePlayers, isLoading: eliteLoading } = useElitePlayers(200);
   const { data: season } = useTourSeason();
   const { data: playerStats } = useTourPlayerStatistics(season?.id);
+
+  // Euro Race to Dubai rankings
+  const { data: euroRankings } = useTourSeasonRankings(
+    activeTour === 'EURO' ? 'euro' : '',
+    2026
+  );
 
   // Reset pagination on search/sort change
   useEffect(() => {
@@ -137,20 +145,44 @@ export function PlayersTab() {
     return map;
   }, [elitePlayers]);
 
-  // Build stats map (earnings, wins, tour rank) from player statistics
+  // Build stats map (earnings, wins, tour rank, points, tournamentsPlayed) from player statistics + euro rankings
   const statsMap = useMemo(() => {
-    const map = new Map<string, { earnings: number | null; wins: number | null; tourRank: number | null }>();
+    const map = new Map<string, { 
+      earnings: number | null; 
+      wins: number | null; 
+      tourRank: number | null; 
+      points: number | null;
+      tournamentsPlayed: number | null;
+    }>();
     if (playerStats) {
       playerStats.forEach(ps => {
         map.set(ps.player_id, { 
           earnings: ps.earnings, 
           wins: ps.wins,
           tourRank: ps.earnings_rank ?? ps.fedex_rank ?? null,
+          points: null,
+          tournamentsPlayed: null,
         });
       });
     }
+    // Merge euro Race to Dubai rankings
+    if (activeTour === 'EURO' && euroRankings) {
+      euroRankings.forEach(r => {
+        const playerId = r.player_id || r.manual_player_id;
+        if (playerId) {
+          const existing = map.get(playerId);
+          map.set(playerId, {
+            earnings: existing?.earnings ?? null,
+            wins: existing?.wins ?? null,
+            tourRank: r.position,
+            points: r.points,
+            tournamentsPlayed: r.tournaments_played,
+          });
+        }
+      });
+    }
     return map;
-  }, [playerStats]);
+  }, [playerStats, activeTour, euroRankings]);
 
   // Tour-level filtering
   const tourFilteredPlayers = useMemo(() => {
@@ -196,6 +228,12 @@ export function PlayersTab() {
             const aRank = aStats?.tourRank ?? a.worldRank ?? Infinity;
             const bRank = bStats?.tourRank ?? b.worldRank ?? Infinity;
             return aRank - bRank;
+          }
+          case 'race-to-dubai': {
+            const aRank = aStats?.tourRank ?? Infinity;
+            const bRank = bStats?.tourRank ?? Infinity;
+            if (aRank !== bRank) return aRank - bRank;
+            return (a.worldRank ?? Infinity) - (b.worldRank ?? Infinity);
           }
           default: // 'world-rank-desc'
             if (activeTour === 'all') {
@@ -305,13 +343,21 @@ export function PlayersTab() {
           const bEarn = statsMap.get(b.id)?.earnings ?? 0;
           return bEarn - aEarn || aRank - bRank;
         }
+        case 'race-to-dubai': {
+          // Sort by R2D position (tourRank), unranked to bottom
+          if (aRank === Infinity && bRank === Infinity) return a.full_name.localeCompare(b.full_name);
+          if (aRank === Infinity) return 1;
+          if (bRank === Infinity) return -1;
+          if (aRank !== bRank) return aRank - bRank;
+          return a.full_name.localeCompare(b.full_name);
+        }
         default:
           return aRank - bRank;
       }
     });
 
     return { rows: filtered, totalCount: filtered.length };
-  }, [tourFilteredPlayers, matchesSearch, sort, rankMap]);
+  }, [tourFilteredPlayers, matchesSearch, sort, rankMap, statsMap, activeTour]);
 
   const showHero = !debouncedSearch;
   const isLoading = allLoading && (!allPlayers || (allPlayers as TourPlayer[]).length === 0);
@@ -458,6 +504,8 @@ export function PlayersTab() {
                         : (pStats?.tourRank || rank?.worldRank)}
                       earnings={pStats?.earnings}
                       wins={pStats?.wins}
+                      points={pStats?.points}
+                      tournamentsPlayed={pStats?.tournamentsPlayed}
                       batchHeadshotUrl={headshotMap?.get(player.id)}
                       showTourBadge={activeTour === 'all'}
                       index={index}

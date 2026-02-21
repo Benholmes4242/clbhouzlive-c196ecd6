@@ -168,3 +168,6 @@ verify_jwt = false
 
 [functions.daily-schedule-sync]
 verify_jwt = false
+
+[functions.scrape-tour-rankings]
+verify_jwt = false

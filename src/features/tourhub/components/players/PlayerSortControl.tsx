@@ -18,12 +18,22 @@ export type PlayerSortType =
   | 'alpha-az'
   | 'alpha-za'
   | 'most-wins'
-  | 'highest-earnings';
+  | 'highest-earnings'
+  | 'race-to-dubai';
 
 interface PlayerSortControlProps {
   value: PlayerSortType;
   onChange: (value: PlayerSortType) => void;
   activeTour?: string;
+}
+
+/** Per-tour default sort mapping */
+export function getDefaultSortForTour(tour: string): PlayerSortType {
+  switch (tour) {
+    case 'all': return 'world-rank-desc';
+    case 'EURO': return 'race-to-dubai';
+    default: return 'highest-earnings';
+  }
 }
 
 const ALL_TOURS_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string }[] = [
@@ -40,9 +50,17 @@ const TOUR_SPECIFIC_OPTIONS: { value: PlayerSortType; label: string; shortLabel:
   { value: 'alpha-za', label: 'Alphabetical Z-A', shortLabel: 'Z-A' },
 ];
 
+const EURO_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string }[] = [
+  { value: 'race-to-dubai', label: 'Race to Dubai', shortLabel: 'Race to Dubai' },
+  { value: 'most-wins', label: 'Most Wins', shortLabel: 'Wins' },
+  { value: 'alpha-az', label: 'Alphabetical A-Z', shortLabel: 'A-Z' },
+  { value: 'alpha-za', label: 'Alphabetical Z-A', shortLabel: 'Z-A' },
+];
+
 export function PlayerSortControl({ value, onChange, activeTour = 'all' }: PlayerSortControlProps) {
   const isTourSpecific = activeTour !== 'all';
-  const SORT_OPTIONS = isTourSpecific ? TOUR_SPECIFIC_OPTIONS : ALL_TOURS_OPTIONS;
+  const isEuro = activeTour === 'EURO';
+  const SORT_OPTIONS = isEuro ? EURO_OPTIONS : (isTourSpecific ? TOUR_SPECIFIC_OPTIONS : ALL_TOURS_OPTIONS);
   const activeOption = SORT_OPTIONS.find(o => o.value === value) || SORT_OPTIONS[0];
 
   return (
