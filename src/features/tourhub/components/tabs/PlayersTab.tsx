@@ -168,21 +168,59 @@ export function PlayersTab() {
   }, [allPlayers]);
 
   // Hero players — sort by tour rank when a specific tour is selected
+  // Falls back to building hero data from tourFilteredPlayers when no elite players exist for the tour
   const heroPlayers = useMemo<ElitePlayer[]>(() => {
-    if (!elitePlayers || elitePlayers.length === 0) return [];
-    if (activeTour === 'all') return elitePlayers.slice(0, 5);
-    const tourElite = elitePlayers.filter(ep => {
+    if (activeTour === 'all') {
+      return (elitePlayers || []).slice(0, 5);
+    }
+    
+    // Filter elite players for this tour
+    const tourElite = (elitePlayers || []).filter(ep => {
       const player = allPlayers?.find(p => p.id === ep.playerId);
       return player?.tour_codes?.includes(activeTour);
     });
-    return tourElite
-      .sort((a, b) => {
-        const aRank = statsMap.get(a.playerId)?.tourRank ?? a.worldRank ?? Infinity;
-        const bRank = statsMap.get(b.playerId)?.tourRank ?? b.worldRank ?? Infinity;
-        return aRank - bRank;
-      })
-      .slice(0, 5);
-  }, [elitePlayers, activeTour, allPlayers, statsMap]);
+    
+    if (tourElite.length > 0) {
+      return tourElite
+        .sort((a, b) => {
+          const aRank = statsMap.get(a.playerId)?.tourRank ?? a.worldRank ?? Infinity;
+          const bRank = statsMap.get(b.playerId)?.tourRank ?? b.worldRank ?? Infinity;
+          return aRank - bRank;
+        })
+        .slice(0, 5);
+    }
+    
+    // Fallback: build hero data from tour-filtered players (for LPGA, Korn Ferry, etc.)
+    if (!tourFilteredPlayers || tourFilteredPlayers.length === 0) return [];
+    
+    const sorted = [...tourFilteredPlayers].sort((a, b) => {
+      const aRank = rankMap.get(a.id)?.worldRank ?? Infinity;
+      const bRank = rankMap.get(b.id)?.worldRank ?? Infinity;
+      const aTourRank = statsMap.get(a.id)?.tourRank;
+      const bTourRank = statsMap.get(b.id)?.tourRank;
+      // Prefer tour rank if available, else OWGR, else alphabetical
+      const aSort = aTourRank ?? aRank;
+      const bSort = bTourRank ?? bRank;
+      if (aSort === Infinity && bSort === Infinity) return a.full_name.localeCompare(b.full_name);
+      return aSort - bSort;
+    });
+    
+    return sorted.slice(0, 5).map((p, i) => ({
+      id: p.id,
+      playerId: p.id,
+      playerName: p.full_name,
+      firstName: p.first_name || '',
+      lastName: p.last_name || '',
+      country: p.country,
+      countryCode: p.country_code,
+      photoUrl: p.photo_url,
+      pgaTourId: p.pga_tour_id,
+      worldRank: rankMap.get(p.id)?.worldRank ?? 0,
+      avgPoints: rankMap.get(p.id)?.avgPoints ?? null,
+      priorRank: null,
+      rankChange: null,
+    }));
+  }, [elitePlayers, activeTour, allPlayers, statsMap, tourFilteredPlayers, rankMap]);
 
   // Search filter
   const matchesSearch = useCallback((name: string, country: string | null) => {
