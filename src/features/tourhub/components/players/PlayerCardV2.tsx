@@ -148,17 +148,24 @@ export function PlayerCardV2({
             </div>
           )}
 
-          {/* Meta line — primary metric is bold */}
-          {metaParts.length > 0 && (
+          {/* Rank line */}
+          {rankPart && (
             <p className="text-muted-foreground truncate" style={{ fontSize: '13px', fontWeight: 500, marginTop: '4px', fontVariantNumeric: 'tabular-nums' }}>
-              {metaParts.map((part, i) => (
+              {activeSort === 'world-rank-desc' || activeSort === 'world-rank-asc' ? (
+                <span className="font-semibold text-foreground">{rankPart}</span>
+              ) : rankPart}
+            </p>
+          )}
+
+          {/* Earnings / Wins line */}
+          {(earningsPart || winsPart) && (
+            <p className="text-muted-foreground truncate" style={{ fontSize: '13px', fontWeight: 500, marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
+              {[earningsPart, winsPart].filter(Boolean).map((part, i, arr) => (
                 <span key={i}>
                   {i > 0 && ' · '}
-                  {i === primaryIndex && primaryIndex >= 0 ? (
+                  {((activeSort === 'highest-earnings' && part === earningsPart) || (activeSort === 'most-wins' && part === winsPart)) ? (
                     <span className="font-semibold text-foreground">{part}</span>
-                  ) : (
-                    part
-                  )}
+                  ) : part}
                 </span>
               ))}
             </p>
