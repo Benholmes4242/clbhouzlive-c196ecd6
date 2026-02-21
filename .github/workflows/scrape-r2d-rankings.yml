@@ -23,6 +23,7 @@ jobs:
         run: |
           cd scripts
           npm install puppeteer @supabase/supabase-js
+          npx puppeteer browsers install chrome
 
       - name: Run scraper
         env:
