@@ -10,6 +10,7 @@ import { ArrowLeft, Globe, TrendingUp, AlertCircle, RefreshCw } from 'lucide-rea
 import { useQueryClient } from '@tanstack/react-query';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
+import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import {
   PlayerHero,
   PlayerSeasonStats,
@@ -34,6 +35,9 @@ export function PlayerProfilePage() {
   const location = useLocation();
   const queryClient = useQueryClient();
   const { setVariant, hideHeader, showHeader } = useHeader();
+
+  // Transparent status bar for immersive hero bleed into safe area
+  useMedianStatusBar("dark", "transparent", true, false);
 
   const { data: player, isLoading: playerLoading, refetch } = useTourPlayer(playerId || '');
   const { data: playerStats } = useSinglePlayerStatistics(playerId);
