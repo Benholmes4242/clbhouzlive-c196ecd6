@@ -15882,6 +15882,7 @@ export type Database = {
         Returns: string
       }
       trigger_push_queue_processing: { Args: never; Returns: undefined }
+      unaccent: { Args: { "": string }; Returns: string }
       unblock_user: { Args: { p_blocked_id: string }; Returns: undefined }
       unlockrows: { Args: { "": string }; Returns: number }
       unregister_push_token: { Args: { p_token: string }; Returns: undefined }
