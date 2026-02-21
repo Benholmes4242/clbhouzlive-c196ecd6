@@ -89,7 +89,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
         <PostingAsMenu
           isOpen={menuOpen}
           onClose={() => setMenuOpen(false)}
-          useLightTheme={false}
+          useLightTheme={true}
           anchorRef={pillRef}
         />
       )}
