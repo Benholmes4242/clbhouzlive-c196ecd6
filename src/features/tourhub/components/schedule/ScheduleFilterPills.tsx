@@ -59,19 +59,18 @@ export function ScheduleFilterPills({
                   : "text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted/50 active:bg-muted/70"
               )}
             >
-              {option.label}
-              
               {option.hasLiveIndicator && counts.live > 0 && (
-                <>
-                  <span className="text-[11px]">({counts.live})</span>
-                  <span className="relative flex h-[6px] w-[6px]">
-                    <span
-                      className="absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping"
-                      style={{ background: '#22C55E' }}
-                    />
-                    <span className="relative inline-flex rounded-full h-[6px] w-[6px]" style={{ background: '#22C55E' }} />
-                  </span>
-                </>
+                <span className="relative flex h-[6px] w-[6px]">
+                  <span
+                    className="absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping"
+                    style={{ background: '#22C55E' }}
+                  />
+                  <span className="relative inline-flex rounded-full h-[6px] w-[6px]" style={{ background: '#22C55E' }} />
+                </span>
+              )}
+              {option.label}
+              {option.hasLiveIndicator && counts.live > 0 && (
+                <span className="text-[11px]">({counts.live})</span>
               )}
             </button>
           );

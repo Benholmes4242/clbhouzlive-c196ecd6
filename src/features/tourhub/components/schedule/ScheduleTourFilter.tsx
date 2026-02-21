@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import { ChevronDown, X, Globe } from 'lucide-react';
+import { ChevronDown, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { AnimatedCheck } from '@/components/ui/AnimatedCheck';
@@ -69,7 +69,6 @@ export function ScheduleTourFilter({
         aria-expanded={open}
       >
         <div className="flex items-center gap-2.5">
-          <Globe className="w-5 h-5 text-muted-foreground" />
           <span className="text-sm font-semibold text-foreground">{activeTourOption.label}</span>
           <span className="text-[11px] font-bold uppercase tracking-[0.5px] text-muted-foreground">
             Schedule
