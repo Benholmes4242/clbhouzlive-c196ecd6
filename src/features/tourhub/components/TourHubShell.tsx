@@ -1,6 +1,7 @@
 import { ReactNode, useEffect } from 'react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
+import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 
 interface TourHubShellProps {
   children: ReactNode;
@@ -10,6 +11,11 @@ interface TourHubShellProps {
 
 export function TourHubShell({ children, immersive = false }: TourHubShellProps) {
   const { setVariant } = useHeader();
+
+  // All Tour Hub pages use immersiveStatusBar={true} on PageRoot, which disables
+  // PageRoot's default hook. This call takes ownership so the transparent status bar
+  // is re-applied on iOS resume (prevents grey safe-area flash).
+  useMedianStatusBar("dark", "transparent", true, false);
 
   useEffect(() => {
     setVariant('solid-light');
