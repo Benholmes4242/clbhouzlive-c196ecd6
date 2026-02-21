@@ -73,7 +73,8 @@ export function PlayerCardV2({
   // Build meta parts — euro/lpga show tour-specific ranking data
   const isEuro = activeTour === 'EURO';
   const isLPGA = activeTour === 'LPGA';
-  const isTourRanking = isEuro || isLPGA;
+  const isPGAD = activeTour === 'PGAD';
+  const isTourRanking = isEuro || isLPGA || isPGAD;
   const rankPart = worldRank != null && worldRank > 0
     ? (activeTour === 'all' ? `#${worldRank} OWGR` : `#${worldRank}`)
     : null;

@@ -124,7 +124,7 @@ export function PlayersTab() {
   const { data: playerStats } = useTourPlayerStatistics(season?.id);
 
   // Tour season rankings (Race to Dubai / Race to CME Globe)
-  const tourRankingsCode = activeTour === 'EURO' ? 'euro' : (activeTour === 'LPGA' ? 'lpga' : '');
+  const tourRankingsCode = activeTour === 'EURO' ? 'euro' : (activeTour === 'LPGA' ? 'lpga' : (activeTour === 'PGAD' ? 'pgad' : ''));
   const { data: tourRankings } = useTourSeasonRankings(tourRankingsCode, 2026);
 
   // Reset pagination on search/sort change
@@ -164,7 +164,7 @@ export function PlayersTab() {
       });
     }
     // Merge tour season rankings (Race to Dubai / Race to CME Globe)
-    if ((activeTour === 'EURO' || activeTour === 'LPGA') && tourRankings) {
+    if ((activeTour === 'EURO' || activeTour === 'LPGA' || activeTour === 'PGAD') && tourRankings) {
       tourRankings.forEach(r => {
         const playerId = r.player_id || r.manual_player_id;
         if (playerId) {
@@ -228,7 +228,8 @@ export function PlayersTab() {
             return aRank - bRank;
           }
           case 'race-to-dubai':
-          case 'race-to-cme': {
+          case 'race-to-cme':
+          case 'points-list': {
             const aRank = aStats?.tourRank ?? Infinity;
             const bRank = bStats?.tourRank ?? Infinity;
             if (aRank !== bRank) return aRank - bRank;
@@ -343,7 +344,8 @@ export function PlayersTab() {
           return bEarn - aEarn || aRank - bRank;
         }
         case 'race-to-dubai':
-        case 'race-to-cme': {
+        case 'race-to-cme':
+        case 'points-list': {
           // Sort by tour ranking position, unranked to bottom
           if (aRank === Infinity && bRank === Infinity) return a.full_name.localeCompare(b.full_name);
           if (aRank === Infinity) return 1;
