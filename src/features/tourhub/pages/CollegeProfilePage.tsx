@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
+import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { 
   FranchiseStoryStrip,
   AlumniDepthChart, 
@@ -32,6 +33,9 @@ export function CollegeProfilePage() {
   const location = useLocation();
   const queryClient = useQueryClient();
   const { setVariant, hideHeader, showHeader } = useHeader();
+
+  // Transparent status bar for immersive hero bleed into safe area
+  useMedianStatusBar("dark", "transparent", true, false);
   const { data: stats, isLoading: statsLoading, error: statsError, refetch: refetchStats } = useCollegeStats(collegeSlug);
   const { data: collegeMap, isLoading: mediaLoading } = useCollegeMediaMap();
   const { data: rivalries } = useCollegeRivalries(collegeSlug);

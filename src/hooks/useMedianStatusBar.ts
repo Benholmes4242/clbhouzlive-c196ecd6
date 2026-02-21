@@ -30,7 +30,7 @@ export function useMedianStatusBar(
     if (!enabled) return;
     if (!navigator.userAgent.toLowerCase().includes("median")) return;
 
-    const applyStatusBar = () => {
+    const applyAll = () => {
       try {
         if (window.median?.statusbar?.set) {
           window.median.statusbar.set({
@@ -40,50 +40,44 @@ export function useMedianStatusBar(
             blur,
           });
         }
+        // Force black on all layers for immersive pages
+        if (overlay) {
+          document.documentElement.style.backgroundColor = '#000000';
+          document.body.style.backgroundColor = '#000000';
+          const appShell = document.querySelector('.app-shell') as HTMLElement;
+          if (appShell) appShell.style.backgroundColor = '#000000';
+        }
       } catch {
         // fail silently
       }
     };
 
     // 1) Apply immediately
-    applyStatusBar();
+    applyAll();
 
     // 2) Register Median's ready callback (bridge loads async)
     const prev = window.median_library_ready;
     window.median_library_ready = () => {
       if (typeof prev === "function") prev();
-      applyStatusBar();
+      applyAll();
     };
 
     // 3) Failsafe retries for SPA navigation
-    const t1 = window.setTimeout(applyStatusBar, 250);
-    const t2 = window.setTimeout(applyStatusBar, 750);
-    const t3 = window.setTimeout(applyStatusBar, 1500);
+    const t1 = window.setTimeout(applyAll, 250);
+    const t2 = window.setTimeout(applyAll, 750);
+    const t3 = window.setTimeout(applyAll, 1500);
 
     // FIX 1: Dual-fire on resume — t=0 (instant) + t=100ms + t=300ms retries
     // FIX 5: Listen to both visibilitychange AND focus for broader iOS WebView coverage
     const reapplyOnResume = () => {
       if (!enabled) return;
-
-      // Fire immediately — catches cases where bridge is ready
-      applyStatusBar();
-
-      // Fire again after 100ms — catches cases where bridge needs time to reinitialize
-      window.setTimeout(applyStatusBar, 100);
-
-      // Fire once more after 300ms — belt and suspenders for slow resume
-      window.setTimeout(applyStatusBar, 300);
+      applyAll();
+      window.setTimeout(applyAll, 100);
+      window.setTimeout(applyAll, 300);
     };
 
     document.addEventListener('visibilitychange', reapplyOnResume);
     window.addEventListener('focus', reapplyOnResume);
-
-    // FIX 3: For immersive/overlay pages, set html + body to black to prevent
-    // grey (#F8FAFC) bleeding through the iOS compositing gap on resume
-    if (overlay) {
-      document.documentElement.style.backgroundColor = '#000000';
-      document.body.style.backgroundColor = '#000000';
-    }
 
     // 5) Update theme-color meta tag to match status bar for iOS compositing
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
@@ -105,6 +99,8 @@ export function useMedianStatusBar(
       // Restore default backgrounds
       document.documentElement.style.backgroundColor = '';
       document.body.style.backgroundColor = '';
+      const appShell = document.querySelector('.app-shell') as HTMLElement;
+      if (appShell) appShell.style.backgroundColor = '';
 
       // Restore default theme-color on unmount
       const meta = document.querySelector('meta[name="theme-color"]');
