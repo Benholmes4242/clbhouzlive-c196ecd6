@@ -379,7 +379,7 @@ export function PlayersTab() {
   if (isLoading) {
     return (
       <div className="space-y-4 py-6">
-        <div className="bg-muted/40 animate-pulse" style={{ height: 'clamp(260px, 45vh, 380px)' }} />
+        <div className="bg-muted/40 animate-pulse" style={{ height: '50dvh' }} />
         <div className="px-4 space-y-3">
           <div className="bg-muted/40 h-12 rounded-2xl animate-pulse" />
           <div className="bg-muted/40 h-11 rounded-2xl animate-pulse" />

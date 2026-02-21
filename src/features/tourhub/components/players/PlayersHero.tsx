@@ -161,7 +161,7 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
             to={`/tourhub/player/${champion.playerId}`}
             className="block active:scale-[0.995] transition-transform"
           >
-            <div className="relative w-full overflow-hidden" style={{ height: 'clamp(260px, 45vh, 380px)' }}>
+            <div className="relative w-full overflow-hidden" style={{ height: '50dvh' }}>
               {showPhoto ? (
                 <motion.img
                   src={photoUrl}

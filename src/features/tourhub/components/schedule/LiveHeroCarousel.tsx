@@ -87,7 +87,7 @@ function LiveSlide({ tournament, leader }: { tournament: TourTournament; leader?
   return (
     <div
       className="relative w-full cursor-pointer"
-      style={{ height: 'clamp(260px, 45vh, 380px)' }}
+      style={{ height: '50dvh' }}
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
     >
       {/* Background image */}
