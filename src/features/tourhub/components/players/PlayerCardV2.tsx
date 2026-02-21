@@ -70,30 +70,32 @@ export function PlayerCardV2({
 
   const staggerDelay = Math.min(index, 20) * 0.015;
 
-  // Build meta parts — euro shows R2D-specific data
+  // Build meta parts — euro/lpga show tour-specific ranking data
   const isEuro = activeTour === 'EURO';
+  const isLPGA = activeTour === 'LPGA';
+  const isTourRanking = isEuro || isLPGA;
   const rankPart = worldRank != null && worldRank > 0
     ? (activeTour === 'all' ? `#${worldRank} OWGR` : `#${worldRank}`)
     : null;
   
-  // Points display for R2D
-  const pointsPart = isEuro && points != null && points > 0
+  // Points display for R2D / CME Globe
+  const pointsPart = isTourRanking && points != null && points > 0
     ? `${points.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} pts`
     : null;
   const eventsPart = isEuro && tournamentsPlayed != null && tournamentsPlayed > 0
     ? `${tournamentsPlayed} ${tournamentsPlayed === 1 ? 'event' : 'events'}`
     : null;
 
-  const earningsPart = !isEuro && earnings != null && earnings > 0 ? formatEarnings(earnings) : null;
+  const earningsPart = !isTourRanking && earnings != null && earnings > 0 ? formatEarnings(earnings) : null;
   const winCount = wins ?? 0;
-  const winsPart = !isEuro && winCount > 0 ? `${winCount} ${winCount === 1 ? 'win' : 'wins'}` : null;
+  const winsPart = !isTourRanking && winCount > 0 ? `${winCount} ${winCount === 1 ? 'win' : 'wins'}` : null;
 
   // Reorder stats based on active sort
   let metaParts: string[] = [];
   let primaryIndex = -1;
 
-  if (isEuro) {
-    // Euro: show points and events
+  if (isTourRanking) {
+    // Euro/LPGA: show points and events
     if (pointsPart) metaParts.push(pointsPart);
     if (eventsPart) metaParts.push(eventsPart);
     primaryIndex = 0;
@@ -171,24 +173,37 @@ export function PlayerCardV2({
             </div>
           )}
 
-          {/* Rank line */}
-          {rankPart && (
+          {/* Combined rank + points line for tour rankings (Euro/LPGA) */}
+          {isTourRanking && (rankPart || pointsPart || eventsPart) && (
             <p className="text-muted-foreground truncate" style={{ fontSize: '13px', fontWeight: 500, marginTop: '4px', fontVariantNumeric: 'tabular-nums' }}>
-              {activeSort === 'world-rank-desc' || activeSort === 'world-rank-asc' || activeSort === 'race-to-dubai' ? (
+              {[rankPart, pointsPart, eventsPart].filter(Boolean).map((part, i) => (
+                <span key={i}>
+                  {i > 0 && ' · '}
+                  {(part === rankPart || part === pointsPart) ? (
+                    <span className="font-semibold text-foreground">{part}</span>
+                  ) : part}
+                </span>
+              ))}
+            </p>
+          )}
+
+          {/* Rank line for non-tour rankings */}
+          {!isTourRanking && rankPart && (
+            <p className="text-muted-foreground truncate" style={{ fontSize: '13px', fontWeight: 500, marginTop: '4px', fontVariantNumeric: 'tabular-nums' }}>
+              {activeSort === 'world-rank-desc' || activeSort === 'world-rank-asc' ? (
                 <span className="font-semibold text-foreground">{rankPart}</span>
               ) : rankPart}
             </p>
           )}
 
-          {/* Earnings / Wins line */}
-          {(earningsPart || winsPart || pointsPart || eventsPart) && (
+          {/* Earnings / Wins line for non-tour rankings */}
+          {!isTourRanking && (earningsPart || winsPart) && (
             <p className="text-muted-foreground truncate" style={{ fontSize: '13px', fontWeight: 500, marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
-              {[earningsPart, winsPart, pointsPart, eventsPart].filter(Boolean).map((part, i, arr) => (
+              {[earningsPart, winsPart].filter(Boolean).map((part, i) => (
                 <span key={i}>
                   {i > 0 && ' · '}
                   {((activeSort === 'highest-earnings' && part === earningsPart) || 
-                    (activeSort === 'most-wins' && part === winsPart) ||
-                    (activeSort === 'race-to-dubai' && part === pointsPart)) ? (
+                    (activeSort === 'most-wins' && part === winsPart)) ? (
                     <span className="font-semibold text-foreground">{part}</span>
                   ) : part}
                 </span>
