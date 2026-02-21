@@ -1166,25 +1166,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                 {/* Right chevron lives inside CinematicActionRail as the top slot */}
               </div>
 
-              {/* Overlay layer above video (not clipped) */}
-              {currentMedia.media_type === 'video' && index === currentIndex && (activeVideoEl || videoRefs.current[item.id]) && (
-                <div className="absolute inset-0 z-[95] pointer-events-none">
-                  <div
-                    className="absolute left-0 right-0 pointer-events-auto"
-                    style={{
-                      bottom:
-                        'calc(var(--bottom-nav-height, 64px) + 32px)',
-                    }}
-                  >
-                    <VideoScrubber
-                      videoEl={(activeVideoEl || videoRefs.current[item.id]) as HTMLVideoElement}
-                      mediaId={item.id}
-                      height={3}
-                      className="pointer-events-auto"
-                    />
-                  </div>
-                </div>
-              )}
+              {/* Scrubber removed from per-card — now fixed outside scroll container */}
 
             </div>
           );
@@ -1438,6 +1420,39 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
               </div>
             ) : undefined}
           />
+        );
+      })()}
+
+      {/* Fixed video scrubber — flush above bottom nav */}
+      {activeVideoEl && (() => {
+        const currentPost = filteredPosts[currentIndex];
+        if (!currentPost) return null;
+        const mediaItems = currentPost.media && currentPost.media.length > 0 ? currentPost.media : [{
+          id: `${currentPost.id}-single`,
+          media_type: currentPost.type as 'video' | 'image',
+          media_url: currentPost.src
+        }];
+        const currentMediaIdx = mediaIndices[currentPost.id] || 0;
+        const activeMedia = mediaItems[currentMediaIdx] || mediaItems[0];
+        if ((activeMedia as any)?.media_type !== 'video') return null;
+        return (
+          <div
+            style={{
+              position: 'fixed',
+              left: 0,
+              right: 0,
+              bottom: 'calc(var(--bottom-nav-height, 64px))',
+              zIndex: 99,
+              pointerEvents: 'auto',
+            }}
+          >
+            <VideoScrubber
+              videoEl={activeVideoEl}
+              mediaId={currentPost.id}
+              height={2}
+              className="pointer-events-auto"
+            />
+          </div>
         );
       })()}
 
