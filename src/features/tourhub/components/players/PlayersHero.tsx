@@ -32,11 +32,12 @@ function RunnerCard({ player, index, activeTour, statsMap }: {
   player: ElitePlayer; 
   index: number;
   activeTour: PlayerTourCode;
-  statsMap?: Map<string, { earnings: number | null; wins: number | null; tourRank: number | null }>;
+  statsMap?: Map<string, { earnings: number | null; wins: number | null; tourRank: number | null; points?: number | null; tournamentsPlayed?: number | null }>;
 }) {
   const pgaHeadshot = player.pgaTourId ? getPgaTourHeadshotUrl(player.pgaTourId) : null;
   const photoUrl = pgaHeadshot || resolvePhotoUrl(player.photoUrl, player.pgaTourId);
-  const tourRank = statsMap?.get(player.playerId)?.tourRank;
+  const stats = statsMap?.get(player.playerId);
+  const tourRank = stats?.tourRank;
   const rank = activeTour === 'all' ? player.worldRank : (tourRank || player.worldRank);
   const lastName = player.playerName.split(' ').slice(-1)[0];
   const country = titleCaseCountry(player.country);

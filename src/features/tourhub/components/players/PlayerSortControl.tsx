@@ -44,6 +44,7 @@ export function getDefaultSortForTour(tour: string): PlayerSortType {
 
 const ALL_TOURS_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string }[] = [
   { value: 'world-rank-desc', label: 'Highest World Ranking', shortLabel: 'World Ranking' },
+  { value: 'highest-earnings', label: 'Highest Earnings', shortLabel: 'Earnings' },
   { value: 'most-wins', label: 'Most Wins', shortLabel: 'Wins' },
   { value: 'alpha-az', label: 'Alphabetical A-Z', shortLabel: 'A-Z' },
   { value: 'alpha-za', label: 'Alphabetical Z-A', shortLabel: 'Z-A' },
@@ -65,18 +66,21 @@ const EURO_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string }
 
 const LPGA_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string }[] = [
   { value: 'race-to-cme', label: 'Race to CME Globe', shortLabel: 'CME Globe' },
+  { value: 'most-wins', label: 'Most Wins', shortLabel: 'Wins' },
   { value: 'alpha-az', label: 'Alphabetical A-Z', shortLabel: 'A-Z' },
   { value: 'alpha-za', label: 'Alphabetical Z-A', shortLabel: 'Z-A' },
 ];
 
 const PGAD_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string }[] = [
   { value: 'points-list', label: 'Points List', shortLabel: 'Points List' },
+  { value: 'most-wins', label: 'Most Wins', shortLabel: 'Wins' },
   { value: 'alpha-az', label: 'Alphabetical A-Z', shortLabel: 'A-Z' },
   { value: 'alpha-za', label: 'Alphabetical Z-A', shortLabel: 'Z-A' },
 ];
 
 const LIV_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string }[] = [
   { value: 'liv-standings', label: 'Standings', shortLabel: 'Standings' },
+  { value: 'most-wins', label: 'Most Wins', shortLabel: 'Wins' },
   { value: 'alpha-az', label: 'Alphabetical A-Z', shortLabel: 'A-Z' },
   { value: 'alpha-za', label: 'Alphabetical Z-A', shortLabel: 'Z-A' },
 ];

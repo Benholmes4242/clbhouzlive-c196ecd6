@@ -125,7 +125,11 @@ export function PlayersTab() {
 
   // Tour season rankings (Race to Dubai / Race to CME Globe)
   const tourRankingsCode = activeTour === 'EURO' ? 'euro' : (activeTour === 'LPGA' ? 'lpga' : (activeTour === 'PGAD' ? 'pgad' : (activeTour === 'LIV' ? 'liv' : '')));
-  const { data: tourRankings } = useTourSeasonRankings(tourRankingsCode, 2026);
+  const seasonYear = useMemo(() => {
+    const now = new Date();
+    return now.getMonth() >= 9 ? now.getFullYear() + 1 : now.getFullYear();
+  }, []);
+  const { data: tourRankings } = useTourSeasonRankings(tourRankingsCode, seasonYear);
 
   // Reset pagination on search/sort change
   useEffect(() => {
@@ -506,6 +510,7 @@ export function PlayersTab() {
                       worldRank={activeTour === 'all' 
                         ? rank?.worldRank 
                         : (pStats?.tourRank || rank?.worldRank)}
+                      owgr={rank?.worldRank}
                       earnings={pStats?.earnings}
                       wins={pStats?.wins}
                       points={pStats?.points}
