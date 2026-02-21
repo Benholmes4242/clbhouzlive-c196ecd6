@@ -235,7 +235,7 @@ export function PlayersTab() {
   if (isLoading) {
     return (
       <div className="space-y-4 py-6">
-        <div className="bg-muted/40 animate-pulse" style={{ height: 'clamp(282px, 53vh, 422px)' }} />
+        <div className="bg-muted/40 animate-pulse" style={{ height: 'clamp(260px, 45vh, 380px)' }} />
         <div className="px-4 space-y-3">
           <div className="bg-muted/40 h-12 rounded-2xl animate-pulse" />
           <div className="bg-muted/40 h-11 rounded-2xl animate-pulse" />
@@ -279,8 +279,8 @@ export function PlayersTab() {
         <PlayersHero players={heroPlayers} activeTour={activeTour} statsMap={statsMap} />
       )}
 
-      {/* Search Bar — 32px gap from runner-up overlap */}
-      <div className="px-4" style={{ marginTop: showHero ? '32px' : '16px' }}>
+      {/* Search Bar — 24px gap from runner cards */}
+      <div className="px-4" style={{ marginTop: showHero ? '24px' : '16px' }}>
         <div className="relative">
           <Search 
             className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-muted-foreground w-[18px] h-[18px]"
@@ -315,29 +315,19 @@ export function PlayersTab() {
         </div>
       </div>
 
-      {/* Sticky toolbar — tour selector + safe-area notch fill */}
-      <div
-        className={cn(
-          "sticky top-0 z-20",
-          "bg-background/95 backdrop-blur-sm",
-          "px-4 pb-2",
-        )}
-        style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
-      >
-        {/* Tour dropdown — 20px from search */}
-        <div style={{ marginTop: '20px' }}>
-          <PlayersTourFilterSheet
-            activeTour={activeTour}
-            onTourChange={setActiveTour}
-            tourCounts={tourCounts}
-          />
-        </div>
+      {/* Tour dropdown — 24px from search */}
+      <div className="px-4" style={{ marginTop: '24px' }}>
+        <PlayersTourFilterSheet
+          activeTour={activeTour}
+          onTourChange={setActiveTour}
+          tourCounts={tourCounts}
+        />
       </div>
 
       {/* Content */}
       <div className="px-4">
-        {/* Sort row — 16px from tour dropdown */}
-        <div className="flex items-center justify-end" style={{ marginTop: '16px' }}>
+        {/* Sort row — 24px from tour dropdown */}
+        <div className="flex items-center justify-end" style={{ marginTop: '24px' }}>
           <PlayerSortControl value={sort} onChange={(v) => { setSort(v); setVisibleCount(PAGE_SIZE); }} />
         </div>
 
