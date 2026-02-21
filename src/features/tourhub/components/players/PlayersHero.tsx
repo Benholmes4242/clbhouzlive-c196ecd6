@@ -137,7 +137,7 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
                 <motion.img
                   src={photoUrl}
                   alt={champion.playerName}
-                  className="absolute inset-0 w-full h-full object-cover object-[center_20%]"
+                  className="absolute inset-0 w-full h-full object-cover object-[center_30%]"
                   loading="eager"
                   initial={{ scale: 1.06 }}
                   animate={{ scale: 1 }}
