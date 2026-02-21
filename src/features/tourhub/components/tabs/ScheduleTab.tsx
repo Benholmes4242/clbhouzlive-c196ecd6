@@ -534,16 +534,15 @@ export function ScheduleTab() {
 
         {/* Sticky Filter Toolbar */}
         <motion.div
-          className="sticky top-0 z-20 bg-background/95 backdrop-blur-md px-4 pb-2"
+          className="sticky top-0 z-20 bg-background/95 backdrop-blur-md px-4 pb-2 mt-6"
           style={{
-            paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
             borderBottom: '1px solid hsl(var(--border) / 0.3)',
           }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.3 }}
         >
-          <div style={{ marginTop: '4px' }}>
+          <div style={{ marginTop: '4px', paddingTop: '8px' }}>
             <ScheduleFilterPills
               activeFilter={filter}
               onFilterChange={setFilter}
