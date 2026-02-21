@@ -3,6 +3,7 @@
  * Aligned with Tour Overview audit typography & spacing.
  */
 
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,8 +16,8 @@ import type { PlayerTourCode } from './PlayersTourFilter';
 interface PlayersHeroProps {
   players: ElitePlayer[];
   activeTour: PlayerTourCode;
-  /** Stats map: playerId → { earnings, wins } */
-  statsMap?: Map<string, { earnings: number | null; wins: number | null }>;
+  /** Stats map: playerId → { earnings, wins, tourRank } */
+  statsMap?: Map<string, { earnings: number | null; wins: number | null; tourRank: number | null }>;
 }
 
 function formatEarningsCompact(amount: number | null | undefined): string | null {
@@ -27,15 +28,20 @@ function formatEarningsCompact(amount: number | null | undefined): string | null
 }
 
 /** Runner card — #2 amber, #3 silver */
-function RunnerCard({ player, index }: { player: ElitePlayer; index: number }) {
+function RunnerCard({ player, index, activeTour, statsMap }: { 
+  player: ElitePlayer; 
+  index: number;
+  activeTour: PlayerTourCode;
+  statsMap?: Map<string, { earnings: number | null; wins: number | null; tourRank: number | null }>;
+}) {
   const pgaHeadshot = player.pgaTourId ? getPgaTourHeadshotUrl(player.pgaTourId) : null;
   const photoUrl = pgaHeadshot || resolvePhotoUrl(player.photoUrl, player.pgaTourId);
-  const rank = player.worldRank;
-  const isFirst = index === 0;
+  const tourRank = statsMap?.get(player.playerId)?.tourRank;
+  const rank = activeTour === 'all' ? player.worldRank : (tourRank || player.worldRank);
   const lastName = player.playerName.split(' ').slice(-1)[0];
   const country = titleCaseCountry(player.country);
 
-  const rankBg = isFirst
+  const rankBg = index === 0
     ? '#f59e0b'
     : '#94A3B8';
 
@@ -88,25 +94,32 @@ function RunnerCard({ player, index }: { player: ElitePlayer; index: number }) {
 }
 
 export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps) {
+  const [imageError, setImageError] = useState(false);
+  const navigate = useNavigate();
+  
   if (players.length === 0) return null;
 
   const champion = players[0];
   const runners = players.slice(1, 5);
   const photoUrl = resolvePhotoUrl(champion.photoUrl, champion.pgaTourId, 'hero');
+  const showPhoto = photoUrl && !imageError;
   const flag = countryCodeToFlag(champion.countryCode);
   const country = titleCaseCountry(champion.country);
 
-  // Build meta line: #1 OWGR · $X.XM · X wins
+  // Build meta line: rank · earnings · wins
   const champStats = statsMap?.get(champion.playerId);
+  const champTourRank = champStats?.tourRank;
   const metaParts: string[] = [];
-  metaParts.push(`#${champion.worldRank} OWGR`);
+  if (activeTour === 'all' || !champTourRank) {
+    metaParts.push(`#${champion.worldRank} OWGR`);
+  } else {
+    metaParts.push(`#${champTourRank}`);
+  }
   const earningsStr = formatEarningsCompact(champStats?.earnings);
   if (earningsStr) metaParts.push(earningsStr);
   if (champStats?.wins && champStats.wins > 0) {
     metaParts.push(`${champStats.wins} ${champStats.wins === 1 ? 'win' : 'wins'}`);
   }
-
-  const navigate = useNavigate();
 
   return (
     <div className="relative">
@@ -133,7 +146,7 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
             className="block active:scale-[0.995] transition-transform"
           >
             <div className="relative w-full overflow-hidden" style={{ height: 'clamp(260px, 45vh, 380px)' }}>
-              {photoUrl ? (
+              {showPhoto ? (
                 <motion.img
                   src={photoUrl}
                   alt={champion.playerName}
@@ -142,9 +155,10 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
                   initial={{ scale: 1.06 }}
                   animate={{ scale: 1 }}
                   transition={{ duration: 12, ease: 'linear' }}
+                  onError={() => setImageError(true)}
                 />
               ) : (
-                <div className="absolute inset-0 w-full h-full bg-muted" />
+                <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-muted/80 to-muted" />
               )}
 
               {/* Strong bottom gradient for text legibility */}
@@ -206,7 +220,7 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
             >
               <div className="flex gap-2">
                 {runners.slice(0, 2).map((player, index) => (
-                  <RunnerCard key={player.playerId} player={player} index={index} />
+                  <RunnerCard key={player.playerId} player={player} index={index} activeTour={activeTour} statsMap={statsMap} />
                 ))}
               </div>
             </motion.div>

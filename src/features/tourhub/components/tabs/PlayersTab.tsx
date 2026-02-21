@@ -134,12 +134,16 @@ export function PlayersTab() {
     return map;
   }, [elitePlayers]);
 
-  // Build stats map (earnings, wins) from player statistics
+  // Build stats map (earnings, wins, tour rank) from player statistics
   const statsMap = useMemo(() => {
-    const map = new Map<string, { earnings: number | null; wins: number | null }>();
+    const map = new Map<string, { earnings: number | null; wins: number | null; tourRank: number | null }>();
     if (playerStats) {
       playerStats.forEach(ps => {
-        map.set(ps.player_id, { earnings: ps.earnings, wins: ps.wins });
+        map.set(ps.player_id, { 
+          earnings: ps.earnings, 
+          wins: ps.wins,
+          tourRank: ps.earnings_rank ?? ps.fedex_rank ?? null,
+        });
       });
     }
     return map;
@@ -163,7 +167,7 @@ export function PlayersTab() {
     return counts;
   }, [allPlayers]);
 
-  // Hero players
+  // Hero players — sort by tour rank when a specific tour is selected
   const heroPlayers = useMemo<ElitePlayer[]>(() => {
     if (!elitePlayers || elitePlayers.length === 0) return [];
     if (activeTour === 'all') return elitePlayers.slice(0, 5);
@@ -171,8 +175,14 @@ export function PlayersTab() {
       const player = allPlayers?.find(p => p.id === ep.playerId);
       return player?.tour_codes?.includes(activeTour);
     });
-    return tourElite.slice(0, 5);
-  }, [elitePlayers, activeTour, allPlayers]);
+    return tourElite
+      .sort((a, b) => {
+        const aRank = statsMap.get(a.playerId)?.tourRank ?? a.worldRank ?? Infinity;
+        const bRank = statsMap.get(b.playerId)?.tourRank ?? b.worldRank ?? Infinity;
+        return aRank - bRank;
+      })
+      .slice(0, 5);
+  }, [elitePlayers, activeTour, allPlayers, statsMap]);
 
   // Search filter
   const matchesSearch = useCallback((name: string, country: string | null) => {
@@ -185,10 +195,18 @@ export function PlayersTab() {
   const { rows, totalCount } = useMemo(() => {
     let filtered = tourFilteredPlayers.filter(p => matchesSearch(p.full_name, p.country));
 
-    // Sort
+    // Sort — use tour-specific rank when a specific tour is selected
     filtered = [...filtered].sort((a, b) => {
-      const aRank = rankMap.get(a.id)?.worldRank ?? Infinity;
-      const bRank = rankMap.get(b.id)?.worldRank ?? Infinity;
+      const aWorldRank = rankMap.get(a.id)?.worldRank ?? Infinity;
+      const bWorldRank = rankMap.get(b.id)?.worldRank ?? Infinity;
+      
+      // Primary rank: tour rank for specific tours, OWGR for "all"
+      const aRank = activeTour === 'all' 
+        ? aWorldRank 
+        : (statsMap.get(a.id)?.tourRank ?? aWorldRank);
+      const bRank = activeTour === 'all' 
+        ? bWorldRank 
+        : (statsMap.get(b.id)?.tourRank ?? bWorldRank);
 
       switch (sort) {
         case 'world-rank-desc':
@@ -220,10 +238,20 @@ export function PlayersTab() {
     return { rows: filtered, totalCount: filtered.length };
   }, [tourFilteredPlayers, matchesSearch, sort, rankMap]);
 
-  const displayRows = rows.slice(0, visibleCount);
-  const hasMore = visibleCount < totalCount;
   const showHero = !debouncedSearch;
   const isLoading = allLoading && (!allPlayers || (allPlayers as TourPlayer[]).length === 0);
+
+  // Filter out players already shown in hero + podium cards
+  const heroPlayerIds = useMemo(() => 
+    new Set(heroPlayers.slice(0, 3).map(p => p.playerId)),
+    [heroPlayers]
+  );
+  const filteredRows = useMemo(() => 
+    showHero ? rows.filter(r => !heroPlayerIds.has(r.id)) : rows,
+    [rows, heroPlayerIds, showHero]
+  );
+  const displayRows = filteredRows.slice(0, visibleCount);
+  const hasMore = visibleCount < filteredRows.length;
 
   // Batch headshots
   const visiblePlayerIds = useMemo(() => displayRows.map(r => r.id), [displayRows]);
@@ -359,7 +387,9 @@ export function PlayersTab() {
                         pgaTourId: player.pga_tour_id,
                         tourCodes: player.tour_codes,
                       }}
-                      worldRank={rank?.worldRank}
+                      worldRank={activeTour === 'all' 
+                        ? rank?.worldRank 
+                        : (pStats?.tourRank || rank?.worldRank)}
                       earnings={pStats?.earnings}
                       wins={pStats?.wins}
                       batchHeadshotUrl={headshotMap?.get(player.id)}
@@ -394,7 +424,7 @@ export function PlayersTab() {
                   Show More Players
                 </span>
                 <span style={{ fontSize: '14px', fontWeight: 400, color: 'hsl(var(--foreground) / 0.6)' }}>
-                  ({visibleCount + 1}-{Math.min(visibleCount + PAGE_SIZE, totalCount)} of {totalCount})
+                 ({visibleCount + 1}-{Math.min(visibleCount + PAGE_SIZE, filteredRows.length)} of {filteredRows.length})
                 </span>
               </span>
               <ChevronDown className="w-4 h-4 text-muted-foreground/40" />
@@ -403,9 +433,9 @@ export function PlayersTab() {
         )}
 
         {/* Showing count */}
-        {totalCount > 0 && (
+        {filteredRows.length > 0 && (
           <p className="text-center text-muted-foreground/40 tabular-nums" style={{ fontSize: '12px', fontWeight: 400, marginTop: '8px' }}>
-            Showing {Math.min(visibleCount, totalCount)} of {totalCount}
+            Showing {Math.min(visibleCount, filteredRows.length)} of {filteredRows.length}
           </p>
         )}
       </div>
