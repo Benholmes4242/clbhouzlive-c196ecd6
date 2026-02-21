@@ -284,17 +284,8 @@ export function PlayersTab() {
   const showHero = !debouncedSearch;
   const isLoading = allLoading && (!allPlayers || (allPlayers as TourPlayer[]).length === 0);
 
-  // Filter out players already shown in hero + podium cards
-  const heroPlayerIds = useMemo(() => 
-    new Set(heroPlayers.slice(0, 3).map(p => p.playerId)),
-    [heroPlayers]
-  );
-  const filteredRows = useMemo(() => 
-    showHero ? rows.filter(r => !heroPlayerIds.has(r.id)) : rows,
-    [rows, heroPlayerIds, showHero]
-  );
-  const displayRows = filteredRows.slice(0, visibleCount);
-  const hasMore = visibleCount < filteredRows.length;
+  const displayRows = rows.slice(0, visibleCount);
+  const hasMore = visibleCount < totalCount;
 
   // Batch headshots
   const visiblePlayerIds = useMemo(() => displayRows.map(r => r.id), [displayRows]);
@@ -467,7 +458,7 @@ export function PlayersTab() {
                   Show More Players
                 </span>
                 <span style={{ fontSize: '14px', fontWeight: 400, color: 'hsl(var(--foreground) / 0.6)' }}>
-                 ({visibleCount + 1}-{Math.min(visibleCount + PAGE_SIZE, filteredRows.length)} of {filteredRows.length})
+                 ({visibleCount + 1}-{Math.min(visibleCount + PAGE_SIZE, totalCount)} of {totalCount})
                 </span>
               </span>
               <ChevronDown className="w-4 h-4 text-muted-foreground/40" />
@@ -476,9 +467,9 @@ export function PlayersTab() {
         )}
 
         {/* Showing count */}
-        {filteredRows.length > 0 && (
+        {totalCount > 0 && (
           <p className="text-center text-muted-foreground/40 tabular-nums" style={{ fontSize: '12px', fontWeight: 400, marginTop: '8px' }}>
-            Showing {Math.min(visibleCount, filteredRows.length)} of {filteredRows.length}
+            Showing {Math.min(visibleCount, totalCount)} of {totalCount}
           </p>
         )}
       </div>
