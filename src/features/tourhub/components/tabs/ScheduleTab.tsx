@@ -534,7 +534,7 @@ export function ScheduleTab() {
 
         {/* Sticky Filter Toolbar */}
         <motion.div
-          className="sticky top-0 z-20 bg-background/95 backdrop-blur-md px-4 pb-2 mt-6"
+          className="sticky top-0 z-20 bg-background/95 backdrop-blur-md px-4 mt-6"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.3 }}
