@@ -203,12 +203,12 @@ function PodiumCard({
               textTransform: 'uppercase' as const,
               color: 'rgba(255,255,255,0.5)',
               marginBottom: isFirst ? '6px' : '4px',
-              textAlign: isFirst ? 'center' as const : undefined,
+              textAlign: 'center' as const,
             }}
           >
             {isFirst ? 'Squad Captain' : 'Captain'}
           </p>
-          <div className={isFirst ? "flex flex-col items-center" : "flex items-center"} style={{ gap: '6px' }}>
+          <div className="flex flex-col items-center" style={{ gap: '6px' }}>
             <SquircleAvatar
               size={isFirst ? 28 : 22}
               src={captainPhotoUrl}
@@ -216,7 +216,7 @@ function PodiumCard({
               hideRing
               fallback={captain.fullName.split(' ').map(n => n[0]).join('').slice(0, 2)}
             />
-            <div className={isFirst ? "text-center" : "min-w-0"}>
+            <div className="text-center">
               <p
                 className="m-0 text-white truncate"
                 style={{
