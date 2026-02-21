@@ -43,7 +43,8 @@ export function PlayersTab() {
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebouncedValue(search, 200);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const [sort, setSort] = useState<PlayerSortType>('world-rank-desc');
+  const initialTour = searchParams.get('tour') || 'all';
+  const [sort, setSort] = useState<PlayerSortType>(initialTour === 'all' ? 'world-rank-desc' : 'highest-earnings');
 
   // Scroll-to-top on mount / restore on back nav
   useEffect(() => {
@@ -110,6 +111,8 @@ export function PlayersTab() {
     params.set('tab', 'players');
     setSearchParams(params, { replace: true });
     setVisibleCount(PAGE_SIZE);
+    // Auto-switch sort default per tour context
+    setSort(tour === 'all' ? 'world-rank-desc' : 'highest-earnings');
   }, [searchParams, setSearchParams]);
 
   // Data hooks

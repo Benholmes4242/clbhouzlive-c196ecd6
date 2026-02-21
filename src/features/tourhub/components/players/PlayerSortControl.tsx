@@ -26,22 +26,23 @@ interface PlayerSortControlProps {
   activeTour?: string;
 }
 
-const BASE_SORT_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string; tourLabel?: string; tourShortLabel?: string }[] = [
-  { value: 'world-rank-desc', label: 'Highest World Ranking', shortLabel: 'World Ranking', tourLabel: 'Money List (High)', tourShortLabel: 'Money List' },
-  { value: 'world-rank-asc', label: 'Lowest World Ranking', shortLabel: 'Rank (Low)', tourLabel: 'Money List (Low)', tourShortLabel: 'Rank (Low)' },
+const ALL_TOURS_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string }[] = [
+  { value: 'world-rank-desc', label: 'Highest World Ranking', shortLabel: 'World Ranking' },
   { value: 'alpha-az', label: 'Alphabetical A-Z', shortLabel: 'A-Z' },
   { value: 'alpha-za', label: 'Alphabetical Z-A', shortLabel: 'Z-A' },
   { value: 'most-wins', label: 'Most Wins', shortLabel: 'Wins' },
-  { value: 'highest-earnings', label: 'Highest Earnings', shortLabel: 'Earnings' },
+];
+
+const TOUR_SPECIFIC_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string }[] = [
+  { value: 'highest-earnings', label: 'Money List', shortLabel: 'Money List' },
+  { value: 'alpha-az', label: 'Alphabetical A-Z', shortLabel: 'A-Z' },
+  { value: 'alpha-za', label: 'Alphabetical Z-A', shortLabel: 'Z-A' },
+  { value: 'most-wins', label: 'Most Wins', shortLabel: 'Wins' },
 ];
 
 export function PlayerSortControl({ value, onChange, activeTour = 'all' }: PlayerSortControlProps) {
   const isTourSpecific = activeTour !== 'all';
-  const SORT_OPTIONS = BASE_SORT_OPTIONS.map(o => ({
-    ...o,
-    label: isTourSpecific && o.tourLabel ? o.tourLabel : o.label,
-    shortLabel: isTourSpecific && o.tourShortLabel ? o.tourShortLabel : o.shortLabel,
-  }));
+  const SORT_OPTIONS = isTourSpecific ? TOUR_SPECIFIC_OPTIONS : ALL_TOURS_OPTIONS;
   const activeOption = SORT_OPTIONS.find(o => o.value === value) || SORT_OPTIONS[0];
 
   return (
