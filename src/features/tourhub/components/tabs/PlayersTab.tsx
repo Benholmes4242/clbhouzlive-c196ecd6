@@ -170,11 +170,47 @@ export function PlayersTab() {
     return counts;
   }, [allPlayers]);
 
-  // Hero players — sort by tour rank when a specific tour is selected
-  // Falls back to building hero data from tourFilteredPlayers when no elite players exist for the tour
+  // Hero players — sorted to match the active sort selection
   const heroPlayers = useMemo<ElitePlayer[]>(() => {
+    // Helper: sort candidates by current sort criteria
+    const sortCandidates = (candidates: ElitePlayer[]) => {
+      return [...candidates].sort((a, b) => {
+        const aStats = statsMap.get(a.playerId);
+        const bStats = statsMap.get(b.playerId);
+
+        switch (sort) {
+          case 'most-wins': {
+            const aWins = aStats?.wins ?? 0;
+            const bWins = bStats?.wins ?? 0;
+            if (bWins !== aWins) return bWins - aWins;
+            return (bStats?.earnings ?? 0) - (aStats?.earnings ?? 0);
+          }
+          case 'alpha-az':
+            return a.playerName.localeCompare(b.playerName);
+          case 'alpha-za':
+            return b.playerName.localeCompare(a.playerName);
+          case 'highest-earnings': {
+            const aEarn = aStats?.earnings ?? 0;
+            const bEarn = bStats?.earnings ?? 0;
+            if (bEarn !== aEarn) return bEarn - aEarn;
+            const aRank = aStats?.tourRank ?? a.worldRank ?? Infinity;
+            const bRank = bStats?.tourRank ?? b.worldRank ?? Infinity;
+            return aRank - bRank;
+          }
+          default: // 'world-rank-desc'
+            if (activeTour === 'all') {
+              return (a.worldRank ?? Infinity) - (b.worldRank ?? Infinity);
+            }
+            const aRank = aStats?.tourRank ?? a.worldRank ?? Infinity;
+            const bRank = bStats?.tourRank ?? b.worldRank ?? Infinity;
+            if (aRank !== bRank) return aRank - bRank;
+            return (bStats?.earnings ?? 0) - (aStats?.earnings ?? 0);
+        }
+      });
+    };
+
     if (activeTour === 'all') {
-      return (elitePlayers || []).slice(0, 5);
+      return sortCandidates(elitePlayers || []).slice(0, 5);
     }
     
     // Filter elite players for this tour
@@ -184,17 +220,7 @@ export function PlayersTab() {
     });
     
     if (tourElite.length > 0) {
-      return tourElite
-        .sort((a, b) => {
-          const aRank = statsMap.get(a.playerId)?.tourRank ?? a.worldRank ?? Infinity;
-          const bRank = statsMap.get(b.playerId)?.tourRank ?? b.worldRank ?? Infinity;
-          if (aRank !== bRank) return aRank - bRank;
-          const aEarnings = statsMap.get(a.playerId)?.earnings ?? 0;
-          const bEarnings = statsMap.get(b.playerId)?.earnings ?? 0;
-          if (bEarnings !== aEarnings) return bEarnings - aEarnings;
-          return a.playerName.localeCompare(b.playerName);
-        })
-        .slice(0, 5);
+      return sortCandidates(tourElite).slice(0, 5);
     }
     
     // Fallback: build hero data from tour-filtered players (for LPGA, Korn Ferry, etc.)
@@ -205,14 +231,13 @@ export function PlayersTab() {
       const bRank = rankMap.get(b.id)?.worldRank ?? Infinity;
       const aTourRank = statsMap.get(a.id)?.tourRank;
       const bTourRank = statsMap.get(b.id)?.tourRank;
-      // Prefer tour rank if available, else OWGR, else alphabetical
       const aSort = aTourRank ?? aRank;
       const bSort = bTourRank ?? bRank;
       if (aSort === Infinity && bSort === Infinity) return a.full_name.localeCompare(b.full_name);
       return aSort - bSort;
     });
     
-    return sorted.slice(0, 5).map((p, i) => ({
+    return sorted.slice(0, 5).map((p) => ({
       id: p.id,
       playerId: p.id,
       playerName: p.full_name,
@@ -227,7 +252,7 @@ export function PlayersTab() {
       priorRank: null,
       rankChange: null,
     }));
-  }, [elitePlayers, activeTour, allPlayers, statsMap, tourFilteredPlayers, rankMap]);
+  }, [elitePlayers, activeTour, allPlayers, statsMap, tourFilteredPlayers, rankMap, sort]);
 
   // Search filter
   const matchesSearch = useCallback((name: string, country: string | null) => {

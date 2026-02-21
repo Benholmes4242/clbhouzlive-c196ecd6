@@ -28,16 +28,16 @@ interface PlayerSortControlProps {
 
 const ALL_TOURS_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string }[] = [
   { value: 'world-rank-desc', label: 'Highest World Ranking', shortLabel: 'World Ranking' },
+  { value: 'most-wins', label: 'Most Wins', shortLabel: 'Wins' },
   { value: 'alpha-az', label: 'Alphabetical A-Z', shortLabel: 'A-Z' },
   { value: 'alpha-za', label: 'Alphabetical Z-A', shortLabel: 'Z-A' },
-  { value: 'most-wins', label: 'Most Wins', shortLabel: 'Wins' },
 ];
 
 const TOUR_SPECIFIC_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string }[] = [
   { value: 'highest-earnings', label: 'Money List', shortLabel: 'Money List' },
+  { value: 'most-wins', label: 'Most Wins', shortLabel: 'Wins' },
   { value: 'alpha-az', label: 'Alphabetical A-Z', shortLabel: 'A-Z' },
   { value: 'alpha-za', label: 'Alphabetical Z-A', shortLabel: 'Z-A' },
-  { value: 'most-wins', label: 'Most Wins', shortLabel: 'Wins' },
 ];
 
 export function PlayerSortControl({ value, onChange, activeTour = 'all' }: PlayerSortControlProps) {
