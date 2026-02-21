@@ -137,6 +137,9 @@ async function scrape() {
     // Scrape LPGA Race to CME Globe
     await scrapeLPGA(browser, supabase);
 
+    // Scrape Korn Ferry Tour Points List
+    await scrapeKornFerry(browser, supabase);
+
   } finally {
     await browser.close();
   }
@@ -273,6 +276,175 @@ async function scrapeLPGA(browser, supabase) {
 
   } catch (err) {
     console.error('[LPGA Scraper] Error:', err.message);
+  } finally {
+    await page.close();
+  }
+}
+
+async function scrapeKornFerry(browser, supabase) {
+  const KFT_URL = 'https://www.pgatour.com/korn-ferry-tour/pointslist';
+  const KFT_TOUR_CODE = 'pgad';
+  const now = new Date();
+  const KFT_SEASON_YEAR = now.getMonth() >= 10 ? now.getFullYear() + 1 : now.getFullYear();
+
+  console.log(`[KFT Scraper] Starting for season ${KFT_SEASON_YEAR}...`);
+
+  const page = await browser.newPage();
+  await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36');
+
+  try {
+    await page.goto(KFT_URL, { waitUntil: 'networkidle2', timeout: 45000 });
+
+    // Wait for the standings table to render
+    await page.waitForFunction(() => {
+      const rows = document.querySelectorAll('tr');
+      return rows.length > 10;
+    }, { timeout: 20000 });
+
+    // Click "Official" button if it exists
+    try {
+      const officialBtn = await page.$('button:has-text("Official"), [class*="Official"]');
+      if (officialBtn) {
+        await officialBtn.click();
+        await new Promise(r => setTimeout(r, 2000));
+      }
+    } catch (e) {
+      // Official tab may already be selected or not exist
+    }
+
+    await new Promise(r => setTimeout(r, 3000));
+
+    const players = await page.evaluate(() => {
+      const data = [];
+      const seen = new Set();
+      const rows = document.querySelectorAll('tr');
+
+      rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length < 4) return;
+
+        const cellTexts = Array.from(cells).map(c => c.textContent.trim());
+
+        let name = null;
+        let rank = null;
+        let points = null;
+
+        // First cell or text that looks like a rank
+        for (const t of cellTexts) {
+          const rankMatch = t.match(/^T?(\d+)$/);
+          if (!rank && rankMatch && parseInt(rankMatch[1]) > 0 && parseInt(rankMatch[1]) < 500) {
+            rank = parseInt(rankMatch[1]);
+            break;
+          }
+        }
+
+        // Find name: cell with alphabetic text longer than 3 chars
+        for (const t of cellTexts) {
+          if (!name && t.length > 3 && /^[A-Za-z\s\.\-\']+$/.test(t) && !/^\d/.test(t)) {
+            name = t.trim();
+            break;
+          }
+        }
+
+        // Find points: number with 3 decimal places, search from right
+        for (let i = cellTexts.length - 1; i >= 0; i--) {
+          const match = cellTexts[i].replace(/,/g, '').match(/^(\d+\.\d{3})$/);
+          if (match && !points) {
+            points = parseFloat(match[1]);
+          }
+        }
+
+        // Fallback: any decimal number
+        if (!points) {
+          for (let i = cellTexts.length - 1; i >= 0; i--) {
+            const num = parseFloat(cellTexts[i].replace(/,/g, ''));
+            if (!isNaN(num) && num > 0 && cellTexts[i].includes('.')) {
+              points = num;
+              break;
+            }
+          }
+        }
+
+        if (rank && name && points && !seen.has(name)) {
+          seen.add(name);
+          data.push({ position: rank, name, points });
+        }
+      });
+
+      data.sort((a, b) => a.position - b.position || b.points - a.points);
+      return data;
+    });
+
+    console.log(`[KFT Scraper] Parsed ${players.length} players`);
+
+    if (players.length === 0) {
+      console.log('[KFT Scraper] No players parsed — HTML structure may have changed, skipping');
+      return;
+    }
+
+    const rows = players.map(p => ({
+      player_name: p.name,
+      tour_code: KFT_TOUR_CODE,
+      season_year: KFT_SEASON_YEAR,
+      position: p.position,
+      points: p.points,
+      tournaments_played: null,
+      country: null,
+      scraped_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }));
+
+    let upserted = 0;
+    for (let i = 0; i < rows.length; i += 50) {
+      const batch = rows.slice(i, i + 50);
+      const { error } = await supabase
+        .from('tour_season_rankings')
+        .upsert(batch, { onConflict: 'tour_code,season_year,player_name' });
+      if (error) {
+        console.error('[KFT Scraper] Upsert error:', error.message);
+      } else {
+        upserted += batch.length;
+      }
+    }
+    console.log(`[KFT Scraper] Upserted ${upserted} players`);
+
+    // Match players to sr_players
+    const { data: kftPlayers } = await supabase
+      .from('sr_players')
+      .select('id, full_name, last_name, first_name')
+      .contains('tour_codes', ['PGAD']);
+
+    if (kftPlayers && kftPlayers.length > 0) {
+      let matched = 0;
+      for (const row of rows) {
+        if (!row.player_name) continue;
+        const match = kftPlayers.find(p => {
+          const fullUpper = p.full_name?.toUpperCase();
+          const scraped = row.player_name.toUpperCase();
+          return fullUpper === scraped ||
+                 fullUpper === scraped.replace(/\s+/g, ' ').trim();
+        });
+        const match2 = !match ? kftPlayers.find(p => {
+          const combined = (p.first_name + ' ' + p.last_name).toUpperCase();
+          return combined === row.player_name.toUpperCase();
+        }) : null;
+
+        const finalMatch = match || match2;
+        if (finalMatch) {
+          await supabase
+            .from('tour_season_rankings')
+            .update({ player_id: finalMatch.id })
+            .eq('tour_code', KFT_TOUR_CODE)
+            .eq('season_year', KFT_SEASON_YEAR)
+            .eq('player_name', row.player_name);
+          matched++;
+        }
+      }
+      console.log(`[KFT Scraper] Matched ${matched} of ${rows.length} players`);
+    }
+
+  } catch (err) {
+    console.error('[KFT Scraper] Error:', err.message);
   } finally {
     await page.close();
   }
