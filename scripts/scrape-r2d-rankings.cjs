@@ -140,6 +140,9 @@ async function scrape() {
     // Scrape Korn Ferry Tour Points List
     await scrapeKornFerry(browser, supabase);
 
+    // Scrape LIV Golf Individual Standings
+    await scrapeLIV(browser, supabase);
+
   } finally {
     await browser.close();
   }
@@ -445,6 +448,159 @@ async function scrapeKornFerry(browser, supabase) {
 
   } catch (err) {
     console.error('[KFT Scraper] Error:', err.message);
+  } finally {
+    await page.close();
+  }
+}
+
+async function scrapeLIV(browser, supabase) {
+  const LIV_URL = 'https://www.livgolf.com/standings';
+  const LIV_TOUR_CODE = 'liv';
+  const now = new Date();
+  const LIV_SEASON_YEAR = now.getMonth() >= 10 ? now.getFullYear() + 1 : now.getFullYear();
+
+  console.log(`[LIV Scraper] Starting for season ${LIV_SEASON_YEAR}...`);
+
+  const page = await browser.newPage();
+  await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36');
+
+  try {
+    await page.goto(LIV_URL, { waitUntil: 'networkidle2', timeout: 45000 });
+    await new Promise(r => setTimeout(r, 3000));
+
+    // Click "Players" tab (default might be Teams)
+    try {
+      const playersBtn = await page.evaluateHandle(() => {
+        const buttons = Array.from(document.querySelectorAll('button, [role="tab"], a'));
+        return buttons.find(b => b.textContent.trim() === 'Players');
+      });
+      if (playersBtn) {
+        await playersBtn.click();
+        await new Promise(r => setTimeout(r, 3000));
+      }
+    } catch (e) {
+      console.log('[LIV Scraper] Players tab click attempt:', e.message);
+    }
+
+    // Wait for player data to render
+    await page.waitForFunction(() => {
+      const text = document.body.innerText;
+      return text.includes('LOCK ZONE') || text.includes('Jon Rahm') || text.includes('226');
+    }, { timeout: 15000 });
+
+    await new Promise(r => setTimeout(r, 2000));
+
+    const players = await page.evaluate(() => {
+      const text = document.body.innerText;
+      const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+      const data = [];
+      const seen = new Set();
+
+      for (let i = 0; i < lines.length; i++) {
+        const posMatch = lines[i].match(/^(\d{1,2})$/);
+        if (posMatch && parseInt(posMatch[1]) >= 1 && parseInt(posMatch[1]) <= 60) {
+          const pos = parseInt(posMatch[1]);
+          let firstName = '', lastName = '', points = 0;
+
+          // Look ahead for points (number with 2 decimal places)
+          for (let j = i + 1; j < Math.min(i + 8, lines.length); j++) {
+            const ptMatch = lines[j].match(/^(\d+\.\d{2})$/);
+            if (ptMatch) { points = parseFloat(ptMatch[1]); break; }
+          }
+
+          // Name is next 2 lines after position
+          if (i + 1 < lines.length) firstName = lines[i + 1];
+          if (i + 2 < lines.length) lastName = lines[i + 2];
+
+          if (firstName && lastName && points) {
+            // Skip "C" captain markers
+            const cleanLast = lastName === 'C' ? lines[i + 3] : lastName;
+            const name = firstName + ' ' + cleanLast;
+            if (!seen.has(name) && !name.includes('POS') && !name.includes('Player')) {
+              seen.add(name);
+              data.push({ position: pos, name, points });
+            }
+          }
+        }
+      }
+
+      data.sort((a, b) => a.position - b.position);
+      return data;
+    });
+
+    console.log(`[LIV Scraper] Parsed ${players.length} players`);
+
+    if (players.length === 0) {
+      console.log('[LIV Scraper] No players parsed — skipping');
+      return;
+    }
+
+    const rows = players.map(p => ({
+      player_name: p.name,
+      tour_code: LIV_TOUR_CODE,
+      season_year: LIV_SEASON_YEAR,
+      position: p.position,
+      points: p.points,
+      tournaments_played: null,
+      country: null,
+      scraped_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }));
+
+    let upserted = 0;
+    for (let i = 0; i < rows.length; i += 50) {
+      const batch = rows.slice(i, i + 50);
+      const { error } = await supabase
+        .from('tour_season_rankings')
+        .upsert(batch, { onConflict: 'tour_code,season_year,player_name' });
+      if (error) {
+        console.error('[LIV Scraper] Upsert error:', error.message);
+      } else {
+        upserted += batch.length;
+      }
+    }
+    console.log(`[LIV Scraper] Upserted ${upserted} players`);
+
+    // Match to sr_players
+    const { data: livPlayers } = await supabase
+      .from('sr_players')
+      .select('id, full_name, last_name, first_name')
+      .contains('tour_codes', ['LIV']);
+
+    if (livPlayers && livPlayers.length > 0) {
+      let matched = 0;
+      for (const row of rows) {
+        if (!row.player_name) continue;
+        const scraped = row.player_name.toUpperCase();
+        const match = livPlayers.find(p => {
+          const fullUpper = p.full_name?.toUpperCase();
+          return fullUpper === scraped;
+        });
+        const match2 = !match ? livPlayers.find(p => {
+          const combined = (p.first_name + ' ' + p.last_name).toUpperCase();
+          return combined === scraped;
+        }) : null;
+        const match3 = (!match && !match2) ? livPlayers.find(p => {
+          return p.last_name?.toUpperCase() === scraped.split(' ').pop() &&
+                 p.first_name?.toUpperCase().startsWith(scraped.split(' ')[0][0]);
+        }) : null;
+
+        const finalMatch = match || match2 || match3;
+        if (finalMatch) {
+          await supabase
+            .from('tour_season_rankings')
+            .update({ player_id: finalMatch.id })
+            .eq('tour_code', LIV_TOUR_CODE)
+            .eq('season_year', LIV_SEASON_YEAR)
+            .eq('player_name', row.player_name);
+          matched++;
+        }
+      }
+      console.log(`[LIV Scraper] Matched ${matched} of ${rows.length} players`);
+    }
+
+  } catch (err) {
+    console.error('[LIV Scraper] Error:', err.message);
   } finally {
     await page.close();
   }

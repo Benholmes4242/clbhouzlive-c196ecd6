@@ -34,7 +34,7 @@ export function useTourSeasonRankings(tourCode: string, seasonYear: number) {
       if (error) throw error;
       return (data || []) as unknown as TourSeasonRanking[];
     },
-    enabled: !!tourCode && tourCode !== 'all' && tourCode !== 'pga',
+    enabled: !!tourCode && tourCode !== 'all' && tourCode !== 'pga' && tourCode !== '',
     staleTime: 1000 * 60 * 30, // 30 minutes
   });
 }
