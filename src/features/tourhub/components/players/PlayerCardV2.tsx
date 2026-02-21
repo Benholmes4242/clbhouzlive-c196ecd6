@@ -22,6 +22,8 @@ interface PlayerCardV2Props {
     tourCodes?: string[] | null;
   };
   worldRank?: number | null;
+  /** Actual OWGR rank (separate from worldRank which may hold tour rank) */
+  owgr?: number | null;
   eventsPlayed?: number | null;
   earnings?: number | null;
   wins?: number | null;
@@ -44,6 +46,7 @@ function formatEarnings(amount: number): string {
 export function PlayerCardV2({
   player,
   worldRank,
+  owgr,
   eventsPlayed,
   earnings,
   wins,
@@ -186,6 +189,13 @@ export function PlayerCardV2({
                   ) : part}
                 </span>
               ))}
+            </p>
+          )}
+
+          {/* OWGR secondary line for tour-ranked tours (EURO, PGAD, LIV — not LPGA) */}
+          {isTourRanking && !isLPGA && owgr != null && owgr > 0 && (
+            <p className="text-muted-foreground truncate" style={{ fontSize: '12px', fontWeight: 400, marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
+              #{owgr} OWGR
             </p>
           )}
 
