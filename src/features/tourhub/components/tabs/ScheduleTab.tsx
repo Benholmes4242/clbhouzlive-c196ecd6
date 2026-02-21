@@ -28,11 +28,10 @@ import {
   ScheduleTournamentCard,
   ScheduleMonthHeader,
   ScheduleEmptyMessage,
-  ScheduleHeroCard,
-  getFeaturedTournament,
   ScheduleTourFilter,
   type TourFilterCode,
-  LiveHeroCarousel,
+  ScheduleHeroCarousel,
+  type ScheduleHeroItem,
 } from '../schedule';
 
 const TOUR_LABELS: Record<string, string> = {
@@ -75,8 +74,6 @@ export function ScheduleTab() {
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const heroScrollRef = useRef<HTMLDivElement>(null);
-  const [activeHeroIndex, setActiveHeroIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   
   const filter = (searchParams.get('filter') as ScheduleFilterType) || 'all';
@@ -186,80 +183,56 @@ export function ScheduleTab() {
 
   const { data: leadersWinnersMap } = useTournamentLeadersWinners([...liveIds, ...completedIds]);
 
-  // Live tournaments for hero carousel
-  const liveTournaments = useMemo(() => {
+  // Unified hero items for all tabs
+  const heroItems = useMemo((): ScheduleHeroItem[] => {
     if (!tournaments) return [];
-    return tournaments
-      .filter(t => t.status === 'inprogress')
-      .filter(t => activeTour === 'all' || t.tour_code === activeTour);
-  }, [tournaments, activeTour]);
+    const tourFiltered = activeTour === 'all' ? tournaments : tournaments.filter(t => t.tour_code === activeTour);
 
-  // Dynamic hero (for non-live tabs)
-  const heroItems = useMemo(() => {
-    if (!tournaments) return [];
-    
-    if (filter === 'live') return []; // Handled by LiveHeroCarousel
+    // Helper: one per tour, deduped
+    const onePerTour = (list: TourTournament[], type: ScheduleHeroItem['type']): ScheduleHeroItem[] => {
+      const seenTours = new Set<string>();
+      return list.filter(t => {
+        const tour = t.tour_code || 'unknown';
+        if (seenTours.has(tour)) return false;
+        seenTours.add(tour);
+        return true;
+      }).map(t => ({ tournament: t, type }));
+    };
+
+    const liveList = tourFiltered.filter(t => t.status === 'inprogress');
+    const completedList = tourFiltered
+      .filter(t => t.status === 'closed')
+      .sort((a, b) => new Date(b.end_date).getTime() - new Date(a.end_date).getTime());
+    const now = new Date();
+    const upcomingList = tourFiltered
+      .filter(t => t.status === 'scheduled' || t.status === 'created')
+      .filter(t => new Date(t.start_date) > now)
+      .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime());
+
+    if (filter === 'live') {
+      return liveList.map(t => ({ tournament: t, type: 'live' as const }));
+    }
 
     if (filter === 'completed') {
-      const completed = tournaments
-        .filter(t => t.status === 'closed')
-        .filter(t => activeTour === 'all' || t.tour_code === activeTour)
-        .sort((a, b) => new Date(b.end_date).getTime() - new Date(a.end_date).getTime());
-      return completed.length > 0 
-        ? [{ tournament: completed[0], type: 'recent' as const }] 
-        : [];
+      return onePerTour(completedList, 'recent');
     }
 
-    // For 'all' tab: collect live + most recent completed + next upcoming (like Tour Overview)
-    if (filter === 'all') {
-      const tourFiltered = activeTour === 'all' ? tournaments : tournaments.filter(t => t.tour_code === activeTour);
-      const items: { tournament: TourTournament; type: 'live' | 'recent' | 'upcoming' }[] = [];
-      
-      const liveTourneys = tourFiltered.filter(t => t.status === 'inprogress');
-      liveTourneys.forEach(t => items.push({ tournament: t, type: 'live' }));
-      
-      const recentCompleted = tourFiltered
-        .filter(t => t.status === 'closed')
-        .sort((a, b) => new Date(b.end_date).getTime() - new Date(a.end_date).getTime())[0];
-      if (recentCompleted) items.push({ tournament: recentCompleted, type: 'recent' });
-      
-      const nextUp = tourFiltered
-        .filter(t => t.status === 'scheduled' || t.status === 'created')
-        .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime())[0];
-      if (nextUp) items.push({ tournament: nextUp, type: 'upcoming' });
-      
-      return items;
+    if (filter === 'upcoming') {
+      // Show live tournaments if any exist, otherwise upcoming per tour
+      if (liveList.length > 0) {
+        return liveList.map(t => ({ tournament: t, type: 'live' as const }));
+      }
+      return onePerTour(upcomingList, 'upcoming');
     }
 
-    // Upcoming tab
-    const liveTourneys = tournaments
-      .filter(t => t.status === 'inprogress')
-      .filter(t => activeTour === 'all' || t.tour_code === activeTour);
-    if (liveTourneys.length > 0) {
-      return liveTourneys.map(t => ({ tournament: t, type: 'live' as const }));
-    }
-
-    const featured = getFeaturedTournament(
-      activeTour === 'all' ? tournaments : tournaments.filter(t => t.tour_code === activeTour)
-    );
-    return featured ? [featured] : [];
+    // 'all' tab: live + one completed per tour + one upcoming per tour, capped at 8
+    const items: ScheduleHeroItem[] = [
+      ...liveList.map(t => ({ tournament: t, type: 'live' as const })),
+      ...onePerTour(completedList, 'recent'),
+      ...onePerTour(upcomingList, 'upcoming'),
+    ];
+    return items.slice(0, 8);
   }, [tournaments, filter, activeTour]);
-
-  // Hero carousel scroll tracking
-  useEffect(() => {
-    const container = heroScrollRef.current;
-    if (!container || heroItems.length <= 1) return;
-    
-    const handleScroll = () => {
-      const scrollLeft = container.scrollLeft;
-      const itemWidth = container.offsetWidth;
-      const index = Math.round(scrollLeft / itemWidth);
-      setActiveHeroIndex(index);
-    };
-    
-    container.addEventListener('scroll', handleScroll, { passive: true });
-    return () => container.removeEventListener('scroll', handleScroll);
-  }, [heroItems.length]);
 
   const filterStats = useMemo(() => {
     if (!tournaments) return { all: 0, live: 0, upcoming: 0, completed: 0 };
@@ -418,61 +391,19 @@ export function ScheduleTab() {
         )}
       </AnimatePresence>
       
-      {/* Live Hero Carousel — SC-01 */}
-      {filter === 'live' && !search && liveTournaments.length > 0 && (
+      {/* Unified Hero Carousel — all tabs */}
+      {!search && heroItems.length > 0 && (
         <div className="relative">
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           >
-            <LiveHeroCarousel tournaments={liveTournaments} leadersMap={leadersWinnersMap} />
-          </motion.div>
-        </div>
-      )}
-
-      {/* Standard Hero — non-live tabs */}
-      {filter !== 'live' && !search && heroItems.length > 0 && (
-        <div className="relative">
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          >
-          {heroItems.length === 1 ? (
-            <ScheduleHeroCard 
-              tournament={heroItems[0].tournament} 
-              type={heroItems[0].type}
-              leaderWinner={leadersWinnersMap?.get(heroItems[0].tournament.id)}
+            <ScheduleHeroCarousel
+              items={heroItems}
+              leadersMap={leadersWinnersMap}
             />
-          ) : (
-            <>
-              <div 
-                ref={heroScrollRef}
-                className="flex snap-x snap-mandatory overflow-x-auto scrollbar-hide"
-                style={{ scrollbarWidth: 'none' }}
-              >
-                {heroItems.map((item) => (
-                  <div key={item.tournament.id} className="w-full flex-shrink-0 snap-start">
-                    <ScheduleHeroCard 
-                      tournament={item.tournament} 
-                      type={item.type}
-                      leaderWinner={leadersWinnersMap?.get(item.tournament.id)}
-                    />
-                  </div>
-                ))}
-              </div>
-              <div className="flex items-center justify-center gap-1.5 mt-2">
-                {heroItems.map((_, i) => (
-                  <span
-                    key={i}
-                    className={i === activeHeroIndex ? "hero-dot-active" : "hero-dot-inactive"}
-                  />
-                ))}
-              </div>
-            </>
-          )}
-        </motion.div>
+          </motion.div>
         </div>
       )}
 
