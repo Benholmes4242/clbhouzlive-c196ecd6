@@ -14931,7 +14931,7 @@ export type Database = {
         }[]
       }
       refresh_college_season_stats: {
-        Args: { target_season_id: string }
+        Args: { target_season_id?: string }
         Returns: undefined
       }
       refresh_college_season_stats_auto: { Args: never; Returns: undefined }
