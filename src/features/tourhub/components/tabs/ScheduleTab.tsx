@@ -12,7 +12,7 @@
 
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Search, X, ArrowLeft, AlertCircle, RefreshCw } from 'lucide-react';
+import { Search, X, AlertCircle, RefreshCw } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTourSeason, useTourTournaments, type TourTournament } from '../../hooks/useTourHubData';
 import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
@@ -210,6 +210,28 @@ export function ScheduleTab() {
         : [];
     }
 
+    // For 'all' tab: collect live + most recent completed + next upcoming (like Tour Overview)
+    if (filter === 'all') {
+      const tourFiltered = activeTour === 'all' ? tournaments : tournaments.filter(t => t.tour_code === activeTour);
+      const items: { tournament: TourTournament; type: 'live' | 'recent' | 'upcoming' }[] = [];
+      
+      const liveTourneys = tourFiltered.filter(t => t.status === 'inprogress');
+      liveTourneys.forEach(t => items.push({ tournament: t, type: 'live' }));
+      
+      const recentCompleted = tourFiltered
+        .filter(t => t.status === 'closed')
+        .sort((a, b) => new Date(b.end_date).getTime() - new Date(a.end_date).getTime())[0];
+      if (recentCompleted) items.push({ tournament: recentCompleted, type: 'recent' });
+      
+      const nextUp = tourFiltered
+        .filter(t => t.status === 'scheduled' || t.status === 'created')
+        .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime())[0];
+      if (nextUp) items.push({ tournament: nextUp, type: 'upcoming' });
+      
+      return items;
+    }
+
+    // Upcoming tab
     const liveTourneys = tournaments
       .filter(t => t.status === 'inprogress')
       .filter(t => activeTour === 'all' || t.tour_code === activeTour);
@@ -399,15 +421,6 @@ export function ScheduleTab() {
       {/* Live Hero Carousel — SC-01 */}
       {filter === 'live' && !search && liveTournaments.length > 0 && (
         <div className="relative">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="absolute z-30 left-4 flex h-11 w-11 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 active:scale-95 transition-all"
-            style={{ top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
-            aria-label="Back"
-          >
-            <ArrowLeft className="h-5 w-5 text-white" />
-          </button>
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -421,15 +434,6 @@ export function ScheduleTab() {
       {/* Standard Hero — non-live tabs */}
       {filter !== 'live' && !search && heroItems.length > 0 && (
         <div className="relative">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="absolute z-30 left-4 flex h-11 w-11 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 active:scale-95 transition-all"
-            style={{ top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
-            aria-label="Back"
-          >
-            <ArrowLeft className="h-5 w-5 text-white" />
-          </button>
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -473,7 +477,17 @@ export function ScheduleTab() {
       )}
 
       {/* Content below hero */}
-      <div className="bg-background pt-4">
+      <div className="bg-background pt-3">
+        {/* ← Tour Overview back link */}
+        <div className="px-4 mb-2">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
+          >
+            ← Tour Overview
+          </button>
+        </div>
         {/* Search Bar */}
         <div className="px-4">
           <motion.div 
@@ -529,14 +543,14 @@ export function ScheduleTab() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.3 }}
         >
-          <div style={{ marginTop: '14px' }}>
+          <div style={{ marginTop: '10px' }}>
             <ScheduleFilterPills
               activeFilter={filter}
               onFilterChange={setFilter}
               counts={filterStats}
             />
           </div>
-          <div style={{ marginTop: '8px' }}>
+          <div style={{ marginTop: '6px' }}>
             <ScheduleTourFilter
               activeTour={activeTour}
               onTourChange={setActiveTour}
@@ -564,7 +578,7 @@ export function ScheduleTab() {
         <AnimatePresence mode="wait">
           {monthGroups.length > 0 ? (
             <motion.div 
-              className="mt-5"
+              className="mt-3"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
