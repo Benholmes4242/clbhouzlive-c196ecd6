@@ -14895,6 +14895,7 @@ export type Database = {
         Args: { p_conversation_id: string }
         Returns: undefined
       }
+      match_tour_rankings_players: { Args: never; Returns: undefined }
       nearby_golfers: {
         Args: {
           limit_rows?: number
