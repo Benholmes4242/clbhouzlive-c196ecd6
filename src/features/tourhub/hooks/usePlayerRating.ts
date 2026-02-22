@@ -50,12 +50,10 @@ export function usePlayerRating(playerId: string | undefined) {
         .eq('player_id', playerId)
         .order('computed_at', { ascending: false })
         .limit(1)
-        .single();
+      .maybeSingle();
 
-      if (error) {
-        if (error.code === 'PGRST116') return null;
-        throw error;
-      }
+      if (error) throw error;
+      if (!data) return null;
 
       return data as unknown as PlayerRating;
     },

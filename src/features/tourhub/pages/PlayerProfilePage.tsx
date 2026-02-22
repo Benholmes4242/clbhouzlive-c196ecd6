@@ -20,7 +20,10 @@ import {
 } from '../components/player';
 import { StatRibbon } from '../components/player/StatRibbon';
 import { PlayerRecentForm } from '../components/player/PlayerRecentForm';
+import { ClbhouzRatingBadge } from '../components/player/ClbhouzRatingBadge';
+import { RatingBreakdownBar } from '../components/player/RatingBreakdownBar';
 import { useTourPlayer, useSinglePlayerStatistics } from '../hooks/useTourHubData';
+import { usePlayerRating } from '../hooks/usePlayerRating';
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -41,6 +44,7 @@ export function PlayerProfilePage() {
 
   const { data: player, isLoading: playerLoading, refetch } = useTourPlayer(playerId || '');
   const { data: playerStats } = useSinglePlayerStatistics(playerId);
+  const { data: playerRating } = usePlayerRating(playerId);
 
   // Pull-to-refresh
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -71,6 +75,7 @@ export function PlayerProfilePage() {
         queryClient.invalidateQueries({ queryKey: ['player-stats', playerId] }),
         queryClient.invalidateQueries({ queryKey: ['player-results', playerId] }),
         queryClient.invalidateQueries({ queryKey: ['world-rankings', playerId] }),
+        queryClient.invalidateQueries({ queryKey: ['player-rating', playerId] }),
       ]);
       setIsRefreshing(false);
     }
@@ -188,7 +193,7 @@ export function PlayerProfilePage() {
         <PlayerHero player={player} playerStats={playerStats ?? null} />
 
         {/* Stats Strip — flush below hero */}
-        <StatRibbon playerStats={playerStats ?? null} />
+        <StatRibbon playerStats={playerStats ?? null} playerRating={playerRating ?? null} />
 
         {/* ← Back text link */}
         <div className="px-4" style={{ marginTop: 12, marginBottom: 12 }}>
@@ -205,6 +210,23 @@ export function PlayerProfilePage() {
 
         {/* Content sections */}
         <div className="w-full max-w-5xl mx-auto px-4" style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
+          {/* Clbhouz Rating */}
+          {playerRating && (
+            <motion.div
+              style={{ marginTop: '24px' }}
+              variants={sectionVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.4 }}
+            >
+              <ClbhouzRatingBadge rating={playerRating} />
+              {playerRating.breakdown && (
+                <RatingBreakdownBar breakdown={playerRating.breakdown} />
+              )}
+            </motion.div>
+          )}
+
           {/* Season Performance — 24px from momentum strip */}
           <motion.div
             style={{ marginTop: '24px' }}
