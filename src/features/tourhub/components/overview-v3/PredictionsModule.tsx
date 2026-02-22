@@ -7,7 +7,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNextTournamentPredictions, type PlayerPrediction, type DarkHorse, type CourseProfile } from '../../hooks/useTournamentPredictions';
-import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
+import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
 import { ChevronRight, TrendingUp, Calendar, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, type Transition } from 'framer-motion';
@@ -120,7 +120,7 @@ const TopPickCard = ({
         
         <div className="w-14 h-14 rounded-full overflow-hidden ring-2 ring-offset-2 ring-white shadow-md flex-shrink-0">
           {(() => {
-            const photoUrl = resolvePhotoUrl(prediction.photoUrl, prediction.pgaTourId);
+            const photoUrl = getR2HeadshotUrlMultiTour(prediction.playerName);
             return photoUrl ? (
               <img src={photoUrl} alt={prediction.playerName} className="w-full h-full object-cover" />
             ) : (
@@ -198,7 +198,7 @@ const CompactPickRow = ({
     
     <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-100 flex-shrink-0">
       {(() => {
-        const photoUrl = resolvePhotoUrl(prediction.photoUrl, prediction.pgaTourId);
+        const photoUrl = getR2HeadshotUrlMultiTour(prediction.playerName);
         return photoUrl ? (
           <img src={photoUrl} alt={prediction.playerName} className="w-full h-full object-cover" />
         ) : (
@@ -243,7 +243,7 @@ const DarkHorseCard = ({
     <div className="flex items-center gap-2">
       <div className="w-10 h-10 rounded-full overflow-hidden bg-white flex-shrink-0">
         {(() => {
-          const photoUrl = resolvePhotoUrl(darkHorse.player.photoUrl, darkHorse.player.pgaTourId);
+          const photoUrl = getR2HeadshotUrlMultiTour(darkHorse.player.playerName);
           return photoUrl ? (
             <img src={photoUrl} alt={darkHorse.player.playerName} className="w-full h-full object-cover" />
           ) : (

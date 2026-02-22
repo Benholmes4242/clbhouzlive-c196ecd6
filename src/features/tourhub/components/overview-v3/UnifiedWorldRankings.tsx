@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils';
 import { useRankingMovers, useWorldRankingsFull } from '../../hooks/useOverviewModules';
 import { SectionErrorState } from '../SectionErrorState';
 import CountryFlag from '@/components/ui/country-flag';
-import { resolvePhotoUrl, getPgaTourHeadshotUrl } from '../../utils/resolvePhotoUrl';
+import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
 
 const PLAYERS_PER_PAGE = 10;
 
@@ -117,7 +117,7 @@ interface MomentumPillProps {
 function MomentumPill({ entry, index, direction }: MomentumPillProps) {
   const navigate = useNavigate();
   const initials = `${entry.firstName?.[0] ?? ''}${entry.lastName?.[0] ?? ''}`.toUpperCase();
-  const photoUrl = resolvePhotoUrl(entry.photoUrl, entry.pgaTourId);
+  const photoUrl = getR2HeadshotUrlMultiTour(`${entry.firstName} ${entry.lastName}`);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
 
@@ -401,9 +401,7 @@ export function UnifiedWorldRankings() {
 
               // Avatar
               const initials = `${entry.player.first_name?.[0] ?? ''}${entry.player.last_name?.[0] ?? ''}`.toUpperCase();
-              const photoUrl = entry.player.pga_tour_id
-                ? getPgaTourHeadshotUrl(entry.player.pga_tour_id)
-                : null;
+              const photoUrl = getR2HeadshotUrlMultiTour(fullName);
 
               return (
                 <motion.div

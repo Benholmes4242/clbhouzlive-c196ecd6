@@ -1,80 +1,34 @@
 /**
- * Resolve player photo URLs to full URLs
- * 
- * Priority:
- *   1. R2 CDN (manually uploaded headshots) - always takes precedence
- *   2. Cloudinary CDN (if pga_tour_id provided) - stable, no rate limits
- *   3. SportRadar API URLs: routed through image-proxy edge function
- *   4. Relative paths like /player-headshots/scottie-scheffler.png
- *   5. Supabase Storage URLs: returned as-is
- *   6. null (triggers initials fallback in components)
- * 
- * Skips ui-avatars.com URLs (initials generators, not real photos)
+ * resolvePhotoUrl — DEPRECATED compatibility shim.
+ *
+ * All player headshots now come from the R2 CDN via getR2HeadshotUrl /
+ * getR2HeadshotUrlMultiTour in @/utils/playerHeadshot.
+ *
+ * This file re-exports those utilities and provides a thin backward-compat
+ * wrapper so existing callers don't break while they migrate.
  */
 
-const SUPABASE_URL = 'https://ybxkehyomcakqjvuhnna.supabase.co';
+export { getR2HeadshotUrl, getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
+import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
 
 /**
- * Generate a stable PGA Tour Cloudinary headshot URL from a PGA Tour player ID.
- * Supports 'thumb' for list/card usage and 'hero' for full-bleed hero images.
- * 
- * @param pgaTourId - The official PGA Tour player ID (e.g., "46046" for Scottie Scheffler)
- * @param size - 'thumb' (440×400 actual) or 'hero' (1600×1200 actual)
- * @returns Cloudinary URL for the player's headshot
+ * @deprecated Use getR2HeadshotUrl / getR2HeadshotUrlMultiTour instead.
+ * Kept only for backward compatibility — returns null so callers fall
+ * through to their own initials placeholder. Components should migrate
+ * to passing playerName + tourCode to the R2 utilities.
  */
-export function getPgaTourHeadshotUrl(pgaTourId: string, size: 'thumb' | 'hero' = 'thumb'): string {
-  const params = size === 'hero'
-    ? 'c_fill,g_face:center,q_auto,f_auto,dpr_2.0,h_800,w_600'
-    : 'c_fill,g_face:center,q_auto,f_auto,dpr_2.0,h_220,w_200';
-  
-  return `https://pga-tour-res.cloudinary.com/image/upload/${params},d_stub:default_avatar_light.webp/headshots_${pgaTourId}`;
+export function resolvePhotoUrl(
+  _photoUrl?: string | null,
+  _pgaTourId?: string | null,
+  _size?: 'thumb' | 'hero',
+): string | null {
+  return null;
 }
 
 /**
- * Resolves the best available photo URL for a player.
- * 
- * @param photoUrl - The photo_url from sr_players table
- * @param pgaTourId - Optional pga_tour_id for Cloudinary resolution (preferred)
- * @param size - 'thumb' for list/card or 'hero' for full-bleed hero images
- * @returns Resolved photo URL or null
+ * @deprecated Use getR2HeadshotUrl instead.
  */
-export function resolvePhotoUrl(
-  photoUrl: string | null | undefined,
-  pgaTourId?: string | null,
-  size: 'thumb' | 'hero' = 'thumb'
-): string | null {
-  // Priority 1: Manually uploaded R2 images ALWAYS take precedence
-  // These are curated/corrected headshots uploaded via admin tool
-  if (photoUrl && photoUrl.includes('media.clbhouz.co.uk/player-headshots/')) {
-    return photoUrl;
-  }
-
-  // Priority 2: Use Cloudinary if pga_tour_id exists
-  if (pgaTourId) {
-    return getPgaTourHeadshotUrl(pgaTourId, size);
-  }
-
-  // Priority 3+: Handle other photo_url formats
-  if (!photoUrl) return null;
-  
-  // Skip ui-avatars.com URLs (these are just initials generators, not real photos)
-  if (photoUrl.includes('ui-avatars.com')) return null;
-  
-  // If it's a SportRadar API URL, route through our proxy to handle 302 redirects
-  if (photoUrl.includes('api.sportradar.com')) {
-    return `${SUPABASE_URL}/functions/v1/image-proxy?url=${encodeURIComponent(photoUrl)}`;
-  }
-  
-  // If it's already a full URL (Supabase Storage, CDN, etc.), use it directly
-  if (photoUrl.startsWith('http://') || photoUrl.startsWith('https://')) {
-    return photoUrl;
-  }
-  
-  // Relative paths starting with / are served from the public folder
-  // e.g., /player-headshots/scottie-scheffler.png works directly
-  if (photoUrl.startsWith('/')) {
-    return photoUrl;
-  }
-  
-  return photoUrl;
+export function getPgaTourHeadshotUrl(_pgaTourId: string, _size?: 'thumb' | 'hero'): string {
+  // Return empty string — callers should migrate to R2 utilities
+  return '';
 }

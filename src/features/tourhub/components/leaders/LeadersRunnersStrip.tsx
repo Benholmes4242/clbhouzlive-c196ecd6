@@ -6,7 +6,7 @@
 
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
+import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
 import type { LeaderCategory } from './constants';
 
 interface RunnerItem {
@@ -44,7 +44,7 @@ function RunnerCard({
   index: number;
 }) {
   const { player, value, rank } = runner;
-  const photoUrl = resolvePhotoUrl(player.photo_url, player.pga_tour_id);
+  const photoUrl = getR2HeadshotUrlMultiTour(player.full_name);
   const lastName = player.full_name.split(' ').slice(-1)[0];
   const fmt = formatOverride ?? category.format;
   const unit = unitOverride ?? category.unit;

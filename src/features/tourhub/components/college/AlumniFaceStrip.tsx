@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
+import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
 import type { AlumniFace } from '../../hooks/useBatchCollegeAlumni';
 
 function getInitials(fullName: string): string {
@@ -57,7 +57,7 @@ export function AlumniFaceStrip({ alumni, collegeName, collegeSlug, totalAlumniC
         {/* Stacked circular avatars — 32×32, 50% radius, 2px white border, -8px overlap */}
         <div className="flex items-center shrink-0" style={{ marginLeft: 0 }}>
           {visible.map((alum, i) => {
-            const photoUrl = resolvePhotoUrl(alum.photo_url, alum.pga_tour_id);
+            const photoUrl = getR2HeadshotUrlMultiTour(alum.full_name);
             return (
               <div
                 key={alum.id}

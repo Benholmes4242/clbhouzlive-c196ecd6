@@ -1,21 +1,19 @@
 /**
- * PlayerAvatar - Displays player headshot with fallback initials
+ * PlayerAvatar - Displays player headshot from R2 CDN with fallback initials
  * 
  * Priority order:
- * 1. sr_players.photo_url (real headshots from storage)
- * 2. player_media.headshot_url (if not ui-avatars.com)
- * 3. Initials fallback
+ * 1. R2 CDN headshot (via getR2HeadshotUrlMultiTour)
+ * 2. Initials fallback
  */
 
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { usePlayerHeadshot } from '../hooks/usePlayerMedia';
-import { resolvePhotoUrl } from '../utils/resolvePhotoUrl';
+import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
 
 interface PlayerAvatarProps {
   playerId: string;
   playerName: string;
-  /** Fallback photo URL from sr_players.photo_url - this is the primary source */
+  /** @deprecated - no longer used, R2 is the single source */
   fallbackPhotoUrl?: string | null;
   size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   className?: string;
@@ -46,17 +44,10 @@ export function PlayerAvatar({
   className 
 }: PlayerAvatarProps) {
   const [imageError, setImageError] = useState(false);
-  const { data: headshotUrl } = usePlayerHeadshot(playerId);
   
-  // Priority: sr_players.photo_url (resolved) > player_media.headshot_url (resolved) > initials
-  const primaryPhotoUrl = resolvePhotoUrl(fallbackPhotoUrl);
-  const secondaryPhotoUrl = resolvePhotoUrl(headshotUrl);
-  const finalPhotoUrl = primaryPhotoUrl || secondaryPhotoUrl;
-  
+  const photoUrl = getR2HeadshotUrlMultiTour(playerName);
   const initials = getInitials(playerName);
-  
-  // Show photo if available and not errored
-  const showPhoto = finalPhotoUrl && !imageError;
+  const showPhoto = photoUrl && !imageError;
   
   return (
     <div 
@@ -69,7 +60,7 @@ export function PlayerAvatar({
     >
       {showPhoto ? (
         <img 
-          src={finalPhotoUrl} 
+          src={photoUrl} 
           alt={playerName}
           className="w-full h-full object-cover object-top"
           loading="lazy"
@@ -83,12 +74,14 @@ export function PlayerAvatar({
 }
 
 /**
- * Batch avatar display for leaderboards - uses pre-fetched headshot map
+ * Batch avatar display for leaderboards - uses R2 CDN
  */
 interface BatchPlayerAvatarProps {
   playerId: string;
   playerName: string;
+  /** @deprecated - no longer used */
   fallbackPhotoUrl?: string | null;
+  /** @deprecated - no longer used */
   headshotMap?: Map<string, string>;
   size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   className?: string;
@@ -104,14 +97,9 @@ export function BatchPlayerAvatar({
 }: BatchPlayerAvatarProps) {
   const [imageError, setImageError] = useState(false);
   
-  // Priority: sr_players.photo_url > headshotMap > initials
-  const primaryPhotoUrl = resolvePhotoUrl(fallbackPhotoUrl);
-  const secondaryPhotoUrl = resolvePhotoUrl(headshotMap?.get(playerId));
-  const finalPhotoUrl = primaryPhotoUrl || secondaryPhotoUrl;
-  
+  const photoUrl = getR2HeadshotUrlMultiTour(playerName);
   const initials = getInitials(playerName);
-  
-  const showPhoto = finalPhotoUrl && !imageError;
+  const showPhoto = photoUrl && !imageError;
   
   return (
     <div 
@@ -124,7 +112,7 @@ export function BatchPlayerAvatar({
     >
       {showPhoto ? (
         <img 
-          src={finalPhotoUrl} 
+          src={photoUrl} 
           alt={playerName}
           className="w-full h-full object-cover object-top"
           loading="lazy"

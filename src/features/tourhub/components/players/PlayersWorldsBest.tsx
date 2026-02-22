@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
+import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
 import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
 import type { ElitePlayer } from '../../hooks/useElitePlayers';
 
@@ -29,7 +29,7 @@ function getRankBadgeClasses(rank: number): string {
 
 /** #1 Champion card */
 function ChampionCard({ player }: { player: ElitePlayer }) {
-  const photoUrl = resolvePhotoUrl(player.photoUrl, player.pgaTourId);
+  const photoUrl = getR2HeadshotUrlMultiTour(player.playerName);
   const flag = countryCodeToFlag(player.countryCode);
   const country = titleCaseCountry(player.country);
   const initials = getInitials(player.playerName);
@@ -91,7 +91,7 @@ function ChampionCard({ player }: { player: ElitePlayer }) {
 
 /** #2-5 Runner cards in horizontal scroll */
 function RunnerCard({ player }: { player: ElitePlayer }) {
-  const photoUrl = resolvePhotoUrl(player.photoUrl, player.pgaTourId);
+  const photoUrl = getR2HeadshotUrlMultiTour(player.playerName);
   const flag = countryCodeToFlag(player.countryCode);
   const country = titleCaseCountry(player.country);
   const initials = getInitials(player.playerName);

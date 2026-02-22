@@ -10,7 +10,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { getPgaTourHeadshotUrl } from '../utils/resolvePhotoUrl';
+import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
 import type { TournamentPhase, NextTournamentPreview } from '../components/tournament-insights/types';
 
 // =============================================
@@ -89,13 +89,10 @@ export interface UseAIPredictionsResult {
 // =============================================
 
 function resolvePlayerPhotoUrl(
-  photoUrl: string | null | undefined,
-  pgaTourId: string | null | undefined
+  playerName: string | null | undefined,
 ): string | null {
-  if (pgaTourId) {
-    return getPgaTourHeadshotUrl(pgaTourId);
-  }
-  return photoUrl || null;
+  if (!playerName) return null;
+  return getR2HeadshotUrlMultiTour(playerName);
 }
 
 // =============================================
@@ -322,7 +319,7 @@ function formatPredictions(
   const rawContenders = (predictions.topContenders || predictions || []).map((p: any, index: number) => ({
     ...p,
     rank: p.rank || index + 1,
-    photoUrl: resolvePlayerPhotoUrl(p.photoUrl, p.pgaTourId),
+    photoUrl: resolvePlayerPhotoUrl(p.playerName),
     reasons: ensureThreeReasons(p.reasons),
   }));
 
@@ -335,7 +332,7 @@ function formatPredictions(
       allPicks.push({
         ...dh,
         rank: allPicks.length + 1,
-        photoUrl: resolvePlayerPhotoUrl(dh.photoUrl, dh.pgaTourId),
+        photoUrl: resolvePlayerPhotoUrl(dh.playerName),
         courseFitScore: dh.courseFitScore || 70,
         winProbability: dh.winProbability || 5,
         concern: dh.concern || '',

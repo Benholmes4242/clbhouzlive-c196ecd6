@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { TrendingDown } from 'lucide-react';
 import { useRankingMovers } from '../../hooks/useOverviewModules';
-import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
+import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import CountryFlag from '@/components/ui/country-flag';
@@ -149,7 +149,7 @@ export function MoversThisWeek() {
                   }}
                 >
                   {(() => {
-                    const photoUrl = resolvePhotoUrl(entry.photoUrl, entry.pgaTourId);
+                    const photoUrl = getR2HeadshotUrlMultiTour(`${entry.firstName} ${entry.lastName}`);
                     return photoUrl ? (
                       <img
                         src={photoUrl}
