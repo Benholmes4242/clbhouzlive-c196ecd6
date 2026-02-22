@@ -74,14 +74,14 @@ function MetricCompareRow({ label, value1, value2, format = String, lowerIsBette
           className="rounded-l-full"
           style={{
             width: `${pct1}%`,
-            backgroundColor: isLeading1 ? '#f59e0b' : 'hsl(var(--border) / 0.3)',
+            backgroundColor: isLeading1 ? '#f59e0b' : '#CBD5E1',
           }}
         />
         <div
           className="rounded-r-full"
           style={{
             width: `${pct2}%`,
-            backgroundColor: isLeading2 ? '#f59e0b' : 'hsl(var(--border) / 0.3)',
+            backgroundColor: isLeading2 ? '#f59e0b' : '#CBD5E1',
           }}
         />
       </div>
