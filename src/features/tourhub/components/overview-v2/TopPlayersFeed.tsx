@@ -148,7 +148,7 @@ export function TopPlayersFeed({ players, maxEvents, maxCuts }: TopPlayersFeedPr
                 }}
               >
                 {(() => {
-                  const headshot = getPlayerHeadshotUrl(stat.player?.full_name ?? '', 'pga');
+                  const headshot = getPlayerHeadshotUrl(stat.player?.full_name ?? '', stat.player?.tour_codes?.[0] ?? 'pga');
                   return (
                     <img 
                       src={headshot}

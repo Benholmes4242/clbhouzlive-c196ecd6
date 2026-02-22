@@ -679,6 +679,7 @@ export interface LeaderEntry {
     country: string | null;
     photoUrl: string | null;
     pgaTourId: string | null;
+    tourCode?: string | null;
   };
 }
 
@@ -721,7 +722,8 @@ export function useTournamentTopLeaders(tournamentId: string | null) {
             last_name,
             country,
             photo_url,
-            pga_tour_id
+            pga_tour_id,
+            tour_codes
           )
         `)
         .eq('tournament_id', tournamentId!)
@@ -758,6 +760,7 @@ export function useTournamentTopLeaders(tournamentId: string | null) {
             country: row.player.country,
             photoUrl: row.player.photo_url,
             pgaTourId: row.player.pga_tour_id ?? null,
+            tourCode: row.player.tour_codes?.[0] ?? null,
           },
         };
       });

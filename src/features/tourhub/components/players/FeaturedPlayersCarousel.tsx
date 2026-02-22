@@ -7,6 +7,7 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
 
 interface FeaturedPlayerCardProps {
@@ -65,18 +66,15 @@ function FeaturedPlayerCard({ player, stats, highlight, className }: FeaturedPla
       {/* Dark gradient for text readability */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-      {/* Avatar or initials */}
+      {/* Avatar */}
       <div className="absolute top-4 left-1/2 -translate-x-1/2">
         <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center overflow-hidden border-2 border-white/30">
-          {player.photo_url ? (
-            <img 
-              src={player.photo_url} 
-              alt={player.full_name}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <span className="text-lg font-bold text-white">{initials}</span>
-          )}
+          <img 
+            src={getPlayerHeadshotUrl(player.full_name, player.tour_codes?.[0] ?? 'pga')}
+            alt={player.full_name}
+            className="w-full h-full object-cover"
+            onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+          />
         </div>
       </div>
 

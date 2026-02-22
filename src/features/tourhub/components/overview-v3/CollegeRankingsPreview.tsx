@@ -104,7 +104,7 @@ function PodiumCard({
   const navigate = useNavigate();
   const isFirst = rank === 1;
   const displayName = media?.short_name || media?.college_name || stats.normalized_name;
-  const captainPhotoUrl = captain ? getPlayerHeadshotUrl(captain.fullName, 'pga') : null;
+  const captainPhotoUrl = captain ? getPlayerHeadshotUrl(captain.fullName, (captain as any).tourCode ?? 'pga') : null;
 
   return (
     <button

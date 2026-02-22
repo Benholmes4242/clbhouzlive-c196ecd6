@@ -158,7 +158,7 @@ export function PlayerStatsTab() {
                       </span>
                       <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0 overflow-hidden">
                         <img 
-                          src={getPlayerHeadshotUrl(stat.player?.full_name ?? '', 'pga')}
+                          src={getPlayerHeadshotUrl(stat.player?.full_name ?? '', stat.player?.tour_codes?.[0] ?? 'pga')}
                           alt={stat.player?.full_name ?? ''}
                           className="w-8 h-8 object-cover"
                           onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}

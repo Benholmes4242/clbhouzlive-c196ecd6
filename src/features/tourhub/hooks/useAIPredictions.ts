@@ -10,7 +10,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import type { TournamentPhase, NextTournamentPreview } from '../components/tournament-insights/types';
 
 // =============================================
@@ -85,15 +85,8 @@ export interface UseAIPredictionsResult {
 }
 
 // =============================================
-// PHOTO URL RESOLVER
+// (Photo resolution now handled in components)
 // =============================================
-
-function resolvePlayerPhotoUrl(
-  playerName: string | null | undefined,
-): string {
-  if (!playerName) return PLAYER_SILHOUETTE_URL;
-  return getPlayerHeadshotUrl(playerName, 'pga');
-}
 
 // =============================================
 // MAIN HOOK
@@ -319,7 +312,7 @@ function formatPredictions(
   const rawContenders = (predictions.topContenders || predictions || []).map((p: any, index: number) => ({
     ...p,
     rank: p.rank || index + 1,
-    photoUrl: resolvePlayerPhotoUrl(p.playerName),
+    photoUrl: p.photoUrl || null,
     reasons: ensureThreeReasons(p.reasons),
   }));
 
@@ -332,7 +325,7 @@ function formatPredictions(
       allPicks.push({
         ...dh,
         rank: allPicks.length + 1,
-        photoUrl: resolvePlayerPhotoUrl(dh.playerName),
+        photoUrl: dh.photoUrl || null,
         courseFitScore: dh.courseFitScore || 70,
         winProbability: dh.winProbability || 5,
         concern: dh.concern || '',

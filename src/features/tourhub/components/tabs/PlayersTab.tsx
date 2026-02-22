@@ -288,6 +288,7 @@ export function PlayersTab() {
       countryCode: p.country_code,
       photoUrl: p.photo_url,
       pgaTourId: p.pga_tour_id,
+      tourCode: p.tour_codes?.[0] ?? null,
       worldRank: rankMap.get(p.id)?.worldRank ?? 0,
       avgPoints: rankMap.get(p.id)?.avgPoints ?? null,
       priorRank: null,

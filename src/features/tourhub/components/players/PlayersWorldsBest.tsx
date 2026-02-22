@@ -29,7 +29,7 @@ function getRankBadgeClasses(rank: number): string {
 
 /** #1 Champion card */
 function ChampionCard({ player }: { player: ElitePlayer }) {
-  const photoUrl = getPlayerHeadshotUrl(player.playerName, 'pga');
+  const photoUrl = getPlayerHeadshotUrl(player.playerName, player.tourCode ?? 'pga');
   const flag = countryCodeToFlag(player.countryCode);
   const country = titleCaseCountry(player.country);
   const initials = getInitials(player.playerName);
@@ -91,7 +91,7 @@ function ChampionCard({ player }: { player: ElitePlayer }) {
 
 /** #2-5 Runner cards in horizontal scroll */
 function RunnerCard({ player }: { player: ElitePlayer }) {
-  const photoUrl = getPlayerHeadshotUrl(player.playerName, 'pga');
+  const photoUrl = getPlayerHeadshotUrl(player.playerName, player.tourCode ?? 'pga');
   const flag = countryCodeToFlag(player.countryCode);
   const country = titleCaseCountry(player.country);
   const initials = getInitials(player.playerName);
