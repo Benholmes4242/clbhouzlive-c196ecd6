@@ -221,7 +221,7 @@ export function TourHubNavOverlay({
               {scoreStr}
             </span>
           )}
-          {' • '}
+          <br />
           <span 
             className="truncate transition-opacity active:opacity-70 cursor-pointer"
             onClick={(e) => {
@@ -260,29 +260,6 @@ export function TourHubNavOverlay({
             {liveCount} LIVE
           </span>
         </div>
-      );
-    }
-    // TM-09: Players card count badge
-    if (item.value === 'players' && playerCount) {
-      return (
-        <span className="text-[13px] text-muted-foreground flex-shrink-0">
-          {playerCount > 800 ? '800+' : playerCount} players
-        </span>
-      );
-    }
-    // TM-05: Leaders card #1 badge — tappable
-    if (item.value === 'leaderboards' && worldNumber1) {
-      const lastName = worldNumber1.playerName.split(' ').slice(-1)[0];
-      return (
-        <span 
-          className="text-[13px] text-muted-foreground flex-shrink-0 transition-opacity active:opacity-70 cursor-pointer"
-          onClick={(e) => {
-            e.stopPropagation();
-            handlePlayerClick(worldNumber1.playerId);
-          }}
-        >
-          #{worldNumber1.worldRank} {lastName}
-        </span>
       );
     }
     return null;

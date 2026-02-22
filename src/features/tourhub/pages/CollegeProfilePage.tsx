@@ -186,7 +186,7 @@ export function CollegeProfilePage() {
         <div
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%)',
+            background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.1) 65%, transparent 85%)',
           }}
         />
 
