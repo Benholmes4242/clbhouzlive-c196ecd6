@@ -1,11 +1,11 @@
 import { useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Menu, TrendingUp, RefreshCw } from 'lucide-react';
+import { Menu, RefreshCw } from 'lucide-react';
 import { openTourNav } from '../contexts/TourNavContext';
 import { motion } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
 import { TourHubShell } from '../components';
-import { CollegeSearch, FranchiseLeaderboard, FranchiseMovers } from '../components/college';
+import { CollegeSearch, FranchiseLeaderboard } from '../components/college';
 import { CollegeHeroBanner } from '../components/college/CollegeHeroBanner';
 import { AlumniFaceStrip } from '../components/college/AlumniFaceStrip';
 import { useCollegeSeasonStats, type CollegeSeasonStats } from '../hooks/useCollegeStats';
@@ -172,19 +172,6 @@ export function CollegeGolfHubPage() {
             <FranchiseLeaderboard limit={25} />
           </section>
 
-          {/* Weekly Movers section — 28px gap */}
-          <section style={{ marginTop: 28 }}>
-            <div className="flex items-center gap-2" style={{ marginBottom: 12 }}>
-              <TrendingUp className="w-4 h-4" style={{ color: '#22C55E' }} />
-              <h2
-                className="text-foreground"
-                style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.3px' }}
-              >
-                This Week's Movers
-              </h2>
-            </div>
-            <FranchiseMovers limit={8} />
-          </section>
         </div>
       </div>
     </TourHubShell>

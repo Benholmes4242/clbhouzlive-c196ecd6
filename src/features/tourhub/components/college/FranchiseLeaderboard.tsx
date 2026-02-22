@@ -13,17 +13,19 @@ import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
 import { useCollegeStatusMap, useTopMovers } from '../../hooks/useCollegeStatus';
 import { useBatchCollegeAlumni } from '../../hooks/useBatchCollegeAlumni';
 import { FranchiseCard } from './FranchiseCard';
+import { FranchiseMovers } from './FranchiseMovers';
 
-type MetricTab = 'earnings' | 'wins' | 'cuts' | 'top10s';
+type MetricTab = 'earnings' | 'wins' | 'cuts' | 'top10s' | 'movers';
 
 const METRIC_TABS: { value: MetricTab; label: string }[] = [
   { value: 'earnings', label: 'Earnings' },
   { value: 'wins', label: 'Wins' },
   { value: 'cuts', label: 'Cuts' },
   { value: 'top10s', label: 'Top 10s' },
+  { value: 'movers', label: 'Movers' },
 ];
 
-const VALID_METRICS = new Set<string>(['earnings', 'wins', 'cuts', 'top10s']);
+const VALID_METRICS = new Set<string>(['earnings', 'wins', 'cuts', 'top10s', 'movers']);
 
 interface FranchiseLeaderboardProps {
   limit?: number;
@@ -113,58 +115,62 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
         </div>
       </div>
 
-      {/* Leaderboard List — 10px gap between cards */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeMetric}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.2 }}
-          className="flex flex-col"
-          style={{ gap: 10 }}
-        >
-          {isLoading ? (
-            Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="bg-card/50 border border-border/30 animate-pulse" style={{ height: 110, borderRadius: 16 }} />
-            ))
-          ) : error ? (
-            <div className="text-center py-12 text-sm text-muted-foreground">Failed to load leaderboard</div>
-          ) : sortedStats.length > 0 ? (
-            sortedStats.map((collegeStats, index) => {
-              const status = statusMap.get(collegeStats.normalized_name) || null;
-              const moverData = moverInfo?.moverData?.get(collegeStats.normalized_name);
-              const momentum = moverData ? {
-                rankChange: moverData.rankChange,
-                earningsDelta: moverData.earningsDelta,
-                isRising: moverData.earningsDelta > 0 || (moverData.rankChange !== null && moverData.rankChange > 0),
-              } : null;
-              const alumni = alumniMap?.get(collegeStats.normalized_name) || undefined;
+      {/* Content */}
+      {activeMetric === 'movers' ? (
+        <FranchiseMovers />
+      ) : (
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeMetric}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+            className="flex flex-col"
+            style={{ gap: 10 }}
+          >
+            {isLoading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="bg-card/50 border border-border/30 animate-pulse" style={{ height: 110, borderRadius: 16 }} />
+              ))
+            ) : error ? (
+              <div className="text-center py-12 text-sm text-muted-foreground">Failed to load leaderboard</div>
+            ) : sortedStats.length > 0 ? (
+              sortedStats.map((collegeStats, index) => {
+                const status = statusMap.get(collegeStats.normalized_name) || null;
+                const moverData = moverInfo?.moverData?.get(collegeStats.normalized_name);
+                const momentum = moverData ? {
+                  rankChange: moverData.rankChange,
+                  earningsDelta: moverData.earningsDelta,
+                  isRising: moverData.earningsDelta > 0 || (moverData.rankChange !== null && moverData.rankChange > 0),
+                } : null;
+                const alumni = alumniMap?.get(collegeStats.normalized_name) || undefined;
 
-              return (
-                <FranchiseCard
-                  key={collegeStats.normalized_name}
-                  stats={collegeStats}
-                  college={collegeMap?.get(collegeStats.normalized_name) || null}
-                  rank={index + 1}
-                  maxValue={maxValue}
-                  activeMetric={activeMetric}
-                  status={status}
-                  momentum={momentum}
-                  alumni={alumni}
-                  animationDelay={index * 0.03}
-                />
-              );
-            })
-          ) : (
-            <div className="flex flex-col items-center py-12 text-center">
-              <Loader2 className="w-5 h-5 text-muted-foreground/50 animate-spin mb-3" />
-              <p className="text-sm font-medium text-foreground mb-1">Season stats are being calculated</p>
-              <p className="text-xs text-muted-foreground">Check back soon.</p>
-            </div>
-          )}
-        </motion.div>
-      </AnimatePresence>
+                return (
+                  <FranchiseCard
+                    key={collegeStats.normalized_name}
+                    stats={collegeStats}
+                    college={collegeMap?.get(collegeStats.normalized_name) || null}
+                    rank={index + 1}
+                    maxValue={maxValue}
+                    activeMetric={activeMetric}
+                    status={status}
+                    momentum={momentum}
+                    alumni={alumni}
+                    animationDelay={index * 0.03}
+                  />
+                );
+              })
+            ) : (
+              <div className="flex flex-col items-center py-12 text-center">
+                <Loader2 className="w-5 h-5 text-muted-foreground/50 animate-spin mb-3" />
+                <p className="text-sm font-medium text-foreground mb-1">Season stats are being calculated</p>
+                <p className="text-xs text-muted-foreground">Check back soon.</p>
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      )}
     </div>
   );
 }
