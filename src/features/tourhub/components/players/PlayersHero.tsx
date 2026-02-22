@@ -6,6 +6,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Menu } from 'lucide-react';
+import { openTourNav } from '../../contexts/TourNavContext';
 import { cn } from '@/lib/utils';
 import { resolvePhotoUrl, getPgaTourHeadshotUrl } from '../../utils/resolvePhotoUrl';
 import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
@@ -139,6 +141,19 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
 
   return (
     <div className="relative">
+      {/* Burger menu */}
+      <button 
+        className="absolute z-20 flex items-center justify-center"
+        style={{ top: '56px', left: '16px', width: '44px', height: '44px' }}
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
+        aria-label="Open tour menu"
+      >
+        <Menu 
+          className="w-[22px] h-[22px]" 
+          strokeWidth={2}
+          style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5))' }}
+        />
+      </button>
       {/* Back arrow removed — replaced by "← Tour Overview" text link below hero */}
       <AnimatePresence mode="wait">
         <motion.div
