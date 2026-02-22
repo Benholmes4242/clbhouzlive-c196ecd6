@@ -51,7 +51,7 @@ const ALL_TOURS_OPTIONS: { value: PlayerSortType; label: string; shortLabel: str
 ];
 
 const TOUR_SPECIFIC_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string }[] = [
-  { value: 'highest-earnings', label: 'Earnings', shortLabel: 'Earnings' },
+  { value: 'highest-earnings', label: 'Highest Earnings', shortLabel: 'Earnings' },
   { value: 'most-wins', label: 'Most Wins', shortLabel: 'Wins' },
   { value: 'alpha-az', label: 'Alphabetical A-Z', shortLabel: 'A-Z' },
   { value: 'alpha-za', label: 'Alphabetical Z-A', shortLabel: 'Z-A' },
@@ -65,7 +65,7 @@ const EURO_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string }
 ];
 
 const LPGA_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string }[] = [
-  { value: 'race-to-cme', label: 'Race to CME Globe', shortLabel: 'CME Globe' },
+  { value: 'race-to-cme', label: 'Race to CME Globe', shortLabel: 'Race to CME Globe' },
   { value: 'most-wins', label: 'Most Wins', shortLabel: 'Wins' },
   { value: 'alpha-az', label: 'Alphabetical A-Z', shortLabel: 'A-Z' },
   { value: 'alpha-za', label: 'Alphabetical Z-A', shortLabel: 'Z-A' },

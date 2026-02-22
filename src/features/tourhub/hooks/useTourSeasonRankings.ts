@@ -16,6 +16,7 @@ export interface TourSeasonRanking {
   position_change: string | null;
   points: number | null;
   tournaments_played: number | null;
+  wins: number | null;
   country: string | null;
   manual_player_id: string | null;
   scraped_at: string;

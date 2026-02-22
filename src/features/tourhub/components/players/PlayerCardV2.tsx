@@ -88,10 +88,8 @@ export function PlayerCardV2({
     ? `${points.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} pts`
     : null;
   const winCount = wins ?? 0;
-  const euroWinsPart = isEuro && winCount > 0 ? `${winCount} ${winCount === 1 ? 'win' : 'wins'}` : null;
-  const eventsPart = !isEuro && isTourRanking && tournamentsPlayed != null && tournamentsPlayed > 0
-    ? `${tournamentsPlayed} ${tournamentsPlayed === 1 ? 'event' : 'events'}`
-    : null;
+  const tourWinsPart = isTourRanking && winCount > 0 ? `${winCount} ${winCount === 1 ? 'win' : 'wins'}` : null;
+  const eventsPart = null; // Events display removed — wins shown instead
 
   const earningsPart = !isTourRanking && earnings != null && earnings > 0 ? formatEarnings(earnings) : null;
   const winsPart = !isTourRanking && winCount > 0 ? `${winCount} ${winCount === 1 ? 'win' : 'wins'}` : null;
@@ -101,10 +99,9 @@ export function PlayerCardV2({
   let primaryIndex = -1;
 
   if (isTourRanking) {
-    // Tour-ranked: show points, then wins (EURO) or events (others)
+    // Tour-ranked: show points, then wins
     if (pointsPart) metaParts.push(pointsPart);
-    if (euroWinsPart) metaParts.push(euroWinsPart);
-    if (eventsPart) metaParts.push(eventsPart);
+    if (tourWinsPart) metaParts.push(tourWinsPart);
     primaryIndex = 0;
   } else if (activeSort === 'most-wins') {
     if (winsPart) metaParts.push(winsPart);
@@ -181,9 +178,9 @@ export function PlayerCardV2({
           )}
 
           {/* Combined rank + points line for tour rankings (Euro/LPGA) */}
-          {isTourRanking && (rankPart || pointsPart || eventsPart || euroWinsPart) && (
+          {isTourRanking && (rankPart || pointsPart || tourWinsPart) && (
             <p className="text-muted-foreground truncate" style={{ fontSize: '13px', fontWeight: 500, marginTop: '4px', fontVariantNumeric: 'tabular-nums' }}>
-              {[rankPart, pointsPart, euroWinsPart, eventsPart].filter(Boolean).map((part, i) => (
+              {[rankPart, pointsPart, tourWinsPart].filter(Boolean).map((part, i) => (
                 <span key={i}>
                   {i > 0 && ' · '}
                   {(part === rankPart || part === pointsPart) ? (
