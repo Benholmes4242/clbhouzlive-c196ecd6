@@ -160,7 +160,7 @@ export function LeadersCategorySheet({
         </div>
 
         {/* Safe area bottom padding */}
-        <div style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }} />
+        <div style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 34px) + 16px)' }} />
       </BottomSheet>
     </>
   );

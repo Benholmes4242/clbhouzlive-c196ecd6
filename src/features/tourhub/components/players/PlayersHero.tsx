@@ -145,7 +145,7 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
         <Menu 
           className="w-[22px] h-[22px]" 
           strokeWidth={2}
-          style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5))' }}
+          style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.7)) drop-shadow(0 0px 8px rgba(0,0,0,0.3))' }}
         />
       </button>
       {/* Back arrow removed — replaced by "← Tour Overview" text link below hero */}
@@ -179,7 +179,7 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
 
               {/* Strong bottom gradient for text legibility */}
               <div className="absolute inset-0" style={{
-                background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.2) 35%, transparent 70%)',
+                background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 35%, rgba(0,0,0,0.05) 60%, transparent 80%)',
               }} />
 
               <div className="absolute bottom-0 left-0 right-0 p-5 pb-6 space-y-1.5">
