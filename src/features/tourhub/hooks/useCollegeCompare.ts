@@ -11,12 +11,14 @@ export interface CollegeCompareData {
     media: CollegeMedia | null;
     topEarners: CollegeAlumnus[];
     topRanked: CollegeAlumnus[];
+    topWinners: CollegeAlumnus[];
   };
   college2: {
     stats: CollegeSeasonStats | null;
     media: CollegeMedia | null;
     topEarners: CollegeAlumnus[];
     topRanked: CollegeAlumnus[];
+    topWinners: CollegeAlumnus[];
   };
 }
 
@@ -32,12 +34,12 @@ export function useCollegeCompare(c1: string | undefined, c2: string | undefined
     queryFn: async (): Promise<CollegeCompareData> => {
       if (!c1 || !c2 || !seasonId) {
         return {
-          college1: { stats: null, media: null, topEarners: [], topRanked: [] },
-          college2: { stats: null, media: null, topEarners: [], topRanked: [] },
+          college1: { stats: null, media: null, topEarners: [], topRanked: [], topWinners: [] },
+          college2: { stats: null, media: null, topEarners: [], topRanked: [], topWinners: [] },
         };
       }
       
-      // Fetch stats for both colleges in parallel
+      // Fetch stats for both colleges in parallel — select ALL fields
       const [stats1, stats2] = await Promise.all([
         supabase
           .from('college_season_stats')
@@ -65,12 +67,14 @@ export function useCollegeCompare(c1: string | undefined, c2: string | undefined
           media: collegeMap?.get(c1) || null,
           topEarners: alumni1.topEarners,
           topRanked: alumni1.topRanked,
+          topWinners: alumni1.topWinners,
         },
         college2: {
           stats: stats2.data as CollegeSeasonStats | null,
           media: collegeMap?.get(c2) || null,
           topEarners: alumni2.topEarners,
           topRanked: alumni2.topRanked,
+          topWinners: alumni2.topWinners,
         },
       };
     },
@@ -87,7 +91,7 @@ async function fetchAlumniForCompare(normalizedName: string, seasonId: string) {
     .eq('college_normalized', normalizedName);
   
   if (!players?.length) {
-    return { topEarners: [], topRanked: [] };
+    return { topEarners: [], topRanked: [], topWinners: [] };
   }
   
   const playerIds = players.map(p => p.id);
@@ -131,5 +135,11 @@ async function fetchAlumniForCompare(normalizedName: string, seasonId: string) {
     .sort((a, b) => (a.world_ranking || 9999) - (b.world_ranking || 9999))
     .slice(0, 5);
   
-  return { topEarners, topRanked };
+  // Sort for top winners
+  const topWinners = [...alumni]
+    .filter(a => (a.wins || 0) > 0)
+    .sort((a, b) => (b.wins || 0) - (a.wins || 0))
+    .slice(0, 5);
+  
+  return { topEarners, topRanked, topWinners };
 }

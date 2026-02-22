@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ArrowRight, Check, Users, AlertCircle } from 'lucide-react';
+import { ArrowRight, Check, Users, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
@@ -14,7 +14,7 @@ import { useCollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useCollegeMediaMap, type CollegeMedia } from '../../hooks/useCollegeMedia';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 
-type CompareMetric = 'earnings' | 'wins' | 'cuts' | 'top10s';
+type CompareMetric = 'earnings' | 'wins' | 'top10s';
 
 interface CollegeCompareSheetProps {
   isOpen: boolean;
@@ -75,14 +75,13 @@ function CollegeSide({ college, value, metric, isWinner }: CollegeSideProps) {
         {displayName}
       </h4>
       
-      {/* Stat value — JetBrains Mono, 22px, weight 800 */}
+      {/* Stat value — system font, tabular-nums, 22px, weight 800 */}
       <motion.div
         key={`${college?.normalized_name}-${metric}`}
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.2 }}
         style={{
-          fontFamily: "'JetBrains Mono', monospace",
           fontSize: '22px',
           fontWeight: 800,
           fontVariantNumeric: 'tabular-nums',
@@ -114,7 +113,7 @@ function RivalChip({ normalizedName, college, isSelected, onClick }: RivalChipPr
         "border transition-all duration-200",
         "active:scale-95 min-h-[44px]",
         isSelected 
-          ? "bg-muted/30 border-border" 
+          ? "bg-foreground text-white border-foreground" 
           : "bg-card border-border/50 hover:bg-muted/80"
       )}
       style={{ padding: '10px 16px', gap: '8px' }}
@@ -124,18 +123,18 @@ function RivalChip({ normalizedName, college, isSelected, onClick }: RivalChipPr
         {getCollegeLogoUrl(college?.college_name || displayName) ? (
           <img src={getCollegeLogoUrl(college?.college_name || displayName)!} alt={displayName} className="w-6 h-6 object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
         ) : (
-          <span className="text-xs font-bold text-muted-foreground">{displayName.charAt(0)}</span>
+          <span className={cn("text-xs font-bold", isSelected ? "text-white" : "text-muted-foreground")}>{displayName.charAt(0)}</span>
         )}
       </div>
       
       <span className={cn(
         "whitespace-nowrap",
-        isSelected ? "text-foreground" : "text-muted-foreground"
+        isSelected ? "text-white" : "text-muted-foreground"
       )} style={{ fontSize: '13px', fontWeight: 500 }}>
         {displayName}
       </span>
       
-      {isSelected && <Check className="w-4 h-4 text-foreground" />}
+      {isSelected && <Check className="w-4 h-4 text-white" />}
     </button>
   );
 }
@@ -143,7 +142,6 @@ function RivalChip({ normalizedName, college, isSelected, onClick }: RivalChipPr
 const METRICS: { key: CompareMetric; label: string }[] = [
   { key: 'earnings', label: 'Earnings' },
   { key: 'wins', label: 'Wins' },
-  { key: 'cuts', label: 'Cuts' },
   { key: 'top10s', label: 'Top 10s' },
 ];
 
@@ -185,7 +183,6 @@ export function CollegeCompareSheet({
     switch (metric) {
       case 'earnings': return stats.earnings_total;
       case 'wins': return stats.wins_total;
-      case 'cuts': return stats.cuts_total;
       case 'top10s': return stats.top10_total;
     }
   };
@@ -228,19 +225,12 @@ export function CollegeCompareSheet({
           >
             {/* Drag handle — 40×4px */}
             <div className="flex justify-center" style={{ paddingTop: '8px', paddingBottom: '4px' }}>
-              <div className="rounded-full" style={{ width: '40px', height: '4px', backgroundColor: 'hsl(var(--muted-foreground) / 0.2)', borderRadius: '2px' }} />
+              <div className="bg-gray-300 rounded-full" style={{ width: '40px', height: '4px', borderRadius: '2px' }} />
             </div>
             
             {/* Title — 18px, weight 700 */}
             <div className="flex items-center justify-between" style={{ padding: '20px 20px 16px' }}>
               <h3 className="text-foreground" style={{ fontSize: '18px', fontWeight: 700 }}>Head to Head</h3>
-              <button
-                onClick={onClose}
-                className="text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center"
-                style={{ width: '36px', height: '36px' }}
-              >
-                <X style={{ width: '20px', height: '20px' }} />
-              </button>
             </div>
             
             {hasError && (
@@ -271,7 +261,7 @@ export function CollegeCompareSheet({
             {/* Rival selector */}
             {!hasError && rivals.length > 0 && (
               <div style={{ padding: '0 20px 16px' }}>
-                <p className="text-muted-foreground" style={{ fontSize: '13px', fontWeight: 500, marginBottom: '10px' }}>Select Rival</p>
+                <p className="text-muted-foreground/60" style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const, marginBottom: '10px' }}>Select Rival</p>
                 <div className="flex overflow-x-auto scrollbar-hide -mx-5 px-5" style={{ gap: '8px' }}>
                   {rivals.map((rivalSlug) => (
                     <RivalChip
@@ -286,7 +276,7 @@ export function CollegeCompareSheet({
               </div>
             )}
             
-            {/* Metric chips — 13px */}
+            {/* Metric chips — 3 tabs: Earnings, Wins, Top 10s */}
             {!hasError && !hasNoRivals && (
               <div className="flex" style={{ padding: '0 20px 16px', gap: '8px', marginTop: '0px' }}>
                 {METRICS.map(({ key, label }) => (
@@ -298,8 +288,8 @@ export function CollegeCompareSheet({
                       "transition-all min-h-[40px]",
                       "active:scale-95",
                       activeMetric === key
-                        ? "bg-muted/40 text-foreground border border-transparent"
-                        : "bg-card text-muted-foreground border border-border/50 hover:bg-muted/80"
+                        ? "bg-card text-foreground border border-border/50 shadow-sm"
+                        : "bg-transparent text-muted-foreground border border-transparent hover:text-foreground"
                     )}
                     style={{
                       fontSize: '13px',

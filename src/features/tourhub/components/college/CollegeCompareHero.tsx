@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { DollarSign, Trophy, Target, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
@@ -13,197 +12,319 @@ interface CollegeCompareHeroProps {
   className?: string;
 }
 
+/* ── Section header matching design system ── */
+function SectionHeader({ children, className }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div
+      className={cn("text-muted-foreground/60", className)}
+      style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}
+    >
+      {children}
+    </div>
+  );
+}
+
+/* ── Metric compare row with visual bar ── */
 interface MetricCompareRowProps {
   label: string;
-  icon: React.ElementType;
   value1: number;
   value2: number;
   format?: (v: number) => string;
-  iconColor?: string;
+  /** true = lower is better (e.g. scoring avg) */
+  lowerIsBetter?: boolean;
 }
 
-function MetricCompareRow({ label, icon: Icon, value1, value2, format = String, iconColor }: MetricCompareRowProps) {
-  const winner = value1 > value2 ? 1 : value2 > value1 ? 2 : 0;
-  
+function MetricCompareRow({ label, value1, value2, format = String, lowerIsBetter = false }: MetricCompareRowProps) {
+  const total = value1 + value2;
+  const pct1 = total > 0 ? (value1 / total) * 100 : 50;
+  const pct2 = total > 0 ? (value2 / total) * 100 : 50;
+
+  let isLeading1: boolean;
+  let isLeading2: boolean;
+  if (lowerIsBetter) {
+    // For scoring/putting: lower is better, but only if value > 0
+    isLeading1 = value1 > 0 && value2 > 0 ? value1 < value2 : false;
+    isLeading2 = value1 > 0 && value2 > 0 ? value2 < value1 : false;
+  } else {
+    isLeading1 = value1 > value2;
+    isLeading2 = value2 > value1;
+  }
+
   return (
-    <div className="flex items-center py-3 border-b border-border last:border-0">
-      <div className={cn(
-        'flex-1 text-right pr-4',
-        winner === 1 && 'font-bold text-primary'
-      )}>
-        <span className="text-lg font-semibold">{format(value1)}</span>
+    <div className="py-3 border-b last:border-0" style={{ borderColor: 'rgba(0,0,0,0.04)' }}>
+      <div className="flex items-center justify-between mb-1.5">
+        <span style={{ fontSize: 13, fontWeight: 600 }} className={isLeading1 ? 'text-foreground' : 'text-muted-foreground'}>
+          {format(value1)}
+        </span>
+        <span style={{ fontSize: 11, fontWeight: 500 }} className="text-muted-foreground">
+          {label}
+        </span>
+        <span style={{ fontSize: 13, fontWeight: 600 }} className={isLeading2 ? 'text-foreground' : 'text-muted-foreground'}>
+          {format(value2)}
+        </span>
       </div>
-      
-      <div className="w-28 flex flex-col items-center">
-        <Icon className={cn('w-4 h-4 mb-1', iconColor || 'text-muted-foreground')} />
-        <span className="text-xs text-muted-foreground">{label}</span>
-      </div>
-      
-      <div className={cn(
-        'flex-1 text-left pl-4',
-        winner === 2 && 'font-bold text-primary'
-      )}>
-        <span className="text-lg font-semibold">{format(value2)}</span>
+      <div className="flex gap-0.5 h-1.5 rounded-full overflow-hidden">
+        <div
+          className="rounded-l-full"
+          style={{
+            width: `${pct1}%`,
+            backgroundColor: isLeading1 ? '#f59e0b' : 'hsl(var(--border))',
+          }}
+        />
+        <div
+          className="rounded-r-full"
+          style={{
+            width: `${pct2}%`,
+            backgroundColor: isLeading2 ? '#f59e0b' : 'hsl(var(--border))',
+          }}
+        />
       </div>
     </div>
   );
 }
 
-function AlumniCompareBlock({ title, alumni1, alumni2 }: { 
-  title: string; 
-  alumni1: CollegeAlumnus[]; 
+/* ── Stat section card ── */
+function StatSection({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div style={{ marginTop: 24 }}>
+      <SectionHeader className="mb-3">{title}</SectionHeader>
+      <div className="bg-card rounded-2xl border border-border/50 p-4" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/* ── Alumni block with stat values ── */
+function AlumniCompareBlock({ title, alumni1, alumni2, statKey }: {
+  title: string;
+  alumni1: CollegeAlumnus[];
   alumni2: CollegeAlumnus[];
+  statKey: 'earnings' | 'world_ranking' | 'wins';
 }) {
+  const formatStat = (a: CollegeAlumnus) => {
+    if (statKey === 'earnings') return formatCurrency(a.earnings || 0);
+    if (statKey === 'world_ranking') return a.world_ranking ? `#${a.world_ranking}` : '—';
+    if (statKey === 'wins') return `${a.wins || 0}W`;
+    return '';
+  };
+
+  const renderSide = (alumni: CollegeAlumnus[]) => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+      {alumni.length > 0 ? alumni.map((a, i) => (
+        <Link
+          key={a.id}
+          to={`/tourhub/player/${a.id}`}
+          className="flex items-center gap-2 bg-card rounded-xl border border-border/50 hover:border-border transition-colors"
+          style={{ padding: '10px 12px' }}
+        >
+          <span className="text-muted-foreground" style={{ fontSize: 11, fontWeight: 500, width: '16px', fontVariantNumeric: 'tabular-nums' }}>{i + 1}</span>
+          <div className="w-8 h-8 bg-muted overflow-hidden shrink-0" style={{ borderRadius: '34%' }}>
+            <img
+              src={getPlayerHeadshotUrl(`${a.first_name} ${a.last_name}`, a.tour_codes?.[0] ?? 'pga')}
+              alt={`${a.first_name} ${a.last_name}`}
+              className="w-full h-full object-cover"
+              onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+            />
+          </div>
+          <div className="flex-1 min-w-0">
+            <span className="text-foreground truncate block" style={{ fontSize: 13, fontWeight: 600 }}>
+              {a.first_name} {a.last_name}
+            </span>
+            <span className="text-muted-foreground" style={{ fontSize: 11, fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
+              {formatStat(a)}
+            </span>
+          </div>
+        </Link>
+      )) : (
+        <p className="text-muted-foreground py-2" style={{ fontSize: 12 }}>No data</p>
+      )}
+    </div>
+  );
+
   return (
-    <div className="mt-6">
-      <h3 className="text-sm font-semibold text-foreground mb-3">{title}</h3>
+    <div style={{ marginTop: 24 }}>
+      <SectionHeader className="mb-3">{title}</SectionHeader>
       <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          {alumni1.length > 0 ? alumni1.map((a, i) => (
-            <Link
-              key={a.id}
-              to={`/tourhub/player/${a.id}`}
-              className="flex items-center gap-2 p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
-            >
-              <span className="text-xs text-muted-foreground w-4">{i + 1}</span>
-              <div className="w-6 h-6 bg-card overflow-hidden shrink-0" style={{ borderRadius: '34%' }}>
-                <img
-                  src={getPlayerHeadshotUrl(`${a.first_name} ${a.last_name}`, a.tour_codes?.[0] ?? 'pga')}
-                  alt={`${a.first_name} ${a.last_name}`}
-                  className="w-full h-full object-cover"
-                  onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-                />
-              </div>
-              <span className="text-xs text-foreground truncate">
-                {a.first_name} {a.last_name}
-              </span>
-            </Link>
-          )) : (
-            <p className="text-xs text-muted-foreground py-2">No data</p>
-          )}
-        </div>
-        
-        <div className="space-y-2">
-          {alumni2.length > 0 ? alumni2.map((a, i) => (
-            <Link
-              key={a.id}
-              to={`/tourhub/player/${a.id}`}
-              className="flex items-center gap-2 p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
-            >
-              <span className="text-xs text-muted-foreground w-4">{i + 1}</span>
-              <div className="w-6 h-6 bg-card overflow-hidden shrink-0" style={{ borderRadius: '34%' }}>
-                <img
-                  src={getPlayerHeadshotUrl(`${a.first_name} ${a.last_name}`, a.tour_codes?.[0] ?? 'pga')}
-                  alt={`${a.first_name} ${a.last_name}`}
-                  className="w-full h-full object-cover"
-                  onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-                />
-              </div>
-              <span className="text-xs text-foreground truncate">
-                {a.first_name} {a.last_name}
-              </span>
-            </Link>
-          )) : (
-            <p className="text-xs text-muted-foreground py-2">No data</p>
-          )}
-        </div>
+        {renderSide(alumni1)}
+        {renderSide(alumni2)}
       </div>
     </div>
   );
 }
 
+/* ── Helpers ── */
+function formatPct(v: number): string {
+  if (!v) return '—';
+  return `${v.toFixed(1)}%`;
+}
+
+function formatAvg(v: number): string {
+  if (!v) return '—';
+  return v.toFixed(2);
+}
+
+function formatDist(v: number): string {
+  if (!v) return '—';
+  return `${v.toFixed(1)} yds`;
+}
+
+function formatSg(v: number): string {
+  if (!v) return '—';
+  return v >= 0 ? `+${v.toFixed(2)}` : v.toFixed(2);
+}
+
+/* ── Main component ── */
 export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps) {
   const { college1, college2 } = data;
   const { data: season } = useTourSeason();
   const seasonYear = season?.year || new Date().getFullYear();
-  
+
   const name1 = college1.media?.short_name || college1.media?.college_name || 'College 1';
   const name2 = college2.media?.short_name || college2.media?.college_name || 'College 2';
-  
+
+  const s1 = college1.stats;
+  const s2 = college2.stats;
+
+  // Count categories led for summary card
+  const comparisons: [number, number, boolean][] = [
+    [s1?.earnings_total || 0, s2?.earnings_total || 0, false],
+    [s1?.wins_total || 0, s2?.wins_total || 0, false],
+    [s1?.top10_total || 0, s2?.top10_total || 0, false],
+    [s1?.top25_total || 0, s2?.top25_total || 0, false],
+    [s1?.events_total || 0, s2?.events_total || 0, false],
+    [s1?.player_count || 0, s2?.player_count || 0, false],
+    [s1?.avg_scoring || 0, s2?.avg_scoring || 0, true],
+    [s1?.avg_sg_total || 0, s2?.avg_sg_total || 0, false],
+    [s1?.avg_putting || 0, s2?.avg_putting || 0, true],
+    [s1?.avg_scrambling || 0, s2?.avg_scrambling || 0, false],
+    [s1?.avg_driving_distance || 0, s2?.avg_driving_distance || 0, false],
+    [s1?.avg_driving_accuracy || 0, s2?.avg_driving_accuracy || 0, false],
+    [s1?.avg_gir || 0, s2?.avg_gir || 0, false],
+    [s1?.avg_sand_saves || 0, s2?.avg_sand_saves || 0, false],
+  ];
+
+  let c1Wins = 0;
+  let c2Wins = 0;
+  comparisons.forEach(([v1, v2, lowerBetter]) => {
+    if (v1 === 0 && v2 === 0) return;
+    if (lowerBetter) {
+      if (v1 > 0 && v2 > 0) {
+        if (v1 < v2) c1Wins++;
+        else if (v2 < v1) c2Wins++;
+      }
+    } else {
+      if (v1 > v2) c1Wins++;
+      else if (v2 > v1) c2Wins++;
+    }
+  });
+
   return (
     <div className={cn('', className)}>
-      {/* Hero Strip */}
+      {/* VS Header */}
       <div className="flex items-center justify-between mb-6">
-        <Link 
-          to={`/tourhub/college-golf/${college1.stats?.normalized_name}`}
+        <Link
+          to={`/tourhub/college-golf/${s1?.normalized_name}`}
           className="flex flex-col items-center group"
         >
-          <div className="w-16 h-16 rounded-xl bg-card border border-border flex items-center justify-center overflow-hidden mb-2 group-hover:border-primary/30 transition-colors">
+          <div className="w-20 h-20 rounded-xl bg-card border border-border flex items-center justify-center overflow-hidden mb-2 group-hover:border-primary/30 transition-colors">
             {getCollegeLogoUrl(college1.media?.college_name || name1) ? (
-              <img src={getCollegeLogoUrl(college1.media?.college_name || name1)!} alt={name1} className="w-12 h-12 object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+              <img src={getCollegeLogoUrl(college1.media?.college_name || name1)!} alt={name1} className="w-16 h-16 object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
             ) : (
               <span className="text-xl font-bold text-muted-foreground">{name1.charAt(0)}</span>
             )}
           </div>
-          <span className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
+          <span className="text-foreground group-hover:text-primary transition-colors text-center" style={{ fontSize: 16, fontWeight: 600 }}>
             {name1}
           </span>
         </Link>
-        
+
         <div className="flex flex-col items-center">
-          <span className="text-2xl font-black text-muted-foreground">VS</span>
-          <span className="text-xs text-muted-foreground">{seasonYear} Season</span>
+          <span className="text-muted-foreground/40" style={{ fontSize: 16, fontWeight: 800 }}>VS</span>
+          <span className="text-muted-foreground/60" style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
+            {seasonYear} Season
+          </span>
         </div>
-        
-        <Link 
-          to={`/tourhub/college-golf/${college2.stats?.normalized_name}`}
+
+        <Link
+          to={`/tourhub/college-golf/${s2?.normalized_name}`}
           className="flex flex-col items-center group"
         >
-          <div className="w-16 h-16 rounded-xl bg-card border border-border flex items-center justify-center overflow-hidden mb-2 group-hover:border-primary/30 transition-colors">
+          <div className="w-20 h-20 rounded-xl bg-card border border-border flex items-center justify-center overflow-hidden mb-2 group-hover:border-primary/30 transition-colors">
             {getCollegeLogoUrl(college2.media?.college_name || name2) ? (
-              <img src={getCollegeLogoUrl(college2.media?.college_name || name2)!} alt={name2} className="w-12 h-12 object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+              <img src={getCollegeLogoUrl(college2.media?.college_name || name2)!} alt={name2} className="w-16 h-16 object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
             ) : (
               <span className="text-xl font-bold text-muted-foreground">{name2.charAt(0)}</span>
             )}
           </div>
-          <span className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
+          <span className="text-foreground group-hover:text-primary transition-colors text-center" style={{ fontSize: 16, fontWeight: 600 }}>
             {name2}
           </span>
         </Link>
       </div>
-      
-      {/* Metrics Comparison */}
-      <div className="bg-card border border-border rounded-xl p-4">
-        <MetricCompareRow
-          label="Earnings"
-          icon={DollarSign}
-          value1={college1.stats?.earnings_total || 0}
-          value2={college2.stats?.earnings_total || 0}
-          format={formatCurrency}
-          iconColor="text-emerald-600"
-        />
-        <MetricCompareRow
-          label="Wins"
-          icon={Trophy}
-          value1={college1.stats?.wins_total || 0}
-          value2={college2.stats?.wins_total || 0}
-          iconColor="text-amber-500"
-        />
-        <MetricCompareRow
-          label="Cuts Made"
-          icon={Target}
-          value1={college1.stats?.cuts_total || 0}
-          value2={college2.stats?.cuts_total || 0}
-        />
-        <MetricCompareRow
-          label="Top 10s"
-          icon={TrendingUp}
-          value1={college1.stats?.top10_total || 0}
-          value2={college2.stats?.top10_total || 0}
-          iconColor="text-primary"
-        />
+
+      {/* Summary Verdict Card */}
+      <div className="bg-card rounded-2xl border border-border/50 p-4" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+        <SectionHeader className="mb-3">Season Summary</SectionHeader>
+        <div className="flex items-center justify-between">
+          <div className="text-center flex-1">
+            <span className="text-foreground block" style={{ fontSize: 28, fontWeight: 700 }}>{c1Wins}</span>
+            <span className="text-muted-foreground block" style={{ fontSize: 11, fontWeight: 500, marginTop: 4 }}>categories led</span>
+          </div>
+          <div className="text-center">
+            <span className="text-muted-foreground/40" style={{ fontSize: 14, fontWeight: 600 }}>—</span>
+          </div>
+          <div className="text-center flex-1">
+            <span className="text-foreground block" style={{ fontSize: 28, fontWeight: 700 }}>{c2Wins}</span>
+            <span className="text-muted-foreground block" style={{ fontSize: 11, fontWeight: 500, marginTop: 4 }}>categories led</span>
+          </div>
+        </div>
       </div>
-      
-      {/* Alumni Comparisons */}
+
+      {/* Season Overview */}
+      <StatSection title="Season Overview">
+        <MetricCompareRow label="Earnings" value1={s1?.earnings_total || 0} value2={s2?.earnings_total || 0} format={formatCurrency} />
+        <MetricCompareRow label="Wins" value1={s1?.wins_total || 0} value2={s2?.wins_total || 0} />
+        <MetricCompareRow label="Top 10s" value1={s1?.top10_total || 0} value2={s2?.top10_total || 0} />
+        <MetricCompareRow label="Top 25s" value1={s1?.top25_total || 0} value2={s2?.top25_total || 0} />
+        <MetricCompareRow label="Events Played" value1={s1?.events_total || 0} value2={s2?.events_total || 0} />
+        <MetricCompareRow label="Players on Tour" value1={s1?.player_count || 0} value2={s2?.player_count || 0} />
+      </StatSection>
+
+      {/* Performance Stats */}
+      <StatSection title="Performance Stats">
+        <MetricCompareRow label="Avg Scoring" value1={s1?.avg_scoring || 0} value2={s2?.avg_scoring || 0} format={formatAvg} lowerIsBetter />
+        <MetricCompareRow label="Avg SG Total" value1={s1?.avg_sg_total || 0} value2={s2?.avg_sg_total || 0} format={formatSg} />
+        <MetricCompareRow label="Avg Putting" value1={s1?.avg_putting || 0} value2={s2?.avg_putting || 0} format={formatAvg} lowerIsBetter />
+        <MetricCompareRow label="Avg Scrambling" value1={s1?.avg_scrambling || 0} value2={s2?.avg_scrambling || 0} format={formatPct} />
+      </StatSection>
+
+      {/* Ball Striking */}
+      <StatSection title="Ball Striking">
+        <MetricCompareRow label="Driving Distance" value1={s1?.avg_driving_distance || 0} value2={s2?.avg_driving_distance || 0} format={formatDist} />
+        <MetricCompareRow label="Driving Accuracy" value1={s1?.avg_driving_accuracy || 0} value2={s2?.avg_driving_accuracy || 0} format={formatPct} />
+        <MetricCompareRow label="GIR" value1={s1?.avg_gir || 0} value2={s2?.avg_gir || 0} format={formatPct} />
+        <MetricCompareRow label="Sand Saves" value1={s1?.avg_sand_saves || 0} value2={s2?.avg_sand_saves || 0} format={formatPct} />
+      </StatSection>
+
+      {/* Alumni Sections */}
       <AlumniCompareBlock
         title="Top Earners"
         alumni1={college1.topEarners}
         alumni2={college2.topEarners}
+        statKey="earnings"
       />
       <AlumniCompareBlock
         title="Best World Rankings"
         alumni1={college1.topRanked}
         alumni2={college2.topRanked}
+        statKey="world_ranking"
+      />
+      <AlumniCompareBlock
+        title="Top Winners"
+        alumni1={college1.topWinners}
+        alumni2={college2.topWinners}
+        statKey="wins"
       />
     </div>
   );
