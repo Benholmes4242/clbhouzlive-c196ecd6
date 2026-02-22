@@ -1,6 +1,7 @@
 import { useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Trophy, TrendingUp, RefreshCw } from 'lucide-react';
+import { Menu, Trophy, TrendingUp, RefreshCw } from 'lucide-react';
+import { openTourNav } from '../contexts/TourNavContext';
 import { motion } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
 import { TourHubShell } from '../components';
@@ -115,29 +116,19 @@ export function CollegeGolfHubPage() {
           </div>
         )}
 
-        {/* Back Link — pill style, bg-white/15, backdrop-blur */}
-        <div
-          className="absolute z-20"
-          style={{ top: 56, left: 16 }}
+        {/* Burger menu — matches Players page */}
+        <button
+          className="absolute z-20 flex items-center justify-center"
+          style={{ top: '56px', left: '16px', width: '44px', height: '44px' }}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
+          aria-label="Open tour menu"
         >
-          <Link
-            to="/tourhub"
-            className="inline-flex items-center gap-1.5 transition-colors active:scale-95"
-            style={{
-              background: 'rgba(255,255,255,0.15)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-              borderRadius: 9999,
-              padding: '8px 14px',
-              color: 'white',
-              fontSize: 13,
-              fontWeight: 500,
-            }}
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Tour Hub
-          </Link>
-        </div>
+          <Menu
+            className="w-[22px] h-[22px]"
+            strokeWidth={2}
+            style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5))' }}
+          />
+        </button>
 
         {/* Immersive Hero */}
         {topCollege && (
@@ -157,9 +148,21 @@ export function CollegeGolfHubPage() {
           />
         )}
 
+        {/* ← Tour Overview link */}
+        <div className="px-4" style={{ marginTop: 12 }}>
+          <Link
+            to="/tourhub?tab=overview"
+            replace
+            className="text-muted-foreground hover:text-foreground transition-colors active:opacity-70"
+            style={{ fontSize: 13, fontWeight: 500 }}
+          >
+            ← Tour Overview
+          </Link>
+        </div>
+
         {/* Content area */}
         <div className="px-4" style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
-          {/* Search — 16px gap from alumni strip */}
+          {/* Search — 16px gap from tour overview link */}
           <div style={{ marginTop: 16 }}>
             <CollegeSearch />
           </div>
