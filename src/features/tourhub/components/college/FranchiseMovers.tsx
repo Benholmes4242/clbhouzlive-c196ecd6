@@ -145,8 +145,14 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
             })
           ) : (
             <div className="flex flex-col items-center text-center" style={{ paddingTop: 32 }}>
-               <p style={{ fontSize: 16, fontWeight: 600 }} className="text-foreground/60">No movement this week</p>
-               <p style={{ fontSize: 13, fontWeight: 400, marginTop: 4 }} className="text-muted-foreground">Movers update every Monday based on weekly ranking changes.</p>
+               <p style={{ fontSize: 16, fontWeight: 600 }} className="text-foreground/60">
+                 {direction === 'up' ? 'No risers this week' : 'No fallers this week'}
+               </p>
+               <p style={{ fontSize: 13, fontWeight: 400, marginTop: 4 }} className="text-muted-foreground">
+                 {direction === 'up'
+                   ? 'No colleges climbed the rankings this week.'
+                   : 'No colleges dropped in the rankings this week. Check back next Monday.'}
+               </p>
             </div>
           )}
         </motion.div>
