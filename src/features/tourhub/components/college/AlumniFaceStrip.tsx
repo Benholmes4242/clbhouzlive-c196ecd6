@@ -29,12 +29,14 @@ const MAX_VISIBLE = 5;
 export function AlumniFaceStrip({ alumni, collegeName, collegeSlug, totalAlumniCount, className }: AlumniFaceStripProps) {
   if (!alumni.length) return null;
 
-  const visible = alumni.slice(0, MAX_VISIBLE);
+  // Sort alumni so those with photos appear first (left)
+  const sorted = [...alumni].sort((a, b) => {
+    const aHas = a.photo_url || a.pga_tour_id ? 1 : 0;
+    const bHas = b.photo_url || b.pga_tour_id ? 1 : 0;
+    return bHas - aHas;
+  });
+  const visible = sorted.slice(0, MAX_VISIBLE);
   const overflow = totalAlumniCount - MAX_VISIBLE;
-  const namePreview = visible
-    .map(a => a.full_name.split(' ').pop())
-    .slice(0, 4)
-    .join(', ');
 
   return (
     <motion.div
@@ -111,10 +113,7 @@ export function AlumniFaceStrip({ alumni, collegeName, collegeSlug, totalAlumniC
 
         {/* Text */}
         <div className="flex-1 min-w-0">
-          <p style={{ fontSize: 13, fontWeight: 500 }} className="text-foreground truncate">
-            {namePreview} …
-          </p>
-          <p style={{ fontSize: 11, fontWeight: 400 }} className="text-muted-foreground mt-0.5">
+          <p className="text-sm text-muted-foreground">
             {totalAlumniCount} alumni on tour this season
           </p>
         </div>

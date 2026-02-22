@@ -1,6 +1,6 @@
 import { useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Menu, Trophy, TrendingUp, RefreshCw } from 'lucide-react';
+import { Menu, TrendingUp, RefreshCw } from 'lucide-react';
 import { openTourNav } from '../contexts/TourNavContext';
 import { motion } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
@@ -167,17 +167,8 @@ export function CollegeGolfHubPage() {
             <CollegeSearch />
           </div>
 
-          {/* Franchise Leaderboard section — 24px gap */}
-          <section style={{ marginTop: 24 }}>
-            <div className="flex items-center gap-2" style={{ marginBottom: 12 }}>
-              <Trophy className="w-4 h-4 text-muted-foreground" />
-              <h2
-                className="text-foreground"
-                style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.3px' }}
-              >
-                Franchise Leaderboard
-              </h2>
-            </div>
+          {/* Franchise Leaderboard section */}
+          <section style={{ marginTop: 16 }}>
             <FranchiseLeaderboard limit={25} />
           </section>
 
