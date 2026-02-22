@@ -1,5 +1,5 @@
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { TourHubShell } from '../components';
 import { CollegeCompareHero } from '../components/college/CollegeCompareHero';
 import { useCollegeCompare } from '../hooks/useCollegeCompare';
@@ -21,30 +21,31 @@ export function CollegeComparePage() {
   
   return (
     <TourHubShell>
-      <div className="min-h-screen relative" style={{ backgroundColor: '#F8FAFC' }}>
+      <div
+        className="min-h-screen relative px-4"
+        style={{
+          backgroundColor: '#F8FAFC',
+          paddingTop: 'max(var(--sat, env(safe-area-inset-top, 0px)), 47px)',
+          paddingBottom: 'calc(var(--sab, 30px) + 16px)',
+        }}
+      >
         {/* Burger menu */}
         <button
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
           aria-label="Open tour menu"
           className="absolute z-30 flex items-center justify-center"
-          style={{ width: 44, height: 44, top: 16, left: 16 }}
+          style={{
+            width: 44,
+            height: 44,
+            top: 'calc(max(var(--sat, env(safe-area-inset-top, 0px)), 47px) + 8px)',
+            left: 16,
+          }}
         >
           <Menu className="w-[22px] h-[22px] text-foreground" style={{ strokeWidth: 2 }} />
         </button>
 
-        {/* Back Link */}
-        <div className="pt-4">
-          <button
-            onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back
-          </button>
-        </div>
-        
         {/* Content */}
-        <div className="pb-8 pt-4">
+        <div className="pt-4">
           {!hasValidParams ? (
             <div className="text-center py-16">
               <p className="text-base text-muted-foreground mb-4">
@@ -69,7 +70,7 @@ export function CollegeComparePage() {
               </p>
             </div>
           ) : data ? (
-            <CollegeCompareHero data={data} />
+            <CollegeCompareHero data={data} onBack={() => navigate(-1)} />
           ) : null}
         </div>
       </div>
