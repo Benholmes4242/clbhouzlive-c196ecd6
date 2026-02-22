@@ -144,7 +144,7 @@ export function TopPlayersPreview() {
                 </span>
                 <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center overflow-hidden">
                   {(() => {
-                    const headshot = getPlayerHeadshotUrl(stat.player?.full_name ?? '', 'pga');
+                    const headshot = getPlayerHeadshotUrl(stat.player?.full_name ?? '', (stat.player as any)?.tour_codes?.[0] ?? 'pga');
                     return (
                       <img 
                         src={headshot}

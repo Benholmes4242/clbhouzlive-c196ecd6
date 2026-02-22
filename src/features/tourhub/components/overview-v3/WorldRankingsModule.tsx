@@ -304,7 +304,7 @@ export function WorldRankingsModule() {
                             const initials = `${entry.player.first_name?.[0] ?? ''}${entry.player.last_name?.[0] ?? ''}`
                               .toUpperCase() || '?';
 
-                            const photoUrl = getPlayerHeadshotUrl(fullName, 'pga');
+                            const photoUrl = getPlayerHeadshotUrl(fullName, entry.player.tour_codes?.[0] ?? 'pga');
 
                             return (
                               <div className="relative w-full h-full">

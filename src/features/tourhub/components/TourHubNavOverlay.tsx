@@ -456,7 +456,7 @@ export function TourHubNavOverlay({
                           
                           {/* TM-11: Avatar with initials fallback */}
                           {(() => {
-                            const headshot = getPlayerHeadshotUrl(player.playerName, 'pga');
+                            const headshot = getPlayerHeadshotUrl(player.playerName, (player as any).tourCode ?? 'pga');
                             const initials = getInitials(player.playerName);
                             return (
                               <AvatarWithInitials

@@ -21,6 +21,7 @@ interface LeaderRowProps {
     countryCode?: string | null;
     photoUrl?: string | null;
     pgaTourId?: string | null;
+    tourCodes?: string[] | null;
   };
   value: number;
   leaderValue: number;
@@ -42,7 +43,7 @@ export function LeaderRow({
   index,
 }: LeaderRowProps) {
   const displayRank = overrideRank ?? rank;
-  const photoUrl = getPlayerHeadshotUrl(player.fullName, 'pga');
+  const photoUrl = getPlayerHeadshotUrl(player.fullName, player.tourCodes?.[0] ?? 'pga');
   const flag = countryCodeToFlag(player.countryCode);
   const countryName = titleCaseCountry(player.country);
   const fmt = formatOverride ?? category.format;
