@@ -3,9 +3,10 @@
  * Straight-edge, Ken Burns, gradient scrim, stat pill.
  */
 
-import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Menu } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { openTourNav } from '../../contexts/TourNavContext';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
 import type { LeaderCategory } from './constants';
@@ -30,7 +31,7 @@ interface LeadersHeroProps {
 }
 
 export function LeadersHero({ leader, category, formatOverride, unitOverride }: LeadersHeroProps) {
-  const navigate = useNavigate();
+  
   const { player, value } = leader;
   const photoUrl = resolvePhotoUrl(player.photo_url, player.pga_tour_id, 'hero');
   const flag = countryCodeToFlag(player.country_code);
@@ -45,28 +46,26 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
       exit={{ opacity: 0 }}
       transition={{ duration: 0.4 }}
     >
-      {/* Back button — 44×44 touch target, 22px icon */}
-      <button
-        type="button"
-        onClick={() => navigate(-1)}
-        className="absolute z-30 flex items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 active:scale-95 transition-all"
-        style={{
-          top: 56,
-          left: 16,
-          width: 44,
-          height: 44,
-        }}
-        aria-label="Back"
+      {/* Burger menu */}
+      <button 
+        className="absolute z-20 flex items-center justify-center"
+        style={{ top: '56px', left: '16px', width: '44px', height: '44px' }}
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
+        aria-label="Open tour menu"
       >
-        <ArrowLeft style={{ width: 22, height: 22, filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }} className="text-white" />
+        <Menu 
+          className="w-[22px] h-[22px]" 
+          strokeWidth={2}
+          style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5))' }}
+        />
       </button>
 
       <Link
         to={`/tourhub/player/${player.id}`}
         className="block active:scale-[0.995] transition-transform"
       >
-        {/* Hero — 65dvh, min 400px, max 600px */}
-        <div className="relative w-full overflow-hidden" style={{ height: 'clamp(400px, 65dvh, 600px)' }}>
+        {/* Hero — 50dvh */}
+        <div className="relative w-full overflow-hidden" style={{ height: '50dvh' }}>
           {photoUrl ? (
             <motion.img
               src={photoUrl}
