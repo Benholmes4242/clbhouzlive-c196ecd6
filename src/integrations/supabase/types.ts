@@ -6096,6 +6096,62 @@ export type Database = {
           },
         ]
       }
+      player_ratings: {
+        Row: {
+          breakdown: Json
+          computed_at: string | null
+          created_at: string | null
+          events_minimum_met: boolean | null
+          id: string
+          player_id: string
+          previous_rating: number | null
+          rating: number
+          rating_delta: number | null
+          scouting_report: string | null
+          season_id: string
+          tier: string
+          updated_at: string | null
+        }
+        Insert: {
+          breakdown?: Json
+          computed_at?: string | null
+          created_at?: string | null
+          events_minimum_met?: boolean | null
+          id?: string
+          player_id: string
+          previous_rating?: number | null
+          rating: number
+          rating_delta?: number | null
+          scouting_report?: string | null
+          season_id: string
+          tier: string
+          updated_at?: string | null
+        }
+        Update: {
+          breakdown?: Json
+          computed_at?: string | null
+          created_at?: string | null
+          events_minimum_met?: boolean | null
+          id?: string
+          player_id?: string
+          previous_rating?: number | null
+          rating?: number
+          rating_delta?: number | null
+          scouting_report?: string | null
+          season_id?: string
+          tier?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_ratings_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "sr_players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       post_comments: {
         Row: {
           actor_id: string
@@ -13434,6 +13490,7 @@ export type Database = {
         Returns: number
       }
       club_key_v2: { Args: { p_name: string }; Returns: string }
+      compute_player_ratings: { Args: never; Returns: undefined }
       count_orphan_posts: { Args: never; Returns: number }
       create_business_account: {
         Args: {
