@@ -44,7 +44,7 @@ interface InfoFieldProps {
 function InfoField({ label, value }: InfoFieldProps) {
   return (
     <div>
-      <p className="text-muted-foreground/50" style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase' }}>{label}</p>
+      <p className="text-muted-foreground/50" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase' }}>{label}</p>
       <div className="text-foreground" style={{ fontSize: '14px', fontWeight: 500, marginTop: '2px' }}>{value}</div>
     </div>
   );

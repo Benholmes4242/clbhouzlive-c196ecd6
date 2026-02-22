@@ -44,15 +44,14 @@ function StatRow({ label, value, trend, barPercent, barIndex = 0 }: StatRowProps
   
   return (
     <div
-      style={{ padding: '14px 0', borderBottom: '1px solid hsl(var(--border) / 0.08)' }}
+      style={{ padding: '14px 0', borderBottom: '1px solid hsl(var(--border) / 0.15)' }}
       aria-label={`${label}: ${value}`}
     >
       <div className="flex justify-between items-center">
-        <span className="text-foreground" style={{ fontSize: '14px', fontWeight: 400 }}>{label}</span>
+        <span className="text-foreground" style={{ fontSize: '14px', fontWeight: 500 }}>{label}</span>
         <div className="flex flex-col items-end">
           <span style={{
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: '15px',
+            fontSize: '14px',
             fontWeight: 700,
             fontVariantNumeric: 'tabular-nums',
             color: hasValue
@@ -65,7 +64,7 @@ function StatRow({ label, value, trend, barPercent, barIndex = 0 }: StatRowProps
             )}
           </span>
           {barPercent !== undefined && hasValue && (
-            <div style={{ marginTop: '4px', width: '120px', height: '4px', borderRadius: '2px' }} className="bg-muted/30 overflow-hidden">
+            <div style={{ marginTop: '4px', width: '120px', height: '4px', borderRadius: '2px', backgroundColor: '#CBD5E1' }} className="overflow-hidden">
               <motion.div
                 style={{
                   height: '100%',
@@ -100,14 +99,13 @@ function SGBar({ label, value }: SGBarProps) {
 
   return (
     <div
-      style={{ padding: '14px 0', borderBottom: '1px solid hsl(var(--border) / 0.08)' }}
+      style={{ padding: '14px 0', borderBottom: '1px solid hsl(var(--border) / 0.15)' }}
       aria-label={`${label}: ${formattedValue} strokes gained`}
     >
       <div className="flex justify-between items-center" style={{ marginBottom: '6px' }}>
-        <span className="text-foreground" style={{ fontSize: '14px', fontWeight: 400 }}>{label}</span>
+        <span className="text-foreground" style={{ fontSize: '14px', fontWeight: 500 }}>{label}</span>
         <span style={{
-          fontFamily: "'JetBrains Mono', monospace",
-          fontSize: '15px',
+          fontSize: '14px',
           fontWeight: 700,
           fontVariantNumeric: 'tabular-nums',
           color: isPositive ? '#22C55E' : '#EF4444',
@@ -115,13 +113,13 @@ function SGBar({ label, value }: SGBarProps) {
           {formattedValue}
         </span>
       </div>
-      <div className="relative overflow-hidden" style={{ height: '4px', borderRadius: '2px' }} >
-        <div className="absolute inset-0 bg-muted/30" />
+      <div className="relative overflow-hidden" style={{ height: '5px', borderRadius: '2.5px' }} >
+        <div className="absolute inset-0" style={{ backgroundColor: '#CBD5E1' }} />
         <div className="absolute left-1/2 top-0 bottom-0 w-px bg-border z-10" />
         <motion.div
           className="absolute top-0 bottom-0"
           style={{
-            borderRadius: '2px',
+            borderRadius: '2.5px',
             backgroundColor: isPositive ? '#22C55E' : '#EF4444',
             width: `${barWidth}%`,
             left: isPositive ? '50%' : `${50 - barWidth}%`,
@@ -144,8 +142,6 @@ interface PlayerSeasonStatsProps {
 export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
   const [activeTab, setActiveTab] = useState('Overview');
 
-  const cutsRatio = (playerStats.cuts_made && playerStats.events_played && playerStats.events_played > 0)
-    ? (playerStats.cuts_made / playerStats.events_played) * 100 : undefined;
   const top10Ratio = (playerStats.top_10s && playerStats.events_played && playerStats.events_played > 0)
     ? (playerStats.top_10s / playerStats.events_played) * 100 : undefined;
   const top25Ratio = (playerStats.top_25s && playerStats.events_played && playerStats.events_played > 0)
@@ -161,8 +157,8 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
         </h2>
       </div>
 
-      {/* Tab bar — underline style */}
-      <div className="flex" role="tablist" aria-label="Season Performance Stats" style={{ borderBottom: '1px solid hsl(var(--border) / 0.1)' }}>
+      {/* Tab bar — sticky underline style */}
+      <div className="flex sticky top-0 z-20 bg-background/95 backdrop-blur-md" role="tablist" aria-label="Season Performance Stats" style={{ borderBottom: '1px solid hsl(var(--border) / 0.1)' }}>
         {TABS.map((tab) => {
           const isActive = activeTab === tab;
           return (
@@ -209,15 +205,9 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
             <div>
               <SubSectionLabel icon={Trophy} label="RESULTS" />
               <StatRow label="Events Played" value={fmt(playerStats.events_played)} />
-              <StatRow label="Cuts Made" value={playerStats.cuts_made != null && playerStats.events_played
-                ? `${playerStats.cuts_made}/${playerStats.events_played}`
-                : fmt(playerStats.cuts_made)}
-                barPercent={cutsRatio}
-                barIndex={0}
-              />
               <StatRow label="Wins" value={fmt(playerStats.wins)} />
-              <StatRow label="Top 10s" value={fmt(playerStats.top_10s)} barPercent={top10Ratio} barIndex={1} />
-              <StatRow label="Top 25s" value={fmt(playerStats.top_25s)} barPercent={top25Ratio} barIndex={2} />
+              <StatRow label="Top 10s" value={fmt(playerStats.top_10s)} barPercent={top10Ratio} barIndex={0} />
+              <StatRow label="Top 25s" value={fmt(playerStats.top_25s)} barPercent={top25Ratio} barIndex={1} />
 
               <SubSectionLabel icon={TrendingUp} label="FINANCIALS" style={{ marginTop: '24px' }} />
               <StatRow label="Earnings" value={fmt(playerStats.earnings, 'currency')} />
@@ -268,7 +258,7 @@ function SubSectionLabel({ icon: Icon, label, style }: { icon: React.ElementType
     <p
       className="flex items-center gap-1.5 text-muted-foreground/50"
       style={{
-        fontSize: '10px',
+        fontSize: '11px',
         fontWeight: 700,
         letterSpacing: '0.8px',
         textTransform: 'uppercase' as const,
