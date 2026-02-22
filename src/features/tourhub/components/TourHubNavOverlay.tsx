@@ -482,20 +482,6 @@ export function TourHubNavOverlay({
                       );
                     })}
                   </div>
-                  {/* Right-side fade — matches panel background */}
-                  <div
-                    aria-hidden="true"
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      right: 0,
-                      bottom: 0,
-                      width: 40,
-                      background: 'linear-gradient(to right, transparent, hsl(var(--background) / 0.85))',
-                      pointerEvents: 'none',
-                      zIndex: 1,
-                    }}
-                  />
                 </div>
               </motion.div>
             )}
