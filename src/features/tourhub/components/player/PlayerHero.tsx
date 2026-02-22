@@ -4,7 +4,7 @@
  */
 
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowLeft, Share2, Globe, Menu } from 'lucide-react';
+import { ArrowLeft, Globe, Menu } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useRef, useCallback } from 'react';
 import { cn } from '@/lib/utils';
@@ -45,16 +45,8 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
     }
   }, [navigate, location.key]);
 
-  const handleShare = useCallback(async () => {
-    try {
-      await navigator.share({
-        title: player.full_name,
-        url: window.location.href,
-      });
-    } catch {
-      // User cancelled or not supported
-    }
-  }, [player.full_name]);
+
+
 
   return (
     <div
@@ -113,18 +105,8 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
         />
       </button>
 
-      {/* Share button — transparent, icon only */}
-      <button
-        onClick={handleShare}
-        aria-label="Share"
-        className="absolute z-30 flex items-center justify-center active:scale-95 transition-transform"
-        style={{ width: 44, height: 44, top: 56, right: 16 }}
-      >
-        <Share2
-          className="w-[20px] h-[20px] text-white"
-          style={{ strokeWidth: 2, filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }}
-        />
-      </button>
+
+
 
       {/* Overlay Content — bottom of hero */}
       <motion.div
