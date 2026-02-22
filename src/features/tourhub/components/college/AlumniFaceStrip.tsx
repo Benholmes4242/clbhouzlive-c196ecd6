@@ -54,6 +54,7 @@ export function AlumniFaceStrip({ alumni, collegeName, collegeSlug, totalAlumniC
           border: '1px solid hsl(var(--border) / 0.5)',
           borderRadius: 16,
           padding: '12px 16px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
         }}
       >
         {/* Stacked squircle avatars — 32×32, 34% radius, 2px white border, -8px overlap */}
@@ -113,7 +114,7 @@ export function AlumniFaceStrip({ alumni, collegeName, collegeSlug, totalAlumniC
 
         {/* Text */}
         <div className="flex-1 min-w-0">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground" style={{ fontWeight: 500 }}>
             {totalAlumniCount} alumni on tour this season
           </p>
         </div>

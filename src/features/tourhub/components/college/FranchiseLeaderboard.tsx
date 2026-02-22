@@ -69,16 +69,27 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
 
   return (
     <div className={cn('', className)}>
-      {/* Tabs — underline style, 4-column even, 14px */}
+      {/* Tabs — pill style, sticky */}
       <div
-        role="tablist"
-        aria-label="Franchise Leaderboard Sort"
+        className="sticky top-0 z-20 -mx-4 px-4 border-b border-border/30"
         style={{
-          borderBottom: '1px solid hsl(var(--border) / 0.1)',
-          marginBottom: 12,
+          background: 'hsl(var(--background))',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          paddingTop: 8,
+          paddingBottom: 8,
+          marginBottom: 16,
         }}
       >
-        <div className="flex">
+        <div
+          role="tablist"
+          aria-label="Franchise Leaderboard Sort"
+          className="flex rounded-xl border border-border/50"
+          style={{
+            background: 'hsl(var(--muted) / 0.3)',
+            padding: 4,
+          }}
+        >
           {METRIC_TABS.map(({ value, label }) => {
             const isSelected = activeMetric === value;
             return (
@@ -88,27 +99,19 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
                 aria-selected={isSelected}
                 onClick={() => setActiveMetric(value)}
                 className={cn(
-                  'relative flex-1 whitespace-nowrap active:scale-[0.98] transition-colors duration-200',
+                  'relative flex-1 whitespace-nowrap rounded-lg active:scale-[0.98] transition-all duration-200',
                   isSelected
-                    ? 'text-foreground'
-                    : 'text-muted-foreground hover:text-foreground'
+                    ? 'bg-card text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:bg-muted/50'
                 )}
                 style={{
                   fontSize: 14,
-                  fontWeight: isSelected ? 600 : 500,
-                  paddingBottom: 10,
-                  minHeight: 40,
+                  fontWeight: 600,
+                  minHeight: 44,
+                  padding: '10px 4px',
                 }}
               >
                 {label}
-                {isSelected && (
-                  <motion.div
-                    layoutId="franchise-tab-underline"
-                    className="absolute bottom-0 left-1/4 right-1/4 bg-foreground rounded-full"
-                    style={{ height: 2 }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                  />
-                )}
               </button>
             );
           })}
@@ -127,7 +130,7 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
             className="flex flex-col"
-            style={{ gap: 10 }}
+            style={{ gap: 12 }}
           >
             {isLoading ? (
               Array.from({ length: 5 }).map((_, i) => (

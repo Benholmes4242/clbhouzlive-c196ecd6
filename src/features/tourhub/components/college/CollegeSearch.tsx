@@ -33,14 +33,15 @@ export function CollegeSearch({ className }: CollegeSearchProps) {
           placeholder="Search colleges..."
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          className="w-full pl-11 pr-10 text-foreground focus:outline-none focus:ring-2 focus:ring-border/50"
+          className="w-full pl-11 pr-10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-border focus:shadow-lg"
           style={{
             height: 48,
-            fontSize: 13,
+            fontSize: 14,
             background: 'hsl(var(--card))',
             border: '1px solid hsl(var(--border) / 0.5)',
             borderRadius: 16,
             padding: '12px 16px 12px 44px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
           }}
         />
         {searchInput && (
