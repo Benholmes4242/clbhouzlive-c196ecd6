@@ -19,6 +19,7 @@ export function CollegeComparePage() {
   
   return (
     <TourHubShell>
+      <div className="min-h-screen" style={{ backgroundColor: '#F8FAFC' }}>
       {/* Back Link */}
       <div className="pt-4">
         <Link 
@@ -75,6 +76,7 @@ export function CollegeComparePage() {
         ) : data ? (
           <CollegeCompareHero data={data} />
         ) : null}
+      </div>
       </div>
     </TourHubShell>
   );
