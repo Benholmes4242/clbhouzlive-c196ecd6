@@ -10,6 +10,7 @@ import type { CollegeAlumnus } from '../../hooks/useCollegeAlumni';
 interface CollegeCompareHeroProps {
   data: CollegeCompareData;
   className?: string;
+  onBack?: () => void;
 }
 
 /* ── Section header matching design system ── */
@@ -42,7 +43,6 @@ function MetricCompareRow({ label, value1, value2, format = String, lowerIsBette
   let isLeading1: boolean;
   let isLeading2: boolean;
   if (lowerIsBetter) {
-    // For scoring/putting: lower is better, but only if value > 0
     isLeading1 = value1 > 0 && value2 > 0 ? value1 < value2 : false;
     isLeading2 = value1 > 0 && value2 > 0 ? value2 < value1 : false;
   } else {
@@ -96,16 +96,20 @@ function StatSection({ title, children }: { title: string; children: React.React
 }
 
 /* ── Alumni block with stat values ── */
-function AlumniCompareBlock({ title, alumni1, alumni2, statKey }: {
+function AlumniCompareBlock({ title, alumni1, alumni2, statKey, emptyLabel }: {
   title: string;
   alumni1: CollegeAlumnus[];
   alumni2: CollegeAlumnus[];
   statKey: 'earnings' | 'world_ranking' | 'wins';
+  emptyLabel?: string;
 }) {
   const formatStat = (a: CollegeAlumnus) => {
     if (statKey === 'earnings') return formatCurrency(a.earnings || 0);
     if (statKey === 'world_ranking') return a.world_ranking ? `#${a.world_ranking}` : '—';
-    if (statKey === 'wins') return `${a.wins || 0}W`;
+    if (statKey === 'wins') {
+      const w = a.wins || 0;
+      return `${w} win${w !== 1 ? 's' : ''}`;
+    }
     return '';
   };
 
@@ -128,8 +132,8 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey }: {
             />
           </div>
           <div className="flex-1 min-w-0">
-            <span className="text-foreground truncate block" style={{ fontSize: 13, fontWeight: 600 }}>
-              {a.first_name} {a.last_name}
+            <span className="text-foreground block" style={{ fontSize: 13, fontWeight: 600 }}>
+              {a.last_name}
             </span>
             <span className="text-muted-foreground" style={{ fontSize: 11, fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
               {formatStat(a)}
@@ -137,7 +141,9 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey }: {
           </div>
         </Link>
       )) : (
-        <p className="text-muted-foreground py-2" style={{ fontSize: 12 }}>No data</p>
+        <span className="text-muted-foreground py-2" style={{ fontSize: 12, fontWeight: 400 }}>
+          {emptyLabel || 'No data available'}
+        </span>
       )}
     </div>
   );
@@ -175,7 +181,7 @@ function formatSg(v: number): string {
 }
 
 /* ── Main component ── */
-export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps) {
+export function CollegeCompareHero({ data, className, onBack }: CollegeCompareHeroProps) {
   const { college1, college2 } = data;
   const { data: season } = useTourSeason();
   const seasonYear = season?.year || new Date().getFullYear();
@@ -186,7 +192,22 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
   const s1 = college1.stats;
   const s2 = college2.stats;
 
-  // Count categories led for summary card
+  // Check if performance/ball-striking data exists
+  const hasPerformanceData = !!(
+    s1?.avg_scoring || s2?.avg_scoring ||
+    s1?.avg_sg_total || s2?.avg_sg_total ||
+    s1?.avg_putting || s2?.avg_putting ||
+    s1?.avg_scrambling || s2?.avg_scrambling
+  );
+
+  const hasBallStrikingData = !!(
+    s1?.avg_driving_distance || s2?.avg_driving_distance ||
+    s1?.avg_driving_accuracy || s2?.avg_driving_accuracy ||
+    s1?.avg_gir || s2?.avg_gir ||
+    s1?.avg_sand_saves || s2?.avg_sand_saves
+  );
+
+  // Count categories led for summary card (only from populated stats)
   const comparisons: [number, number, boolean][] = [
     [s1?.earnings_total || 0, s2?.earnings_total || 0, false],
     [s1?.wins_total || 0, s2?.wins_total || 0, false],
@@ -194,15 +215,25 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
     [s1?.top25_total || 0, s2?.top25_total || 0, false],
     [s1?.events_total || 0, s2?.events_total || 0, false],
     [s1?.player_count || 0, s2?.player_count || 0, false],
-    [s1?.avg_scoring || 0, s2?.avg_scoring || 0, true],
-    [s1?.avg_sg_total || 0, s2?.avg_sg_total || 0, false],
-    [s1?.avg_putting || 0, s2?.avg_putting || 0, true],
-    [s1?.avg_scrambling || 0, s2?.avg_scrambling || 0, false],
-    [s1?.avg_driving_distance || 0, s2?.avg_driving_distance || 0, false],
-    [s1?.avg_driving_accuracy || 0, s2?.avg_driving_accuracy || 0, false],
-    [s1?.avg_gir || 0, s2?.avg_gir || 0, false],
-    [s1?.avg_sand_saves || 0, s2?.avg_sand_saves || 0, false],
   ];
+
+  // Only include performance stats in category count if they exist
+  if (hasPerformanceData) {
+    comparisons.push(
+      [s1?.avg_scoring || 0, s2?.avg_scoring || 0, true],
+      [s1?.avg_sg_total || 0, s2?.avg_sg_total || 0, false],
+      [s1?.avg_putting || 0, s2?.avg_putting || 0, true],
+      [s1?.avg_scrambling || 0, s2?.avg_scrambling || 0, false],
+    );
+  }
+  if (hasBallStrikingData) {
+    comparisons.push(
+      [s1?.avg_driving_distance || 0, s2?.avg_driving_distance || 0, false],
+      [s1?.avg_driving_accuracy || 0, s2?.avg_driving_accuracy || 0, false],
+      [s1?.avg_gir || 0, s2?.avg_gir || 0, false],
+      [s1?.avg_sand_saves || 0, s2?.avg_sand_saves || 0, false],
+    );
+  }
 
   let c1Wins = 0;
   let c2Wins = 0;
@@ -263,6 +294,17 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
         </Link>
       </div>
 
+      {/* Back button — below VS header */}
+      {onBack && (
+        <button
+          onClick={onBack}
+          className="text-muted-foreground active:opacity-70 transition-opacity mb-4"
+          style={{ fontSize: 13, fontWeight: 500 }}
+        >
+          ← Back
+        </button>
+      )}
+
       {/* Summary Verdict Card */}
       <div className="bg-card rounded-2xl border border-border/50 p-4" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
         <SectionHeader className="mb-3">Season Summary</SectionHeader>
@@ -291,21 +333,25 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
         <MetricCompareRow label="Players on Tour" value1={s1?.player_count || 0} value2={s2?.player_count || 0} />
       </StatSection>
 
-      {/* Performance Stats */}
-      <StatSection title="Performance Stats">
-        <MetricCompareRow label="Avg Scoring" value1={s1?.avg_scoring || 0} value2={s2?.avg_scoring || 0} format={formatAvg} lowerIsBetter />
-        <MetricCompareRow label="Avg SG Total" value1={s1?.avg_sg_total || 0} value2={s2?.avg_sg_total || 0} format={formatSg} />
-        <MetricCompareRow label="Avg Putting" value1={s1?.avg_putting || 0} value2={s2?.avg_putting || 0} format={formatAvg} lowerIsBetter />
-        <MetricCompareRow label="Avg Scrambling" value1={s1?.avg_scrambling || 0} value2={s2?.avg_scrambling || 0} format={formatPct} />
-      </StatSection>
+      {/* Performance Stats — only if data exists */}
+      {hasPerformanceData && (
+        <StatSection title="Performance Stats">
+          <MetricCompareRow label="Avg Scoring" value1={s1?.avg_scoring || 0} value2={s2?.avg_scoring || 0} format={formatAvg} lowerIsBetter />
+          <MetricCompareRow label="Avg SG Total" value1={s1?.avg_sg_total || 0} value2={s2?.avg_sg_total || 0} format={formatSg} />
+          <MetricCompareRow label="Avg Putting" value1={s1?.avg_putting || 0} value2={s2?.avg_putting || 0} format={formatAvg} lowerIsBetter />
+          <MetricCompareRow label="Avg Scrambling" value1={s1?.avg_scrambling || 0} value2={s2?.avg_scrambling || 0} format={formatPct} />
+        </StatSection>
+      )}
 
-      {/* Ball Striking */}
-      <StatSection title="Ball Striking">
-        <MetricCompareRow label="Driving Distance" value1={s1?.avg_driving_distance || 0} value2={s2?.avg_driving_distance || 0} format={formatDist} />
-        <MetricCompareRow label="Driving Accuracy" value1={s1?.avg_driving_accuracy || 0} value2={s2?.avg_driving_accuracy || 0} format={formatPct} />
-        <MetricCompareRow label="GIR" value1={s1?.avg_gir || 0} value2={s2?.avg_gir || 0} format={formatPct} />
-        <MetricCompareRow label="Sand Saves" value1={s1?.avg_sand_saves || 0} value2={s2?.avg_sand_saves || 0} format={formatPct} />
-      </StatSection>
+      {/* Ball Striking — only if data exists */}
+      {hasBallStrikingData && (
+        <StatSection title="Ball Striking">
+          <MetricCompareRow label="Driving Distance" value1={s1?.avg_driving_distance || 0} value2={s2?.avg_driving_distance || 0} format={formatDist} />
+          <MetricCompareRow label="Driving Accuracy" value1={s1?.avg_driving_accuracy || 0} value2={s2?.avg_driving_accuracy || 0} format={formatPct} />
+          <MetricCompareRow label="GIR" value1={s1?.avg_gir || 0} value2={s2?.avg_gir || 0} format={formatPct} />
+          <MetricCompareRow label="Sand Saves" value1={s1?.avg_sand_saves || 0} value2={s2?.avg_sand_saves || 0} format={formatPct} />
+        </StatSection>
+      )}
 
       {/* Alumni Sections */}
       <AlumniCompareBlock
@@ -325,6 +371,7 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
         alumni1={college1.topWinners}
         alumni2={college2.topWinners}
         statKey="wins"
+        emptyLabel="No winners this season"
       />
     </div>
   );
