@@ -55,7 +55,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
   return (
     <div className={cn('', className)}>
       {weekLabel && (
-        <div className="flex items-center gap-1.5 text-muted-foreground/50 uppercase mb-3" style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.8px' }}>
+        <div className="flex items-center gap-1.5 text-muted-foreground/50 uppercase mb-3" style={{ fontSize: 11, fontWeight: 600, letterSpacing: '1px' }}>
           <CalendarDays className="w-3.5 h-3.5" />
           {weekLabel}
         </div>
@@ -69,7 +69,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
           background: 'hsl(var(--muted) / 0.3)',
           border: '1px solid hsl(var(--border) / 0.5)',
           padding: 4,
-          marginBottom: 12,
+          marginBottom: 16,
         }}
       >
         {[
@@ -113,7 +113,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.2 }}
           className="flex flex-col"
-          style={{ gap: 10 }}
+          style={{ gap: 12 }}
         >
           {isLoading ? (
             Array.from({ length: 4 }).map((_, i) => (

@@ -192,7 +192,7 @@ export function FranchiseCard({
           {/* College name — 16px, 600 */}
           <h3
             className="text-foreground leading-tight group-hover:text-primary transition-colors"
-            style={{ fontSize: 16, fontWeight: 600, letterSpacing: '-0.1px' }}
+            style={{ fontSize: 16, fontWeight: 600, letterSpacing: '-0.15px' }}
           >
             {displayName}
           </h3>
@@ -210,7 +210,7 @@ export function FranchiseCard({
                       : item.color || 'text-muted-foreground'
                   )}
                   style={{
-                    fontSize: 12,
+                    fontSize: item.isAccent ? 13 : 12,
                     fontWeight: item.isAccent ? 600 : 500,
                   }}
                 >

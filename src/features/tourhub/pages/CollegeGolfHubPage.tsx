@@ -162,13 +162,13 @@ export function CollegeGolfHubPage() {
 
         {/* Content area */}
         <div className="px-4" style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
-          {/* Search — 16px gap from tour overview link */}
-          <div style={{ marginTop: 16 }}>
+          {/* Search — 8px gap from tour overview link */}
+          <div style={{ marginTop: 8 }}>
             <CollegeSearch />
           </div>
 
           {/* Franchise Leaderboard section */}
-          <section style={{ marginTop: 16 }}>
+          <section style={{ marginTop: 24 }}>
             <FranchiseLeaderboard limit={25} />
           </section>
 

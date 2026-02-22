@@ -139,7 +139,10 @@ export function CollegeHeroBanner({ stats, college, className }: CollegeHeroBann
             transition={{ duration: 0.3, delay: 0.3 }}
             className="flex items-stretch mx-4"
             style={{
-              background: 'rgba(0,0,0,0.12)',
+              background: 'rgba(0,0,0,0.25)',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+              border: '1px solid rgba(255,255,255,0.08)',
               borderRadius: 12,
               padding: '12px 0',
               width: '100%',
@@ -176,7 +179,6 @@ function StatCell({ label, value, icon }: { label: string; value: string; icon?:
         {icon}
         <span
           style={{
-            fontFamily: 'ui-monospace, "JetBrains Mono", monospace',
             fontSize: 17,
             fontWeight: 700,
             color: 'white',
