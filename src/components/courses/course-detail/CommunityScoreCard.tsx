@@ -246,7 +246,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
             const isOutstandingCat = score >= 9;
             const barColorClass = isOutstandingCat 
              ? 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]' 
-             : 'bg-[#d1d5db]';
+             : 'bg-[#CBD5E1]';
             
             return (
               <div key={cat.id} className="space-y-1.5">

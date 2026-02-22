@@ -194,16 +194,15 @@ export const MILESTONE_PALETTE_MAP: Record<number, ClbhouzAchievementKey> = {
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
 /**
- * NEW RATING COLOR SYSTEM:
- * - Fair → Excellent: All use EMERALD (#334E3D)
- * - Outstanding: Uses CHARTREUS GOLD (#C1A84C)
+ * RATING COLOR SYSTEM:
+ * - Fair → Excellent: Slate-300 (#CBD5E1)
+ * - Outstanding: Amber-500 (#f59e0b)
  * 
- * The old slate/gray progression colors have been decommissioned.
- * is NO LONGER used for rating bars/pills.
+ * Legacy constants — prefer COURSE_RATING_THEMES from globalAchievementMilestoneSystem.
  */
 export const RATING_COLORS = {
-  EMERALD: '#334E3D',    // Used for Fair, Good, Very Good, Excellent
-  GOLD: '#C1A84C',       // Chartreus - Used for Outstanding only
+  SLATE: '#CBD5E1',      // Used for Fair, Good, Very Good, Excellent
+  GOLD: '#f59e0b',       // Amber - Used for Outstanding only
 } as const;
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
