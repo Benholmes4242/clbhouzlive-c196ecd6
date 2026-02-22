@@ -191,17 +191,18 @@ export function CollegeProfilePage() {
 
         {/* Burger menu — matches Players/Leaders pages */}
         <button
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); console.log('COLLEGE PROFILE BURGER TAPPED'); openTourNav(); }}
           aria-label="Open tour menu"
-          className="absolute z-30 flex items-center justify-center rounded-full"
+          className="absolute z-50 flex items-center justify-center rounded-full"
           style={{
             width: 44,
             height: 44,
-            top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
+            top: 56,
             left: 16,
             background: 'rgba(0,0,0,0.25)',
             backdropFilter: 'blur(8px)',
             WebkitBackdropFilter: 'blur(8px)',
+            pointerEvents: 'auto' as const,
           }}
         >
           <Menu className="w-6 h-6 text-white" />
