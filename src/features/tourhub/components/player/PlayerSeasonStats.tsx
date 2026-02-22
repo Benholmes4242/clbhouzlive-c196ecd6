@@ -159,7 +159,7 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
 
       {/* Tab bar — sticky pill style */}
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md pb-3 pt-1">
-        <div className="rounded-xl bg-muted/30 border border-border/50 p-1 flex" role="tablist" aria-label="Season Performance Stats">
+        <div className="rounded-xl p-1 flex gap-1" role="tablist" aria-label="Season Performance Stats">
           {TABS.map((tab) => {
             const isActive = activeTab === tab;
             return (
@@ -171,7 +171,7 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
                 className={cn(
                   "flex-1 rounded-lg py-2.5 min-h-[44px] transition-all text-center",
                   isActive
-                    ? "bg-card text-foreground shadow-sm"
+                    ? "bg-foreground text-background shadow-sm"
                     : "bg-transparent text-muted-foreground"
                 )}
                 style={{
