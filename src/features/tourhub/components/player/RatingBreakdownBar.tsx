@@ -5,13 +5,13 @@ interface Props {
 }
 
 const SEGMENTS = [
-  { key: 'scoring', label: 'Scoring', max: 25, color: '#f59e0b' },
-  { key: 'sg_total', label: 'SG Total', max: 20, color: '#22C55E' },
-  { key: 'world_ranking', label: 'World Rank', max: 15, color: '#3B82F6' },
-  { key: 'results', label: 'Results', max: 15, color: '#A855F7' },
+  { key: 'scoring', label: 'Scoring', max: 22, color: '#f59e0b' },
+  { key: 'sg_total', label: 'SG Total', max: 18, color: '#22C55E' },
+  { key: 'world_ranking', label: 'World Rank', max: 20, color: '#3B82F6' },
+  { key: 'results', label: 'Results', max: 12, color: '#A855F7' },
   { key: 'ball_striking', label: 'Ball Striking', max: 10, color: '#EC4899' },
   { key: 'short_game', label: 'Short Game', max: 10, color: '#14B8A6' },
-  { key: 'power', label: 'Power', max: 5, color: '#F97316' },
+  { key: 'power', label: 'Power', max: 8, color: '#F97316' },
 ] as const;
 
 export function RatingBreakdownBar({ breakdown }: Props) {
