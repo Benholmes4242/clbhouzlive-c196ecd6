@@ -11,7 +11,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import { useTourPlayers, useTourSeason, useTourPlayerStatistics, type TourPlayer } from '../../hooks/useTourHubData';
 import { useElitePlayers, type ElitePlayer } from '../../hooks/useElitePlayers';
-import { usePlayerHeadshots } from '../../hooks/usePlayerMedia';
 import { useTourSeasonRankings } from '../../hooks/useTourSeasonRankings';
 import { PlayersHero } from '../players/PlayersHero';
 import { type PlayerTourCode } from '../players/PlayersTourFilter';
@@ -372,10 +371,6 @@ export function PlayersTab() {
   const displayRows = rows.slice(0, visibleCount);
   const hasMore = visibleCount < totalCount;
 
-  // Batch headshots
-  const visiblePlayerIds = useMemo(() => displayRows.map(r => r.id), [displayRows]);
-  const { data: headshotMap } = usePlayerHeadshots(visiblePlayerIds);
-
   const contentKey = `${activeTour}-${debouncedSearch}-${sort}`;
 
   // Loading skeleton
@@ -525,7 +520,6 @@ export function PlayersTab() {
                       wins={pStats?.wins}
                       points={pStats?.points}
                       tournamentsPlayed={pStats?.tournamentsPlayed}
-                      batchHeadshotUrl={headshotMap?.get(player.id)}
                       showTourBadge={activeTour === 'all'}
                       index={index}
                       activeSort={sort}
