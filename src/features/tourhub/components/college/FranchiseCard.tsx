@@ -5,7 +5,7 @@
 
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Users, TrendingUp } from 'lucide-react';
+import { TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
@@ -74,18 +74,18 @@ export function FranchiseCard({
       const items: { label: string; value: string; isAccent: boolean; color?: string }[] = [];
       const earningsStr = formatDeltaValue(deltas.earnings_delta);
       const winsStr = deltas.wins_delta !== 0 ? `${deltas.wins_delta > 0 ? '+' : ''}${deltas.wins_delta}` : null;
-      const cutsStr = deltas.cuts_delta !== 0 ? `${deltas.cuts_delta > 0 ? '+' : ''}${deltas.cuts_delta}` : null;
+      const top10Str = deltas.top10_delta !== 0 ? `${deltas.top10_delta > 0 ? '+' : ''}${deltas.top10_delta}` : null;
       
       items.push({ label: '', value: earningsStr, isAccent: true, color: deltas.earnings_delta >= 0 ? 'text-emerald-600' : 'text-rose-600' });
       if (winsStr) items.push({ label: pluralize(deltas.wins_delta, 'win'), value: winsStr, isAccent: false, color: deltas.wins_delta > 0 ? 'text-amber-600' : 'text-muted-foreground' });
-      if (cutsStr) items.push({ label: pluralize(deltas.cuts_delta, 'cut'), value: cutsStr, isAccent: false });
+      if (top10Str) items.push({ label: 'top 10s', value: top10Str, isAccent: false });
       return items;
     }
 
     return [
       { label: '', value: formatCompact(stats.earnings_total), isAccent: activeMetric === 'earnings' },
       { label: pluralize(stats.wins_total, 'win'), value: String(stats.wins_total), isAccent: activeMetric === 'wins' },
-      { label: pluralize(stats.cuts_total, 'cut'), value: String(stats.cuts_total), isAccent: activeMetric === 'cuts' },
+      { label: 'top 10s', value: String(stats.top10_total), isAccent: activeMetric === 'top10s' },
     ];
   };
 
@@ -97,8 +97,7 @@ export function FranchiseCard({
     displayName,
     `${formatCompact(stats.earnings_total)} earnings`,
     `${stats.wins_total} ${pluralize(stats.wins_total, 'win')}`,
-    `${stats.cuts_total} ${pluralize(stats.cuts_total, 'cut')}`,
-    `${stats.player_count} alumni`,
+    `${stats.top10_total} top 10s`,
   ].filter(Boolean).join(', ');
 
   return (
@@ -218,19 +217,13 @@ export function FranchiseCard({
                 </span>
               </span>
             ))}
-            {/* Alumni count */}
-            <span className="flex items-center">
-              <span className="text-muted-foreground/30 mx-0.5" style={{ fontSize: 10 }}>·</span>
-              <Users className="w-3 h-3 text-muted-foreground mr-0.5" />
-              <span className="text-muted-foreground tabular-nums" style={{ fontSize: 12 }}>{stats.player_count}</span>
-            </span>
           </div>
 
           {/* Alumni face thumbnails — 24×24 squircle */}
           {alumni && alumni.length > 0 && (
-            <div className="flex items-center" style={{ marginTop: 6 }}>
-              <div className="flex items-center">
-                {alumni.slice(0, 3).map((a, i) => {
+            <div className="flex items-center overflow-hidden" style={{ marginTop: 6 }}>
+              <div className="flex items-center flex-nowrap">
+                {alumni.map((a, i) => {
                   const photoUrl = getPlayerHeadshotUrl(a.full_name, a.tour_codes?.[0] ?? 'pga');
                   return (
                     <div
@@ -242,8 +235,9 @@ export function FranchiseCard({
                         borderRadius: '34%',
                         border: '1.5px solid white',
                         marginLeft: i === 0 ? 0 : -6,
-                        zIndex: 3 - i,
+                        zIndex: alumni.length - i,
                         position: 'relative',
+                        flexShrink: 0,
                       }}
                     >
                       {photoUrl ? (
@@ -265,11 +259,6 @@ export function FranchiseCard({
                   );
                 })}
               </div>
-              {stats.player_count > 3 && (
-                <span className="text-muted-foreground/40 ml-1.5 tabular-nums" style={{ fontSize: 11, fontWeight: 500 }}>
-                  +{stats.player_count - 3}
-                </span>
-              )}
             </div>
           )}
         </div>

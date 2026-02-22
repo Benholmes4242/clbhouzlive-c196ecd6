@@ -20,7 +20,6 @@ type MetricTab = 'earnings' | 'wins' | 'cuts' | 'top10s' | 'movers';
 const METRIC_TABS: { value: MetricTab; label: string }[] = [
   { value: 'earnings', label: 'Earnings' },
   { value: 'wins', label: 'Wins' },
-  { value: 'cuts', label: 'Cuts' },
   { value: 'top10s', label: 'Top 10s' },
   { value: 'movers', label: 'Movers' },
 ];
