@@ -45,7 +45,7 @@ function HeadToHeadChip({ winsA, winsB, earningsDiff, winner }: HeadToHeadChipPr
         color: isWinning ? '#22C55E' : isTied ? 'hsl(var(--muted-foreground))' : 'hsl(var(--destructive))',
       }}
     >
-      {isTied ? 'Tied' : isWinning ? `W ${winsA}–${winsB}` : `L ${winsA}–${winsB}`}
+      {isTied ? 'Tied' : isWinning ? `Ahead ${winsA} of 3` : `Trails ${winsA} of 3`}
     </div>
   );
 }
@@ -72,9 +72,6 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
       
       if (myStats.wins_total > rivalStats.wins_total) winsA++;
       else if (rivalStats.wins_total > myStats.wins_total) winsB++;
-      
-      if (myStats.cuts_total > rivalStats.cuts_total) winsA++;
-      else if (rivalStats.cuts_total > myStats.cuts_total) winsB++;
       
       if (myStats.top10_total > rivalStats.top10_total) winsA++;
       else if (rivalStats.top10_total > myStats.top10_total) winsB++;
@@ -150,8 +147,11 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
             
             {/* Record pill */}
             {rivalry.h2h && (
-              <div style={{ marginTop: '6px' }}>
+              <div style={{ marginTop: '6px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <HeadToHeadChip {...rivalry.h2h} />
+                <span style={{ fontSize: 10, fontWeight: 400, color: 'hsl(var(--muted-foreground))', opacity: 0.6, marginTop: 2 }}>
+                  earnings · wins · top 10s
+                </span>
               </div>
             )}
             

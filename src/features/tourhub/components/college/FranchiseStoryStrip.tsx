@@ -103,18 +103,35 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
   // Top alumnus
   const topAlumnus = alumni?.[0];
 
-  // Build week summary
-  const weekParts: string[] = [];
-  if (weekEarnings > 0) weekParts.push(`+${formatCurrency(weekEarnings)}`);
-  if (weekWins > 0) weekParts.push(`${weekWins} win${weekWins > 1 ? 's' : ''}`);
-  if (weekTop10s > 0) weekParts.push(`${weekTop10s} top 10${weekTop10s > 1 ? 's' : ''}`);
-  const weekSummary = weekParts.length > 0 ? weekParts.join(' · ') : 'No activity';
+  const hasWeekActivity = weekEarnings > 0 || weekWins > 0 || weekTop10s > 0;
+
+  const secondaryWeekParts = [
+    weekWins > 0 ? `${weekWins} win${weekWins > 1 ? 's' : ''}` : null,
+    weekTop10s > 0 ? `${weekTop10s} top 10${weekTop10s > 1 ? 's' : ''}` : null,
+  ].filter(Boolean).join(' · ');
 
   return (
     <div className={cn('grid grid-cols-2 gap-3', className)}>
       {/* This Week */}
       <StoryTile icon={TrendingUp} iconColor="text-emerald-500" title="This Week" delay={0}>
-        <span className="text-foreground leading-tight" style={{ fontSize: '15px', fontWeight: 600, marginTop: '6px' }}>{weekSummary}</span>
+        {hasWeekActivity ? (
+          <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {weekEarnings > 0 && (
+              <span style={{ fontSize: 15, fontWeight: 600, color: '#22c55e' }}>
+                +{formatCurrency(weekEarnings)}
+              </span>
+            )}
+            {secondaryWeekParts && (
+              <span className="text-muted-foreground" style={{ fontSize: 12, fontWeight: 500 }}>
+                {secondaryWeekParts}
+              </span>
+            )}
+          </div>
+        ) : (
+          <span className="text-muted-foreground" style={{ fontSize: 13, fontWeight: 400, marginTop: 6 }}>
+            No activity
+          </span>
+        )}
       </StoryTile>
 
       {/* Top Performer */}
@@ -129,11 +146,19 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
           {topAlumnus ? `${topAlumnus.first_name} ${topAlumnus.last_name}` : 'No data'}
         </span>
         {topAlumnus && (
-          <span className="text-muted-foreground truncate" style={{ fontSize: '12px', fontWeight: 400, marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
-            {topAlumnus.earnings ? formatCurrency(topAlumnus.earnings) : ''}
-            {topAlumnus.wins ? ` · ${topAlumnus.wins} win${topAlumnus.wins > 1 ? 's' : ''}` : ''}
-            {topAlumnus.world_ranking && topAlumnus.world_ranking < 500 ? ` · #${topAlumnus.world_ranking} OWGR` : ''}
-          </span>
+          <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 1 }}>
+            {topAlumnus.earnings ? (
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#f59e0b' }}>
+                {formatCurrency(topAlumnus.earnings)}
+              </span>
+            ) : null}
+            <span className="text-muted-foreground" style={{ fontSize: 11, fontWeight: 500 }}>
+              {[
+                topAlumnus.wins > 0 ? `${topAlumnus.wins} win${topAlumnus.wins > 1 ? 's' : ''}` : null,
+                topAlumnus.world_ranking && topAlumnus.world_ranking < 500 ? `#${topAlumnus.world_ranking} OWGR` : null,
+              ].filter(Boolean).join(' · ')}
+            </span>
+          </div>
         )}
       </StoryTile>
     </div>
