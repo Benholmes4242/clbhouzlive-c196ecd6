@@ -70,7 +70,7 @@ function RunnerCard({
           background: index === 0 ? '#94A3B8' : '#C2875A',
         }}
       >
-        <span style={{ fontSize: 14, fontWeight: 700, color: 'white' }}>{rank}</span>
+        <span style={{ fontSize: 14, fontWeight: 700, color: 'white' }}>{index + 2}</span>
       </div>
 
       {/* Avatar — 36×36, 34% border-radius */}
