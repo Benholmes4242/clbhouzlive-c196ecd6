@@ -31,7 +31,7 @@ interface MetricCompareRowProps {
   value1: number;
   value2: number;
   format?: (v: number) => string;
-  /** true = lower is better (e.g. scoring avg) */
+  /** true = lower is better (e.g. scoring avg, putting avg) */
   lowerIsBetter?: boolean;
 }
 
@@ -51,31 +51,37 @@ function MetricCompareRow({ label, value1, value2, format = String, lowerIsBette
   }
 
   return (
-    <div className="py-3 border-b last:border-0" style={{ borderColor: 'rgba(0,0,0,0.04)' }}>
+    <div className="py-3 border-b last:border-0" style={{ borderColor: 'hsl(var(--border) / 0.1)' }}>
       <div className="flex items-center justify-between mb-1.5">
-        <span style={{ fontSize: 13, fontWeight: 600 }} className={isLeading1 ? 'text-foreground' : 'text-muted-foreground'}>
+        <span
+          className={isLeading1 ? 'text-foreground' : 'text-muted-foreground'}
+          style={{ fontSize: 14, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}
+        >
           {format(value1)}
         </span>
-        <span style={{ fontSize: 11, fontWeight: 500 }} className="text-muted-foreground">
+        <span style={{ fontSize: 12, fontWeight: 500 }} className="text-muted-foreground">
           {label}
         </span>
-        <span style={{ fontSize: 13, fontWeight: 600 }} className={isLeading2 ? 'text-foreground' : 'text-muted-foreground'}>
+        <span
+          className={isLeading2 ? 'text-foreground' : 'text-muted-foreground'}
+          style={{ fontSize: 14, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}
+        >
           {format(value2)}
         </span>
       </div>
-      <div className="flex gap-0.5 h-1.5 rounded-full overflow-hidden">
+      <div className="flex gap-0.5 rounded-full overflow-hidden" style={{ height: 4 }}>
         <div
           className="rounded-l-full"
           style={{
             width: `${pct1}%`,
-            backgroundColor: isLeading1 ? '#f59e0b' : 'hsl(var(--border))',
+            backgroundColor: isLeading1 ? '#f59e0b' : 'hsl(var(--border) / 0.3)',
           }}
         />
         <div
           className="rounded-r-full"
           style={{
             width: `${pct2}%`,
-            backgroundColor: isLeading2 ? '#f59e0b' : 'hsl(var(--border))',
+            backgroundColor: isLeading2 ? '#f59e0b' : 'hsl(var(--border) / 0.3)',
           }}
         />
       </div>
@@ -83,12 +89,12 @@ function MetricCompareRow({ label, value1, value2, format = String, lowerIsBette
   );
 }
 
-/* ── Stat section card ── */
+/* ── Flat stat section (no card wrapper) ── */
 function StatSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div style={{ marginTop: 24 }}>
       <SectionHeader className="mb-3">{title}</SectionHeader>
-      <div className="bg-card rounded-2xl border border-border/50 p-4" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+      <div className="mt-2">
         {children}
       </div>
     </div>
@@ -149,7 +155,7 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, emptyLabel }: {
   );
 
   return (
-    <div style={{ marginTop: 24 }}>
+    <div style={{ marginTop: 28 }}>
       <SectionHeader className="mb-3">{title}</SectionHeader>
       <div className="grid grid-cols-2 gap-4">
         {renderSide(alumni1)}
@@ -323,7 +329,7 @@ export function CollegeCompareHero({ data, className, onBack }: CollegeCompareHe
         </div>
       </div>
 
-      {/* Season Overview */}
+      {/* Season Overview — no card wrapper */}
       <StatSection title="Season Overview">
         <MetricCompareRow label="Earnings" value1={s1?.earnings_total || 0} value2={s2?.earnings_total || 0} format={formatCurrency} />
         <MetricCompareRow label="Wins" value1={s1?.wins_total || 0} value2={s2?.wins_total || 0} />
@@ -333,7 +339,7 @@ export function CollegeCompareHero({ data, className, onBack }: CollegeCompareHe
         <MetricCompareRow label="Players on Tour" value1={s1?.player_count || 0} value2={s2?.player_count || 0} />
       </StatSection>
 
-      {/* Performance Stats — only if data exists */}
+      {/* Performance Stats — no card wrapper */}
       {hasPerformanceData && (
         <StatSection title="Performance Stats">
           <MetricCompareRow label="Avg Scoring" value1={s1?.avg_scoring || 0} value2={s2?.avg_scoring || 0} format={formatAvg} lowerIsBetter />
@@ -343,7 +349,7 @@ export function CollegeCompareHero({ data, className, onBack }: CollegeCompareHe
         </StatSection>
       )}
 
-      {/* Ball Striking — only if data exists */}
+      {/* Ball Striking — no card wrapper */}
       {hasBallStrikingData && (
         <StatSection title="Ball Striking">
           <MetricCompareRow label="Driving Distance" value1={s1?.avg_driving_distance || 0} value2={s2?.avg_driving_distance || 0} format={formatDist} />
