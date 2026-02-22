@@ -45,7 +45,7 @@ export function CollegeComparePage() {
         </button>
 
         {/* Content */}
-        <div className="pt-4">
+        <div style={{ paddingTop: 56 }}>
           {!hasValidParams ? (
             <div className="text-center py-16">
               <p className="text-base text-muted-foreground mb-4">
