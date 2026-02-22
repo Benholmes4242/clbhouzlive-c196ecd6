@@ -326,15 +326,26 @@ function ReviewCard({
 /* ---------- Subcomponents & Utils ---------- */
 
 function RatingPill({ value10, your }: { value10: number; your?: boolean }) {
+  const isOutstanding = value10 >= 9;
   return (
     <span
-      className="inline-flex items-center gap-2 rounded-full bg-yellow-100 px-2.5 py-0.5 text-sm font-medium text-yellow-900 tabular-nums dark:bg-yellow-900/20 dark:text-yellow-100"
+      className={cn(
+        "inline-flex items-center gap-2 rounded-full px-2.5 py-0.5 text-sm font-medium tabular-nums",
+        isOutstanding
+          ? "bg-[#f59e0b]/10 text-[#d97706] dark:bg-[#f59e0b]/20 dark:text-[#fbbf24]"
+          : "bg-[#CBD5E1]/10 text-[#94A3B8] dark:bg-[#CBD5E1]/10 dark:text-[#CBD5E1]"
+      )}
       aria-label={`Rating ${formatScore(value10)} out of 10`}
     >
       <ClubhouseLogo size="xs" />
       {formatScore(value10)}
       {your && (
-        <span className="rounded-full bg-white/70 px-1.5 py-[1px] text-meta text-yellow-900 dark:bg-white/10 dark:text-yellow-100">
+        <span className={cn(
+          "rounded-full px-1.5 py-[1px] text-meta",
+          isOutstanding
+            ? "bg-white/70 text-[#d97706] dark:bg-white/10 dark:text-[#fbbf24]"
+            : "bg-white/70 text-[#94A3B8] dark:bg-white/10 dark:text-[#CBD5E1]"
+        )}>
           Your Review
         </span>
       )}

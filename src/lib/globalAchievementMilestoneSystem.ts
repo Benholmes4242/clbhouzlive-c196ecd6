@@ -119,21 +119,20 @@ export interface RatingTheme {
   gradient?: string;
 }
 
-// NEW: Gray/Amber color system - matching slider styling
-const RATING_GRAY = '#9ca3af';     // gray-400 for Fair→Excellent
-const RATING_GRAY_FILL = '#d1d5db'; // gray-300 for bars
+// NEW: Slate/Amber color system
+const RATING_SLATE = '#CBD5E1';     // slate-300 for Fair→Excellent
 const RATING_AMBER = '#f59e0b';    // amber-500 for Outstanding
 const RATING_AMBER_LIGHT = '#fbbf24'; // amber-400 for gradient end
 
-// All non-outstanding tiers use Gray styling
+// All non-outstanding tiers use Slate styling
 const grayTheme = {
-  accent: RATING_GRAY,
-  bgLight: '#9ca3af0D',  // 5% opacity
-  bgDark: '#9ca3af1A',   // 10% opacity
-  bgClass: 'bg-[#9ca3af]/5',
-  borderClass: 'border-[#9ca3af]/20',
-  textClass: 'text-[#6b7280]',  // gray-500 for text
-  barFillClass: 'bg-[#d1d5db]', // gray-300 for bars
+  accent: RATING_SLATE,
+  bgLight: '#CBD5E10D',  // 5% opacity
+  bgDark: '#CBD5E11A',   // 10% opacity
+  bgClass: 'bg-[#CBD5E1]/10',
+  borderClass: 'border-[#CBD5E1]/20',
+  textClass: 'text-[#94A3B8]',  // slate-400 for text
+  barFillClass: 'bg-[#CBD5E1]', // slate-300 for bars
 };
 
 // Outstanding uses Amber/Orange gradient styling
