@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
+import { getR2HeadshotUrl, getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
 import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
 import type { PlayerSortType } from './PlayerSortControl';
 
@@ -29,7 +29,6 @@ interface PlayerCardV2Props {
   wins?: number | null;
   points?: number | null;
   tournamentsPlayed?: number | null;
-  batchHeadshotUrl?: string | null;
   showTourBadge?: boolean;
   index?: number;
   activeSort?: PlayerSortType;
@@ -52,15 +51,16 @@ export function PlayerCardV2({
   wins,
   points,
   tournamentsPlayed,
-  batchHeadshotUrl,
   showTourBadge = true,
   index = 0,
   activeSort = 'world-rank-desc',
   activeTour = 'all',
   onNavigate,
 }: PlayerCardV2Props) {
-  const filteredBatchUrl = batchHeadshotUrl && !batchHeadshotUrl.includes('ui-avatars.com') ? batchHeadshotUrl : null;
-  const photoUrl = filteredBatchUrl ?? resolvePhotoUrl(player.photoUrl, player.pgaTourId);
+  // R2 headshot is the single source of truth
+  const photoUrl = activeTour === 'all'
+    ? getR2HeadshotUrlMultiTour(player.fullName, player.tourCodes)
+    : getR2HeadshotUrl(player.fullName, activeTour);
   const flag = countryCodeToFlag(player.countryCode);
   const countryName = titleCaseCountry(player.country);
 
@@ -153,6 +153,10 @@ export function PlayerCardV2({
               alt={player.fullName}
               className="w-full h-full object-cover object-top"
               loading="lazy"
+              onError={(e) => {
+                // Hide broken image, initials fallback shows through bg
+                e.currentTarget.style.display = 'none';
+              }}
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20 flex items-center justify-center">

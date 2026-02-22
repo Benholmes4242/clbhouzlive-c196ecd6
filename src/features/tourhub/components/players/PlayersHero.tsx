@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu } from 'lucide-react';
 import { openTourNav } from '../../contexts/TourNavContext';
 import { cn } from '@/lib/utils';
-import { resolvePhotoUrl, getPgaTourHeadshotUrl } from '../../utils/resolvePhotoUrl';
+import { getR2HeadshotUrl, getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
 import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
 import type { ElitePlayer } from '../../hooks/useElitePlayers';
 import type { PlayerTourCode } from './PlayersTourFilter';
@@ -35,8 +35,9 @@ function RunnerCard({ player, index, activeTour, statsMap }: {
   activeTour: PlayerTourCode;
   statsMap?: Map<string, { earnings: number | null; wins: number | null; tourRank: number | null; points?: number | null; tournamentsPlayed?: number | null }>;
 }) {
-  const pgaHeadshot = player.pgaTourId ? getPgaTourHeadshotUrl(player.pgaTourId) : null;
-  const photoUrl = pgaHeadshot || resolvePhotoUrl(player.photoUrl, player.pgaTourId);
+  const photoUrl = activeTour === 'all'
+    ? getR2HeadshotUrlMultiTour(player.playerName)
+    : getR2HeadshotUrl(player.playerName, activeTour);
   const stats = statsMap?.get(player.playerId);
   const tourRank = stats?.tourRank;
   const rank = activeTour === 'all' ? player.worldRank : (tourRank || player.worldRank);
@@ -103,7 +104,9 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
 
   const champion = players[0];
   const runners = players.slice(1, 5);
-  const photoUrl = resolvePhotoUrl(champion.photoUrl, champion.pgaTourId, 'hero');
+  const photoUrl = activeTour === 'all'
+    ? getR2HeadshotUrlMultiTour(champion.playerName)
+    : getR2HeadshotUrl(champion.playerName, activeTour);
   const showPhoto = photoUrl && !imageError;
   const flag = countryCodeToFlag(champion.countryCode);
   const country = titleCaseCountry(champion.country);
