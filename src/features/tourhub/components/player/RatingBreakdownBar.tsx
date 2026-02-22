@@ -10,7 +10,7 @@ export function RatingBreakdownBar({ breakdown }: Props) {
   const worldRank = breakdown.world_ranking || 0;
 
   return (
-    <div className="flex items-center justify-between" style={{ marginTop: 8, padding: '4px 0' }}>
+    <div className="flex items-center justify-center gap-2" style={{ marginTop: 8, padding: '4px 0' }}>
       <span className="text-muted-foreground" style={{ fontSize: 11, fontWeight: 500 }}>
         Base from World #{worldRank}
       </span>

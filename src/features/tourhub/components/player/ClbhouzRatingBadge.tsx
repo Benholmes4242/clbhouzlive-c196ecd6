@@ -10,10 +10,10 @@ export function ClbhouzRatingBadge({ rating }: Props) {
   const delta = rating.rating_delta;
 
   return (
-    <div className="flex items-center gap-4" style={{ padding: '12px 0' }}>
+    <div className="flex flex-col items-center gap-1.5" style={{ padding: '8px 0' }}>
       {/* Rating Square */}
       <div
-        className="flex flex-col items-center justify-center shrink-0"
+        className="flex flex-col items-center justify-center"
         style={{
           width: 60,
           height: 60,
@@ -48,37 +48,28 @@ export function ClbhouzRatingBadge({ rating }: Props) {
         </span>
       </div>
 
-      {/* Tier + Delta */}
-      <div className="flex flex-col gap-0.5">
-        <span
-          style={{
-            fontSize: 16,
-            fontWeight: 700,
-            color: tier.color,
-          }}
-        >
-          {tier.label}
-        </span>
-        <span className="text-muted-foreground" style={{ fontSize: 12, fontWeight: 500 }}>
-          Clbhouz Rating
-        </span>
-        {delta !== 0 && (
-          <div className="flex items-center gap-1" style={{ marginTop: 2 }}>
-            {delta > 0 ? (
-              <TrendingUp style={{ width: 14, height: 14, color: '#22C55E' }} />
-            ) : (
-              <TrendingDown style={{ width: 14, height: 14, color: '#EF4444' }} />
-            )}
-            <span style={{
-              fontSize: 12,
-              fontWeight: 600,
-              color: delta > 0 ? '#22C55E' : '#EF4444',
-            }}>
-              {delta > 0 ? '+' : ''}{delta} this week
-            </span>
-          </div>
-        )}
-      </div>
+      <span style={{ fontSize: 16, fontWeight: 700, color: tier.color }}>
+        {tier.label}
+      </span>
+      <span style={{ fontSize: 11, fontWeight: 500 }} className="text-muted-foreground">
+        Clbhouz Rating
+      </span>
+      {delta !== 0 && (
+        <div className="flex items-center gap-1">
+          {delta > 0 ? (
+            <TrendingUp className="w-3 h-3" style={{ color: '#22C55E' }} />
+          ) : (
+            <TrendingDown className="w-3 h-3" style={{ color: '#EF4444' }} />
+          )}
+          <span style={{
+            fontSize: 11,
+            fontWeight: 600,
+            color: delta > 0 ? '#22C55E' : '#EF4444',
+          }}>
+            {delta > 0 ? '+' : ''}{delta} this week
+          </span>
+        </div>
+      )}
     </div>
   );
 }

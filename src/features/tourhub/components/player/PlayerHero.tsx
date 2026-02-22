@@ -4,7 +4,7 @@
  */
 
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Globe, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
@@ -62,7 +62,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
       <div
         className="absolute inset-0"
         style={{
-          background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.1) 65%, transparent 85%)',
+          background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 35%, rgba(0,0,0,0.05) 60%, transparent 80%)',
         }}
       />
 
@@ -105,11 +105,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
         <div className="flex items-center gap-2" style={{ marginBottom: '8px' }}>
           {countryDisplay && (
             <span className="flex items-center gap-1.5" style={{ fontSize: '13px', fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>
-              {flag ? (
-                <span className="text-lg leading-none">{flag}</span>
-              ) : (
-                <Globe className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.7)' }} />
-              )}
+              {flag && <span className="text-lg leading-none">{flag}</span>}
               {countryDisplay}
             </span>
           )}

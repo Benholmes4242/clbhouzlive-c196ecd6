@@ -213,7 +213,8 @@ export function PlayerProfilePage() {
           {/* Clbhouz Rating */}
           {playerRating && (
             <motion.div
-              style={{ marginTop: '24px' }}
+              className="flex flex-col items-center text-center"
+              style={{ marginTop: 24, paddingTop: 8, paddingBottom: 8 }}
               variants={sectionVariants}
               initial="hidden"
               whileInView="visible"
@@ -222,7 +223,9 @@ export function PlayerProfilePage() {
             >
               <ClbhouzRatingBadge rating={playerRating} />
               {playerRating.breakdown && (
-                <RatingBreakdownBar breakdown={playerRating.breakdown} />
+                <div className="mt-2">
+                  <RatingBreakdownBar breakdown={playerRating.breakdown} />
+                </div>
               )}
             </motion.div>
           )}
