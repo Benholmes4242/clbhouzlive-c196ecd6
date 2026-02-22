@@ -78,6 +78,7 @@ export function AlumniFaceStrip({ alumni, collegeName, collegeSlug, totalAlumniC
                     alt={alum.full_name}
                     className="w-full h-full object-cover object-top"
                     loading="lazy"
+                    onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
                   />
                 ) : (
                   <div className="w-full h-full bg-muted flex items-center justify-center">

@@ -4,11 +4,13 @@
  */
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { TourNavProvider, useTourNav } from '../contexts/TourNavContext';
 import { TourHubNavOverlay } from './TourHubNavOverlay';
 
 function TourNavInner({ children }: { children: React.ReactNode }) {
   const { isNavOpen, closeNav } = useTourNav();
+  const navigate = useNavigate();
 
   return (
     <>
@@ -17,7 +19,10 @@ function TourNavInner({ children }: { children: React.ReactNode }) {
         isOpen={isNavOpen}
         onClose={closeNav}
         activeTab="overview"
-        onNavigate={() => {}}
+        onNavigate={(tab) => {
+          navigate(`/tourhub?tab=${tab}`, { replace: true });
+          closeNav();
+        }}
       />
     </>
   );
