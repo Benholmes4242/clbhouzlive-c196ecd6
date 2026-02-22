@@ -6,7 +6,7 @@
  */
 
 import { useMemo, useEffect, useRef, useState, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -34,6 +34,7 @@ interface RankedItem {
 }
 
 export function LeadersTab() {
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const categoryKey = searchParams.get('category') || 'world_rank';
   const category = getCategoryByKey(categoryKey) || LEADER_CATEGORIES[0];
@@ -220,8 +221,18 @@ export function LeadersTab() {
         />
       )}
 
+      {/* ← Tour Overview back link */}
+      <div className="px-4 pt-3 pb-1">
+        <button
+          onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
+          className="text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
+        >
+          ← Tour Overview
+        </button>
+      </div>
+
       {/* Content area */}
-      <div className="px-4" style={{ paddingTop: 24, paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
+      <div className="px-4" style={{ paddingTop: 12, paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
         {/* Category selector button + bottom sheet */}
         <LeadersCategorySheet
           categories={LEADER_CATEGORIES}
