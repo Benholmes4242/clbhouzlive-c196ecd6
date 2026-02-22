@@ -2,13 +2,12 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface PlayerRatingBreakdown {
-  scoring: number;
-  sg_total: number;
+  base_rating: number;
+  form_modifier: number;
+  form_scoring: number;
+  form_sg: number;
+  form_results: number;
   world_ranking: number;
-  results: number;
-  ball_striking: number;
-  short_game: number;
-  power: number;
   scoring_percentile: number;
   sg_percentile: number;
   ranking_percentile: number;
@@ -16,6 +15,11 @@ export interface PlayerRatingBreakdown {
   ball_striking_percentile: number;
   short_game_percentile: number;
   power_percentile: number;
+  total_events: number;
+  events_2025: number;
+  events_2026: number;
+  weight_2025: number;
+  weight_2026: number;
 }
 
 export interface PlayerRating {
