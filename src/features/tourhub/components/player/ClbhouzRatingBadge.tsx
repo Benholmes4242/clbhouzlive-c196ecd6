@@ -10,24 +10,25 @@ export function ClbhouzRatingBadge({ rating }: Props) {
   const delta = rating.rating_delta;
 
   return (
-    <div className="flex items-center gap-4" style={{ padding: '16px 0' }}>
-      {/* Rating Circle */}
+    <div className="flex items-center gap-4" style={{ padding: '12px 0' }}>
+      {/* Rating Square */}
       <div
         className="flex flex-col items-center justify-center shrink-0"
         style={{
-          width: 72,
-          height: 72,
-          borderRadius: '50%',
-          border: `3px solid ${tier.color}`,
-          backgroundColor: tier.bgColor,
+          width: 60,
+          height: 60,
+          borderRadius: 16,
+          background: tier.color,
+          boxShadow: `0 4px 16px ${tier.color}30`,
         }}
       >
         <span
           style={{
-            fontSize: 8,
+            fontSize: 7,
             fontWeight: 800,
-            letterSpacing: '1px',
-            color: tier.color,
+            letterSpacing: '0.8px',
+            textTransform: 'uppercase' as const,
+            color: 'rgba(255,255,255,0.8)',
             lineHeight: 1,
             marginTop: 2,
           }}
@@ -36,9 +37,9 @@ export function ClbhouzRatingBadge({ rating }: Props) {
         </span>
         <span
           style={{
-            fontSize: 28,
+            fontSize: 26,
             fontWeight: 800,
-            color: tier.color,
+            color: 'white',
             lineHeight: 1,
             fontVariantNumeric: 'tabular-nums',
           }}

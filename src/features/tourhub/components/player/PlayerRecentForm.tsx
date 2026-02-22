@@ -29,7 +29,7 @@ export function PlayerRecentForm({ playerId }: PlayerRecentFormProps) {
   let Icon: React.ElementType;
 
   if (avgPosition <= 10) {
-    formLabel = avgPosition <= 5 ? 'Excellent' : 'Strong';
+    formLabel = avgPosition <= 5 ? 'Hot streak' : 'Strong';
     textColor = '#22C55E';
     bgColor = 'rgba(34,197,94,0.08)';
     borderColor = '#22C55E';

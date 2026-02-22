@@ -44,7 +44,7 @@ function StatRow({ label, value, trend, barPercent, barIndex = 0 }: StatRowProps
   
   return (
     <div
-      style={{ padding: '14px 0', borderBottom: '1px solid hsl(var(--border) / 0.15)' }}
+      style={{ padding: '12px 0', borderBottom: '1px solid hsl(var(--border) / 0.15)' }}
       aria-label={`${label}: ${value}`}
     >
       <div className="flex justify-between items-center">
@@ -99,7 +99,7 @@ function SGBar({ label, value }: SGBarProps) {
 
   return (
     <div
-      style={{ padding: '14px 0', borderBottom: '1px solid hsl(var(--border) / 0.15)' }}
+      style={{ padding: '12px 0', borderBottom: '1px solid hsl(var(--border) / 0.15)' }}
       aria-label={`${label}: ${formattedValue} strokes gained`}
     >
       <div className="flex justify-between items-center" style={{ marginBottom: '6px' }}>
@@ -172,7 +172,7 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
                   "flex-1 rounded-lg py-2.5 min-h-[44px] transition-all text-center",
                   isActive
                     ? "bg-card text-foreground shadow-sm"
-                    : "text-muted-foreground hover:bg-muted/50"
+                    : "bg-transparent text-muted-foreground"
                 )}
                 style={{
                   fontSize: tab === 'Strokes Gained' ? '12px' : '13px',
@@ -255,11 +255,11 @@ function SubSectionLabel({ icon: Icon, label, style }: { icon: React.ElementType
       className="flex items-center gap-1.5 text-muted-foreground/50"
       style={{
         fontSize: '11px',
-        fontWeight: 700,
+        fontWeight: 600,
         letterSpacing: '0.8px',
         textTransform: 'uppercase' as const,
         marginTop: '20px',
-        marginBottom: '12px',
+        marginBottom: '10px',
         ...style,
       }}
     >

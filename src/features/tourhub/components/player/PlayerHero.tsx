@@ -45,13 +45,14 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
         <motion.img
           src={heroPhotoUrl}
           alt={player.full_name}
-          className="absolute inset-0 w-full h-full object-cover object-top"
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ y: imageY, objectPosition: 'center 20%' }}
           loading="eager"
           fetchPriority="high"
           initial={{ scale: 1.06 }}
           animate={{ scale: 1 }}
           transition={{ duration: 10, ease: 'linear' }}
-          style={{ y: imageY }}
+          
         />
       ) : (
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-800 via-emerald-900 to-slate-900" />
@@ -74,7 +75,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
       >
         <Menu
           className="w-[22px] h-[22px] text-white"
-          style={{ strokeWidth: 2, filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }}
+          style={{ strokeWidth: 2, filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.7)) drop-shadow(0 0px 8px rgba(0,0,0,0.3))' }}
         />
       </button>
 

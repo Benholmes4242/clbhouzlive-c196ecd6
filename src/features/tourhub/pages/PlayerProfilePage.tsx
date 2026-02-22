@@ -193,7 +193,7 @@ export function PlayerProfilePage() {
         <PlayerHero player={player} playerStats={playerStats ?? null} />
 
         {/* Stats Strip — flush below hero */}
-        <StatRibbon playerStats={playerStats ?? null} playerRating={playerRating ?? null} />
+        <StatRibbon playerStats={playerStats ?? null} />
 
         {/* ← Back text link */}
         <div className="px-4" style={{ marginTop: 12, marginBottom: 12 }}>
@@ -229,7 +229,7 @@ export function PlayerProfilePage() {
 
           {/* Season Performance — 24px from momentum strip */}
           <motion.div
-            style={{ marginTop: '24px' }}
+            style={{ marginTop: '20px' }}
             variants={sectionVariants}
             initial="hidden"
             whileInView="visible"
