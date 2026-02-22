@@ -157,37 +157,33 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
         </h2>
       </div>
 
-      {/* Tab bar — sticky underline style */}
-      <div className="flex sticky top-0 z-20 bg-background/95 backdrop-blur-md" role="tablist" aria-label="Season Performance Stats" style={{ borderBottom: '1px solid hsl(var(--border) / 0.1)' }}>
-        {TABS.map((tab) => {
-          const isActive = activeTab === tab;
-          return (
-            <button
-              key={tab}
-              role="tab"
-              aria-selected={isActive}
-              onClick={() => setActiveTab(tab)}
-              className="relative flex-1 text-center active:scale-[0.95] transition-colors"
-              style={{
-                fontSize: '14px',
-                fontWeight: isActive ? 600 : 500,
-                paddingBottom: '10px',
-                paddingTop: '4px',
-                color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
-              }}
-            >
-              {tab}
-              {isActive && (
-                <motion.div
-                  layoutId="season-tab-editorial"
-                  className="absolute bottom-0 left-0 right-0 bg-foreground rounded-full"
-                  style={{ height: '2px' }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                />
-              )}
-            </button>
-          );
-        })}
+      {/* Tab bar — sticky pill style */}
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md pb-3 pt-1">
+        <div className="rounded-xl bg-muted/30 border border-border/50 p-1 flex" role="tablist" aria-label="Season Performance Stats">
+          {TABS.map((tab) => {
+            const isActive = activeTab === tab;
+            return (
+              <button
+                key={tab}
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => setActiveTab(tab)}
+                className={cn(
+                  "flex-1 rounded-lg py-2.5 min-h-[44px] transition-all text-center",
+                  isActive
+                    ? "bg-card text-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-muted/50"
+                )}
+                style={{
+                  fontSize: tab === 'Strokes Gained' ? '12px' : '13px',
+                  fontWeight: 600,
+                }}
+              >
+                {tab}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Tab content — 16px gap from tabs */}

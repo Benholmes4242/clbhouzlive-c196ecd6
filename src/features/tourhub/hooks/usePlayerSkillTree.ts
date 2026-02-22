@@ -119,6 +119,18 @@ function percentileToLevel(percentile: number): number {
 }
 
 /**
+ * Exaggerate percentile differences for more dramatic radar shapes.
+ * Power curve: sqrt stretches mid-range values outward (like FIFA).
+ * Minimum 15% so the shape never collapses to nothing.
+ */
+export function normalizeForChart(percentile: number): number {
+  const min = 0.15;
+  const max = 1.0;
+  const curved = Math.pow(percentile / 100, 0.6);
+  return min + curved * (max - min);
+}
+
+/**
  * Calculate percentile rank within array of values
  * Returns 0-100 where 100 is the best
  */
