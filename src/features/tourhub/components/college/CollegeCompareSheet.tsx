@@ -217,7 +217,7 @@ export function CollegeCompareSheet({
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
             className={cn(
               "fixed bottom-0 left-0 right-0 z-50",
               "bg-card rounded-t-2xl",
