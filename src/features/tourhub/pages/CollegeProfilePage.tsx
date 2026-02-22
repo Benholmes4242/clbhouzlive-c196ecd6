@@ -203,7 +203,7 @@ export function CollegeProfilePage() {
         {/* Content — centered */}
         {isLoading ? (
           <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-8 pt-20">
-            <div className="w-[110px] h-[110px] rounded-full bg-white/10 animate-pulse mb-4" />
+            <div className="w-[140px] h-[140px] rounded-full bg-white/10 animate-pulse mb-4" />
             <div className="h-8 w-48 bg-white/10 rounded animate-pulse mb-2" />
             <div className="h-4 w-32 bg-white/10 rounded animate-pulse" />
           </div>
@@ -215,7 +215,7 @@ export function CollegeProfilePage() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3, delay: 0.1 }}
               style={{
-                fontSize: '10px',
+                fontSize: '11px',
                 fontWeight: 700,
                 letterSpacing: '1.2px',
                 textTransform: 'uppercase' as const,
@@ -233,11 +233,11 @@ export function CollegeProfilePage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.12 }}
                 className="flex items-center gap-1.5"
-                style={{ marginTop: '4px', marginBottom: '20px' }}
+                style={{ marginTop: '4px', marginBottom: '12px' }}
               >
                 <Crown className="w-4 h-4" style={{ color: '#f59e0b' }} />
                 <span style={{
-                  fontSize: '11px',
+                  fontSize: '12px',
                   fontWeight: 700,
                   letterSpacing: '1.2px',
                   textTransform: 'uppercase' as const,
@@ -261,14 +261,14 @@ export function CollegeProfilePage() {
                   alt={displayName}
                   className="object-contain"
                   style={{
-                    width: '110px',
-                    height: '110px',
+                    width: '140px',
+                    height: '140px',
                     filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.3))',
                   }}
                   onError={() => setHeroImgError(true)}
                 />
               ) : (
-                <div className="w-[110px] h-[110px] bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center shadow-2xl" style={{ borderRadius: '34%' }}>
+                <div className="w-[140px] h-[140px] bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center shadow-2xl" style={{ borderRadius: '34%' }}>
                   <span className="text-4xl font-bold text-white/70">
                     {displayName?.charAt(0)?.toUpperCase() || '?'}
                   </span>
@@ -283,7 +283,7 @@ export function CollegeProfilePage() {
               transition={{ duration: 0.3, delay: 0.25 }}
               className="text-center text-white"
               style={{
-                fontSize: '28px',
+                fontSize: '34px',
                 fontWeight: 700,
                 letterSpacing: '-0.4px',
                 marginBottom: '4px',
@@ -299,8 +299,8 @@ export function CollegeProfilePage() {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3, delay: 0.3 }}
                 style={{
-                  fontSize: '13px',
-                  fontWeight: 400,
+                  fontSize: '14px',
+                  fontWeight: 500,
                   color: 'rgba(255,255,255,0.6)',
                 }}
               >
@@ -312,30 +312,28 @@ export function CollegeProfilePage() {
         ) : null}
       </div>
 
-      {/* Stats Bar — 5-column, overlaps hero by -24px */}
+      {/* Stats Bar — 3-column glass overlay on hero */}
       {stats && (
         <div className="relative z-10 mx-4" style={{ marginTop: '-24px' }}>
           <motion.div
-            className="rounded-2xl border border-border/50 bg-card"
+            className="flex items-stretch"
             style={{
-              padding: '14px 8px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-              display: 'grid',
-              gridTemplateColumns: 'repeat(5, 1fr)',
+              background: 'rgba(0,0,0,0.25)',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: 16,
+              padding: '12px 0',
             }}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.3 }}
           >
-            <StatPill label="WINS" value={String(stats.wins_total)} highlight={stats.wins_total > 0} />
-            <StatDivider />
-            <StatPill label="EARNINGS" value={formatCurrency(stats.earnings_total)} />
-            <StatDivider />
-            <StatPill label="CUTS" value={String(stats.cuts_total)} />
-            <StatDivider />
-            <StatPill label="TOP 10" value={String(stats.top10_total)} />
-            <StatDivider />
-            <StatPill label="PLAYERS" value={String(stats.player_count)} />
+            <GlassStatCell label="EARNINGS" value={formatCurrency(stats.earnings_total)} />
+            <div style={{ width: 1, background: 'rgba(255,255,255,0.1)' }} />
+            <GlassStatCell label="WINS" value={String(stats.wins_total)} highlight={stats.wins_total > 0} />
+            <div style={{ width: 1, background: 'rgba(255,255,255,0.1)' }} />
+            <GlassStatCell label="ALUMNI" value={String(stats.player_count)} />
           </motion.div>
         </div>
       )}
@@ -481,27 +479,25 @@ function formatCurrency(amount: number): string {
   return `$${amount.toFixed(0)}`;
 }
 
-function StatDivider() {
-  return <div className="w-px self-stretch bg-border/20" />;
-}
-
-function StatPill({ label, value, highlight = false }: { label: string; value: string; highlight?: boolean }) {
+function GlassStatCell({ label, value, highlight = false }: { label: string; value: string; highlight?: boolean }) {
   return (
-    <div className="flex flex-col items-center justify-center">
+    <div className="flex-1 flex flex-col items-center justify-center">
       <span style={{
-        fontSize: '10px',
-        fontWeight: 700,
+        fontSize: 10,
+        fontWeight: 600,
         letterSpacing: '0.5px',
         textTransform: 'uppercase' as const,
-      }} className="text-muted-foreground/50 block mb-0.5">
+        color: 'rgba(255,255,255,0.5)',
+      }}>
         {label}
       </span>
       <span style={{
-        fontSize: '15px',
+        fontSize: 18,
         fontWeight: 700,
         fontVariantNumeric: 'tabular-nums',
-        color: highlight ? '#f59e0b' : undefined,
-      }} className={highlight ? '' : 'text-foreground'}>
+        color: highlight ? '#f59e0b' : 'white',
+        marginTop: 2,
+      }}>
         {value}
       </span>
     </div>

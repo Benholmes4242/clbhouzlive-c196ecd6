@@ -78,8 +78,8 @@ export function CollegeHeroBanner({ stats, college, className }: CollegeHeroBann
                 alt={displayName}
                 className="object-contain"
                 style={{
-                  width: 110,
-                  height: 110,
+                  width: 140,
+                  height: 140,
                   filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.3))',
                 }}
                 onError={(e) => { e.currentTarget.style.display = 'none'; }}
@@ -93,18 +93,18 @@ export function CollegeHeroBanner({ stats, college, className }: CollegeHeroBann
             )}
           </motion.div>
 
-          {/* #1 Badge — 11px, 700, amber, uppercase, tracking 1.2px */}
+          {/* #1 Badge — 12px, 700, amber */}
           <motion.div
             initial={{ y: 8, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.2 }}
             className="flex items-center gap-1.5"
-            style={{ marginBottom: 8 }}
+            style={{ marginBottom: 12 }}
           >
             <Trophy className="w-3.5 h-3.5" style={{ color: '#f59e0b' }} />
             <span
               style={{
-                fontSize: 11,
+                fontSize: 12,
                 fontWeight: 700,
                 letterSpacing: '1.2px',
                 textTransform: 'uppercase',
@@ -115,22 +115,37 @@ export function CollegeHeroBanner({ stats, college, className }: CollegeHeroBann
             </span>
           </motion.div>
 
-          {/* College Name — 28px, 700, white, tracking -0.4px */}
+          {/* College Name — 34px, 700, white */}
           <motion.h1
             initial={{ y: 8, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.25 }}
             className="text-center"
             style={{
-              fontSize: 28,
+              fontSize: 34,
               fontWeight: 700,
               color: 'white',
               letterSpacing: '-0.4px',
-              marginBottom: 16,
+              marginBottom: 4,
             }}
           >
             {displayName}
           </motion.h1>
+
+          {/* Subtitle */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, delay: 0.28 }}
+            style={{
+              fontSize: 14,
+              fontWeight: 500,
+              color: 'rgba(255,255,255,0.6)',
+              marginBottom: 12,
+            }}
+          >
+            {stats.player_count} alumni on the PGA Tour
+          </motion.p>
 
           {/* Stats Grid — 3 cols in dark container */}
           <motion.div
@@ -164,10 +179,10 @@ export function CollegeHeroBanner({ stats, college, className }: CollegeHeroBann
 function StatCell({ label, value, icon }: { label: string; value: string; icon?: React.ReactNode }) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center">
-      <span
+    <span
         style={{
           fontSize: 10,
-          fontWeight: 700,
+          fontWeight: 600,
           letterSpacing: '0.5px',
           textTransform: 'uppercase',
           color: 'rgba(255,255,255,0.5)',
