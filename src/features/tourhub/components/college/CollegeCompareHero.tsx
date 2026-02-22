@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
-import { DollarSign, Trophy, Target, TrendingUp, User } from 'lucide-react';
+import { DollarSign, Trophy, Target, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { useTourSeason } from '../../hooks/useTourHubData';
 import type { CollegeCompareData } from '../../hooks/useCollegeCompare';
@@ -66,11 +67,12 @@ function AlumniCompareBlock({ title, alumni1, alumni2 }: {
             >
               <span className="text-xs text-muted-foreground w-4">{i + 1}</span>
               <div className="w-6 h-6 rounded-full bg-card overflow-hidden shrink-0">
-                {a.photo_url ? (
-                  <img src={a.photo_url} alt="" className="w-full h-full object-cover" />
-                ) : (
-                  <User className="w-full h-full p-1 text-muted-foreground" />
-                )}
+                <img
+                  src={getPlayerHeadshotUrl(`${a.first_name} ${a.last_name}`, a.tour_codes?.[0] ?? 'pga')}
+                  alt={`${a.first_name} ${a.last_name}`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+                />
               </div>
               <span className="text-xs text-foreground truncate">
                 {a.first_name} {a.last_name}
@@ -90,11 +92,12 @@ function AlumniCompareBlock({ title, alumni1, alumni2 }: {
             >
               <span className="text-xs text-muted-foreground w-4">{i + 1}</span>
               <div className="w-6 h-6 rounded-full bg-card overflow-hidden shrink-0">
-                {a.photo_url ? (
-                  <img src={a.photo_url} alt="" className="w-full h-full object-cover" />
-                ) : (
-                  <User className="w-full h-full p-1 text-muted-foreground" />
-                )}
+                <img
+                  src={getPlayerHeadshotUrl(`${a.first_name} ${a.last_name}`, a.tour_codes?.[0] ?? 'pga')}
+                  alt={`${a.first_name} ${a.last_name}`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+                />
               </div>
               <span className="text-xs text-foreground truncate">
                 {a.first_name} {a.last_name}

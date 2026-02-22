@@ -53,7 +53,7 @@ export function PlayerSpotlight() {
           {/* Player Photo */}
           <div className="w-20 h-20 rounded-xl overflow-hidden bg-white/20 flex-shrink-0 ring-2 ring-white/30 shadow-lg">
             {(() => {
-              const photoUrl = getPlayerHeadshotUrl(`${spotlight.firstName} ${spotlight.lastName}`, 'pga');
+              const photoUrl = getPlayerHeadshotUrl(`${spotlight.firstName} ${spotlight.lastName}`, spotlight.tourCode ?? 'pga');
               return photoUrl ? (
                 <img
                   src={photoUrl}

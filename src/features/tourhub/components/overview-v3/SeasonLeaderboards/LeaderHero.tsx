@@ -25,7 +25,7 @@ function formatCountryName(country: string | null): string {
 
 export const LeaderHero = memo(function LeaderHero({ player, accentColor }: LeaderHeroProps) {
   const navigate = useNavigate();
-  const photoUrl = getPlayerHeadshotUrl(player.playerName, 'pga');
+  const photoUrl = getPlayerHeadshotUrl(player.playerName, player.tourCode ?? 'pga');
   const accent = CATEGORY_ACCENT_COLORS[accentColor];
   const [imgError, setImgError] = useState(false);
 

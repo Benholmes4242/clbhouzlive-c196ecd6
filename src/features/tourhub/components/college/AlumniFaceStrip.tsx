@@ -57,7 +57,7 @@ export function AlumniFaceStrip({ alumni, collegeName, collegeSlug, totalAlumniC
         {/* Stacked circular avatars — 32×32, 50% radius, 2px white border, -8px overlap */}
         <div className="flex items-center shrink-0" style={{ marginLeft: 0 }}>
           {visible.map((alum, i) => {
-            const photoUrl = getPlayerHeadshotUrl(alum.full_name, 'pga');
+            const photoUrl = getPlayerHeadshotUrl(alum.full_name, alum.tour_codes?.[0] ?? 'pga');
             return (
               <div
                 key={alum.id}

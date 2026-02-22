@@ -149,7 +149,7 @@ export function MoversThisWeek() {
                   }}
                 >
                   {(() => {
-                    const photoUrl = getPlayerHeadshotUrl(`${entry.firstName} ${entry.lastName}`, 'pga');
+                    const photoUrl = getPlayerHeadshotUrl(`${entry.firstName} ${entry.lastName}`, entry.tourCode ?? 'pga');
                     return photoUrl ? (
                       <img
                         src={photoUrl}

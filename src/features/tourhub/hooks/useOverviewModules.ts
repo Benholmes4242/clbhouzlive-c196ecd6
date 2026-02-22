@@ -49,6 +49,7 @@ export interface RankingMover {
   country: string | null;
   photoUrl: string | null;
   pgaTourId: string | null;
+  tourCode: string;
   rank: number;
   priorRank: number | null;
   rankChange: number;
@@ -80,6 +81,7 @@ export interface SpotlightPlayer {
   country: string | null;
   photoUrl: string | null;
   pgaTourId: string | null;
+  tourCode: string;
   label: string;
   statLabel: string;
   statValue: string;
@@ -278,7 +280,7 @@ export function useRankingMovers() {
           rank,
           prior_rank,
           avg_points,
-          player:sr_players!inner(id, first_name, last_name, country, photo_url, pga_tour_id)
+          player:sr_players!inner(id, first_name, last_name, country, photo_url, pga_tour_id, tour_codes)
         `)
         .not('prior_rank', 'is', null)
         .order('rank', { ascending: true })
@@ -303,6 +305,7 @@ export function useRankingMovers() {
           country: row.player.country,
           photoUrl: row.player.photo_url,
           pgaTourId: row.player.pga_tour_id,
+          tourCode: row.player.tour_codes?.[0] ?? 'pga',
           rank: row.rank,
           priorRank: row.prior_rank,
           rankChange,
@@ -784,7 +787,7 @@ export function usePlayerSpotlight() {
         .select(`
           rank,
           avg_points,
-          player:sr_players!inner(id, first_name, last_name, country, photo_url, pga_tour_id)
+          player:sr_players!inner(id, first_name, last_name, country, photo_url, pga_tour_id, tour_codes)
         `)
         .eq('rank', 1)
         .maybeSingle();
@@ -800,6 +803,7 @@ export function usePlayerSpotlight() {
           country: player.country,
           photoUrl: player.photo_url,
           pgaTourId: player.pga_tour_id || null,
+          tourCode: player.tour_codes?.[0] ?? 'pga',
           label: 'World No. 1',
           statLabel: 'Avg Points',
           statValue: worldNo1.avg_points?.toFixed(2) || 'N/A',
@@ -935,6 +939,7 @@ export interface WorldRankingEntry {
     photo_url: string | null;
     country: string | null;
     pga_tour_id: string | null;
+    tour_codes?: string[] | null;
   };
 }
 
@@ -969,7 +974,8 @@ export function useWorldRankingsFull() {
             last_name,
             photo_url,
             country,
-            pga_tour_id
+            pga_tour_id,
+            tour_codes
           )
         `)
         .gte('rank', 1)

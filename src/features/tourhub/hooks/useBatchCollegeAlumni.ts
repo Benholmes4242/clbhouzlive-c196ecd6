@@ -6,6 +6,7 @@ export interface AlumniFace {
   full_name: string;
   photo_url: string | null;
   pga_tour_id: string | null;
+  tour_codes: string[] | null;
   college_normalized: string;
 }
 
@@ -21,7 +22,7 @@ export function useBatchCollegeAlumni(collegeSlugs: string[], perCollege = 3) {
 
       const { data, error } = await supabase
         .from('sr_players')
-        .select('id, first_name, last_name, photo_url, pga_tour_id, college_normalized')
+        .select('id, first_name, last_name, photo_url, pga_tour_id, tour_codes, college_normalized')
         .in('college_normalized', collegeSlugs)
         .not('photo_url', 'is', null)
         .limit(collegeSlugs.length * (perCollege + 2));
@@ -42,6 +43,7 @@ export function useBatchCollegeAlumni(collegeSlugs: string[], perCollege = 3) {
             full_name: `${p.first_name} ${p.last_name}`,
             photo_url: p.photo_url,
             pga_tour_id: p.pga_tour_id || null,
+            tour_codes: (p as any).tour_codes ?? null,
             college_normalized: key,
           });
           grouped.set(key, list);

@@ -7,6 +7,7 @@ import { ArrowRight, TrendingUp } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { toTitleCase } from '@/lib/formatters';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import type { TourPlayerStatistics } from '../../hooks/useTourHubData';
 
 type SortOption = 'events' | 'cuts' | 'world_rank';
@@ -146,17 +147,17 @@ export function TopPlayersFeed({ players, maxEvents, maxCuts }: TopPlayersFeedPr
                   boxShadow: rankIntensity > 0 ? `0 0 8px hsl(var(--primary) / ${rankIntensity})` : 'none',
                 }}
               >
-                {stat.player?.photo_url ? (
-                  <img 
-                    src={stat.player.photo_url} 
-                    alt={stat.player.full_name}
-                    className="w-10 h-10 object-cover"
-                  />
-                ) : (
-                  <span className="text-sm font-semibold text-muted-foreground">
-                    {stat.player?.full_name?.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                  </span>
-                )}
+                {(() => {
+                  const headshot = getPlayerHeadshotUrl(stat.player?.full_name ?? '', 'pga');
+                  return (
+                    <img 
+                      src={headshot}
+                      alt={stat.player?.full_name ?? ''}
+                      className="w-10 h-10 object-cover"
+                      onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+                    />
+                  );
+                })()}
               </div>
 
               {/* Player Info */}

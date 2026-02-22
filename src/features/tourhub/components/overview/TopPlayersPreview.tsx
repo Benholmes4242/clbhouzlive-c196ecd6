@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, User, TrendingUp } from 'lucide-react';
+import { ArrowRight, TrendingUp } from 'lucide-react';
 import { useTourSeason, useTourPlayerStatistics } from '../../hooks/useTourHubData';
 import { useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 
 type SortOption = 'events' | 'cuts' | 'world_rank';
 
@@ -142,15 +143,17 @@ export function TopPlayersPreview() {
                   {index + 1}
                 </span>
                 <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center overflow-hidden">
-                  {stat.player?.photo_url ? (
-                    <img 
-                      src={stat.player.photo_url} 
-                      alt={stat.player.full_name}
-                      className="w-9 h-9 object-cover"
-                    />
-                  ) : (
-                    <User className="w-4 h-4 text-muted-foreground" />
-                  )}
+                  {(() => {
+                    const headshot = getPlayerHeadshotUrl(stat.player?.full_name ?? '', 'pga');
+                    return (
+                      <img 
+                        src={headshot}
+                        alt={stat.player?.full_name ?? ''}
+                        className="w-9 h-9 object-cover"
+                        onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+                      />
+                    );
+                  })()}
                 </div>
                 <div>
                   <p className="font-medium text-foreground group-hover:text-primary transition-colors text-sm">

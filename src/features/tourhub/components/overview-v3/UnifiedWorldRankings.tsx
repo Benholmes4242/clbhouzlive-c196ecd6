@@ -106,6 +106,7 @@ interface MomentumPillProps {
     country: string;
     photoUrl: string | null;
     pgaTourId: string | null;
+    tourCode: string;
     rank: number;
     priorRank: number | null;
     rankChange: number;
@@ -117,7 +118,7 @@ interface MomentumPillProps {
 function MomentumPill({ entry, index, direction }: MomentumPillProps) {
   const navigate = useNavigate();
   const initials = `${entry.firstName?.[0] ?? ''}${entry.lastName?.[0] ?? ''}`.toUpperCase();
-  const photoUrl = getPlayerHeadshotUrl(`${entry.firstName} ${entry.lastName}`, 'pga');
+  const photoUrl = getPlayerHeadshotUrl(`${entry.firstName} ${entry.lastName}`, entry.tourCode ?? 'pga');
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
 
@@ -401,7 +402,7 @@ export function UnifiedWorldRankings() {
 
               // Avatar
               const initials = `${entry.player.first_name?.[0] ?? ''}${entry.player.last_name?.[0] ?? ''}`.toUpperCase();
-              const photoUrl = getPlayerHeadshotUrl(fullName, 'pga');
+              const photoUrl = getPlayerHeadshotUrl(fullName, entry.player.tour_codes?.[0] ?? 'pga');
 
               return (
                 <motion.div

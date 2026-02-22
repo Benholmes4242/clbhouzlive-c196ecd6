@@ -27,6 +27,7 @@ export interface LeaderboardPlayer {
   lastName: string;
   countryCode: string;
   photoUrl: string | null;
+  tourCode?: string;
   initials: string;
   statValue: number;
   statDisplayValue: string;
@@ -309,7 +310,7 @@ async function fetchSeasonLeaderboards(requestedYear?: number): Promise<SeasonLe
           firstName,
           lastName,
           countryCode: player.country || 'USA',
-          photoUrl: getPlayerHeadshotUrl(`${firstName} ${lastName}`.trim(), 'pga'),
+          photoUrl: null, // Components resolve headshots via getPlayerHeadshotUrl
           initials: `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase(),
           statValue,
           statDisplayValue: config.formatValue(statValue),

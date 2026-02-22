@@ -19,6 +19,7 @@ export interface LeaderboardPlayer {
   lastName: string;
   countryCode: string;
   photoUrl: string | null;
+  tourCode?: string;
   initials: string;
   statValue: number;
   statDisplayValue: string;
