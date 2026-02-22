@@ -98,6 +98,7 @@ export function useCollegeWeeklyMovers(options?: {
 /**
  * Fetches rivalries for a college.
  * Returns all colleges that are rivals (both directions).
+ * Falls back to closest-ranked colleges if no rivalries defined.
  */
 export function useCollegeRivalries(normalizedName: string | undefined) {
   const { data: collegeMap } = useCollegeMediaMap();
@@ -119,16 +120,46 @@ export function useCollegeRivalries(normalizedName: string | undefined) {
       }
       
       // Extract rival colleges (the "other" side)
-      const rivals = (data || []).map(r => {
-        const rivalName = r.college_a === normalizedName ? r.college_b : r.college_a;
-        return {
-          ...r,
-          rivalNormalizedName: rivalName,
-          college: collegeMap?.get(rivalName) || null,
-        };
-      });
+      if (data && data.length > 0) {
+        return data.map(r => {
+          const rivalName = r.college_a === normalizedName ? r.college_b : r.college_a;
+          return {
+            ...r,
+            rivalNormalizedName: rivalName,
+            college: collegeMap?.get(rivalName) || null,
+            isFallback: false,
+          };
+        });
+      }
       
-      return rivals;
+      // Fallback: get closest-ranked colleges by earnings
+      const { data: allStats } = await supabase
+        .from('college_season_stats')
+        .select('normalized_name, earnings_total')
+        .order('earnings_total', { ascending: false });
+      
+      if (!allStats || allStats.length === 0) return [];
+      
+      const myIndex = allStats.findIndex(s => s.normalized_name === normalizedName);
+      if (myIndex === -1) return [];
+      
+      // Get up to 3 colleges from nearby ranks (±3 positions)
+      const nearby: typeof allStats = [];
+      for (let i = Math.max(0, myIndex - 3); i <= Math.min(allStats.length - 1, myIndex + 3); i++) {
+        if (i !== myIndex) nearby.push(allStats[i]);
+        if (nearby.length >= 3) break;
+      }
+      
+      return nearby.map(c => ({
+        id: `fallback-${c.normalized_name}`,
+        college_a: normalizedName,
+        college_b: c.normalized_name,
+        weight: 1,
+        created_at: new Date().toISOString(),
+        rivalNormalizedName: c.normalized_name,
+        college: collegeMap?.get(c.normalized_name) || null,
+        isFallback: true,
+      }));
     },
     enabled: !!normalizedName,
     staleTime: 10 * 60 * 1000,
