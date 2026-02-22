@@ -10,6 +10,7 @@ import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toTitleCase } from '@/lib/formatters';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import type { TourPlayerStatistics } from '../../hooks/useTourHubData';
 
 type SortOption = 'world_rank' | 'cuts' | 'events';
@@ -141,19 +142,12 @@ export function PlayersFeed({ players, maxEvents, maxCuts }: PlayersFeedProps) {
               >
                 {/* Player photo */}
                 <div className="relative w-11 h-11 rounded-full overflow-hidden flex-shrink-0 bg-muted">
-                  {stat.player?.photo_url ? (
-                    <img 
-                      src={stat.player.photo_url} 
-                      alt={stat.player.full_name}
-                      className="w-full h-full object-cover object-top"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">
-                      <span className="text-sm font-bold text-muted-foreground/50">
-                        {stat.player?.full_name?.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                      </span>
-                    </div>
-                  )}
+                  <img 
+                    src={getPlayerHeadshotUrl(stat.player?.full_name ?? '', 'pga')}
+                    alt={stat.player?.full_name ?? ''}
+                    className="w-full h-full object-cover object-top"
+                    onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+                  />
                 </div>
 
                 {/* Player Info */}

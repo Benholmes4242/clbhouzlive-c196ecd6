@@ -1,6 +1,6 @@
 /**
  * PlayersWorldsBest - Top 5 world-ranked players showcase.
- * Light-mode, semantic tokens, SquircleAvatar with Cloudinary photos.
+ * Light-mode, semantic tokens, SquircleAvatar with R2 photos.
  */
 
 import { useRef } from 'react';

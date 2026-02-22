@@ -229,7 +229,7 @@ export function FranchiseCard({
             <div className="flex items-center" style={{ marginTop: 6 }}>
               <div className="flex items-center">
                 {alumni.slice(0, 3).map((a, i) => {
-                  const photoUrl = getPlayerHeadshotUrl(a.full_name, 'pga');
+                  const photoUrl = getPlayerHeadshotUrl(a.full_name, a.tour_codes?.[0] ?? 'pga');
                   return (
                     <div
                       key={a.id}

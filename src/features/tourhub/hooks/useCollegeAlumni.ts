@@ -9,6 +9,7 @@ export interface CollegeAlumnus {
   country: string | null;
   photo_url: string | null;
   pga_tour_id: string | null;
+  tour_codes: string[] | null;
   world_ranking: number | null;
   college: string;
   // Stats from sr_player_statistics
@@ -38,7 +39,7 @@ export function useCollegeAlumni(normalizedName: string | undefined, options?: {
       // Query players directly using the indexed college_normalized column
       const { data: players, error: playersError } = await supabase
         .from('sr_players')
-        .select('id, first_name, last_name, country, photo_url, pga_tour_id, college')
+        .select('id, first_name, last_name, country, photo_url, pga_tour_id, college, tour_codes')
         .eq('college_normalized', normalizedName);
       
       if (playersError) {
@@ -74,6 +75,7 @@ export function useCollegeAlumni(normalizedName: string | undefined, options?: {
           country: p.country,
           photo_url: p.photo_url,
           pga_tour_id: p.pga_tour_id || null,
+          tour_codes: (p as any).tour_codes ?? null,
           college: p.college || '',
           world_ranking: typeof statistics.world_rank === 'number' ? statistics.world_rank : null,
           earnings: typeof statistics.earnings === 'number' ? statistics.earnings : 0,

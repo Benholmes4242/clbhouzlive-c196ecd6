@@ -1,6 +1,5 @@
 /**
  * AlumniDepthChart - Squad-style depth chart with tier-colored left borders
- * Photos resolved via pga_tour_id for Cloudinary CDN quality.
  */
 
 import { useState, useMemo } from 'react';
@@ -36,7 +35,7 @@ function AlumniRow({ alumnus, index, tierAccent }: AlumniRowProps) {
   const hasWins = (alumnus.wins || 0) > 0;
   const hasEarnings = (alumnus.earnings || 0) > 0;
   const hasWorldRank = alumnus.world_ranking && alumnus.world_ranking < 500;
-  const photoUrl = getPlayerHeadshotUrl(fullName, 'pga');
+  const photoUrl = getPlayerHeadshotUrl(fullName, alumnus.tour_codes?.[0] ?? 'pga');
 
   const initials = fullName
     .split(' ')

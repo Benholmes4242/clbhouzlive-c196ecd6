@@ -1,9 +1,10 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronUp, ChevronDown, User, Globe } from 'lucide-react';
+import { ChevronUp, ChevronDown, Globe } from 'lucide-react';
 import { useTourSeason, useTourPlayerStatistics } from '../../hooks/useTourHubData';
 import { TourHubEmptyState } from '../TourHubEmptyState';
 import { cn } from '@/lib/utils';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 
 // Use world_rank instead of fedex_rank since FedEx is locked
 type SortKey = 'world_rank' | 'events_played' | 'wins' | 'top_10s' | 'scoring_avg' | 'drive_avg' | 'gir_pct' | 'putt_avg';
@@ -156,15 +157,12 @@ export function PlayerStatsTab() {
                         {index + 1}
                       </span>
                       <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0 overflow-hidden">
-                        {stat.player?.photo_url ? (
-                          <img 
-                            src={stat.player.photo_url} 
-                            alt={stat.player.full_name}
-                            className="w-8 h-8 object-cover"
-                          />
-                        ) : (
-                          <User className="w-3 h-3 text-muted-foreground" />
-                        )}
+                        <img 
+                          src={getPlayerHeadshotUrl(stat.player?.full_name ?? '', 'pga')}
+                          alt={stat.player?.full_name ?? ''}
+                          className="w-8 h-8 object-cover"
+                          onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+                        />
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="font-medium text-foreground text-sm truncate">{stat.player?.full_name || 'Unknown'}</p>

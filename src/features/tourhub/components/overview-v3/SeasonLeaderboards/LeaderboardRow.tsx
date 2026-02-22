@@ -44,7 +44,7 @@ export const LeaderboardRow = memo(function LeaderboardRow({
     navigate(`/tourhub/player/${player.playerId}`);
   };
 
-  const photoUrl = getPlayerHeadshotUrl(player.playerName, 'pga');
+  const photoUrl = getPlayerHeadshotUrl(player.playerName, player.tourCode ?? 'pga');
 
   return (
     <button
