@@ -74,7 +74,7 @@ export function getCollegeColors(normalizedName: string): CollegeBrandColors {
  */
 export function getCollegePodiumGradient(normalizedName: string): string {
   const colors = getCollegeColors(normalizedName);
-  return `linear-gradient(135deg, ${colors.primary}E6 0%, ${colors.primary}CC 50%, ${colors.secondary}99 100%)`;
+  return `linear-gradient(135deg, ${colors.primary}99 0%, ${colors.primary}80 50%, ${colors.secondary}66 100%)`;
 }
 
 /**

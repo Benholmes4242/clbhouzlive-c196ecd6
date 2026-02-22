@@ -38,14 +38,14 @@ interface LeaderCategory {
 }
 
 const LEADER_CATEGORIES: LeaderCategory[] = [
-  { key: 'avg_driving_distance', title: 'Longest Drivers', sort: 'desc', format: (v) => `${v} yds` },
-  { key: 'avg_driving_accuracy', title: 'Fairways Hit', sort: 'desc', format: (v) => `${v}%` },
-  { key: 'avg_gir', title: 'Greens in Reg', sort: 'desc', format: (v) => `${v}%` },
-  { key: 'avg_putting', title: 'Average Putts', sort: 'asc', format: (v) => `${v}` },
-  { key: 'avg_scrambling', title: 'Best Scramblers', sort: 'desc', format: (v) => `${v}%` },
-  { key: 'avg_sand_saves', title: 'Sand Saves', sort: 'desc', format: (v) => `${v}%` },
-  { key: 'avg_sg_total', title: 'Strokes Gained', sort: 'desc', format: (v) => `+${v}` },
-  { key: 'avg_scoring', title: 'Lowest Avg Scoring', sort: 'asc', format: (v) => `${v}` },
+  { key: 'avg_driving_distance', title: 'Longest Drivers', sort: 'desc', format: (v) => `${Number(v).toFixed(1)} yds` },
+  { key: 'avg_driving_accuracy', title: 'Fairways Hit', sort: 'desc', format: (v) => `${Math.round(Number(v))}%` },
+  { key: 'avg_gir', title: 'Greens in Reg', sort: 'desc', format: (v) => `${Math.round(Number(v))}%` },
+  { key: 'avg_putting', title: 'Average Putts', sort: 'asc', format: (v) => `${Number(v).toFixed(2)}` },
+  { key: 'avg_scrambling', title: 'Best Scramblers', sort: 'desc', format: (v) => `${Math.round(Number(v))}%` },
+  { key: 'avg_sand_saves', title: 'Sand Saves', sort: 'desc', format: (v) => `${Math.round(Number(v))}%` },
+  { key: 'avg_sg_total', title: 'Strokes Gained', sort: 'desc', format: (v) => `+${Number(v).toFixed(2)}` },
+  { key: 'avg_scoring', title: 'Lowest Avg Scoring', sort: 'asc', format: (v) => `${Number(v).toFixed(1)}` },
 ];
 
 // ============================================================================
