@@ -126,9 +126,9 @@ export function CollegeGolfHubPage() {
 
         {/* Burger menu — AFTER hero in DOM so it paints on top of hero's stacking context */}
         <button
-          className="absolute z-30 flex items-center justify-center"
-          style={{ top: '56px', left: '16px', width: '44px', height: '44px' }}
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
+          className="absolute z-50 flex items-center justify-center"
+          style={{ top: 56, left: 16, width: 44, height: 44, pointerEvents: 'auto' as const }}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); console.log('COLLEGE HUB BURGER TAPPED'); openTourNav(); }}
           aria-label="Open tour menu"
         >
           <Menu
