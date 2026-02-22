@@ -15,7 +15,7 @@ import { useCollegeMediaMap, type CollegeMedia } from '../../hooks/useCollegeMed
 import { useFranchiseCaptains, type FranchiseCaptain } from '../../hooks/useFranchiseCaptains';
 import { useFollowedColleges } from '../../hooks/useCollegeMovers';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
-import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
+import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
@@ -103,7 +103,7 @@ function PodiumCard({
   const navigate = useNavigate();
   const isFirst = rank === 1;
   const displayName = media?.short_name || media?.college_name || stats.normalized_name;
-  const captainPhotoUrl = captain ? resolvePhotoUrl(captain.photoUrl, captain.pgaTourId) : null;
+  const captainPhotoUrl = captain ? getR2HeadshotUrlMultiTour(captain.fullName) : null;
 
   return (
     <button

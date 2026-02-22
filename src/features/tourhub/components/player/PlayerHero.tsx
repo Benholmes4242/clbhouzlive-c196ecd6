@@ -8,7 +8,7 @@ import { ArrowLeft, Share2, Globe } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useRef, useCallback } from 'react';
 import { cn } from '@/lib/utils';
-import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
+import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
 import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
 
@@ -22,7 +22,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
   const location = useLocation();
   const heroRef = useRef<HTMLDivElement>(null);
 
-  const heroPhotoUrl = resolvePhotoUrl(player.photo_url, player.pga_tour_id, 'hero');
+  const heroPhotoUrl = getR2HeadshotUrlMultiTour(player.full_name);
 
   const age = player.birth_date
     ? Math.floor((Date.now() - new Date(player.birth_date).getTime()) / (365.25 * 24 * 60 * 60 * 1000))

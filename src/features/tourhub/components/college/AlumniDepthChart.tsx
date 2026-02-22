@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Crown, Cog, Rocket, ChevronDown, ChevronUp, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCollegeAlumni, type CollegeAlumnus } from '../../hooks/useCollegeAlumni';
-import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
+import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 
 interface AlumniDepthChartProps {
@@ -36,7 +36,7 @@ function AlumniRow({ alumnus, index, tierAccent }: AlumniRowProps) {
   const hasWins = (alumnus.wins || 0) > 0;
   const hasEarnings = (alumnus.earnings || 0) > 0;
   const hasWorldRank = alumnus.world_ranking && alumnus.world_ranking < 500;
-  const photoUrl = resolvePhotoUrl(alumnus.photo_url, alumnus.pga_tour_id);
+  const photoUrl = getR2HeadshotUrlMultiTour(fullName);
 
   const initials = fullName
     .split(' ')

@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import { TourHubShell } from '../components/TourHubShell';
 import { useTourTournament, useTourLeaderboard } from '../hooks/useTourHubData';
 import { useLeaderboardRealtime } from '../hooks/useLeaderboardRealtime';
-import { usePlayerHeadshots } from '../hooks/usePlayerMedia';
+// usePlayerHeadshots removed — R2 CDN is now the headshot source
 import { useSingleCourseImage } from '../hooks/useCourseImageResolver';
 import { getCourseImage } from '../utils/placeholders';
 import { EventWinnerCard } from '../components/EventWinnerCard';
@@ -142,7 +142,7 @@ export function TournamentDetailPage() {
       .filter(Boolean) as string[];
   }, [leaderboard]);
   
-  const { data: headshotMap } = usePlayerHeadshots(playerIds);
+  const headshotMap = undefined; // R2 CDN handles headshots via PlayerAvatar
 
   const countdownText = useMemo(() => {
     if (!tournament || !isUpcoming) return undefined;

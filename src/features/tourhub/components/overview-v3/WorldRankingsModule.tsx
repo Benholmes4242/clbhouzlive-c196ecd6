@@ -15,7 +15,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWorldRankingsFull } from '../../hooks/useOverviewModules';
 import CountryFlag from '@/components/ui/country-flag';
-import { getPgaTourHeadshotUrl } from '../../utils/resolvePhotoUrl';
+import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
 
 const PLAYERS_PER_PAGE = 10;
 
@@ -304,9 +304,7 @@ export function WorldRankingsModule() {
                             const initials = `${entry.player.first_name?.[0] ?? ''}${entry.player.last_name?.[0] ?? ''}`
                               .toUpperCase() || '?';
 
-                            const photoUrl = entry.player.pga_tour_id
-                              ? getPgaTourHeadshotUrl(entry.player.pga_tour_id)
-                              : null;
+                            const photoUrl = getR2HeadshotUrlMultiTour(fullName);
 
                             return (
                               <div className="relative w-full h-full">
