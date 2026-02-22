@@ -93,6 +93,8 @@ export function ScheduleHeroCarousel({ items, leadersMap, height }: ScheduleHero
         tournament={currentItem.tournament}
         type={currentItem.type}
         leaderWinner={leadersMap?.get(currentItem.tournament.id)}
+        currentIndex={0}
+        totalSlides={1}
       />
     );
   }
@@ -116,22 +118,14 @@ export function ScheduleHeroCarousel({ items, leadersMap, height }: ScheduleHero
               tournament={currentItem.tournament}
               type={currentItem.type}
               leaderWinner={leadersMap?.get(currentItem.tournament.id)}
+              currentIndex={activeIndex}
+              totalSlides={count}
+              onDotClick={(i) => { setActiveIndex(i); pausedRef.current = false; startAutoAdvance(); }}
             />
           </motion.div>
         </AnimatePresence>
       </div>
 
-      {/* Pagination dots — inside card area */}
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 dots-backing">
-        {items.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => { setActiveIndex(i); pausedRef.current = false; startAutoAdvance(); }}
-            className={i === activeIndex ? 'hero-dot-active' : 'hero-dot-inactive'}
-            aria-label={`Slide ${i + 1}`}
-          />
-        ))}
-      </div>
     </div>
   );
 }

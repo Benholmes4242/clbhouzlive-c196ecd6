@@ -24,18 +24,21 @@ interface ScheduleHeroCardProps {
   tournament: TourTournament;
   type: 'live' | 'upcoming' | 'recent';
   leaderWinner?: TournamentLeaderWinner;
+  currentIndex?: number;
+  totalSlides?: number;
+  onDotClick?: (index: number) => void;
 }
 
 function getTourLabel(tourCode?: string): string {
   const labels: Record<string, string> = {
-    pga: 'PGA TOUR', EURO: 'DP WORLD', LPGA: 'LPGA',
+    pga: 'PGA TOUR', EURO: 'DP WORLD TOUR', LPGA: 'LPGA',
     CHAMP: 'CHAMPIONS', PGAD: 'KORN FERRY', LIV: 'LIV GOLF',
   };
   return labels[tourCode || ''] || 'TOUR';
 }
 
 
-export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHeroCardProps) {
+export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex = 0, totalSlides = 1, onDotClick }: ScheduleHeroCardProps) {
   const navigate = useNavigate();
   const [imgError, setImgError] = useState(false);
   const { courseImage } = useSingleCourseImage(
@@ -350,6 +353,24 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHer
               </>
             )}
           </>
+        )}
+
+        {/* Pagination dots — inside glass card */}
+        {totalSlides > 1 && (
+          <div className="flex items-center justify-center gap-1.5 pt-2 pb-1">
+            {Array.from({ length: totalSlides }).map((_, i) => (
+              <button
+                key={i}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); onDotClick?.(i); }}
+                className={`rounded-full transition-all duration-300 ${
+                  i === currentIndex
+                    ? 'w-[18px] h-[6px] bg-white/90'
+                    : 'w-[6px] h-[6px] bg-white/40'
+                }`}
+                aria-label={`Slide ${i + 1}`}
+              />
+            ))}
+          </div>
         )}
       </motion.div>
     </Link>

@@ -367,6 +367,9 @@ export function TourHubNavOverlay({
             {/* Header spacer for safe area */}
             <div style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }} />
             
+            {/* Content container — pushed down to fill space vacated by removed close button */}
+            <div style={{ paddingTop: '16px' }}>
+            
             {/* World Rankings Strip */}
             {displayPlayers.length > 0 && (
               <motion.div
@@ -671,6 +674,7 @@ export function TourHubNavOverlay({
                 ))}
               </div>
             </div>
+            </div>{/* Close content padding wrapper */}
           </motion.div>
         </>
       )}

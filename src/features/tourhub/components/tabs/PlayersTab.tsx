@@ -4,7 +4,7 @@
  */
 
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { useSearchParams, useLocation } from 'react-router-dom';
+import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import { Search, X, ChevronDown, RefreshCw } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
@@ -40,6 +40,7 @@ const PAGE_SIZE = 50;
 export function PlayersTab() {
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebouncedValue(search, 200);
@@ -47,15 +48,13 @@ export function PlayersTab() {
   const initialTour = searchParams.get('tour') || 'all';
   const [sort, setSort] = useState<PlayerSortType>(getDefaultSortForTour(initialTour));
 
-  // Scroll-to-top on mount / restore on back nav
+  // Scroll-to-top on mount — always start at top
   useEffect(() => {
-    const saved = sessionStorage.getItem('players-scroll');
-    if (saved) {
-      requestAnimationFrame(() => window.scrollTo(0, parseInt(saved, 10)));
-      sessionStorage.removeItem('players-scroll');
-    } else {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    requestAnimationFrame(() => {
       window.scrollTo(0, 0);
-    }
+    });
   }, []);
 
   // Pull-to-refresh state
@@ -427,8 +426,19 @@ export function PlayersTab() {
         <PlayersHero players={heroPlayers} activeTour={activeTour} statsMap={statsMap} />
       )}
 
+      {/* ← Tour Overview back link */}
+      <div className="px-4 pt-3 pb-1">
+        <button
+          type="button"
+          onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
+          className="text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
+        >
+          ← Tour Overview
+        </button>
+      </div>
+
       {/* Search Bar — 24px gap from runner cards */}
-      <div className="px-4" style={{ marginTop: showHero ? '24px' : '16px' }}>
+      <div className="px-4" style={{ marginTop: '12px' }}>
         <div className="relative">
           <Search 
             className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-muted-foreground w-[18px] h-[18px]"
