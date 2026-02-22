@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { Menu, Swords, GitCompare, Globe, Crown, RefreshCw, AlertCircle } from 'lucide-react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { Menu, Swords, GitCompare, Crown, RefreshCw, AlertCircle } from 'lucide-react';
 import { openTourNav } from '../contexts/TourNavContext';
 import { motion } from 'framer-motion';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
@@ -14,7 +14,7 @@ import {
   CollegeRivalsCarousel,
   CollegeCompareSheet,
 } from '../components/college';
-import { FollowCollegeButton } from '../components/college/FollowCollegeButton';
+
 import { useCollegeStats, useCollegeSeasonStats } from '../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
 import { useCollegeRivalries } from '../hooks/useCollegeMovers';
@@ -33,6 +33,7 @@ export function CollegeProfilePage() {
   const { collegeSlug } = useParams<{ collegeSlug: string }>();
   
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const { setVariant, hideHeader, showHeader } = useHeader();
 
   // Transparent status bar for immersive hero bleed into safe area
@@ -316,20 +317,6 @@ export function CollegeProfilePage() {
               </motion.p>
             )}
 
-            {/* Follow button */}
-            {collegeSlug && (
-              <motion.div
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.35 }}
-                style={{ marginTop: '12px' }}
-              >
-                <FollowCollegeButton
-                  normalizedName={collegeSlug}
-                  className="bg-white/15 border-white/20 text-white hover:bg-white/25"
-                />
-              </motion.div>
-            )}
           </div>
         ) : null}
       </div>
@@ -361,6 +348,16 @@ export function CollegeProfilePage() {
           </motion.div>
         </div>
       )}
+
+      {/* Back link */}
+      <div className="px-4" style={{ marginTop: 12 }}>
+        <button
+          onClick={() => navigate('/tourhub/college-golf', { replace: true })}
+          className="text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
+        >
+          ← College Golf
+        </button>
+      </div>
 
       {/* Content sections */}
       <div className="w-full max-w-5xl mx-auto px-4" style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
@@ -468,15 +465,6 @@ export function CollegeProfilePage() {
           </div>
         )}
 
-        {/* Footer */}
-        <div style={{ marginTop: '24px' }}>
-          <div className="flex items-center gap-2 justify-center">
-            <Globe className="w-4 h-4" style={{ color: 'hsl(var(--muted-foreground) / 0.2)' }} />
-            <span style={{ fontSize: '11px', fontWeight: 400, color: 'hsl(var(--muted-foreground) / 0.3)' }}>
-              Powered by SportsRadar
-            </span>
-          </div>
-        </div>
       </div>
 
       {/* Compare Sheet */}
