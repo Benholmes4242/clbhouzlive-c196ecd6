@@ -84,9 +84,9 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
         <div
           role="tablist"
           aria-label="Franchise Leaderboard Sort"
-          className="flex rounded-xl border border-border/50"
+          className="flex rounded-xl"
           style={{
-            background: 'hsl(var(--muted) / 0.3)',
+            background: 'transparent',
             padding: 4,
           }}
         >
