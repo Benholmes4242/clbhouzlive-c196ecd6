@@ -102,6 +102,7 @@ Deno.serve(async (req) => {
           ? parseInt(p.tournamentsPlayed)
           : null,
         country: p.country || null,
+        wins: 0,
         scraped_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
