@@ -5,11 +5,10 @@
 
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Users, ChevronRight, TrendingUp } from 'lucide-react';
+import { Users, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
-import { FollowCollegeButton } from './FollowCollegeButton';
 import type { CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import type { CollegeMedia } from '../../hooks/useCollegeMedia';
 import type { CollegeStatus, CollegeMomentum } from '../../hooks/useCollegeStatus';
@@ -192,7 +191,7 @@ export function FranchiseCard({
         <div className="flex-1 min-w-0 flex flex-col justify-center" style={{ padding: '14px 12px 14px 0', paddingLeft: 14 }}>
           {/* College name — 16px, 600 */}
           <h3
-            className="text-foreground truncate leading-tight group-hover:text-primary transition-colors"
+            className="text-foreground leading-tight group-hover:text-primary transition-colors"
             style={{ fontSize: 16, fontWeight: 600, letterSpacing: '-0.1px' }}
           >
             {displayName}
@@ -275,11 +274,6 @@ export function FranchiseCard({
           )}
         </div>
 
-        {/* Follow button + Chevron */}
-        <div className="flex items-center pr-3 shrink-0 gap-2">
-          <FollowCollegeButton normalizedName={slug} className="h-7 text-xs px-3" />
-          <ChevronRight className="w-4 h-4" style={{ color: 'hsl(var(--muted-foreground) / 0.25)' }} />
-        </div>
       </Link>
     </motion.div>
   );
