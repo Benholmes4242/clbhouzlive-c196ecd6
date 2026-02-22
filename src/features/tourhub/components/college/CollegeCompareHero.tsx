@@ -133,7 +133,7 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, emptyLabel }: {
             <img
               src={getPlayerHeadshotUrl(`${a.first_name} ${a.last_name}`, a.tour_codes?.[0] ?? 'pga')}
               alt={`${a.first_name} ${a.last_name}`}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover object-top"
               onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
             />
           </div>
@@ -259,10 +259,10 @@ export function CollegeCompareHero({ data, className, onBack }: CollegeCompareHe
   return (
     <div className={cn('', className)}>
       {/* VS Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center mb-6" style={{ gap: 0 }}>
         <Link
           to={`/tourhub/college-golf/${s1?.normalized_name}`}
-          className="flex flex-col items-center group"
+          className="flex-1 flex flex-col items-center group min-w-0"
         >
           <div className="w-20 h-20 rounded-xl bg-card border border-border flex items-center justify-center overflow-hidden mb-2 group-hover:border-primary/30 transition-colors">
             {getCollegeLogoUrl(college1.media?.college_name || name1) ? (
@@ -271,12 +271,12 @@ export function CollegeCompareHero({ data, className, onBack }: CollegeCompareHe
               <span className="text-xl font-bold text-muted-foreground">{name1.charAt(0)}</span>
             )}
           </div>
-          <span className="text-foreground group-hover:text-primary transition-colors text-center" style={{ fontSize: 16, fontWeight: 600 }}>
+          <span className="text-foreground group-hover:text-primary transition-colors text-center truncate max-w-full" style={{ fontSize: 16, fontWeight: 600 }}>
             {name1}
           </span>
         </Link>
 
-        <div className="flex flex-col items-center">
+        <div className="shrink-0 w-16 flex flex-col items-center">
           <span className="text-muted-foreground/40" style={{ fontSize: 16, fontWeight: 800 }}>VS</span>
           <span className="text-muted-foreground/60" style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
             {seasonYear} Season
@@ -285,7 +285,7 @@ export function CollegeCompareHero({ data, className, onBack }: CollegeCompareHe
 
         <Link
           to={`/tourhub/college-golf/${s2?.normalized_name}`}
-          className="flex flex-col items-center group"
+          className="flex-1 flex flex-col items-center group min-w-0"
         >
           <div className="w-20 h-20 rounded-xl bg-card border border-border flex items-center justify-center overflow-hidden mb-2 group-hover:border-primary/30 transition-colors">
             {getCollegeLogoUrl(college2.media?.college_name || name2) ? (
@@ -294,7 +294,7 @@ export function CollegeCompareHero({ data, className, onBack }: CollegeCompareHe
               <span className="text-xl font-bold text-muted-foreground">{name2.charAt(0)}</span>
             )}
           </div>
-          <span className="text-foreground group-hover:text-primary transition-colors text-center" style={{ fontSize: 16, fontWeight: 600 }}>
+          <span className="text-foreground group-hover:text-primary transition-colors text-center truncate max-w-full" style={{ fontSize: 16, fontWeight: 600 }}>
             {name2}
           </span>
         </Link>
