@@ -36,16 +36,16 @@ function StoryTile({ icon: Icon, iconColor, title, children, to, delay = 0 }: St
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay }}
       className={cn(
-        "flex flex-col rounded-2xl",
+        "flex flex-col rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)]",
         "bg-card border border-border/50",
         to && "hover:border-primary/40 hover:shadow-md transition-all cursor-pointer"
       )}
       style={{ padding: '16px' }}
     >
       <div className="flex items-center gap-1.5 mb-1.5">
-        <Icon className={cn('text-muted-foreground/40')} style={{ width: '14px', height: '14px' }} />
+        <Icon className={cn('text-muted-foreground/50')} style={{ width: '14px', height: '14px' }} />
         <span style={{
-          fontSize: '9px',
+          fontSize: '10px',
           fontWeight: 700,
           letterSpacing: '0.8px',
           textTransform: 'uppercase' as const,

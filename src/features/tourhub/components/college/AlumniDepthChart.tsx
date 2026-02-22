@@ -147,7 +147,7 @@ function Section({ title, subtitle, icon: Icon, iconColor, alumni, defaultExpand
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-muted-foreground/50" style={{ fontSize: '13px', fontWeight: 500 }}>
+          <span className="text-muted-foreground/60" style={{ fontSize: '13px', fontWeight: 500 }}>
             {alumni.length}
           </span>
           {hasMore && (
@@ -163,7 +163,7 @@ function Section({ title, subtitle, icon: Icon, iconColor, alumni, defaultExpand
       </button>
       
       <AnimatePresence initial={false}>
-        <motion.div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }} initial={false} animate={{ height: 'auto' }}>
+        <motion.div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }} initial={false} animate={{ height: 'auto' }}>
           {displayedAlumni.map((alumnus, index) => (
             <AlumniRow key={alumnus.id} alumnus={alumnus} index={index} tierAccent={tierAccent} />
           ))}
