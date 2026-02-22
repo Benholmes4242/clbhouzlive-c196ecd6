@@ -10,6 +10,7 @@ import { Zap, Target, Flame, Shield, Activity } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   usePlayerSkillTree, 
+  normalizeForChart,
   SKILL_ATTRIBUTES,
   type SkillAttributeKey,
   type SkillAttribute,
@@ -93,14 +94,16 @@ const AttributeRow = memo(({ attribute, delay = 0, animate = true }: { attribute
       <span className="flex-1 text-foreground" style={{ fontSize: 14, fontWeight: 500, marginLeft: 10 }}>
         {config.label}
       </span>
-      <span className="text-foreground" style={{ fontSize: 14, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
-        {formatValue()}
-      </span>
-      {config.unit && (
-        <span className="text-muted-foreground" style={{ fontSize: 11, fontWeight: 500, marginLeft: 4, minWidth: 24 }}>
-          {config.unit}
+      <div className="flex items-baseline gap-1">
+        <span className="text-foreground" style={{ fontSize: 14, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+          {formatValue()}
         </span>
-      )}
+        {config.unit && (
+          <span className="text-muted-foreground" style={{ fontSize: 11, fontWeight: 500 }}>
+            {config.unit}
+          </span>
+        )}
+      </div>
     </motion.div>
   );
 });
@@ -108,35 +111,35 @@ AttributeRow.displayName = 'AttributeRow';
 
 /** SVG Radar / Spider Chart */
 function SkillRadarChart({ attributes, animate = true }: { attributes: SkillAttribute[]; animate?: boolean }) {
-  const SIZE = 320;
-  const CENTER = 160;
-  const RADIUS = 100;
-  const LABEL_RADIUS = 135;
-  const LEVELS = 10;
+  const SIZE = 340;
+  const CENTER = 170;
+  const RADIUS = 115;
+  const LABEL_RADIUS = 148;
 
   const orderedKeys: SkillAttributeKey[] = ['power', 'precision', 'scoring', 'recovery', 'consistency'];
-  const ordered = orderedKeys.map(key => attributes.find(a => a.key === key) || { key, level: 0 } as SkillAttribute);
+  const ordered = orderedKeys.map(key => attributes.find(a => a.key === key) || { key, level: 0, percentile: 50 } as SkillAttribute);
   const count = ordered.length;
 
   const angleStep = (2 * Math.PI) / count;
   const startAngle = -Math.PI / 2;
 
-  const getPoint = (index: number, level: number) => {
+  const getPoint = (index: number, fraction: number) => {
     const angle = startAngle + index * angleStep;
-    const r = (level / LEVELS) * RADIUS;
+    const r = fraction * RADIUS;
     return { x: CENTER + r * Math.cos(angle), y: CENTER + r * Math.sin(angle) };
   };
 
-  const gridRings = [2, 4, 6, 8, 10].map(level => {
+  // 4 concentric grid rings at 25%, 50%, 75%, 100%
+  const gridRings = [0.25, 0.5, 0.75, 1.0].map(frac => {
     const points = Array.from({ length: count }).map((_, i) => {
-      const p = getPoint(i, level);
+      const p = getPoint(i, frac);
       return `${p.x},${p.y}`;
     }).join(' ');
-    return <polygon key={level} points={points} fill="none" stroke="hsl(var(--border))" strokeWidth="1" opacity="0.1" />;
+    return <polygon key={frac} points={points} fill="none" stroke="hsl(var(--border))" strokeWidth="0.5" opacity="0.3" />;
   });
 
   const axisLines = Array.from({ length: count }).map((_, i) => {
-    const p = getPoint(i, LEVELS);
+    const p = getPoint(i, 1);
     return (
       <line
         key={i}
@@ -145,16 +148,15 @@ function SkillRadarChart({ attributes, animate = true }: { attributes: SkillAttr
         x2={p.x}
         y2={p.y}
         stroke="hsl(var(--border))"
-        strokeWidth="1"
-        opacity={0.1}
+        strokeWidth="0.5"
+        opacity={0.3}
       />
     );
   });
 
-  const dataPoints = ordered.map((attr, i) => {
-    const p = getPoint(i, attr.level);
-    return `${p.x},${p.y}`;
-  }).join(' ');
+  // Use normalizeForChart for dramatic shapes
+  const dataPointCoords = ordered.map((attr, i) => getPoint(i, normalizeForChart(attr.percentile ?? 50)));
+  const dataPoints = dataPointCoords.map(p => `${p.x},${p.y}`).join(' ');
 
   const labels = ordered.map((attr, i) => {
     const angle = startAngle + i * angleStep;
@@ -176,11 +178,11 @@ function SkillRadarChart({ attributes, animate = true }: { attributes: SkillAttr
   });
 
   return (
-    <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="mx-auto" style={{ width: '240px', height: '240px', marginTop: '20px' }}>
+    <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="mx-auto" style={{ width: '280px', height: '280px' }}>
       <defs>
         <linearGradient id="skill-fill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="rgba(245,158,11,0.15)" />
-          <stop offset="100%" stopColor="rgba(245,158,11,0.05)" />
+          <stop offset="0%" stopColor="rgba(245,158,11,0.25)" />
+          <stop offset="100%" stopColor="rgba(245,158,11,0.1)" />
         </linearGradient>
       </defs>
       {gridRings}
@@ -189,29 +191,27 @@ function SkillRadarChart({ attributes, animate = true }: { attributes: SkillAttr
         points={dataPoints}
         fill="url(#skill-fill)"
         stroke="#F59E0B"
-        strokeWidth="2"
+        strokeWidth="2.5"
         initial={animate ? { opacity: 0, scale: 0.5 } : false}
         animate={animate ? { opacity: 1, scale: 1 } : undefined}
         transition={{ duration: 0.5, delay: 0.3 }}
         style={{ transformOrigin: `${CENTER}px ${CENTER}px` }}
       />
-      {ordered.map((attr, i) => {
-        const p = getPoint(i, attr.level);
-        return (
-          <motion.circle
-            key={attr.key}
-            cx={p.x}
-            cy={p.y}
-            r={3}
-            fill="#F59E0B"
-            stroke="white"
-            strokeWidth="1.5"
-            initial={animate ? { scale: 0 } : false}
-            animate={animate ? { scale: 1 } : undefined}
-            transition={{ delay: 0.5 + i * 0.1 }}
-          />
-        );
-      })}
+      {/* Data point dots */}
+      {dataPointCoords.map((p, i) => (
+        <motion.circle
+          key={`dot-${i}`}
+          cx={p.x}
+          cy={p.y}
+          r={4}
+          fill="#f59e0b"
+          stroke="white"
+          strokeWidth={2}
+          initial={animate ? { scale: 0 } : false}
+          animate={animate ? { scale: 1 } : undefined}
+          transition={{ delay: 0.5 + i * 0.1 }}
+        />
+      ))}
       {labels}
     </svg>
   );
