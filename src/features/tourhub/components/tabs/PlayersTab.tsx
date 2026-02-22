@@ -174,7 +174,7 @@ export function PlayersTab() {
           const existing = map.get(playerId);
           map.set(playerId, {
             earnings: existing?.earnings ?? null,
-            wins: existing?.wins ?? null,
+            wins: r.wins ?? existing?.wins ?? null,
             tourRank: r.position,
             points: r.points,
             tournamentsPlayed: r.tournaments_played,

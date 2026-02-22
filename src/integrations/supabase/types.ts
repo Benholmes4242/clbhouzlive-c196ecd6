@@ -9864,6 +9864,7 @@ export type Database = {
           tour_code: string
           tournaments_played: number | null
           updated_at: string | null
+          wins: number | null
         }
         Insert: {
           country?: string | null
@@ -9880,6 +9881,7 @@ export type Database = {
           tour_code: string
           tournaments_played?: number | null
           updated_at?: string | null
+          wins?: number | null
         }
         Update: {
           country?: string | null
@@ -9896,6 +9898,7 @@ export type Database = {
           tour_code?: string
           tournaments_played?: number | null
           updated_at?: string | null
+          wins?: number | null
         }
         Relationships: [
           {

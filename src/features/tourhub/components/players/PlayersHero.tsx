@@ -123,8 +123,8 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
     if (champStats?.points != null && champStats.points > 0) {
       metaParts.push(`${champStats.points.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} pts`);
     }
-    if (!isLPGA && !isPGAD && !isLIV && champStats?.tournamentsPlayed != null && champStats.tournamentsPlayed > 0) {
-      metaParts.push(`${champStats.tournamentsPlayed} ${champStats.tournamentsPlayed === 1 ? 'event' : 'events'}`);
+    if (champStats?.wins != null && champStats.wins > 0) {
+      metaParts.push(`${champStats.wins} ${champStats.wins === 1 ? 'win' : 'wins'}`);
     }
   } else {
     if (activeTour === 'all' || !champTourRank) {

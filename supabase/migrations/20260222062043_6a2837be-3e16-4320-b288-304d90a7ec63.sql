@@ -1,0 +1,1 @@
+ALTER TABLE tour_season_rankings ADD COLUMN IF NOT EXISTS wins integer DEFAULT 0;
