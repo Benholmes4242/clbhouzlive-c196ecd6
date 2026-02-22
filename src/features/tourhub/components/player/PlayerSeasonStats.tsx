@@ -108,7 +108,7 @@ function SGBar({ label, value }: SGBarProps) {
           fontSize: '14px',
           fontWeight: 700,
           fontVariantNumeric: 'tabular-nums',
-          color: isPositive ? '#22C55E' : '#EF4444',
+          color: isPositive ? '#f59e0b' : '#EF4444',
         }}>
           {formattedValue}
         </span>
@@ -120,7 +120,7 @@ function SGBar({ label, value }: SGBarProps) {
           className="absolute top-0 bottom-0"
           style={{
             borderRadius: '2.5px',
-            backgroundColor: isPositive ? '#22C55E' : '#EF4444',
+            backgroundColor: isPositive ? '#f59e0b' : '#EF4444',
             width: `${barWidth}%`,
             left: isPositive ? '50%' : `${50 - barWidth}%`,
           }}

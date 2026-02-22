@@ -191,7 +191,7 @@ export function PlayerProfilePage() {
         <StatRibbon playerStats={playerStats ?? null} />
 
         {/* ← Back text link */}
-        <div className="px-4" style={{ marginTop: 12 }}>
+        <div className="px-4" style={{ marginTop: 12, marginBottom: 12 }}>
           <button
             onClick={handleBack}
             className="text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
