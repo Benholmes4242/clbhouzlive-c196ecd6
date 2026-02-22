@@ -66,8 +66,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
         className="flex items-stretch overflow-hidden"
         style={{
           borderRadius: 16,
-          background: 'hsl(var(--muted) / 0.3)',
-          border: '1px solid hsl(var(--border) / 0.5)',
+          background: 'transparent',
           padding: 4,
           marginBottom: 16,
         }}

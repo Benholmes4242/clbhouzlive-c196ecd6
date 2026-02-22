@@ -71,7 +71,7 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
     <div className={cn('', className)}>
       {/* Tabs — pill style, sticky */}
       <div
-        className="sticky top-0 z-20 -mx-4 px-4 border-b border-border/30"
+        className="sticky top-0 z-20 -mx-4 px-4"
         style={{
           background: 'hsl(var(--background))',
           backdropFilter: 'blur(12px)',
