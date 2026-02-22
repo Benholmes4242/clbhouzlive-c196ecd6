@@ -145,6 +145,15 @@ async function scrape() {
     // Scrape LIV Golf Individual Standings
     await scrapeLIV(browser, supabase);
 
+    // Populate wins from tournament results data
+    console.log('[R2D Scraper] Populating wins from tournament results...');
+    const { error: winsError } = await supabase.rpc('populate_tour_ranking_wins');
+    if (winsError) {
+      console.error('[R2D Scraper] Failed to populate wins:', winsError.message);
+    } else {
+      console.log('[R2D Scraper] Wins populated successfully');
+    }
+
   } finally {
     await browser.close();
   }
@@ -207,26 +216,9 @@ async function scrapeLPGA(browser, supabase) {
           if (/^[A-Z]{3}$/.test(v)) { country = v; break; }
         }
 
-        // Find wins: look for small integers (0-20) that appear after the events/points columns
-        // LPGA table order: rank, photo, name, country, fav, CME pts, total pts, events, wins, top10, pts rank
-        let wins = 0;
-        // Collect all small integers from the values (excluding rank itself)
-        const smallInts = [];
-        for (const v of values) {
-          const n = parseInt(v);
-          if (!isNaN(n) && n >= 0 && n <= 50 && v === String(n) && n !== rank) {
-            smallInts.push(n);
-          }
-        }
-        // Wins is typically after events count — take the second small int if available
-        // (first small int after rank is usually events, second is wins)
-        if (smallInts.length >= 2) {
-          wins = smallInts[1]; // events is [0], wins is [1]
-        }
-
         if (rank && name && points !== null) {
           seen.add(name);
-          data.push({ position: rank, name, country, points, wins });
+          data.push({ position: rank, name, country, points });
         }
       });
 
@@ -249,7 +241,7 @@ async function scrapeLPGA(browser, supabase) {
       points: p.points,
       tournaments_played: null,
       country: p.country || null,
-      wins: p.wins || 0,
+      wins: 0,
       scraped_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     }));
