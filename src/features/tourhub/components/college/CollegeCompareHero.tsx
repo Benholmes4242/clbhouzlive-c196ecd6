@@ -66,7 +66,7 @@ function AlumniCompareBlock({ title, alumni1, alumni2 }: {
               className="flex items-center gap-2 p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
             >
               <span className="text-xs text-muted-foreground w-4">{i + 1}</span>
-              <div className="w-6 h-6 rounded-full bg-card overflow-hidden shrink-0">
+              <div className="w-6 h-6 bg-card overflow-hidden shrink-0" style={{ borderRadius: '34%' }}>
                 <img
                   src={getPlayerHeadshotUrl(`${a.first_name} ${a.last_name}`, a.tour_codes?.[0] ?? 'pga')}
                   alt={`${a.first_name} ${a.last_name}`}
@@ -91,7 +91,7 @@ function AlumniCompareBlock({ title, alumni1, alumni2 }: {
               className="flex items-center gap-2 p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
             >
               <span className="text-xs text-muted-foreground w-4">{i + 1}</span>
-              <div className="w-6 h-6 rounded-full bg-card overflow-hidden shrink-0">
+              <div className="w-6 h-6 bg-card overflow-hidden shrink-0" style={{ borderRadius: '34%' }}>
                 <img
                   src={getPlayerHeadshotUrl(`${a.first_name} ${a.last_name}`, a.tour_codes?.[0] ?? 'pga')}
                   alt={`${a.first_name} ${a.last_name}`}

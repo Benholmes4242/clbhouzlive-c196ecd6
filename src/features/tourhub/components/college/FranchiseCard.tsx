@@ -224,7 +224,7 @@ export function FranchiseCard({
             </span>
           </div>
 
-          {/* Alumni face thumbnails — 24×24 circular */}
+          {/* Alumni face thumbnails — 24×24 squircle */}
           {alumni && alumni.length > 0 && (
             <div className="flex items-center" style={{ marginTop: 6 }}>
               <div className="flex items-center">
@@ -237,7 +237,7 @@ export function FranchiseCard({
                       style={{
                         width: 24,
                         height: 24,
-                        borderRadius: '50%',
+                        borderRadius: '34%',
                         border: '1.5px solid white',
                         marginLeft: i === 0 ? 0 : -6,
                         zIndex: 3 - i,

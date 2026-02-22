@@ -116,7 +116,15 @@ export function CollegeGolfHubPage() {
           </div>
         )}
 
-        {/* Burger menu — matches Players page */}
+        {/* Immersive Hero */}
+        {topCollege && (
+          <CollegeHeroBanner
+            stats={topCollege}
+            college={topCollegeMedia}
+          />
+        )}
+
+        {/* Burger menu — AFTER hero in DOM so it paints on top of hero's stacking context */}
         <button
           className="absolute z-30 flex items-center justify-center"
           style={{ top: '56px', left: '16px', width: '44px', height: '44px' }}
@@ -129,14 +137,6 @@ export function CollegeGolfHubPage() {
             style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5))' }}
           />
         </button>
-
-        {/* Immersive Hero */}
-        {topCollege && (
-          <CollegeHeroBanner
-            stats={topCollege}
-            college={topCollegeMedia}
-          />
-        )}
 
         {/* Alumni Face Strip — overlaps hero */}
         {heroAlumni && heroAlumni.length > 0 && topCollege && (
