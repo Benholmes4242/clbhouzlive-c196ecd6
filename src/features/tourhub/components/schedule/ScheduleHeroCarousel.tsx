@@ -14,9 +14,11 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Menu } from 'lucide-react';
 import type { TourTournament } from '../../hooks/useTourHubData';
 import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
 import { ScheduleHeroCard } from './ScheduleHeroCard';
+import { openTourNav } from '../../contexts/TourNavContext';
 import '@/styles/hero-glass.css';
 
 type HeroItemType = 'live' | 'upcoming' | 'recent';
@@ -89,18 +91,44 @@ export function ScheduleHeroCarousel({ items, leadersMap, height }: ScheduleHero
 
   if (count === 1) {
     return (
-      <ScheduleHeroCard
-        tournament={currentItem.tournament}
-        type={currentItem.type}
-        leaderWinner={leadersMap?.get(currentItem.tournament.id)}
-        currentIndex={0}
-        totalSlides={1}
-      />
+      <div className="relative">
+        <button 
+          className="absolute z-20 flex items-center justify-center"
+          style={{ top: '56px', left: '16px', width: '44px', height: '44px' }}
+          onClick={openTourNav}
+          aria-label="Open tour menu"
+        >
+          <Menu 
+            className="w-[22px] h-[22px]" 
+            strokeWidth={2}
+            style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5))' }}
+          />
+        </button>
+        <ScheduleHeroCard
+          tournament={currentItem.tournament}
+          type={currentItem.type}
+          leaderWinner={leadersMap?.get(currentItem.tournament.id)}
+          currentIndex={0}
+          totalSlides={1}
+        />
+      </div>
     );
   }
 
   return (
     <div className="relative">
+      <button 
+        className="absolute z-20 flex items-center justify-center"
+        style={{ top: '56px', left: '16px', width: '44px', height: '44px' }}
+        onClick={openTourNav}
+        aria-label="Open tour menu"
+      >
+        <Menu 
+          className="w-[22px] h-[22px]" 
+          strokeWidth={2}
+          style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5))' }}
+        />
+      </button>
       <div
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
