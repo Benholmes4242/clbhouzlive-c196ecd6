@@ -98,7 +98,7 @@ function AlumniRow({ alumnus, index, tierAccent }: AlumniRowProps) {
 
           {/* Meta line */}
           {metaParts.length > 0 && (
-            <p className="text-muted-foreground truncate" style={{ fontSize: '13px', fontWeight: 500, marginTop: '4px', fontVariantNumeric: 'tabular-nums' }}>
+            <p className="text-muted-foreground line-clamp-2" style={{ fontSize: '13px', fontWeight: 500, marginTop: '4px', fontVariantNumeric: 'tabular-nums' }}>
               {metaParts.join(' · ')}
             </p>
           )}

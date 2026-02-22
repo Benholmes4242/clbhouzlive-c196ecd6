@@ -98,7 +98,7 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
   const thisMover = movers?.find(m => m.normalized_name === normalizedName);
   const weekEarnings = thisMover?.earnings_delta || 0;
   const weekWins = thisMover?.wins_delta || 0;
-  const weekCuts = thisMover?.cuts_delta || 0;
+  const weekTop10s = thisMover?.top10_delta || 0;
 
   // Top alumnus
   const topAlumnus = alumni?.[0];
@@ -107,7 +107,7 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
   const weekParts: string[] = [];
   if (weekEarnings > 0) weekParts.push(`+${formatCurrency(weekEarnings)}`);
   if (weekWins > 0) weekParts.push(`${weekWins} win${weekWins > 1 ? 's' : ''}`);
-  if (weekCuts > 0) weekParts.push(`${weekCuts} cut${weekCuts > 1 ? 's' : ''}`);
+  if (weekTop10s > 0) weekParts.push(`${weekTop10s} top 10${weekTop10s > 1 ? 's' : ''}`);
   const weekSummary = weekParts.length > 0 ? weekParts.join(' · ') : 'No activity';
 
   return (
