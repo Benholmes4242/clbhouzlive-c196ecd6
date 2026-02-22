@@ -121,7 +121,7 @@ export function ScheduleTourFilter({
                 >
                   <div
                     className={cn(
-                      'w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold tabular-nums',
+                      'w-9 rounded-[34%] aspect-[1/1.05] flex items-center justify-center text-xs font-bold tabular-nums',
                       isActive ? 'bg-foreground text-background' : 'bg-card text-muted-foreground'
                     )}
                   >
