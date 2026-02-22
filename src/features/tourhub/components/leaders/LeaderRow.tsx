@@ -64,7 +64,7 @@ export function LeaderRow({
         style={{
           padding: '12px 16px',
           minHeight: 64,
-          borderBottom: '1px solid hsl(var(--border) / 0.08)',
+          borderBottom: '1px solid hsl(var(--border) / 0.15)',
           gap: 12,
         }}
         aria-label={ariaLabel}
@@ -92,7 +92,7 @@ export function LeaderRow({
               style={{
                 width: 44,
                 height: 44,
-                borderRadius: 13,
+                borderRadius: 12,
                 objectFit: 'cover',
                 border: '1px solid hsl(var(--border) / 0.5)',
               }}
@@ -103,7 +103,7 @@ export function LeaderRow({
               style={{
                 width: 44,
                 height: 44,
-                borderRadius: 13,
+                borderRadius: 12,
                 border: '1px solid hsl(var(--border) / 0.5)',
               }}
             >
@@ -129,8 +129,7 @@ export function LeaderRow({
         <div className="text-right shrink-0">
           <span
             style={{
-              fontFamily: 'ui-monospace, "JetBrains Mono", monospace',
-              fontSize: 15,
+              fontSize: 14,
               fontWeight: 700,
               fontVariantNumeric: 'tabular-nums',
             }}
@@ -147,7 +146,7 @@ export function LeaderRow({
                 textTransform: 'uppercase' as const,
                 marginTop: 2,
               }}
-              className="text-muted-foreground/40"
+              className="text-muted-foreground/60"
             >
               {unit}
             </p>
