@@ -103,7 +103,7 @@ export function CollegeGolfHubPage() {
 
   return (
     <TourHubShell immersive>
-      <div onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
+      <div className="relative" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
         {/* Pull-to-refresh indicator */}
         {(pullDistance > 0 || isRefreshing) && (
           <div className="flex justify-center py-2" style={{ height: pullDistance > 0 ? pullDistance * 0.4 : 32 }}>
@@ -118,7 +118,7 @@ export function CollegeGolfHubPage() {
 
         {/* Burger menu — matches Players page */}
         <button
-          className="absolute z-20 flex items-center justify-center"
+          className="absolute z-30 flex items-center justify-center"
           style={{ top: '56px', left: '16px', width: '44px', height: '44px' }}
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
           aria-label="Open tour menu"
