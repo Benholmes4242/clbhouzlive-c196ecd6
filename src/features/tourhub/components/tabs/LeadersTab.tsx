@@ -222,7 +222,7 @@ export function LeadersTab() {
       )}
 
       {/* ← Tour Overview back link */}
-      <div className="px-4 pt-3 pb-1">
+      <div className="px-4 pt-3 pb-0">
         <button
           onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
           className="text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
@@ -232,16 +232,26 @@ export function LeadersTab() {
       </div>
 
       {/* Content area */}
-      <div className="px-4" style={{ paddingTop: 12, paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
-        {/* Category selector button + bottom sheet */}
-        <LeadersCategorySheet
-          categories={LEADER_CATEGORIES}
-          activeKey={category.key}
-          onCategoryChange={setCategory}
-        />
+      <div className="px-4" style={{ paddingTop: 8, paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
+        {/* Category selector — sticky */}
+        <div
+          className="sticky top-0 z-20 -mx-4 px-4 pt-2 pb-2"
+          style={{
+            background: 'hsl(var(--background) / 0.95)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            borderBottom: '1px solid hsl(var(--border) / 0.15)',
+          }}
+        >
+          <LeadersCategorySheet
+            categories={LEADER_CATEGORIES}
+            activeKey={category.key}
+            onCategoryChange={setCategory}
+          />
+        </div>
 
         {/* Rankings list (#4–50) — 12px gap from dropdown */}
-        <div style={{ marginTop: 12 }}>
+        <div style={{ marginTop: 16 }}>
           <AnimatePresence mode="wait">
             <motion.div
               key={category.key}

@@ -114,7 +114,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
               transition={{ delay: 0.2, duration: 0.4 }}
               style={{
                 fontSize: 22,
-                fontWeight: 800,
+                fontWeight: 700,
                 color: 'white',
                 letterSpacing: '-0.3px',
                 lineHeight: 1.2,

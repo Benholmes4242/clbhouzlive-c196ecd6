@@ -17,7 +17,7 @@ const tabs: { value: TourHubTab; label: string; shortLabel: string }[] = [
   { value: 'overview', label: 'Overview', shortLabel: 'Overview' },
   { value: 'schedule', label: 'Schedule', shortLabel: 'Schedule' },
   { value: 'players', label: 'Players', shortLabel: 'Players' },
-  { value: 'leaderboards', label: 'Leaderboards', shortLabel: 'Leaders' },
+  { value: 'leaderboards', label: 'Rankings', shortLabel: 'Rankings' },
 ];
 
 export function TourHubTabs({ activeTab, onTabChange, className }: TourHubTabsProps) {

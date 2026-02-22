@@ -59,6 +59,7 @@ function RunnerCard({
         border: '1px solid hsl(var(--border) / 0.5)',
         borderRadius: 16,
         padding: '10px 14px',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
       }}
     >
       {/* Rank circle — 32×32, amber */}
@@ -92,7 +93,7 @@ function RunnerCard({
       {/* Name & stat value */}
       <div className="flex-1 min-w-0 text-left">
         <p style={{ fontSize: 14, fontWeight: 600 }} className="text-foreground truncate">{lastName}</p>
-        <p style={{ fontSize: 11, fontWeight: 400 }} className="text-muted-foreground truncate">
+        <p style={{ fontSize: 11, fontWeight: 500 }} className="text-muted-foreground truncate">
           {fmt(value)}{unit ? ` ${unit}` : ''}
         </p>
       </div>
@@ -114,7 +115,7 @@ export function LeadersRunnersStrip({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4, duration: 0.35 }}
       className="flex px-4"
-      style={{ marginTop: '-20px', position: 'relative', zIndex: 10, gap: 8 }}
+      style={{ marginTop: '-20px', position: 'relative', zIndex: 10, gap: 10 }}
     >
       {runners.map((runner, i) => (
         <RunnerCard
