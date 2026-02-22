@@ -57,7 +57,7 @@ export const SKILL_ATTRIBUTES: Record<SkillAttributeKey, {
   unit: string;
 }> = {
   power: {
-    name: 'Power',
+    name: 'Driving Distance',
     icon: '💪',
     color: 'text-red-500',
     gradient: 'from-red-500 to-orange-500',
@@ -65,7 +65,7 @@ export const SKILL_ATTRIBUTES: Record<SkillAttributeKey, {
     unit: 'yds',
   },
   precision: {
-    name: 'Precision',
+    name: 'Driving Accuracy',
     icon: '🎯',
     color: 'text-blue-500',
     gradient: 'from-blue-500 to-indigo-500',
@@ -73,15 +73,15 @@ export const SKILL_ATTRIBUTES: Record<SkillAttributeKey, {
     unit: '%',
   },
   scoring: {
-    name: 'Scoring',
+    name: 'Birdies per Round',
     icon: '🔥',
     color: 'text-amber-500',
     gradient: 'from-amber-500 to-yellow-500',
     description: 'Birdie-making ability and low scoring',
-    unit: 'birdies',
+    unit: '',
   },
   recovery: {
-    name: 'Recovery',
+    name: 'Scrambling',
     icon: '🛡️',
     color: 'text-green-500',
     gradient: 'from-green-500 to-emerald-500',
@@ -89,12 +89,12 @@ export const SKILL_ATTRIBUTES: Record<SkillAttributeKey, {
     unit: '%',
   },
   consistency: {
-    name: 'Consistency',
+    name: 'SG Total',
     icon: '⚡',
     color: 'text-purple-500',
     gradient: 'from-purple-500 to-violet-500',
     description: 'Overall strokes gained performance',
-    unit: 'SG',
+    unit: '',
   },
 };
 
@@ -125,14 +125,9 @@ function percentileToLevel(percentile: number): number {
 function calculatePercentile(value: number, allValues: number[], higherIsBetter: boolean): number {
   const sorted = [...allValues].sort((a, b) => a - b);
   const rank = sorted.indexOf(value);
-  let percentile = (rank / (sorted.length - 1)) * 100;
+  const percentile = (rank / Math.max(sorted.length - 1, 1)) * 100;
   
-  // Flip for "higher is better" metrics
-  if (higherIsBetter) {
-    percentile = 100 - percentile;
-  }
-  
-  // Invert to make higher percentile = better
+  // For "higher is better", higher values should get higher percentiles
   return Math.round(higherIsBetter ? percentile : 100 - percentile);
 }
 

@@ -42,7 +42,7 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
   {
     key: 'world_rank',
     label: 'World Ranking',
-    shortLabel: 'World',
+    shortLabel: 'World Rankings',
     section: 'performance',
     icon: Globe,
     emoji: '🌍',
@@ -57,7 +57,7 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
   {
     key: 'events_played',
     label: 'Events Played',
-    shortLabel: 'Events',
+    shortLabel: 'Events Played',
     section: 'performance',
     icon: Calendar,
     emoji: '📅',
@@ -72,7 +72,7 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
   {
     key: 'cuts_made',
     label: 'Cuts Made',
-    shortLabel: 'Cuts',
+    shortLabel: 'Cuts Made',
     section: 'performance',
     icon: Scissors,
     emoji: '✂️',
@@ -137,7 +137,7 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
   {
     key: 'scoring_avg',
     label: 'Scoring Average',
-    shortLabel: 'Scoring',
+    shortLabel: 'Scoring Average',
     section: 'stats',
     icon: Gauge,
     emoji: '⚾',
@@ -152,7 +152,7 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
   {
     key: 'drive_avg',
     label: 'Driving Distance',
-    shortLabel: 'Distance',
+    shortLabel: 'Driving Distance',
     section: 'stats',
     icon: Zap,
     emoji: '⚡',
@@ -167,7 +167,7 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
   {
     key: 'drive_acc',
     label: 'Driving Accuracy',
-    shortLabel: 'Accuracy',
+    shortLabel: 'Driving Accuracy',
     section: 'stats',
     icon: Crosshair,
     emoji: '🎯',
@@ -212,7 +212,7 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
   {
     key: 'sand_saves_pct',
     label: 'Sand Saves',
-    shortLabel: 'Sand',
+    shortLabel: 'Sand Saves',
     section: 'stats',
     icon: Sun,
     emoji: '⛱️',
@@ -227,7 +227,7 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
   {
     key: 'scrambling_pct',
     label: 'Scrambling',
-    shortLabel: 'Scramble',
+    shortLabel: 'Scrambling',
     section: 'stats',
     icon: RefreshCw,
     emoji: '🔄',
