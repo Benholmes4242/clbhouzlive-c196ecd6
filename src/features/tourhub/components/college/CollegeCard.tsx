@@ -82,11 +82,11 @@ export function CollegeCard({ stats, college, rank, alumni, className }: College
 
         {/* Alumni face preview */}
         {alumni && alumni.length > 0 && (
-          <div className="flex items-center -space-x-1.5 mt-2">
-            {alumni.slice(0, 3).map(a => {
+          <div className="flex items-center -space-x-1.5 mt-2 overflow-hidden flex-nowrap">
+            {alumni.map(a => {
               const photoUrl = getPlayerHeadshotUrl(a.full_name, 'pga');
               return (
-                <div key={a.id} className="w-5 h-5 border border-card overflow-hidden bg-muted" style={{ borderRadius: '34%' }}>
+                <div key={a.id} className="w-5 h-5 shrink-0 border border-card overflow-hidden bg-muted" style={{ borderRadius: '34%' }}>
                   <img src={photoUrl} alt={a.full_name} className="w-full h-full object-cover object-top" loading="lazy"
                     onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }} />
                 </div>
