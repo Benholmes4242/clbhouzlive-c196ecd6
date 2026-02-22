@@ -45,7 +45,7 @@ function HeadToHeadChip({ winsA, winsB, earningsDiff, winner }: HeadToHeadChipPr
         color: isWinning ? '#22C55E' : isTied ? 'hsl(var(--muted-foreground))' : 'hsl(var(--destructive))',
       }}
     >
-      {isTied ? 'Tied' : isWinning ? `Ahead ${winsA} of 3` : `Trails ${winsA} of 3`}
+      {isTied ? 'Tied' : isWinning ? `Ahead ${winsA} of 3 stats` : `Trails ${winsA} of 3 stats`}
     </div>
   );
 }
