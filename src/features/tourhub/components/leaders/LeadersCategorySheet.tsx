@@ -138,9 +138,9 @@ export function LeadersCategorySheet({
                           borderRadius: 12,
                           padding: '14px 16px',
                           border: isActive
-                            ? '1px solid hsl(142 76% 36%)'
+                            ? '1px solid hsl(var(--foreground))'
                             : '1px solid hsl(var(--border) / 0.5)',
-                          background: isActive ? 'hsl(142 76% 36%)' : 'hsl(var(--card))',
+                          background: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--card))',
                           color: isActive ? 'white' : 'hsl(var(--foreground))',
                           fontWeight: isActive ? 600 : 500,
                         }}
