@@ -8,6 +8,7 @@
  */
 
 import { Link, useNavigate } from 'react-router-dom';
+import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
@@ -110,7 +111,7 @@ export function IdentityCard({ player, stats, college, statDisplay = 'rank', cla
 
         {/* Right: College Feature with Deep Link */}
         <div className="flex flex-col items-center shrink-0 min-w-[64px] ml-2">
-          {college?.logo_url ? (
+          {getCollegeLogoUrl(college?.college_name || player.college) ? (
             <button
               onClick={handleCollegeClick}
               className={cn(
@@ -118,7 +119,7 @@ export function IdentityCard({ player, stats, college, statDisplay = 'rank', cla
                 "transition-transform hover:scale-105 active:scale-95",
                 "focus:outline-none focus:ring-2 focus:ring-[#e2e8f0] rounded-lg p-1.5 -m-1.5"
               )}
-              aria-label={`View ${college.college_name} alumni`}
+              aria-label={`View ${college?.college_name || player.college} alumni`}
             >
               {/* "College" label above logo */}
               <span className="text-[9px] font-medium text-muted-foreground/70 uppercase tracking-wider mb-1">
@@ -134,10 +135,11 @@ export function IdentityCard({ player, stats, college, statDisplay = 'rank', cla
                 "transition-all duration-200"
               )}>
                 <img 
-                  src={college.logo_url} 
-                  alt={college.college_name}
+                  src={getCollegeLogoUrl(college?.college_name || player.college)!} 
+                  alt={college?.college_name || player.college || ''}
                   className="w-9 h-9 object-contain"
                   loading="lazy"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
                 />
               </div>
               <span className="text-[10px] text-muted-foreground mt-1 text-center max-w-[72px] truncate leading-tight group-hover/college:text-primary transition-colors">

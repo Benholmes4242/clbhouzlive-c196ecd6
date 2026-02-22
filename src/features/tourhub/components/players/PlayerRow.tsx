@@ -8,6 +8,7 @@
  */
 
 import { Link } from 'react-router-dom';
+import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { cn } from '@/lib/utils';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
 import type { CollegeMedia } from '../../hooks/useCollegeMedia';
@@ -95,13 +96,14 @@ export function PlayerRow({ player, stats, college, statDisplay = 'rank', classN
 
       {/* Right: College Feature - THE STAR */}
       <div className="flex flex-col items-center shrink-0 min-w-[60px] ml-2">
-        {college?.logo_url ? (
+        {getCollegeLogoUrl(college?.college_name || player.college) ? (
           <>
             <img 
-              src={college.logo_url} 
-              alt={college.college_name}
+              src={getCollegeLogoUrl(college?.college_name || player.college)!} 
+              alt={college?.college_name || player.college || ''}
               className="w-10 h-10 object-contain"
               loading="lazy"
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
             />
             <span className="text-[10px] text-muted-foreground mt-1 text-center max-w-[70px] truncate leading-tight">
               {collegeShortName}

@@ -16,6 +16,7 @@ import { useFranchiseCaptains, type FranchiseCaptain } from '../../hooks/useFran
 import { useFollowedColleges } from '../../hooks/useCollegeMovers';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
+import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
@@ -140,9 +141,9 @@ function PodiumCard({
           </span>
         </div>
 
-        {media?.logo_url && (
+        {getCollegeLogoUrl(media?.college_name || stats.normalized_name) && (
           <img
-            src={media.logo_url}
+            src={getCollegeLogoUrl(media?.college_name || stats.normalized_name)!}
             alt={displayName}
             className="object-contain mb-2"
             style={{
@@ -150,6 +151,7 @@ function PodiumCard({
               height: isFirst ? '80px' : '50px',
               filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.3))',
             }}
+            onError={(e) => { e.currentTarget.style.display = 'none'; }}
           />
         )}
 
@@ -295,12 +297,13 @@ function LeaderboardRows({
           >
             <span style={{ width: '30px', fontSize: '14px', fontWeight: 600, color: 'rgba(0,0,0,0.4)' }}>{rank}</span>
             <div className="flex items-center flex-1 min-w-0" style={{ gap: '8px' }}>
-              {media?.logo_url && (
+              {getCollegeLogoUrl(media?.college_name || stats.normalized_name) && (
                 <img
-                  src={media.logo_url}
+                  src={getCollegeLogoUrl(media?.college_name || stats.normalized_name)!}
                   alt={displayName}
                   className="object-contain rounded-full"
                   style={{ width: '24px', height: '24px' }}
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
                 />
               )}
               <span className="truncate text-foreground" style={{ fontSize: '14px', fontWeight: 600 }}>{displayName}</span>
@@ -416,12 +419,13 @@ function FranchiseLeadersCarousel({ leaders }: { leaders: FranchiseLeader[] }) {
             </span>
 
             {/* Logo */}
-            {leader.media?.logo_url && (
+            {getCollegeLogoUrl(leader.media?.college_name || leader.college.normalized_name) && (
               <img
-                src={leader.media.logo_url}
-                alt={leader.media.college_name}
+                src={getCollegeLogoUrl(leader.media?.college_name || leader.college.normalized_name)!}
+                alt={leader.media?.college_name || ''}
                 className="object-contain mb-2"
                 style={{ width: '36px', height: '36px' }}
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
               />
             )}
 
@@ -549,12 +553,13 @@ function YourFranchiseCard({
         Your Franchise
       </span>
       <div className="flex items-center" style={{ gap: '10px' }}>
-        {media?.logo_url && (
+        {getCollegeLogoUrl(media?.college_name || stats.normalized_name) && (
           <img
-            src={media.logo_url}
+            src={getCollegeLogoUrl(media?.college_name || stats.normalized_name)!}
             alt={displayName}
             className="object-contain rounded-full"
             style={{ width: '28px', height: '28px' }}
+            onError={(e) => { e.currentTarget.style.display = 'none'; }}
           />
         )}
         <div className="flex-1 min-w-0">

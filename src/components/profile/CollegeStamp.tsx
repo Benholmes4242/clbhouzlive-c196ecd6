@@ -1,5 +1,6 @@
 import React from 'react';
 import { useCollegeMediaByName } from '@/hooks/useCollegeMediaSearch';
+import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 
 interface CollegeStampProps {
   normalizedName: string;
@@ -36,12 +37,13 @@ export const CollegeStamp: React.FC<CollegeStampProps> = ({
       {withDivider && (
         <span className="text-muted-foreground/40 mx-1">·</span>
       )}
-      {college.logo_url ? (
+      {getCollegeLogoUrl(college.college_name) ? (
         <img 
-          src={college.logo_url} 
+          src={getCollegeLogoUrl(college.college_name)!} 
           alt={`${displayName} logo`}
           className="w-5 h-5 rounded-full object-contain bg-background"
           style={{ opacity: isSupporter ? 0.7 : 1 }}
+          onError={(e) => { e.currentTarget.style.display = 'none'; }}
         />
       ) : (
         <div className="w-5 h-5 rounded-full bg-muted flex items-center justify-center">

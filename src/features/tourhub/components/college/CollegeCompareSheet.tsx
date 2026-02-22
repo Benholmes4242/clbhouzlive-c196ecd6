@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowRight, Check, Users, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { Button } from '@/components/ui/button';
 import { useCollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useCollegeMediaMap, type CollegeMedia } from '../../hooks/useCollegeMedia';
@@ -54,12 +55,13 @@ function CollegeSide({ college, value, metric, isWinner }: CollegeSideProps) {
           backgroundColor: 'hsl(var(--muted) / 0.2)',
         }}
       >
-        {college?.logo_url ? (
+        {getCollegeLogoUrl(college?.college_name || displayName) ? (
           <img 
-            src={college.logo_url} 
+            src={getCollegeLogoUrl(college?.college_name || displayName)!} 
             alt={displayName}
             className="object-contain relative z-10"
             style={{ width: '72px', height: '72px' }}
+            onError={(e) => { e.currentTarget.style.display = 'none'; }}
           />
         ) : (
           <span className="text-xl font-bold text-muted-foreground/60 relative z-10">
@@ -119,8 +121,8 @@ function RivalChip({ normalizedName, college, isSelected, onClick }: RivalChipPr
     >
       {/* College logo — 24×24px */}
       <div className="flex items-center justify-center overflow-hidden" style={{ width: '24px', height: '24px' }}>
-        {college?.logo_url ? (
-          <img src={college.logo_url} alt={displayName} className="w-6 h-6 object-contain" />
+        {getCollegeLogoUrl(college?.college_name || displayName) ? (
+          <img src={getCollegeLogoUrl(college?.college_name || displayName)!} alt={displayName} className="w-6 h-6 object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
         ) : (
           <span className="text-xs font-bold text-muted-foreground">{displayName.charAt(0)}</span>
         )}

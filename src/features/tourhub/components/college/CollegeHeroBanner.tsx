@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
+import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { getCollegeGradientCSS } from '../../config/collegeBrandColors';
 import type { CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import type { CollegeMedia } from '../../hooks/useCollegeMedia';
@@ -71,9 +72,9 @@ export function CollegeHeroBanner({ stats, college, className }: CollegeHeroBann
             transition={{ duration: 0.4, delay: 0.15 }}
             className="mb-4"
           >
-            {college?.logo_url ? (
+            {getCollegeLogoUrl(college?.college_name || stats.normalized_name) ? (
               <img
-                src={college.logo_url}
+                src={getCollegeLogoUrl(college?.college_name || stats.normalized_name)!}
                 alt={displayName}
                 className="object-contain"
                 style={{
@@ -81,6 +82,7 @@ export function CollegeHeroBanner({ stats, college, className }: CollegeHeroBann
                   height: 110,
                   filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.3))',
                 }}
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
               />
             ) : (
               <div className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center shadow-2xl">

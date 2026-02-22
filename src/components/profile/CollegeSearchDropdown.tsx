@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useCollegeMediaSearch, CollegeMediaResult } from '@/hooks/useCollegeMediaSearch';
 import { GraduationCap, Loader2 } from 'lucide-react';
+import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 
 interface CollegeSearchDropdownProps {
   value: CollegeMediaResult | null;
@@ -199,11 +200,12 @@ export const CollegeSearchDropdown: React.FC<CollegeSearchDropdownProps> = ({
                   isHighlighted ? 'bg-white/10' : 'hover:bg-white/5'
                 }`}
               >
-                {college.logo_url ? (
+                {getCollegeLogoUrl(college.college_name) ? (
                   <img 
-                    src={college.logo_url} 
+                    src={getCollegeLogoUrl(college.college_name)!} 
                     alt={`${displayName} logo`}
                     className="w-[22px] h-[22px] rounded-full object-contain bg-background flex-shrink-0"
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
                   />
                 ) : (
                   <div className="w-[22px] h-[22px] rounded-full bg-muted/30 flex items-center justify-center flex-shrink-0">

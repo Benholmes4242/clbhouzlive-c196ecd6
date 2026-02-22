@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { DollarSign, Trophy, Target, TrendingUp, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { useTourSeason } from '../../hooks/useTourHubData';
 import type { CollegeCompareData } from '../../hooks/useCollegeCompare';
@@ -125,8 +126,8 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
           className="flex flex-col items-center group"
         >
           <div className="w-16 h-16 rounded-xl bg-card border border-border flex items-center justify-center overflow-hidden mb-2 group-hover:border-primary/30 transition-colors">
-            {college1.media?.logo_url ? (
-              <img src={college1.media.logo_url} alt={name1} className="w-12 h-12 object-contain" />
+            {getCollegeLogoUrl(college1.media?.college_name || name1) ? (
+              <img src={getCollegeLogoUrl(college1.media?.college_name || name1)!} alt={name1} className="w-12 h-12 object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
             ) : (
               <span className="text-xl font-bold text-muted-foreground">{name1.charAt(0)}</span>
             )}
@@ -146,8 +147,8 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
           className="flex flex-col items-center group"
         >
           <div className="w-16 h-16 rounded-xl bg-card border border-border flex items-center justify-center overflow-hidden mb-2 group-hover:border-primary/30 transition-colors">
-            {college2.media?.logo_url ? (
-              <img src={college2.media.logo_url} alt={name2} className="w-12 h-12 object-contain" />
+            {getCollegeLogoUrl(college2.media?.college_name || name2) ? (
+              <img src={getCollegeLogoUrl(college2.media?.college_name || name2)!} alt={name2} className="w-12 h-12 object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
             ) : (
               <span className="text-xl font-bold text-muted-foreground">{name2.charAt(0)}</span>
             )}

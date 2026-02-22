@@ -6,6 +6,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
+import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { useCollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
@@ -157,7 +158,7 @@ export function PickFranchiseSheet({ open, onOpenChange }: PickFranchiseSheetPro
                     key={college.normalized_name}
                     normalizedName={college.normalized_name}
                     displayName={college.short_name || college.college_name}
-                    logoUrl={college.logo_url}
+                    logoUrl={getCollegeLogoUrl(college.college_name)}
                     playerCount={stats?.player_count ?? 0}
                     userId={user?.id}
                     isFollowed={followedSet.has(college.normalized_name)}
@@ -175,7 +176,7 @@ export function PickFranchiseSheet({ open, onOpenChange }: PickFranchiseSheetPro
                   key={stats.normalized_name}
                   normalizedName={stats.normalized_name}
                   displayName={displayName}
-                  logoUrl={media?.logo_url ?? null}
+                  logoUrl={getCollegeLogoUrl(media?.college_name || stats.normalized_name)}
                   playerCount={stats.player_count}
                   userId={user?.id}
                   isFollowed={followedSet.has(stats.normalized_name)}
