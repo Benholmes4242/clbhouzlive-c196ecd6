@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import { usePlayerSpotlight } from '../../hooks/useOverviewModules';
-import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import CountryFlag from '@/components/ui/country-flag';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -53,7 +53,7 @@ export function PlayerSpotlight() {
           {/* Player Photo */}
           <div className="w-20 h-20 rounded-xl overflow-hidden bg-white/20 flex-shrink-0 ring-2 ring-white/30 shadow-lg">
             {(() => {
-              const photoUrl = getR2HeadshotUrlMultiTour(`${spotlight.firstName} ${spotlight.lastName}`);
+              const photoUrl = getPlayerHeadshotUrl(`${spotlight.firstName} ${spotlight.lastName}`, 'pga');
               return photoUrl ? (
                 <img
                   src={photoUrl}

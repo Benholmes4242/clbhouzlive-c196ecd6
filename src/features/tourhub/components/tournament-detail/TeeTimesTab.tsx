@@ -300,7 +300,7 @@ function TeeTimeGroupCard({ group, index, searchQuery }: { group: TeeTimeGroup; 
               <BatchPlayerAvatar
                 playerId={player.playerId || ''}
                 playerName={player.name}
-                fallbackPhotoUrl={player.photoUrl}
+                
                 size="sm"
               />
               <div className="flex-1 min-w-0">

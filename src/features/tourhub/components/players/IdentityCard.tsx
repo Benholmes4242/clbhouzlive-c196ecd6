@@ -78,7 +78,7 @@ export function IdentityCard({ player, stats, college, statDisplay = 'rank', cla
             <PlayerAvatar
               playerId={player.id}
               playerName={player.full_name}
-              fallbackPhotoUrl={player.photo_url}
+              
               size="md"
             />
             {/* Rank Badge - tiered colors with subtle glow */}

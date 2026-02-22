@@ -6,7 +6,7 @@
 
 import { Link } from 'react-router-dom';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
 import type { LeaderCategory } from './constants';
 
@@ -61,7 +61,7 @@ function PodiumCard({
 }) {
   const { player, value } = entry;
   const displayRank = entry.overrideRank ?? entry.rank;
-  const photoUrl = resolvePhotoUrl(player.photoUrl, player.pgaTourId);
+  const photoUrl = getPlayerHeadshotUrl(player.fullName, 'pga');
   const flag = countryCodeToFlag(player.countryCode);
   const countryName = titleCaseCountry(player.country);
   const fmt = formatOverride ?? category.format;

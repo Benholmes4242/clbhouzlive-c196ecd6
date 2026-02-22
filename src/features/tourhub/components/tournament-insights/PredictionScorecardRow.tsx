@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import type { TrackedPrediction } from './types';
 
 interface PredictionScorecardRowProps {
@@ -70,7 +70,7 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
   const offLead = getOffLeadDisplay(prediction, isCompleted);
   const isCut = prediction.performanceStatus === 'cut';
   const isWD = prediction.performanceStatus === 'withdrawn';
-  const avatarUrl = getR2HeadshotUrlMultiTour(prediction.playerName);
+  const avatarUrl = getPlayerHeadshotUrl(prediction.playerName, 'pga');
 
   return (
     <motion.div

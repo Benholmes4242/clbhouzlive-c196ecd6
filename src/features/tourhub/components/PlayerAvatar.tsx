@@ -1,20 +1,18 @@
 /**
- * PlayerAvatar - Displays player headshot from R2 CDN with fallback initials
+ * PlayerAvatar - Displays player headshot from R2 CDN with silhouette fallback
  * 
- * Priority order:
- * 1. R2 CDN headshot (via getR2HeadshotUrlMultiTour)
- * 2. Initials fallback
+ * Uses getPlayerHeadshotUrl which always returns a valid URL
+ * (silhouette placeholder when tour code unknown).
  */
 
-import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 
 interface PlayerAvatarProps {
   playerId: string;
   playerName: string;
-  /** @deprecated - no longer used, R2 is the single source */
-  fallbackPhotoUrl?: string | null;
+  /** Tour code for R2 folder lookup. Falls back to silhouette if omitted. */
+  tourCode?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   className?: string;
 }
@@ -27,27 +25,14 @@ const SIZE_CLASSES = {
   '2xl': 'w-32 h-32 text-4xl',
 };
 
-function getInitials(name: string): string {
-  return name
-    .split(' ')
-    .map(n => n[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
-}
-
 export function PlayerAvatar({ 
   playerId, 
   playerName, 
-  fallbackPhotoUrl, 
+  tourCode = 'pga',
   size = 'md',
   className 
 }: PlayerAvatarProps) {
-  const [imageError, setImageError] = useState(false);
-  
-  const photoUrl = getR2HeadshotUrlMultiTour(playerName);
-  const initials = getInitials(playerName);
-  const showPhoto = photoUrl && !imageError;
+  const headshotUrl = getPlayerHeadshotUrl(playerName, tourCode);
   
   return (
     <div 
@@ -58,17 +43,13 @@ export function PlayerAvatar({
       )}
       style={{ borderRadius: '34%', aspectRatio: '1 / 1.05' }}
     >
-      {showPhoto ? (
-        <img 
-          src={photoUrl} 
-          alt={playerName}
-          className="w-full h-full object-cover object-top"
-          loading="lazy"
-          onError={() => setImageError(true)}
-        />
-      ) : (
-        <span className="font-medium text-muted-foreground">{initials}</span>
-      )}
+      <img 
+        src={headshotUrl} 
+        alt={playerName}
+        className="w-full h-full object-cover object-top"
+        loading="lazy"
+        onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+      />
     </div>
   );
 }
@@ -79,10 +60,7 @@ export function PlayerAvatar({
 interface BatchPlayerAvatarProps {
   playerId: string;
   playerName: string;
-  /** @deprecated - no longer used */
-  fallbackPhotoUrl?: string | null;
-  /** @deprecated - no longer used */
-  headshotMap?: Map<string, string>;
+  tourCode?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   className?: string;
 }
@@ -90,16 +68,11 @@ interface BatchPlayerAvatarProps {
 export function BatchPlayerAvatar({ 
   playerId, 
   playerName, 
-  fallbackPhotoUrl,
-  headshotMap,
+  tourCode = 'pga',
   size = 'md',
   className 
 }: BatchPlayerAvatarProps) {
-  const [imageError, setImageError] = useState(false);
-  
-  const photoUrl = getR2HeadshotUrlMultiTour(playerName);
-  const initials = getInitials(playerName);
-  const showPhoto = photoUrl && !imageError;
+  const headshotUrl = getPlayerHeadshotUrl(playerName, tourCode);
   
   return (
     <div 
@@ -110,17 +83,13 @@ export function BatchPlayerAvatar({
       )}
       style={{ borderRadius: '34%', aspectRatio: '1 / 1.05' }}
     >
-      {showPhoto ? (
-        <img 
-          src={photoUrl} 
-          alt={playerName}
-          className="w-full h-full object-cover object-top"
-          loading="lazy"
-          onError={() => setImageError(true)}
-        />
-      ) : (
-        <span className="font-medium text-muted-foreground">{initials}</span>
-      )}
+      <img 
+        src={headshotUrl} 
+        alt={playerName}
+        className="w-full h-full object-cover object-top"
+        loading="lazy"
+        onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+      />
     </div>
   );
 }

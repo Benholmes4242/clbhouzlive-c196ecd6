@@ -27,7 +27,7 @@ import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWin
 
 import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 import { getTourLogo } from '../../utils/tourLogos';
-import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
 import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows, WinnerStatsPanel } from '../shared/TourHeroHelpers';
@@ -111,7 +111,7 @@ interface LeaderboardRowProps {
 function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreFlash, positionDelta = 0 }: LeaderboardRowProps) {
   const navigate = useNavigate();
   const abbreviatedName = `${leader.player.firstName[0]}. ${leader.player.lastName}`;
-  const photoUrl = getR2HeadshotUrlMultiTour(`${leader.player.firstName} ${leader.player.lastName}`);
+  const photoUrl = getPlayerHeadshotUrl(`${leader.player.firstName} ${leader.player.lastName}`, 'pga');
   const initials = `${leader.player.firstName[0]}${leader.player.lastName[0]}`.toUpperCase();
   const thruDisplay = formatThruDisplay(leader.thru, leader.round_1, leader.round_2, leader.round_3, leader.round_4, leader.status, leader.thruUpdatedAt, leader.tournamentTimezone);
   
@@ -196,7 +196,7 @@ function CondensedTieRow({ row, index, isActive }: { row: LiveLeaderboardRow; in
         {/* Stacked avatars */}
         <div className="flex items-center flex-shrink-0">
           {row.players.slice(0, 4).map((player, i) => {
-            const photoUrl = getR2HeadshotUrlMultiTour(`${player.player.firstName} ${player.player.lastName}`);
+            const photoUrl = getPlayerHeadshotUrl(`${player.player.firstName} ${player.player.lastName}`, 'pga');
             const initials = `${player.player.firstName[0]}${player.player.lastName[0]}`.toUpperCase();
             return (
               <div
@@ -665,7 +665,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
                           style={{ display: 'flex', alignItems: 'center', gap: 10 }}
                         >
-                          <PlayerAvatar photoUrl={getR2HeadshotUrlMultiTour(winnerInfo.winnerName)} displayName={winnerInfo.winnerName} size={60} frosted />
+                          <PlayerAvatar photoUrl={getPlayerHeadshotUrl(winnerInfo.winnerName, 'pga')} displayName={winnerInfo.winnerName} size={60} frosted />
                           <div>
                             <span style={{ fontSize: '17px', fontWeight: 700, color: '#FFFFFF', display: 'block' }}>{winnerInfo.winnerName}</span>
                             {winnerInfo.winnerScore && (

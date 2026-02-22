@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu } from 'lucide-react';
 import { openTourNav } from '../../contexts/TourNavContext';
 import { cn } from '@/lib/utils';
-import { getR2HeadshotUrl, getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
 import type { ElitePlayer } from '../../hooks/useElitePlayers';
 import type { PlayerTourCode } from './PlayersTourFilter';
@@ -35,9 +35,8 @@ function RunnerCard({ player, index, activeTour, statsMap }: {
   activeTour: PlayerTourCode;
   statsMap?: Map<string, { earnings: number | null; wins: number | null; tourRank: number | null; points?: number | null; tournamentsPlayed?: number | null }>;
 }) {
-  const photoUrl = activeTour === 'all'
-    ? getR2HeadshotUrlMultiTour(player.playerName)
-    : getR2HeadshotUrl(player.playerName, activeTour);
+  const tourCode = activeTour === 'all' ? 'pga' : activeTour;
+  const photoUrl = getPlayerHeadshotUrl(player.playerName, tourCode);
   const stats = statsMap?.get(player.playerId);
   const tourRank = stats?.tourRank;
   const rank = activeTour === 'all' ? player.worldRank : (tourRank || player.worldRank);
@@ -71,20 +70,13 @@ function RunnerCard({ player, index, activeTour, statsMap }: {
         className="flex-shrink-0 overflow-hidden"
         style={{ width: '36px', height: '36px', borderRadius: '34%', border: '1px solid hsl(var(--border) / 0.4)' }}
       >
-        {photoUrl ? (
-          <div className="relative w-full h-full">
-            <div className="absolute inset-0 bg-muted" />
-            <img
-              src={photoUrl}
-              alt={player.playerName}
-              className="relative z-10 w-full h-full object-cover"
-              loading="lazy"
-              onError={(e) => { e.currentTarget.style.display = 'none'; }}
-            />
-          </div>
-        ) : (
-          <div className="w-full h-full bg-muted" />
-        )}
+        <img
+          src={photoUrl}
+          alt={player.playerName}
+          className="w-full h-full object-cover"
+          loading="lazy"
+          onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+        />
       </div>
 
       {/* Name & Country */}
@@ -104,10 +96,9 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
 
   const champion = players[0];
   const runners = players.slice(1, 5);
-  const photoUrl = activeTour === 'all'
-    ? getR2HeadshotUrlMultiTour(champion.playerName)
-    : getR2HeadshotUrl(champion.playerName, activeTour);
-  const showPhoto = photoUrl && !imageError;
+  const champTourCode = activeTour === 'all' ? 'pga' : activeTour;
+  const photoUrl = getPlayerHeadshotUrl(champion.playerName, champTourCode);
+  const showPhoto = !imageError;
   const flag = countryCodeToFlag(champion.countryCode);
   const country = titleCaseCountry(champion.country);
 

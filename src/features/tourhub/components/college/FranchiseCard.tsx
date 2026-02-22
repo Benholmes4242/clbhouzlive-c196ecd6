@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Users, ChevronRight, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { FollowCollegeButton } from './FollowCollegeButton';
 import type { CollegeSeasonStats } from '../../hooks/useCollegeStats';
@@ -229,7 +229,7 @@ export function FranchiseCard({
             <div className="flex items-center" style={{ marginTop: 6 }}>
               <div className="flex items-center">
                 {alumni.slice(0, 3).map((a, i) => {
-                  const photoUrl = getR2HeadshotUrlMultiTour(a.full_name);
+                  const photoUrl = getPlayerHeadshotUrl(a.full_name, 'pga');
                   return (
                     <div
                       key={a.id}

@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { getR2HeadshotUrl, getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
 import type { PlayerSortType } from './PlayerSortControl';
 
@@ -57,10 +57,9 @@ export function PlayerCardV2({
   activeTour = 'all',
   onNavigate,
 }: PlayerCardV2Props) {
-  // R2 headshot is the single source of truth
-  const photoUrl = activeTour === 'all'
-    ? getR2HeadshotUrlMultiTour(player.fullName, player.tourCodes)
-    : getR2HeadshotUrl(player.fullName, activeTour);
+  // R2 headshot — single source of truth
+  const tourCode = activeTour === 'all' ? (player.tourCodes?.[0] ?? 'pga') : activeTour;
+  const photoUrl = getPlayerHeadshotUrl(player.fullName, tourCode);
   const flag = countryCodeToFlag(player.countryCode);
   const countryName = titleCaseCountry(player.country);
 
@@ -147,22 +146,13 @@ export function PlayerCardV2({
       >
         {/* Photo section — left 140px */}
         <div className="relative shrink-0 bg-muted overflow-hidden" style={{ width: '140px', borderRadius: '16px 0 0 16px' }}>
-          {photoUrl ? (
-            <img
-              src={photoUrl}
-              alt={player.fullName}
-              className="w-full h-full object-cover object-top"
-              loading="lazy"
-              onError={(e) => {
-                // Hide broken image, initials fallback shows through bg
-                e.currentTarget.style.display = 'none';
-              }}
-            />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20 flex items-center justify-center">
-              <span className="text-2xl font-bold text-muted-foreground/30">{initials}</span>
-            </div>
-          )}
+          <img
+            src={photoUrl}
+            alt={player.fullName}
+            className="w-full h-full object-cover object-top"
+            loading="lazy"
+            onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+          />
         </div>
 
         {/* Info section */}

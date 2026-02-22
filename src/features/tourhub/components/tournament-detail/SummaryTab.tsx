@@ -100,8 +100,6 @@ function WinnerCard({ winner, runnerUp, headshotMap }: {
           <BatchPlayerAvatar
             playerId={winner.player?.id || ''}
             playerName={winner.player?.full_name || 'Unknown'}
-            fallbackPhotoUrl={winner.player?.photo_url}
-            headshotMap={headshotMap}
             size="lg"
           />
         </Link>
@@ -323,8 +321,6 @@ export function SummaryTab({
                     <BatchPlayerAvatar
                       playerId={entry.player?.id || ''}
                       playerName={entry.player?.full_name || 'Unknown'}
-                      fallbackPhotoUrl={entry.player?.photo_url}
-                      headshotMap={headshotMap}
                       size="sm"
                     />
                     <span className="flex-1 text-[14px] font-semibold text-foreground truncate">

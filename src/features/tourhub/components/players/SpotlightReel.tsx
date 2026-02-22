@@ -93,7 +93,7 @@ function SpotlightCard({ player, worldRank, isActive }: SpotlightCardProps) {
               <PlayerAvatar
                 playerId={player.id}
                 playerName={player.full_name}
-                fallbackPhotoUrl={player.photo_url}
+                
                 size="xl"
                 className="relative border-2 border-white/30"
               />

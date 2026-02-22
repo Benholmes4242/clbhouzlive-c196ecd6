@@ -11,7 +11,7 @@ import CountryFlag from '@/components/ui/country-flag';
 import type { LeaderboardPlayer } from './types';
 import type { CategoryId } from './StatCategoryIcons';
 import { CATEGORY_ACCENT_COLORS } from './constants';
-import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 
 interface LeaderHeroProps {
   player: LeaderboardPlayer;
@@ -25,7 +25,7 @@ function formatCountryName(country: string | null): string {
 
 export const LeaderHero = memo(function LeaderHero({ player, accentColor }: LeaderHeroProps) {
   const navigate = useNavigate();
-  const photoUrl = getR2HeadshotUrlMultiTour(player.playerName);
+  const photoUrl = getPlayerHeadshotUrl(player.playerName, 'pga');
   const accent = CATEGORY_ACCENT_COLORS[accentColor];
   const [imgError, setImgError] = useState(false);
 

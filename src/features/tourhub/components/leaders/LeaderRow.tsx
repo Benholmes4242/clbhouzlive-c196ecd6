@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
 import type { LeaderCategory } from './constants';
 
@@ -42,7 +42,7 @@ export function LeaderRow({
   index,
 }: LeaderRowProps) {
   const displayRank = overrideRank ?? rank;
-  const photoUrl = getR2HeadshotUrlMultiTour(player.fullName);
+  const photoUrl = getPlayerHeadshotUrl(player.fullName, 'pga');
   const flag = countryCodeToFlag(player.countryCode);
   const countryName = titleCaseCountry(player.country);
   const fmt = formatOverride ?? category.format;
