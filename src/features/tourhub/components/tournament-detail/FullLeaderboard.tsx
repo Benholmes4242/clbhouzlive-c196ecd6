@@ -303,8 +303,6 @@ export function FullLeaderboard({
                   <BatchPlayerAvatar
                     playerId={entry.player?.id || ''}
                     playerName={entry.player?.full_name || 'Unknown'}
-                    fallbackPhotoUrl={entry.player?.photo_url}
-                    headshotMap={headshotMap}
                     size="sm"
                   />
                 </div>

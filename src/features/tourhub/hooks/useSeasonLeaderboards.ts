@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 
 // ============================================
 // TYPES
@@ -309,7 +309,7 @@ async function fetchSeasonLeaderboards(requestedYear?: number): Promise<SeasonLe
           firstName,
           lastName,
           countryCode: player.country || 'USA',
-          photoUrl: getR2HeadshotUrlMultiTour(`${firstName} ${lastName}`.trim()),
+          photoUrl: getPlayerHeadshotUrl(`${firstName} ${lastName}`.trim(), 'pga'),
           initials: `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase(),
           statValue,
           statDisplayValue: config.formatValue(statValue),

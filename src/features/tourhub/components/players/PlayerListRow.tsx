@@ -9,7 +9,7 @@ import { ChevronRight, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
 
 function getRankBadgeClasses(rank: number): string {
@@ -76,7 +76,7 @@ export function PlayerListRow({
   index = 0,
 }: PlayerListRowProps) {
   // Use R2 headshot as primary source
-  const photoUrl = batchHeadshotUrl ?? getR2HeadshotUrlMultiTour(player.fullName);
+  const photoUrl = batchHeadshotUrl ?? getPlayerHeadshotUrl(player.fullName, 'pga');
   const flag = countryCodeToFlag(player.countryCode);
   const countryName = titleCaseCountry(player.country);
 

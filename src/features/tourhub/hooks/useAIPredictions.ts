@@ -10,7 +10,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import type { TournamentPhase, NextTournamentPreview } from '../components/tournament-insights/types';
 
 // =============================================
@@ -90,9 +90,9 @@ export interface UseAIPredictionsResult {
 
 function resolvePlayerPhotoUrl(
   playerName: string | null | undefined,
-): string | null {
-  if (!playerName) return null;
-  return getR2HeadshotUrlMultiTour(playerName);
+): string {
+  if (!playerName) return PLAYER_SILHOUETTE_URL;
+  return getPlayerHeadshotUrl(playerName, 'pga');
 }
 
 // =============================================

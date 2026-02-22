@@ -143,7 +143,7 @@ export function EventWinnerCard({ tournamentId, className }: EventWinnerCardProp
               <PlayerAvatar
                 playerId={winner.player.id}
                 playerName={winner.player.full_name}
-                fallbackPhotoUrl={winner.player.photo_url}
+                
                 size="xl"
                 className="ring-4 ring-amber-500/40 ring-offset-2 ring-offset-background"
               />

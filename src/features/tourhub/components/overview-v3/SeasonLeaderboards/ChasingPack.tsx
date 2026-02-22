@@ -11,7 +11,7 @@ import CountryFlag from '@/components/ui/country-flag';
 import type { LeaderboardPlayer } from './types';
 import type { CategoryId } from './StatCategoryIcons';
 import { CATEGORY_ACCENT_COLORS } from './constants';
-import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 
 interface ChasingPackProps {
   players: LeaderboardPlayer[];
@@ -39,7 +39,7 @@ const ChaserCard = memo(function ChaserCard({
   accentColor: CategoryId;
 }) {
   const navigate = useNavigate();
-  const photoUrl = getR2HeadshotUrlMultiTour(player.playerName);
+  const photoUrl = getPlayerHeadshotUrl(player.playerName, 'pga');
   const delta = formatDelta(player.statValue, leaderValue, higherIsBetter);
   const accent = CATEGORY_ACCENT_COLORS[accentColor];
   const [imgError, setImgError] = useState(false);

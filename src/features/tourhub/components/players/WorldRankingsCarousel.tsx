@@ -48,7 +48,7 @@ function WorldRankCard({ player, worldRank, className }: WorldRankCardProps) {
         <PlayerAvatar
           playerId={player.id}
           playerName={player.full_name}
-          fallbackPhotoUrl={player.photo_url}
+          
           size="lg"
         />
         {/* Hover indicator */}

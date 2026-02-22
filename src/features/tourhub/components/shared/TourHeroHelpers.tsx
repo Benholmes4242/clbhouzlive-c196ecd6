@@ -7,7 +7,7 @@ import React from 'react';
 import type { WinnerStats } from '../../hooks/useWinnerScorecardStats';
 import type { WinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import type { TournamentFinisher } from '../../hooks/useTournamentLeadersWinners';
 
 /** Score color — live state: pure white (#FFFFFF) matching scrubber fill, regardless of par */
@@ -62,7 +62,7 @@ export function PlayerAvatar({
   /** Use frosted glass styling (rgba(255,255,255,0.1) bg + frosted border) — for glass card contexts */
   frosted?: boolean;
 }) {
-  const resolved = resolvePhotoUrl(photoUrl, pgaTourId);
+  const resolved = photoUrl || PLAYER_SILHOUETTE_URL;
   const initials = displayName
     .split(/[\s.]/)
     .filter(Boolean)

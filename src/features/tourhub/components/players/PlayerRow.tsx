@@ -63,7 +63,7 @@ export function PlayerRow({ player, stats, college, statDisplay = 'rank', classN
           <PlayerAvatar
             playerId={player.id}
             playerName={player.full_name}
-            fallbackPhotoUrl={player.photo_url}
+            
             size="md"
           />
           {/* Rank Badge - tiered colors */}

@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { Menu } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { openTourNav } from '../../contexts/TourNavContext';
-import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
 import type { LeaderCategory } from './constants';
 
@@ -33,7 +33,7 @@ interface LeadersHeroProps {
 export function LeadersHero({ leader, category, formatOverride, unitOverride }: LeadersHeroProps) {
   
   const { player, value } = leader;
-  const photoUrl = getR2HeadshotUrlMultiTour(player.full_name);
+  const photoUrl = getPlayerHeadshotUrl(player.full_name, 'pga');
   const flag = countryCodeToFlag(player.country_code);
   const countryName = titleCaseCountry(player.country);
   const fmt = formatOverride ?? category.format;

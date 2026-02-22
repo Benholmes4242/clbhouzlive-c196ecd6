@@ -17,7 +17,7 @@ import { cn } from '@/lib/utils';
 import { useLiveArena, type LiveArenaTournament, type LiveArenaPlayer } from '../../hooks/useLiveArena';
 import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 import { getTourLogo } from '../../utils/tourLogos';
-import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import '@/styles/hero-glass.css';
 
@@ -117,7 +117,7 @@ MomentumTag.displayName = 'MomentumTag';
  * Chase Pack Player Pill
  */
 const ChasePackPlayer = memo(({ player }: { player: LiveArenaPlayer }) => {
-  const photoUrl = getR2HeadshotUrlMultiTour(player.player.fullName);
+  const photoUrl = getPlayerHeadshotUrl(player.player.fullName, 'pga');
   
   return (
     <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/10 backdrop-blur-sm flex-shrink-0">
@@ -181,7 +181,7 @@ function LiveArenaSlide({
   ];
   const bgGradient = gradients[tournament.name.length % gradients.length];
 
-  const leaderPhotoUrl = tournament.leader ? getR2HeadshotUrlMultiTour(tournament.leader.player.fullName) : null;
+  const leaderPhotoUrl = tournament.leader ? getPlayerHeadshotUrl(tournament.leader.player.fullName, tournament.tourSlug || 'pga') : null;
 
   return (
     <motion.div

@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useSeasonLeaders } from '../../hooks/useOverviewModules';
 import { TourId, TOUR_CONFIG } from '../../hooks/useOverviewData';
 import { getTourLogo } from '../../utils/tourLogos';
-import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
@@ -51,7 +51,7 @@ function LeaderCard({
       </p>
       <div className="w-12 h-12 mx-auto rounded-full overflow-hidden bg-slate-200 mb-2 ring-2 ring-white/50">
         {(() => {
-          const photoUrl = getR2HeadshotUrlMultiTour(`${leader.firstName} ${leader.lastName}`);
+          const photoUrl = getPlayerHeadshotUrl(`${leader.firstName} ${leader.lastName}`, 'pga');
           return photoUrl ? (
             <img src={photoUrl} alt="" className="w-full h-full object-cover" />
           ) : (

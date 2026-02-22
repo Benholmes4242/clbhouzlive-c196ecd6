@@ -15,7 +15,7 @@ import CountryFlag from '@/components/ui/country-flag';
 import type { LeaderboardPlayer } from './types';
 import type { CategoryId } from './StatCategoryIcons';
 import { CATEGORY_ACCENT_COLORS } from './constants';
-import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 
 interface LeaderboardRowProps {
   player: LeaderboardPlayer;
@@ -44,7 +44,7 @@ export const LeaderboardRow = memo(function LeaderboardRow({
     navigate(`/tourhub/player/${player.playerId}`);
   };
 
-  const photoUrl = getR2HeadshotUrlMultiTour(player.playerName);
+  const photoUrl = getPlayerHeadshotUrl(player.playerName, 'pga');
 
   return (
     <button

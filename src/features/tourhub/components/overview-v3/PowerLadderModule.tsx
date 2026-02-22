@@ -19,7 +19,7 @@ import {
   type PowerTier, 
   type PowerLadderPlayer,
 } from '../../hooks/usePowerLadder';
-import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { cn } from '@/lib/utils';
 
 // Spring physics for animations
@@ -180,7 +180,7 @@ const PlayerRow = memo(({
         player.rank <= 3 ? config.bgClass.replace('bg-gradient-to-r', 'ring') : "ring-slate-200"
       )}>
         {(() => {
-          const photoUrl = resolvePhotoUrl(player.player.photoUrl, player.player.pgaTourId);
+          const photoUrl = getPlayerHeadshotUrl(player.player.fullName, 'pga');
           return photoUrl ? (
             <img
               src={photoUrl}

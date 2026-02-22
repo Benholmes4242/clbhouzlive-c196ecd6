@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
 import { useTopWorldRanked, toTitleCase, getInitials } from '../hooks/useWorldRankings';
-import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { 
   useLiveTournamentCount, 
   useLiveLeaderTeaser, 
@@ -456,7 +456,7 @@ export function TourHubNavOverlay({
                           
                           {/* TM-11: Avatar with initials fallback */}
                           {(() => {
-                            const headshot = getR2HeadshotUrlMultiTour(player.playerName);
+                            const headshot = getPlayerHeadshotUrl(player.playerName, 'pga');
                             const initials = getInitials(player.playerName);
                             return (
                               <AvatarWithInitials

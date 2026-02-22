@@ -3,7 +3,7 @@ import { Users, DollarSign, Trophy, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
-import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import type { CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import type { CollegeMedia } from '../../hooks/useCollegeMedia';
 import type { AlumniFace } from '../../hooks/useBatchCollegeAlumni';
@@ -84,14 +84,11 @@ export function CollegeCard({ stats, college, rank, alumni, className }: College
         {alumni && alumni.length > 0 && (
           <div className="flex items-center -space-x-1.5 mt-2">
             {alumni.slice(0, 3).map(a => {
-              const photoUrl = getR2HeadshotUrlMultiTour(a.full_name);
+              const photoUrl = getPlayerHeadshotUrl(a.full_name, 'pga');
               return (
                 <div key={a.id} className="w-5 h-5 border border-card overflow-hidden bg-muted" style={{ borderRadius: '34%' }}>
-                  {photoUrl ? (
-                    <img src={photoUrl} alt={a.full_name} className="w-full h-full object-cover object-top" loading="lazy" />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20" />
-                  )}
+                  <img src={photoUrl} alt={a.full_name} className="w-full h-full object-cover object-top" loading="lazy"
+                    onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }} />
                 </div>
               );
             })}
