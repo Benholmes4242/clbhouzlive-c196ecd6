@@ -117,7 +117,7 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
   }
   
   return (
-    <div className={cn('flex overflow-x-auto pb-2 -mx-4 px-4', className)} style={{ gap: '8px', touchAction: 'pan-x pan-y' }}>
+    <div className={cn('flex overflow-x-auto pb-2 -mx-4 px-4', className)} style={{ gap: '10px', touchAction: 'pan-x pan-y' }}>
       {enrichedRivalries.map((rivalry) => {
         const rivalName = rivalry.rivalNormalizedName;
         const college = rivalry.college;
@@ -163,7 +163,7 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
         );
         
         const cardStyles = cn(
-          'shrink-0 rounded-2xl',
+          'shrink-0 rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)]',
           'bg-card border border-border/50',
           'hover:border-primary/30 hover:bg-card/90 transition-all duration-200',
           'active:scale-[0.98]',

@@ -194,19 +194,10 @@ export function CollegeProfilePage() {
         <button
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
           aria-label="Open tour menu"
-          className="absolute z-30 flex items-center justify-center rounded-full"
-          style={{
-            width: 44,
-            height: 44,
-            top: 56,
-            left: 16,
-            background: 'rgba(0,0,0,0.25)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-            pointerEvents: 'auto' as const,
-          }}
+          className="absolute z-30 flex items-center justify-center"
+          style={{ width: 44, height: 44, top: 56, left: 16 }}
         >
-          <Menu className="w-6 h-6 text-white" />
+          <Menu className="w-[22px] h-[22px] text-white" style={{ strokeWidth: 2, filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }} />
         </button>
 
         {/* Content — centered */}
@@ -228,7 +219,7 @@ export function CollegeProfilePage() {
                 fontWeight: 700,
                 letterSpacing: '1.2px',
                 textTransform: 'uppercase' as const,
-                color: 'rgba(255,255,255,0.45)',
+                color: 'rgba(255,255,255,0.55)',
                 marginBottom: '4px',
               }}
             >
@@ -328,7 +319,7 @@ export function CollegeProfilePage() {
             className="rounded-2xl border border-border/50 bg-card"
             style={{
               padding: '14px 8px',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
               display: 'grid',
               gridTemplateColumns: 'repeat(5, 1fr)',
             }}
@@ -374,7 +365,7 @@ export function CollegeProfilePage() {
           >
             <button 
               onClick={handleCompareClick}
-              className="flex items-center rounded-xl border border-border/50 bg-card active:scale-95 transition-all"
+              className="flex items-center rounded-xl border border-border/50 bg-card shadow-[0_1px_3px_rgba(0,0,0,0.04)] active:scale-95 transition-all"
               style={{ padding: '10px 20px', gap: '6px' }}
             >
               <GitCompare className="w-4 h-4 text-muted-foreground" />
@@ -405,7 +396,7 @@ export function CollegeProfilePage() {
             whileInView="visible"
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.4 }}
-            style={{ marginTop: '24px' }}
+            style={{ marginTop: '28px' }}
           >
             <div className="flex items-center gap-2" style={{ marginBottom: '12px' }}>
               <Swords className="w-4 h-4 text-muted-foreground" />
@@ -489,14 +480,14 @@ function formatCurrency(amount: number): string {
 }
 
 function StatDivider() {
-  return <div className="w-px self-stretch bg-border/10" />;
+  return <div className="w-px self-stretch bg-border/20" />;
 }
 
 function StatPill({ label, value, highlight = false }: { label: string; value: string; highlight?: boolean }) {
   return (
     <div className="flex flex-col items-center justify-center">
       <span style={{
-        fontSize: '9px',
+        fontSize: '10px',
         fontWeight: 700,
         letterSpacing: '0.5px',
         textTransform: 'uppercase' as const,
