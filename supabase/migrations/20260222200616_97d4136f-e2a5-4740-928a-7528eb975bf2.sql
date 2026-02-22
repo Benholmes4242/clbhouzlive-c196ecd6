@@ -1,0 +1,1 @@
+ALTER TABLE player_ratings ADD CONSTRAINT player_ratings_player_id_unique UNIQUE (player_id);
