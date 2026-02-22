@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import { ChevronDown, X } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { AnimatedCheck } from '@/components/ui/AnimatedCheck';
@@ -21,7 +21,7 @@ interface TourOption {
 const TOUR_OPTIONS: TourOption[] = [
   { code: 'all', label: 'All Tours', description: 'Show events from every tour' },
   { code: 'pga', label: 'PGA Tour', description: 'PGA Tour events' },
-  { code: 'EURO', label: 'DP World', description: 'DP World Tour events' },
+  { code: 'EURO', label: 'DP World Tour', description: 'DP World Tour events' },
   { code: 'LPGA', label: 'LPGA', description: 'LPGA Tour events' },
   { code: 'CHAMP', label: 'Champions', description: 'PGA Champions Tour events' },
   { code: 'PGAD', label: 'Korn Ferry', description: 'Korn Ferry Tour events' },
@@ -95,13 +95,6 @@ export function ScheduleTourFilter({
             >
               Filter by Tour
             </h2>
-            <button
-              onClick={() => setOpen(false)}
-              className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"
-              aria-label="Close"
-            >
-              <X className="w-4 h-4 text-muted-foreground" />
-            </button>
           </div>
 
           {/* Tour options */}

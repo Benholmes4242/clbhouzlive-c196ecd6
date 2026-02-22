@@ -79,26 +79,13 @@ export function ScheduleTab() {
   const filter = (searchParams.get('filter') as ScheduleFilterType) || 'all';
   const activeTour = (searchParams.get('tour') as TourFilterCode) || 'all';
 
-  // Scroll to top on mount
+  // Scroll to top on mount — always start at top
   useEffect(() => {
     window.scrollTo(0, 0);
-    document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
-    const scrollContainer = document.querySelector('[data-scroll-container]') || document.querySelector('main') || document.querySelector('.page-root');
-    if (scrollContainer) scrollContainer.scrollTop = 0;
     requestAnimationFrame(() => {
       window.scrollTo(0, 0);
-      document.documentElement.scrollTop = 0;
     });
-
-    // Restore scroll position on back navigation
-    const savedPos = sessionStorage.getItem(SCROLL_KEY);
-    if (savedPos) {
-      requestAnimationFrame(() => {
-        window.scrollTo(0, parseInt(savedPos, 10));
-      });
-      sessionStorage.removeItem(SCROLL_KEY);
-    }
   }, []);
 
   // Save scroll position before navigating away
@@ -413,7 +400,7 @@ export function ScheduleTab() {
         <div className="px-4 mb-2">
           <button
             type="button"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
             className="text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
           >
             ← Tour Overview

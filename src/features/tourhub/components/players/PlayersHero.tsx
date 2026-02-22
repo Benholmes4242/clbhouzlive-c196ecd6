@@ -5,7 +5,6 @@
 
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { resolvePhotoUrl, getPgaTourHeadshotUrl } from '../../utils/resolvePhotoUrl';
@@ -43,8 +42,8 @@ function RunnerCard({ player, index, activeTour, statsMap }: {
   const country = titleCaseCountry(player.country);
 
   const rankBg = index === 0
-    ? '#f59e0b'
-    : '#94A3B8';
+    ? '#94A3B8'
+    : '#C2875A';
 
   return (
     <Link
@@ -140,16 +139,7 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
 
   return (
     <div className="relative">
-      {/* Back button */}
-      <button
-        type="button"
-        onClick={() => navigate(-1)}
-        className="absolute z-30 left-4 flex h-11 w-11 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 active:scale-95 transition-all"
-        style={{ top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
-        aria-label="Back"
-      >
-        <ArrowLeft className="h-5 w-5 text-white" />
-      </button>
+      {/* Back arrow removed — replaced by "← Tour Overview" text link below hero */}
       <AnimatePresence mode="wait">
         <motion.div
           key={champion.playerId}
