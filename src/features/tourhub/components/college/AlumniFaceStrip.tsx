@@ -42,7 +42,7 @@ export function AlumniFaceStrip({ alumni, collegeName, collegeSlug, totalAlumniC
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.4, delay: 0.4 }}
       className={cn('px-4', className)}
-      style={{ marginTop: -20 }}
+      style={{ marginTop: -20, position: 'relative', zIndex: 10 }}
     >
       <Link
         to={`/tourhub/college-golf/${collegeSlug}`}

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, Swords, GitCompare, Globe, Crown, RefreshCw, AlertCircle } from 'lucide-react';
+import { useParams, Link } from 'react-router-dom';
+import { Menu, Swords, GitCompare, Globe, Crown, RefreshCw, AlertCircle } from 'lucide-react';
+import { openTourNav } from '../contexts/TourNavContext';
 import { motion } from 'framer-motion';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { useQueryClient } from '@tanstack/react-query';
@@ -30,8 +31,7 @@ const sectionVariants = {
 
 export function CollegeProfilePage() {
   const { collegeSlug } = useParams<{ collegeSlug: string }>();
-  const navigate = useNavigate();
-  const location = useLocation();
+  
   const queryClient = useQueryClient();
   const { setVariant, hideHeader, showHeader } = useHeader();
 
@@ -123,13 +123,7 @@ export function CollegeProfilePage() {
     setCompareOpen(false);
   }, [collegeSlug]);
   
-  const handleBack = () => {
-    if (location.key !== 'default') {
-      navigate(-1);
-    } else {
-      navigate('/tourhub/college-golf');
-    }
-  };
+  
   
   const handleCompareClick = () => {
     if (!compareCollege2 && firstRival) {
@@ -167,8 +161,8 @@ export function CollegeProfilePage() {
       )}
       {/* Immersive Brand Color Hero */}
       <div
-        className="relative overflow-hidden"
-        style={{ height: 'clamp(282px, 53vh, 422px)' }}
+        className="relative"
+        style={{ height: '50dvh' }}
       >
         {/* Brand gradient background with Ken Burns */}
         <motion.div
@@ -195,25 +189,22 @@ export function CollegeProfilePage() {
           }}
         />
 
-        {/* Back Button — plain arrow, 44×44px, matching Players/Leaders */}
+        {/* Burger menu — matches Players/Leaders pages */}
         <button
-          onClick={handleBack}
-          className="absolute z-20 flex items-center justify-center active:scale-95 transition-all"
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
+          aria-label="Open tour menu"
+          className="absolute z-30 flex items-center justify-center rounded-full"
           style={{
+            width: 44,
+            height: 44,
             top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
-            left: '16px',
-            width: '44px',
-            height: '44px',
+            left: 16,
+            background: 'rgba(0,0,0,0.25)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
           }}
         >
-          <ArrowLeft 
-            className="text-white" 
-            style={{ 
-              width: '22px', 
-              height: '22px',
-              filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))',
-            }} 
-          />
+          <Menu className="w-6 h-6 text-white" />
         </button>
 
         {/* Content — centered */}
