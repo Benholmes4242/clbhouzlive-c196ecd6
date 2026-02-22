@@ -10,7 +10,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { toast } from 'sonner';
-import { RefreshCw, Image, Building2, MapPin, Search, ExternalLink, CheckCircle, XCircle, AlertCircle, Newspaper, FileText, Upload, User } from 'lucide-react';
+import { RefreshCw, Image, Building2, MapPin, Search, ExternalLink, CheckCircle, XCircle, AlertCircle, Newspaper, FileText, Upload, User, Users } from 'lucide-react';
+import PlayersAssetTab from '@/features/admin/components/assets/PlayersAssetTab';
 import { format } from 'date-fns';
 
 type AssetKind = 'headshot' | 'logo' | 'venue';
@@ -58,7 +59,7 @@ const PROVIDERS = [
 ];
 
 export default function MediaAssetsManagement() {
-  const [activeTab, setActiveTab] = useState<'headshots' | 'logos' | 'venues' | 'availability' | 'news' | 'analysis' | 'upload'>('headshots');
+  const [activeTab, setActiveTab] = useState<'headshots' | 'logos' | 'venues' | 'availability' | 'news' | 'analysis' | 'upload' | 'players'>('headshots');
   const [searchQuery, setSearchQuery] = useState('');
   const [leagueFilter, setLeagueFilter] = useState('all');
   const [providerFilter, setProviderFilter] = useState('all');
@@ -585,6 +586,19 @@ export default function MediaAssetsManagement() {
             </div>
           </CardContent>
         </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <User className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">—</p>
+                <p className="text-xs text-muted-foreground">Player Photos</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
@@ -617,10 +631,14 @@ export default function MediaAssetsManagement() {
             <Upload className="h-4 w-4" />
             Upload Headshot
           </TabsTrigger>
+          <TabsTrigger value="players" className="gap-2">
+            <Users className="h-4 w-4" />
+            Players
+          </TabsTrigger>
         </TabsList>
 
         {/* Filters for asset and editorial tabs */}
-        {activeTab !== 'availability' && activeTab !== 'upload' && (
+        {activeTab !== 'availability' && activeTab !== 'upload' && activeTab !== 'players' && (
           <div className="flex gap-3 mt-4">
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -802,6 +820,10 @@ export default function MediaAssetsManagement() {
               </Button>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="players" className="mt-4">
+          <PlayersAssetTab />
         </TabsContent>
       </Tabs>
     </div>
