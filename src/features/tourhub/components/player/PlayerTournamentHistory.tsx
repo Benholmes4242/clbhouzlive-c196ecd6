@@ -53,16 +53,15 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
                   key={result.id}
                   to={`/tourhub/tournament/${result.tournament_id}`}
                   className="flex items-center gap-3 group active:scale-[0.98] transition-transform"
-                  style={{ padding: '12px 0', borderBottom: '1px solid hsl(var(--border) / 0.08)' }}
+                  style={{ padding: '12px 0', borderBottom: '1px solid hsl(var(--border) / 0.15)' }}
                 >
                   {/* Position — 14px, weight 700 */}
                   <span
                     className="shrink-0"
                     style={{
-                      width: '64px',
+                      width: '52px',
                       fontSize: '14px',
                       fontWeight: 700,
-                      fontFamily: "'JetBrains Mono', monospace",
                       fontVariantNumeric: 'tabular-nums',
                       color: isWin ? '#f59e0b' : 'hsl(var(--foreground))',
                     }}
@@ -75,20 +74,19 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
                     {result.tournament_name}
                   </span>
 
-                  {/* Date — 13px, weight 400 */}
-                  <span className="text-muted-foreground shrink-0" style={{ fontSize: '13px', fontWeight: 400, width: '56px', textAlign: 'right' }}>
+                  {/* Date — 12px, weight 500 */}
+                  <span className="text-muted-foreground shrink-0" style={{ fontSize: '12px', fontWeight: 500, width: '56px', textAlign: 'right' }}>
                     {result.tournament_end_date
                       ? format(new Date(result.tournament_end_date), 'MMM d')
                       : '—'}
                   </span>
 
-                  {/* Score — JetBrains Mono, 14px, weight 700 */}
+                  {/* Score — 14px, weight 700 */}
                   <span
                     className="shrink-0"
                     style={{
                       width: '40px',
                       textAlign: 'right',
-                      fontFamily: "'JetBrains Mono', monospace",
                       fontSize: '14px',
                       fontWeight: 700,
                       fontVariantNumeric: 'tabular-nums',

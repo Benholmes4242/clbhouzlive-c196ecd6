@@ -6,7 +6,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Globe, TrendingUp, AlertCircle, RefreshCw } from 'lucide-react';
+import { ArrowLeft, TrendingUp, AlertCircle, RefreshCw } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
@@ -269,15 +269,8 @@ export function PlayerProfilePage() {
             <PlayerInfoCard player={player} />
           </motion.div>
 
-          {/* Footer */}
-          <div style={{ marginTop: '24px' }}>
-            <div className="flex items-center justify-center gap-2">
-              <Globe className="w-4 h-4" style={{ color: 'hsl(var(--muted-foreground) / 0.2)' }} />
-              <span style={{ fontSize: '11px', fontWeight: 400, color: 'hsl(var(--muted-foreground) / 0.3)' }}>
-                Powered by SportsRadar
-              </span>
-            </div>
-          </div>
+          {/* Bottom spacer */}
+          <div style={{ marginTop: '24px' }} />
         </div>
       </div>
     </PageRoot>

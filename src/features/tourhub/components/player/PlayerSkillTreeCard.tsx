@@ -74,7 +74,7 @@ const LevelDots = memo(({ level, colorKey, isStrongest, delay = 0, animate = tru
           style={{
             width: '8px',
             height: '8px',
-            backgroundColor: index < level ? dotColor : 'hsl(var(--muted) / 0.2)',
+            backgroundColor: index < level ? dotColor : '#CBD5E1',
           }}
           initial={animate ? { scale: 0 } : false}
           animate={animate ? { scale: 1 } : undefined}
@@ -125,9 +125,9 @@ const AttributeRow = memo(({ attribute, isStrongest, delay = 0, animate = true }
       />
       <div className="text-right" style={{ width: '48px' }}>
         <span style={{
-          fontFamily: "'JetBrains Mono', monospace",
           fontSize: '13px',
           fontWeight: 700,
+          fontVariantNumeric: 'tabular-nums',
           color: levelColor,
         }}>
           Lv.{attribute.level}
@@ -135,7 +135,6 @@ const AttributeRow = memo(({ attribute, isStrongest, delay = 0, animate = true }
       </div>
       <div className="text-right shrink-0" style={{ width: '64px' }}>
         <span className="text-muted-foreground" style={{
-          fontFamily: "'JetBrains Mono', monospace",
           fontSize: '12px',
           fontWeight: 500,
           fontVariantNumeric: 'tabular-nums',
@@ -174,7 +173,7 @@ const OverallLevelBadge = memo(({ level, animate = true }: { level: number; anim
         }}
       >
         <span className="text-white/70" style={{ fontSize: '8px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Overall</span>
-        <span className="text-white" style={{ fontSize: '24px', fontWeight: 800, fontFamily: "'JetBrains Mono', monospace" }}>{level}</span>
+        <span className="text-white" style={{ fontSize: '24px', fontWeight: 800 }}>{level}</span>
       </div>
       <div>
         <span style={{ fontSize: '16px', fontWeight: 700, color: tier.color }}>{tier.name}</span>
@@ -250,7 +249,7 @@ function SkillRadarChart({ attributes, animate = true, activeSkill = null }: { a
         textAnchor="middle"
         dominantBaseline="central"
         className="fill-muted-foreground"
-        style={{ fontSize: '12px', fontWeight: isActive ? 700 : 500 }}
+        style={{ fontSize: '11px', fontWeight: isActive ? 700 : 500 }}
       >
         {config.name}
       </text>
