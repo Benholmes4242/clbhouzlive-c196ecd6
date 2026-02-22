@@ -1,8 +1,9 @@
-import { useSearchParams, Link } from 'react-router-dom';
-import { ArrowLeft, GitCompare } from 'lucide-react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Menu } from 'lucide-react';
 import { TourHubShell } from '../components';
 import { CollegeCompareHero } from '../components/college/CollegeCompareHero';
 import { useCollegeCompare } from '../hooks/useCollegeCompare';
+import { openTourNav } from '../contexts/TourNavContext';
 
 /**
  * College Compare Page - Side-by-side comparison of two colleges.
@@ -10,6 +11,7 @@ import { useCollegeCompare } from '../hooks/useCollegeCompare';
  */
 export function CollegeComparePage() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const c1 = searchParams.get('c1') || '';
   const c2 = searchParams.get('c2') || '';
   
@@ -19,64 +21,57 @@ export function CollegeComparePage() {
   
   return (
     <TourHubShell>
-      <div className="min-h-screen" style={{ backgroundColor: '#F8FAFC' }}>
-      {/* Back Link */}
-      <div className="pt-4">
-        <Link 
-          to="/tourhub/college-golf" 
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+      <div className="min-h-screen relative" style={{ backgroundColor: '#F8FAFC' }}>
+        {/* Burger menu */}
+        <button
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
+          aria-label="Open tour menu"
+          className="absolute z-30 flex items-center justify-center"
+          style={{ width: 44, height: 44, top: 16, left: 16 }}
         >
-          <ArrowLeft className="w-4 h-4" />
-          College Golf
-        </Link>
-      </div>
-      
-      {/* Header */}
-      <header className="py-6">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center">
-            <GitCompare className="w-6 h-6 text-muted-foreground" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-foreground">
-              College Comparison
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Head-to-head alumni performance
-            </p>
-          </div>
+          <Menu className="w-[22px] h-[22px] text-foreground" style={{ strokeWidth: 2 }} />
+        </button>
+
+        {/* Back Link */}
+        <div className="pt-4">
+          <button
+            onClick={() => navigate(-1)}
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </button>
         </div>
-      </header>
-      
-      {/* Content */}
-      <div className="pb-8">
-        {!hasValidParams ? (
-          <div className="text-center py-16">
-            <p className="text-base text-muted-foreground mb-4">
-              Select two colleges to compare
-            </p>
-            <Link 
-              to="/tourhub/college-golf" 
-              className="text-foreground font-medium hover:underline"
-            >
-              Browse colleges
-            </Link>
-          </div>
-        ) : isLoading ? (
-          <div className="space-y-4">
-            <div className="h-32 bg-card border border-border rounded-xl animate-pulse" />
-            <div className="h-48 bg-card border border-border rounded-xl animate-pulse" />
-          </div>
-        ) : error ? (
-          <div className="text-center py-16">
-            <p className="text-base text-muted-foreground">
-              Failed to load comparison data
-            </p>
-          </div>
-        ) : data ? (
-          <CollegeCompareHero data={data} />
-        ) : null}
-      </div>
+        
+        {/* Content */}
+        <div className="pb-8 pt-4">
+          {!hasValidParams ? (
+            <div className="text-center py-16">
+              <p className="text-base text-muted-foreground mb-4">
+                Select two colleges to compare
+              </p>
+              <button
+                onClick={() => navigate('/tourhub/college-golf')}
+                className="text-foreground font-medium hover:underline"
+              >
+                Browse colleges
+              </button>
+            </div>
+          ) : isLoading ? (
+            <div className="space-y-4">
+              <div className="h-32 bg-card border border-border rounded-xl animate-pulse" />
+              <div className="h-48 bg-card border border-border rounded-xl animate-pulse" />
+            </div>
+          ) : error ? (
+            <div className="text-center py-16">
+              <p className="text-base text-muted-foreground">
+                Failed to load comparison data
+              </p>
+            </div>
+          ) : data ? (
+            <CollegeCompareHero data={data} />
+          ) : null}
+        </div>
       </div>
     </TourHubShell>
   );
