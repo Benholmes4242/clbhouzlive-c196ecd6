@@ -132,6 +132,14 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Populate wins from tournament results
+    const { error: winsError } = await supabase.rpc('populate_tour_ranking_wins');
+    if (winsError) {
+      console.error('[scrape-tour-rankings] Failed to populate wins:', winsError.message);
+    } else {
+      console.log('[scrape-tour-rankings] Wins populated successfully');
+    }
+
     return new Response(
       JSON.stringify({
         success: true,

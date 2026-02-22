@@ -14931,6 +14931,7 @@ export type Database = {
         | { Args: { tbl_oid: unknown; use_typmod?: boolean }; Returns: number }
         | { Args: { use_typmod?: boolean }; Returns: string }
       populate_taggable_entities: { Args: never; Returns: undefined }
+      populate_tour_ranking_wins: { Args: never; Returns: undefined }
       postgis_constraint_dims: {
         Args: { geomcolumn: string; geomschema: string; geomtable: string }
         Returns: number
