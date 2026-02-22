@@ -39,7 +39,7 @@ export function StatRibbon({ playerStats }: StatRibbonProps) {
             transition={{ delay: 0.3 + i * 0.04, duration: 0.3 }}
           >
             <span style={{
-              fontSize: '9px',
+              fontSize: '10px',
               fontWeight: 700,
               letterSpacing: '0.5px',
               textTransform: 'uppercase' as const,
@@ -50,7 +50,6 @@ export function StatRibbon({ playerStats }: StatRibbonProps) {
               style={{
                 fontSize: '17px',
                 fontWeight: 700,
-                fontFamily: "'JetBrains Mono', monospace",
                 fontVariantNumeric: 'tabular-nums',
                 marginTop: '2px',
                 display: 'block',

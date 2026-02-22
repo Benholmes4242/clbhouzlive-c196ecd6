@@ -508,7 +508,7 @@ function AppRoutes() {
         {/* Tour Hub routes */}
         <Route path="/tourhub" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubMainPage /></Suspense>} />
         <Route path="/tourhub/tournament/:tournamentId" element={<Suspense fallback={<GenericPageSkeleton />}><TournamentDetailPage /></Suspense>} />
-        <Route path="/tourhub/player/:playerId" element={<Suspense fallback={<GenericPageSkeleton />}><PlayerProfilePage /></Suspense>} />
+        <Route path="/tourhub/player/:playerId" element={<Suspense fallback={<GenericPageSkeleton />}><TourNavWrapper><PlayerProfilePage /></TourNavWrapper></Suspense>} />
         <Route path="/tourhub/live" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubLivePage /></Suspense>} />
         <Route path="/tourhub/tour/:tour" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubTourPage /></Suspense>} />
         <Route path="/tourhub/event/:tour/:eventId" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubEventPage /></Suspense>} />

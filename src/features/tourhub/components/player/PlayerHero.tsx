@@ -4,12 +4,13 @@
  */
 
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowLeft, Share2, Globe } from 'lucide-react';
+import { ArrowLeft, Share2, Globe, Menu } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useRef, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
+import { openTourNav } from '../../contexts/TourNavContext';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
 
 interface PlayerHeroProps {
@@ -59,7 +60,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
     <div
       ref={heroRef}
       className="relative w-full overflow-hidden"
-      style={{ height: 'clamp(380px, 55dvh, 550px)' }}
+      style={{ height: '50dvh' }}
     >
       {/* Hero Image or Fallback Gradient */}
       {heroPhotoUrl ? (
@@ -78,62 +79,52 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-800 via-emerald-900 to-slate-900" />
       )}
 
-      {/* Gradient scrim — per spec */}
+      {/* Gradient scrim — smooth multi-stop */}
       <div
         className="absolute inset-0"
         style={{
-          background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 40%, transparent 70%)',
+          background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.1) 65%, transparent 85%)',
         }}
       />
 
-      {/* Back button — rounded-full, bg-white/10, backdrop-blur 8px */}
+      {/* Burger menu — standard Tour Hub position */}
       <button
-        onClick={handleBack}
-        className="absolute z-10 rounded-full flex items-center justify-center active:scale-95 transition-all"
-        style={{
-          top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
-          left: '16px',
-          width: '44px',
-          height: '44px',
-          background: 'rgba(255,255,255,0.1)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
-        }}
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
+        aria-label="Open tour menu"
+        className="absolute z-30 flex items-center justify-center"
+        style={{ width: 44, height: 44, top: 56, left: 16 }}
       >
-        <ArrowLeft
-          className="text-white"
-          style={{
-            width: '22px',
-            height: '22px',
-            filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))',
-          }}
+        <Menu
+          className="w-[22px] h-[22px] text-white"
+          style={{ strokeWidth: 2, filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }}
         />
       </button>
 
-      {/* Share button — identical styling, top right */}
-      <motion.button
+      {/* Back button — transparent, next to burger */}
+      <button
+        onClick={handleBack}
+        aria-label="Go back"
+        className="absolute z-30 flex items-center justify-center active:scale-95 transition-transform"
+        style={{ width: 44, height: 44, top: 56, left: 68 }}
+      >
+        <ArrowLeft
+          className="w-[22px] h-[22px] text-white"
+          style={{ strokeWidth: 2, filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }}
+        />
+      </button>
+
+      {/* Share button — transparent, icon only */}
+      <button
         onClick={handleShare}
-        className="absolute z-10 rounded-full flex items-center justify-center"
-        style={{
-          top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
-          right: '16px',
-          width: '44px',
-          height: '44px',
-          background: 'rgba(255,255,255,0.1)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
-        }}
-        whileTap={{ scale: 0.9 }}
+        aria-label="Share"
+        className="absolute z-30 flex items-center justify-center active:scale-95 transition-transform"
+        style={{ width: 44, height: 44, top: 56, right: 16 }}
       >
         <Share2
-          className="text-white"
-          style={{
-            width: '20px',
-            height: '20px',
-            filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))',
-          }}
+          className="w-[20px] h-[20px] text-white"
+          style={{ strokeWidth: 2, filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }}
         />
-      </motion.button>
+      </button>
 
       {/* Overlay Content — bottom of hero */}
       <motion.div
@@ -143,12 +134,12 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, duration: 0.5 }}
       >
-        {/* Player Name — 26px, weight 800, tracking -0.3px */}
+        {/* Player Name — 28px, weight 700 */}
         <h1
           className="text-white"
           style={{
-            fontSize: '26px',
-            fontWeight: 800,
+            fontSize: '28px',
+            fontWeight: 700,
             letterSpacing: '-0.3px',
             lineHeight: 1.15,
             marginBottom: '4px',
@@ -177,7 +168,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
           )}
         </div>
 
-        {/* Glass Rank Pills — rounded-full, bg-white/15, backdrop-blur 8px */}
+        {/* Glass Rank Pills */}
         <div className="flex flex-wrap" style={{ gap: '8px' }}>
           {playerStats?.world_rank && playerStats.world_rank > 0 && (
             <motion.span
