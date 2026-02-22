@@ -54,7 +54,7 @@ export function AlumniFaceStrip({ alumni, collegeName, collegeSlug, totalAlumniC
           padding: '12px 16px',
         }}
       >
-        {/* Stacked circular avatars — 32×32, 50% radius, 2px white border, -8px overlap */}
+        {/* Stacked squircle avatars — 32×32, 34% radius, 2px white border, -8px overlap */}
         <div className="flex items-center shrink-0" style={{ marginLeft: 0 }}>
           {visible.map((alum, i) => {
             const photoUrl = getPlayerHeadshotUrl(alum.full_name, alum.tour_codes?.[0] ?? 'pga');
@@ -65,7 +65,7 @@ export function AlumniFaceStrip({ alumni, collegeName, collegeSlug, totalAlumniC
                 style={{
                   width: 32,
                   height: 32,
-                  borderRadius: '50%',
+                  borderRadius: '34%',
                   border: '2px solid white',
                   marginLeft: i === 0 ? 0 : -8,
                   zIndex: MAX_VISIBLE - i,
@@ -95,7 +95,7 @@ export function AlumniFaceStrip({ alumni, collegeName, collegeSlug, totalAlumniC
               style={{
                 width: 32,
                 height: 32,
-                borderRadius: '50%',
+                borderRadius: '34%',
                 border: '2px solid white',
                 marginLeft: -8,
                 position: 'relative',
