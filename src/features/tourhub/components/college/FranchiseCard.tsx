@@ -156,7 +156,10 @@ export function FranchiseCard({
                 width: isTopThree ? 24 : 'auto',
                 height: isTopThree ? 24 : 'auto',
                 borderRadius: isTopThree ? '50%' : 4,
-                background: isTopThree ? '#f59e0b' : 'transparent',
+                background: rank === 1 ? '#f59e0b'
+                  : rank === 2 ? '#94A3B8'
+                  : rank === 3 ? '#C2875A'
+                  : 'transparent',
                 color: isTopThree ? 'white' : 'hsl(var(--muted-foreground) / 0.5)',
                 fontSize: isTopThree ? 11 : 12,
                 fontWeight: isTopThree ? 700 : 600,
@@ -245,7 +248,13 @@ export function FranchiseCard({
                       }}
                     >
                       {photoUrl ? (
-                        <img src={photoUrl} alt={a.full_name} className="w-full h-full object-cover object-top" loading="lazy" />
+                        <img
+                          src={photoUrl}
+                          alt={a.full_name}
+                          className="w-full h-full object-cover object-top"
+                          loading="lazy"
+                          onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+                        />
                       ) : (
                         <div className="w-full h-full bg-muted flex items-center justify-center">
                           <span className="text-[6px] font-bold text-muted-foreground/70">
