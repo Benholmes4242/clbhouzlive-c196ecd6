@@ -4,9 +4,8 @@
  */
 
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowLeft, Globe, Menu } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useRef, useCallback } from 'react';
+import { Globe, Menu } from 'lucide-react';
+import { useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
@@ -19,8 +18,6 @@ interface PlayerHeroProps {
 }
 
 export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
-  const navigate = useNavigate();
-  const location = useLocation();
   const heroRef = useRef<HTMLDivElement>(null);
 
   const heroPhotoUrl = getPlayerHeadshotUrl(player.full_name, player.tour_codes?.[0] ?? 'pga');
@@ -36,17 +33,6 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
   // Parallax on scroll
   const { scrollY } = useScroll();
   const imageY = useTransform(scrollY, [0, 400], [0, 80]);
-
-  const handleBack = useCallback(() => {
-    if (location.key !== 'default') {
-      navigate(-1);
-    } else {
-      navigate('/tourhub?tab=players');
-    }
-  }, [navigate, location.key]);
-
-
-
 
   return (
     <div
@@ -91,22 +77,6 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
           style={{ strokeWidth: 2, filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }}
         />
       </button>
-
-      {/* Back button — transparent, next to burger */}
-      <button
-        onClick={handleBack}
-        aria-label="Go back"
-        className="absolute z-30 flex items-center justify-center active:scale-95 transition-transform"
-        style={{ width: 44, height: 44, top: 56, left: 68 }}
-      >
-        <ArrowLeft
-          className="w-[22px] h-[22px] text-white"
-          style={{ strokeWidth: 2, filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }}
-        />
-      </button>
-
-
-
 
       {/* Overlay Content — bottom of hero */}
       <motion.div
