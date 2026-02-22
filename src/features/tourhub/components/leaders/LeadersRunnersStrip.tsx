@@ -35,11 +35,13 @@ function RunnerCard({
   category,
   formatOverride,
   unitOverride,
+  index,
 }: {
   runner: RunnerItem;
   category: LeaderCategory;
   formatOverride?: (v: number) => string;
   unitOverride?: string;
+  index: number;
 }) {
   const { player, value, rank } = runner;
   const photoUrl = resolvePhotoUrl(player.photo_url, player.pga_tour_id);
@@ -65,7 +67,7 @@ function RunnerCard({
         style={{
           width: 32,
           height: 32,
-          background: '#f59e0b',
+          background: index === 0 ? '#94A3B8' : '#C2875A',
         }}
       >
         <span style={{ fontSize: 14, fontWeight: 700, color: 'white' }}>{rank}</span>
@@ -114,13 +116,14 @@ export function LeadersRunnersStrip({
       className="flex px-4"
       style={{ marginTop: '-20px', position: 'relative', zIndex: 10, gap: 8 }}
     >
-      {runners.map((runner) => (
+      {runners.map((runner, i) => (
         <RunnerCard
           key={runner.playerId}
           runner={runner}
           category={category}
           formatOverride={formatOverride}
           unitOverride={unitOverride}
+          index={i}
         />
       ))}
     </motion.div>

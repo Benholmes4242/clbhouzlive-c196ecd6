@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import { ChevronDown, X, Check } from 'lucide-react';
+import { ChevronDown, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import type { LeaderCategory } from './constants';
@@ -87,7 +87,7 @@ export function LeadersCategorySheet({
           style={{ maxHeight: 'calc(70vh - 60px)', padding: '0 20px' }}
         >
           {/* Header */}
-          <div className="flex items-center justify-between" style={{ padding: '20px 0 16px' }}>
+          <div style={{ padding: '20px 0 16px' }}>
             <h2
               id="leaders-category-sheet-title"
               style={{ fontSize: 18, fontWeight: 700 }}
@@ -95,14 +95,6 @@ export function LeadersCategorySheet({
             >
               Leaderboard Category
             </h2>
-            <button
-              onClick={() => setOpen(false)}
-              className="flex items-center justify-center rounded-full bg-muted"
-              style={{ width: 36, height: 36 }}
-              aria-label="Close"
-            >
-              <X style={{ width: 20, height: 20 }} className="text-muted-foreground" />
-            </button>
           </div>
 
           {/* Grouped grid */}
