@@ -8,6 +8,7 @@
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 
 /**
  * Count of currently in-progress tournaments
@@ -120,17 +121,19 @@ export function useTopCollegeTeaser() {
 
       if (!data) return null;
 
-      // Get logo
+      // Get college name
       const { data: media } = await supabase
         .from('college_media')
-        .select('logo_url, college_name')
+        .select('college_name')
         .eq('normalized_name', data.normalized_name)
         .maybeSingle();
 
+      const collegeName = media?.college_name || data.normalized_name;
+
       return {
-        name: media?.college_name || data.normalized_name,
+        name: collegeName,
         earnings: data.earnings_total,
-        logoUrl: media?.logo_url || null,
+        logoUrl: getCollegeLogoUrl(collegeName),
       };
     },
     staleTime: 600_000, // 10 minutes

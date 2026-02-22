@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Swords, GitCompare, Globe, Crown, RefreshCw, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { useQueryClient } from '@tanstack/react-query';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
@@ -270,9 +271,9 @@ export function CollegeProfilePage() {
               transition={{ duration: 0.4, delay: 0.15 }}
               style={{ marginBottom: '16px' }}
             >
-              {college?.logo_url && !heroImgError ? (
+              {getCollegeLogoUrl(college?.college_name || collegeSlug) && !heroImgError ? (
                 <img
-                  src={college.logo_url}
+                  src={getCollegeLogoUrl(college?.college_name || collegeSlug)!}
                   alt={displayName}
                   className="object-contain"
                   style={{

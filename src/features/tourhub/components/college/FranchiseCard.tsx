@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { Users, ChevronRight, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
+import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { FollowCollegeButton } from './FollowCollegeButton';
 import type { CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import type { CollegeMedia } from '../../hooks/useCollegeMedia';
@@ -133,12 +134,13 @@ export function FranchiseCard({
             borderRadius: '16px 0 0 16px',
           }}
         >
-          {college?.logo_url ? (
+          {getCollegeLogoUrl(college?.college_name || stats.normalized_name) ? (
             <img
-              src={college.logo_url}
+              src={getCollegeLogoUrl(college?.college_name || stats.normalized_name)!}
               alt={displayName}
               style={{ width: 64, height: 64, objectFit: 'contain' }}
               loading="lazy"
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20" />

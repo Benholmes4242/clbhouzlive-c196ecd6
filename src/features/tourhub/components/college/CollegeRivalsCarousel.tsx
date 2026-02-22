@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { useCollegeRivalries } from '../../hooks/useCollegeMovers';
 import { useCollegeSeasonStats } from '../../hooks/useCollegeStats';
 
@@ -126,13 +127,14 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
           <>
             {/* Logo with circular muted background */}
             <div className="relative flex items-center justify-center rounded-full bg-muted/20" style={{ width: '72px', height: '72px' }}>
-              {college?.logo_url ? (
+              {getCollegeLogoUrl(college?.college_name || rivalName) ? (
                 <img 
-                  src={college.logo_url} 
+                  src={getCollegeLogoUrl(college?.college_name || rivalName)!} 
                   alt={displayName}
                   className="object-contain relative z-10"
                   style={{ width: '56px', height: '56px' }}
                   loading="lazy"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
                 />
               ) : (
                 <span className="text-lg font-bold text-muted-foreground relative z-10">

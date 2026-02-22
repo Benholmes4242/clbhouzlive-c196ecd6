@@ -2,7 +2,8 @@ import { Link } from 'react-router-dom';
 import { Users, DollarSign, Trophy, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
-import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
+import { getCollegeLogoUrl } from '@/utils/collegeLogo';
+import { getR2HeadshotUrlMultiTour } from '@/utils/playerHeadshot';
 import type { CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import type { CollegeMedia } from '../../hooks/useCollegeMedia';
 import type { AlumniFace } from '../../hooks/useBatchCollegeAlumni';
@@ -36,12 +37,13 @@ export function CollegeCard({ stats, college, rank, alumni, className }: College
     >
       {/* Logo section — left ~110px, matching PlayerCardV2 photo area */}
       <div className="relative w-[110px] shrink-0 bg-muted overflow-hidden flex items-center justify-center">
-        {college?.logo_url ? (
+        {getCollegeLogoUrl(college?.college_name || stats.normalized_name) ? (
           <img
-            src={college.logo_url}
+            src={getCollegeLogoUrl(college?.college_name || stats.normalized_name)!}
             alt={displayName}
             className="w-16 h-16 object-contain"
             loading="lazy"
+            onError={(e) => { e.currentTarget.style.display = 'none'; }}
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20 flex items-center justify-center">
@@ -82,7 +84,7 @@ export function CollegeCard({ stats, college, rank, alumni, className }: College
         {alumni && alumni.length > 0 && (
           <div className="flex items-center -space-x-1.5 mt-2">
             {alumni.slice(0, 3).map(a => {
-              const photoUrl = resolvePhotoUrl(a.photo_url, a.pga_tour_id);
+              const photoUrl = getR2HeadshotUrlMultiTour(a.full_name);
               return (
                 <div key={a.id} className="w-5 h-5 border border-card overflow-hidden bg-muted" style={{ borderRadius: '34%' }}>
                   {photoUrl ? (

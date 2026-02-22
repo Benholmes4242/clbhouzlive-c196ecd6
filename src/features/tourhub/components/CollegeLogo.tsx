@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import type { CollegeMedia } from '../hooks/useCollegeMedia';
 
 interface CollegeLogoProps {
@@ -24,24 +25,26 @@ const SIZE_CLASSES = {
 };
 
 /**
- * Displays a college logo from the college_media table.
+ * Displays a college logo from R2.
  * Returns null if no college or no logo available.
  */
 export function CollegeLogo({ college, size = 'sm', className }: CollegeLogoProps) {
-  if (!college?.logo_url) {
+  const logoUrl = getCollegeLogoUrl(college?.college_name);
+  if (!logoUrl) {
     return null;
   }
   
   return (
     <img
-      src={college.logo_url}
-      alt={college.short_name || college.college_name}
+      src={logoUrl}
+      alt={college?.short_name || college?.college_name || ''}
       className={cn(
         SIZE_CLASSES[size],
         'object-contain shrink-0 rounded-sm',
         className
       )}
       loading="lazy"
+      onError={(e) => { e.currentTarget.style.display = 'none'; }}
     />
   );
 }
@@ -74,7 +77,8 @@ export function CollegeDisplay({
   className 
 }: CollegeDisplayProps) {
   const displayName = college?.short_name || college?.college_name || collegeName;
-  const hasLogo = showLogo && college?.logo_url;
+  const logoUrl = getCollegeLogoUrl(college?.college_name || collegeName);
+  const hasLogo = showLogo && !!logoUrl;
   
   return (
     <span 
