@@ -191,9 +191,9 @@ export function CollegeProfilePage() {
 
         {/* Burger menu — matches Players/Leaders pages */}
         <button
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); console.log('COLLEGE PROFILE BURGER TAPPED'); openTourNav(); }}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
           aria-label="Open tour menu"
-          className="absolute z-50 flex items-center justify-center rounded-full"
+          className="absolute z-30 flex items-center justify-center rounded-full"
           style={{
             width: 44,
             height: 44,
