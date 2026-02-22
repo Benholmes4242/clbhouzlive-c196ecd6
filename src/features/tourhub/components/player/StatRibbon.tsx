@@ -5,9 +5,12 @@
 
 import { motion } from 'framer-motion';
 import type { TourPlayerStatistics } from '../../hooks/useTourHubData';
+import type { PlayerRating } from '../../hooks/usePlayerRating';
+import { TIER_CONFIG } from '../../hooks/usePlayerRating';
 
 interface StatRibbonProps {
   playerStats: TourPlayerStatistics | null;
+  playerRating?: PlayerRating | null;
 }
 
 function formatEarnings(earnings: number | null | undefined): string | null {
@@ -18,18 +21,25 @@ function formatEarnings(earnings: number | null | undefined): string | null {
   return `$${earnings.toLocaleString()}`;
 }
 
-export function StatRibbon({ playerStats }: StatRibbonProps) {
+export function StatRibbon({ playerStats, playerRating }: StatRibbonProps) {
+  const ratingColor = playerRating ? TIER_CONFIG[playerRating.tier]?.color : undefined;
+
   const stats = [
+    {
+      label: 'CLBHOUZ',
+      value: playerRating ? String(playerRating.rating) : null,
+      highlightColor: ratingColor,
+    },
     { label: 'WORLD', value: playerStats?.world_rank && playerStats.world_rank > 0 ? `#${playerStats.world_rank}` : null },
     { label: 'FEDEX', value: playerStats?.fedex_rank && playerStats.fedex_rank > 0 ? `#${playerStats.fedex_rank}` : null },
-    { label: 'WINS', value: playerStats?.wins != null ? String(playerStats.wins) : null, highlight: !!(playerStats?.wins && playerStats.wins > 0) },
+    { label: 'WINS', value: playerStats?.wins != null ? String(playerStats.wins) : null, highlightColor: playerStats?.wins && playerStats.wins > 0 ? '#f59e0b' : undefined },
     { label: 'EVENTS', value: playerStats?.events_played != null ? String(playerStats.events_played) : null },
     { label: 'EARNINGS', value: formatEarnings(playerStats?.earnings) },
   ];
 
   return (
     <div className="bg-card" style={{ padding: '14px 4px', borderBottom: '1px solid hsl(var(--border) / 0.1)' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${stats.length}, 1fr)` }}>
         {stats.map((stat, i) => (
           <motion.div
             key={stat.label}
@@ -53,11 +63,9 @@ export function StatRibbon({ playerStats }: StatRibbonProps) {
                 fontVariantNumeric: 'tabular-nums',
                 marginTop: '2px',
                 display: 'block',
-                color: stat.value
-                  ? stat.highlight ? '#f59e0b' : undefined
-                  : undefined,
+                color: stat.value && stat.highlightColor ? stat.highlightColor : undefined,
               }}
-              className={stat.value ? (stat.highlight ? '' : 'text-foreground') : 'text-muted-foreground'}
+              className={stat.value ? (stat.highlightColor ? '' : 'text-foreground') : 'text-muted-foreground'}
             >
               {stat.value || '—'}
             </span>
