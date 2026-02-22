@@ -388,7 +388,7 @@ export function CollegeProfilePage() {
           </motion.div>
         )}
 
-        {/* Rivalries — 24px from activity cards */}
+        {/* Rivalries — 28px from activity cards */}
         {stats && rivalSlugs.length > 0 && (
           <motion.section
             variants={sectionVariants}
@@ -400,7 +400,9 @@ export function CollegeProfilePage() {
           >
             <div className="flex items-center gap-2" style={{ marginBottom: '12px' }}>
               <Swords className="w-4 h-4 text-muted-foreground" />
-              <h2 style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }} className="text-foreground">Rivals</h2>
+              <h2 style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }} className="text-foreground">
+                {rivalries?.every(r => r.isFallback) ? 'Similar Programs' : 'Rivals'}
+              </h2>
             </div>
             <CollegeRivalsCarousel 
               normalizedName={collegeSlug || ''} 
