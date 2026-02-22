@@ -220,7 +220,7 @@ export function CollegeCompareSheet({
             transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
             className={cn(
               "fixed bottom-0 left-0 right-0 z-50",
-              "bg-card rounded-t-2xl",
+              "bg-[#F8FAFC] dark:bg-card rounded-t-2xl",
               "border-t border-border",
               "shadow-2xl shadow-black/20",
               "max-h-[85vh] overflow-hidden"
