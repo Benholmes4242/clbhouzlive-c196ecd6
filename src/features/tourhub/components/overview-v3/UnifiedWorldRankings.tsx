@@ -204,10 +204,10 @@ export function UnifiedWorldRankings() {
 
   const moverPlayerIds = useMemo(() => new Set(movers?.map(m => m.playerId) || []), [movers]);
   const upwardMovers = useMemo(() => 
-    (movers || []).filter(m => m.rankChange > 0).sort((a, b) => b.rankChange - a.rankChange).slice(0, 5), 
+    (movers || []).filter(m => m.rankChange > 0).sort((a, b) => b.rankChange - a.rankChange).slice(0, 10), 
   [movers]);
   const downwardMovers = useMemo(() => 
-    (movers || []).filter(m => m.rankChange < 0).sort((a, b) => a.rankChange - b.rankChange).slice(0, 5), 
+    (movers || []).filter(m => m.rankChange < 0).sort((a, b) => a.rankChange - b.rankChange).slice(0, 10), 
   [movers]);
   const narrative = useMemo(() => generateNarrative(rankings, movers), [rankings, movers]);
 
