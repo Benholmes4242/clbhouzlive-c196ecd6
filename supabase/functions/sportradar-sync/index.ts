@@ -34,6 +34,23 @@ function getTourSlug(tourName: string): string | null {
   return map[normalized] ?? (normalized.includes('LIV') ? null : 'pga');
 }
 
+// Tour slug mapping for tee times — includes LIV (which has tee time data)
+function getTourSlugForTeeTimes(tourName: string): string | null {
+  const normalized = (tourName || '').toUpperCase();
+  const map: Record<string, string | null> = {
+    'PGA': 'pga',
+    'LPGA': 'lpga',
+    'EURO': 'eur',
+    'DP': 'eur',
+    'CHAMP': 'champions-tour',
+    'PGAD': 'pgad',
+    'LIV': 'liv',     // LIV DOES have tee times
+    'OLY': null,
+    'USGA': null,
+  };
+  return map[normalized] ?? (normalized.includes('LIV') ? 'liv' : 'pga');
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -127,6 +144,9 @@ Deno.serve(async (req) => {
           break;
         case 'backfill_hole_stats':
           result = await backfillHoleStatistics(supabase, sportradarApiKey);
+          break;
+        case 'backfill_tee_times':
+          result = await backfillTeeTimes(supabase, sportradarApiKey);
           break;
         default:
           result = await syncSchedule(supabase, sportradarApiKey, effectiveTour, effectiveYear);
@@ -1378,4 +1398,73 @@ async function syncPlayerStatistics(supabase: any, apiKey: string, tour: string,
   }
 
   return { records: totalRecords, message: `Synced ${totalRecords} player statistics`, debug: { url } };
+}
+
+// ============================================================================
+// BACKFILL TEE TIMES — Sync tee times for all completed/inprogress tournaments
+// ============================================================================
+async function backfillTeeTimes(supabase: any, apiKey: string) {
+  const { data: tournaments } = await supabase
+    .from('sr_tournaments')
+    .select('id, sr_id, name, season_id, status')
+    .in('status', ['closed', 'inprogress'])
+    .order('end_date', { ascending: false });
+
+  if (!tournaments?.length) return { records: 0, message: 'No tournaments found' };
+
+  let totalRecords = 0;
+  let processed = 0;
+  let skipped = 0;
+  const debug: any[] = [];
+
+  for (const tournament of tournaments) {
+    processed++;
+
+    // Get season info
+    const { data: season } = await supabase
+      .from('sr_seasons')
+      .select('year, tour_name')
+      .eq('id', tournament.season_id)
+      .maybeSingle();
+
+    const year = season?.year || new Date().getFullYear();
+    const tourSlug = getTourSlugForTeeTimes(season?.tour_name || 'pga');
+    
+    if (!tourSlug) {
+      skipped++;
+      debug.push({ name: tournament.name, status: 'skipped', reason: 'unsupported tour' });
+      continue;
+    }
+
+    // Check if already has tee time data
+    const { count: existingRows } = await supabase
+      .from('sr_tee_times')
+      .select('*', { count: 'exact', head: true })
+      .eq('tournament_id', tournament.id);
+
+    if (existingRows && existingRows > 0) {
+      skipped++;
+      continue;
+    }
+
+    console.log(`[Backfill Tee Times] (${processed}/${tournaments.length}) Syncing ${tournament.name}`);
+
+    try {
+      const result = await syncTeeTimes(supabase, apiKey, tourSlug, year, tournament.sr_id, 'rounds');
+      totalRecords += result?.records || 0;
+      debug.push({ name: tournament.name, status: 'synced', records: result?.records || 0 });
+    } catch (e) {
+      console.error(`[Backfill Tee Times] Error for ${tournament.name}: ${e.message}`);
+      debug.push({ name: tournament.name, status: 'error', error: e.message });
+    }
+
+    // Rate limiting
+    await new Promise(resolve => setTimeout(resolve, 1500));
+  }
+
+  return {
+    records: totalRecords,
+    message: `Backfilled tee times for ${processed} tournaments (${skipped} skipped)`,
+    debug,
+  };
 }
