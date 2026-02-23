@@ -112,7 +112,6 @@ export function useElitePlayers(limit: number = 50) {
         };
       });
       
-      console.log('[useElitePlayers] Loaded elite players:', elitePlayers.length);
       return elitePlayers;
     },
     staleTime: 5 * 60 * 1000,
