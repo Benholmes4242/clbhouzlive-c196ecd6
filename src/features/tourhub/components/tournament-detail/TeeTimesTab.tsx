@@ -13,6 +13,7 @@ import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { RoundSelector } from './RoundSelector';
+import { TournamentEmptyState } from './TournamentEmptyState';
 import { useTourTeeTimesEnriched } from '../../hooks/useTourHubData';
 import { countryCodeToFlag } from '../../utils/countryFlags';
 
@@ -58,18 +59,11 @@ function TeeTimesEmpty({ isCompleted, roundLabel }: { isCompleted?: boolean; rou
   }
 
   return (
-    <motion.div
-      className="flex items-center justify-center min-h-[300px] py-12"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
-      <div className="text-center space-y-3">
-        <Clock className="w-12 h-12 mx-auto text-muted-foreground/30" />
-        <h3 className="text-lg font-semibold text-foreground">{title}</h3>
-        <p className="text-sm text-muted-foreground max-w-[280px] mx-auto">{subtitle}</p>
-      </div>
-    </motion.div>
+    <TournamentEmptyState
+      icon={<Clock className="w-16 h-16" />}
+      title={title}
+      subtitle={subtitle}
+    />
   );
 }
 

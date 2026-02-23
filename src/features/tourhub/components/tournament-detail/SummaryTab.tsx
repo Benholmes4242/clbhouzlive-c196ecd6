@@ -54,7 +54,7 @@ function ScoreToPar({ score }: { score: number | null }) {
   const formatted = score === 0 ? 'E' : score > 0 ? `+${score}` : String(score);
   return (
     <span
-      className="score-mono font-bold"
+      className="font-bold"
       style={{
         color: score < 0
           ? TOUR_COLORS.scoreUnderPar
@@ -105,7 +105,7 @@ function WinnerCard({ winner, runnerUp, headshotMap }: {
         </Link>
         <div className="flex-1 min-w-0">
           <Link to={`/tourhub/player/${winner.player?.id}`}>
-            <h4 className="text-[22px] font-extrabold text-foreground truncate hover:text-primary transition-colors" style={{ letterSpacing: '-0.3px' }}>
+            <h4 className="font-bold text-foreground truncate hover:text-primary transition-colors" style={{ fontSize: 28, fontWeight: 700, letterSpacing: '-0.3px' }}>
               {winner.player?.full_name || 'Unknown'}
             </h4>
           </Link>
@@ -115,10 +115,10 @@ function WinnerCard({ winner, runnerUp, headshotMap }: {
             </p>
           )}
           <div className="flex items-baseline gap-3">
-            <span className="score-mono text-[28px] font-bold" style={{ color: TOUR_COLORS.scoreUnderPar }}>
+            <span style={{ fontSize: 28, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: TOUR_COLORS.scoreUnderPar }}>
               {winner.score === 0 ? 'E' : winner.score > 0 ? `+${winner.score}` : String(winner.score)}
             </span>
-            <span className="score-mono text-sm text-muted-foreground">
+            <span className="text-sm text-muted-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>
               ({winner.strokes} strokes)
             </span>
           </div>
@@ -130,7 +130,7 @@ function WinnerCard({ winner, runnerUp, headshotMap }: {
         {[winner.round_1, winner.round_2, winner.round_3, winner.round_4].some(Boolean) && (
           <div className="flex items-center gap-1.5">
             <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Rounds:</span>
-            <span className="score-mono text-xs font-medium text-foreground">
+            <span className="text-xs font-medium text-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>
               {[winner.round_1, winner.round_2, winner.round_3, winner.round_4]
                 .filter(r => r != null)
                 .join('-')}
@@ -219,11 +219,11 @@ export function SummaryTab({
           <div className="divide-y divide-border/30">
             {scoringStats.rounds.map(round => (
               <div key={round.round} className="grid grid-cols-5 gap-2 py-2.5 items-center">
-                <span className="text-[13px] font-semibold text-foreground font-mono">R{round.round}</span>
-                <span className="text-[13px] text-center font-mono font-medium text-foreground tabular-nums">{round.lowScore}</span>
-                <span className="text-[13px] text-center font-mono text-muted-foreground tabular-nums">{round.avgScore.toFixed(1)}</span>
-                <span className="text-[13px] text-center font-mono text-green-600 tabular-nums">{round.totalBirdies}</span>
-                <span className="text-[13px] text-center font-mono text-orange-500 tabular-nums">{round.totalBogeys}</span>
+                <span className="text-[13px] font-semibold text-foreground">R{round.round}</span>
+                <span className="text-[13px] text-center font-medium text-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>{round.lowScore}</span>
+                <span className="text-[13px] text-center text-muted-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>{round.avgScore.toFixed(1)}</span>
+                <span className="text-[13px] text-center text-green-600" style={{ fontVariantNumeric: 'tabular-nums' }}>{round.totalBirdies}</span>
+                <span className="text-[13px] text-center text-orange-500" style={{ fontVariantNumeric: 'tabular-nums' }}>{round.totalBogeys}</span>
               </div>
             ))}
           </div>
@@ -270,9 +270,9 @@ export function SummaryTab({
                 <div className="grid grid-cols-5 gap-2">
                   {segments.map((seg) => (
                     <div key={seg.label} className="text-center">
-                      <div className="text-[13px] font-bold text-foreground font-mono tabular-nums">{seg.count}</div>
+                      <div className="text-[13px] font-bold text-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>{seg.count}</div>
                       <div className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-medium">{seg.label}</div>
-                      <div className="text-[9px] text-muted-foreground/50 tabular-nums">{seg.pct}%</div>
+                      <div className="text-[9px] text-muted-foreground/50" style={{ fontVariantNumeric: 'tabular-nums' }}>{seg.pct}%</div>
                     </div>
                   ))}
                 </div>
@@ -312,10 +312,13 @@ export function SummaryTab({
                       isWinner && "bg-amber-50/20"
                     )}
                   >
-                    <span className={cn(
-                      "w-7 text-center text-[12px] font-bold font-mono tabular-nums",
-                      isWinner ? "text-amber-600" : "text-muted-foreground"
-                    )}>
+                     <span className={cn(
+                      "w-7 text-center text-[12px] font-bold",
+                      isWinner ? "text-amber-600" 
+                        : entry.position === 2 ? "text-slate-400"
+                        : entry.position === 3 ? "text-orange-500"
+                        : "text-muted-foreground"
+                    )} style={{ fontVariantNumeric: 'tabular-nums' }}>
                       {entry.position_tied ? `T${entry.position}` : entry.position}
                     </span>
                     <BatchPlayerAvatar
@@ -328,7 +331,7 @@ export function SummaryTab({
                     </span>
                     <ScoreToPar score={entry.score} />
                     {entry.money && entry.money > 0 && (
-                      <span className="text-[10px] text-muted-foreground score-mono hidden sm:block">
+                      <span className="text-[10px] text-muted-foreground hidden sm:block" style={{ fontVariantNumeric: 'tabular-nums' }}>
                         ${(entry.money / 1000).toFixed(0)}K
                       </span>
                     )}
@@ -359,18 +362,18 @@ export function SummaryTab({
             const latestRound = scoringStats.rounds[scoringStats.rounds.length - 1];
             return (
               <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <div className="text-[9px] uppercase tracking-wider text-muted-foreground/60 font-medium mb-1">Low Round</div>
-                  <div className="text-[18px] font-bold text-foreground font-mono tabular-nums">{latestRound.lowScore}</div>
+              <div>
+                <div className="text-[9px] uppercase tracking-wider text-muted-foreground/60 font-medium mb-1">Low Round</div>
+                <div className="text-[18px] font-bold text-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>{latestRound.lowScore}</div>
+              </div>
+              <div>
+                <div className="text-[9px] uppercase tracking-wider text-muted-foreground/60 font-medium mb-1">Scoring Avg</div>
+                <div className="text-[18px] font-bold text-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>{latestRound.avgScore.toFixed(1)}</div>
                 </div>
                 <div>
-                  <div className="text-[9px] uppercase tracking-wider text-muted-foreground/60 font-medium mb-1">Scoring Avg</div>
-                  <div className="text-[18px] font-bold text-foreground font-mono tabular-nums">{latestRound.avgScore.toFixed(1)}</div>
-                </div>
-                <div>
-                  <div className="text-[9px] uppercase tracking-wider text-muted-foreground/60 font-medium mb-1">Field</div>
-                  <div className="text-[18px] font-bold text-foreground font-mono tabular-nums">{latestRound.playerCount}</div>
-                </div>
+                <div className="text-[9px] uppercase tracking-wider text-muted-foreground/60 font-medium mb-1">Field</div>
+                <div className="text-[18px] font-bold text-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>{latestRound.playerCount}</div>
+              </div>
               </div>
             );
           })()}

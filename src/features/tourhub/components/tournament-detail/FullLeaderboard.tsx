@@ -389,11 +389,11 @@ export function FullLeaderboard({
 
               {showCutLine && (
                 <div className="flex items-center gap-3 px-4 py-2 bg-destructive/5">
-                  <div className="flex-1 border-t border-dashed border-destructive/30" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-destructive/60">
+                  <div className="flex-1 border-t border-dashed border-destructive/50" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-destructive/80">
                     Projected Cut
                   </span>
-                  <div className="flex-1 border-t border-dashed border-destructive/30" />
+                  <div className="flex-1 border-t border-dashed border-destructive/50" />
                 </div>
               )}
             </motion.div>
@@ -403,7 +403,7 @@ export function FullLeaderboard({
 
       {/* Results count */}
       <div className="py-4 border-t border-border/20 text-center">
-        <span className="text-xs text-muted-foreground tabular-nums font-mono">
+        <span className="text-xs text-muted-foreground">
           {sortedEntries.length} player{sortedEntries.length !== 1 ? 's' : ''}
           {searchQuery && ` matching "${searchQuery}"`}
         </span>

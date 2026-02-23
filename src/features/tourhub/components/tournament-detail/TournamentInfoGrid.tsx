@@ -5,7 +5,7 @@
 import { DollarSign, Trophy, Users, Calendar, Crosshair, Star, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { format } from 'date-fns';
+import { format, isSameMonth } from 'date-fns';
 import type { TourTournament } from '../../hooks/useTourHubData';
 
 interface TournamentInfoGridProps {
@@ -18,6 +18,15 @@ interface InfoItem {
   label: string;
   value: string;
   link?: string;
+}
+
+function formatDateRange(startDate: string, endDate: string): string {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  if (isSameMonth(start, end)) {
+    return `${format(start, 'MMM d')} – ${format(end, 'd, yyyy')}`;
+  }
+  return `${format(start, 'MMM d')} – ${format(end, 'MMM d, yyyy')}`;
 }
 
 export function TournamentInfoGrid({ tournament, fieldSize }: TournamentInfoGridProps) {
@@ -50,7 +59,7 @@ export function TournamentInfoGrid({ tournament, fieldSize }: TournamentInfoGrid
   items.push({
     icon: <Calendar className="w-4 h-4" />,
     label: 'Dates',
-    value: `${format(new Date(tournament.start_date), 'MMM d')} – ${format(new Date(tournament.end_date), 'd, yyyy')}`,
+    value: formatDateRange(tournament.start_date, tournament.end_date),
   });
 
   const rawData = (tournament as any).scoring_system;

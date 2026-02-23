@@ -1,10 +1,8 @@
 /**
- * TournamentDetailTabs - Plain text tabs with underline active state
- * TD-05: Added role="tablist" and role="tab" with aria-selected
+ * TournamentDetailTabs - Pill-style tabs with sticky positioning
+ * TD-05: role="tablist" and role="tab" with aria-selected
  */
 
-import { useRef, useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 export type TournamentTab = 'overview' | 'leaderboard' | 'summary' | 'tee-times' | 'hole-stats';
@@ -30,9 +28,6 @@ interface TournamentDetailTabsProps {
 }
 
 export function TournamentDetailTabs({ activeTab, onTabChange, className, tournamentStatus }: TournamentDetailTabsProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
-
   const isLive = tournamentStatus === 'inprogress';
   const isCompleted = tournamentStatus === 'closed';
 
@@ -41,38 +36,13 @@ export function TournamentDetailTabs({ activeTab, onTabChange, className, tourna
     return true;
   });
 
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const activeIndex = visibleTabs.findIndex(t => t.value === activeTab);
-    const buttons = containerRef.current.querySelectorAll('button');
-    const activeButton = buttons[activeIndex] as HTMLButtonElement;
-    
-    if (activeButton) {
-      setIndicatorStyle({
-        left: activeButton.offsetLeft,
-        width: activeButton.offsetWidth,
-      });
-    }
-  }, [activeTab, visibleTabs.length]);
-
   return (
-    <div className={cn("relative border-b border-border", className)}>
+    <div className={cn("sticky top-0 z-20 bg-background/95 backdrop-blur-md py-3", className)}>
       <div 
-        ref={containerRef}
-        className="relative flex items-stretch"
+        className="rounded-xl bg-muted/30 border border-border/50 p-1 flex"
         role="tablist"
         aria-label="Tournament Sections"
       >
-        {/* Animated underline indicator */}
-        <motion.div
-          className="absolute bottom-0 h-[2px] rounded-full bg-foreground"
-          animate={{
-            left: indicatorStyle.left,
-            width: indicatorStyle.width,
-          }}
-          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-        />
-
         {visibleTabs.map((tab) => {
           const isActive = activeTab === tab.value;
 
@@ -83,21 +53,18 @@ export function TournamentDetailTabs({ activeTab, onTabChange, className, tourna
               aria-selected={isActive}
               onClick={() => onTabChange(tab.value)}
               className={cn(
-                "relative flex-1 flex items-center justify-center gap-1.5 py-3 text-sm whitespace-nowrap",
-                "min-h-[44px] transition-colors duration-200 active:scale-[0.95] transition-transform",
+                "relative flex-1 flex items-center justify-center gap-1 rounded-lg py-2.5 text-[13px] font-semibold",
+                "min-h-[44px] transition-all duration-200 active:scale-[0.95]",
                 isActive 
-                  ? "text-foreground font-semibold" 
-                  : "text-muted-foreground font-medium hover:text-foreground"
+                  ? "bg-card text-foreground shadow-sm" 
+                  : "bg-transparent text-muted-foreground"
               )}
             >
               {tab.label}
               
-              {/* LIVE pulsing dot on Leaderboard tab */}
+              {/* LIVE dot on Leaderboard tab */}
               {isLive && tab.value === 'leaderboard' && (
-                <span className="relative flex h-2 w-2 ml-0.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: '#f59e0b' }} />
-                  <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: '#f59e0b' }} />
-                </span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#f59e0b] flex-shrink-0" />
               )}
             </button>
           );
