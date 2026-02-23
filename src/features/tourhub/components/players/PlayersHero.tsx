@@ -448,7 +448,13 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
               style={{ padding: '0 16px', marginTop: '-20px', position: 'relative', zIndex: 10, boxSizing: 'border-box', width: '100%' }}
             >
               <div className="flex gap-2" style={{ width: '100%' }}>
-                {runners.slice(0, 2).map((player, index) => (
+                {(() => {
+                  // In wins mode, only show runners with 1+ wins
+                  const runnersToShow = sort === 'most-wins'
+                    ? runners.filter(r => (statsMap?.get(r.playerId)?.wins ?? 0) > 0).slice(0, 2)
+                    : runners.slice(0, 2);
+                  return runnersToShow;
+                })().map((player, index) => (
                   <RunnerCard
                     key={player.playerId}
                     player={player}

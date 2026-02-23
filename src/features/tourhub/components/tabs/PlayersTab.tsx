@@ -275,26 +275,12 @@ export function PlayersTab() {
       
       return false;
     });
+
+    // For tour-specific sorts, supplement hero pool with ALL tour players
+    // so leaders who aren't in OWGR top 200 can appear (e.g. Jarvis, Schott on DP World)
+    const needsFullPool = sort === 'most-wins' || sort === 'highest-earnings' || sort === 'race-to-dubai' || sort === 'race-to-cme' || sort === 'points-list' || sort === 'liv-standings';
     
-    if (tourElite.length > 0) {
-      return sortCandidates(tourElite).slice(0, 5);
-    }
-    
-    // Fallback: build hero data from tour-filtered players (for LPGA, Korn Ferry, etc.)
-    if (!tourFilteredPlayers || tourFilteredPlayers.length === 0) return [];
-    
-    const sorted = [...tourFilteredPlayers].sort((a, b) => {
-      const aRank = rankMap.get(a.id)?.worldRank ?? Infinity;
-      const bRank = rankMap.get(b.id)?.worldRank ?? Infinity;
-      const aTourRank = statsMap.get(a.id)?.tourRank;
-      const bTourRank = statsMap.get(b.id)?.tourRank;
-      const aSort = aTourRank ?? aRank;
-      const bSort = bTourRank ?? bRank;
-      if (aSort === Infinity && bSort === Infinity) return a.full_name.localeCompare(b.full_name);
-      return aSort - bSort;
-    });
-    
-    return sorted.slice(0, 5).map((p) => ({
+    const toEliteShape = (p: TourPlayer): ElitePlayer => ({
       id: p.id,
       playerId: p.id,
       playerName: p.full_name,
@@ -309,7 +295,26 @@ export function PlayersTab() {
       avgPoints: rankMap.get(p.id)?.avgPoints ?? null,
       priorRank: null,
       rankChange: null,
-    }));
+    });
+
+    let heroPool: ElitePlayer[] = [...tourElite];
+
+    if (needsFullPool && tourFilteredPlayers && tourFilteredPlayers.length > 0) {
+      const existingIds = new Set(heroPool.map(ep => ep.playerId));
+      const additional = tourFilteredPlayers
+        .filter(p => !existingIds.has(p.id))
+        .map(toEliteShape);
+      heroPool = [...heroPool, ...additional];
+    }
+
+    if (heroPool.length > 0) {
+      return sortCandidates(heroPool).slice(0, 5);
+    }
+    
+    // Fallback: build hero data from tour-filtered players (for tours with no elite players at all)
+    if (!tourFilteredPlayers || tourFilteredPlayers.length === 0) return [];
+    
+    return tourFilteredPlayers.slice(0, 5).map(toEliteShape);
   }, [elitePlayers, activeTour, allPlayers, statsMap, tourFilteredPlayers, rankMap, sort]);
 
   // Search filter
