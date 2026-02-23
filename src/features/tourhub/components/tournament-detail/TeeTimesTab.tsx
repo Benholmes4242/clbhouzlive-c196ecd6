@@ -16,6 +16,7 @@ import { RoundSelector } from './RoundSelector';
 import { TournamentEmptyState } from './TournamentEmptyState';
 import { useTourTeeTimesEnriched } from '../../hooks/useTourHubData';
 import { countryCodeToFlag } from '../../utils/countryFlags';
+import { toTitleCase } from '@/lib/formatters';
 
 interface TeeTimesTabProps {
   tournamentId: string;
@@ -322,9 +323,9 @@ function TeeTimeGroupCard({ group, index, searchQuery }: { group: TeeTimeGroup; 
                   {player.name}
                 </p>
                 {player.country && (
-                  <p className="text-muted-foreground uppercase tracking-wide" style={{ fontSize: '11px', fontWeight: 500 }}>
+                  <p className="text-muted-foreground" style={{ fontSize: '11px', fontWeight: 500 }}>
                     {flag && <span className="mr-1">{flag}</span>}
-                    {countryName || player.country}
+                    {toTitleCase(countryName || player.country)}
                   </p>
                 )}
               </div>

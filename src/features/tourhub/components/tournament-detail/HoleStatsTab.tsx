@@ -96,14 +96,14 @@ function ScoringBar({ hole }: { hole: ProcessedHole }) {
     { count: hole.eagles, color: '#f59e0b', label: 'Eag' },
     { count: hole.birdies, color: '#22C55E', label: 'Bir' },
     { count: hole.pars, color: '#CBD5E1', label: 'Par' },
-    { count: hole.bogeys, color: 'rgba(249, 115, 22, 0.6)', label: 'Bog' },
-    { count: hole.doubleBogeys + hole.other, color: 'rgba(239, 68, 68, 0.6)', label: 'Dbl+' },
+    { count: hole.bogeys, color: '#EF4444', label: 'Bog' },
+    { count: hole.doubleBogeys + hole.other, color: '#1E293B', label: 'Dbl+' },
   ].filter(s => s.count > 0);
 
   return (
-    <div className="space-y-1">
-      <div className="flex items-center gap-2">
-        <div className="flex h-1.5 rounded-full overflow-hidden flex-1">
+    <div className="flex items-start gap-2">
+      <div className="flex-1 space-y-1">
+        <div className="flex h-1.5 rounded-full overflow-hidden">
           {segments.map((seg, i) => (
             <div
               key={i}
@@ -112,17 +112,18 @@ function ScoringBar({ hole }: { hole: ProcessedHole }) {
             />
           ))}
         </div>
-        <span className="text-foreground w-14 text-right" style={{ fontSize: '15px', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
-          {hole.scoringAverage.toFixed(2)}
-        </span>
+        <div className="flex flex-wrap gap-x-3 gap-y-0.5">
+          {segments.map((seg, i) => (
+            <span key={i} className="flex items-center gap-1 text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
+              <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: seg.color }} />
+              <span>{seg.count} {seg.label}</span>
+            </span>
+          ))}
+        </div>
       </div>
-      <div className="flex flex-wrap gap-x-3 gap-y-0.5">
-        {segments.map((seg, i) => (
-          <span key={i} className="text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
-            {seg.count} {seg.label}
-          </span>
-        ))}
-      </div>
+      <span className="text-foreground w-14 text-right shrink-0" style={{ fontSize: '15px', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+        {hole.scoringAverage.toFixed(2)}
+      </span>
     </div>
   );
 }
