@@ -12,10 +12,16 @@ interface TabConfig {
   label: string;
 }
 
-const ALL_TABS: TabConfig[] = [
+const COMPLETED_TABS: TabConfig[] = [
+  { value: 'summary', label: 'Summary' },
+  { value: 'leaderboard', label: 'Leaderboard' },
+  { value: 'tee-times', label: 'Tee Times' },
+  { value: 'hole-stats', label: 'Holes' },
+];
+
+const DEFAULT_TABS: TabConfig[] = [
   { value: 'overview', label: 'Overview' },
   { value: 'leaderboard', label: 'Leaderboard' },
-  { value: 'summary', label: 'Summary' },
   { value: 'tee-times', label: 'Tee Times' },
   { value: 'hole-stats', label: 'Holes' },
 ];
@@ -31,10 +37,7 @@ export function TournamentDetailTabs({ activeTab, onTabChange, className, tourna
   const isLive = tournamentStatus === 'inprogress';
   const isCompleted = tournamentStatus === 'closed';
 
-  const visibleTabs = ALL_TABS.filter(tab => {
-    if (tab.value === 'summary' && !isCompleted) return false;
-    return true;
-  });
+  const visibleTabs = isCompleted ? COMPLETED_TABS : DEFAULT_TABS;
 
   return (
     <div className={cn("sticky top-0 z-20 bg-background/95 backdrop-blur-md py-3", className)}>

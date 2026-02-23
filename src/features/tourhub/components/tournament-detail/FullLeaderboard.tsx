@@ -46,18 +46,19 @@ interface FullLeaderboardProps {
 
 function ScoreCell({ score, className }: { score: number | null; className?: string }) {
   if (score === null || score === undefined) {
-    return <span className={cn("score-mono text-muted-foreground/50", className)}>—</span>;
+    return <span className={cn("text-muted-foreground/50", className)} style={{ fontVariantNumeric: 'tabular-nums' }}>—</span>;
   }
-  return <span className={cn("score-mono font-semibold text-foreground tabular-nums", className)}>{score}</span>;
+  return <span className={cn("font-semibold text-foreground", className)} style={{ fontVariantNumeric: 'tabular-nums' }}>{score}</span>;
 }
 
 function ScoreToPar({ score, className }: { score: number | null; className?: string }) {
-  if (score === null) return <span className={cn("score-mono text-muted-foreground/50", className)}>—</span>;
+  if (score === null) return <span className={cn("text-muted-foreground/50", className)} style={{ fontVariantNumeric: 'tabular-nums' }}>—</span>;
   const formatted = score === 0 ? 'E' : score > 0 ? `+${score}` : String(score);
   return (
     <span
-      className={cn("score-mono font-bold", className)}
+      className={cn("font-bold", className)}
       style={{
+        fontVariantNumeric: 'tabular-nums',
         color: score < 0
           ? TOUR_COLORS.scoreUnderPar
           : score > 0

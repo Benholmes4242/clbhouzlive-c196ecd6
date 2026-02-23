@@ -39,8 +39,9 @@ function ScoreToPar({ score, className }: { score: number | null; className?: st
   const formatted = score === 0 ? 'E' : score > 0 ? `+${score}` : String(score);
   return (
     <span 
-      className={cn("score-mono font-bold tabular-nums", className)}
+      className={cn("font-bold", className)}
       style={{ 
+        fontVariantNumeric: 'tabular-nums',
         color: score < 0 
           ? TOUR_COLORS.scoreUnderPar 
           : score > 0 
