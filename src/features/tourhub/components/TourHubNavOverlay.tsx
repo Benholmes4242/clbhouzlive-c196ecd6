@@ -367,7 +367,7 @@ export function TourHubNavOverlay({
                   <motion.button
                     onClick={handleViewAllRankings}
                     whileTap={{ scale: 0.95 }}
-                    className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground transition-opacity active:opacity-70"
+                    className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground transition-opacity active:opacity-70 outline-none focus:outline-none focus-visible:outline-none"
                   >
                     View all
                     <ChevronRight className="w-3.5 h-3.5" />
