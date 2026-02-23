@@ -16,6 +16,24 @@ const getTourBaseUrl = (tour: string = 'pga') => `https://api.sportradar.com/gol
 // Base for global endpoints (no tour): /golf/{access_level}/v3/{lang}
 const getGlobalBaseUrl = () => `https://api.sportradar.com/golf/${getAccessLevel()}/v3/en`;
 
+// Comprehensive tour name → Sportradar API slug mapping
+// Returns null for tours where Sportradar doesn't provide hole statistics
+function getTourSlug(tourName: string): string | null {
+  const normalized = (tourName || '').toUpperCase();
+  const map: Record<string, string | null> = {
+    'PGA': 'pga',
+    'LPGA': 'lpga',
+    'EURO': 'eur',
+    'DP': 'eur',
+    'CHAMP': 'champions-tour',
+    'PGAD': 'pgad',
+    'LIV': null,    // Sportradar does not provide hole stats for LIV
+    'OLY': null,    // Olympics — no hole stats endpoint
+    'USGA': null,   // USGA — no standard hole stats endpoint
+  };
+  return map[normalized] ?? (normalized.includes('LIV') ? null : 'pga');
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -951,9 +969,16 @@ async function syncTeeTimes(
 // HOLE STATISTICS - Tour-scoped: /{year}/tournaments/{id}/hole-statistics.json
 // Captures new field: avg_diff
 // ============================================================================
-async function syncHoleStatistics(supabase: any, apiKey: string, tour: string, year: number, tournamentSrId: string) {
+async function syncHoleStatistics(supabase: any, apiKey: string, tour: string, year: number, tournamentSrId: string, tournamentName?: string) {
   if (!tournamentSrId) {
     return { records: 0, message: 'Tournament ID required', debug: { error: 'missing_tournament_id' } };
+  }
+
+  // Check if this tour supports hole statistics
+  const tourSlug = getTourSlug(tour);
+  if (!tourSlug) {
+    console.log(`[Hole Statistics] Skipping ${tournamentName || tournamentSrId} — hole stats not available for ${tour} tour`);
+    return { records: 0, message: `Hole stats not available for ${tour} tour`, debug: { tour, skipped: true } };
   }
 
   const { data: tournament } = await supabase
@@ -966,7 +991,7 @@ async function syncHoleStatistics(supabase: any, apiKey: string, tour: string, y
     return { records: 0, message: 'Tournament not found in database', debug: { tournamentSrId } };
   }
 
-  const url = `${getTourBaseUrl(tour)}/${year}/tournaments/${tournamentSrId}/hole-statistics.json`;
+  const url = `${getTourBaseUrl(tourSlug)}/${year}/tournaments/${tournamentSrId}/hole-statistics.json`;
   
   let data: any;
   try {
@@ -1052,22 +1077,9 @@ async function syncHoleStatistics(supabase: any, apiKey: string, tour: string, y
   if (rounds.length > 0 && rounds[0].holes?.length > 0) {
     const sampleHole = rounds[0].holes[0];
     console.log('=== SPORTRADAR HOLE STATS RAW ===');
-    console.log('Full response keys:', Object.keys(data));
-    console.log('First round keys:', Object.keys(rounds[0]));
-    console.log('Sample hole keys:', Object.keys(sampleHole));
+    console.log(`Tour: ${tourSlug}, Keys: ${Object.keys(sampleHole).join(', ')}`);
     console.log('First hole sample:', JSON.stringify(sampleHole, null, 2));
-    console.log('=== FIELD MAPPING DEBUG ===');
-    console.log('Trying .statistics?.scoring_avg:', sampleHole?.statistics?.scoring_avg);
-    console.log('Trying .scoring_avg:', sampleHole?.scoring_avg);
-    console.log('Trying .statistics?.scoring_average:', sampleHole?.statistics?.scoring_average);
-    console.log('Trying .scoring_average:', sampleHole?.scoring_average);
-    console.log('Trying .eagles:', sampleHole?.eagles);
-    console.log('Trying .statistics?.eagles:', sampleHole?.statistics?.eagles);
-    console.log('Trying .statistics?.birdies:', sampleHole?.statistics?.birdies);
-    console.log('Trying .birdies:', sampleHole?.birdies);
-    console.log('Trying .avg_diff:', sampleHole?.avg_diff);
-    console.log('Trying .statistics?.avg_diff:', sampleHole?.statistics?.avg_diff);
-    console.log('=== END FIELD MAPPING ===');
+    console.log('=== END RAW ===');
   }
 
   for (const round of rounds) {
@@ -1110,7 +1122,39 @@ async function syncHoleStatistics(supabase: any, apiKey: string, tour: string, y
 // BACKFILL HOLE STATISTICS — Iterate all closed tournaments missing hole data
 // ============================================================================
 async function backfillHoleStatistics(supabase: any, apiKey: string) {
-  // Get all closed tournaments
+  // ── Step 1: Clean up zero-data rows from unsupported tours ──
+  const unsupportedTourNames = ['LIV', 'OLY', 'USGA'];
+  const { data: unsupportedSeasons } = await supabase
+    .from('sr_seasons')
+    .select('id')
+    .in('tour_name', unsupportedTourNames);
+
+  if (unsupportedSeasons?.length) {
+    const seasonIds = unsupportedSeasons.map((s: any) => s.id);
+    const { data: unsupportedTournaments } = await supabase
+      .from('sr_tournaments')
+      .select('id, name')
+      .in('season_id', seasonIds);
+
+    for (const t of (unsupportedTournaments || [])) {
+      const { count: zeroRows } = await supabase
+        .from('sr_hole_statistics')
+        .select('*', { count: 'exact', head: true })
+        .eq('tournament_id', t.id)
+        .or('scoring_average.is.null,scoring_average.eq.0');
+
+      if (zeroRows && zeroRows > 0) {
+        await supabase
+          .from('sr_hole_statistics')
+          .delete()
+          .eq('tournament_id', t.id)
+          .or('scoring_average.is.null,scoring_average.eq.0');
+        console.log(`[Backfill] Cleaned ${zeroRows} zero-data rows for ${t.name} (unsupported tour)`);
+      }
+    }
+  }
+
+  // ── Step 2: Get all closed tournaments ──
   const { data: tournaments, error: qErr } = await supabase
     .from('sr_tournaments')
     .select('id, sr_id, name, season_id')
@@ -1123,27 +1167,14 @@ async function backfillHoleStatistics(supabase: any, apiKey: string) {
 
   let totalRecords = 0;
   let processed = 0;
+  let skipped = 0;
   const total = tournaments.length;
-  const results: { name: string; records: number; skipped?: boolean }[] = [];
+  const results: { name: string; records: number; skipped?: boolean; reason?: string }[] = [];
 
   for (const tournament of tournaments) {
     processed++;
-    
-    // Check if this tournament already has real hole stats data
-    const { data: existing } = await supabase
-      .from('sr_hole_statistics')
-      .select('scoring_average')
-      .eq('tournament_id', tournament.id)
-      .not('scoring_average', 'is', null)
-      .gt('scoring_average', 0)
-      .limit(1);
 
-    if (existing?.length) {
-      results.push({ name: tournament.name, records: 0, skipped: true });
-      continue;
-    }
-
-    // Get season info for API URL
+    // Get season info for API URL and tour slug
     const { data: season } = await supabase
       .from('sr_seasons')
       .select('year, tour_name')
@@ -1151,31 +1182,54 @@ async function backfillHoleStatistics(supabase: any, apiKey: string) {
       .maybeSingle();
 
     const year = season?.year || new Date().getFullYear();
-    const tourName = (season?.tour_name || 'pga').toLowerCase();
-    const tour = tourName.includes('lpga') ? 'lpga' 
-      : tourName.includes('euro') || tourName.includes('dp') ? 'eur'
-      : tourName.includes('champ') ? 'champions-tour'
-      : 'pga';
+    const tourName = season?.tour_name || 'pga';
+    
+    // Use centralized tour slug mapping
+    const tourSlug = getTourSlug(tourName);
+    if (!tourSlug) {
+      results.push({ name: tournament.name, records: 0, skipped: true, reason: `unsupported tour: ${tourName}` });
+      skipped++;
+      continue;
+    }
 
-    console.log(`[Backfill] (${processed}/${total}) Syncing hole stats for ${tournament.name}...`);
+    // Check if fully populated (all rows have data)
+    const { count: rowsWithData } = await supabase
+      .from('sr_hole_statistics')
+      .select('*', { count: 'exact', head: true })
+      .eq('tournament_id', tournament.id)
+      .gt('scoring_average', 0);
+
+    const { count: totalRows } = await supabase
+      .from('sr_hole_statistics')
+      .select('*', { count: 'exact', head: true })
+      .eq('tournament_id', tournament.id);
+
+    // Skip only if we have rows AND all of them have real data
+    if (rowsWithData && rowsWithData > 0 && rowsWithData === totalRows) {
+      results.push({ name: tournament.name, records: 0, skipped: true, reason: `fully populated (${rowsWithData} rows)` });
+      skipped++;
+      continue;
+    }
+
+    console.log(`[Backfill] (${processed}/${total}) Syncing ${tournament.name} — ${rowsWithData || 0}/${totalRows || 0} rows have data`);
 
     try {
-      const result = await syncHoleStatistics(supabase, apiKey, tour, year, tournament.sr_id);
+      const result = await syncHoleStatistics(supabase, apiKey, tourSlug, year, tournament.sr_id, tournament.name);
       totalRecords += result.records;
       results.push({ name: tournament.name, records: result.records });
     } catch (e) {
       console.error(`[Backfill] Error for ${tournament.name}: ${e.message}`);
-      results.push({ name: tournament.name, records: 0 });
+      results.push({ name: tournament.name, records: 0, reason: e.message });
     }
 
     // Rate limit: 1.5 seconds between tournaments
     await new Promise(resolve => setTimeout(resolve, 1500));
   }
 
-  console.log(`[Backfill] Complete: ${totalRecords} total hole stats across ${processed} tournaments`);
+  console.log(`[Backfill] Complete: ${totalRecords} records, ${skipped} skipped, ${processed} processed`);
   return { 
     records: totalRecords, 
-    message: `Backfilled hole stats for ${processed} tournaments (${totalRecords} records)`,
+    message: `Backfilled hole stats: ${totalRecords} records across ${processed} tournaments (${skipped} skipped)`,
     debug: { results }
   };
 }
