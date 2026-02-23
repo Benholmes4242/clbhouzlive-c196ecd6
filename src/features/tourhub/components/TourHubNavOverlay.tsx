@@ -401,12 +401,12 @@ export function TourHubNavOverlay({
                           style={{
                             scrollSnapAlign: 'start',
                             background: isFirst 
-                              ? 'linear-gradient(135deg, rgba(251, 191, 36, 0.12) 0%, rgba(245, 158, 11, 0.08) 100%)'
+                              ? 'linear-gradient(135deg, rgba(252, 211, 77, 0.10) 0%, rgba(245, 158, 11, 0.06) 100%)'
                               : 'hsl(var(--card) / 0.6)',
                             backdropFilter: 'blur(8px)',
                             WebkitBackdropFilter: 'blur(8px)',
                             border: isFirst 
-                              ? '1.5px solid rgba(245, 158, 11, 0.35)'
+                              ? '1.5px solid rgba(245, 158, 11, 0.25)'
                               : '1px solid hsl(var(--border) / 0.3)',
                             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04), 0 0 1px rgba(0, 0, 0, 0.08)',
                             minWidth: '155px',
@@ -416,15 +416,25 @@ export function TourHubNavOverlay({
                           <div
                             className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center"
                             style={{
-                              background: isFirst 
-                                ? `linear-gradient(135deg, ${TOUR_COLORS.rankGold[0]} 0%, ${TOUR_COLORS.rankGold[1]} 100%)`
+                              background: index === 0
+                                ? 'linear-gradient(135deg, #fcd34d, #f59e0b)'
                                 : index === 1
-                                ? `linear-gradient(135deg, ${TOUR_COLORS.rankSilver[0]} 0%, ${TOUR_COLORS.rankSilver[1]} 100%)`
-                                : `linear-gradient(135deg, ${TOUR_COLORS.rankBronze[0]} 0%, ${TOUR_COLORS.rankBronze[1]} 100%)`,
+                                ? 'linear-gradient(135deg, hsl(var(--foreground) / 0.3), hsl(var(--foreground) / 0.4))'
+                                : index === 2
+                                ? 'linear-gradient(135deg, #d97706, #b45309)'
+                                : 'linear-gradient(135deg, hsl(var(--muted-foreground) / 0.2), hsl(var(--muted-foreground) / 0.25))',
                               boxShadow: '0 1px 3px rgba(0, 0, 0, 0.12)',
                             }}
                           >
-                            <span className="text-xs font-bold text-white">
+                            <span className="text-xs font-bold" style={{
+                              color: index === 0
+                                ? '#78350f'
+                                : index === 1
+                                ? 'hsl(var(--background))'
+                                : index === 2
+                                ? '#ffffff'
+                                : 'hsl(var(--muted-foreground))',
+                            }}>
                               {player.worldRank}
                             </span>
                           </div>
