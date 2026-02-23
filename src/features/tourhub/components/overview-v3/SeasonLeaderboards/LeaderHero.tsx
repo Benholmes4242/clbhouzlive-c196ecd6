@@ -60,6 +60,7 @@ export const LeaderHero = memo(function LeaderHero({ player, accentColor }: Lead
               borderRadius: '0',
               borderTopLeftRadius: '20px',
               borderBottomLeftRadius: '20px',
+              backgroundColor: '#F8FAFC',
             }}
           >
             {showPhoto ? (
