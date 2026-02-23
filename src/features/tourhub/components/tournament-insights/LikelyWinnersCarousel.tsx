@@ -33,7 +33,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Build unified pick list: featured + 3 contenders = 4 total
+  // Build unified pick list: featured + 4 contenders = 5 total
   const contenderCards = cards.filter(c => c.type === 'contender').slice(0, 4);
 
   const allPicks: PickCard[] = [

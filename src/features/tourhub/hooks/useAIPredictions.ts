@@ -338,7 +338,7 @@ function formatPredictions(
     });
   }
 
-  const topContenders = allPicks.slice(0, 4);
+  const topContenders = allPicks.slice(0, 5);
 
   return {
     tournament: {
