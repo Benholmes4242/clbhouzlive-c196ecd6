@@ -168,7 +168,7 @@ export function PlayersWorldsBest({ players }: PlayersWorldsBestProps) {
         </div>
         <Link
           to="/tourhub?tab=players&tier=elite"
-          className="text-sm font-medium text-primary flex items-center gap-0.5 active:scale-[0.95] transition-transform"
+          className="text-sm font-medium text-primary flex items-center gap-0.5 active:scale-[0.95] transition-transform focus:outline-none focus-visible:outline-none"
         >
           View All
           <ChevronRight className="w-4 h-4" />

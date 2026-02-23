@@ -35,6 +35,8 @@ interface PlayerCardV2Props {
   activeSort?: PlayerSortType;
   activeTour?: string;
   onNavigate?: () => void;
+  /** Skip entry animation (e.g. when inside an already-animating overlay) */
+  disableAnimation?: boolean;
 }
 
 function formatEarnings(amount: number): string {
@@ -57,6 +59,7 @@ export function PlayerCardV2({
   activeSort = 'world-rank-desc',
   activeTour = 'all',
   onNavigate,
+  disableAnimation = false,
 }: PlayerCardV2Props) {
   // R2 headshot — single source of truth
   const tourCode = activeTour === 'all' ? (player.tourCodes?.[0] ?? 'pga') : activeTour;
@@ -129,9 +132,9 @@ export function PlayerCardV2({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 6 }}
+      initial={disableAnimation ? false : { opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: staggerDelay, duration: 0.25, ease: 'easeOut' }}
+      transition={disableAnimation ? { duration: 0 } : { delay: staggerDelay, duration: 0.25, ease: 'easeOut' }}
     >
       <Link
         to={`/tourhub/player/${player.id}`}
