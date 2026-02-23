@@ -76,6 +76,7 @@ export const LeaderHero = memo(function LeaderHero({ player, accentColor }: Lead
                 src={PLAYER_SILHOUETTE_URL}
                 alt={player.playerName}
                 className="w-full h-full object-cover"
+                style={{ backgroundColor: '#F8FAFC' }}
               />
             )}
           </div>
