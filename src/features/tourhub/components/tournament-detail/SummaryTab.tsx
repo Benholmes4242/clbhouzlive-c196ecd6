@@ -87,15 +87,14 @@ function WinnerCard({ winner, runnerUp, headshotMap }: {
 
   return (
     <motion.div
-      className="py-6 border-t border-border"
+      className="mt-6"
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
-      <div className="flex items-center gap-2 mb-4">
-        <Trophy className="w-4 h-4 text-amber-600" />
-        <h3 className="text-sm font-semibold text-foreground">Champion</h3>
-      </div>
+      <h3 className="text-foreground mb-3" style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.3px' }}>Champion</h3>
+
+      <div className="bg-card rounded-2xl border border-border/50 px-4 py-3">
 
       <div className="flex items-center gap-4">
         <Link to={`/tourhub/player/${winner.player?.id}`}>
@@ -155,6 +154,7 @@ function WinnerCard({ winner, runnerUp, headshotMap }: {
           </div>
         )}
       </div>
+      </div>
     </motion.div>
   );
 }
@@ -200,15 +200,14 @@ export function SummaryTab({
       {/* Round-by-round scoring summary */}
       {scoringStats && scoringStats.rounds.length > 0 && (
         <motion.div
-          className="py-6 border-t border-border"
+          className="mt-6"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.4 }}
         >
-          <div className="flex items-center gap-2 mb-4">
-            <TrendingUp className="w-4 h-4 text-muted-foreground" />
-            <h3 className="text-sm font-semibold text-foreground">Round-by-Round</h3>
-          </div>
+          <h3 className="text-foreground mb-3" style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.3px' }}>Tournament Stats</h3>
+
+          <div className="bg-card rounded-2xl border border-border/50 px-4 py-3">
 
           {/* Column headers */}
           <div className="grid grid-cols-5 gap-2 py-2 border-b border-border">
@@ -230,21 +229,21 @@ export function SummaryTab({
               </div>
             ))}
           </div>
+          </div>
         </motion.div>
       )}
 
       {/* Field statistics */}
       {scoringStats && (
         <motion.div
-          className="py-6 border-t border-border"
+          className="mt-6"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.4 }}
         >
-          <div className="flex items-center gap-2 mb-4">
-            <Award className="w-4 h-4 text-muted-foreground" />
-            <h3 className="text-sm font-semibold text-foreground">Field Statistics</h3>
-          </div>
+          <h3 className="text-foreground mb-3" style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.3px' }}>Field Statistics</h3>
+
+          <div className="bg-card rounded-2xl border border-border/50 px-4 py-3">
 
           {(() => {
             const t = scoringStats.totals;
@@ -282,21 +281,21 @@ export function SummaryTab({
               </div>
             );
           })()}
+          </div>
         </motion.div>
       )}
 
       {/* Final Top 10 */}
       {isCompleted && top10.length > 0 && (
         <motion.div
-          className="py-6 border-t border-border"
+          className="mt-6"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.4 }}
         >
-          <div className="flex items-center gap-2 mb-4">
-            <Trophy className="w-4 h-4 text-amber-600" />
-            <h3 className="text-sm font-semibold text-foreground">Final Top 10</h3>
-          </div>
+          <h3 className="text-foreground mb-3" style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.3px' }}>Top Finishers</h3>
+
+          <div className="bg-card rounded-2xl border border-border/50 px-4 py-3">
 
           <div className="divide-y divide-border/30">
             {top10.map((entry: any, idx: number) => {
@@ -329,7 +328,7 @@ export function SummaryTab({
                       playerName={entry.player?.full_name || 'Unknown'}
                       size="sm"
                     />
-                    <span className="flex-1 text-[14px] font-semibold text-foreground truncate">
+                    <span className="flex-1 text-[15px] font-semibold text-foreground truncate" style={{ letterSpacing: '-0.1px' }}>
                       {entry.player?.full_name || 'Unknown'}
                     </span>
                     <ScoreToPar score={entry.score} />
@@ -342,6 +341,7 @@ export function SummaryTab({
                 </motion.div>
               );
             })}
+          </div>
           </div>
         </motion.div>
       )}

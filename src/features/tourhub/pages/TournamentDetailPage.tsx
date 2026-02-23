@@ -388,9 +388,9 @@ export function TournamentDetailPage() {
           <button
             onClick={() => navigate(-1)}
             className="text-muted-foreground active:opacity-70 transition-opacity"
-            style={{ fontSize: 13, fontWeight: 500, padding: '12px 0 4px 0' }}
+            style={{ fontSize: 13, fontWeight: 500, padding: '12px 0 8px 0' }}
           >
-            ← Back
+            ← Tournament
           </button>
           
           {/* TD-05: Tabs with role="tablist" */}
@@ -402,7 +402,7 @@ export function TournamentDetailPage() {
           
           {/* Tab Content with role="tabpanel" */}
           <AnimatePresence mode="wait">
-            <div key={activeTab} className="pt-4" role="tabpanel" aria-label={`${activeTab} content`}>
+            <div key={activeTab} className="pt-5" role="tabpanel" aria-label={`${activeTab} content`}>
               {renderTabContent()}
             </div>
           </AnimatePresence>

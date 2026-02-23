@@ -91,11 +91,11 @@ const AttributeRow = memo(({ attribute, delay = 0, animate = true }: { attribute
       <div className={cn("flex items-center justify-center rounded-lg shrink-0", iconBg.bg, iconBg.text)} style={{ width: '28px', height: '28px' }}>
         <Icon style={{ width: '16px', height: '16px' }} />
       </div>
-      <span className="flex-1 text-foreground" style={{ fontSize: 14, fontWeight: 500, marginLeft: 10 }}>
+      <span className="flex-1 text-foreground" style={{ fontSize: 15, fontWeight: 500, marginLeft: 10 }}>
         {config.label}
       </span>
       <div className="flex items-baseline justify-end" style={{ minWidth: '80px' }}>
-        <span className="text-foreground" style={{ fontSize: 14, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+        <span className="text-foreground" style={{ fontSize: 15, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
           {formatValue()}
         </span>
         <span className="text-muted-foreground inline-block text-left" style={{ fontSize: 11, fontWeight: 500, width: '22px', marginLeft: 2 }}>
@@ -275,7 +275,7 @@ export function PlayerSkillTreeCard({ playerId }: { playerId: string }) {
   }
 
   return (
-    <div ref={ref}>
+    <div ref={ref} className="bg-card rounded-2xl border border-border/50 px-4 py-3">
       <div style={{ marginBottom: '16px' }}>{headerContent}</div>
 
       {/* Attribute Rows */}

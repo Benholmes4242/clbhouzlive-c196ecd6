@@ -100,14 +100,12 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
   }
 
   return (
-    <div>
-      {/* Section divider above */}
-      <div style={{ borderTop: '1px solid hsl(var(--border) / 0.08)', paddingTop: '0' }} />
-      
+    <div className="bg-card rounded-2xl border border-border/50 px-4 py-3">
+      {/* Section header — 22px / 700 / -0.3px */}
       {/* Section header — 11px / 700 / uppercase / muted */}
       <div className="flex items-center gap-2" style={{ marginBottom: '16px' }}>
         <User className="w-4 h-4 text-muted-foreground" />
-        <h2 className="text-muted-foreground/50" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+        <h2 className="text-foreground" style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}>
           Player Info
         </h2>
       </div>
