@@ -22,7 +22,7 @@ import { getCollegeGradientCSS } from '../config/collegeBrandColors';
 import { useTourSeason } from '../hooks/useTourHubData';
 import { Button } from '@/components/ui/button';
 
-const SCROLL_KEY = 'college-detail-scroll';
+
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -70,16 +70,7 @@ export function CollegeProfilePage() {
     return idx >= 0 ? idx + 1 : null;
   })();
 
-  // Scroll restoration
-  useEffect(() => {
-    const saved = sessionStorage.getItem(SCROLL_KEY);
-    if (saved) {
-      requestAnimationFrame(() => window.scrollTo(0, parseInt(saved, 10)));
-      sessionStorage.removeItem(SCROLL_KEY);
-    } else {
-      window.scrollTo(0, 0);
-    }
-  }, [collegeSlug]);
+  // Scroll position handled by centralized ScrollRestoration component
 
   // Pull-to-refresh handlers
   const handleTouchStart = useCallback((e: React.TouchEvent) => {

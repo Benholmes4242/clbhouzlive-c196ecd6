@@ -33,7 +33,7 @@ import {
 import { TournamentEmptyState } from '../components/tournament-detail/TournamentEmptyState';
 
 const VALID_TABS: TournamentTab[] = ['overview', 'leaderboard', 'summary', 'tee-times', 'hole-stats'];
-const SCROLL_KEY = 'tournament-detail-scroll';
+
 
 export function TournamentDetailPage() {
   const { tournamentId } = useParams<{ tournamentId: string }>();
@@ -48,20 +48,7 @@ export function TournamentDetailPage() {
   
   const [activeTab, setActiveTab] = useState<TournamentTab>(initialTab);
 
-  // TD-08: Scroll position restoration
-  useEffect(() => {
-    const saved = sessionStorage.getItem(SCROLL_KEY);
-    if (saved) {
-      requestAnimationFrame(() => window.scrollTo(0, parseInt(saved, 10)));
-      sessionStorage.removeItem(SCROLL_KEY);
-    } else {
-      window.scrollTo(0, 0);
-    }
-  }, []);
-
-  const saveScrollPosition = useCallback(() => {
-    sessionStorage.setItem(SCROLL_KEY, String(window.scrollY));
-  }, []);
+  // Scroll position handled by centralized ScrollRestoration component
 
   // TD-01: Pull-to-refresh
   const [isPulling, setIsPulling] = useState(false);
@@ -288,7 +275,7 @@ export function TournamentDetailPage() {
             tournamentStatus={tournament.status}
             tournamentTimezone={tournament.timezone}
             venuePar={tournament.venue_par}
-            onPlayerTap={saveScrollPosition}
+            onPlayerTap={() => {}}
           />
         );
       

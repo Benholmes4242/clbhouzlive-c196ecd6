@@ -29,7 +29,6 @@ function TourHubMainPageInner() {
     if (tabParam && tabParam !== activeTab) {
       setActiveTab(tabParam);
       window.scrollTo(0, 0);
-      document.documentElement.scrollTop = 0;
     }
   }, [tabParam]);
   

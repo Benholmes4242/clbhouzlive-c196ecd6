@@ -52,10 +52,7 @@ export function LeadersTab() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [categoryKey]);
 
-  // ─── Scroll to top on mount ───
-  useEffect(() => {
-    window.scrollTo({ top: 0 });
-  }, []);
+  // Scroll position handled by centralized ScrollRestoration component
 
   // ─── Pull-to-refresh ───
   const [isRefreshing, setIsRefreshing] = useState(false);
