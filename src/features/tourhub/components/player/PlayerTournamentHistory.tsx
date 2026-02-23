@@ -24,7 +24,7 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
   const hasMore = (allResults?.length ?? 0) > INITIAL_LIMIT;
 
   return (
-    <div>
+    <div className="bg-card rounded-2xl border border-border/50 px-4 py-3">
       {/* Section header — 22px / 700 */}
       <div className="flex items-center gap-2" style={{ marginBottom: '12px' }}>
         <Activity className="w-4 h-4 text-muted-foreground" />
@@ -60,8 +60,8 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
                     className="shrink-0"
                     style={{
                       width: '52px',
-                      fontSize: '14px',
-                      fontWeight: 700,
+                      fontSize: '13px',
+                      fontWeight: 600,
                       fontVariantNumeric: 'tabular-nums',
                       color: isWin ? '#f59e0b' : 'hsl(var(--foreground))',
                     }}
@@ -70,12 +70,12 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
                   </span>
 
                   {/* Tournament name — 14px, weight 500 */}
-                  <span className="text-foreground flex-1 min-w-0 truncate group-hover:text-primary transition-colors" style={{ fontSize: '14px', fontWeight: 500 }}>
+                  <span className="text-foreground flex-1 min-w-0 truncate group-hover:text-primary transition-colors" style={{ fontSize: '15px', fontWeight: 600, letterSpacing: '-0.1px' }}>
                     {result.tournament_name}
                   </span>
 
                   {/* Date — 12px, weight 500 */}
-                  <span className="text-muted-foreground shrink-0" style={{ fontSize: '12px', fontWeight: 500, width: '56px', textAlign: 'right' }}>
+                  <span className="text-muted-foreground shrink-0" style={{ fontSize: '12px', fontWeight: 400, width: '56px', textAlign: 'right' }}>
                     {result.tournament_end_date
                       ? format(new Date(result.tournament_end_date), 'MMM d')
                       : '—'}
@@ -87,7 +87,7 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
                     style={{
                       width: '40px',
                       textAlign: 'right',
-                      fontSize: '14px',
+                      fontSize: '15px',
                       fontWeight: 700,
                       fontVariantNumeric: 'tabular-nums',
                       color: score !== null && score < 0

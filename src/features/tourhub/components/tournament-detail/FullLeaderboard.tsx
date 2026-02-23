@@ -219,38 +219,38 @@ export function FullLeaderboard({
       {/* Column headers */}
       <div className="flex items-center gap-2 px-4 py-2 border-b border-border sticky top-0 bg-background/95 backdrop-blur-sm z-10">
         <div className="w-8 shrink-0 text-center">
-          <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">Pos</span>
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">Pos</span>
         </div>
         <div className="w-8 shrink-0" />
         <div className="flex-1 min-w-0">
-          <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">Player</span>
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">Player</span>
         </div>
         {showRoundColumns && (
           <>
             <div className="w-9 text-center hidden sm:block">
-              <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">R1</span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">R1</span>
             </div>
             <div className="w-9 text-center hidden sm:block">
-              <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">R2</span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">R2</span>
             </div>
             <div className="w-9 text-center hidden sm:block">
-              <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">R3</span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">R3</span>
             </div>
             <div className="w-9 text-center hidden sm:block">
-              <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">R4</span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">R4</span>
             </div>
             <div className="w-12 text-center hidden sm:block">
-              <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">Total</span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">Total</span>
             </div>
           </>
         )}
         <div className="w-12 text-center">
-          <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
             {selectedRound === 'Overall' ? 'To Par' : 'Score'}
           </span>
         </div>
         <div className="w-10 text-center">
-          <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">Thru</span>
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">Thru</span>
         </div>
         <div className="w-4 shrink-0" />
       </div>
@@ -310,9 +310,9 @@ export function FullLeaderboard({
 
                 <div className="flex-1 min-w-0">
                   <p className={cn(
-                    "font-semibold truncate text-foreground text-[14px]",
+                    "font-semibold truncate text-foreground text-[15px]",
                     isWD && "italic"
-                  )}>
+                  )} style={{ letterSpacing: '-0.1px' }}>
                     {entry.player?.full_name || 'Unknown'}
                   </p>
                   {entry.player?.country_code && (

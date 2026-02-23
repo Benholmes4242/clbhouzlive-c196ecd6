@@ -59,7 +59,7 @@ export function TournamentDetailTabs({ activeTab, onTabChange, className, tourna
                 "relative flex-1 flex items-center justify-center gap-1 rounded-lg py-2.5 text-[13px] font-semibold",
                 "min-h-[44px] transition-all duration-200 active:scale-[0.95]",
                 isActive 
-                  ? "bg-card text-foreground shadow-sm" 
+                  ? "bg-foreground text-background shadow-sm" 
                   : "bg-transparent text-muted-foreground"
               )}
             >

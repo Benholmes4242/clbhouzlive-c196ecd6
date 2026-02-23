@@ -48,10 +48,10 @@ function StatRow({ label, value, trend, barPercent, barIndex = 0 }: StatRowProps
       aria-label={`${label}: ${value}`}
     >
       <div className="flex justify-between items-center">
-        <span className="text-foreground" style={{ fontSize: '14px', fontWeight: 500 }}>{label}</span>
+        <span className="text-foreground" style={{ fontSize: '15px', fontWeight: 500 }}>{label}</span>
         <div className="flex flex-col items-end">
           <span style={{
-            fontSize: '14px',
+            fontSize: '15px',
             fontWeight: 700,
             fontVariantNumeric: 'tabular-nums',
             color: hasValue
@@ -103,9 +103,9 @@ function SGBar({ label, value }: SGBarProps) {
       aria-label={`${label}: ${formattedValue} strokes gained`}
     >
       <div className="flex justify-between items-center" style={{ marginBottom: '6px' }}>
-        <span className="text-foreground" style={{ fontSize: '14px', fontWeight: 500 }}>{label}</span>
+        <span className="text-foreground" style={{ fontSize: '15px', fontWeight: 500 }}>{label}</span>
         <span style={{
-          fontSize: '14px',
+          fontSize: '15px',
           fontWeight: 700,
           fontVariantNumeric: 'tabular-nums',
           color: isPositive ? '#f59e0b' : '#EF4444',
@@ -148,7 +148,7 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
     ? (playerStats.top_25s / playerStats.events_played) * 100 : undefined;
 
   return (
-    <div>
+    <div className="bg-card rounded-2xl border border-border/50 px-4 py-3">
       {/* Section header — 22px / 700 / tracking -0.3px */}
       <div className="flex items-center gap-2" style={{ marginBottom: '12px' }}>
         <BarChart3 className="w-4 h-4 text-muted-foreground" />
