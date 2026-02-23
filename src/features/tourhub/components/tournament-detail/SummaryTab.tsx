@@ -314,7 +314,7 @@ export function SummaryTab({
                   >
                      <span className={cn(
                       "w-7 text-center text-[12px] font-bold",
-                      isWinner ? "text-amber-600" 
+                      isWinner ? "text-[#f59e0b]" 
                         : entry.position === 2 ? "text-slate-400"
                         : entry.position === 3 ? "text-orange-500"
                         : "text-muted-foreground"

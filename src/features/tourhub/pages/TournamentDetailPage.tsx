@@ -41,12 +41,11 @@ export function TournamentDetailPage() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   
-  const initialTab = useMemo(() => {
+  const [activeTab, setActiveTab] = useState<TournamentTab>(() => {
     const tabParam = searchParams.get('tab') as TournamentTab | null;
-    return tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'overview';
-  }, []);
-  
-  const [activeTab, setActiveTab] = useState<TournamentTab>(initialTab);
+    if (tabParam && VALID_TABS.includes(tabParam)) return tabParam;
+    return 'overview'; // Will be corrected once tournament data loads
+  });
 
   // Scroll position handled by centralized ScrollRestoration component
 
@@ -144,13 +143,15 @@ export function TournamentDetailPage() {
     return { name, score: scoreStr };
   }, [isLive, leaderboard]);
 
-  // Derive winner from leaderboard for completed tournaments (fallback for EventWinnerCard)
-  const leaderboardWinner = useMemo(() => {
-    if (!isCompleted || !leaderboard?.length) return null;
-    const first = leaderboard[0] as any;
-    if (!first?.player) return null;
-    return first;
-  }, [isCompleted, leaderboard]);
+  // Redirect to 'summary' tab for completed tournaments if on 'overview'
+  useEffect(() => {
+    if (isCompleted && activeTab === 'overview') {
+      setActiveTab('summary');
+      const newParams = new URLSearchParams(searchParams);
+      newParams.set('tab', 'summary');
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [isCompleted, activeTab, searchParams, setSearchParams]);
 
   if (isLoading) {
     return (
@@ -281,14 +282,29 @@ export function TournamentDetailPage() {
       
       case 'summary':
         return (
-          <SummaryTab
-            tournamentId={tournamentId || ''}
-            tournamentSrId={tournament.sr_id}
-            isLive={isLive}
-            isCompleted={isCompleted}
-            leaderboard={leaderboard}
-            headshotMap={headshotMap}
-          />
+          <>
+            <SummaryTab
+              tournamentId={tournamentId || ''}
+              tournamentSrId={tournament.sr_id}
+              isLive={isLive}
+              isCompleted={isCompleted}
+              leaderboard={leaderboard}
+              headshotMap={headshotMap}
+            />
+            {isCompleted && (
+              <>
+                <CourseInfoCard
+                  tournament={tournament}
+                  courseImage={courseMatch?.imageUrl}
+                  courseId={courseMatch?.golfCourseId}
+                />
+                <TournamentInfoGrid
+                  tournament={tournament}
+                  fieldSize={leaderboard?.length}
+                />
+              </>
+            )}
+          </>
         );
       
       case 'tee-times':
