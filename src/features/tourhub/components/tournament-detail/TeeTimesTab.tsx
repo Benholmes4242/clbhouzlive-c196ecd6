@@ -308,23 +308,13 @@ function TeeTimeGroupCard({ group, index, searchQuery }: { group: TeeTimeGroup; 
                 playerName={player.name}
                 size="md"
               />
-              <div className="flex items-center gap-2 flex-1 min-w-0">
-                <span className="text-sm font-semibold text-foreground truncate">
+              <div className="flex-1 min-w-0">
+                <span className="text-sm font-semibold text-foreground truncate block">
                   {player.name}
                 </span>
-                {flag && (
-                  <span style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 13,
-                    lineHeight: 1,
-                    backgroundColor: 'hsl(var(--muted) / 0.5)',
-                    borderRadius: 4,
-                    padding: '1px 3px',
-                    flexShrink: 0,
-                  }}>
-                    {flag}
+                {player.country && (
+                  <span style={{ fontSize: 11, fontWeight: 500 }} className="text-muted-foreground">
+                    {flag || player.country?.toUpperCase() || ''}
                   </span>
                 )}
               </div>

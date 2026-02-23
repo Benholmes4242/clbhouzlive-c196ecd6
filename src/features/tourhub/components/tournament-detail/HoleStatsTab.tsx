@@ -80,11 +80,11 @@ function HoleStatsEmpty({ isCompleted, roundLabel }: { isCompleted?: boolean; ro
 
 // Difficulty badge color — softened tiers with borders
 function getDiffBadge(avgDiff: number) {
-  if (avgDiff > 0.05) return 'bg-red-500/90 text-white';
-  if (avgDiff > 0.01) return 'bg-orange-50 text-orange-600 border border-orange-200';
+  if (avgDiff > 0.05) return 'bg-red-100 text-red-600 border border-red-200';
+  if (avgDiff > 0.01) return 'bg-orange-50 text-orange-500 border border-orange-100';
   if (avgDiff > -0.01) return 'bg-muted text-muted-foreground';
-  if (avgDiff > -0.15) return 'bg-green-50 text-green-600 border border-green-200';
-  return 'bg-green-500/90 text-white';
+  if (avgDiff > -0.15) return 'bg-green-50 text-green-600 border border-green-100';
+  return 'bg-green-100 text-green-700 border border-green-200';
 }
 
 // Scoring distribution bar — refined 2-3 tone palette
@@ -112,7 +112,7 @@ function ScoringBar({ hole }: { hole: ProcessedHole }) {
             />
           ))}
         </div>
-        <div className="flex items-center gap-x-2.5 mt-1">
+        <div className="flex items-center justify-center gap-x-2.5 mt-1">
           {segments.map((seg, i) => (
             <span key={i} className="flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: seg.color }} />
@@ -479,11 +479,11 @@ const HoleRow = ({ hole, total }: { hole: ProcessedHole; total: number }) => {
       className="flex items-start gap-3 py-4 px-0"
       style={{ borderBottom: '1px solid hsl(var(--border) / 0.15)' }}
     >
-      {/* Hole badge — w-10 h-10 */}
+      {/* Hole badge — w-8 h-8 */}
       <div className={cn(
-        "w-10 h-10 rounded-full flex items-center justify-center shrink-0",
+        "w-8 h-8 rounded-full flex items-center justify-center shrink-0",
         getDiffBadge(hole.avgDiff)
-      )} style={{ fontSize: '13px', fontWeight: 700 }}>
+      )} style={{ fontSize: '12px', fontWeight: 600 }}>
         {hole.holeNumber}
       </div>
 
