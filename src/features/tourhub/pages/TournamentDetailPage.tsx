@@ -3,8 +3,8 @@
  */
 
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
-import { Globe, Trophy, Clock, Target, RefreshCw, AlertCircle } from 'lucide-react';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
+import { Trophy, Clock, RefreshCw, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
 import { useQueryClient } from '@tanstack/react-query';
@@ -12,7 +12,6 @@ import { cn } from '@/lib/utils';
 import { TourHubShell } from '../components/TourHubShell';
 import { useTourTournament, useTourLeaderboard } from '../hooks/useTourHubData';
 import { useLeaderboardRealtime } from '../hooks/useLeaderboardRealtime';
-// usePlayerHeadshots removed — R2 CDN is now the headshot source
 import { useSingleCourseImage } from '../hooks/useCourseImageResolver';
 import { getCourseImage } from '../utils/placeholders';
 import { EventWinnerCard } from '../components/EventWinnerCard';
@@ -31,6 +30,7 @@ import {
   SummaryTab,
   type TournamentTab,
 } from '../components/tournament-detail';
+import { TournamentEmptyState } from '../components/tournament-detail/TournamentEmptyState';
 
 const VALID_TABS: TournamentTab[] = ['overview', 'leaderboard', 'summary', 'tee-times', 'hole-stats'];
 const SCROLL_KEY = 'tournament-detail-scroll';
@@ -39,6 +39,7 @@ export function TournamentDetailPage() {
   const { tournamentId } = useParams<{ tournamentId: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   
   const initialTab = useMemo(() => {
     const tabParam = searchParams.get('tab') as TournamentTab | null;
@@ -135,13 +136,6 @@ export function TournamentDetailPage() {
   const { courseImage: courseMatch } = useSingleCourseImage(venueInput);
   const heroImageUrl = courseMatch?.imageUrl || getCourseImage({ id: tournamentId || '' });
   
-  const playerIds = useMemo(() => {
-    if (!leaderboard) return [];
-    return leaderboard
-      .map((entry: any) => entry.player?.id)
-      .filter(Boolean) as string[];
-  }, [leaderboard]);
-  
   const headshotMap = undefined; // R2 CDN handles headshots via PlayerAvatar
 
   const countdownText = useMemo(() => {
@@ -162,6 +156,14 @@ export function TournamentDetailPage() {
     const scoreStr = score === 0 ? 'E' : score < 0 ? String(score) : score > 0 ? `+${score}` : null;
     return { name, score: scoreStr };
   }, [isLive, leaderboard]);
+
+  // Derive winner from leaderboard for completed tournaments (fallback for EventWinnerCard)
+  const leaderboardWinner = useMemo(() => {
+    if (!isCompleted || !leaderboard?.length) return null;
+    const first = leaderboard[0] as any;
+    if (!first?.player) return null;
+    return first;
+  }, [isCompleted, leaderboard]);
 
   if (isLoading) {
     return (
@@ -224,8 +226,10 @@ export function TournamentDetailPage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
           >
-            {/* TD-07: Champion placeholder for live events */}
+            {/* Champion section for completed tournaments */}
             {isCompleted && tournamentId && <EventWinnerCard tournamentId={tournamentId} />}
+            
+            {/* Champion placeholder — only for non-completed tournaments */}
             {!isCompleted && (
               <motion.div
                 className="py-6 border-t border-border"
@@ -269,16 +273,12 @@ export function TournamentDetailPage() {
       case 'leaderboard':
         if (!hasLeaderboard) {
           return (
-            <motion.div className="flex items-center justify-center py-20" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-              <div className="text-center space-y-3">
-                <Trophy className="w-12 h-12 mx-auto text-muted-foreground/30" />
-                <h3 className="text-lg font-semibold text-foreground">Leaderboard Coming Soon</h3>
-                <p className="text-sm text-muted-foreground max-w-[280px] mx-auto">
-                  Leaderboard data will appear once the tournament begins.
-                  {countdownText && <span className="block mt-1 font-medium">{countdownText}</span>}
-                </p>
-              </div>
-            </motion.div>
+            <TournamentEmptyState
+              icon={<Trophy className="w-16 h-16" />}
+              title="Leaderboard Coming Soon"
+              subtitle="Leaderboard data will appear once the tournament begins."
+              countdown={countdownText}
+            />
           );
         }
         return (
@@ -380,6 +380,15 @@ export function TournamentDetailPage() {
               <StatusBar variant="upcoming" countdownText={countdownText} className="mb-4" />
             )}
           </div>
+
+          {/* Canonical back link */}
+          <button
+            onClick={() => navigate(-1)}
+            className="text-muted-foreground active:opacity-70 transition-opacity"
+            style={{ fontSize: 13, fontWeight: 500, padding: '12px 0 4px 0' }}
+          >
+            ← Back
+          </button>
           
           {/* TD-05: Tabs with role="tablist" */}
           <TournamentDetailTabs 
@@ -394,15 +403,8 @@ export function TournamentDetailPage() {
               {renderTabContent()}
             </div>
           </AnimatePresence>
-          
-          {/* Data source footer */}
-          <div className="mt-8 pt-6 border-t border-border/40 flex items-center justify-center gap-2 text-[11px] text-muted-foreground/30 pb-8">
-            <Globe className="w-3.5 h-3.5" />
-            <span>Powered by SportsRadar</span>
-          </div>
         </div>
       </div>
     </TourHubShell>
   );
 }
-
