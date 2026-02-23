@@ -107,6 +107,9 @@ Deno.serve(async (req) => {
         case 'seasons':
           result = await syncSeasons(supabase, sportradarApiKey);
           break;
+        case 'backfill_hole_stats':
+          result = await backfillHoleStatistics(supabase, sportradarApiKey);
+          break;
         default:
           result = await syncSchedule(supabase, sportradarApiKey, effectiveTour, effectiveYear);
       }
@@ -1080,7 +1083,7 @@ async function syncHoleStatistics(supabase: any, apiKey: string, tour: string, y
         hole_number: hole.number,
         par: hole.par,
         yardage: hole.yardage,
-        scoring_average: stats.scoring_avg ?? stats.scoring_average ?? hole.scoring_average ?? hole.scoring_avg ?? hole.strokes_avg ?? null,
+        scoring_average: stats.scoring_avg ?? stats.scoring_average ?? hole.strokes_avg ?? hole.scoring_average ?? hole.scoring_avg ?? null,
         avg_diff: stats.avg_diff ?? stats.relative_to_par ?? hole.avg_diff ?? hole.diff ?? null,
         eagles: stats.eagles ?? hole.eagles ?? 0,
         birdies: stats.birdies ?? hole.birdies ?? 0,
@@ -1100,6 +1103,80 @@ async function syncHoleStatistics(supabase: any, apiKey: string, tour: string, y
     records: totalRecords, 
     message: `Synced ${totalRecords} hole statistics`,
     debug: { url, topKeys, roundsFound: rounds.length }
+  };
+}
+
+// ============================================================================
+// BACKFILL HOLE STATISTICS — Iterate all closed tournaments missing hole data
+// ============================================================================
+async function backfillHoleStatistics(supabase: any, apiKey: string) {
+  // Get all closed tournaments
+  const { data: tournaments, error: qErr } = await supabase
+    .from('sr_tournaments')
+    .select('id, sr_id, name, season_id')
+    .eq('status', 'closed')
+    .order('end_date', { ascending: false });
+
+  if (qErr || !tournaments?.length) {
+    return { records: 0, message: 'No closed tournaments found', debug: { error: qErr?.message } };
+  }
+
+  let totalRecords = 0;
+  let processed = 0;
+  const total = tournaments.length;
+  const results: { name: string; records: number; skipped?: boolean }[] = [];
+
+  for (const tournament of tournaments) {
+    processed++;
+    
+    // Check if this tournament already has real hole stats data
+    const { data: existing } = await supabase
+      .from('sr_hole_statistics')
+      .select('scoring_average')
+      .eq('tournament_id', tournament.id)
+      .not('scoring_average', 'is', null)
+      .gt('scoring_average', 0)
+      .limit(1);
+
+    if (existing?.length) {
+      results.push({ name: tournament.name, records: 0, skipped: true });
+      continue;
+    }
+
+    // Get season info for API URL
+    const { data: season } = await supabase
+      .from('sr_seasons')
+      .select('year, tour_name')
+      .eq('id', tournament.season_id)
+      .maybeSingle();
+
+    const year = season?.year || new Date().getFullYear();
+    const tourName = (season?.tour_name || 'pga').toLowerCase();
+    const tour = tourName.includes('lpga') ? 'lpga' 
+      : tourName.includes('euro') || tourName.includes('dp') ? 'eur'
+      : tourName.includes('champ') ? 'champions-tour'
+      : 'pga';
+
+    console.log(`[Backfill] (${processed}/${total}) Syncing hole stats for ${tournament.name}...`);
+
+    try {
+      const result = await syncHoleStatistics(supabase, apiKey, tour, year, tournament.sr_id);
+      totalRecords += result.records;
+      results.push({ name: tournament.name, records: result.records });
+    } catch (e) {
+      console.error(`[Backfill] Error for ${tournament.name}: ${e.message}`);
+      results.push({ name: tournament.name, records: 0 });
+    }
+
+    // Rate limit: 1.5 seconds between tournaments
+    await new Promise(resolve => setTimeout(resolve, 1500));
+  }
+
+  console.log(`[Backfill] Complete: ${totalRecords} total hole stats across ${processed} tournaments`);
+  return { 
+    records: totalRecords, 
+    message: `Backfilled hole stats for ${processed} tournaments (${totalRecords} records)`,
+    debug: { results }
   };
 }
 
