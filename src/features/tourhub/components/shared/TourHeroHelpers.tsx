@@ -85,9 +85,7 @@ export function PlayerAvatar({
 }) {
   // PRIMARY: R2 headshot by name + tour. FALLBACK: silhouette.
   // photo_url from database is intentionally ignored — it contains expired Sportradar API URLs.
-  const resolved = tourCode
-    ? getPlayerHeadshotUrl(displayName, tourCode)
-    : (photoUrl || PLAYER_SILHOUETTE_URL);
+  const resolved = getPlayerHeadshotUrl(displayName, tourCode || 'pga') || PLAYER_SILHOUETTE_URL;
   const initials = displayName
     .split(/[\s.]/)
     .filter(Boolean)

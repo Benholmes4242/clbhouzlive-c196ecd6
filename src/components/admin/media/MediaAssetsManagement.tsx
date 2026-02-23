@@ -149,35 +149,9 @@ export default function MediaAssetsManagement() {
     uploadHeadshotMutation.mutate(file);
   };
 
-  // Fetch assets by kind
-  const { data: assets, isLoading: assetsLoading } = useQuery({
-    queryKey: ['sr-media-assets', activeTab, leagueFilter, providerFilter, searchQuery],
-    queryFn: async () => {
-      if (activeTab === 'availability' || activeTab === 'news') return [];
-      
-      let query = supabase
-        .from('sr_media_assets')
-        .select('*')
-        .eq('kind', activeTab === 'headshots' ? 'headshot' : activeTab === 'logos' ? 'logo' : 'venue')
-        .order('updated_at', { ascending: false })
-        .limit(100);
-      
-      if (leagueFilter !== 'all') {
-        query = query.eq('league', leagueFilter);
-      }
-      if (providerFilter !== 'all') {
-        query = query.eq('provider', providerFilter);
-      }
-      if (searchQuery) {
-        query = query.ilike('title', `%${searchQuery}%`);
-      }
-      
-      const { data, error } = await query;
-      if (error) throw error;
-      return data as MediaAsset[];
-    },
-    enabled: activeTab !== 'availability' && activeTab !== 'news',
-  });
+  // sr_media_assets table has been dropped — headshots are now served from R2 via getPlayerHeadshotUrl().
+  const assets: MediaAsset[] = [];
+  const assetsLoading = false;
 
   // Fetch availability map
   const { data: availability, isLoading: availabilityLoading } = useQuery({
@@ -220,46 +194,11 @@ export default function MediaAssetsManagement() {
     enabled: activeTab === 'news' || activeTab === 'analysis',
   });
 
-  // Fetch asset counts by kind
-  const { data: assetCounts } = useQuery({
-    queryKey: ['sr-media-counts'],
-    queryFn: async () => {
-      const [headshots, logos, venues, newsCount, analysisCount] = await Promise.all([
-        supabase.from('sr_media_assets').select('id', { count: 'exact', head: true }).eq('kind', 'headshot'),
-        supabase.from('sr_media_assets').select('id', { count: 'exact', head: true }).eq('kind', 'logo'),
-        supabase.from('sr_media_assets').select('id', { count: 'exact', head: true }).eq('kind', 'venue'),
-        supabase.from('sr_editorial_items').select('id', { count: 'exact', head: true }).eq('type', 'news'),
-        supabase.from('sr_editorial_items').select('id', { count: 'exact', head: true }).eq('type', 'analysis'),
-      ]);
-      return {
-        headshots: headshots.count || 0,
-        logos: logos.count || 0,
-        venues: venues.count || 0,
-        news: newsCount.count || 0,
-        analysis: analysisCount.count || 0,
-      };
-    },
-  });
+  // sr_media_assets table has been dropped — counts are no longer available
+  const assetCounts = { headshots: 0, logos: 0, venues: 0, news: 0, analysis: 0 };
 
-  // Sync mutation
-  const syncMutation = useMutation({
-    mutationFn: async (action: string) => {
-      const { data, error } = await supabase.functions.invoke('sportradar-media-sync', {
-        body: { action },
-      });
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: (data) => {
-      toast.success(data.message || 'Sync completed');
-      queryClient.invalidateQueries({ queryKey: ['sr-media-assets'] });
-      queryClient.invalidateQueries({ queryKey: ['sr-media-counts'] });
-      queryClient.invalidateQueries({ queryKey: ['sr-media-availability'] });
-    },
-    onError: (error: any) => {
-      toast.error(`Sync failed: ${error.message}`);
-    },
-  });
+  // sportradar-media-sync edge function has been deleted — sync is no longer available
+  const syncMutation = { isPending: false, mutate: (_action: string) => { toast.info('Media sync has been decommissioned. Headshots are now served from R2.'); } };
 
   const getStatusIcon = (status: ProviderStatus) => {
     switch (status) {

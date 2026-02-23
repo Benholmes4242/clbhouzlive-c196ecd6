@@ -665,7 +665,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
                           style={{ display: 'flex', alignItems: 'center', gap: 10 }}
                         >
-                          <PlayerAvatar photoUrl={getPlayerHeadshotUrl(winnerInfo.winnerName, winnerInfo.tourSlug ?? 'pga')} displayName={winnerInfo.winnerName} size={60} frosted />
+                          <PlayerAvatar displayName={winnerInfo.winnerName} tourCode={winnerInfo.tourSlug || 'pga'} size={60} frosted />
                           <div>
                             <span style={{ fontSize: '17px', fontWeight: 700, color: '#FFFFFF', display: 'block' }}>{winnerInfo.winnerName}</span>
                             {winnerInfo.winnerScore && (
