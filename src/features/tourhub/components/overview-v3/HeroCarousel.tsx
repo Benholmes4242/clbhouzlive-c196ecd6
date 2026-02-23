@@ -636,7 +636,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         >
                           {/* 60px photo */}
                           <button onClick={handlePlayerTap(podiumWinner.playerId)} className="transition-opacity active:opacity-70" style={{ flexShrink: 0 }}>
-                            <PlayerAvatar photoUrl={podiumWinner.photoUrl} pgaTourId={podiumWinner.pgaTourId} displayName={podiumWinner.displayName} size={60} frosted />
+                            <PlayerAvatar photoUrl={podiumWinner.photoUrl} pgaTourId={podiumWinner.pgaTourId} displayName={podiumWinner.displayName} tourCode={tournament.tourSlug} size={60} frosted />
                           </button>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             {/* Name + score */}
@@ -706,7 +706,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', gap: 6 }}
                       >
                         {runnerRows.map(row => (
-                          <PodiumRunnerRow key={row.position} row={row} onPlayerTap={handlePlayerTap} />
+                          <PodiumRunnerRow key={row.position} row={row} tourCode={tournament.tourSlug} onPlayerTap={handlePlayerTap} />
                         ))}
                       </motion.div>
                     ) : (

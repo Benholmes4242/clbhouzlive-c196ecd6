@@ -29,8 +29,26 @@ export function formatPurse(purse: number | null): string {
 
 /** Frosted glass avatar — for use inside dark/photo glass cards */
 function FrostedAvatar({ src, displayName, size }: { src: string | null; displayName: string; size: number }) {
+  const [currentSrc, setCurrentSrc] = React.useState(src);
   const [imgError, setImgError] = React.useState(false);
   const initials = displayName.split(/[\s.]/).filter(Boolean).map(w => w[0]?.toUpperCase() || '').slice(0, 2).join('') || '?';
+
+  // Reset state when src prop changes
+  React.useEffect(() => {
+    setCurrentSrc(src);
+    setImgError(false);
+  }, [src]);
+
+  const handleError = () => {
+    if (currentSrc && currentSrc !== PLAYER_SILHOUETTE_URL) {
+      // First failure: try silhouette
+      setCurrentSrc(PLAYER_SILHOUETTE_URL);
+    } else {
+      // Silhouette also failed: show initials as absolute last resort
+      setImgError(true);
+    }
+  };
+
   return (
     <div style={{
       width: size, height: size, borderRadius: '34%', overflow: 'hidden', flexShrink: 0,
@@ -38,8 +56,8 @@ function FrostedAvatar({ src, displayName, size }: { src: string | null; display
       background: 'rgba(255,255,255,0.1)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
-      {src && !imgError ? (
-        <img src={src} alt={displayName} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} onError={() => setImgError(true)} />
+      {currentSrc && !imgError ? (
+        <img src={currentSrc} alt={displayName} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} onError={handleError} />
       ) : (
         <span style={{ fontSize: Math.round(size * 0.35), fontWeight: 700, color: 'rgba(255,255,255,0.65)', lineHeight: 1 }}>{initials}</span>
       )}
@@ -52,17 +70,24 @@ export function PlayerAvatar({
   photoUrl,
   pgaTourId,
   displayName,
+  tourCode,
   size = 44,
   frosted = false,
 }: {
-  photoUrl: string | null;
+  photoUrl?: string | null;
   pgaTourId?: string | null;
   displayName: string;
+  /** Tour code for R2 folder lookup — e.g. 'pga', 'euro', 'lpga', 'liv' */
+  tourCode?: string;
   size?: number;
   /** Use frosted glass styling (rgba(255,255,255,0.1) bg + frosted border) — for glass card contexts */
   frosted?: boolean;
 }) {
-  const resolved = photoUrl || PLAYER_SILHOUETTE_URL;
+  // PRIMARY: R2 headshot by name + tour. FALLBACK: silhouette.
+  // photo_url from database is intentionally ignored — it contains expired Sportradar API URLs.
+  const resolved = tourCode
+    ? getPlayerHeadshotUrl(displayName, tourCode)
+    : (photoUrl || PLAYER_SILHOUETTE_URL);
   const initials = displayName
     .split(/[\s.]/)
     .filter(Boolean)
@@ -115,9 +140,11 @@ export function buildPodiumRows(allFetched: TournamentFinisher[]): PodiumRow[] {
 
 export function PodiumRunnerRow({
   row,
+  tourCode,
   onPlayerTap,
 }: {
   row: PodiumRow;
+  tourCode?: string;
   onPlayerTap?: (playerId: string | null | undefined) => (e: React.MouseEvent) => void;
 }) {
   const isSingle = row.players.length === 1;
@@ -155,6 +182,7 @@ export function PodiumRunnerRow({
             photoUrl={player.photoUrl}
             pgaTourId={player.pgaTourId}
             displayName={player.displayName}
+            tourCode={tourCode}
             size={30}
             frosted
           />
@@ -175,6 +203,7 @@ export function PodiumRunnerRow({
                 photoUrl={p.photoUrl}
                 pgaTourId={p.pgaTourId}
                 displayName={p.displayName}
+                tourCode={tourCode}
                 size={26}
                 frosted
               />
