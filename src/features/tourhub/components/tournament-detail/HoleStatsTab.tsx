@@ -112,11 +112,13 @@ function ScoringBar({ hole }: { hole: ProcessedHole }) {
             />
           ))}
         </div>
-        <div className="flex flex-wrap gap-x-3 gap-y-0.5">
+        <div className="flex items-center gap-x-2.5 mt-1">
           {segments.map((seg, i) => (
-            <span key={i} className="flex items-center gap-1 text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
+            <span key={i} className="flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: seg.color }} />
-              <span>{seg.count} {seg.label}</span>
+              <span style={{ fontSize: 10, fontWeight: 500, fontVariantNumeric: 'tabular-nums' }} className="text-muted-foreground/60">
+                {seg.count}
+              </span>
             </span>
           ))}
         </div>
@@ -422,6 +424,45 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
             {backNine.map((hole) => (
               <HoleRow key={hole.holeNumber} hole={hole} total={processedHoles.length} />
             ))}
+
+            {/* Persistent color legend */}
+            {hasRoundData && (
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                alignItems: 'center', 
+                gap: 16, 
+                paddingTop: 24, 
+                paddingBottom: 32,
+                borderTop: '1px solid hsl(var(--border) / 0.15)',
+                marginTop: 8,
+              }}>
+                {[
+                  { color: '#f59e0b', label: 'Eagles' },
+                  { color: '#22C55E', label: 'Birdies' },
+                  { color: '#CBD5E1', label: 'Pars' },
+                  { color: '#EF4444', label: 'Bogeys' },
+                  { color: '#1E293B', label: 'Dbl Bogey+' },
+                ].map((item, i) => (
+                  <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <span style={{ 
+                      width: 6, 
+                      height: 6, 
+                      borderRadius: '50%', 
+                      backgroundColor: item.color, 
+                      flexShrink: 0 
+                    }} />
+                    <span style={{ 
+                      fontSize: 10, 
+                      fontWeight: 500, 
+                      color: 'hsl(var(--muted-foreground) / 0.6)' 
+                    }}>
+                      {item.label}
+                    </span>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
