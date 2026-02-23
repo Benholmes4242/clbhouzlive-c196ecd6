@@ -69,6 +69,7 @@ function RunnerCard({ player, index, activeTour, statsMap, sort, tiedCount }: {
         background: 'hsl(var(--card))',
         border: '1px solid hsl(var(--border) / 0.5)',
         flex: '1 1 0%',
+        minWidth: 0,
       }}
     >
       {/* Rank circle */}
@@ -192,10 +193,6 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
           left: '16px',
           width: '44px',
           height: '44px',
-          background: 'hsl(var(--background))',
-          borderRadius: '12px',
-          border: '1px solid hsl(var(--border) / 0.5)',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
         }}
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
         aria-label="Open tour menu"
@@ -203,7 +200,7 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
         <Menu 
           className="w-[22px] h-[22px]" 
           strokeWidth={2}
-          style={{ color: 'hsl(var(--foreground))', filter: 'none' }}
+          style={{ color: 'hsl(var(--foreground))', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.15))' }}
         />
       </button>
       {/* Back arrow removed — replaced by "← Tour Overview" text link below hero */}
@@ -291,10 +288,9 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.35 }}
-              className="px-4"
-              style={{ marginTop: '-28px', position: 'relative', zIndex: 10 }}
+              style={{ padding: '0 16px', marginTop: '-20px', position: 'relative', zIndex: 10, boxSizing: 'border-box', width: '100%' }}
             >
-              <div className="flex gap-2">
+              <div className="flex gap-2" style={{ width: '100%' }}>
                 {runners.slice(0, 2).map((player, index) => (
                   <RunnerCard
                     key={player.playerId}
