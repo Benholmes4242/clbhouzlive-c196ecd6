@@ -83,12 +83,11 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
       >
         <div className="flex items-center justify-between">
           <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#1C1917' }}>
-            Our Top 5
+            Top 5 Picks
           </h3>
           <button
             onClick={() => setShowConfidenceInfo(!showConfidenceInfo)}
-            className="flex items-center gap-1 active:opacity-70 transition-opacity"
-            style={{ color: 'rgba(180, 130, 0, 0.6)' }}
+            className="flex items-center gap-1 active:opacity-70 transition-opacity text-muted-foreground/60"
           >
             <Info className="w-3.5 h-3.5" />
             <span style={{ fontSize: '12px', fontWeight: 500 }}>AI confidence score</span>
@@ -184,7 +183,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
               <div className="flex flex-col gap-2">
                 {pick.bullets.slice(0, 3).map((bullet, j) => (
                   <div key={j} className="flex items-start gap-2">
-                    <span className="text-[8px] mt-[5px] flex-shrink-0" style={{ color: '#B8860B' }}>
+                    <span className="text-[8px] mt-[5px] flex-shrink-0 text-muted-foreground/40">
                       ◆
                     </span>
                     <span className="text-[13px] leading-relaxed text-muted-foreground">

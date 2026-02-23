@@ -20,7 +20,6 @@ export const ClubhouseIntelligence = memo(function ClubhouseIntelligence({
   inline,
 }: ClubhouseIntelligenceProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
   const hasExpandedContent = !!insight.expandedText;
 
   return (
@@ -48,16 +47,11 @@ export const ClubhouseIntelligence = memo(function ClubhouseIntelligence({
       {hasExpandedContent && (
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          className="flex items-center gap-1.5 mt-3 text-[13px] font-semibold bg-transparent border-none cursor-pointer p-0 transition-colors duration-200 active:opacity-70"
-          style={{
-            color: isHovered ? '#DAA520' : '#B8860B',
-          }}
+          className="flex items-center gap-1.5 mt-3 text-[13px] font-semibold bg-transparent border-none cursor-pointer p-0 transition-opacity duration-200 text-foreground hover:opacity-70 active:opacity-70"
         >
           {isExpanded ? 'Show less' : 'Show more'}
           <ChevronDown
-            className="w-3.5 h-3.5 transition-transform duration-200"
+            className="w-3.5 h-3.5 transition-transform duration-200 text-foreground"
             style={{
               transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
             }}
