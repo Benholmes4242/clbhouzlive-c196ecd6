@@ -31,15 +31,22 @@ export function formatPurse(purse: number | null): string {
 function FrostedAvatar({ src, displayName, size }: { src: string | null; displayName: string; size: number }) {
   const [currentSrc, setCurrentSrc] = React.useState(src);
   const [imgError, setImgError] = React.useState(false);
+  const [loaded, setLoaded] = React.useState(false);
   const initials = displayName.split(/[\s.]/).filter(Boolean).map(w => w[0]?.toUpperCase() || '').slice(0, 2).join('') || '?';
 
   // Reset state when src prop changes
   React.useEffect(() => {
     setCurrentSrc(src);
     setImgError(false);
+    setLoaded(false);
   }, [src]);
 
+  const handleLoad = () => {
+    setLoaded(true); // Lock in success — ignore subsequent onError
+  };
+
   const handleError = () => {
+    if (loaded) return; // Image already loaded successfully — ignore false error
     if (currentSrc && currentSrc !== PLAYER_SILHOUETTE_URL) {
       // First failure: try silhouette
       setCurrentSrc(PLAYER_SILHOUETTE_URL);
@@ -57,7 +64,7 @@ function FrostedAvatar({ src, displayName, size }: { src: string | null; display
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
       {currentSrc && !imgError ? (
-        <img src={currentSrc} alt={displayName} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} onError={handleError} />
+        <img src={currentSrc} alt={displayName} crossOrigin="anonymous" onLoad={handleLoad} onError={handleError} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
       ) : (
         <span style={{ fontSize: Math.round(size * 0.35), fontWeight: 700, color: 'rgba(255,255,255,0.65)', lineHeight: 1 }}>{initials}</span>
       )}
