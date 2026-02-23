@@ -842,6 +842,26 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     return () => clearInterval(interval);
   }, [slides.length, isPaused]);
 
+  // Preload current slide's winner avatar into browser cache
+  useEffect(() => {
+    const slide = slides[currentIndex];
+    if (slide?.type === 'completed') {
+      const winners = leadersWinnersMap?.[slide.tournament.id];
+      const winner = winners?.find(w => w.position === 1);
+      if (winner) {
+        const url = getPlayerHeadshotUrl(
+          `${winner.player.firstName} ${winner.player.lastName}`,
+          slide.tournament.tourSlug || 'pga'
+        );
+        if (url) {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.src = url;
+        }
+      }
+    }
+  }, [currentIndex, slides, leadersWinnersMap]);
+
   // Reset index when slides change
   useEffect(() => {
     if (currentIndex >= slides.length) {
