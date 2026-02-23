@@ -37,6 +37,8 @@ interface PlayerCardV2Props {
   onNavigate?: () => void;
   /** Skip entry animation (e.g. when inside an already-animating overlay) */
   disableAnimation?: boolean;
+  /** Directory mode — show only name, country, photo, chevron (no stats/rank) */
+  directoryMode?: boolean;
 }
 
 function formatEarnings(amount: number): string {
@@ -60,6 +62,7 @@ export function PlayerCardV2({
   activeTour = 'all',
   onNavigate,
   disableAnimation = false,
+  directoryMode = false,
 }: PlayerCardV2Props) {
   // R2 headshot — single source of truth
   const tourCode = activeTour === 'all' ? (player.tourCodes?.[0] ?? 'pga') : activeTour;
@@ -175,49 +178,54 @@ export function PlayerCardV2({
             </div>
           )}
 
-          {/* Combined rank + points line for tour rankings (Euro/LPGA) */}
-          {isTourRanking && (rankPart || pointsPart || tourWinsPart) && (
-            <p className="text-muted-foreground truncate" style={{ fontSize: '13px', fontWeight: 500, marginTop: '4px', fontVariantNumeric: 'tabular-nums' }}>
-              {[rankPart, pointsPart, tourWinsPart].filter(Boolean).map((part, i) => (
-                <span key={i}>
-                  {i > 0 && ' · '}
-                  {(part === rankPart || part === pointsPart) ? (
-                    <span className="font-semibold text-foreground">{part}</span>
-                  ) : part}
-                </span>
-              ))}
-            </p>
-          )}
+          {/* Stats lines — hidden in directory mode */}
+          {!directoryMode && (
+            <>
+              {/* Combined rank + points line for tour rankings (Euro/LPGA) */}
+              {isTourRanking && (rankPart || pointsPart || tourWinsPart) && (
+                <p className="text-muted-foreground truncate" style={{ fontSize: '13px', fontWeight: 500, marginTop: '4px', fontVariantNumeric: 'tabular-nums' }}>
+                  {[rankPart, pointsPart, tourWinsPart].filter(Boolean).map((part, i) => (
+                    <span key={i}>
+                      {i > 0 && ' · '}
+                      {(part === rankPart || part === pointsPart) ? (
+                        <span className="font-semibold text-foreground">{part}</span>
+                      ) : part}
+                    </span>
+                  ))}
+                </p>
+              )}
 
-          {/* OWGR secondary line for tour-ranked tours (EURO, PGAD, LIV — not LPGA) */}
-          {isTourRanking && !isLPGA && owgr != null && owgr > 0 && (
-            <p className="text-muted-foreground truncate" style={{ fontSize: '12px', fontWeight: 400, marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
-              #{owgr} OWGR
-            </p>
-          )}
+              {/* OWGR secondary line for tour-ranked tours (EURO, PGAD, LIV — not LPGA) */}
+              {isTourRanking && !isLPGA && owgr != null && owgr > 0 && (
+                <p className="text-muted-foreground truncate" style={{ fontSize: '12px', fontWeight: 400, marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
+                  #{owgr} OWGR
+                </p>
+              )}
 
-          {/* Rank line for non-tour rankings */}
-          {!isTourRanking && rankPart && (
-            <p className="text-muted-foreground truncate" style={{ fontSize: '13px', fontWeight: 500, marginTop: '4px', fontVariantNumeric: 'tabular-nums' }}>
-              {activeSort === 'world-rank-desc' || activeSort === 'world-rank-asc' ? (
-                <span className="font-semibold text-foreground">{rankPart}</span>
-              ) : rankPart}
-            </p>
-          )}
+              {/* Rank line for non-tour rankings */}
+              {!isTourRanking && rankPart && (
+                <p className="text-muted-foreground truncate" style={{ fontSize: '13px', fontWeight: 500, marginTop: '4px', fontVariantNumeric: 'tabular-nums' }}>
+                  {activeSort === 'world-rank-desc' || activeSort === 'world-rank-asc' ? (
+                    <span className="font-semibold text-foreground">{rankPart}</span>
+                  ) : rankPart}
+                </p>
+              )}
 
-          {/* Earnings / Wins line for non-tour rankings */}
-          {!isTourRanking && (earningsPart || winsPart) && (
-            <p className="text-muted-foreground truncate" style={{ fontSize: '13px', fontWeight: 500, marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
-              {[earningsPart, winsPart].filter(Boolean).map((part, i) => (
-                <span key={i}>
-                  {i > 0 && ' · '}
-                  {((activeSort === 'highest-earnings' && part === earningsPart) || 
-                    (activeSort === 'most-wins' && part === winsPart)) ? (
-                    <span className="font-semibold text-foreground">{part}</span>
-                  ) : part}
-                </span>
-              ))}
-            </p>
+              {/* Earnings / Wins line for non-tour rankings */}
+              {!isTourRanking && (earningsPart || winsPart) && (
+                <p className="text-muted-foreground truncate" style={{ fontSize: '13px', fontWeight: 500, marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
+                  {[earningsPart, winsPart].filter(Boolean).map((part, i) => (
+                    <span key={i}>
+                      {i > 0 && ' · '}
+                      {((activeSort === 'highest-earnings' && part === earningsPart) || 
+                        (activeSort === 'most-wins' && part === winsPart)) ? (
+                        <span className="font-semibold text-foreground">{part}</span>
+                      ) : part}
+                    </span>
+                  ))}
+                </p>
+              )}
+            </>
           )}
         </div>
 

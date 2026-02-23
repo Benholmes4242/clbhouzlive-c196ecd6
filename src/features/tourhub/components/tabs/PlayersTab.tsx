@@ -244,7 +244,11 @@ export function PlayersTab() {
     };
 
     if (activeTour === 'all') {
-      return sortCandidates(elitePlayers || []).slice(0, 5);
+      // Showcase: top 8 by world ranking
+      return (elitePlayers || [])
+        .filter(p => p.worldRank && p.worldRank > 0)
+        .sort((a, b) => (a.worldRank || 999) - (b.worldRank || 999))
+        .slice(0, 8);
     }
     
     // Filter elite players for this tour
@@ -473,10 +477,12 @@ export function PlayersTab() {
 
       {/* Content */}
       <div className="px-4">
-        {/* Sort row — 24px from tour dropdown */}
-        <div className="flex items-center justify-end" style={{ marginTop: '24px' }}>
-          <PlayerSortControl value={sort} onChange={(v) => { setSort(v); setVisibleCount(PAGE_SIZE); }} activeTour={activeTour} />
-        </div>
+        {/* Sort row — 24px from tour dropdown (hidden for All Tours) */}
+        {activeTour !== 'all' && (
+          <div className="flex items-center justify-end" style={{ marginTop: '24px' }}>
+            <PlayerSortControl value={sort} onChange={(v) => { setSort(v); setVisibleCount(PAGE_SIZE); }} activeTour={activeTour} />
+          </div>
+        )}
 
         {/* Player cards — 12px from sort */}
         <AnimatePresence mode="wait">
@@ -487,7 +493,7 @@ export function PlayersTab() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             className="flex flex-col gap-2"
-            style={{ marginTop: '12px' }}
+            style={{ marginTop: activeTour === 'all' ? '24px' : '12px' }}
           >
             {displayRows.length > 0 ? (
               <>
@@ -518,6 +524,7 @@ export function PlayersTab() {
                       index={index}
                       activeSort={sort}
                       activeTour={activeTour}
+                      directoryMode={activeTour === 'all'}
                       onNavigate={() => sessionStorage.setItem('players-scroll', String(window.scrollY))}
                     />
                   );

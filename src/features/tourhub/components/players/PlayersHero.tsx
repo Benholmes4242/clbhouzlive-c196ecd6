@@ -3,7 +3,7 @@
  * Aligned with Tour Overview audit typography & spacing.
  */
 
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu } from 'lucide-react';
@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
+import { useSwipeable } from 'react-swipeable';
 import type { ElitePlayer } from '../../hooks/useElitePlayers';
 import type { PlayerTourCode } from './PlayersTourFilter';
 import type { PlayerSortType } from './PlayerSortControl';
@@ -30,6 +31,155 @@ function formatEarningsCompact(amount: number | null | undefined): string | null
   if (amount >= 1_000_000) return `$${(amount / 1_000_000).toFixed(1)}M`;
   if (amount >= 1_000) return `$${(amount / 1_000).toFixed(0)}K`;
   return `$${amount}`;
+}
+
+/* ─── All Tours Showcase Carousel ─── */
+function AllToursShowcase({ players }: { players: ElitePlayer[] }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const resumeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const count = players.length;
+
+  const startAutoRotation = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setCurrentIndex(prev => (prev + 1) % count);
+    }, 5000);
+  }, [count]);
+
+  const stopAutoRotation = useCallback(() => {
+    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+  }, []);
+
+  useEffect(() => {
+    if (!isPaused && count > 1) startAutoRotation();
+    return () => stopAutoRotation();
+  }, [isPaused, count, startAutoRotation, stopAutoRotation]);
+
+  const goTo = useCallback((idx: number) => {
+    setCurrentIndex(((idx % count) + count) % count);
+    // Pause then resume after 3s
+    setIsPaused(true);
+    stopAutoRotation();
+    if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
+    resumeTimeoutRef.current = setTimeout(() => setIsPaused(false), 3000);
+  }, [count, stopAutoRotation]);
+
+  useEffect(() => {
+    return () => { if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current); };
+  }, []);
+
+  const handlers = useSwipeable({
+    onSwipedLeft: () => goTo(currentIndex + 1),
+    onSwipedRight: () => goTo(currentIndex - 1),
+    trackMouse: false,
+    trackTouch: true,
+    preventScrollOnSwipe: true,
+    delta: 30,
+  });
+
+  const player = players[currentIndex];
+  if (!player) return null;
+
+  const photoUrl = getPlayerHeadshotUrl(player.playerName, 'pga');
+  const country = titleCaseCountry(player.country);
+
+  return (
+    <div className="relative">
+      {/* Burger menu */}
+      <button
+        className="absolute z-20 flex items-center justify-center"
+        style={{ top: '48px', left: '16px', width: '44px', height: '44px' }}
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
+        aria-label="Open tour menu"
+      >
+        <Menu
+          className="w-[22px] h-[22px]"
+          strokeWidth={2}
+          style={{ color: 'hsl(var(--foreground))', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.15))' }}
+        />
+      </button>
+
+      <div {...handlers}>
+        <Link
+          to={`/tourhub/player/${player.playerId}`}
+          className="block active:scale-[0.995] transition-transform"
+        >
+          <div className="relative w-full overflow-hidden" style={{ height: '40dvh' }}>
+            <AnimatePresence mode="wait">
+              <motion.img
+                key={player.playerId}
+                src={photoUrl}
+                alt={player.playerName}
+                className="absolute inset-0 w-full h-full object-cover object-[center_10%]"
+                loading="eager"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
+                onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+              />
+            </AnimatePresence>
+
+            {/* Gradient */}
+            <div className="absolute inset-0" style={{
+              background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 35%, rgba(0,0,0,0.05) 60%, transparent 80%)',
+            }} />
+
+            {/* Bottom content */}
+            <div className="absolute bottom-0 left-0 right-0 p-5 pb-6 space-y-1.5">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={player.playerId}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.35 }}
+                  className="space-y-1"
+                >
+                  <h2
+                    className="text-white"
+                    style={{ fontSize: '20px', fontWeight: 700, letterSpacing: '-0.3px', lineHeight: 1.2 }}
+                  >
+                    {player.playerName}
+                  </h2>
+                  <div className="flex items-center gap-1.5">
+                    <CountryFlag country={player.country} size="sm" className="brightness-110" />
+                    {country && (
+                      <span style={{ fontSize: '13px', fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>
+                        {country}
+                      </span>
+                    )}
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+
+              {/* Carousel dots */}
+              {count > 1 && (
+                <div className="flex items-center justify-center gap-2 pt-1">
+                  {players.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); goTo(i); }}
+                      className="rounded-full transition-colors duration-200"
+                      style={{
+                        width: '7px',
+                        height: '7px',
+                        background: i === currentIndex ? 'hsl(var(--foreground))' : 'rgba(255,255,255,0.3)',
+                      }}
+                      aria-label={`Go to player ${i + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </Link>
+      </div>
+    </div>
+  );
 }
 
 /** Runner card — #2 amber, #3 silver */
@@ -119,9 +269,14 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
   
   if (players.length === 0) return null;
 
+  // All Tours: render showcase carousel instead
+  if (activeTour === 'all') {
+    return <AllToursShowcase players={players} />;
+  }
+
   const champion = players[0];
   const runners = players.slice(1, 5);
-  const champTourCode = activeTour === 'all' ? 'pga' : activeTour;
+  const champTourCode = activeTour;
   const photoUrl = getPlayerHeadshotUrl(champion.playerName, champTourCode);
   const showPhoto = !imageError;
   const flag = countryCodeToFlag(champion.countryCode);
@@ -141,14 +296,11 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
   const earningsStr = formatEarningsCompact(champStats?.earnings);
 
   if (sort === 'most-wins') {
-    // Wins mode: show wins prominently, skip rank and earnings
     if (champWins > 0) metaParts.push(`${champWins} ${champWins === 1 ? 'win' : 'wins'}`);
   } else if (sort === 'highest-earnings') {
-    // Earnings mode: show earnings prominently, skip rank
     if (earningsStr) metaParts.push(earningsStr);
     if (champWins > 0) metaParts.push(`${champWins} ${champWins === 1 ? 'win' : 'wins'}`);
   } else {
-    // Default (world-rank, alpha, tour-specific sorts): existing behavior
     if (isRankingsTour && champTourRank) {
       metaParts.push(`#${champTourRank}`);
       if (champStats?.points != null && champStats.points > 0) {
@@ -158,7 +310,7 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
         metaParts.push(`${champWins} ${champWins === 1 ? 'win' : 'wins'}`);
       }
     } else {
-      if (activeTour === 'all' || !champTourRank) {
+      if (!champTourRank) {
         metaParts.push(`#${champion.worldRank} OWGR`);
       } else {
         metaParts.push(`#${champTourRank}`);
@@ -174,10 +326,8 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
   const getPlayerWins = (p: ElitePlayer) => statsMap?.get(p.playerId)?.wins ?? 0;
   let tiedCounts: number[] = [];
   if (sort === 'most-wins' && runners.length >= 2) {
-    // Count how many OTHER players in the full list share the same win count
     tiedCounts = runners.slice(0, 2).map(runner => {
       const runnerWins = getPlayerWins(runner);
-      // Count all players with same wins, subtract the ones already shown (hero + runners)
       const shownIds = new Set([champion.playerId, ...runners.slice(0, 2).map(r => r.playerId)]);
       const othersWithSameWins = players.filter(
         p => !shownIds.has(p.playerId) && getPlayerWins(p) === runnerWins
