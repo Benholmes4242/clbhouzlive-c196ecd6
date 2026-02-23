@@ -25,11 +25,11 @@ const SKILL_ICONS: Record<SkillAttributeKey, React.ElementType> = {
 };
 
 const SKILL_ICON_BG: Record<SkillAttributeKey, { bg: string; text: string }> = {
-  power: { bg: 'bg-red-100', text: 'text-red-500' },
-  precision: { bg: 'bg-amber-100', text: 'text-amber-600' },
-  scoring: { bg: 'bg-amber-100', text: 'text-amber-600' },
-  recovery: { bg: 'bg-teal-100', text: 'text-teal-600' },
-  consistency: { bg: 'bg-purple-100', text: 'text-purple-600' },
+  power: { bg: 'bg-muted', text: 'text-muted-foreground' },
+  precision: { bg: 'bg-muted', text: 'text-muted-foreground' },
+  scoring: { bg: 'bg-muted', text: 'text-muted-foreground' },
+  recovery: { bg: 'bg-muted', text: 'text-muted-foreground' },
+  consistency: { bg: 'bg-muted', text: 'text-muted-foreground' },
 };
 
 const SKILL_ACCENT_COLORS: Record<SkillAttributeKey, string> = {
@@ -94,12 +94,12 @@ const AttributeRow = memo(({ attribute, delay = 0, animate = true }: { attribute
       <span className="flex-1 text-foreground" style={{ fontSize: 14, fontWeight: 500, marginLeft: 10 }}>
         {config.label}
       </span>
-      <div className="flex items-baseline gap-1">
+      <div className="text-right" style={{ minWidth: '72px' }}>
         <span className="text-foreground" style={{ fontSize: 14, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
           {formatValue()}
         </span>
         {config.unit && (
-          <span className="text-muted-foreground" style={{ fontSize: 11, fontWeight: 500 }}>
+          <span className="text-muted-foreground" style={{ fontSize: 11, fontWeight: 500, marginLeft: 2 }}>
             {config.unit}
           </span>
         )}
