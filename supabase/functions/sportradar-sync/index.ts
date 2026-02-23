@@ -1045,29 +1045,54 @@ async function syncHoleStatistics(supabase: any, apiKey: string, tour: string, y
     console.log(`[Hole Statistics] Could not find holes. Sample: ${JSON.stringify(data).substring(0, 500)}`);
   }
 
+  // Debug: log first hole sample to identify field structure
+  if (rounds.length > 0 && rounds[0].holes?.length > 0) {
+    const sampleHole = rounds[0].holes[0];
+    console.log('=== SPORTRADAR HOLE STATS RAW ===');
+    console.log('Full response keys:', Object.keys(data));
+    console.log('First round keys:', Object.keys(rounds[0]));
+    console.log('Sample hole keys:', Object.keys(sampleHole));
+    console.log('First hole sample:', JSON.stringify(sampleHole, null, 2));
+    console.log('=== FIELD MAPPING DEBUG ===');
+    console.log('Trying .statistics?.scoring_avg:', sampleHole?.statistics?.scoring_avg);
+    console.log('Trying .scoring_avg:', sampleHole?.scoring_avg);
+    console.log('Trying .statistics?.scoring_average:', sampleHole?.statistics?.scoring_average);
+    console.log('Trying .scoring_average:', sampleHole?.scoring_average);
+    console.log('Trying .eagles:', sampleHole?.eagles);
+    console.log('Trying .statistics?.eagles:', sampleHole?.statistics?.eagles);
+    console.log('Trying .statistics?.birdies:', sampleHole?.statistics?.birdies);
+    console.log('Trying .birdies:', sampleHole?.birdies);
+    console.log('Trying .avg_diff:', sampleHole?.avg_diff);
+    console.log('Trying .statistics?.avg_diff:', sampleHole?.statistics?.avg_diff);
+    console.log('=== END FIELD MAPPING ===');
+  }
+
   for (const round of rounds) {
     const roundNum = round.number || null;
     const holes = round.holes || [];
 
     for (const hole of holes) {
+      // Try multiple field paths: hole.statistics.X, hole.X, fallback to 0/null
+      const stats = hole.statistics || {};
       const { error } = await supabase.from('sr_hole_statistics').upsert({
         tournament_id: tournament.id,
         round_number: roundNum,
         hole_number: hole.number,
         par: hole.par,
         yardage: hole.yardage,
-        scoring_average: hole.scoring_average || hole.strokes_avg || hole.average,
-        avg_diff: hole.avg_diff || hole.diff,
-        eagles: hole.eagles,
-        birdies: hole.birdies,
-        pars: hole.pars,
-        bogeys: hole.bogeys,
-        double_bogeys: hole.double_bogeys,
-        other: hole.other || hole.other_scores,
-        rank: hole.rank,
+        scoring_average: stats.scoring_avg ?? stats.scoring_average ?? hole.scoring_average ?? hole.scoring_avg ?? hole.strokes_avg ?? null,
+        avg_diff: stats.avg_diff ?? stats.relative_to_par ?? hole.avg_diff ?? hole.diff ?? null,
+        eagles: stats.eagles ?? hole.eagles ?? 0,
+        birdies: stats.birdies ?? hole.birdies ?? 0,
+        pars: stats.pars ?? hole.pars ?? 0,
+        bogeys: stats.bogeys ?? hole.bogeys ?? 0,
+        double_bogeys: stats.double_bogeys ?? hole.double_bogeys ?? 0,
+        other: stats.other ?? hole.other ?? hole.other_scores ?? 0,
+        rank: stats.rank ?? hole.rank ?? null,
         raw_data: hole,
       }, { onConflict: 'tournament_id,round_number,hole_number' });
       if (!error) totalRecords++;
+      else console.error(`[Hole Statistics] Upsert error for hole ${hole.number} round ${roundNum}:`, error.message);
     }
   }
 
