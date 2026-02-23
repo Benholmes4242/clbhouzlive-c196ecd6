@@ -11,6 +11,7 @@ import { openTourNav } from '../../contexts/TourNavContext';
 import { cn } from '@/lib/utils';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
+import CountryFlag from '@/components/ui/country-flag';
 import type { ElitePlayer } from '../../hooks/useElitePlayers';
 import type { PlayerTourCode } from './PlayersTourFilter';
 import type { PlayerSortType } from './PlayerSortControl';
@@ -74,10 +75,10 @@ function RunnerCard({ player, index, activeTour, statsMap, sort, tiedCount }: {
     >
       {/* Rank circle */}
       <div
-        className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
-        style={{ background: rankBg }}
+        className="flex-shrink-0 rounded-full flex items-center justify-center"
+        style={{ background: rankBg, width: '26px', height: '26px' }}
       >
-        <span style={{ fontSize: '14px', fontWeight: 700, color: 'white' }}>{badgeNumber}</span>
+        <span style={{ fontSize: '11px', fontWeight: 700, color: 'white' }}>{badgeNumber}</span>
       </div>
 
       {/* Avatar */}
@@ -104,7 +105,10 @@ function RunnerCard({ player, index, activeTour, statsMap, sort, tiedCount }: {
             </span>
           )}
         </div>
-        <p style={{ fontSize: '11px', fontWeight: 400 }} className="text-muted-foreground truncate">{country || 'Unknown'}</p>
+        <div className="flex items-center gap-1">
+          <CountryFlag country={player.country} size="sm" />
+          <p style={{ fontSize: '11px', fontWeight: 400 }} className="text-muted-foreground truncate">{country || 'Unknown'}</p>
+        </div>
       </div>
     </Link>
   );
@@ -237,7 +241,7 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
                 background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 35%, rgba(0,0,0,0.05) 60%, transparent 80%)',
               }} />
 
-              <div className="absolute bottom-0 left-0 right-0 p-5 pb-6 space-y-1.5">
+              <div className="absolute bottom-0 left-0 right-0 p-5 pb-10 space-y-1.5">
                 <motion.h2
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -254,7 +258,7 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
                   transition={{ delay: 0.22, duration: 0.4 }}
                   className="flex items-center gap-1.5"
                 >
-                  {flag && <span className="text-lg">{flag}</span>}
+                  <CountryFlag country={champion.country} size="sm" className="brightness-110" />
                   <span style={{ fontSize: '13px', fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>{country}</span>
                 </motion.div>
 
