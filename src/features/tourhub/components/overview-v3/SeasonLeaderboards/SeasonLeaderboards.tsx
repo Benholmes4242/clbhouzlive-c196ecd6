@@ -236,7 +236,7 @@ export function SeasonLeaderboards() {
             style={{ marginTop: '16px' }}
           >
             {/* Stat context line — no icon badge */}
-            <p className="m-0 text-muted-foreground mb-4" style={{ fontSize: '14px', fontWeight: 500, fontStyle: 'italic' }}>
+            <p className="m-0 text-muted-foreground/60 mb-4" style={{ fontSize: '12px', fontWeight: 500 }}>
               {contextLine}
             </p>
 
@@ -275,21 +275,11 @@ export function SeasonLeaderboards() {
                 const leaderCategory = categoryMap[activeCategory] || 'strokes_gained_total';
                 navigate(`/tourhub?tab=leaderboards&category=${leaderCategory}`);
               }}
-              style={{
-                width: '100%',
-                padding: '14px',
-                borderRadius: '12px',
-                border: '1px solid rgba(0,0,0,0.08)',
-                background: 'rgba(0,0,0,0.03)',
-                fontSize: '14px',
-                fontWeight: 600,
-                color: 'rgba(0,0,0,0.55)',
-                cursor: 'pointer',
-                marginTop: '12px',
-              }}
-              className="active:scale-[0.98] transition-transform duration-150"
+              className="w-full flex items-center justify-center gap-1 py-3 text-[13px] font-semibold text-foreground hover:opacity-70 active:scale-[0.98] transition-all duration-150"
+              style={{ marginTop: '12px' }}
             >
-              View Full Rankings ›
+              View Full Rankings
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </button>
           </motion.div>
         </AnimatePresence>
