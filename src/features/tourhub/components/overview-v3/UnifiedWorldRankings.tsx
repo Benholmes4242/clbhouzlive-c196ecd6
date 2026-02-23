@@ -301,7 +301,7 @@ export function UnifiedWorldRankings() {
           <ChevronRight className="w-3.5 h-3.5 opacity-60" />
         </button>
       </div>
-      <p className="text-muted-foreground/60 leading-tight mt-0.5 mb-2.5" style={{ fontSize: '13px', fontWeight: 500 }}>
+      <p className="text-muted-foreground/60 leading-tight mt-1 mb-2.5" style={{ fontSize: '13px', fontWeight: 500 }}>
         {(() => {
           const rankingDate = (rankings as any)?.[0]?.ranking_date;
           if (!rankingDate) return 'Updated weekly · Official OWGR data';
@@ -314,7 +314,7 @@ export function UnifiedWorldRankings() {
           return `Updated ${rankingDate} · Official OWGR data`;
         })()}
       </p>
-      <div className="border-b mb-4" style={{ borderColor: 'hsl(var(--border) / 0.1)' }} />
+      <div className="border-b mb-4" style={{ borderColor: 'hsl(var(--border) / 0.3)' }} />
 
 
       {/* ═══ 3. Risers & Fallers ═══ */}
@@ -358,7 +358,7 @@ export function UnifiedWorldRankings() {
       {/* ═══ 4. Leaderboard ═══ */}
       <div>
         {/* Two-column stat headers */}
-        <div className="flex items-center pb-2" style={{ borderBottom: '1px solid hsl(var(--border) / 0.1)' }}>
+        <div className="flex items-center pb-2" style={{ borderBottom: '1px solid hsl(var(--border) / 0.3)' }}>
           <div className="w-10 flex-shrink-0 text-center uppercase text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em' }}>
             #
           </div>
@@ -414,7 +414,7 @@ export function UnifiedWorldRankings() {
                   style={{
                     padding: '12px 0',
                     minHeight: '64px',
-                    borderBottom: '1px solid hsl(var(--border) / 0.08)',
+                    borderBottom: '1px solid hsl(var(--border) / 0.15)',
                     borderLeft: isMover ? '3px solid hsl(142 76% 36%)' : '3px solid transparent',
                     background: rowBg,
                   }}

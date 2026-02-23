@@ -194,7 +194,7 @@ export function WhatsComing() {
       aria-label="Upcoming tournaments"
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-4 mb-3">
+      <div className="flex items-center justify-between px-4 mb-4">
         <h2 className="text-foreground text-[1.375rem] font-bold" style={{ letterSpacing: '-0.3px' }}>
           What's Coming Up
         </h2>
