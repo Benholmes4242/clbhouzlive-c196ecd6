@@ -59,7 +59,7 @@ function FrostedAvatar({ src, displayName, size }: { src: string | null; display
   return (
     <div style={{
       width: size, height: size, borderRadius: '34%', overflow: 'hidden', flexShrink: 0,
-      border: '1.5px solid rgba(255,255,255,0.25)',
+      border: '1.5px solid #F8FAFC',
       background: '#F8FAFC',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
