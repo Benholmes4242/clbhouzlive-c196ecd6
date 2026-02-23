@@ -180,8 +180,20 @@ export function PlayersTab() {
   // Tour-level filtering
   const tourFilteredPlayers = useMemo(() => {
     if (!allPlayers || activeTour === 'all') return allPlayers || [];
-    return allPlayers.filter(p => p.tour_codes?.includes(activeTour));
-  }, [allPlayers, activeTour]);
+    return allPlayers.filter(p => {
+      // Primary: player has this tour in their tour_codes
+      if (p.tour_codes?.includes(activeTour)) return true;
+      
+      // Safety net for PGA: include any player with a world ranking in the top 100
+      // who has empty tour_codes (they almost certainly play on PGA Tour)
+      if (activeTour === 'pga' && (!p.tour_codes || p.tour_codes.length === 0)) {
+        const wr = rankMap.get(p.id)?.worldRank;
+        return wr != null && wr <= 100;
+      }
+      
+      return false;
+    });
+  }, [allPlayers, activeTour, rankMap]);
 
   // Tour counts
   const tourCounts = useMemo(() => {
@@ -253,7 +265,15 @@ export function PlayersTab() {
     // Filter elite players for this tour
     const tourElite = (elitePlayers || []).filter(ep => {
       const player = allPlayers?.find(p => p.id === ep.playerId);
-      return player?.tour_codes?.includes(activeTour);
+      if (!player) return false;
+      if (player.tour_codes?.includes(activeTour)) return true;
+      
+      // Safety net for PGA
+      if (activeTour === 'pga' && (!player.tour_codes || player.tour_codes.length === 0)) {
+        return ep.worldRank != null && ep.worldRank <= 100;
+      }
+      
+      return false;
     });
     
     if (tourElite.length > 0) {
