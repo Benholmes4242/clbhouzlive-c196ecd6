@@ -16,12 +16,6 @@ interface ResultsRecapProps {
   bestCallActual?: number;
 }
 
-const GRADE_STYLES: Record<AccuracyMetrics['overallGrade'], { bg: string; text: string; border: string; label: string }> = {
-  excellent: { bg: '#ecfdf5', text: '#047857', border: '#a7f3d0', label: 'Excellent' },
-  good: { bg: '#fffbeb', text: '#b45309', border: '#fde68a', label: 'Good' },
-  mixed: { bg: '#eff6ff', text: '#1d4ed8', border: '#bfdbfe', label: 'Mixed' },
-  poor: { bg: '#f9fafb', text: '#4b5563', border: '#e5e7eb', label: 'Poor' },
-};
 
 function getOrdinalSuffix(n: number): string {
   const s = ['th', 'st', 'nd', 'rd'];
@@ -36,7 +30,7 @@ export const ResultsRecap: React.FC<ResultsRecapProps> = ({
   bestCallPredicted,
   bestCallActual,
 }) => {
-  const grade = GRADE_STYLES[accuracy.overallGrade];
+  
 
   return (
     <motion.div
@@ -52,33 +46,14 @@ export const ResultsRecap: React.FC<ResultsRecapProps> = ({
           padding: '12px 16px',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          gap: 8,
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-          <span style={{ fontSize: 13, fontWeight: 600, color: 'hsl(var(--background))' }}>
-            Intelligence Results
-          </span>
-          <span style={{ fontSize: 11, fontWeight: 400, color: 'hsl(var(--background) / 0.6)' }}>
-            {predictions.tournament.name}
-          </span>
-        </div>
-        {/* Grade badge */}
-        <span
-          style={{
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: '0.05em',
-            textTransform: 'uppercase',
-            padding: '3px 8px',
-            borderRadius: 6,
-            background: grade.bg,
-            color: grade.text,
-            border: `1px solid ${grade.border}`,
-            flexShrink: 0,
-          }}
-        >
-          {grade.label}
+        <span style={{ fontSize: 13, fontWeight: 600, color: 'hsl(var(--background))' }}>
+          Intelligence Results
+        </span>
+        <span style={{ fontSize: 11, fontWeight: 400, color: 'hsl(var(--background) / 0.6)' }}>
+          {predictions.tournament.name}
         </span>
       </div>
 
