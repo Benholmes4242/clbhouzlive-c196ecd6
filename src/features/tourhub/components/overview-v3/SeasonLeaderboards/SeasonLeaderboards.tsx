@@ -236,7 +236,7 @@ export function SeasonLeaderboards() {
             style={{ marginTop: '16px' }}
           >
             {/* Stat context line — no icon badge */}
-            <p className="m-0 text-muted-foreground/60 mb-4" style={{ fontSize: '12px', fontWeight: 500 }}>
+            <p className="m-0 text-muted-foreground/60 mb-4" style={{ fontSize: '13px', fontWeight: 500 }}>
               {contextLine}
             </p>
 

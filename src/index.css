@@ -232,7 +232,7 @@ html.lightbox-open {
    * - space-sub (8px): Title→subtitle, button→helper text
    * - space-internal (12px): Inside cards, list row padding
    */
-  --space-section: 32px;
+  --space-section: 24px;
   --space-block: 16px;
   --space-sub: 8px;
   --space-internal: 12px;
