@@ -192,7 +192,7 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
       <button 
         className="absolute z-20 flex items-center justify-center"
         style={{
-          top: '56px',
+          top: '48px',
           left: '16px',
           width: '44px',
           height: '44px',
@@ -219,7 +219,7 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
             to={`/tourhub/player/${champion.playerId}`}
             className="block active:scale-[0.995] transition-transform"
           >
-            <div className="relative w-full overflow-hidden" style={{ height: '50dvh' }}>
+            <div className="relative w-full overflow-hidden" style={{ height: '40dvh' }}>
               {showPhoto ? (
                 <motion.img
                   src={photoUrl}
@@ -240,13 +240,13 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
                 background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 35%, rgba(0,0,0,0.05) 60%, transparent 80%)',
               }} />
 
-              <div className="absolute bottom-0 left-0 right-0 p-5 pb-10 space-y-1.5">
+              <div className="absolute bottom-0 left-0 right-0 p-5 pb-6 space-y-1.5">
                 <motion.h2
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2, duration: 0.4 }}
                   className="text-white"
-                  style={{ fontSize: '22px', fontWeight: 800, letterSpacing: '-0.3px', lineHeight: 1.2 }}
+                  style={{ fontSize: '20px', fontWeight: 800, letterSpacing: '-0.3px', lineHeight: 1.2 }}
                 >
                   {champion.playerName}
                 </motion.h2>
@@ -272,7 +272,7 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
                         fontSize: '13px', fontWeight: 600, 
                         background: 'rgba(245,158,11,0.85)', 
                         borderRadius: '20px', 
-                        padding: '6px 14px',
+                        padding: '5px 12px',
                         letterSpacing: '0.3px',
                       }}
                     >
