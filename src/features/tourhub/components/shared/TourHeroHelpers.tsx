@@ -64,7 +64,7 @@ function FrostedAvatar({ src, displayName, size }: { src: string | null; display
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
       {currentSrc && !imgError ? (
-        <img src={currentSrc} alt={displayName} crossOrigin="anonymous" onLoad={handleLoad} onError={handleError} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
+        <img src={currentSrc} alt={displayName} onLoad={handleLoad} onError={handleError} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
       ) : (
         <span style={{ fontSize: Math.round(size * 0.35), fontWeight: 700, color: 'rgba(255,255,255,0.65)', lineHeight: 1 }}>{initials}</span>
       )}
@@ -77,6 +77,7 @@ export function PlayerAvatar({
   photoUrl,
   pgaTourId,
   displayName,
+  fullName,
   tourCode,
   size = 44,
   frosted = false,
@@ -84,15 +85,17 @@ export function PlayerAvatar({
   photoUrl?: string | null;
   pgaTourId?: string | null;
   displayName: string;
+  /** Full name for R2 lookup — e.g. "Jacob Bridgeman". Falls back to displayName if omitted. */
+  fullName?: string;
   /** Tour code for R2 folder lookup — e.g. 'pga', 'euro', 'lpga', 'liv' */
   tourCode?: string;
   size?: number;
   /** Use frosted glass styling (rgba(255,255,255,0.1) bg + frosted border) — for glass card contexts */
   frosted?: boolean;
 }) {
-  // PRIMARY: R2 headshot by name + tour. FALLBACK: silhouette.
-  // photo_url from database is intentionally ignored — it contains expired Sportradar API URLs.
-  const resolved = getPlayerHeadshotUrl(displayName, tourCode || 'pga') || PLAYER_SILHOUETTE_URL;
+  // PRIMARY: R2 headshot by full name + tour. FALLBACK: silhouette.
+  const nameForLookup = fullName || displayName;
+  const resolved = getPlayerHeadshotUrl(nameForLookup, tourCode || 'pga') || PLAYER_SILHOUETTE_URL;
   const initials = displayName
     .split(/[\s.]/)
     .filter(Boolean)
@@ -187,6 +190,7 @@ export function PodiumRunnerRow({
             photoUrl={player.photoUrl}
             pgaTourId={player.pgaTourId}
             displayName={player.displayName}
+            fullName={player.fullName}
             tourCode={tourCode}
             size={30}
             frosted
@@ -208,6 +212,7 @@ export function PodiumRunnerRow({
                 photoUrl={p.photoUrl}
                 pgaTourId={p.pgaTourId}
                 displayName={p.displayName}
+                fullName={p.fullName}
                 tourCode={tourCode}
                 size={26}
                 frosted
