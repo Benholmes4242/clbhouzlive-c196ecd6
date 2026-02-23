@@ -12,8 +12,8 @@ export const countryToFlagCode: Record<string, string> = {
   // UK and constituent countries
   'Britain & Ireland': 'GB',
   'Continental Europe': 'EU',
-  'ENGLAND': 'GB',
-  'England': 'GB',
+  'ENGLAND': 'GB-ENG',
+  'England': 'GB-ENG',
   'GREAT BRITAIN': 'GB',
   'Great Britain': 'GB',
   'UNITED KINGDOM': 'GB',
@@ -26,8 +26,8 @@ export const countryToFlagCode: Record<string, string> = {
   'WALES': 'GB-WLS',
   'Wales': 'GB-WLS',
   
-  'NORTHERN IRELAND': 'GB',
-  'Northern Ireland': 'GB',
+  'NORTHERN IRELAND': 'GB-NIR',
+  'Northern Ireland': 'GB-NIR',
   
   'IRELAND': 'IE',
   'Ireland': 'IE',
