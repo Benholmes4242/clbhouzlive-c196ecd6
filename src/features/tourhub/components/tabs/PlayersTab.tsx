@@ -231,14 +231,13 @@ export function PlayersTab() {
             if (aRank !== bRank) return aRank - bRank;
             return (a.worldRank ?? Infinity) - (b.worldRank ?? Infinity);
           }
-          default: // 'world-rank-desc'
-            if (activeTour === 'all') {
-              return (a.worldRank ?? Infinity) - (b.worldRank ?? Infinity);
-            }
-            const aRank = aStats?.tourRank ?? a.worldRank ?? Infinity;
-            const bRank = bStats?.tourRank ?? b.worldRank ?? Infinity;
-            if (aRank !== bRank) return aRank - bRank;
+          default: {
+            // World Ranking sort always uses OWGR worldRank, regardless of tour
+            const aWR = a.worldRank ?? Infinity;
+            const bWR = b.worldRank ?? Infinity;
+            if (aWR !== bWR) return aWR - bWR;
             return (bStats?.earnings ?? 0) - (aStats?.earnings ?? 0);
+          }
         }
       });
     };
@@ -318,12 +317,15 @@ export function PlayersTab() {
         : (statsMap.get(b.id)?.tourRank ?? bWorldRank);
 
       switch (sort) {
-        case 'world-rank-desc':
-          if (aRank === Infinity && bRank === Infinity) return a.full_name.localeCompare(b.full_name);
-          if (aRank === Infinity) return 1;
-          if (bRank === Infinity) return -1;
-          if (aRank !== bRank) return aRank - bRank;
+        case 'world-rank-desc': {
+          const aWR = rankMap.get(a.id)?.worldRank ?? Infinity;
+          const bWR = rankMap.get(b.id)?.worldRank ?? Infinity;
+          if (aWR === Infinity && bWR === Infinity) return a.full_name.localeCompare(b.full_name);
+          if (aWR === Infinity) return 1;
+          if (bWR === Infinity) return -1;
+          if (aWR !== bWR) return aWR - bWR;
           return a.full_name.localeCompare(b.full_name);
+        }
         case 'world-rank-asc':
           if (aRank === Infinity && bRank === Infinity) return a.full_name.localeCompare(b.full_name);
           if (aRank === Infinity) return 1;
@@ -337,7 +339,9 @@ export function PlayersTab() {
         case 'most-wins': {
           const aWins = statsMap.get(a.id)?.wins ?? 0;
           const bWins = statsMap.get(b.id)?.wins ?? 0;
-          return bWins - aWins || aRank - bRank;
+          const aEarn = statsMap.get(a.id)?.earnings ?? 0;
+          const bEarn = statsMap.get(b.id)?.earnings ?? 0;
+          return bWins - aWins || bEarn - aEarn;
         }
         case 'highest-earnings': {
           const aEarn = statsMap.get(a.id)?.earnings ?? 0;
@@ -512,9 +516,11 @@ export function PlayersTab() {
                         pgaTourId: player.pga_tour_id,
                         tourCodes: player.tour_codes,
                       }}
-                      worldRank={activeTour === 'all' 
-                        ? rank?.worldRank 
-                        : (pStats?.tourRank || rank?.worldRank)}
+                      worldRank={
+                        sort === 'world-rank-desc' || sort === 'alpha-az' || sort === 'alpha-za' || activeTour === 'all'
+                          ? rank?.worldRank
+                          : (pStats?.tourRank || rank?.worldRank)
+                      }
                       owgr={rank?.worldRank}
                       earnings={pStats?.earnings}
                       wins={pStats?.wins}
