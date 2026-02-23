@@ -74,6 +74,7 @@ const ChaserCard = memo(function ChaserCard({
               borderRadius: '0',
               borderTopLeftRadius: '14px',
               borderBottomLeftRadius: '14px',
+              backgroundColor: '#F8FAFC',
             }}
           >
             {showPhoto ? (
