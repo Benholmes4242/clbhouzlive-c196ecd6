@@ -7,12 +7,16 @@ const TOUR_FOLDER: Record<string, string> = {
   PGA:  'PGA%20Tour',
   euro: 'DP%20World%20Tour',
   EURO: 'DP%20World%20Tour',
+  dp:   'DP%20World%20Tour',
+  DP:   'DP%20World%20Tour',
   lpga: 'LPGA',
   LPGA: 'LPGA',
   pgad: 'Korn%20Ferry',
   PGAD: 'Korn%20Ferry',
   liv:  'LIV',
   LIV:  'LIV',
+  champ: 'Champions%20Tour',
+  CHAMP: 'Champions%20Tour',
 };
 
 /**

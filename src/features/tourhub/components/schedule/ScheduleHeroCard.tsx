@@ -168,6 +168,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                         photoUrl={winner.photoUrl}
                         pgaTourId={winner.pgaTourId}
                         displayName={winner.displayName}
+                        tourCode={tournament.tour_code}
                         size={48}
                         frosted
                       />
@@ -216,6 +217,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                   <PodiumRunnerRow
                     key={row.position}
                     row={row}
+                    tourCode={tournament.tour_code}
                     onPlayerTap={handlePlayerTap}
                   />
                 ))}
@@ -292,6 +294,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                           photoUrl={leaderWinner.photoUrl}
                           pgaTourId={leaderWinner.pgaTourId}
                           displayName={leaderWinner.displayName}
+                          tourCode={tournament.tour_code}
                           size={36}
                           frosted
                         />
