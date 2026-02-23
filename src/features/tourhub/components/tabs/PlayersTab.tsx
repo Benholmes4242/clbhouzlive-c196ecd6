@@ -412,7 +412,7 @@ export function PlayersTab() {
 
       {/* Hero */}
       {showHero && heroPlayers.length > 0 && (
-        <PlayersHero players={heroPlayers} activeTour={activeTour} statsMap={statsMap} />
+        <PlayersHero players={heroPlayers} activeTour={activeTour} statsMap={statsMap} sort={sort} />
       )}
 
       {/* ← Tour Overview back link */}

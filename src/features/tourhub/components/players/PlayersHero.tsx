@@ -13,12 +13,15 @@ import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeads
 import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
 import type { ElitePlayer } from '../../hooks/useElitePlayers';
 import type { PlayerTourCode } from './PlayersTourFilter';
+import type { PlayerSortType } from './PlayerSortControl';
 
 interface PlayersHeroProps {
   players: ElitePlayer[];
   activeTour: PlayerTourCode;
   /** Stats map: playerId → { earnings, wins, tourRank, points, tournamentsPlayed } */
   statsMap?: Map<string, { earnings: number | null; wins: number | null; tourRank: number | null; points?: number | null; tournamentsPlayed?: number | null }>;
+  /** Current sort mode */
+  sort?: PlayerSortType;
 }
 
 function formatEarningsCompact(amount: number | null | undefined): string | null {
@@ -29,19 +32,30 @@ function formatEarningsCompact(amount: number | null | undefined): string | null
 }
 
 /** Runner card — #2 amber, #3 silver */
-function RunnerCard({ player, index, activeTour, statsMap }: { 
+function RunnerCard({ player, index, activeTour, statsMap, sort, tiedCount }: { 
   player: ElitePlayer; 
   index: number;
   activeTour: PlayerTourCode;
   statsMap?: Map<string, { earnings: number | null; wins: number | null; tourRank: number | null; points?: number | null; tournamentsPlayed?: number | null }>;
+  sort?: PlayerSortType;
+  tiedCount?: number;
 }) {
   const tourCode = activeTour === 'all' ? 'pga' : activeTour;
   const photoUrl = getPlayerHeadshotUrl(player.playerName, tourCode);
   const stats = statsMap?.get(player.playerId);
   const tourRank = stats?.tourRank;
-  const rank = activeTour === 'all' ? player.worldRank : (tourRank || player.worldRank);
   const lastName = player.playerName.split(' ').slice(-1)[0];
   const country = titleCaseCountry(player.country);
+
+  // Context-aware badge number
+  let badgeNumber: number | string;
+  if (sort === 'most-wins') {
+    badgeNumber = stats?.wins || 0;
+  } else if (sort === 'highest-earnings') {
+    badgeNumber = index + 2; // position 2 or 3
+  } else {
+    badgeNumber = activeTour === 'all' ? player.worldRank : (tourRank || player.worldRank);
+  }
 
   const rankBg = index === 0
     ? '#94A3B8'
@@ -62,7 +76,7 @@ function RunnerCard({ player, index, activeTour, statsMap }: {
         className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
         style={{ background: rankBg }}
       >
-        <span style={{ fontSize: '14px', fontWeight: 700, color: 'white' }}>{rank}</span>
+        <span style={{ fontSize: '14px', fontWeight: 700, color: 'white' }}>{badgeNumber}</span>
       </div>
 
       {/* Avatar */}
@@ -81,14 +95,21 @@ function RunnerCard({ player, index, activeTour, statsMap }: {
 
       {/* Name & Country */}
       <div className="flex-1 min-w-0 text-left">
-        <p style={{ fontSize: '14px', fontWeight: 600 }} className="text-foreground truncate">{lastName}</p>
+        <div className="flex items-center gap-1">
+          <p style={{ fontSize: '14px', fontWeight: 600 }} className="text-foreground truncate">{lastName}</p>
+          {tiedCount != null && tiedCount > 0 && (
+            <span style={{ fontSize: '11px', fontWeight: 600 }} className="text-muted-foreground shrink-0">
+              +{tiedCount}
+            </span>
+          )}
+        </div>
         <p style={{ fontSize: '11px', fontWeight: 400 }} className="text-muted-foreground truncate">{country || 'Unknown'}</p>
       </div>
     </Link>
   );
 }
 
-export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps) {
+export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-desc' }: PlayersHeroProps) {
   const [imageError, setImageError] = useState(false);
   const navigate = useNavigate();
   
@@ -102,7 +123,7 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
   const flag = countryCodeToFlag(champion.countryCode);
   const country = titleCaseCountry(champion.country);
 
-  // Build meta line: rank · earnings/points · wins/events
+  // Build meta line: context-aware based on sort mode
   const champStats = statsMap?.get(champion.playerId);
   const champTourRank = champStats?.tourRank;
   const isEuro = activeTour === 'EURO';
@@ -112,25 +133,53 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
   const isRankingsTour = isEuro || isLPGA || isPGAD || isLIV;
   const metaParts: string[] = [];
   
-  if (isRankingsTour && champTourRank) {
-    metaParts.push(`#${champTourRank}`);
-    if (champStats?.points != null && champStats.points > 0) {
-      metaParts.push(`${champStats.points.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} pts`);
-    }
-    if (champStats?.wins != null && champStats.wins > 0) {
-      metaParts.push(`${champStats.wins} ${champStats.wins === 1 ? 'win' : 'wins'}`);
-    }
-  } else {
-    if (activeTour === 'all' || !champTourRank) {
-      metaParts.push(`#${champion.worldRank} OWGR`);
-    } else {
-      metaParts.push(`#${champTourRank}`);
-    }
-    const earningsStr = formatEarningsCompact(champStats?.earnings);
+  const champWins = champStats?.wins ?? 0;
+  const earningsStr = formatEarningsCompact(champStats?.earnings);
+
+  if (sort === 'most-wins') {
+    // Wins mode: show wins prominently, skip rank and earnings
+    if (champWins > 0) metaParts.push(`${champWins} ${champWins === 1 ? 'win' : 'wins'}`);
+  } else if (sort === 'highest-earnings') {
+    // Earnings mode: show earnings prominently, skip rank
     if (earningsStr) metaParts.push(earningsStr);
-    if (champStats?.wins && champStats.wins > 0) {
-      metaParts.push(`${champStats.wins} ${champStats.wins === 1 ? 'win' : 'wins'}`);
+    if (champWins > 0) metaParts.push(`${champWins} ${champWins === 1 ? 'win' : 'wins'}`);
+  } else {
+    // Default (world-rank, alpha, tour-specific sorts): existing behavior
+    if (isRankingsTour && champTourRank) {
+      metaParts.push(`#${champTourRank}`);
+      if (champStats?.points != null && champStats.points > 0) {
+        metaParts.push(`${champStats.points.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} pts`);
+      }
+      if (champWins > 0) {
+        metaParts.push(`${champWins} ${champWins === 1 ? 'win' : 'wins'}`);
+      }
+    } else {
+      if (activeTour === 'all' || !champTourRank) {
+        metaParts.push(`#${champion.worldRank} OWGR`);
+      } else {
+        metaParts.push(`#${champTourRank}`);
+      }
+      if (earningsStr) metaParts.push(earningsStr);
+      if (champWins > 0) {
+        metaParts.push(`${champWins} ${champWins === 1 ? 'win' : 'wins'}`);
+      }
     }
+  }
+
+  // Calculate tied counts for most-wins sort
+  const getPlayerWins = (p: ElitePlayer) => statsMap?.get(p.playerId)?.wins ?? 0;
+  let tiedCounts: number[] = [];
+  if (sort === 'most-wins' && runners.length >= 2) {
+    // Count how many OTHER players in the full list share the same win count
+    tiedCounts = runners.slice(0, 2).map(runner => {
+      const runnerWins = getPlayerWins(runner);
+      // Count all players with same wins, subtract the ones already shown (hero + runners)
+      const shownIds = new Set([champion.playerId, ...runners.slice(0, 2).map(r => r.playerId)]);
+      const othersWithSameWins = players.filter(
+        p => !shownIds.has(p.playerId) && getPlayerWins(p) === runnerWins
+      ).length;
+      return othersWithSameWins;
+    });
   }
 
   return (
@@ -138,14 +187,23 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
       {/* Burger menu */}
       <button 
         className="absolute z-20 flex items-center justify-center"
-        style={{ top: '56px', left: '16px', width: '44px', height: '44px' }}
+        style={{
+          top: '56px',
+          left: '16px',
+          width: '44px',
+          height: '44px',
+          background: 'hsl(var(--background))',
+          borderRadius: '12px',
+          border: '1px solid hsl(var(--border) / 0.5)',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+        }}
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
         aria-label="Open tour menu"
       >
         <Menu 
           className="w-[22px] h-[22px]" 
           strokeWidth={2}
-          style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.7)) drop-shadow(0 0px 8px rgba(0,0,0,0.3))' }}
+          style={{ color: 'hsl(var(--foreground))', filter: 'none' }}
         />
       </button>
       {/* Back arrow removed — replaced by "← Tour Overview" text link below hero */}
@@ -203,24 +261,26 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
                   <span style={{ fontSize: '13px', fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>{country}</span>
                 </motion.div>
 
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.26, duration: 0.4 }}
-                >
-                  <span 
-                    className="inline-block text-white"
-                    style={{ 
-                      fontSize: '13px', fontWeight: 600, 
-                      background: 'rgba(245,158,11,0.85)', 
-                      borderRadius: '20px', 
-                      padding: '6px 14px',
-                      letterSpacing: '0.3px',
-                    }}
+                {metaParts.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.26, duration: 0.4 }}
                   >
-                    {metaParts.join(' · ')}
-                  </span>
-                </motion.div>
+                    <span 
+                      className="inline-block text-white"
+                      style={{ 
+                        fontSize: '13px', fontWeight: 600, 
+                        background: 'rgba(245,158,11,0.85)', 
+                        borderRadius: '20px', 
+                        padding: '6px 14px',
+                        letterSpacing: '0.3px',
+                      }}
+                    >
+                      {metaParts.join(' · ')}
+                    </span>
+                  </motion.div>
+                )}
               </div>
             </div>
           </Link>
@@ -232,11 +292,19 @@ export function PlayersHero({ players, activeTour, statsMap }: PlayersHeroProps)
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.35 }}
               className="px-4"
-              style={{ marginTop: '-20px', position: 'relative', zIndex: 10 }}
+              style={{ marginTop: '-28px', position: 'relative', zIndex: 10 }}
             >
               <div className="flex gap-2">
                 {runners.slice(0, 2).map((player, index) => (
-                  <RunnerCard key={player.playerId} player={player} index={index} activeTour={activeTour} statsMap={statsMap} />
+                  <RunnerCard
+                    key={player.playerId}
+                    player={player}
+                    index={index}
+                    activeTour={activeTour}
+                    statsMap={statsMap}
+                    sort={sort}
+                    tiedCount={tiedCounts[index]}
+                  />
                 ))}
               </div>
             </motion.div>
