@@ -8441,57 +8441,6 @@ export type Database = {
           },
         ]
       }
-      sr_media_assets: {
-        Row: {
-          copyright: string | null
-          created_at: string | null
-          description: string | null
-          id: string
-          kind: string
-          last_seen_at: string | null
-          league: string
-          links: Json | null
-          manifest_source_url: string | null
-          provider: string
-          refs: Json | null
-          sport: string
-          title: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          copyright?: string | null
-          created_at?: string | null
-          description?: string | null
-          id: string
-          kind: string
-          last_seen_at?: string | null
-          league: string
-          links?: Json | null
-          manifest_source_url?: string | null
-          provider: string
-          refs?: Json | null
-          sport?: string
-          title?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          copyright?: string | null
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          kind?: string
-          last_seen_at?: string | null
-          league?: string
-          links?: Json | null
-          manifest_source_url?: string | null
-          provider?: string
-          refs?: Json | null
-          sport?: string
-          title?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       sr_media_provider_availability: {
         Row: {
           asset_type: string
