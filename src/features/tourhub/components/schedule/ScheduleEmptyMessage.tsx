@@ -5,7 +5,7 @@
 import { Link } from 'react-router-dom';
 import { Calendar, Flag, Trophy, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { format, differenceInDays, differenceInHours } from 'date-fns';
+import { format } from 'date-fns';
 
 interface ScheduleEmptyMessageProps {
   variant: 'no-live' | 'no-results' | 'no-upcoming' | 'season-complete';
@@ -19,14 +19,7 @@ interface ScheduleEmptyMessageProps {
 
 function formatCountdown(dateStr: string): string {
   const target = new Date(dateStr);
-  const now = new Date();
-  const days = differenceInDays(target, now);
-  const hours = differenceInHours(target, now) % 24;
-  
-  if (days > 1) return `starts in ${days} days`;
-  if (days === 1) return `starts tomorrow`;
-  if (hours > 1) return `starts in ${hours} hours`;
-  return `starts soon`;
+  return `starts ${format(target, 'EEE, MMM d')}`;
 }
 
 export function ScheduleEmptyMessage({ 
@@ -83,7 +76,6 @@ export function ScheduleEmptyMessage({
             </p>
             <p className="text-muted-foreground" style={{ fontSize: '13px', fontWeight: 400, marginTop: '2px' }}>
               {countdown}
-              {formattedDate && <> · {formattedDate}</>}
             </p>
           </div>
         )}
