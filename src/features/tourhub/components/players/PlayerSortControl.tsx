@@ -33,7 +33,8 @@ interface PlayerSortControlProps {
 /** Per-tour default sort mapping */
 export function getDefaultSortForTour(tour: string): PlayerSortType {
   switch (tour) {
-    case 'all': return 'world-rank-desc';
+    case 'all': return 'alpha-az';
+    case 'pga': return 'world-rank-desc';
     case 'EURO': return 'race-to-dubai';
     case 'LPGA': return 'race-to-cme';
     case 'PGAD': return 'points-list';
@@ -43,6 +44,11 @@ export function getDefaultSortForTour(tour: string): PlayerSortType {
 }
 
 const ALL_TOURS_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string }[] = [
+  { value: 'alpha-az', label: 'Alphabetical A-Z', shortLabel: 'A-Z' },
+  { value: 'alpha-za', label: 'Alphabetical Z-A', shortLabel: 'Z-A' },
+];
+
+const PGA_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string }[] = [
   { value: 'world-rank-desc', label: 'Highest World Ranking', shortLabel: 'World Ranking' },
   { value: 'highest-earnings', label: 'Highest Earnings', shortLabel: 'Earnings' },
   { value: 'most-wins', label: 'Most Wins', shortLabel: 'Wins' },
@@ -86,12 +92,13 @@ const LIV_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string }[
 ];
 
 export function PlayerSortControl({ value, onChange, activeTour = 'all' }: PlayerSortControlProps) {
-  const isTourSpecific = activeTour !== 'all';
+  const isPGA = activeTour === 'pga';
   const isEuro = activeTour === 'EURO';
   const isLPGA = activeTour === 'LPGA';
   const isPGAD = activeTour === 'PGAD';
   const isLIV = activeTour === 'LIV';
-  const SORT_OPTIONS = isLIV ? LIV_OPTIONS : (isPGAD ? PGAD_OPTIONS : (isLPGA ? LPGA_OPTIONS : (isEuro ? EURO_OPTIONS : (isTourSpecific ? TOUR_SPECIFIC_OPTIONS : ALL_TOURS_OPTIONS))));
+  const isTourSpecific = activeTour !== 'all' && !isPGA && !isEuro && !isLPGA && !isPGAD && !isLIV;
+  const SORT_OPTIONS = isLIV ? LIV_OPTIONS : (isPGAD ? PGAD_OPTIONS : (isLPGA ? LPGA_OPTIONS : (isEuro ? EURO_OPTIONS : (isPGA ? PGA_OPTIONS : (isTourSpecific ? TOUR_SPECIFIC_OPTIONS : ALL_TOURS_OPTIONS)))));
   const activeOption = SORT_OPTIONS.find(o => o.value === value) || SORT_OPTIONS[0];
 
   return (
