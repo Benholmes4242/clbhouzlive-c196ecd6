@@ -287,23 +287,41 @@ export function useTourPlayers(search?: string) {
   return useQuery({
     queryKey: ['tourhub', 'players', search],
     queryFn: async () => {
-      let query = supabase
-        .from('sr_players')
-        .select('id, sr_id, first_name, last_name, full_name, birth_date, birth_place, residence, college, college_normalized, turned_pro, country, country_code, photo_url, height, weight, pga_tour_id, handedness, tour_codes')
-        .order('full_name', { ascending: true })
-        .limit(2000);
-      
-      if (search && search.length >= 2) {
-        query = query.ilike('full_name', `%${search}%`);
+      const columns = 'id, sr_id, first_name, last_name, full_name, birth_date, birth_place, residence, college, college_normalized, turned_pro, country, country_code, photo_url, height, weight, pga_tour_id, handedness, tour_codes';
+      const allPlayers: TourPlayer[] = [];
+      const batchSize = 1000;
+      let offset = 0;
+      let hasMore = true;
+
+      while (hasMore) {
+        let query = supabase
+          .from('sr_players')
+          .select(columns)
+          .order('full_name', { ascending: true })
+          .range(offset, offset + batchSize - 1);
+
+        if (search && search.length >= 2) {
+          query = query.ilike('full_name', `%${search}%`);
+        }
+
+        const { data, error } = await query;
+
+        if (error) {
+          console.error('Error fetching players:', error);
+          return allPlayers;
+        }
+
+        if (data && data.length > 0) {
+          allPlayers.push(...(data as TourPlayer[]));
+          offset += batchSize;
+          hasMore = data.length === batchSize;
+        } else {
+          hasMore = false;
+        }
       }
-      
-      const { data, error } = await query;
-      
-      if (error) {
-        console.error('Error fetching players:', error);
-        return [];
-      }
-      return (data || []) as TourPlayer[];
+
+      console.log('[useTourPlayers] total rows returned:', allPlayers.length);
+      return allPlayers;
     },
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
