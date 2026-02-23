@@ -147,7 +147,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
           </h2>
           {/* Subtitle only when NOT live — toggle replaces it */}
           {!isLive && (
-            <p className="mt-1 text-muted-foreground" style={{ fontSize: '13px', fontWeight: 400 }}>
+            <p className="mt-1 text-muted-foreground/60" style={{ fontSize: '13px', fontWeight: 500 }}>
               AI analysis of course fit, form, and field strength
             </p>
           )}

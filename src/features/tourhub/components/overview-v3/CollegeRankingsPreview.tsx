@@ -654,8 +654,8 @@ export function CollegeRankingsPreview() {
             Franchise Rankings
           </h2>
           <p
-            className="m-0"
-            style={{ fontSize: '13px', fontWeight: 500, color: 'hsl(var(--muted-foreground) / 0.6)', marginTop: '3px' }}
+            className="m-0 mt-1 text-muted-foreground/60"
+            style={{ fontSize: '13px', fontWeight: 500 }}
           >
             Where college legacies compete on tour
           </p>
@@ -764,7 +764,7 @@ export function CollegeRankingsPreview() {
             borderRadius: '0',
           }}
         >
-          <span className="text-foreground" style={{ fontSize: '14px', fontWeight: 600 }}>
+          <span className="text-foreground" style={{ fontSize: '13px', fontWeight: 600 }}>
             View Full Franchise Rankings ›
           </span>
         </button>

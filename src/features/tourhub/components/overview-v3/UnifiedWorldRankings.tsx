@@ -301,7 +301,7 @@ export function UnifiedWorldRankings() {
           <ChevronRight className="w-3.5 h-3.5 opacity-60" />
         </button>
       </div>
-      <p className="text-muted-foreground/60 leading-tight mt-0.5 mb-2.5" style={{ fontSize: '12px' }}>
+      <p className="text-muted-foreground/60 leading-tight mt-0.5 mb-2.5" style={{ fontSize: '13px', fontWeight: 500 }}>
         {(() => {
           const rankingDate = (rankings as any)?.[0]?.ranking_date;
           if (!rankingDate) return 'Updated weekly · Official OWGR data';
