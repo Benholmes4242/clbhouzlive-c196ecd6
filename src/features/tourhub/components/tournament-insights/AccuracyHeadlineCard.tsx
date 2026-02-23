@@ -50,7 +50,7 @@ export const AccuracyHeadlineCard: React.FC<AccuracyHeadlineCardProps> = ({
         <div className="flex items-center gap-2 mb-3">
           <Brain className="w-4 h-4" style={{ color: '#B8860B' }} />
           <span className="text-sm font-semibold text-foreground">
-            Clbhouz Intelligence Tracker
+            Tournament Intelligence Tracker
           </span>
         </div>
 

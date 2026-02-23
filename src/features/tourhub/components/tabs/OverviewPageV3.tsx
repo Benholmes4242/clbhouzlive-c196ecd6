@@ -104,7 +104,7 @@ export function OverviewPageV3() {
           <WhatsComing />
 
 
-          {/* 4. Tournament Insights - AI Predictions (CLBHOUZ Intelligence) */}
+          {/* 4. Tournament Insights - AI Predictions (Tournament Intelligence) */}
           <LazySection minHeight={250}>
             <TournamentInsights />
           </LazySection>

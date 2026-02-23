@@ -62,16 +62,16 @@ async function fetchTrackerData(
   ).length;
   const fieldCompletionPct = totalInField > 0 ? playersWithScores / totalInField : 0;
 
-  // Match top contenders (all 4 picks, no dark horses)
-  const trackedPredictions: TrackedPrediction[] = predictions.topContenders.slice(0, 4).map((p, i) => {
+  // Match top contenders (all 5 picks)
+  const trackedPredictions: TrackedPrediction[] = predictions.topContenders.slice(0, 5).map((p, i) => {
     const lb = leaderboardMap.get(p.playerId)
       ?? leaderboardByName.get(p.playerName?.toLowerCase() ?? '');
     return buildTrackedPrediction(p, i + 1, lb, false, fieldCompletionPct);
   });
 
-  // Backwards compat: if old data had dark horses but < 4 contenders, merge them in
-  if (trackedPredictions.length < 4 && predictions.darkHorses?.length > 0) {
-    const remaining = 4 - trackedPredictions.length;
+  // Backwards compat: if old data had dark horses but < 5 contenders, merge them in
+  if (trackedPredictions.length < 5 && predictions.darkHorses?.length > 0) {
+    const remaining = 5 - trackedPredictions.length;
     predictions.darkHorses.slice(0, remaining).forEach((dh, i) => {
       const lb = leaderboardMap.get(dh.playerId)
         ?? leaderboardByName.get(dh.playerName?.toLowerCase() ?? '');

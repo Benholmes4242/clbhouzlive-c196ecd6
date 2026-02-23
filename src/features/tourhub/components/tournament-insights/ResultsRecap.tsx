@@ -1,10 +1,10 @@
 /**
  * ResultsRecap - Post-tournament results summary card
+ * Premium editorial scorecard design
  */
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Brain, CheckCircle2 } from 'lucide-react';
 import type { AccuracyMetrics } from './types';
 import type { AIPredictionData } from '../../hooks/useAIPredictions';
 
@@ -23,6 +23,12 @@ const GRADE_STYLES: Record<AccuracyMetrics['overallGrade'], { bg: string; text: 
   poor: { bg: '#f9fafb', text: '#4b5563', border: '#e5e7eb', label: 'Poor' },
 };
 
+function getOrdinalSuffix(n: number): string {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return s[(v - 20) % 10] || s[v] || s[0];
+}
+
 export const ResultsRecap: React.FC<ResultsRecapProps> = ({
   predictions,
   accuracy,
@@ -37,53 +43,80 @@ export const ResultsRecap: React.FC<ResultsRecapProps> = ({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      className="rounded-2xl bg-card border border-border overflow-hidden"
-      style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)' }}
+      className="bg-card rounded-2xl border border-border/50 overflow-hidden"
     >
-      <div className="p-4">
-        {/* Header */}
-        <div className="flex items-center gap-2 mb-3">
-          <Brain className="w-4 h-4" style={{ color: '#B8860B' }} />
-          <span className="text-sm font-semibold text-foreground">
-            Clbhouz Intelligence Results
+      {/* Header bar — dark */}
+      <div
+        style={{
+          background: 'hsl(var(--foreground))',
+          padding: '12px 16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: 'hsl(var(--background))' }}>
+            Intelligence Results
+          </span>
+          <span style={{ fontSize: 11, fontWeight: 400, color: 'hsl(var(--background) / 0.6)' }}>
+            {predictions.tournament.name}
           </span>
         </div>
+        {/* Grade badge */}
+        <span
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.05em',
+            textTransform: 'uppercase',
+            padding: '3px 8px',
+            borderRadius: 6,
+            background: grade.bg,
+            color: grade.text,
+            border: `1px solid ${grade.border}`,
+            flexShrink: 0,
+          }}
+        >
+          {grade.label}
+        </span>
+      </div>
 
-        {/* Tournament name */}
-        <p className="text-xs text-muted-foreground mb-3">
-          {predictions.tournament.name}
-        </p>
-
-        {/* Accuracy */}
-        <div className="flex items-center gap-2 mb-2">
-          <CheckCircle2 className="w-4 h-4" style={{ color: '#059669' }} />
-          <span className="text-sm font-medium text-foreground">
-            {accuracy.accuracyLabel}
-          </span>
-        </div>
-
-        {/* Grade */}
-        <div className="flex items-center gap-2 mb-3">
+      {/* Body */}
+      <div style={{ padding: '14px 16px' }}>
+        {/* Accuracy headline */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
           <span
-            className="inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold"
+            className="text-foreground"
+            style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.3px' }}
+          >
+            {accuracy.inTop10}/{accuracy.totalPredictions}
+          </span>
+          <span
+            className="text-muted-foreground"
+            style={{ fontSize: 13, fontWeight: 500 }}
+          >
+            picks finished in the Top 10
+          </span>
+        </div>
+
+        {/* Best call line */}
+        {bestCallName && bestCallActual != null && (
+          <div
+            className="text-muted-foreground"
             style={{
-              backgroundColor: grade.bg,
-              color: grade.text,
-              border: `1px solid ${grade.border}`,
+              fontSize: 12,
+              fontWeight: 500,
+              padding: '8px 12px',
+              background: 'hsl(var(--muted) / 0.5)',
+              borderRadius: 8,
             }}
           >
-            Grade: {grade.label}
-          </span>
-        </div>
-
-        {/* Best call */}
-        {bestCallName && (
-          <p className="text-xs text-muted-foreground">
-            Best call: {bestCallName} (Predicted {bestCallPredicted}
-            {bestCallPredicted === 1 ? 'st' : bestCallPredicted === 2 ? 'nd' : bestCallPredicted === 3 ? 'rd' : 'th'},
-            Finished {bestCallActual}
-            {bestCallActual === 1 ? 'st' : bestCallActual === 2 ? 'nd' : bestCallActual === 3 ? 'rd' : 'th'})
-          </p>
+            <span className="text-foreground" style={{ fontWeight: 600 }}>
+              {bestCallName}
+            </span>
+            {' '}— Predicted 1st, finished {bestCallActual}{getOrdinalSuffix(bestCallActual)}
+          </div>
         )}
       </div>
     </motion.div>

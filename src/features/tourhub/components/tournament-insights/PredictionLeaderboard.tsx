@@ -19,8 +19,8 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
 }) => {
   if (allPicks.length === 0) return null;
 
-  // All 4 picks in one flat list — no dark horse separation
-  const rows = allPicks.slice(0, 4);
+  // All 5 picks in one flat list
+  const rows = allPicks.slice(0, 5);
 
   return (
     <motion.div
@@ -39,7 +39,7 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
       >
         <div className="flex-1 min-w-0">
           <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' as const, color: 'rgba(0,0,0,0.35)' }}>
-            TOP PICKS
+            OUR TOP 5
           </span>
         </div>
         <div className="w-[52px] flex-shrink-0 text-center">

@@ -16,7 +16,7 @@ interface IntelligenceTabSwitcherProps {
 const IntelligenceTabSwitcher: React.FC<IntelligenceTabSwitcherProps> = ({ activeTab, onTabChange }) => {
   const tabs: { id: IntelligenceTab; label: string }[] = [
     { id: 'courseDNA', label: 'Course DNA' },
-    { id: 'predictions', label: 'Top Picks' },
+    { id: 'predictions', label: 'Our Top 5' },
   ];
 
   return (

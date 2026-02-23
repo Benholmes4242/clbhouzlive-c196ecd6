@@ -34,7 +34,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Build unified pick list: featured + 3 contenders = 4 total
-  const contenderCards = cards.filter(c => c.type === 'contender').slice(0, 3);
+  const contenderCards = cards.filter(c => c.type === 'contender').slice(0, 4);
 
   const allPicks: PickCard[] = [
     {
@@ -83,7 +83,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
       >
         <div className="flex items-center justify-between">
           <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#1C1917' }}>
-            Top Picks
+            Our Top 5
           </h3>
           <button
             onClick={() => setShowConfidenceInfo(!showConfidenceInfo)}
@@ -208,7 +208,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
               style={{
                 width: i === activeIndex ? '16px' : '6px',
                 height: '6px',
-                background: i === activeIndex ? '#B8860B' : 'rgba(0,0,0,0.12)',
+                background: i === activeIndex ? 'hsl(var(--foreground))' : 'rgba(0,0,0,0.12)',
               }}
             />
           ))}
