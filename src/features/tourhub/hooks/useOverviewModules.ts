@@ -282,6 +282,7 @@ export function useRankingMovers() {
           avg_points,
           player:sr_players!inner(id, first_name, last_name, country, photo_url, pga_tour_id, tour_codes)
         `)
+        // NOTE: photo_url is NOT used for display — headshots come from R2 via getPlayerHeadshotUrl()
         .not('prior_rank', 'is', null)
         .order('rank', { ascending: true })
         .limit(200);
@@ -789,6 +790,7 @@ export function usePlayerSpotlight() {
           avg_points,
           player:sr_players!inner(id, first_name, last_name, country, photo_url, pga_tour_id, tour_codes)
         `)
+        // NOTE: photo_url is NOT used for display — headshots come from R2 via getPlayerHeadshotUrl()
         .eq('rank', 1)
         .maybeSingle();
 

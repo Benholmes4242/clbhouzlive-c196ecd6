@@ -67,6 +67,8 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
             pga_tour_id
           )
         `)
+        // NOTE: photo_url is NOT used for display. All player headshots are served from R2
+        // via getPlayerHeadshotUrl(). This field is kept for reference only.
         .in('tournament_id', tournamentIds)
         .lte('position', 10)
         .order('tournament_id', { ascending: true })
