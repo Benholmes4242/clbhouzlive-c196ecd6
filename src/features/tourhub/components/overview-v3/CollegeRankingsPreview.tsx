@@ -22,9 +22,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { PickFranchiseSheet } from '../college/PickFranchiseSheet';
 import {
-  getCollegePodiumGradient,
-  getCollegeAccentBg,
-  getCollegeAccentBorder,
+  getCollegePodiumTint,
 } from '../../config/collegeBrandColors';
 
 // ============================================================================
@@ -112,8 +110,9 @@ function PodiumCard({
       className="flex flex-col text-left overflow-hidden active:scale-[0.97] transition-transform"
       style={{
         flex: isFirst ? '1 1 45%' : '1 1 27.5%',
-        background: getCollegePodiumGradient(stats.normalized_name),
-        borderRadius: isFirst ? '16px' : '12px',
+        background: getCollegePodiumTint(stats.normalized_name),
+        border: '1px solid hsl(var(--border) / 0.5)',
+        borderRadius: '16px',
         minHeight: isFirst ? '240px' : '200px',
         alignSelf: 'flex-end',
       }}
@@ -134,7 +133,7 @@ function PodiumCard({
               fontWeight: 700,
               letterSpacing: '1px',
               textTransform: 'uppercase' as const,
-              color: 'rgba(255,255,255,0.45)',
+              color: 'hsl(var(--muted-foreground) / 0.6)',
             }}
           >
             #{rank}
@@ -156,7 +155,7 @@ function PodiumCard({
         )}
 
         <h3
-          className="text-white leading-tight m-0 mb-1"
+          className="text-foreground leading-tight m-0 mb-1"
           style={{
             fontSize: isFirst ? '20px' : '14px',
             fontWeight: isFirst ? 700 : 600,
@@ -167,7 +166,7 @@ function PodiumCard({
         </h3>
 
         <p
-          className="m-0 text-white"
+          className="m-0 text-foreground"
           style={{
             fontSize: isFirst ? '16px' : '13px',
             fontWeight: 700,
@@ -180,7 +179,7 @@ function PodiumCard({
           className="m-0"
           style={{
             fontSize: isFirst ? '12px' : '11px',
-            color: 'rgba(255,255,255,0.6)',
+            color: 'hsl(var(--muted-foreground))',
             marginTop: '4px',
           }}
         >
@@ -191,7 +190,7 @@ function PodiumCard({
       {captain && (
         <div
           style={{
-            borderTop: '1px solid rgba(255,255,255,0.1)',
+            borderTop: '1px solid hsl(var(--border) / 0.3)',
             padding: isFirst ? '10px 12px' : '8px 8px',
             marginTop: 'auto',
           }}
@@ -203,7 +202,7 @@ function PodiumCard({
               fontWeight: 600,
               letterSpacing: '1px',
               textTransform: 'uppercase' as const,
-              color: 'rgba(255,255,255,0.5)',
+              color: 'hsl(var(--muted-foreground) / 0.6)',
               marginBottom: isFirst ? '6px' : '4px',
               textAlign: 'center' as const,
             }}
@@ -213,19 +212,18 @@ function PodiumCard({
           <div className="flex flex-col items-center" style={{ gap: '6px' }}>
             <SquircleAvatar
               size={isFirst ? 28 : 22}
-              src={captainPhotoUrl}
+              src={captainPhotoUrl || PLAYER_SILHOUETTE_URL}
               alt={captain.fullName}
               hideRing
               fallback={captain.fullName.split(' ').map(n => n[0]).join('').slice(0, 2)}
             />
             <div className="text-center">
               <p
-                className="m-0 text-white truncate"
+                className="m-0 text-foreground truncate"
                 style={{
                   fontSize: isFirst ? '12px' : '10px',
                   fontWeight: 500,
                   lineHeight: 1.2,
-                  color: 'rgba(255,255,255,0.85)',
                 }}
               >
                 {isFirst
@@ -237,7 +235,7 @@ function PodiumCard({
                 style={{
                   fontSize: isFirst ? '11px' : '10px',
                   fontWeight: 600,
-                  color: 'rgba(255,255,255,0.5)',
+                  color: 'hsl(var(--muted-foreground) / 0.6)',
                 }}
               >
                 {formatCurrency(captain.earnings)}
@@ -266,18 +264,18 @@ function LeaderboardRows({
   if (!rows.length) return null;
 
   return (
-    <div className="mx-4 mb-4">
+    <div className="mx-4 mb-6">
       {/* Header row */}
       <div
         className="flex items-center"
         style={{
           padding: '8px 16px',
-          borderBottom: '1px solid rgba(0,0,0,0.06)',
+          borderBottom: '1px solid hsl(var(--border) / 0.3)',
         }}
       >
-        <span style={{ width: '30px', fontSize: '10px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' as const, color: 'rgba(0,0,0,0.35)' }}>#</span>
-        <span className="flex-1" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' as const, color: 'rgba(0,0,0,0.35)' }}>Franchise</span>
-        <span style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' as const, color: 'rgba(0,0,0,0.35)', textAlign: 'right' as const }}>Earnings on Tour</span>
+        <span style={{ width: '30px', fontSize: '10px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' as const, color: 'hsl(var(--muted-foreground) / 0.6)' }}>#</span>
+        <span className="flex-1" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' as const, color: 'hsl(var(--muted-foreground) / 0.6)' }}>Franchise</span>
+        <span style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' as const, color: 'hsl(var(--muted-foreground) / 0.6)', textAlign: 'right' as const }}>Earnings on Tour</span>
       </div>
 
       {rows.map((stats, i) => {
@@ -292,10 +290,10 @@ function LeaderboardRows({
             className="w-full flex items-center bg-transparent active:bg-black/[0.02] transition-colors"
             style={{
               padding: '14px 16px',
-              borderBottom: i < rows.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none',
+              borderBottom: i < rows.length - 1 ? '1px solid hsl(var(--border) / 0.3)' : 'none',
             }}
           >
-            <span style={{ width: '30px', fontSize: '14px', fontWeight: 600, color: 'rgba(0,0,0,0.4)' }}>{rank}</span>
+            <span style={{ width: '30px', fontSize: '14px', fontWeight: 600, color: 'hsl(var(--muted-foreground) / 0.6)' }}>{rank}</span>
             <div className="flex items-center flex-1 min-w-0" style={{ gap: '8px' }}>
               {getCollegeLogoUrl(media?.college_name || stats.normalized_name) && (
                 <img
@@ -311,7 +309,7 @@ function LeaderboardRows({
                 <span style={{ fontSize: '8px', color: '#D97706', marginLeft: '2px' }}>⭐</span>
               )}
             </div>
-            <span className="text-foreground" style={{ fontSize: '13px', fontWeight: 600, textAlign: 'right' as const }}>
+            <span className="text-foreground" style={{ fontSize: '13px', fontWeight: 600, textAlign: 'right' as const, fontVariantNumeric: 'tabular-nums' }}>
               {formatCurrency(stats.earnings_total)}
             </span>
           </button>
@@ -367,13 +365,13 @@ function FranchiseLeadersCarousel({ leaders }: { leaders: FranchiseLeader[] }) {
   if (!leaders.length) return null;
 
   return (
-    <div className="mb-4">
+    <div className="mb-6">
       {/* Section heading */}
       <div className="px-4 mb-3">
-        <h3 className="m-0 text-foreground" style={{ fontSize: '18px', fontWeight: 700 }}>
+        <h3 className="m-0 text-foreground" style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}>
           Franchise Leaders
         </h3>
-        <p className="m-0" style={{ fontSize: '12px', color: 'rgba(0,0,0,0.4)', fontStyle: 'italic', marginTop: '2px' }}>
+        <p className="m-0" style={{ fontSize: '13px', fontWeight: 500, color: 'hsl(var(--muted-foreground) / 0.6)', marginTop: '3px' }}>
           Which franchise leads each category?
         </p>
       </div>
@@ -397,11 +395,10 @@ function FranchiseLeadersCarousel({ leaders }: { leaders: FranchiseLeader[] }) {
             style={{
               width: '160px',
               minHeight: '140px',
-              background: getCollegeAccentBg(leader.college.normalized_name),
-              border: `1px solid ${getCollegeAccentBorder(leader.college.normalized_name)}`,
-              borderRadius: '12px',
+              background: 'hsl(var(--card))',
+              border: '1px solid hsl(var(--border) / 0.5)',
+              borderRadius: '16px',
               padding: '14px',
-              
             }}
           >
             {/* Category title */}
@@ -410,7 +407,7 @@ function FranchiseLeadersCarousel({ leaders }: { leaders: FranchiseLeader[] }) {
                 fontSize: '11px',
                 fontWeight: 600,
                 letterSpacing: '0.3px',
-                color: 'rgba(0,0,0,0.45)',
+                color: 'hsl(var(--muted-foreground) / 0.6)',
                 textTransform: 'uppercase' as const,
                 marginBottom: '12px',
               }}
@@ -435,12 +432,12 @@ function FranchiseLeadersCarousel({ leaders }: { leaders: FranchiseLeader[] }) {
             </span>
 
             {/* Stat value */}
-            <span style={{ fontSize: '18px', fontWeight: 700, color: 'rgba(0,0,0,0.85)', marginBottom: '2px' }}>
+            <span style={{ fontSize: '18px', fontWeight: 700, color: 'hsl(var(--foreground))', marginBottom: '2px', fontVariantNumeric: 'tabular-nums' }}>
               {leader.value}
             </span>
 
             {/* Alumni count */}
-            <span style={{ fontSize: '11px', color: 'rgba(0,0,0,0.35)' }}>
+            <span style={{ fontSize: '11px', fontWeight: 500, color: 'hsl(var(--muted-foreground) / 0.6)' }}>
               {leader.alumni} on tour
             </span>
           </div>
@@ -468,9 +465,9 @@ function PickFranchiseCTA({ onOpen }: { onOpen: () => void }) {
       onClick={onOpen}
       className="w-full flex items-center text-left active:scale-[0.97] transition-transform"
       style={{
-        background: 'rgba(0,0,0,0.02)',
-        border: '1px dashed rgba(0,0,0,0.12)',
-        borderRadius: '12px',
+        background: 'hsl(var(--card))',
+        border: '1px dashed hsl(var(--border) / 0.5)',
+        borderRadius: '16px',
         padding: '16px',
         gap: '12px',
       }}
@@ -480,18 +477,15 @@ function PickFranchiseCTA({ onOpen }: { onOpen: () => void }) {
         <p className="m-0 text-foreground" style={{ fontSize: '14px', fontWeight: 600 }}>
           Pick your franchise
         </p>
-        <p className="m-0" style={{ fontSize: '12px', color: 'rgba(0,0,0,0.45)' }}>
+        <p className="m-0" style={{ fontSize: '12px', color: 'hsl(var(--muted-foreground) / 0.6)' }}>
           Follow a college and join the rivalry
         </p>
       </div>
-      <ChevronRight size={16} style={{ color: 'rgba(0,0,0,0.3)', flexShrink: 0 }} />
+      <ChevronRight size={16} className="text-muted-foreground opacity-60 flex-shrink-0" />
     </button>
   );
 }
 
-// ============================================================================
-// MAIN COMPONENT
-// ============================================================================
 // ============================================================================
 // YOUR FRANCHISE BADGE (shown on podium/leaderboard if user follows)
 // ============================================================================
@@ -531,11 +525,11 @@ function YourFranchiseCard({
 
   return (
     <div
-      className="mx-4 mb-4"
+      className="mx-4 mb-6"
       style={{
-        background: 'rgba(0,0,0,0.02)',
-        border: '1px solid rgba(0,0,0,0.06)',
-        borderRadius: '12px',
+        background: 'hsl(var(--card))',
+        border: '1px solid hsl(var(--border) / 0.5)',
+        borderRadius: '16px',
         padding: '14px 16px',
       }}
     >
@@ -566,11 +560,11 @@ function YourFranchiseCard({
           <span className="text-foreground truncate block" style={{ fontSize: '15px', fontWeight: 600 }}>
             {displayName}
           </span>
-          <span style={{ fontSize: '12px', color: 'rgba(0,0,0,0.4)' }}>
+          <span style={{ fontSize: '12px', color: 'hsl(var(--muted-foreground) / 0.6)' }}>
             {formatCurrency(stats.earnings_total)} earnings · {stats.player_count} pros on tour
           </span>
         </div>
-        <span style={{ fontSize: '18px', fontWeight: 700, color: 'rgba(0,0,0,0.3)' }}>
+        <span className="text-muted-foreground" style={{ fontSize: '18px', fontWeight: 700 }}>
           #{rank}
         </span>
       </div>
@@ -644,7 +638,7 @@ export function CollegeRankingsPreview() {
 
   return (
     <section>
-      {/* 1. SECTION HEADER */}
+      {/* 1. SECTION HEADER — no "View All" (bottom link handles navigation) */}
       <motion.div
         className="flex items-end justify-between px-4 mb-1"
         initial={{ opacity: 0, y: 12 }}
@@ -661,19 +655,11 @@ export function CollegeRankingsPreview() {
           </h2>
           <p
             className="m-0"
-            style={{ fontSize: '13px', fontWeight: 400, color: 'rgba(0,0,0,0.45)', fontStyle: 'italic', marginTop: '3px' }}
+            style={{ fontSize: '13px', fontWeight: 500, color: 'hsl(var(--muted-foreground) / 0.6)', marginTop: '3px' }}
           >
             Where college legacies compete on tour
           </p>
         </div>
-        <button
-          onClick={() => navigate('/tourhub/college-golf')}
-          className="flex items-center gap-0.5 bg-transparent border-none cursor-pointer text-muted-foreground"
-          style={{ fontSize: '13px', fontWeight: 500, minHeight: '44px' }}
-        >
-          View All
-          <ChevronRight size={12} className="opacity-60" />
-        </button>
       </motion.div>
 
       {/* Hairline divider */}
@@ -682,7 +668,7 @@ export function CollegeRankingsPreview() {
       {/* 2. CHASE METRIC */}
       {chaseMetric && (
         <motion.div
-          className="px-4 mb-4"
+          className="px-4 mb-6"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
@@ -692,12 +678,11 @@ export function CollegeRankingsPreview() {
             style={{
               fontSize: '13.5px',
               fontWeight: 500,
-              color: 'rgba(0,0,0,0.55)',
-              fontStyle: 'italic',
+              color: 'hsl(var(--muted-foreground))',
               padding: '12px 16px',
-              background: 'rgba(0,0,0,0.02)',
-              borderRadius: '10px',
-              borderLeft: '3px solid rgba(0,0,0,0.08)',
+              background: 'hsl(var(--card))',
+              border: '1px solid hsl(var(--border) / 0.5)',
+              borderRadius: '16px',
               lineHeight: 1.5,
             }}
           >
@@ -708,7 +693,7 @@ export function CollegeRankingsPreview() {
 
       {/* 3. PODIUM — #2 left, #1 centre (tallest), #3 right */}
       <motion.div
-        className="px-4 mb-4"
+        className="px-4 mb-6"
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -763,23 +748,23 @@ export function CollegeRankingsPreview() {
       <FranchiseLeadersCarousel leaders={franchiseLeaders} />
 
       {/* 6. PICK YOUR FRANCHISE CTA */}
-      <div className="px-4 mb-3">
+      <div className="px-4 mb-6">
         <PickFranchiseCTA onOpen={() => setSheetOpen(true)} />
       </div>
 
-      {/* 7. VIEW FULL FRANCHISE RANKINGS */}
+      {/* 7. VIEW FULL FRANCHISE RANKINGS — clean text link */}
       <div className="px-4">
         <button
           onClick={() => navigate('/tourhub/college-golf')}
           className="w-full flex items-center justify-center active:scale-[0.97] transition-transform"
           style={{
-            padding: '14px',
-            background: 'rgba(0,0,0,0.03)',
-            border: '1px solid rgba(0,0,0,0.08)',
-            borderRadius: '12px',
+            padding: '8px 0',
+            background: 'transparent',
+            border: 'none',
+            borderRadius: '0',
           }}
         >
-          <span style={{ fontSize: '14px', fontWeight: 600, color: 'rgba(0,0,0,0.55)' }}>
+          <span className="text-foreground" style={{ fontSize: '14px', fontWeight: 600 }}>
             View Full Franchise Rankings ›
           </span>
         </button>

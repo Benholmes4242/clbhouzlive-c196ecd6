@@ -100,3 +100,17 @@ export function getCollegeGradientCSS(normalizedName: string): string {
   const { primary, secondary } = getCollegeColors(normalizedName);
   return `linear-gradient(135deg, ${primary} 0%, ${secondary} 100%)`;
 }
+
+/**
+ * Very light school-color tint for podium cards over a light card base.
+ * Returns rgba() at ~7% opacity of the school's primary brand color.
+ */
+export function getCollegePodiumTint(normalizedName: string): string {
+  const colors = getCollegeColors(normalizedName);
+  // Parse hex to rgb and return at 0.07 opacity
+  const hex = colors.primary.replace('#', '');
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, 0.07)`;
+}
