@@ -220,7 +220,10 @@ export function PlayersTab() {
             const aWins = aStats?.wins ?? 0;
             const bWins = bStats?.wins ?? 0;
             if (bWins !== aWins) return bWins - aWins;
-            return (bStats?.earnings ?? 0) - (aStats?.earnings ?? 0);
+            const aEarn = aStats?.earnings ?? 0;
+            const bEarn = bStats?.earnings ?? 0;
+            if (bEarn !== aEarn) return bEarn - aEarn;
+            return (bStats?.points ?? 0) - (aStats?.points ?? 0);
           }
           case 'alpha-az':
             return a.playerName.localeCompare(b.playerName);
@@ -362,11 +365,15 @@ export function PlayersTab() {
         case 'alpha-za':
           return b.full_name.localeCompare(a.full_name);
         case 'most-wins': {
-          const aWins = statsMap.get(a.id)?.wins ?? 0;
-          const bWins = statsMap.get(b.id)?.wins ?? 0;
-          const aEarn = statsMap.get(a.id)?.earnings ?? 0;
-          const bEarn = statsMap.get(b.id)?.earnings ?? 0;
-          return bWins - aWins || bEarn - aEarn;
+          const aStats = statsMap.get(a.id);
+          const bStats = statsMap.get(b.id);
+          const aWins = aStats?.wins ?? 0;
+          const bWins = bStats?.wins ?? 0;
+          if (bWins !== aWins) return bWins - aWins;
+          const aEarn = aStats?.earnings ?? 0;
+          const bEarn = bStats?.earnings ?? 0;
+          if (bEarn !== aEarn) return bEarn - aEarn;
+          return (bStats?.points ?? 0) - (aStats?.points ?? 0);
         }
         case 'highest-earnings': {
           const aEarn = statsMap.get(a.id)?.earnings ?? 0;
