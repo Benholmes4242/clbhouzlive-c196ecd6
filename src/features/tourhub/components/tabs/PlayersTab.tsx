@@ -48,14 +48,34 @@ const TOUR_CODE_ALIASES: Record<string, PlayerTourCode> = {
 
 function normalizeTourCode(rawTour: string | null | undefined): PlayerTourCode {
   if (!rawTour) return 'all';
-  const normalized = TOUR_CODE_ALIASES[rawTour.trim().toLowerCase()];
-  return normalized ?? 'all';
+  const raw = rawTour.trim().toLowerCase();
+  const normalized = TOUR_CODE_ALIASES[raw];
+  if (normalized) return normalized;
+
+  // Robust fallback for legacy / malformed codes (e.g. "PGA TOUR", "DP WORLD")
+  if (raw.includes('pga')) return 'pga';
+  if (raw.includes('dp') || raw.includes('euro')) return 'EURO';
+  if (raw.includes('lpga')) return 'LPGA';
+  if (raw.includes('korn') || raw.includes('pgad')) return 'PGAD';
+  if (raw.includes('liv')) return 'LIV';
+
+  return 'all';
 }
 
 function playerHasTour(player: TourPlayer, tour: PlayerTourCode): boolean {
   if (tour === 'all') return true;
-  const normalizedTarget = normalizeTourCode(tour);
-  return (player.tour_codes ?? []).some((code) => normalizeTourCode(code) === normalizedTarget);
+  return (player.tour_codes ?? []).some((code) => normalizeTourCode(code) === tour);
+}
+
+function isLikelyPgaElitePlayer(player: TourPlayer, worldRank: number | null | undefined): boolean {
+  if (worldRank == null || worldRank > 100) return false;
+
+  const normalizedCodes = (player.tour_codes ?? []).map((code) => normalizeTourCode(code));
+  const explicitlyOtherTour = normalizedCodes.some((code) => code === 'EURO' || code === 'LPGA' || code === 'PGAD' || code === 'LIV');
+
+  // Include elite OWGR players when PGA metadata is missing/malformed,
+  // but exclude players explicitly tagged to other tours.
+  return !explicitlyOtherTour;
 }
 
 export function PlayersTab() {
@@ -224,11 +244,10 @@ export function PlayersTab() {
       // Primary: player has this tour in their tour_codes
       if (playerHasTour(p, activeTour)) return true;
       
-      // Safety net for PGA: include any player with a world ranking in the top 100
-      // who has empty tour_codes (they almost certainly play on PGA Tour)
-      if (activeTour === 'pga' && (!p.tour_codes || p.tour_codes.length === 0)) {
-        const wr = rankMap.get(p.id)?.worldRank;
-        return wr != null && wr <= 100;
+      // Safety net for PGA: include elite OWGR players when tour metadata is stale/malformed
+      if (activeTour === 'pga') {
+        const wr = rankMap.get(p.id)?.worldRank ?? null;
+        return isLikelyPgaElitePlayer(p, wr);
       }
       
       return false;
@@ -309,9 +328,9 @@ export function PlayersTab() {
       if (!player) return false;
       if (playerHasTour(player, activeTour)) return true;
       
-      // Safety net for PGA
-      if (activeTour === 'pga' && (!player.tour_codes || player.tour_codes.length === 0)) {
-        return ep.worldRank != null && ep.worldRank <= 100;
+      // Safety net for PGA: include elite OWGR players when tour metadata is stale/malformed
+      if (activeTour === 'pga') {
+        return isLikelyPgaElitePlayer(player, ep.worldRank);
       }
       
       return false;
