@@ -105,6 +105,11 @@ Deno.serve(async (req) => {
       const holeData = await fetchSportradar(holeStatsUrl, sportradarApiKey);
       
       const rounds = holeData.rounds || [];
+      
+      if (!rounds || rounds.length === 0) {
+        console.warn(`[RoundComplete] No hole stats available yet for round ${roundNumber}. Will be picked up on next sync.`);
+      }
+      
       for (const round of rounds) {
         const roundNum = round.number;
         const courses = round.courses || [];
@@ -118,14 +123,14 @@ Deno.serve(async (req) => {
               hole_number: hole.number,
               par: hole.par,
               yardage: hole.yardage,
-              scoring_average: stats.scoring_avg ?? stats.scoring_average ?? hole.scoring_average ?? hole.scoring_avg ?? null,
+              scoring_average: stats.scoring_avg ?? stats.scoring_average ?? hole.scoring_average ?? hole.scoring_avg ?? hole.strokes_avg ?? null,
               avg_diff: stats.avg_diff ?? stats.relative_to_par ?? hole.avg_diff ?? null,
               eagles: stats.eagles ?? hole.eagles ?? 0,
               birdies: stats.birdies ?? hole.birdies ?? 0,
               pars: stats.pars ?? hole.pars ?? 0,
               bogeys: stats.bogeys ?? hole.bogeys ?? 0,
               double_bogeys: stats.double_bogeys ?? hole.double_bogeys ?? 0,
-              other: stats.other ?? hole.other ?? 0,
+              other: stats.other ?? hole.other ?? hole.other_scores ?? 0,
               raw_data: hole,
             }, { onConflict: 'tournament_id,round_number,hole_number' });
             if (!error) holeStatsRecords++;
