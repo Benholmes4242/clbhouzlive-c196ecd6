@@ -394,9 +394,9 @@ export function TourHubNavOverlay({
                       return (
                         <motion.button
                           key={player.playerId}
-                          initial={{ opacity: 0, x: 15, scale: 0.97 }}
+                          initial={{ opacity: 0, x: 16, scale: 0.97 }}
                           animate={{ opacity: 1, x: 0, scale: 1 }}
-                          transition={{ delay: 0.12 + index * 0.06, duration: 0.3, ease: ITEM_EASE }}
+                          transition={{ delay: 0.15 + index * 0.05, duration: 0.3, ease: ITEM_EASE }}
                           whileTap={{ scale: 0.97 }}
                           onClick={() => handlePlayerClick(player.playerId)}
                           className="flex-shrink-0 flex items-center gap-2.5 px-3 py-2.5 rounded-2xl transition-all"
