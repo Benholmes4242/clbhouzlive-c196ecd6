@@ -15,7 +15,7 @@ import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { RoundSelector } from './RoundSelector';
 import { TournamentEmptyState } from './TournamentEmptyState';
 import { useTourTeeTimesEnriched } from '../../hooks/useTourHubData';
-import { countryCodeToFlag } from '../../utils/countryFlags';
+import CountryFlag from '@/components/ui/country-flag';
 
 
 interface TeeTimesTabProps {
@@ -291,8 +291,6 @@ function TeeTimeGroupCard({ group, index, searchQuery }: { group: TeeTimeGroup; 
       <div>
         {group.players.map((player, playerIdx) => {
           const isLast = playerIdx === group.players.length - 1;
-          const flag = countryCodeToFlag(player.country || '');
-          
           const hasTappableLink = !!player.playerId;
 
           const content = (
@@ -313,9 +311,7 @@ function TeeTimeGroupCard({ group, index, searchQuery }: { group: TeeTimeGroup; 
                   {player.name}
                 </span>
                 {player.country && (
-                  <span style={{ fontSize: 11, fontWeight: 500 }} className="text-muted-foreground">
-                    {flag || player.country?.toUpperCase() || ''}
-                  </span>
+                  <CountryFlag country={player.country} size="sm" className="mt-0.5" />
                 )}
               </div>
               {hasTappableLink && (
