@@ -74,7 +74,7 @@ export function ScheduleEmptyMessage({
 
         {/* Countdown to next event */}
         {nextTournamentName && countdown && (
-          <div className="flex flex-col items-center max-w-[300px]" style={{ marginTop: '12px' }}>
+          <div className="flex flex-col items-center max-w-[300px]" style={{ marginTop: '24px' }}>
             <p className="text-muted-foreground" style={{ fontSize: '13px', fontWeight: 400 }}>
               Next up
             </p>
