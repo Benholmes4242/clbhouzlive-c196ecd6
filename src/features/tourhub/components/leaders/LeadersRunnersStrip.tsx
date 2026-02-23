@@ -7,6 +7,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import CountryFlag from '@/components/ui/country-flag';
 import type { LeaderCategory } from './constants';
 
 interface RunnerItem {
@@ -55,6 +56,7 @@ function RunnerCard({
       className="flex items-center gap-2 active:scale-[0.97] transition-transform"
       style={{
         flex: '1 1 0%',
+        minWidth: 0,
         background: 'hsl(var(--card))',
         border: '1px solid hsl(var(--border) / 0.5)',
         borderRadius: 16,
@@ -62,16 +64,16 @@ function RunnerCard({
         boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
       }}
     >
-      {/* Rank circle — 32×32, amber */}
+      {/* Rank circle — 26×26 */}
       <div
         className="flex-shrink-0 flex items-center justify-center rounded-full"
         style={{
-          width: 32,
-          height: 32,
+          width: 26,
+          height: 26,
           background: index === 0 ? '#94A3B8' : '#C2875A',
         }}
       >
-        <span style={{ fontSize: 14, fontWeight: 700, color: 'white' }}>{index + 2}</span>
+        <span style={{ fontSize: 11, fontWeight: 700, color: 'white' }}>{index + 2}</span>
       </div>
 
       {/* Avatar — 36×36, 34% border-radius */}
@@ -90,12 +92,12 @@ function RunnerCard({
         )}
       </div>
 
-      {/* Name & stat value */}
+      {/* Name & flag */}
       <div className="flex-1 min-w-0 text-left">
         <p style={{ fontSize: 14, fontWeight: 600 }} className="text-foreground truncate">{lastName}</p>
-        <p style={{ fontSize: 11, fontWeight: 500 }} className="text-muted-foreground truncate">
-          {fmt(value)}{unit ? ` ${unit}` : ''}
-        </p>
+        <div className="flex items-center gap-1">
+          <CountryFlag country={runner.player.country_code || runner.player.country} size="sm" />
+        </div>
       </div>
     </Link>
   );
@@ -114,8 +116,8 @@ export function LeadersRunnersStrip({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4, duration: 0.35 }}
-      className="flex px-4"
-      style={{ marginTop: '-20px', position: 'relative', zIndex: 10, gap: 10 }}
+      className="flex"
+      style={{ padding: '0 16px', marginTop: '-20px', position: 'relative', zIndex: 10, gap: 8, boxSizing: 'border-box', width: '100%' }}
     >
       {runners.map((runner, i) => (
         <RunnerCard

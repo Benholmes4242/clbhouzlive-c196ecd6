@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { openTourNav } from '../../contexts/TourNavContext';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
+import CountryFlag from '@/components/ui/country-flag';
 import type { LeaderCategory } from './constants';
 
 interface LeadersHeroProps {
@@ -57,7 +58,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
         <Menu 
           className="w-[22px] h-[22px]" 
           strokeWidth={2}
-          style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.7)) drop-shadow(0 0px 8px rgba(0,0,0,0.3))' }}
+          style={{ color: 'hsl(var(--foreground))', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.15))' }}
         />
       </button>
 
@@ -90,7 +91,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
             background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 35%, rgba(0,0,0,0.05) 60%, transparent 80%)',
           }} />
 
-          <div className="absolute bottom-0 left-0 right-0 px-4 pb-6 space-y-1.5">
+          <div className="absolute bottom-0 left-0 right-0 px-4 pb-10 space-y-1.5">
             {/* Category label — 11px, 700, amber, uppercase, wide tracking */}
             <motion.p
               initial={{ opacity: 0, y: 8 }}
@@ -123,15 +124,14 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
               {player.full_name}
             </motion.h2>
 
-            {/* Country — 13px, 500 */}
+            {/* Country flag only */}
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.22, duration: 0.4 }}
               className="flex items-center gap-1.5"
             >
-              {flag && <span className="text-lg">{flag}</span>}
-              <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>{countryName}</span>
+              <CountryFlag country={player.country_code || player.country} size="sm" className="brightness-110" />
             </motion.div>
 
             {/* Stats pill — amber bg, white text, 13px/600 */}
