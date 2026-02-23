@@ -290,7 +290,7 @@ function LeaderboardRows({
             className="w-full flex items-center bg-transparent active:bg-black/[0.02] transition-colors"
             style={{
               padding: '14px 16px',
-              borderBottom: i < rows.length - 1 ? '1px solid hsl(var(--border) / 0.3)' : 'none',
+              borderBottom: i < rows.length - 1 ? '1px solid hsl(var(--border) / 0.15)' : 'none',
             }}
           >
             <span style={{ width: '30px', fontSize: '14px', fontWeight: 600, color: 'hsl(var(--muted-foreground) / 0.6)' }}>{rank}</span>
@@ -640,7 +640,7 @@ export function CollegeRankingsPreview() {
     <section>
       {/* 1. SECTION HEADER — no "View All" (bottom link handles navigation) */}
       <motion.div
-        className="flex items-end justify-between px-4 mb-1"
+        className="flex items-end justify-between px-4 mb-4"
         initial={{ opacity: 0, y: 12 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}

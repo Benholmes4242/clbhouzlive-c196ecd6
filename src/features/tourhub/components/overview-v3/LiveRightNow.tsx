@@ -36,7 +36,7 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
         <div style={{
           fontSize: '13.5px',
           fontWeight: 600,
-          color: 'rgba(0,0,0,0.85)',
+          color: 'hsl(var(--foreground))',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -54,7 +54,7 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
           <span style={{
             fontSize: '12px',
             fontWeight: 500,
-            color: 'rgba(0,0,0,0.45)',
+            color: 'hsl(var(--muted-foreground) / 0.6)',
           }}>
             {tournament.leader?.name ?? 'Starting soon'}
           </span>

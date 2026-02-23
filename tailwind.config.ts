@@ -217,7 +217,7 @@ export default {
 				 * DO NOT USE: mt-5, mt-7, gap-5, space-y-5, space-y-7, etc.
 				 * INSTEAD USE: mt-section, gap-block, space-y-internal, etc.
 				 */
-				'section': '40px',   // Section → section (brief: 40px between major sections)
+				'section': '24px',   // Section → section (canonical: 24px between major sections)
 				'block': '16px',     // Header → content, card → card
 				'sub': '8px',        // Title → subtitle
 				'internal': '12px',  // Inside cards, list rows

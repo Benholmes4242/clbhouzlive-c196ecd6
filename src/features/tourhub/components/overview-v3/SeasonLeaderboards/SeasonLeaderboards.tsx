@@ -87,7 +87,7 @@ const SeasonLeaderboardsEmpty = memo(function SeasonLeaderboardsEmpty() {
           Performance Rankings
         </h2>
       </div>
-      <div className="mx-4 mt-4 p-8 text-center rounded-2xl" style={{ background: 'rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.06)' }}>
+      <div className="mx-4 mt-4 p-8 text-center rounded-2xl bg-muted/30 border border-border/50">
         <div className="flex flex-col items-center gap-3">
           <BarChartIcon size={32} style={{ color: 'rgba(0,0,0,0.2)' }} />
           <h3 className="font-semibold text-foreground m-0">No Stats Available</h3>
@@ -150,7 +150,7 @@ export function SeasonLeaderboards() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-        style={{ marginBottom: '14px' }}
+        style={{ marginBottom: '16px' }}
       >
         <div>
           <div className="flex items-center gap-2">
@@ -209,11 +209,10 @@ export function SeasonLeaderboards() {
       {/* ═══ NO DATA FOR SELECTED YEAR ═══ */}
       {hasNoCategories ? (
         <motion.div
-          className="mx-4 mt-4 p-8 text-center rounded-2xl"
+          className="mx-4 mt-4 p-8 text-center rounded-2xl bg-muted/30 border border-border/50"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          style={{ background: 'rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.06)' }}
         >
           <div className="flex flex-col items-center gap-3">
             <BarChartIcon size={32} style={{ color: 'rgba(0,0,0,0.2)' }} />
