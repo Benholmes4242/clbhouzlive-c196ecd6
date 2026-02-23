@@ -148,11 +148,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
           {/* Subtitle only when NOT live — toggle replaces it */}
           {!isLive && (
             <p className="mt-1 text-muted-foreground" style={{ fontSize: '13px', fontWeight: 400 }}>
-              {isCompleted
-                ? 'How our AI picks performed this week'
-                : intelligenceView === 'upcoming'
-                  ? 'Early analysis for the upcoming tournament'
-                  : 'AI-powered picks and course analysis for this week\'s field'}
+              AI analysis of course fit, form, and field strength
             </p>
           )}
         </div>
