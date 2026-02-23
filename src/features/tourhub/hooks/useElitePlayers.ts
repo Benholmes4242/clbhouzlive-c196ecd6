@@ -30,7 +30,17 @@ export function useElitePlayers(limit: number = 50) {
   return useQuery({
     queryKey: ['tourhub', 'elite-players', limit],
     queryFn: async () => {
-      // Get world rankings with player data joined
+      // Get latest ranking snapshot date first
+      const { data: latestDateRow } = await supabase
+        .from('sr_world_rankings')
+        .select('ranking_date')
+        .order('ranking_date', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!latestDateRow?.ranking_date) return [];
+
+      // Get world rankings with player data joined (latest snapshot only)
       const { data: rankings, error: rankingsError } = await supabase
         .from('sr_world_rankings')
         .select(`
@@ -41,6 +51,7 @@ export function useElitePlayers(limit: number = 50) {
           avg_points,
           raw_data
         `)
+        .eq('ranking_date', latestDateRow.ranking_date)
         .order('rank', { ascending: true })
         .limit(limit);
       
