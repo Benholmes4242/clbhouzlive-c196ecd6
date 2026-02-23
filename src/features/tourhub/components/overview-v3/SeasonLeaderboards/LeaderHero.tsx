@@ -67,7 +67,7 @@ export const LeaderHero = memo(function LeaderHero({ player, accentColor }: Lead
               <img
                 src={photoUrl}
                 alt={player.playerName}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-[center_20%]"
                 loading="eager"
                 onError={() => setImgError(true)}
               />
