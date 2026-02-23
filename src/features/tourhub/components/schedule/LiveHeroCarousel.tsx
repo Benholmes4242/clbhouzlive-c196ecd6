@@ -17,25 +17,22 @@ import type { TourTournament } from '../../hooks/useTourHubData';
 import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
 import { useSingleCourseImage } from '../../hooks/useCourseImageResolver';
 import { getCourseImage } from '../../utils/placeholders';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import '@/styles/hero-glass.css';
 
 /** Player avatar for carousel live card */
-function PlayerAvatar({ photoUrl, displayName, size = 36 }: { photoUrl: string | null; displayName: string; size?: number }) {
+function PlayerAvatar({ fullName, tourCode, displayName, size = 36 }: { fullName?: string; tourCode?: string; displayName: string; size?: number }) {
   const [imgError, setImgError] = useState(false);
-  const initials = displayName.split(/[\s.]/).filter(Boolean).map(w => w[0]?.toUpperCase() || '').slice(0, 2).join('');
+  const src = getPlayerHeadshotUrl(fullName || displayName, tourCode || 'pga');
   return (
     <div style={{
       width: size, height: size, borderRadius: '34%', overflow: 'hidden', flexShrink: 0,
       border: '1.5px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.1)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
-      {photoUrl && !imgError ? (
-        <img src={photoUrl} alt={displayName}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }}
-          onError={() => setImgError(true)} />
-      ) : (
-        <span style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.65)', lineHeight: 1 }}>{initials || '?'}</span>
-      )}
+      <img src={imgError ? PLAYER_SILHOUETTE_URL : src} alt={displayName}
+        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }}
+        onError={() => setImgError(true)} />
     </div>
   );
 }
@@ -189,7 +186,7 @@ function LiveSlide({ tournament, leader }: { tournament: TourTournament; leader?
             margin: '10px -8px 0 -8px',
           }}>
             <button onClick={handlePlayerTap} className="transition-opacity active:opacity-70">
-              <PlayerAvatar photoUrl={leader.photoUrl ?? null} displayName={leader.displayName} size={36} />
+              <PlayerAvatar fullName={leader.fullName} tourCode={tournament.tour_code} displayName={leader.displayName} size={36} />
             </button>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
