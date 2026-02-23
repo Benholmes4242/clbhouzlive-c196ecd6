@@ -54,7 +54,7 @@ export function ScheduleEmptyMessage({
           "py-16 px-6 mx-4 text-center",
           className
         )}
-        style={{ minHeight: 'clamp(282px, 53vh, 422px)' }}
+        style={{ paddingTop: '40px', paddingBottom: '40px' }}
       >
         {/* Icon cluster */}
         <div className="relative">
@@ -71,22 +71,6 @@ export function ScheduleEmptyMessage({
         >
           No Tournaments Live Right Now
         </h3>
-
-        {/* Countdown to next event */}
-        {nextTournamentName && countdown && (
-          <div className="flex flex-col items-center max-w-[300px]" style={{ marginTop: '12px' }}>
-            <p className="text-muted-foreground" style={{ fontSize: '13px', fontWeight: 400 }}>
-              Next up
-            </p>
-            <p className="text-foreground text-center" style={{ fontSize: '16px', fontWeight: 600, marginTop: '4px' }}>
-              {nextTournamentName}
-            </p>
-            <p className="text-muted-foreground" style={{ fontSize: '13px', fontWeight: 400, marginTop: '2px' }}>
-              {countdown}
-              {formattedDate && <> · {formattedDate}</>}
-            </p>
-          </div>
-        )}
 
         {!nextTournamentName && (
           <p className="text-muted-foreground max-w-[280px]" style={{ fontSize: '13px', fontWeight: 400, marginTop: '12px' }}>

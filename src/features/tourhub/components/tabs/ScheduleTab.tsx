@@ -197,7 +197,14 @@ export function ScheduleTab() {
       .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime());
 
     if (filter === 'live') {
-      return liveList.map(t => ({ tournament: t, type: 'live' as const }));
+      if (liveList.length > 0) {
+        return liveList.map(t => ({ tournament: t, type: 'live' as const }));
+      }
+      // No live tournaments — show next upcoming as hero
+      if (upcomingList.length > 0) {
+        return [{ tournament: upcomingList[0], type: 'upcoming' as const }];
+      }
+      return [];
     }
 
     if (filter === 'completed') {
