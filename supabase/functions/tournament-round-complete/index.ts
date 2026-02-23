@@ -111,21 +111,22 @@ Deno.serve(async (req) => {
         for (const course of courses) {
           const holes = course.holes || [];
           for (const hole of holes) {
+            const stats = hole.statistics || {};
             const { error } = await supabase.from('sr_hole_statistics').upsert({
               tournament_id: tournament.id,
               round_number: roundNum,
               hole_number: hole.number,
               par: hole.par,
               yardage: hole.yardage,
-              scoring_avg: hole.statistics?.scoring_avg,
-              relative_to_par: hole.statistics?.relative_to_par,
-              eagles: hole.statistics?.eagles,
-              birdies: hole.statistics?.birdies,
-              pars: hole.statistics?.pars,
-              bogeys: hole.statistics?.bogeys,
-              double_bogeys: hole.statistics?.double_bogeys,
-              other: hole.statistics?.other,
-              avg_diff: hole.statistics?.avg_diff,
+              scoring_average: stats.scoring_avg ?? stats.scoring_average ?? hole.scoring_average ?? hole.scoring_avg ?? null,
+              avg_diff: stats.avg_diff ?? stats.relative_to_par ?? hole.avg_diff ?? null,
+              eagles: stats.eagles ?? hole.eagles ?? 0,
+              birdies: stats.birdies ?? hole.birdies ?? 0,
+              pars: stats.pars ?? hole.pars ?? 0,
+              bogeys: stats.bogeys ?? hole.bogeys ?? 0,
+              double_bogeys: stats.double_bogeys ?? hole.double_bogeys ?? 0,
+              other: stats.other ?? hole.other ?? 0,
+              raw_data: hole,
             }, { onConflict: 'tournament_id,round_number,hole_number' });
             if (!error) holeStatsRecords++;
           }

@@ -153,27 +153,27 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
     for (const stat of filtered as any[]) {
       const existing = holeMap.get(stat.hole_number);
       if (existing) {
-        existing.eagles += stat.eagles || 0;
-        existing.birdies += stat.birdies || 0;
-        existing.pars += stat.pars || 0;
-        existing.bogeys += stat.bogeys || 0;
-        existing.doubleBogeys += stat.double_bogeys || 0;
-        existing.other += stat.other || 0;
-        existing.scoringAverage = (existing.scoringAverage + (stat.scoring_average || 0)) / 2;
-        existing.avgDiff = (existing.avgDiff + (stat.avg_diff || 0)) / 2;
+        existing.eagles += Number(stat.eagles) || 0;
+        existing.birdies += Number(stat.birdies) || 0;
+        existing.pars += Number(stat.pars) || 0;
+        existing.bogeys += Number(stat.bogeys) || 0;
+        existing.doubleBogeys += Number(stat.double_bogeys) || 0;
+        existing.other += Number(stat.other) || 0;
+        existing.scoringAverage = (existing.scoringAverage + (Number(stat.scoring_average) || 0)) / 2;
+        existing.avgDiff = (existing.avgDiff + (Number(stat.avg_diff) || 0)) / 2;
       } else {
         holeMap.set(stat.hole_number, {
           holeNumber: stat.hole_number,
           par: stat.par,
           yardage: stat.yardage,
-          scoringAverage: stat.scoring_average || 0,
-          avgDiff: stat.avg_diff || 0,
-          eagles: stat.eagles || 0,
-          birdies: stat.birdies || 0,
-          pars: stat.pars || 0,
-          bogeys: stat.bogeys || 0,
-          doubleBogeys: stat.double_bogeys || 0,
-          other: stat.other || 0,
+          scoringAverage: Number(stat.scoring_average) || 0,
+          avgDiff: Number(stat.avg_diff) || 0,
+          eagles: Number(stat.eagles) || 0,
+          birdies: Number(stat.birdies) || 0,
+          pars: Number(stat.pars) || 0,
+          bogeys: Number(stat.bogeys) || 0,
+          doubleBogeys: Number(stat.double_bogeys) || 0,
+          other: Number(stat.other) || 0,
           totalPlayers: stat.raw_data?.players || 0,
           difficultyRank: 0,
         });
