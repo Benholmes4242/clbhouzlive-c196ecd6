@@ -290,7 +290,8 @@ export function useTourPlayers(search?: string) {
       let query = supabase
         .from('sr_players')
         .select('id, sr_id, first_name, last_name, full_name, birth_date, birth_place, residence, college, college_normalized, turned_pro, country, country_code, photo_url, height, weight, pga_tour_id, handedness, tour_codes')
-        .order('full_name', { ascending: true });
+        .order('full_name', { ascending: true })
+        .limit(2000);
       
       if (search && search.length >= 2) {
         query = query.ilike('full_name', `%${search}%`);
