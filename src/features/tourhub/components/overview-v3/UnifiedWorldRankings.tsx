@@ -485,14 +485,13 @@ export function UnifiedWorldRankings() {
             <button
               onClick={goToPrevPage}
               disabled={currentPage === 0}
-              className="flex items-center justify-center rounded-lg border border-border/60 bg-card active:scale-95 transition-all disabled:opacity-25 disabled:pointer-events-none"
-              style={{ width: '44px', height: '44px' }}
+              className="disabled:opacity-25 disabled:pointer-events-none active:scale-95 transition-all"
               aria-label="Previous page"
             >
-              <ChevronLeft className="w-4 h-4 text-muted-foreground" />
+              <ChevronLeft className="w-4 h-4 text-muted-foreground/40 cursor-pointer hover:text-foreground transition-colors" />
             </button>
 
-            <div className="flex items-center" style={{ gap: '6px' }}>
+            <div className="flex items-center gap-1.5">
               {Array.from({ length: dotRange.end - dotRange.start }).map((_, i) => {
                 const dotIndex = dotRange.start + i;
                 const isActive = dotIndex === currentPage;
@@ -506,7 +505,7 @@ export function UnifiedWorldRankings() {
                       width: isActive ? '20px' : '6px',
                       borderRadius: '3px',
                       background: isActive
-                        ? 'rgba(0,0,0,0.7)'
+                        ? 'hsl(var(--foreground))'
                         : 'rgba(0,0,0,0.12)',
                     }}
                     aria-label={`Page ${dotIndex + 1} of ${totalPages}`}
@@ -518,11 +517,10 @@ export function UnifiedWorldRankings() {
             <button
               onClick={goToNextPage}
               disabled={currentPage === totalPages - 1}
-              className="flex items-center justify-center rounded-lg border border-border/60 bg-card active:scale-95 transition-all disabled:opacity-25 disabled:pointer-events-none"
-              style={{ width: '44px', height: '44px' }}
+              className="disabled:opacity-25 disabled:pointer-events-none active:scale-95 transition-all"
               aria-label="Next page"
             >
-              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+              <ChevronRight className="w-4 h-4 text-muted-foreground/40 cursor-pointer hover:text-foreground transition-colors" />
             </button>
           </div>
 
