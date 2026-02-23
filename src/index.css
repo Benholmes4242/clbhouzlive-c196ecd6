@@ -30,6 +30,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Player silhouette fallback — always show on off-white, never transparent/checkerboard */
+img[src*="Silhouette"] {
+  background-color: #F8FAFC;
+}
+
 /* 
  * ============================================================================
  * CRITICAL: PREVENT PULL-TO-REFRESH AND OVERSCROLL - DO NOT MODIFY OR REMOVE
