@@ -8,7 +8,8 @@ import { ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
-import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
+import { titleCaseCountry } from '../../utils/countryFlags';
+import CountryFlag from '@/components/ui/country-flag';
 import type { PlayerSortType } from './PlayerSortControl';
 
 interface PlayerCardV2Props {
@@ -60,7 +61,7 @@ export function PlayerCardV2({
   // R2 headshot — single source of truth
   const tourCode = activeTour === 'all' ? (player.tourCodes?.[0] ?? 'pga') : activeTour;
   const photoUrl = getPlayerHeadshotUrl(player.fullName, tourCode);
-  const flag = countryCodeToFlag(player.countryCode);
+  
   const countryName = titleCaseCountry(player.country);
 
   const initials = player.fullName
@@ -166,7 +167,7 @@ export function PlayerCardV2({
 
           {countryName && (
             <div className="flex items-center gap-1.5" style={{ marginTop: '2px' }}>
-              {flag && <span className="text-xs leading-none">{flag}</span>}
+              <CountryFlag country={player.country} size="sm" />
               <span style={{ fontSize: '13px', fontWeight: 400 }} className="text-muted-foreground truncate">{countryName}</span>
             </div>
           )}
