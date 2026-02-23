@@ -16,7 +16,7 @@ import { RoundSelector } from './RoundSelector';
 import { TournamentEmptyState } from './TournamentEmptyState';
 import { useTourTeeTimesEnriched } from '../../hooks/useTourHubData';
 import { countryCodeToFlag } from '../../utils/countryFlags';
-import { toTitleCase } from '@/lib/formatters';
+
 
 interface TeeTimesTabProps {
   tournamentId: string;
@@ -81,16 +81,6 @@ interface TeeTimeGroup {
   }>;
 }
 
-/** Map 2-letter country code to full name */
-function countryCodeToName(code?: string): string | null {
-  if (!code) return null;
-  try {
-    const name = new Intl.DisplayNames(['en'], { type: 'region' }).of(code.toUpperCase());
-    return name || null;
-  } catch {
-    return null;
-  }
-}
 
 export function TeeTimesTab({ tournamentId, isCompleted }: TeeTimesTabProps) {
   const [selectedRound, setSelectedRound] = useState('R1');
@@ -302,7 +292,7 @@ function TeeTimeGroupCard({ group, index, searchQuery }: { group: TeeTimeGroup; 
         {group.players.map((player, playerIdx) => {
           const isLast = playerIdx === group.players.length - 1;
           const flag = countryCodeToFlag(player.country || '');
-          const countryName = countryCodeToName(player.country);
+          
           const hasTappableLink = !!player.playerId;
 
           const content = (
@@ -318,15 +308,24 @@ function TeeTimeGroupCard({ group, index, searchQuery }: { group: TeeTimeGroup; 
                 playerName={player.name}
                 size="md"
               />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-foreground truncate">
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                <span className="text-sm font-semibold text-foreground truncate">
                   {player.name}
-                </p>
-                {player.country && (
-                  <p className="text-muted-foreground" style={{ fontSize: '11px', fontWeight: 500 }}>
-                    {flag && <span className="mr-1">{flag}</span>}
-                    {toTitleCase(countryName || player.country)}
-                  </p>
+                </span>
+                {flag && (
+                  <span style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 13,
+                    lineHeight: 1,
+                    backgroundColor: 'hsl(var(--muted) / 0.5)',
+                    borderRadius: 4,
+                    padding: '1px 3px',
+                    flexShrink: 0,
+                  }}>
+                    {flag}
+                  </span>
                 )}
               </div>
               {hasTappableLink && (
