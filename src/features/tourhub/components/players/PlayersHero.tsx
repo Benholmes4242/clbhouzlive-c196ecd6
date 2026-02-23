@@ -204,6 +204,8 @@ function RunnerCard({ player, index, activeTour, statsMap, sort, tiedCount }: {
     badgeNumber = stats?.wins || 0;
   } else if (sort === 'highest-earnings') {
     badgeNumber = index + 2; // position 2 or 3
+  } else if (sort === 'world-rank-desc' || sort === 'alpha-az' || sort === 'alpha-za') {
+    badgeNumber = player.worldRank;
   } else {
     badgeNumber = activeTour === 'all' ? player.worldRank : (tourRank || player.worldRank);
   }
@@ -310,10 +312,13 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
         metaParts.push(`${champWins} ${champWins === 1 ? 'win' : 'wins'}`);
       }
     } else {
-      if (!champTourRank) {
-        metaParts.push(`#${champion.worldRank} OWGR`);
+      if (sort === 'world-rank-desc' || sort === 'alpha-az' || sort === 'alpha-za') {
+        // Always show OWGR for world ranking and alphabetical sorts
+        if (champion.worldRank) metaParts.push(`#${champion.worldRank} OWGR`);
       } else {
-        metaParts.push(`#${champTourRank}`);
+        // Tour-specific sorts can use tourRank
+        if (champTourRank) metaParts.push(`#${champTourRank}`);
+        else if (champion.worldRank) metaParts.push(`#${champion.worldRank} OWGR`);
       }
       if (earningsStr) metaParts.push(earningsStr);
       if (champWins > 0) {
