@@ -36,6 +36,28 @@ function useDebouncedValue(value: string, delay: number): string {
 
 const PAGE_SIZE = 50;
 
+const TOUR_CODE_ALIASES: Record<string, PlayerTourCode> = {
+  all: 'all',
+  pga: 'pga',
+  euro: 'EURO',
+  dp: 'EURO',
+  lpga: 'LPGA',
+  pgad: 'PGAD',
+  liv: 'LIV',
+};
+
+function normalizeTourCode(rawTour: string | null | undefined): PlayerTourCode {
+  if (!rawTour) return 'all';
+  const normalized = TOUR_CODE_ALIASES[rawTour.trim().toLowerCase()];
+  return normalized ?? 'all';
+}
+
+function playerHasTour(player: TourPlayer, tour: PlayerTourCode): boolean {
+  if (tour === 'all') return true;
+  const normalizedTarget = normalizeTourCode(tour);
+  return (player.tour_codes ?? []).some((code) => normalizeTourCode(code) === normalizedTarget);
+}
+
 export function PlayersTab() {
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
@@ -44,7 +66,7 @@ export function PlayersTab() {
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebouncedValue(search, 200);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const initialTour = searchParams.get('tour') || 'all';
+  const initialTour = normalizeTourCode(searchParams.get('tour'));
   const [sort, setSort] = useState<PlayerSortType>(getDefaultSortForTour(initialTour));
 
   // Scroll position handled by centralized ScrollRestoration component
@@ -93,7 +115,7 @@ export function PlayersTab() {
   }, [pullDistance, handleRefresh]);
 
   // Tour filter from URL
-  const activeTour = (searchParams.get('tour') as PlayerTourCode) || 'all';
+  const activeTour = normalizeTourCode(searchParams.get('tour'));
   const setActiveTour = useCallback((tour: PlayerTourCode) => {
     const params = new URLSearchParams(searchParams);
     if (tour === 'all') {
@@ -121,6 +143,24 @@ export function PlayersTab() {
     return now.getMonth() >= 9 ? now.getFullYear() + 1 : now.getFullYear();
   }, []);
   const { data: tourRankings } = useTourSeasonRankings(tourRankingsCode, seasonYear);
+
+  // Normalize legacy/variant tour codes in URL (e.g. `PGA` -> `pga`)
+  useEffect(() => {
+    const rawTour = searchParams.get('tour');
+    if (!rawTour) return;
+
+    const normalizedTour = normalizeTourCode(rawTour);
+    if (rawTour === normalizedTour) return;
+
+    const params = new URLSearchParams(searchParams);
+    if (normalizedTour === 'all') {
+      params.delete('tour');
+    } else {
+      params.set('tour', normalizedTour);
+    }
+    params.set('tab', 'players');
+    setSearchParams(params, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   // Reset pagination on search/sort change
   useEffect(() => {
@@ -182,7 +222,7 @@ export function PlayersTab() {
     if (!allPlayers || activeTour === 'all') return allPlayers || [];
     return allPlayers.filter(p => {
       // Primary: player has this tour in their tour_codes
-      if (p.tour_codes?.includes(activeTour)) return true;
+      if (playerHasTour(p, activeTour)) return true;
       
       // Safety net for PGA: include any player with a world ranking in the top 100
       // who has empty tour_codes (they almost certainly play on PGA Tour)
@@ -201,7 +241,8 @@ export function PlayersTab() {
     const counts: Record<string, number> = {};
     allPlayers.forEach(p => {
       p.tour_codes?.forEach(code => {
-        counts[code] = (counts[code] || 0) + 1;
+        const normalized = normalizeTourCode(code);
+        counts[normalized] = (counts[normalized] || 0) + 1;
       });
     });
     return counts;
@@ -266,7 +307,7 @@ export function PlayersTab() {
     const tourElite = (elitePlayers || []).filter(ep => {
       const player = allPlayers?.find(p => p.id === ep.playerId);
       if (!player) return false;
-      if (player.tour_codes?.includes(activeTour)) return true;
+      if (playerHasTour(player, activeTour)) return true;
       
       // Safety net for PGA
       if (activeTour === 'pga' && (!player.tour_codes || player.tour_codes.length === 0)) {
