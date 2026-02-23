@@ -429,9 +429,9 @@ export function UnifiedWorldRankings() {
                       {entry.rank}
                     </span>
                     {rankChange > 0 ? (
-                      <span className="text-green-500" style={{ fontSize: '10px' }}>▲</span>
+                      <span className="text-green-500" style={{ fontSize: '10px', fontWeight: 600 }}>▲{Math.abs(rankChange)}</span>
                     ) : rankChange < 0 ? (
-                      <span className="text-red-400" style={{ fontSize: '10px' }}>▼</span>
+                      <span className="text-red-400" style={{ fontSize: '10px', fontWeight: 600 }}>▼{Math.abs(rankChange)}</span>
                     ) : null}
                   </div>
 
