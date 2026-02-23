@@ -6,7 +6,7 @@
  */
 
 import { useState, useMemo } from 'react';
-import { Clock, Users, Search, X } from 'lucide-react';
+import { Clock, Users, Search, X, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
@@ -80,6 +80,17 @@ interface TeeTimeGroup {
   }>;
 }
 
+/** Map 2-letter country code to full name */
+function countryCodeToName(code?: string): string | null {
+  if (!code) return null;
+  try {
+    const name = new Intl.DisplayNames(['en'], { type: 'region' }).of(code.toUpperCase());
+    return name || null;
+  } catch {
+    return null;
+  }
+}
+
 export function TeeTimesTab({ tournamentId, isCompleted }: TeeTimesTabProps) {
   const [selectedRound, setSelectedRound] = useState('R1');
   const [searchQuery, setSearchQuery] = useState('');
@@ -95,7 +106,7 @@ export function TeeTimesTab({ tournamentId, isCompleted }: TeeTimesTabProps) {
     return rounds.map(r => `R${r}`);
   }, [allTeeTimes]);
 
-  // If only 1 round exists (e.g., LIV), hide individual round tabs — only show data
+  // If only 1 round exists (e.g., LIV), hide individual round tabs
   const showRoundTabs = availableRounds.length > 1;
 
   // Group tee times
@@ -172,7 +183,7 @@ export function TeeTimesTab({ tournamentId, isCompleted }: TeeTimesTabProps) {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Round selector — hidden if only 1 round exists (e.g., LIV) */}
+      {/* Round selector — hidden if only 1 round exists */}
       {showRoundTabs && (
         <RoundSelector
           rounds={availableRounds}
@@ -182,7 +193,7 @@ export function TeeTimesTab({ tournamentId, isCompleted }: TeeTimesTabProps) {
       )}
 
       {/* Summary */}
-      <div className="flex items-center gap-2 text-sm text-muted-foreground py-3 px-4">
+      <div className="flex items-center gap-2 text-muted-foreground py-3 px-4 mb-2" style={{ fontSize: '13px', fontWeight: 500 }}>
         <Users className="w-4 h-4 shrink-0" />
         <span className="tabular-nums">
           {groups.length} groups · Round {roundNumber}
@@ -192,18 +203,19 @@ export function TeeTimesTab({ tournamentId, isCompleted }: TeeTimesTabProps) {
 
       {/* Search input */}
       <div className="relative px-4 mb-4">
-        <Search className="absolute left-7 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-muted-foreground z-10" strokeWidth={2.5} />
+        <Search className="absolute left-7 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-muted-foreground/40 z-10" strokeWidth={2.5} />
         <input
           type="text"
           placeholder="Find your player…"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className={cn(
-            "w-full h-12 pl-10 pr-10 rounded-2xl text-sm text-foreground placeholder:text-muted-foreground/50",
-            "bg-muted/50 border border-border",
+            "w-full h-12 pl-10 pr-10 rounded-2xl text-foreground placeholder:text-muted-foreground/40",
+            "bg-muted/30 border border-border/50",
             "focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30",
             "transition-all duration-200"
           )}
+          style={{ fontSize: '13px' }}
         />
         {searchQuery && (
           <button
@@ -218,7 +230,7 @@ export function TeeTimesTab({ tournamentId, isCompleted }: TeeTimesTabProps) {
       <div className="border-t border-border" />
 
       {/* Tee time groups */}
-      <div className="space-y-3 pt-4 px-4">
+      <div className="space-y-4 pt-4 px-4">
         {filteredGroups.length === 0 && searchQuery && (
           <div className="text-center py-12">
             <p className="text-sm text-muted-foreground">No players matching "{searchQuery}"</p>
@@ -231,7 +243,7 @@ export function TeeTimesTab({ tournamentId, isCompleted }: TeeTimesTabProps) {
               <div className="text-xs font-semibold tracking-widest uppercase text-muted-foreground py-2">
                 Hole {hole} Start
               </div>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {holeGroups.map((group, idx) => (
                   <TeeTimeGroupCard key={`${group.teeTime}-${idx}`} group={group} index={idx} searchQuery={searchQuery} />
                 ))}
@@ -260,22 +272,26 @@ function TeeTimeGroupCard({ group, index, searchQuery }: { group: TeeTimeGroup; 
   return (
     <motion.div
       className={cn(
-        "bg-card rounded-2xl border border-border overflow-hidden",
+        "bg-card rounded-2xl border border-border/50 overflow-hidden",
         hasMatchingPlayer && "ring-2 ring-amber-400"
       )}
+      style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: Math.min(index * 0.02, 0.4), duration: 0.3 }}
     >
       {/* Group header */}
-      <div className="flex items-center justify-between bg-muted/30 px-4 py-2.5 border-b border-border/40">
+      <div
+        className="flex items-center justify-between px-4 py-3"
+        style={{ borderBottom: '1px solid hsl(var(--border) / 0.15)' }}
+      >
         <div className="flex items-center gap-2">
-          <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+          <Clock className="w-4 h-4 text-muted-foreground/60" />
           <span className="text-sm font-semibold text-foreground">
             {format(new Date(group.teeTime), 'h:mm a')}
           </span>
         </div>
-        <span className="text-sm font-medium text-muted-foreground">
+        <span className="text-muted-foreground/60" style={{ fontSize: '12px', fontWeight: 500 }}>
           Hole {group.startingHole}
         </span>
       </div>
@@ -285,36 +301,40 @@ function TeeTimeGroupCard({ group, index, searchQuery }: { group: TeeTimeGroup; 
         {group.players.map((player, playerIdx) => {
           const isLast = playerIdx === group.players.length - 1;
           const flag = countryCodeToFlag(player.country || '');
+          const countryName = countryCodeToName(player.country);
+          const hasTappableLink = !!player.playerId;
 
           const content = (
             <div
               className={cn(
                 "flex items-center gap-3 py-3 px-4 transition-all duration-150",
-                "hover:bg-muted/40 active:scale-[0.995]",
-                !isLast && "border-b border-border/40"
+                "hover:bg-muted/40 active:scale-[0.995]"
               )}
+              style={!isLast ? { borderBottom: '1px solid hsl(var(--border) / 0.15)' } : undefined}
             >
               <BatchPlayerAvatar
                 playerId={player.playerId || ''}
                 playerName={player.name}
-                
-                size="sm"
+                size="md"
               />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-foreground truncate">
                   {player.name}
                 </p>
                 {player.country && (
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide">
+                  <p className="text-muted-foreground uppercase tracking-wide" style={{ fontSize: '11px', fontWeight: 500 }}>
                     {flag && <span className="mr-1">{flag}</span>}
-                    {player.country}
+                    {countryName || player.country}
                   </p>
                 )}
               </div>
+              {hasTappableLink && (
+                <ChevronRight className="w-4 h-4 text-muted-foreground/30 shrink-0" />
+              )}
             </div>
           );
 
-          if (player.playerId) {
+          if (hasTappableLink) {
             return (
               <Link key={player.id || playerIdx} to={`/tourhub/player/${player.playerId}`} className="block">
                 {content}

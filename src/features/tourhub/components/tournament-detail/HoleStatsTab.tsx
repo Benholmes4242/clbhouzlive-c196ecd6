@@ -42,7 +42,7 @@ function HoleStatsSkeleton() {
     <div className="space-y-4 animate-pulse">
       <div className="h-10 bg-muted rounded-full w-40" />
       <div className="flex gap-3 px-4">
-        {[1, 2, 3].map(i => (
+        {[1, 2, 3, 4].map(i => (
           <div key={i} className="flex-1 h-24 bg-muted rounded-xl" />
         ))}
       </div>
@@ -78,16 +78,16 @@ function HoleStatsEmpty({ isCompleted, roundLabel }: { isCompleted?: boolean; ro
   );
 }
 
-// Difficulty badge color
+// Difficulty badge color — softened tiers with borders
 function getDiffBadge(avgDiff: number) {
-  if (avgDiff > 0.05) return 'bg-red-500 text-white';
-  if (avgDiff > 0.01) return 'bg-orange-100 text-orange-700';
-  if (avgDiff > -0.01) return 'bg-gray-100 text-gray-600';
-  if (avgDiff > -0.15) return 'bg-green-100 text-green-700';
-  return 'bg-green-500 text-white';
+  if (avgDiff > 0.05) return 'bg-red-500/90 text-white';
+  if (avgDiff > 0.01) return 'bg-orange-50 text-orange-600 border border-orange-200';
+  if (avgDiff > -0.01) return 'bg-muted text-muted-foreground';
+  if (avgDiff > -0.15) return 'bg-green-50 text-green-600 border border-green-200';
+  return 'bg-green-500/90 text-white';
 }
 
-// Scoring distribution bar — refined colors
+// Scoring distribution bar — refined 2-3 tone palette
 function ScoringBar({ hole }: { hole: ProcessedHole }) {
   const total = hole.eagles + hole.birdies + hole.pars + hole.bogeys + hole.doubleBogeys + hole.other;
   if (total === 0) return null;
@@ -95,25 +95,30 @@ function ScoringBar({ hole }: { hole: ProcessedHole }) {
   const segments = [
     { count: hole.eagles, color: '#f59e0b', label: 'Eag' },
     { count: hole.birdies, color: '#22C55E', label: 'Bir' },
-    { count: hole.pars, color: '#3B82F6', label: 'Par' },
-    { count: hole.bogeys, color: '#F97316', label: 'Bog' },
-    { count: hole.doubleBogeys + hole.other, color: '#EF4444', label: 'Dbl+' },
+    { count: hole.pars, color: '#CBD5E1', label: 'Par' },
+    { count: hole.bogeys, color: 'rgba(249, 115, 22, 0.6)', label: 'Bog' },
+    { count: hole.doubleBogeys + hole.other, color: 'rgba(239, 68, 68, 0.6)', label: 'Dbl+' },
   ].filter(s => s.count > 0);
 
   return (
     <div className="space-y-1">
-      <div className="flex h-2.5 rounded-full overflow-hidden">
-        {segments.map((seg, i) => (
-          <div
-            key={i}
-            className="transition-all"
-            style={{ width: `${(seg.count / total) * 100}%`, backgroundColor: seg.color }}
-          />
-        ))}
+      <div className="flex items-center gap-2">
+        <div className="flex h-1.5 rounded-full overflow-hidden flex-1">
+          {segments.map((seg, i) => (
+            <div
+              key={i}
+              className="transition-all"
+              style={{ width: `${(seg.count / total) * 100}%`, backgroundColor: seg.color }}
+            />
+          ))}
+        </div>
+        <span className="text-foreground w-14 text-right" style={{ fontSize: '15px', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+          {hole.scoringAverage.toFixed(2)}
+        </span>
       </div>
-      <div className="flex flex-wrap gap-x-2.5 gap-y-0.5">
+      <div className="flex flex-wrap gap-x-3 gap-y-0.5">
         {segments.map((seg, i) => (
-          <span key={i} className="text-muted-foreground" style={{ fontSize: '10px', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
+          <span key={i} className="text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
             {seg.count} {seg.label}
           </span>
         ))}
@@ -132,11 +137,10 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
     contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, [selectedRound]);
 
-  // Determine available rounds — FIX A: hide individual tabs if only 1 round
+  // Determine available rounds — hide individual tabs if only 1 round
   const availableRounds = useMemo(() => {
     if (!rawHoleStats || rawHoleStats.length === 0) return ['Overall'];
     const rounds = [...new Set(rawHoleStats.map((h: any) => h.round_number))].sort();
-    // If only 1 round exists (e.g., LIV), don't show individual round tabs — only Overall
     if (rounds.length <= 1) return ['Overall'];
     return ['Overall', ...rounds.map(r => `R${r}`)];
   }, [rawHoleStats]);
@@ -227,7 +231,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
     return <HoleStatsEmpty isCompleted={isCompleted} />;
   }
 
-  // TD-03: Check if selected round has actual data
+  // Check if selected round has actual data
   const hasRoundData = processedHoles.some(h => h.scoringAverage > 0);
 
   return (
@@ -248,7 +252,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
         </div>
       )}
 
-      {/* TD-03: Empty round state */}
+      {/* Empty round state */}
       {!hasRoundData && selectedRound !== 'Overall' ? (
         <motion.div
           className="flex items-center justify-center min-h-[300px] py-12"
@@ -332,53 +336,61 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
             </div>
           )}
 
-          {/* Course summary stats strip — FIX D: card-style container */}
+          {/* Course summary stats strip — 4 columns with Eagles promoted */}
           {hasRoundData && summary && (
             <div
-              className="bg-card rounded-2xl border border-border/50 grid grid-cols-3 text-center p-5 mt-8"
+              className="bg-card rounded-2xl border border-border/50 grid grid-cols-4 text-center p-4 mt-8"
               style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
             >
               <div>
                 <div className="text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
                   Course Avg
                 </div>
-                <div className="text-foreground" style={{ fontSize: '22px', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+                <div className="text-foreground" style={{ fontSize: '20px', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
                   {summary.avgScore.toFixed(1)}
                 </div>
                 <div className="text-muted-foreground" style={{ fontSize: '11px', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>Par {summary.totalPar}</div>
               </div>
               <div>
                 <div className="text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
+                  Eagles
+                </div>
+                <div style={{ fontSize: '20px', fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: '#f59e0b' }}>
+                  {summary.totalEagles}
+                </div>
+              </div>
+              <div>
+                <div className="text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
                   Birdies
                 </div>
-                <div style={{ fontSize: '22px', fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: '#22C55E' }}>
+                <div style={{ fontSize: '20px', fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: '#22C55E' }}>
                   {summary.totalBirdies}
                 </div>
-                {summary.totalEagles > 0 && (
-                  <div className="text-muted-foreground" style={{ fontSize: '11px', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>{summary.totalEagles} eagles</div>
-                )}
               </div>
               <div>
                 <div className="text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
                   Bogeys
                 </div>
-                <div style={{ fontSize: '22px', fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: '#EF4444' }}>
+                <div style={{ fontSize: '20px', fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: '#EF4444' }}>
                   {summary.totalBogeys}
                 </div>
               </div>
             </div>
           )}
 
-          {/* Hole rows — flowing list */}
+          {/* Hole rows */}
           <div className="mt-8">
             {/* Front Nine header */}
             {frontNine.length > 0 && (
-              <div className="text-center py-2.5" style={{ borderBottom: '1px solid hsl(var(--border) / 0.15)' }}>
+              <div
+                className="flex items-center justify-between"
+                style={{ borderTop: '1px solid hsl(var(--border) / 0.3)', paddingTop: '20px', marginTop: '8px' }}
+              >
                 <span className="text-muted-foreground/60" style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
                   Front Nine
                 </span>
                 {frontNineAvg !== null && (
-                  <span className="text-muted-foreground ml-2" style={{ fontSize: '11px', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
+                  <span className="text-muted-foreground" style={{ fontSize: '11px', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
                     Avg {frontNineAvg.toFixed(1)} (Par {frontNinePar})
                   </span>
                 )}
@@ -391,12 +403,15 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
 
             {/* Back Nine header */}
             {backNine.length > 0 && (
-              <div className="text-center py-2.5 mt-2" style={{ borderBottom: '1px solid hsl(var(--border) / 0.15)' }}>
+              <div
+                className="flex items-center justify-between"
+                style={{ borderTop: '1px solid hsl(var(--border) / 0.3)', paddingTop: '20px', marginTop: '8px' }}
+              >
                 <span className="text-muted-foreground/60" style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
                   Back Nine
                 </span>
                 {backNineAvg !== null && (
-                  <span className="text-muted-foreground ml-2" style={{ fontSize: '11px', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
+                  <span className="text-muted-foreground" style={{ fontSize: '11px', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
                     Avg {backNineAvg.toFixed(1)} (Par {backNinePar})
                   </span>
                 )}
@@ -413,7 +428,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
   );
 }
 
-// Extracted hole row — refined layout (FIX E + G)
+// Extracted hole row — clean layout: no average indicator track
 const HoleRow = ({ hole, total }: { hole: ProcessedHole; total: number }) => {
   const hasData = hole.scoringAverage > 0;
 
@@ -432,10 +447,11 @@ const HoleRow = ({ hole, total }: { hole: ProcessedHole; total: number }) => {
 
       {/* Content */}
       <div className="flex-1 min-w-0">
+        {/* Line 1: Par + yardage (left), difficulty arrow + value (right) */}
         <div className="flex items-center justify-between mb-1.5">
           <div className="flex items-center gap-2">
             <span className="text-foreground" style={{ fontSize: '14px', fontWeight: 600 }}>Par {hole.par}</span>
-            {hole.yardage && (
+            {hole.yardage && hole.yardage > 0 && (
               <span className="text-muted-foreground" style={{ fontSize: '12px', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>{hole.yardage} yds</span>
             )}
           </div>
@@ -457,47 +473,9 @@ const HoleRow = ({ hole, total }: { hole: ProcessedHole; total: number }) => {
           </div>
         </div>
 
-        {/* FIX G: Only render scoring data if we have it */}
+        {/* Line 2 + 3: Scoring distribution bar with avg value, then breakdown */}
         {hasData ? (
-          <>
-            {/* Average score indicator — refined */}
-            <div className="flex items-center gap-2 mb-2">
-              <div className="flex-1 h-1 bg-muted/50 rounded-full relative overflow-hidden">
-                {hole.avgDiff !== 0 && (
-                  <div
-                    className={cn(
-                      "absolute top-0 h-full rounded-full",
-                      hole.avgDiff > 0 ? "left-1/2" : "right-1/2"
-                    )}
-                    style={{
-                      width: `${Math.min(Math.abs(hole.avgDiff) * 50, 50)}%`,
-                      backgroundColor: hole.avgDiff > 0 ? 'rgba(248,113,113,0.4)' : 'rgba(74,222,128,0.4)',
-                    }}
-                  />
-                )}
-                <div className="absolute top-0 left-1/2 w-px h-2 bg-border" style={{ transform: 'translateY(-1px)' }} />
-                {hole.avgDiff !== 0 && (
-                  <div
-                    className="absolute rounded-full"
-                    style={{
-                      width: '6px',
-                      height: '6px',
-                      top: '-1px',
-                      left: `calc(50% + ${Math.min(Math.max(hole.avgDiff * 50, -50), 50)}%)`,
-                      transform: 'translateX(-50%)',
-                      backgroundColor: hole.avgDiff > 0 ? '#EF4444' : '#22C55E',
-                    }}
-                  />
-                )}
-              </div>
-              <span className="text-foreground w-12 text-right" style={{ fontSize: '15px', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
-                {hole.scoringAverage.toFixed(2)}
-              </span>
-            </div>
-
-            {/* Scoring distribution */}
-            <ScoringBar hole={hole} />
-          </>
+          <ScoringBar hole={hole} />
         ) : (
           <div className="text-muted-foreground" style={{ fontSize: '14px', fontVariantNumeric: 'tabular-nums' }}>—</div>
         )}
