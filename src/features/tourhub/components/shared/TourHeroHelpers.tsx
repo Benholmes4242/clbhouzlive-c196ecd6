@@ -59,8 +59,8 @@ function FrostedAvatar({ src, displayName, size }: { src: string | null; display
   return (
     <div style={{
       width: size, height: size, borderRadius: '34%', overflow: 'hidden', flexShrink: 0,
-      border: '1.5px solid rgba(255,255,255,0.2)',
-      background: 'rgba(255,255,255,0.1)',
+      border: '1.5px solid rgba(255,255,255,0.25)',
+      background: '#8E9196',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
       {currentSrc && !imgError ? (
@@ -366,10 +366,7 @@ export function WinnerStatsPanel({
   return (
     <div style={{
       marginTop: 12,
-      padding: 12,
-      background: 'rgba(255,255,255,0.04)',
-      border: '1px solid rgba(255,255,255,0.06)',
-      borderRadius: 14,
+      padding: 0,
     }}>
       {/* Tournament Stats */}
       {hasTournament && (
@@ -435,19 +432,19 @@ export function WinnerStatsPanel({
               <StatChip
                 value={Math.round(seasonStats!.drivingDistance)}
                 label="Driver"
-                suffix=" yds"
+                suffix="yds"
               />
             )}
             {seasonStats!.drivingAccuracy && (
               <StatChip
-                value={seasonStats!.drivingAccuracy.toFixed(1)}
+                value={Math.round(seasonStats!.drivingAccuracy).toString()}
                 label="Fairways"
                 suffix="%"
               />
             )}
             {seasonStats!.greensInReg && (
               <StatChip
-                value={seasonStats!.greensInReg.toFixed(1)}
+                value={Math.round(seasonStats!.greensInReg).toString()}
                 label="GIR"
                 suffix="%"
               />
