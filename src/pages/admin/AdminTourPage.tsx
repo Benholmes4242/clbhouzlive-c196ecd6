@@ -63,7 +63,7 @@ export function AdminTourPage() {
   const { data: counts } = useQuery({
     queryKey: ['sr-counts'],
     queryFn: async () => {
-      const [tournaments, seasons, players, rankings, leaderboards, summaries, scorecards, tee_times, hole_stats, player_stats, courses, media] = await Promise.all([
+      const [tournaments, seasons, players, rankings, leaderboards, summaries, scorecards, tee_times, hole_stats, player_stats, courses] = await Promise.all([
         supabase.from('sr_tournaments').select('id', { count: 'exact', head: true }),
         supabase.from('sr_seasons').select('id', { count: 'exact', head: true }),
         supabase.from('sr_players').select('id', { count: 'exact', head: true }),
@@ -75,7 +75,6 @@ export function AdminTourPage() {
         supabase.from('sr_hole_statistics').select('id', { count: 'exact', head: true }),
         supabase.from('sr_player_statistics').select('id', { count: 'exact', head: true }),
         supabase.from('sr_courses').select('id', { count: 'exact', head: true }),
-        supabase.from('sr_media_assets').select('id', { count: 'exact', head: true }),
       ]);
       return {
         tournaments: tournaments.count || 0,
@@ -89,7 +88,7 @@ export function AdminTourPage() {
         hole_stats: hole_stats.count || 0,
         player_stats: player_stats.count || 0,
         courses: courses.count || 0,
-        media: media.count || 0,
+        media: 0, // sr_media_assets decommissioned — R2 is now sole headshot source
       };
     },
   });

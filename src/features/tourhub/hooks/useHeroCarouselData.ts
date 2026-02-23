@@ -141,6 +141,7 @@ async function fetchHeroData(): Promise<HeroSlide[]> {
             tournament_id, position, score,
             player:sr_players!inner(sr_id, first_name, last_name, photo_url, pga_tour_id)
           `)
+          // NOTE: photo_url is NOT used for display — headshots come from R2 via getPlayerHeadshotUrl()
           .in('tournament_id', allTournamentIds)
           .gt('strokes', 0)
           .not('position', 'is', null)

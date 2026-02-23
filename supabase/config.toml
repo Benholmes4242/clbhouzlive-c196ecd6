@@ -117,8 +117,6 @@ verify_jwt = false
 [functions.audio-proxy]
 verify_jwt = false
 
-[functions.sportradar-media-sync]
-verify_jwt = true
 
 
 [functions.smart-compilation]

@@ -38,6 +38,7 @@ export function useEventWinner(tournamentId: string | undefined) {
           *,
           player:sr_players(id, full_name, country, photo_url)
         `)
+        // NOTE: photo_url is NOT used for display — headshots come from R2 via getPlayerHeadshotUrl()
         .eq('tournament_id', tournamentId)
         .maybeSingle();
       
