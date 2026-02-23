@@ -20,10 +20,11 @@ import {
 } from '../components/player';
 import { StatRibbon } from '../components/player/StatRibbon';
 import { PlayerRecentForm } from '../components/player/PlayerRecentForm';
-import { ClbhouzRatingBadge } from '../components/player/ClbhouzRatingBadge';
-import { RatingBreakdownBar } from '../components/player/RatingBreakdownBar';
+// TEMPORARILY HIDDEN — Clbhouz Rating (re-enable when algorithm is tuned)
+// import { ClbhouzRatingBadge } from '../components/player/ClbhouzRatingBadge';
+// import { RatingBreakdownBar } from '../components/player/RatingBreakdownBar';
 import { useTourPlayer, useSinglePlayerStatistics } from '../hooks/useTourHubData';
-import { usePlayerRating } from '../hooks/usePlayerRating';
+// import { usePlayerRating } from '../hooks/usePlayerRating';
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -44,7 +45,8 @@ export function PlayerProfilePage() {
 
   const { data: player, isLoading: playerLoading, refetch } = useTourPlayer(playerId || '');
   const { data: playerStats } = useSinglePlayerStatistics(playerId);
-  const { data: playerRating } = usePlayerRating(playerId);
+  // TEMPORARILY HIDDEN — Clbhouz Rating
+  // const { data: playerRating } = usePlayerRating(playerId);
 
   // Pull-to-refresh
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -210,7 +212,7 @@ export function PlayerProfilePage() {
 
         {/* Content sections */}
         <div className="w-full max-w-5xl mx-auto px-4" style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
-          {/* Clbhouz Rating */}
+          {/* TEMPORARILY HIDDEN — Clbhouz Rating (re-enable when algorithm is tuned)
           {playerRating && (
             <motion.div
               className="flex flex-col items-center text-center"
@@ -229,6 +231,7 @@ export function PlayerProfilePage() {
               )}
             </motion.div>
           )}
+          */}
 
           {/* Season Performance — 24px from momentum strip */}
           <motion.div
