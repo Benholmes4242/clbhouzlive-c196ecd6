@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Info } from 'lucide-react';
 import type { WinnerProfile, ContenderCard } from './types';
 import ConfidenceProgress from './components/ConfidenceProgress';
+import { PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 
 interface LikelyWinnersCarouselProps {
   featured: WinnerProfile;
@@ -147,16 +148,13 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
             {/* Avatar + Name row */}
             <div className="flex items-start gap-3.5 mb-4">
               <div className="relative flex-shrink-0">
-                {pick.avatarUrl ? (
-                  <img
-                    src={pick.avatarUrl}
-                    alt={pick.name}
-                    className="w-14 h-14 rounded-[14px] object-cover border border-border"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="w-14 h-14 rounded-[14px] bg-muted border border-border" />
-                )}
+                <img
+                  src={pick.avatarUrl || PLAYER_SILHOUETTE_URL}
+                  alt={pick.name}
+                  className="w-14 h-14 rounded-[14px] object-cover border border-border"
+                  loading="lazy"
+                  onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+                />
               </div>
 
               <div className="flex-1 min-w-0">
