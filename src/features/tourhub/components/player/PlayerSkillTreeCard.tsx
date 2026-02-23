@@ -94,15 +94,13 @@ const AttributeRow = memo(({ attribute, delay = 0, animate = true }: { attribute
       <span className="flex-1 text-foreground" style={{ fontSize: 14, fontWeight: 500, marginLeft: 10 }}>
         {config.label}
       </span>
-      <div className="text-right" style={{ minWidth: '72px' }}>
+      <div className="flex items-baseline justify-end" style={{ minWidth: '80px' }}>
         <span className="text-foreground" style={{ fontSize: 14, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
           {formatValue()}
         </span>
-        {config.unit && (
-          <span className="text-muted-foreground" style={{ fontSize: 11, fontWeight: 500, marginLeft: 2 }}>
-            {config.unit}
-          </span>
-        )}
+        <span className="text-muted-foreground inline-block text-left" style={{ fontSize: 11, fontWeight: 500, width: '22px', marginLeft: 2 }}>
+          {config.unit || ''}
+        </span>
       </div>
     </motion.div>
   );
