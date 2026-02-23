@@ -51,7 +51,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
       {/* Burger menu */}
       <button 
         className="absolute z-20 flex items-center justify-center"
-        style={{ top: '56px', left: '16px', width: '44px', height: '44px' }}
+        style={{ top: '48px', left: '16px', width: '44px', height: '44px' }}
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
         aria-label="Open tour menu"
       >
@@ -67,7 +67,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
         className="block active:scale-[0.995] transition-transform"
       >
         {/* Hero — 50dvh */}
-        <div className="relative w-full overflow-hidden" style={{ height: '50dvh' }}>
+        <div className="relative w-full overflow-hidden" style={{ height: '40dvh' }}>
           {photoUrl ? (
             <motion.img
               src={photoUrl}
@@ -91,7 +91,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
             background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 35%, rgba(0,0,0,0.05) 60%, transparent 80%)',
           }} />
 
-          <div className="absolute bottom-0 left-0 right-0 px-4 pb-10 space-y-1.5">
+          <div className="absolute bottom-0 left-0 right-0 px-4 pb-6 space-y-1.5">
             {/* Category label — 11px, 700, amber, uppercase, wide tracking */}
             <motion.p
               initial={{ opacity: 0, y: 8 }}
@@ -114,7 +114,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.4 }}
               style={{
-                fontSize: 22,
+                fontSize: 20,
                 fontWeight: 700,
                 color: 'white',
                 letterSpacing: '-0.3px',
@@ -148,7 +148,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
                   fontSize: 13,
                   fontWeight: 600,
                   borderRadius: 20,
-                  padding: '6px 14px',
+                  padding: '5px 12px',
                   letterSpacing: '0.3px',
                 }}
               >
