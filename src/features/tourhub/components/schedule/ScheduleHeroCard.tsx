@@ -168,6 +168,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                         photoUrl={winner.photoUrl}
                         pgaTourId={winner.pgaTourId}
                         displayName={winner.displayName}
+                        fullName={winner.fullName}
                         tourCode={tournament.tour_code}
                         size={48}
                         frosted
