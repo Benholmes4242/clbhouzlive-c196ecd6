@@ -246,6 +246,36 @@ async function syncTournament(
     }
   }
 
+  // ── Periodic hole stats safety net (every 10th minute) ───────────
+  const tourSlug = getTourSlug(seasonData?.tour_name || 'pga');
+  const currentMinute = new Date().getMinutes();
+  const shouldSyncHoleStats = (currentMinute % 10 === 0);
+
+  if (shouldSyncHoleStats && tourSlug) {
+    try {
+      console.log(`[LiveSync] Running periodic hole stats sync for ${tournament.name}`);
+      const syncUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/sportradar-sync`;
+      await fetch(syncUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'hole_stats',
+          tournamentId: tournament.sr_id,
+          tourId: tourSlug,
+          year: year,
+        }),
+      });
+      console.log(`[LiveSync] Hole stats refreshed for ${tournament.name}`);
+    } catch (e) {
+      console.warn(`[LiveSync] Hole stats sync failed for ${tournament.name}: ${e.message}`);
+    }
+  } else if (shouldSyncHoleStats && !tourSlug) {
+    console.log(`[LiveSync] Skipping hole stats for ${tournament.name} — unsupported tour`);
+  }
+
   // ── Lifecycle: check if Sportradar reports tournament as closed ───
   let transitionedToClosed = false;
   const closedStatuses = ['closed', 'complete', 'completed', 'official'];
@@ -279,6 +309,30 @@ async function syncTournament(
     if (!closeError) {
       transitionedToClosed = true;
       console.log(`[LiveSync] ✓ Transitioned ${tournament.name} to closed${winnerId ? ` (winner: ${winnerId})` : ''}`);
+
+      // ── Final hole stats sync on tournament close ──────────────
+      if (tourSlug) {
+        try {
+          console.log(`[LiveSync] Running final hole stats sync for ${tournament.name}`);
+          const syncUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/sportradar-sync`;
+          await fetch(syncUrl, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              action: 'hole_stats',
+              tournamentId: tournament.sr_id,
+              tourId: tourSlug,
+              year: year,
+            }),
+          });
+          console.log(`[LiveSync] Final hole stats completed for ${tournament.name}`);
+        } catch (e) {
+          console.warn(`[LiveSync] Final hole stats failed for ${tournament.name}: ${e.message}`);
+        }
+      }
     }
   } else {
     // Update last_live_sync timestamp
@@ -313,6 +367,23 @@ function mapTourName(tourName: string): string {
   if (name.includes('korn ferry') || name.includes('pgad')) return 'pgad';
   if (name.includes('pga')) return 'pga';
   return 'pga';
+}
+
+// Tour slug mapping for hole statistics — returns null for unsupported tours
+function getTourSlug(tourName: string): string | null {
+  const normalized = (tourName || '').toUpperCase();
+  const map: Record<string, string | null> = {
+    'PGA': 'pga',
+    'LPGA': 'lpga',
+    'EURO': 'eur',
+    'DP': 'eur',
+    'CHAMP': 'champions-tour',
+    'PGAD': 'pgad',
+    'LIV': null,
+    'OLY': null,
+    'USGA': null,
+  };
+  return map[normalized] ?? (normalized.includes('LIV') ? null : 'pga');
 }
 
 // ── Status Resolver ──────────────────────────────────────────────────
