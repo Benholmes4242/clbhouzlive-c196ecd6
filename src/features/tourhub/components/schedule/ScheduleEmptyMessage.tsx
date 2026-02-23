@@ -19,7 +19,7 @@ interface ScheduleEmptyMessageProps {
 
 function formatCountdown(dateStr: string): string {
   const target = new Date(dateStr);
-  return `starts ${format(target, 'EEE, MMM d')}`;
+  return `Starts ${format(target, 'EEE, MMM d')}`;
 }
 
 export function ScheduleEmptyMessage({ 
