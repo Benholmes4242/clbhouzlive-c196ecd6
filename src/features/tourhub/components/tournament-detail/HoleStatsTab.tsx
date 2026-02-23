@@ -1,7 +1,7 @@
 /**
  * HoleStatsTab - Hole-by-hole tournament statistics
  * 
- * Editorial layout: no card containers, flowing list with dividers,
+ * World-class editorial layout: elevated cards, refined typography,
  * toughest/easiest holes podiums, summary stats strip, front/back nine dividers.
  */
 
@@ -87,17 +87,17 @@ function getDiffBadge(avgDiff: number) {
   return 'bg-green-500 text-white';
 }
 
-// Scoring distribution bar
+// Scoring distribution bar — refined colors
 function ScoringBar({ hole }: { hole: ProcessedHole }) {
   const total = hole.eagles + hole.birdies + hole.pars + hole.bogeys + hole.doubleBogeys + hole.other;
   if (total === 0) return null;
 
   const segments = [
-    { count: hole.eagles, color: 'bg-amber-400', label: 'Eag' },
-    { count: hole.birdies, color: 'bg-green-500', label: 'Bir' },
-    { count: hole.pars, color: 'bg-blue-400', label: 'Par' },
-    { count: hole.bogeys, color: 'bg-orange-400', label: 'Bog' },
-    { count: hole.doubleBogeys + hole.other, color: 'bg-red-500', label: 'Dbl+' },
+    { count: hole.eagles, color: '#f59e0b', label: 'Eag' },
+    { count: hole.birdies, color: '#22C55E', label: 'Bir' },
+    { count: hole.pars, color: '#3B82F6', label: 'Par' },
+    { count: hole.bogeys, color: '#F97316', label: 'Bog' },
+    { count: hole.doubleBogeys + hole.other, color: '#EF4444', label: 'Dbl+' },
   ].filter(s => s.count > 0);
 
   return (
@@ -106,14 +106,14 @@ function ScoringBar({ hole }: { hole: ProcessedHole }) {
         {segments.map((seg, i) => (
           <div
             key={i}
-            className={cn("transition-all", seg.color)}
-            style={{ width: `${(seg.count / total) * 100}%` }}
+            className="transition-all"
+            style={{ width: `${(seg.count / total) * 100}%`, backgroundColor: seg.color }}
           />
         ))}
       </div>
       <div className="flex flex-wrap gap-x-2.5 gap-y-0.5">
         {segments.map((seg, i) => (
-          <span key={i} className="text-[10px] text-muted-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>
+          <span key={i} className="text-muted-foreground" style={{ fontSize: '10px', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
             {seg.count} {seg.label}
           </span>
         ))}
@@ -132,10 +132,12 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
     contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, [selectedRound]);
 
-  // Determine available rounds
+  // Determine available rounds — FIX A: hide individual tabs if only 1 round
   const availableRounds = useMemo(() => {
     if (!rawHoleStats || rawHoleStats.length === 0) return ['Overall'];
     const rounds = [...new Set(rawHoleStats.map((h: any) => h.round_number))].sort();
+    // If only 1 round exists (e.g., LIV), don't show individual round tabs — only Overall
+    if (rounds.length <= 1) return ['Overall'];
     return ['Overall', ...rounds.map(r => `R${r}`)];
   }, [rawHoleStats]);
 
@@ -235,13 +237,15 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Round selector */}
+      {/* Round selector — only show if more than just Overall */}
       {availableRounds.length > 1 && (
-        <RoundSelector
-          rounds={availableRounds}
-          activeRound={selectedRound}
-          onRoundChange={setSelectedRound}
-        />
+        <div className="mb-6">
+          <RoundSelector
+            rounds={availableRounds}
+            activeRound={selectedRound}
+            onRoundChange={setSelectedRound}
+          />
+        </div>
       )}
 
       {/* TD-03: Empty round state */}
@@ -263,13 +267,13 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
           </div>
         </motion.div>
       ) : (
-        <>
+        <div className="px-4">
           {/* Toughest holes */}
           {hasRoundData && toughestHoles.length > 0 && (
-            <div className="px-4 pt-6 pb-4">
+            <div className="mt-6 mb-3">
               <div className="flex items-center gap-1.5 mb-3">
-                <Flame className="w-3.5 h-3.5 text-red-500" />
-                <span className="text-[10px] font-semibold tracking-widest uppercase text-muted-foreground">
+                <Flame className="w-4 h-4 text-red-500" />
+                <span className="text-muted-foreground/60" style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
                   Toughest Holes
                 </span>
               </div>
@@ -277,16 +281,17 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
                 {toughestHoles.map((hole, idx) => (
                   <div
                     key={hole.holeNumber}
-                    className="flex-1 bg-red-50 dark:bg-red-950/20 rounded-2xl border border-red-100 dark:border-red-900/30 p-3 text-center"
+                    className="flex-1 bg-card rounded-2xl border border-border/50 p-4 text-center"
+                    style={{ borderLeft: '3px solid #EF4444', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
                   >
-                    <div className="text-sm font-bold text-red-500">#{idx + 1}</div>
+                    <div className="font-bold text-red-500" style={{ fontSize: '11px' }}>#{idx + 1}</div>
                     <div className="text-xl font-bold text-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>
                       Hole {hole.holeNumber}
                     </div>
                     <div className="text-xs text-muted-foreground">
                       Par {hole.par} · Avg {hole.scoringAverage.toFixed(2)}
                     </div>
-                    <div className="text-sm font-semibold text-red-500 mt-1" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                    <div className="font-semibold text-red-500 mt-1" style={{ fontSize: '13px', fontVariantNumeric: 'tabular-nums' }}>
                       +{hole.avgDiff.toFixed(2)}
                     </div>
                   </div>
@@ -297,10 +302,10 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
 
           {/* Easiest holes */}
           {hasRoundData && easiestHoles.length > 0 && easiestHoles[0].avgDiff < 0 && (
-            <div className="px-4 pb-4">
+            <div className="mt-6 mb-3">
               <div className="flex items-center gap-1.5 mb-3">
-                <Leaf className="w-3.5 h-3.5 text-green-500" />
-                <span className="text-[10px] font-semibold tracking-widest uppercase text-muted-foreground">
+                <Leaf className="w-4 h-4 text-green-500" />
+                <span className="text-muted-foreground/60" style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
                   Easiest Holes
                 </span>
               </div>
@@ -308,16 +313,17 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
                 {easiestHoles.map((hole, idx) => (
                   <div
                     key={hole.holeNumber}
-                    className="flex-1 bg-green-50 dark:bg-green-950/20 rounded-2xl border border-green-100 dark:border-green-900/30 p-3 text-center"
+                    className="flex-1 bg-card rounded-2xl border border-border/50 p-4 text-center"
+                    style={{ borderLeft: '3px solid #22C55E', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
                   >
-                    <div className="text-sm font-bold text-green-600">#{idx + 1}</div>
+                    <div className="font-bold text-green-600" style={{ fontSize: '11px' }}>#{idx + 1}</div>
                     <div className="text-xl font-bold text-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>
                       Hole {hole.holeNumber}
                     </div>
                     <div className="text-xs text-muted-foreground">
                       Par {hole.par} · Avg {hole.scoringAverage.toFixed(2)}
                     </div>
-                    <div className="text-sm font-semibold text-green-600 mt-1" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                    <div className="font-semibold text-green-600 mt-1" style={{ fontSize: '13px', fontVariantNumeric: 'tabular-nums' }}>
                       {hole.avgDiff.toFixed(2)}
                     </div>
                   </div>
@@ -326,34 +332,37 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
             </div>
           )}
 
-          {/* Course summary stats strip */}
+          {/* Course summary stats strip — FIX D: card-style container */}
           {hasRoundData && summary && (
-            <div className="border-y border-border grid grid-cols-3 text-center py-4">
+            <div
+              className="bg-card rounded-2xl border border-border/50 grid grid-cols-3 text-center p-5 mt-8"
+              style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+            >
               <div>
-                <div className="text-[10px] font-semibold tracking-widest uppercase text-muted-foreground">
+                <div className="text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
                   Course Avg
                 </div>
-                <div className="text-xl font-bold text-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                <div className="text-foreground" style={{ fontSize: '22px', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
                   {summary.avgScore.toFixed(1)}
                 </div>
-                <div className="text-[10px] text-muted-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>Par {summary.totalPar}</div>
+                <div className="text-muted-foreground" style={{ fontSize: '11px', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>Par {summary.totalPar}</div>
               </div>
               <div>
-                <div className="text-[10px] font-semibold tracking-widest uppercase text-muted-foreground">
+                <div className="text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
                   Birdies
                 </div>
-                <div className="text-xl font-bold text-green-600" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                <div style={{ fontSize: '22px', fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: '#22C55E' }}>
                   {summary.totalBirdies}
                 </div>
                 {summary.totalEagles > 0 && (
-                  <div className="text-[10px] text-muted-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>{summary.totalEagles} eagles</div>
+                  <div className="text-muted-foreground" style={{ fontSize: '11px', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>{summary.totalEagles} eagles</div>
                 )}
               </div>
               <div>
-                <div className="text-[10px] font-semibold tracking-widest uppercase text-muted-foreground">
+                <div className="text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
                   Bogeys
                 </div>
-                <div className="text-xl font-bold text-red-500" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                <div style={{ fontSize: '22px', fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: '#EF4444' }}>
                   {summary.totalBogeys}
                 </div>
               </div>
@@ -361,15 +370,15 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
           )}
 
           {/* Hole rows — flowing list */}
-          <div>
+          <div className="mt-8">
             {/* Front Nine header */}
             {frontNine.length > 0 && (
-              <div className="bg-muted/50 text-center py-2 border-b border-border">
-                <span className="text-[10px] font-semibold tracking-widest uppercase text-muted-foreground">
+              <div className="text-center py-2.5" style={{ borderBottom: '1px solid hsl(var(--border) / 0.15)' }}>
+                <span className="text-muted-foreground/60" style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
                   Front Nine
                 </span>
                 {frontNineAvg !== null && (
-                  <span className="text-[10px] text-muted-foreground ml-2" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                  <span className="text-muted-foreground ml-2" style={{ fontSize: '11px', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
                     Avg {frontNineAvg.toFixed(1)} (Par {frontNinePar})
                   </span>
                 )}
@@ -382,12 +391,12 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
 
             {/* Back Nine header */}
             {backNine.length > 0 && (
-              <div className="bg-muted/50 text-center py-2 border-y border-border">
-                <span className="text-[10px] font-semibold tracking-widest uppercase text-muted-foreground">
+              <div className="text-center py-2.5 mt-2" style={{ borderBottom: '1px solid hsl(var(--border) / 0.15)' }}>
+                <span className="text-muted-foreground/60" style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
                   Back Nine
                 </span>
                 {backNineAvg !== null && (
-                  <span className="text-[10px] text-muted-foreground ml-2" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                  <span className="text-muted-foreground ml-2" style={{ fontSize: '11px', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
                     Avg {backNineAvg.toFixed(1)} (Par {backNinePar})
                   </span>
                 )}
@@ -398,73 +407,101 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
               <HoleRow key={hole.holeNumber} hole={hole} total={processedHoles.length} />
             ))}
           </div>
-        </>
+        </div>
       )}
     </motion.div>
   );
 }
 
-// Extracted hole row for performance
-const HoleRow = ({ hole, total }: { hole: ProcessedHole; total: number }) => (
-  <div className="flex items-start gap-3 py-4 px-4 border-b border-border/50">
-    {/* Hole badge */}
-    <div className={cn(
-      "w-11 h-11 rounded-full flex items-center justify-center text-sm font-bold shrink-0",
-      getDiffBadge(hole.avgDiff)
-    )}>
-      {hole.holeNumber}
-    </div>
+// Extracted hole row — refined layout (FIX E + G)
+const HoleRow = ({ hole, total }: { hole: ProcessedHole; total: number }) => {
+  const hasData = hole.scoringAverage > 0;
 
-    {/* Content */}
-    <div className="flex-1 min-w-0">
-      <div className="flex items-center justify-between mb-1.5">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold text-foreground">Par {hole.par}</span>
-          {hole.yardage && (
-            <span className="text-xs text-muted-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>{hole.yardage} yds</span>
-          )}
-        </div>
-        {/* Difficulty indicator */}
-        <div className="shrink-0">
-          {hole.avgDiff > 0 ? (
-            <div className="flex items-center gap-0.5 text-red-500">
-              <TrendingUp className="w-3.5 h-3.5" />
-              <span className="text-xs font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>+{hole.avgDiff.toFixed(2)}</span>
-            </div>
-          ) : hole.avgDiff < 0 ? (
-            <div className="flex items-center gap-0.5 text-green-600">
-              <TrendingDown className="w-3.5 h-3.5" />
-              <span className="text-xs font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>{hole.avgDiff.toFixed(2)}</span>
-            </div>
-          ) : (
-            <span className="text-xs text-muted-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>Even</span>
-          )}
-        </div>
+  return (
+    <div
+      className="flex items-start gap-3 py-4 px-0"
+      style={{ borderBottom: '1px solid hsl(var(--border) / 0.15)' }}
+    >
+      {/* Hole badge — w-10 h-10 */}
+      <div className={cn(
+        "w-10 h-10 rounded-full flex items-center justify-center shrink-0",
+        getDiffBadge(hole.avgDiff)
+      )} style={{ fontSize: '13px', fontWeight: 700 }}>
+        {hole.holeNumber}
       </div>
 
-      {/* Average score indicator */}
-      <div className="flex items-center gap-2 mb-2">
-        <div className="flex-1 h-1.5 bg-muted rounded-full relative overflow-hidden">
-          {hole.avgDiff !== 0 && (
-            <div
-              className={cn(
-                "absolute top-0 h-full rounded-full",
-                hole.avgDiff > 0 ? "bg-red-400/60 left-1/2" : "bg-green-400 right-1/2"
-              )}
-              style={{
-                width: `${Math.min(Math.abs(hole.avgDiff) * 50, 50)}%`,
-              }}
-            />
-          )}
-          <div className="absolute top-0 left-1/2 w-px h-full bg-muted-foreground/30" />
+      {/* Content */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between mb-1.5">
+          <div className="flex items-center gap-2">
+            <span className="text-foreground" style={{ fontSize: '14px', fontWeight: 600 }}>Par {hole.par}</span>
+            {hole.yardage && (
+              <span className="text-muted-foreground" style={{ fontSize: '12px', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>{hole.yardage} yds</span>
+            )}
+          </div>
+          {/* Difficulty indicator */}
+          <div className="shrink-0">
+            {hole.avgDiff > 0 ? (
+              <div className="flex items-center gap-0.5" style={{ color: '#EF4444' }}>
+                <TrendingUp className="w-3 h-3" />
+                <span style={{ fontSize: '12px', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>+{hole.avgDiff.toFixed(2)}</span>
+              </div>
+            ) : hole.avgDiff < 0 ? (
+              <div className="flex items-center gap-0.5" style={{ color: '#22C55E' }}>
+                <TrendingDown className="w-3 h-3" />
+                <span style={{ fontSize: '12px', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{hole.avgDiff.toFixed(2)}</span>
+              </div>
+            ) : (
+              <span className="text-muted-foreground" style={{ fontSize: '12px', fontVariantNumeric: 'tabular-nums' }}>Even</span>
+            )}
+          </div>
         </div>
-        <span className="text-base font-bold text-foreground w-12 text-right" style={{ fontVariantNumeric: 'tabular-nums' }}>
-          {hole.scoringAverage.toFixed(2)}
-        </span>
-      </div>
 
-      {/* Scoring distribution */}
-      <ScoringBar hole={hole} />
+        {/* FIX G: Only render scoring data if we have it */}
+        {hasData ? (
+          <>
+            {/* Average score indicator — refined */}
+            <div className="flex items-center gap-2 mb-2">
+              <div className="flex-1 h-1 bg-muted/50 rounded-full relative overflow-hidden">
+                {hole.avgDiff !== 0 && (
+                  <div
+                    className={cn(
+                      "absolute top-0 h-full rounded-full",
+                      hole.avgDiff > 0 ? "left-1/2" : "right-1/2"
+                    )}
+                    style={{
+                      width: `${Math.min(Math.abs(hole.avgDiff) * 50, 50)}%`,
+                      backgroundColor: hole.avgDiff > 0 ? 'rgba(248,113,113,0.4)' : 'rgba(74,222,128,0.4)',
+                    }}
+                  />
+                )}
+                <div className="absolute top-0 left-1/2 w-px h-2 bg-border" style={{ transform: 'translateY(-1px)' }} />
+                {hole.avgDiff !== 0 && (
+                  <div
+                    className="absolute rounded-full"
+                    style={{
+                      width: '6px',
+                      height: '6px',
+                      top: '-1px',
+                      left: `calc(50% + ${Math.min(Math.max(hole.avgDiff * 50, -50), 50)}%)`,
+                      transform: 'translateX(-50%)',
+                      backgroundColor: hole.avgDiff > 0 ? '#EF4444' : '#22C55E',
+                    }}
+                  />
+                )}
+              </div>
+              <span className="text-foreground w-12 text-right" style={{ fontSize: '15px', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+                {hole.scoringAverage.toFixed(2)}
+              </span>
+            </div>
+
+            {/* Scoring distribution */}
+            <ScoringBar hole={hole} />
+          </>
+        ) : (
+          <div className="text-muted-foreground" style={{ fontSize: '14px', fontVariantNumeric: 'tabular-nums' }}>—</div>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
