@@ -166,9 +166,7 @@ function MomentumPill({ entry, index, direction }: MomentumPillProps) {
             <span className="whitespace-nowrap text-[0.8125rem] font-medium text-foreground/80">{entry.lastName}</span>
             <div className="flex items-center gap-1">
               <span className="text-[0.625rem] text-muted-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>#{entry.rank}</span>
-              <span className="whitespace-nowrap text-[0.625rem] font-medium" style={{
-                color: isUp ? '#16A34A' : '#DC2626',
-              }}>
+               <span className={cn("whitespace-nowrap text-[0.625rem] font-medium", isUp ? 'text-green-500' : 'text-red-400')}>
                 <span style={{ fontSize: '10px' }}>{isUp ? '▲' : '▼'}</span>{isUp ? '+' : '−'}{absChange}
               </span>
             </div>
@@ -303,7 +301,7 @@ export function UnifiedWorldRankings() {
           <ChevronRight className="w-3.5 h-3.5 opacity-60" />
         </button>
       </div>
-      <p className="text-[11px] text-muted-foreground leading-tight mb-2.5">
+      <p className="text-muted-foreground/60 leading-tight mt-0.5 mb-2.5" style={{ fontSize: '12px' }}>
         {(() => {
           const rankingDate = (rankings as any)?.[0]?.ranking_date;
           if (!rankingDate) return 'Updated weekly · Official OWGR data';
@@ -325,7 +323,7 @@ export function UnifiedWorldRankings() {
           {/* Row 1 — Risers */}
           {upwardMovers.length > 0 && (
             <div>
-              <span className="font-semibold" style={{ color: 'rgba(22,163,74,0.8)', fontSize: '12px' }}>▲ Risers</span>
+              <span className="text-green-500" style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>▲ Risers</span>
               <div
                 className="flex gap-2 overflow-x-auto scrollbar-hide mt-1.5 pb-0.5"
                 style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory', touchAction: 'pan-x pan-y' }}
@@ -341,7 +339,7 @@ export function UnifiedWorldRankings() {
           {/* Row 2 — Fallers */}
           {downwardMovers.length > 0 && (
             <div>
-              <span className="font-semibold" style={{ color: 'rgba(220,38,38,0.75)', fontSize: '12px' }}>▼ Fallers</span>
+              <span className="text-red-400" style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>▼ Fallers</span>
               <div
                 className="flex gap-2 overflow-x-auto scrollbar-hide mt-1.5 pb-0.5"
                 style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory', touchAction: 'pan-x pan-y' }}
@@ -361,16 +359,16 @@ export function UnifiedWorldRankings() {
       <div>
         {/* Two-column stat headers */}
         <div className="flex items-center pb-2" style={{ borderBottom: '1px solid hsl(var(--border) / 0.1)' }}>
-          <div className="w-10 flex-shrink-0 text-center uppercase text-[0.625rem] font-bold tracking-wide text-muted-foreground">
+          <div className="w-10 flex-shrink-0 text-center uppercase text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em' }}>
             #
           </div>
-          <div className="flex-1 min-w-0 uppercase text-[0.625rem] font-bold tracking-wide text-muted-foreground">
+          <div className="flex-1 min-w-0 uppercase text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em' }}>
             Player
           </div>
-          <div className="w-16 flex-shrink-0 text-right uppercase text-[0.625rem] font-bold tracking-wide text-muted-foreground">
+          <div className="w-16 flex-shrink-0 text-right uppercase text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em' }}>
             Avg Pts
           </div>
-          <div className="w-16 flex-shrink-0 text-right uppercase text-[0.625rem] font-bold tracking-wide text-muted-foreground">
+          <div className="w-16 flex-shrink-0 text-right uppercase text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em' }}>
             Total
           </div>
         </div>
@@ -431,12 +429,10 @@ export function UnifiedWorldRankings() {
                       {entry.rank}
                     </span>
                     {rankChange > 0 ? (
-                      <span style={{ fontSize: '10px', color: 'rgba(22,163,74,0.9)' }}>▲</span>
+                      <span className="text-green-500" style={{ fontSize: '10px' }}>▲</span>
                     ) : rankChange < 0 ? (
-                      <span style={{ fontSize: '10px', color: 'rgba(220,38,38,0.75)' }}>▼</span>
-                    ) : (
-                      <span className="text-[10px] text-muted-foreground/30 font-bold">—</span>
-                    )}
+                      <span className="text-red-400" style={{ fontSize: '10px' }}>▼</span>
+                    ) : null}
                   </div>
 
                   {/* ── Avatar + name ── */}
