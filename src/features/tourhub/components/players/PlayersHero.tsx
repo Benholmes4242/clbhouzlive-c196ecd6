@@ -440,34 +440,35 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
           </Link>
 
           {/* Runner row — overlaps hero bottom */}
-          {runners.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.35 }}
-              style={{ padding: '0 16px', marginTop: '-20px', position: 'relative', zIndex: 10, boxSizing: 'border-box', width: '100%' }}
-            >
-              <div className="flex gap-2" style={{ width: '100%' }}>
-                {(() => {
-                  // In wins mode, only show runners with 1+ wins
-                  const runnersToShow = sort === 'most-wins'
-                    ? runners.filter(r => (statsMap?.get(r.playerId)?.wins ?? 0) > 0).slice(0, 2)
-                    : runners.slice(0, 2);
-                  return runnersToShow;
-                })().map((player, index) => (
-                  <RunnerCard
-                    key={player.playerId}
-                    player={player}
-                    index={index}
-                    activeTour={activeTour}
-                    statsMap={statsMap}
-                    sort={sort}
-                    tiedCount={tiedCounts[index]}
-                  />
-                ))}
-              </div>
-            </motion.div>
-          )}
+          {(() => {
+            let runnersToShow = runners.slice(0, 2);
+            if (sort === 'most-wins') {
+              runnersToShow = runnersToShow.filter(r => (statsMap?.get(r.playerId)?.wins ?? 0) > 0);
+            }
+            if (runnersToShow.length === 0) return null;
+            return (
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.35 }}
+                style={{ padding: '0 16px', marginTop: '-20px', position: 'relative', zIndex: 10, boxSizing: 'border-box', width: '100%' }}
+              >
+                <div className="flex gap-2" style={{ width: '100%' }}>
+                  {runnersToShow.map((player, index) => (
+                    <RunnerCard
+                      key={player.playerId}
+                      player={player}
+                      index={index}
+                      activeTour={activeTour}
+                      statsMap={statsMap}
+                      sort={sort}
+                      tiedCount={tiedCounts[index]}
+                    />
+                  ))}
+                </div>
+              </motion.div>
+            );
+          })()}
         </motion.div>
       </AnimatePresence>
     </div>
