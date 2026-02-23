@@ -636,7 +636,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         >
                           {/* 60px photo */}
                           <button onClick={handlePlayerTap(podiumWinner.playerId)} className="transition-opacity active:opacity-70" style={{ flexShrink: 0 }}>
-                            <PlayerAvatar photoUrl={podiumWinner.photoUrl} pgaTourId={podiumWinner.pgaTourId} displayName={podiumWinner.displayName} tourCode={tournament.tourSlug} size={60} frosted />
+                            <PlayerAvatar displayName={podiumWinner.displayName} fullName={podiumWinner.fullName} tourCode={tournament.tourSlug} size={60} frosted />
                           </button>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             {/* Name + score */}
@@ -855,7 +855,6 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
         );
         if (url) {
           const img = new Image();
-          img.crossOrigin = 'anonymous';
           img.src = url;
         }
       }
