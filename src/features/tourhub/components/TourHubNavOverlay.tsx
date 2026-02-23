@@ -151,28 +151,28 @@ export function TourHubNavOverlay({
     haptic('light');
     onNavigate(tab);
     onClose();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'instant' });
   }, [onNavigate, onClose]);
 
   const handleLinkClick = useCallback((path: string) => {
     haptic('light');
     onClose();
     navigate(path);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'instant' });
   }, [onClose, navigate]);
 
   const handleViewAllRankings = useCallback(() => {
     haptic('light');
     onNavigate('leaderboards');
     onClose();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'instant' });
   }, [onNavigate, onClose]);
 
   const handlePlayerClick = useCallback((playerId: string) => {
     haptic('light');
     onClose();
     navigate(`/tourhub/player/${playerId}`);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'instant' });
   }, [onClose, navigate]);
   
   if (typeof document === 'undefined') return null;
@@ -230,7 +230,7 @@ export function TourHubNavOverlay({
                 haptic('light');
                 onClose();
                 navigate(`/tourhub/tournament/${leaderTeaser.tournamentId}`);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                window.scrollTo({ top: 0, behavior: 'instant' });
               }
             }}
           >
@@ -608,7 +608,7 @@ export function TourHubNavOverlay({
                               haptic('light');
                               onClose();
                               navigate('/tourhub/college-golf');
-                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                              window.scrollTo({ top: 0, behavior: 'instant' });
                             }}
                           >
                             {topCollege.logoUrl && (

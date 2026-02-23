@@ -47,14 +47,7 @@ export function PlayersTab() {
   const initialTour = searchParams.get('tour') || 'all';
   const [sort, setSort] = useState<PlayerSortType>(getDefaultSortForTour(initialTour));
 
-  // Scroll-to-top on mount — always start at top
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    requestAnimationFrame(() => {
-      window.scrollTo(0, 0);
-    });
-  }, []);
+  // Scroll position handled by centralized ScrollRestoration component
 
   // Pull-to-refresh state
   const [isRefreshing, setIsRefreshing] = useState(false);

@@ -4,18 +4,18 @@
  */
 
 import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigationType } from 'react-router-dom';
 
 const scrollPositions = new Map<string, number>();
 
 export const ScrollRestoration = () => {
   const location = useLocation();
+  const navigationType = useNavigationType();
 
+  // Save current scroll position before leaving
   useEffect(() => {
-    // Exclude course detail routes from scroll restoration
     const isCourseDetail = /^\/courses\/[^/]+$/.test(location.pathname);
     
-    // Save current scroll position before leaving (only for non-course-detail routes)
     return () => {
       if (!isCourseDetail) {
         const currentPath = location.pathname + location.search;
@@ -24,46 +24,34 @@ export const ScrollRestoration = () => {
     };
   }, [location]);
 
+  // Restore or reset scroll based on navigation type
   useEffect(() => {
-    // Exclude course detail routes from scroll restoration
     const isCourseDetail = /^\/courses\/[^/]+$/.test(location.pathname);
-    
-    if (isCourseDetail) {
-      // Course details handle their own scroll-to-top
-      return;
-    }
-    
-    // Restore scroll position for this route
+    if (isCourseDetail) return;
+
     const currentPath = location.pathname + location.search;
-    const savedPosition = scrollPositions.get(currentPath);
-    
-    if (savedPosition !== undefined) {
-      // Wait for data to load before restoring scroll
-      // Use a longer delay to ensure React Query has hydrated
-      const timeoutId = setTimeout(() => {
-        // Check if content is actually rendered by looking for a minimum body height
-        if (document.body.scrollHeight > savedPosition) {
-          window.scrollTo({
-            top: savedPosition,
-            behavior: 'instant'
-          });
-        } else {
-          // Content not fully rendered, try again with RAF
-          requestAnimationFrame(() => {
-            window.scrollTo({
-              top: savedPosition,
-              behavior: 'instant'
+
+    if (navigationType === 'POP') {
+      // Back/forward — restore saved position
+      const savedPosition = scrollPositions.get(currentPath);
+      if (savedPosition !== undefined) {
+        const timeoutId = setTimeout(() => {
+          if (document.body.scrollHeight > savedPosition) {
+            window.scrollTo({ top: savedPosition, behavior: 'instant' });
+          } else {
+            requestAnimationFrame(() => {
+              window.scrollTo({ top: savedPosition, behavior: 'instant' });
             });
-          });
-        }
-      }, 100);
-      
-      return () => clearTimeout(timeoutId);
+          }
+        }, 100);
+        return () => clearTimeout(timeoutId);
+      }
     } else {
-      // New route - scroll to top
-      window.scrollTo(0, 0);
+      // PUSH or REPLACE — clear stale position and scroll to top
+      scrollPositions.delete(currentPath);
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     }
-  }, [location]);
+  }, [location, navigationType]);
 
   return null;
 };
