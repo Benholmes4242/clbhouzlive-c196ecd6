@@ -84,7 +84,7 @@ export function ScheduleTourFilter({
         ariaLabelledBy="schedule-tour-sheet-title"
       >
         <div
-          className="overflow-y-auto overscroll-contain px-4 pb-4"
+          className="overflow-y-auto overscroll-contain px-4 pb-2"
           style={{ maxHeight: 'calc(70vh - 60px)' }}
         >
           {/* Header */}
