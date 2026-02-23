@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { TOUR_COLORS } from '../../constants/colors';
+import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
 import { useTournamentScoringStats } from '../../hooks/useTourHubData';
 
 interface SummaryTabProps {
@@ -110,8 +111,9 @@ function WinnerCard({ winner, runnerUp, headshotMap }: {
             </h4>
           </Link>
           {winner.player?.country && (
-            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
-              {winner.player.country}
+            <p className="text-xs text-muted-foreground mb-2">
+              {countryCodeToFlag(winner.player.country)}{' '}
+              {titleCaseCountry(winner.player.country)}
             </p>
           )}
           <div className="flex items-baseline gap-3">
