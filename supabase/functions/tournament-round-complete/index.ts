@@ -30,6 +30,12 @@ function mapTourName(tourName: string): string {
   return 'pga';
 }
 
+// Tours that support hole statistics via Sportradar API
+function tourSupportsHoleStats(tourSlug: string): boolean {
+  const unsupported = ['liv', 'oly', 'usga'];
+  return !unsupported.includes(tourSlug.toLowerCase());
+}
+
 async function fetchSportradar(url: string, apiKey: string): Promise<any> {
   const response = await fetch(url, {
     headers: { 'x-api-key': apiKey, 'Accept': 'application/json' }
@@ -100,7 +106,9 @@ Deno.serve(async (req) => {
     let scorecardsRecords = 0;
 
     // ── 1. Fetch Hole Statistics ──────────────────────────────────────
-    try {
+    if (!tourSupportsHoleStats(tour)) {
+      console.log(`[RoundComplete] Skipping hole stats for ${tournament.name} — ${tour} tour not supported`);
+    } else try {
       const holeStatsUrl = `${getTourBaseUrl(tour)}/${year}/tournaments/${tournament.sr_id}/hole-statistics.json`;
       const holeData = await fetchSportradar(holeStatsUrl, sportradarApiKey);
       
