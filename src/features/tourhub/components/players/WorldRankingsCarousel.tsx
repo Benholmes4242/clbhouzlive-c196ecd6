@@ -118,7 +118,7 @@ export function WorldRankingsCarousel({ worldRankedPlayers, players }: WorldRank
         </h3>
         <Link 
           to="/tourhub?tab=players&filter=top-ranked"
-          className="text-xs text-primary hover:underline flex items-center gap-0.5"
+          className="text-xs text-primary hover:underline flex items-center gap-0.5 focus:outline-none focus-visible:outline-none"
         >
           View All
           <ChevronRight className="w-3 h-3" />
