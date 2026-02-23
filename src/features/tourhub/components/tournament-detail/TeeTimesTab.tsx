@@ -52,7 +52,7 @@ function TeeTimesEmpty({ isCompleted, roundLabel }: { isCompleted?: boolean; rou
 
   if (isCompleted) {
     title = 'Tee Times No Longer Available';
-    subtitle = 'Tee time data is not retained after the tournament ends.';
+    subtitle = 'Historical tee time data is not available for this tournament.';
   } else if (roundLabel) {
     title = `${roundLabel} Tee Times Not Yet Published`;
     subtitle = 'Check back after the previous round for updated pairings.';
@@ -94,6 +94,9 @@ export function TeeTimesTab({ tournamentId, isCompleted }: TeeTimesTabProps) {
     const rounds = [...new Set(allTeeTimes.map((t: any) => t.round_number))].sort();
     return rounds.map(r => `R${r}`);
   }, [allTeeTimes]);
+
+  // If only 1 round exists (e.g., LIV), hide individual round tabs — only show data
+  const showRoundTabs = availableRounds.length > 1;
 
   // Group tee times
   const groups = useMemo((): TeeTimeGroup[] => {
@@ -169,8 +172,8 @@ export function TeeTimesTab({ tournamentId, isCompleted }: TeeTimesTabProps) {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Round selector */}
-      {availableRounds.length > 1 && (
+      {/* Round selector — hidden if only 1 round exists (e.g., LIV) */}
+      {showRoundTabs && (
         <RoundSelector
           rounds={availableRounds}
           activeRound={selectedRound}
@@ -244,7 +247,7 @@ export function TeeTimesTab({ tournamentId, isCompleted }: TeeTimesTabProps) {
 
       {/* Timezone note */}
       <div className="text-center py-6">
-        <span className="text-[10px] text-muted-foreground italic">All times displayed in tournament local time</span>
+        <span className="text-[11px] font-medium text-muted-foreground/60">Times shown in your local timezone</span>
       </div>
     </motion.div>
   );

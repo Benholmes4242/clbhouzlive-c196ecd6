@@ -99,7 +99,49 @@ Deno.serve(async (req) => {
       console.log(`[LiveSync] Status resolver: ${resolved} tournament(s) transitioned to inprogress`);
     }
 
-    // ── Fetch ALL live tournaments ────────────────────────────────────
+    // 3. Pre-tournament tee times sync — for tournaments starting within 3 days
+    const threeDaysFromNow = new Date();
+    threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
+    const todayStr = today;
+    const futureStr = threeDaysFromNow.toISOString().split('T')[0];
+    
+    const { data: upcomingTournaments } = await supabase
+      .from('sr_tournaments')
+      .select('id, sr_id, name, season_id, start_date')
+      .in('status', ['created', 'scheduled'])
+      .lte('start_date', futureStr)
+      .gte('start_date', todayStr);
+
+    if (upcomingTournaments?.length) {
+      console.log(`[LiveSync] ${upcomingTournaments.length} upcoming tournament(s) within 3 days — syncing tee times`);
+      for (const upcoming of upcomingTournaments) {
+        const { data: uSeason } = await supabase.from('sr_seasons').select('year, tour_name').eq('id', upcoming.season_id).maybeSingle();
+        const uYear = uSeason?.year || new Date().getFullYear();
+        const uTourSlug = getTourSlugForTeeTimes(uSeason?.tour_name || 'pga');
+        if (!uTourSlug) continue;
+        
+        try {
+          const syncUrl = `${supabaseUrl}/functions/v1/sportradar-sync`;
+          await fetch(syncUrl, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${supabaseServiceKey}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              action: 'tee_times',
+              tournamentId: upcoming.sr_id,
+              tourId: uTourSlug,
+              year: uYear,
+            }),
+          });
+          console.log(`[LiveSync] Pre-tournament tee times synced for ${upcoming.name}`);
+        } catch (e) {
+          console.warn(`[LiveSync] Pre-tournament tee times failed for ${upcoming.name}: ${e.message}`);
+        }
+      }
+    }
+
     const { data: liveTournaments, error: queryError } = await supabase
       .from('sr_tournaments')
       .select('id, sr_id, name, status, start_date, end_date, season_id, last_live_sync, timezone')
@@ -276,6 +318,33 @@ async function syncTournament(
     console.log(`[LiveSync] Skipping hole stats for ${tournament.name} — unsupported tour`);
   }
 
+  // ── Periodic tee times sync (every 10th minute, offset by 5) ─────
+  const teeTimesTourSlug = getTourSlugForTeeTimes(seasonData?.tour_name || 'pga');
+  const shouldSyncTeeTimes = (currentMinute % 10 === 5);
+
+  if (shouldSyncTeeTimes && teeTimesTourSlug) {
+    try {
+      console.log(`[LiveSync] Syncing tee times for ${tournament.name}`);
+      const syncUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/sportradar-sync`;
+      await fetch(syncUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'tee_times',
+          tournamentId: tournament.sr_id,
+          tourId: teeTimesTourSlug,
+          year: year,
+        }),
+      });
+      console.log(`[LiveSync] Tee times refreshed for ${tournament.name}`);
+    } catch (e) {
+      console.warn(`[LiveSync] Tee times sync failed for ${tournament.name}: ${e.message}`);
+    }
+  }
+
   // ── Lifecycle: check if Sportradar reports tournament as closed ───
   let transitionedToClosed = false;
   const closedStatuses = ['closed', 'complete', 'completed', 'official'];
@@ -333,6 +402,31 @@ async function syncTournament(
           console.warn(`[LiveSync] Final hole stats failed for ${tournament.name}: ${e.message}`);
         }
       }
+
+      // ── Final tee times sync on tournament close ──────────────
+      const closeTeeTimesSlug = getTourSlugForTeeTimes(seasonData?.tour_name || 'pga');
+      if (closeTeeTimesSlug) {
+        try {
+          console.log(`[LiveSync] Running final tee times sync for ${tournament.name}`);
+          const syncUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/sportradar-sync`;
+          await fetch(syncUrl, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              action: 'tee_times',
+              tournamentId: tournament.sr_id,
+              tourId: closeTeeTimesSlug,
+              year: year,
+            }),
+          });
+          console.log(`[LiveSync] Final tee times completed for ${tournament.name}`);
+        } catch (e) {
+          console.warn(`[LiveSync] Final tee times failed for ${tournament.name}: ${e.message}`);
+        }
+      }
     }
   } else {
     // Update last_live_sync timestamp
@@ -384,6 +478,23 @@ function getTourSlug(tourName: string): string | null {
     'USGA': null,
   };
   return map[normalized] ?? (normalized.includes('LIV') ? null : 'pga');
+}
+
+// Tour slug mapping for tee times — includes LIV (which has tee time data)
+function getTourSlugForTeeTimes(tourName: string): string | null {
+  const normalized = (tourName || '').toUpperCase();
+  const map: Record<string, string | null> = {
+    'PGA': 'pga',
+    'LPGA': 'lpga',
+    'EURO': 'eur',
+    'DP': 'eur',
+    'CHAMP': 'champions-tour',
+    'PGAD': 'pgad',
+    'LIV': 'liv',
+    'OLY': null,
+    'USGA': null,
+  };
+  return map[normalized] ?? (normalized.includes('LIV') ? 'liv' : 'pga');
 }
 
 // ── Status Resolver ──────────────────────────────────────────────────
