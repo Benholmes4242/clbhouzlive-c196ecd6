@@ -71,11 +71,10 @@ export const LeaderHero = memo(function LeaderHero({ player, accentColor }: Lead
                 onError={() => setImgError(true)}
               />
             ) : (
-              <div
-                className="w-full h-full"
-                style={{
-                  background: `linear-gradient(135deg, ${accent.bgMedium} 0%, ${accent.bgLight} 100%)`,
-                }}
+              <img
+                src={PLAYER_SILHOUETTE_URL}
+                alt={player.playerName}
+                className="w-full h-full object-cover"
               />
             )}
           </div>

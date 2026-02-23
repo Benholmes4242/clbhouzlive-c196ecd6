@@ -85,11 +85,10 @@ const ChaserCard = memo(function ChaserCard({
                 onError={() => setImgError(true)}
               />
             ) : (
-              <div
-                className="w-full h-full"
-                style={{
-                  background: `linear-gradient(135deg, ${accent.bgMedium} 0%, ${accent.bgLight} 100%)`,
-                }}
+              <img
+                src={PLAYER_SILHOUETTE_URL}
+                alt={player.playerName}
+                className="w-full h-full object-cover"
               />
             )}
           </div>
@@ -150,7 +149,7 @@ export const ChasingPack = memo(function ChasingPack({
   return (
     <div style={{ marginTop: '16px' }}>
       {/* Section label */}
-      <p className="m-0 text-muted-foreground" style={{ marginBottom: '8px', fontSize: '11px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+      <p className="m-0 text-muted-foreground" style={{ marginBottom: '8px', fontSize: '11px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
         The Chasers
       </p>
 
