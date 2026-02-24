@@ -84,15 +84,14 @@ export function LeadersCategorySheet({
         ariaLabelledBy="leaders-category-sheet-title"
       >
         <div
-          className="overflow-y-auto overscroll-contain pb-6"
-          style={{ maxHeight: 'calc(70vh - 60px)', padding: '0 20px' }}
+          className="overflow-y-auto overscroll-contain px-4 pb-2"
+          style={{ maxHeight: 'calc(70vh - 60px)' }}
         >
           {/* Header */}
-          <div style={{ padding: '20px 0 16px' }}>
+          <div className="flex items-center justify-between mb-4">
             <h2
               id="leaders-category-sheet-title"
-              style={{ fontSize: 18, fontWeight: 700 }}
-              className="text-foreground"
+              className="text-lg font-bold text-foreground"
             >
               Performance Category
             </h2>
@@ -160,7 +159,7 @@ export function LeadersCategorySheet({
         </div>
 
         {/* Safe area bottom padding */}
-        <div style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 34px) + 16px)' }} />
+        <div style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }} />
       </BottomSheet>
     </>
   );
