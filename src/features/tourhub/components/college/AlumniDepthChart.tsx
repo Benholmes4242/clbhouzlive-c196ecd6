@@ -67,7 +67,8 @@ function AlumniRow({ alumnus, index, tierAccent }: AlumniRowProps) {
           "active:scale-[0.98] transition-all"
         )}
         style={{
-          minHeight: '100px',
+          height: '120px',
+          minHeight: '120px',
           borderLeftWidth: '3px',
           borderLeftStyle: 'solid',
           borderLeftColor: tierBorderColor[tierAccent],
@@ -228,7 +229,7 @@ export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChart
     return (
       <div className={cn('space-y-3', className)}>
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="bg-card/50 border border-border/30 rounded-2xl animate-pulse" style={{ height: '100px' }} />
+          <div key={i} className="bg-card/50 border border-border/30 rounded-2xl animate-pulse" style={{ height: '120px' }} />
         ))}
       </div>
     );
