@@ -19,6 +19,7 @@ import { AccuracyHeadlineCard } from './AccuracyHeadlineCard';
 import { PredictionLeaderboard } from './PredictionLeaderboard';
 import { LiveUpcomingToggle } from './LiveUpcomingToggle';
 import { ResultsRecap } from './ResultsRecap';
+import { StaleBadge } from './StaleBadge';
 import IntelligenceTabSwitcher from './components/IntelligenceTabSwitcher';
 import type { IntelligenceView } from './types';
 
@@ -60,6 +61,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
     nextTournamentPreview,
     nextTournamentPredictionsLoading,
     hasUpcoming,
+    isStale,
   } = useTournamentInsights();
 
   // Derived phase booleans — computed before early returns so hooks below are valid
@@ -229,8 +231,9 @@ export const TournamentInsights = memo(function TournamentInsights() {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
-                className="pb-6"
+                className="pb-6 space-y-3"
               >
+                {isStale && <StaleBadge />}
                 {data.winners.length > 0 && (
                   <LikelyWinnersCarousel featured={data.winners[0]} cards={data.contenderCards} />
                 )}
@@ -594,22 +597,25 @@ export const TournamentInsights = memo(function TournamentInsights() {
             style={{ borderTop: '1px solid rgba(0, 0, 0, 0.05)' }}
           >
             {tracker ? (
-              <ResultsRecap
-                predictions={{
-                  tournament: {
-                    id: data?.tournament.id ?? '', name: data?.tournament.name ?? '',
-                    venueName: data?.tournament.courseName ?? '', venueCity: '', venueState: '',
-                    startDate: '', endDate: '', purse: 0, par: 0, yardage: 0, status: 'complete',
-                  },
-                  topContenders: [], darkHorses: [],
-                  courseAnalysis: { winnerProfile: '', keyStats: [], insight: '', difficulty: '' },
-                  confidence: 0, generatedAt: '', isAIPowered: true, isStale: false,
-                }}
-                accuracy={tracker.accuracy}
-                bestCallName={getBestCall(tracker)?.playerName}
-                bestCallPredicted={getBestCall(tracker)?.predictedRank}
-                bestCallActual={getBestCall(tracker)?.actualPosition ?? undefined}
-              />
+              <>
+                <ResultsRecap
+                  predictions={{
+                    tournament: {
+                      id: data?.tournament.id ?? '', name: data?.tournament.name ?? '',
+                      venueName: data?.tournament.courseName ?? '', venueCity: '', venueState: '',
+                      startDate: '', endDate: '', purse: 0, par: 0, yardage: 0, status: 'complete',
+                    },
+                    topContenders: [], darkHorses: [],
+                    courseAnalysis: { winnerProfile: '', keyStats: [], insight: '', difficulty: '' },
+                    confidence: 0, generatedAt: '', isAIPowered: true, isStale: false,
+                  }}
+                  accuracy={tracker.accuracy}
+                  bestCallName={getBestCall(tracker)?.playerName}
+                  bestCallPredicted={getBestCall(tracker)?.predictedRank}
+                  bestCallActual={getBestCall(tracker)?.actualPosition ?? undefined}
+                />
+                <PredictionLeaderboard allPicks={tracker.allPicks} isCompleted={true} />
+              </>
             ) : null}
           </motion.div>
         )}
