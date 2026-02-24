@@ -123,10 +123,11 @@ export const TournamentInsights = memo(function TournamentInsights() {
     dateRangeText: nextTournamentPreview.startDate,
     heroImageUrl: '',
   } : null);
-  const heroData = isLive && intelligenceView === 'upcoming' && upcomingHeroData
+  const heroData = intelligenceView === 'upcoming' && upcomingHeroData
     ? upcomingHeroData
     : data?.tournament ?? null;
   const heroIsLive = isLive && intelligenceView === 'live';
+  const heroIsCompleted = isCompleted && intelligenceView === 'live';
 
   return (
     <section aria-label="Featured tournament analysis" className="space-y-0 px-4">
@@ -177,7 +178,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
             >
-              <TournamentHeroCard tournament={heroData} isLive={heroIsLive} isCompleted={isCompleted} />
+              <TournamentHeroCard tournament={heroData} isLive={heroIsLive} isCompleted={heroIsCompleted} />
             </motion.div>
           </AnimatePresence>
         </div>
