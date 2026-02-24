@@ -4,7 +4,7 @@
 
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
-import { Trophy, Clock, RefreshCw, AlertCircle } from 'lucide-react';
+import { Trophy, Clock, RefreshCw, AlertCircle, ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
 import { useQueryClient } from '@tanstack/react-query';
@@ -159,7 +159,7 @@ export function TournamentDetailPage() {
         <div className="animate-pulse">
           <div 
             style={{ 
-              minHeight: 'calc(clamp(282px, 53vh, 422px) + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
+              minHeight: 'calc(45dvh + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
               background: 'linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--background)) 50%, hsl(var(--muted)) 75%)',
               backgroundSize: '200% 100%',
               animation: 'shimmer 1.5s infinite',
@@ -387,10 +387,11 @@ export function TournamentDetailPage() {
           {/* Canonical back link */}
           <button
             onClick={() => navigate(-1)}
-            className="text-muted-foreground active:opacity-70 transition-opacity"
+            className="flex items-center gap-0.5 text-muted-foreground active:opacity-70 transition-opacity"
             style={{ fontSize: 13, fontWeight: 500, padding: '12px 0 8px 0' }}
           >
-            ← Tournament
+            <ChevronLeft size={14} />
+            Tournament
           </button>
           
           {/* TD-05: Tabs with role="tablist" */}

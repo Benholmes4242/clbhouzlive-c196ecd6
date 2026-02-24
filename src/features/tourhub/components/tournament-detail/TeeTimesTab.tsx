@@ -194,19 +194,19 @@ export function TeeTimesTab({ tournamentId, isCompleted }: TeeTimesTabProps) {
 
       {/* Search input */}
       <div className="relative px-4 mb-4">
-        <Search className="absolute left-7 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-muted-foreground/40 z-10" strokeWidth={2.5} />
+        <Search className="absolute left-7 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-muted-foreground z-10" strokeWidth={2.5} />
         <input
           type="text"
           placeholder="Find your player…"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className={cn(
-            "w-full h-12 pl-10 pr-10 rounded-2xl text-foreground placeholder:text-muted-foreground/40",
-            "bg-muted/30 border border-border/50",
+            "w-full h-12 pl-10 pr-10 rounded-2xl text-foreground placeholder:text-muted-foreground/50",
+            "bg-muted/50 border border-border",
             "focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30",
             "transition-all duration-200"
           )}
-          style={{ fontSize: '13px' }}
+          style={{ fontSize: '14px' }}
         />
         {searchQuery && (
           <button
@@ -266,7 +266,7 @@ function TeeTimeGroupCard({ group, index, searchQuery }: { group: TeeTimeGroup; 
         "bg-card rounded-2xl border border-border/50 overflow-hidden",
         hasMatchingPlayer && "ring-2 ring-amber-400"
       )}
-      style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+      
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: Math.min(index * 0.02, 0.4), duration: 0.3 }}
@@ -307,7 +307,7 @@ function TeeTimeGroupCard({ group, index, searchQuery }: { group: TeeTimeGroup; 
                 size="md"
               />
               <div className="flex-1 min-w-0">
-                <span className="text-sm font-semibold text-foreground truncate block">
+                <span className="font-semibold text-foreground truncate block" style={{ fontSize: 15, letterSpacing: '-0.2px' }}>
                   {player.name}
                 </span>
                 {player.country && (
@@ -315,7 +315,7 @@ function TeeTimeGroupCard({ group, index, searchQuery }: { group: TeeTimeGroup; 
                 )}
               </div>
               {hasTappableLink && (
-                <ChevronRight className="w-4 h-4 text-muted-foreground/30 shrink-0" />
+                <ChevronRight className="w-4 h-4 text-muted-foreground/50 shrink-0" />
               )}
             </div>
           );

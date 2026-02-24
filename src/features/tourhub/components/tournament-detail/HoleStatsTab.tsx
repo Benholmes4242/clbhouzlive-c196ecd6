@@ -93,9 +93,9 @@ function ScoringBar({ hole }: { hole: ProcessedHole }) {
   if (total === 0) return null;
 
   const segments = [
-    { count: hole.eagles, color: '#f59e0b', label: 'Eag' },
+    { count: hole.eagles, color: 'rgba(245, 158, 11, 0.9)', label: 'Eag' },
     { count: hole.birdies, color: '#22C55E', label: 'Bir' },
-    { count: hole.pars, color: '#CBD5E1', label: 'Par' },
+    { count: hole.pars, color: 'hsl(var(--border))', label: 'Par' },
     { count: hole.bogeys, color: '#EF4444', label: 'Bog' },
     { count: hole.doubleBogeys + hole.other, color: '#1E293B', label: 'Dbl+' },
   ].filter(s => s.count > 0);
@@ -280,16 +280,16 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
             <div className="mt-6 mb-3">
               <div className="flex items-center gap-1.5 mb-3">
                 <Flame className="w-4 h-4 text-red-500" />
-                <span className="text-muted-foreground/60" style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
+                <span className="text-muted-foreground/60" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' as const }}>
                   Toughest Holes
                 </span>
               </div>
-              <div className="flex gap-3">
+              <div className="flex gap-2">
                 {toughestHoles.map((hole, idx) => (
                   <div
                     key={hole.holeNumber}
                     className="flex-1 bg-card rounded-2xl border border-border/50 p-4 text-center"
-                    style={{ borderLeft: '3px solid #EF4444', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+                    style={{ borderLeft: '3px solid #EF4444' }}
                   >
                     <div className="font-bold text-red-500" style={{ fontSize: '11px' }}>#{idx + 1}</div>
                     <div className="text-xl font-bold text-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>
@@ -312,16 +312,16 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
             <div className="mt-6 mb-3">
               <div className="flex items-center gap-1.5 mb-3">
                 <Leaf className="w-4 h-4 text-green-500" />
-                <span className="text-muted-foreground/60" style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
+                <span className="text-muted-foreground/60" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' as const }}>
                   Easiest Holes
                 </span>
               </div>
-              <div className="flex gap-3">
+              <div className="flex gap-2">
                 {easiestHoles.map((hole, idx) => (
                   <div
                     key={hole.holeNumber}
                     className="flex-1 bg-card rounded-2xl border border-border/50 p-4 text-center"
-                    style={{ borderLeft: '3px solid #22C55E', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+                    style={{ borderLeft: '3px solid #22C55E' }}
                   >
                     <div className="font-bold text-green-600" style={{ fontSize: '11px' }}>#{idx + 1}</div>
                     <div className="text-xl font-bold text-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>
@@ -343,10 +343,9 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
           {hasRoundData && summary && (
             <div
               className="bg-card rounded-2xl border border-border/50 grid grid-cols-4 text-center p-4 mt-8"
-              style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
             >
               <div>
-                <div className="text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
+                <div className="text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' as const }}>
                   Course Avg
                 </div>
                 <div className="text-foreground" style={{ fontSize: '20px', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
@@ -355,15 +354,15 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
                 <div className="text-muted-foreground" style={{ fontSize: '11px', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>Par {summary.totalPar}</div>
               </div>
               <div>
-                <div className="text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
+                <div className="text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' as const }}>
                   Eagles
                 </div>
-                <div style={{ fontSize: '20px', fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: '#f59e0b' }}>
+                <div style={{ fontSize: '20px', fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: 'rgba(245, 158, 11, 0.9)' }}>
                   {summary.totalEagles}
                 </div>
               </div>
               <div>
-                <div className="text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
+                <div className="text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' as const }}>
                   Birdies
                 </div>
                 <div style={{ fontSize: '20px', fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: '#22C55E' }}>
@@ -371,7 +370,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
                 </div>
               </div>
               <div>
-                <div className="text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
+                <div className="text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' as const }}>
                   Bogeys
                 </div>
                 <div style={{ fontSize: '20px', fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: '#EF4444' }}>
@@ -389,7 +388,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
                 className="flex items-center justify-between"
                 style={{ borderTop: '1px solid hsl(var(--border) / 0.3)', paddingTop: '20px', marginTop: '8px' }}
               >
-                <span className="text-muted-foreground/60" style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
+                <span className="text-muted-foreground/60" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' as const }}>
                   Front Nine
                 </span>
                 {frontNineAvg !== null && (
@@ -410,7 +409,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
                 className="flex items-center justify-between"
                 style={{ borderTop: '1px solid hsl(var(--border) / 0.3)', paddingTop: '20px', marginTop: '8px' }}
               >
-                <span className="text-muted-foreground/60" style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
+                <span className="text-muted-foreground/60" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' as const }}>
                   Back Nine
                 </span>
                 {backNineAvg !== null && (
@@ -438,9 +437,9 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
                 marginTop: 8,
               }}>
                 {[
-                  { color: '#f59e0b', label: 'Eagles' },
+                  { color: 'rgba(245, 158, 11, 0.9)', label: 'Eagles' },
                   { color: '#22C55E', label: 'Birdies' },
-                  { color: '#CBD5E1', label: 'Pars' },
+                  { color: 'hsl(var(--border))', label: 'Pars' },
                   { color: '#EF4444', label: 'Bogeys' },
                   { color: '#1E293B', label: 'Dbl Bogey+' },
                 ].map((item, i) => (

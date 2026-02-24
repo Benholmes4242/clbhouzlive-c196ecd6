@@ -256,7 +256,7 @@ export function FullLeaderboard({
       </div>
 
       {/* Player rows */}
-      <div className="divide-y divide-border/30">
+      <div className="divide-y divide-border/15">
         {sortedEntries.map((entry, index) => {
           const isMissedCut = entry.status === 'MC' || entry.status === 'CUT';
           const isWD = entry.status === 'WD';
@@ -312,7 +312,7 @@ export function FullLeaderboard({
                   <p className={cn(
                     "font-semibold truncate text-foreground text-[15px]",
                     isWD && "italic"
-                  )} style={{ letterSpacing: '-0.1px' }}>
+                  )} style={{ letterSpacing: '-0.2px' }}>
                     {entry.player?.full_name || 'Unknown'}
                   </p>
                   {entry.player?.country_code && (
@@ -385,7 +385,7 @@ export function FullLeaderboard({
                   })()}
                 </div>
 
-                <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/30 shrink-0" />
+                <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50 shrink-0" />
               </Link>
 
               {showCutLine && (
