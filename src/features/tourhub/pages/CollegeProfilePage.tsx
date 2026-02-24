@@ -153,7 +153,7 @@ export function CollegeProfilePage() {
       )}
       {/* Immersive Brand Color Hero */}
       <div
-        className="relative"
+        className="relative overflow-hidden"
         style={{ height: '50dvh' }}
       >
         {/* Brand gradient background with Ken Burns */}
