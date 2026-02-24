@@ -44,11 +44,11 @@ function AlumniRow({ alumnus, index, tierAccent }: AlumniRowProps) {
     .join('')
     .toUpperCase();
 
-  // Build meta line: #N OWGR · $X.XM · X wins
-  const metaParts: string[] = [];
-  if (hasWorldRank) metaParts.push(`#${alumnus.world_ranking} OWGR`);
-  if (hasEarnings) metaParts.push(formatCurrency(alumnus.earnings || 0));
-  if (hasWins) metaParts.push(`${alumnus.wins} ${alumnus.wins === 1 ? 'win' : 'wins'}`);
+  // Build two lines: OWGR on top, earnings/wins below
+  const rankLine = hasWorldRank ? `#${alumnus.world_ranking} OWGR` : null;
+  const detailParts: string[] = [];
+  if (hasEarnings) detailParts.push(formatCurrency(alumnus.earnings || 0));
+  if (hasWins) detailParts.push(`${alumnus.wins} ${alumnus.wins === 1 ? 'win' : 'wins'}`);
 
   return (
     <motion.div
@@ -97,10 +97,17 @@ function AlumniRow({ alumnus, index, tierAccent }: AlumniRowProps) {
             {fullName}
           </h3>
 
-          {/* Meta line */}
-          {metaParts.length > 0 && (
-            <p className="text-muted-foreground line-clamp-2" style={{ fontSize: '13px', fontWeight: 500, marginTop: '4px', fontVariantNumeric: 'tabular-nums' }}>
-              {metaParts.join(' · ')}
+          {/* OWGR line */}
+          {rankLine && (
+            <p className="text-muted-foreground" style={{ fontSize: '13px', fontWeight: 500, marginTop: '4px', fontVariantNumeric: 'tabular-nums' }}>
+              {rankLine}
+            </p>
+          )}
+
+          {/* Earnings / wins line */}
+          {detailParts.length > 0 && (
+            <p className="text-muted-foreground/60" style={{ fontSize: '13px', fontWeight: 500, marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
+              {detailParts.join(' · ')}
             </p>
           )}
         </div>
