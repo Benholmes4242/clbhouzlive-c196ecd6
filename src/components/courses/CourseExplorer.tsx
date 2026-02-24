@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -524,6 +524,11 @@ const CourseExplorer = () => {
           {/* Inline retry on pagination error */}
           {isError && !isFetchingNextPage && allCourses.length > 0 && (
             <InlineRetryCard />
+          )}
+
+          {/* Loading indicator during retry */}
+          {isError && isFetchingNextPage && allCourses.length > 0 && (
+            <InlineLoadingSkeleton />
           )}
         </>
       )}
