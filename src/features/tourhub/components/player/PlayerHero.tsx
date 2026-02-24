@@ -38,7 +38,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
     <div
       ref={heroRef}
       className="relative w-full overflow-hidden"
-      style={{ height: '50dvh' }}
+      style={{ height: '45dvh' }}
     >
       {/* Hero Image or Fallback Gradient */}
       {heroPhotoUrl ? (

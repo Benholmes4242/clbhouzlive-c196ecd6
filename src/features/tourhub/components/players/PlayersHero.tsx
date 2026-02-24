@@ -107,7 +107,7 @@ function AllToursShowcase({ players }: { players: ElitePlayer[] }) {
           to={`/tourhub/player/${player.playerId}`}
           className="block active:scale-[0.995] transition-transform"
         >
-          <div className="relative w-full overflow-hidden" style={{ height: '40dvh' }}>
+          <div className="relative w-full overflow-hidden" style={{ height: '45dvh' }}>
             <AnimatePresence mode="wait">
               <motion.img
                 key={player.playerId}
@@ -374,7 +374,7 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
             to={`/tourhub/player/${champion.playerId}`}
             className="block active:scale-[0.995] transition-transform"
           >
-            <div className="relative w-full overflow-hidden" style={{ height: '40dvh' }}>
+            <div className="relative w-full overflow-hidden" style={{ height: '45dvh' }}>
               {showPhoto ? (
                 <motion.img
                   src={photoUrl}
