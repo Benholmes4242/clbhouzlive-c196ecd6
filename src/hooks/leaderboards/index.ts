@@ -3,8 +3,8 @@ export { useExplorationLeaderboard } from './useExplorationLeaderboard';
 export { useUserExplorationStatus } from './useUserExplorationStatus';
 export { useClubSearch } from './useClubSearch';
 
-// Legacy alias for backward compatibility
-export { useExplorationLeaderboard as useCountriesLeaderboard } from './useExplorationLeaderboard';
+// Legacy countries leaderboard (separate useQuery-based hook)
+export { useCountriesLeaderboard } from './useCountriesLeaderboard';
 
 // Handicap Leaderboards
 export { useHandicapImprovementLeaderboard } from './useHandicapImprovementLeaderboard';

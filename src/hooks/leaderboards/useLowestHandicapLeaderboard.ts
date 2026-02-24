@@ -1,14 +1,14 @@
-import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import type { LowestHandicapEntry, LeaderboardScope } from '@/types/leaderboards';
+
+const PAGE_SIZE = 50;
 
 interface UseLowestHandicapLeaderboardOptions {
   scope?: LeaderboardScope;
   clubId?: string | null;
   country?: string | null;
-  limit?: number;
-  offset?: number;
   enabled?: boolean;
 }
 
@@ -18,19 +18,17 @@ export function useLowestHandicapLeaderboard(options: UseLowestHandicapLeaderboa
     scope = 'global', 
     clubId = null,
     country = null,
-    limit = 100, 
-    offset = 0, 
     enabled = true 
   } = options;
 
-  return useQuery({
-    queryKey: ['lowest-handicap-leaderboard', scope, clubId, country, limit, offset, user?.id],
-    queryFn: async (): Promise<LowestHandicapEntry[]> => {
+  return useInfiniteQuery({
+    queryKey: ['lowest-handicap-leaderboard', scope, clubId, country, user?.id],
+    queryFn: async ({ pageParam = 0 }): Promise<{ entries: LowestHandicapEntry[] }> => {
       const { data, error } = await supabase.rpc('get_lowest_handicap_leaderboard', {
         p_scope: scope,
         p_club_id: clubId ?? null,
-        p_limit: limit,
-        p_offset: offset,
+        p_limit: PAGE_SIZE,
+        p_offset: pageParam,
         p_current_user_id: user?.id ?? null,
         p_country: scope === 'country' ? country : null,
       });
@@ -40,10 +38,17 @@ export function useLowestHandicapLeaderboard(options: UseLowestHandicapLeaderboa
         throw error;
       }
 
-      return (data ?? []) as unknown as LowestHandicapEntry[];
+      return { entries: (data ?? []) as unknown as LowestHandicapEntry[] };
+    },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.entries.length < PAGE_SIZE) return undefined;
+      const totalLoaded = allPages.reduce((sum, p) => sum + p.entries.length, 0);
+      return totalLoaded;
     },
     enabled,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
     placeholderData: keepPreviousData,
-    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
