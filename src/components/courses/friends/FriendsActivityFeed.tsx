@@ -11,7 +11,6 @@ interface FriendsActivityFeedProps {
   courses: CourseWithFriends[];
   trendingCourseIds: Set<string>;
   userPlayedCourseIds?: Set<string>;
-  onSave?: (courseId: string) => void;
 }
 
 type FeedItem =
@@ -33,7 +32,6 @@ const FriendsActivityFeed: React.FC<FriendsActivityFeedProps> = ({
   courses,
   trendingCourseIds,
   userPlayedCourseIds,
-  onSave,
 }) => {
   const [activeFilter, setActiveFilter] = useState<FeedFilter>('all');
   const [page, setPage] = useState(0);
@@ -135,7 +133,7 @@ const FriendsActivityFeed: React.FC<FriendsActivityFeedProps> = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.15 }}
-        className="space-y-3"
+        className="space-y-2.5"
       >
         {paginatedItems.map((item, idx) => {
           if (item.type === 'cluster') {
