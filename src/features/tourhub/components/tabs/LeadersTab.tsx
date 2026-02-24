@@ -258,7 +258,7 @@ export function LeadersTab() {
               transition={{ duration: 0.25 }}
             >
               {listPlayers.length > 0 && (
-                <div className="flex flex-col">
+                <div>
                   {listPlayers.map((item, idx) => (
                     <LeaderRow
                       key={item.playerId}
@@ -282,7 +282,6 @@ export function LeadersTab() {
                   ))}
                 </div>
               )}
-
 
               {/* Empty state */}
               {rankedPlayers.length === 0 && <LeadersEmptyState />}

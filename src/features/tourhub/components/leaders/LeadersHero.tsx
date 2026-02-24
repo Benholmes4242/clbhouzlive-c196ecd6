@@ -72,7 +72,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
             <motion.img
               src={photoUrl}
               alt={player.full_name}
-              className="absolute inset-0 w-full h-full object-cover object-[center_10%]"
+              className="absolute inset-0 w-full h-full object-cover object-[center_20%]"
               loading="eager"
               initial={{ scale: 1.06 }}
               animate={{ scale: 1 }}
