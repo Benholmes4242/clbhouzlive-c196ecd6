@@ -174,7 +174,7 @@ export function LeadersTab() {
   // ─── Hero leader (#1) ───
   const leader = rankedPlayers[0] ?? null;
   const runners = rankedPlayers.slice(1, 3);
-  const listPlayers = rankedPlayers.slice(3);
+  const listPlayers = rankedPlayers;
 
   return (
     <div
@@ -262,7 +262,7 @@ export function LeadersTab() {
                   {listPlayers.map((item, idx) => (
                     <LeaderRow
                       key={item.playerId}
-                      rank={idx + 4}
+                      rank={idx + 1}
                       overrideRank={isWorldCategory ? item.rank : undefined}
                       player={{
                         id: item.playerId,
