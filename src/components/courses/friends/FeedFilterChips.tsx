@@ -34,10 +34,10 @@ const FeedFilterChips: React.FC<FeedFilterChipsProps> = ({ activeFilter, onFilte
             className={cn(
               'flex-1 px-3 py-1.5 text-sm font-medium rounded-xl transition-all duration-200 active:scale-[0.97]',
               isActive
-                ? 'bg-white font-semibold text-foreground'
+                ? 'bg-card font-semibold text-foreground'
                 : 'text-muted-foreground'
             )}
-            style={isActive ? { boxShadow: '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)' } : undefined}
+            
           >
             {filter.label}
           </button>

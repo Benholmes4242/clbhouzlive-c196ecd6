@@ -15,11 +15,11 @@ interface PillToggleProps {
 }
 
 /**
- * PillToggle - Apple-style pill toggle for tab/filter selection
+ * PillToggle - Tier 2 sub-filter pill toggle
  * 
  * Features:
- * - Rounded-full pill container
- * - Active button with shadow
+ * - Subtle track background
+ * - Active button with bg-card, no shadow
  * - Smooth transitions + tap feedback
  */
 export const PillToggle: React.FC<PillToggleProps> = ({ 
@@ -49,9 +49,6 @@ export const PillToggle: React.FC<PillToggleProps> = ({
               ? 'bg-card text-foreground font-semibold' 
               : 'text-muted-foreground hover:text-foreground/70'
           )}
-          style={selected === option.id ? {
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)',
-          } : undefined}
         >
           {option.label}
         </button>

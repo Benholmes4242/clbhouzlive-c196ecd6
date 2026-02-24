@@ -1,5 +1,5 @@
 /**
- * RegionChips - Segmented control region filters matching Schedule page tabs
+ * RegionChips - Tier 2 sub-filter region chips for Players page
  */
 
 import { cn } from '@/lib/utils';
@@ -26,10 +26,9 @@ export function RegionChips({ activeRegion, onRegionChange }: RegionChipsProps) 
       role="tablist"
       aria-label="Filter by region"
     >
-      {/* Full-width segmented control - matching Schedule page */}
       <div 
-        className="flex items-stretch rounded-xl overflow-hidden"
-        style={{ background: '#e2e8f0' }}
+        className="flex items-stretch rounded-[14px] overflow-hidden p-[3px]"
+        style={{ background: 'rgba(0, 0, 0, 0.03)' }}
       >
         {regions.map((region) => {
           const isActive = activeRegion === region.value;
@@ -41,11 +40,11 @@ export function RegionChips({ activeRegion, onRegionChange }: RegionChipsProps) 
               aria-selected={isActive}
               onClick={() => onRegionChange(region.value)}
               className={cn(
-                "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap",
-                "min-h-[44px]", // Accessibility touch target
+                "relative flex-1 py-2.5 text-[13px] font-medium transition-all duration-200 whitespace-nowrap",
+                "min-h-[44px]",
                 isActive 
-                  ? "bg-white text-[#1e293b] shadow-sm m-1 rounded-lg border border-[#e2e8f0]" 
-                  : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
+                  ? "bg-card text-foreground font-semibold rounded-xl" 
+                  : "text-muted-foreground rounded-xl"
               )}
             >
               {region.shortLabel}

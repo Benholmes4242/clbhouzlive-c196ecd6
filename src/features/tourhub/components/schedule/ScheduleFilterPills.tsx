@@ -55,7 +55,7 @@ export function ScheduleFilterPills({
               className={cn(
                 "relative flex-1 py-2.5 text-[14px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98] flex items-center justify-center gap-1.5",
                 isActive
-                  ? "bg-foreground text-background shadow-sm m-1 rounded-lg"
+                  ? "bg-foreground text-background m-1 rounded-lg"
                   : "text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted/50 active:bg-muted/70"
               )}
             >

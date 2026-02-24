@@ -290,7 +290,8 @@ const ActivityPage: React.FC = () => {
         {/* Filter tabs - Match Profile page style */}
         <div className="mb-4">
           <div
-            className="flex gap-2 overflow-x-auto scrollbar-hide px-0 -mx-0"
+            className="flex gap-0.5 overflow-x-auto scrollbar-hide rounded-[14px] p-[3px]"
+            style={{ background: 'rgba(0, 0, 0, 0.03)' }}
             role="tablist"
             aria-label="Activity filters"
           >
@@ -303,10 +304,10 @@ const ActivityPage: React.FC = () => {
                 id={`activity-tab-${tab.id}`}
                 onClick={() => handleTabChange(tab.id)}
                 className={cn(
-                  "flex-shrink-0 px-4 py-2.5 min-h-[44px] flex items-center text-sm font-medium rounded-full transition-all duration-150 whitespace-nowrap active:scale-[0.95]",
+                  "flex-shrink-0 px-4 py-2.5 min-h-[44px] flex items-center text-sm font-medium rounded-xl transition-all duration-150 whitespace-nowrap active:scale-[0.95]",
                   activeTab === tab.id
-                    ? "bg-foreground text-background shadow-sm"
-                    : "bg-card text-foreground border border-border hover:bg-muted/50"
+                    ? "bg-card text-foreground font-semibold"
+                    : "bg-transparent text-muted-foreground"
                 )}
               >
                 {tab.label}

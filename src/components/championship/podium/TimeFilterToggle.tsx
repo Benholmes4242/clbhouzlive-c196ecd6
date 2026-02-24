@@ -14,14 +14,14 @@ export const TimeFilterToggle: React.FC<TimeFilterToggleProps> = ({
   className,
 }) => {
   return (
-    <div className={cn('inline-flex p-0.5 bg-[#e2e8f0]/50 rounded-full border border-[#e2e8f0]/80', className)}>
+    <div className={cn('inline-flex rounded-[14px] p-[3px]', className)} style={{ background: 'rgba(0, 0, 0, 0.03)' }}>
       <button
         onClick={() => onChange('season')}
         className={cn(
-          'px-3 py-1 text-xs font-medium rounded-full transition-all duration-150',
+          'px-3 py-1 text-xs font-medium rounded-xl transition-all duration-150',
           value === 'season'
-            ? 'bg-white shadow-sm text-[#1e293b]'
-            : 'text-[#64748b] hover:text-[#475569]'
+            ? 'bg-card text-foreground font-semibold'
+            : 'text-muted-foreground'
         )}
       >
         This Season
@@ -29,10 +29,10 @@ export const TimeFilterToggle: React.FC<TimeFilterToggleProps> = ({
       <button
         onClick={() => onChange('all_time')}
         className={cn(
-          'px-3 py-1 text-xs font-medium rounded-full transition-all duration-150',
+          'px-3 py-1 text-xs font-medium rounded-xl transition-all duration-150',
           value === 'all_time'
-            ? 'bg-white shadow-sm text-[#1e293b]'
-            : 'text-[#64748b] hover:text-[#475569]'
+            ? 'bg-card text-foreground font-semibold'
+            : 'text-muted-foreground'
         )}
       >
         All-Time

@@ -1,5 +1,5 @@
 /**
- * RoundSelector - Pill-style round filter matching canonical pill tab pattern
+ * RoundSelector - Tier 2 sub-filter round selector
  * TD-06: Added role="tablist" and role="tab" with aria-selected
  */
 
@@ -15,7 +15,8 @@ interface RoundSelectorProps {
 export function RoundSelector({ rounds, activeRound, onRoundChange, className }: RoundSelectorProps) {
   return (
     <div
-      className={cn("flex gap-1 mb-4", className)}
+      className={cn("flex gap-0.5 mb-4 rounded-[14px] p-[3px]", className)}
+      style={{ background: 'rgba(0, 0, 0, 0.03)' }}
       role="tablist"
       aria-label="Round Selection"
     >
@@ -28,9 +29,9 @@ export function RoundSelector({ rounds, activeRound, onRoundChange, className }:
             aria-selected={isActive}
             onClick={() => onRoundChange(round)}
             className={cn(
-              "flex-1 px-4 py-1.5 rounded-lg text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.95]",
+              "flex-1 px-4 py-1.5 rounded-xl text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.95]",
               isActive
-                ? "bg-card text-foreground shadow-sm font-semibold"
+                ? "bg-card text-foreground font-semibold"
                 : "bg-transparent text-muted-foreground font-medium"
             )}
           >

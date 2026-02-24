@@ -31,7 +31,7 @@ const IntelligenceTabSwitcher: React.FC<IntelligenceTabSwitcherProps> = ({ activ
             className={cn(
               "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98] flex items-center justify-center",
               isActive
-                ? "bg-foreground text-background shadow-sm m-1 rounded-lg"
+                ? "bg-foreground text-background m-1 rounded-lg"
                 : "text-muted-foreground hover:text-foreground rounded-lg active:bg-card/50"
             )}
           >
