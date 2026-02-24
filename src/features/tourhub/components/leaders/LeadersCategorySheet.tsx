@@ -62,7 +62,7 @@ export function LeadersCategorySheet({
           border: '1px solid hsl(var(--border) / 0.5)',
           borderRadius: 16,
           padding: '12px 16px',
-          boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          
         }}
         aria-haspopup="dialog"
         aria-expanded={open}
