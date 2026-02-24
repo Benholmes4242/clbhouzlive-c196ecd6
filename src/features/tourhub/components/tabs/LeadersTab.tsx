@@ -8,7 +8,7 @@
 import { useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, ChevronLeft } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTourSeason, useTourPlayerStatistics } from '../../hooks/useTourHubData';
 import { useWorldRankingsLeaders } from '../../hooks/useWorldRankingsLeaders';
@@ -156,7 +156,7 @@ export function LeadersTab() {
   if (isLoading) {
     return (
       <div className="space-y-4 animate-pulse py-4">
-        <div className="rounded-2xl bg-muted/40" style={{ height: 'clamp(282px, 53vh, 422px)' }} />
+        <div className="rounded-2xl bg-muted/40" style={{ height: '45dvh' }} />
         <div className="flex gap-2 overflow-hidden px-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="h-9 w-20 rounded-full bg-muted/40 shrink-0" />
@@ -222,9 +222,10 @@ export function LeadersTab() {
       <div className="px-4 pt-3 pb-0">
         <button
           onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
-          className="text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
+          className="inline-flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
         >
-          ← Tour Overview
+          <ChevronLeft size={14} />
+          Tour Overview
         </button>
       </div>
 

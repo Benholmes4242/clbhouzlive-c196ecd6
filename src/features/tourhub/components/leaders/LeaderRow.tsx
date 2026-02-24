@@ -75,7 +75,7 @@ export function LeaderRow({
             fontSize: 14,
             fontWeight: 600,
             fontVariantNumeric: 'tabular-nums',
-            color: 'hsl(var(--muted-foreground) / 0.5)',
+            color: 'hsl(var(--muted-foreground) / 0.6)',
           }}
         >
           {displayRank}
@@ -90,7 +90,7 @@ export function LeaderRow({
               style={{
                 width: 44,
                 height: 44,
-                borderRadius: 12,
+                borderRadius: '34%',
                 objectFit: 'cover',
                 border: '1px solid hsl(var(--border) / 0.5)',
               }}
@@ -101,7 +101,7 @@ export function LeaderRow({
               style={{
                 width: 44,
                 height: 44,
-                borderRadius: 12,
+                borderRadius: '34%',
                 border: '1px solid hsl(var(--border) / 0.5)',
               }}
             >
@@ -114,7 +114,7 @@ export function LeaderRow({
 
         {/* Info */}
         <div className="flex-1 min-w-0 flex flex-col justify-center" style={{ gap: 1 }}>
-          <p style={{ fontSize: 14, fontWeight: 600 }} className="text-foreground truncate leading-tight">
+          <p style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.2px' }} className="text-foreground truncate leading-tight">
             {player.fullName}
           </p>
           <div className="flex items-center gap-1">
@@ -137,7 +137,7 @@ export function LeaderRow({
           {unit && (
             <p
               style={{
-                fontSize: 9,
+                fontSize: 10,
                 fontWeight: 600,
                 letterSpacing: '0.5px',
                 textTransform: 'uppercase' as const,
@@ -151,7 +151,7 @@ export function LeaderRow({
         </div>
 
         {/* Chevron — 3.5, muted/25 */}
-        <ChevronRight className="shrink-0" style={{ width: 14, height: 14, color: 'hsl(var(--muted-foreground) / 0.25)' }} />
+        <ChevronRight className="shrink-0" style={{ width: 14, height: 14, color: 'hsl(var(--muted-foreground) / 0.5)' }} />
       </Link>
     </motion.div>
   );

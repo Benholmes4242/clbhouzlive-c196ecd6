@@ -56,8 +56,8 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
         aria-label="Open tour menu"
       >
         <Menu 
-          className="w-[22px] h-[22px]" 
-          strokeWidth={2}
+          className="w-[24px] h-[24px]" 
+          strokeWidth={1.5}
           style={{ color: 'hsl(var(--foreground))', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.15))' }}
         />
       </button>
@@ -102,7 +102,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
                 fontWeight: 700,
                 letterSpacing: '1.2px',
                 textTransform: 'uppercase' as const,
-                color: '#f59e0b',
+                color: 'rgba(245, 158, 11, 0.9)',
               }}
             >
               {category.label} Leader
@@ -117,8 +117,8 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
             >
               <h2
                 style={{
-                  fontSize: 20,
-                  fontWeight: 700,
+                  fontSize: 22,
+                  fontWeight: 800,
                   color: 'white',
                   letterSpacing: '-0.3px',
                   lineHeight: 1.2,
