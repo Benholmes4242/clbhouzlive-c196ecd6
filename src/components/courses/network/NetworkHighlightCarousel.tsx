@@ -96,12 +96,7 @@ export const NetworkHighlightCarousel: React.FC<NetworkHighlightCarouselProps> =
 
               {/* Social proof badge - TOP LEFT */}
               {badgeLabel && (
-                <div 
-                  className="absolute top-2 left-2 px-2 py-1 text-xs font-medium text-white rounded-full backdrop-blur-sm"
-                  style={{
-                    background: 'rgba(0, 0, 0, 0.5)',
-                  }}
-                >
+                <div className="absolute top-2 left-2 glass-badge-tight px-2 py-1 text-xs font-medium text-white rounded-full">
                   {badgeLabel}
                 </div>
               )}
