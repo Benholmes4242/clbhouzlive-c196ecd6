@@ -1,7 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Star, TrendingUp, TrendingDown, Flame, Award } from 'lucide-react';
-import { CoursePrestigeTags } from './CoursePrestigeTags';
+import { Star, TrendingUp, TrendingDown } from 'lucide-react';
 
 interface Course {
   course_id: string;
@@ -28,49 +27,50 @@ interface Props {
 }
 
 export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, onClick }) => {
-  const isTop3 = rank <= 3;
-  const isTop10 = rank <= 10;
-
-  // Modern Country Club palette for ranks
-  const getRankStyle = () => {
-    if (rank === 1) return 'bg-[#C1A84C] text-white'; // Chartreus Gold
-    if (rank === 2) return 'bg-[#B8C6C9] text-white'; // Sky Blue Silver
-    if (rank === 3) return 'bg-[#8B7355] text-white'; // Warm Bronze
-    if (isTop10) return 'bg-[#C1A84C]/10 text-[#C1A84C]'; // Gold tint for top 10
-    return 'bg-muted text-muted-foreground';
+  const getRankColor = () => {
+    if (rank === 1) return '#D4A853';
+    if (rank === 2) return '#A8B4C0';
+    if (rank === 3) return '#C4956A';
+    return undefined;
   };
 
   const getUserHistory = () => {
     if (!course.current_user_played) return 'Not played';
-    // If played but count is 0/1, show "Played ✓"; otherwise show count
     if (course.current_user_play_count <= 1) return 'Played ✓';
     return `Played ${course.current_user_play_count}×`;
   };
 
   const location = course.sub_country || course.country || '';
+  const rankColor = getRankColor();
 
   return (
     <button
       onClick={onClick}
       aria-label={`View ${course.course_name}`}
       className={cn(
-        'w-full flex items-center gap-3 py-3 px-4 border-b border-border text-left',
-        'hover:bg-muted/50 transition-colors active:scale-[0.98] transition-transform'
+        'w-full flex items-center gap-3 py-3 px-4 text-left',
+        'transition-colors active:scale-[0.98] transition-transform',
+        'hover:bg-[rgba(0,0,0,0.02)]',
+        course.current_user_played && 'bg-[rgba(82,183,136,0.03)]',
       )}
+      style={{
+        borderBottom: '1px solid rgba(0, 0, 0, 0.04)',
+        borderLeft: course.current_user_played ? '3px solid rgba(82, 183, 136, 0.3)' : undefined,
+      }}
     >
       {/* Rank */}
       <div
-        className={cn(
-          'w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0',
-          'text-xs font-bold',
-          getRankStyle()
-        )}
+        className="w-8 flex-shrink-0 text-center font-bold text-lg"
+        style={{ color: rankColor || 'hsl(var(--muted-foreground))' }}
       >
         {rank}
       </div>
 
-      {/* Course thumbnail */}
-      <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-muted">
+      {/* Course thumbnail — 64x48 */}
+      <div
+        className="flex-shrink-0 rounded-[10px] overflow-hidden bg-muted"
+        style={{ width: 64, height: 48, border: '1px solid rgba(0, 0, 0, 0.06)' }}
+      >
         {course.thumbnail_url ? (
           <img
             src={course.thumbnail_url}
@@ -90,72 +90,46 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, onClick 
         <h4 className="font-semibold text-sm text-foreground truncate">
           {course.course_name}
         </h4>
-        <p className="text-xs text-muted-foreground truncate">
+        <p className="text-xs text-muted-foreground truncate mt-px">
           {location}
         </p>
 
-        {/* Prestige tags */}
-        {course.prestige_tags && course.prestige_tags.length > 0 && (
-          <CoursePrestigeTags tags={course.prestige_tags} />
-        )}
-
-        {/* Meta Row - sort-aware ordering */}
-        <div className="flex items-center gap-2 mt-1 text-xs">
-          {sort === 'most_played' ? (
-            <>
-              {/* Play count FIRST for Most Played */}
-              <span className="flex items-center gap-0.5">
-                <Star className="w-3 h-3 text-[#C1A84C] fill-[#C1A84C]" />
-                <span className="text-muted-foreground">{course.avg_rating?.toFixed(1) || '-'}</span>
-              </span>
-              <span className="text-muted-foreground/30">•</span>
-              <span className="font-medium text-foreground">
-                Played by {course.unique_players || course.times_played}
-              </span>
-            </>
-          ) : (
-            <>
-              {/* Rating FIRST for Highest Rated / Trending */}
-              <span className="flex items-center gap-0.5">
-                <Star className="w-3 h-3 text-[#C1A84C] fill-[#C1A84C]" />
-                <span className="font-medium text-muted-foreground">{course.avg_rating?.toFixed(1) || '-'}</span>
-              </span>
-              <span className="text-muted-foreground/30">•</span>
-              <span className="text-muted-foreground">Played by {course.unique_players || course.times_played}</span>
-            </>
-          )}
-          <span className="text-muted-foreground/30">•</span>
-          <span className={course.current_user_played ? 'text-emerald-600 font-medium' : 'text-muted-foreground'}>
-            {getUserHistory()}
+        {/* Rating row */}
+        <div className="flex items-center gap-1.5 mt-1 text-xs">
+          <span className="flex items-center gap-0.5">
+            <Star className="w-3 h-3 fill-current" style={{ color: '#D4A853' }} />
+            <span className="font-bold" style={{ color: '#D4A853' }}>
+              {course.avg_rating?.toFixed(1) || '-'}
+            </span>
+          </span>
+          <span style={{ color: 'rgba(0,0,0,0.15)' }}>·</span>
+          <span className="text-muted-foreground">
+            Played by {course.unique_players || course.times_played}
           </span>
         </div>
       </div>
 
-      {/* Right indicators */}
+      {/* Right side: played status + rank movement */}
       <div className="flex flex-col items-end gap-1 flex-shrink-0">
-        {/* Rank movement */}
+        <span className={cn(
+          'text-xs font-semibold',
+          course.current_user_played ? 'text-[#40916C]' : 'text-muted-foreground'
+        )}>
+          {getUserHistory()}
+        </span>
+
         {course.rank_change !== 0 && (
           <div className={cn(
             'flex items-center gap-0.5 text-xs font-medium',
             course.rank_change > 0 ? 'text-emerald-600' : 'text-red-500'
           )}>
             {course.rank_change > 0 ? (
-              <TrendingUp className="w-3.5 h-3.5" />
+              <TrendingUp className="w-3 h-3" />
             ) : (
-              <TrendingDown className="w-3.5 h-3.5" />
+              <TrendingDown className="w-3 h-3" />
             )}
             <span>{Math.abs(course.rank_change)}</span>
           </div>
-        )}
-
-        {/* Trending indicator */}
-        {course.is_trending && (
-          <Flame className="w-4 h-4 text-orange-500" />
-        )}
-
-        {/* Hall of Fame indicator */}
-        {course.is_hall_of_fame && (
-          <Award className="w-4 h-4 text-[#C1A84C]" />
         )}
       </div>
     </button>

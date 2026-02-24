@@ -400,7 +400,7 @@ export function CoursesLeaderboardView() {
   }
 
   return (
-    <div className="flex flex-col pb-24 space-y-6">
+    <div className="flex flex-col pb-24">
       {/* 1. Recently Played by Your Circle - TOP */}
       {circleLoading ? (
         <section className="space-y-3 -mx-4">
@@ -409,8 +409,8 @@ export function CoursesLeaderboardView() {
           </div>
           <div className="flex gap-3 overflow-x-auto pl-4 pr-4 scrollbar-hide">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="flex-shrink-0 w-[180px]">
-                <Skeleton className="h-[120px] w-full rounded-xl mb-2" />
+              <div key={i} className="flex-shrink-0 w-[170px]">
+                <Skeleton className="h-[128px] w-full rounded-2xl mb-2" />
                 <Skeleton className="h-4 w-32 mb-1" />
                 <div className="flex items-center gap-2">
                   <Skeleton className="h-5 w-5 rounded-full" />
@@ -421,116 +421,110 @@ export function CoursesLeaderboardView() {
           </div>
         </section>
       ) : circleRecentRounds && circleRecentRounds.length > 0 ? (
-        <section className="space-y-3 -mx-4 mt-4">
-          <h3 className="text-sm font-semibold text-foreground px-4">
-            Recently Played by Your Circle
+        <section className="-mx-4 mt-4">
+          <h3 className="text-lg font-bold text-foreground px-4 mb-3">
+            Your Circle's Recent Rounds
           </h3>
-          <div className="overflow-x-auto pb-2 px-4 scrollbar-hide">
-            <div className="flex gap-3">
-              {circleRecentRounds.slice(0, 8).map((round: any) => (
-                <button
-                  key={round.id}
-                  onClick={() => handleCourseClick(round.course_id)}
-                  className="w-40 flex-shrink-0 text-left group active:scale-[0.97] transition-transform"
-                >
-                  {/* Course Image */}
-                  <div className="relative aspect-[4/3] rounded-xl overflow-hidden mb-2 shadow-sm group-hover:shadow-md transition-shadow">
-                    {round.golf_courses?.thumbnail_image ? (
-                      <img
-                        src={round.golf_courses.thumbnail_image}
-                        alt={round.golf_courses.name}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-muted flex items-center justify-center">
-                        <span className="text-muted-foreground text-xs">No image</span>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Course Name */}
-                  <h4 className="text-sm font-semibold text-foreground truncate leading-tight">
-                    {round.golf_courses?.name}
-                  </h4>
-                  
-                  {/* Player Info */}
-                  <div className="flex items-center gap-1.5 mt-1">
-                    <SquircleAvatar
-                      size={18}
-                      src={round.user_profiles?.profile_photo_url}
-                      alt={round.user_profiles?.display_name}
-                      fallback={(round.user_profiles?.display_name?.[0] || '?').toUpperCase()}
-                    />
-                    <span className="text-xs text-muted-foreground truncate flex-1">
-                      {round.user_profiles?.display_name}
-                    </span>
-                  </div>
-                  
-                  {/* Time and Rating */}
-                  <div className="flex items-center justify-between mt-1">
-                    <span className="text-xs text-muted-foreground">
-                      {formatDistanceToNow(new Date(round.created_at), { addSuffix: false })} ago
-                    </span>
-                    {round.rating && (
-                      <div className="flex items-center gap-0.5">
-                        <Star className="w-3 h-3 text-[#C1A84C] fill-[#C1A84C]" />
-                        <span className={cn('text-xs font-medium', round.rating >= 9.0 ? 'text-amber-500' : 'text-foreground')}>
-                          {round.rating.toFixed(1)}
+          <div className="relative">
+            <div className="overflow-x-auto pb-2 px-4 scrollbar-hide">
+              <div className="flex gap-3">
+                {circleRecentRounds.slice(0, 8).map((round: any) => (
+                  <button
+                    key={round.id}
+                    onClick={() => handleCourseClick(round.course_id)}
+                    className="w-[170px] flex-shrink-0 text-left group active:scale-[0.97] transition-transform"
+                  >
+                    {/* Course Image */}
+                    <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-2" style={{ boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)' }}>
+                      {round.golf_courses?.thumbnail_image ? (
+                        <>
+                          <img
+                            src={round.golf_courses.thumbnail_image}
+                            alt={round.golf_courses.name}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                          {/* Bottom gradient overlay */}
+                          <div className="absolute inset-x-0 bottom-0 h-8" style={{ background: 'linear-gradient(transparent, rgba(0,0,0,0.03))' }} />
+                        </>
+                      ) : (
+                        <div className="w-full h-full bg-muted flex items-center justify-center">
+                          <span className="text-muted-foreground text-xs">No image</span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Course Name */}
+                    <h4 className="text-sm font-semibold text-foreground line-clamp-2 leading-tight">
+                      {round.golf_courses?.name}
+                    </h4>
+                    
+                    {/* Player Info + Rating row */}
+                    <div className="flex items-center justify-between mt-1">
+                      <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                        <SquircleAvatar
+                          size={20}
+                          src={round.user_profiles?.profile_photo_url}
+                          alt={round.user_profiles?.display_name}
+                          fallback={(round.user_profiles?.display_name?.[0] || '?').toUpperCase()}
+                        />
+                        <span className="text-xs text-muted-foreground truncate">
+                          {round.user_profiles?.display_name}
+                        </span>
+                        <span className="text-xs text-muted-foreground/40">·</span>
+                        <span className="text-xs text-muted-foreground whitespace-nowrap">
+                          {formatDistanceToNow(new Date(round.created_at), { addSuffix: false })}
                         </span>
                       </div>
-                    )}
-                  </div>
-                </button>
-              ))}
+                      {round.rating && (
+                        <div className="flex items-center gap-0.5 flex-shrink-0 ml-1">
+                          <Star className="w-3.5 h-3.5 fill-current" style={{ color: '#D4A853' }} />
+                          <span className="text-sm font-bold" style={{ color: '#D4A853' }}>
+                            {round.rating.toFixed(1)}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
+            {/* Right fade-out hint */}
+            <div className="absolute top-0 right-0 bottom-2 w-8 pointer-events-none" style={{ background: 'linear-gradient(to right, transparent, hsl(var(--background)))' }} />
           </div>
           
-          {/* Scroll Indicator Dots */}
-          <div className="flex justify-center gap-1 px-4">
+          {/* Pill-style pagination dots */}
+          <div className="flex justify-center gap-2 mt-3">
             {circleRecentRounds.slice(0, Math.min(4, circleRecentRounds.length)).map((_: any, index: number) => (
               <div 
                 key={index}
-                className={cn(
-                  'w-1.5 h-1.5 rounded-full transition-colors',
-                  index === 0 ? 'bg-foreground' : 'bg-muted-foreground/30'
-                )}
+                className="rounded-full transition-colors"
+                style={index === 0 
+                  ? { width: 20, height: 6, background: '#40916C' }
+                  : { width: 6, height: 6, background: 'rgba(0, 0, 0, 0.12)' }
+                }
               />
             ))}
           </div>
         </section>
       ) : null}
 
-      {/* 2. Sort tabs + 3. Time Range tabs + 4. Scope selector */}
-      <CourseFilters
-        sort={sort}
-        onSortChange={handleSortChange}
-        timeRange={timeRange}
-        onTimeRangeChange={handleTimeRangeChange}
-        scope={scope}
-        onScopeChange={handleScopeChange}
-      />
-
-      {/* Region/Sub-Region Selector - shown when scope is 'country' */}
-      {scope === 'country' && (
-        <div className="px-4">
-          <CourseLocationSelector 
-            selectedRegion={selectedRegion}
-            selectedSubRegion={selectedSubRegion}
-            onRegionChange={setSelectedRegion}
-            onSubRegionChange={setSelectedSubRegion}
-          />
-        </div>
-      )}
+      {/* 2. Sort tabs — single row */}
+      <div className="mt-5">
+        <CourseFilters
+          sort={sort}
+          onSortChange={handleSortChange}
+        />
+      </div>
 
       {/* Course Rankings Section */}
-      <section className="space-y-4 -mx-4">
-        <div className="space-y-1 px-4 pt-2">
-          <h2 className="text-lg font-semibold text-foreground">Course Rankings</h2>
-          <p className="text-sm text-muted-foreground">
-            {sort === 'most_played' && "The world's greatest golf courses by total rounds logged"}
-            {sort === 'highest_rated' && "The world's greatest golf courses by community rating"}
-            {sort === 'rising' && "The world's greatest golf courses trending lately"}
+      <section className="-mx-4 mt-4">
+        <div className="px-4 mb-5">
+          <h2 className="text-xl font-bold text-foreground">Course Rankings</h2>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            {sort === 'most_played' && "The world's greatest courses by rounds played"}
+            {sort === 'highest_rated' && "The world's greatest courses by community rating"}
+            {sort === 'rising' && "The world's greatest courses trending right now"}
           </p>
         </div>
 

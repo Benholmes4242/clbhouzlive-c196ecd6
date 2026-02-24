@@ -22,10 +22,9 @@ export const CoursePodium: React.FC<Props> = ({ courses, sort, onCourseClick }) 
   if (courses.length < 3) return null;
 
   return (
-    <div className="relative px-4 pt-6 pb-4">
-
-      {/* Podium slots: #2, #1, #3 */}
-      <div className="flex items-end justify-center gap-3">
+    <div className="relative px-4 pt-4 pb-6">
+      {/* Podium slots: #2, #1, #3 — flex items-end for stepped layout */}
+      <div className="flex items-start justify-center gap-3">
         {/* #2 - Left */}
         <CoursePodiumSlot
           course={courses[1]}
@@ -35,7 +34,7 @@ export const CoursePodium: React.FC<Props> = ({ courses, sort, onCourseClick }) 
           onClick={() => onCourseClick(courses[1].course_id)}
         />
 
-        {/* #1 - Center (largest) */}
+        {/* #1 - Center (largest, highest) */}
         <CoursePodiumSlot
           course={courses[0]}
           rank={1}
