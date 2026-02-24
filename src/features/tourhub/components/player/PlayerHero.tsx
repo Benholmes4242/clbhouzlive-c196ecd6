@@ -74,8 +74,9 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
         style={{ width: 44, height: 44, top: 56, left: 16 }}
       >
         <Menu
-          className="w-[22px] h-[22px] text-white"
-          style={{ strokeWidth: 2, filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.7)) drop-shadow(0 0px 8px rgba(0,0,0,0.3))' }}
+          className="w-[22px] h-[22px]"
+          strokeWidth={2}
+          style={{ color: 'hsl(var(--foreground))', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.15))' }}
         />
       </button>
 
