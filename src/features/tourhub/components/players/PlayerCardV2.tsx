@@ -146,7 +146,7 @@ export function PlayerCardV2({
         className={cn(
           "flex overflow-hidden",
           "bg-card rounded-2xl border border-border/50",
-          "shadow-[0_1px_3px_rgba(0,0,0,0.04)]",
+          "",
           "active:scale-[0.98] transition-all"
         )}
         style={{ height: '120px', minHeight: '120px' }}
@@ -166,7 +166,7 @@ export function PlayerCardV2({
         <div className="flex-1 min-w-0 p-4 flex flex-col justify-center">
           <h3 
             className="text-foreground truncate"
-            style={{ fontSize: '16px', fontWeight: 600, letterSpacing: '-0.1px' }}
+            style={{ fontSize: '15px', fontWeight: 600, letterSpacing: '-0.2px' }}
           >
             {player.fullName}
           </h3>
@@ -174,7 +174,7 @@ export function PlayerCardV2({
           {countryName && (
             <div className="flex items-center gap-1.5" style={{ marginTop: '2px' }}>
               <CountryFlag country={player.country} size="sm" />
-              <span style={{ fontSize: '13px', fontWeight: 400 }} className="text-muted-foreground truncate">{countryName}</span>
+              <span style={{ fontSize: '12px', fontWeight: 400 }} className="text-muted-foreground/60 truncate">{countryName}</span>
             </div>
           )}
 
@@ -188,7 +188,7 @@ export function PlayerCardV2({
                     <span key={i}>
                       {i > 0 && ' · '}
                       {(part === rankPart || part === pointsPart) ? (
-                        <span className="font-semibold text-foreground">{part}</span>
+                    <span className="font-bold text-foreground">{part}</span>
                       ) : part}
                     </span>
                   ))}
@@ -206,7 +206,7 @@ export function PlayerCardV2({
               {!isTourRanking && rankPart && (
                 <p className="text-muted-foreground truncate" style={{ fontSize: '13px', fontWeight: 500, marginTop: '4px', fontVariantNumeric: 'tabular-nums' }}>
                   {activeSort === 'world-rank-desc' || activeSort === 'world-rank-asc' ? (
-                    <span className="font-semibold text-foreground">{rankPart}</span>
+                    <span className="font-bold text-foreground">{rankPart}</span>
                   ) : rankPart}
                 </p>
               )}
@@ -231,7 +231,7 @@ export function PlayerCardV2({
 
         {/* Chevron */}
         <div className="flex items-center pr-3 shrink-0">
-          <ChevronRight className="w-4 h-4 text-muted-foreground/30" />
+          <ChevronRight className="w-4 h-4 text-muted-foreground/50" />
         </div>
       </Link>
     </motion.div>

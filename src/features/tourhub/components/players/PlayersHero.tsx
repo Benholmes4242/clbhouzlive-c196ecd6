@@ -95,9 +95,9 @@ function AllToursShowcase({ players }: { players: ElitePlayer[] }) {
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
         aria-label="Open tour menu"
       >
-        <Menu
-          className="w-[22px] h-[22px]"
-          strokeWidth={2}
+        <Menu 
+          className="w-6 h-6" 
+          strokeWidth={1.5}
           style={{ color: 'hsl(var(--foreground))', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.15))' }}
         />
       </button>
@@ -141,7 +141,7 @@ className="absolute inset-0 w-full h-full object-cover object-[center_10%]"
                 >
                   <h2
                     className="text-white"
-                    style={{ fontSize: '20px', fontWeight: 700, letterSpacing: '-0.3px', lineHeight: 1.2 }}
+                    style={{ fontSize: '22px', fontWeight: 800, letterSpacing: '-0.3px', lineHeight: 1.2 }}
                   >
                     {player.playerName}
                   </h2>
@@ -158,20 +158,32 @@ className="absolute inset-0 w-full h-full object-cover object-[center_10%]"
 
               {/* Carousel dots */}
               {count > 1 && (
-                <div className="flex items-center justify-center gap-2 pt-1">
-                  {players.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); goTo(i); }}
-                      className="rounded-full transition-colors duration-200"
-                      style={{
-                        width: '7px',
-                        height: '7px',
-                        background: i === currentIndex ? 'hsl(var(--foreground))' : 'rgba(255,255,255,0.3)',
-                      }}
-                      aria-label={`Go to player ${i + 1}`}
-                    />
-                  ))}
+                <div className="flex items-center justify-center pt-1">
+                  <div
+                    className="flex items-center gap-2"
+                    style={{
+                      background: 'rgba(0,0,0,0.14)',
+                      backdropFilter: 'blur(16px)',
+                      WebkitBackdropFilter: 'blur(16px)',
+                      padding: '6px 12px',
+                      borderRadius: '9999px',
+                    }}
+                  >
+                    {players.map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); goTo(i); }}
+                        className="rounded-full"
+                        style={{
+                          width: i === currentIndex ? '20px' : '6px',
+                          height: '6px',
+                          background: i === currentIndex ? 'white' : 'rgba(255,255,255,0.4)',
+                          transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                        }}
+                        aria-label={`Go to player ${i + 1}`}
+                      />
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
@@ -356,8 +368,8 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
         aria-label="Open tour menu"
       >
         <Menu 
-          className="w-[22px] h-[22px]" 
-          strokeWidth={2}
+          className="w-6 h-6" 
+          strokeWidth={1.5}
           style={{ color: 'hsl(var(--foreground))', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.15))' }}
         />
       </button>
@@ -401,7 +413,7 @@ className={`absolute inset-0 w-full h-full object-cover ${activeTour === 'LIV' ?
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2, duration: 0.4 }}
                   className="text-white"
-                  style={{ fontSize: '20px', fontWeight: 800, letterSpacing: '-0.3px', lineHeight: 1.2 }}
+                  style={{ fontSize: '22px', fontWeight: 800, letterSpacing: '-0.3px', lineHeight: 1.2 }}
                 >
                   {champion.playerName}
                 </motion.h2>
