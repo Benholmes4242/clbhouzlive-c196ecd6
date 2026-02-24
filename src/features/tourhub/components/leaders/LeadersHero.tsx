@@ -67,7 +67,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
         className="block active:scale-[0.995] transition-transform"
       >
         {/* Hero — 50dvh */}
-        <div className="relative w-full overflow-hidden" style={{ height: '40dvh' }}>
+        <div className="relative w-full overflow-hidden" style={{ height: '45dvh' }}>
           {photoUrl ? (
             <motion.img
               src={photoUrl}

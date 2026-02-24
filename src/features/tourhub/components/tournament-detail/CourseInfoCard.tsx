@@ -32,7 +32,7 @@ export function CourseInfoCard({ tournament, courseImage, courseId }: CourseInfo
     >
       {/* Course image — full bleed with overlay */}
       {courseImage && (
-        <div className="relative w-[calc(100%+32px)] -ml-4 overflow-hidden mb-4 group" style={{ height: `${Math.round(306 * 0.8)}px` }}>
+        <div className="relative w-[calc(100%+32px)] -ml-4 overflow-hidden mb-4 group" style={{ height: '45dvh' }}>
           <img 
             src={courseImage} 
             alt={tournament.venue_course_name || 'Course'} 

@@ -87,7 +87,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
     <Link
       to={`/tourhub/tournament/${tournament.id}`}
       className="block relative overflow-hidden active:scale-[0.98] transition-transform"
-      style={{ height: '50dvh' }}
+      style={{ height: '45dvh' }}
     >
       {/* Background with Ken Burns */}
       <motion.div
