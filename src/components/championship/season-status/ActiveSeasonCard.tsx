@@ -152,7 +152,7 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
 
       {/* Season Selector Tabs — Pill container */}
       <div 
-        className="rounded-[14px] p-[3px] overflow-x-auto scrollbar-hide"
+        className="rounded-[14px] p-[3px]"
         style={{ backgroundColor: 'rgba(0, 0, 0, 0.03)' }}
       >
         <div className="flex gap-1">
@@ -169,7 +169,7 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
                 onClick={() => !isLocked && onSeasonSelect?.(id)}
                 disabled={isLocked}
                 className={cn(
-                  'flex-1 flex flex-col items-center gap-1 px-5 py-3 rounded-xl',
+                  'flex-1 flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl min-w-0',
                   'transition-all duration-200 active:scale-[0.97]',
                   isActive && 'bg-card shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)]',
                   isLocked && 'cursor-not-allowed',
@@ -179,12 +179,12 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
                 {/* Icon with optional lock overlay */}
                 <div className="relative">
                   <SeasonIcon
-                    className={cn('w-5 h-5', isLocked && 'opacity-50')}
+                    className={cn('w-4.5 h-4.5', isLocked && 'opacity-50')}
                     style={{ color: isActive ? '#40916C' : isLocked ? 'hsl(var(--muted-foreground))' : 'hsl(var(--muted-foreground))' }}
                   />
                   {isLocked && (
                     <Lock 
-                      className="absolute -bottom-0.5 -right-1 w-3 h-3 text-muted-foreground/60" 
+                      className="absolute -bottom-0.5 -right-1 w-2.5 h-2.5 text-muted-foreground/60" 
                     />
                   )}
                 </div>
@@ -192,7 +192,7 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
                 {/* Label */}
                 <span
                   className={cn(
-                    'text-[11px] font-medium leading-tight text-center whitespace-nowrap',
+                    'text-xs font-medium leading-tight text-center whitespace-nowrap',
                     isActive ? 'text-foreground font-semibold' : 'text-muted-foreground',
                     isLocked && 'opacity-50'
                   )}
