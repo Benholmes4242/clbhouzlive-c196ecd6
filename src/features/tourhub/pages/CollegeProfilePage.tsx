@@ -307,13 +307,8 @@ export function CollegeProfilePage() {
       {stats && (
         <div className="relative z-10 mx-4" style={{ marginTop: '-24px' }}>
           <motion.div
-            className="flex items-stretch"
+            className="flex items-stretch rounded-2xl border border-border/50 bg-card shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
             style={{
-              background: 'rgba(0,0,0,0.25)',
-              backdropFilter: 'blur(16px)',
-              WebkitBackdropFilter: 'blur(16px)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: 16,
               padding: '12px 0',
             }}
             initial={{ opacity: 0, y: 12 }}
