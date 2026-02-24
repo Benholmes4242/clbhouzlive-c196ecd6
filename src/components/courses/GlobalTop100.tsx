@@ -345,7 +345,7 @@ const GlobalTop100 = () => {
               }
             }}
           >
-            <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
+            <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base text-[hsl(210,13%,18%)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
               <SelectValue placeholder="Choose Top 100 list" />
             </SelectTrigger>
             <SelectContent>
@@ -370,7 +370,7 @@ const GlobalTop100 = () => {
                 value={selectedSubregion}
                 onValueChange={setSelectedSubregion}
               >
-                <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
+                <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base text-[hsl(210,13%,18%)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
                   <SelectValue placeholder="All sub-regions" />
                 </SelectTrigger>
                 <SelectContent>
