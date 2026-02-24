@@ -105,7 +105,7 @@ const InitialErrorState = ({ onRetry }: { onRetry: () => void }) => (
 );
 
 // ─── Virtualization constants ───────────────────────────────────────
-const ROW_HEIGHT = 64; // Measured from LeaderboardRowV3: p-3 (12px*2) + h-10 avatar (40px) = 64px
+const ROW_HEIGHT = 72; // 64px row (p-3 + h-10 avatar) + 8px gap (space-y-2)
 const VIRTUALIZATION_THRESHOLD = 50;
 const OVERSCAN = 8; // Buffer rows above/below viewport
 
@@ -776,6 +776,11 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         {/* Inline retry on pagination error */}
         {isError && !isFetchingNextPage && allEntries.length > 0 && (
           <InlineRetryCard onRetry={() => fetchNextPage()} />
+        )}
+
+        {/* Loading indicator during retry */}
+        {isError && isFetchingNextPage && allEntries.length > 0 && (
+          <LeaderboardLoadingSkeleton />
         )}
       </div>
 
