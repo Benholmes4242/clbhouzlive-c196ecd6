@@ -159,7 +159,7 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
 
       {/* Tab bar — sticky pill style */}
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md pb-3 pt-1">
-        <div className="rounded-xl p-1 flex gap-1" role="tablist" aria-label="Season Performance Stats">
+        <div className="flex gap-1" role="tablist" aria-label="Season Performance Stats">
           {TABS.map((tab) => {
             const isActive = activeTab === tab;
             return (
