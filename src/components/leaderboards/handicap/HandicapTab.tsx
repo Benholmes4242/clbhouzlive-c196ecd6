@@ -77,7 +77,7 @@ export function HandicapTab() {
   };
 
   return (
-    <div className="space-y-5 pb-24">
+    <div className="space-y-6">
       <LowestHandicapLeaderboard 
         scope={scope} 
         clubId={scope === 'club' ? selectedClubId : null}

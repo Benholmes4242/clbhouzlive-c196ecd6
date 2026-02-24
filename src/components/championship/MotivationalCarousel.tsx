@@ -165,7 +165,7 @@ export const MotivationalCarousel: React.FC<Props> = ({
         'relative overflow-hidden rounded-2xl',
         'backdrop-blur-xl',
         'border border-border/30',
-        'shadow-[0_4px_24px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(255,255,255,0.8)]',
+        
         'p-4'
       )}
       style={{

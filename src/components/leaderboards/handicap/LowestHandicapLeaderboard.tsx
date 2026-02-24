@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronUp } from 'lucide-react';
+
 import { useLowestHandicapLeaderboard } from '@/hooks/leaderboards';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { formatHcp, getHandicapStatusLabel, getHandicapStatusColor, getHandicapBadgeStyle } from '@/lib/formatHcp';
@@ -101,10 +101,10 @@ function HandicapRow({
         isCurrentUser ? 'px-3' : 'px-4',
       )}
       style={{
-        borderBottom: '1px solid rgba(0, 0, 0, 0.04)',
+        borderBottom: isCurrentUser ? undefined : '1px solid hsl(var(--border) / 0.15)',
         ...(isCurrentUser ? {
-          background: 'rgba(212, 168, 83, 0.06)',
-          borderLeft: '3px solid #D4A853',
+          background: 'rgba(212, 168, 83, 0.08)',
+          border: '1px solid rgba(212, 168, 83, 0.2)',
           borderRadius: 12,
         } : {}),
       }}
@@ -124,18 +124,13 @@ function HandicapRow({
       </div>
 
       {/* Avatar */}
-      <div
-        className="flex-shrink-0 rounded-full overflow-hidden"
-        style={{ width: 44, height: 44, border: '1px solid rgba(0, 0, 0, 0.06)' }}
-      >
-        {entry.avatar_url ? (
-          <img src={entry.avatar_url} alt={entry.display_name} className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground text-sm font-semibold">
-            {initials}
-          </div>
-        )}
-      </div>
+      <SquircleAvatar
+        size={44}
+        src={entry.avatar_url}
+        alt={entry.display_name || 'Golfer'}
+        fallback={initials}
+        ringColor={rank <= 3 ? RANK_BADGE_COLORS[rank]?.bg : undefined}
+      />
 
       {/* Name & category */}
       <div className="flex-1 min-w-0">
@@ -181,7 +176,6 @@ interface LowestHandicapLeaderboardProps {
 
 export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, scopeSelector }: LowestHandicapLeaderboardProps) {
   const { user } = useSupabaseSession();
-  const [showScrollTop, setShowScrollTop] = useState(false);
   const [scrollTop, setScrollTop] = useState(0);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -207,12 +201,11 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
     [data?.pages]
   );
 
-  // Scroll tracking
+  // Scroll tracking for virtualization
   useEffect(() => {
     const handleScroll = () => {
       const rootEl = document.getElementById('root');
       const currentScroll = (rootEl && rootEl.scrollTop > 0) ? rootEl.scrollTop : window.scrollY;
-      setShowScrollTop(currentScroll > 400);
       setScrollTop(currentScroll);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -374,26 +367,6 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
         <HandicapLeaderboardSkeleton />
       )}
 
-      {/* Scroll-to-top FAB */}
-      <button
-        onClick={() => {
-          const rootEl = document.getElementById('root');
-          if (rootEl) rootEl.scrollTop = 0;
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
-        className={cn(
-          "fixed bottom-24 right-4 z-40 w-12 h-12 rounded-full",
-          "bg-foreground/80 text-background shadow-lg backdrop-blur-sm",
-          "flex items-center justify-center",
-          "transition-all duration-300 ease-out active:scale-[0.95]",
-          showScrollTop
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 translate-y-4 pointer-events-none"
-        )}
-        aria-label="Scroll to top"
-      >
-        <ChevronUp className="w-5 h-5" />
-      </button>
     </div>
   );
 }

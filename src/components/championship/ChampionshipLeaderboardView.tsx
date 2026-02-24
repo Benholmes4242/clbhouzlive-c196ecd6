@@ -2,7 +2,7 @@ import React, { useState, useMemo, useRef, useLayoutEffect, useCallback, useEffe
 import { cn } from '@/lib/utils';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, ChevronUp, Users, Building2, RefreshCw, WifiOff } from 'lucide-react';
+import { Loader2, Users, Building2, RefreshCw, WifiOff } from 'lucide-react';
 
 import {
   useChampionshipLeaderboard,
@@ -141,7 +141,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   const [selectedRival, setSelectedRival] = useState<UserRival | null>(null);
   const [showCelebration, setShowCelebration] = useState(false);
   const [previousRank, setPreviousRank] = useState<number | null>(null);
-  const [showScrollTop, setShowScrollTop] = useState(false);
+  
 
   // Club-related state (restored from persistence)
   const [selectedClubId, setSelectedClubId] = useState<string | null>(() => {
@@ -471,15 +471,6 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     }
   }, [arenaMode, divisionFilter, allEntries]);
 
-  // Scroll-to-top FAB visibility
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 400);
-    };
-    
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Build division ladder data
   const divisionLadderData = useMemo(() => {
@@ -543,7 +534,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   }, [useVirtualization, allEntries, scrollTop]);
 
   return (
-    <div className={cn('flex flex-col px-4 py-5 space-y-6 pb-24', className)}>
+    <div className={cn('flex flex-col px-4 py-5 space-y-6', className)}>
       {/* 1. Season Status Panel — floats on page background, no card wrapper */}
       {timeFilter === 'seasonal' && currentSeason && (
         <SeasonStatusPanel
@@ -807,22 +798,6 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         />
       )}
 
-      {/* Scroll to Top FAB */}
-      <button
-        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className={cn(
-          "fixed bottom-24 right-4 z-40 w-12 h-12 rounded-full",
-          "bg-foreground/80 text-background shadow-lg backdrop-blur-sm",
-          "flex items-center justify-center",
-          "transition-all duration-300 ease-out active:scale-[0.95]",
-          showScrollTop 
-            ? "opacity-100 translate-y-0" 
-            : "opacity-0 translate-y-4 pointer-events-none"
-        )}
-        aria-label="Scroll to top"
-      >
-        <ChevronUp className="w-5 h-5" />
-      </button>
     </div>
   );
 }

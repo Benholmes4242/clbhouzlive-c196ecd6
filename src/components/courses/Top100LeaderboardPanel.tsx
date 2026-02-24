@@ -53,7 +53,7 @@ const Top100LeaderboardPanel = () => {
                 className={cn(
                   'flex-1 py-2.5 px-2 rounded-lg text-center transition-all duration-200 active:scale-[0.97]',
                   view === tab.id
-                    ? 'bg-card shadow-sm border border-border'
+                    ? 'bg-card border border-border'
                     : 'text-muted-foreground hover:bg-card/50'
                 )}
               >

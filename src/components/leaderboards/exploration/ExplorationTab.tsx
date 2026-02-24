@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo, useLayoutEffect, useCallback } fr
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExplorationLeaderboard, useUserExplorationStatus } from '@/hooks/leaderboards';
 import { supabase } from '@/integrations/supabase/client';
-import { ChevronUp } from 'lucide-react';
+
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -92,7 +92,7 @@ export function ExplorationTab() {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(() => savedFilters?.selectedCountry ?? null);
   const [userHomeClubId, setUserHomeClubId] = useState<string | null>(null);
   const [userHomeClubName, setUserHomeClubName] = useState<string | null>(null);
-  const [showScrollTop, setShowScrollTop] = useState(false);
+  
   const [scrollTop, setScrollTop] = useState(0);
 
   // Refs
@@ -127,12 +127,11 @@ export function ExplorationTab() {
     }
   });
 
-  // Scroll-to-top FAB listener + scroll tracking
+  // Scroll tracking for virtualization
   useEffect(() => {
     const handleScroll = () => {
       const rootEl = document.getElementById('root');
       const currentScroll = (rootEl && rootEl.scrollTop > 0) ? rootEl.scrollTop : window.scrollY;
-      setShowScrollTop(currentScroll > 400);
       setScrollTop(currentScroll);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -262,18 +261,18 @@ export function ExplorationTab() {
 
   const getPodiumRingColor = (rank: number): string | null => {
     switch (rank) {
-      case 1: return '#C1A84C';
+      case 1: return '#D4A853';
       case 2: return '#B8C6C9';
-      case 3: return '#8B7355';
+      case 3: return '#C4956A';
       default: return null;
     }
   };
 
   const getMetricColor = (rank: number): string => {
     switch (rank) {
-      case 1: return 'text-[#C1A84C]';
+      case 1: return 'text-[#D4A853]';
       case 2: return 'text-[#B8C6C9]';
-      case 3: return 'text-[#8B7355]';
+      case 3: return 'text-[#C4956A]';
       default: return 'text-foreground';
     }
   };
@@ -320,7 +319,7 @@ export function ExplorationTab() {
   );
 
   return (
-    <div className="flex flex-col px-4 pt-4 pb-24">
+    <div className="flex flex-col px-4 pt-4 space-y-6">
       {/* 1. World Map — 16px below sub-tabs (pt-4) */}
       {user && userStatus && (
         <GlobalProgressMap 
@@ -330,9 +329,9 @@ export function ExplorationTab() {
         />
       )}
 
-      {/* 2. Continents Achievement Banner — 20px below map */}
+      {/* 2. Continents Achievement Banner */}
       {user && userStatus && (
-        <div className="mt-5">
+        <div>
           <GlobalGolfersMapStatsRow
             continentsPlayed={continentsPlayed}
             continentsTotal={6}
@@ -343,13 +342,13 @@ export function ExplorationTab() {
         </div>
       )}
 
-      {/* 3. Scope Selector — 20px below banner */}
-      <div className="flex justify-center mt-5">
+      {/* 3. Scope Selector */}
+      <div className="flex justify-center">
         <LeaderboardScopeSelector value={scope} onChange={setScope} />
       </div>
 
       {scope === 'club' && (
-        <div className="mt-4">
+        <div>
           <ClubSearchBar
             selectedClubId={selectedClubId}
             selectedClubName={selectedClubName}
@@ -361,7 +360,7 @@ export function ExplorationTab() {
       )}
 
       {scope === 'country' && (
-        <div className="mt-4">
+        <div>
           <CountrySelector
             selectedCountry={selectedCountry}
             onCountrySelect={setSelectedCountry}
@@ -371,7 +370,7 @@ export function ExplorationTab() {
 
       {/* Initial error */}
       {isError && allEntries.length === 0 && !isLoading && (
-        <div className="mt-4">
+        <div>
           <InitialErrorState onRetry={() => refetch()} />
         </div>
        )}
@@ -391,7 +390,7 @@ export function ExplorationTab() {
           }
         />
       ) : allEntries.length > 0 ? (
-        <div className="mt-4">
+        <div>
           {/* Podium */}
           <ExplorationPodium 
             entries={podiumEntries} 
@@ -399,8 +398,8 @@ export function ExplorationTab() {
             currentUserId={user?.id}
           />
 
-          {/* Rankings List — 16px below podium */}
-          <div ref={listContainerRef} className="flex flex-col mt-4">
+          {/* Rankings List */}
+          <div ref={listContainerRef} className="flex flex-col">
             {virtualizedContent ? (
               <div style={{ height: virtualizedContent.totalHeight, position: 'relative' }}>
                 <div style={{ transform: `translateY(${virtualizedContent.offsetY}px)`, position: 'absolute', width: '100%' }}>
@@ -433,26 +432,6 @@ export function ExplorationTab() {
         </div>
       ) : null}
 
-      {/* Scroll to Top FAB */}
-      <button
-        onClick={() => {
-          const rootEl = document.getElementById('root');
-          if (rootEl) rootEl.scrollTop = 0;
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
-        className={cn(
-          "fixed bottom-24 right-4 z-40 w-12 h-12 rounded-full",
-          "bg-foreground/80 text-background shadow-lg backdrop-blur-sm",
-          "flex items-center justify-center",
-          "transition-all duration-300 ease-out active:scale-[0.95]",
-          showScrollTop 
-            ? "opacity-100 translate-y-0" 
-            : "opacity-0 translate-y-4 pointer-events-none"
-        )}
-        aria-label="Scroll to top"
-      >
-        <ChevronUp className="w-5 h-5" />
-      </button>
     </div>
   );
 }

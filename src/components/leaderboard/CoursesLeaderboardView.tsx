@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { LeaderboardEmptyState } from './LeaderboardEmptyState';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { Star, ChevronUp, RefreshCw, WifiOff } from 'lucide-react';
+import { Star, RefreshCw, WifiOff } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { CreateGameTripSheetV2 } from '@/features/hub/components/create-game-trip-v2';
 import { cn } from '@/lib/utils';
@@ -121,7 +121,6 @@ export function CoursesLeaderboardView() {
     return saved?.subRegion ?? null;
   });
   const [gamesHubOpen, setGamesHubOpen] = useState(false);
-  const [showScrollTop, setShowScrollTop] = useState(false);
 
   // Scroll position preservation refs for filter changes
   const scrollPositionRef = useRef<number>(0);
@@ -156,15 +155,6 @@ export function CoursesLeaderboardView() {
     }
   }, [scope]);
 
-  // Scroll-to-top FAB listener
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 400);
-    };
-    
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Fetch course leaderboard data
   const { 
@@ -400,7 +390,7 @@ export function CoursesLeaderboardView() {
   }
 
   return (
-    <div className="flex flex-col pb-24">
+    <div className="flex flex-col space-y-6">
       {/* 1. Recently Played by Your Circle - TOP */}
       {circleLoading ? (
         <section className="space-y-3 -mx-4">
@@ -421,8 +411,8 @@ export function CoursesLeaderboardView() {
           </div>
         </section>
       ) : circleRecentRounds && circleRecentRounds.length > 0 ? (
-        <section className="-mx-4 mt-4">
-          <h3 className="text-lg font-bold text-foreground px-4 mb-3">
+        <section className="-mx-4">
+          <h3 className="text-[22px] font-bold text-foreground px-4 mb-3" style={{ letterSpacing: '-0.3px' }}>
             Your Circle's Recent Rounds
           </h3>
           <div className="relative">
@@ -435,7 +425,7 @@ export function CoursesLeaderboardView() {
                     className="w-[170px] flex-shrink-0 text-left group active:scale-[0.97] transition-transform"
                   >
                     {/* Course Image */}
-                    <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-2" style={{ boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)' }}>
+                    <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-2">
                       {round.golf_courses?.thumbnail_image ? (
                         <>
                           <img
@@ -510,7 +500,7 @@ export function CoursesLeaderboardView() {
       ) : null}
 
       {/* 2. Sort tabs — single row */}
-      <div className="mt-5">
+      <div>
         <CourseFilters
           sort={sort}
           onSortChange={handleSortChange}
@@ -518,9 +508,9 @@ export function CoursesLeaderboardView() {
       </div>
 
       {/* Course Rankings Section */}
-      <section className="-mx-4 mt-4">
+      <section className="-mx-4">
         <div className="px-4 mb-5">
-          <h2 className="text-xl font-bold text-foreground">Course Rankings</h2>
+          <h2 className="text-[22px] font-bold text-foreground" style={{ letterSpacing: '-0.3px' }}>Course Rankings</h2>
           <p className="text-sm text-muted-foreground mt-0.5">
             {sort === 'most_played' && "The world's greatest courses by rounds played"}
             {sort === 'highest_rated' && "The world's greatest courses by community rating"}
@@ -639,22 +629,6 @@ export function CoursesLeaderboardView() {
         onClose={() => setGamesHubOpen(false)}
       />
 
-      {/* Scroll to Top FAB */}
-      <button
-        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className={cn(
-          "fixed bottom-24 right-4 z-40 w-12 h-12 rounded-full",
-          "bg-foreground/80 text-background backdrop-blur-sm shadow-lg",
-          "flex items-center justify-center",
-          "transition-all duration-300 ease-out active:scale-[0.95]",
-          showScrollTop 
-            ? "opacity-100 translate-y-0" 
-            : "opacity-0 translate-y-4 pointer-events-none"
-        )}
-        aria-label="Scroll to top"
-      >
-        <ChevronUp className="w-5 h-5" />
-      </button>
     </div>
   );
 }
