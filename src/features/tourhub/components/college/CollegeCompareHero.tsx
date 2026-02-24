@@ -277,10 +277,10 @@ export function CollegeCompareHero({ data, className, onBack }: CollegeCompareHe
         </Link>
 
         <div className="shrink-0 w-16 flex flex-col items-center">
-          <span className="text-muted-foreground/40" style={{ fontSize: 16, fontWeight: 800 }}>VS</span>
           <span className="text-muted-foreground/60" style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
             {seasonYear} Season
           </span>
+          <span className="text-muted-foreground/40" style={{ fontSize: 16, fontWeight: 800 }}>VS</span>
         </div>
 
         <Link
