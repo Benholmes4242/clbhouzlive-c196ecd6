@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface Top100JourneyHeroProps {
@@ -64,8 +65,8 @@ const ProgressRing: React.FC<ProgressRingProps> = ({
         {/* Gradient definition */}
         <defs>
           <linearGradient id="outstandingGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#f59e0b" />
-            <stop offset="100%" stopColor="#fbbf24" />
+            <stop offset="0%" stopColor="rgba(245, 158, 11, 0.9)" />
+            <stop offset="100%" stopColor="rgba(251, 191, 36, 0.9)" />
           </linearGradient>
         </defs>
         {/* Background track */}
@@ -119,7 +120,12 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
   };
 
   return (
-    <section className={cn('w-full', className)}>
+    <motion.section
+      className={cn('w-full', className)}
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35 }}
+    >
       <button
         type="button"
         onClick={handleClick}
@@ -127,11 +133,10 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
           'relative w-full p-4',
           'rounded-2xl',
           'bg-card/92 backdrop-blur-sm',
-          'border border-border/60',
-          'shadow-sm',
+          'border border-border/50',
           'text-left',
           'cursor-pointer',
-          'hover:bg-card/95 hover:shadow-md',
+          'hover:bg-card/95',
           'active:scale-[0.99]',
           'transition-all duration-200'
         )}
@@ -150,7 +155,10 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
         {/* Text content */}
         <div className="pr-20">
           {/* Title */}
-          <h2 className="text-lg font-semibold text-foreground mb-2">
+          <h2
+            className="text-[22px] font-bold text-foreground mb-2"
+            style={{ letterSpacing: '-0.3px' }}
+          >
             Your Top 100 Journey
           </h2>
 
@@ -159,7 +167,7 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
             <span 
               className="text-3xl font-bold"
               style={{ 
-                background: 'linear-gradient(to right, #f59e0b, #fbbf24)', 
+                background: 'linear-gradient(to right, rgba(245, 158, 11, 0.9), rgba(251, 191, 36, 0.9))', 
                 WebkitBackgroundClip: 'text', 
                 WebkitTextFillColor: 'transparent' 
               }}
@@ -174,22 +182,23 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
           {/* CTA Button */}
           <span
             className={cn(
-              'inline-flex items-center gap-1',
+              'inline-flex items-center gap-0.5',
               'px-4 py-2.5',
               'text-sm font-medium',
               'bg-muted text-foreground',
               'rounded-lg',
               'hover:bg-muted/80',
+              'active:scale-[0.97]',
               'transition-all duration-150',
               'whitespace-nowrap'
             )}
           >
             {isZeroProgress ? 'Start your Top 100 Journey' : 'View your Top 100 Journey'}
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight size={14} />
           </span>
         </div>
       </button>
-    </section>
+    </motion.section>
   );
 };
 

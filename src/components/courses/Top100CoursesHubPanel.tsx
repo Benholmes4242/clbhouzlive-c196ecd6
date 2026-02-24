@@ -173,7 +173,7 @@ const Top100CoursesHubPanel = () => {
   };
 
   return (
-    <div className="space-y-3 pb-6">
+    <div className="space-y-4">
       {/* Top 100 Journey Hero - Premium progress module */}
       {user && (
         <Top100JourneyHero
@@ -193,7 +193,7 @@ const Top100CoursesHubPanel = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search within this Top 100 list"
             aria-label="Search within Top 100 list"
-            className="pl-10 pr-10 h-11 bg-card border border-border/60 rounded-sq-sm shadow-[0_1px_3px_rgba(0,0,0,0.06)] text-base focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border focus-visible:outline-none"
+            className="pl-10 pr-10 h-11 bg-card border border-border/50 rounded-sq-sm text-base focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border focus-visible:outline-none"
           />
           {searchTerm && (
             <button
@@ -215,10 +215,10 @@ const Top100CoursesHubPanel = () => {
               <SelectTrigger 
                 aria-label="Select Top 100 list" 
                 className={cn(
-                  'h-11 w-full rounded-sq-sm bg-card justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98]',
+                  'h-11 w-full rounded-sq-sm bg-card justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98]',
                   selectedList !== 'global' 
-                    ? 'border-primary/40 ring-1 ring-primary/20 text-foreground' 
-                    : 'border-border'
+                    ? 'bg-foreground text-background border-foreground' 
+                    : 'border-border/50'
                 )}
               >
                 <SelectValue placeholder="Global Top 100" />
@@ -239,10 +239,10 @@ const Top100CoursesHubPanel = () => {
               <SelectTrigger 
                 aria-label="Sort courses" 
                 className={cn(
-                  'h-11 w-full rounded-sq-sm bg-card justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98]',
+                  'h-11 w-full rounded-sq-sm bg-card justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98]',
                   sortOption !== 'official' 
-                    ? 'border-primary/40 ring-1 ring-primary/20 text-foreground' 
-                    : 'border-border'
+                    ? 'bg-foreground text-background border-foreground' 
+                    : 'border-border/50'
                 )}
               >
                 <SelectValue placeholder="Official ranking" />
