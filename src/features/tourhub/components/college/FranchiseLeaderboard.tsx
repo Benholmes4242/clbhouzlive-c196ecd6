@@ -100,7 +100,7 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
                 className={cn(
                   'relative flex-1 whitespace-nowrap rounded-lg active:scale-[0.98] transition-all duration-200',
                   isSelected
-                    ? 'bg-card text-foreground shadow-sm'
+                    ? 'bg-foreground text-background shadow-sm'
                     : 'text-muted-foreground hover:bg-muted/50'
                 )}
                 style={{
