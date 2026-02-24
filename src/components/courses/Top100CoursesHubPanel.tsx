@@ -1,13 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useTop100ListSummaries } from '@/hooks/useTop100ListSummaries';
-import { useFriendsOnTop100Journey } from '@/hooks/useFriendsOnTop100Journey';
 import { useGolfCoursesInfinite, type SearchedCourseWithRating } from '@/hooks/useGolfCoursesInfinite';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
-import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Search, Award, X } from 'lucide-react';
 import { Top100JourneyHero } from '@/components/top100/Top100JourneyHero';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -16,16 +12,12 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import VirtualizedCourseList from './VirtualizedCourseList';
-import { AppSelect, AppSelectOption } from '@/components/ui/AppSelect';
-import { FLAGS } from '@/config/flags';
-import {
-  PRIMARY_REGIONS,
-  SUBREGIONS,
-  type PrimaryRegionKey,
-  normalizeLabel,
-} from '@/constants/courseRegions';
+import { type AppSelectOption } from '@/components/ui/AppSelect';
 
 type Top100SortOption = 'official' | 'user_rating';
+
+/** Known Top 100 list slugs for validation. */
+const KNOWN_LIST_SLUGS = ['global', 'gb-i', 'usa', 'europe'];
 
 /** Read saved Top 100 filters from sessionStorage (parsed once, shared by initialisers). */
 function readSavedFilters(): { list?: string; sort?: string; searchTerm?: string } | null {
@@ -37,33 +29,14 @@ function readSavedFilters(): { list?: string; sort?: string; searchTerm?: string
   }
 }
 
-function listSlugToRegionKey(slug: string): PrimaryRegionKey {
-  switch (slug) {
-    case 'gb-i':
-    case 'gb-i-top100':
-      return PRIMARY_REGIONS.GB_I;
-    case 'usa':
-    case 'usa-top100':
-      return PRIMARY_REGIONS.USA;
-    case 'europe':
-    case 'europe-top100':
-      return PRIMARY_REGIONS.EUROPE;
-    case 'rest':
-    case 'rest-top100':
-      return PRIMARY_REGIONS.REST;
-    default:
-      return PRIMARY_REGIONS.ALL;
-  }
-}
-
 const Top100CoursesHubPanel = () => {
   const { user } = useSupabaseSession();
-  const navigate = useNavigate();
   
   // State — initialised from sessionStorage when available
   const [selectedList, setSelectedList] = useState(() => {
     const saved = readSavedFilters();
-    return saved?.list || 'global';
+    if (saved?.list && KNOWN_LIST_SLUGS.includes(saved.list)) return saved.list;
+    return 'global';
   });
   const [searchTerm, setSearchTerm] = useState(() => {
     const saved = readSavedFilters();
@@ -82,20 +55,7 @@ const Top100CoursesHubPanel = () => {
   // Fetch data
   const { data: progress } = useTop100ProgressForUser(user?.id);
   const { data: listSummaries = [] } = useTop100ListSummaries(user?.id);
-  const { data: friendsData = [] } = useFriendsOnTop100Journey(user?.id);
   const { data: lists = [] } = useTop100Lists();
-  
-  // Mock friends for testing
-  const mockFriends = FLAGS.TOP100_MOCK_FRIENDS_ENABLED ? [
-    { user_id: 'mock1', profile: { display_name: 'Sarah Mitchell', username: 'sarahm', profile_photo_url: null, home_club: 'Augusta National' }, top100CoursesPlayed: 8 },
-    { user_id: 'mock2', profile: { display_name: 'James Anderson', username: 'jamesA', profile_photo_url: null, home_club: 'Pebble Beach' }, top100CoursesPlayed: 12 },
-    { user_id: 'mock3', profile: { display_name: 'Emma Wilson', username: 'emmaw', profile_photo_url: null, home_club: null }, top100CoursesPlayed: 5 },
-    { user_id: 'mock4', profile: { display_name: 'David Chen', username: 'dchen', profile_photo_url: null, home_club: 'Royal County Down' }, top100CoursesPlayed: 15 },
-    { user_id: 'mock5', profile: { display_name: 'Lisa Thompson', username: 'lisat', profile_photo_url: null, home_club: null }, top100CoursesPlayed: 7 },
-  ] : [];
-  
-  const friends = [...friendsData, ...mockFriends];
-  const hasFriends = friends.length > 0;
 
   // Progress calculations
   const totalRated = progress?.total_top100_rated ?? progress?.total_played_top100 ?? 0;
@@ -206,18 +166,6 @@ const Top100CoursesHubPanel = () => {
     { value: 'user_rating', label: 'User rating' },
   ];
 
-  const handleOpenTop100Club = () => {
-    if (user) {
-      navigate('/top100?tab=my-progress');
-    } else {
-      navigate('/auth?redirect=/top100?tab=my-progress');
-    }
-  };
-
-  const handleOpenLeaderboard = () => {
-    navigate('/top100?tab=leaderboard');
-  };
-
   const handleResetFilters = () => {
     setSelectedList('global');
     setSearchTerm('');
@@ -313,7 +261,6 @@ const Top100CoursesHubPanel = () => {
 
       {/* Rankings List */}
       {isLoading ? (
-        /* Premium skeleton loading state */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div key={i} className="space-y-3 p-3 rounded-sq-md bg-card border border-border/40">
@@ -330,7 +277,6 @@ const Top100CoursesHubPanel = () => {
           ))}
         </div>
       ) : allCourses.length === 0 ? (
-        /* Empty state - friendly with search-specific messaging */
         <div className="flex flex-col items-center justify-center py-16 text-center gap-4 animate-fade-in">
           <div className="w-14 h-14 rounded-full bg-muted/50 border border-border/60 flex items-center justify-center shadow-sm">
             {searchTerm ? (

@@ -139,16 +139,10 @@ const GlobalTop100 = () => {
     }
   }, [page]);
 
-  // Cleanup on unmount - clear sessionStorage to prevent stale state on revisit
+  // Cleanup on unmount - reset mounted ref only (sessionStorage persists intentionally)
   useEffect(() => {
     return () => {
       mountedRef.current = false;
-      try {
-        sessionStorage.removeItem('top100-scroll');
-        sessionStorage.removeItem('top100-last-filters');
-      } catch (e) {
-        console.error('Failed to clear top100 storage:', e);
-      }
     };
   }, []);
 
