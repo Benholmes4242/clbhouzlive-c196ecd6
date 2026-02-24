@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import { ChevronLeft } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
@@ -18,7 +20,7 @@ function SectionHeader({ children, className }: { children: React.ReactNode; cla
   return (
     <div
       className={cn("text-muted-foreground/60", className)}
-      style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}
+      style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' as const }}
     >
       {children}
     </div>
@@ -51,7 +53,7 @@ function MetricCompareRow({ label, value1, value2, format = String, lowerIsBette
   }
 
   return (
-    <div className="py-3 border-b last:border-0" style={{ borderColor: 'hsl(var(--border) / 0.1)' }}>
+    <div className="py-3 border-b last:border-0" style={{ borderColor: 'hsl(var(--border) / 0.15)' }}>
       <div className="flex items-center justify-between mb-1.5">
         <span
           className={isLeading1 ? 'text-foreground' : 'text-muted-foreground'}
@@ -74,14 +76,14 @@ function MetricCompareRow({ label, value1, value2, format = String, lowerIsBette
           className="rounded-l-full"
           style={{
             width: `${pct1}%`,
-            backgroundColor: isLeading1 ? '#f59e0b' : '#CBD5E1',
+            backgroundColor: isLeading1 ? 'rgba(245, 158, 11, 0.9)' : 'hsl(var(--border))',
           }}
         />
         <div
           className="rounded-r-full"
           style={{
             width: `${pct2}%`,
-            backgroundColor: isLeading2 ? '#f59e0b' : '#CBD5E1',
+            backgroundColor: isLeading2 ? 'rgba(245, 158, 11, 0.9)' : 'hsl(var(--border))',
           }}
         />
       </div>
@@ -92,12 +94,18 @@ function MetricCompareRow({ label, value1, value2, format = String, lowerIsBette
 /* ── Flat stat section (no card wrapper) ── */
 function StatSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ marginTop: 24 }}>
+    <motion.div
+      style={{ marginTop: 24 }}
+      initial={{ opacity: 0, y: 12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4 }}
+    >
       <SectionHeader className="mb-3">{title}</SectionHeader>
       <div className="mt-2">
         {children}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -125,7 +133,7 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, emptyLabel }: {
         <Link
           key={a.id}
           to={`/tourhub/player/${a.id}`}
-          className="flex items-center gap-2 bg-card rounded-xl border border-border/50 hover:border-border transition-colors"
+          className="flex items-center gap-2 bg-card rounded-2xl border border-border/50 hover:border-border transition-colors"
           style={{ padding: '10px 12px' }}
         >
           <span className="text-muted-foreground" style={{ fontSize: 11, fontWeight: 500, width: '16px', fontVariantNumeric: 'tabular-nums' }}>{i + 1}</span>
@@ -155,13 +163,19 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, emptyLabel }: {
   );
 
   return (
-    <div style={{ marginTop: 28 }}>
+    <motion.div
+      style={{ marginTop: 24 }}
+      initial={{ opacity: 0, y: 12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4 }}
+    >
       <SectionHeader className="mb-3">{title}</SectionHeader>
       <div className="grid grid-cols-2 gap-4">
         {renderSide(alumni1)}
         {renderSide(alumni2)}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -259,7 +273,7 @@ export function CollegeCompareHero({ data, className, onBack }: CollegeCompareHe
   return (
     <div className={cn('', className)}>
       {/* VS Header */}
-      <div className="mb-6">
+      <motion.div className="mb-6" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
         {/* Season label centered above the VS row */}
         <div className="flex justify-center mb-2">
           <span className="text-muted-foreground/60" style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
@@ -272,14 +286,14 @@ export function CollegeCompareHero({ data, className, onBack }: CollegeCompareHe
             to={`/tourhub/college-golf/${s1?.normalized_name}`}
             className="flex-1 flex flex-col items-center group min-w-0"
           >
-            <div className="w-20 h-20 rounded-xl bg-card border border-border flex items-center justify-center overflow-hidden mb-2 group-hover:border-primary/30 transition-colors">
+            <div className="w-20 h-20 rounded-xl bg-card border border-border/50 flex items-center justify-center overflow-hidden mb-2 group-hover:border-primary/30 transition-colors">
               {getCollegeLogoUrl(college1.media?.college_name || name1) ? (
                 <img src={getCollegeLogoUrl(college1.media?.college_name || name1)!} alt={name1} className="w-16 h-16 object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
               ) : (
                 <span className="text-xl font-bold text-muted-foreground">{name1.charAt(0)}</span>
               )}
             </div>
-            <span className="text-foreground group-hover:text-primary transition-colors text-center truncate max-w-full" style={{ fontSize: 16, fontWeight: 600 }}>
+            <span className="text-foreground group-hover:text-primary transition-colors text-center truncate max-w-full" style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.2px' }}>
               {name1}
             </span>
           </Link>
@@ -293,33 +307,34 @@ export function CollegeCompareHero({ data, className, onBack }: CollegeCompareHe
             to={`/tourhub/college-golf/${s2?.normalized_name}`}
             className="flex-1 flex flex-col items-center group min-w-0"
           >
-            <div className="w-20 h-20 rounded-xl bg-card border border-border flex items-center justify-center overflow-hidden mb-2 group-hover:border-primary/30 transition-colors">
+            <div className="w-20 h-20 rounded-xl bg-card border border-border/50 flex items-center justify-center overflow-hidden mb-2 group-hover:border-primary/30 transition-colors">
               {getCollegeLogoUrl(college2.media?.college_name || name2) ? (
                 <img src={getCollegeLogoUrl(college2.media?.college_name || name2)!} alt={name2} className="w-16 h-16 object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
               ) : (
                 <span className="text-xl font-bold text-muted-foreground">{name2.charAt(0)}</span>
               )}
             </div>
-            <span className="text-foreground group-hover:text-primary transition-colors text-center truncate max-w-full" style={{ fontSize: 16, fontWeight: 600 }}>
+            <span className="text-foreground group-hover:text-primary transition-colors text-center truncate max-w-full" style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.2px' }}>
               {name2}
             </span>
           </Link>
         </div>
-      </div>
+      </motion.div>
 
       {/* Back button — below VS header */}
       {onBack && (
         <button
           onClick={onBack}
-          className="text-muted-foreground active:opacity-70 transition-opacity mb-4"
+          className="flex items-center gap-0.5 text-muted-foreground active:opacity-70 transition-opacity mb-4"
           style={{ fontSize: 13, fontWeight: 500 }}
         >
-          ← Back
+          <ChevronLeft size={14} />
+          Back
         </button>
       )}
 
       {/* Summary Verdict Card */}
-      <div className="bg-card rounded-2xl border border-border/50 p-4" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+      <motion.div className="bg-card rounded-2xl border border-border/50 p-4" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.1 }}>
         <SectionHeader className="mb-3">Season Summary</SectionHeader>
         <div className="flex items-center justify-between">
           <div className="text-center flex-1">
@@ -334,7 +349,7 @@ export function CollegeCompareHero({ data, className, onBack }: CollegeCompareHe
             <span className="text-muted-foreground block" style={{ fontSize: 11, fontWeight: 500, marginTop: 4 }}>categories led</span>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Season Overview — no card wrapper */}
       <StatSection title="Season Overview">

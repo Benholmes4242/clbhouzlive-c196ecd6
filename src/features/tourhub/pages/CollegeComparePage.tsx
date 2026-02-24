@@ -22,9 +22,8 @@ export function CollegeComparePage() {
   return (
     <TourHubShell>
       <div
-        className="min-h-screen relative px-4"
+        className="min-h-screen relative px-4 bg-background"
         style={{
-          backgroundColor: '#F8FAFC',
           paddingTop: 'max(var(--sat, env(safe-area-inset-top, 0px)), 47px)',
           paddingBottom: 'calc(var(--sab, 30px) + 16px)',
         }}
@@ -41,7 +40,7 @@ export function CollegeComparePage() {
             left: 16,
           }}
         >
-          <Menu className="w-[22px] h-[22px] text-foreground" style={{ strokeWidth: 2 }} />
+          <Menu className="w-[24px] h-[24px] text-foreground" style={{ strokeWidth: 1.5 }} />
         </button>
 
         {/* Content */}
