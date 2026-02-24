@@ -108,29 +108,24 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
               {category.label} Leader
             </motion.p>
 
-            {/* Player name — 22px, 800, white */}
-            <motion.h2
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.4 }}
-              style={{
-                fontSize: 20,
-                fontWeight: 700,
-                color: 'white',
-                letterSpacing: '-0.3px',
-                lineHeight: 1.2,
-              }}
-            >
-              {player.full_name}
-            </motion.h2>
-
-            {/* Country flag only */}
+            {/* Player name + flag */}
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.22, duration: 0.4 }}
-              className="flex items-center gap-1.5"
+              transition={{ delay: 0.2, duration: 0.4 }}
+              className="flex items-center gap-2"
             >
+              <h2
+                style={{
+                  fontSize: 20,
+                  fontWeight: 700,
+                  color: 'white',
+                  letterSpacing: '-0.3px',
+                  lineHeight: 1.2,
+                }}
+              >
+                {player.full_name}
+              </h2>
               <CountryFlag country={player.country_code || player.country} size="sm" className="brightness-110" />
             </motion.div>
 

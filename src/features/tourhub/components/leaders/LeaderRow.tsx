@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
-import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
+import CountryFlag from '@/components/ui/country-flag';
 import type { LeaderCategory } from './constants';
 
 interface LeaderRowProps {
@@ -44,13 +44,11 @@ export function LeaderRow({
 }: LeaderRowProps) {
   const displayRank = overrideRank ?? rank;
   const photoUrl = getPlayerHeadshotUrl(player.fullName, player.tourCodes?.[0] ?? 'pga');
-  const flag = countryCodeToFlag(player.countryCode);
-  const countryName = titleCaseCountry(player.country);
   const fmt = formatOverride ?? category.format;
   const unit = unitOverride ?? category.unit;
   const formattedStat = fmt(value);
 
-  const ariaLabel = `Rank ${displayRank}, ${player.fullName}, ${countryName || 'Unknown'}, ${formattedStat}${unit ? ` ${unit}` : ''}`;
+  const ariaLabel = `Rank ${displayRank}, ${player.fullName}, ${formattedStat}${unit ? ` ${unit}` : ''}`;
 
   return (
     <motion.div
@@ -119,9 +117,8 @@ export function LeaderRow({
           <p style={{ fontSize: 14, fontWeight: 600 }} className="text-foreground truncate leading-tight">
             {player.fullName}
           </p>
-          <div className="flex items-center gap-1.5">
-            {flag && <span className="text-xs leading-none">{flag}</span>}
-            <span style={{ fontSize: 11, fontWeight: 400 }} className="text-muted-foreground truncate">{countryName}</span>
+          <div className="flex items-center gap-1">
+            <CountryFlag country={player.countryCode || player.country} size="sm" />
           </div>
         </div>
 
