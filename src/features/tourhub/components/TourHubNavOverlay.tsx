@@ -408,7 +408,6 @@ export function TourHubNavOverlay({
                             border: isFirst 
                               ? '1.5px solid rgba(245, 158, 11, 0.25)'
                               : '1px solid hsl(var(--border) / 0.3)',
-                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04), 0 0 1px rgba(0, 0, 0, 0.08)',
                             minWidth: '155px',
                           }}
                         >
@@ -481,7 +480,7 @@ export function TourHubNavOverlay({
                 paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)',
               }}
             >
-              <div className="space-y-2.5">
+              <div className="space-y-2">
                 {NAV_ITEMS.map((item, index) => {
                   const isActive = activeTab === item.value;
                   const dynamicSubtitle = item.value === 'schedule' ? scheduleSubtitle : item.subtitle;
@@ -506,9 +505,6 @@ export function TourHubNavOverlay({
                         border: isActive
                           ? '1px solid hsl(var(--border) / 0.4)'
                           : '1px solid hsl(var(--border) / 0.2)',
-                        boxShadow: isActive
-                          ? '0 2px 8px rgba(0, 0, 0, 0.04)'
-                          : '0 1px 2px rgba(0, 0, 0, 0.02)',
                       }}
                       aria-current={isActive ? 'page' : undefined}
                       aria-label={getAriaLabel(item)}
@@ -533,16 +529,17 @@ export function TourHubNavOverlay({
                         {/* Title row — badge inline on the right */}
                         <div className="flex items-center justify-between gap-2">
                           <div 
-                            className="text-[15px] font-semibold"
-                            style={{ 
-                              color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--foreground) / 0.8)',
-                            }}
+                          className="text-[15px] font-semibold"
+                          style={{ 
+                            color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--foreground) / 0.8)',
+                            letterSpacing: '-0.2px',
+                          }}
                           >
                             {item.label}
                           </div>
                           {renderBadge(item)}
                         </div>
-                        <div className="text-[13px] mt-0.5 leading-relaxed text-muted-foreground">
+                        <div className="text-[13px] mt-1 leading-relaxed text-muted-foreground">
                           {dynamicSubtitle}
                         </div>
                         {renderTeaser(item)}
@@ -556,7 +553,7 @@ export function TourHubNavOverlay({
               <div className="h-px my-4 border-t border-border/30" />
 
               {/* Link Items (College Golf, etc.) */}
-              <div className="space-y-2.5">
+              <div className="space-y-2">
                 {LINK_ITEMS.map((item, index) => (
                   <motion.button
                     key={item.id}
@@ -573,7 +570,6 @@ export function TourHubNavOverlay({
                     style={{
                       background: 'hsl(var(--card) / 0.5)',
                       border: '1px solid hsl(var(--border) / 0.2)',
-                      boxShadow: '0 1px 2px rgba(0, 0, 0, 0.02)',
                     }}
                     aria-label="College Golf — From campus standout to Tour contender"
                   >
@@ -603,7 +599,7 @@ export function TourHubNavOverlay({
                           </span>
                         )}
                       </div>
-                      <div className="text-[13px] mt-0.5 leading-relaxed text-muted-foreground">
+                      <div className="text-[13px] mt-1 leading-relaxed text-muted-foreground">
                         {item.subtitle}
                       </div>
                       {/* TM-06: College #1 teaser — school name tappable */}
@@ -638,7 +634,7 @@ export function TourHubNavOverlay({
                     
                     {/* Chevron */}
                     <ChevronRight 
-                      className="w-4.5 h-4.5 flex-shrink-0 text-muted-foreground/60"
+                      className="w-4.5 h-4.5 flex-shrink-0 text-muted-foreground/50"
                     />
                   </motion.button>
                 ))}
