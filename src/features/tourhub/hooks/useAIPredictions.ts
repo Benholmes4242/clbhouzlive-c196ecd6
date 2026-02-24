@@ -29,6 +29,7 @@ export interface AITopContender {
   courseFitScore: number;
   reasons: string[];
   concern: string;
+  promoted?: boolean;
 }
 
 export interface AIDarkHorse {
@@ -289,17 +290,164 @@ async function fetchPredictionsForTournament(tournament: any): Promise<AIPredict
     return null;
   }
 
+  const rawPredictions = {
+    topContenders: (aiPredictions.predictions || []) as any[],
+    darkHorses: (aiPredictions.dark_horses || []) as any[],
+    courseAnalysis: aiPredictions.course_analysis || {},
+    confidence: aiPredictions.confidence || 0.7,
+  };
+
+  // WD validation: check if any predicted players have withdrawn
+  const validatedPredictions = await validatePicksAgainstField(
+    tournament.id,
+    rawPredictions
+  );
+
   return formatPredictions(
     tournament,
-    {
-      topContenders: aiPredictions.predictions || [],
-      darkHorses: aiPredictions.dark_horses || [],
-      courseAnalysis: aiPredictions.course_analysis || {},
-      confidence: aiPredictions.confidence || 0.7,
-    },
+    validatedPredictions,
     true,
     aiPredictions.generated_at
   );
+}
+
+/**
+ * Validates top picks against the live leaderboard / tee-time field.
+ * If a top-5 pick has status 'wd' or is missing from the field entirely
+ * (and the tournament has started), promote an alternate from dark_horses.
+ */
+async function validatePicksAgainstField(
+  tournamentId: string,
+  predictions: {
+    topContenders: any[];
+    darkHorses: any[];
+    courseAnalysis: any;
+    confidence: number;
+  }
+) {
+  const contenders = [...(predictions.topContenders || [])];
+  const alternates = [...(predictions.darkHorses || [])];
+
+  if (contenders.length === 0) return predictions;
+
+  // Collect all player IDs (sr_ids) from picks + alternates
+  const allPlayerIds = [
+    ...contenders.map((p: any) => p.playerId),
+    ...alternates.map((p: any) => p.playerId),
+  ].filter(Boolean);
+
+  if (allPlayerIds.length === 0) return predictions;
+
+  // Query leaderboard for these players' statuses
+  const { data: lbRows } = await supabase
+    .from('sr_leaderboards')
+    .select('player_id, status, sr_players!inner(sr_id)')
+    .eq('tournament_id', tournamentId);
+
+  if (!lbRows || lbRows.length === 0) {
+    // No leaderboard data yet (pre-tournament) — check tee times instead
+    // sr_tee_time_players -> sr_tee_times (via tee_time_id) -> tournament_id
+    const { data: teeTimeIds } = await supabase
+      .from('sr_tee_times')
+      .select('id')
+      .eq('tournament_id', tournamentId);
+
+    if (!teeTimeIds || teeTimeIds.length === 0) return predictions;
+
+    const { data: ttRows } = await supabase
+      .from('sr_tee_time_players')
+      .select('player_id, sr_players!inner(sr_id)')
+      .in('tee_time_id', teeTimeIds.map(t => t.id));
+
+    // If no tee time player data, return as-is
+    if (!ttRows || ttRows.length === 0) return predictions;
+
+    // Build set of players confirmed in the field via tee times
+    const fieldSet = new Set(ttRows.map((r: any) => (r.sr_players as any)?.sr_id).filter(Boolean));
+
+    // If field data exists but is very small, don't filter (might be partial data)
+    if (fieldSet.size < 20) return predictions;
+
+    // Check if any top-5 picks are NOT in the tee-time field
+    const validContenders: any[] = [];
+    const withdrawnPicks: any[] = [];
+    for (const p of contenders) {
+      if (fieldSet.has(p.playerId)) {
+        validContenders.push(p);
+      } else {
+        withdrawnPicks.push({ ...p, withdrawnStatus: 'wd' });
+      }
+    }
+
+    // Promote alternates to fill gaps
+    let promoted = 0;
+    for (const alt of alternates) {
+      if (validContenders.length >= 5) break;
+      if (fieldSet.has(alt.playerId)) {
+        validContenders.push({
+          ...alt,
+          rank: validContenders.length + 1,
+          promoted: true,
+        });
+        promoted++;
+      }
+    }
+
+    if (promoted > 0) {
+      console.log(`[useAIPredictions] Promoted ${promoted} alternate(s) to replace WD picks`);
+    }
+
+    return {
+      ...predictions,
+      topContenders: validContenders,
+      withdrawnPicks,
+    };
+  }
+
+  // Build status map keyed by sr_id
+  const statusMap = new Map<string, string>();
+  lbRows.forEach((row: any) => {
+    const srId = (row.sr_players as any)?.sr_id;
+    if (srId) statusMap.set(srId, row.status || 'active');
+  });
+
+  // Filter out withdrawn picks
+  const validContenders: any[] = [];
+  const withdrawnPicks: any[] = [];
+
+  for (const p of contenders) {
+    const status = statusMap.get(p.playerId);
+    if (status === 'wd' || status === 'dsq') {
+      withdrawnPicks.push({ ...p, withdrawnStatus: status });
+    } else {
+      validContenders.push(p);
+    }
+  }
+
+  // Promote alternates
+  let promoted = 0;
+  for (const alt of alternates) {
+    if (validContenders.length >= 5) break;
+    const altStatus = statusMap.get(alt.playerId);
+    if (altStatus !== 'wd' && altStatus !== 'dsq') {
+      validContenders.push({
+        ...alt,
+        rank: validContenders.length + 1,
+        promoted: true,
+      });
+      promoted++;
+    }
+  }
+
+  if (promoted > 0) {
+    console.log(`[useAIPredictions] Promoted ${promoted} alternate(s) to replace WD picks`);
+  }
+
+  return {
+    ...predictions,
+    topContenders: validContenders,
+    withdrawnPicks,
+  };
 }
 
 function formatPredictions(
