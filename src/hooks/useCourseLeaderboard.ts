@@ -82,7 +82,7 @@ export function useCourseLeaderboard(args: UseCourseLeaderboardArgs = {}) {
         p_time_period: timeRange === 'this_season' ? 'year' : timeRange,
         p_current_user_id: user?.id ?? null,
         p_limit: pageSize,
-        p_offset: (pageParam as number) * pageSize,
+        p_offset: pageParam as number,
         p_country: scope === 'country' ? region : null,
         p_sub_country: scope === 'country' ? subRegion : null,
       });
@@ -124,7 +124,7 @@ export function useCourseLeaderboard(args: UseCourseLeaderboardArgs = {}) {
           shortlisted_count: 0,
           shortlisted_by_me: false,
           unique_players: row.total_rounds,
-          rank: row.rank ?? ((pageParam as number) * pageSize + index + 1),
+          rank: row.rank ?? ((pageParam as number) + index + 1),
           previous_rank: null,
           rank_change: row.rank_change ?? 0,
           is_trending: false,
@@ -138,7 +138,9 @@ export function useCourseLeaderboard(args: UseCourseLeaderboardArgs = {}) {
       };
     },
     getNextPageParam: (lastPage, allPages) => {
-      return lastPage.entries.length < pageSize ? undefined : allPages.length;
+      if (lastPage.entries.length < pageSize) return undefined;
+      const totalLoaded = allPages.reduce((sum, p) => sum + p.entries.length, 0);
+      return totalLoaded;
     },
     staleTime: 60 * 1000,
   });
