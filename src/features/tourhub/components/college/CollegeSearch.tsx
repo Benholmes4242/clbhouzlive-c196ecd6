@@ -41,7 +41,7 @@ export function CollegeSearch({ className }: CollegeSearchProps) {
             border: '1px solid hsl(var(--border) / 0.5)',
             borderRadius: 16,
             padding: '12px 16px 12px 44px',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+            
           }}
         />
         {searchInput && (

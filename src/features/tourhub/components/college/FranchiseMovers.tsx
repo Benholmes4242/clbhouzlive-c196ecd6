@@ -91,12 +91,12 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
                 minHeight: 44,
                 fontSize: 14,
                 fontWeight: isSelected ? 600 : 500,
-                color: isSelected ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
-                background: isSelected ? 'hsl(var(--card))' : 'transparent',
-                boxShadow: isSelected ? '0 1px 3px rgba(0,0,0,0.06)' : 'none',
+                color: isSelected ? 'hsl(var(--background))' : 'hsl(var(--muted-foreground))',
+                background: isSelected ? 'hsl(var(--foreground))' : 'transparent',
+                boxShadow: 'none',
               }}
             >
-              <Icon className="w-4 h-4" style={{ color: iconColor }} />
+              <Icon className="w-4 h-4" style={{ color: isSelected ? 'white' : iconColor }} />
               {label}
             </button>
           );
@@ -112,7 +112,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.2 }}
           className="flex flex-col"
-          style={{ gap: 12 }}
+          style={{ gap: 8 }}
         >
           {isLoading ? (
             Array.from({ length: 4 }).map((_, i) => (
@@ -144,10 +144,10 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
             })
           ) : (
             <div className="flex flex-col items-center text-center" style={{ paddingTop: 32 }}>
-               <p style={{ fontSize: 16, fontWeight: 600 }} className="text-foreground/60">
+               <p style={{ fontSize: 15, fontWeight: 600 }} className="text-foreground">
                  {direction === 'up' ? 'No risers this week' : 'No fallers this week'}
                </p>
-               <p style={{ fontSize: 13, fontWeight: 400, marginTop: 4 }} className="text-muted-foreground">
+               <p style={{ fontSize: 13, fontWeight: 400, marginTop: 4 }} className="text-muted-foreground/70">
                  {direction === 'up'
                    ? 'No colleges climbed the rankings this week.'
                    : 'No colleges dropped in the rankings this week. Check back next Monday.'}
