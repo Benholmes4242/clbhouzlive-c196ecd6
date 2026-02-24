@@ -320,8 +320,8 @@ export function ExplorationTab() {
   );
 
   return (
-    <div className="flex flex-col px-4 pt-1 pb-24 space-y-4">
-      {/* 1. World Map */}
+    <div className="flex flex-col px-4 pt-4 pb-24">
+      {/* 1. World Map — 16px below sub-tabs (pt-4) */}
       {user && userStatus && (
         <GlobalProgressMap 
           playedContinents={userStatus.continent_list ?? []}
@@ -330,43 +330,51 @@ export function ExplorationTab() {
         />
       )}
 
-      {/* 2. Stats Row */}
+      {/* 2. Continents Achievement Banner — 20px below map */}
       {user && userStatus && (
-        <GlobalGolfersMapStatsRow
-          continentsPlayed={continentsPlayed}
-          continentsTotal={6}
-          countriesPlayed={countriesPlayed}
-          viewMode={metric}
-          onViewModeChange={setMetric}
-        />
+        <div className="mt-5">
+          <GlobalGolfersMapStatsRow
+            continentsPlayed={continentsPlayed}
+            continentsTotal={6}
+            countriesPlayed={countriesPlayed}
+            viewMode={metric}
+            onViewModeChange={setMetric}
+          />
+        </div>
       )}
 
-      {/* 3. Scope Selector */}
-      <div className="flex justify-center">
+      {/* 3. Scope Selector — 20px below banner */}
+      <div className="flex justify-center mt-5">
         <LeaderboardScopeSelector value={scope} onChange={setScope} />
       </div>
 
       {scope === 'club' && (
-        <ClubSearchBar
-          selectedClubId={selectedClubId}
-          selectedClubName={selectedClubName}
-          userHomeClubId={userHomeClubId}
-          userHomeClubName={userHomeClubName}
-          onClubSelect={handleClubSelect}
-        />
+        <div className="mt-4">
+          <ClubSearchBar
+            selectedClubId={selectedClubId}
+            selectedClubName={selectedClubName}
+            userHomeClubId={userHomeClubId}
+            userHomeClubName={userHomeClubName}
+            onClubSelect={handleClubSelect}
+          />
+        </div>
       )}
 
       {scope === 'country' && (
-        <CountrySelector
-          selectedCountry={selectedCountry}
-          onCountrySelect={setSelectedCountry}
-        />
+        <div className="mt-4">
+          <CountrySelector
+            selectedCountry={selectedCountry}
+            onCountrySelect={setSelectedCountry}
+          />
+        </div>
       )}
 
       {/* Initial error */}
       {isError && allEntries.length === 0 && !isLoading && (
-        <InitialErrorState onRetry={() => refetch()} />
-      )}
+        <div className="mt-4">
+          <InitialErrorState onRetry={() => refetch()} />
+        </div>
+       )}
 
       {/* Initial loading */}
       {isLoading ? (
@@ -383,7 +391,7 @@ export function ExplorationTab() {
           }
         />
       ) : allEntries.length > 0 ? (
-        <>
+        <div className="mt-4">
           {/* Podium */}
           <ExplorationPodium 
             entries={podiumEntries} 
@@ -391,8 +399,8 @@ export function ExplorationTab() {
             currentUserId={user?.id}
           />
 
-          {/* Rankings List */}
-          <div ref={listContainerRef} className="flex flex-col space-y-2">
+          {/* Rankings List — 16px below podium */}
+          <div ref={listContainerRef} className="flex flex-col mt-4">
             {virtualizedContent ? (
               <div style={{ height: virtualizedContent.totalHeight, position: 'relative' }}>
                 <div style={{ transform: `translateY(${virtualizedContent.offsetY}px)`, position: 'absolute', width: '100%' }}>
@@ -422,7 +430,7 @@ export function ExplorationTab() {
           {isError && isFetchingNextPage && allEntries.length > 0 && (
             <ExplorationLeaderboardSkeleton />
           )}
-        </>
+        </div>
       ) : null}
 
       {/* Scroll to Top FAB */}
