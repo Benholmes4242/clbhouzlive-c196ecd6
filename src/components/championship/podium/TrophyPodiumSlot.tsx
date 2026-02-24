@@ -14,118 +14,91 @@ interface TrophyPodiumSlotProps {
   animationDelay?: number;
 }
 
-// Position-specific styling with squircle avatars (34% border-radius, 1:1.05 aspect)
-// Position-specific styling with squircle avatars (34% border-radius, 1:1.05 aspect)
-// THINNER RINGS: 1.5px for all positions
-// Modern Country Club palette for podium positions
+// Premium awards stage configuration
 const POSITION_CONFIG = {
   1: {
-    ringSize: 130,
-    borderWidth: 1.5,
-    gap: 0.5,
-    badgeSize: 32,
-    platformHeight: 48,
-    nameSize: 'text-base font-bold',
-    countSize: 'text-xl',
-    borderColor: '#C1A84C', // Golf Chartreus gold
-    badgeBg: 'bg-[#C1A84C]',
-    badgeText: '',
-    showCrown: true,
+    avatarSize: 110,         // Hero size
+    mobileAvatarSize: 90,
+    borderWidth: 3,
+    badgeSize: 28,
+    nameClass: 'text-lg font-bold',
+    statClass: 'text-base',
+    borderGradient: ['#D4A853', '#F0D78C', '#D4A853'], // Gold
+    badgeBg: '#D4A853',
+    shadowColor: 'rgba(212, 168, 83, 0.25)',
+    crownSize: 36,
+    verticalOffset: 0,       // Highest
   },
   2: {
-    ringSize: 104,
-    borderWidth: 1.5,
-    gap: 0.5,
-    badgeSize: 28,
-    platformHeight: 32,
-    nameSize: 'text-sm font-semibold',
-    countSize: 'text-lg',
-    borderColor: '#B8C6C9', // Golf Sky Blue silver
-    badgeBg: 'bg-[#B8C6C9]',
-    badgeText: '2',
-    showCrown: false,
+    avatarSize: 80,
+    mobileAvatarSize: 68,
+    borderWidth: 2.5,
+    badgeSize: 24,
+    nameClass: 'text-sm font-semibold',
+    statClass: 'text-sm',
+    borderGradient: ['#A8B4C0'], // Silver
+    badgeBg: '#A8B4C0',
+    shadowColor: 'rgba(0, 0, 0, 0.1)',
+    crownSize: 0,
+    verticalOffset: 20,      // Lower than #1
   },
   3: {
-    ringSize: 104,
-    borderWidth: 1.5,
-    gap: 0.5,
-    badgeSize: 28,
-    platformHeight: 24,
-    nameSize: 'text-sm font-semibold',
-    countSize: 'text-lg',
-    borderColor: '#8B7355', // Warm bronze (complementary)
-    badgeBg: 'bg-[#8B7355]',
-    badgeText: '3',
-    showCrown: false,
+    avatarSize: 80,
+    mobileAvatarSize: 68,
+    borderWidth: 2.5,
+    badgeSize: 24,
+    nameClass: 'text-sm font-semibold',
+    statClass: 'text-sm',
+    borderGradient: ['#C4956A'], // Bronze
+    badgeBg: '#C4956A',
+    shadowColor: 'rgba(0, 0, 0, 0.1)',
+    crownSize: 0,
+    verticalOffset: 32,      // Lowest
   },
 } as const;
-
-// Responsive sizing - smaller on mobile, larger on desktop
-const RESPONSIVE_CONFIG = {
-  1: {
-    sizeClass: 'w-[110px] sm:w-[130px]',
-    heightMultiplier: 1.05,
-  },
-  2: {
-    sizeClass: 'w-[88px] sm:w-[104px]',
-    heightMultiplier: 1.05,
-  },
-  3: {
-    sizeClass: 'w-[88px] sm:w-[104px]',
-    heightMultiplier: 1.05,
-  },
-} as const;
-
-/**
- * Calculate inner image size based on ring size, border, and gap
- * Formula: Image size = Ring size - (border × 2) - (gap × 2)
- */
-function getImageSize(ringSize: number, borderWidth: number, gap: number): number {
-  return ringSize - (borderWidth * 2) - (gap * 2);
-}
 
 export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
   entry,
   position,
-  seasonThemeColor = '#22c55e',
   isCurrentUser = false,
   onClick,
   animationDelay = 0,
 }) => {
   const config = POSITION_CONFIG[position];
-  const imageSize = getImageSize(config.ringSize, config.borderWidth, config.gap);
 
-  // Empty slot placeholder
   if (!entry) {
     return (
-      <div className="flex flex-col items-center flex-1">
-        {/* Empty platform */}
-        <div 
-          className="w-full max-w-[130px] rounded-t-lg bg-muted/50"
-          style={{ height: config.platformHeight }}
-        />
+      <div className="flex flex-col items-center flex-1" style={{ marginTop: config.verticalOffset }}>
+        <div
+          className="rounded-full bg-muted flex items-center justify-center text-muted-foreground text-xl font-medium"
+          style={{ width: config.mobileAvatarSize, height: config.mobileAvatarSize }}
+        >
+          ?
+        </div>
       </div>
     );
   }
 
   const nameParts = formatNameTwoLines(entry.display_name, entry.username);
   const avatarFallback = entry.display_name?.charAt(0) || entry.username?.charAt(0) || '?';
+  const borderColor = config.borderGradient[0];
 
   return (
     <motion.div
       className="flex flex-col items-center cursor-pointer relative flex-1"
+      style={{ marginTop: config.verticalOffset }}
       onClick={onClick}
       whileTap={{ scale: 0.97 }}
-      initial={{ opacity: 0, scale: 0.95, y: 10 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{
         duration: 0.3,
         delay: animationDelay,
         ease: 'easeOut',
       }}
     >
-      {/* Crown for 1st place */}
-      {config.showCrown && (
+      {/* Crown for 1st place — large and dramatic */}
+      {position === 1 && (
         <motion.div
           className="mb-1"
           initial={{ scale: 0, rotate: -10 }}
@@ -137,61 +110,41 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
             stiffness: 200,
           }}
         >
-          <Crown 
-            size={28} 
-            className="drop-shadow-sm"
-            style={{ color: '#C1A84C' }}
-            fill="#C1A84C"
+          <Crown
+            size={config.crownSize}
+            className="drop-shadow-md"
+            style={{ color: '#D4A853' }}
+            fill="#D4A853"
             strokeWidth={1.5}
           />
         </motion.div>
       )}
 
-      {/* Position badge (above image) */}
-      {!config.showCrown && (
-        <div
-          className={cn(
-            'mb-2 flex items-center justify-center font-bold text-white shadow-sm',
-            config.badgeBg
-          )}
-          style={{
-            width: config.badgeSize,
-            height: config.badgeSize * 1.05, // Squircle aspect ratio
-            borderRadius: '34%',
-            fontSize: config.badgeSize * 0.5,
-          }}
-        >
-          {config.badgeText}
-        </div>
-      )}
-
-      {/* Profile image with glow (1st only) and metallic squircle ring with gap */}
+      {/* Avatar with metallic ring */}
       <div className="relative">
-        {/* Radial glow effect for 1st place - Chartreus gold like Hall of Fame */}
+        {/* Golden glow for #1 — warm spotlight */}
         {position === 1 && (
-          <div 
+          <div
             className="absolute -z-10"
             style={{
-              top: '-1rem',
-              left: '-2.5rem',
-              right: '-2.5rem',
-              bottom: '-2.5rem',
-              // Chartreus gold glow matching Hall of Fame prestige
-              background: 'radial-gradient(ellipse at center, rgba(193, 168, 76, 0.6) 0%, rgba(193, 168, 76, 0.35) 30%, rgba(193, 168, 76, 0.1) 60%, transparent 80%)',
-              filter: 'blur(16px)',
+              top: '-1.5rem',
+              left: '-2rem',
+              right: '-2rem',
+              bottom: '-2rem',
+              background: 'radial-gradient(ellipse at center, rgba(212, 168, 83, 0.3) 0%, rgba(212, 168, 83, 0.1) 50%, transparent 80%)',
+              filter: 'blur(12px)',
             }}
           />
         )}
-        
-        {/* Squircle avatar with box-shadow for ring + gap effect */}
+
+        {/* Avatar image */}
         <div
-          className="relative overflow-hidden"
+          className="relative rounded-full overflow-hidden"
           style={{
-            width: imageSize,
-            height: imageSize * 1.05, // Squircle aspect ratio: 1 / 1.05
-            borderRadius: '34%',
-            // Inner shadow creates the gap (matches background), outer creates the ring
-            boxShadow: `0 0 0 ${config.gap}px hsl(var(--background)), 0 0 0 ${config.gap + config.borderWidth}px ${config.borderColor}`,
+            width: config.mobileAvatarSize,
+            height: config.mobileAvatarSize,
+            border: `${config.borderWidth}px solid ${borderColor}`,
+            boxShadow: `0 ${position === 1 ? '8px 24px' : '4px 12px'} ${config.shadowColor}`,
           }}
         >
           {entry.avatar_url ? (
@@ -207,39 +160,39 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
           )}
         </div>
 
-        {/* 1st place badge inside crown */}
-        {position === 1 && (
-          <div
-            className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex items-center justify-center font-bold text-white shadow-md"
-            style={{
-              width: config.badgeSize,
-              height: config.badgeSize * 1.05,
-              borderRadius: '34%',
-              fontSize: config.badgeSize * 0.5,
-              backgroundColor: '#C1A84C', // Golf Chartreus gold
-            }}
-          >
-            1
-          </div>
-        )}
+        {/* Rank badge — bottom-right overlapping border */}
+        <div
+          className="absolute -bottom-1 -right-1 flex items-center justify-center font-bold text-white shadow-md"
+          style={{
+            width: config.badgeSize,
+            height: config.badgeSize,
+            borderRadius: '50%',
+            backgroundColor: config.badgeBg,
+            border: '2px solid white',
+            fontSize: config.badgeSize * 0.45,
+            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)',
+          }}
+        >
+          {position}
+        </div>
       </div>
 
-      {/* Name - Two lines */}
-      <div className="mt-2 text-center">
-        <p className={cn('text-foreground leading-tight', config.nameSize)}>
+      {/* Name */}
+      <div className="mt-3 text-center">
+        <p className={cn('text-foreground leading-tight', config.nameClass)}>
           {nameParts.firstName}
         </p>
         {nameParts.lastName && (
-          <p className={cn('text-foreground leading-tight', config.nameSize)}>
+          <p className={cn('text-foreground leading-tight', config.nameClass)}>
             {nameParts.lastName}
           </p>
         )}
       </div>
 
-      {/* Course count - uses podium position color */}
+      {/* Stat — green number + muted label */}
       <motion.p
-        className={cn('font-bold', config.countSize)}
-        style={{ color: config.borderColor }}
+        className={cn('font-bold mt-0.5', config.statClass)}
+        style={{ color: '#40916C' }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: animationDelay + 0.3, duration: 0.3 }}
@@ -247,17 +200,6 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
         {entry.courses_logged}
         <span className="text-xs font-normal text-muted-foreground ml-1">courses</span>
       </motion.p>
-
-      {/* Platform - Chartreus gold for #1, subtle for others */}
-      <div
-        className="w-full max-w-[130px] mt-2 rounded-t-lg"
-        style={{
-          height: config.platformHeight,
-          backgroundColor: position === 1 
-            ? 'rgba(193, 168, 76, 0.15)' // Chartreus gold 15% opacity
-            : 'hsl(var(--muted))',
-        }}
-      />
     </motion.div>
   );
 };
