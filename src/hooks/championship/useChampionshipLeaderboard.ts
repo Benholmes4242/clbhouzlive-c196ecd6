@@ -74,8 +74,10 @@ function toZone(zoneType: string | null | undefined): ZoneType {
   return null;
 }
 
+const DEFAULT_PAGE_SIZE = 50;
+
 export function useChampionshipLeaderboard(args: UseChampionshipLeaderboardArgs) {
-  const { arenaMode, divisionFilter = 'all', timeFilter = 'seasonal', clubId = null, country = null, pageSize = 50, enabled = true } = args;
+  const { arenaMode, divisionFilter = 'all', timeFilter = 'seasonal', clubId = null, country = null, pageSize = DEFAULT_PAGE_SIZE, enabled = true } = args;
 
   return useInfiniteQuery({
     queryKey: ['championship-leaderboard', arenaMode, divisionFilter, timeFilter, clubId, country],
@@ -91,7 +93,7 @@ export function useChampionshipLeaderboard(args: UseChampionshipLeaderboardArgs)
         const { data, error } = await supabase.rpc('get_championship_leaderboard_alltime', {
           p_scope: arenaMode,
           p_limit: pageSize,
-          p_offset: (pageParam as number) * pageSize,
+          p_offset: pageParam as number,
           p_current_user_id: currentUserId || undefined,
           p_club_id: arenaMode === 'club' ? clubId : undefined,
           p_country: arenaMode === 'country' ? country : undefined,
@@ -140,7 +142,7 @@ export function useChampionshipLeaderboard(args: UseChampionshipLeaderboardArgs)
       const { data, error } = await supabase.rpc('get_championship_leaderboard', {
         p_scope: arenaMode,
         p_limit: pageSize,
-        p_offset: (pageParam as number) * pageSize,
+        p_offset: pageParam as number,
         p_current_user_id: currentUserId || undefined,
         p_club_id: arenaMode === 'club' ? clubId : undefined,
         p_country: arenaMode === 'country' ? country : undefined,
@@ -206,9 +208,12 @@ export function useChampionshipLeaderboard(args: UseChampionshipLeaderboardArgs)
         season: seasonInfo,
       };
     },
-    getNextPageParam: (lastPage, allPages) => {
-      const loadedCount = allPages.reduce((sum, page) => sum + page.entries.length, 0);
-      return loadedCount < lastPage.total_count ? allPages.length : undefined;
+    getNextPageParam: (lastPage, _allPages) => {
+      // Reliable pattern: if last page returned fewer entries than page size, we've reached the end
+      if (lastPage.entries.length < pageSize) return undefined;
+      // Otherwise, next page offset = total entries loaded so far
+      const totalLoaded = _allPages.reduce((sum, p) => sum + p.entries.length, 0);
+      return totalLoaded;
     },
     staleTime: 60 * 1000, // 1 minute
   });

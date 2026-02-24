@@ -2,7 +2,7 @@ import React, { useState, useMemo, useRef, useLayoutEffect, useCallback, useEffe
 import { cn } from '@/lib/utils';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, ChevronUp, Users, Building2 } from 'lucide-react';
+import { Loader2, ChevronUp, Users, Building2, RefreshCw, WifiOff } from 'lucide-react';
 
 import {
   useChampionshipLeaderboard,
@@ -30,12 +30,84 @@ import { MotivationalCarousel } from './MotivationalCarousel';
 import { HallOfFameHeader } from './HallOfFameHeader';
 import { ClubSearchBar } from '@/components/leaderboards/exploration/ClubSearchBar';
 import { CountrySelector } from '@/components/leaderboards/shared/CountrySelector';
+import { Skeleton } from '@/components/ui/skeleton';
 import { getSeasonConfig, SEASON_ORDER, type SeasonId } from '@/lib/seasonConfig';
 import type { ChampionshipArenaMode, DivisionSlug, UserRival } from '@/types/championship';
 import { DIVISION_ORDER, getDivisionIndex } from '@/types/championship';
 import type { TimeFilter, PodiumScope } from '@/types/podium';
 import { TIER_CONFIG } from '@/lib/clbhouzAchievementPalette';
 import { supabase } from '@/integrations/supabase/client';
+
+// ─── Persistence helpers ────────────────────────────────────────────
+const STORAGE_KEY_FILTERS = 'championship-leaderboard-filters';
+const STORAGE_KEY_SCROLL = 'championship-leaderboard-scroll';
+
+interface SavedFilters {
+  scope: ChampionshipArenaMode;
+  timeFilter: 'seasonal' | 'all_time';
+  divisionFilter: DivisionSlug | 'all';
+  clubId: string | null;
+  country: string | null;
+}
+
+function readSavedFilters(): SavedFilters | null {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY_FILTERS);
+    if (!raw) return null;
+    return JSON.parse(raw) as SavedFilters;
+  } catch {
+    return null;
+  }
+}
+
+// ─── Inline sub-components ──────────────────────────────────────────
+
+const LeaderboardLoadingSkeleton = () => (
+  <div className="space-y-2">
+    {[1, 2, 3].map((i) => (
+      <div key={i} className="flex items-center gap-3 p-3 rounded-xl animate-pulse">
+        <Skeleton className="w-7 h-7 rounded-full" />
+        <Skeleton className="w-10 h-10 rounded-full" />
+        <div className="flex-1 space-y-1.5">
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-3 w-24" />
+        </div>
+        <Skeleton className="w-10 h-8 rounded" />
+      </div>
+    ))}
+  </div>
+);
+
+const InlineRetryCard = ({ onRetry }: { onRetry: () => void }) => (
+  <div className="max-w-md mx-auto mt-4">
+    <button
+      onClick={onRetry}
+      className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-sq-sm bg-card border border-border text-sm text-muted-foreground hover:text-foreground hover:border-border/80 transition-colors active:scale-[0.98]"
+    >
+      <RefreshCw className="w-3.5 h-3.5" />
+      Couldn't load more entries · Tap to retry
+    </button>
+  </div>
+);
+
+const InitialErrorState = ({ onRetry }: { onRetry: () => void }) => (
+  <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+    <WifiOff className="w-12 h-12 text-muted-foreground/40 mb-4" />
+    <p className="text-foreground font-semibold mb-1">Unable to load leaderboard</p>
+    <p className="text-sm text-muted-foreground mb-4">Check your connection and try again</p>
+    <button
+      onClick={onRetry}
+      className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 active:scale-[0.97] transition-all"
+    >
+      Retry
+    </button>
+  </div>
+);
+
+// ─── Virtualization constants ───────────────────────────────────────
+const ROW_HEIGHT = 64; // Measured from LeaderboardRowV3: p-3 (12px*2) + h-10 avatar (40px) = 64px
+const VIRTUALIZATION_THRESHOLD = 50;
+const OVERSCAN = 8; // Buffer rows above/below viewport
 
 interface ChampionshipLeaderboardViewProps {
   className?: string;
@@ -50,10 +122,19 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   const navigate = useNavigate();
   const userId = user?.id;
 
-  // Filter state
-  const [arenaMode, setArenaMode] = useState<ChampionshipArenaMode>('global');
-  const [divisionFilter, setDivisionFilter] = useState<DivisionSlug | 'all'>('all');
-  const [timeFilter, setTimeFilter] = useState<'seasonal' | 'all_time'>('seasonal');
+  // ─── Filter state with persistence ───────────────────────────────
+  const [arenaMode, setArenaMode] = useState<ChampionshipArenaMode>(() => {
+    const saved = readSavedFilters();
+    return saved?.scope ?? 'global';
+  });
+  const [divisionFilter, setDivisionFilter] = useState<DivisionSlug | 'all'>(() => {
+    const saved = readSavedFilters();
+    return saved?.divisionFilter ?? 'all';
+  });
+  const [timeFilter, setTimeFilter] = useState<'seasonal' | 'all_time'>(() => {
+    const saved = readSavedFilters();
+    return saved?.timeFilter ?? 'seasonal';
+  });
   
   // UI state
   const [showDivisionLadder, setShowDivisionLadder] = useState(false);
@@ -62,18 +143,45 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   const [previousRank, setPreviousRank] = useState<number | null>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  // Club-related state
-  const [selectedClubId, setSelectedClubId] = useState<string | null>(null);
+  // Club-related state (restored from persistence)
+  const [selectedClubId, setSelectedClubId] = useState<string | null>(() => {
+    const saved = readSavedFilters();
+    return saved?.clubId ?? null;
+  });
   const [selectedClubName, setSelectedClubName] = useState<string | null>(null);
   const [userHomeClubId, setUserHomeClubId] = useState<string | null>(null);
   const [userHomeClubName, setUserHomeClubName] = useState<string | null>(null);
   
-  // Country-related state
-  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+  // Country-related state (restored from persistence)
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(() => {
+    const saved = readSavedFilters();
+    return saved?.country ?? null;
+  });
 
   // Scroll position preservation refs for filter changes
   const scrollPositionRef = useRef<number>(0);
   const isFilterChangeRef = useRef<boolean>(false);
+
+  // Infinite scroll refs
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const hasRestoredScroll = useRef(false);
+
+  // ─── Virtualization state ─────────────────────────────────────────
+  const [scrollTop, setScrollTop] = useState(0);
+  const listContainerRef = useRef<HTMLDivElement>(null);
+
+  // ─── Filter persistence effect ────────────────────────────────────
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(STORAGE_KEY_FILTERS, JSON.stringify({
+        scope: arenaMode,
+        timeFilter,
+        divisionFilter,
+        clubId: selectedClubId,
+        country: selectedCountry,
+      }));
+    } catch { /* ignore */ }
+  }, [arenaMode, timeFilter, divisionFilter, selectedClubId, selectedCountry]);
 
   // Fetch user's home club
   useEffect(() => {
@@ -135,8 +243,12 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   const {
     data: leaderboardData,
     isLoading: leaderboardLoading,
+    isError,
+    error: leaderboardError,
     hasNextPage,
     fetchNextPage,
+    isFetchingNextPage,
+    refetch,
   } = useChampionshipLeaderboard({
     arenaMode,
     divisionFilter,
@@ -175,10 +287,73 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     return seasonalPodiumData;
   }, [timeFilter, seasonalPodiumData]);
 
-  // Flatten paginated entries
-  const entries = useMemo(() => {
+  // Flatten paginated entries — memoized for stable reference
+  const allEntries = useMemo(() => {
     return leaderboardData?.pages.flatMap((page) => page.entries) ?? [];
-  }, [leaderboardData]);
+  }, [leaderboardData?.pages]);
+
+  // ─── Infinite scroll via IntersectionObserver ─────────────────────
+  const isFetchingRef = useRef(isFetchingNextPage);
+  isFetchingRef.current = isFetchingNextPage;
+
+  useEffect(() => {
+    if (!sentinelRef.current || !hasNextPage) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && hasNextPage && !isFetchingRef.current) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: '600px', threshold: 0 },
+    );
+
+    observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
+  }, [hasNextPage, fetchNextPage]);
+
+  // ─── Virtualization scroll tracking ───────────────────────────────
+  useEffect(() => {
+    if (allEntries.length < VIRTUALIZATION_THRESHOLD) return;
+
+    const handleScroll = () => {
+      const rootEl = document.getElementById('root');
+      const y = rootEl && rootEl.scrollTop > 0 ? rootEl.scrollTop : window.scrollY;
+      setScrollTop(y);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    const rootEl = document.getElementById('root');
+    rootEl?.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      rootEl?.removeEventListener('scroll', handleScroll);
+    };
+  }, [allEntries.length]);
+
+  // ─── Scroll position save/restore ─────────────────────────────────
+  const handleEntryClick = useCallback((clickedUserId: string) => {
+    const rootEl = document.getElementById('root');
+    const scrollY = (rootEl && rootEl.scrollTop > 0) ? rootEl.scrollTop : window.scrollY;
+    sessionStorage.setItem(STORAGE_KEY_SCROLL, scrollY.toString());
+    navigate(`/profile/${clickedUserId}?tab=top100`);
+  }, [navigate]);
+
+  useEffect(() => {
+    if (hasRestoredScroll.current || allEntries.length === 0) return;
+    const savedScroll = sessionStorage.getItem(STORAGE_KEY_SCROLL);
+    if (savedScroll) {
+      hasRestoredScroll.current = true;
+      requestAnimationFrame(() => {
+        const rootEl = document.getElementById('root');
+        const scrollTarget = parseInt(savedScroll, 10);
+        if (rootEl) rootEl.scrollTop = scrollTarget;
+        window.scrollTo({ top: scrollTarget, behavior: 'instant' as ScrollBehavior });
+        sessionStorage.removeItem(STORAGE_KEY_SCROLL);
+      });
+    }
+  }, [allEntries.length]);
 
   // Get current season from calendar
   const currentSeason = useMemo(() => {
@@ -240,15 +415,13 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
   // Calculate motivational carousel data
   const currentUserEntry = useMemo(() => {
-    return entries.find(e => e.is_current_user) || null;
-  }, [entries]);
+    return allEntries.find(e => e.is_current_user) || null;
+  }, [allEntries]);
 
   const currentRank = currentUserEntry?.current_rank || null;
   const isInTop10 = currentRank !== null && currentRank <= 10;
   const isInTop3 = currentRank !== null && currentRank <= 3;
 
-  // Note: Friend ahead/behind data not available in current entry type
-  // Can be extended later when is_friend is added to the leaderboard entries
   const friendAhead = null;
   const friendBehind = null;
 
@@ -290,14 +463,13 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     if (isFilterChangeRef.current) {
       const rootEl = document.getElementById('root');
       if (rootEl) {
-        // Use rAF to ensure DOM has updated before restoring scroll
         requestAnimationFrame(() => {
           rootEl.scrollTop = scrollPositionRef.current;
         });
       }
       isFilterChangeRef.current = false;
     }
-  }, [arenaMode, divisionFilter, entries]);
+  }, [arenaMode, divisionFilter, allEntries]);
 
   // Scroll-to-top FAB visibility
   useEffect(() => {
@@ -347,6 +519,28 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       coursesToNext: userStatus.courses_to_next_division || 0,
     };
   }, [userStatus]);
+
+  // ─── Virtualized list rendering ───────────────────────────────────
+  const useVirtualization = allEntries.length >= VIRTUALIZATION_THRESHOLD;
+
+  const virtualizedContent = useMemo(() => {
+    if (!useVirtualization) return null;
+
+    // Calculate the offset of the list container from the top of the page
+    // We approximate — the list starts after podium, filters, etc.
+    const containerOffset = listContainerRef.current?.offsetTop ?? 0;
+    const relativeScroll = Math.max(0, scrollTop - containerOffset);
+
+    const totalHeight = allEntries.length * ROW_HEIGHT;
+    const startIndex = Math.max(0, Math.floor(relativeScroll / ROW_HEIGHT) - OVERSCAN);
+    const visibleCount = Math.ceil(window.innerHeight / ROW_HEIGHT) + OVERSCAN * 2;
+    const endIndex = Math.min(allEntries.length, startIndex + visibleCount);
+
+    const visibleEntries = allEntries.slice(startIndex, endIndex);
+    const offsetY = startIndex * ROW_HEIGHT;
+
+    return { totalHeight, visibleEntries, offsetY, startIndex };
+  }, [useVirtualization, allEntries, scrollTop]);
 
   return (
     <div className={cn('flex flex-col px-4 py-4 space-y-6 pb-24', className)}>
@@ -424,7 +618,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       {timeFilter === 'seasonal' && currentUserEntry && (
         <MotivationalCarousel
           currentRank={currentRank}
-          totalPlayers={entries.length}
+          totalPlayers={allEntries.length}
           coursesThisSeason={currentUserEntry.courses_this_season}
           friendAhead={friendAhead ? {
             name: friendAhead.display_name?.split(' ')[0] || 'Friend',
@@ -476,9 +670,11 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           onCountrySelect={setSelectedCountry}
         />
       )}
-      <div className="min-h-[400px] relative" style={{ overflowAnchor: 'auto' }}>
+
+      {/* 9. Leaderboard List */}
+      <div ref={listContainerRef} className="min-h-[400px] relative" style={{ overflowAnchor: 'auto' }}>
         {/* Loading overlay - doesn't unmount the list */}
-        {leaderboardLoading && entries.length > 0 && (
+        {leaderboardLoading && allEntries.length > 0 && (
           <div className="absolute inset-x-0 top-0 flex items-center justify-center py-4 z-10 pointer-events-none">
             <div className="flex items-center gap-2 px-3 py-1.5 bg-background/80 backdrop-blur-sm rounded-full shadow-sm border border-border/50">
               <Loader2 className="w-4 h-4 animate-spin text-primary" />
@@ -487,20 +683,25 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           </div>
         )}
         
-        {leaderboardLoading && entries.length === 0 ? (
+        {/* Initial error state */}
+        {isError && allEntries.length === 0 ? (
+          <InitialErrorState onRetry={() => refetch()} />
+        ) : leaderboardLoading && allEntries.length === 0 ? (
           // Initial loading skeleton
-          [...Array(5)].map((_, i) => (
-            <div key={i} className="py-3 px-4 animate-pulse flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-muted" />
-              <div className="w-11 h-11 rounded-full bg-muted" />
-              <div className="flex-1 space-y-2">
-                <div className="h-4 w-32 bg-muted rounded" />
-                <div className="h-3 w-24 bg-muted rounded" />
+          <div className="space-y-2">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="py-3 px-4 animate-pulse flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-muted" />
+                <div className="w-11 h-11 rounded-full bg-muted" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 w-32 bg-muted rounded" />
+                  <div className="h-3 w-24 bg-muted rounded" />
+                </div>
+                <div className="w-8 h-8 bg-muted rounded" />
               </div>
-              <div className="w-8 h-8 bg-muted rounded" />
-            </div>
-          ))
-        ) : entries.length === 0 && !leaderboardLoading ? (
+            ))}
+          </div>
+        ) : allEntries.length === 0 && !leaderboardLoading ? (
           // Contextual empty states based on arena mode
           arenaMode === 'friends' ? (
             <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
@@ -523,10 +724,34 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
               <p className="text-muted-foreground">No players found</p>
             </div>
           )
+        ) : useVirtualization && virtualizedContent ? (
+          // Virtualized list for large entry counts
+          <div
+            className={cn('relative transition-opacity duration-150', leaderboardLoading && 'opacity-60')}
+            style={{ height: virtualizedContent.totalHeight }}
+          >
+            <div
+              className="absolute inset-x-0 space-y-2"
+              style={{ transform: `translateY(${virtualizedContent.offsetY}px)` }}
+            >
+              {virtualizedContent.visibleEntries.map((entry) => (
+                <LeaderboardRowV3
+                  key={entry.user_id}
+                  rank={entry.current_rank}
+                  name={entry.display_name}
+                  avatarUrl={entry.avatar_url}
+                  homeClubName={entry.home_club}
+                  courses={entry.courses_this_season}
+                  isCurrentUser={entry.is_current_user}
+                  onClick={() => handleEntryClick(entry.user_id)}
+                />
+              ))}
+            </div>
+          </div>
         ) : (
-          // Leaderboard List with space-y-2 between rows
+          // Non-virtualized list for smaller entry counts
           <div className={cn('transition-opacity duration-150 space-y-2', leaderboardLoading && 'opacity-60')}>
-            {entries.map((entry) => (
+            {allEntries.map((entry) => (
               <LeaderboardRowV3
                 key={entry.user_id}
                 rank={entry.current_rank}
@@ -535,27 +760,23 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                 homeClubName={entry.home_club}
                 courses={entry.courses_this_season}
                 isCurrentUser={entry.is_current_user}
-                onClick={() => navigate(`/profile/${entry.user_id}?tab=top100`)}
+                onClick={() => handleEntryClick(entry.user_id)}
               />
             ))}
           </div>
         )}
         
-        {/* Load more / End of list indicator */}
-        {hasNextPage ? (
-          <button
-            onClick={() => fetchNextPage()}
-            disabled={leaderboardLoading}
-            className="w-full py-4 text-sm text-primary font-medium hover:bg-muted/30 active:scale-[0.98] transition-all rounded-xl"
-          >
-            {leaderboardLoading ? 'Loading...' : 'Load more'}
-          </button>
-        ) : entries.length > 0 ? (
-          /* 10. End of List */
-          <p className="text-center text-sm text-muted-foreground py-4">
-            You've reached the end
-          </p>
-        ) : null}
+        {/* Sentinel + loading skeleton for infinite scroll */}
+        {hasNextPage && !isError && (
+          <div ref={sentinelRef}>
+            {isFetchingNextPage && <LeaderboardLoadingSkeleton />}
+          </div>
+        )}
+
+        {/* Inline retry on pagination error */}
+        {isError && !isFetchingNextPage && allEntries.length > 0 && (
+          <InlineRetryCard onRetry={() => fetchNextPage()} />
+        )}
       </div>
 
       {/* Rival Versus Panel (drawer) */}
