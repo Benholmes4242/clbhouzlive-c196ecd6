@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Menu, Swords, GitCompare, Crown, RefreshCw, AlertCircle } from 'lucide-react';
+import { Menu, Swords, GitCompare, Crown, RefreshCw, AlertCircle, ChevronLeft } from 'lucide-react';
 import { openTourNav } from '../contexts/TourNavContext';
 import { motion } from 'framer-motion';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
@@ -188,7 +188,7 @@ export function CollegeProfilePage() {
           className="absolute z-30 flex items-center justify-center"
           style={{ width: 44, height: 44, top: 56, left: 16 }}
         >
-          <Menu className="w-[22px] h-[22px] text-white" style={{ strokeWidth: 2, filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }} />
+          <Menu className="w-[24px] h-[24px] text-white" style={{ strokeWidth: 1.5, filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }} />
         </button>
 
         {/* Content — centered */}
@@ -226,13 +226,13 @@ export function CollegeProfilePage() {
                 className="flex items-center gap-1.5"
                 style={{ marginTop: '4px', marginBottom: '12px' }}
               >
-                <Crown className="w-4 h-4" style={{ color: '#f59e0b' }} />
+                <Crown className="w-4 h-4" style={{ color: 'rgba(245, 158, 11, 0.9)' }} />
                 <span style={{
                   fontSize: '12px',
                   fontWeight: 700,
                   letterSpacing: '1.2px',
                   textTransform: 'uppercase' as const,
-                  color: '#f59e0b',
+                  color: 'rgba(245, 158, 11, 0.9)',
                 }}>
                   #{collegeRank} This Season
                 </span>
@@ -307,7 +307,7 @@ export function CollegeProfilePage() {
       {stats && (
         <div className="relative z-10 mx-4" style={{ marginTop: '-24px' }}>
           <motion.div
-            className="flex items-stretch rounded-2xl border border-border/50 bg-card shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
+            className="flex items-stretch rounded-2xl border border-border/50 bg-card"
             style={{
               padding: '12px 0',
             }}
@@ -328,9 +328,10 @@ export function CollegeProfilePage() {
       <div className="px-4" style={{ marginTop: 12 }}>
         <button
           onClick={() => navigate('/tourhub/college-golf', { replace: true })}
-          className="text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
+          className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
         >
-          ← College Golf
+          <ChevronLeft size={14} />
+          College Golf
         </button>
       </div>
 
@@ -349,7 +350,7 @@ export function CollegeProfilePage() {
           >
             <button 
               onClick={handleCompareClick}
-              className="flex items-center rounded-xl border border-border/50 bg-card shadow-[0_1px_3px_rgba(0,0,0,0.04)] active:scale-95 transition-all"
+              className="flex items-center rounded-xl border border-border/50 bg-card active:scale-95 transition-all"
               style={{ padding: '10px 20px', gap: '6px' }}
             >
               <GitCompare className="w-4 h-4 text-muted-foreground" />
@@ -380,7 +381,7 @@ export function CollegeProfilePage() {
             whileInView="visible"
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.4 }}
-            style={{ marginTop: '28px' }}
+            style={{ marginTop: '24px' }}
           >
             <div className="flex items-center gap-2" style={{ marginBottom: '12px' }}>
               <Swords className="w-4 h-4 text-muted-foreground" />
@@ -403,7 +404,7 @@ export function CollegeProfilePage() {
             whileInView="visible"
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.4, delay: 0.1 }}
-            style={{ marginTop: '28px' }}
+             style={{ marginTop: '24px' }}
           >
             <h2 style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }} className="text-foreground">
               Alumni Depth Chart
@@ -480,7 +481,7 @@ function GlassStatCell({ label, value, highlight = false }: { label: string; val
         fontSize: 18,
         fontWeight: 700,
         fontVariantNumeric: 'tabular-nums',
-        color: highlight ? '#f59e0b' : undefined,
+        color: highlight ? 'rgba(245, 158, 11, 0.9)' : undefined,
         marginTop: 2,
       }}>
         {value}
