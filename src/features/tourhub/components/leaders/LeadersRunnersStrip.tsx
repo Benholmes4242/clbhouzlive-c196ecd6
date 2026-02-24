@@ -53,16 +53,7 @@ function RunnerCard({
   return (
     <Link
       to={`/tourhub/player/${player.id}`}
-      className="flex items-center gap-2 active:scale-[0.97] transition-transform"
-      style={{
-        flex: '1 1 0%',
-        minWidth: 0,
-        background: 'hsl(var(--card))',
-        border: '1px solid hsl(var(--border) / 0.5)',
-        borderRadius: 16,
-        padding: '10px 14px',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-      }}
+      className="flex items-center gap-2 active:scale-[0.97] transition-transform flex-1 min-w-0 bg-card border border-border/50 rounded-2xl px-3.5 py-2.5"
     >
       {/* Rank circle — 26×26 */}
       <div
