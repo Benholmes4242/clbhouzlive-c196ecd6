@@ -21,12 +21,12 @@ export function StatRibbon({ playerStats }: StatRibbonProps) {
   const stats = [
     { label: 'WORLD', value: playerStats?.world_rank && playerStats.world_rank > 0 ? `#${playerStats.world_rank}` : null },
     { label: 'FEDEX', value: playerStats?.fedex_rank && playerStats.fedex_rank > 0 ? `#${playerStats.fedex_rank}` : null },
-    { label: 'WINS', value: playerStats?.wins != null ? String(playerStats.wins) : null, highlightColor: playerStats?.wins && playerStats.wins > 0 ? '#f59e0b' : undefined },
+    { label: 'WINS', value: playerStats?.wins != null ? String(playerStats.wins) : null, highlightColor: playerStats?.wins && playerStats.wins > 0 ? 'rgba(245, 158, 11, 0.9)' : undefined },
     { label: 'EARNINGS', value: formatEarnings(playerStats?.earnings) },
   ];
 
   return (
-    <div className="bg-card" style={{ padding: '14px 4px', borderBottom: '1px solid hsl(var(--border) / 0.1)' }}>
+    <div className="bg-card" style={{ padding: '14px 4px', borderBottom: '1px solid hsl(var(--border) / 0.15)' }}>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)' }}>
         {stats.map((stat, i) => (
           <motion.div

@@ -188,7 +188,7 @@ function SkillRadarChart({ attributes, animate = true }: { attributes: SkillAttr
       <motion.polygon
         points={dataPoints}
         fill="url(#skill-fill)"
-        stroke="#F59E0B"
+        stroke="rgba(245, 158, 11, 0.9)"
         strokeWidth="2.5"
         initial={animate ? { opacity: 0, scale: 0.5 } : false}
         animate={animate ? { opacity: 1, scale: 1 } : undefined}
@@ -202,7 +202,7 @@ function SkillRadarChart({ attributes, animate = true }: { attributes: SkillAttr
           cx={p.x}
           cy={p.y}
           r={4}
-          fill="#f59e0b"
+          fill="rgba(245, 158, 11, 0.9)"
           stroke="white"
           strokeWidth={2}
           initial={animate ? { scale: 0 } : false}
@@ -275,7 +275,7 @@ export function PlayerSkillTreeCard({ playerId }: { playerId: string }) {
   }
 
   return (
-    <div ref={ref} className="px-4 py-6 border-b border-border/40">
+    <div ref={ref} className="px-4 py-6 border-b border-border/30">
       <div style={{ marginBottom: '16px' }}>{headerContent}</div>
 
       {/* Attribute Rows */}
