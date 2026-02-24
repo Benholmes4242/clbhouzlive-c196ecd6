@@ -241,7 +241,7 @@ function RunnerCard({ player, index, activeTour, statsMap, sort, tiedCount }: {
         <img
           src={photoUrl}
           alt={player.playerName}
-          className={`w-full h-full object-cover ${activeTour === 'LIV' ? 'object-[center_1%]' : ''}`}
+          className={`w-full h-full object-cover ${activeTour === 'LIV' ? 'object-[center_40%]' : ''}`}
           loading="lazy"
           onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
         />
@@ -379,7 +379,7 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
                 <motion.img
                   src={photoUrl}
                   alt={champion.playerName}
-className={`absolute inset-0 w-full h-full object-cover ${activeTour === 'LIV' ? 'object-[center_1%]' : 'object-[center_10%]'}`}
+className={`absolute inset-0 w-full h-full object-cover ${activeTour === 'LIV' ? 'object-[center_40%]' : 'object-[center_10%]'}`}
                   loading="eager"
                   initial={{ scale: 1.06 }}
                   animate={{ scale: 1 }}
