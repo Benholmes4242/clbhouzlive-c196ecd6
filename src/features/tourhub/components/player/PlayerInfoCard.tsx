@@ -100,7 +100,7 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
   }
 
   return (
-    <div className="bg-card rounded-2xl border border-border/50 px-4 py-3">
+    <div className="px-4 py-6">
       {/* Section header — 22px / 700 / -0.3px */}
       {/* Section header — 11px / 700 / uppercase / muted */}
       <div className="flex items-center gap-2" style={{ marginBottom: '16px' }}>

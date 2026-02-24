@@ -275,7 +275,7 @@ export function PlayerSkillTreeCard({ playerId }: { playerId: string }) {
   }
 
   return (
-    <div ref={ref} className="bg-card rounded-2xl border border-border/50 px-4 py-3">
+    <div ref={ref} className="px-4 py-6 border-b border-border/40">
       <div style={{ marginBottom: '16px' }}>{headerContent}</div>
 
       {/* Attribute Rows */}
