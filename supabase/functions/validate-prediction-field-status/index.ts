@@ -27,6 +27,15 @@ Deno.serve(async (req) => {
     const perplexityKey = Deno.env.get("PERPLEXITY_API_KEY");
     const supabase = createClient(supabaseUrl, serviceKey);
 
+    // Check if this is a pre-start hourly check (only process tournaments starting within 3 hours)
+    let isPreStartCheck = false;
+    try {
+      const body = await req.json();
+      isPreStartCheck = body?.mode === "pre-start-check";
+    } catch {
+      // No body — daily cron mode
+    }
+
     // Find tournaments with predictions that are still scheduled
     const { data: predictions, error: predErr } = await supabase
       .from("ai_predictions")
@@ -41,9 +50,25 @@ Deno.serve(async (req) => {
       );
     }
 
+    // In pre-start mode, filter to only tournaments starting within 3 hours
+    const filteredPredictions = isPreStartCheck
+      ? predictions.filter((pred: any) => {
+          const startDate = new Date((pred as any).sr_tournaments.start_date);
+          const hoursUntilStart = (startDate.getTime() - Date.now()) / (1000 * 60 * 60);
+          return hoursUntilStart > 0 && hoursUntilStart <= 3;
+        })
+      : predictions;
+
+    if (filteredPredictions.length === 0) {
+      return new Response(
+        JSON.stringify({ message: isPreStartCheck ? "No tournaments starting within 3 hours" : "No tournaments to validate" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const results: any[] = [];
 
-    for (const pred of predictions) {
+    for (const pred of filteredPredictions) {
       const tournament = (pred as any).sr_tournaments;
       const topContenders: any[] = (pred.predictions as any[]) || [];
       const alternates: any[] = (pred.dark_horses as any[]) || [];

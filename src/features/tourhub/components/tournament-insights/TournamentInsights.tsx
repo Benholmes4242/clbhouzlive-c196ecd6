@@ -5,7 +5,7 @@
  * Completed: Falls back to next tournament or results recap
  */
 
-import React, { memo, useState, useEffect } from 'react';
+import React, { memo, useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -89,6 +89,16 @@ export const TournamentInsights = memo(function TournamentInsights() {
 
   const hasLiveScores = (liveScoreCount ?? 0) > 0;
   const isWaitingForPlay = isLive && !hasLiveScores;
+
+  // Build set of withdrawn player IDs from tracker for WD badge overlay
+  const withdrawnPlayerIds = useMemo(() => {
+    if (!tracker) return undefined;
+    const wdIds = new Set<string>();
+    for (const p of tracker.allPicks) {
+      if (p.performanceStatus === 'withdrawn') wdIds.add(p.playerId);
+    }
+    return wdIds.size > 0 ? wdIds : undefined;
+  }, [tracker]);
 
   const [activeTab, setActiveTab] = useState<IntelligenceTab>('courseDNA');
   const [intelligenceView, setIntelligenceView] = useState<IntelligenceView>('live');
@@ -174,7 +184,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
         <div className="-mx-4 relative">
           <AnimatePresence mode="wait">
             <motion.div
-              key={heroIsLive ? 'live-hero' : 'upcoming-hero'}
+              key={`hero-${intelligenceView}-${heroData?.id ?? 'none'}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -357,7 +367,11 @@ export const TournamentInsights = memo(function TournamentInsights() {
 
                 {/* AI predicted contenders with confidence bars */}
                 {data.winners.length > 0 && (
-                  <LikelyWinnersCarousel featured={data.winners[0]} cards={data.contenderCards} />
+                  <LikelyWinnersCarousel
+                    featured={data.winners[0]}
+                    cards={data.contenderCards}
+                    withdrawnPlayerIds={withdrawnPlayerIds}
+                  />
                 )}
 
                 {/* Course DNA — auto-expanded via useEffect */}
@@ -448,7 +462,11 @@ export const TournamentInsights = memo(function TournamentInsights() {
               /* ── NO TRACKER: fallback to predictions carousel ── */
               <div className="pb-6">
                 {data.winners.length > 0 && (
-                  <LikelyWinnersCarousel featured={data.winners[0]} cards={data.contenderCards} />
+                  <LikelyWinnersCarousel
+                    featured={data.winners[0]}
+                    cards={data.contenderCards}
+                    withdrawnPlayerIds={withdrawnPlayerIds}
+                  />
                 )}
               </div>
             )}
