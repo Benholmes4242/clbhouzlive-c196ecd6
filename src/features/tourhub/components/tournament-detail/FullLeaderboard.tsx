@@ -88,7 +88,7 @@ function PositionBadge({ position, tied, isMissedCut, status }: {
 
   return (
     <div className={cn(
-      "w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0",
+      "w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0",
       isTop3 ? podiumStyles[position] : "bg-muted text-muted-foreground"
     )}>
       {display}
@@ -218,7 +218,7 @@ export function FullLeaderboard({
 
       {/* Column headers */}
       <div className="flex items-center gap-2 px-4 py-2 border-b border-border sticky top-0 bg-background/95 backdrop-blur-sm z-10">
-        <div className="w-8 shrink-0 text-center">
+        <div className="w-7 shrink-0 text-center">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">Pos</span>
         </div>
         <div className="w-8 shrink-0" />

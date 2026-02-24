@@ -15,7 +15,7 @@ interface RoundSelectorProps {
 export function RoundSelector({ rounds, activeRound, onRoundChange, className }: RoundSelectorProps) {
   return (
     <div
-      className={cn("rounded-xl bg-muted/30 border border-border/50 p-1 flex mb-4", className)}
+      className={cn("flex gap-1 mb-4", className)}
       role="tablist"
       aria-label="Round Selection"
     >

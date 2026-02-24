@@ -42,7 +42,7 @@ export function TournamentDetailTabs({ activeTab, onTabChange, className, tourna
   return (
     <div className={cn("sticky top-0 z-20 bg-background/95 backdrop-blur-md py-3", className)}>
       <div 
-        className="rounded-xl bg-muted/30 border border-border/50 p-1 flex"
+        className="flex gap-1"
         role="tablist"
         aria-label="Tournament Sections"
       >

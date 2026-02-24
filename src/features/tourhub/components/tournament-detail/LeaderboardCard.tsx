@@ -71,7 +71,7 @@ function PositionBadge({ position, tied, isMissedCut, status }: {
   
   return (
     <div className={cn(
-      "w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0",
+      "w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0",
       isTop3 ? podiumStyles[position] : "bg-muted text-muted-foreground"
     )}>
       {display}
@@ -168,7 +168,7 @@ export function LeaderboardCard({
   
   return (
     <motion.div 
-      className="py-6 border-t border-border"
+      className="py-6"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
