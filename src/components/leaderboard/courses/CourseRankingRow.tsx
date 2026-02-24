@@ -54,7 +54,7 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, onClick 
         course.current_user_played && 'bg-[rgba(82,183,136,0.03)]',
       )}
       style={{
-        borderBottom: '1px solid rgba(0, 0, 0, 0.04)',
+        borderBottom: '1px solid hsl(var(--border) / 0.15)',
         borderLeft: course.current_user_played ? '3px solid rgba(82, 183, 136, 0.3)' : undefined,
       }}
     >

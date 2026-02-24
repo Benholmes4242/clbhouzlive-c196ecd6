@@ -16,20 +16,20 @@ const MEDAL_CONFIG: Record<number, {
 }> = {
   1: {
     emoji: '🥇',
-    bgClass: 'bg-[#C1A84C]', // Golf Chartreus gold
-    borderClass: 'border-[#A89040]',
+    bgClass: 'bg-[#D4A853]',
+    borderClass: 'border-[#B8922F]',
     textClass: 'text-white',
   },
   2: {
     emoji: '🥈',
-    bgClass: 'bg-[#B8C6C9]', // Golf Sky Blue silver
+    bgClass: 'bg-[#A8B4C0]',
     borderClass: 'border-[#9AABAF]',
     textClass: 'text-white',
   },
   3: {
     emoji: '🥉',
-    bgClass: 'bg-[#8B7355]', // Warm bronze
-    borderClass: 'border-[#6D5A42]',
+    bgClass: 'bg-[#C4956A]',
+    borderClass: 'border-[#A87B52]',
     textClass: 'text-white',
   },
 };

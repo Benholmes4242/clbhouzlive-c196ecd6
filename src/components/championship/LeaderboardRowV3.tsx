@@ -62,7 +62,7 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
           background: 'rgba(212, 168, 83, 0.08)',
           border: '1px solid rgba(212, 168, 83, 0.2)',
         } : {
-          borderBottom: '1px solid rgba(0, 0, 0, 0.04)',
+          borderBottom: '1px solid hsl(var(--border) / 0.15)',
         }),
       }}
     >

@@ -45,16 +45,19 @@ export function LeaderboardRow({
     <Link
       to={`/profile/${userId}`}
       className={cn(
-        'w-full py-3 flex items-center gap-3 transition-colors transition-transform relative active:scale-[0.98]',
-        isCurrentUser && 'bg-primary/5 pl-3 pr-4',
-        !isCurrentUser && 'px-4',
-        'hover:bg-muted/20 active:bg-muted/30'
+        'w-full py-3 flex items-center gap-3 transition-colors transition-transform active:scale-[0.98]',
+        'px-4',
+        'hover:bg-muted/20 active:bg-muted/30',
+        isCurrentUser && 'rounded-xl'
       )}
+      style={{
+        borderBottom: isCurrentUser ? undefined : '1px solid hsl(var(--border) / 0.15)',
+        ...(isCurrentUser ? {
+          background: 'rgba(212, 168, 83, 0.08)',
+          border: '1px solid rgba(212, 168, 83, 0.2)',
+        } : {}),
+      }}
     >
-      {/* Left accent border for current user - Golf Chartreus */}
-      {isCurrentUser && (
-        <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#C1A84C]" />
-      )}
       
       {/* Rank Badge - using Championship MedalBadge */}
       <MedalBadge rank={rank} size="md" />

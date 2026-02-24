@@ -68,7 +68,7 @@ export function ClubSearchBar({
           variant="ghost"
           size="sm"
           onClick={handleBackToMyClub}
-          className="h-8 px-2 text-xs text-teal-600 hover:text-teal-700 hover:bg-teal-50"
+          className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/40"
         >
           <ChevronLeft className="w-3 h-3 mr-1" />
           Back to {userHomeClubName || 'My Club'}
@@ -77,7 +77,7 @@ export function ClubSearchBar({
 
       {/* Search input */}
       <div className="relative">
-        <div className="rounded-xl relative flex items-center gap-2.5 px-3.5 py-3 bg-card border border-border/60 shadow-sm">
+        <div className="rounded-xl relative flex items-center gap-2.5 px-3.5 py-3 bg-card border border-border/50">
           <Search className="w-4 h-4 flex-shrink-0 text-muted-foreground" />
           <input
             ref={inputRef}
