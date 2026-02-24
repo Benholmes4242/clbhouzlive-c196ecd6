@@ -149,7 +149,7 @@ export function PlayerCardV2({
           "shadow-[0_1px_3px_rgba(0,0,0,0.04)]",
           "active:scale-[0.98] transition-all"
         )}
-        style={{ minHeight: '100px' }}
+        style={{ height: '120px', minHeight: '120px' }}
       >
         {/* Photo section — left 140px */}
         <div className="relative shrink-0 bg-muted overflow-hidden" style={{ width: '140px', borderRadius: '16px 0 0 16px' }}>
