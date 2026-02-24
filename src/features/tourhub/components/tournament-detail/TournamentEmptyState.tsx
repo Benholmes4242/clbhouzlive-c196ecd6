@@ -19,7 +19,7 @@ export function TournamentEmptyState({ icon, title, subtitle, countdown }: Tourn
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="w-16 h-16 flex items-center justify-center text-muted-foreground/30 mb-4">
+      <div className="w-16 h-16 flex items-center justify-center text-muted-foreground mb-4">
         {icon}
       </div>
       <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>

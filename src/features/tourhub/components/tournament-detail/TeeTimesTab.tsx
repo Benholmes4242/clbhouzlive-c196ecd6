@@ -218,7 +218,7 @@ export function TeeTimesTab({ tournamentId, isCompleted }: TeeTimesTabProps) {
         )}
       </div>
 
-      <div className="border-t border-border" />
+      <div />
 
       {/* Tee time groups */}
       <div className="space-y-4 pt-4 px-4">

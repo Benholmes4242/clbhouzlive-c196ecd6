@@ -85,7 +85,7 @@ export function TournamentInfoGrid({ tournament, fieldSize }: TournamentInfoGrid
   
   return (
     <motion.div 
-      className="py-6 border-t border-border"
+      className="py-6"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
@@ -95,7 +95,7 @@ export function TournamentInfoGrid({ tournament, fieldSize }: TournamentInfoGrid
         Tournament Details
       </h3>
       
-      <div className="divide-y divide-border/50">
+      <div>
         {items.map((item) => (
           <div 
             key={item.label}
