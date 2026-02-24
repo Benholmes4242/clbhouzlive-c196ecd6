@@ -70,6 +70,8 @@ export interface AIPredictionData {
   confidence: number;
   generatedAt: string;
   isAIPowered: boolean;
+  /** True when predictions are >24h old pre-tournament or flagged for regeneration */
+  isStale: boolean;
 }
 
 export interface UseAIPredictionsResult {
@@ -307,7 +309,8 @@ async function fetchPredictionsForTournament(tournament: any): Promise<AIPredict
     tournament,
     validatedPredictions,
     true,
-    aiPredictions.generated_at
+    aiPredictions.generated_at,
+    aiPredictions.research_context
   );
 }
 
@@ -454,7 +457,8 @@ function formatPredictions(
   tournament: any,
   predictions: any,
   isAIPowered: boolean,
-  generatedAt?: string
+  generatedAt?: string,
+  researchContext?: any
 ): AIPredictionData {
   // Backwards compat: merge contenders + dark horses into one list, take 4
   const rawContenders = (predictions.topContenders || predictions || []).map((p: any, index: number) => ({
@@ -513,7 +517,32 @@ function formatPredictions(
     confidence: predictions.confidence || 0.7,
     generatedAt: generatedAt || new Date().toISOString(),
     isAIPowered,
+    isStale: isPredictionStale(tournament, generatedAt, researchContext),
   };
+}
+
+/**
+ * Returns true when predictions should be considered stale:
+ * - Generated >24h ago AND tournament hasn't started yet
+ * - Flagged as needs_full_regeneration by the validation edge function
+ */
+function isPredictionStale(
+  tournament: any,
+  generatedAt?: string,
+  researchContext?: any
+): boolean {
+  if (researchContext?.needs_full_regeneration) return true;
+
+  const status = tournament?.status;
+  if (status === 'inprogress' || status === 'closed' || status === 'complete') {
+    return false;
+  }
+
+  if (!generatedAt) return false;
+
+  const generatedTime = new Date(generatedAt).getTime();
+  const twentyFourHours = 24 * 60 * 60 * 1000;
+  return (Date.now() - generatedTime) > twentyFourHours;
 }
 
 /**

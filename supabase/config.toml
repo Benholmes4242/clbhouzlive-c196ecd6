@@ -169,3 +169,6 @@ verify_jwt = false
 
 [functions.scrape-tour-rankings]
 verify_jwt = false
+
+[functions.validate-prediction-field-status]
+verify_jwt = false
