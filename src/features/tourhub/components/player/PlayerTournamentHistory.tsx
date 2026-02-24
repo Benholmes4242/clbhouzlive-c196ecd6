@@ -24,7 +24,7 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
   const hasMore = (allResults?.length ?? 0) > INITIAL_LIMIT;
 
   return (
-    <div className="bg-card rounded-2xl border border-border/50 px-4 py-3">
+    <div className="px-4 py-6 border-b border-border/40">
       {/* Section header — 22px / 700 */}
       <div className="flex items-center gap-2" style={{ marginBottom: '12px' }}>
         <Activity className="w-4 h-4 text-muted-foreground" />

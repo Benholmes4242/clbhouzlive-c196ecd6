@@ -148,7 +148,7 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
     ? (playerStats.top_25s / playerStats.events_played) * 100 : undefined;
 
   return (
-    <div className="bg-card rounded-2xl border border-border/50 px-4 py-3">
+    <div className="px-4 py-6 border-b border-border/40">
       {/* Section header — 22px / 700 / tracking -0.3px */}
       <div className="flex items-center gap-2" style={{ marginBottom: '12px' }}>
         <BarChart3 className="w-4 h-4 text-muted-foreground" />

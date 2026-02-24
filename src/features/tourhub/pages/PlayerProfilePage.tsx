@@ -235,7 +235,7 @@ export function PlayerProfilePage() {
 
           {/* Season Performance — 24px from momentum strip */}
           <motion.div
-            style={{ marginTop: '24px' }}
+            style={{ marginTop: '0px' }}
             variants={sectionVariants}
             initial="hidden"
             whileInView="visible"
@@ -260,7 +260,7 @@ export function PlayerProfilePage() {
           {/* Skill Build — 28px gap */}
           {playerId && (
             <motion.div
-              style={{ marginTop: '24px' }}
+              style={{ marginTop: '0px' }}
               variants={sectionVariants}
               initial="hidden"
               whileInView="visible"
@@ -274,7 +274,7 @@ export function PlayerProfilePage() {
           {/* Recent Tournaments — 28px gap */}
           {playerId && (
             <motion.div
-              style={{ marginTop: '24px' }}
+              style={{ marginTop: '0px' }}
               variants={sectionVariants}
               initial="hidden"
               whileInView="visible"
@@ -287,7 +287,7 @@ export function PlayerProfilePage() {
 
           {/* Player Info — 28px gap */}
           <motion.div
-            style={{ marginTop: '24px' }}
+            style={{ marginTop: '0px' }}
             variants={sectionVariants}
             initial="hidden"
             whileInView="visible"
@@ -298,7 +298,7 @@ export function PlayerProfilePage() {
           </motion.div>
 
           {/* Bottom spacer */}
-          <div style={{ marginTop: '24px' }} />
+          <div style={{ marginTop: '0px' }} />
         </div>
       </div>
     </PageRoot>
