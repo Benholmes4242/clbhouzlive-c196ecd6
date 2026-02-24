@@ -41,6 +41,8 @@ class CoursesErrorBoundary extends Component<Props, State> {
       sessionStorage.removeItem('exploration-leaderboard-scroll');
       sessionStorage.removeItem('handicap-leaderboard-filters');
       sessionStorage.removeItem('handicap-leaderboard-scroll');
+      sessionStorage.removeItem('top100-list-filters');
+      sessionStorage.removeItem('top100:list:scrollY');
     } catch (e) {
       console.error('Failed to clear storage:', e);
     }
