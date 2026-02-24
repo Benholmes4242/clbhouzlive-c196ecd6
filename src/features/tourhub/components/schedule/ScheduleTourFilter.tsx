@@ -112,42 +112,48 @@ export function ScheduleTourFilter({
                   onClick={() => handleSelect(tour.code)}
                   role="option"
                   aria-selected={isActive}
-                  className={cn(
-                    'w-full flex items-center gap-3 p-2.5 rounded-xl transition-all',
-                    isActive
-                      ? 'bg-muted border border-border'
-                      : 'bg-muted/50 border border-transparent hover:border-border'
-                  )}
+                  className="w-full flex items-center gap-3 text-left transition-all duration-150"
+                  style={{
+                    borderRadius: 12,
+                    padding: '14px 16px',
+                    border: isActive
+                      ? '1px solid hsl(var(--foreground))'
+                      : '1px solid hsl(var(--border) / 0.5)',
+                    background: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--card))',
+                  }}
                 >
                   <div
-                    className={cn(
-                      'w-9 rounded-[34%] aspect-[1/1.05] flex items-center justify-center text-xs font-bold tabular-nums',
-                      isActive ? 'bg-foreground text-background' : 'bg-card text-muted-foreground'
-                    )}
+                    className="w-9 rounded-[34%] aspect-[1/1.05] flex items-center justify-center text-xs font-bold tabular-nums"
+                    style={{
+                      background: isActive ? 'rgba(255,255,255,0.2)' : 'hsl(var(--muted))',
+                      color: isActive ? 'white' : 'hsl(var(--muted-foreground))',
+                    }}
                   >
                     {count}
                   </div>
 
-                  <div className="flex-1 text-left">
+                  <div className="flex-1">
                     <p
-                      className={cn(
-                        'font-semibold text-[14px]',
-                        isActive ? 'text-foreground' : 'text-muted-foreground'
-                      )}
+                      style={{
+                        fontSize: 14,
+                        fontWeight: isActive ? 600 : 500,
+                        color: isActive ? 'white' : 'hsl(var(--foreground))',
+                      }}
                     >
                       {tour.label}
                     </p>
                     <p
-                      className={cn(
-                        'text-[11px] mt-0.5',
-                        isActive ? 'text-muted-foreground' : 'text-muted-foreground/70'
-                      )}
+                      style={{
+                        fontSize: 11,
+                        marginTop: 2,
+                        color: isActive ? 'rgba(255,255,255,0.7)' : 'hsl(var(--muted-foreground) / 0.7)',
+                      }}
                     >
                       {tour.description}
                     </p>
                   </div>
 
-                  {isActive && <AnimatedCheck color="hsl(var(--foreground))" />}
+                  {isActive && <AnimatedCheck color="white" />}
                 </motion.button>
               );
             })}
