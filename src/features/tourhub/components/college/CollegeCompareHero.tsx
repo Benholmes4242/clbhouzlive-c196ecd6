@@ -259,45 +259,52 @@ export function CollegeCompareHero({ data, className, onBack }: CollegeCompareHe
   return (
     <div className={cn('', className)}>
       {/* VS Header */}
-      <div className="flex items-center mb-6" style={{ gap: 0 }}>
-        <Link
-          to={`/tourhub/college-golf/${s1?.normalized_name}`}
-          className="flex-1 flex flex-col items-center group min-w-0"
-        >
-          <div className="w-20 h-20 rounded-xl bg-card border border-border flex items-center justify-center overflow-hidden mb-2 group-hover:border-primary/30 transition-colors">
-            {getCollegeLogoUrl(college1.media?.college_name || name1) ? (
-              <img src={getCollegeLogoUrl(college1.media?.college_name || name1)!} alt={name1} className="w-16 h-16 object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
-            ) : (
-              <span className="text-xl font-bold text-muted-foreground">{name1.charAt(0)}</span>
-            )}
-          </div>
-          <span className="text-foreground group-hover:text-primary transition-colors text-center truncate max-w-full" style={{ fontSize: 16, fontWeight: 600 }}>
-            {name1}
-          </span>
-        </Link>
-
-        <div className="shrink-0 w-16 flex flex-col items-center">
+      <div className="mb-6">
+        {/* Season label centered above the VS row */}
+        <div className="flex justify-center mb-2">
           <span className="text-muted-foreground/60" style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
             {seasonYear} Season
           </span>
-          <span className="text-muted-foreground/40" style={{ fontSize: 16, fontWeight: 800 }}>VS</span>
         </div>
 
-        <Link
-          to={`/tourhub/college-golf/${s2?.normalized_name}`}
-          className="flex-1 flex flex-col items-center group min-w-0"
-        >
-          <div className="w-20 h-20 rounded-xl bg-card border border-border flex items-center justify-center overflow-hidden mb-2 group-hover:border-primary/30 transition-colors">
-            {getCollegeLogoUrl(college2.media?.college_name || name2) ? (
-              <img src={getCollegeLogoUrl(college2.media?.college_name || name2)!} alt={name2} className="w-16 h-16 object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
-            ) : (
-              <span className="text-xl font-bold text-muted-foreground">{name2.charAt(0)}</span>
-            )}
+        <div className="flex items-start" style={{ gap: 0 }}>
+          <Link
+            to={`/tourhub/college-golf/${s1?.normalized_name}`}
+            className="flex-1 flex flex-col items-center group min-w-0"
+          >
+            <div className="w-20 h-20 rounded-xl bg-card border border-border flex items-center justify-center overflow-hidden mb-2 group-hover:border-primary/30 transition-colors">
+              {getCollegeLogoUrl(college1.media?.college_name || name1) ? (
+                <img src={getCollegeLogoUrl(college1.media?.college_name || name1)!} alt={name1} className="w-16 h-16 object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+              ) : (
+                <span className="text-xl font-bold text-muted-foreground">{name1.charAt(0)}</span>
+              )}
+            </div>
+            <span className="text-foreground group-hover:text-primary transition-colors text-center truncate max-w-full" style={{ fontSize: 16, fontWeight: 600 }}>
+              {name1}
+            </span>
+          </Link>
+
+          {/* VS vertically centered with the 80px logo boxes */}
+          <div className="shrink-0 w-16 flex items-center justify-center" style={{ height: 80 }}>
+            <span className="text-muted-foreground/40" style={{ fontSize: 16, fontWeight: 800 }}>VS</span>
           </div>
-          <span className="text-foreground group-hover:text-primary transition-colors text-center truncate max-w-full" style={{ fontSize: 16, fontWeight: 600 }}>
-            {name2}
-          </span>
-        </Link>
+
+          <Link
+            to={`/tourhub/college-golf/${s2?.normalized_name}`}
+            className="flex-1 flex flex-col items-center group min-w-0"
+          >
+            <div className="w-20 h-20 rounded-xl bg-card border border-border flex items-center justify-center overflow-hidden mb-2 group-hover:border-primary/30 transition-colors">
+              {getCollegeLogoUrl(college2.media?.college_name || name2) ? (
+                <img src={getCollegeLogoUrl(college2.media?.college_name || name2)!} alt={name2} className="w-16 h-16 object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+              ) : (
+                <span className="text-xl font-bold text-muted-foreground">{name2.charAt(0)}</span>
+              )}
+            </div>
+            <span className="text-foreground group-hover:text-primary transition-colors text-center truncate max-w-full" style={{ fontSize: 16, fontWeight: 600 }}>
+              {name2}
+            </span>
+          </Link>
+        </div>
       </div>
 
       {/* Back button — below VS header */}
