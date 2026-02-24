@@ -49,7 +49,7 @@ export function AppSelect<T extends string = string>({
         <SelectTrigger
           aria-label={ariaLabel}
           className={cn(
-            'h-9 rounded-sq-sm border border-border bg-card px-3 text-sm',
+            'h-9 rounded-sq-sm border border-border bg-card px-3 text-sm text-[hsl(210,13%,18%)]',
             'focus:outline-none focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border',
             '',
             icon && 'pl-2',
