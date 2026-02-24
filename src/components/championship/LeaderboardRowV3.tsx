@@ -13,11 +13,11 @@ interface LeaderboardRowV3Props {
   onClick?: () => void;
 }
 
-// Modern Country Club palette for ranks — intentional brand colors
+// Premium rank badge colors — Gold / Silver / Bronze
 const getRankColor = (r: number) => {
-  if (r === 1) return '#C1A84C'; // Chartreus Gold
-  if (r === 2) return '#B8C6C9'; // Sky Blue Silver
-  if (r === 3) return '#8B7355'; // Warm Bronze
+  if (r === 1) return '#D4A853'; // Gold
+  if (r === 2) return '#A8B4C0'; // Silver
+  if (r === 3) return '#C4956A'; // Bronze
   return 'hsl(var(--muted))';
 };
 
@@ -26,17 +26,13 @@ const getRankTextColor = (r: number) => {
   return 'hsl(var(--muted-foreground))';
 };
 
-// Podium positions keep their metallic color; rank 4+ uses foreground (not amber)
-const getCoursesColor = (r: number, isCurrentUser: boolean) => {
-  if (isCurrentUser) return 'text-amber-600';
-  if (r === 1) return 'text-[#C1A84C]';
-  if (r === 2) return 'text-[#B8C6C9]';
-  if (r === 3) return 'text-[#8B7355]';
-  return 'text-foreground';
-};
-
 /**
- * LeaderboardRowV3 - Polished leaderboard row with Apple-grade styling
+ * LeaderboardRowV3 - Refined leaderboard row with premium styling
+ * 
+ * - Gold/Silver/Bronze rank badges for top 3
+ * - Green stat color (#40916C) for all ranks
+ * - Gold-tinted highlight for current user
+ * - Subtle row dividers
  */
 export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
   rank,
@@ -47,7 +43,6 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
   isCurrentUser,
   onClick,
 }) => {
-  // Top 3 get a subtle ring in their rank color
   const ringColor = rank <= 3 ? getRankColor(rank) : undefined;
 
   return (
@@ -58,27 +53,35 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
       onClick={onClick}
       onKeyDown={(e) => e.key === 'Enter' && onClick?.()}
       className={cn(
-        "flex items-center gap-3 p-3 rounded-xl transition-all duration-200 cursor-pointer",
-        "hover:bg-muted/50 active:scale-[0.98]",
-        isCurrentUser && "bg-amber-50 border border-amber-200"
+        "flex items-center gap-3 py-3 px-4 transition-all duration-200 cursor-pointer",
+        "hover:bg-[rgba(0,0,0,0.02)] active:scale-[0.98]",
+        isCurrentUser && "rounded-xl"
       )}
+      style={{
+        ...(isCurrentUser ? {
+          background: 'rgba(212, 168, 83, 0.08)',
+          border: '1px solid rgba(212, 168, 83, 0.2)',
+        } : {
+          borderBottom: '1px solid rgba(0, 0, 0, 0.04)',
+        }),
+      }}
     >
       {/* Position Badge */}
       <div 
         className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
         style={{ 
           backgroundColor: getRankColor(rank),
-          color: getRankTextColor(rank)
+          color: getRankTextColor(rank),
         }}
       >
         {rank}
       </div>
 
-      {/* Avatar with ring for top 3 */}
-      <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-border">
+      {/* Avatar */}
+      <div className="flex-shrink-0" style={{ width: 44, height: 44 }}>
         <SquircleAvatar
           src={avatarUrl}
-          size={40}
+          size={44}
           ringColor={ringColor}
           alt={name}
           fallback={name?.charAt(0) || '?'}
@@ -89,8 +92,7 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
       {/* Info */}
       <div className="flex-1 min-w-0">
         <p className={cn(
-          "text-sm font-semibold truncate",
-          isCurrentUser ? "text-amber-900" : "text-foreground"
+          "text-sm font-semibold truncate text-foreground",
         )}>
           {name}
         </p>
@@ -99,11 +101,11 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
         )}
       </div>
 
-      {/* Score */}
-      <div className={cn(
-        "text-3xl font-bold flex-shrink-0",
-        getCoursesColor(rank, isCurrentUser)
-      )}>
+      {/* Score — green for all */}
+      <div 
+        className="text-lg font-bold flex-shrink-0"
+        style={{ color: '#40916C' }}
+      >
         {courses}
       </div>
     </div>

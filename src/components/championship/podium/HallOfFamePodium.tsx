@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Crown, Trophy, Sparkles } from 'lucide-react';
+import { Crown, Trophy } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { usePodiumAllTime } from '@/hooks/championship/usePodiumAllTime';
 import type { AllTimePodiumEntry, PodiumScope } from '@/types/podium';
@@ -8,62 +8,58 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { formatNameTwoLines } from '@/utils/formatters';
 
 interface HallOfFamePodiumProps {
-  // Option 1: Pass entries directly
   entries?: AllTimePodiumEntry[];
-  // Option 2: Fetch data internally using scope
   scope?: PodiumScope;
   currentUserId?: string;
   onUserClick?: (userId: string) => void;
 }
 
-// Position-specific styling - Modern Country Club palette
+// Premium awards stage configuration — matching TrophyPodiumSlot with richer All-Time gold
 const POSITION_CONFIG = {
   1: {
-    ringSize: 130,
-    borderWidth: 1.5,
-    gap: 0.5,
-    borderColor: '#C1A84C', // Chartreus Gold
-    badgeSize: 24,
-    badgeBg: 'bg-[#C1A84C]',
-    nameSize: 'text-sm font-bold',
-    glowColor: 'rgba(193, 168, 76, 0.6)',
-    scoreColor: '#C1A84C',
-    crownSize: 'w-9 h-9',
+    avatarSize: 110,
+    mobileAvatarSize: 90,
+    borderWidth: 3,
+    badgeSize: 28,
+    nameClass: 'text-lg font-bold',
+    statClass: 'text-base',
+    // Richer gold for All-Time — deeper multi-stop gradient feel
+    borderColor: '#D4A853',
+    badgeBg: '#D4A853',
+    shadowColor: 'rgba(212, 168, 83, 0.3)', // Slightly stronger than seasonal 0.25
+    crownSize: 36,
+    verticalOffset: 0,
   },
   2: {
-    ringSize: 104,
-    borderWidth: 1.5,
-    gap: 0.5,
-    borderColor: '#B8C6C9', // Sky Blue Silver
+    avatarSize: 80,
+    mobileAvatarSize: 68,
+    borderWidth: 2.5,
     badgeSize: 24,
-    badgeBg: 'bg-[#B8C6C9]',
-    nameSize: 'text-xs font-semibold',
-    glowColor: 'rgba(184, 198, 201, 0.25)',
-    scoreColor: '#B8C6C9',
-    crownSize: null,
+    nameClass: 'text-sm font-semibold',
+    statClass: 'text-sm',
+    borderColor: '#A8B4C0',
+    badgeBg: '#A8B4C0',
+    shadowColor: 'rgba(0, 0, 0, 0.1)',
+    crownSize: 0,
+    verticalOffset: 20,
   },
   3: {
-    ringSize: 104,
-    borderWidth: 1.5,
-    gap: 0.5,
-    borderColor: '#8B7355', // Warm Bronze
+    avatarSize: 80,
+    mobileAvatarSize: 68,
+    borderWidth: 2.5,
     badgeSize: 24,
-    badgeBg: 'bg-[#8B7355]',
-    nameSize: 'text-xs font-semibold',
-    glowColor: 'rgba(139, 115, 85, 0.25)',
-    scoreColor: '#8B7355',
-    crownSize: null,
+    nameClass: 'text-sm font-semibold',
+    statClass: 'text-sm',
+    borderColor: '#C4956A',
+    badgeBg: '#C4956A',
+    shadowColor: 'rgba(0, 0, 0, 0.1)',
+    crownSize: 0,
+    verticalOffset: 32,
   },
 } as const;
 
-/**
- * Calculate inner image size based on ring size, border, and gap
- */
-function getImageSize(ringSize: number, borderWidth: number, gap: number): number {
-  return ringSize - (borderWidth * 2) - (gap * 2);
-}
-
-// formatNameTwoLines imported from @/utils/formatters
+// Stagger order: 2nd → 1st → 3rd
+const ANIMATION_DELAYS = { 1: 0.15, 2: 0, 3: 0.3 } as const;
 
 interface SlotProps {
   entry: AllTimePodiumEntry | undefined;
@@ -74,15 +70,13 @@ interface SlotProps {
 
 const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animationDelay = 0 }) => {
   const config = POSITION_CONFIG[position];
-  const isFirst = position === 1;
-  const imageSize = getImageSize(config.ringSize, config.borderWidth, config.gap);
 
   if (!entry) {
     return (
-      <div className="flex flex-col items-center flex-1">
+      <div className="flex flex-col items-center flex-1" style={{ marginTop: config.verticalOffset }}>
         <div
-          className="rounded-xl bg-muted/30 flex items-center justify-center text-muted-foreground text-2xl"
-          style={{ width: imageSize, height: imageSize }}
+          className="rounded-full bg-muted flex items-center justify-center text-muted-foreground text-xl font-medium"
+          style={{ width: config.mobileAvatarSize, height: config.mobileAvatarSize }}
         >
           ?
         </div>
@@ -95,23 +89,18 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
 
   return (
     <motion.div
-      className={cn(
-        'flex flex-col items-center cursor-pointer flex-1',
-        isFirst && 'mb-4'
-      )}
+      className="flex flex-col items-center cursor-pointer relative flex-1"
+      style={{ marginTop: config.verticalOffset }}
       onClick={onClick}
-      initial={{ opacity: 0, scale: 0.95, y: 10 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{
-        duration: 0.3,
-        delay: animationDelay,
-        ease: 'easeOut',
-      }}
+      whileTap={{ scale: 0.97 }}
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: animationDelay, ease: 'easeOut' }}
     >
-      {/* Crown for 1st place - uses Chartreus gold */}
-      {isFirst && (
+      {/* Crown for 1st place — large and dramatic */}
+      {position === 1 && (
         <motion.div
-          className="relative mb-1.5"
+          className="mb-1"
           initial={{ scale: 0, rotate: -10 }}
           animate={{ scale: 1, rotate: 0 }}
           transition={{
@@ -121,68 +110,41 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
             stiffness: 200,
           }}
         >
-          <Crown 
-            className={config.crownSize || 'w-7 h-7'}
-            style={{ color: '#C1A84C' }}
-            fill="#C1A84C"
+          <Crown
+            size={config.crownSize}
+            className="drop-shadow-md"
+            style={{ color: '#D4A853' }}
+            fill="#D4A853"
             strokeWidth={1.5}
-          />
-          {/* Animated sparkle */}
-          <Sparkles 
-            className="absolute -top-1 -right-2.5 w-3.5 h-3.5 animate-pulse" 
-            style={{ color: '#C1A84C' }}
-          />
-          {/* Second sparkle for extra legendary feel */}
-          <Sparkles 
-            className="absolute -top-0.5 -left-2 w-2.5 h-2.5 animate-pulse" 
-            style={{ animationDelay: '0.5s', color: '#C1A84C' }}
           />
         </motion.div>
       )}
 
-      {/* Position badge (above image for 2nd/3rd) */}
-      {!isFirst && (
-        <div
-          className={cn(
-            'mb-2 flex items-center justify-center font-bold text-white shadow-md',
-            config.badgeBg
-          )}
-          style={{
-            width: config.badgeSize,
-            height: config.badgeSize,
-            borderRadius: '50%',
-            fontSize: config.badgeSize * 0.5,
-          }}
-        >
-          {position}
-        </div>
-      )}
-
-      {/* Avatar with glow and metallic frame - using box-shadow for ring+gap effect */}
+      {/* Avatar with metallic ring */}
       <div className="relative">
-        {/* Enhanced glow for #1 - uses Chartreus gold */}
-        {isFirst && (
-          <div 
-            className="absolute -z-10 pointer-events-none"
+        {/* Golden glow for #1 — warm spotlight, slightly stronger for All-Time */}
+        {position === 1 && (
+          <div
+            className="absolute -z-10"
             style={{
               top: '-1.5rem',
-              left: '-3rem',
-              right: '-3rem',
-              bottom: '-2.5rem',
-              background: 'radial-gradient(ellipse 100% 90% at center 50%, rgba(193, 168, 76, 0.65) 0%, rgba(193, 168, 76, 0.35) 30%, rgba(193, 168, 76, 0.1) 60%, transparent 85%)',
-              filter: 'blur(20px)',
+              left: '-2rem',
+              right: '-2rem',
+              bottom: '-2rem',
+              background: 'radial-gradient(ellipse at center, rgba(212, 168, 83, 0.35) 0%, rgba(212, 168, 83, 0.12) 50%, transparent 80%)',
+              filter: 'blur(12px)',
             }}
           />
         )}
 
-        {/* Avatar with box-shadow for ring + gap effect (matching TrophyPodium technique) */}
+        {/* Avatar image */}
         <div
-          className="relative overflow-hidden rounded-xl"
+          className="relative rounded-full overflow-hidden"
           style={{
-            width: imageSize,
-            height: imageSize,
-            // Inner shadow creates the gap (matches background), outer creates the ring
-            boxShadow: `0 0 0 ${config.gap}px hsl(var(--background)), 0 0 0 ${config.gap + config.borderWidth}px ${config.borderColor}`,
+            width: config.mobileAvatarSize,
+            height: config.mobileAvatarSize,
+            border: `${config.borderWidth}px solid ${config.borderColor}`,
+            boxShadow: `0 ${position === 1 ? '8px 28px' : '4px 12px'} ${config.shadowColor}`,
           }}
         >
           {entry.avatar_url ? (
@@ -198,55 +160,49 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
           )}
         </div>
 
-        {/* 1st place badge */}
-        {isFirst && (
-          <div
-            className={cn(
-              'absolute -bottom-2.5 left-1/2 -translate-x-1/2 flex items-center justify-center font-bold text-white shadow-lg',
-              config.badgeBg
-            )}
-            style={{
-              width: config.badgeSize,
-              height: config.badgeSize,
-              borderRadius: '50%',
-              fontSize: config.badgeSize * 0.5,
-            }}
-          >
-            1
-          </div>
-        )}
+        {/* Rank badge — bottom-right overlapping border */}
+        <div
+          className="absolute -bottom-1 -right-1 flex items-center justify-center font-bold text-white shadow-md"
+          style={{
+            width: config.badgeSize,
+            height: config.badgeSize,
+            borderRadius: '50%',
+            backgroundColor: config.badgeBg,
+            border: '2px solid white',
+            fontSize: config.badgeSize * 0.45,
+            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)',
+          }}
+        >
+          {position}
+        </div>
       </div>
 
-      {/* Name - Two lines */}
-      <div className="mt-4 text-center">
-        <p className={cn('text-foreground leading-tight', config.nameSize)}>
+      {/* Name */}
+      <div className="mt-3 text-center">
+        <p className={cn('text-foreground leading-tight', config.nameClass)}>
           {nameParts.firstName}
         </p>
         {nameParts.lastName && (
-          <p className={cn('text-foreground leading-tight', config.nameSize)}>
+          <p className={cn('text-foreground leading-tight', config.nameClass)}>
             {nameParts.lastName}
           </p>
         )}
       </div>
 
-      {/* Course count */}
+      {/* Stat — green number + muted label */}
       <motion.p
-        className="text-sm mt-0.5"
+        className={cn('font-bold mt-0.5', config.statClass)}
+        style={{ color: '#40916C' }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: animationDelay + 0.3, duration: 0.3 }}
       >
-        <span 
-          className="font-bold"
-          style={{ color: config.scoreColor }}
-        >
-          {entry.all_time_courses}
-        </span>
-        <span className="text-muted-foreground text-xs ml-1">courses</span>
+        {entry.all_time_courses}
+        <span className="text-xs font-normal text-muted-foreground ml-1">courses</span>
       </motion.p>
 
       {/* Season wins for 1st place */}
-      {isFirst && entry.seasons_won > 0 && (
+      {position === 1 && entry.seasons_won > 0 && (
         <p className="text-xs text-muted-foreground mt-1">
           {entry.seasons_won} season{entry.seasons_won !== 1 ? 's' : ''} won
         </p>
@@ -255,26 +211,12 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
   );
 };
 
-/**
- * HallOfFamePodium - Premium all-time leaderboard podium
- * 
- * Features:
- * - Gold/Silver/Bronze styling
- * - Crown for 1st place
- * - Golden glow effect
- * - Decorative stars background
- * 
- * Supports two modes:
- * 1. Pass `entries` directly for controlled mode
- * 2. Pass `scope` to fetch data internally
- */
 export const HallOfFamePodium: React.FC<HallOfFamePodiumProps> = ({
   entries: entriesProp,
   scope,
   currentUserId,
   onUserClick,
 }) => {
-  // Fetch data if scope is provided and entries are not
   const { data: fetchedEntries, isLoading } = usePodiumAllTime({
     scope: scope || 'global',
     currentUserId,
@@ -283,7 +225,6 @@ export const HallOfFamePodium: React.FC<HallOfFamePodiumProps> = ({
 
   const entries = entriesProp || fetchedEntries;
 
-  // Loading state (only when fetching internally)
   if (!entriesProp && isLoading) {
     return (
       <div className="w-full py-6">
@@ -296,31 +237,22 @@ export const HallOfFamePodium: React.FC<HallOfFamePodiumProps> = ({
     );
   }
 
-  // Empty state
   if (!entries || entries.length === 0) {
     return (
       <div className="w-full py-8 text-center">
         <div className="flex items-end justify-center gap-4 opacity-40">
           {[2, 1, 3].map((pos) => (
-            <div
-              key={pos}
-              className="flex flex-col items-center"
-            >
+            <div key={pos} className="flex flex-col items-center">
               <div
-                className="rounded-xl bg-muted flex items-center justify-center text-muted-foreground text-2xl font-medium"
-                style={{
-                  width: pos === 1 ? 100 : 80,
-                  height: pos === 1 ? 100 : 80,
-                }}
+                className="rounded-full bg-muted flex items-center justify-center text-muted-foreground text-2xl font-medium"
+                style={{ width: pos === 1 ? 90 : 68, height: pos === 1 ? 90 : 68 }}
               >
                 ?
               </div>
             </div>
           ))}
         </div>
-        <p className="text-sm text-muted-foreground mt-4">
-          No all-time leaders yet!
-        </p>
+        <p className="text-sm text-muted-foreground mt-4">No all-time leaders yet!</p>
       </div>
     );
   }
@@ -329,71 +261,69 @@ export const HallOfFamePodium: React.FC<HallOfFamePodiumProps> = ({
   const second = entries.find((e) => e.podium_position === 2);
   const third = entries.find((e) => e.podium_position === 3);
 
-  // Animation delays for staggered entrance (2nd → 1st → 3rd)
-  const delays = { 2: 0, 1: 0.15, 3: 0.3 };
-
   return (
-    <div className="relative pt-2 pb-6 px-4 overflow-visible">
-      {/* Ambient glow behind entire podium - fades to transparent at top to avoid hard line */}
-      <div 
-        className="absolute -z-10 pointer-events-none"
-        style={{
-          top: '40%',
-          left: '-2rem',
-          right: '-2rem',
-          bottom: '-2rem',
-          background: 'radial-gradient(ellipse 100% 80% at center 70%, rgba(251, 191, 36, 0.25) 0%, rgba(251, 191, 36, 0.12) 40%, rgba(251, 191, 36, 0.04) 70%, transparent 100%)',
-          filter: 'blur(20px)',
-        }}
-      />
-
-      {/* Hall of Fame Header */}
-      <div className="text-center mb-8">
-        {/* Subtle gold divider line */}
-        <div className="flex items-center justify-center gap-3 mb-3">
-          <div className="h-px w-12 bg-gradient-to-r from-transparent to-amber-300/60" />
-          <Trophy className="w-5 h-5 text-amber-500" />
-          <div className="h-px w-12 bg-gradient-to-l from-transparent to-amber-300/60" />
+    <div className="relative w-full overflow-visible">
+      {/* Hall of Fame Header — prestige inscription */}
+      <div className="text-center py-6">
+        {/* Decorative gold gradient lines flanking trophy */}
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <div 
+            className="h-px w-20"
+            style={{ background: 'linear-gradient(90deg, transparent, rgba(212, 168, 83, 0.3), transparent)' }}
+          />
+          <div 
+            className="relative"
+            style={{ filter: 'drop-shadow(0 0 12px rgba(212, 168, 83, 0.2))' }}
+          >
+            <Trophy size={32} style={{ color: '#D4A853' }} />
+          </div>
+          <div 
+            className="h-px w-20"
+            style={{ background: 'linear-gradient(90deg, transparent, rgba(212, 168, 83, 0.3), transparent)' }}
+          />
         </div>
         
-        {/* Title */}
-        <h2 className="text-lg font-semibold text-foreground">
+        <h2 className="text-2xl font-bold text-foreground tracking-tight mt-2">
           Hall of Fame
         </h2>
-        
-        {/* Subtitle */}
-        <p className="text-xs text-muted-foreground mt-1 font-normal">
+        <p className="text-sm text-muted-foreground mt-1">
           Lifetime leaders across all seasons
         </p>
       </div>
 
+      {/* Spotlight background behind #1 */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          top: '40%',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'radial-gradient(ellipse at 50% 30%, rgba(82, 183, 136, 0.06) 0%, transparent 70%)',
+        }}
+      />
+
       {/* Podium Layout: 2nd - 1st (elevated) - 3rd */}
-      <div className="flex items-end justify-center gap-2">
-        {/* 2nd Place - Left */}
+      <div className="relative flex items-start justify-center pb-6">
         <HallOfFameSlot
           entry={second}
           position={2}
           onClick={() => second && onUserClick?.(second.user_id)}
-          animationDelay={delays[2]}
+          animationDelay={ANIMATION_DELAYS[2]}
         />
-
-        {/* 1st Place - Center (elevated) */}
         <HallOfFameSlot
           entry={first}
           position={1}
           onClick={() => first && onUserClick?.(first.user_id)}
-          animationDelay={delays[1]}
+          animationDelay={ANIMATION_DELAYS[1]}
         />
-
-        {/* 3rd Place - Right */}
         <HallOfFameSlot
           entry={third}
           position={3}
           onClick={() => third && onUserClick?.(third.user_id)}
-          animationDelay={delays[3]}
+          animationDelay={ANIMATION_DELAYS[3]}
         />
       </div>
-
     </div>
   );
 };

@@ -27,7 +27,7 @@ import { DivisionProgressPreview } from './DivisionProgressPreview';
 import { LeaderboardRowV3 } from './LeaderboardRowV3';
 import { RankCelebration } from './RankCelebration';
 import { MotivationalCarousel } from './MotivationalCarousel';
-import { HallOfFameHeader } from './HallOfFameHeader';
+// HallOfFameHeader is now integrated into HallOfFamePodium
 import { ClubSearchBar } from '@/components/leaderboards/exploration/ClubSearchBar';
 import { CountrySelector } from '@/components/leaderboards/shared/CountrySelector';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -556,13 +556,13 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         />
       )}
 
-      {/* 2. Time Filter Toggle - Centered */}
+      {/* 2. Time Filter Toggle - Centered — 24px above podium */}
       <div className="flex justify-center">
         <TimeModeToggle value={timeFilter} onChange={setTimeFilter} />
       </div>
 
       {/* 3. Podium - Show Trophy Podium for seasonal, Hall of Fame for all-time */}
-      <div className="overflow-visible pt-2">
+      <div className="overflow-visible">
         {timeFilter === 'seasonal' && podiumEntries.length > 0 && (
           <TrophyPodium
             entries={podiumEntries}
@@ -672,7 +672,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       )}
 
       {/* 9. Leaderboard List */}
-      <div ref={listContainerRef} className="min-h-[400px] relative" style={{ overflowAnchor: 'auto' }}>
+      <div ref={listContainerRef} className="min-h-[400px] relative -mt-2" style={{ overflowAnchor: 'auto' }}>
         {/* Loading overlay - doesn't unmount the list */}
         {leaderboardLoading && allEntries.length > 0 && (
           <div className="absolute inset-x-0 top-0 flex items-center justify-center py-4 z-10 pointer-events-none">
