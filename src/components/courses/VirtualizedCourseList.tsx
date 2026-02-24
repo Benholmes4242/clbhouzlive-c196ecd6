@@ -3,6 +3,9 @@
  * Only renders visible items + buffer, reducing DOM nodes significantly
  * 
  * Uses UnifiedCourseCard - the single source of truth for course cards.
+ * 
+ * Column-aware: calculates heights based on actual grid column count
+ * to avoid over-sizing on md:grid-cols-2 / lg:grid-cols-3 layouts.
  */
 
 import React, { useRef, useState, useEffect, useCallback } from 'react';
@@ -34,10 +37,10 @@ interface VirtualizedCourseListProps {
   footer?: React.ReactNode;
 }
 
-// Card height for scroll calculations and grid height sizing
-const ITEM_HEIGHT = 300; // Mobile card height
-const ITEM_HEIGHT_SM = 280; // Desktop card height
-const BUFFER_SIZE = 3; // Number of items to render above/below viewport
+// Row height for scroll calculations (per grid row, not per item)
+const ROW_HEIGHT = 300; // Mobile row height
+const ROW_HEIGHT_SM = 280; // Desktop row height
+const BUFFER_ROWS = 3; // Number of rows to render above/below viewport
 
 const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
   courses,
@@ -47,76 +50,68 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const [visibleRange, setVisibleRange] = useState({ start: 0, end: 10 });
-  const [itemHeight, setItemHeight] = useState(ITEM_HEIGHT);
-  const [isMobile, setIsMobile] = useState(true);
+  const [rowHeight, setRowHeight] = useState(ROW_HEIGHT);
+  const [columnCount, setColumnCount] = useState(1);
 
-  // Detect viewport size and update item height
+  // Detect viewport size → update row height + column count
   useEffect(() => {
-    const checkMobile = () => {
-      const mobile = window.innerWidth < 640; // sm breakpoint
-      setIsMobile(mobile);
-      setItemHeight(mobile ? ITEM_HEIGHT : ITEM_HEIGHT_SM);
+    const check = () => {
+      const w = window.innerWidth;
+      setRowHeight(w < 640 ? ROW_HEIGHT : ROW_HEIGHT_SM);
+      // Match Tailwind breakpoints: 1 col default, 2 at md (768), 3 at lg (1024)
+      if (w >= 1024) setColumnCount(3);
+      else if (w >= 768) setColumnCount(2);
+      else setColumnCount(1);
     };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
   }, []);
 
-  // Get the actual scrolling container - in this app it's #root, not window
+  // Get the actual scrolling container
   const getScrollContainer = useCallback((): HTMLElement => {
-    // In this app, #root is the scrolling container (see index.css)
     const rootElement = document.getElementById('root');
-    if (rootElement) {
-      return rootElement;
-    }
-    
-    // Fallback: search up the tree for scrolling parent
+    if (rootElement) return rootElement;
     let element = containerRef.current?.parentElement;
     while (element) {
       const style = window.getComputedStyle(element);
       const hasScroll = style.overflowY === 'scroll' || style.overflowY === 'auto';
-      if (hasScroll && element.scrollHeight > element.clientHeight) {
-        return element;
-      }
+      if (hasScroll && element.scrollHeight > element.clientHeight) return element;
       element = element.parentElement;
     }
-    
-    // Last resort fallback to document.body
     return document.body;
   }, []);
 
-  // Update visible range on scroll
+  // Update visible range on scroll (row-aware)
   const updateVisibleRange = useCallback(() => {
     if (!containerRef.current) return;
 
     const scrollContainer = getScrollContainer();
     const scrollTop = scrollContainer.scrollTop;
     const viewportHeight = scrollContainer.clientHeight;
-    
-    // Find container's offset from top of scroll container
+
     const containerRect = containerRef.current.getBoundingClientRect();
     const scrollContainerRect = scrollContainer.getBoundingClientRect();
     const containerTop = containerRect.top - scrollContainerRect.top + scrollTop;
-    
-    // Calculate scroll position relative to container start
+
     const scrollRelative = Math.max(0, scrollTop - containerTop);
-    
-    // Calculate visible indices with buffer
-    const startIndex = Math.max(0, Math.floor(scrollRelative / itemHeight) - BUFFER_SIZE);
-    const visibleCount = Math.ceil(viewportHeight / itemHeight);
-    const endIndex = Math.min(
-      courses.length,
-      startIndex + visibleCount + (BUFFER_SIZE * 2)
-    );
+
+    // Calculate in rows, then convert to item indices
+    const startRow = Math.max(0, Math.floor(scrollRelative / rowHeight) - BUFFER_ROWS);
+    const visibleRows = Math.ceil(viewportHeight / rowHeight);
+    const totalRows = Math.ceil(courses.length / columnCount);
+    const endRow = Math.min(totalRows, startRow + visibleRows + BUFFER_ROWS * 2);
+
+    const startIndex = startRow * columnCount;
+    const endIndex = Math.min(courses.length, endRow * columnCount);
 
     // Always show at least 10 items initially
-    const finalEnd = Math.max(endIndex, 10);
+    const finalEnd = Math.max(endIndex, Math.min(10, courses.length));
 
     setVisibleRange({ start: startIndex, end: finalEnd });
-  }, [courses.length, itemHeight, getScrollContainer]);
+  }, [courses.length, rowHeight, columnCount, getScrollContainer]);
 
-  // Throttled scroll handler - attach to #root (the actual scrolling container)
+  // Throttled scroll handler
   useEffect(() => {
     let rafId: number | null = null;
     let ticking = false;
@@ -131,15 +126,9 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
       }
     };
 
-    // Initial calculation - delay to ensure container is positioned
-    const initTimer = setTimeout(() => {
-      updateVisibleRange();
-    }, 100);
-
-    // Attach listener to #root (the actual scrolling container in this app)
+    const initTimer = setTimeout(() => updateVisibleRange(), 100);
     const scrollContainer = getScrollContainer();
     scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
-    
     return () => {
       clearTimeout(initTimer);
       scrollContainer.removeEventListener('scroll', handleScroll);
@@ -147,25 +136,22 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
     };
   }, [updateVisibleRange, getScrollContainer]);
 
-  // Recalculate on courses change and window resize
+  // Recalculate on courses change
   useEffect(() => {
-    const timer = setTimeout(() => {
-      updateVisibleRange();
-    }, 50);
-    
+    const timer = setTimeout(() => updateVisibleRange(), 50);
     return () => clearTimeout(timer);
-  }, [courses, updateVisibleRange]);
+  }, [courses.length, updateVisibleRange]);
 
-  const totalHeight = courses.length * itemHeight;
-  const offsetY = visibleRange.start * itemHeight;
+  // Total height accounts for columns
+  const totalRows = Math.ceil(courses.length / columnCount);
+  const totalHeight = totalRows * rowHeight;
+  const offsetRow = Math.floor(visibleRange.start / columnCount);
+  const offsetY = offsetRow * rowHeight;
 
-  // Only render when we have courses
-  if (courses.length === 0) {
-    return null;
-  }
+  if (courses.length === 0) return null;
 
-  // For very small lists (< 20 items), don't virtualize
-  if (courses.length < 20) {
+  // For small lists (< 25 items), don't virtualize — render all
+  if (courses.length < 25) {
     return (
       <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
         <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6">
@@ -189,51 +175,17 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
   }
 
   // Virtualized rendering for larger lists
-  // For 25 or fewer courses, skip virtualization and render all at once
-  if (courses.length <= 25) {
-    return (
-      <div 
-        ref={containerRef}
-        className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0"
-      >
-        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6">
-          {courses.map((course) => (
-            <div key={course.id} className="mb-0">
-              <UnifiedCourseCard 
-                course={fromGolfCourse(course)}
-                showRankBadges={true}
-                showRating={true}
-                onClick={() => {
-                  onCourseClick?.();
-                  navigate(`/courses/${course.id}`);
-                }}
-              />
-            </div>
-          ))}
-        </div>
-        {footer && <div className="pt-8">{footer}</div>}
-      </div>
-    );
-  }
-
-  // For larger lists (>25), use virtualization
   const visibleCourses = courses.slice(visibleRange.start, visibleRange.end);
-
-  // Calculate the height for just the course grid, footer sits after
-  const gridHeight = totalHeight;
 
   return (
     <div 
       ref={containerRef}
       className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0"
     >
-      {/* Virtualized grid with fixed height - z-index 0 to stay below footer */}
-      <div style={{ height: gridHeight, position: 'relative', zIndex: 0 }}>
+      <div style={{ height: totalHeight, position: 'relative', zIndex: 0 }}>
         <div
           className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6 will-change-transform"
-          style={{
-            transform: `translateY(${offsetY}px)`,
-          }}
+          style={{ transform: `translateY(${offsetY}px)` }}
         >
           {visibleCourses.map((course) => (
             <div key={course.id} className="mb-0">
@@ -250,7 +202,6 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
           ))}
         </div>
       </div>
-      {/* Footer (pagination) sits after the grid - z-index 10 ensures it appears above cards */}
       {footer && <div className="pt-8 relative z-10 bg-background">{footer}</div>}
     </div>
   );

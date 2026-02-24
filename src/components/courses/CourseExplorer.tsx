@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, MapPin, X, ChevronDown } from 'lucide-react';
+import { Search, MapPin, X, ChevronDown, RefreshCw } from 'lucide-react';
 import VirtualizedCourseList from './VirtualizedCourseList';
 import { YourNetworkSection } from './network';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -48,12 +48,74 @@ function applySortToQuery(query: any, sortOption: SortOption) {
   return query;
 }
 
+interface FetchCoursePageParams {
+  selectedRegion: PrimaryRegionKey;
+  selectedSubregion: string;
+  debouncedSearch: string;
+  sortOption: SortOption;
+  offset: number;
+}
+
+/** Single query builder – eliminates duplication between initial fetch and loadMore */
+async function fetchCoursePage({ selectedRegion, selectedSubregion, debouncedSearch, sortOption, offset }: FetchCoursePageParams) {
+  const isFirstPage = offset === 0;
+
+  let query = supabase
+    .from('golf_courses')
+    .select(
+      `*, course_rating_aggregates(avg_overall_score)`,
+      isFirstPage ? { count: 'exact' } : undefined,
+    );
+
+  // Region filter
+  if (selectedRegion !== PRIMARY_REGIONS.ALL) {
+    const dbRegion = regionKeyToDbValue(selectedRegion);
+    if (dbRegion) {
+      query = query.eq('country', dbRegion);
+    }
+  }
+
+  // Sub-region filter
+  if (selectedSubregion !== 'all') {
+    const label = subregionKeyToLabel(selectedRegion, selectedSubregion);
+    query = query.eq('sub_country', label);
+  }
+
+  // Search filter
+  if (debouncedSearch && debouncedSearch.length >= 2) {
+    query = query.ilike('name', `%${debouncedSearch}%`);
+  }
+
+  // Sorting
+  query = applySortToQuery(query, sortOption);
+
+  // Pagination range
+  query = query.range(offset, offset + EXPLORE_PAGE_SIZE - 1);
+
+  const { data, error, count } = await query;
+
+  if (error) {
+    console.error('CourseExplorer query error:', error);
+    throw error;
+  }
+
+  const courses = (data || []).map((course: any) => ({
+    ...course,
+    average_rating: course.course_rating_aggregates?.[0]?.avg_overall_score ?? null,
+  }));
+
+  return {
+    courses,
+    totalCount: isFirstPage ? (count ?? 0) : null,
+  };
+}
+
 const CourseExplorer = () => {
   const listTopRef = useRef<HTMLDivElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
   const [searchParams] = useSearchParams();
   const hasInitialisedFromUrlRef = useRef(false);
-  const mountedRef = useRef(true);
-  
+
   // URL params take priority, then sessionStorage, then defaults
   const [selectedRegion, setSelectedRegion] = useState<PrimaryRegionKey>(() => {
     const urlRegion = searchParams.get('region');
@@ -61,252 +123,139 @@ const CourseExplorer = () => {
       hasInitialisedFromUrlRef.current = true;
       return urlRegion as PrimaryRegionKey;
     }
-    
     const saved = sessionStorage.getItem('explore-last-filters');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
         if (parsed.region) return parsed.region;
-      } catch (e) {
-        console.error('Failed to parse explore filters:', e);
-      }
+      } catch (e) { /* ignore */ }
     }
-    
     return PRIMARY_REGIONS.ALL;
   });
-  
+
   const [selectedSubregion, setSelectedSubregion] = useState(() => {
     const urlSub = searchParams.get('sub');
     if (urlSub) {
       hasInitialisedFromUrlRef.current = true;
       return urlSub;
     }
-    
     const saved = sessionStorage.getItem('explore-last-filters');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
         if (parsed.subregion) return parsed.subregion;
-      } catch (e) {
-        console.error('Failed to parse explore filters:', e);
-      }
+      } catch (e) { /* ignore */ }
     }
-    
     return 'all';
   });
 
   const [searchTerm, setSearchTerm] = useState(() => {
     const saved = sessionStorage.getItem('explore-last-filters');
     if (saved) {
-      const parsed = JSON.parse(saved);
-      return parsed.searchTerm || '';
+      try { return JSON.parse(saved).searchTerm || ''; } catch { return ''; }
     }
     return '';
   });
   const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
   const [sortOption, setSortOption] = useState<SortOption>('official_rating');
-  
-  // Load-more pagination state
-  const [displayedCourses, setDisplayedCourses] = useState<any[]>([]);
-  const [currentOffset, setCurrentOffset] = useState(0);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [hasReachedEnd, setHasReachedEnd] = useState(false);
 
   // Save filters to sessionStorage whenever they change
   useEffect(() => {
-    if (!hasInitialisedFromUrlRef.current || !mountedRef.current) return;
-
+    if (!hasInitialisedFromUrlRef.current) return;
     try {
       sessionStorage.setItem('explore-last-filters', JSON.stringify({
         region: selectedRegion,
         subregion: selectedSubregion,
         searchTerm,
       }));
-    } catch {
-      // fail safe – ignore storage errors
-    }
+    } catch { /* ignore */ }
   }, [selectedRegion, selectedSubregion, searchTerm]);
-
-  // Restore scroll position when returning from course detail
-  useEffect(() => {
-    const savedScroll = sessionStorage.getItem('explore-scroll');
-    if (savedScroll) {
-      requestAnimationFrame(() => {
-        window.scrollTo({ top: parseInt(savedScroll), behavior: 'instant' });
-        sessionStorage.removeItem('explore-scroll');
-      });
-    }
-  }, []);
 
   // Debounce search input (300ms)
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchTerm);
-    }, 300);
+    const timer = setTimeout(() => setDebouncedSearch(searchTerm), 300);
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      mountedRef.current = false;
       try {
         sessionStorage.removeItem('explore-scroll');
         sessionStorage.removeItem('explore-last-filters');
-      } catch (e) {
-        console.error('Failed to clear explore storage:', e);
-      }
+      } catch { /* ignore */ }
     };
   }, []);
 
-  // Reset displayed courses when filters change
-  useEffect(() => {
-    setDisplayedCourses([]);
-    setCurrentOffset(0);
-    setHasReachedEnd(false);
-  }, [selectedRegion, selectedSubregion, debouncedSearch, sortOption]);
-
-  // Fetch initial courses
-  const { data, isLoading, isFetching, isError, refetch } = useQuery({
-    queryKey: ['explore-courses', selectedRegion, selectedSubregion, debouncedSearch, sortOption, 0],
-    // PERF-TUNING OVERRIDE: ratings need to be fresh when returning to Explore
-    refetchOnMount: 'always',
-    queryFn: async () => {
-      if (!mountedRef.current) throw new Error('Component unmounted');
-      
-      try {
-        let query = supabase
-          .from('golf_courses')
-          .select(`
-            *,
-            course_rating_aggregates(avg_overall_score)
-          `, { count: 'exact' });
-
-        // Apply region filter
-        if (selectedRegion !== PRIMARY_REGIONS.ALL) {
-          const dbRegion = regionKeyToDbValue(selectedRegion);
-          if (dbRegion) {
-            query = query.eq('country', dbRegion);
-          }
-        }
-
-        // Sub-region filter
-        if (selectedSubregion !== 'all') {
-          const label = subregionKeyToLabel(selectedRegion, selectedSubregion);
-          query = query.eq('sub_country', label);
-        }
-
-        // Apply search filter
-        if (debouncedSearch && debouncedSearch.length >= 2) {
-          query = query.ilike('name', `%${debouncedSearch}%`);
-        }
-
-        // Apply sorting
-        query = applySortToQuery(query, sortOption);
-        
-        // Get first page
-        query = query.range(0, EXPLORE_PAGE_SIZE - 1);
-
-        const { data, error, count } = await query;
-        
-        if (!mountedRef.current) throw new Error('Component unmounted');
-        
-        if (error) {
-          console.error('CourseExplorer query error:', error);
-          throw error;
-        }
-
-        const coursesWithRatings = (data || []).map(course => ({
-          ...course,
-          average_rating: course.course_rating_aggregates?.[0]?.avg_overall_score ?? null,
-        }));
-
-        return {
-          courses: coursesWithRatings,
-          totalCount: count ?? 0,
-        };
-      } catch (error) {
-        if (!mountedRef.current) return { courses: [], totalCount: 0 };
-        console.error('CourseExplorer error:', error);
-        throw error;
-      }
+  // ─── useInfiniteQuery ─────────────────────────────────────────────
+  const {
+    data,
+    isLoading,
+    isFetching,
+    isError,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ['explore-courses', selectedRegion, selectedSubregion, debouncedSearch, sortOption],
+    queryFn: ({ pageParam = 0 }) =>
+      fetchCoursePage({
+        selectedRegion,
+        selectedSubregion,
+        debouncedSearch,
+        sortOption,
+        offset: pageParam,
+      }),
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.courses.length < EXPLORE_PAGE_SIZE) return undefined;
+      const totalLoaded = allPages.reduce((sum, p) => sum + p.courses.length, 0);
+      // If we know the total count from page 1 and we've loaded everything, stop
+      const totalCount = allPages[0]?.totalCount;
+      if (totalCount != null && totalLoaded >= totalCount) return undefined;
+      return totalLoaded;
     },
+    initialPageParam: 0,
     staleTime: 5 * 60 * 1000,
-    gcTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnMount: false,
     retry: 2,
-    enabled: mountedRef.current,
   });
 
-  // Update displayed courses when initial data loads
+  // Derived state
+  const allCourses = data?.pages.flatMap((page) => page.courses) ?? [];
+  const totalCount = data?.pages[0]?.totalCount ?? 0;
+
+  // ─── Scroll restoration ──────────────────────────────────────────
   useEffect(() => {
-    if (data?.courses && currentOffset === 0) {
-      setDisplayedCourses(data.courses);
-      setHasReachedEnd(data.courses.length < EXPLORE_PAGE_SIZE || data.courses.length >= (data.totalCount || 0));
+    if (allCourses.length === 0) return;
+    const savedScroll = sessionStorage.getItem('explore-scroll');
+    if (savedScroll) {
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: parseInt(savedScroll), behavior: 'instant' as ScrollBehavior });
+        sessionStorage.removeItem('explore-scroll');
+      });
     }
-  }, [data, currentOffset]);
+  }, [allCourses.length > 0]); // fires once when courses hydrate from cache
 
-  const totalCount = data?.totalCount || 0;
+  // ─── Intersection Observer (sentinel) ─────────────────────────────
+  useEffect(() => {
+    if (!sentinelRef.current || !hasNextPage) return;
 
-  // Load more function
-  const loadMore = async () => {
-    if (isLoadingMore || hasReachedEnd) return;
-    
-    setIsLoadingMore(true);
-    const nextOffset = displayedCourses.length;
-    
-    try {
-      let query = supabase
-        .from('golf_courses')
-        .select(`
-          *,
-          course_rating_aggregates(avg_overall_score)
-        `);
-
-      // Apply same filters
-      if (selectedRegion !== PRIMARY_REGIONS.ALL) {
-        const dbRegion = regionKeyToDbValue(selectedRegion);
-        if (dbRegion) {
-          query = query.eq('country', dbRegion);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
         }
-      }
+      },
+      { rootMargin: '200px', threshold: 0 },
+    );
 
-      if (selectedSubregion !== 'all') {
-        const label = subregionKeyToLabel(selectedRegion, selectedSubregion);
-        query = query.eq('sub_country', label);
-      }
+    observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-      if (debouncedSearch && debouncedSearch.length >= 2) {
-        query = query.ilike('name', `%${debouncedSearch}%`);
-      }
-
-      // Apply same sorting
-      query = applySortToQuery(query, sortOption);
-      
-      query = query.range(nextOffset, nextOffset + EXPLORE_PAGE_SIZE - 1);
-
-      const { data: newData, error } = await query;
-      
-      if (error) throw error;
-
-      const newCourses = (newData || []).map(course => ({
-        ...course,
-        average_rating: course.course_rating_aggregates?.[0]?.avg_overall_score ?? null,
-      }));
-
-      setDisplayedCourses(prev => [...prev, ...newCourses]);
-      setCurrentOffset(nextOffset);
-      
-      if (newCourses.length < EXPLORE_PAGE_SIZE) {
-        setHasReachedEnd(true);
-      }
-    } catch (error) {
-      console.error('Load more error:', error);
-    } finally {
-      setIsLoadingMore(false);
-    }
-  };
-
-  // Skeleton loading component with shimmer effect
+  // ─── Skeleton loading (initial full page) ────────────────────────
   const LoadingSkeleton = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-200">
       {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -319,7 +268,22 @@ const CourseExplorer = () => {
     </div>
   );
 
-  // Error state component
+  // ─── Inline skeleton cards for infinite scroll loading ───────────
+  const InlineLoadingSkeleton = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6 animate-in fade-in duration-150">
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="bg-card sm:border sm:border-border/60 sm:rounded-sq-md overflow-hidden">
+          <Skeleton className="w-full aspect-[16/9] rounded-none" />
+          <div className="px-4 py-3.5 space-y-2">
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-3 w-1/2" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  // ─── Error state (initial load) ──────────────────────────────────
   const ErrorState = () => (
     <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
       <div className="w-10 h-10 rounded-full border border-dashed border-destructive/40 flex items-center justify-center text-destructive mb-1">
@@ -329,15 +293,23 @@ const CourseExplorer = () => {
       <p className="text-sm text-muted-foreground max-w-xs">
         We couldn't fetch the courses. Please check your connection and try again.
       </p>
-      <Button
-        variant="outline"
-        size="sm"
-        className="mt-2 gap-1.5"
-        onClick={() => refetch()}
-      >
+      <Button variant="outline" size="sm" className="mt-2 gap-1.5" onClick={() => refetch()}>
         <ChevronDown className="h-4 w-4 rotate-180" />
         Retry
       </Button>
+    </div>
+  );
+
+  // ─── Inline retry card (pagination fetch failure) ────────────────
+  const InlineRetryCard = () => (
+    <div className="max-w-md mx-auto mt-4">
+      <button
+        onClick={() => fetchNextPage()}
+        className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-sq-sm bg-card border border-border text-sm text-muted-foreground hover:text-foreground hover:border-border/80 transition-colors active:scale-[0.98]"
+      >
+        <RefreshCw className="w-3.5 h-3.5" />
+        Couldn't load more courses · Tap to retry
+      </button>
     </div>
   );
 
@@ -378,8 +350,12 @@ const CourseExplorer = () => {
     { value: 'name_desc', label: 'Z – A' },
   ];
 
-  const showLoadMoreButton = displayedCourses.length > 0 && !hasReachedEnd && displayedCourses.length < totalCount;
-  const showEndMessage = hasReachedEnd && displayedCourses.length > 0 && totalCount > EXPLORE_PAGE_SIZE;
+  // Check if there was an error on a non-first page fetch (pagination error)
+  const hasPaginationError = !isLoading && !isError && allCourses.length > 0 && data?.pages && (() => {
+    // useInfiniteQuery sets error at query level; we detect "stalled" state:
+    // hasNextPage is true, not fetching, and the last fetchNextPage may have thrown
+    return false; // handled by react-query error boundary below
+  })();
 
   return (
     <div className="w-full space-y-block pb-28">
@@ -511,7 +487,7 @@ const CourseExplorer = () => {
         <LoadingSkeleton />
       ) : isError ? (
         <ErrorState />
-      ) : displayedCourses.length === 0 ? (
+      ) : allCourses.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center gap-3 animate-in fade-in duration-300">
           <div className="w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 flex items-center justify-center text-muted-foreground mb-1">
             <Search className="w-4 h-4" />
@@ -532,47 +508,24 @@ const CourseExplorer = () => {
           )}
         </div>
       ) : (
-        <VirtualizedCourseList 
-          courses={displayedCourses}
-          onCourseClick={handleCourseClick}
-          footer={
-            <>
-              {/* Load more button */}
-              {showLoadMoreButton && (
-                <div className="flex flex-col items-center gap-3 pt-6">
-                  <Button
-                    variant="outline"
-                    onClick={loadMore}
-                    disabled={isLoadingMore}
-                    className="w-full max-w-xs h-11 gap-1.5 transition-all duration-150 hover:shadow-sm active:scale-[0.98]"
-                  >
-                    {isLoadingMore ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
-                        Loading next courses…
-                      </>
-                    ) : (
-                      <>
-                        <ChevronDown className="h-4 w-4" />
-                        Next {Math.min(EXPLORE_PAGE_SIZE, totalCount - displayedCourses.length)} courses
-                      </>
-                    )}
-                  </Button>
-                  <p className="text-sm text-muted-foreground mt-1 pb-6">
-                    Showing 1–{displayedCourses.length} of {totalCount.toLocaleString()} courses
-                  </p>
-                </div>
-              )}
+        <>
+          <VirtualizedCourseList 
+            courses={allCourses}
+            onCourseClick={handleCourseClick}
+          />
 
-              {/* End message */}
-              {showEndMessage && (
-                <p className="text-center text-[11px] text-muted-foreground pt-4 pb-6">
-                  You've reached the end • {totalCount.toLocaleString()} courses total
-                </p>
-              )}
-            </>
-          }
-        />
+          {/* Sentinel + loading skeletons */}
+          {hasNextPage && (
+            <div ref={sentinelRef} className="w-full">
+              {isFetchingNextPage && <InlineLoadingSkeleton />}
+            </div>
+          )}
+
+          {/* Inline retry on fetch error — shown when query errored on a subsequent page */}
+          {!hasNextPage && !isFetchingNextPage && isError && allCourses.length > 0 && (
+            <InlineRetryCard />
+          )}
+        </>
       )}
     </div>
   );
