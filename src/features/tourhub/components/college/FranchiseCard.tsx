@@ -119,7 +119,7 @@ export function FranchiseCard({
           background: 'hsl(var(--card))',
           borderRadius: 16,
           border: '1px solid hsl(var(--border) / 0.5)',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+          
           minHeight: 110,
         }}
       >
@@ -158,7 +158,7 @@ export function FranchiseCard({
                   : rank === 2 ? '#94A3B8'
                   : rank === 3 ? '#C2875A'
                   : 'transparent',
-                color: isTopThree ? 'white' : 'hsl(var(--muted-foreground) / 0.5)',
+                color: isTopThree ? 'white' : 'hsl(var(--muted-foreground) / 0.6)',
                 fontSize: isTopThree ? 11 : 12,
                 fontWeight: isTopThree ? 700 : 600,
                 fontVariantNumeric: 'tabular-nums',
@@ -191,7 +191,7 @@ export function FranchiseCard({
           {/* College name — 16px, 600 */}
           <h3
             className="text-foreground leading-tight group-hover:text-primary transition-colors"
-            style={{ fontSize: 16, fontWeight: 600, letterSpacing: '-0.15px' }}
+            style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.2px' }}
           >
             {displayName}
           </h3>

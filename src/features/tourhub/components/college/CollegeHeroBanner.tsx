@@ -101,14 +101,14 @@ export function CollegeHeroBanner({ stats, college, className }: CollegeHeroBann
             className="flex items-center gap-1.5"
             style={{ marginBottom: 12 }}
           >
-            <Trophy className="w-3.5 h-3.5" style={{ color: '#f59e0b' }} />
+            <Trophy className="w-3.5 h-3.5" style={{ color: 'rgba(245, 158, 11, 0.9)' }} />
             <span
               style={{
                 fontSize: 12,
                 fontWeight: 700,
                 letterSpacing: '1.2px',
                 textTransform: 'uppercase',
-                color: '#f59e0b',
+                color: 'rgba(245, 158, 11, 0.9)',
               }}
             >
               #1 This Season

@@ -129,7 +129,7 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
             className="flex flex-col"
-            style={{ gap: 12 }}
+            style={{ gap: 8 }}
           >
             {isLoading ? (
               Array.from({ length: 5 }).map((_, i) => (

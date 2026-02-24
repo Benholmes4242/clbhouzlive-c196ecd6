@@ -54,7 +54,7 @@ export function AlumniFaceStrip({ alumni, collegeName, collegeSlug, totalAlumniC
           border: '1px solid hsl(var(--border) / 0.5)',
           borderRadius: 16,
           padding: '12px 16px',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+          
         }}
       >
         {/* Stacked squircle avatars — 32×32, 34% radius, 2px white border, -8px overlap */}
@@ -119,7 +119,7 @@ export function AlumniFaceStrip({ alumni, collegeName, collegeSlug, totalAlumniC
           </p>
         </div>
 
-        <ChevronRight className="w-4 h-4 shrink-0" style={{ color: 'hsl(var(--muted-foreground) / 0.3)' }} />
+        <ChevronRight className="w-4 h-4 shrink-0" style={{ color: 'hsl(var(--muted-foreground) / 0.5)' }} />
       </Link>
     </motion.div>
   );

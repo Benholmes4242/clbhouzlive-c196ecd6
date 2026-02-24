@@ -1,6 +1,6 @@
 import { useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Menu, RefreshCw } from 'lucide-react';
+import { Menu, RefreshCw, ChevronLeft } from 'lucide-react';
 import { openTourNav } from '../contexts/TourNavContext';
 import { motion } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
@@ -132,8 +132,8 @@ export function CollegeGolfHubPage() {
           aria-label="Open tour menu"
         >
           <Menu
-            className="w-[22px] h-[22px]"
-            strokeWidth={2}
+            className="w-[24px] h-[24px]"
+            strokeWidth={1.5}
             style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5))' }}
           />
         </button>
@@ -149,21 +149,22 @@ export function CollegeGolfHubPage() {
         )}
 
         {/* ← Tour Overview link */}
-        <div className="px-4" style={{ marginTop: 12 }}>
+        <div className="px-4" style={{ marginTop: 16 }}>
           <Link
             to="/tourhub?tab=overview"
             replace
-            className="text-muted-foreground hover:text-foreground transition-colors active:opacity-70"
+            className="inline-flex items-center gap-0.5 text-muted-foreground hover:text-foreground transition-colors active:opacity-70"
             style={{ fontSize: 13, fontWeight: 500 }}
           >
-            ← Tour Overview
+            <ChevronLeft size={14} />
+            Tour Overview
           </Link>
         </div>
 
         {/* Content area */}
         <div className="px-4" style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
           {/* Search — 8px gap from tour overview link */}
-          <div style={{ marginTop: 8 }}>
+          <div style={{ marginTop: 16 }}>
             <CollegeSearch />
           </div>
 
