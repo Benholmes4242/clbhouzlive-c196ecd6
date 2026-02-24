@@ -150,7 +150,7 @@ function WinnerCard({ winner, runnerUp, headshotMap }: {
         {earnings && (
           <div className="flex items-center gap-1.5">
             <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Earnings:</span>
-            <span className="text-xs font-semibold" style={{ color: '#f59e0b' }}>{earnings}</span>
+            <span className="text-xs font-semibold" style={{ color: 'rgba(245, 158, 11, 0.9)' }}>{earnings}</span>
           </div>
         )}
       </div>
@@ -297,7 +297,7 @@ export function SummaryTab({
 
           <div>
 
-          <div className="divide-y divide-border/30">
+          <div className="divide-y divide-border/15">
             {top10.map((entry: any, idx: number) => {
               const isWinner = entry.position === 1;
               return (
@@ -316,7 +316,7 @@ export function SummaryTab({
                   >
                      <span className={cn(
                       "w-7 text-center text-[12px] font-bold",
-                      isWinner ? "text-[#f59e0b]" 
+                      isWinner ? "text-[rgba(245,158,11,0.9)]" 
                         : entry.position === 2 ? "text-slate-400"
                         : entry.position === 3 ? "text-orange-500"
                         : "text-muted-foreground"
@@ -328,7 +328,7 @@ export function SummaryTab({
                       playerName={entry.player?.full_name || 'Unknown'}
                       size="sm"
                     />
-                    <span className="flex-1 text-[15px] font-semibold text-foreground truncate" style={{ letterSpacing: '-0.1px' }}>
+                    <span className="flex-1 text-[15px] font-semibold text-foreground truncate" style={{ letterSpacing: '-0.2px' }}>
                       {entry.player?.full_name || 'Unknown'}
                     </span>
                     <ScoreToPar score={entry.score} />

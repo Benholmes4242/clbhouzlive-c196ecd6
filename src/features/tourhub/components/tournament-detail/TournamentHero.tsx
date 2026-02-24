@@ -99,7 +99,7 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
     <div className="relative overflow-hidden">
       <motion.div 
         className="relative overflow-hidden"
-        style={{ minHeight: 'calc(clamp(282px, 53vh, 422px) + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
+        style={{ minHeight: 'calc(45dvh + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
@@ -146,8 +146,8 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
           style={{ width: 44, height: 44, top: 56, left: 16 }}
         >
           <Menu
-            className="w-[22px] h-[22px] text-white"
-            style={{ strokeWidth: 2, filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.7)) drop-shadow(0 0px 8px rgba(0,0,0,0.3))' }}
+            className="w-[24px] h-[24px] text-white"
+            style={{ strokeWidth: 1.5, filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.7)) drop-shadow(0 0px 8px rgba(0,0,0,0.3))' }}
           />
         </button>
 

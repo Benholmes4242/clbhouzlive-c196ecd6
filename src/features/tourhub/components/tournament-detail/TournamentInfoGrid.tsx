@@ -91,7 +91,7 @@ export function TournamentInfoGrid({ tournament, fieldSize }: TournamentInfoGrid
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.35 }}
     >
-      <h3 className="text-[10px] font-bold tracking-[0.8px] uppercase text-muted-foreground/50 mb-4">
+      <h3 className="text-[10px] font-bold uppercase text-muted-foreground/50 mb-4" style={{ letterSpacing: '0.05em' }}>
         Tournament Details
       </h3>
       
@@ -105,7 +105,7 @@ export function TournamentInfoGrid({ tournament, fieldSize }: TournamentInfoGrid
               {item.icon}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] font-semibold tracking-widest uppercase text-muted-foreground mb-0.5">
+              <p className="text-[10px] font-semibold uppercase text-muted-foreground mb-0.5" style={{ letterSpacing: '0.05em' }}>
                 {item.label}
               </p>
               <p className="text-sm font-medium text-foreground truncate">

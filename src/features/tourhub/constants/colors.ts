@@ -12,7 +12,7 @@ export const TOUR_COLORS = {
   intelligenceGoldDark: '#FF8C00',
   
   // Scores (PGA Tour convention)
-  scoreUnderPar: '#f59e0b',
+  scoreUnderPar: 'rgba(245, 158, 11, 0.9)',
   scoreOverPar: '#111827',
   scoreEven: 'rgba(0,0,0,0.4)',
   
