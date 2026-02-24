@@ -23,6 +23,7 @@ interface PickCard {
   avatarUrl: string;
   confidenceTier: 'elite' | 'high' | 'medium';
   bullets: string[];
+  promoted?: boolean;
 }
 
 export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
@@ -44,6 +45,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
       avatarUrl: featured.avatarUrl,
       confidenceTier: featured.confidenceTier,
       bullets: featured.fitBullets.slice(0, 3),
+      promoted: featured.promoted,
     },
     ...contenderCards.map(c => ({
       id: c.id,
@@ -52,6 +54,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
       avatarUrl: c.avatarUrl,
       confidenceTier: c.confidenceTier ?? ('medium' as const),
       bullets: c.fitBullets?.slice(0, 3) || (c.description ? [c.description] : []),
+      promoted: c.promoted,
     })),
   ];
 
@@ -162,14 +165,27 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                     {pick.name}
                   </span>
                 </div>
-                {pick.countryCode && (
-                  <span
-                    className="text-[10px] font-semibold px-2 py-0.5 rounded-md text-muted-foreground inline-block"
-                    style={{ background: 'rgba(0, 0, 0, 0.04)' }}
-                  >
-                    {pick.countryCode}
-                  </span>
-                )}
+                <div className="flex items-center gap-1.5">
+                  {pick.countryCode && (
+                    <span
+                      className="text-[10px] font-semibold px-2 py-0.5 rounded-md text-muted-foreground inline-block"
+                      style={{ background: 'rgba(0, 0, 0, 0.04)' }}
+                    >
+                      {pick.countryCode}
+                    </span>
+                  )}
+                  {pick.promoted && (
+                    <span
+                      className="text-[10px] font-semibold px-2 py-0.5 rounded-md inline-block"
+                      style={{
+                        background: 'rgba(59, 130, 246, 0.08)',
+                        color: 'rgb(59, 130, 246)',
+                      }}
+                    >
+                      Promoted pick
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
 

@@ -121,6 +121,7 @@ function transformPredictions(aiData: AIPredictionData): TournamentInsightsData 
       confidenceTier: getConfidenceTier(i),
       fitBullets: p.reasons?.slice(0, 3) || [],
       keyTag: extractKeyTag(p.reasons?.[0]),
+      promoted: !!p.promoted,
     })),
 
     dangerous: [],
@@ -180,6 +181,7 @@ function buildContenderCards(
     type: 'contender' as const,
     rank: i + 2,
     confidenceTier: getConfidenceTier(i + 1),
+    promoted: !!p.promoted,
   }));
 }
 
