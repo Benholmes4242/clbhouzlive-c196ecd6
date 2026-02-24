@@ -17,7 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 import { NewSeasonBanner } from '@/components/feed/NewSeasonBanner';
 import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
 import { useSeasonRecap } from '@/hooks/useSeasonRecap';
-import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
+
 import { cn } from '@/lib/utils';
 import { Compass } from 'lucide-react';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
@@ -78,18 +78,13 @@ const ClubhouseContent = () => {
   // Transparent status bar for immersive video bleed into safe area
   useMedianStatusBar("dark", "transparent", true, false);
   
-  // Cinema Dim: register this page as Clubhouse
-  const { setIsClubhousePage, cinemaDim } = useCinemaDimContext();
-  
   // Use useLayoutEffect for route class to prevent flash
   useLayoutEffect(() => {
     document.body.classList.add('route-clubhouse');
-    setIsClubhousePage(true);
     return () => {
       document.body.classList.remove('route-clubhouse');
-      setIsClubhousePage(false);
     };
-  }, [setIsClubhousePage]);
+  }, []);
   
   const location = useLocation();
   const clubhouseRootRef = useRef<HTMLDivElement>(null);
@@ -322,7 +317,7 @@ const ClubhouseContent = () => {
   return (
     <PageRoot 
       ref={clubhouseRootRef} 
-      className={cn("clubhouse-root", cinemaDim && "cinema-dim")} 
+      className="clubhouse-root" 
       style={{ 
         "--bg-page": "#0F0F0F", 
         position: 'relative', 

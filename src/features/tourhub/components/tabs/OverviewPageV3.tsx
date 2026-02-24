@@ -13,7 +13,6 @@
  * 7. College Golf Rankings (NEW - preview of college leaderboard)
  */
 
-import { useLayoutEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   HeroCarousel,
@@ -25,7 +24,6 @@ import { CollegeRankingsPreview } from '../overview-v3/CollegeRankingsPreview';
 import { SeasonLeaderboards } from '../overview-v3/SeasonLeaderboards';
 import { TournamentInsights } from '../tournament-insights';
 import { LazySection } from '../overview-v3/LazySection';
-import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { usePreventOverscroll } from '@/hooks/usePreventOverscroll';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
@@ -33,7 +31,6 @@ import { HERO_STYLES } from '../../constants/heroStyles';
 import { WifiOff } from 'lucide-react';
 
 export function OverviewPageV3() {
-  const { setDimmablePage, setIsLightDimmed } = useCinemaDimContext();
   const { isOnline } = useNetworkStatus();
 
   // Prevent pull-down overscroll bounce on this immersive page
@@ -41,17 +38,6 @@ export function OverviewPageV3() {
 
   // Set transparent status bar with WHITE icons for dark hero image
   useMedianStatusBar("dark", "transparent", true, false);
-
-  // Register as dimmable page with IMMEDIATE dimming
-  useLayoutEffect(() => {
-    setDimmablePage('tourhub-overview');
-    setIsLightDimmed(true);
-    
-    return () => {
-      setDimmablePage(null);
-      setIsLightDimmed(false);
-    };
-  }, [setDimmablePage, setIsLightDimmed]);
 
   return (
     <motion.div
@@ -99,28 +85,23 @@ export function OverviewPageV3() {
           {/* 2. Live Right Now (conditional - hides if no live) */}
           <LiveRightNow />
 
-
           {/* 3. What's Coming - upcoming tournaments across all tours */}
           <WhatsComing />
-
 
           {/* 4. Tournament Insights - AI Predictions (Tournament Intelligence) */}
           <LazySection minHeight={250}>
             <TournamentInsights />
           </LazySection>
 
-
           {/* 5. Unified World Rankings (Movers + OWGR Table) */}
           <LazySection minHeight={400}>
             <UnifiedWorldRankings />
           </LazySection>
 
-
           {/* 6. Season Leaderboards */}
           <LazySection minHeight={300}>
             <SeasonLeaderboards />
           </LazySection>
-
 
           {/* 7. College Golf Rankings */}
           <LazySection minHeight={350}>

@@ -77,7 +77,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
                 isOpen={menuOpen}
                 hasUnreadNotifications={hasUnread}
                 useGlassTheme={true}
-                isDimmed={false}
+                
               />
             </div>
           )}

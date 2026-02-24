@@ -34,7 +34,7 @@ import { Top100DebugProvider } from '@/context/Top100DebugContext';
 import { UIProvider } from '@/contexts/UIContext';
 import { ModalProvider } from '@/contexts/ModalContext';
 import { BottomNavigationProvider } from '@/contexts/BottomNavigationContext';
-import { CinemaDimProvider } from '@/contexts/CinemaDimContext';
+
 import { PostEventsBridge } from '@/events/PostEventsBridge';
 import { UploadToastsBridge } from '@/uploads/UploadToastsBridge';
 import UploadProgressBanner from '@/components/uploads/UploadProgressBanner';
@@ -688,7 +688,7 @@ const AppInner: React.FC = () => {
         <HeaderProvider>
             <ModalProvider>
               <BottomNavigationProvider>
-                <CinemaDimProvider>
+                
                   <UIProvider>
                     <ToastHost>
                       <HubProvider>
@@ -735,7 +735,7 @@ const AppInner: React.FC = () => {
                       </HubProvider>
                     </ToastHost>
                   </UIProvider>
-                </CinemaDimProvider>
+                
               </BottomNavigationProvider>
             </ModalProvider>
           </HeaderProvider>

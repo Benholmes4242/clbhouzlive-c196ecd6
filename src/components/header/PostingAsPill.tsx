@@ -11,7 +11,6 @@ interface PostingAsPillProps {
   hasUnreadNotifications?: boolean;
   useLightTheme?: boolean;
   useGlassTheme?: boolean; // Clubhouse frosted-glass treatment
-  isDimmed?: boolean; // When true, pill becomes transparent
 }
 
 /**
@@ -19,7 +18,7 @@ interface PostingAsPillProps {
  * Uses forwardRef to allow parent to get anchor position for desktop popover
  */
 export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
-  ({ onClick, isOpen, hasUnreadNotifications = false, useLightTheme = false, useGlassTheme = false, isDimmed = false }, ref) => {
+  ({ onClick, isOpen, hasUnreadNotifications = false, useLightTheme = false, useGlassTheme = false }, ref) => {
     const { activeActor, isLoading } = useActiveActor();
     
     // Get unread messages count from messaging system
@@ -58,16 +57,8 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
 
     const getInitials = (name: string) => name.charAt(0).toUpperCase();
 
-    // Get styles based on theme and dim state
+    // Get styles based on theme
     const getPillStyles = () => {
-      if (isDimmed) {
-        return {
-          background: 'transparent',
-          border: '1px solid transparent',
-          backdropFilter: 'none',
-          WebkitBackdropFilter: 'none',
-        };
-      }
       if (useGlassTheme) {
         return {
           background: 'rgba(0, 0, 0, 0.35)',
@@ -101,9 +92,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
               ? "hover:brightness-110"
               : useLightTheme 
                 ? "hover:opacity-90" 
-                : isDimmed
-                  ? ""
-                  : "bg-white/5 border border-white/10 hover:bg-white/10 active:bg-white/15"
+                : "bg-white/5 border border-white/10 hover:bg-white/10 active:bg-white/15"
           )}
           style={getPillStyles()}
         >

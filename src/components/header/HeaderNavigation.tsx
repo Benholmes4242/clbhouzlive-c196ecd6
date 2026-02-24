@@ -23,10 +23,9 @@ import { useProfilePrefetch } from '@/hooks/useProfilePrefetch';
 interface HeaderNavigationProps {
   onInteraction?: () => void;
   useLightTheme?: boolean;
-  isDimmed?: boolean;
 }
 
-const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useLightTheme = false, isDimmed = false }) => {
+const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useLightTheme = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useSupabaseSession();
@@ -61,13 +60,11 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
     queryFn: async () => {
       if (!user?.id) return { isAdmin: false, isLimitedAdmin: false };
       
-      // Check for admin role
       const { data: isAdmin, error: adminError } = await supabase.rpc('is_admin');
       if (adminError) {
         console.error('Error checking admin status:', adminError);
       }
 
-      // Check for limited admin role
       const { data: isLimitedAdmin, error: limitedAdminError } = await supabase.rpc('has_role', {
         _user_id: user.id,
         _role: 'limited_admin'
@@ -85,14 +82,11 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
     enabled: !!user?.id,
   });
 
-  // Check if user has any businesses they manage
   const { hasBusinesses } = useHasBusinesses(user?.id);
   const { data: businesses } = useMyBusinesses(user?.id);
 
-  // Business intro modal state
   const [showBusinessIntroModal, setShowBusinessIntroModal] = useState(false);
 
-  // Fetch profile to check creator_only
   const { data: profile } = useQuery({
     queryKey: ['profile-creator-only', user?.id],
     queryFn: async () => {
@@ -122,7 +116,6 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
     navigate('/business/intro');
   };
 
-  // Keep modal handler for intro flow if needed elsewhere
   const handleBusinessIntroContinue = () => {
     navigate('/business/create');
   };
@@ -149,16 +142,13 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
     try {
       console.log('Starting logout process...');
       
-      // Sign out from Supabase first
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error('Error during Supabase logout:', error);
-        // Continue with logout process even if Supabase logout fails
       } else {
         console.log('Supabase logout successful');
       }
       
-      // Clear any cached data in localStorage and sessionStorage
       try {
         localStorage.clear();
         sessionStorage.clear();
@@ -166,13 +156,11 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
         console.warn('Error clearing storage:', storageError);
       }
       
-      // Force navigation to landing page and reload
       console.log('Redirecting to landing page...');
       window.location.href = '/';
       
     } catch (error) {
       console.error('Error during logout:', error);
-      // Force redirect even if logout fails
       window.location.href = '/';
     }
   };
@@ -210,7 +198,7 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
     <div ref={navigationRef} className="flex items-center space-x-1 md:space-x-4">
       {/* Identity Selector - only shown when user has multiple identities */}
       <div className="hidden sm:block">
-        <IdentitySelector isDimmed={isDimmed} />
+        <IdentitySelector />
       </div>
 
       <DropdownMenu>
@@ -232,7 +220,6 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
             Edit Profile
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          {/* Business profiles option - always goes to hub */}
           {hasBusinesses && businesses && businesses.length > 0 ? (
             <DropdownMenuItem onClick={() => navigate('/businesses/manage')}>
               <Briefcase className="h-4 w-4 mr-2" />

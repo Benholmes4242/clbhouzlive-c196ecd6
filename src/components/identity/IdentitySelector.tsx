@@ -18,11 +18,9 @@ interface IdentitySelectorProps {
   compact?: boolean;
   /** Visual variant - 'light' for light backgrounds, 'dark' for dark/glass backgrounds */
   variant?: 'light' | 'dark';
-  /** When true, selector becomes transparent (used when header is dimmed) */
-  isDimmed?: boolean;
 }
 
-export function IdentitySelector({ compact = false, variant = 'light', isDimmed = false }: IdentitySelectorProps) {
+export function IdentitySelector({ compact = false, variant = 'light' }: IdentitySelectorProps) {
   const navigate = useNavigate();
   const { activeActor, setActiveActor, availableActors, isLoading } = useActiveActor();
 
@@ -68,21 +66,12 @@ export function IdentitySelector({ compact = false, variant = 'light', isDimmed 
     }
   };
 
-  // Style variants - supports dimmed state
-  const triggerClasses = isDimmed
-    ? `inline-flex items-center gap-2 ${compact ? 'pl-1.5 pr-2.5 py-1' : 'pl-2 pr-3 py-1.5'} rounded-sq-pill transition-all duration-500`
-    : variant === 'dark'
+  // Style variants
+  const triggerClasses = variant === 'dark'
       ? `inline-flex items-center gap-2 ${compact ? 'pl-1.5 pr-2.5 py-1' : 'pl-2 pr-3 py-1.5'} rounded-sq-pill bg-white/5 border border-white/10 hover:bg-white/10 active:bg-white/15 transition-colors`
       : `inline-flex items-center gap-2 ${compact ? 'px-2 py-1' : 'px-3 py-1.5'} rounded-sq-pill border hover:opacity-90 transition-colors`;
 
   const getTriggerStyle = () => {
-    if (isDimmed) {
-      return {
-        background: 'transparent',
-        border: '1px solid transparent',
-        backdropFilter: 'none',
-      };
-    }
     if (variant === 'light') {
       return {
         background: 'var(--cm-surface-alt)',

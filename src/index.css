@@ -193,9 +193,6 @@ html.lightbox-open {
   --clubhouse-border: 0 0% 100% / 0.08;
   --clubhouse-border-light: 0 0% 100% / 0.10;
   
-  /* Cinema dim mode overrides */
-  --clubhouse-dim-bg-header: 0 0% 6% / 0.02;
-  --clubhouse-dim-bg-footer: 0 0% 5% / 0.02;
   
   /* Active states for dark theme */
   --clubhouse-active-bg: 0 0% 100% / 0.10;
