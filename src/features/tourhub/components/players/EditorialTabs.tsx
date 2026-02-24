@@ -1,11 +1,5 @@
 /**
- * EditorialTabs - Premium segmented control tabs matching Schedule page
- * 
- * Tabs:
- * - The Field (All Players)
- * - Elite (Top Ranked)
- * - On Tour (Most Active)
- * - Next Wave (Rookies)
+ * EditorialTabs - Tier 2 sub-filter tabs for Players page
  */
 
 import { cn } from '@/lib/utils';
@@ -37,10 +31,9 @@ export function EditorialTabs({ activeFilter, onFilterChange, counts }: Editoria
       role="tablist"
       aria-label="Filter players"
     >
-      {/* Full-width segmented control - matching Schedule page */}
       <div 
-        className="flex items-stretch rounded-xl overflow-hidden"
-        style={{ background: '#e2e8f0' }}
+        className="flex items-stretch rounded-[14px] overflow-hidden p-[3px]"
+        style={{ background: 'rgba(0, 0, 0, 0.03)' }}
       >
         {TABS.map((tab) => {
           const isActive = activeFilter === tab.value;
@@ -53,11 +46,11 @@ export function EditorialTabs({ activeFilter, onFilterChange, counts }: Editoria
               aria-selected={isActive}
               onClick={() => onFilterChange(tab.value)}
               className={cn(
-                "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap",
-                "min-h-[44px]", // Accessibility touch target
+                "relative flex-1 py-2.5 text-[13px] font-medium transition-all duration-200 whitespace-nowrap",
+                "min-h-[44px]",
                 isActive 
-                  ? "bg-white text-[#1e293b] shadow-sm m-1 rounded-lg border border-[#e2e8f0]" 
-                  : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
+                  ? "bg-card text-foreground font-semibold rounded-xl" 
+                  : "text-muted-foreground rounded-xl"
               )}
             >
               <span className="flex items-center justify-center gap-1.5">
@@ -65,7 +58,7 @@ export function EditorialTabs({ activeFilter, onFilterChange, counts }: Editoria
                 {count !== undefined && count > 0 && (
                   <span className={cn(
                     "text-[10px] font-normal tabular-nums",
-                    isActive ? "text-slate-500" : "text-slate-400"
+                    isActive ? "text-muted-foreground" : "text-muted-foreground/70"
                   )}>
                     {count > 999 ? '999+' : count}
                   </span>

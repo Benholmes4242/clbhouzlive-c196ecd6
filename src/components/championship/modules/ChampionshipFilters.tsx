@@ -22,7 +22,7 @@ const scopeOptions = [
 
 /**
  * ChampionshipFilters - Arena mode and division filter controls.
- * Uses Apple-style pill toggles.
+ * Uses Tier 2 pill toggles.
  */
 export function ChampionshipFilters({
   arenaMode,
@@ -51,9 +51,9 @@ export function ChampionshipFilters({
           <button
             onClick={() => onDivisionFilterChange('all')}
             className={cn(
-              'flex-shrink-0 px-3.5 py-2 text-xs font-medium rounded-full border transition-colors active:scale-[0.95]',
+              'flex-shrink-0 px-3.5 py-2 text-xs font-medium rounded-xl border transition-colors active:scale-[0.95]',
               divisionFilter === 'all'
-                ? 'bg-foreground text-background border-foreground'
+                ? 'bg-card text-foreground font-semibold border-border'
                 : 'bg-card text-muted-foreground border-border hover:border-border/80'
             )}
           >
@@ -64,7 +64,7 @@ export function ChampionshipFilters({
               key={division.id}
               onClick={() => onDivisionFilterChange(division.slug)}
               className={cn(
-                'flex-shrink-0 px-3.5 py-2 text-xs font-medium rounded-full border transition-colors active:scale-[0.95]',
+                'flex-shrink-0 px-3.5 py-2 text-xs font-medium rounded-xl border transition-colors active:scale-[0.95]',
                 divisionFilter === division.slug
                   ? 'text-white border-transparent'
                   : 'bg-card text-muted-foreground border-border hover:border-border/80'

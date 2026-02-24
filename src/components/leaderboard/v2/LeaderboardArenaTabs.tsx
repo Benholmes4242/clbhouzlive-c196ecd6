@@ -1,7 +1,7 @@
 /**
  * LeaderboardArenaTabs - Tab navigation matching header style
  * Global Elite | Regional Wars | Friends League | Most Active | Nearby
- * Uses underline-style tabs like Courses/My Progress/Leaderboard
+ * Tier 1: Dark fill, switches entire view
  */
 
 import React from 'react';
@@ -72,12 +72,12 @@ export function LeaderboardArenaTabs({
 
   return (
     <div className="w-full">
-      {/* Scrollable tabs - Pill toggle style */}
+      {/* Scrollable tabs - Tier 1 dark fill */}
       <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
         <div 
           role="tablist" 
           aria-label="Leaderboard views"
-          className="inline-flex p-1 rounded-xl overflow-hidden bg-[#e2e8f0] min-w-max"
+          className="inline-flex gap-1 min-w-max"
         >
           {ARENA_TABS.map((tab) => {
             const Icon = tab.icon;
@@ -97,8 +97,8 @@ export function LeaderboardArenaTabs({
                   'relative flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-150',
                   'whitespace-nowrap',
                   isActive
-                    ? 'm-1 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
-                    : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50 bg-transparent border-0 shadow-none',
+                    ? 'bg-foreground text-background font-semibold'
+                    : 'text-muted-foreground hover:text-foreground bg-transparent',
                   isDisabled && 'opacity-40 cursor-not-allowed'
                 )}
               >
@@ -121,7 +121,7 @@ export function LeaderboardArenaTabs({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 5 }}
             transition={{ duration: 0.2 }}
-            className="text-xs text-[#64748b] mt-3 text-center"
+            className="text-xs text-muted-foreground mt-3 text-center"
           >
             {activeTab.description}
           </motion.p>

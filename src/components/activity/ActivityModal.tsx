@@ -89,7 +89,6 @@ const ActivityModal: React.FC<ActivityModalProps> = ({ open, onOpenChange }) => 
     }
   };
 
-  // Toggle read state from bottom sheet
   const handleToggleRead = (notification: ActivityNotification) => {
     if (notification.is_mock) return;
     if (notification.is_unread) {
@@ -99,28 +98,23 @@ const ActivityModal: React.FC<ActivityModalProps> = ({ open, onOpenChange }) => 
     }
   };
 
-  // Delete from bottom sheet
   const handleDeleteNotification = (notification: ActivityNotification) => {
     if (notification.is_mock) return;
     handleDelete(notification.id);
   };
 
-  // Open bottom sheet for a notification
   const openActionsSheet = (notification: ActivityNotification) => {
     setSelectedNotification(notification);
     setActionSheetOpen(true);
   };
 
   const handleNotificationClick = async (notification: ActivityNotification) => {
-    // Close modal first
     onOpenChange(false);
     
-    // Navigate
     if (notification.context_url) {
       navigate(notification.context_url);
     }
 
-    // Mark as read if unread
     if (!notification.is_read) {
       await handleMarkRead(notification.id);
     }
@@ -183,11 +177,11 @@ const ActivityModal: React.FC<ActivityModalProps> = ({ open, onOpenChange }) => 
           </header>
 
           <main className="mx-auto w-full max-w-[720px] px-4 pt-4 pb-24">
-            {/* Filter tabs - Match Profile page style */}
+            {/* Filter tabs - Tier 2 */}
             <div className="mb-4">
               <div 
-                className="grid w-full grid-cols-4 gap-1 p-1 rounded-xl"
-                style={{ background: '#e2e8f0' }}
+                className="grid w-full grid-cols-4 gap-1 rounded-[14px] p-[3px]"
+                style={{ background: 'rgba(0, 0, 0, 0.03)' }}
                 role="tablist"
               >
                 {ACTIVITY_TABS.map((tab) => (
@@ -197,10 +191,10 @@ const ActivityModal: React.FC<ActivityModalProps> = ({ open, onOpenChange }) => 
                     aria-selected={activeTab === tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={cn(
-                      "py-2 text-sm font-medium rounded-lg transition-all duration-150 whitespace-nowrap",
+                      "py-2 text-sm font-medium rounded-xl transition-all duration-150 whitespace-nowrap",
                       activeTab === tab.id
-                        ? "bg-white text-[#1e293b] shadow-sm"
-                        : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
+                        ? "bg-card text-foreground font-semibold"
+                        : "text-muted-foreground"
                     )}
                   >
                     {tab.label}

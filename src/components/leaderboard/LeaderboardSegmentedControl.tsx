@@ -23,7 +23,7 @@ export function LeaderboardSegmentedControl({
 }: LeaderboardSegmentedControlProps) {
   return (
     <div className="w-full overflow-x-auto pb-1 -mx-1 px-1">
-      <div className="inline-flex rounded-sq-pill bg-muted/60 p-1 text-xs font-medium min-w-max">
+      <div className="inline-flex rounded-[14px] p-[3px] text-xs font-medium min-w-max" style={{ background: 'rgba(0, 0, 0, 0.03)' }}>
         {SEGMENTS.map((seg) => {
           const isDisabled = disabledSegments.includes(seg.value);
           const isActive = value === seg.value;
@@ -35,9 +35,9 @@ export function LeaderboardSegmentedControl({
               disabled={isDisabled}
               onClick={() => !isDisabled && onChange(seg.value)}
               className={cn(
-                'px-3 py-1.5 rounded-sq-pill transition-all whitespace-nowrap',
+                'px-3 py-1.5 rounded-xl transition-all whitespace-nowrap',
                 isActive
-                  ? 'bg-background shadow-sm text-foreground'
+                  ? 'bg-card text-foreground font-semibold'
                   : 'text-muted-foreground',
                 isDisabled && 'opacity-40 cursor-not-allowed'
               )}
