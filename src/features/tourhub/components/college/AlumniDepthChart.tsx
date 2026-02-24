@@ -72,7 +72,7 @@ function AlumniRow({ alumnus, index, tierAccent }: AlumniRowProps) {
           borderLeftWidth: '3px',
           borderLeftStyle: 'solid',
           borderLeftColor: tierBorderColor[tierAccent],
-          boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+          
         }}
       >
         {/* Photo section — 140px left */}
@@ -93,7 +93,7 @@ function AlumniRow({ alumnus, index, tierAccent }: AlumniRowProps) {
 
         {/* Info section */}
         <div className="flex-1 min-w-0 flex flex-col justify-center" style={{ padding: '12px 12px 12px 14px' }}>
-          <h3 className="text-foreground truncate leading-tight" style={{ fontSize: '16px', fontWeight: 600 }}>
+          <h3 className="text-foreground truncate leading-tight" style={{ fontSize: '15px', fontWeight: 600, letterSpacing: '-0.2px' }}>
             {fullName}
           </h3>
 
@@ -114,7 +114,7 @@ function AlumniRow({ alumnus, index, tierAccent }: AlumniRowProps) {
 
         {/* Chevron */}
         <div className="flex items-center pr-3 shrink-0">
-          <ChevronRight className="w-4 h-4 text-muted-foreground/30" />
+          <ChevronRight className="w-4 h-4 text-muted-foreground/50" />
         </div>
       </Link>
     </motion.div>
@@ -171,7 +171,7 @@ function Section({ title, subtitle, icon: Icon, iconColor, alumni, defaultExpand
       </button>
       
       <AnimatePresence initial={false}>
-        <motion.div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }} initial={false} animate={{ height: 'auto' }}>
+        <motion.div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }} initial={false} animate={{ height: 'auto' }}>
           {displayedAlumni.map((alumnus, index) => (
             <AlumniRow key={alumnus.id} alumnus={alumnus} index={index} tierAccent={tierAccent} />
           ))}

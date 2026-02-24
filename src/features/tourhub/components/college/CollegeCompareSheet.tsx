@@ -217,7 +217,7 @@ export function CollegeCompareSheet({
             transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
             className={cn(
               "fixed bottom-0 left-0 right-0 z-50",
-              "bg-[#F8FAFC] dark:bg-card rounded-t-2xl",
+              "bg-background rounded-t-3xl",
               "border-t border-border",
               "shadow-2xl shadow-black/20",
               "max-h-[85vh] overflow-hidden"
@@ -225,7 +225,7 @@ export function CollegeCompareSheet({
           >
             {/* Drag handle — 40×4px */}
             <div className="flex justify-center" style={{ paddingTop: '8px', paddingBottom: '4px' }}>
-              <div className="bg-gray-300 rounded-full" style={{ width: '40px', height: '4px', borderRadius: '2px' }} />
+              <div className="bg-muted-foreground/30 rounded-full" style={{ width: '40px', height: '4px', borderRadius: '2px' }} />
             </div>
             
             {/* Title — 18px, weight 700 */}
@@ -288,7 +288,7 @@ export function CollegeCompareSheet({
                       "transition-all min-h-[40px]",
                       "active:scale-95",
                       activeMetric === key
-                        ? "bg-card text-foreground border border-border/50 shadow-sm"
+                        ? "bg-foreground text-background border border-foreground"
                         : "bg-transparent text-muted-foreground border border-transparent hover:text-foreground"
                     )}
                     style={{
