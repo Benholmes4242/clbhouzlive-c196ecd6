@@ -24,7 +24,7 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
   const hasMore = (allResults?.length ?? 0) > INITIAL_LIMIT;
 
   return (
-    <div className="px-4 py-6 border-b border-border/40">
+    <div className="px-4 py-6 border-b border-border/30">
       {/* Section header — 22px / 700 */}
       <div className="flex items-center gap-2" style={{ marginBottom: '12px' }}>
         <Activity className="w-4 h-4 text-muted-foreground" />
@@ -63,14 +63,14 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
                       fontSize: '13px',
                       fontWeight: 600,
                       fontVariantNumeric: 'tabular-nums',
-                      color: isWin ? '#f59e0b' : 'hsl(var(--foreground))',
+                      color: isWin ? 'rgba(245, 158, 11, 0.9)' : 'hsl(var(--foreground))',
                     }}
                   >
-                    {isWin ? <Trophy className="w-4 h-4 inline" style={{ color: '#f59e0b' }} /> : pos}
+                    {isWin ? <Trophy className="w-4 h-4 inline" style={{ color: 'rgba(245, 158, 11, 0.9)' }} /> : pos}
                   </span>
 
                   {/* Tournament name — 14px, weight 500 */}
-                  <span className="text-foreground flex-1 min-w-0 truncate group-hover:text-primary transition-colors" style={{ fontSize: '15px', fontWeight: 600, letterSpacing: '-0.1px' }}>
+                  <span className="text-foreground flex-1 min-w-0 truncate group-hover:text-primary transition-colors" style={{ fontSize: '15px', fontWeight: 600, letterSpacing: '-0.2px' }}>
                     {result.tournament_name}
                   </span>
 
@@ -91,7 +91,7 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
                       fontWeight: 700,
                       fontVariantNumeric: 'tabular-nums',
                       color: score !== null && score < 0
-                        ? '#f59e0b'
+                        ? 'rgba(245, 158, 11, 0.9)'
                         : score !== null && score > 0
                           ? TOUR_COLORS.scoreOverPar
                           : TOUR_COLORS.scoreEven,

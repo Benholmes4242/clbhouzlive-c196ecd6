@@ -6,7 +6,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, TrendingUp, AlertCircle, RefreshCw } from 'lucide-react';
+import { ArrowLeft, TrendingUp, AlertCircle, RefreshCw, ChevronLeft } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
@@ -109,7 +109,7 @@ export function PlayerProfilePage() {
     return (
       <PageRoot className="min-h-screen w-full bg-background" immersive immersiveStatusBar>
         <div className="animate-pulse">
-          <div style={{ height: 'clamp(380px, 55dvh, 550px)' }} className="bg-muted" />
+          <div style={{ height: '45dvh' }} className="bg-muted" />
           <div className="bg-card" style={{ padding: '14px 4px', borderBottom: '1px solid hsl(var(--border) / 0.1)' }}>
             <div className="flex justify-between px-4">
               {Array.from({ length: 5 }).map((_, i) => (
@@ -201,9 +201,10 @@ export function PlayerProfilePage() {
         <div className="px-4" style={{ padding: '12px 16px 8px 16px' }}>
           <button
             onClick={handleBack}
-            className="text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
+            className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
           >
-            ← Players
+            <ChevronLeft size={14} />
+            Players
           </button>
         </div>
 

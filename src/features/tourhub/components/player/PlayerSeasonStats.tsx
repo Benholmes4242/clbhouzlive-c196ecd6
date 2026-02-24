@@ -64,12 +64,12 @@ function StatRow({ label, value, trend, barPercent, barIndex = 0 }: StatRowProps
             )}
           </span>
           {barPercent !== undefined && hasValue && (
-            <div style={{ marginTop: '4px', width: '120px', height: '4px', borderRadius: '2px', backgroundColor: '#CBD5E1' }} className="overflow-hidden">
+            <div style={{ marginTop: '4px', width: '120px', height: '4px', borderRadius: '2px', backgroundColor: 'hsl(var(--border))' }} className="overflow-hidden">
               <motion.div
                 style={{
                   height: '100%',
                   borderRadius: '2px',
-                  backgroundColor: '#f59e0b',
+                  backgroundColor: 'rgba(245, 158, 11, 0.9)',
                   width: `${Math.min(100, Math.max(0, barPercent))}%`,
                   originX: 0,
                 }}
@@ -108,19 +108,19 @@ function SGBar({ label, value }: SGBarProps) {
           fontSize: '15px',
           fontWeight: 700,
           fontVariantNumeric: 'tabular-nums',
-          color: isPositive ? '#f59e0b' : '#EF4444',
+          color: isPositive ? 'rgba(245, 158, 11, 0.9)' : '#EF4444',
         }}>
           {formattedValue}
         </span>
       </div>
       <div className="relative overflow-hidden" style={{ height: '5px', borderRadius: '2.5px' }} >
-        <div className="absolute inset-0" style={{ backgroundColor: '#CBD5E1' }} />
+        <div className="absolute inset-0" style={{ backgroundColor: 'hsl(var(--border))' }} />
         <div className="absolute left-1/2 top-0 bottom-0 w-px bg-border z-10" />
         <motion.div
           className="absolute top-0 bottom-0"
           style={{
             borderRadius: '2.5px',
-            backgroundColor: isPositive ? '#f59e0b' : '#EF4444',
+            backgroundColor: isPositive ? 'rgba(245, 158, 11, 0.9)' : '#EF4444',
             width: `${barWidth}%`,
             left: isPositive ? '50%' : `${50 - barWidth}%`,
           }}
@@ -148,7 +148,7 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
     ? (playerStats.top_25s / playerStats.events_played) * 100 : undefined;
 
   return (
-    <div className="px-4 py-6 border-b border-border/40">
+    <div className="px-4 py-6 border-b border-border/30">
       {/* Section header — 22px / 700 / tracking -0.3px */}
       <div className="flex items-center gap-2" style={{ marginBottom: '12px' }}>
         <BarChart3 className="w-4 h-4 text-muted-foreground" />
@@ -255,8 +255,8 @@ function SubSectionLabel({ icon: Icon, label, style }: { icon: React.ElementType
       className="flex items-center gap-1.5 text-muted-foreground/50"
       style={{
         fontSize: '11px',
-        fontWeight: 600,
-        letterSpacing: '0.8px',
+        fontWeight: 700,
+        letterSpacing: '0.05em',
         textTransform: 'uppercase' as const,
         marginTop: '20px',
         marginBottom: '10px',
