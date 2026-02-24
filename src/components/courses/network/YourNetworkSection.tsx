@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNetworkActivity } from '@/hooks/useNetworkActivity';
@@ -49,14 +50,15 @@ export const YourNetworkSection: React.FC<YourNetworkSectionProps> = ({ classNam
     >
       {/* Header Row */}
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-lg font-semibold text-foreground">
+        <h2 className="text-[22px] font-bold text-foreground" style={{ letterSpacing: '-0.3px' }}>
           Your Network
         </h2>
         <button
           onClick={handleViewAll}
-          className="py-2.5 px-1 text-sm text-muted-foreground font-medium hover:text-foreground active:scale-[0.97] transition-all"
+          className="py-2.5 px-1 text-[13px] text-muted-foreground font-medium hover:text-foreground active:scale-[0.97] transition-all flex items-center gap-0.5"
         >
-          View all ›
+          View all
+          <ChevronRight size={14} />
         </button>
       </div>
 

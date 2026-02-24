@@ -45,7 +45,7 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
               className={cn(
                 'flex-1 py-2.5 px-4 text-sm font-medium rounded-lg transition-all duration-150 active:scale-[0.97] flex items-center justify-center',
                 isActive
-                  ? 'm-1 bg-card text-foreground shadow-sm border border-border'
+                  ? 'm-1 bg-foreground text-background rounded-lg'
                   : 'text-muted-foreground hover:text-foreground hover:bg-card/50',
               )}
             >
