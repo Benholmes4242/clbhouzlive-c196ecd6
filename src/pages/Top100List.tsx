@@ -8,7 +8,7 @@ import { useFriendsTop100Progress } from '@/hooks/useFriendsTop100Progress';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import GolfClubView from '@/components/golf-club/GolfClubView';
-import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
+
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import {
   Top100ListLeaderboard,
@@ -61,14 +61,6 @@ const Top100List = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { session, user } = useSupabaseSession();
-  
-  // Register as dimmable page for auto-hide header
-  const { setDimmablePage } = useCinemaDimContext();
-  
-  useLayoutEffect(() => {
-    setDimmablePage('course-detail'); // Reuse course-detail behavior
-    return () => setDimmablePage(null);
-  }, [setDimmablePage]);
 
   // Transparent status bar for immersive hero bleed into safe area
   useMedianStatusBar("dark", "transparent", true, false);

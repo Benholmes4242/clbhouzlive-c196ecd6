@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import GolfClubView from '@/components/golf-club/GolfClubView';
 import { FadeInContent } from '@/components/ui/FadeInContent';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { usePreventOverscroll } from '@/hooks/usePreventOverscroll';
 
@@ -18,14 +17,6 @@ const CourseDetailPage = () => {
   
   // Safe area bleed: transparent status bar with white icons for hero image
   useMedianStatusBar("dark", "transparent", true, false);
-  
-  // Register as dimmable page for auto-hide header
-  const { setDimmablePage } = useCinemaDimContext();
-  
-  useLayoutEffect(() => {
-    setDimmablePage('course-detail');
-    return () => setDimmablePage(null);
-  }, [setDimmablePage]);
 
   // Always scroll to top ONLY when navigating to a different course
   // Does NOT scroll when tab/filter changes (preserves scroll position)

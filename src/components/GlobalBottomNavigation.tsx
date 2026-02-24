@@ -6,7 +6,7 @@ import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { useModalState } from '@/hooks/useModalDetector';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 import { useModalContext } from '@/contexts/ModalContext';
-import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
+
 // Note: usePrefetch is accessed via useAppPrefetch to avoid static/dynamic import conflict
 import { useAppPrefetch } from '@/hooks/useAppPrefetch';
 import SnapToast from '@/components/snap/SnapToast';
@@ -50,7 +50,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const location = useLocation();
   const { isVisible, setNavRef } = useBottomNavigation();
   const { shouldHideHeader } = useModalContext();
-  const { cinemaDim, bumpChrome, isClubhousePage } = useCinemaDimContext();
+  
   const { triggerPrefetch } = useAppPrefetch();
   const { activeTab, handleTabClick, handlePrefetch } = useNavigationHandlers();
   const isDesktop = useIsDesktop();
@@ -65,9 +65,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
     handlePrefetch(path); // Also trigger hero video prefetch
   }, [triggerPrefetch, handlePrefetch]);
   
-  // ⛔ BOTTOM NAV NEVER DIMS ON CLUBHOUSE
-  // Cinema dim is ONLY for the header - bottom nav stays fully visible at all times
-  const isDimmed = false;
+  
   
   // Check if drawer is active (for clubhouse mini profile or comments)
   const [isDrawerActive, setIsDrawerActive] = useState(false);
@@ -196,8 +194,6 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
 
   // Handle tab clicks including camera action
   const handleTabClickWithCamera = (tab: { id: string; path: string | null; isAction?: boolean }) => {
-    // Bump chrome on any interaction
-    bumpChrome();
     
     if (tab.isAction && tab.id === 'post') {
       // Open composer directly with empty state
@@ -232,28 +228,19 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 navRef.current = el;
                 setNavRef(el);
               }}
-              className={cn(
-                "chrome-bottom-nav clubhouse-footer",
-                isDimmed ? "border-transparent" : ""
-              )}
+              className="chrome-bottom-nav clubhouse-footer"
               data-chrome="bottom-nav"
               style={{
-                background: isDimmed 
-                  ? 'hsl(var(--clubhouse-dim-bg-footer))'
-                  : isWarmGradientRoute
+                background: isWarmGradientRoute
                     ? 'rgba(255,253,248,0.55)'
                     : isClubhouseRoute 
                       ? 'hsl(var(--clubhouse-bg-footer))'
                       : 'hsl(210 40% 98% / 0.95)',
-                // Match CompactHeader hairline: 0.5px + slate-800/20 equivalent
-                borderTop: isDimmed
-                  ? 'none'
-                  : isWarmGradientRoute
+                borderTop: isWarmGradientRoute
                     ? '1px solid rgba(255,255,255,0.3)'
                     : `0.5px solid ${isClubhouseRoute ? 'hsl(var(--clubhouse-border))' : 'hsl(215 25% 27% / 0.2)'}`,
-                // Match header blur intensity (CompactHeader uses blur(20px))
-                backdropFilter: isDimmed ? 'none' : isWarmGradientRoute ? 'blur(24px)' : 'blur(20px)',
-                WebkitBackdropFilter: isDimmed ? 'none' : isWarmGradientRoute ? 'blur(24px)' : 'blur(20px)',
+                backdropFilter: isWarmGradientRoute ? 'blur(24px)' : 'blur(20px)',
+                WebkitBackdropFilter: isWarmGradientRoute ? 'blur(24px)' : 'blur(20px)',
                 paddingBottom: '30px',
                 transition: 'all var(--motion-slow) cubic-bezier(0.22, 1, 0.36, 1)',
               }}
@@ -263,7 +250,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 onTabClick={handleTabClickWithCamera}
                 onPrefetch={handleNavPrefetch}
                 variant={isClubhouseRoute ? 'clubhouse' : 'default'}
-                isDimmed={isDimmed}
+                isDimmed={false}
                 useAmberActive={isWarmGradientRoute}
                 showBorder={false}
               />

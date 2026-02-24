@@ -11,7 +11,6 @@ import { PostingAsMenu } from './PostingAsMenu';
 import { SearchOverlay } from './SearchOverlay';
 import { ActingAsIndicator } from './ActingAsIndicator';
 import { cn } from '@/lib/utils';
-import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import { NineDotsIcon } from '@/features/tourhub/components/NineDotsIcon';
 import { openTourNav } from '@/features/tourhub/contexts/TourNavContext';
 import { haptic } from '@/utils/haptics';
@@ -40,7 +39,6 @@ interface CompactHeaderProps {
  *   - Safe-area is handled by the PageRoot component instead
  * 
  * This distinction was intentionally designed and MUST be preserved.
- * See lines 96, 104-105 for the conditional implementation.
  */
 const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const navigate = useNavigate();
@@ -60,11 +58,6 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   
   // Clubhouse tab context - may be null if not on Clubhouse page
   const clubhouseTab = useClubhouseTab();
-  
-  // Cinema Dim context - supports both dark (Clubhouse) and light (Course/Profile) themes
-  const { cinemaDim, bumpChrome, isClubhousePage, isLightDimmed, dimmablePage } = useCinemaDimContext();
-  const isDarkDimmed = isClubhousePage && cinemaDim;
-  const isLightDimmablePage = dimmablePage === 'course-detail' || dimmablePage === 'profile' || dimmablePage === 'tourhub-overview';
   
   // Determine routes
   const isClubhouseRoute = location.pathname === '/' || location.pathname.startsWith('/clubhouse');
@@ -99,14 +92,9 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   
   // Search overlay always uses light mode app-wide
   const useLightTheme = true;
-  
-  // Determine if header should be dimmed (either dark or light theme)
-  const shouldDim = isDarkDimmed || (isLightDimmablePage && isLightDimmed);
 
   const handleLogoClick = () => {
-    bumpChrome();
     if (isBackArrowRoute) {
-      // On back arrow routes, go back
       haptic('light');
       if (isDiscoverSubPage) {
         handleDiscoverBack();
@@ -119,24 +107,19 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
       } else if (isAchievementsRoute) {
         navigate(-1);
       } else if (isMessagesConversationRoute) {
-        // From conversation, go back to messages list
         navigate('/messages');
       } else if (isMessagesRoute) {
-        // From messages list, go back
         navigate(-1);
       }
     } else if (isTourRoute) {
-      // On tour pages, open the tour navigation menu
       haptic('light');
       openTourNav();
     } else {
-      // Otherwise go to clubhouse
       navigate('/clubhouse');
     }
   };
 
   const handleDiscoverBack = () => {
-    // Navigate back to appropriate Discover tab
     if (location.pathname.startsWith('/discover/explore/region/') || 
         location.pathname.startsWith('/discover/explore/theme/')) {
       navigate('/discover?main=channels');
@@ -149,57 +132,37 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
 
   const handleTop100Back = () => {
     if (isTop100HubPage) {
-      // From hub page, navigate back to Courses page with Top 100 tab
       navigate('/courses?tab=top100');
     } else {
-      // From regional list pages, navigate back to World's Top 100 with courses tab
       navigate('/top100?tab=courses');
     }
   };
   
   const handleSearchClick = () => {
-    bumpChrome();
     setSearchOpen(true);
   };
   
   const handleMenuClick = () => {
-    bumpChrome();
     setMenuOpen(v => !v);
   };
 
-  // Theme-specific styling - using CSS variables
+  // Theme-specific styling
   const LIGHT_BG = 'hsl(var(--background) / 0.95)';
-  const LIGHT_DIM_BG = 'transparent'; // Fully transparent when dimmed on light pages
   const LIGHT_BORDER = 'hsl(var(--border) / 0.5)';
-  const DIM_BG = 'hsl(var(--clubhouse-dim-bg-header))';
-  const DIM_BORDER = 'hsl(var(--clubhouse-border))';
   const STANDARD_BG = 'hsl(var(--clubhouse-bg-header))';
   const STANDARD_BORDER = 'hsl(var(--clubhouse-border))';
-  const CINEMA_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
 
-  // Get background based on theme and dim state
+  // Get background based on theme
   const getBackground = () => {
-    if (useLightTheme) {
-      if (isLightDimmablePage && isLightDimmed) return LIGHT_DIM_BG;
-      return LIGHT_BG;
-    }
-    if (isDarkDimmed) return DIM_BG;
+    if (useLightTheme) return LIGHT_BG;
     return STANDARD_BG;
   };
 
   // Get border based on theme
   const getBorder = () => {
-    if (useLightTheme) {
-      if (isLightDimmablePage && isLightDimmed) return "transparent";
-      return LIGHT_BORDER;
-    }
-    if (isDarkDimmed && isClubhouseRoute) return "transparent";
-    if (isDarkDimmed) return DIM_BORDER;
+    if (useLightTheme) return LIGHT_BORDER;
     return STANDARD_BORDER;
   };
-  
-  // Hide brand (logo + wordmark) when dimmed on either theme
-  const hideBrand = shouldDim;
 
   // Standardized header height: 55px content, with safe-area on top for Clubhouse
   const contentHeight = 55;
@@ -215,18 +178,14 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           className
         )}
         style={{
-          // Position at top
           top: 0,
           background: getBackground(),
-          backdropFilter: shouldDim ? 'none' : 'blur(20px)',
-          WebkitBackdropFilter: shouldDim ? 'none' : 'blur(20px)',
-          // Clubhouse: height includes safe area, with paddingTop to push content below notch
-          // Other pages: fixed 55px height, no safe area handling (PageRoot handles it)
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
           height: isClubhouseRoute ? `calc(${contentHeight}px + env(safe-area-inset-top))` : `${contentHeight}px`,
           paddingTop: isClubhouseRoute ? 'env(safe-area-inset-top)' : 0,
           borderBottom: `0.5px solid ${getBorder()}`,
           boxShadow: 'none',
-          transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}, backdrop-filter 800ms ${CINEMA_EASE}`,
         }}
       >
         {/* Content wrapper - always 55px, positioned below safe area on Clubhouse */}
@@ -247,21 +206,11 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               aria-label={isBackArrowRoute ? "Go back" : isTourRoute ? "Go to tour menu" : "Go to home"}
             >
               {isBackArrowRoute ? (
-                <ArrowLeft 
-                  className={cn(
-                    "transition-opacity duration-300 h-6 w-6",
-                    hideBrand ? "opacity-0" : shouldDim ? "opacity-55" : "text-foreground"
-                  )}
-                />
+                <ArrowLeft className="h-6 w-6 text-foreground" />
               ) : isTourRoute ? (
                 <span className="relative inline-flex">
                   <NineDotsIcon 
-                    className={cn(
-                      "transition-opacity duration-300",
-                      dimmablePage === 'tourhub-overview' 
-                        ? "text-white/90"
-                        : shouldDim ? "opacity-55" : "text-foreground"
-                    )}
+                    className="text-foreground"
                     size={28} 
                   />
                   {hasLiveTournaments && (
@@ -277,11 +226,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                 <img
                   src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
                   alt="clbhouz"
-                  className={cn(
-                    "object-contain transition-opacity duration-300",
-                    "h-9 w-9", // Standardized logo size
-                    hideBrand ? "opacity-0" : shouldDim ? "opacity-55" : "hover:opacity-80"
-                  )}
+                  className="object-contain h-9 w-9 hover:opacity-80"
                 />
               )}
             </button>
@@ -289,9 +234,6 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
 
           {/* Center section: Clubhouse tabs (mobile) or Desktop nav (lg+) */}
           <div className="flex-1 flex justify-center">
-            {/* Mobile: Show Clubhouse tabs when on Clubhouse route */}
-            {/* Clubhouse tab toggle moved to Clubhouse page */}
-            
             {/* Desktop: main nav links */}
             <nav className="hidden lg:flex items-center gap-1">
               {[
@@ -305,37 +247,17 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                 return (
                   <button
                     key={item.path}
-                    onClick={() => {
-                      bumpChrome();
-                      navigate(item.path);
-                    }}
+                    onClick={() => navigate(item.path)}
                     className={cn(
                       "px-3 py-1.5 text-sm font-medium rounded-sq-sm transition-all duration-300 active:scale-[0.97]",
                       useLightTheme 
                         ? isActive 
-                          ? shouldDim 
-                            ? "bg-muted/20" 
-                            : "text-foreground bg-muted/80" 
-                          : shouldDim
-                            ? "hover:bg-muted/20"
-                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          ? "text-foreground bg-muted/80" 
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                         : isActive 
-                          ? isDarkDimmed 
-                            ? "bg-white/5" 
-                            : "text-white bg-white/10"
-                          : isDarkDimmed
-                            ? "hover:bg-white/5"
-                            : "text-white/60 hover:text-white hover:bg-white/5"
+                          ? "text-white bg-white/10"
+                          : "text-white/60 hover:text-white hover:bg-white/5"
                     )}
-                    style={useLightTheme ? {
-                      color: shouldDim 
-                        ? (isActive ? 'hsl(var(--foreground) / 0.78)' : 'hsl(var(--foreground) / 0.55)')
-                        : undefined
-                    } : !useLightTheme ? {
-                      color: isDarkDimmed 
-                        ? (isActive ? 'rgba(255, 255, 255, 0.78)' : 'rgba(255, 255, 255, 0.55)')
-                        : undefined
-                    } : undefined}
                   >
                     {item.label}
                   </button>
@@ -354,19 +276,13 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                 "p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-all",
                 "h-11 w-11",
                 useLightTheme
-                  ? shouldDim 
-                    ? "text-muted-foreground hover:text-foreground hover:bg-muted/30"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                  : isDarkDimmed 
-                    ? "hover:bg-[hsl(var(--clubhouse-hover-bg))]" 
-                    : "hover:bg-[hsl(var(--clubhouse-active-bg))]"
+                  ? "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  : "hover:bg-[hsl(var(--clubhouse-active-bg))]"
               )}
               style={{ 
                 color: useLightTheme 
                   ? undefined 
-                  : isDarkDimmed 
-                    ? 'hsl(var(--clubhouse-text-dimmed))' 
-                    : 'hsl(var(--clubhouse-text-muted))',
+                  : 'hsl(var(--clubhouse-text-muted))',
                 transition: 'all var(--motion-fast) var(--ease-standard)'
               }}
               onClick={handleSearchClick}
@@ -384,7 +300,6 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                   isOpen={menuOpen}
                   hasUnreadNotifications={hasUnread}
                   useLightTheme={useLightTheme}
-                  isDimmed={shouldDim}
                 />
               ) : (
                 /* Skeleton placeholder while auth resolves — prevents layout shift */
@@ -397,8 +312,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             
             {/* Desktop: Acting as indicator + Full navigation */}
             <div className="hidden sm:flex items-center">
-              <ActingAsIndicator useLightTheme={useLightTheme} isDimmed={shouldDim} />
-              <HeaderNavigation onInteraction={bumpChrome} useLightTheme={useLightTheme} isDimmed={shouldDim} />
+              <ActingAsIndicator useLightTheme={useLightTheme} />
+              <HeaderNavigation useLightTheme={useLightTheme} />
             </div>
           </div>
         </div>
