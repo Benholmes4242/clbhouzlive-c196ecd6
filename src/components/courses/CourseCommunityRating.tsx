@@ -5,6 +5,10 @@ interface CourseCommunityRatingProps {
   rating: number;
   className?: string;
   size?: 'sm' | 'md' | 'lg';
+  /** Show the Clbhouz orange logomark to the left of the rating */
+  showLogo?: boolean;
+  /** Force the rating text to foreground color regardless of tier */
+  forceNeutral?: boolean;
 }
 
 /**
@@ -12,13 +16,15 @@ interface CourseCommunityRatingProps {
  * This is the SINGLE source of truth for rating display in course cards.
  * 
  * Rating tier colors:
- * - Outstanding (9.0+): amber-500 (brand accent)
+ * - Outstanding (9.0+): amber-500 (brand accent) — unless forceNeutral is set
  * - Standard (< 9.0): foreground (neutral)
  */
 export const CourseCommunityRating: React.FC<CourseCommunityRatingProps> = ({
   rating,
   className = '',
   size = 'md',
+  showLogo = false,
+  forceNeutral = false,
 }) => {
   const textClasses = {
     sm: 'text-xs',
@@ -26,14 +32,28 @@ export const CourseCommunityRating: React.FC<CourseCommunityRatingProps> = ({
     lg: 'text-base',
   }[size];
 
+  const logoSize = {
+    sm: 'w-3.5 h-3.5',
+    md: 'w-4 h-4',
+    lg: 'w-[18px] h-[18px]',
+  }[size];
+
   const isOutstanding = rating >= 9.0;
 
   return (
-    <div className={`flex items-center flex-shrink-0 ${className}`}>
+    <div className={`flex items-center flex-shrink-0 gap-1.5 ${className}`}>
+      {showLogo && (
+        <img
+          src="/assets/logomark-orange.png"
+          alt=""
+          className={cn(logoSize, 'object-contain')}
+          aria-hidden="true"
+        />
+      )}
       <span className={cn(
         textClasses,
         'font-semibold tabular-nums',
-        isOutstanding ? 'text-amber-500' : 'text-foreground'
+        forceNeutral || !isOutstanding ? 'text-foreground' : 'text-amber-500'
       )}>
         {rating.toFixed(1)}
       </span>

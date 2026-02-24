@@ -264,7 +264,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
           {/* Community rating - fixed width container for alignment lock */}
           {showRating && course.communityRating != null && (
             <div className="flex-shrink-0 min-w-[56px] flex items-center justify-end self-center">
-              <CourseCommunityRating rating={course.communityRating} size="lg" />
+              <CourseCommunityRating rating={course.communityRating} size="lg" showLogo forceNeutral />
             </div>
           )}
         </div>
