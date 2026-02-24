@@ -26,7 +26,7 @@ const FriendsActivityPage: React.FC = () => {
           >
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
-          <h1 className="text-base font-semibold text-foreground">Your Network</h1>
+          <h1 className="text-lg font-bold text-foreground">Your Network</h1>
         </div>
       </div>
 
