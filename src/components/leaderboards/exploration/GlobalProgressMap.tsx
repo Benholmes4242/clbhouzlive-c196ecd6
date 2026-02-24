@@ -228,18 +228,17 @@ const COUNTRY_NAMES_TO_ISO3: Record<string, string> = {
 
 // Brand colors with three-state system
 const COLORS = {
-  playedFill: '#8B9D77',
-  playedFillHover: '#7A8C68',
+  playedFill: '#40916C',
+  playedFillHover: '#2D6A4F',
   playedStroke: '#FFFFFF',
-  playedOpacity: 1,
-  notPlayedFill: 'hsl(var(--muted))',
-  notPlayedStroke: 'hsl(var(--border))',
-  notPlayedOpacity: 0.45,
-  disabledFill: 'hsl(var(--muted-foreground))',
+  playedOpacity: 0.7,
+  notPlayedFill: 'rgba(0, 0, 0, 0.06)',
+  notPlayedStroke: 'rgba(0, 0, 0, 0.04)',
+  notPlayedOpacity: 1,
+  disabledFill: 'rgba(0, 0, 0, 0.04)',
   disabledStroke: 'transparent',
-  disabledOpacity: 0.25,
-  // Countries view: slightly more saturated for individual countries
-  countryPlayedFill: '#7A8C68',
+  disabledOpacity: 0.5,
+  countryPlayedFill: '#40916C',
   countryPlayedStroke: '#FFFFFF',
 };
 
@@ -304,8 +303,16 @@ function GlobalProgressMapComponent({
 
   return (
     <div className={className}>
-      {/* Map - Full bleed with 10px gap on each side */}
-      <div className="relative" style={{ marginLeft: 'calc(-50vw + 50% + 10px)', marginRight: 'calc(-50vw + 50% + 10px)', width: 'calc(100vw - 20px)' }}>
+      {/* Map - with subtle framing */}
+      <div 
+        className="relative rounded-2xl overflow-hidden"
+        style={{ 
+          marginLeft: 'calc(-50vw + 50% + 10px)', 
+          marginRight: 'calc(-50vw + 50% + 10px)', 
+          width: 'calc(100vw - 20px)',
+          border: '1px solid rgba(0, 0, 0, 0.04)',
+        }}
+      >
         <ComposableMap
           projection="geoEqualEarth"
           projectionConfig={{
