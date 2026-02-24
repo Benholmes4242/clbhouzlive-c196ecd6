@@ -316,9 +316,9 @@ export function CollegeProfilePage() {
             transition={{ delay: 0.4, duration: 0.3 }}
           >
             <GlassStatCell label="EARNINGS" value={formatCurrency(stats.earnings_total)} />
-            <div style={{ width: 1, background: 'rgba(255,255,255,0.1)' }} />
+            <div style={{ width: 1 }} className="bg-border/50" />
             <GlassStatCell label="WINS" value={String(stats.wins_total)} highlight={stats.wins_total > 0} />
-            <div style={{ width: 1, background: 'rgba(255,255,255,0.1)' }} />
+            <div style={{ width: 1 }} className="bg-border/50" />
             <GlassStatCell label="ALUMNI" value={String(stats.player_count)} />
           </motion.div>
         </div>
@@ -468,20 +468,19 @@ function formatCurrency(amount: number): string {
 function GlassStatCell({ label, value, highlight = false }: { label: string; value: string; highlight?: boolean }) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center">
-      <span style={{
+      <span className="text-muted-foreground" style={{
         fontSize: 10,
         fontWeight: 600,
         letterSpacing: '0.5px',
         textTransform: 'uppercase' as const,
-        color: 'rgba(255,255,255,0.5)',
       }}>
         {label}
       </span>
-      <span style={{
+      <span className="text-foreground" style={{
         fontSize: 18,
         fontWeight: 700,
         fontVariantNumeric: 'tabular-nums',
-        color: highlight ? '#f59e0b' : 'white',
+        color: highlight ? '#f59e0b' : undefined,
         marginTop: 2,
       }}>
         {value}
