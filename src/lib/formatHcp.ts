@@ -37,6 +37,8 @@ export function getHandicapStatusLabel(handicap: number): string | null {
   if (handicap < -0.4) return 'Plus Figure';
   if (handicap >= -0.4 && handicap <= 0.4) return 'Scratch';
   if (handicap >= 0.5 && handicap <= 9.9) return 'Single Figure';
+  if (handicap >= 10.0 && handicap <= 19.9) return 'Mid Figure';
+  if (handicap >= 20.0) return 'High Figure';
   return null;
 }
 
@@ -45,8 +47,43 @@ export function getHandicapStatusLabel(handicap: number): string | null {
  * Matches getHandicapStatusLabel thresholds.
  */
 export function getHandicapStatusColor(handicap: number): string {
-  if (handicap < -0.4) return '#C1A84C'; // Chartreus gold - plus figure
-  if (handicap >= -0.4 && handicap <= 0.4) return '#C1A84C'; // Chartreus gold - scratch
-  if (handicap >= 0.5 && handicap <= 9.9) return '#334E3D'; // Emerald - single figure
-  return '#64748b'; // Default muted (10.0+)
+  if (handicap < -0.4) return '#D4A853'; // Gold - plus figure
+  if (handicap >= -0.4 && handicap <= 0.4) return '#D4A853'; // Gold - scratch
+  if (handicap >= 0.5 && handicap <= 9.9) return '#40916C'; // Green - single figure
+  return 'hsl(var(--muted-foreground))'; // Muted for mid/high
+}
+
+/**
+ * Get handicap category badge styling.
+ */
+export function getHandicapBadgeStyle(handicap: number): {
+  bg: string;
+  text: string;
+  border: string;
+} {
+  if (handicap < -0.4) return {
+    bg: 'rgba(212, 168, 83, 0.12)',
+    text: '#C4963E',
+    border: 'rgba(212, 168, 83, 0.25)',
+  };
+  if (handicap >= -0.4 && handicap <= 0.4) return {
+    bg: 'rgba(212, 168, 83, 0.12)',
+    text: '#C4963E',
+    border: 'rgba(212, 168, 83, 0.25)',
+  };
+  if (handicap >= 0.5 && handicap <= 9.9) return {
+    bg: 'rgba(82, 183, 136, 0.10)',
+    text: '#40916C',
+    border: 'rgba(82, 183, 136, 0.2)',
+  };
+  if (handicap >= 10.0 && handicap <= 19.9) return {
+    bg: 'rgba(0, 0, 0, 0.04)',
+    text: 'hsl(var(--muted-foreground))',
+    border: 'rgba(0, 0, 0, 0.08)',
+  };
+  return {
+    bg: 'rgba(0, 0, 0, 0.03)',
+    text: 'hsl(var(--muted-foreground))',
+    border: 'rgba(0, 0, 0, 0.06)',
+  };
 }
