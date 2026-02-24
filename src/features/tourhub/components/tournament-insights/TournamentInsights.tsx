@@ -603,7 +603,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
                   },
                   topContenders: [], darkHorses: [],
                   courseAnalysis: { winnerProfile: '', keyStats: [], insight: '', difficulty: '' },
-                  confidence: 0, generatedAt: '', isAIPowered: true,
+                  confidence: 0, generatedAt: '', isAIPowered: true, isStale: false,
                 }}
                 accuracy={tracker.accuracy}
                 bestCallName={getBestCall(tracker)?.playerName}
