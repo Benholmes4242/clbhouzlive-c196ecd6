@@ -350,7 +350,7 @@ const CourseExplorer = () => {
 
 
   return (
-    <div className="w-full space-y-block pb-28">
+    <div className="w-full space-y-block">
       {/* Your Network Section - Shows activity from friends */}
       <YourNetworkSection className="mt-2" />
 
@@ -361,7 +361,7 @@ const CourseExplorer = () => {
           placeholder="Search by name, county or area…"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10 pr-10 h-11 rounded-sq-sm bg-card border border-border shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border transition-all duration-150 text-base placeholder:text-[15px]"
+          className="pl-10 pr-10 h-11 rounded-sq-sm bg-card border border-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border transition-all duration-150 text-base placeholder:text-[15px]"
           aria-label="Search golf courses"
           role="searchbox"
         />
@@ -390,7 +390,7 @@ const CourseExplorer = () => {
             setSelectedSubregion('all');
           }}>
             <SelectTrigger 
-              className={`h-11 w-full rounded-sq-sm bg-card justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-border focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98] ${
+              className={`h-11 w-full rounded-sq-sm bg-card justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98] ${
                 selectedRegion !== PRIMARY_REGIONS.ALL 
                   ? 'border-border ring-1 ring-border text-foreground' 
                   : 'border-border'
@@ -420,7 +420,7 @@ const CourseExplorer = () => {
             disabled={selectedRegion === PRIMARY_REGIONS.ALL || !SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.length}
           >
             <SelectTrigger 
-              className={`h-11 w-full rounded-sq-sm bg-card justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-border focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed ${
+              className={`h-11 w-full rounded-sq-sm bg-card justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed ${
                 selectedSubregion !== 'all' 
                   ? 'border-border ring-1 ring-border text-foreground' 
                   : 'border-border'

@@ -29,7 +29,7 @@ export const Top100RankBadge: React.FC<Top100RankBadgeProps> = ({ listSlug, rank
   };
 
   return (
-    <div className="glass-badge-tight shadow-[0_2px_8px_rgba(0,0,0,0.35)] [--badge-w:52px] md:[--badge-w:56px] lg:[--badge-w:56px]">
+    <div className="glass-badge-tight [--badge-w:52px] md:[--badge-w:56px] lg:[--badge-w:56px]">
       {renderIcon()}
       <span className="text-white">#{rank}</span>
     </div>

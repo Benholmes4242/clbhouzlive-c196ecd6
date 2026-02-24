@@ -156,7 +156,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
       type="button"
       onClick={handleClick}
       aria-label={`View ${course.name}`}
-      className={`group w-full rounded-none sm:rounded-sq-md overflow-hidden bg-card sm:border sm:border-border/60 text-left shadow-none sm:shadow-sm hover:sm:shadow-lg hover:sm:scale-[1.005] active:scale-[0.98] sm:active:scale-[0.995] transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 ${className}`}
+      className={`group w-full rounded-none sm:rounded-sq-md overflow-hidden bg-card sm:border sm:border-border/50 text-left shadow-none sm:shadow-sm hover:sm:shadow-lg hover:sm:scale-[1.005] active:scale-[0.98] sm:active:scale-[0.995] transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 ${className}`}
     >
       {/* Hero image with badges */}
       <div className={`relative w-full ${IMAGE_ASPECT} overflow-hidden`}>
@@ -224,7 +224,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0 space-y-1">
             {/* Course name */}
-            <h3 className="text-sm font-semibold text-foreground truncate" title={course.name}>
+            <h3 className="text-[15px] font-semibold text-foreground truncate" style={{ letterSpacing: '-0.2px' }} title={course.name}>
               {course.name}
             </h3>
 

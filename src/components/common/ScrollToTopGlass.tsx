@@ -81,19 +81,21 @@ const ScrollToTopGlass = () => {
           flex
           items-center
           justify-center
-          bg-white
-          border
-          border-gray-100
-          shadow-lg
-          hover:shadow-xl
           active:scale-95
           transition-all
           duration-150
           touch-manipulation
         "
-        style={{ WebkitTapHighlightColor: 'transparent' }}
+        style={{ 
+          WebkitTapHighlightColor: 'transparent',
+          background: 'rgba(0, 0, 0, 0.28)',
+          backdropFilter: 'blur(22px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(22px) saturate(180%)',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
+        }}
       >
-        <ChevronUp className="h-4 w-4" style={{ color: '#4b5563' }} />
+        <ChevronUp className="h-4 w-4 text-white" />
       </button>
     </div>,
     document.body

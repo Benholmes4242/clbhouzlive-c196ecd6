@@ -51,7 +51,7 @@ export function AppSelect<T extends string = string>({
           className={cn(
             'h-9 rounded-sq-sm border border-border bg-card px-3 text-sm',
             'focus:outline-none focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border',
-            'shadow-[0_1px_2px_rgba(15,23,42,0.04)]',
+            '',
             icon && 'pl-2',
             triggerClassName
           )}
