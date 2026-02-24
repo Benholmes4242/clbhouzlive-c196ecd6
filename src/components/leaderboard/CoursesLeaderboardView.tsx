@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCourseLeaderboard, CourseSortType } from '@/hooks/useCourseLeaderboard';
 import { useQuery } from '@tanstack/react-query';
@@ -6,9 +6,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { LeaderboardEmptyState } from './LeaderboardEmptyState';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { Star, Loader2, ChevronUp } from 'lucide-react';
-import { formatDistanceToNow, startOfMonth, startOfYear } from 'date-fns';
-import { Button } from '@/components/ui/button';
+import { Star, ChevronUp, RefreshCw, WifiOff } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
 import { CreateGameTripSheetV2 } from '@/features/hub/components/create-game-trip-v2';
 import { cn } from '@/lib/utils';
 import { CourseLocationSelector } from '@/components/leaderboards/shared/CourseLocationSelector';
@@ -24,15 +23,130 @@ import {
 
 const PAGE_SIZE = 20;
 
+// ─── Persistence helpers ────────────────────────────────────────────
+const STORAGE_KEY_FILTERS = 'courses-leaderboard-filters';
+const STORAGE_KEY_SCROLL = 'courses-leaderboard-scroll';
+
+interface SavedFilters {
+  sort: CourseSortType;
+  timeRange: CourseTimeRange;
+  scope: CourseScope;
+  region: string | null;
+  subRegion: string | null;
+}
+
+function readSavedFilters(): SavedFilters | null {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY_FILTERS);
+    if (!raw) return null;
+    return JSON.parse(raw) as SavedFilters;
+  } catch {
+    return null;
+  }
+}
+
+// ─── Inline sub-components ──────────────────────────────────────────
+
+const CourseLeaderboardSkeleton = () => (
+  <div className="flex flex-col">
+    {[1, 2, 3].map((i) => (
+      <div key={i} className="flex items-center gap-3 py-3 px-4 border-b border-border animate-pulse">
+        <Skeleton className="w-7 h-7 rounded-full" />
+        <Skeleton className="w-14 h-14 rounded-xl" />
+        <div className="flex-1 space-y-1.5">
+          <Skeleton className="h-4 w-3/4" />
+          <Skeleton className="h-3 w-1/2" />
+          <Skeleton className="h-3 w-2/3" />
+        </div>
+        <Skeleton className="w-6 h-10" />
+      </div>
+    ))}
+  </div>
+);
+
+const InlineRetryCard = ({ onRetry }: { onRetry: () => void }) => (
+  <div className="max-w-md mx-auto mt-4 px-4">
+    <button
+      onClick={onRetry}
+      className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-sq-sm bg-card border border-border text-sm text-muted-foreground hover:text-foreground hover:border-border/80 transition-colors active:scale-[0.98]"
+    >
+      <RefreshCw className="w-3.5 h-3.5" />
+      Couldn't load more courses · Tap to retry
+    </button>
+  </div>
+);
+
+const InitialErrorState = ({ onRetry }: { onRetry: () => void }) => (
+  <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+    <WifiOff className="w-12 h-12 text-muted-foreground/40 mb-4" />
+    <p className="text-foreground font-semibold mb-1">Unable to load course rankings</p>
+    <p className="text-sm text-muted-foreground mb-4">Check your connection and try again</p>
+    <button
+      onClick={onRetry}
+      className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 active:scale-[0.97] transition-all"
+    >
+      Retry
+    </button>
+  </div>
+);
+
+// ─── Virtualization constants ───────────────────────────────────────
+// CourseRankingRow: py-3 (24px) + h-14 thumbnail (56px) + border-b (1px) = ~81px
+const ROW_HEIGHT = 81;
+const VIRTUALIZATION_THRESHOLD = 50;
+const OVERSCAN = 8;
+
 export function CoursesLeaderboardView() {
   const navigate = useNavigate();
-  const [sort, setSort] = useState<CourseSortType>('highest_rated');
-  const [timeRange, setTimeRange] = useState<CourseTimeRange>('all_time');
-  const [scope, setScope] = useState<CourseScope>('global');
-  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
-  const [selectedSubRegion, setSelectedSubRegion] = useState<string | null>(null);
+  
+  // ─── Filter state with persistence ───────────────────────────────
+  const [sort, setSort] = useState<CourseSortType>(() => {
+    const saved = readSavedFilters();
+    return saved?.sort ?? 'highest_rated';
+  });
+  const [timeRange, setTimeRange] = useState<CourseTimeRange>(() => {
+    const saved = readSavedFilters();
+    return saved?.timeRange ?? 'all_time';
+  });
+  const [scope, setScope] = useState<CourseScope>(() => {
+    const saved = readSavedFilters();
+    return saved?.scope ?? 'global';
+  });
+  const [selectedRegion, setSelectedRegion] = useState<string | null>(() => {
+    const saved = readSavedFilters();
+    return saved?.region ?? null;
+  });
+  const [selectedSubRegion, setSelectedSubRegion] = useState<string | null>(() => {
+    const saved = readSavedFilters();
+    return saved?.subRegion ?? null;
+  });
   const [gamesHubOpen, setGamesHubOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // Scroll position preservation refs for filter changes
+  const scrollPositionRef = useRef<number>(0);
+  const isFilterChangeRef = useRef<boolean>(false);
+
+  // Infinite scroll refs
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const hasRestoredScroll = useRef(false);
+
+  // Virtualization state
+  const [scrollTop, setScrollTop] = useState(0);
+  const listContainerRef = useRef<HTMLDivElement>(null);
+
+  // ─── Filter persistence effect ────────────────────────────────────
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(STORAGE_KEY_FILTERS, JSON.stringify({
+        sort,
+        timeRange,
+        scope,
+        region: selectedRegion,
+        subRegion: selectedSubRegion,
+      }));
+    } catch { /* ignore */ }
+  }, [sort, timeRange, scope, selectedRegion, selectedSubRegion]);
 
   // Clear region/sub-region when scope changes away from 'country'
   useEffect(() => {
@@ -52,14 +166,16 @@ export function CoursesLeaderboardView() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Fetch course leaderboard data - shows ALL reviewed courses (no Top 100 restriction)
+  // Fetch course leaderboard data
   const { 
     data, 
     isLoading, 
     isFetching,
+    isError,
     hasNextPage, 
     fetchNextPage,
-    isFetchingNextPage 
+    isFetchingNextPage,
+    refetch,
   } = useCourseLeaderboard({
     scope: scope === 'country' ? 'country' : 'worldwide',
     timeRange,
@@ -69,13 +185,75 @@ export function CoursesLeaderboardView() {
     subRegion: scope === 'country' ? selectedSubRegion : null,
   });
 
-  // Flatten pages into single array
+  // Flatten pages — memoized for stable reference
   const allCourses = useMemo(() => {
-    return data?.pages.flatMap(page => page.entries) || [];
-  }, [data]);
+    return data?.pages.flatMap(page => page.entries) ?? [];
+  }, [data?.pages]);
 
-  // Fetch recent Top 100 rounds by circle (people user follows)
-  // NOTE: Query key does NOT include timeRange - carousel is independent of time filter
+  // ─── Infinite scroll via IntersectionObserver ─────────────────────
+  const isFetchingRef = useRef(isFetchingNextPage);
+  isFetchingRef.current = isFetchingNextPage;
+
+  useEffect(() => {
+    if (!sentinelRef.current || !hasNextPage) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && hasNextPage && !isFetchingRef.current) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: '600px', threshold: 0 },
+    );
+
+    observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
+  }, [hasNextPage, fetchNextPage]);
+
+  // ─── Virtualization scroll tracking ───────────────────────────────
+  useEffect(() => {
+    if (allCourses.length < VIRTUALIZATION_THRESHOLD) return;
+
+    const handleScroll = () => {
+      const rootEl = document.getElementById('root');
+      const y = rootEl && rootEl.scrollTop > 0 ? rootEl.scrollTop : window.scrollY;
+      setScrollTop(y);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    const rootEl = document.getElementById('root');
+    rootEl?.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      rootEl?.removeEventListener('scroll', handleScroll);
+    };
+  }, [allCourses.length]);
+
+  // ─── Scroll position save/restore ─────────────────────────────────
+  const handleCourseClick = useCallback((courseId: string) => {
+    const rootEl = document.getElementById('root');
+    const scrollY = (rootEl && rootEl.scrollTop > 0) ? rootEl.scrollTop : window.scrollY;
+    sessionStorage.setItem(STORAGE_KEY_SCROLL, scrollY.toString());
+    navigate(`/courses/${courseId}`);
+  }, [navigate]);
+
+  useEffect(() => {
+    if (hasRestoredScroll.current || allCourses.length === 0) return;
+    const savedScroll = sessionStorage.getItem(STORAGE_KEY_SCROLL);
+    if (savedScroll) {
+      hasRestoredScroll.current = true;
+      requestAnimationFrame(() => {
+        const rootEl = document.getElementById('root');
+        const scrollTarget = parseInt(savedScroll, 10);
+        if (rootEl) rootEl.scrollTop = scrollTarget;
+        window.scrollTo({ top: scrollTarget, behavior: 'instant' as ScrollBehavior });
+        sessionStorage.removeItem(STORAGE_KEY_SCROLL);
+      });
+    }
+  }, [allCourses.length]);
+
+  // Fetch recent Top 100 rounds by circle
   const { data: circleRecentRounds, isLoading: circleLoading } = useQuery({
     queryKey: ['circle-recent-top100-rounds'],
     queryFn: async () => {
@@ -137,20 +315,68 @@ export function CoursesLeaderboardView() {
     return showPodium ? allCourses.slice(3) : allCourses;
   }, [showPodium, allCourses]);
 
-  const handleCourseClick = useCallback((courseId: string) => {
-    navigate(`/courses/${courseId}`);
-  }, [navigate]);
-
   const handleSortChange = useCallback((newSort: CourseSortType) => {
+    const rootEl = document.getElementById('root');
+    if (rootEl) {
+      scrollPositionRef.current = rootEl.scrollTop;
+      isFilterChangeRef.current = true;
+    }
     setSort(newSort);
   }, []);
 
   const handleTimeRangeChange = useCallback((newTimeRange: CourseTimeRange) => {
+    const rootEl = document.getElementById('root');
+    if (rootEl) {
+      scrollPositionRef.current = rootEl.scrollTop;
+      isFilterChangeRef.current = true;
+    }
     setTimeRange(newTimeRange);
   }, []);
 
-  // Loading skeleton
-  if (isLoading && allCourses.length === 0) {
+  const handleScopeChange = useCallback((newScope: CourseScope) => {
+    const rootEl = document.getElementById('root');
+    if (rootEl) {
+      scrollPositionRef.current = rootEl.scrollTop;
+      isFilterChangeRef.current = true;
+    }
+    setScope(newScope);
+  }, []);
+
+  // Restore scroll position after filter change and re-render
+  useLayoutEffect(() => {
+    if (isFilterChangeRef.current) {
+      const rootEl = document.getElementById('root');
+      if (rootEl) {
+        requestAnimationFrame(() => {
+          rootEl.scrollTop = scrollPositionRef.current;
+        });
+      }
+      isFilterChangeRef.current = false;
+    }
+  }, [sort, timeRange, scope, allCourses]);
+
+  // ─── Virtualized list rendering ───────────────────────────────────
+  const useVirtualization = listCourses.length >= VIRTUALIZATION_THRESHOLD;
+
+  const virtualizedContent = useMemo(() => {
+    if (!useVirtualization) return null;
+
+    const containerOffset = listContainerRef.current?.offsetTop ?? 0;
+    const relativeScroll = Math.max(0, scrollTop - containerOffset);
+
+    const totalHeight = listCourses.length * ROW_HEIGHT;
+    const startIndex = Math.max(0, Math.floor(relativeScroll / ROW_HEIGHT) - OVERSCAN);
+    const visibleCount = Math.ceil(window.innerHeight / ROW_HEIGHT) + OVERSCAN * 2;
+    const endIndex = Math.min(listCourses.length, startIndex + visibleCount);
+
+    const visibleEntries = listCourses.slice(startIndex, endIndex);
+    const offsetY = startIndex * ROW_HEIGHT;
+
+    return { totalHeight, visibleEntries, offsetY, startIndex };
+  }, [useVirtualization, listCourses, scrollTop]);
+
+  // Loading skeleton for initial load
+  if (isLoading && allCourses.length === 0 && !isError) {
     return (
       <div className="space-y-4 pb-8 animate-fade-in">
         <div className="px-4 space-y-4">
@@ -204,7 +430,7 @@ export function CoursesLeaderboardView() {
               {circleRecentRounds.slice(0, 8).map((round: any) => (
                 <button
                   key={round.id}
-                  onClick={() => navigate(`/courses/${round.course_id}`)}
+                  onClick={() => handleCourseClick(round.course_id)}
                   className="w-40 flex-shrink-0 text-left group active:scale-[0.97] transition-transform"
                 >
                   {/* Course Image */}
@@ -282,7 +508,7 @@ export function CoursesLeaderboardView() {
         timeRange={timeRange}
         onTimeRangeChange={handleTimeRangeChange}
         scope={scope}
-        onScopeChange={setScope}
+        onScopeChange={handleScopeChange}
       />
 
       {/* Region/Sub-Region Selector - shown when scope is 'country' */}
@@ -308,84 +534,108 @@ export function CoursesLeaderboardView() {
           </p>
         </div>
 
-        {/* Updating overlay */}
-        <div className={isFetching && !isFetchingNextPage ? 'opacity-60' : ''}>
-          {/* Podium (conditional) */}
-          {showPodium && (
-            <CoursePodium 
-              courses={podiumCourses.map(c => ({
-                course_id: c.course_id,
-                course_name: c.course_name,
-                country: c.country,
-                sub_country: c.sub_country,
-                thumbnail_url: c.thumbnail_url,
-                avg_rating: c.avg_rating,
-                times_played: c.times_played,
-                rank_change: c.rank_change,
-              }))}
-              sort={sort === 'rising' ? 'rising' : sort === 'highest_rated' ? 'highest_rated' : 'most_played'}
-              onCourseClick={handleCourseClick}
-            />
-          )}
-
-          {/* Rankings List */}
-          <div className="flex flex-col">
-            {listCourses.length === 0 && allCourses.length === 0 && !isLoading ? (
-              <div className="py-8">
-                <LeaderboardEmptyState type="no-matches" onResetFilters={() => handleSortChange('most_played')} />
-              </div>
-            ) : (
-              listCourses.map((course, index) => (
-                <CourseRankingRow
-                  key={course.course_id}
-                  course={{
-                    ...course,
-                    unique_players: course.unique_players || course.times_played,
-                    rank_change: course.rank_change || 0,
-                    is_trending: course.is_trending || false,
-                    is_hall_of_fame: course.is_hall_of_fame || false,
-                    prestige_tags: course.prestige_tags || [],
-                    current_user_played: course.current_user_played || false,
-                    current_user_play_count: course.current_user_play_count || 0,
-                  }}
-                  rank={showPodium ? index + 4 : index + 1}
-                  sort={sort}
-                  onClick={() => handleCourseClick(course.course_id)}
+        {/* Initial error state */}
+        {isError && allCourses.length === 0 ? (
+          <InitialErrorState onRetry={() => refetch()} />
+        ) : (
+          <>
+            {/* Updating overlay */}
+            <div className={isFetching && !isFetchingNextPage ? 'opacity-60' : ''}>
+              {/* Podium (conditional) */}
+              {showPodium && (
+                <CoursePodium 
+                  courses={podiumCourses.map(c => ({
+                    course_id: c.course_id,
+                    course_name: c.course_name,
+                    country: c.country,
+                    sub_country: c.sub_country,
+                    thumbnail_url: c.thumbnail_url,
+                    avg_rating: c.avg_rating,
+                    times_played: c.times_played,
+                    rank_change: c.rank_change,
+                  }))}
+                  sort={sort === 'rising' ? 'rising' : sort === 'highest_rated' ? 'highest_rated' : 'most_played'}
+                  onCourseClick={handleCourseClick}
                 />
-              ))
-            )}
-          </div>
-        </div>
+              )}
 
-        {/* Load more / End indicator */}
-        {allCourses.length > 0 && (
-          <div className="flex flex-col items-center gap-3 pt-4 pb-6 px-4">
-            {hasNextPage ? (
-              <Button
-                variant="outline"
-                size="default"
-                onClick={() => fetchNextPage()}
-                disabled={isFetchingNextPage}
-                className="w-full max-w-xs gap-2 rounded-sq-sm"
-              >
-                {isFetchingNextPage ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Loading...
-                  </>
+              {/* Rankings List */}
+              <div ref={listContainerRef} className="flex flex-col relative">
+                {listCourses.length === 0 && allCourses.length === 0 && !isLoading ? (
+                  <div className="py-8">
+                    <LeaderboardEmptyState type="no-matches" onResetFilters={() => handleSortChange('most_played')} />
+                  </div>
+                ) : useVirtualization && virtualizedContent ? (
+                  // Virtualized list for large entry counts
+                  <div
+                    className="relative"
+                    style={{ height: virtualizedContent.totalHeight }}
+                  >
+                    <div
+                      className="absolute inset-x-0"
+                      style={{ transform: `translateY(${virtualizedContent.offsetY}px)` }}
+                    >
+                      {virtualizedContent.visibleEntries.map((course, i) => (
+                        <CourseRankingRow
+                          key={course.course_id}
+                          course={{
+                            ...course,
+                            unique_players: course.unique_players || course.times_played,
+                            rank_change: course.rank_change || 0,
+                            is_trending: course.is_trending || false,
+                            is_hall_of_fame: course.is_hall_of_fame || false,
+                            prestige_tags: course.prestige_tags || [],
+                            current_user_played: course.current_user_played || false,
+                            current_user_play_count: course.current_user_play_count || 0,
+                          }}
+                          rank={showPodium ? (virtualizedContent.startIndex + i) + 4 : (virtualizedContent.startIndex + i) + 1}
+                          sort={sort}
+                          onClick={() => handleCourseClick(course.course_id)}
+                        />
+                      ))}
+                    </div>
+                  </div>
                 ) : (
-                  'Load more'
+                  // Non-virtualized list
+                  listCourses.map((course, index) => (
+                    <CourseRankingRow
+                      key={course.course_id}
+                      course={{
+                        ...course,
+                        unique_players: course.unique_players || course.times_played,
+                        rank_change: course.rank_change || 0,
+                        is_trending: course.is_trending || false,
+                        is_hall_of_fame: course.is_hall_of_fame || false,
+                        prestige_tags: course.prestige_tags || [],
+                        current_user_played: course.current_user_played || false,
+                        current_user_play_count: course.current_user_play_count || 0,
+                      }}
+                      rank={showPodium ? index + 4 : index + 1}
+                      sort={sort}
+                      onClick={() => handleCourseClick(course.course_id)}
+                    />
+                  ))
                 )}
-              </Button>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                You've reached the end
-              </p>
+              </div>
+            </div>
+
+            {/* Sentinel + loading skeleton for infinite scroll */}
+            {hasNextPage && !isError && (
+              <div ref={sentinelRef}>
+                {isFetchingNextPage && <CourseLeaderboardSkeleton />}
+              </div>
             )}
-            <p className="text-[11px] text-muted-foreground text-center">
-              Showing {allCourses.length} courses
-            </p>
-          </div>
+
+            {/* Inline retry on pagination error */}
+            {isError && !isFetchingNextPage && allCourses.length > 0 && (
+              <InlineRetryCard onRetry={() => fetchNextPage()} />
+            )}
+
+            {/* Loading indicator during retry */}
+            {isError && isFetchingNextPage && allCourses.length > 0 && (
+              <CourseLeaderboardSkeleton />
+            )}
+          </>
         )}
       </section>
 
