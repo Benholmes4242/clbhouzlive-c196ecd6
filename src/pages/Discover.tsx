@@ -55,7 +55,7 @@ const Discover = () => {
   // Rehydration state - show skeleton when app is rehydrating after background
   const { isRehydrating } = useRehydrationSafe();
   
-  const { main, sub } = useDiscoverQuery();
+  const { main, sub, setMain } = useDiscoverQuery();
   const [durationFilter, setDurationFilter] = useVideoLengthFilter();
 
   // Timing instrumentation - log page mount/unmount
@@ -296,14 +296,20 @@ const Discover = () => {
   // ============================================
 
   return (
-    <PageRoot className="min-h-screen text-foreground bg-[#F8FAFC]">
+    <PageRoot className="min-h-screen text-foreground bg-background">
       <FadeInContent>
-        <main className="pb-20 bg-[#F8FAFC]">
+        <main className="pb-20 bg-background">
             {/* Tabs - sit directly on page canvas, no intermediate blocks */}
-            <div className="px-1 bg-[#F8FAFC]">
-              <SegmentedControl 
-                activeTab={activeFilter}
-                onTabChange={() => {}} // No-op: tabs control via URL now
+            <div className="px-1">
+              <SegmentedControl
+                tabs={[
+                  { id: 'shorts', label: 'Watch' },
+                  { id: 'videos', label: 'Videos' },
+                  { id: 'explore', label: 'Explore' },
+                  { id: 'following', label: 'Friends' },
+                ]}
+                activeTab={main}
+                onTabChange={(id) => setMain(id as MainKey)}
               />
             </div>
             
