@@ -5,6 +5,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFriendsCourses } from '@/hooks/useFriendsCourses';
 import { toast } from 'sonner';
 import { type Timeframe } from '@/lib/timeWindow';
+import { CalendarDays } from 'lucide-react';
 
 import NetworkStatsBar from './friends/NetworkStatsBar';
 import NetworkChallengePrompt from './friends/NetworkChallengePrompt';
@@ -136,14 +137,17 @@ const FriendsCoursesPanel: React.FC = () => {
     return new Set(courses.filter(c => c.total_friends_played >= 2).map(c => c.course_id));
   }, [courses]);
 
+  const hasFriends = sourceData?.hasFriends ?? false;
+
   if (!user) return null;
   if (isLoading && !filteredData) return <FriendsCoursesSkeleton />;
-  if (isError) return <FriendsCoursesEmpty />;
-  if (totalCourses === 0) return <FriendsCoursesEmpty />;
+
+  // Only show onboarding empty state when user genuinely has no friends
+  if (!hasFriends && !isLoading) return <FriendsCoursesEmpty />;
 
   return (
     <div className="w-full pb-6">
-      {/* Inline Stats Bar */}
+      {/* Inline Stats Bar — ALWAYS visible when user has friends */}
       <NetworkStatsBar
         totalRounds={totalRounds}
         totalCourses={totalCourses}
@@ -152,38 +156,49 @@ const FriendsCoursesPanel: React.FC = () => {
         onTimeframeChange={setTimeframe}
       />
 
-      {/* Challenge Prompt */}
-      <div className="px-4 mt-2">
-        <NetworkChallengePrompt
-          userPlayedCount={userPlayedCount}
-          totalCourses={totalCourses}
-        />
-      </div>
-
-      {/* Hero Course — cinematic spotlight */}
-      {heroCourse && (
-        <div className="mt-4">
-          <FriendsHeroCourseCard course={heroCourse} filterType="all" />
+      {totalCourses === 0 ? (
+        /* Inline "no activity" for this period — user can change filter */
+        <div className="flex flex-col items-center justify-center py-12 text-center px-4">
+          <CalendarDays className="w-10 h-10 text-muted-foreground/30 mb-3" />
+          <p className="text-sm font-semibold text-foreground">No activity in this period</p>
+          <p className="text-xs text-muted-foreground mt-1">Try expanding your time range</p>
         </div>
+      ) : (
+        <>
+          {/* Challenge Prompt */}
+          <div className="px-4 mt-2">
+            <NetworkChallengePrompt
+              userPlayedCount={userPlayedCount}
+              totalCourses={totalCourses}
+            />
+          </div>
+
+          {/* Hero Course — cinematic spotlight */}
+          {heroCourse && (
+            <div className="mt-4">
+              <FriendsHeroCourseCard course={heroCourse} filterType="all" />
+            </div>
+          )}
+
+          {/* Most Active Friends */}
+          <div className="px-4 mt-6">
+            <FriendsActivityCard leaderboard={leaderboard} timeframe={timeframe} />
+          </div>
+
+          {/* Network Activity Feed */}
+          <div className="px-4 mt-6">
+            <div className="mb-3">
+              <h3 className="text-lg font-bold text-foreground">Network Activity</h3>
+            </div>
+            <FriendsActivityFeed
+              recent={recent}
+              courses={courses}
+              trendingCourseIds={trendingCourseIds}
+              userPlayedCourseIds={userPlayedCourseIds}
+            />
+          </div>
+        </>
       )}
-
-      {/* Most Active Friends */}
-      <div className="px-4 mt-6">
-        <FriendsActivityCard leaderboard={leaderboard} timeframe={timeframe} />
-      </div>
-
-      {/* Network Activity Feed */}
-      <div className="px-4 mt-6">
-        <div className="mb-3">
-          <h3 className="text-lg font-bold text-foreground">Network Activity</h3>
-        </div>
-        <FriendsActivityFeed
-          recent={recent}
-          courses={courses}
-          trendingCourseIds={trendingCourseIds}
-          userPlayedCourseIds={userPlayedCourseIds}
-        />
-      </div>
     </div>
   );
 };

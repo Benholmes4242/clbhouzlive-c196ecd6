@@ -224,4 +224,5 @@ export const MOCK_FRIEND_COURSES: FriendsCoursesResult = {
   recent: mockFriendHits,
   totalCourses: mockCoursesWithFriends.length,
   totalFriendsActive: 3, // Andrew, Sarah, James
+  hasFriends: true,
 };

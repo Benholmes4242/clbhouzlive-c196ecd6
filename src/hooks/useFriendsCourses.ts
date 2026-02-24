@@ -46,6 +46,7 @@ export type FriendsCoursesResult = {
   recent: FriendCourseHit[];
   totalCourses: number;
   totalFriendsActive: number;
+  hasFriends: boolean;
 };
 
 export function useFriendsCourses(userId?: string, timeframe: Timeframe = '90d') {
@@ -59,6 +60,7 @@ export function useFriendsCourses(userId?: string, timeframe: Timeframe = '90d')
           recent: [],
           totalCourses: 0,
           totalFriendsActive: 0,
+          hasFriends: false,
         };
       }
 
@@ -83,6 +85,7 @@ export function useFriendsCourses(userId?: string, timeframe: Timeframe = '90d')
           recent: [],
           totalCourses: 0,
           totalFriendsActive: 0,
+          hasFriends: false,
         };
       }
 
@@ -138,6 +141,7 @@ export function useFriendsCourses(userId?: string, timeframe: Timeframe = '90d')
           recent: [],
           totalCourses: 0,
           totalFriendsActive: friendIds.length,
+          hasFriends: true,
         };
       }
 
@@ -250,6 +254,7 @@ export function useFriendsCourses(userId?: string, timeframe: Timeframe = '90d')
         recent,
         totalCourses: courses.length,
         totalFriendsActive: activeFriendIds.size,
+        hasFriends: true,
       };
     },
     staleTime: 5 * 60 * 1000,  // 5 min – shorter since timeframe affects data
