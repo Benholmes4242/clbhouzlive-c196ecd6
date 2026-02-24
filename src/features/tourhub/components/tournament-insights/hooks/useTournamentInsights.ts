@@ -67,6 +67,8 @@ export function useTournamentInsights() {
     nextTournamentPredictionsLoading,
     /** Tab shows whenever a next tournament exists, regardless of predictions */
     hasUpcoming: !!nextTournamentPreview,
+    /** True when predictions are outdated and should show a warning */
+    isStale: aiData?.isStale ?? false,
   };
 }
 
