@@ -12,6 +12,7 @@ import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import CoursesErrorBoundary from './CoursesErrorBoundary';
 import { Trophy } from 'lucide-react';
+import SegmentedControl from '@/components/discover/SegmentedControl';
 
 interface CoursesContentProps {
   username?: string;
@@ -152,48 +153,15 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
       ) : (
         /* Main courses page - show Explore, Global Top 100, and Friends' Courses */
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          {/* Tabs wrapper - matches Discover SegmentedControl exactly */}
-          <section className="py-3 -mx-4 px-4 bg-background">
-            <div className="flex p-1 rounded-xl overflow-hidden bg-muted">
-              <button
-                role="tab"
-                aria-selected={activeTab === 'explore'}
-                onClick={() => handleTabChange('explore')}
-                className={`flex-1 py-2.5 px-5 text-sm font-medium rounded-lg transition-all duration-150 active:scale-[0.97] ${
-                  activeTab === 'explore'
-                    ? 'm-1 bg-card text-foreground shadow-sm border border-border'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-card/50'
-                }`}
-              >
-                Explore
-              </button>
-              <button
-                role="tab"
-                aria-selected={activeTab === 'top100'}
-                onClick={() => handleTabChange('top100')}
-                className={`flex-1 py-2.5 px-5 text-sm font-medium rounded-lg transition-all duration-150 active:scale-[0.97] flex items-center justify-center ${
-                  activeTab === 'top100'
-                    ? 'm-1 bg-card text-foreground shadow-sm border border-border'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-card/50'
-                }`}
-              >
-                <Trophy className="h-4 w-4 mr-1.5" />
-                Top 100
-              </button>
-              <button
-                role="tab"
-                aria-selected={activeTab === 'leaderboards'}
-                onClick={() => handleTabChange('leaderboards')}
-                className={`flex-1 py-2.5 px-5 text-sm font-medium rounded-lg transition-all duration-150 active:scale-[0.97] ${
-                  activeTab === 'leaderboards'
-                    ? 'm-1 bg-card text-foreground shadow-sm border border-border'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-card/50'
-                }`}
-              >
-                Leaderboards
-              </button>
-            </div>
-          </section>
+          <SegmentedControl
+            tabs={[
+              { id: 'explore', label: 'Explore' },
+              { id: 'top100', label: 'Top 100', icon: <Trophy className="h-4 w-4" /> },
+              { id: 'leaderboards', label: 'Leaderboards' },
+            ]}
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+          />
 
           <TabsContent value="explore" className="mt-2">
             <CourseExplorer />

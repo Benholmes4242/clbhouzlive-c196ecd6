@@ -375,10 +375,10 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               <Search className="h-5 w-5" />
             </Button>
             
-            {/* Identity pill (mobile only, logged in users) */}
-            {user && (
-              <div className="sm:hidden">
-              <PostingAsPill 
+            {/* Identity pill (mobile only) */}
+            <div className="sm:hidden">
+              {user ? (
+                <PostingAsPill 
                   ref={pillRef}
                   onClick={handleMenuClick} 
                   isOpen={menuOpen}
@@ -386,8 +386,14 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                   useLightTheme={useLightTheme}
                   isDimmed={shouldDim}
                 />
-              </div>
-            )}
+              ) : (
+                /* Skeleton placeholder while auth resolves — prevents layout shift */
+                <div 
+                  className="rounded-full bg-muted/50 animate-pulse"
+                  style={{ width: 34, height: 34 }}
+                />
+              )}
+            </div>
             
             {/* Desktop: Acting as indicator + Full navigation */}
             <div className="hidden sm:flex items-center">

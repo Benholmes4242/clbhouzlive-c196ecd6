@@ -1,57 +1,55 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
-import { MainPill } from '@/constants/discoverPills';
 
-interface SegmentedControlProps {
-  activeTab: string;
-  onTabChange: (tab: string) => void;
-  onOpenVideoSearch?: () => void;
+interface Tab {
+  id: string;
+  label: string;
+  icon?: React.ReactNode;
 }
 
-const tabs = [
-  { id: 'shorts', label: 'Watch' },
-  { id: 'videos', label: 'Videos' },
-  { id: 'explore', label: 'Explore' },
-  { id: 'following', label: 'Friends' }
-];
+interface SegmentedControlProps {
+  tabs: Tab[];
+  activeTab: string;
+  onTabChange: (tabId: string) => void;
+  className?: string;
+}
 
-const SegmentedControl: React.FC<SegmentedControlProps> = ({ 
-  activeTab, 
+/**
+ * SegmentedControl — Shared pill-toggle tab component.
+ * Canonical styling sourced from Tours Overview (TourHubTabs).
+ *
+ * Container:  bg-muted  rounded-xl  p-1
+ * Active tab: bg-card  text-foreground  shadow-sm  rounded-lg  border border-border  m-1
+ * Inactive:   text-muted-foreground  transparent
+ *
+ * All colors use design tokens — no hardcoded hex values.
+ */
+const SegmentedControl: React.FC<SegmentedControlProps> = ({
+  tabs,
+  activeTab,
   onTabChange,
-  onOpenVideoSearch
+  className,
 }) => {
-  const { main, setMain } = useDiscoverQuery();
-
-  const handleTabClick = (tabId: string) => {
-    setMain(tabId as MainPill);
-  };
-
   return (
-    <section className="py-3 px-4" style={{ background: '#F8FAFC' }}>
-      <div 
-        className="flex p-1 rounded-full overflow-hidden"
-        style={{ background: 'rgba(0, 0, 0, 0.06)' }}
-      >
+    <section className={cn('py-3 -mx-4 px-4 bg-background', className)}>
+      <div className="flex p-1 rounded-xl overflow-hidden bg-muted">
         {tabs.map((tab) => {
-          const isActive = main === tab.id;
-          
+          const isActive = activeTab === tab.id;
+
           return (
             <button
               key={tab.id}
               role="tab"
               aria-selected={isActive}
-              onClick={() => handleTabClick(tab.id)}
+              onClick={() => onTabChange(tab.id)}
               className={cn(
-                "flex-1 py-2.5 px-4 text-sm rounded-full transition-all duration-200",
-                isActive 
-                  ? "bg-white font-semibold shadow-sm" 
-                  : "font-medium hover:bg-white/40"
+                'flex-1 py-2.5 px-4 text-sm font-medium rounded-lg transition-all duration-150 active:scale-[0.97] flex items-center justify-center',
+                isActive
+                  ? 'm-1 bg-card text-foreground shadow-sm border border-border'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-card/50',
               )}
-              style={{ 
-                color: isActive ? '#111827' : '#6b7280',
-              }}
             >
+              {tab.icon && <span className="mr-1.5">{tab.icon}</span>}
               {tab.label}
             </button>
           );

@@ -82,6 +82,7 @@ import { KeepAliveOutlet } from '@/components/keep-alive/KeepAliveOutlet';
 // Import wrapped components with explicit variants
 import ClubhouseWrapped from "./pages/ClubhouseWrapped";
 import DiscoverWrapped from "./pages/DiscoverWrapped";
+import CoursesWrapped from "./pages/CoursesWrapped";
 import ProfileWrapped from "./pages/ProfileWrapped";
 import SettingsWrapped from "./pages/SettingsWrapped";
 import AuthWrapped from "./pages/AuthWrapped";
@@ -103,7 +104,7 @@ const QuestReplayView = lazy(() => import("./pages/QuestReplayView"));
 const AdminBackfill = lazy(() => import("./pages/AdminBackfill"));
 const UserReviewsPage = lazy(() => import("./pages/UserReviewsPage"));
 // Old Settings page removed - now using SettingsPageV2 via SettingsWrapped
-const Courses = lazy(() => import("./pages/Courses"));
+// Courses page now uses CoursesWrapped (imported above) which handles header/dim reset
 const CourseDetailPage = lazy(() => import("./pages/CourseDetailPage"));
 const CourseReviewsPage = lazy(() => import("./pages/CourseReviewsPage"));
 const RateCoursePage = lazy(() => import("./pages/RateCoursePage"));
@@ -332,7 +333,7 @@ function AppRoutes() {
         <Route path="/discover" element={<Suspense fallback={<DiscoverSkeleton />}><DiscoverWrapped /></Suspense>} />
         <Route path="/discover/explore/region/:slug" element={<Suspense fallback={<GenericPageSkeleton />}><ExploreRegionPage /></Suspense>} />
         <Route path="/discover/explore/theme/:slug" element={<Suspense fallback={<GenericPageSkeleton />}><ExploreThemePage /></Suspense>} />
-        <Route path="/courses" element={<Suspense fallback={<CoursesListSkeleton />}><Courses /></Suspense>} />
+        <Route path="/courses" element={<Suspense fallback={<CoursesListSkeleton />}><CoursesWrapped /></Suspense>} />
         <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />
         <Route path="/courses/:courseId/rate" element={<Suspense fallback={<RateCoursePageSkeleton />}><RateCoursePage /></Suspense>} />
         <Route path="/courses/:courseId/share-review/:reviewId" element={<Suspense fallback={<GenericPageSkeleton />}><ShareReviewPage /></Suspense>} />
