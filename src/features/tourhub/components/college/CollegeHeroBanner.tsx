@@ -31,7 +31,7 @@ export function CollegeHeroBanner({ stats, college, className }: CollegeHeroBann
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.4 }}
-        className={cn('relative', className)}
+        className={cn('relative overflow-hidden', className)}
         style={{ height: '50dvh' }}
       >
         {/* Background gradient with Ken Burns */}
