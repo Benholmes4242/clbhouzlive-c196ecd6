@@ -44,13 +44,9 @@ const getOfficialRankForSlug = (
   }
 };
 import { Top100HeroShell } from '@/components/top100/Top100HeroShell';
-import { Button } from '@/components/ui/button';
-import { ChevronDown } from 'lucide-react';
 import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { EXPLORE_PAGE_SIZE } from '@/config/pagination';
-import { scrollToTop } from '@/utils/scrollToTop';
 
 const REGION_DISPLAY_NAMES: Record<string, string> = {
   global: 'Worldwide',
@@ -59,7 +55,6 @@ const REGION_DISPLAY_NAMES: Record<string, string> = {
   europe: 'Continental Europe',
 };
 
-const PAGE_SIZE = EXPLORE_PAGE_SIZE; // Match Explore page (10 courses)
 const INSIGHT_INTERVAL = 10; // Insert insight card every N courses
 
 const Top100List = () => {
@@ -84,8 +79,26 @@ const Top100List = () => {
 
 
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
-  const [filterChip, setFilterChip] = useState<Top100FilterChip>('official');
-  const [sortMode, setSortMode] = useState<Top100SortMode>('rating_high');
+  const [filterChip, setFilterChip] = useState<Top100FilterChip>(() => {
+    try {
+      const saved = sessionStorage.getItem('top100-list-filters');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.filterChip) return parsed.filterChip;
+      }
+    } catch {}
+    return 'official';
+  });
+  const [sortMode, setSortMode] = useState<Top100SortMode>(() => {
+    try {
+      const saved = sessionStorage.getItem('top100-list-filters');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.sortMode) return parsed.sortMode;
+      }
+    } catch {}
+    return 'rating_high';
+  });
 
   // When switching to Played/Unplayed, force sort to rating_high
   const handleFilterChange = (newFilter: Top100FilterChip) => {
@@ -94,9 +107,6 @@ const Top100List = () => {
       setSortMode('rating_high');
     }
   };
-  const [displayedCount, setDisplayedCount] = useState(PAGE_SIZE);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-
   const listTopRef = useRef<HTMLDivElement | null>(null);
   const filterRef = useRef<HTMLDivElement | null>(null);
 
@@ -105,14 +115,10 @@ const Top100List = () => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, [slug]);
 
-  // Restore displayedCount + scroll from sessionStorage on mount
+  // Restore scroll from sessionStorage on mount
   useEffect(() => {
-    const savedCount = sessionStorage.getItem('top100:list:displayedCount');
     const savedScrollY = sessionStorage.getItem('top100:list:scrollY');
 
-    if (savedCount) {
-      setDisplayedCount(Number(savedCount));
-    }
     if (savedScrollY) {
       requestAnimationFrame(() => {
         window.scrollTo({
@@ -123,9 +129,18 @@ const Top100List = () => {
       });
     }
 
-    sessionStorage.removeItem('top100:list:displayedCount');
     sessionStorage.removeItem('top100:list:scrollY');
   }, []);
+
+  // Persist filter state
+  useEffect(() => {
+    try {
+      sessionStorage.setItem('top100-list-filters', JSON.stringify({
+        filterChip,
+        sortMode,
+      }));
+    } catch { /* ignore */ }
+  }, [filterChip, sortMode]);
 
 
   // Find the current list
@@ -255,11 +270,6 @@ const Top100List = () => {
 
 
 
-  // Reset displayed count when filter or sort changes
-  useEffect(() => {
-    setDisplayedCount(PAGE_SIZE);
-  }, [filterChip, sortMode]);
-
   // Filter and sort courses
   const filteredAndSortedCourses = useMemo(() => {
     if (!courses) return [];
@@ -358,34 +368,11 @@ const Top100List = () => {
     return filtered;
   }, [courses, filterChip, sortMode, playedCourseIds, slug]);
 
-  // Load-more calculations (Explore pattern: accumulate items)
-  const totalFiltered = filteredAndSortedCourses.length;
-  const hasMoreCourses = displayedCount < totalFiltered;
-  const remainingCount = Math.min(PAGE_SIZE, totalFiltered - displayedCount);
-
-  // Displayed courses (load-more pattern: show 1 to displayedCount)
-  const displayedCourses = useMemo(() => {
-    return filteredAndSortedCourses.slice(0, displayedCount);
-  }, [filteredAndSortedCourses, displayedCount]);
-
-  // Load more function (matches Explore pattern)
-  const loadMore = useCallback(() => {
-    if (!hasMoreCourses || isLoadingMore) return;
-    
-    setIsLoadingMore(true);
-    // Simulate brief loading state for UX consistency
-    setTimeout(() => {
-      setDisplayedCount((prev) => Math.min(prev + PAGE_SIZE, totalFiltered));
-      setIsLoadingMore(false);
-    }, 150);
-  }, [hasMoreCourses, isLoadingMore, totalFiltered]);
-
-  // Save displayedCount + scroll before navigating to course detail
+  // Save scroll before navigating to course detail
   const handleOpenCourse = useCallback((courseId: string) => {
-    sessionStorage.setItem('top100:list:displayedCount', String(displayedCount));
     sessionStorage.setItem('top100:list:scrollY', String(window.scrollY));
     navigate(`/courses/${courseId}`);
-  }, [displayedCount, navigate]);
+  }, [navigate]);
 
   if (isLoading) {
     return (
@@ -476,7 +463,7 @@ const Top100List = () => {
         {/* Spacing: Filter → Divider = 24px (L), Divider → List = 16px (M) */}
         {/* Combined: Filter → List = 16px (M) since no explicit divider component */}
         <section className="mt-4 pb-6 sm:space-y-3">
-          {displayedCourses.map((course, index) => {
+          {filteredAndSortedCourses.map((course, index) => {
             // Insert insight card every N courses
             const shouldInsertInsight = 
               index > 0 && 
@@ -514,7 +501,7 @@ const Top100List = () => {
             );
           })}
 
-          {displayedCourses.length === 0 && (
+          {filteredAndSortedCourses.length === 0 && (
             <div className="text-center py-12 mx-4">
               <p className="text-muted-foreground text-lg">
                 No courses match your current filter
@@ -522,41 +509,6 @@ const Top100List = () => {
             </div>
           )}
         </section>
-
-        {/* 7. Pagination - Load More button matching Explore page exactly */}
-        {hasMoreCourses && (
-          <div className="flex flex-col items-center gap-2 pt-4 px-4 pb-6">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={loadMore}
-              disabled={isLoadingMore}
-              className="w-full max-w-xs gap-1.5 transition-all duration-150 hover:shadow-sm active:scale-[0.98]"
-            >
-              {isLoadingMore ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
-                  Loading next courses…
-                </>
-              ) : (
-                <>
-                  <ChevronDown className="h-4 w-4" />
-                  Next {remainingCount} courses
-                </>
-              )}
-            </Button>
-            <p className="text-[11px] text-muted-foreground">
-              Showing 1–{displayedCourses.length} of {totalFiltered.toLocaleString()} courses
-            </p>
-          </div>
-        )}
-
-        {/* End message when all courses shown */}
-        {!hasMoreCourses && displayedCourses.length > PAGE_SIZE && (
-          <p className="text-center text-[11px] text-muted-foreground pt-4 pb-6">
-            You've reached the end • {totalFiltered.toLocaleString()} courses total
-          </p>
-        )}
 
       </main>
 
