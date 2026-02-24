@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useTop100ListSummaries } from '@/hooks/useTop100ListSummaries';
 import { useFriendsOnTop100Journey } from '@/hooks/useFriendsOnTop100Journey';
-import { useGolfCoursesInfinite } from '@/hooks/useGolfCoursesInfinite';
+import { useGolfCoursesInfinite, type SearchedCourseWithRating } from '@/hooks/useGolfCoursesInfinite';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { Search, Award, X, ChevronDown, ChevronRight } from 'lucide-react';
+import { Search, Award, X } from 'lucide-react';
 import { Top100JourneyHero } from '@/components/top100/Top100JourneyHero';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
@@ -25,9 +25,17 @@ import {
   normalizeLabel,
 } from '@/constants/courseRegions';
 
-const PAGE_SIZE = 10;
-
 type Top100SortOption = 'official' | 'user_rating';
+
+/** Read saved Top 100 filters from sessionStorage (parsed once, shared by initialisers). */
+function readSavedFilters(): { list?: string; sort?: string; searchTerm?: string } | null {
+  try {
+    const raw = sessionStorage.getItem('top100-last-filters');
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
 
 function listSlugToRegionKey(slug: string): PrimaryRegionKey {
   switch (slug) {
@@ -52,16 +60,24 @@ const Top100CoursesHubPanel = () => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   
-  // State
-  const [selectedList, setSelectedList] = useState('global');
-  const [searchTerm, setSearchTerm] = useState('');
+  // State — initialised from sessionStorage when available
+  const [selectedList, setSelectedList] = useState(() => {
+    const saved = readSavedFilters();
+    return saved?.list || 'global';
+  });
+  const [searchTerm, setSearchTerm] = useState(() => {
+    const saved = readSavedFilters();
+    return saved?.searchTerm || '';
+  });
   const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
-  const [sortOption, setSortOption] = useState<Top100SortOption>('official');
-  
-  // Load-more pagination
-  const [displayedCourses, setDisplayedCourses] = useState<any[]>([]);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [hasReachedEnd, setHasReachedEnd] = useState(false);
+  const [sortOption, setSortOption] = useState<Top100SortOption>(() => {
+    const saved = readSavedFilters();
+    const val = saved?.sort;
+    return val === 'user_rating' ? 'user_rating' : 'official';
+  });
+
+  // Scroll restoration ref
+  const hasRestoredScroll = useRef(false);
 
   // Fetch data
   const { data: progress } = useTop100ProgressForUser(user?.id);
@@ -91,19 +107,28 @@ const Top100CoursesHubPanel = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
+  // Persist filters to sessionStorage
+  useEffect(() => {
+    try {
+      sessionStorage.setItem('top100-last-filters', JSON.stringify({
+        list: selectedList,
+        sort: sortOption,
+        searchTerm,
+      }));
+    } catch { /* ignore */ }
+  }, [selectedList, sortOption, searchTerm]);
+
   // Fetch courses
   const { 
     data: coursesData,
     isLoading,
-    fetchNextPage,
-    hasNextPage: hasMorePages,
   } = useGolfCoursesInfinite({
     searchQuery: debouncedSearch,
     listSlug: selectedList,
   });
 
   // Flatten and sort courses
-  const allCourses = React.useMemo(() => {
+  const allCourses: SearchedCourseWithRating[] = React.useMemo(() => {
     const courses = coursesData?.pages.flat() ?? [];
     
     return [...courses].sort((a, b) => {
@@ -129,32 +154,28 @@ const Top100CoursesHubPanel = () => {
     });
   }, [coursesData, sortOption, selectedList]);
 
-  const totalCount = allCourses.length;
-
-  // Reset displayed courses when filters change
+  // Scroll restoration on mount (after courses load)
   useEffect(() => {
-    setDisplayedCourses(allCourses.slice(0, PAGE_SIZE));
-    setHasReachedEnd(allCourses.length <= PAGE_SIZE);
-  }, [allCourses]);
+    if (hasRestoredScroll.current || allCourses.length === 0) return;
+    const savedScroll = sessionStorage.getItem('top100-scroll');
+    if (savedScroll) {
+      hasRestoredScroll.current = true;
+      requestAnimationFrame(() => {
+        const rootEl = document.getElementById('root');
+        const scrollTarget = parseInt(savedScroll);
+        if (rootEl) rootEl.scrollTop = scrollTarget;
+        window.scrollTo({ top: scrollTarget, behavior: 'instant' as ScrollBehavior });
+        sessionStorage.removeItem('top100-scroll');
+      });
+    }
+  }, [allCourses.length]);
 
-  // Load more handler
-  const loadMore = useCallback(() => {
-    if (isLoadingMore || hasReachedEnd) return;
-    
-    setIsLoadingMore(true);
-    const nextCount = displayedCourses.length + PAGE_SIZE;
-    
-    setTimeout(() => {
-      if (nextCount >= allCourses.length) {
-        setDisplayedCourses(allCourses);
-        setHasReachedEnd(true);
-        if (hasMorePages) fetchNextPage();
-      } else {
-        setDisplayedCourses(allCourses.slice(0, nextCount));
-      }
-      setIsLoadingMore(false);
-    }, 100);
-  }, [allCourses, displayedCourses.length, hasReachedEnd, isLoadingMore, hasMorePages, fetchNextPage]);
+  // Save scroll position before navigating to a course detail
+  const handleCourseClick = () => {
+    const rootEl = document.getElementById('root');
+    const scrollY = (rootEl && rootEl.scrollTop > 0) ? rootEl.scrollTop : window.scrollY;
+    sessionStorage.setItem('top100-scroll', scrollY.toString());
+  };
 
   // List options
   const listOptions = lists.length > 0 
@@ -202,9 +223,6 @@ const Top100CoursesHubPanel = () => {
     setSearchTerm('');
     setSortOption('official');
   };
-
-  const showLoadMoreButton = displayedCourses.length > 0 && !hasReachedEnd && displayedCourses.length < totalCount;
-  const showEndMessage = hasReachedEnd && displayedCourses.length > PAGE_SIZE;
 
   return (
     <div className="space-y-3 pb-6">
@@ -293,7 +311,7 @@ const Top100CoursesHubPanel = () => {
         </div>
       </section>
 
-      {/* 5. Rankings List - mt-4 from controls */}
+      {/* Rankings List */}
       {isLoading ? (
         /* Premium skeleton loading state */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in">
@@ -311,7 +329,7 @@ const Top100CoursesHubPanel = () => {
             </div>
           ))}
         </div>
-      ) : displayedCourses.length === 0 ? (
+      ) : allCourses.length === 0 ? (
         /* Empty state - friendly with search-specific messaging */
         <div className="flex flex-col items-center justify-center py-16 text-center gap-4 animate-fade-in">
           <div className="w-14 h-14 rounded-full bg-muted/50 border border-border/60 flex items-center justify-center shadow-sm">
@@ -348,45 +366,8 @@ const Top100CoursesHubPanel = () => {
         </div>
       ) : (
         <VirtualizedCourseList 
-          courses={displayedCourses}
-          onCourseClick={() => {}}
-          footer={
-            <>
-              {/* Pagination - load more button */}
-              {showLoadMoreButton && (
-                <div className="flex flex-col items-center gap-2 pt-4">
-                  <Button
-                    variant="outline"
-                    onClick={loadMore}
-                    disabled={isLoadingMore}
-                    className="h-11 w-full max-w-xs gap-1.5 transition-all duration-200 hover:shadow-sm hover:border-border active:scale-[0.98]"
-                  >
-                    {isLoadingMore ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
-                        Loading…
-                      </>
-                    ) : (
-                      <>
-                        <ChevronDown className="h-4 w-4" />
-                        Next {Math.min(PAGE_SIZE, totalCount - displayedCourses.length)} courses
-                      </>
-                    )}
-                  </Button>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Showing 1–{displayedCourses.length} of {totalCount.toLocaleString()} courses
-                  </p>
-                </div>
-              )}
-
-              {/* End message with proper bottom spacing */}
-              {showEndMessage && (
-                <p className="text-center text-sm text-muted-foreground pt-4 pb-6">
-                  You've reached the end • {totalCount.toLocaleString()} courses total
-                </p>
-              )}
-            </>
-          }
+          courses={allCourses}
+          onCourseClick={handleCourseClick}
         />
       )}
     </div>
