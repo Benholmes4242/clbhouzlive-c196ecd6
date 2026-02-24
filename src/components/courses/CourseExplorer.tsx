@@ -110,19 +110,73 @@ async function fetchCoursePage({ selectedRegion, selectedSubregion, debouncedSea
   };
 }
 
+// ─── Top-level sub-components (stable references across renders) ───
+
+const LoadingSkeleton = () => (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-200">
+    {[1, 2, 3, 4, 5, 6].map((i) => (
+      <div key={i} className="space-y-3 animate-pulse">
+        <Skeleton className="h-48 w-full rounded-sq-sm bg-gradient-to-r from-muted via-muted/50 to-muted animate-shimmer" />
+        <Skeleton className="h-6 w-3/4 bg-gradient-to-r from-muted via-muted/50 to-muted" />
+        <Skeleton className="h-4 w-1/2 bg-gradient-to-r from-muted via-muted/50 to-muted" />
+      </div>
+    ))}
+  </div>
+);
+
+const InlineLoadingSkeleton = () => (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6 animate-in fade-in duration-150">
+    {[1, 2, 3].map((i) => (
+      <div key={i} className="bg-card sm:border sm:border-border/60 sm:rounded-sq-md overflow-hidden">
+        <Skeleton className="w-full aspect-[16/9] rounded-none" />
+        <div className="px-4 py-3.5 space-y-2">
+          <Skeleton className="h-4 w-3/4" />
+          <Skeleton className="h-3 w-1/2" />
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
+const ErrorState = ({ onRetry }: { onRetry: () => void }) => (
+  <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
+    <div className="w-10 h-10 rounded-full border border-dashed border-destructive/40 flex items-center justify-center text-destructive mb-1">
+      <X className="w-4 h-4" />
+    </div>
+    <h3 className="text-sm font-semibold">Unable to load courses</h3>
+    <p className="text-sm text-muted-foreground max-w-xs">
+      We couldn't fetch the courses. Please check your connection and try again.
+    </p>
+    <Button variant="outline" size="sm" className="mt-2 gap-1.5" onClick={onRetry}>
+      <ChevronDown className="h-4 w-4 rotate-180" />
+      Retry
+    </Button>
+  </div>
+);
+
+const InlineRetryCard = ({ onRetry }: { onRetry: () => void }) => (
+  <div className="max-w-md mx-auto mt-4">
+    <button
+      onClick={onRetry}
+      className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-sq-sm bg-card border border-border text-sm text-muted-foreground hover:text-foreground hover:border-border/80 transition-colors active:scale-[0.98]"
+    >
+      <RefreshCw className="w-3.5 h-3.5" />
+      Couldn't load more courses · Tap to retry
+    </button>
+  </div>
+);
+
+// ─── Main component ────────────────────────────────────────────────
+
 const CourseExplorer = () => {
   const listTopRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const [searchParams] = useSearchParams();
-  const hasInitialisedFromUrlRef = useRef(false);
 
   // URL params take priority, then sessionStorage, then defaults
   const [selectedRegion, setSelectedRegion] = useState<PrimaryRegionKey>(() => {
     const urlRegion = searchParams.get('region');
-    if (urlRegion) {
-      hasInitialisedFromUrlRef.current = true;
-      return urlRegion as PrimaryRegionKey;
-    }
+    if (urlRegion) return urlRegion as PrimaryRegionKey;
     const saved = sessionStorage.getItem('explore-last-filters');
     if (saved) {
       try {
@@ -135,10 +189,7 @@ const CourseExplorer = () => {
 
   const [selectedSubregion, setSelectedSubregion] = useState(() => {
     const urlSub = searchParams.get('sub');
-    if (urlSub) {
-      hasInitialisedFromUrlRef.current = true;
-      return urlSub;
-    }
+    if (urlSub) return urlSub;
     const saved = sessionStorage.getItem('explore-last-filters');
     if (saved) {
       try {
@@ -161,7 +212,6 @@ const CourseExplorer = () => {
 
   // Save filters to sessionStorage whenever they change
   useEffect(() => {
-    if (!hasInitialisedFromUrlRef.current) return;
     try {
       sessionStorage.setItem('explore-last-filters', JSON.stringify({
         region: selectedRegion,
@@ -258,64 +308,6 @@ const CourseExplorer = () => {
     observer.observe(sentinelRef.current);
     return () => observer.disconnect();
   }, [hasNextPage, fetchNextPage]);
-
-  // ─── Skeleton loading (initial full page) ────────────────────────
-  const LoadingSkeleton = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-200">
-      {[1, 2, 3, 4, 5, 6].map((i) => (
-        <div key={i} className="space-y-3 animate-pulse">
-          <Skeleton className="h-48 w-full rounded-sq-sm bg-gradient-to-r from-muted via-muted/50 to-muted animate-shimmer" />
-          <Skeleton className="h-6 w-3/4 bg-gradient-to-r from-muted via-muted/50 to-muted" />
-          <Skeleton className="h-4 w-1/2 bg-gradient-to-r from-muted via-muted/50 to-muted" />
-        </div>
-      ))}
-    </div>
-  );
-
-  // ─── Inline skeleton cards for infinite scroll loading ───────────
-  const InlineLoadingSkeleton = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6 animate-in fade-in duration-150">
-      {[1, 2, 3].map((i) => (
-        <div key={i} className="bg-card sm:border sm:border-border/60 sm:rounded-sq-md overflow-hidden">
-          <Skeleton className="w-full aspect-[16/9] rounded-none" />
-          <div className="px-4 py-3.5 space-y-2">
-            <Skeleton className="h-4 w-3/4" />
-            <Skeleton className="h-3 w-1/2" />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-
-  // ─── Error state (initial load) ──────────────────────────────────
-  const ErrorState = () => (
-    <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
-      <div className="w-10 h-10 rounded-full border border-dashed border-destructive/40 flex items-center justify-center text-destructive mb-1">
-        <X className="w-4 h-4" />
-      </div>
-      <h3 className="text-sm font-semibold">Unable to load courses</h3>
-      <p className="text-sm text-muted-foreground max-w-xs">
-        We couldn't fetch the courses. Please check your connection and try again.
-      </p>
-      <Button variant="outline" size="sm" className="mt-2 gap-1.5" onClick={() => refetch()}>
-        <ChevronDown className="h-4 w-4 rotate-180" />
-        Retry
-      </Button>
-    </div>
-  );
-
-  // ─── Inline retry card (pagination fetch failure) ────────────────
-  const InlineRetryCard = () => (
-    <div className="max-w-md mx-auto mt-4">
-      <button
-        onClick={() => fetchNextPage()}
-        className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-sq-sm bg-card border border-border text-sm text-muted-foreground hover:text-foreground hover:border-border/80 transition-colors active:scale-[0.98]"
-      >
-        <RefreshCw className="w-3.5 h-3.5" />
-        Couldn't load more courses · Tap to retry
-      </button>
-    </div>
-  );
 
   const regionOptions = Object.entries(PRIMARY_REGION_LABELS).map(([key, label]) => ({
     value: key as PrimaryRegionKey,
@@ -486,7 +478,7 @@ const CourseExplorer = () => {
       {isLoading ? (
         <LoadingSkeleton />
       ) : (isError && allCourses.length === 0) ? (
-        <ErrorState />
+        <ErrorState onRetry={() => refetch()} />
       ) : allCourses.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center gap-3 animate-in fade-in duration-300">
           <div className="w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 flex items-center justify-center text-muted-foreground mb-1">
@@ -523,7 +515,7 @@ const CourseExplorer = () => {
 
           {/* Inline retry on pagination error */}
           {isError && !isFetchingNextPage && allCourses.length > 0 && (
-            <InlineRetryCard />
+            <InlineRetryCard onRetry={() => fetchNextPage()} />
           )}
 
           {/* Loading indicator during retry */}
