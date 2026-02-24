@@ -14,6 +14,7 @@ import { PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 interface LikelyWinnersCarouselProps {
   featured: WinnerProfile;
   cards: ContenderCard[];
+  withdrawnPlayerIds?: Set<string>;
 }
 
 interface PickCard {
@@ -24,11 +25,13 @@ interface PickCard {
   confidenceTier: 'elite' | 'high' | 'medium';
   bullets: string[];
   promoted?: boolean;
+  isWithdrawn?: boolean;
 }
 
 export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
   featured,
   cards,
+  withdrawnPlayerIds,
 }: LikelyWinnersCarouselProps) {
   const [showConfidenceInfo, setShowConfidenceInfo] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -46,6 +49,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
       confidenceTier: featured.confidenceTier,
       bullets: featured.fitBullets.slice(0, 3),
       promoted: featured.promoted,
+      isWithdrawn: withdrawnPlayerIds?.has(featured.id) ?? false,
     },
     ...contenderCards.map(c => ({
       id: c.id,
@@ -55,6 +59,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
       confidenceTier: c.confidenceTier ?? ('medium' as const),
       bullets: c.fitBullets?.slice(0, 3) || (c.description ? [c.description] : []),
       promoted: c.promoted,
+      isWithdrawn: withdrawnPlayerIds?.has(c.id) ?? false,
     })),
   ];
 
@@ -145,6 +150,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
               minWidth: 'calc(100% - 36px)',
               scrollSnapAlign: 'start',
               boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+              opacity: pick.isWithdrawn ? 0.7 : 1,
             }}
           >
             {/* Avatar + Name row */}
@@ -157,6 +163,20 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                   loading="lazy"
                   onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
                 />
+                {pick.isWithdrawn && (
+                  <div
+                    className="absolute -top-1 -right-1 px-1.5 py-0.5 rounded-md font-bold uppercase"
+                    style={{
+                      fontSize: '9px',
+                      letterSpacing: '0.5px',
+                      background: 'hsl(0 84% 60%)',
+                      color: 'white',
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    WD
+                  </div>
+                )}
               </div>
 
               <div className="flex-1 min-w-0">

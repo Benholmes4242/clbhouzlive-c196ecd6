@@ -460,7 +460,7 @@ function formatPredictions(
   generatedAt?: string,
   researchContext?: any
 ): AIPredictionData {
-  // Backwards compat: merge contenders + dark horses into one list, take 4
+  // All 5 display picks come directly from Claude (no legacy padding needed)
   const rawContenders = (predictions.topContenders || predictions || []).map((p: any, index: number) => ({
     ...p,
     rank: p.rank || index + 1,
@@ -468,29 +468,7 @@ function formatPredictions(
     reasons: ensureThreeReasons(p.reasons),
   }));
 
-  // If old format had < 4 contenders but had dark horses, merge them
-  const rawDarkHorses = predictions.darkHorses || [];
-  let allPicks = [...rawContenders];
-  if (allPicks.length < 4 && rawDarkHorses.length > 0) {
-    const remaining = 4 - allPicks.length;
-    rawDarkHorses.slice(0, remaining).forEach((dh: any) => {
-      allPicks.push({
-        ...dh,
-        rank: allPicks.length + 1,
-        photoUrl: dh.photoUrl || null,
-        courseFitScore: dh.courseFitScore || 70,
-        winProbability: dh.winProbability || 5,
-        concern: dh.concern || '',
-        reasons: ensureThreeReasons(dh.reasons || [
-          dh.hook,
-          dh.keyStat ? `Key strength: ${dh.keyStat}` : 'Strong overall form',
-          'Proven competitor on tour',
-        ]),
-      });
-    });
-  }
-
-  const topContenders = allPicks.slice(0, 5);
+  const topContenders = rawContenders.slice(0, 5);
 
   return {
     tournament: {
