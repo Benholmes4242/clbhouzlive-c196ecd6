@@ -543,8 +543,8 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   }, [useVirtualization, allEntries, scrollTop]);
 
   return (
-    <div className={cn('flex flex-col px-4 py-4 space-y-6 pb-24', className)}>
-      {/* 1. Season Status Panel - Only show in seasonal mode */}
+    <div className={cn('flex flex-col px-4 py-5 space-y-6 pb-24', className)}>
+      {/* 1. Season Status Panel — floats on page background, no card wrapper */}
       {timeFilter === 'seasonal' && currentSeason && (
         <SeasonStatusPanel
           currentSeasonId={currentSeasonId}
