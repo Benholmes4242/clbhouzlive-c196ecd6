@@ -33,6 +33,14 @@ class CoursesErrorBoundary extends Component<Props, State> {
       sessionStorage.removeItem('top100-last-filters');
       sessionStorage.removeItem('explore-scroll');
       sessionStorage.removeItem('top100-scroll');
+      sessionStorage.removeItem('championship-leaderboard-filters');
+      sessionStorage.removeItem('championship-leaderboard-scroll');
+      sessionStorage.removeItem('courses-leaderboard-filters');
+      sessionStorage.removeItem('courses-leaderboard-scroll');
+      sessionStorage.removeItem('exploration-leaderboard-filters');
+      sessionStorage.removeItem('exploration-leaderboard-scroll');
+      sessionStorage.removeItem('handicap-leaderboard-filters');
+      sessionStorage.removeItem('handicap-leaderboard-scroll');
     } catch (e) {
       console.error('Failed to clear storage:', e);
     }
