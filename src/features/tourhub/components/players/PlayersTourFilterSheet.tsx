@@ -59,7 +59,7 @@ export function PlayersTourFilterSheet({
           'w-full flex items-center justify-between',
           'bg-card border border-border/50 rounded-2xl',
           'px-4 py-3',
-          'shadow-[0_1px_4px_rgba(0,0,0,0.04)]',
+          '',
           'transition-all duration-200',
           'active:scale-[0.99]'
         )}

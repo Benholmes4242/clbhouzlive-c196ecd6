@@ -5,7 +5,7 @@
 
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
-import { Search, X, ChevronDown, RefreshCw } from 'lucide-react';
+import { Search, X, ChevronDown, ChevronLeft, RefreshCw } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
@@ -411,7 +411,7 @@ export function PlayersTab() {
   if (isLoading) {
     return (
       <div className="space-y-4 py-6">
-        <div className="bg-muted/40 animate-pulse" style={{ height: '50dvh' }} />
+        <div className="bg-muted/40 animate-pulse" style={{ height: '45dvh' }} />
         <div className="px-4 space-y-3">
           <div className="bg-muted/40 h-12 rounded-2xl animate-pulse" />
           <div className="bg-muted/40 h-11 rounded-2xl animate-pulse" />
@@ -456,18 +456,19 @@ export function PlayersTab() {
       )}
 
       {/* ← Tour Overview back link */}
-      <div className="px-4 pt-3 pb-1">
+      <div className="px-4 pt-3">
         <button
           type="button"
           onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
-          className="text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
+          className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
         >
-          ← Tour Overview
+          <ChevronLeft size={14} />
+          Tour Overview
         </button>
       </div>
 
       {/* Search Bar — 24px gap from runner cards */}
-      <div className="px-4" style={{ marginTop: '12px' }}>
+      <div className="px-4" style={{ marginTop: '16px' }}>
         <div className="relative">
           <Search 
             className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-muted-foreground w-[18px] h-[18px]"
@@ -482,7 +483,7 @@ export function PlayersTab() {
               "w-full h-12 pl-11 pr-10 rounded-2xl text-[13px] transition-all duration-200",
               "bg-card border text-foreground placeholder:text-muted-foreground",
               "focus:outline-none focus:ring-2 focus:bg-card",
-              "border-border/50 ring-transparent shadow-sm",
+              "border-border/50 ring-transparent",
               "focus:border-border focus:ring-border/50 focus:shadow-lg"
             )}
           />
@@ -529,7 +530,7 @@ export function PlayersTab() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             className="flex flex-col gap-2"
-            style={{ marginTop: activeTour === 'all' ? '24px' : '12px' }}
+            style={{ marginTop: activeTour === 'all' ? '24px' : '16px' }}
           >
             {displayRows.length > 0 ? (
               <>
