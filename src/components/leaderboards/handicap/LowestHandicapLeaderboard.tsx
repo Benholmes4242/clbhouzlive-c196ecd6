@@ -1,40 +1,36 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { ChevronUp } from 'lucide-react';
 import { useLowestHandicapLeaderboard } from '@/hooks/leaderboards';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { formatHcp } from '@/lib/formatHcp';
+import { formatHcp, getHandicapStatusLabel, getHandicapStatusColor, getHandicapBadgeStyle } from '@/lib/formatHcp';
 import { HandicapPodium } from './HandicapPodium';
 import { HandicapInsightBanner } from './HandicapInsightBanner';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  LeaderboardRow,
-  LeaderboardEmpty,
-  LeaderboardLoading,
-} from '../shared';
-import type { LeaderboardScope } from '@/types/leaderboards';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
+import type { LeaderboardScope } from '@/types/leaderboards';
 
 // --- Constants ---
-const ROW_HEIGHT = 72; // 64px row (py-3 + h-10 avatar) + 8px gap (space-y-2)
+const ROW_HEIGHT = 72;
 const VIRTUALIZATION_THRESHOLD = 50;
 const OVERSCAN = 8;
 const STORAGE_KEY_SCROLL = 'handicap-leaderboard-scroll';
 
-// Metallic palette matching MedalBadge
-const RANK_COLORS: Record<number, string> = {
-  1: '#C1A84C',
-  2: '#B8C6C9',
-  3: '#8B7355',
+const RANK_BADGE_COLORS: Record<number, { bg: string; text: string }> = {
+  1: { bg: '#D4A853', text: 'white' },
+  2: { bg: '#A8B4C0', text: 'white' },
+  3: { bg: '#C4956A', text: 'white' },
 };
 
-// --- Helper components (module-level) ---
+// --- Helper components ---
 function HandicapLeaderboardSkeleton() {
   return (
     <div className="space-y-2">
       {Array.from({ length: 3 }).map((_, i) => (
         <div key={i} className="flex items-center gap-3 p-3">
-          <Skeleton className="h-8 w-8 rounded-full" />
-          <Skeleton className="h-10 w-10 rounded-full" />
+          <Skeleton className="h-7 w-7 rounded-full" />
+          <Skeleton className="h-11 w-11 rounded-full" />
           <div className="flex-1 space-y-1.5">
             <Skeleton className="h-4 w-32" />
             <Skeleton className="h-3 w-20" />
@@ -51,7 +47,7 @@ function InlineRetryCard({ onRetry }: { onRetry: () => void }) {
     <div className="py-4 px-4">
       <button
         onClick={onRetry}
-        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-surface-alt text-sm text-muted-foreground hover:bg-muted/30 active:scale-[0.98] transition-all"
+        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-muted text-sm text-muted-foreground hover:bg-muted/80 active:scale-[0.98] transition-all"
       >
         Couldn't load more entries · Tap to retry
       </button>
@@ -73,6 +69,108 @@ function InitialErrorState({ onRetry }: { onRetry: () => void }) {
   );
 }
 
+// --- Handicap Row ---
+function HandicapRow({
+  entry,
+  userId,
+}: {
+  entry: any;
+  userId?: string;
+}) {
+  const isCurrentUser = entry.user_id === userId;
+  const rank = entry.rank;
+  const handicap = entry.handicap_index;
+  const statusLabel = getHandicapStatusLabel(handicap);
+  const handicapColor = getHandicapStatusColor(handicap);
+  const badgeColors = RANK_BADGE_COLORS[rank];
+  const categoryBadge = getHandicapBadgeStyle(handicap);
+
+  const initials = (entry.display_name || '?')
+    .split(' ')
+    .map((n: string) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+
+  return (
+    <Link
+      to={`/profile/${entry.user_id}`}
+      className={cn(
+        'w-full py-3 flex items-center gap-3 transition-colors active:scale-[0.98]',
+        'hover:bg-[rgba(0,0,0,0.02)]',
+        isCurrentUser ? 'px-3' : 'px-4',
+      )}
+      style={{
+        borderBottom: '1px solid rgba(0, 0, 0, 0.04)',
+        ...(isCurrentUser ? {
+          background: 'rgba(212, 168, 83, 0.06)',
+          borderLeft: '3px solid #D4A853',
+          borderRadius: 12,
+        } : {}),
+      }}
+    >
+      {/* Rank badge */}
+      <div
+        className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+        style={badgeColors ? {
+          background: badgeColors.bg,
+          color: badgeColors.text,
+        } : {
+          background: 'rgba(0, 0, 0, 0.08)',
+          color: 'hsl(var(--muted-foreground))',
+        }}
+      >
+        {rank}
+      </div>
+
+      {/* Avatar */}
+      <div
+        className="flex-shrink-0 rounded-full overflow-hidden"
+        style={{ width: 44, height: 44, border: '1px solid rgba(0, 0, 0, 0.06)' }}
+      >
+        {entry.avatar_url ? (
+          <img src={entry.avatar_url} alt={entry.display_name} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground text-sm font-semibold">
+            {initials}
+          </div>
+        )}
+      </div>
+
+      {/* Name & category */}
+      <div className="flex-1 min-w-0">
+        <p className={cn('text-sm font-semibold text-foreground truncate', isCurrentUser && 'text-primary')}>
+          {entry.display_name || 'Unknown'}
+        </p>
+        {statusLabel && (
+          <span
+            className="inline-block text-[10px] font-semibold uppercase tracking-wide mt-0.5 rounded-md"
+            style={{
+              background: categoryBadge.bg,
+              color: categoryBadge.text,
+              border: `1px solid ${categoryBadge.border}`,
+              padding: '2px 6px',
+            }}
+          >
+            {statusLabel}
+          </span>
+        )}
+      </div>
+
+      {/* Handicap number */}
+      <div className="flex-shrink-0">
+        <span
+          className="text-xl font-bold"
+          style={{ color: handicapColor }}
+        >
+          {formatHcp(handicap)}
+        </span>
+      </div>
+    </Link>
+  );
+}
+
+// --- Main component ---
 interface LowestHandicapLeaderboardProps {
   scope: LeaderboardScope;
   clubId?: string | null;
@@ -86,7 +184,6 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [scrollTop, setScrollTop] = useState(0);
 
-  // Refs
   const sentinelRef = useRef<HTMLDivElement>(null);
   const listContainerRef = useRef<HTMLDivElement>(null);
   const hasRestoredScroll = useRef(false);
@@ -99,7 +196,7 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
     fetchNextPage,
     isFetchingNextPage,
     refetch,
-  } = useLowestHandicapLeaderboard({ 
+  } = useLowestHandicapLeaderboard({
     scope,
     clubId: scope === 'club' ? clubId : undefined,
     country: scope === 'country' ? country : undefined,
@@ -186,28 +283,6 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
     return { startIndex, endIndex, totalHeight, offsetY };
   }, [allEntries.length, scrollTop]);
 
-  // Render entry helper
-  const renderEntry = (entry: any) => (
-    <div key={entry.user_id} onClick={handleEntryClick}>
-      <LeaderboardRow
-        rank={entry.rank}
-        userId={entry.user_id}
-        displayName={entry.display_name || 'Unknown'}
-        profilePhotoUrl={entry.avatar_url}
-        isCurrentUser={entry.user_id === user?.id}
-      >
-        <div className="text-right">
-          <div
-            className="text-3xl font-bold"
-            style={{ color: RANK_COLORS[entry.rank] || 'hsl(var(--muted-foreground))' }}
-          >
-            {formatHcp(entry.handicap_index)}
-          </div>
-        </div>
-      </LeaderboardRow>
-    </div>
-  );
-
   // Initial error
   if (isError && allEntries.length === 0 && !isLoading) {
     return (
@@ -221,7 +296,7 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
   if (isLoading) {
     return (
       <div className="px-4">
-        <LeaderboardLoading />
+        <HandicapLeaderboardSkeleton />
       </div>
     );
   }
@@ -230,21 +305,20 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
     return (
       <div className="px-4 space-y-4">
         {scopeSelector}
-        <LeaderboardEmpty
-          title={scope === 'club' ? "No handicaps from this club yet" : "No handicaps recorded"}
-          description={
-            scope === 'club' && clubName
-              ? `Invite your club mates from ${clubName} to join!`
-              : "Add your handicap to your profile to appear here!"
-          }
-        />
+        <div className="text-center py-12">
+          <p className="text-sm text-muted-foreground">
+            {scope === 'club' && clubName
+              ? `No handicaps from ${clubName} yet. Invite your club mates!`
+              : "No handicaps recorded. Add your handicap to appear here!"}
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-5">
-      {/* Podium for Top 3 */}
+    <div>
+      {/* Podium */}
       {allEntries.length >= 3 && (
         <HandicapPodium
           entries={allEntries.slice(0, 3)}
@@ -255,44 +329,47 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
 
       {/* Scope Selector */}
       {scopeSelector && (
-        <div className="py-4">
+        <div className="mt-5">
           {scopeSelector}
         </div>
       )}
 
       {/* Insight Banner */}
-      <HandicapInsightBanner userRank={userRank} mode="lowest" />
+      <div className="mt-5">
+        <HandicapInsightBanner userRank={userRank} mode="lowest" />
+      </div>
 
       {/* Rankings List */}
       {allEntries.length > 0 && (
-        <div ref={listContainerRef} className="space-y-2">
+        <div ref={listContainerRef} className="mt-4" onClick={handleEntryClick}>
           {virtualizedContent ? (
             <div style={{ height: virtualizedContent.totalHeight, position: 'relative' }}>
               <div style={{ transform: `translateY(${virtualizedContent.offsetY}px)`, position: 'absolute', width: '100%' }}>
-                {allEntries.slice(virtualizedContent.startIndex, virtualizedContent.endIndex).map(entry =>
-                  renderEntry(entry)
-                )}
+                {allEntries.slice(virtualizedContent.startIndex, virtualizedContent.endIndex).map(entry => (
+                  <HandicapRow key={entry.user_id} entry={entry} userId={user?.id} />
+                ))}
               </div>
             </div>
           ) : (
-            allEntries.map(entry => renderEntry(entry))
+            allEntries.map(entry => (
+              <HandicapRow key={entry.user_id} entry={entry} userId={user?.id} />
+            ))
           )}
         </div>
       )}
 
-      {/* Sentinel + loading skeleton */}
+      {/* Sentinel + loading */}
       {hasNextPage && !isError && (
         <div ref={sentinelRef}>
           {isFetchingNextPage && <HandicapLeaderboardSkeleton />}
         </div>
       )}
 
-      {/* Inline retry on pagination error */}
+      {/* Inline retry */}
       {isError && !isFetchingNextPage && allEntries.length > 0 && (
         <InlineRetryCard onRetry={() => fetchNextPage()} />
       )}
 
-      {/* Loading indicator during retry */}
       {isError && isFetchingNextPage && allEntries.length > 0 && (
         <HandicapLeaderboardSkeleton />
       )}
@@ -309,8 +386,8 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
           "bg-foreground/80 text-background shadow-lg backdrop-blur-sm",
           "flex items-center justify-center",
           "transition-all duration-300 ease-out active:scale-[0.95]",
-          showScrollTop 
-            ? "opacity-100 translate-y-0" 
+          showScrollTop
+            ? "opacity-100 translate-y-0"
             : "opacity-0 translate-y-4 pointer-events-none"
         )}
         aria-label="Scroll to top"
