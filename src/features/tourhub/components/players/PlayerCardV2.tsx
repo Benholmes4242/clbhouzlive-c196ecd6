@@ -157,7 +157,7 @@ export function PlayerCardV2({
             src={photoUrl}
             alt={player.fullName}
             className="w-full h-full object-cover"
-            style={{ transform: 'scale(0.85)', transformOrigin: 'center center' }}
+            style={{ transform: 'scale(0.85)', transformOrigin: '50% 60%' }}
             loading="lazy"
             onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
           />
