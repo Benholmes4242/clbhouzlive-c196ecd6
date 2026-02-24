@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -177,15 +177,8 @@ const CourseExplorer = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      try {
-        sessionStorage.removeItem('explore-scroll');
-        sessionStorage.removeItem('explore-last-filters');
-      } catch { /* ignore */ }
-    };
-  }, []);
+  // (Cleanup removed — explore-scroll is self-cleaning after restore,
+  //  explore-last-filters must persist across unmounts/tab switches)
 
   // ─── useInfiniteQuery ─────────────────────────────────────────────
   const {
@@ -222,38 +215,49 @@ const CourseExplorer = () => {
     retry: 2,
   });
 
-  // Derived state
-  const allCourses = data?.pages.flatMap((page) => page.courses) ?? [];
+  // Derived state (memoised to preserve reference for React.memo on VirtualizedCourseList)
+  const allCourses = useMemo(
+    () => data?.pages.flatMap((page) => page.courses) ?? [],
+    [data?.pages],
+  );
   const totalCount = data?.pages[0]?.totalCount ?? 0;
 
   // ─── Scroll restoration ──────────────────────────────────────────
+  const hasRestoredScroll = useRef(false);
   useEffect(() => {
-    if (allCourses.length === 0) return;
+    if (hasRestoredScroll.current || allCourses.length === 0) return;
     const savedScroll = sessionStorage.getItem('explore-scroll');
     if (savedScroll) {
+      hasRestoredScroll.current = true;
       requestAnimationFrame(() => {
-        window.scrollTo({ top: parseInt(savedScroll), behavior: 'instant' as ScrollBehavior });
+        const scrollTarget = parseInt(savedScroll);
+        const rootEl = document.getElementById('root');
+        if (rootEl) rootEl.scrollTop = scrollTarget;
+        window.scrollTo({ top: scrollTarget, behavior: 'instant' as ScrollBehavior });
         sessionStorage.removeItem('explore-scroll');
       });
     }
-  }, [allCourses.length > 0]); // fires once when courses hydrate from cache
+  }, [allCourses.length]);
 
   // ─── Intersection Observer (sentinel) ─────────────────────────────
+  const isFetchingRef = useRef(isFetchingNextPage);
+  isFetchingRef.current = isFetchingNextPage;
+
   useEffect(() => {
     if (!sentinelRef.current || !hasNextPage) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+        if (entry.isIntersecting && hasNextPage && !isFetchingRef.current) {
           fetchNextPage();
         }
       },
-      { rootMargin: '200px', threshold: 0 },
+      { rootMargin: '600px', threshold: 0 },
     );
 
     observer.observe(sentinelRef.current);
     return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [hasNextPage, fetchNextPage]);
 
   // ─── Skeleton loading (initial full page) ────────────────────────
   const LoadingSkeleton = () => (
@@ -339,7 +343,9 @@ const CourseExplorer = () => {
 
   // Capture scroll position when clicking a course card
   const handleCourseClick = () => {
-    sessionStorage.setItem('explore-scroll', window.scrollY.toString());
+    const rootEl = document.getElementById('root');
+    const scrollY = (rootEl && rootEl.scrollTop > 0) ? rootEl.scrollTop : window.scrollY;
+    sessionStorage.setItem('explore-scroll', scrollY.toString());
   };
 
   const sortOptions: AppSelectOption<SortOption>[] = [
@@ -350,12 +356,6 @@ const CourseExplorer = () => {
     { value: 'name_desc', label: 'Z – A' },
   ];
 
-  // Check if there was an error on a non-first page fetch (pagination error)
-  const hasPaginationError = !isLoading && !isError && allCourses.length > 0 && data?.pages && (() => {
-    // useInfiniteQuery sets error at query level; we detect "stalled" state:
-    // hasNextPage is true, not fetching, and the last fetchNextPage may have thrown
-    return false; // handled by react-query error boundary below
-  })();
 
   return (
     <div className="w-full space-y-block pb-28">
@@ -485,7 +485,7 @@ const CourseExplorer = () => {
       
       {isLoading ? (
         <LoadingSkeleton />
-      ) : isError ? (
+      ) : (isError && allCourses.length === 0) ? (
         <ErrorState />
       ) : allCourses.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center gap-3 animate-in fade-in duration-300">
@@ -515,14 +515,14 @@ const CourseExplorer = () => {
           />
 
           {/* Sentinel + loading skeletons */}
-          {hasNextPage && (
+          {hasNextPage && !isError && (
             <div ref={sentinelRef} className="w-full">
               {isFetchingNextPage && <InlineLoadingSkeleton />}
             </div>
           )}
 
-          {/* Inline retry on fetch error — shown when query errored on a subsequent page */}
-          {!hasNextPage && !isFetchingNextPage && isError && allCourses.length > 0 && (
+          {/* Inline retry on pagination error */}
+          {isError && !isFetchingNextPage && allCourses.length > 0 && (
             <InlineRetryCard />
           )}
         </>
