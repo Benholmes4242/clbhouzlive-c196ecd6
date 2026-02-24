@@ -32,7 +32,7 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
 }) => {
   return (
     <section className={cn('py-3 -mx-4 px-4 bg-background', className)}>
-      <div className="flex p-1 rounded-xl overflow-hidden bg-muted">
+      <div className="flex p-1 rounded-xl overflow-hidden">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
 
