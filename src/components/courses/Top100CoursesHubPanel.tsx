@@ -59,7 +59,9 @@ const Top100CoursesHubPanel = () => {
 
   // Progress calculations
   const totalRated = progress?.total_top100_rated ?? progress?.total_played_top100 ?? 0;
-  const listsCount = listSummaries.filter(list => list.played_count > 0).length;
+  const startedLists = listSummaries.filter(list => list.played_count > 0);
+  const listsCount = startedLists.length;
+  const totalCoursesInStartedLists = startedLists.reduce((sum, list) => sum + list.total_courses, 0);
 
   // Debounce search
   useEffect(() => {
@@ -178,7 +180,7 @@ const Top100CoursesHubPanel = () => {
       {user && (
         <Top100JourneyHero
           completedCourses={totalRated}
-          totalCourses={100}
+          totalCoursesInStartedLists={totalCoursesInStartedLists}
           listCount={listsCount}
         />
       )}

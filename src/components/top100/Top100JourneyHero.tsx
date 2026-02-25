@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 
 interface Top100JourneyHeroProps {
   completedCourses: number;
-  totalCourses?: number;
+  totalCoursesInStartedLists: number;
   listCount: number;
   className?: string;
 }
@@ -106,13 +106,13 @@ const ProgressRing: React.FC<ProgressRingProps> = ({
  */
 export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
   completedCourses,
-  totalCourses = 100,
+  totalCoursesInStartedLists,
   listCount,
   className,
 }) => {
   const navigate = useNavigate();
   const stageLabel = getStageLabel(completedCourses);
-  const isComplete = completedCourses >= totalCourses;
+  const isComplete = totalCoursesInStartedLists > 0 && completedCourses >= totalCoursesInStartedLists;
   const isZeroProgress = completedCourses === 0;
 
   const handleClick = () => {
@@ -146,7 +146,7 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
         <div className="absolute top-4 right-4">
           <ProgressRing
             completed={completedCourses}
-            total={totalCourses}
+            total={totalCoursesInStartedLists || 1}
             size={72}
             strokeWidth={7}
           />
@@ -175,7 +175,7 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
               {completedCourses}
             </span>
             <span className="text-sm text-muted-foreground">
-              courses completed
+              {completedCourses === 1 ? 'course' : 'courses'} in {listCount} {listCount === 1 ? 'list' : 'lists'}
             </span>
           </div>
 
