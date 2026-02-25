@@ -186,10 +186,11 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
 
                   {/* Avatar image */}
                   <div
-                    className="relative rounded-full overflow-hidden"
+                    className="relative overflow-hidden"
                     style={{
                       width: config.mobileAvatarSize,
-                      height: config.mobileAvatarSize,
+                      aspectRatio: '1 / 1.05',
+                      borderRadius: '34%',
                       border: `${config.borderWidth}px solid ${config.borderColor}`,
                       boxShadow: `0 ${position === 1 ? '8px 24px' : '4px 12px'} ${config.shadowColor}`,
                     }}
@@ -209,11 +210,11 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
 
                   {/* Rank badge — bottom-right */}
                   <div
-                    className="absolute -bottom-1 -right-1 flex items-center justify-center font-bold text-white shadow-md"
+                    className="absolute -bottom-1.5 -right-0.5 flex items-center justify-center font-bold text-white shadow-md"
                     style={{
                       width: config.badgeSize,
                       height: config.badgeSize,
-                      borderRadius: '50%',
+                      borderRadius: '34%',
                       backgroundColor: config.badgeBg,
                       border: '2px solid white',
                       fontSize: config.badgeSize * 0.45,

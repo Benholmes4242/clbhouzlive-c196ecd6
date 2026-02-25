@@ -121,10 +121,11 @@ export function HandicapPodiumSlot({
           )}
 
           <div
-            className="relative rounded-full overflow-hidden"
+            className="relative overflow-hidden"
             style={{
               width: config.avatarSize,
-              height: config.avatarSize,
+              aspectRatio: '1 / 1.05',
+              borderRadius: '34%',
               border: rank === 1
                 ? `${config.borderWidth}px solid transparent`
                 : `${config.borderWidth}px solid ${config.borderGradient}`,
@@ -147,10 +148,11 @@ export function HandicapPodiumSlot({
 
           {/* Rank badge — bottom-right */}
           <div
-            className="absolute -bottom-1 -right-1 rounded-full flex items-center justify-center font-bold shadow-md"
+            className="absolute -bottom-1.5 -right-0.5 flex items-center justify-center font-bold shadow-md"
             style={{
               width: config.badgeSize,
               height: config.badgeSize,
+              borderRadius: '34%',
               background: badge.bg,
               color: badge.text,
               fontSize: rank === 1 ? 14 : 12,
