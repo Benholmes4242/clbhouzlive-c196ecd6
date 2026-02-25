@@ -7,6 +7,7 @@
 import { memo, useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Info, TrendingUp, MapPin, Flame, Trophy, Target, Sparkles } from 'lucide-react';
+import CountryFlag from '@/components/ui/country-flag';
 import type { WinnerProfile, ContenderCard } from './types';
 import ConfidenceGauge from './components/ConfidenceGauge';
 import { getReasonIcon, type ReasonIconResult } from './utils/getReasonIcon';
@@ -118,20 +119,6 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
             <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#1C1917' }}>
               Top 5 Picks
             </h3>
-            {/* AI Powered badge */}
-            <span
-              className="inline-flex items-center gap-1 rounded-full"
-              style={{
-                fontSize: 10,
-                fontWeight: 600,
-                padding: '2px 8px',
-                background: 'rgba(59,130,246,0.08)',
-                color: 'rgba(59,130,246,0.7)',
-                letterSpacing: '0.2px',
-              }}
-            >
-              ✨ AI
-            </span>
           </div>
           <button
             onClick={() => setShowConfidenceInfo(!showConfidenceInfo)}
@@ -248,15 +235,10 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                   >
                     {pick.name}
                   </span>
-                  <div className="flex items-center gap-1.5">
-                    {pick.countryCode && (
-                      <span
-                        className="text-[10px] font-semibold px-2 py-0.5 rounded-md text-muted-foreground inline-block"
-                        style={{ background: 'rgba(0, 0, 0, 0.04)' }}
-                      >
-                        {pick.countryCode}
-                      </span>
-                    )}
+                    <div className="flex items-center gap-1.5">
+                     {pick.countryCode && (
+                       <CountryFlag country={pick.countryCode} size="sm" className="rounded-sm" />
+                     )}
                     {pick.promoted && (
                       <span
                         className="text-[10px] font-semibold px-2 py-0.5 rounded-md inline-block"
