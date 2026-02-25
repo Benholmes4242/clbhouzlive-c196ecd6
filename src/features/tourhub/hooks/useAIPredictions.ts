@@ -366,7 +366,7 @@ async function validatePicksAgainstField(
     if (!ttRows || ttRows.length === 0) return predictions;
 
     // Build set of players confirmed in the field via tee times
-    const fieldSet = new Set(ttRows.map((r: any) => (r.sr_players as any)?.sr_id).filter(Boolean));
+    const fieldSet = new Set(ttRows.map((r: any) => (r.sr_players as any)?.id).filter(Boolean));
 
     // If field data exists but is very small, don't filter (might be partial data)
     if (fieldSet.size < 20) return predictions;
@@ -410,7 +410,7 @@ async function validatePicksAgainstField(
   // Build status map keyed by sr_id
   const statusMap = new Map<string, string>();
   lbRows.forEach((row: any) => {
-    const srId = (row.sr_players as any)?.sr_id;
+    const srId = (row.sr_players as any)?.id;
     if (srId) statusMap.set(srId, row.status || 'active');
   });
 
