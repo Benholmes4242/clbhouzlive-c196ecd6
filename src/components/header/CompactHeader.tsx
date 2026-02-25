@@ -147,7 +147,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   };
 
   // Theme-specific styling
-  const LIGHT_BG = 'hsl(var(--background) / 0.95)';
+  const LIGHT_BG = '#F8FAFC';
   const LIGHT_BORDER = 'hsl(var(--border) / 0.5)';
   const STANDARD_BG = 'hsl(var(--clubhouse-bg-header))';
   const STANDARD_BORDER = 'hsl(var(--clubhouse-border))';
