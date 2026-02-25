@@ -390,15 +390,11 @@ const CourseExplorer = () => {
             setSelectedSubregion('all');
           }}>
             <SelectTrigger 
-              className={`h-11 w-full rounded-sq-sm justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98] ${
-                selectedRegion !== PRIMARY_REGIONS.ALL 
-                  ? 'bg-foreground text-background border-foreground' 
-                  : 'bg-card border-border text-[hsl(210,13%,18%)]'
-              }`}
+              className="h-11 w-full rounded-sq-sm justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98] bg-card border-border text-[hsl(210,13%,18%)]"
               aria-label="Select region"
             >
               <div className="flex items-center">
-                <MapPin className={`mr-2 h-4 w-4 ${selectedRegion !== PRIMARY_REGIONS.ALL ? 'text-background/70' : 'text-muted-foreground'}`} aria-hidden="true" />
+                <MapPin className="mr-2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
                 <SelectValue placeholder="All Regions" />
               </div>
             </SelectTrigger>
@@ -420,11 +416,7 @@ const CourseExplorer = () => {
             disabled={selectedRegion === PRIMARY_REGIONS.ALL || !SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.length}
           >
             <SelectTrigger 
-              className={`h-11 w-full rounded-sq-sm justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed ${
-                selectedSubregion !== 'all' 
-                  ? 'bg-foreground text-background border-foreground' 
-                  : 'bg-card border-border text-[hsl(210,13%,18%)]'
-              }`}
+              className="h-11 w-full rounded-sq-sm justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed bg-card border-border text-[hsl(210,13%,18%)]"
               aria-label="Select sub-region"
             >
               <SelectValue placeholder={selectedRegion === PRIMARY_REGIONS.ALL ? "Choose a region first" : "All sub-regions"} />
