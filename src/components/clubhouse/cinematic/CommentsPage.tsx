@@ -1347,8 +1347,14 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
     }
     meta.setAttribute('content', isDark ? '#0d0d0d' : '#FFFFFF');
 
-    // 2. Median.co native wrapper fallback
-    (window as any).median?.statusbar?.style(isDark ? 'light' : 'dark');
+    // 2. Median.co native wrapper fallback — safely wrapped
+    try {
+      if (typeof (window as any).median?.statusbar?.set === 'function') {
+        (window as any).median.statusbar.set({ style: isDark ? 'light' : 'dark' });
+      }
+    } catch (e) {
+      // Silently ignore — not in Median context
+    }
 
     return () => {
       if (existed && meta) {
@@ -1356,7 +1362,11 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
       } else {
         meta?.remove();
       }
-      (window as any).median?.statusbar?.style('light');
+      try {
+        if (typeof (window as any).median?.statusbar?.set === 'function') {
+          (window as any).median.statusbar.set({ style: 'light' });
+        }
+      } catch (e) {}
     };
   }, [isOpen, isDark]);
 
