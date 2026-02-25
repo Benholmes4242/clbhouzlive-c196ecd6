@@ -141,8 +141,7 @@ export const CourseHallOfFame: React.FC = () => {
                     <p className="text-[10px] font-medium text-slate-700 mt-1.5 line-clamp-2 max-w-[70px] mx-auto">
                       {course.course_name}
                     </p>
-                    <p className="text-[9px] text-slate-500 flex items-center justify-center gap-0.5">
-                      <Star className="w-2.5 h-2.5 text-amber-500 fill-amber-500" />
+                    <p className="text-[9px] text-slate-500 flex items-center justify-center">
                       {course.lifetime_avg_rating?.toFixed(1)}
                     </p>
                   </button>

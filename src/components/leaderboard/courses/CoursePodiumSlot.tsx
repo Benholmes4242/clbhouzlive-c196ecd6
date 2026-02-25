@@ -59,8 +59,7 @@ export const CoursePodiumSlot: React.FC<Props> = ({
     switch (sort) {
       case 'highest_rated':
         return (
-          <span className="flex items-center justify-center gap-0.5">
-            <Star className="fill-current" style={{ color: '#D4A853', width: config.iconSize, height: config.iconSize }} />
+          <span className="flex items-center justify-center">
             <span style={{ color: '#D4A853', fontSize: config.metricSize, fontWeight: config.metricWeight }}>
               {course.avg_rating?.toFixed(1) || '-'}
             </span>
@@ -78,8 +77,7 @@ export const CoursePodiumSlot: React.FC<Props> = ({
       case 'rising':
         if (!course.rank_change || course.rank_change === 0) {
           return (
-            <span className="flex items-center justify-center gap-0.5">
-              <Star className="fill-current" style={{ color: '#D4A853', width: config.iconSize, height: config.iconSize }} />
+            <span className="flex items-center justify-center">
               <span style={{ color: '#D4A853', fontSize: config.metricSize, fontWeight: config.metricWeight }}>
                 {course.avg_rating?.toFixed(1) || '-'}
               </span>
