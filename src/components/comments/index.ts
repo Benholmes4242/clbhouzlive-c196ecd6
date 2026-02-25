@@ -15,3 +15,6 @@ export { CommentingAsIndicator } from './CommentingAsIndicator';
 export { triggerHaptic, QUICK_REACTIONS, REPORT_REASONS } from './utils';
 export { default as CommentPreview } from './CommentPreview';
 export { CommentsSkeleton, CommentSkeleton } from './CommentsSkeleton';
+export { VoiceRecordButton } from './VoiceRecordButton';
+export { TypingPresence } from './TypingPresence';
+export { ReactionBurst } from './ReactionBurst';
