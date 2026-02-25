@@ -178,7 +178,10 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
       >
         {allPicks.map((pick, i) => {
           const isFeatured = i === 0;
-          const isActive = i === activeIndex;
+          // Color tiers: 0 = amber, 1-2 = emerald, 3-4 = blue
+          const accentColor = i === 0 ? 'rgba(245,158,11,0.9)'
+            : i <= 2 ? '#10B981'
+            : '#3B82F6';
 
           return (
             <motion.div
@@ -191,64 +194,36 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                 ease: [0.16, 1, 0.3, 1],
               }}
               viewport={{ once: true }}
-              className="rounded-2xl flex-shrink-0 relative"
+              className="rounded-2xl flex-shrink-0 relative overflow-hidden"
               style={{
                 width: isFeatured ? 'calc(100% - 28px)' : 'calc(100% - 36px)',
                 minWidth: isFeatured ? 'calc(100% - 28px)' : 'calc(100% - 36px)',
                 scrollSnapAlign: 'start',
-                padding: 20,
-                background: isFeatured
-                  ? 'linear-gradient(180deg, #FFFCF5 0%, #FFFFFF 100%)'
-                  : '#FFFFFF',
-                border: isFeatured ? 'none' : '1px solid rgba(0,0,0,0.06)',
-                borderLeft: isFeatured ? '3px solid #D4A017' : undefined,
-                boxShadow: isActive
-                  ? '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)'
-                  : '0 1px 2px rgba(0,0,0,0.05)',
+                background: '#FFFFFF',
+                border: '1px solid rgba(0,0,0,0.06)',
+                borderLeft: `3px solid ${accentColor}`,
                 opacity: pick.isWithdrawn ? 0.6 : undefined,
               }}
             >
-              {/* #1 PICK badge */}
-              {isFeatured && !pick.isWithdrawn && (
-                <div
-                  className="absolute font-bold uppercase"
-                  style={{
-                    top: -6,
-                    left: 12,
-                    fontSize: 10.5,
-                    letterSpacing: '0.5px',
-                    padding: '4px 12px',
-                    borderRadius: 999,
-                    background: 'linear-gradient(135deg, #D4A017, #E8B830)',
-                    color: '#FFFFFF',
-                    boxShadow: '0 2px 6px rgba(212,160,23,0.3)',
-                    lineHeight: 1.2,
-                  }}
-                >
-                  #1 Pick
-                </div>
-              )}
-
               {/* Avatar + Name row */}
-              <div className="flex items-start gap-3.5 mb-4" style={{ marginTop: isFeatured ? 6 : 0 }}>
+              <div className="flex items-start gap-3.5" style={{ paddingRight: 20, paddingTop: 0, paddingBottom: 0 }}>
+                {/* Player photo — fills top-left corner */}
                 <div className="relative flex-shrink-0">
                   <img
                     src={pick.avatarUrl || PLAYER_SILHOUETTE_URL}
                     alt={pick.name}
                     className="object-cover"
                     style={{
-                      width: isFeatured ? 68 : 58,
-                      height: isFeatured ? 68 : 58,
-                      borderRadius: 16,
-                      border: '2px solid white',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                      width: isFeatured ? 80 : 70,
+                      height: isFeatured ? 80 : 70,
+                      borderRadius: '0 0 16px 0',
                     }}
                     loading="lazy"
                     onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
                   />
                   {pick.isWithdrawn && (
                     <div
-                      className="absolute -top-1 -right-1 px-1.5 py-0.5 rounded-md font-bold uppercase"
+                      className="absolute top-1 right-1 px-1.5 py-0.5 rounded-md font-bold uppercase"
                       style={{
                         fontSize: '9px',
                         letterSpacing: '0.5px',
@@ -262,7 +237,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                   )}
                 </div>
 
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 pt-3">
                   <span
                     className="block tracking-tight text-foreground"
                     style={{
@@ -298,17 +273,19 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                 </div>
 
                 {/* Confidence gauge — top right of card */}
-                <ConfidenceGauge
-                  tier={pick.confidenceTier}
-                  variant={isFeatured ? 'gold' : 'neutral'}
-                  animationDelay={400 + i * 80}
-                  isWithdrawn={pick.isWithdrawn}
-                />
+                <div className="pt-3">
+                  <ConfidenceGauge
+                    tier={pick.confidenceTier}
+                    variant={isFeatured ? 'gold' : 'neutral'}
+                    animationDelay={400 + i * 80}
+                    isWithdrawn={pick.isWithdrawn}
+                  />
+                </div>
               </div>
 
               {/* Bullet points with contextual icons */}
               {pick.bullets.length > 0 && (
-                <div className="flex flex-col gap-2.5">
+                <div className="flex flex-col gap-2.5 px-5 pb-5 pt-3">
                   {pick.bullets.slice(0, 3).map((bullet, j) => (
                     <div key={j} className="flex items-start gap-2">
                       <ReasonIcon text={bullet} />
