@@ -203,6 +203,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                       width: isFeatured ? 64 : 56,
                       height: isFeatured ? 64 : 56,
                       borderRadius: '34%',
+                      objectPosition: 'center 20%',
                     }}
                     loading="lazy"
                     onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
