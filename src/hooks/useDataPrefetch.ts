@@ -125,6 +125,7 @@ export function usePostPrefetch(postId: string | undefined) {
           .from('post_comments')
           .select('id, user_id, content, created_at, parent_id')
           .eq('post_id', postId)
+          .is('deleted_at', null)
           .order('created_at', { ascending: true })
           .limit(20);
         return data;

@@ -29,7 +29,8 @@ export function usePostInsights(postId: string | undefined) {
         supabase
           .from('post_comments')
           .select('id', { count: 'exact', head: true })
-          .eq('post_id', postId),
+          .eq('post_id', postId)
+          .is('deleted_at', null),
       ]);
 
       return {
