@@ -1354,16 +1354,12 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
             className={cn(
               'fixed inset-x-0 bottom-0 z-[101] w-full rounded-t-3xl',
               'flex flex-col',
-              !isDark && isGrey && 'bg-muted'
+              !isDark && (isGrey ? 'bg-muted' : 'bg-[#f8fafc]')
             )}
             style={{
               height: '75dvh',
               boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.15)',
-              background: isDark
-                ? '#0d0d0d'
-                : isGrey
-                  ? undefined
-                  : 'linear-gradient(180deg, rgba(245, 158, 11, 0.06) 0%, rgba(245, 158, 11, 0) 20%), #F8FAFC',
+              ...(isDark ? { background: '#0d0d0d' } : {}),
             }}
           >
             {/* Vignette overlay - darkens edges (matches /auth page) */}
@@ -1690,7 +1686,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
             <motion.div 
               className="flex-shrink-0 px-4 py-3"
               style={{ 
-                paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 20px)',
+                paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)',
                 background: isDark 
                   ? 'rgba(13, 13, 13, 0.98)' 
                   : isGrey 
