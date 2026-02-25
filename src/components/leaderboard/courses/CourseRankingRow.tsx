@@ -101,8 +101,7 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, seasonCo
 
         {/* Rating row */}
         <div className="flex items-center gap-1.5 mt-1" style={{ fontSize: 13 }}>
-          <span className="flex items-center gap-0.5">
-            <Star className="w-3.5 h-3.5 fill-current" style={{ color: '#D4A853' }} />
+          <span className="flex items-center">
             <span className="font-bold" style={{ color: '#D4A853', fontSize: 16 }}>
               {course.avg_rating?.toFixed(1) || '-'}
             </span>

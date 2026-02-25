@@ -484,8 +484,7 @@ export function CoursesLeaderboardView() {
                       {round.rating && (
                         <>
                           <span className="text-xs text-muted-foreground/40">·</span>
-                          <div className="flex items-center gap-0.5">
-                            <Star className="w-3.5 h-3.5 fill-current" style={{ color: '#D4A853' }} />
+                          <div className="flex items-center">
                             <span className="font-bold" style={{ color: '#D4A853', fontSize: 14 }}>
                               {round.rating.toFixed(1)}
                             </span>
