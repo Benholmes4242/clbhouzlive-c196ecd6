@@ -13841,6 +13841,42 @@ export type Database = {
       equals: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       execute_sql: { Args: { params?: Json; query: string }; Returns: Json }
       expire_pings: { Args: never; Returns: undefined }
+      explore_courses_by_rating: {
+        Args: {
+          p_country?: string
+          p_limit?: number
+          p_offset?: number
+          p_search?: string
+          p_sub_country?: string
+        }
+        Returns: {
+          average_rating: number
+          club_id: string
+          continent: Database["public"]["Enums"]["continent"]
+          country: string
+          country_code: string
+          country_rank: number
+          course_type: Database["public"]["Enums"]["course_type"]
+          created_at: string
+          description: string
+          global_rank: number
+          has_hosted_major: boolean
+          id: string
+          latitude: number
+          longitude: number
+          major_championships: string[]
+          name: string
+          region: string
+          region_key: string
+          regional_rank: number
+          sub_country: string
+          thumbnail_image: string
+          top100_url: string
+          updated_at: string
+          usa_rank: number
+          website_url: string
+        }[]
+      }
       fetch_social_feed_posts: {
         Args: {
           current_offset: number
