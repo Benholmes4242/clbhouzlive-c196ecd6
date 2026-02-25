@@ -1039,8 +1039,11 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
     if (!viewport) return;
     
     const handleResize = () => {
-      const offset = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop);
-      setKeyboardOffset(offset);
+      const keyboardHeight = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop);
+      const panelBottom = window.innerHeight * 0.7;
+      const keyboardTop = window.innerHeight - keyboardHeight;
+      const overlap = panelBottom - keyboardTop;
+      setKeyboardOffset(Math.max(0, overlap));
     };
     
     viewport.addEventListener('resize', handleResize);
@@ -1338,27 +1341,27 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
             transition={{ duration: 0.2 }}
             className="fixed inset-0 z-[100]"
             style={{
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-              backgroundColor: 'rgba(0, 0, 0, 0.3)',
+              backdropFilter: 'blur(4px)',
+              WebkitBackdropFilter: 'blur(4px)',
+              backgroundColor: 'rgba(0, 0, 0, 0.25)',
             }}
             onClick={onClose}
           />
 
-          {/* Comments Panel — 80vw slide-over anchored to right edge */}
+          {/* Comments Panel — slides down from top, 70vh height, full width */}
           <motion.div
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
+            initial={{ y: '-100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '-100%' }}
             transition={SPRING_SNAPPY}
             className={cn(
-              'fixed inset-y-0 right-0 z-[101]',
+              'fixed inset-x-0 top-0 z-[101] w-full rounded-b-3xl',
               'flex flex-col',
               !isDark && (isGrey ? 'bg-muted' : 'bg-[#f8fafc]')
             )}
             style={{
-              width: 'min(80vw, 420px)',
-              boxShadow: '-8px 0 32px rgba(0, 0, 0, 0.15)',
+              height: '70vh',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
               ...(isDark ? { background: '#0d0d0d' } : {}),
             }}
           >
@@ -1901,6 +1904,10 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                 </motion.div>
               </div>
             </motion.div>
+            {/* Drag handle — bottom of panel */}
+            <div className="flex justify-center py-2 flex-shrink-0">
+              <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+            </div>
           </motion.div>
 
           {/* Full-screen emoji overlay - MUST be outside panel, covers entire viewport including sides */}
@@ -1927,12 +1934,11 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                 exit={{ opacity: 0, y: 12 }}
                 transition={{ duration: 0.18, ease: [0.4, 0, 0.2, 1] }}
                 className={cn(
-                  "fixed right-4 z-[110] emoji-picker-container",
-                  "rounded-[16px] overflow-hidden shadow-xl",
-                  "sm:right-auto sm:left-[calc(100%-420px+16px)] sm:w-[calc(420px-32px)]"
+                  "fixed z-[110] emoji-picker-container",
+                  "rounded-[16px] overflow-hidden shadow-xl"
                 )}
                 style={{ 
-                  bottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)',
+                  bottom: 'calc(30vh + 12px)',
                   left: '16px',
                   right: '16px',
                   maxWidth: 'calc(100% - 32px)',
@@ -1959,7 +1965,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
             query={mentionQuery}
             onSelect={handleMentionSelect}
             zIndex={110}
-            bottomOffset={72 + keyboardOffset}
+            bottomOffset={Math.round(window.innerHeight * 0.3) + 12 + keyboardOffset}
           />
 
           {/* Action Sheet */}
