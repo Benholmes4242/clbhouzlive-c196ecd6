@@ -11,9 +11,12 @@ interface Top100JourneyHeroProps {
   className?: string;
 }
 
-/**
- * Calculate stage label based on completed courses
- */
+const MILESTONES = [5, 10, 25, 50, 75, 100];
+
+function getNextMilestone(completed: number): number {
+  return MILESTONES.find(m => m > completed) ?? 100;
+}
+
 function getStageLabel(completed: number): string {
   if (completed >= 100) return 'Grand Slam';
   if (completed >= 50) return '50 Club';
@@ -30,9 +33,6 @@ interface ProgressRingProps {
   strokeWidth?: number;
 }
 
-/**
- * Circular progress ring with animated fill
- */
 const ProgressRing: React.FC<ProgressRingProps> = ({
   completed,
   total,
@@ -40,70 +40,52 @@ const ProgressRing: React.FC<ProgressRingProps> = ({
   strokeWidth = 8,
 }) => {
   const [animatedProgress, setAnimatedProgress] = useState(0);
-  
+
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   const progress = Math.min(animatedProgress / total, 1);
   const strokeDashoffset = circumference - progress * circumference;
-  const percentage = Math.round(progress * 100);
 
-  // Animate on mount
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setAnimatedProgress(completed);
-    }, 100);
+    const timer = setTimeout(() => setAnimatedProgress(completed), 100);
     return () => clearTimeout(timer);
   }, [completed]);
 
   return (
     <div className="relative flex-shrink-0" style={{ width: size, height: size }}>
-      <svg
-        width={size}
-        height={size}
-        className="transform -rotate-90"
-      >
-        {/* Gradient definition */}
+      <svg width={size} height={size} className="transform -rotate-90">
         <defs>
           <linearGradient id="outstandingGradient" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="rgba(245, 158, 11, 0.9)" />
             <stop offset="100%" stopColor="rgba(251, 191, 36, 0.9)" />
           </linearGradient>
         </defs>
-        {/* Background track */}
         <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={strokeWidth}
+          cx={size / 2} cy={size / 2} r={radius}
+          fill="none" stroke="currentColor" strokeWidth={strokeWidth}
           className="text-muted"
         />
-        {/* Progress arc - Outstanding gradient */}
         <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke="url(#outstandingGradient)"
-          strokeWidth={strokeWidth}
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
+          cx={size / 2} cy={size / 2} r={radius}
+          fill="none" stroke="url(#outstandingGradient)"
+          strokeWidth={strokeWidth} strokeLinecap="round"
+          strokeDasharray={circumference} strokeDashoffset={strokeDashoffset}
           className="transition-all duration-700 ease-out"
         />
       </svg>
-      {/* Center text */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-lg font-bold text-foreground">{percentage}%</span>
+      {/* Center: completed/total fraction */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="font-bold text-foreground" style={{ fontSize: 15 }}>
+          {completed}
+        </span>
+        <span className="text-muted-foreground font-semibold" style={{ fontSize: 11 }}>
+          /{total}
+        </span>
       </div>
     </div>
   );
 };
 
-/**
- * Top100JourneyHero - Premium hero module for Top 100 journey entry point
- */
 export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
   completedCourses,
   totalCourses = 100,
@@ -111,9 +93,8 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
   className,
 }) => {
   const navigate = useNavigate();
-  const stageLabel = getStageLabel(completedCourses);
-  const isComplete = completedCourses >= totalCourses;
   const isZeroProgress = completedCourses === 0;
+  const nextMilestone = completedCourses >= 100 ? 100 : getNextMilestone(completedCourses);
 
   const handleClick = () => {
     navigate('/top100?tab=my-progress');
@@ -142,19 +123,21 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
         )}
         aria-label="View your Top 100 Journey"
       >
-        {/* Progress Ring - Top Right */}
-        <div className="absolute top-4 right-4">
+        {/* Progress Ring + milestone label — top right */}
+        <div className="absolute top-4 right-4 flex flex-col items-center">
           <ProgressRing
             completed={completedCourses}
-            total={totalCourses}
+            total={nextMilestone}
             size={72}
             strokeWidth={7}
           />
+          <span className="text-[10px] text-muted-foreground mt-1 font-medium">
+            Next: {nextMilestone}
+          </span>
         </div>
 
         {/* Text content */}
-        <div className="pr-20">
-          {/* Title */}
+        <div className="pr-24">
           <h2
             className="text-[22px] font-bold text-foreground mb-2"
             style={{ letterSpacing: '-0.3px' }}
@@ -162,14 +145,13 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
             Your Top 100 Journey
           </h2>
 
-          {/* Progress Headline - Outstanding gradient on number */}
-          <div className="flex items-baseline gap-2 mb-3">
-            <span 
+          <div className="flex items-baseline gap-2 mb-1">
+            <span
               className="text-3xl font-bold"
-              style={{ 
-                background: 'linear-gradient(to right, rgba(245, 158, 11, 0.9), rgba(251, 191, 36, 0.9))', 
-                WebkitBackgroundClip: 'text', 
-                WebkitTextFillColor: 'transparent' 
+              style={{
+                background: 'linear-gradient(to right, rgba(245, 158, 11, 0.9), rgba(251, 191, 36, 0.9))',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
               }}
             >
               {completedCourses}
@@ -179,7 +161,14 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
             </span>
           </div>
 
-          {/* CTA Button */}
+          {listCount > 0 && (
+            <p className="text-xs text-muted-foreground mb-3">
+              Across {listCount} Top 100 {listCount === 1 ? 'list' : 'lists'}
+            </p>
+          )}
+
+          {listCount === 0 && <div className="mb-3" />}
+
           <span
             className={cn(
               'inline-flex items-center gap-0.5',
