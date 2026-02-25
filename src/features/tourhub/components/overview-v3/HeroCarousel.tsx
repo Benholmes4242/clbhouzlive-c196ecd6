@@ -428,6 +428,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
               boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
               borderRadius: '12px',
               overflow: 'hidden',
+              zIndex: 10,
+              pointerEvents: 'auto' as const,
             }}
             variants={cardVariants}
             initial="enter"
@@ -885,13 +887,26 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (!touchStartRef.current) return;
+    if (!touchStartRef.current) {
+      setTimeout(() => setIsPaused(false), 5000);
+      return;
+    }
     const deltaX = touchMoveRef.current;
     const deltaY = Math.abs(
       (e.changedTouches[0]?.clientY ?? 0) - touchStartRef.current.y
     );
-    const threshold = 50;
+    const elapsed = Date.now() - touchStartRef.current.time;
 
+    touchStartRef.current = null;
+    touchMoveRef.current = 0;
+
+    // Tap detection: minimal movement + short duration → let browser handle as click
+    if (Math.abs(deltaX) < 10 && deltaY < 10 && elapsed < 300) {
+      setTimeout(() => setIsPaused(false), 5000);
+      return;
+    }
+
+    const threshold = 50;
     if (Math.abs(deltaX) > threshold && Math.abs(deltaX) > deltaY) {
       if (deltaX < -threshold && currentIndex < slides.length - 1) {
         setCurrentIndex(prev => prev + 1);
@@ -900,9 +915,6 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
       }
     }
 
-    touchStartRef.current = null;
-    touchMoveRef.current = 0;
-    
     setTimeout(() => setIsPaused(false), 5000);
   };
 
