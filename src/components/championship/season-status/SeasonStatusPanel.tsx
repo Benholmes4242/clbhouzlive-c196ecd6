@@ -14,6 +14,7 @@ interface SeasonStatusPanelProps {
   isError?: boolean;
   onRetry?: () => void;
   onSeasonClick?: (seasonId: SeasonId) => void;
+  seasonColor?: string;
   className?: string;
 }
 
@@ -29,6 +30,7 @@ export const SeasonStatusPanel: React.FC<SeasonStatusPanelProps> = ({
   isError,
   onRetry,
   onSeasonClick,
+  seasonColor,
   className,
 }) => {
   if (isLoading) {
@@ -75,6 +77,7 @@ export const SeasonStatusPanel: React.FC<SeasonStatusPanelProps> = ({
         progressPercent={progressPercent}
         seasonData={seasonData}
         onSeasonSelect={onSeasonClick}
+        seasonColor={seasonColor}
       />
     </div>
   );

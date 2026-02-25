@@ -11,6 +11,7 @@ interface LeaderboardRowV3Props {
   isCurrentUser: boolean;
   top100Count?: number;
   onClick?: () => void;
+  seasonColor?: string;
 }
 
 // Premium rank badge colors — Gold / Silver / Bronze
@@ -26,14 +27,6 @@ const getRankTextColor = (r: number) => {
   return 'hsl(var(--muted-foreground))';
 };
 
-/**
- * LeaderboardRowV3 - Refined leaderboard row with premium styling
- * 
- * - Gold/Silver/Bronze rank badges for top 3
- * - Green stat color (#40916C) for all ranks
- * - Gold-tinted highlight for current user
- * - Subtle row dividers
- */
 export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
   rank,
   name,
@@ -42,9 +35,8 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
   courses,
   isCurrentUser,
   onClick,
+  seasonColor = '#006747',
 }) => {
-  
-
   return (
     <div
       role="button"
@@ -67,9 +59,9 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
       }}
     >
       {/* Position Badge */}
-      <div 
+      <div
         className="w-[22px] h-[22px] rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"
-        style={{ 
+        style={{
           backgroundColor: getRankColor(rank),
           color: getRankTextColor(rank),
         }}
@@ -90,9 +82,7 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
 
       {/* Info */}
       <div className="flex-1 min-w-0">
-        <p className={cn(
-          "text-sm font-semibold truncate text-foreground",
-        )}>
+        <p className="text-sm font-semibold truncate text-foreground">
           {name}
         </p>
         {homeClubName && (
@@ -100,10 +90,10 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
         )}
       </div>
 
-      {/* Score — green for all */}
-      <div 
+      {/* Score — season-colored */}
+      <div
         className="text-lg font-bold flex-shrink-0"
-        style={{ color: '#40916C' }}
+        style={{ color: seasonColor }}
       >
         {courses}
       </div>
