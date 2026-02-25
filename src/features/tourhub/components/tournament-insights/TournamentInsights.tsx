@@ -102,6 +102,11 @@ export const TournamentInsights = memo(function TournamentInsights() {
 
   const [activeTab, setActiveTab] = useState<IntelligenceTab>('courseDNA');
   const [intelligenceView, setIntelligenceView] = useState<IntelligenceView>('live');
+
+  // Default to Top 5 Picks when switching to "Next Up" view
+  useEffect(() => {
+    setActiveTab(intelligenceView === 'upcoming' ? 'predictions' : 'courseDNA');
+  }, [intelligenceView]);
   const [showCourseDNA, setShowCourseDNA] = useState(false);
 
   // Auto-expand Course DNA while waiting for play to begin
@@ -265,7 +270,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
           >
             {nextTournamentInsights ? (
               <>
-                <IntelligenceTabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
+                <IntelligenceTabSwitcher activeTab={activeTab} onTabChange={setActiveTab} picksFirst />
 
                 {activeTab === 'courseDNA' && (
                   <motion.div
@@ -486,7 +491,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
           >
             {nextTournamentInsights ? (
               <>
-                <IntelligenceTabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
+                <IntelligenceTabSwitcher activeTab={activeTab} onTabChange={setActiveTab} picksFirst />
 
                 {activeTab === 'courseDNA' && (
                   <motion.div
@@ -551,7 +556,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
           >
             {nextTournamentInsights ? (
               <>
-                <IntelligenceTabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
+                <IntelligenceTabSwitcher activeTab={activeTab} onTabChange={setActiveTab} picksFirst />
 
                 {activeTab === 'courseDNA' && (
                   <motion.div
