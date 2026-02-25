@@ -16,8 +16,6 @@ const scopeOptions = [
   { id: 'global', label: 'Global' },
   { id: 'division', label: 'Division' },
   { id: 'friends', label: 'Friends' },
-  { id: 'club', label: 'Clubs' },
-  { id: 'country', label: 'Country' },
 ];
 
 /**
