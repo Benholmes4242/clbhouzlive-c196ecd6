@@ -75,7 +75,7 @@ export const TrophyPodium: React.FC<TrophyPodiumProps> = ({
   const delays = { 2: 0, 1: 0.1, 3: 0.2 };
 
   return (
-    <div className="w-full py-8 overflow-visible relative">
+    <div className="w-full py-8 overflow-visible relative" style={{ paddingTop: 32, paddingBottom: 32 }}>
       {/* Subtle radial spotlight behind #1 */}
       <div
         className="absolute inset-0 pointer-events-none"
@@ -85,7 +85,7 @@ export const TrophyPodium: React.FC<TrophyPodiumProps> = ({
       />
 
       {/* Podium Layout: 2nd - 1st - 3rd with stepped vertical positioning */}
-      <div className="flex items-start justify-center relative">
+      <div className="flex items-start justify-center relative gap-6">
         <TrophyPodiumSlot
           entry={second}
           position={2}

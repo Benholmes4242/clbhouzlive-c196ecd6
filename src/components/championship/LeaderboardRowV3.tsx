@@ -16,9 +16,9 @@ interface LeaderboardRowV3Props {
 
 // Premium rank badge colors — Gold / Silver / Bronze
 const getRankColor = (r: number) => {
-  if (r === 1) return '#D4A853'; // Gold
-  if (r === 2) return '#A8B4C0'; // Silver
-  if (r === 3) return '#C4956A'; // Bronze
+  if (r === 1) return '#D4A853';
+  if (r === 2) return '#A8B4C0';
+  if (r === 3) return '#C4956A';
   return 'hsl(var(--muted))';
 };
 
@@ -45,35 +45,39 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
       onClick={onClick}
       onKeyDown={(e) => e.key === 'Enter' && onClick?.()}
       className={cn(
-        "flex items-center gap-3 py-3 px-4 transition-all duration-200 cursor-pointer",
+        "flex items-center gap-3 py-4 px-5 transition-all duration-200 cursor-pointer",
         "hover:bg-[rgba(0,0,0,0.02)] active:scale-[0.98]",
         isCurrentUser && "rounded-xl"
       )}
       style={{
         ...(isCurrentUser ? {
           background: 'rgba(212, 168, 83, 0.08)',
-          border: '1px solid rgba(212, 168, 83, 0.2)',
+          border: '2px solid rgba(212, 168, 83, 0.25)',
         } : {
-          borderBottom: '1px solid hsl(var(--border) / 0.15)',
+          borderBottom: '1px solid hsl(var(--border) / 0.08)',
         }),
       }}
     >
       {/* Position Badge */}
       <div
-        className="w-[22px] h-[22px] rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"
+        className="flex items-center justify-center font-bold flex-shrink-0"
         style={{
+          width: 28,
+          height: 28,
+          borderRadius: '50%',
           backgroundColor: getRankColor(rank),
           color: getRankTextColor(rank),
+          fontSize: 14,
         }}
       >
         {rank}
       </div>
 
       {/* Avatar */}
-      <div className="flex-shrink-0" style={{ width: 44, height: 44 }}>
+      <div className="flex-shrink-0" style={{ width: 48, height: 48 }}>
         <SquircleAvatar
           src={avatarUrl}
-          size={44}
+          size={48}
           alt={name}
           fallback={name?.charAt(0) || '?'}
           hideRing
@@ -82,18 +86,18 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
 
       {/* Info */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold truncate text-foreground">
+        <p className="text-[16px] font-semibold truncate text-foreground" style={{ letterSpacing: '-0.2px' }}>
           {name}
         </p>
         {homeClubName && (
-          <p className="text-xs text-muted-foreground truncate">{homeClubName}</p>
+          <p className="text-[13px] text-muted-foreground truncate">{homeClubName}</p>
         )}
       </div>
 
-      {/* Score — season-colored */}
+      {/* Score */}
       <div
-        className="text-lg font-bold flex-shrink-0"
-        style={{ color: seasonColor }}
+        className="flex-shrink-0"
+        style={{ color: seasonColor, fontSize: 22, fontWeight: 800 }}
       >
         {courses}
       </div>

@@ -4,9 +4,12 @@ import { cn } from '@/lib/utils';
 interface Props {
   value: 'season' | 'allTime';
   onChange: (value: 'season' | 'allTime') => void;
+  seasonYear?: number;
 }
 
-export const TimeModeToggle: React.FC<Props> = ({ value, onChange }) => {
+export const TimeModeToggle: React.FC<Props> = ({ value, onChange, seasonYear }) => {
+  const yearLabel = String(seasonYear ?? new Date().getFullYear());
+
   return (
     <div className="flex justify-center py-1">
       <div className="inline-flex items-center rounded-[14px] p-[3px]" style={{ background: 'rgba(0, 0, 0, 0.03)' }}>
@@ -19,7 +22,7 @@ export const TimeModeToggle: React.FC<Props> = ({ value, onChange }) => {
               : 'text-muted-foreground'
           )}
         >
-          This Season
+          {yearLabel}
         </button>
         <button
           onClick={() => onChange('allTime')}
