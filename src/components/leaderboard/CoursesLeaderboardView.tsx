@@ -458,35 +458,39 @@ export function CoursesLeaderboardView() {
                       )}
                     </div>
                     
-                    {/* Course Name */}
-                    <h4 className="font-semibold text-foreground line-clamp-2 leading-tight" style={{ fontSize: 15 }}>
+                    {/* Course Name — single line truncated */}
+                    <h4 className="font-semibold text-foreground truncate leading-tight" style={{ fontSize: 15 }}>
                       {round.golf_courses?.name}
                     </h4>
                     
-                    {/* Player Info + Rating row */}
-                    <div className="flex items-center justify-between mt-1">
-                      <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                        <SquircleAvatar
-                          size={24}
-                          src={round.user_profiles?.profile_photo_url}
-                          alt={round.user_profiles?.display_name}
-                          fallback={(round.user_profiles?.display_name?.[0] || '?').toUpperCase()}
-                        />
-                        <span className="text-xs text-muted-foreground truncate">
-                          {round.user_profiles?.display_name}
-                        </span>
-                        <span className="text-xs text-muted-foreground/40">·</span>
-                        <span className="text-xs text-muted-foreground whitespace-nowrap">
-                          {formatDistanceToNow(new Date(round.created_at), { addSuffix: false })}
-                        </span>
-                      </div>
+                    {/* Row 2: Avatar + Username */}
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <SquircleAvatar
+                        size={20}
+                        src={round.user_profiles?.profile_photo_url}
+                        alt={round.user_profiles?.display_name}
+                        fallback={(round.user_profiles?.display_name?.[0] || '?').toUpperCase()}
+                      />
+                      <span className="text-sm text-muted-foreground truncate">
+                        {round.user_profiles?.display_name}
+                      </span>
+                    </div>
+
+                    {/* Row 3: Time ago + Rating */}
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <span className="text-xs text-muted-foreground whitespace-nowrap">
+                        {formatDistanceToNow(new Date(round.created_at), { addSuffix: true })}
+                      </span>
                       {round.rating && (
-                        <div className="flex items-center gap-0.5 flex-shrink-0 ml-1">
-                          <Star className="w-3.5 h-3.5 fill-current" style={{ color: '#D4A853' }} />
-                          <span className="font-bold" style={{ color: '#D4A853', fontSize: 15 }}>
-                            {round.rating.toFixed(1)}
-                          </span>
-                        </div>
+                        <>
+                          <span className="text-xs text-muted-foreground/40">·</span>
+                          <div className="flex items-center gap-0.5">
+                            <Star className="w-3.5 h-3.5 fill-current" style={{ color: '#D4A853' }} />
+                            <span className="font-bold" style={{ color: '#D4A853', fontSize: 14 }}>
+                              {round.rating.toFixed(1)}
+                            </span>
+                          </div>
+                        </>
                       )}
                     </div>
                   </button>
@@ -514,7 +518,7 @@ export function CoursesLeaderboardView() {
       ) : null}
 
       {/* 2. Sort tabs — single row */}
-      <div>
+      <div className="mt-4">
         <CourseFilters
           sort={sort}
           onSortChange={handleSortChange}

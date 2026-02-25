@@ -283,13 +283,9 @@ export function ExplorationTab() {
     }
   };
 
-  const getMetricColor = (rank: number): string => {
-    switch (rank) {
-      case 1: return 'text-[#D4A853]';
-      case 2: return 'text-[#B8C6C9]';
-      case 3: return 'text-[#C4956A]';
-      default: return 'text-foreground';
-    }
+  const getMetricColor = (_rank: number): string => {
+    // All stat numbers use season color for consistency
+    return '';
   };
 
   const podiumEntries = allEntries.slice(0, 3);
@@ -328,7 +324,7 @@ export function ExplorationTab() {
         seasonColor={seasonThemeColor}
       >
         <div className={getMetricColor(entry.rank)}>
-          <LeaderboardStat value={getMetricValue(entry)} seasonColor={entry.rank > 3 ? seasonThemeColor : undefined} />
+          <LeaderboardStat value={getMetricValue(entry)} seasonColor={seasonThemeColor} />
         </div>
       </LeaderboardRow>
     </div>
