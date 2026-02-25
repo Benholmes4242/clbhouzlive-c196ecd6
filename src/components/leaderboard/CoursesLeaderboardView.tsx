@@ -316,8 +316,8 @@ export function CoursesLeaderboardView() {
   }, [showPodium, allCourses]);
 
   const listCourses = useMemo(() => {
-    return showPodium ? allCourses.slice(3) : allCourses;
-  }, [showPodium, allCourses]);
+    return allCourses;
+  }, [allCourses]);
 
   const handleSortChange = useCallback((newSort: CourseSortType) => {
     const rootEl = document.getElementById('root');
@@ -590,7 +590,7 @@ export function CoursesLeaderboardView() {
                             current_user_played: course.current_user_played || false,
                             current_user_play_count: course.current_user_play_count || 0,
                           }}
-                          rank={showPodium ? (virtualizedContent.startIndex + i) + 4 : (virtualizedContent.startIndex + i) + 1}
+                          rank={(virtualizedContent.startIndex + i) + 1}
                           sort={sort}
                           seasonColor={seasonThemeColor}
                           onClick={() => handleCourseClick(course.course_id)}
@@ -613,7 +613,7 @@ export function CoursesLeaderboardView() {
                         current_user_played: course.current_user_played || false,
                         current_user_play_count: course.current_user_play_count || 0,
                       }}
-                      rank={showPodium ? index + 4 : index + 1}
+                      rank={index + 1}
                       sort={sort}
                       seasonColor={seasonThemeColor}
                       onClick={() => handleCourseClick(course.course_id)}
