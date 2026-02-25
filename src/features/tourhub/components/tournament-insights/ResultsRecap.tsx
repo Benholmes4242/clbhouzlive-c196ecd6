@@ -63,20 +63,6 @@ export const ResultsRecap: React.FC<ResultsRecapProps> = ({
             {predictions.tournament.name}
           </span>
         </div>
-        {/* Grade badge */}
-        <span
-          style={{
-            fontSize: 11,
-            fontWeight: 700,
-            padding: '2px 8px',
-            borderRadius: 6,
-            background: grade.bg,
-            color: grade.text,
-            letterSpacing: '0.5px',
-          }}
-        >
-          {grade.label}
-        </span>
       </div>
 
       {/* Body */}
