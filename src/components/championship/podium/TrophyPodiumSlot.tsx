@@ -78,7 +78,7 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
       <div className="flex flex-col items-center flex-1" style={{ marginTop: config.verticalOffset }}>
         <div
           className="bg-muted flex items-center justify-center text-muted-foreground text-xl font-medium"
-          style={{ width: config.mobileAvatarSize, height: config.mobileAvatarSize, borderRadius: '34%' }}
+          style={{ width: config.mobileAvatarSize, height: config.mobileAvatarSize, borderRadius: '50%' }}
         >
           ?
         </div>
@@ -149,8 +149,8 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
           className="relative overflow-hidden"
           style={{
             width: config.mobileAvatarSize,
-            aspectRatio: '1 / 1.05',
-            borderRadius: '34%',
+            height: config.mobileAvatarSize,
+            borderRadius: '50%',
             border: `${config.borderWidth}px solid ${borderColor}`,
             boxShadow: `0 ${position === 1 ? '8px 24px' : '4px 12px'} ${config.shadowColor}`,
           }}
@@ -174,7 +174,7 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
           style={{
             width: config.badgeSize,
             height: config.badgeSize,
-            borderRadius: '34%',
+            borderRadius: '50%',
             backgroundColor: config.badgeBg,
             border: '2px solid white',
             fontSize: config.badgeSize * 0.45,
