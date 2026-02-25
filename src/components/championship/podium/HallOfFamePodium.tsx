@@ -75,8 +75,8 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
     return (
       <div className="flex flex-col items-center flex-1" style={{ marginTop: config.verticalOffset }}>
         <div
-          className="rounded-full bg-muted flex items-center justify-center text-muted-foreground text-xl font-medium"
-          style={{ width: config.mobileAvatarSize, height: config.mobileAvatarSize }}
+          className="bg-muted flex items-center justify-center text-muted-foreground text-xl font-medium"
+          style={{ width: config.mobileAvatarSize, height: config.mobileAvatarSize, borderRadius: '34%' }}
         >
           ?
         </div>
@@ -139,10 +139,11 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
 
         {/* Avatar image */}
         <div
-          className="relative rounded-full overflow-hidden"
+          className="relative overflow-hidden"
           style={{
             width: config.mobileAvatarSize,
-            height: config.mobileAvatarSize,
+            aspectRatio: '1 / 1.05',
+            borderRadius: '34%',
             border: `${config.borderWidth}px solid ${config.borderColor}`,
             boxShadow: `0 ${position === 1 ? '8px 28px' : '4px 12px'} ${config.shadowColor}`,
           }}
@@ -162,11 +163,11 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
 
         {/* Rank badge — bottom-right overlapping border */}
         <div
-          className="absolute -bottom-1 -right-1 flex items-center justify-center font-bold text-white shadow-md"
+          className="absolute -bottom-1.5 -right-0.5 flex items-center justify-center font-bold text-white shadow-md"
           style={{
             width: config.badgeSize,
             height: config.badgeSize,
-            borderRadius: '50%',
+            borderRadius: '34%',
             backgroundColor: config.badgeBg,
             border: '2px solid white',
             fontSize: config.badgeSize * 0.45,
@@ -244,8 +245,8 @@ export const HallOfFamePodium: React.FC<HallOfFamePodiumProps> = ({
           {[2, 1, 3].map((pos) => (
             <div key={pos} className="flex flex-col items-center">
               <div
-                className="rounded-full bg-muted flex items-center justify-center text-muted-foreground text-2xl font-medium"
-                style={{ width: pos === 1 ? 90 : 68, height: pos === 1 ? 90 : 68 }}
+                className="bg-muted flex items-center justify-center text-muted-foreground text-2xl font-medium"
+                style={{ width: pos === 1 ? 90 : 68, height: pos === 1 ? 90 : 68, borderRadius: '34%' }}
               >
                 ?
               </div>

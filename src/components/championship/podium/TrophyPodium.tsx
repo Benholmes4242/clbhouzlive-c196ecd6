@@ -27,16 +27,16 @@ export const TrophyPodium: React.FC<TrophyPodiumProps> = ({
       <div className="w-full py-8">
         <div className="flex items-end justify-center gap-6">
           <div className="flex flex-col items-center">
-            <Skeleton className="w-[68px] h-[68px] rounded-full" />
+            <Skeleton className="w-[68px] h-[68px]" style={{ borderRadius: '34%' }} />
             <Skeleton className="w-14 h-4 mt-2 rounded" />
           </div>
           <div className="flex flex-col items-center">
             <Skeleton className="w-7 h-7 mb-1 rounded" />
-            <Skeleton className="w-[90px] h-[90px] rounded-full" />
+            <Skeleton className="w-[90px] h-[90px]" style={{ borderRadius: '34%' }} />
             <Skeleton className="w-16 h-5 mt-2 rounded" />
           </div>
           <div className="flex flex-col items-center">
-            <Skeleton className="w-[68px] h-[68px] rounded-full" />
+            <Skeleton className="w-[68px] h-[68px]" style={{ borderRadius: '34%' }} />
             <Skeleton className="w-14 h-4 mt-2 rounded" />
           </div>
         </div>
@@ -51,8 +51,8 @@ export const TrophyPodium: React.FC<TrophyPodiumProps> = ({
           {[2, 1, 3].map((pos) => (
             <div key={pos} className="flex flex-col items-center">
               <div
-                className="rounded-full bg-muted flex items-center justify-center text-muted-foreground text-2xl font-medium"
-                style={{ width: pos === 1 ? 90 : 68, height: pos === 1 ? 90 : 68 }}
+                className="bg-muted flex items-center justify-center text-muted-foreground text-2xl font-medium"
+                style={{ width: pos === 1 ? 90 : 68, height: pos === 1 ? 90 : 68, borderRadius: '34%' }}
               >
                 ?
               </div>
