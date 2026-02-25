@@ -319,7 +319,7 @@ export function ExplorationTab() {
   );
 
   return (
-    <div className="flex flex-col px-4 pt-4 space-y-6">
+    <div className="flex flex-col px-5 pt-4 space-y-6">
       {/* 1. World Map — 16px below sub-tabs (pt-4) */}
       {user && userStatus && (
         <GlobalProgressMap 
@@ -396,6 +396,7 @@ export function ExplorationTab() {
             entries={podiumEntries} 
             metric={metric}
             currentUserId={user?.id}
+            seasonColor="#006747"
           />
 
           {/* Rankings List */}
