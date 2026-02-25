@@ -15,14 +15,14 @@ export { CommentingAsIndicator } from './CommentingAsIndicator';
 export { triggerHaptic, QUICK_REACTIONS, REPORT_REASONS } from './utils';
 export { default as CommentPreview } from './CommentPreview';
 export { CommentsSkeleton, CommentSkeleton } from './CommentsSkeleton';
-export { VoiceRecordButton } from './VoiceRecordButton';
+
 export { TypingPresence } from './TypingPresence';
 export { ReactionBurst } from './ReactionBurst';
 export { FloatingReaction } from './FloatingReaction';
 export { LivePresenceBar } from './LivePresenceBar';
 export { RichCommentToolbar } from './RichCommentToolbar';
 export { generateCommentLink, parseCommentLink, getSmartNotificationCopy } from './CommentDeepLink';
-export { VoiceNotePlayer } from './VoiceNotePlayer';
+
 export { AnimatedCount } from './AnimatedCount';
 export { SwipeableComment } from './SwipeableComment';
 export { CommentImage } from './CommentImage';

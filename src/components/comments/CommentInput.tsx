@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Smile, X, Pencil, Check } from 'lucide-react';
-import { VoiceRecordButton } from '@/components/comments/VoiceRecordButton';
+
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { CommentingAsIndicator } from '@/components/comments/CommentingAsIndicator';
@@ -21,7 +21,7 @@ interface CommentInputProps {
   newComment: string;
   onCommentChange: (value: string) => void;
   onSubmit: () => void;
-  onSubmitVoice?: (mediaUrl: string, durationSeconds: number) => void;
+  
   isAddingComment: boolean;
   isUpdatingComment: boolean;
   editingComment: CommentWithReplies | CommentReply | null;
@@ -52,7 +52,7 @@ export const CommentInput: React.FC<CommentInputProps> = ({
   newComment,
   onCommentChange,
   onSubmit,
-  onSubmitVoice,
+  
   isAddingComment,
   isUpdatingComment,
   editingComment,
@@ -104,9 +104,6 @@ export const CommentInput: React.FC<CommentInputProps> = ({
     }
   }, [newComment, onCommentChange, inputRef]);
 
-  const handleVoiceNoteComplete = useCallback((mediaUrl: string, durationSeconds: number) => {
-    onSubmitVoice?.(mediaUrl, durationSeconds);
-  }, [onSubmitVoice]);
 
   const hasContent = newComment.trim().length > 0 || !!attachedPhoto;
 
@@ -290,16 +287,6 @@ export const CommentInput: React.FC<CommentInputProps> = ({
             </div>
 
           <div className="flex flex-col items-center justify-end gap-0.5 pb-0.5 flex-shrink-0">
-              {/* Voice record button - only show when text is empty */}
-              {!newComment.trim() && !editingComment && !attachedPhoto && (
-                <VoiceRecordButton
-                  isDark={isDark}
-                  onTranscription={(text) => onCommentChange(text)}
-                  onVoiceNoteComplete={handleVoiceNoteComplete}
-                  mode="voice-comment"
-                />
-              )}
-
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={onToggleEmojiPicker}
