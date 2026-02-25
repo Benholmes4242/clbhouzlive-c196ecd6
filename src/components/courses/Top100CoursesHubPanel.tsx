@@ -217,12 +217,8 @@ const Top100CoursesHubPanel = () => {
             <Select value={selectedList} onValueChange={setSelectedList}>
               <SelectTrigger 
                 aria-label="Select Top 100 list" 
-                className={cn(
-                  'h-11 w-full rounded-sq-sm bg-card justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98]',
-                  selectedList !== 'global' 
-                    ? 'bg-foreground text-background border-foreground' 
-                    : 'border-border/50'
-                )}
+                className="h-11 w-full rounded-sq-sm bg-card border-border/50 justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98]"
+                style={{ color: 'hsl(210, 13%, 18%)' }}
               >
                 <SelectValue placeholder="Global Top 100" />
               </SelectTrigger>
@@ -241,12 +237,8 @@ const Top100CoursesHubPanel = () => {
             <Select value={sortOption} onValueChange={(v) => setSortOption(v as Top100SortOption)}>
               <SelectTrigger 
                 aria-label="Sort courses" 
-                className={cn(
-                  'h-11 w-full rounded-sq-sm bg-card justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98]',
-                  sortOption !== 'official' 
-                    ? 'bg-foreground text-background border-foreground' 
-                    : 'border-border/50'
-                )}
+                className="h-11 w-full rounded-sq-sm bg-card border-border/50 justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98]"
+                style={{ color: 'hsl(210, 13%, 18%)' }}
               >
                 <SelectValue placeholder="Official ranking" />
               </SelectTrigger>
