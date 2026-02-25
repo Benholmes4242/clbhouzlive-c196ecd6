@@ -20,8 +20,15 @@ interface Props {
   position: 'left' | 'center' | 'right';
   sort: 'most_played' | 'highest_rated' | 'rising';
   showGlow?: boolean;
+  seasonColor?: string;
   onClick: () => void;
 }
+
+const POSITION_CONFIG = {
+  1: { imageWidth: 'clamp(140px, 38vw, 180px)', badgeSize: 26, badgeFontSize: 13, nameSize: 16, nameWeight: 700, locationSize: 13, metricSize: 20, metricWeight: 800, iconSize: 18, verticalOffset: 0, maxInfoWidth: 180 },
+  2: { imageWidth: 'clamp(110px, 28vw, 135px)', badgeSize: 22, badgeFontSize: 11, nameSize: 13, nameWeight: 600, locationSize: 11, metricSize: 16, metricWeight: 700, iconSize: 16, verticalOffset: 24, maxInfoWidth: 135 },
+  3: { imageWidth: 'clamp(110px, 28vw, 135px)', badgeSize: 22, badgeFontSize: 11, nameSize: 13, nameWeight: 600, locationSize: 11, metricSize: 16, metricWeight: 700, iconSize: 16, verticalOffset: 40, maxInfoWidth: 135 },
+} as const;
 
 export const CoursePodiumSlot: React.FC<Props> = ({
   course,
@@ -29,9 +36,11 @@ export const CoursePodiumSlot: React.FC<Props> = ({
   position,
   sort,
   showGlow,
+  seasonColor = '#006747',
   onClick,
 }) => {
   const isCenter = position === 'center';
+  const config = POSITION_CONFIG[rank];
 
   const getBorderStyle = () => {
     switch (rank) {
@@ -41,26 +50,27 @@ export const CoursePodiumSlot: React.FC<Props> = ({
         backgroundOrigin: 'border-box',
         backgroundClip: 'padding-box, border-box',
       };
-      case 2: return { border: '2.5px solid #A8B4C0' };
-      case 3: return { border: '2.5px solid #C4956A' };
+      case 2: return { border: '3px solid #A8B4C0' };
+      case 3: return { border: '3px solid #C4956A' };
     }
   };
 
-  const getRankBadgeStyle = () => {
+  const getRankBadgeColor = () => {
     switch (rank) {
-      case 1: return { background: '#D4A853', width: 28, height: 28 };
-      case 2: return { background: '#A8B4C0', width: 24, height: 24 };
-      case 3: return { background: '#C4956A', width: 24, height: 24 };
+      case 1: return '#D4A853';
+      case 2: return '#A8B4C0';
+      case 3: return '#C4956A';
     }
   };
 
   const getMetricDisplay = () => {
+    const iconCls = `w-[${config.iconSize}px] h-[${config.iconSize}px]`;
     switch (sort) {
       case 'highest_rated':
         return (
           <span className="flex items-center justify-center gap-0.5">
-            <Star className={cn('fill-current', isCenter ? 'w-4 h-4' : 'w-3.5 h-3.5')} style={{ color: '#D4A853' }} />
-            <span className={cn('font-bold', isCenter ? 'text-base' : 'text-sm')} style={{ color: '#D4A853' }}>
+            <Star className="fill-current" style={{ color: '#D4A853', width: config.iconSize, height: config.iconSize }} />
+            <span style={{ color: '#D4A853', fontSize: config.metricSize, fontWeight: config.metricWeight }}>
               {course.avg_rating?.toFixed(1) || '-'}
             </span>
           </span>
@@ -68,8 +78,8 @@ export const CoursePodiumSlot: React.FC<Props> = ({
       case 'most_played':
         return (
           <span className="flex items-center justify-center gap-1">
-            <Users className={cn(isCenter ? 'w-4 h-4' : 'w-3.5 h-3.5')} style={{ color: '#40916C' }} />
-            <span className={cn('font-bold', isCenter ? 'text-base' : 'text-sm')} style={{ color: '#40916C' }}>
+            <Users style={{ color: seasonColor, width: config.iconSize, height: config.iconSize }} />
+            <span style={{ color: seasonColor, fontSize: config.metricSize, fontWeight: config.metricWeight }}>
               {course.times_played}
             </span>
           </span>
@@ -78,8 +88,8 @@ export const CoursePodiumSlot: React.FC<Props> = ({
         if (!course.rank_change || course.rank_change === 0) {
           return (
             <span className="flex items-center justify-center gap-0.5">
-              <Star className={cn('fill-current', isCenter ? 'w-4 h-4' : 'w-3.5 h-3.5')} style={{ color: '#D4A853' }} />
-              <span className={cn('font-bold', isCenter ? 'text-base' : 'text-sm')} style={{ color: '#D4A853' }}>
+              <Star className="fill-current" style={{ color: '#D4A853', width: config.iconSize, height: config.iconSize }} />
+              <span style={{ color: '#D4A853', fontSize: config.metricSize, fontWeight: config.metricWeight }}>
                 {course.avg_rating?.toFixed(1) || '-'}
               </span>
             </span>
@@ -87,8 +97,8 @@ export const CoursePodiumSlot: React.FC<Props> = ({
         }
         return (
           <span className="flex items-center justify-center gap-1">
-            <TrendingUp className={cn(isCenter ? 'w-4 h-4' : 'w-3.5 h-3.5')} style={{ color: '#40916C' }} />
-            <span className={cn('font-bold', isCenter ? 'text-base' : 'text-sm')} style={{ color: '#40916C' }}>
+            <TrendingUp style={{ color: seasonColor, width: config.iconSize, height: config.iconSize }} />
+            <span style={{ color: seasonColor, fontSize: config.metricSize, fontWeight: config.metricWeight }}>
               +{course.rank_change}
             </span>
           </span>
@@ -97,12 +107,6 @@ export const CoursePodiumSlot: React.FC<Props> = ({
   };
 
   const location = course.sub_country || course.country || '';
-  const badgeStyle = getRankBadgeStyle();
-
-  // Vertical offset for stepped podium
-  const verticalOffset = rank === 1 ? 0 : rank === 2 ? 16 : 28;
-
-  // Staggered animation delay
   const animDelay = rank === 1 ? 0 : rank === 2 ? 0.1 : 0.2;
 
   return (
@@ -114,8 +118,8 @@ export const CoursePodiumSlot: React.FC<Props> = ({
       transition={{ delay: animDelay, duration: 0.4, ease: 'easeOut' }}
       className="relative flex flex-col items-center"
       style={{
-        width: isCenter ? 'clamp(130px, 34vw, 160px)' : 'clamp(100px, 26vw, 120px)',
-        marginTop: verticalOffset,
+        width: config.imageWidth,
+        marginTop: config.verticalOffset,
       }}
     >
       {/* Crown for 1st place */}
@@ -127,7 +131,7 @@ export const CoursePodiumSlot: React.FC<Props> = ({
           transition={{ delay: 0.3, duration: 0.4, type: 'spring', stiffness: 200 }}
         >
           <Crown
-            size={32}
+            size={36}
             className="drop-shadow-md"
             style={{ color: '#D4A853', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))' }}
             fill="#D4A853"
@@ -179,10 +183,10 @@ export const CoursePodiumSlot: React.FC<Props> = ({
         <div
           className="absolute -bottom-3 left-1/2 -translate-x-1/2 rounded-full flex items-center justify-center text-white font-bold shadow-md"
           style={{
-            width: badgeStyle.width,
-            height: badgeStyle.height,
-            background: badgeStyle.background,
-            fontSize: rank === 1 ? 14 : 12,
+            width: config.badgeSize,
+            height: config.badgeSize,
+            background: getRankBadgeColor(),
+            fontSize: config.badgeFontSize,
             border: '2px solid white',
           }}
         >
@@ -191,20 +195,17 @@ export const CoursePodiumSlot: React.FC<Props> = ({
       </div>
 
       {/* Course info */}
-      <div className={cn(
-        'mt-4 text-center w-full',
-        isCenter ? 'max-w-[160px]' : 'max-w-[120px]'
-      )}>
-        <p className={cn(
-          'font-bold text-foreground line-clamp-2 leading-tight',
-          isCenter ? 'text-sm' : 'text-xs'
-        )}>
+      <div className="mt-4 text-center w-full" style={{ maxWidth: config.maxInfoWidth }}>
+        <p
+          className="text-foreground line-clamp-2 leading-tight"
+          style={{ fontSize: config.nameSize, fontWeight: config.nameWeight }}
+        >
           {course.course_name}
         </p>
-        <p className={cn(
-          'text-muted-foreground mt-0.5 truncate',
-          isCenter ? 'text-xs' : 'text-[10px]'
-        )}>
+        <p
+          className="text-muted-foreground mt-0.5 truncate"
+          style={{ fontSize: config.locationSize }}
+        >
           {location}
         </p>
         <div className="mt-1">

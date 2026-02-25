@@ -11,6 +11,8 @@ import { formatDistanceToNow } from 'date-fns';
 import { CreateGameTripSheetV2 } from '@/features/hub/components/create-game-trip-v2';
 import { cn } from '@/lib/utils';
 import { CourseLocationSelector } from '@/components/leaderboards/shared/CourseLocationSelector';
+import { useSeasonCalendar } from '@/hooks/championship';
+import { getSeasonConfig, type SeasonId } from '@/lib/seasonConfig';
 
 // New course components
 import { 
@@ -98,7 +100,19 @@ const OVERSCAN = 8;
 
 export function CoursesLeaderboardView() {
   const navigate = useNavigate();
-  
+
+  // Season color derivation
+  const { data: seasonCalendar } = useSeasonCalendar();
+  const seasonThemeColor = useMemo(() => {
+    const currentSeason = seasonCalendar?.find(s => s.is_current);
+    if (!currentSeason) return '#006747';
+    const lower = currentSeason.name.toLowerCase();
+    let id: SeasonId = 'major';
+    if (lower.includes('pre-season') || lower.includes('preseason')) id = 'preseason';
+    else if (lower.includes('summer')) id = 'summer';
+    else if (lower.includes('off-season') || lower.includes('offseason')) id = 'offseason';
+    return getSeasonConfig(id).themeColor;
+  }, [seasonCalendar]);
   // ─── Filter state with persistence ───────────────────────────────
   const [sort, setSort] = useState<CourseSortType>(() => {
     const saved = readSavedFilters();
@@ -390,11 +404,11 @@ export function CoursesLeaderboardView() {
   }
 
   return (
-    <div className="flex flex-col space-y-6">
+    <div className="flex flex-col" style={{ gap: 20 }}>
       {/* 1. Recently Played by Your Circle - TOP */}
       {circleLoading ? (
-        <section className="space-y-3 -mx-4">
-          <div className="px-4">
+        <section className="space-y-3 -mx-5">
+          <div className="px-5">
             <Skeleton className="h-5 w-48" />
           </div>
           <div className="flex gap-3 overflow-x-auto pl-4 pr-4 scrollbar-hide">
@@ -411,18 +425,18 @@ export function CoursesLeaderboardView() {
           </div>
         </section>
       ) : circleRecentRounds && circleRecentRounds.length > 0 ? (
-        <section className="-mx-4">
-          <h3 className="text-[22px] font-bold text-foreground px-4 mb-3" style={{ letterSpacing: '-0.3px' }}>
+        <section className="-mx-5">
+          <h3 className="text-xl font-bold text-foreground px-5 mb-3" style={{ letterSpacing: '-0.3px' }}>
             Your Circle's Recent Rounds
           </h3>
           <div className="relative">
-            <div className="overflow-x-auto pb-2 px-4 scrollbar-hide">
-              <div className="flex gap-3">
+            <div className="overflow-x-auto pb-2 px-5 scrollbar-hide">
+              <div className="flex gap-4">
                 {circleRecentRounds.slice(0, 8).map((round: any) => (
                   <button
                     key={round.id}
                     onClick={() => handleCourseClick(round.course_id)}
-                    className="w-[170px] flex-shrink-0 text-left group active:scale-[0.97] transition-transform"
+                    className="w-[190px] flex-shrink-0 text-left group active:scale-[0.97] transition-transform"
                   >
                     {/* Course Image */}
                     <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-2">
@@ -445,7 +459,7 @@ export function CoursesLeaderboardView() {
                     </div>
                     
                     {/* Course Name */}
-                    <h4 className="text-sm font-semibold text-foreground line-clamp-2 leading-tight">
+                    <h4 className="font-semibold text-foreground line-clamp-2 leading-tight" style={{ fontSize: 15 }}>
                       {round.golf_courses?.name}
                     </h4>
                     
@@ -453,7 +467,7 @@ export function CoursesLeaderboardView() {
                     <div className="flex items-center justify-between mt-1">
                       <div className="flex items-center gap-1.5 min-w-0 flex-1">
                         <SquircleAvatar
-                          size={20}
+                          size={24}
                           src={round.user_profiles?.profile_photo_url}
                           alt={round.user_profiles?.display_name}
                           fallback={(round.user_profiles?.display_name?.[0] || '?').toUpperCase()}
@@ -469,7 +483,7 @@ export function CoursesLeaderboardView() {
                       {round.rating && (
                         <div className="flex items-center gap-0.5 flex-shrink-0 ml-1">
                           <Star className="w-3.5 h-3.5 fill-current" style={{ color: '#D4A853' }} />
-                          <span className="text-sm font-bold" style={{ color: '#D4A853' }}>
+                          <span className="font-bold" style={{ color: '#D4A853', fontSize: 15 }}>
                             {round.rating.toFixed(1)}
                           </span>
                         </div>
@@ -490,7 +504,7 @@ export function CoursesLeaderboardView() {
                 key={index}
                 className="rounded-full transition-colors"
                 style={index === 0 
-                  ? { width: 20, height: 6, background: '#40916C' }
+                  ? { width: 20, height: 6, background: seasonThemeColor }
                   : { width: 6, height: 6, background: 'rgba(0, 0, 0, 0.12)' }
                 }
               />
@@ -508,10 +522,10 @@ export function CoursesLeaderboardView() {
       </div>
 
       {/* Course Rankings Section */}
-      <section className="-mx-4">
-        <div className="px-4 mb-5">
-          <h2 className="text-[22px] font-bold text-foreground" style={{ letterSpacing: '-0.3px' }}>Course Rankings</h2>
-          <p className="text-sm text-muted-foreground mt-0.5">
+      <section className="-mx-5">
+        <div className="px-5 mb-5">
+          <h2 className="text-2xl font-bold text-foreground" style={{ letterSpacing: '-0.3px' }}>Course Rankings</h2>
+          <p className="text-base text-muted-foreground mt-0.5">
             {sort === 'most_played' && "The world's greatest courses by rounds played"}
             {sort === 'highest_rated' && "The world's greatest courses by community rating"}
             {sort === 'rising' && "The world's greatest courses trending right now"}
@@ -539,6 +553,7 @@ export function CoursesLeaderboardView() {
                     rank_change: c.rank_change,
                   }))}
                   sort={sort === 'rising' ? 'rising' : sort === 'highest_rated' ? 'highest_rated' : 'most_played'}
+                  seasonColor={seasonThemeColor}
                   onCourseClick={handleCourseClick}
                 />
               )}
@@ -574,6 +589,7 @@ export function CoursesLeaderboardView() {
                           }}
                           rank={showPodium ? (virtualizedContent.startIndex + i) + 4 : (virtualizedContent.startIndex + i) + 1}
                           sort={sort}
+                          seasonColor={seasonThemeColor}
                           onClick={() => handleCourseClick(course.course_id)}
                         />
                       ))}
@@ -596,6 +612,7 @@ export function CoursesLeaderboardView() {
                       }}
                       rank={showPodium ? index + 4 : index + 1}
                       sort={sort}
+                      seasonColor={seasonThemeColor}
                       onClick={() => handleCourseClick(course.course_id)}
                     />
                   ))
