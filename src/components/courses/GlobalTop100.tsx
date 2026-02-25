@@ -22,7 +22,7 @@ import { AppSelect, AppSelectOption } from '@/components/ui/AppSelect';
 import { COURSES_PAGE_SIZE } from '@/config/pagination';
 import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
 
-type Top100SortOption = 'official' | 'name_asc' | 'name_desc';
+type Top100SortOption = 'official' | 'community' | 'name_asc' | 'name_desc';
 
 function listSlugToRegionKey(slug: string): PrimaryRegionKey {
   switch (slug) {
@@ -194,6 +194,12 @@ const GlobalTop100 = () => {
   // Apply sorting
   filteredCourses = [...filteredCourses].sort((a, b) => {
     switch (sortOption) {
+      case 'community':
+        // Sort by average_rating descending, nulls last
+        const ratingA = (a as any).average_rating ?? -1;
+        const ratingB = (b as any).average_rating ?? -1;
+        if (ratingB !== ratingA) return ratingB - ratingA;
+        return a.name.localeCompare(b.name);
       case 'name_asc':
         return a.name.localeCompare(b.name);
       case 'name_desc':
@@ -299,6 +305,7 @@ const GlobalTop100 = () => {
 
   const sortOptions: AppSelectOption<Top100SortOption>[] = [
     { value: 'official', label: 'Official Rating' },
+    { value: 'community', label: 'Community Rating' },
     { value: 'name_asc', label: 'A–Z' },
     { value: 'name_desc', label: 'Z–A' },
   ];
@@ -332,7 +339,7 @@ const GlobalTop100 = () => {
       </div>
 
       {/* Top 100 List Selector + Sub-region */}
-      <div className="max-w-xl mx-auto flex items-center justify-center gap-3">
+      <div className="max-w-xl mx-auto flex items-center justify-center gap-3" onClick={(e) => e.stopPropagation()} onTouchEnd={(e) => e.stopPropagation()}>
         <div className="flex-1">
           <Select
             value={selectedList}
@@ -345,10 +352,10 @@ const GlobalTop100 = () => {
               }
             }}
           >
-            <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base text-[hsl(210,13%,18%)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
+            <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow" style={{ color: 'hsl(210, 13%, 18%)' }}>
               <SelectValue placeholder="Choose Top 100 list" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
               {listOptions.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
@@ -370,10 +377,10 @@ const GlobalTop100 = () => {
                 value={selectedSubregion}
                 onValueChange={setSelectedSubregion}
               >
-                <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base text-[hsl(210,13%,18%)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
+                <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow" style={{ color: 'hsl(210, 13%, 18%)' }}>
                   <SelectValue placeholder="All sub-regions" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
                   <SelectItem value="all">All sub-regions</SelectItem>
                   {subregions.map((s) => (
                     <SelectItem key={s} value={normalizeLabel(s)}>

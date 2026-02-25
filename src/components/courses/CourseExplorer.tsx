@@ -382,7 +382,7 @@ const CourseExplorer = () => {
       </div>
 
       {/* Region + sub-region filters */}
-      <div className="max-w-xl mx-auto flex items-center justify-center gap-3" role="group" aria-label="Course filters">
+      <div className="max-w-xl mx-auto flex items-center justify-center gap-3" role="group" aria-label="Course filters" onClick={(e) => e.stopPropagation()} onTouchEnd={(e) => e.stopPropagation()}>
         {/* Primary region */}
         <div className="flex-1">
           <Select value={selectedRegion} onValueChange={(value) => {
