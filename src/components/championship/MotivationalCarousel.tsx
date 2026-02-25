@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { 
-  TrendingUp, 
-  Target, 
-  Users, 
-  Flame, 
+import {
+  TrendingUp,
+  Target,
+  Users,
+  Flame,
   Award,
-  Sparkles
+  Sparkles,
 } from 'lucide-react';
 
 interface MotivationalMessage {
@@ -45,29 +45,27 @@ export const MotivationalCarousel: React.FC<Props> = ({
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Build dynamic messages based on user's situation
   const messages: MotivationalMessage[] = [];
 
-  // Top 3 message (highest priority) - Golf Chartreus gold
   if (isInTop3 && currentRank) {
     messages.push({
       id: 'top3',
       icon: Award,
-      iconColor: '#C1A84C',
-      message: currentRank === 1 
-        ? "You're leading the pack! 👑" 
-        : `You're #${currentRank}! Just ${currentRank - 1} spot${currentRank > 2 ? 's' : ''} from the top`,
+      iconColor: '#D4A853',
+      message:
+        currentRank === 1
+          ? "You're leading the pack! 👑"
+          : `You're #${currentRank}! Just ${currentRank - 1} spot${currentRank > 2 ? 's' : ''} from the top`,
       subMessage: 'Keep up the incredible pace',
       priority: 100,
     });
-  }
-  else if (isInTop10 && currentRank) {
+  } else if (isInTop10 && currentRank) {
     messages.push({
       id: 'top10',
       icon: TrendingUp,
-      iconColor: '#334E3D',
+      iconColor: '#D4A853',
       message: `You're #${currentRank} — in the top 10!`,
-      subMessage: coursesToNextRank 
+      subMessage: coursesToNextRank
         ? `${coursesToNextRank} course${coursesToNextRank > 1 ? 's' : ''} to climb higher`
         : 'Keep pushing to climb higher',
       priority: 90,
@@ -78,7 +76,7 @@ export const MotivationalCarousel: React.FC<Props> = ({
     messages.push({
       id: 'friend-ahead',
       icon: Users,
-      iconColor: '#B8C6C9',
+      iconColor: '#D4A853',
       message: `${friendAhead.name} is ${friendAhead.coursesAhead} course${friendAhead.coursesAhead > 1 ? 's' : ''} ahead`,
       subMessage: 'Complete more courses to catch up!',
       priority: 80,
@@ -89,7 +87,7 @@ export const MotivationalCarousel: React.FC<Props> = ({
     messages.push({
       id: 'friend-behind',
       icon: Users,
-      iconColor: '#334E3D',
+      iconColor: '#D4A853',
       message: `You're ${friendBehind.coursesBehind} course${friendBehind.coursesBehind > 1 ? 's' : ''} ahead of ${friendBehind.name}`,
       subMessage: 'Stay ahead — keep logging courses!',
       priority: 70,
@@ -100,7 +98,7 @@ export const MotivationalCarousel: React.FC<Props> = ({
     messages.push({
       id: 'rival',
       icon: Target,
-      iconColor: '#C1A84C',
+      iconColor: '#D4A853',
       message: `Your rival ${rivalAhead.name} is #${rivalAhead.rank}`,
       subMessage: `${rivalAhead.coursesAhead} course${rivalAhead.coursesAhead > 1 ? 's' : ''} to overtake them`,
       priority: 85,
@@ -111,7 +109,7 @@ export const MotivationalCarousel: React.FC<Props> = ({
     messages.push({
       id: 'streak',
       icon: Flame,
-      iconColor: '#E5D0A1',
+      iconColor: '#D4A853',
       message: `${streak}-day streak! 🔥`,
       subMessage: 'Keep it going — play tomorrow!',
       priority: 60,
@@ -122,7 +120,7 @@ export const MotivationalCarousel: React.FC<Props> = ({
     messages.push({
       id: 'close-to-rank',
       icon: Sparkles,
-      iconColor: '#334E3D',
+      iconColor: '#D4A853',
       message: `Just ${coursesToNextRank} course${coursesToNextRank > 1 ? 's' : ''} to move up!`,
       subMessage: "You're so close to the next rank",
       priority: 75,
@@ -133,8 +131,8 @@ export const MotivationalCarousel: React.FC<Props> = ({
     messages.push({
       id: 'generic',
       icon: TrendingUp,
-      iconColor: '#334E3D',
-      message: currentRank 
+      iconColor: '#D4A853',
+      message: currentRank
         ? `You're #${currentRank} of ${totalPlayers} players`
         : 'Log courses to join the leaderboard!',
       subMessage: 'Every course counts',
@@ -146,7 +144,7 @@ export const MotivationalCarousel: React.FC<Props> = ({
 
   useEffect(() => {
     if (sortedMessages.length <= 1) return;
-    
+
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % sortedMessages.length);
     }, 5000);
@@ -159,47 +157,47 @@ export const MotivationalCarousel: React.FC<Props> = ({
 
   const Icon = currentMessage.icon;
 
+  // Highlight rank numbers in the message with gold
+  const renderMessage = (msg: string) => {
+    return msg.replace(/#(\d+)/g, '<gold>#$1</gold>').split(/(<gold>.*?<\/gold>)/).map((part, i) => {
+      const match = part.match(/^<gold>(.*)<\/gold>$/);
+      if (match) {
+        return (
+          <span key={i} className="font-bold" style={{ color: '#D4A853' }}>
+            {match[1]}
+          </span>
+        );
+      }
+      return part;
+    });
+  };
+
   return (
-    <div 
-      className={cn(
-        'relative overflow-hidden rounded-2xl',
-        'backdrop-blur-xl',
-        'border border-border/30',
-        
-        'p-4'
-      )}
+    <div
+      className="relative overflow-hidden px-4 py-3"
       style={{
-        background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 50%, rgba(248,250,252,0.8) 100%)',
+        background: 'linear-gradient(135deg, rgba(212, 168, 83, 0.08), rgba(212, 168, 83, 0.04))',
+        border: '1px solid rgba(212, 168, 83, 0.15)',
+        borderRadius: '14px',
       }}
     >
-      {/* Liquid glass highlight effect */}
-      <div 
-        className="absolute top-0 left-0 right-0 h-1/2 pointer-events-none"
-        style={{
-          background: 'linear-gradient(180deg, rgba(255,255,255,0.6) 0%, transparent 100%)',
-          borderRadius: '16px 16px 0 0',
-        }}
-      />
-
       {/* Content */}
       <div className="relative flex items-center gap-3">
-        {/* Icon with colored background */}
-        <div 
-          className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
-          style={{ 
-            backgroundColor: `${currentMessage.iconColor}15`,
+        {/* Trophy icon */}
+        <div
+          className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center"
+          style={{
+            backgroundColor: 'rgba(212, 168, 83, 0.12)',
+            boxShadow: '0 0 8px rgba(212, 168, 83, 0.15)',
           }}
         >
-          <Icon 
-            className="w-5 h-5" 
-            style={{ color: currentMessage.iconColor }}
-          />
+          <Icon className="w-[18px] h-[18px]" style={{ color: '#D4A853' }} />
         </div>
 
-        {/* Text content */}
+        {/* Text */}
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-foreground truncate">
-            {currentMessage.message}
+          <p className="text-sm font-bold text-foreground truncate">
+            {renderMessage(currentMessage.message)}
           </p>
           {currentMessage.subMessage && (
             <p className="text-xs text-muted-foreground truncate mt-0.5">
@@ -207,28 +205,38 @@ export const MotivationalCarousel: React.FC<Props> = ({
             </p>
           )}
         </div>
-
-        {/* Carousel indicator dots */}
-        {sortedMessages.length > 1 && (
-          <div className="flex items-center gap-1">
-            {sortedMessages.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setCurrentIndex(idx)}
-                className="p-2 -m-1.5"
-                aria-label={`Go to message ${idx + 1}`}
-              >
-                <div className={cn(
-                  'w-2.5 h-2.5 rounded-full transition-all duration-300',
-                  idx === currentIndex 
-                    ? 'bg-foreground w-4' 
-                    : 'bg-muted-foreground/30 hover:bg-muted-foreground/50'
-                )} />
-              </button>
-            ))}
-          </div>
-        )}
       </div>
+
+      {/* Dot indicators */}
+      {sortedMessages.length > 1 && (
+        <div className="flex items-center justify-center gap-1.5 mt-2">
+          {sortedMessages.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentIndex(idx)}
+              className="p-1"
+              aria-label={`Go to message ${idx + 1}`}
+            >
+              <div
+                className="rounded-full transition-all duration-300"
+                style={{
+                  ...(idx === currentIndex
+                    ? {
+                        width: '16px',
+                        height: '4px',
+                        backgroundColor: '#D4A853',
+                      }
+                    : {
+                        width: '4px',
+                        height: '4px',
+                        backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                      }),
+                }}
+              />
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

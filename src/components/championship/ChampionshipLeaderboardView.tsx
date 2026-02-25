@@ -593,15 +593,20 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
             completedCount={divisionLadderData.filter(d => d.status === 'completed').length}
           />
           
-          {/* Full Division Ladder (expandable) */}
-          {showDivisionLadder && (
+          {/* Full Division Ladder (expandable with animation) */}
+          <div
+            className={cn(
+              'overflow-hidden transition-all duration-300 ease-in-out',
+              showDivisionLadder ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
+            )}
+          >
             <DivisionLadderPanel
               divisions={divisionLadderData}
               userCourses={userStatus.courses_this_season}
               coursesToNext={nextDivision.coursesToNext}
               nextDivisionName={nextDivision.name}
             />
-          )}
+          </div>
         </>
       )}
 

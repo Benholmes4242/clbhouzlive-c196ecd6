@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Lock, Check, ChevronRight, Target } from 'lucide-react';
+import { Lock, Check, ChevronRight } from 'lucide-react';
 
 interface Division {
   id: string;
@@ -18,187 +18,191 @@ interface DivisionLadderPanelProps {
   estimatedRounds?: number;
 }
 
-// Helper to create light tint from hex color
-const getColorTint = (hexColor: string, opacity: number = 0.12): string => {
-  return `${hexColor}${Math.round(opacity * 255).toString(16).padStart(2, '0')}`;
-};
-
 /**
- * DivisionLadderPanel - Clean division ladder with milestone colors
- * 
- * Features:
- * - Uses each division's milestone color for styling
- * - Clear status icons in division colors
- * - "X to go" for next division
- * - Progress header with current division color
+ * DivisionLadderPanel - Premium tier list with connector lines and progressive fade
  */
 export const DivisionLadderPanel: React.FC<DivisionLadderPanelProps> = ({
   divisions,
   userCourses,
   coursesToNext,
   nextDivisionName,
-  estimatedRounds,
 }) => {
-  // Get current division for progress bar color
-  const currentDivision = divisions.find(d => d.status === 'current');
-  const currentColor = currentDivision?.color || '#7A6B5B';
-  
-  // Calculate progress within current tier
-  const progressPercent = coursesToNext > 0 
-    ? Math.min(100, ((10 - (coursesToNext % 10)) / 10) * 100)
-    : 100;
+  // Track locked index for progressive fade
+  let lockedIndex = 0;
 
-  // Get styles based on status and division color
-  const getRowStyles = (division: Division) => {
-    const color = division.color;
-    switch (division.status) {
-      case 'completed':
-        return {
-          background: getColorTint(color, 0.12),
-          iconBg: getColorTint(color, 0.20),
-          iconColor: color,
-          textColor: color,
-        };
-      case 'current':
-        return {
-          background: getColorTint(color, 0.18),
-          borderColor: getColorTint(color, 0.25),
-          iconBg: getColorTint(color, 0.25),
-          iconColor: color,
-          textColor: color,
-        };
-      case 'next':
-        return {
-          background: 'rgba(251, 146, 60, 0.12)',
-          iconBg: 'rgba(251, 146, 60, 0.20)',
-          iconColor: '#F97316',
-          textColor: undefined,
-          accentColor: '#F97316',
-        };
-      case 'locked':
-      default:
-        return {
-          background: 'transparent',
-          iconBg: undefined,
-          iconColor: '#9CA3AF',
-          textColor: '#9CA3AF',
-        };
+  // Determine connector line style between two divisions
+  const getConnectorStyle = (currentStatus: Division['status'], nextStatus: Division['status']) => {
+    if (
+      (currentStatus === 'completed' && nextStatus === 'current') ||
+      (currentStatus === 'completed' && nextStatus === 'completed')
+    ) {
+      return { width: 2, color: '#40916C', dashed: false };
     }
+    if (currentStatus === 'current' && nextStatus === 'next') {
+      return { width: 2, gradient: true, dashed: false };
+    }
+    if (currentStatus === 'next' && nextStatus === 'locked') {
+      return { width: 1, color: 'rgba(0, 0, 0, 0.1)', dashed: false };
+    }
+    // locked → locked
+    return { width: 1, color: 'rgba(0, 0, 0, 0.06)', dashed: true };
   };
 
   return (
-    <div className="space-y-4">
-      {/* Progress Header - uses current division color */}
-      {coursesToNext > 0 && (
-        <div className="bg-muted/30 rounded-xl p-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm flex items-center gap-2">
-              <Target className="w-4 h-4 text-muted-foreground" />
-              Next: {nextDivisionName}
-            </span>
-            <span className="text-sm font-semibold">{coursesToNext} to go</span>
-          </div>
-          <div className="h-2 bg-muted rounded-full overflow-hidden mb-2">
-            <div 
-              className="h-full rounded-full transition-all"
-              style={{ 
-                width: `${progressPercent}%`,
-                backgroundColor: currentColor,
-              }}
-            />
-          </div>
-          {estimatedRounds !== undefined && estimatedRounds > 0 && (
-            <p className="text-xs text-muted-foreground">
-              ~{estimatedRounds} rounds to promotion
-            </p>
-          )}
-        </div>
-      )}
+    <div className="px-4 pb-2">
+      {divisions.map((division, index) => {
+        const isLocked = division.status === 'locked';
+        const currentLockedIndex = isLocked ? lockedIndex++ : 0;
+        const opacity = isLocked ? Math.max(0.4, 0.8 - currentLockedIndex * 0.07) : 1;
 
-      {/* Division List - with milestone colors */}
-      <div className="space-y-1">
-        {divisions.map((division) => {
-          const styles = getRowStyles(division);
-          
-          return (
+        // Connector line to next item
+        const nextDiv = divisions[index + 1];
+        const connector = nextDiv ? getConnectorStyle(division.status, nextDiv.status) : null;
+
+        return (
+          <div key={division.id} style={{ opacity }}>
+            {/* Tier item */}
             <div
-              key={division.id}
               className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-xl transition-colors",
-                division.status === 'current' && "border",
-                division.status === 'locked' && "opacity-60"
+                'flex items-center gap-3 px-3 py-3 relative',
+                division.status === 'current' && 'rounded-xl',
+                division.status === 'next' && 'rounded-xl',
               )}
               style={{
-                backgroundColor: division.status !== 'locked' ? styles.background : undefined,
-                borderColor: division.status === 'current' ? styles.borderColor : undefined,
+                ...(division.status === 'current' && {
+                  backgroundColor: 'rgba(82, 183, 136, 0.04)',
+                  borderLeft: '3px solid #40916C',
+                  borderRadius: '12px',
+                }),
+                ...(division.status === 'next' && {
+                  backgroundColor: 'rgba(212, 168, 83, 0.06)',
+                  border: '1px solid rgba(212, 168, 83, 0.15)',
+                  borderRadius: '12px',
+                }),
               }}
             >
-              {/* Status Icon - uses division color */}
-              <div 
-                className={cn(
-                  "w-8 h-8 rounded-full flex items-center justify-center",
-                  division.status === 'locked' && "bg-muted"
-                )}
+              {/* Icon circle */}
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
                 style={{
-                  backgroundColor: division.status !== 'locked' ? styles.iconBg : undefined,
+                  ...(division.status === 'completed' && {
+                    backgroundColor: '#40916C',
+                  }),
+                  ...(division.status === 'current' && {
+                    backgroundColor: '#40916C',
+                  }),
+                  ...(division.status === 'next' && {
+                    backgroundColor: 'rgba(212, 168, 83, 0.15)',
+                  }),
+                  ...(division.status === 'locked' && {
+                    backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                  }),
                 }}
               >
-                {(division.status === 'current' || division.status === 'completed') && (
-                  <Check className="w-4 h-4" style={{ color: styles.iconColor }} />
+                {(division.status === 'completed' || division.status === 'current') && (
+                  <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
                 )}
                 {division.status === 'next' && (
-                  <ChevronRight className="w-4 h-4" style={{ color: styles.iconColor }} />
+                  <ChevronRight className="w-3.5 h-3.5" style={{ color: '#D4A853' }} />
                 )}
                 {division.status === 'locked' && (
-                  <Lock className="w-4 h-4 text-gray-400" />
+                  <Lock
+                    className="w-3.5 h-3.5"
+                    style={{ color: 'hsl(var(--muted-foreground))', opacity: 0.4 }}
+                  />
                 )}
               </div>
 
-              {/* Division Info */}
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <div 
-                    className="w-2 h-2 rounded-full"
-                    style={{ backgroundColor: division.color }}
-                  />
-                  <span 
-                    className={cn(
-                      "font-medium text-sm",
-                      division.status === 'locked' && "text-gray-400"
-                    )}
-                    style={{
-                      color: division.status !== 'locked' ? styles.textColor : undefined,
-                    }}
-                  >
-                    {division.name}
-                  </span>
-                  {division.status === 'current' && (
-                    <span 
-                      className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
-                      style={{ 
-                        backgroundColor: getColorTint(division.color, 0.25),
-                        color: division.color,
-                      }}
-                    >
-                      Current
-                    </span>
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <span
+                  className={cn(
+                    'text-sm block',
+                    division.status === 'completed' && 'font-semibold text-foreground',
+                    division.status === 'current' && 'font-bold text-foreground',
+                    division.status === 'next' && 'font-bold text-foreground',
+                    division.status === 'locked' && 'font-medium',
                   )}
-                </div>
-                <span className="text-xs text-muted-foreground">
+                  style={{
+                    ...(division.status === 'locked' && {
+                      color: 'hsl(var(--muted-foreground))',
+                      opacity: 0.7,
+                    }),
+                  }}
+                >
+                  {division.name}
+                </span>
+                <span
+                  className="text-xs"
+                  style={{
+                    color: 'hsl(var(--muted-foreground))',
+                    ...(division.status === 'locked' && { opacity: 0.5 }),
+                  }}
+                >
                   {division.threshold}+ courses
                 </span>
               </div>
 
-              {/* Right side - "X to go" for next division */}
+              {/* Right side */}
+              {division.status === 'current' && (
+                <div
+                  className="inline-flex items-center gap-1.5 px-2 py-0.5 flex-shrink-0"
+                  style={{
+                    backgroundColor: 'rgba(82, 183, 136, 0.12)',
+                    borderRadius: '6px',
+                  }}
+                >
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span
+                      className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-50"
+                      style={{ backgroundColor: '#40916C' }}
+                    />
+                    <span
+                      className="relative inline-flex rounded-full h-1.5 w-1.5"
+                      style={{ backgroundColor: '#40916C' }}
+                    />
+                  </span>
+                  <span
+                    className="text-xs font-semibold uppercase tracking-wide"
+                    style={{ color: '#40916C' }}
+                  >
+                    Current
+                  </span>
+                </div>
+              )}
               {division.status === 'next' && coursesToNext > 0 && (
-                <span className="text-xs font-semibold text-orange-500">
+                <span className="text-sm font-bold flex-shrink-0" style={{ color: '#D4A853' }}>
                   {coursesToNext} to go
                 </span>
               )}
             </div>
-          );
-        })}
-      </div>
+
+            {/* Connector line */}
+            {connector && (
+              <div className="flex pl-[18px]">
+                <div
+                  style={{
+                    width: `${connector.width}px`,
+                    height: '8px',
+                    ...(connector.gradient
+                      ? {
+                          background:
+                            'linear-gradient(to bottom, #40916C, rgba(212, 168, 83, 0.4))',
+                        }
+                      : {
+                          backgroundColor: connector.color,
+                        }),
+                    ...(connector.dashed && {
+                      backgroundColor: 'transparent',
+                      borderLeft: `${connector.width}px dashed ${connector.color}`,
+                    }),
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 };
