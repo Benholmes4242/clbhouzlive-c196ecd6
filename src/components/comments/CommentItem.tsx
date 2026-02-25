@@ -8,6 +8,7 @@ import { MentionText } from '@/components/comments/MentionText';
 import { CaddiePickBadge } from '@/components/comments/CaddiePickBadge';
 import { ReactionDisplay } from '@/components/comments/ReactionDisplay';
 import { VoiceNotePlayer } from '@/components/comments/VoiceNotePlayer';
+import { CommentImage } from '@/components/comments/CommentImage';
 import { FloatingReaction } from '@/components/comments/FloatingReaction';
 import { AnimatedCount } from '@/components/comments/AnimatedCount';
 import { triggerHaptic } from '@/components/comments/utils';
@@ -103,43 +104,21 @@ export const CommentItem: React.FC<CommentItemProps> = ({
     return (
       <>
         {showDivider && (
-          <div
-            className={cn(
-              "h-px ml-[58px] mr-[56px]",
-              isDark ? "bg-white/8" : "bg-border/20"
-            )}
-          />
+          <div className={cn("h-px ml-[58px] mr-[56px]", isDark ? "bg-white/8" : "bg-border/20")} />
         )}
-        <div
-          ref={commentRef}
-          className={cn(
-            "flex items-center gap-3 py-3",
-            isReply && "pl-[26px]"
-          )}
-        >
-          <div className={cn(
-            "w-8 h-8 rounded-full flex items-center justify-center",
-            isDark ? "bg-white/8" : "bg-muted/60"
-          )}>
+        <div ref={commentRef} className={cn("flex items-center gap-3 py-3", isReply && "pl-[26px]")}>
+          <div className={cn("w-8 h-8 rounded-full flex items-center justify-center", isDark ? "bg-white/8" : "bg-muted/60")}>
             <Flag className={cn("w-4 h-4", isDark ? "text-white/35" : "text-muted-foreground/60")} />
           </div>
           <div className="flex-1">
-            <span className={cn(
-              "text-[13px]",
-              isDark ? "text-white/45" : "text-muted-foreground/70"
-            )}>
+            <span className={cn("text-[13px]", isDark ? "text-white/45" : "text-muted-foreground/70")}>
               You reported this comment.
             </span>
           </div>
-          <button
-            onClick={onReveal}
-            className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-medium transition-colors",
-              isDark
-                ? "bg-white/8 text-white/60 hover:bg-white/12"
-                : "bg-muted/60 text-muted-foreground hover:bg-muted/80"
-            )}
-          >
+          <button onClick={onReveal} className={cn(
+            "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-medium transition-colors",
+            isDark ? "bg-white/8 text-white/60 hover:bg-white/12" : "bg-muted/60 text-muted-foreground hover:bg-muted/80"
+          )}>
             <Eye className="w-3.5 h-3.5" />
             View
           </button>
@@ -158,13 +137,9 @@ export const CommentItem: React.FC<CommentItemProps> = ({
           isCaddiePick && !isReply && (isDark
             ? "bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent ring-1 ring-amber-500/20 mx-0"
             : "bg-gradient-to-r from-amber-50 via-amber-50/50 to-transparent ring-1 ring-amber-500/20 mx-0"),
-          !isCaddiePick && !isReply && (isDark
-            ? "bg-white/[0.02] mx-0"
-            : "bg-muted/20 mx-0"),
+          !isCaddiePick && !isReply && (isDark ? "bg-white/[0.02] mx-0" : "bg-muted/20 mx-0"),
           isPressing && "opacity-75 scale-[0.99]",
-          isHighlighted && (isDark
-            ? "bg-white/[0.05] ring-1 ring-white/12"
-            : "bg-primary/[0.04] ring-1 ring-primary/15")
+          isHighlighted && (isDark ? "bg-white/[0.05] ring-1 ring-white/12" : "bg-primary/[0.04] ring-1 ring-primary/15")
         )}
         initial={isHighlighted ? { opacity: 0 } : false}
         animate={isHighlighted ? { opacity: 1 } : {}}
@@ -172,10 +147,8 @@ export const CommentItem: React.FC<CommentItemProps> = ({
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         onTouchCancel={handleTouchEnd}
-        onContextMenu={(e) => {
-          e.preventDefault();
-          onLongPress?.(comment);
-        }}
+        onContextMenu={(e) => { e.preventDefault(); onLongPress?.(comment); }}
+        style={{ backgroundColor: isDark ? undefined : undefined }}
       >
         <SquircleAvatar
           size={isReply ? 28 : 34}
@@ -197,31 +170,26 @@ export const CommentItem: React.FC<CommentItemProps> = ({
             {isAuthor && (
               <span className={cn(
                 "flex-shrink-0 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide",
-                isDark
-                  ? "bg-primary/20 text-primary"
-                  : "bg-primary/15 text-primary"
+                isDark ? "bg-primary/20 text-primary" : "bg-primary/15 text-primary"
               )}>
                 OP
               </span>
             )}
-            {isCaddiePick && !isReply && (
-              <CaddiePickBadge size="sm" />
-            )}
-            <span className={cn(
-              "text-[11px] flex-shrink-0",
-              isDark ? "text-white/35" : "text-muted-foreground/50"
-            )}>
+            {isCaddiePick && !isReply && <CaddiePickBadge size="sm" />}
+            <span className={cn("text-[11px] flex-shrink-0", isDark ? "text-white/35" : "text-muted-foreground/50")}>
               {relativeTime(comment.created_at)}
             </span>
             {(comment as any).is_edited && (
-              <span className={cn(
-                "text-[11px] flex-shrink-0",
-                isDark ? "text-white/25" : "text-muted-foreground/40"
-              )}>
+              <span className={cn("text-[11px] flex-shrink-0", isDark ? "text-white/25" : "text-muted-foreground/40")}>
                 · (edited)
               </span>
             )}
           </div>
+
+          {/* Image attachment — rendered above text */}
+          {(comment as any).media_type === 'image' && (comment as any).media_url && (
+            <CommentImage mediaUrl={(comment as any).media_url} isDark={isDark} />
+          )}
 
           <MentionText
             text={comment.content}
@@ -244,10 +212,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({
 
           {!isReply && onReply && (
             <button
-              onClick={() => {
-                triggerHaptic('light');
-                onReply(comment.id, comment.user_name);
-              }}
+              onClick={() => { triggerHaptic('light'); onReply(comment.id, comment.user_name); }}
               className={cn(
                 "mt-1 py-2.5 px-1 text-[12px] font-medium transition-transform active:scale-[0.97]",
                 isDark ? "text-white/40" : "text-muted-foreground/70"
@@ -262,15 +227,10 @@ export const CommentItem: React.FC<CommentItemProps> = ({
         <div className="flex items-center gap-1.5 flex-shrink-0 pr-1 relative">
           {isOwnComment && (
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onLongPress?.(comment);
-              }}
+              onClick={(e) => { e.stopPropagation(); onLongPress?.(comment); }}
               className={cn(
                 "w-8 h-8 flex items-center justify-center rounded-full transition-colors",
-                isDark
-                  ? "text-white/40 hover:text-white/60 hover:bg-white/10"
-                  : "text-muted-foreground/40 hover:text-muted-foreground/60 hover:bg-muted/50"
+                isDark ? "text-white/40 hover:text-white/60 hover:bg-white/10" : "text-muted-foreground/40 hover:text-muted-foreground/60 hover:bg-muted/50"
               )}
             >
               <MoreHorizontal className="w-4 h-4" />
@@ -293,7 +253,6 @@ export const CommentItem: React.FC<CommentItemProps> = ({
             />
           )}
 
-          {/* Floating reaction animation */}
           <FloatingReaction emoji={floatingEmoji} trigger={floatingReactionTrigger} />
 
           <motion.button
@@ -302,10 +261,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({
             onContextMenu={(e) => {
               e.preventDefault();
               const rect = e.currentTarget.getBoundingClientRect();
-              onLongPressReaction?.(comment.id, {
-                x: rect.left + rect.width / 2,
-                y: rect.top,
-              });
+              onLongPressReaction?.(comment.id, { x: rect.left + rect.width / 2, y: rect.top });
             }}
             onTouchStart={(e) => {
               const timer = setTimeout(() => {
@@ -352,16 +308,12 @@ export const CommentItem: React.FC<CommentItemProps> = ({
               animate={comment.has_liked ? { scale: [1, 1.3, 1] } : {}}
               transition={{ duration: 0.2, ease: 'easeOut' }}
             >
-              <Heart
-                className={cn(
-                  "w-4 h-4 transition-colors",
-                  comment.has_liked
-                    ? "fill-like text-like"
-                    : isDark
-                      ? "text-white/40 group-hover:text-like/70"
-                      : "text-muted-foreground/50 group-hover:text-like/70"
-                )}
-              />
+              <Heart className={cn(
+                "w-4 h-4 transition-colors",
+                comment.has_liked
+                  ? "fill-like text-like"
+                  : isDark ? "text-white/40 group-hover:text-like/70" : "text-muted-foreground/50 group-hover:text-like/70"
+              )} />
             </motion.div>
           </motion.button>
           {comment.likes_count > 0 && (
@@ -369,9 +321,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({
               count={comment.likes_count}
               className={cn(
                 "text-xs -ml-2",
-                comment.has_liked
-                  ? "text-like"
-                  : isDark ? "text-white/50" : "text-muted-foreground/70"
+                comment.has_liked ? "text-like" : isDark ? "text-white/50" : "text-muted-foreground/70"
               )}
             />
           )}

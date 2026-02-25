@@ -4,6 +4,7 @@ import { ChevronRight, Loader2 } from 'lucide-react';
 import { Virtuoso } from 'react-virtuoso';
 import { cn } from '@/lib/utils';
 import { CommentItem } from '@/components/comments/CommentItem';
+import { SwipeableComment } from '@/components/comments/SwipeableComment';
 import { CommentsEmptyState } from '@/components/comments/CommentsEmptyState';
 import { CommentsSkeleton } from '@/components/comments/CommentsSkeleton';
 import { supabase } from '@/integrations/supabase/client';
@@ -84,7 +85,7 @@ export const CommentsList: React.FC<CommentsListProps> = ({
 
   // Infinite scroll via IntersectionObserver (for non-virtualized mode)
   useEffect(() => {
-    if (useVirtualized) return; // Virtuoso handles this
+    if (useVirtualized) return;
     const sentinel = sentinelRef.current;
     const container = commentsListRef.current;
     if (!sentinel || !container || !hasNextPage || isFetchingNextPage) return;
@@ -128,28 +129,34 @@ export const CommentsList: React.FC<CommentsListProps> = ({
 
     return (
       <div key={comment.id} className="mb-2">
-        <CommentItem
-          comment={comment}
-          isDark={isDark}
-          isGrey={isGrey}
-          onLike={onToggleLike}
-          onReply={onReply}
-          isLiking={isTogglingLike}
-          isOwnComment={isOwnComment}
-          onLongPress={onLongPress}
-          isAuthor={creatorUserId === comment.user_id}
-          isHighlighted={highlightedCommentId === comment.id}
-          isHidden={hiddenCommentIds.has(comment.id)}
-          isRevealed={revealedCommentIds.has(comment.id)}
-          onReveal={() => onRevealComment(comment.id)}
-          commentRef={registerCommentRef(comment.id)}
-          isCaddiePick={isThisCaddiePick}
-          onLongPressReaction={onOpenReactionPicker}
-          reactionCounts={getReactionsForComment(comment.id).reactions}
-          userReactions={getReactionsForComment(comment.id).userReactions}
-          onReactionToggle={(commentId, type) => onToggleReaction({ commentId, reactionType: type })}
-          onMentionTap={handleMentionTap}
-        />
+        <SwipeableComment
+          onSwipeReply={() => onReply(comment.id, comment.user_name)}
+          onSwipeLike={() => onToggleLike(comment.id)}
+          hasLiked={comment.has_liked}
+        >
+          <CommentItem
+            comment={comment}
+            isDark={isDark}
+            isGrey={isGrey}
+            onLike={onToggleLike}
+            onReply={onReply}
+            isLiking={isTogglingLike}
+            isOwnComment={isOwnComment}
+            onLongPress={onLongPress}
+            isAuthor={creatorUserId === comment.user_id}
+            isHighlighted={highlightedCommentId === comment.id}
+            isHidden={hiddenCommentIds.has(comment.id)}
+            isRevealed={revealedCommentIds.has(comment.id)}
+            onReveal={() => onRevealComment(comment.id)}
+            commentRef={registerCommentRef(comment.id)}
+            isCaddiePick={isThisCaddiePick}
+            onLongPressReaction={onOpenReactionPicker}
+            reactionCounts={getReactionsForComment(comment.id).reactions}
+            userReactions={getReactionsForComment(comment.id).userReactions}
+            onReactionToggle={(commentId, type) => onToggleReaction({ commentId, reactionType: type })}
+            onMentionTap={handleMentionTap}
+          />
+        </SwipeableComment>
 
         {/* Replies */}
         {(comment.replies.length > 0 || totalReplies > 0) && (
@@ -167,29 +174,35 @@ export const CommentsList: React.FC<CommentsListProps> = ({
             />
             <div className="pt-1 pb-2">
               {visibleReplies.map((reply, replyIndex) => (
-                <CommentItem
+                <SwipeableComment
                   key={reply.id}
-                  comment={reply}
-                  isDark={isDark}
-                  isGrey={isGrey}
-                  onLike={onToggleLike}
-                  isReply
-                  isLiking={isTogglingLike}
-                  showDivider={replyIndex > 0}
-                  isOwnComment={currentUserId === reply.user_id}
-                  onLongPress={onLongPress}
-                  isAuthor={creatorUserId === reply.user_id}
-                  isHighlighted={highlightedCommentId === reply.id}
-                  isHidden={hiddenCommentIds.has(reply.id)}
-                  isRevealed={revealedCommentIds.has(reply.id)}
-                  onReveal={() => onRevealComment(reply.id)}
-                  commentRef={registerCommentRef(reply.id)}
-                  onLongPressReaction={onOpenReactionPicker}
-                  reactionCounts={getReactionsForComment(reply.id).reactions}
-                  userReactions={getReactionsForComment(reply.id).userReactions}
-                  onReactionToggle={(commentId, type) => onToggleReaction({ commentId, reactionType: type })}
-                  onMentionTap={handleMentionTap}
-                />
+                  onSwipeReply={() => onReply(comment.id, reply.user_name)}
+                  onSwipeLike={() => onToggleLike(reply.id)}
+                  hasLiked={reply.has_liked}
+                >
+                  <CommentItem
+                    comment={reply}
+                    isDark={isDark}
+                    isGrey={isGrey}
+                    onLike={onToggleLike}
+                    isReply
+                    isLiking={isTogglingLike}
+                    showDivider={replyIndex > 0}
+                    isOwnComment={currentUserId === reply.user_id}
+                    onLongPress={onLongPress}
+                    isAuthor={creatorUserId === reply.user_id}
+                    isHighlighted={highlightedCommentId === reply.id}
+                    isHidden={hiddenCommentIds.has(reply.id)}
+                    isRevealed={revealedCommentIds.has(reply.id)}
+                    onReveal={() => onRevealComment(reply.id)}
+                    commentRef={registerCommentRef(reply.id)}
+                    onLongPressReaction={onOpenReactionPicker}
+                    reactionCounts={getReactionsForComment(reply.id).reactions}
+                    userReactions={getReactionsForComment(reply.id).userReactions}
+                    onReactionToggle={(commentId, type) => onToggleReaction({ commentId, reactionType: type })}
+                    onMentionTap={handleMentionTap}
+                  />
+                </SwipeableComment>
               ))}
 
               {hiddenRepliesCount > 0 && !repliesExpanded && (

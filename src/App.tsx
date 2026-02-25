@@ -252,6 +252,7 @@ const ManageTeamPage = lazy(() => import("./pages/ManageTeamPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const CreateMomentPage = lazy(() => import("./pages/CreateMomentPage"));
 const PostDeepLinkPage = lazy(() => import("./pages/PostDeepLinkPage"));
+const CommentDeepLinkPage = lazy(() => import("./components/comments/CommentDeepLinkHandler"));
 
 // Import season wrap modal
 import { SeasonWrapModal } from '@/components/season/SeasonWrapModal';
@@ -346,6 +347,7 @@ function AppRoutes() {
         
         {/* Post deep link for notifications */}
         <Route path="/post/:postId" element={<Suspense fallback={null}><PostDeepLinkPage /></Suspense>} />
+        <Route path="/post/:postId/comment/:commentId" element={<Suspense fallback={null}><CommentDeepLinkPage /></Suspense>} />
         
         <Route path="/videos" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><VideosPage /></Suspense>} />
         <Route path="/video/:videoId" element={<Suspense fallback={null}><VideoPlayerModal /></Suspense>} />
