@@ -1,16 +1,18 @@
 /**
  * RichCommentToolbar — Toolbar above keyboard with contextual comment actions:
- * Tag Course, Tag Hole, etc.
+ * Tag Course, Tag Hole, Photo attachment.
  */
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Flag, Hash } from 'lucide-react';
+import { Flag, Hash, Camera } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface RichCommentToolbarProps {
   isDark: boolean;
   isVisible: boolean;
   onInsertText: (text: string) => void;
+  onPhotoSelected?: (photo: { file: File; previewUrl: string }) => void;
 }
 
 const HOLES = Array.from({ length: 18 }, (_, i) => i + 1);
@@ -19,10 +21,36 @@ export const RichCommentToolbar: React.FC<RichCommentToolbarProps> = ({
   isDark,
   isVisible,
   onInsertText,
+  onPhotoSelected,
 }) => {
   const [showHolePicker, setShowHolePicker] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isVisible) return null;
+
+  const handlePhotoSelect = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image must be under 5MB');
+      return;
+    }
+
+    const previewUrl = URL.createObjectURL(file);
+    onPhotoSelected?.({ file, previewUrl });
+
+    // Reset input so same file can be selected again
+    e.target.value = '';
+  };
 
   return (
     <AnimatePresence>
@@ -41,6 +69,7 @@ export const RichCommentToolbar: React.FC<RichCommentToolbarProps> = ({
             {[
               { icon: Flag, label: 'Tag Course', action: () => onInsertText('⛳ ') },
               { icon: Hash, label: 'Tag Hole', action: () => setShowHolePicker(true) },
+              { icon: Camera, label: 'Photo', action: handlePhotoSelect },
             ].map((item) => (
               <motion.button
                 key={item.label}
@@ -99,6 +128,15 @@ export const RichCommentToolbar: React.FC<RichCommentToolbarProps> = ({
             </div>
           </div>
         )}
+
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          className="hidden"
+          onChange={handleFileChange}
+        />
       </motion.div>
     </AnimatePresence>
   );

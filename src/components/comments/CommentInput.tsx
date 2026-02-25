@@ -40,6 +40,10 @@ interface CommentInputProps {
   onMentionSelect: (mention: MentionSuggestion) => void;
   // Refs
   inputRef: React.RefObject<HTMLTextAreaElement>;
+  // Photo attachment
+  attachedPhoto?: { file: File; previewUrl: string } | null;
+  onRemovePhoto?: () => void;
+  sheetHeight?: string;
 }
 
 export const CommentInput: React.FC<CommentInputProps> = ({
@@ -64,6 +68,9 @@ export const CommentInput: React.FC<CommentInputProps> = ({
   mentionQuery,
   onMentionSelect,
   inputRef,
+  attachedPhoto,
+  onRemovePhoto,
+  sheetHeight = '75dvh',
 }) => {
   const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -100,6 +107,8 @@ export const CommentInput: React.FC<CommentInputProps> = ({
   const handleVoiceNoteComplete = useCallback((mediaUrl: string, durationSeconds: number) => {
     onSubmitVoice?.(mediaUrl, durationSeconds);
   }, [onSubmitVoice]);
+
+  const hasContent = newComment.trim().length > 0 || !!attachedPhoto;
 
   return (
     <>
@@ -156,10 +165,7 @@ export const CommentInput: React.FC<CommentInputProps> = ({
               transition={{ duration: 0.16, ease: 'easeOut' }}
               className="flex items-center justify-between mb-2 overflow-hidden"
             >
-              <span className={cn(
-                "text-[13px]",
-                isDark ? "text-white/60" : "text-muted-foreground"
-              )}>
+              <span className={cn("text-[13px]", isDark ? "text-white/60" : "text-muted-foreground")}>
                 Replying to <span className="font-medium">{replyingTo.displayName}</span>
               </span>
               <button
@@ -169,11 +175,37 @@ export const CommentInput: React.FC<CommentInputProps> = ({
                   isDark ? "hover:bg-white/10" : "hover:bg-muted"
                 )}
               >
-                <X className={cn(
-                  "w-4 h-4",
-                  isDark ? "text-white/60" : "text-muted-foreground"
-                )} />
+                <X className={cn("w-4 h-4", isDark ? "text-white/60" : "text-muted-foreground")} />
               </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Photo attachment preview */}
+        <AnimatePresence>
+          {attachedPhoto && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="relative mb-2 overflow-hidden"
+            >
+              <div className="relative inline-block">
+                <img
+                  src={attachedPhoto.previewUrl}
+                  alt="Attachment preview"
+                  className={cn(
+                    "w-20 h-20 object-cover rounded-lg border",
+                    isDark ? "border-white/10" : "border-border/50"
+                  )}
+                />
+                <button
+                  onClick={onRemovePhoto}
+                  className="absolute -top-2 -right-2 w-5 h-5 bg-destructive rounded-full flex items-center justify-center shadow-sm"
+                >
+                  <X className="w-3 h-3 text-destructive-foreground" />
+                </button>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -259,7 +291,7 @@ export const CommentInput: React.FC<CommentInputProps> = ({
 
           <div className="flex flex-col items-center justify-end gap-0.5 pb-0.5 flex-shrink-0">
               {/* Voice record button - only show when text is empty */}
-              {!newComment.trim() && !editingComment && (
+              {!newComment.trim() && !editingComment && !attachedPhoto && (
                 <VoiceRecordButton
                   isDark={isDark}
                   onTranscription={(text) => onCommentChange(text)}
@@ -286,15 +318,15 @@ export const CommentInput: React.FC<CommentInputProps> = ({
                 whileTap={{ scale: 0.88 }}
                 animate={{
                   rotate: (isAddingComment || isUpdatingComment) ? 45 : 0,
-                  scale: newComment.trim() ? 1.02 : 1,
+                  scale: hasContent ? 1.02 : 1,
                 }}
                 onClick={onSubmit}
-                disabled={!newComment.trim() || isAddingComment || isUpdatingComment}
+                disabled={!hasContent || isAddingComment || isUpdatingComment}
                 className={cn(
                   'w-8 h-8 rounded-full relative overflow-hidden',
                   'flex items-center justify-center',
                   'transition-all duration-200',
-                  newComment.trim()
+                  hasContent
                     ? editingComment
                       ? 'bg-amber-500 text-white hover:bg-amber-600 shadow-lg shadow-amber-500/25'
                       : isDark
@@ -346,7 +378,7 @@ export const CommentInput: React.FC<CommentInputProps> = ({
               "rounded-[16px] overflow-hidden shadow-xl"
             )}
             style={{
-              bottom: 'calc(75dvh - 60px)',
+              bottom: `calc(${sheetHeight} - 60px)`,
               left: '16px',
               right: '16px',
               maxWidth: 'calc(100% - 32px)',

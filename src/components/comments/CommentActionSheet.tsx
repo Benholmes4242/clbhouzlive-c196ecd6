@@ -1,7 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { X, Copy, Flag, Ban, Trash2, Pencil } from 'lucide-react';
+import { X, Copy, Flag, Ban, Trash2, Pencil, Link } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
+import { generateCommentLink } from '@/components/comments/CommentDeepLink';
 
 interface CommentActionSheetProps {
   isOpen: boolean;
@@ -17,6 +19,8 @@ interface CommentActionSheetProps {
   isCaddiePick?: boolean;
   onSetCaddiePick?: () => void;
   onRemoveCaddiePick?: () => void;
+  postId?: string;
+  commentId?: string;
 }
 
 export const CommentActionSheet: React.FC<CommentActionSheetProps> = ({
@@ -33,8 +37,19 @@ export const CommentActionSheet: React.FC<CommentActionSheetProps> = ({
   isCaddiePick = false,
   onSetCaddiePick,
   onRemoveCaddiePick,
+  postId,
+  commentId,
 }) => {
   if (!isOpen) return null;
+
+  const handleCopyLink = () => {
+    if (postId && commentId) {
+      const link = generateCommentLink(postId, commentId);
+      navigator.clipboard.writeText(link);
+      toast.success('Comment link copied');
+      onClose();
+    }
+  };
 
   return (
     <motion.div
@@ -44,10 +59,7 @@ export const CommentActionSheet: React.FC<CommentActionSheetProps> = ({
       className="fixed inset-0 z-[200] flex items-end justify-center"
       onClick={onClose}
     >
-      <div className={cn(
-        "absolute inset-0",
-        isDark ? "bg-black/60" : "bg-black/40"
-      )} />
+      <div className={cn("absolute inset-0", isDark ? "bg-black/60" : "bg-black/40")} />
       <motion.div
         initial={{ y: '100%' }}
         animate={{ y: 0 }}
@@ -113,6 +125,22 @@ export const CommentActionSheet: React.FC<CommentActionSheetProps> = ({
               <span className={cn("text-[15px]", isDark ? "text-white" : "text-foreground")}>Copy text</span>
             </button>
             <div className={cn("h-px mx-4", isDark ? "bg-white/10" : "bg-border/50")} />
+            {/* Copy Link */}
+            {postId && commentId && (
+              <>
+                <button
+                  onClick={handleCopyLink}
+                  className={cn(
+                    "w-full flex items-center gap-3 px-5 py-4 transition-colors",
+                    isDark ? "hover:bg-white/5" : "hover:bg-muted/50"
+                  )}
+                >
+                  <Link className={cn("w-5 h-5", isDark ? "text-white/70" : "text-muted-foreground")} />
+                  <span className={cn("text-[15px]", isDark ? "text-white" : "text-foreground")}>Copy link</span>
+                </button>
+                <div className={cn("h-px mx-4", isDark ? "bg-white/10" : "bg-border/50")} />
+              </>
+            )}
             <button
               onClick={() => { onDelete?.(); onClose(); }}
               className={cn(
@@ -137,6 +165,22 @@ export const CommentActionSheet: React.FC<CommentActionSheetProps> = ({
               <span className={cn("text-[15px]", isDark ? "text-white" : "text-foreground")}>Copy text</span>
             </button>
             <div className={cn("h-px mx-4", isDark ? "bg-white/10" : "bg-border/50")} />
+            {/* Copy Link */}
+            {postId && commentId && (
+              <>
+                <button
+                  onClick={handleCopyLink}
+                  className={cn(
+                    "w-full flex items-center gap-3 px-5 py-4 transition-colors",
+                    isDark ? "hover:bg-white/5" : "hover:bg-muted/50"
+                  )}
+                >
+                  <Link className={cn("w-5 h-5", isDark ? "text-white/70" : "text-muted-foreground")} />
+                  <span className={cn("text-[15px]", isDark ? "text-white" : "text-foreground")}>Copy link</span>
+                </button>
+                <div className={cn("h-px mx-4", isDark ? "bg-white/10" : "bg-border/50")} />
+              </>
+            )}
             <button
               onClick={() => { onReport?.(); }}
               className={cn(

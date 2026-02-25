@@ -24,3 +24,6 @@ export { RichCommentToolbar } from './RichCommentToolbar';
 export { generateCommentLink, parseCommentLink, getSmartNotificationCopy } from './CommentDeepLink';
 export { VoiceNotePlayer } from './VoiceNotePlayer';
 export { AnimatedCount } from './AnimatedCount';
+export { SwipeableComment } from './SwipeableComment';
+export { CommentImage } from './CommentImage';
+export { default as CommentDeepLinkHandler } from './CommentDeepLinkHandler';

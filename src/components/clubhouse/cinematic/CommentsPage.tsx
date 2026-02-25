@@ -6,7 +6,7 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { toast } from 'sonner';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,12 +18,14 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 import { useCommentsWithReplies, CommentWithReplies, CommentReply } from '@/hooks/useCommentsWithReplies';
 import { useHiddenComments } from '@/hooks/useHiddenComments';
 import { useCaddiePick } from '@/hooks/useCaddiePick';
 import { useCommentsRealtime } from '@/hooks/useCommentsRealtime';
 import { useCommentReactions } from '@/hooks/useCommentReactions';
 import { useActiveActor } from '@/context/ActiveActorContext';
+import { useAmbientColor } from '@/hooks/useAmbientColor';
 import { SPRING_SNAPPY } from '@/lib/motionTokens';
 import { MentionSuggestion } from '@/components/post/post-wizard/steps/MentionBottomSheet';
 
@@ -38,11 +40,13 @@ import { TypingPresence } from '@/components/comments/TypingPresence';
 import { LivePresenceBar } from '@/components/comments/LivePresenceBar';
 import { RichCommentToolbar } from '@/components/comments/RichCommentToolbar';
 import { triggerHaptic } from '@/components/comments/utils';
+import { X } from 'lucide-react';
 
 interface CommentsPageProps {
   isOpen: boolean;
   onClose: () => void;
   postId: string;
+  postImageUrl?: string;
   videoThumbnail?: string;
   creatorName?: string;
   creatorAvatar?: string;
@@ -74,6 +78,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   isOpen,
   onClose,
   postId,
+  postImageUrl,
   theme = 'dark',
   currentUserId,
   creatorUserId,
@@ -107,6 +112,14 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
     commentId: string | null;
     position: { x: number; y: number };
   }>({ isOpen: false, commentId: null, position: { x: 0, y: 0 } });
+
+  // Dual-snap sheet state
+  const [sheetPosition, setSheetPosition] = useState<'peek' | 'full'>('peek');
+  const sheetHeight = sheetPosition === 'peek' ? '75dvh' : '95dvh';
+
+  // Photo attachment state
+  const [attachedPhoto, setAttachedPhoto] = useState<{ file: File; previewUrl: string } | null>(null);
+
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const commentsListRef = useRef<HTMLDivElement>(null);
   const commentRefs = useRef<Map<string, HTMLDivElement>>(new Map());
@@ -135,6 +148,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   useCommentsRealtime(postId);
   const { getReactionsForComment, toggleReaction } = useCommentReactions(postId, currentUserId);
   const { activeActor } = useActiveActor();
+  const { ambientColor } = useAmbientColor(postImageUrl, postId);
 
   const isDark = theme === 'dark';
   const isGrey = theme === 'grey';
@@ -144,16 +158,13 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   const sortedComments = useMemo(() => {
     let sorted = [...comments];
     
-    // Sort by mode
     if (sortMode === 'best') {
       sorted.sort((a, b) => {
         const getScore = (c: typeof a) => (c.likes_count || 0) + (c.replies_count || 0) + (getReactionsForComment(c.id).reactions?.length || 0);
         return getScore(b) - getScore(a);
       });
     }
-    // 'newest' is the default order from the paginated query (ascending created_at)
     
-    // Pin caddie pick to top regardless of sort
     if (caddiePickCommentId) {
       const idx = sorted.findIndex(c => c.id === caddiePickCommentId);
       if (idx > 0) {
@@ -219,6 +230,11 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
     }
   }, [isOpen]);
 
+  // Reset sheet position on close
+  useEffect(() => {
+    if (!isOpen) setSheetPosition('peek');
+  }, [isOpen]);
+
   // Deep linking
   useEffect(() => {
     if (!isOpen) { hasHandledInitialLinkRef.current = false; return; }
@@ -264,11 +280,46 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
     setTimeout(() => inputRef.current?.focus(), 100);
   }, []);
 
+  // Dual-snap drag handler
+  const handleSheetDragEnd = useCallback((_: any, info: PanInfo) => {
+    const velocity = info.velocity.y;
+    const offset = info.offset.y;
+
+    if (sheetPosition === 'full') {
+      if (offset > 100 || velocity > 500) {
+        if (offset > 250 || velocity > 1000) {
+          onClose();
+        } else {
+          setSheetPosition('peek');
+        }
+      }
+    } else {
+      if (offset < -50 || velocity < -300) {
+        setSheetPosition('full');
+      } else if (offset > 80 || velocity > 500) {
+        onClose();
+      }
+    }
+  }, [sheetPosition, onClose]);
+
+  // Photo attachment handler
+  const handlePhotoSelected = useCallback((photo: { file: File; previewUrl: string }) => {
+    setAttachedPhoto(photo);
+  }, []);
+
+  const handleRemovePhoto = useCallback(() => {
+    if (attachedPhoto) {
+      URL.revokeObjectURL(attachedPhoto.previewUrl);
+      setAttachedPhoto(null);
+    }
+  }, [attachedPhoto]);
+
   const handleSubmitComment = useCallback(async () => {
     const content = newComment.trim();
-    if (!content || isAddingComment || isUpdatingComment) return;
+    if ((!content && !attachedPhoto) || isAddingComment || isUpdatingComment) return;
 
     if (editingComment) {
+      if (!content) return;
       const commentId = editingComment.id;
       setNewComment('');
       setEditingComment(null);
@@ -284,21 +335,46 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
       return;
     }
 
+    // Handle photo upload
+    let mediaUrl: string | undefined;
+    let mediaType: string | undefined;
+
+    if (attachedPhoto) {
+      const user = (await supabase.auth.getUser()).data.user;
+      if (!user) { toast.error('Sign in to attach photos'); return; }
+
+      const ext = attachedPhoto.file.name.split('.').pop() || 'jpg';
+      const filePath = `${user.id}/${crypto.randomUUID()}.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('comment-images')
+        .upload(filePath, attachedPhoto.file, { contentType: attachedPhoto.file.type });
+
+      if (uploadError) {
+        toast.error('Failed to upload image');
+        return;
+      }
+
+      mediaUrl = filePath;
+      mediaType = 'image';
+    }
+
     const parentId = replyingTo?.topLevelId ?? undefined;
     setNewComment('');
     setReplyingTo(null);
     setShowEmojiPicker(false);
     setShowMentions(false);
+    handleRemovePhoto();
     triggerHaptic('success');
 
     try {
-      const newCommentId = await addComment(content, parentId);
+      const newCommentId = await addComment(content || '', parentId, mediaUrl && mediaType ? { mediaUrl, mediaType } : undefined);
       if (parentId) setExpandedReplies(prev => new Set(prev).add(parentId));
       setTimeout(() => highlightComment(newCommentId, true), 150);
     } catch (error) {
       console.error('Failed to add comment:', error);
     }
-  }, [newComment, isAddingComment, isUpdatingComment, editingComment, updateComment, addComment, replyingTo, highlightComment]);
+  }, [newComment, attachedPhoto, isAddingComment, isUpdatingComment, editingComment, updateComment, addComment, replyingTo, highlightComment, handleRemovePhoto]);
 
   const handleSubmitVoice = useCallback(async (mediaUrl: string, durationSeconds: number) => {
     if (isAddingComment) return;
@@ -407,7 +483,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
           {/* Panel */}
           <motion.div
             initial={{ y: '100%' }}
-            animate={{ y: 0 }}
+            animate={{ y: 0, height: sheetHeight }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
             className={cn(
@@ -416,11 +492,21 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               !isDark && (isGrey ? 'bg-muted' : 'bg-[#f8fafc]')
             )}
             style={{
-              height: '75dvh',
               boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.15)',
               ...(isDark ? { background: '#0d0d0d' } : {}),
+              ...(sheetPosition === 'full' ? { paddingTop: 'env(safe-area-inset-top, 0px)' } : {}),
             }}
           >
+            {/* Ambient color gradient overlay */}
+            <div
+              className="absolute top-0 left-0 right-0 pointer-events-none rounded-t-3xl z-0"
+              style={{
+                height: '80px',
+                background: `linear-gradient(to bottom, ${ambientColor}, transparent)`,
+                transition: 'background 0.5s ease',
+              }}
+            />
+
             {/* Dark mode overlays */}
             {isDark && (
               <>
@@ -435,19 +521,46 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               </>
             )}
 
-            {/* Drag handle */}
-            <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
+            {/* Drag handle — draggable for dual-snap */}
+            <motion.div
+              drag="y"
+              dragConstraints={{ top: 0, bottom: 0 }}
+              dragElastic={0.2}
+              onDragEnd={handleSheetDragEnd}
+              className="flex justify-center pt-3 pb-1 flex-shrink-0 cursor-grab active:cursor-grabbing relative z-10"
+            >
               <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
-            </div>
+            </motion.div>
 
             {/* Header */}
-            <CommentsHeader
-              isDark={isDark}
-              commentCount={comments.length}
-              onClose={onClose}
-              sortMode={sortMode}
-              onSortChange={setSortMode}
-            />
+            <div className="relative z-10 flex items-center">
+              <div className="flex-1">
+                <CommentsHeader
+                  isDark={isDark}
+                  commentCount={comments.length}
+                  onClose={onClose}
+                  sortMode={sortMode}
+                  onSortChange={setSortMode}
+                />
+              </div>
+              {/* Close button in full mode */}
+              <AnimatePresence>
+                {sheetPosition === 'full' && (
+                  <motion.button
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    onClick={onClose}
+                    className={cn(
+                      "absolute right-4 top-3 w-8 h-8 flex items-center justify-center rounded-full z-20",
+                      isDark ? "bg-white/8 hover:bg-white/12 text-white/60" : "bg-muted/60 hover:bg-muted text-muted-foreground"
+                    )}
+                  >
+                    <X className="w-4 h-4" />
+                  </motion.button>
+                )}
+              </AnimatePresence>
+            </div>
 
             {/* Live presence bar */}
             <LivePresenceBar
@@ -511,6 +624,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                 setNewComment(prev => prev + text);
                 setTimeout(() => inputRef.current?.focus(), 50);
               }}
+              onPhotoSelected={handlePhotoSelected}
             />
 
             {/* Input */}
@@ -536,6 +650,9 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               mentionQuery={mentionQuery}
               onMentionSelect={handleMentionSelect}
               inputRef={inputRef as React.RefObject<HTMLTextAreaElement>}
+              attachedPhoto={attachedPhoto}
+              onRemovePhoto={handleRemovePhoto}
+              sheetHeight={sheetHeight}
             />
           </motion.div>
 
@@ -556,6 +673,8 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                 isCaddiePick={selectedComment?.id === caddiePickCommentId}
                 onSetCaddiePick={() => selectedComment && setCaddiePick(selectedComment.id)}
                 onRemoveCaddiePick={() => removeCaddiePick()}
+                postId={postId}
+                commentId={selectedComment?.id}
               />
             )}
           </AnimatePresence>
