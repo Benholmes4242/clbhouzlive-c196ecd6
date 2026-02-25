@@ -44,19 +44,20 @@ export function getHandicapStatusLabel(handicap: number): string | null {
 
 /**
  * Get status color based on handicap value.
- * Matches getHandicapStatusLabel thresholds.
+ * Plus/Scratch = gold, Single Figure = seasonColor (defaults to green), Mid/High = muted.
  */
-export function getHandicapStatusColor(handicap: number): string {
+export function getHandicapStatusColor(handicap: number, seasonColor?: string): string {
   if (handicap < -0.4) return '#D4A853'; // Gold - plus figure
   if (handicap >= -0.4 && handicap <= 0.4) return '#D4A853'; // Gold - scratch
-  if (handicap >= 0.5 && handicap <= 9.9) return '#40916C'; // Green - single figure
+  if (handicap >= 0.5 && handicap <= 9.9) return seasonColor || '#40916C'; // Season color - single figure
   return 'hsl(var(--muted-foreground))'; // Muted for mid/high
 }
 
 /**
  * Get handicap category badge styling.
+ * Single Figure tier accepts optional seasonColor for season-aware tinting.
  */
-export function getHandicapBadgeStyle(handicap: number): {
+export function getHandicapBadgeStyle(handicap: number, seasonColor?: string): {
   bg: string;
   text: string;
   border: string;
@@ -71,11 +72,14 @@ export function getHandicapBadgeStyle(handicap: number): {
     text: '#C4963E',
     border: 'rgba(212, 168, 83, 0.25)',
   };
-  if (handicap >= 0.5 && handicap <= 9.9) return {
-    bg: 'rgba(82, 183, 136, 0.10)',
-    text: '#40916C',
-    border: 'rgba(82, 183, 136, 0.2)',
-  };
+  if (handicap >= 0.5 && handicap <= 9.9) {
+    const color = seasonColor || '#40916C';
+    return {
+      bg: `${color}1A`,      // ~10% opacity
+      text: color,
+      border: `${color}33`,  // ~20% opacity
+    };
+  }
   if (handicap >= 10.0 && handicap <= 19.9) return {
     bg: 'rgba(0, 0, 0, 0.04)',
     text: 'hsl(var(--muted-foreground))',

@@ -12,38 +12,48 @@ interface HandicapPodiumSlotProps {
   handicap: number;
   isCurrentUser?: boolean;
   animationDelay?: number;
+  seasonColor?: string;
 }
 
 const POSITION_CONFIG = {
   1: {
-    avatarSize: 110,
+    avatarSize: 120,
     borderWidth: 0.5,
     borderGradient: 'linear-gradient(135deg, #D4A853, #F0D78C, #D4A853)',
-    badgeSize: 28,
-    nameClass: 'text-base font-bold',
+    badgeSize: 26,
+    nameSize: 17,
+    nameWeight: 700,
+    statSize: 24,
+    statWeight: 800,
     glowShadow: '0 8px 28px rgba(212, 168, 83, 0.25)',
     showCrown: true,
     verticalOffset: 0,
   },
   2: {
-    avatarSize: 80,
+    avatarSize: 88,
     borderWidth: 0.5,
     borderGradient: '#A8B4C0',
-    badgeSize: 24,
-    nameClass: 'text-sm font-semibold',
+    badgeSize: 22,
+    nameSize: 15,
+    nameWeight: 600,
+    statSize: 20,
+    statWeight: 700,
     glowShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
     showCrown: false,
-    verticalOffset: 20,
+    verticalOffset: 24,
   },
   3: {
-    avatarSize: 80,
+    avatarSize: 88,
     borderWidth: 0.5,
     borderGradient: '#C4956A',
-    badgeSize: 24,
-    nameClass: 'text-sm font-semibold',
+    badgeSize: 22,
+    nameSize: 15,
+    nameWeight: 600,
+    statSize: 20,
+    statWeight: 700,
     glowShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
     showCrown: false,
-    verticalOffset: 32,
+    verticalOffset: 40,
   },
 } as const;
 
@@ -67,11 +77,13 @@ export function HandicapPodiumSlot({
   handicap,
   isCurrentUser = false,
   animationDelay = 0,
+  seasonColor,
 }: HandicapPodiumSlotProps) {
   const config = POSITION_CONFIG[rank];
   const nameParts = formatNameTwoLines(displayName);
   const statusLabel = getHandicapStatusLabel(handicap);
-  const badgeStyle = getHandicapBadgeStyle(handicap);
+  const badgeStyle = getHandicapBadgeStyle(handicap, seasonColor);
+  const handicapColor = getHandicapStatusColor(handicap, seasonColor);
   const badge = BADGE_COLORS[rank];
 
   const initials = displayName
@@ -108,7 +120,7 @@ export function HandicapPodiumSlot({
           </motion.div>
         )}
 
-        {/* Avatar with ring */}
+        {/* Avatar with ring — CIRCULAR */}
         <div className="relative">
           {/* Spotlight glow for #1 */}
           {rank === 1 && (
@@ -124,8 +136,8 @@ export function HandicapPodiumSlot({
             className="relative overflow-hidden"
             style={{
               width: config.avatarSize,
-              aspectRatio: '1 / 1.05',
-              borderRadius: '34%',
+              height: config.avatarSize,
+              borderRadius: '50%',
               border: rank === 1
                 ? `${config.borderWidth}px solid transparent`
                 : `${config.borderWidth}px solid ${config.borderGradient}`,
@@ -146,13 +158,13 @@ export function HandicapPodiumSlot({
             )}
           </div>
 
-          {/* Rank badge — bottom-right */}
+          {/* Rank badge — circular */}
           <div
             className="absolute -bottom-1.5 -right-0.5 flex items-center justify-center font-bold shadow-md"
             style={{
               width: config.badgeSize,
               height: config.badgeSize,
-              borderRadius: '34%',
+              borderRadius: '50%',
               background: badge.bg,
               color: badge.text,
               fontSize: rank === 1 ? 14 : 12,
@@ -165,24 +177,30 @@ export function HandicapPodiumSlot({
 
         {/* Name */}
         <div className="mt-2.5 text-center max-w-[120px]">
-          {/* "You" label */}
+          {/* "You" label — season colored */}
           {isCurrentUser && (
-            <p className="text-xs font-medium mb-0.5" style={{ color: '#40916C' }}>You</p>
+            <p className="text-xs font-medium mb-0.5" style={{ color: seasonColor || '#40916C' }}>You</p>
           )}
-          <p className={cn('text-foreground leading-tight', config.nameClass)}>
+          <p
+            className="text-foreground leading-tight"
+            style={{ fontSize: config.nameSize, fontWeight: config.nameWeight }}
+          >
             {nameParts.firstName}
           </p>
           {nameParts.lastName && (
-            <p className={cn('text-foreground leading-tight', config.nameClass)}>
+            <p
+              className="text-foreground leading-tight"
+              style={{ fontSize: config.nameSize, fontWeight: config.nameWeight }}
+            >
               {nameParts.lastName}
             </p>
           )}
         </div>
 
-        {/* Handicap value */}
+        {/* Handicap value — category colored */}
         <motion.p
-          className="text-lg font-bold mt-1"
-          style={{ color: '#40916C' }}
+          className="mt-1"
+          style={{ color: handicapColor, fontSize: config.statSize, fontWeight: config.statWeight }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: animationDelay + 0.3, duration: 0.3 }}

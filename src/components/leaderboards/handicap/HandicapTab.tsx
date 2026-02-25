@@ -1,10 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 import { LeaderboardScopeSelector } from '../shared';
 import { ClubSearchBar } from '../exploration/ClubSearchBar';
 import { CountrySelector } from '../shared/CountrySelector';
 import { LowestHandicapLeaderboard } from './LowestHandicapLeaderboard';
+import { useSeasonCalendar } from '@/hooks/championship';
+import { getSeasonConfig, type SeasonId } from '@/lib/seasonConfig';
 import type { LeaderboardScope } from '@/types/leaderboards';
 
 const STORAGE_KEY_FILTERS = 'handicap-leaderboard-filters';
@@ -27,6 +29,19 @@ export function HandicapTab() {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(() => savedFilters?.selectedCountry ?? null);
   const [userHomeClubId, setUserHomeClubId] = useState<string | null>(null);
   const [userHomeClubName, setUserHomeClubName] = useState<string | null>(null);
+
+  // Derive season color
+  const { data: seasonCalendar } = useSeasonCalendar();
+  const seasonThemeColor = useMemo(() => {
+    const currentSeason = seasonCalendar?.find(s => s.is_current);
+    if (!currentSeason) return '#006747';
+    const lower = currentSeason.name.toLowerCase();
+    let id: SeasonId = 'major';
+    if (lower.includes('pre-season') || lower.includes('preseason') || lower.includes('training')) id = 'preseason';
+    else if (lower.includes('summer')) id = 'summer';
+    else if (lower.includes('off-season') || lower.includes('offseason')) id = 'offseason';
+    return getSeasonConfig(id).themeColor;
+  }, [seasonCalendar]);
 
   // Save filters
   useEffect(() => {
@@ -77,17 +92,18 @@ export function HandicapTab() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <LowestHandicapLeaderboard 
         scope={scope} 
         clubId={scope === 'club' ? selectedClubId : null}
         clubName={scope === 'club' ? selectedClubName : null}
         country={scope === 'country' ? selectedCountry : null}
+        seasonColor={seasonThemeColor}
         scopeSelector={
           <div className="space-y-4">
             <LeaderboardScopeSelector value={scope} onChange={setScope} />
             {scope === 'country' && (
-              <div className="px-4">
+              <div className="px-5">
                 <CountrySelector
                   selectedCountry={selectedCountry}
                   onCountrySelect={setSelectedCountry}
@@ -95,7 +111,7 @@ export function HandicapTab() {
               </div>
             )}
             {scope === 'club' && (
-              <div className="px-4">
+              <div className="px-5">
                 <ClubSearchBar
                   selectedClubId={selectedClubId}
                   selectedClubName={selectedClubName}
