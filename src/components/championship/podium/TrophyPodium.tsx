@@ -1,5 +1,6 @@
 import React from 'react';
 import { SeasonalPodiumEntry } from '@/types/podium';
+import { getSeasonGradient } from '@/lib/colorUtils';
 import { TrophyPodiumSlot } from './TrophyPodiumSlot';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -79,7 +80,7 @@ export const TrophyPodium: React.FC<TrophyPodiumProps> = ({
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse 60% 80% at 50% 35%, rgba(82, 183, 136, 0.06) 0%, transparent 70%)',
+          background: `radial-gradient(ellipse 60% 80% at 50% 35%, ${getSeasonGradient(seasonThemeColor).subtleTint} 0%, transparent 70%)`,
         }}
       />
 

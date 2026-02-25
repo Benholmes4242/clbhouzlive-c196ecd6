@@ -1,6 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Check, ChevronDown, Trophy } from 'lucide-react';
+import { getSeasonGradient } from '@/lib/colorUtils';
 
 interface Division {
   id: string;
@@ -19,6 +20,7 @@ interface Props {
   onToggle: () => void;
   totalDivisions: number;
   completedCount: number;
+  seasonColor?: string;
 }
 
 export const DivisionProgressPreview: React.FC<Props> = ({
@@ -30,8 +32,11 @@ export const DivisionProgressPreview: React.FC<Props> = ({
   onToggle,
   totalDivisions,
   completedCount,
+  seasonColor = '#006747',
 }) => {
   if (!currentDivision) return null;
+
+  const gradient = getSeasonGradient(seasonColor);
 
   const calculateProgress = (): number => {
     if (!nextDivision) return 100;
@@ -47,10 +52,10 @@ export const DivisionProgressPreview: React.FC<Props> = ({
       {/* Current Club Row */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2.5">
-          {/* Green check circle */}
+          {/* Season-colored check circle */}
           <div
             className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
-            style={{ backgroundColor: '#40916C' }}
+            style={{ backgroundColor: seasonColor }}
           >
             <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
           </div>
@@ -61,23 +66,23 @@ export const DivisionProgressPreview: React.FC<Props> = ({
           <div
             className="inline-flex items-center gap-1.5 px-2 py-0.5"
             style={{
-              backgroundColor: 'rgba(82, 183, 136, 0.12)',
+              backgroundColor: gradient.tint,
               borderRadius: '6px',
             }}
           >
             <span className="relative flex h-1.5 w-1.5">
               <span
                 className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-50"
-                style={{ backgroundColor: '#40916C' }}
+                style={{ backgroundColor: seasonColor }}
               />
               <span
                 className="relative inline-flex rounded-full h-1.5 w-1.5"
-                style={{ backgroundColor: '#40916C' }}
+                style={{ backgroundColor: seasonColor }}
               />
             </span>
             <span
               className="text-xs font-semibold uppercase tracking-wide"
-              style={{ color: '#40916C' }}
+              style={{ color: seasonColor }}
             >
               Current
             </span>
@@ -96,14 +101,14 @@ export const DivisionProgressPreview: React.FC<Props> = ({
               className="h-full rounded-full transition-all duration-500"
               style={{
                 width: `${progressPercent}%`,
-                background: 'linear-gradient(to right, #2D6A4F, #52B788)',
+                background: `linear-gradient(to right, ${gradient.dark}, ${gradient.light})`,
               }}
             />
           </div>
-          {/* "X to Fairway" label */}
+          {/* "X to Next" label */}
           <div className="flex justify-end mt-1.5">
             <span className="text-xs text-muted-foreground">
-              <span className="font-bold" style={{ color: '#40916C' }}>
+              <span className="font-bold" style={{ color: seasonColor }}>
                 {coursesToNext}
               </span>{' '}
               to {nextDivision.name}
@@ -126,13 +131,13 @@ export const DivisionProgressPreview: React.FC<Props> = ({
         onClick={onToggle}
         className="w-full flex items-center justify-center gap-1.5 pt-1 active:scale-[0.98] transition-transform"
       >
-        <span className="text-sm font-medium" style={{ color: '#40916C' }}>
+        <span className="text-sm font-medium" style={{ color: seasonColor }}>
           {isExpanded ? 'Hide Division Ladder' : 'View Division Ladder'}
         </span>
         <ChevronDown
           className="w-3.5 h-3.5 transition-transform duration-200"
           style={{
-            color: '#40916C',
+            color: seasonColor,
             transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
           }}
         />

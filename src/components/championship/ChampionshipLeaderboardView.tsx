@@ -544,6 +544,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           seasonData={seasonData}
           isLoading={!seasonCalendar}
           onSeasonClick={(id) => console.log('Season chip clicked:', id)}
+          seasonColor={seasonThemeColor}
         />
       )}
 
@@ -591,6 +592,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
             onToggle={() => setShowDivisionLadder(!showDivisionLadder)}
             totalDivisions={divisionLadderData.length}
             completedCount={divisionLadderData.filter(d => d.status === 'completed').length}
+            seasonColor={seasonThemeColor}
           />
           
           {/* Full Division Ladder (expandable with animation) */}
@@ -605,6 +607,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
               userCourses={userStatus.courses_this_season}
               coursesToNext={nextDivision.coursesToNext}
               nextDivisionName={nextDivision.name}
+              seasonColor={seasonThemeColor}
             />
           </div>
         </>
@@ -739,6 +742,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                   homeClubName={entry.home_club}
                   courses={entry.courses_this_season}
                   isCurrentUser={entry.is_current_user}
+                  seasonColor={timeFilter === 'seasonal' ? seasonThemeColor : '#D4A853'}
                   onClick={() => handleEntryClick(entry.user_id)}
                 />
               ))}
@@ -755,7 +759,8 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                 avatarUrl={entry.avatar_url}
                 homeClubName={entry.home_club}
                 courses={entry.courses_this_season}
-                isCurrentUser={entry.is_current_user}
+                  isCurrentUser={entry.is_current_user}
+                  seasonColor={timeFilter === 'seasonal' ? seasonThemeColor : '#D4A853'}
                 onClick={() => handleEntryClick(entry.user_id)}
               />
             ))}

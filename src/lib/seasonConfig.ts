@@ -27,7 +27,7 @@ export const SEASON_CONFIG: Record<SeasonId, SeasonConfig> = {
     label: 'Pre-Season',
     title: 'Pre-Season Training',
     subtitle: 'Get match ready',
-    themeColor: '#334E3D', // Golf Emerald - country club green
+    themeColor: '#B8E600', // Bright lime - energy, anticipation
     Icon: Dumbbell,
   },
   major: {
@@ -35,7 +35,7 @@ export const SEASON_CONFIG: Record<SeasonId, SeasonConfig> = {
     label: 'Major',
     title: 'Major Season',
     subtitle: 'Championship time',
-    themeColor: '#C1A84C', // Golf Chartreus - refined gold
+    themeColor: '#006747', // Augusta National green - prestige
     Icon: Trophy,
   },
   summer: {
@@ -43,7 +43,7 @@ export const SEASON_CONFIG: Record<SeasonId, SeasonConfig> = {
     label: 'Summer',
     title: 'Summer Season',
     subtitle: 'Keep the momentum',
-    themeColor: '#E5D0A1', // Golf Pale Lime - warm sand
+    themeColor: '#F59E0B', // Warm amber - sun-drenched rounds
     Icon: Sun,
   },
   offseason: {
@@ -51,7 +51,7 @@ export const SEASON_CONFIG: Record<SeasonId, SeasonConfig> = {
     label: 'Off-Season',
     title: 'Off-Season Rest',
     subtitle: 'Rest and reflect',
-    themeColor: '#B8C6C9', // Golf Sky Blue - cool mist
+    themeColor: '#475569', // Slate - reflective, cool
     Icon: Moon,
   },
 };

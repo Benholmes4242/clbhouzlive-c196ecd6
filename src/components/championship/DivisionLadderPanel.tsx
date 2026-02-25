@@ -1,6 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Lock, Check, ChevronRight } from 'lucide-react';
+import { getSeasonGradient } from '@/lib/colorUtils';
 
 interface Division {
   id: string;
@@ -16,6 +17,7 @@ interface DivisionLadderPanelProps {
   coursesToNext: number;
   nextDivisionName: string;
   estimatedRounds?: number;
+  seasonColor?: string;
 }
 
 /**
@@ -26,7 +28,10 @@ export const DivisionLadderPanel: React.FC<DivisionLadderPanelProps> = ({
   userCourses,
   coursesToNext,
   nextDivisionName,
+  seasonColor = '#006747',
 }) => {
+  const gradient = getSeasonGradient(seasonColor);
+
   // Track locked index for progressive fade
   let lockedIndex = 0;
 
@@ -36,7 +41,7 @@ export const DivisionLadderPanel: React.FC<DivisionLadderPanelProps> = ({
       (currentStatus === 'completed' && nextStatus === 'current') ||
       (currentStatus === 'completed' && nextStatus === 'completed')
     ) {
-      return { width: 2, color: '#40916C', dashed: false };
+      return { width: 2, color: seasonColor, dashed: false };
     }
     if (currentStatus === 'current' && nextStatus === 'next') {
       return { width: 2, gradient: true, dashed: false };
@@ -70,8 +75,8 @@ export const DivisionLadderPanel: React.FC<DivisionLadderPanelProps> = ({
               )}
               style={{
                 ...(division.status === 'current' && {
-                  backgroundColor: 'rgba(82, 183, 136, 0.04)',
-                  borderLeft: '3px solid #40916C',
+                  backgroundColor: gradient.subtleTint,
+                  borderLeft: `3px solid ${seasonColor}`,
                   borderRadius: '12px',
                 }),
                 ...(division.status === 'next' && {
@@ -81,15 +86,15 @@ export const DivisionLadderPanel: React.FC<DivisionLadderPanelProps> = ({
                 }),
               }}
             >
-              {/* Icon circle */}
+              {/* Icon circle — uses division.color for completed/current */}
               <div
                 className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
                 style={{
                   ...(division.status === 'completed' && {
-                    backgroundColor: '#40916C',
+                    backgroundColor: division.color || seasonColor,
                   }),
                   ...(division.status === 'current' && {
-                    backgroundColor: '#40916C',
+                    backgroundColor: seasonColor,
                   }),
                   ...(division.status === 'next' && {
                     backgroundColor: 'rgba(212, 168, 83, 0.15)',
@@ -148,23 +153,23 @@ export const DivisionLadderPanel: React.FC<DivisionLadderPanelProps> = ({
                 <div
                   className="inline-flex items-center gap-1.5 px-2 py-0.5 flex-shrink-0"
                   style={{
-                    backgroundColor: 'rgba(82, 183, 136, 0.12)',
+                    backgroundColor: gradient.tint,
                     borderRadius: '6px',
                   }}
                 >
                   <span className="relative flex h-1.5 w-1.5">
                     <span
                       className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-50"
-                      style={{ backgroundColor: '#40916C' }}
+                      style={{ backgroundColor: seasonColor }}
                     />
                     <span
                       className="relative inline-flex rounded-full h-1.5 w-1.5"
-                      style={{ backgroundColor: '#40916C' }}
+                      style={{ backgroundColor: seasonColor }}
                     />
                   </span>
                   <span
                     className="text-xs font-semibold uppercase tracking-wide"
-                    style={{ color: '#40916C' }}
+                    style={{ color: seasonColor }}
                   >
                     Current
                   </span>
@@ -186,8 +191,7 @@ export const DivisionLadderPanel: React.FC<DivisionLadderPanelProps> = ({
                     height: '8px',
                     ...(connector.gradient
                       ? {
-                          background:
-                            'linear-gradient(to bottom, #40916C, rgba(212, 168, 83, 0.4))',
+                          background: `linear-gradient(to bottom, ${seasonColor}, rgba(212, 168, 83, 0.4))`,
                         }
                       : {
                           backgroundColor: connector.color,

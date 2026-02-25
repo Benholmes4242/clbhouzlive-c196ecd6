@@ -193,7 +193,7 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
       {/* Stat — green number + muted label */}
       <motion.p
         className={cn('font-bold mt-0.5', config.statClass)}
-        style={{ color: '#40916C' }}
+        style={{ color: '#D4A853' }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: animationDelay + 0.3, duration: 0.3 }}

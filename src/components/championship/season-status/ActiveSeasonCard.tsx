@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { getSeasonConfig, SEASON_ORDER, type SeasonId } from '@/lib/seasonConfig';
+import { getSeasonGradient } from '@/lib/colorUtils';
 import { Lock } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -14,27 +15,26 @@ interface ActiveSeasonCardProps {
   progressPercent: number;
   seasonData?: Record<SeasonId, SeasonData>;
   onSeasonSelect?: (seasonId: SeasonId) => void;
+  seasonColor?: string;
   className?: string;
 }
 
-/**
- * ActiveSeasonCard — Hero season section floating on page background.
- * No card wrapper. Progress ring is a statement piece with gradient stroke.
- * Season selector tabs use pill-container treatment.
- */
 export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
   seasonId,
   daysRemaining,
   progressPercent,
   seasonData = {},
   onSeasonSelect,
+  seasonColor,
   className,
 }) => {
   const config = getSeasonConfig(seasonId);
-  
+  const color = seasonColor || config.themeColor;
+  const gradient = getSeasonGradient(color);
+
   // Animated progress ring fill
   const [animatedProgress, setAnimatedProgress] = useState(0);
-  
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setAnimatedProgress(progressPercent);
@@ -48,6 +48,9 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
   const ringRadius = (ringSize - ringStroke) / 2;
   const ringCircumference = ringRadius * 2 * Math.PI;
   const ringOffset = ringCircumference - (animatedProgress / 100) * ringCircumference;
+
+  // Unique gradient ID to avoid SVG conflicts
+  const gradientId = `seasonRingGradient-${seasonId}`;
 
   // Season state logic
   const getSeasonState = (id: SeasonId): 'active' | 'completed' | 'locked' => {
@@ -68,6 +71,11 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
     }
   };
 
+  // Get the color for each season tab icon
+  const getTabSeasonColor = (id: SeasonId): string => {
+    return getSeasonConfig(id).themeColor;
+  };
+
   return (
     <motion.div
       className={cn('space-y-5', className)}
@@ -81,13 +89,13 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
         <div className="flex-shrink-0 relative" style={{ width: ringSize, height: ringSize }}>
           <svg width={ringSize} height={ringSize} className="transform -rotate-90">
             <defs>
-              <linearGradient id="seasonRingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#2D6A4F" />
-                <stop offset="50%" stopColor="#40916C" />
-                <stop offset="100%" stopColor="#52B788" />
+              <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor={gradient.dark} />
+                <stop offset="50%" stopColor={gradient.mid} />
+                <stop offset="100%" stopColor={gradient.light} />
               </linearGradient>
             </defs>
-            {/* Track — barely visible */}
+            {/* Track */}
             <circle
               cx={ringSize / 2}
               cy={ringSize / 2}
@@ -96,13 +104,13 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
               stroke="rgba(0, 0, 0, 0.06)"
               strokeWidth={ringStroke}
             />
-            {/* Progress arc — gradient stroke */}
+            {/* Progress arc */}
             <circle
               cx={ringSize / 2}
               cy={ringSize / 2}
               r={ringRadius}
               fill="none"
-              stroke="url(#seasonRingGradient)"
+              stroke={`url(#${gradientId})`}
               strokeWidth={ringStroke}
               strokeDasharray={ringCircumference}
               strokeDashoffset={ringOffset}
@@ -118,32 +126,28 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
 
         {/* Season Info */}
         <div className="flex-1 min-w-0">
-          {/* Top row: Label + Active badge */}
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
               Current Season
             </span>
-            {/* Active badge — green pill with pulsing dot */}
-            <div 
+            {/* Active badge — season-colored pill with pulsing dot */}
+            <div
               className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full"
-              style={{ backgroundColor: 'rgba(82, 183, 136, 0.12)' }}
+              style={{ backgroundColor: gradient.tint }}
             >
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-50" style={{ backgroundColor: '#40916C' }} />
-                <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: '#40916C' }} />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-50" style={{ backgroundColor: color }} />
+                <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: color }} />
               </span>
-              <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: '#40916C' }}>
+              <span className="text-xs font-semibold uppercase tracking-wide" style={{ color }}>
                 Active
               </span>
             </div>
           </div>
-          
-          {/* Season name — large and bold */}
+
           <h3 className="text-xl font-bold text-foreground leading-tight">
             {config.title}
           </h3>
-          
-          {/* Tagline */}
           <p className="text-sm text-muted-foreground mt-0.5">
             {config.subtitle}
           </p>
@@ -151,7 +155,7 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
       </div>
 
       {/* Season Selector Tabs — Pill container */}
-      <div 
+      <div
         className="rounded-[14px] p-[3px]"
         style={{ backgroundColor: 'rgba(0, 0, 0, 0.03)' }}
       >
@@ -162,6 +166,7 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
             const state = getSeasonState(id);
             const isLocked = state === 'locked';
             const isActive = state === 'active';
+            const tabColor = getTabSeasonColor(id);
 
             return (
               <button
@@ -176,20 +181,15 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
                   !isLocked && !isActive && 'hover:opacity-60'
                 )}
               >
-                {/* Icon with optional lock overlay */}
                 <div className="relative">
                   <SeasonIcon
                     className={cn('w-4.5 h-4.5', isLocked && 'opacity-50')}
-                    style={{ color: isActive ? '#40916C' : isLocked ? 'hsl(var(--muted-foreground))' : 'hsl(var(--muted-foreground))' }}
+                    style={{ color: isActive ? tabColor : 'hsl(var(--muted-foreground))' }}
                   />
                   {isLocked && (
-                    <Lock 
-                      className="absolute -bottom-0.5 -right-1 w-2.5 h-2.5 text-muted-foreground/60" 
-                    />
+                    <Lock className="absolute -bottom-0.5 -right-1 w-2.5 h-2.5 text-muted-foreground/60" />
                   )}
                 </div>
-
-                {/* Label */}
                 <span
                   className={cn(
                     'text-xs font-medium leading-tight text-center whitespace-nowrap',
