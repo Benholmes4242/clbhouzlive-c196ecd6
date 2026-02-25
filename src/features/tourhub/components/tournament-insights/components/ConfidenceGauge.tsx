@@ -22,7 +22,7 @@ const tierToPercentage: Record<ConfidenceTier, number> = {
 };
 
 function getArcColor(tier: ConfidenceTier, variant: 'gold' | 'neutral'): string {
-  if (variant === 'gold') return '#D4A017';
+  if (variant === 'gold') return 'rgba(245,158,11,0.9)';
   const pct = tierToPercentage[tier];
   if (pct >= 90) return '#16A34A';
   if (pct >= 70) return '#3B82F6';
