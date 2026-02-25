@@ -75,9 +75,9 @@ export const SimplePodium: React.FC<SimplePodiumProps> = ({
                 <SquircleAvatar
                   src={user.avatarUrl}
                   size={avatarSize}
-                  top100Count={user.top100Count ?? user.courses}
                   alt={user.name}
                   fallback={user.name?.charAt(0) || '?'}
+                  hideRing
                 />
                 
                 {/* Position Badge - bottom right */}
