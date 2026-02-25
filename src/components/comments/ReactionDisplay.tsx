@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { GOLF_REACTIONS, GolfReactionType } from './GolfReactionPicker';
+import { AnimatedCount } from './AnimatedCount';
 
 interface ReactionCount {
   type: GolfReactionType;
@@ -64,14 +65,15 @@ export function ReactionDisplay({
         })}
       </div>
       
-      {/* Count */}
+      {/* Count — odometer animation */}
       {totalCount > 0 && (
-        <span className={cn(
-          "text-xs font-medium",
-          isDark ? "text-white/60" : "text-muted-foreground"
-        )}>
-          {totalCount}
-        </span>
+        <AnimatedCount
+          count={totalCount}
+          className={cn(
+            "text-xs font-medium",
+            isDark ? "text-white/60" : "text-muted-foreground"
+          )}
+        />
       )}
     </div>
   );
