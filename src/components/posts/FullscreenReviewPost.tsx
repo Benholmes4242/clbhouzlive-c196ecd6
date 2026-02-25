@@ -442,7 +442,7 @@ export function FullscreenReviewPost({
           )}
 
           {/* CTAs - Glass style buttons */}
-          <div className="flex gap-3 mb-4">
+          <div className="flex gap-3 mb-4" style={{ paddingBottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))' }}>
             <button
               onClick={handleViewCourse}
               className="flex-1 py-3.5 rounded-xl font-medium text-sm text-white/80 transition-all active:scale-[0.98]"
