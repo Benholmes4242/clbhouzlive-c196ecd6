@@ -68,7 +68,7 @@ export function LeaderboardRow({
         src={profilePhotoUrl}
         alt={displayName}
         fallback={initials}
-        ringColor={ringColor}
+        hideRing
       />
 
       {/* Name & Info - 3-line layout for Explore tab */}
