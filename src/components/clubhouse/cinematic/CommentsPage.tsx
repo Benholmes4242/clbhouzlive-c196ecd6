@@ -1363,7 +1363,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                 ? '#0d0d0d'
                 : isGrey
                   ? undefined
-                  : 'linear-gradient(180deg, rgba(245, 158, 11, 0.06) 0%, #F8FAFC 20%)',
+                  : 'linear-gradient(180deg, rgba(245, 158, 11, 0.06) 0%, rgba(245, 158, 11, 0) 20%), #F8FAFC',
             }}
           >
             {/* Vignette overlay - darkens edges (matches /auth page) */}
