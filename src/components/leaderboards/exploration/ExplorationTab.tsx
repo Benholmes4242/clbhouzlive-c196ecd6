@@ -358,29 +358,9 @@ export function ExplorationTab() {
 
       {/* 3. Scope Selector */}
       <div className="flex justify-center">
-        <LeaderboardScopeSelector value={scope} onChange={setScope} />
+        <LeaderboardScopeSelector value={scope} onChange={setScope} showClub={false} showCountry={false} />
       </div>
 
-      {scope === 'club' && (
-        <div>
-          <ClubSearchBar
-            selectedClubId={selectedClubId}
-            selectedClubName={selectedClubName}
-            userHomeClubId={userHomeClubId}
-            userHomeClubName={userHomeClubName}
-            onClubSelect={handleClubSelect}
-          />
-        </div>
-      )}
-
-      {scope === 'country' && (
-        <div>
-          <CountrySelector
-            selectedCountry={selectedCountry}
-            onCountrySelect={setSelectedCountry}
-          />
-        </div>
-      )}
 
       {/* Initial error */}
       {isError && allEntries.length === 0 && !isLoading && (
