@@ -195,9 +195,9 @@ const GlobalTop100 = () => {
   filteredCourses = [...filteredCourses].sort((a, b) => {
     switch (sortOption) {
       case 'community':
-        // Sort by average_rating descending, nulls last
-        const ratingA = (a as any).average_rating ?? -1;
-        const ratingB = (b as any).average_rating ?? -1;
+        // Sort by average_rating (merged from course_rating_aggregates in useGolfCoursesInfinite)
+        const ratingA = a.average_rating ?? -1;
+        const ratingB = b.average_rating ?? -1;
         if (ratingB !== ratingA) return ratingB - ratingA;
         return a.name.localeCompare(b.name);
       case 'name_asc':

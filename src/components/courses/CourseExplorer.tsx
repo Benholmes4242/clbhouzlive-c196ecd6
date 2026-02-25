@@ -24,10 +24,19 @@ import { EXPLORE_PAGE_SIZE } from '@/config/pagination';
 type SortOption = 'official_rating' | 'community_rating' | 'recently_added' | 'name_asc' | 'name_desc';
 
 /** Apply the current sort option to a Supabase query builder. */
+/**
+ * Apply the current sort option to a Supabase query builder.
+ *
+ * NOTE: For 'community_rating', PostgREST referencedTable ordering on views
+ * is silently ignored. We fall back to a default server-side order here and
+ * apply the real community-rating sort **client-side** after fetching
+ * (see `applyCommunitySort` below).
+ */
 function applySortToQuery(query: any, sortOption: SortOption) {
   switch (sortOption) {
     case 'community_rating':
-      query = query.order('avg_overall_score', { referencedTable: 'course_rating_aggregates', ascending: false, nullsFirst: false });
+      // Server can't sort by view column — use name as stable fallback.
+      // Real sort happens client-side in applyCommunitySort().
       query = query.order('name', { ascending: true });
       break;
     case 'recently_added':
@@ -46,6 +55,23 @@ function applySortToQuery(query: any, sortOption: SortOption) {
       break;
   }
   return query;
+}
+
+/**
+ * Client-side community rating sort.
+ * Applied after fetch because PostgREST can't order by view columns.
+ *
+ * LIMITATION: With infinite scroll, this only sorts within currently loaded
+ * pages — not globally across all courses. Acceptable trade-off vs. creating
+ * a DB function.
+ */
+function applyCommunitySort<T extends { average_rating?: number | null; name?: string }>(courses: T[]): T[] {
+  return [...courses].sort((a, b) => {
+    const rA = a.average_rating ?? -1;
+    const rB = b.average_rating ?? -1;
+    if (rB !== rA) return rB - rA;
+    return (a.name ?? '').localeCompare(b.name ?? '');
+  });
 }
 
 interface FetchCoursePageParams {
@@ -267,8 +293,12 @@ const CourseExplorer = () => {
 
   // Derived state (memoised to preserve reference for React.memo on VirtualizedCourseList)
   const allCourses = useMemo(
-    () => data?.pages.flatMap((page) => page.courses) ?? [],
-    [data?.pages],
+    () => {
+      const flat = data?.pages.flatMap((page) => page.courses) ?? [];
+      // Apply client-side community rating sort (server can't sort by view columns)
+      return sortOption === 'community_rating' ? applyCommunitySort(flat) : flat;
+    },
+    [data?.pages, sortOption],
   );
   const totalCount = data?.pages[0]?.totalCount ?? 0;
 
