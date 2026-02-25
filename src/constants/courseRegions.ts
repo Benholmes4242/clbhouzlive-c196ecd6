@@ -19,7 +19,7 @@ export type PrimaryRegionKey =
 // Human-friendly label for each primary region
 export const PRIMARY_REGION_LABELS: Record<PrimaryRegionKey, string> = {
   'all': 'All Regions',
-  'gb-i': 'Britain & Ireland',
+  'gb-i': 'GB&I',
   'usa': 'USA',
   'europe': 'Continental Europe',
   'asia': 'Asia',

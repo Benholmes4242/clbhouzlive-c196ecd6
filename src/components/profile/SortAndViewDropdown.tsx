@@ -29,7 +29,7 @@ const SortAndViewDropdown: React.FC<SortAndViewDropdownProps> = ({
   const regions = [
     { value: 'all', label: 'All Courses' },
     { value: 'global', label: 'Global Top 100' },
-    { value: 'britain-ireland', label: 'Britain & Ireland Top 100' },
+    { value: 'britain-ireland', label: 'GB&I Top 100' },
     { value: 'usa', label: 'USA Top 100' },
     { value: 'europe', label: 'Europe Top 100' }
   ];
