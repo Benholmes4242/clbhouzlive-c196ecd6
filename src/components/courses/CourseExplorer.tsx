@@ -86,6 +86,50 @@ interface FetchCoursePageParams {
 async function fetchCoursePage({ selectedRegion, selectedSubregion, debouncedSearch, sortOption, offset }: FetchCoursePageParams) {
   const isFirstPage = offset === 0;
 
+  // ── Community-rating sort: use dedicated server-side RPC ──
+  if (sortOption === 'community_rating') {
+    const countryParam = selectedRegion !== PRIMARY_REGIONS.ALL
+      ? regionKeyToDbValue(selectedRegion) || null
+      : null;
+    const subCountryParam = selectedSubregion !== 'all'
+      ? subregionKeyToLabel(selectedRegion, selectedSubregion)
+      : null;
+    const searchParam = debouncedSearch && debouncedSearch.length >= 2
+      ? debouncedSearch
+      : null;
+
+    const { data, error } = await supabase.rpc('explore_courses_by_rating', {
+      p_country: countryParam,
+      p_sub_country: subCountryParam,
+      p_search: searchParam,
+      p_limit: EXPLORE_PAGE_SIZE,
+      p_offset: offset,
+    });
+
+    if (error) {
+      console.error('CourseExplorer rating-sort RPC error:', error);
+      throw error;
+    }
+
+    const courses = (data || []) as any[];
+
+    // For first page we need a count – do a lightweight count query
+    let totalCount: number | null = null;
+    if (isFirstPage) {
+      let countQuery = supabase
+        .from('golf_courses')
+        .select('id', { count: 'exact', head: true });
+      if (countryParam) countQuery = countQuery.eq('country', countryParam);
+      if (subCountryParam) countQuery = countQuery.eq('sub_country', subCountryParam);
+      if (searchParam) countQuery = countQuery.ilike('name', `%${searchParam}%`);
+      const { count } = await countQuery;
+      totalCount = count ?? 0;
+    }
+
+    return { courses, totalCount };
+  }
+
+  // ── All other sort modes: standard PostgREST query ──
   let query = supabase
     .from('golf_courses')
     .select(
@@ -295,10 +339,10 @@ const CourseExplorer = () => {
   const allCourses = useMemo(
     () => {
       const flat = data?.pages.flatMap((page) => page.courses) ?? [];
-      // Apply client-side community rating sort (server can't sort by view columns)
-      return sortOption === 'community_rating' ? applyCommunitySort(flat) : flat;
+      // Community rating sort is now handled server-side via RPC — no client-side re-sort needed
+      return flat;
     },
-    [data?.pages, sortOption],
+    [data?.pages],
   );
   const totalCount = data?.pages[0]?.totalCount ?? 0;
 
