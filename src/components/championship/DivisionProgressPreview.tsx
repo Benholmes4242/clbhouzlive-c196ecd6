@@ -48,18 +48,18 @@ export const DivisionProgressPreview: React.FC<Props> = ({
   const progressPercent = calculateProgress();
 
   return (
-    <div className="px-4 py-3">
+    <div className="px-5 py-4">
       {/* Current Club Row */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2.5">
           {/* Season-colored check circle */}
           <div
             className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
-            style={{ backgroundColor: seasonColor }}
+            style={{ backgroundColor: seasonColor, width: 28, height: 28 }}
           >
-            <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
+            <Check className="w-4 h-4 text-white" strokeWidth={3} />
           </div>
-          <span className="text-base font-bold text-foreground">
+          <span className="text-[18px] font-bold text-foreground">
             {currentDivision.name}
           </span>
           {/* CURRENT pill badge with pulsing dot */}
@@ -81,8 +81,8 @@ export const DivisionProgressPreview: React.FC<Props> = ({
               />
             </span>
             <span
-              className="text-xs font-semibold uppercase tracking-wide"
-              style={{ color: seasonColor }}
+              className="font-semibold uppercase tracking-wide"
+              style={{ color: seasonColor, fontSize: '13px', padding: '5px 12px' }}
             >
               Current
             </span>
@@ -94,7 +94,7 @@ export const DivisionProgressPreview: React.FC<Props> = ({
       {nextDivision && (
         <div className="mb-3">
           <div
-            className="h-[5px] rounded-full overflow-hidden"
+            className="h-2 rounded-full overflow-hidden"
             style={{ backgroundColor: 'rgba(0, 0, 0, 0.06)' }}
           >
             <div
@@ -107,8 +107,8 @@ export const DivisionProgressPreview: React.FC<Props> = ({
           </div>
           {/* "X to Next" label */}
           <div className="flex justify-end mt-1.5">
-            <span className="text-xs text-muted-foreground">
-              <span className="font-bold" style={{ color: seasonColor }}>
+            <span className="text-[15px] text-muted-foreground">
+              <span className="text-[18px] font-bold" style={{ color: seasonColor }}>
                 {coursesToNext}
               </span>{' '}
               to {nextDivision.name}
@@ -131,11 +131,11 @@ export const DivisionProgressPreview: React.FC<Props> = ({
         onClick={onToggle}
         className="w-full flex items-center justify-center gap-1.5 pt-1 active:scale-[0.98] transition-transform"
       >
-        <span className="text-sm font-medium" style={{ color: seasonColor }}>
+        <span className="text-[15px] font-semibold" style={{ color: seasonColor }}>
           {isExpanded ? 'Hide Division Ladder' : 'View Division Ladder'}
         </span>
         <ChevronDown
-          className="w-3.5 h-3.5 transition-transform duration-200"
+          className="w-[18px] h-[18px] transition-transform duration-200"
           style={{
             color: seasonColor,
             transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',

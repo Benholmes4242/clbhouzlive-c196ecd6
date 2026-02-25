@@ -42,9 +42,9 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
     return () => clearTimeout(timer);
   }, [progressPercent]);
 
-  // Progress ring geometry
-  const ringSize = 80;
-  const ringStroke = 5;
+  // Progress ring geometry — scaled up for premium feel
+  const ringSize = 96;
+  const ringStroke = 6;
   const ringRadius = (ringSize - ringStroke) / 2;
   const ringCircumference = ringRadius * 2 * Math.PI;
   const ringOffset = ringCircumference - (animatedProgress / 100) * ringCircumference;
@@ -78,7 +78,7 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
 
   return (
     <motion.div
-      className={cn('space-y-5', className)}
+      className={cn('space-y-5 py-5 px-5', className)}
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35 }}
@@ -120,35 +120,35 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
           </svg>
           {/* Center number */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-2xl font-bold text-foreground">{daysRemaining}</span>
+            <span className="text-[28px] font-bold text-foreground leading-none">{daysRemaining}</span>
           </div>
         </div>
 
         {/* Season Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+            <span className="text-xs font-medium text-muted-foreground uppercase" style={{ letterSpacing: '0.05em', fontSize: '12px' }}>
               Current Season
             </span>
             {/* Active badge — season-colored pill with pulsing dot */}
             <div
-              className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full"
-              style={{ backgroundColor: gradient.tint }}
+              className="inline-flex items-center gap-1.5 rounded-full"
+              style={{ backgroundColor: gradient.tint, padding: '6px 14px' }}
             >
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-50" style={{ backgroundColor: color }} />
                 <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: color }} />
               </span>
-              <span className="text-xs font-semibold uppercase tracking-wide" style={{ color }}>
+              <span className="font-semibold uppercase tracking-wide" style={{ color, fontSize: '13px' }}>
                 Active
               </span>
             </div>
           </div>
 
-          <h3 className="text-xl font-bold text-foreground leading-tight">
+          <h3 className="text-[22px] font-bold text-foreground leading-tight">
             {config.title}
           </h3>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <p className="text-[14px] text-muted-foreground mt-0.5">
             {config.subtitle}
           </p>
         </div>
@@ -174,16 +174,16 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
                 onClick={() => !isLocked && onSeasonSelect?.(id)}
                 disabled={isLocked}
                 className={cn(
-                  'flex-1 flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl min-w-0',
+                'flex-1 flex flex-col items-center gap-1.5 px-3 py-3 rounded-xl min-w-0',
                   'transition-all duration-200 active:scale-[0.97]',
-                  isActive && 'bg-card shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)]',
+                  isActive && 'bg-card shadow-[0_2px_8px_rgba(0,0,0,0.08)]',
                   isLocked && 'cursor-not-allowed',
                   !isLocked && !isActive && 'hover:opacity-60'
                 )}
               >
                 <div className="relative">
                   <SeasonIcon
-                    className={cn('w-4.5 h-4.5', isLocked && 'opacity-50')}
+                    className={cn('w-6 h-6', isLocked && 'opacity-50')}
                     style={{ color: isActive ? tabColor : 'hsl(var(--muted-foreground))' }}
                   />
                   {isLocked && (
@@ -192,10 +192,11 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
                 </div>
                 <span
                   className={cn(
-                    'text-xs font-medium leading-tight text-center whitespace-nowrap',
+                    'font-medium leading-tight text-center whitespace-nowrap',
                     isActive ? 'text-foreground font-semibold' : 'text-muted-foreground',
                     isLocked && 'opacity-50'
                   )}
+                  style={{ fontSize: '12px' }}
                 >
                   {getShortName(id)}
                 </span>

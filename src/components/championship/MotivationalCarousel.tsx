@@ -163,7 +163,7 @@ export const MotivationalCarousel: React.FC<Props> = ({
       const match = part.match(/^<gold>(.*)<\/gold>$/);
       if (match) {
         return (
-          <span key={i} className="font-bold" style={{ color: '#D4A853' }}>
+          <span key={i} className="font-extrabold" style={{ color: '#D4A853', fontSize: '20px' }}>
             {match[1]}
           </span>
         );
@@ -174,33 +174,36 @@ export const MotivationalCarousel: React.FC<Props> = ({
 
   return (
     <div
-      className="relative overflow-hidden px-4 py-3"
+      className="relative overflow-hidden px-5 py-4"
       style={{
-        background: 'linear-gradient(135deg, rgba(212, 168, 83, 0.08), rgba(212, 168, 83, 0.04))',
-        border: '1px solid rgba(212, 168, 83, 0.15)',
-        borderRadius: '14px',
+        background: 'linear-gradient(135deg, rgba(212, 168, 83, 0.06), rgba(212, 168, 83, 0.02))',
+        borderLeft: '3px solid #D4A853',
+        borderRadius: '16px',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
       }}
     >
       {/* Content */}
       <div className="relative flex items-center gap-3">
         {/* Trophy icon */}
         <div
-          className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center"
+          className="flex-shrink-0 rounded-full flex items-center justify-center"
           style={{
+            width: 40,
+            height: 40,
             backgroundColor: 'rgba(212, 168, 83, 0.12)',
             boxShadow: '0 0 8px rgba(212, 168, 83, 0.15)',
           }}
         >
-          <Icon className="w-[18px] h-[18px]" style={{ color: '#D4A853' }} />
+          <Icon className="w-5 h-5" style={{ color: '#D4A853' }} />
         </div>
 
         {/* Text */}
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-foreground truncate">
+          <p className="text-[17px] font-semibold text-foreground truncate">
             {renderMessage(currentMessage.message)}
           </p>
           {currentMessage.subMessage && (
-            <p className="text-xs text-muted-foreground truncate mt-0.5">
+            <p className="text-[14px] text-muted-foreground truncate mt-0.5">
               {currentMessage.subMessage}
             </p>
           )}

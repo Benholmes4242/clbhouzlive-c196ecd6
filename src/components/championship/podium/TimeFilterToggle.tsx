@@ -5,14 +5,18 @@ import { TimeFilter } from '@/types/podium';
 interface TimeFilterToggleProps {
   value: TimeFilter;
   onChange: (value: TimeFilter) => void;
+  seasonYear?: number;
   className?: string;
 }
 
 export const TimeFilterToggle: React.FC<TimeFilterToggleProps> = ({
   value,
   onChange,
+  seasonYear,
   className,
 }) => {
+  const yearLabel = String(seasonYear ?? new Date().getFullYear());
+
   return (
     <div className={cn('inline-flex rounded-[14px] p-[3px]', className)} style={{ background: 'rgba(0, 0, 0, 0.03)' }}>
       <button
@@ -24,7 +28,7 @@ export const TimeFilterToggle: React.FC<TimeFilterToggleProps> = ({
             : 'text-muted-foreground'
         )}
       >
-        This Season
+        {yearLabel}
       </button>
       <button
         onClick={() => onChange('all_time')}

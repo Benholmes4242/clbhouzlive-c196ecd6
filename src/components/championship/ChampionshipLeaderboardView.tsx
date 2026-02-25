@@ -534,7 +534,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   }, [useVirtualization, allEntries, scrollTop]);
 
   return (
-    <div className={cn('flex flex-col px-4 py-5 space-y-6', className)}>
+    <div className={cn('flex flex-col px-5 py-5', className)} style={{ gap: 20 }}>
       {/* 1. Season Status Panel — floats on page background, no card wrapper */}
       {timeFilter === 'seasonal' && currentSeason && (
         <SeasonStatusPanel
@@ -548,9 +548,13 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         />
       )}
 
-      {/* 2. Time Filter Toggle - Centered — 24px above podium */}
-      <div className="flex justify-center">
-        <TimeModeToggle value={timeFilter} onChange={setTimeFilter} />
+      {/* 2. Time Filter Toggle */}
+      <div>
+        <TimeModeToggle
+          value={timeFilter}
+          onChange={setTimeFilter}
+          seasonYear={currentSeason ? new Date(currentSeason.start_date).getFullYear() : undefined}
+        />
       </div>
 
       {/* 3. Podium - Show Trophy Podium for seasonal, Hall of Fame for all-time */}
@@ -671,7 +675,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       )}
 
       {/* 9. Leaderboard List */}
-      <div ref={listContainerRef} className="min-h-[400px] relative -mt-2" style={{ overflowAnchor: 'auto' }}>
+      <div ref={listContainerRef} className="min-h-[400px] relative" style={{ overflowAnchor: 'auto' }}>
         {/* Loading overlay - doesn't unmount the list */}
         {leaderboardLoading && allEntries.length > 0 && (
           <div className="absolute inset-x-0 top-0 flex items-center justify-center py-4 z-10 pointer-events-none">
@@ -767,6 +771,28 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           </div>
         )}
         
+        {/* Short list invite CTA */}
+        {allEntries.length > 0 && allEntries.length < 10 && !hasNextPage && !leaderboardLoading && (
+          <div className="mt-6 mx-4 py-5 px-4 rounded-2xl flex flex-col items-center gap-2 text-center"
+            style={{ border: '1.5px dashed hsl(var(--border) / 0.3)' }}
+          >
+            <p className="text-[14px] text-muted-foreground">
+              Invite friends to climb the leaderboard
+            </p>
+            <button
+              className="text-[14px] font-semibold transition-opacity hover:opacity-80 active:scale-[0.97]"
+              style={{ color: timeFilter === 'seasonal' ? seasonThemeColor : '#D4A853' }}
+              onClick={() => {
+                if (navigator.share) {
+                  navigator.share({ title: 'Join me on Clbhouz', url: window.location.origin });
+                }
+              }}
+            >
+              Share Invite Link
+            </button>
+          </div>
+        )}
+
         {/* Sentinel + loading skeleton for infinite scroll */}
         {hasNextPage && !isError && (
           <div ref={sentinelRef}>

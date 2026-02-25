@@ -14,46 +14,52 @@ interface TrophyPodiumSlotProps {
   animationDelay?: number;
 }
 
-// Premium awards stage configuration
+// Premium awards stage configuration — scaled up
 const POSITION_CONFIG = {
   1: {
-    avatarSize: 110,         // Hero size
-    mobileAvatarSize: 90,
-    borderWidth: 0.5,
-    badgeSize: 28,
-    nameClass: 'text-lg font-bold',
-    statClass: 'text-base',
-    borderGradient: ['#D4A853', '#F0D78C', '#D4A853'], // Gold
+    avatarSize: 120,
+    mobileAvatarSize: 120,
+    borderWidth: 3,
+    badgeSize: 26,
+    nameClass: 'text-[17px] font-bold',
+    statSize: 24,
+    statWeight: 800,
+    labelSize: 13,
+    borderGradient: ['#D4A853', '#F0D78C', '#D4A853'],
     badgeBg: '#D4A853',
     shadowColor: 'rgba(212, 168, 83, 0.25)',
     crownSize: 36,
-    verticalOffset: 0,       // Highest
+    verticalOffset: 0,
   },
   2: {
-    avatarSize: 80,
-    mobileAvatarSize: 68,
-    borderWidth: 0.5,
-    badgeSize: 24,
-    nameClass: 'text-sm font-semibold',
-    statClass: 'text-sm',
-    borderGradient: ['#A8B4C0'], // Silver
+    avatarSize: 88,
+    mobileAvatarSize: 88,
+    borderWidth: 3,
+    badgeSize: 22,
+    nameClass: 'text-[15px] font-semibold',
+    statSize: 20,
+    statWeight: 700,
+    labelSize: 12,
+    borderGradient: ['#A8B4C0'],
     badgeBg: '#A8B4C0',
     shadowColor: 'rgba(0, 0, 0, 0.1)',
     crownSize: 0,
-    verticalOffset: 20,      // Lower than #1
+    verticalOffset: 24,
   },
   3: {
-    avatarSize: 80,
-    mobileAvatarSize: 68,
-    borderWidth: 0.5,
-    badgeSize: 24,
-    nameClass: 'text-sm font-semibold',
-    statClass: 'text-sm',
-    borderGradient: ['#C4956A'], // Bronze
+    avatarSize: 88,
+    mobileAvatarSize: 88,
+    borderWidth: 3,
+    badgeSize: 22,
+    nameClass: 'text-[15px] font-semibold',
+    statSize: 20,
+    statWeight: 700,
+    labelSize: 12,
+    borderGradient: ['#C4956A'],
     badgeBg: '#C4956A',
     shadowColor: 'rgba(0, 0, 0, 0.1)',
     crownSize: 0,
-    verticalOffset: 32,      // Lowest
+    verticalOffset: 40,
   },
 } as const;
 
@@ -98,7 +104,7 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
         ease: 'easeOut',
       }}
     >
-      {/* Crown for 1st place — large and dramatic */}
+      {/* Crown for 1st place */}
       {position === 1 && (
         <motion.div
           className="mb-1"
@@ -123,7 +129,7 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
 
       {/* Avatar with metallic ring */}
       <div className="relative">
-        {/* Golden glow for #1 — warm spotlight */}
+        {/* Golden glow for #1 */}
         {position === 1 && (
           <div
             className="absolute -z-10"
@@ -162,7 +168,7 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
           )}
         </div>
 
-        {/* Rank badge — bottom-right overlapping border */}
+        {/* Rank badge */}
         <div
           className="absolute -bottom-1.5 -right-0.5 flex items-center justify-center font-bold text-white shadow-md"
           style={{
@@ -191,16 +197,16 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
         )}
       </div>
 
-      {/* Stat — green number + muted label */}
+      {/* Stat */}
       <motion.p
-        className={cn('font-bold mt-0.5', config.statClass)}
-        style={{ color: seasonThemeColor }}
+        className="font-bold mt-0.5"
+        style={{ color: seasonThemeColor, fontSize: config.statSize, fontWeight: config.statWeight }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: animationDelay + 0.3, duration: 0.3 }}
       >
         {entry.courses_logged}
-        <span className="text-xs font-normal text-muted-foreground ml-1">courses</span>
+        <span className="font-normal text-muted-foreground ml-1" style={{ fontSize: config.labelSize }}>courses</span>
       </motion.p>
     </motion.div>
   );

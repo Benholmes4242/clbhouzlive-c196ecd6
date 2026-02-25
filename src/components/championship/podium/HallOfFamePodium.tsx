@@ -14,51 +14,55 @@ interface HallOfFamePodiumProps {
   onUserClick?: (userId: string) => void;
 }
 
-// Premium awards stage configuration — matching TrophyPodiumSlot with richer All-Time gold
+// Scaled-up configuration matching TrophyPodiumSlot
 const POSITION_CONFIG = {
   1: {
-    avatarSize: 110,
-    mobileAvatarSize: 90,
-    borderWidth: 0.5,
-    badgeSize: 28,
-    nameClass: 'text-lg font-bold',
-    statClass: 'text-base',
-    // Richer gold for All-Time — deeper multi-stop gradient feel
+    avatarSize: 120,
+    mobileAvatarSize: 120,
+    borderWidth: 3,
+    badgeSize: 26,
+    nameClass: 'text-[17px] font-bold',
+    statSize: 24,
+    statWeight: 800,
+    labelSize: 13,
     borderColor: '#D4A853',
     badgeBg: '#D4A853',
-    shadowColor: 'rgba(212, 168, 83, 0.3)', // Slightly stronger than seasonal 0.25
+    shadowColor: 'rgba(212, 168, 83, 0.3)',
     crownSize: 36,
     verticalOffset: 0,
   },
   2: {
-    avatarSize: 80,
-    mobileAvatarSize: 68,
-    borderWidth: 0.5,
-    badgeSize: 24,
-    nameClass: 'text-sm font-semibold',
-    statClass: 'text-sm',
+    avatarSize: 88,
+    mobileAvatarSize: 88,
+    borderWidth: 3,
+    badgeSize: 22,
+    nameClass: 'text-[15px] font-semibold',
+    statSize: 20,
+    statWeight: 700,
+    labelSize: 12,
     borderColor: '#A8B4C0',
     badgeBg: '#A8B4C0',
     shadowColor: 'rgba(0, 0, 0, 0.1)',
     crownSize: 0,
-    verticalOffset: 20,
+    verticalOffset: 24,
   },
   3: {
-    avatarSize: 80,
-    mobileAvatarSize: 68,
-    borderWidth: 0.5,
-    badgeSize: 24,
-    nameClass: 'text-sm font-semibold',
-    statClass: 'text-sm',
+    avatarSize: 88,
+    mobileAvatarSize: 88,
+    borderWidth: 3,
+    badgeSize: 22,
+    nameClass: 'text-[15px] font-semibold',
+    statSize: 20,
+    statWeight: 700,
+    labelSize: 12,
     borderColor: '#C4956A',
     badgeBg: '#C4956A',
     shadowColor: 'rgba(0, 0, 0, 0.1)',
     crownSize: 0,
-    verticalOffset: 32,
+    verticalOffset: 40,
   },
 } as const;
 
-// Stagger order: 2nd → 1st → 3rd
 const ANIMATION_DELAYS = { 1: 0.15, 2: 0, 3: 0.3 } as const;
 
 interface SlotProps {
@@ -97,7 +101,7 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: animationDelay, ease: 'easeOut' }}
     >
-      {/* Crown for 1st place — large and dramatic */}
+      {/* Crown for 1st place */}
       {position === 1 && (
         <motion.div
           className="mb-1"
@@ -122,7 +126,6 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
 
       {/* Avatar with metallic ring */}
       <div className="relative">
-        {/* Golden glow for #1 — warm spotlight, slightly stronger for All-Time */}
         {position === 1 && (
           <div
             className="absolute -z-10"
@@ -137,7 +140,6 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
           />
         )}
 
-        {/* Avatar image */}
         <div
           className="relative overflow-hidden"
           style={{
@@ -161,7 +163,6 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
           )}
         </div>
 
-        {/* Rank badge — bottom-right overlapping border */}
         <div
           className="absolute -bottom-1.5 -right-0.5 flex items-center justify-center font-bold text-white shadow-md"
           style={{
@@ -190,19 +191,18 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
         )}
       </div>
 
-      {/* Stat — green number + muted label */}
+      {/* Stat */}
       <motion.p
-        className={cn('font-bold mt-0.5', config.statClass)}
-        style={{ color: '#D4A853' }}
+        className="font-bold mt-0.5"
+        style={{ color: '#D4A853', fontSize: config.statSize, fontWeight: config.statWeight }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: animationDelay + 0.3, duration: 0.3 }}
       >
         {entry.all_time_courses}
-        <span className="text-xs font-normal text-muted-foreground ml-1">courses</span>
+        <span className="font-normal text-muted-foreground ml-1" style={{ fontSize: config.labelSize }}>courses</span>
       </motion.p>
 
-      {/* Season wins for 1st place */}
       {position === 1 && entry.seasons_won > 0 && (
         <p className="text-xs text-muted-foreground mt-1">
           {entry.seasons_won} season{entry.seasons_won !== 1 ? 's' : ''} won
@@ -246,7 +246,7 @@ export const HallOfFamePodium: React.FC<HallOfFamePodiumProps> = ({
             <div key={pos} className="flex flex-col items-center">
               <div
                 className="bg-muted flex items-center justify-center text-muted-foreground text-2xl font-medium"
-                style={{ width: pos === 1 ? 90 : 68, height: pos === 1 ? 90 : 68, borderRadius: '34%' }}
+                style={{ width: pos === 1 ? 120 : 88, height: pos === 1 ? 120 : 88, borderRadius: '34%' }}
               >
                 ?
               </div>
@@ -264,9 +264,8 @@ export const HallOfFamePodium: React.FC<HallOfFamePodiumProps> = ({
 
   return (
     <div className="relative w-full overflow-visible">
-      {/* Hall of Fame Header — prestige inscription */}
+      {/* Hall of Fame Header */}
       <div className="text-center py-6">
-        {/* Decorative gold gradient lines flanking trophy */}
         <div className="flex items-center justify-center gap-3 mb-2">
           <div 
             className="h-px w-20"
@@ -292,7 +291,7 @@ export const HallOfFamePodium: React.FC<HallOfFamePodiumProps> = ({
         </p>
       </div>
 
-      {/* Spotlight background behind #1 */}
+      {/* Spotlight */}
       <div
         className="absolute pointer-events-none"
         style={{
@@ -304,8 +303,8 @@ export const HallOfFamePodium: React.FC<HallOfFamePodiumProps> = ({
         }}
       />
 
-      {/* Podium Layout: 2nd - 1st (elevated) - 3rd */}
-      <div className="relative flex items-start justify-center pb-6">
+      {/* Podium Layout */}
+      <div className="relative flex items-start justify-center gap-6 pb-6">
         <HallOfFameSlot
           entry={second}
           position={2}

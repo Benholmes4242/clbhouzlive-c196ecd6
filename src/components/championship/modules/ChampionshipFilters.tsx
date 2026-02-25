@@ -41,7 +41,7 @@ export function ChampionshipFilters({
           options={scopeOptions} 
           selected={arenaMode} 
           onSelect={(id) => onArenaModeChange(id as ChampionshipArenaMode)}
-          size="small"
+          size="default"
         />
       </div>
 

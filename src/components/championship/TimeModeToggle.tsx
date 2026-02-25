@@ -4,26 +4,30 @@ import { cn } from '@/lib/utils';
 interface TimeModeToggleProps {
   value: 'seasonal' | 'all_time';
   onChange: (value: 'seasonal' | 'all_time') => void;
+  seasonYear?: number;
 }
 
-const options = [
-  { id: 'seasonal' as const, label: 'This Season' },
-  { id: 'all_time' as const, label: 'All-Time' },
-];
-
 /**
- * TimeModeToggle — Pill-background treatment matching season selector.
- * Equal-width options, smooth transition, subtle shadow on active.
+ * TimeModeToggle — Premium pill toggle for Season / All-Time.
+ * Dynamically derives the year label from the active season.
  */
 export const TimeModeToggle: React.FC<TimeModeToggleProps> = ({
   value,
   onChange,
+  seasonYear,
 }) => {
+  const yearLabel = String(seasonYear ?? new Date().getFullYear());
+
+  const options = [
+    { id: 'seasonal' as const, label: yearLabel },
+    { id: 'all_time' as const, label: 'All-Time' },
+  ];
+
   return (
-    <div className="flex justify-center">
+    <div className="w-full px-1">
       <div
-        className="inline-flex rounded-xl p-[3px]"
-        style={{ backgroundColor: 'rgba(0, 0, 0, 0.03)' }}
+        className="flex rounded-xl p-1"
+        style={{ backgroundColor: 'rgba(0, 0, 0, 0.04)' }}
       >
         {options.map((option) => {
           const isActive = value === option.id;
@@ -32,10 +36,10 @@ export const TimeModeToggle: React.FC<TimeModeToggleProps> = ({
               key={option.id}
               onClick={() => onChange(option.id)}
               className={cn(
-                'flex-1 min-w-[110px] px-6 py-2 rounded-[10px] text-sm font-medium',
+                'flex-1 py-2.5 rounded-[10px] text-[15px] font-medium',
                 'transition-all duration-200 ease-in-out active:scale-[0.97]',
                 isActive
-                  ? 'bg-card text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)] font-semibold'
+                  ? 'bg-card text-foreground shadow-sm font-semibold'
                   : 'text-muted-foreground hover:text-foreground'
               )}
             >
