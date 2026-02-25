@@ -98,7 +98,8 @@ const Top100CoursesHubPanel = () => {
         case 'user_rating':
           const ratingA = a.average_rating ?? -1;
           const ratingB = b.average_rating ?? -1;
-          return ratingB - ratingA;
+          if (ratingB !== ratingA) return ratingB - ratingA;
+          return (a.name ?? '').localeCompare(b.name ?? '');
         case 'official':
         default:
           const rankA = selectedList.includes('global') ? a.list_memberships.find((m: any) => m.list_slug.includes('global'))?.rank :
@@ -165,7 +166,7 @@ const Top100CoursesHubPanel = () => {
 
   const sortOptions: AppSelectOption<Top100SortOption>[] = [
     { value: 'official', label: 'Official ranking' },
-    { value: 'user_rating', label: 'User rating' },
+    { value: 'user_rating', label: 'Community rating' },
   ];
 
   const handleResetFilters = () => {
