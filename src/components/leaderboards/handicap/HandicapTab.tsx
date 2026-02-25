@@ -101,26 +101,7 @@ export function HandicapTab() {
         seasonColor={seasonThemeColor}
         scopeSelector={
           <div className="space-y-4">
-            <LeaderboardScopeSelector value={scope} onChange={setScope} />
-            {scope === 'country' && (
-              <div className="px-5">
-                <CountrySelector
-                  selectedCountry={selectedCountry}
-                  onCountrySelect={setSelectedCountry}
-                />
-              </div>
-            )}
-            {scope === 'club' && (
-              <div className="px-5">
-                <ClubSearchBar
-                  selectedClubId={selectedClubId}
-                  selectedClubName={selectedClubName}
-                  userHomeClubId={userHomeClubId}
-                  userHomeClubName={userHomeClubName}
-                  onClubSelect={handleClubSelect}
-                />
-              </div>
-            )}
+            <LeaderboardScopeSelector value={scope} onChange={setScope} showClub={false} showCountry={false} />
           </div>
         }
       />
