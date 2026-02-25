@@ -12,12 +12,12 @@ export interface SeasonGradient {
 }
 
 const GRADIENTS: Record<string, SeasonGradient> = {
-  '#98FBCB': { // Pre-Season (fresh mint)
-    dark: '#6BE8A8',
-    mid: '#98FBCB',
-    light: '#C0FDE0',
-    tint: 'rgba(152, 251, 203, 0.12)',
-    subtleTint: 'rgba(152, 251, 203, 0.04)',
+  '#3EBD93': { // Pre-Season (fresh emerald)
+    dark: '#2A9B78',
+    mid: '#3EBD93',
+    light: '#6DD4B1',
+    tint: 'rgba(62, 189, 147, 0.12)',
+    subtleTint: 'rgba(62, 189, 147, 0.04)',
   },
   '#006747': { // Major (Augusta green)
     dark: '#004D35',
