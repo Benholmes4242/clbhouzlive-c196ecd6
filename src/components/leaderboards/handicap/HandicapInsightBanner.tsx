@@ -47,7 +47,7 @@ export function HandicapInsightBanner({
 
   return (
     <div
-      className="mx-4 flex items-center gap-3 rounded-[14px]"
+      className="mx-5 flex items-center gap-3 rounded-[14px]"
       style={{
         background: 'linear-gradient(to right, rgba(212, 168, 83, 0.08), rgba(212, 168, 83, 0.04))',
         border: '1px solid rgba(212, 168, 83, 0.15)',
@@ -58,7 +58,7 @@ export function HandicapInsightBanner({
         className="flex-shrink-0 flex items-center justify-center"
         style={{ filter: 'drop-shadow(0 0 8px rgba(212, 168, 83, 0.2))' }}
       >
-        <Icon size={24} style={{ color: '#D4A853' }} />
+        <Icon size={28} style={{ color: '#D4A853' }} />
       </div>
       <p className="text-sm font-semibold text-foreground flex-1">
         {isTopRank && highlightNumber ? (

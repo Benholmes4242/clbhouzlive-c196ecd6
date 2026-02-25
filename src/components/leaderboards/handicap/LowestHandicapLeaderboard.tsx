@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { Target } from 'lucide-react';
 
 import { useLowestHandicapLeaderboard } from '@/hooks/leaderboards';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -44,7 +45,7 @@ function HandicapLeaderboardSkeleton() {
 
 function InlineRetryCard({ onRetry }: { onRetry: () => void }) {
   return (
-    <div className="py-4 px-4">
+    <div className="py-4 px-5">
       <button
         onClick={onRetry}
         className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-muted text-sm text-muted-foreground hover:bg-muted/80 active:scale-[0.98] transition-all"
@@ -57,7 +58,7 @@ function InlineRetryCard({ onRetry }: { onRetry: () => void }) {
 
 function InitialErrorState({ onRetry }: { onRetry: () => void }) {
   return (
-    <div className="flex flex-col items-center justify-center py-12 px-4 text-center space-y-4">
+    <div className="flex flex-col items-center justify-center py-12 px-5 text-center space-y-4">
       <p className="text-muted-foreground text-sm">Something went wrong loading the leaderboard.</p>
       <button
         onClick={onRetry}
@@ -69,21 +70,46 @@ function InitialErrorState({ onRetry }: { onRetry: () => void }) {
   );
 }
 
+// --- Empty State ---
+function EmptyState({ scope, clubName, seasonColor }: { scope: string; clubName?: string | null; seasonColor?: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-16 px-5 text-center space-y-4">
+      <div className="flex items-center justify-center" style={{ opacity: 0.2 }}>
+        <Target size={48} className="text-muted-foreground" />
+      </div>
+      <p className="text-base text-muted-foreground">
+        {scope === 'club' && clubName
+          ? `No handicaps from ${clubName} yet. Invite your club mates!`
+          : "No handicaps recorded. Add your handicap to appear here!"}
+      </p>
+      <Link
+        to="/profile/edit"
+        className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white transition-all active:scale-[0.97]"
+        style={{ backgroundColor: seasonColor || 'hsl(var(--primary))' }}
+      >
+        Add Handicap
+      </Link>
+    </div>
+  );
+}
+
 // --- Handicap Row ---
 function HandicapRow({
   entry,
   userId,
+  seasonColor,
 }: {
   entry: any;
   userId?: string;
+  seasonColor?: string;
 }) {
   const isCurrentUser = entry.user_id === userId;
   const rank = entry.rank;
   const handicap = entry.handicap_index;
   const statusLabel = getHandicapStatusLabel(handicap);
-  const handicapColor = getHandicapStatusColor(handicap);
+  const handicapColor = getHandicapStatusColor(handicap, seasonColor);
   const badgeColors = RANK_BADGE_COLORS[rank];
-  const categoryBadge = getHandicapBadgeStyle(handicap);
+  const categoryBadge = getHandicapBadgeStyle(handicap, seasonColor);
 
   const initials = (entry.display_name || '?')
     .split(' ')
@@ -96,15 +122,15 @@ function HandicapRow({
     <Link
       to={`/profile/${entry.user_id}`}
       className={cn(
-        'w-full py-3 flex items-center gap-3 transition-colors active:scale-[0.98]',
+        'w-full py-4 flex items-center gap-3 transition-colors active:scale-[0.98]',
         'hover:bg-[rgba(0,0,0,0.02)]',
-        isCurrentUser ? 'px-3' : 'px-4',
+        isCurrentUser ? 'px-4' : 'px-5',
       )}
       style={{
         borderBottom: isCurrentUser ? undefined : '1px solid hsl(var(--border) / 0.15)',
         ...(isCurrentUser ? {
           background: 'rgba(212, 168, 83, 0.08)',
-          border: '1px solid rgba(212, 168, 83, 0.2)',
+          border: '2px solid rgba(212, 168, 83, 0.2)',
           borderRadius: 12,
         } : {}),
       }}
@@ -125,7 +151,7 @@ function HandicapRow({
 
       {/* Avatar */}
       <SquircleAvatar
-        size={44}
+        size={48}
         src={entry.avatar_url}
         alt={entry.display_name || 'Golfer'}
         fallback={initials}
@@ -134,13 +160,16 @@ function HandicapRow({
 
       {/* Name & category */}
       <div className="flex-1 min-w-0">
-        <p className={cn('text-sm font-semibold text-foreground truncate', isCurrentUser && 'text-primary')}>
+        <p className={cn('font-semibold text-foreground truncate', isCurrentUser && 'text-primary')}
+          style={{ fontSize: 16 }}
+        >
           {entry.display_name || 'Unknown'}
         </p>
         {statusLabel && (
           <span
-            className="inline-block text-[10px] font-semibold uppercase tracking-wide mt-0.5 rounded-md"
+            className="inline-block font-semibold uppercase tracking-wide mt-0.5 rounded-md"
             style={{
+              fontSize: 11,
               background: categoryBadge.bg,
               color: categoryBadge.text,
               border: `1px solid ${categoryBadge.border}`,
@@ -155,8 +184,7 @@ function HandicapRow({
       {/* Handicap number */}
       <div className="flex-shrink-0">
         <span
-          className="text-xl font-bold"
-          style={{ color: handicapColor }}
+          style={{ color: handicapColor, fontSize: 22, fontWeight: 800 }}
         >
           {formatHcp(handicap)}
         </span>
@@ -172,9 +200,10 @@ interface LowestHandicapLeaderboardProps {
   clubName?: string | null;
   country?: string | null;
   scopeSelector?: React.ReactNode;
+  seasonColor?: string;
 }
 
-export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, scopeSelector }: LowestHandicapLeaderboardProps) {
+export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, scopeSelector, seasonColor }: LowestHandicapLeaderboardProps) {
   const { user } = useSupabaseSession();
   const [scrollTop, setScrollTop] = useState(0);
 
@@ -279,7 +308,7 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
   // Initial error
   if (isError && allEntries.length === 0 && !isLoading) {
     return (
-      <div className="px-4 space-y-4">
+      <div className="px-5 space-y-5">
         {scopeSelector}
         <InitialErrorState onRetry={() => refetch()} />
       </div>
@@ -288,7 +317,7 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
 
   if (isLoading) {
     return (
-      <div className="px-4">
+      <div className="px-5">
         <HandicapLeaderboardSkeleton />
       </div>
     );
@@ -296,15 +325,9 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
 
   if (!isError && allEntries.length === 0) {
     return (
-      <div className="px-4 space-y-4">
+      <div className="px-5 space-y-5">
         {scopeSelector}
-        <div className="text-center py-12">
-          <p className="text-sm text-muted-foreground">
-            {scope === 'club' && clubName
-              ? `No handicaps from ${clubName} yet. Invite your club mates!`
-              : "No handicaps recorded. Add your handicap to appear here!"}
-          </p>
-        </div>
+        <EmptyState scope={scope} clubName={clubName} seasonColor={seasonColor} />
       </div>
     );
   }
@@ -317,6 +340,7 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
           entries={allEntries.slice(0, 3)}
           currentUserId={user?.id}
           mode="lowest"
+          seasonColor={seasonColor}
         />
       )}
 
@@ -339,13 +363,13 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
             <div style={{ height: virtualizedContent.totalHeight, position: 'relative' }}>
               <div style={{ transform: `translateY(${virtualizedContent.offsetY}px)`, position: 'absolute', width: '100%' }}>
                 {allEntries.slice(virtualizedContent.startIndex, virtualizedContent.endIndex).map(entry => (
-                  <HandicapRow key={entry.user_id} entry={entry} userId={user?.id} />
+                  <HandicapRow key={entry.user_id} entry={entry} userId={user?.id} seasonColor={seasonColor} />
                 ))}
               </div>
             </div>
           ) : (
             allEntries.map(entry => (
-              <HandicapRow key={entry.user_id} entry={entry} userId={user?.id} />
+              <HandicapRow key={entry.user_id} entry={entry} userId={user?.id} seasonColor={seasonColor} />
             ))
           )}
         </div>
