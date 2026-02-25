@@ -23,10 +23,11 @@ interface Props {
   course: Course;
   rank: number;
   sort: 'highest_rated' | 'most_played' | 'rising';
+  seasonColor?: string;
   onClick: () => void;
 }
 
-export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, onClick }) => {
+export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, seasonColor = '#006747', onClick }) => {
   const getRankColor = () => {
     if (rank === 1) return '#D4A853';
     if (rank === 2) return '#A8B4C0';
@@ -43,33 +44,37 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, onClick 
   const location = course.sub_country || course.country || '';
   const rankColor = getRankColor();
 
+  // Season-aware played treatment
+  const playedBg = course.current_user_played ? `${seasonColor}08` : undefined;
+  const playedBorder = course.current_user_played ? `${seasonColor}4D` : undefined;
+
   return (
     <button
       onClick={onClick}
       aria-label={`View ${course.course_name}`}
       className={cn(
-        'w-full flex items-center gap-3 py-3 px-4 text-left',
+        'w-full flex items-center gap-3 py-4 px-5 text-left',
         'transition-colors active:scale-[0.98] transition-transform',
         'hover:bg-[rgba(0,0,0,0.02)]',
-        course.current_user_played && 'bg-[rgba(82,183,136,0.03)]',
       )}
       style={{
         borderBottom: '1px solid hsl(var(--border) / 0.15)',
-        borderLeft: course.current_user_played ? '3px solid rgba(82, 183, 136, 0.3)' : undefined,
+        borderLeft: playedBorder ? `3px solid ${playedBorder}` : undefined,
+        backgroundColor: playedBg,
       }}
     >
       {/* Rank */}
       <div
-        className="w-8 flex-shrink-0 text-center font-bold text-lg"
-        style={{ color: rankColor || 'hsl(var(--muted-foreground))' }}
+        className="w-8 flex-shrink-0 text-center font-extrabold"
+        style={{ color: rankColor || 'hsl(var(--muted-foreground))', fontSize: 20 }}
       >
         {rank}
       </div>
 
-      {/* Course thumbnail — 64x48 */}
+      {/* Course thumbnail — 72x54 */}
       <div
-        className="flex-shrink-0 rounded-[10px] overflow-hidden bg-muted"
-        style={{ width: 64, height: 48, border: '1px solid rgba(0, 0, 0, 0.06)' }}
+        className="flex-shrink-0 rounded-xl overflow-hidden bg-muted"
+        style={{ width: 72, height: 54, border: '1px solid rgba(0, 0, 0, 0.06)' }}
       >
         {course.thumbnail_url ? (
           <img
@@ -87,18 +92,18 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, onClick 
 
       {/* Course info */}
       <div className="flex-1 min-w-0">
-        <h4 className="font-semibold text-sm text-foreground truncate">
+        <h4 className="font-semibold text-foreground truncate" style={{ fontSize: 15 }}>
           {course.course_name}
         </h4>
-        <p className="text-xs text-muted-foreground truncate mt-px">
+        <p className="text-muted-foreground truncate mt-px" style={{ fontSize: 13 }}>
           {location}
         </p>
 
         {/* Rating row */}
-        <div className="flex items-center gap-1.5 mt-1 text-xs">
+        <div className="flex items-center gap-1.5 mt-1" style={{ fontSize: 13 }}>
           <span className="flex items-center gap-0.5">
-            <Star className="w-3 h-3 fill-current" style={{ color: '#D4A853' }} />
-            <span className="font-bold" style={{ color: '#D4A853' }}>
+            <Star className="w-3.5 h-3.5 fill-current" style={{ color: '#D4A853' }} />
+            <span className="font-bold" style={{ color: '#D4A853', fontSize: 16 }}>
               {course.avg_rating?.toFixed(1) || '-'}
             </span>
           </span>
@@ -111,10 +116,13 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, onClick 
 
       {/* Right side: played status + rank movement */}
       <div className="flex flex-col items-end gap-1 flex-shrink-0">
-        <span className={cn(
-          'text-xs font-semibold',
-          course.current_user_played ? 'text-[#40916C]' : 'text-muted-foreground'
-        )}>
+        <span
+          className="font-semibold"
+          style={{
+            fontSize: 13,
+            color: course.current_user_played ? seasonColor : 'hsl(var(--muted-foreground))',
+          }}
+        >
           {getUserHistory()}
         </span>
 
