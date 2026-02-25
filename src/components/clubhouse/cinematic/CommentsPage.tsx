@@ -93,6 +93,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [replyingTo, setReplyingTo] = useState<ReplyingToState | null>(null);
   const [sortMode, setSortMode] = useState<'best' | 'newest'>('newest');
+  const [sortTrigger, setSortTrigger] = useState(0);
   const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set());
   const [selectedComment, setSelectedComment] = useState<CommentWithReplies | CommentReply | null>(null);
   const [showActionSheet, setShowActionSheet] = useState(false);
@@ -172,7 +173,8 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
       }
     }
     return sorted;
-  }, [comments, caddiePickCommentId, sortMode, getReactionsForComment]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [comments.length, caddiePickCommentId, sortMode, sortTrigger]);
 
   // --- Callbacks ---
   const revealComment = useCallback((commentId: string) => {
@@ -540,7 +542,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                   commentCount={comments.length}
                   onClose={onClose}
                   sortMode={sortMode}
-                  onSortChange={setSortMode}
+                  onSortChange={(mode) => { setSortMode(mode); setSortTrigger(prev => prev + 1); }}
                 />
               </div>
               {/* Close button in full mode */}
