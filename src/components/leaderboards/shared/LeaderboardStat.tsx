@@ -7,6 +7,7 @@ interface LeaderboardStatProps {
   positive?: boolean;
   negative?: boolean;
   className?: string;
+  seasonColor?: string;
 }
 
 export function LeaderboardStat({
@@ -16,16 +17,18 @@ export function LeaderboardStat({
   positive = false,
   negative = false,
   className,
+  seasonColor,
 }: LeaderboardStatProps) {
   return (
     <div className={cn('text-right', className)}>
       <div
         className={cn(
-          'text-xl font-bold',
-          highlight && 'text-primary',
-          positive && 'text-green-600 dark:text-green-400',
-          negative && 'text-red-600 dark:text-red-400',
+          'text-[22px] font-extrabold',
+          !seasonColor && highlight && 'text-primary',
+          !seasonColor && positive && 'text-green-600 dark:text-green-400',
+          !seasonColor && negative && 'text-red-600 dark:text-red-400',
         )}
+        style={seasonColor ? { color: seasonColor } : undefined}
       >
         {value}
       </div>
