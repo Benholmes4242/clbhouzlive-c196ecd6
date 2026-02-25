@@ -330,23 +330,17 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
       {/* Dot indicators — pill for active, circle for inactive */}
       {allPicks.length > 1 && (
         <div className="flex items-center justify-center gap-1.5 mt-3">
-          {allPicks.map((_, i) => {
-            const isActive = i === activeIndex;
-            const isFirst = i === 0;
-            return (
-              <div
-                key={i}
-                className="rounded-full transition-all duration-200"
-                style={{
-                  width: isActive ? 20 : 8,
-                  height: 8,
-                  background: isActive
-                    ? (isFirst ? '#D4A017' : 'hsl(var(--foreground))')
-                    : 'rgba(0,0,0,0.12)',
-                }}
-              />
-            );
-          })}
+          {allPicks.map((_, i) => (
+            <div
+              key={i}
+              className="rounded-full transition-all duration-200"
+              style={{
+                width: i === activeIndex ? '16px' : '6px',
+                height: '6px',
+                background: i === activeIndex ? 'hsl(var(--foreground))' : 'rgba(0,0,0,0.12)',
+              }}
+            />
+          ))}
         </div>
       )}
     </div>
