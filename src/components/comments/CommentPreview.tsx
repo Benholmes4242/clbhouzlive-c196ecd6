@@ -38,6 +38,7 @@ const CommentPreview: React.FC<CommentPreviewProps> = ({ postId, totalComments, 
         `)
         .eq('post_id', postId)
         .is('parent_id', null)
+        .is('deleted_at', null)
         .order('created_at', { ascending: false })
         .limit(2);
 

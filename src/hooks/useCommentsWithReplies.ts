@@ -57,8 +57,9 @@ export function useCommentsWithReplies(postId: string | null) {
       // Fetch all comments for this post (including actor info)
       const { data: allComments, error } = await supabase
         .from('post_comments')
-        .select('id, user_id, actor_type, actor_id, content, created_at, updated_at, parent_id')
+        .select('id, user_id, actor_type, actor_id, content, created_at, updated_at, parent_id, is_edited')
         .eq('post_id', postId)
+        .is('deleted_at', null)
         .order('created_at', { ascending: true });
 
       if (error) {
@@ -317,8 +318,9 @@ export function useCommentsWithReplies(postId: string | null) {
       // caused silent no-ops when there was any actor_id vs user_id mismatch.
       const { error, data: deletedRows } = await supabase
         .from('post_comments')
-        .delete()
+        .update({ deleted_at: new Date().toISOString() })
         .eq('id', commentId)
+        .is('deleted_at', null)
         .select('id');
 
       const deletedCount = deletedRows?.length ?? 0;
@@ -334,7 +336,8 @@ export function useCommentsWithReplies(postId: string | null) {
       const { count: remaining } = await supabase
         .from('post_comments')
         .select('id', { count: 'exact', head: true })
-        .eq('post_id', postId!);
+        .eq('post_id', postId!)
+        .is('deleted_at', null);
 
       try {
         await supabase
@@ -358,7 +361,7 @@ export function useCommentsWithReplies(postId: string | null) {
 
       const { error } = await supabase
         .from('post_comments')
-        .update({ content, updated_at: new Date().toISOString() })
+        .update({ content, updated_at: new Date().toISOString(), is_edited: true })
         .eq('id', commentId)
         .eq('user_id', user.id); // RLS safety belt
 

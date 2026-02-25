@@ -6158,7 +6158,9 @@ export type Database = {
           actor_type: string
           content: string
           created_at: string
+          deleted_at: string | null
           id: string
+          is_edited: boolean | null
           parent_id: string | null
           post_id: string
           updated_at: string
@@ -6169,7 +6171,9 @@ export type Database = {
           actor_type?: string
           content: string
           created_at?: string
+          deleted_at?: string | null
           id?: string
+          is_edited?: boolean | null
           parent_id?: string | null
           post_id: string
           updated_at?: string
@@ -6180,7 +6184,9 @@ export type Database = {
           actor_type?: string
           content?: string
           created_at?: string
+          deleted_at?: string | null
           id?: string
+          is_edited?: boolean | null
           parent_id?: string | null
           post_id?: string
           updated_at?: string

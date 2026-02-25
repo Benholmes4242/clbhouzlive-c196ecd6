@@ -44,7 +44,8 @@ export function usePostEngagement(postId: string | null) {
       const { count: commentsCount, error: commentsError } = await supabase
         .from('post_comments')
         .select('*', { count: 'exact', head: true })
-        .eq('post_id', postId);
+        .eq('post_id', postId)
+        .is('deleted_at', null);
 
       if (commentsError) console.error('Error fetching comments count:', commentsError);
 
@@ -197,6 +198,7 @@ export function usePostEngagement(postId: string | null) {
           actor_id
         `)
         .eq('post_id', postId)
+        .is('deleted_at', null)
         .order('created_at', { ascending: true });
 
       if (error) {
