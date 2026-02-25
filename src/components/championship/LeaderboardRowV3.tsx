@@ -68,7 +68,7 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
     >
       {/* Position Badge */}
       <div 
-        className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+        className="w-[22px] h-[22px] rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"
         style={{ 
           backgroundColor: getRankColor(rank),
           color: getRankTextColor(rank),

@@ -35,9 +35,9 @@ const MEDAL_CONFIG: Record<number, {
 };
 
 const SIZE_CLASSES = {
-  sm: 'w-6 h-6 text-xs',
-  md: 'w-8 h-8 text-sm',
-  lg: 'w-10 h-10 text-base',
+  sm: 'w-5 h-5 text-[10px]',
+  md: 'w-[22px] h-[22px] text-[10px]',
+  lg: 'w-8 h-8 text-sm',
 };
 
 /**
