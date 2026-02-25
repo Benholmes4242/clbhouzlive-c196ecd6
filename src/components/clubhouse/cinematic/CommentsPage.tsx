@@ -378,24 +378,6 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
     }
   }, [newComment, attachedPhoto, isAddingComment, isUpdatingComment, editingComment, updateComment, addComment, replyingTo, highlightComment, handleRemovePhoto]);
 
-  const handleSubmitVoice = useCallback(async (mediaUrl: string, durationSeconds: number) => {
-    if (isAddingComment) return;
-    const parentId = replyingTo?.topLevelId ?? undefined;
-    setReplyingTo(null);
-    triggerHaptic('success');
-
-    try {
-      const newCommentId = await addComment('', parentId, {
-        mediaUrl,
-        mediaType: 'voice',
-        voiceDurationSeconds: durationSeconds,
-      });
-      if (parentId) setExpandedReplies(prev => new Set(prev).add(parentId));
-      setTimeout(() => highlightComment(newCommentId, true), 150);
-    } catch (error) {
-      console.error('Failed to add voice comment:', error);
-    }
-  }, [isAddingComment, addComment, replyingTo, highlightComment]);
 
   const handleReply = useCallback((commentId: string, userName: string) => {
     setReplyingTo({ topLevelId: commentId, displayName: userName });
@@ -636,7 +618,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               newComment={newComment}
               onCommentChange={handleCommentChange}
               onSubmit={handleSubmitComment}
-              onSubmitVoice={handleSubmitVoice}
+              
               isAddingComment={isAddingComment}
               isUpdatingComment={isUpdatingComment}
               editingComment={editingComment}

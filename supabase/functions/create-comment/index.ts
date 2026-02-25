@@ -48,11 +48,16 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    // Voice comments can have empty content
-    const isVoiceComment = mediaType === 'voice' && mediaUrl;
+    // Reject voice comments — no longer supported
+    if (mediaType === 'voice') {
+      return new Response(JSON.stringify({ error: 'Voice comments are not supported' }), {
+        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const trimmed = (content || '').trim();
 
-    if (!isVoiceComment && trimmed.length === 0) {
+    if (trimmed.length === 0) {
       return new Response(JSON.stringify({ error: 'Content cannot be empty' }), {
         status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -82,7 +87,7 @@ Deno.serve(async (req: Request) => {
     const insertData: Record<string, unknown> = {
       post_id: postId,
       user_id: userId,
-      content: isVoiceComment && !trimmed ? '[Voice note]' : trimmed,
+      content: trimmed,
       parent_id: parentId || null,
       actor_type: actorType || 'personal',
       actor_id: actorId || userId,

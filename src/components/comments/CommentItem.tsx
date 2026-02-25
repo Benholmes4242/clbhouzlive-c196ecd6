@@ -7,7 +7,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/comments/MentionText';
 import { CaddiePickBadge } from '@/components/comments/CaddiePickBadge';
 import { ReactionDisplay } from '@/components/comments/ReactionDisplay';
-import { VoiceNotePlayer } from '@/components/comments/VoiceNotePlayer';
+
 import { CommentImage } from '@/components/comments/CommentImage';
 import { FloatingReaction } from '@/components/comments/FloatingReaction';
 import { AnimatedCount } from '@/components/comments/AnimatedCount';
@@ -200,15 +200,6 @@ export const CommentItem: React.FC<CommentItemProps> = ({
             onMentionTap={onMentionTap}
           />
 
-          {/* Voice note player */}
-          {(comment as any).media_type === 'voice' && (comment as any).media_url && (
-            <VoiceNotePlayer
-              mediaUrl={(comment as any).media_url}
-              durationSeconds={(comment as any).voice_duration_seconds || 0}
-              commentId={comment.id}
-              isDark={isDark}
-            />
-          )}
 
           {!isReply && onReply && (
             <button
