@@ -111,7 +111,7 @@ function HandicapRow({
     >
       {/* Rank badge */}
       <div
-        className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+        className="w-[22px] h-[22px] rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"
         style={badgeColors ? {
           background: badgeColors.bg,
           color: badgeColors.text,

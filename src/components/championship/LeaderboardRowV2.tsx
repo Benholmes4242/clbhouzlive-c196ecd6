@@ -58,7 +58,7 @@ export const LeaderboardRowV2: React.FC<LeaderboardRowV2Props> = ({
     >
       {/* Rank */}
       <div className={cn(
-        "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0",
+        "w-[22px] h-[22px] rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0",
         getRankStyle()
       )}>
         {rank}
