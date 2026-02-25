@@ -4,6 +4,7 @@ import { ChevronRight, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CommentItem } from '@/components/comments/CommentItem';
 import { CommentsEmptyState } from '@/components/comments/CommentsEmptyState';
+import { CommentsSkeleton } from '@/components/comments/CommentsSkeleton';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import type { CommentWithReplies, CommentReply } from '@/hooks/useCommentsWithReplies';
@@ -126,11 +127,7 @@ export const CommentsList: React.FC<CommentsListProps> = ({
       }}
     >
       {commentsLoading ? (
-        <div className="flex items-center justify-center py-12">
-          <div className={cn("text-sm", isDark ? "text-white/50" : "text-muted-foreground")}>
-            Loading comments...
-          </div>
-        </div>
+        <CommentsSkeleton isDark={isDark} count={5} />
       ) : comments.length === 0 ? (
         <CommentsEmptyState isDark={isDark} onQuickReact={onQuickReact} />
       ) : (

@@ -208,12 +208,12 @@ export const CommentItem: React.FC<CommentItemProps> = ({
             )}>
               {relativeTime(comment.created_at)}
             </span>
-            {comment.updated_at && (new Date(comment.updated_at).getTime() - new Date(comment.created_at).getTime() > 2000) && (
+            {(comment as any).is_edited && (
               <span className={cn(
                 "text-[11px] flex-shrink-0",
                 isDark ? "text-white/25" : "text-muted-foreground/40"
               )}>
-                · edited
+                · (edited)
               </span>
             )}
           </div>
