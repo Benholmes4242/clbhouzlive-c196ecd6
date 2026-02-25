@@ -1386,8 +1386,8 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
             <div 
               className="absolute inset-x-0 top-0 pointer-events-none rounded-t-3xl"
               style={{
-                height: '40%',
-                background: 'linear-gradient(to bottom, rgba(245, 158, 11, 0.10) 0%, rgba(245, 158, 11, 0.04) 40%, transparent 100%)',
+                height: '50%',
+                background: 'linear-gradient(to bottom, rgba(245, 158, 11, 0.18) 0%, rgba(245, 158, 11, 0.08) 35%, rgba(245, 158, 11, 0.02) 65%, transparent 100%)',
               }}
             />
 
