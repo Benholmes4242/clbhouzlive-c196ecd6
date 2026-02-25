@@ -1382,15 +1382,6 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               />
             )}
             
-            {/* Amber gradient — canonical outstanding color, top-down fade */}
-            <div 
-              className="absolute inset-x-0 top-0 pointer-events-none rounded-t-3xl"
-              style={{
-                height: '50%',
-                background: 'linear-gradient(to bottom, rgba(245, 158, 11, 0.18) 0%, rgba(245, 158, 11, 0.08) 35%, rgba(245, 158, 11, 0.02) 65%, transparent 100%)',
-              }}
-            />
-
             {/* Drag handle — top of panel */}
             <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
               <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
