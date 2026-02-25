@@ -43,16 +43,7 @@ export const CoursePodiumSlot: React.FC<Props> = ({
   const config = POSITION_CONFIG[rank];
 
   const getBorderStyle = () => {
-    switch (rank) {
-      case 1: return {
-        border: '3px solid transparent',
-        backgroundImage: 'linear-gradient(var(--background), var(--background)), linear-gradient(135deg, #D4A853, #F0D78C, #D4A853)',
-        backgroundOrigin: 'border-box',
-        backgroundClip: 'padding-box, border-box',
-      };
-      case 2: return { border: '3px solid #A8B4C0' };
-      case 3: return { border: '3px solid #C4956A' };
-    }
+    return { border: 'none' };
   };
 
   const getRankBadgeColor = () => {
