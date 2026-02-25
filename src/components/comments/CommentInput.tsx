@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Smile, X, Pencil, Check } from 'lucide-react';
 import { VoiceRecordButton } from '@/components/comments/VoiceRecordButton';
@@ -21,6 +21,7 @@ interface CommentInputProps {
   newComment: string;
   onCommentChange: (value: string) => void;
   onSubmit: () => void;
+  onSubmitVoice?: (mediaUrl: string, durationSeconds: number) => void;
   isAddingComment: boolean;
   isUpdatingComment: boolean;
   editingComment: CommentWithReplies | CommentReply | null;
@@ -47,6 +48,7 @@ export const CommentInput: React.FC<CommentInputProps> = ({
   newComment,
   onCommentChange,
   onSubmit,
+  onSubmitVoice,
   isAddingComment,
   isUpdatingComment,
   editingComment,
@@ -94,6 +96,10 @@ export const CommentInput: React.FC<CommentInputProps> = ({
       onCommentChange(newComment + emoji.native);
     }
   }, [newComment, onCommentChange, inputRef]);
+
+  const handleVoiceNoteComplete = useCallback((mediaUrl: string, durationSeconds: number) => {
+    onSubmitVoice?.(mediaUrl, durationSeconds);
+  }, [onSubmitVoice]);
 
   return (
     <>
@@ -257,6 +263,8 @@ export const CommentInput: React.FC<CommentInputProps> = ({
                 <VoiceRecordButton
                   isDark={isDark}
                   onTranscription={(text) => onCommentChange(text)}
+                  onVoiceNoteComplete={handleVoiceNoteComplete}
+                  mode="voice-comment"
                 />
               )}
 

@@ -1,6 +1,6 @@
 /**
  * VoiceRecordButton — Animated mic button with pulsing waveform overlay.
- * Press-and-hold records; release transcribes via voice-to-text edge function.
+ * Supports dual mode: voice-comment (upload audio) or transcribe (speech-to-text).
  */
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -9,19 +9,27 @@ import { cn } from '@/lib/utils';
 import { useVoiceRecording } from '@/hooks/useVoiceRecording';
 import { triggerHaptic } from '@/components/comments/utils';
 
+type VoiceMode = 'voice-comment' | 'transcribe';
+
 interface VoiceRecordButtonProps {
   isDark: boolean;
-  onTranscription: (text: string) => void;
+  onTranscription?: (text: string) => void;
+  onVoiceNoteComplete?: (mediaUrl: string, durationSeconds: number) => void;
+  mode?: VoiceMode;
   disabled?: boolean;
 }
 
 export const VoiceRecordButton: React.FC<VoiceRecordButtonProps> = ({
   isDark,
   onTranscription,
+  onVoiceNoteComplete,
+  mode = 'transcribe',
   disabled = false,
 }) => {
   const { isRecording, isProcessing, startRecording, stopRecording } = useVoiceRecording({
     onTranscriptionComplete: onTranscription,
+    onVoiceNoteComplete: onVoiceNoteComplete,
+    mode,
   });
 
   const [elapsed, setElapsed] = useState(0);
