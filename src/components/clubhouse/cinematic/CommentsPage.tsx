@@ -34,6 +34,7 @@ import { CommentActionSheet } from '@/components/comments/CommentActionSheet';
 import { ReportCommentModal } from '@/components/comments/ReportCommentModal';
 import { BlockUserModal } from '@/components/comments/BlockUserModal';
 import { GolfReactionPicker, GolfReactionType } from '@/components/comments/GolfReactionPicker';
+import { TypingPresence } from '@/components/comments/TypingPresence';
 import { triggerHaptic } from '@/components/comments/utils';
 
 interface CommentsPageProps {
@@ -458,6 +459,15 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               isFetchingNextPage={isFetchingNextPage}
               onFetchNextPage={() => fetchNextPage()}
               onLoadAllReplies={loadAllReplies}
+            />
+
+            {/* Typing presence */}
+            <TypingPresence
+              postId={postId}
+              currentUserId={currentUserId}
+              currentUserName={activeActor?.name}
+              isDark={isDark}
+              isTyping={newComment.length > 0}
             />
 
             {/* Input */}

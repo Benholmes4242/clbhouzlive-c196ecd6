@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Smile, X, Pencil, Check } from 'lucide-react';
+import { VoiceRecordButton } from '@/components/comments/VoiceRecordButton';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { CommentingAsIndicator } from '@/components/comments/CommentingAsIndicator';
@@ -250,7 +251,15 @@ export const CommentInput: React.FC<CommentInputProps> = ({
               />
             </div>
 
-            <div className="flex flex-col items-center justify-end gap-0.5 pb-0.5 flex-shrink-0">
+          <div className="flex flex-col items-center justify-end gap-0.5 pb-0.5 flex-shrink-0">
+              {/* Voice record button - only show when text is empty */}
+              {!newComment.trim() && !editingComment && (
+                <VoiceRecordButton
+                  isDark={isDark}
+                  onTranscription={(text) => onCommentChange(text)}
+                />
+              )}
+
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={onToggleEmojiPicker}
