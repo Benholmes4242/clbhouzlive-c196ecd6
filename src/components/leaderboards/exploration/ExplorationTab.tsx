@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useMemo, useLayoutEffect, useCallback } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExplorationLeaderboard, useUserExplorationStatus } from '@/hooks/leaderboards';
+import { useSeasonCalendar } from '@/hooks/championship';
+import { getSeasonConfig, type SeasonId } from '@/lib/seasonConfig';
 import { supabase } from '@/integrations/supabase/client';
 
 import { cn } from '@/lib/utils';
@@ -84,6 +86,19 @@ function loadSavedFilters() {
 export function ExplorationTab() {
   const { user } = useSupabaseSession();
   const savedFilters = useRef(loadSavedFilters()).current;
+
+  // Season color derivation
+  const { data: seasonCalendar } = useSeasonCalendar();
+  const seasonThemeColor = useMemo(() => {
+    const currentSeason = seasonCalendar?.find(s => s.is_current);
+    if (!currentSeason) return '#006747';
+    const lower = currentSeason.name.toLowerCase();
+    let id: SeasonId = 'major';
+    if (lower.includes('pre-season') || lower.includes('preseason') || lower.includes('training')) id = 'preseason';
+    else if (lower.includes('summer')) id = 'summer';
+    else if (lower.includes('off-season') || lower.includes('offseason')) id = 'offseason';
+    return getSeasonConfig(id).themeColor;
+  }, [seasonCalendar]);
 
   const [scope, setScope] = useState<LeaderboardScope>(() => savedFilters?.scope ?? 'global');
   const [metric, setMetric] = useState<ExplorationMetric>(() => savedFilters?.metric ?? 'countries');
@@ -310,22 +325,24 @@ export function ExplorationTab() {
         ringColor={getPodiumRingColor(entry.rank)}
         isCurrentUser={entry.user_id === user?.id}
         isFriend={entry.is_friend && scope !== 'friends'}
+        seasonColor={seasonThemeColor}
       >
         <div className={getMetricColor(entry.rank)}>
-          <LeaderboardStat value={getMetricValue(entry)} />
+          <LeaderboardStat value={getMetricValue(entry)} seasonColor={entry.rank > 3 ? seasonThemeColor : undefined} />
         </div>
       </LeaderboardRow>
     </div>
   );
 
   return (
-    <div className="flex flex-col px-4 pt-4 space-y-6">
+    <div className="flex flex-col px-5 pt-4" style={{ gap: 20 }}>
       {/* 1. World Map — 16px below sub-tabs (pt-4) */}
       {user && userStatus && (
         <GlobalProgressMap 
           playedContinents={userStatus.continent_list ?? []}
           playedCountries={userStatus.country_list ?? []}
           mapView={metric}
+          seasonColor={seasonThemeColor}
         />
       )}
 
@@ -338,6 +355,7 @@ export function ExplorationTab() {
             countriesPlayed={countriesPlayed}
             viewMode={metric}
             onViewModeChange={setMetric}
+            seasonColor={seasonThemeColor}
           />
         </div>
       )}
@@ -396,6 +414,7 @@ export function ExplorationTab() {
             entries={podiumEntries} 
             metric={metric}
             currentUserId={user?.id}
+            seasonColor={seasonThemeColor}
           />
 
           {/* Rankings List */}

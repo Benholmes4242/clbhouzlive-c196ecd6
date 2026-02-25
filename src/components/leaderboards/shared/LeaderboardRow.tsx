@@ -13,14 +13,12 @@ interface LeaderboardRowProps {
   ringColor?: string | null;
   isCurrentUser?: boolean;
   isFriend?: boolean;
+  seasonColor?: string;
   children: React.ReactNode;
 }
 
 /**
- * LeaderboardRow - Matches Championship tab styling exactly:
- * - MedalBadge for ranks (filled amber circles for top 3)
- * - 2-line layout (name, then courses · club)
- * - Large primary-colored stat on the right
+ * LeaderboardRow — A* spec: 72px height, 48px squircle avatars, 16px/600 names
  */
 export function LeaderboardRow({
   rank,
@@ -32,6 +30,7 @@ export function LeaderboardRow({
   ringColor,
   isCurrentUser = false,
   isFriend = false,
+  seasonColor,
   children,
 }: LeaderboardRowProps) {
   const initials = displayName
@@ -45,16 +44,16 @@ export function LeaderboardRow({
     <Link
       to={`/profile/${userId}`}
       className={cn(
-        'w-full py-3 flex items-center gap-3 transition-colors transition-transform active:scale-[0.98]',
+        'w-full py-4 flex items-center gap-3 transition-colors transition-transform active:scale-[0.98]',
         'px-4',
         'hover:bg-muted/20 active:bg-muted/30',
         isCurrentUser && 'rounded-xl'
       )}
       style={{
-        borderBottom: isCurrentUser ? undefined : '1px solid hsl(var(--border) / 0.15)',
+        borderBottom: isCurrentUser ? undefined : '1px solid hsl(var(--border) / 0.08)',
         ...(isCurrentUser ? {
           background: 'rgba(212, 168, 83, 0.08)',
-          border: '1px solid rgba(212, 168, 83, 0.2)',
+          border: '2px solid rgba(212, 168, 83, 0.2)',
         } : {}),
       }}
     >
@@ -62,35 +61,35 @@ export function LeaderboardRow({
       {/* Rank Badge - using Championship MedalBadge */}
       <MedalBadge rank={rank} size="md" />
 
-      {/* Avatar */}
+      {/* Avatar — 48px squircle */}
       <SquircleAvatar
-        size={40}
+        size={48}
         src={profilePhotoUrl}
         alt={displayName}
         fallback={initials}
         hideRing
       />
 
-      {/* Name & Info - 3-line layout for Explore tab */}
+      {/* Name & Info */}
       <div className="flex-1 min-w-0 text-left">
-        {/* Line 1: Name */}
+        {/* Line 1: Name — 16px semibold */}
         <span className={cn(
-          'text-sm font-medium truncate block',
-          isCurrentUser && 'text-primary font-semibold'
+          'text-base font-semibold truncate block',
+          isCurrentUser && 'text-primary'
         )}>
           {displayName}
         </span>
         
         {/* Line 2: Home Club */}
         {homeClub && (
-          <span className="text-xs text-muted-foreground truncate block">
+          <span className="text-[13px] text-muted-foreground truncate block">
             {homeClub}
           </span>
         )}
         
         {/* Line 3: Courses count */}
         {coursesCount !== undefined && (
-          <span className="text-xs text-muted-foreground block">
+          <span className="text-[13px] text-muted-foreground block">
             {coursesCount} courses
           </span>
         )}

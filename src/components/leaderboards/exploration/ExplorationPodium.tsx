@@ -2,18 +2,22 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Crown, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getSeasonGradient } from '@/lib/colorUtils';
 import type { ExplorationLeaderboardEntry, ExplorationMetric } from '@/types/leaderboards';
 
-// Premium awards stage configuration — matches TrophyPodiumSlot
+// Premium awards stage configuration — matches TrophyPodiumSlot A* spec
 const POSITION_CONFIG = {
   1: {
-    avatarSize: 110,
-    mobileAvatarSize: 90,
+    avatarSize: 120,
+    mobileAvatarSize: 120,
     borderWidth: 0.5,
-    badgeSize: 28,
-    nameClass: 'text-lg font-bold',
-    statClass: 'text-base',
-    borderColor: '#D4A853',        // Gold
+    badgeSize: 26,
+    nameSize: 17,
+    nameWeight: 700,
+    statSize: 24,
+    statWeight: 800,
+    labelSize: 13,
+    borderColor: '#D4A853',
     borderGradient: ['#D4A853', '#F0D78C', '#D4A853'],
     badgeBg: '#D4A853',
     shadowColor: 'rgba(212, 168, 83, 0.25)',
@@ -21,32 +25,38 @@ const POSITION_CONFIG = {
     verticalOffset: 0,
   },
   2: {
-    avatarSize: 80,
-    mobileAvatarSize: 68,
+    avatarSize: 88,
+    mobileAvatarSize: 88,
     borderWidth: 0.5,
-    badgeSize: 24,
-    nameClass: 'text-sm font-semibold',
-    statClass: 'text-sm',
-    borderColor: '#A8B4C0',        // Silver
+    badgeSize: 22,
+    nameSize: 15,
+    nameWeight: 600,
+    statSize: 20,
+    statWeight: 700,
+    labelSize: 12,
+    borderColor: '#A8B4C0',
     borderGradient: ['#A8B4C0'],
     badgeBg: '#A8B4C0',
     shadowColor: 'rgba(0, 0, 0, 0.1)',
     crownSize: 0,
-    verticalOffset: 20,
+    verticalOffset: 24,
   },
   3: {
-    avatarSize: 80,
-    mobileAvatarSize: 68,
+    avatarSize: 88,
+    mobileAvatarSize: 88,
     borderWidth: 0.5,
-    badgeSize: 24,
-    nameClass: 'text-sm font-semibold',
-    statClass: 'text-sm',
-    borderColor: '#C4956A',        // Bronze
+    badgeSize: 22,
+    nameSize: 15,
+    nameWeight: 600,
+    statSize: 20,
+    statWeight: 700,
+    labelSize: 12,
+    borderColor: '#C4956A',
     borderGradient: ['#C4956A'],
     badgeBg: '#C4956A',
     shadowColor: 'rgba(0, 0, 0, 0.1)',
     crownSize: 0,
-    verticalOffset: 32,
+    verticalOffset: 40,
   },
 } as const;
 
@@ -54,6 +64,7 @@ interface ExplorationPodiumProps {
   entries: ExplorationLeaderboardEntry[];
   metric: ExplorationMetric;
   currentUserId?: string;
+  seasonColor?: string;
 }
 
 const getMetricValue = (entry: ExplorationLeaderboardEntry, metric: ExplorationMetric): number => {
@@ -96,7 +107,9 @@ function formatNameTwoLines(displayName: string | null): { firstName: string; la
 // Stagger order: #2 first (0ms), #1 second (100ms), #3 third (200ms)
 const ANIMATION_DELAYS = { 1: 0.1, 2: 0, 3: 0.2 } as const;
 
-export function ExplorationPodium({ entries, metric, currentUserId }: ExplorationPodiumProps) {
+export function ExplorationPodium({ entries, metric, currentUserId, seasonColor = '#006747' }: ExplorationPodiumProps) {
+  const gradient = getSeasonGradient(seasonColor);
+
   if (entries.length < 3) {
     return (
       <div className="py-12 text-center">
@@ -120,12 +133,12 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
       <div
         className="absolute pointer-events-none inset-0"
         style={{
-          background: 'radial-gradient(ellipse at 50% 40%, rgba(82, 183, 136, 0.06) 0%, transparent 70%)',
+          background: `radial-gradient(ellipse at 50% 40%, ${gradient.subtleTint} 0%, transparent 70%)`,
         }}
       />
 
       {/* Podium Layout: 2nd - 1st (elevated) - 3rd */}
-      <div className="relative flex items-start justify-center">
+      <div className="relative flex items-start justify-center gap-2">
         {arranged.map(({ entry, position }) => {
           const config = POSITION_CONFIG[position];
           const metricValue = getMetricValue(entry, metric);
@@ -167,7 +180,7 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
                   </motion.div>
                 )}
 
-                {/* Avatar with metallic ring */}
+                {/* Avatar with metallic ring — CIRCULAR */}
                 <div className="relative">
                   {/* Golden glow for #1 */}
                   {position === 1 && (
@@ -184,13 +197,13 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
                     />
                   )}
 
-                  {/* Avatar image */}
+                  {/* Avatar image — circle */}
                   <div
                     className="relative overflow-hidden"
                     style={{
                       width: config.mobileAvatarSize,
-                      aspectRatio: '1 / 1.05',
-                      borderRadius: '34%',
+                      height: config.mobileAvatarSize,
+                      borderRadius: '50%',
                       border: `${config.borderWidth}px solid ${config.borderColor}`,
                       boxShadow: `0 ${position === 1 ? '8px 24px' : '4px 12px'} ${config.shadowColor}`,
                     }}
@@ -208,13 +221,13 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
                     )}
                   </div>
 
-                  {/* Rank badge — bottom-right */}
+                  {/* Rank badge — circular, bottom-right */}
                   <div
                     className="absolute -bottom-1.5 -right-0.5 flex items-center justify-center font-bold text-white shadow-md"
                     style={{
                       width: config.badgeSize,
                       height: config.badgeSize,
-                      borderRadius: '34%',
+                      borderRadius: '50%',
                       backgroundColor: config.badgeBg,
                       border: '2px solid white',
                       fontSize: config.badgeSize * 0.45,
@@ -227,26 +240,35 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
 
                 {/* Name */}
                 <div className="mt-3 text-center">
-                  <p className={cn('text-foreground leading-tight', config.nameClass)}>
+                  <p
+                    className="text-foreground leading-tight"
+                    style={{ fontSize: config.nameSize, fontWeight: config.nameWeight }}
+                  >
                     {nameParts.firstName}
                   </p>
                   {nameParts.lastName && (
-                    <p className={cn('text-foreground leading-tight', config.nameClass)}>
+                    <p
+                      className="text-foreground leading-tight"
+                      style={{ fontSize: config.nameSize, fontWeight: config.nameWeight }}
+                    >
                       {nameParts.lastName}
                     </p>
                   )}
                 </div>
 
-                {/* Stat — green number + muted label */}
+                {/* Stat — season-colored number + muted label */}
                 <motion.p
-                  className={cn('font-bold mt-0.5', config.statClass)}
-                  style={{ color: '#40916C' }}
+                  className="font-bold mt-0.5"
+                  style={{ color: seasonColor, fontSize: config.statSize, fontWeight: config.statWeight }}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: delay + 0.3, duration: 0.3 }}
                 >
                   {metricValue}
-                  <span className="text-xs font-normal text-muted-foreground ml-1">
+                  <span
+                    className="font-normal text-muted-foreground ml-1"
+                    style={{ fontSize: config.labelSize }}
+                  >
                     {getMetricLabel(metric)}
                   </span>
                 </motion.p>
@@ -257,7 +279,7 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
                     {entry.continent_list.filter(c => c !== 'Antarctica').slice(0, 3).map((continent) => (
                       <span
                         key={continent}
-                        className="text-[9px] px-1.5 py-0.5 text-muted-foreground rounded-md whitespace-nowrap"
+                        className="text-[11px] px-2 py-0.5 text-muted-foreground rounded-md whitespace-nowrap"
                         style={{
                           background: 'rgba(0, 0, 0, 0.04)',
                           border: '1px solid rgba(0, 0, 0, 0.08)',
@@ -267,7 +289,7 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
                       </span>
                     ))}
                     {entry.continent_list.filter(c => c !== 'Antarctica').length > 3 && (
-                      <span className="text-[9px] text-muted-foreground">
+                      <span className="text-[11px] text-muted-foreground">
                         +{entry.continent_list.filter(c => c !== 'Antarctica').length - 3}
                       </span>
                     )}
