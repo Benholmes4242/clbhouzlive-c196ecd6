@@ -18,3 +18,7 @@ export { CommentsSkeleton, CommentSkeleton } from './CommentsSkeleton';
 export { VoiceRecordButton } from './VoiceRecordButton';
 export { TypingPresence } from './TypingPresence';
 export { ReactionBurst } from './ReactionBurst';
+export { FloatingReaction } from './FloatingReaction';
+export { LivePresenceBar } from './LivePresenceBar';
+export { RichCommentToolbar } from './RichCommentToolbar';
+export { generateCommentLink, parseCommentLink, getSmartNotificationCopy } from './CommentDeepLink';

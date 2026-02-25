@@ -172,3 +172,6 @@ verify_jwt = false
 
 [functions.validate-prediction-field-status]
 verify_jwt = false
+
+[functions.create-comment]
+verify_jwt = false

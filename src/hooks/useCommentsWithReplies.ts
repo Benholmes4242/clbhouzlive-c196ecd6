@@ -257,7 +257,7 @@ export function useCommentsWithReplies(postId: string | null) {
     });
   }, [postId, user?.id, queryClient, enrichComments]);
 
-  // Add comment mutation
+  // Add comment mutation with optimistic update
   const addCommentMutation = useMutation({
     mutationFn: async ({ content, parentId }: { content: string; parentId?: string }): Promise<string> => {
       if (!postId || !user?.id) throw new Error('Missing postId or user');
@@ -326,14 +326,54 @@ export function useCommentsWithReplies(postId: string | null) {
 
       return data.id;
     },
-    onSuccess: () => {
+    onMutate: async ({ content, parentId }) => {
+      // Optimistic insert
+      await queryClient.cancelQueries({ queryKey: ['post-comments-with-replies', postId] });
+      const prev = queryClient.getQueryData(['post-comments-with-replies', postId]);
+
+      const optimisticId = `optimistic-${Date.now()}`;
+      const optimisticComment: CommentWithReplies = {
+        id: optimisticId,
+        user_id: user?.id || '',
+        actor_type: actorType as 'personal' | 'business',
+        actor_id: actorId,
+        user_name: 'You',
+        avatar_url: null,
+        content,
+        created_at: new Date().toISOString(),
+        likes_count: 0,
+        has_liked: false,
+        replies: [],
+        replies_count: 0,
+        total_replies_count: 0,
+      };
+
+      if (!parentId) {
+        queryClient.setQueryData(['post-comments-with-replies', postId], (old: any) => {
+          if (!old?.pages?.length) return { pages: [{ comments: [optimisticComment], nextCursor: null }], pageParams: [null] };
+          const pages = [...old.pages];
+          const lastPage = { ...pages[pages.length - 1] };
+          lastPage.comments = [...lastPage.comments, optimisticComment];
+          pages[pages.length - 1] = lastPage;
+          return { ...old, pages };
+        });
+      }
+
+      return { prev };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.prev) {
+        queryClient.setQueryData(['post-comments-with-replies', postId], context.prev);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['post-comments-with-replies', postId] });
       queryClient.invalidateQueries({ queryKey: ['post-engagement', postId] });
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
     },
   });
 
-  // Toggle comment like
+  // Toggle comment like with optimistic update
   const toggleLikeMutation = useMutation({
     mutationFn: async (commentId: string) => {
       if (!user?.id) throw new Error('Not authenticated');
@@ -351,7 +391,47 @@ export function useCommentsWithReplies(postId: string | null) {
         await supabase.from('comment_likes').insert({ comment_id: commentId, user_id: user.id });
       }
     },
-    onSuccess: () => {
+    onMutate: async (commentId) => {
+      await queryClient.cancelQueries({ queryKey: ['post-comments-with-replies', postId] });
+      const prev = queryClient.getQueryData(['post-comments-with-replies', postId]);
+
+      // Optimistically toggle like
+      queryClient.setQueryData(['post-comments-with-replies', postId], (old: any) => {
+        if (!old?.pages) return old;
+        return {
+          ...old,
+          pages: old.pages.map((page: PageData) => ({
+            ...page,
+            comments: page.comments.map((c: CommentWithReplies) => {
+              if (c.id === commentId) {
+                return {
+                  ...c,
+                  has_liked: !c.has_liked,
+                  likes_count: c.has_liked ? c.likes_count - 1 : c.likes_count + 1,
+                };
+              }
+              // Check replies
+              return {
+                ...c,
+                replies: c.replies.map((r: CommentReply) =>
+                  r.id === commentId
+                    ? { ...r, has_liked: !r.has_liked, likes_count: r.has_liked ? r.likes_count - 1 : r.likes_count + 1 }
+                    : r
+                ),
+              };
+            }),
+          })),
+        };
+      });
+
+      return { prev };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.prev) {
+        queryClient.setQueryData(['post-comments-with-replies', postId], context.prev);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['post-comments-with-replies', postId] });
     },
   });
