@@ -1,10 +1,11 @@
 /**
  * ResultsRecap - Post-tournament results summary card
- * Premium editorial scorecard with grade, accuracy breakdown, and best call
+ * Premium editorial scorecard with accuracy breakdown and best call
  */
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Target } from 'lucide-react';
 import type { AccuracyMetrics } from './types';
 import type { AIPredictionData } from '../../hooks/useAIPredictions';
 
@@ -22,13 +23,6 @@ function getOrdinalSuffix(n: number): string {
   return s[(v - 20) % 10] || s[v] || s[0];
 }
 
-const GRADE_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
-  excellent: { label: 'A+', bg: 'rgba(34,197,94,0.12)', text: 'rgba(34,197,94,0.9)' },
-  good:      { label: 'B+', bg: 'rgba(59,130,246,0.12)', text: 'rgba(59,130,246,0.9)' },
-  mixed:     { label: 'C',  bg: 'rgba(245,158,11,0.12)', text: 'rgba(245,158,11,0.9)' },
-  poor:      { label: 'D',  bg: 'rgba(239,68,68,0.12)', text: 'rgba(239,68,68,0.9)' },
-};
-
 export const ResultsRecap: React.FC<ResultsRecapProps> = ({
   predictions,
   accuracy,
@@ -36,16 +30,15 @@ export const ResultsRecap: React.FC<ResultsRecapProps> = ({
   bestCallPredicted,
   bestCallActual,
 }) => {
-  const grade = GRADE_CONFIG[accuracy.overallGrade] ?? GRADE_CONFIG.mixed;
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       className="bg-card rounded-2xl border border-border/50 overflow-hidden"
+      style={{ borderTop: '2px solid hsl(var(--foreground))' }}
     >
-      {/* Header bar — dark */}
+      {/* Header bar */}
       <div
         style={{
           background: 'hsl(var(--foreground))',
@@ -67,11 +60,11 @@ export const ResultsRecap: React.FC<ResultsRecapProps> = ({
 
       {/* Body */}
       <div style={{ padding: '14px 16px' }}>
-        {/* Accuracy headline */}
+        {/* Accuracy headline — 32px/800 */}
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 12 }}>
           <span
             className="text-foreground"
-            style={{ fontSize: 28, fontWeight: 700, letterSpacing: '-0.5px' }}
+            style={{ fontSize: 32, fontWeight: 800, letterSpacing: '-1px' }}
           >
             {accuracy.inTop10}/{accuracy.totalPredictions}
           </span>
@@ -83,7 +76,7 @@ export const ResultsRecap: React.FC<ResultsRecapProps> = ({
           </span>
         </div>
 
-        {/* Accuracy breakdown row */}
+        {/* Accuracy breakdown row — subtle green tint when hits > 0 */}
         <div
           style={{
             display: 'flex',
@@ -106,17 +99,18 @@ export const ResultsRecap: React.FC<ResultsRecapProps> = ({
                 padding: '10px 0',
                 textAlign: 'center',
                 borderRight: i < 2 ? '1px solid hsl(var(--border) / 0.3)' : 'none',
+                background: bucket.value > 0 ? 'rgba(34, 197, 94, 0.04)' : 'transparent',
               }}
             >
               <div
                 className="text-foreground"
-                style={{ fontSize: 18, fontWeight: 700, lineHeight: 1.1 }}
+                style={{ fontSize: 20, fontWeight: 800, lineHeight: 1.1 }}
               >
                 {bucket.value}
               </div>
               <div
                 className="text-muted-foreground"
-                style={{ fontSize: 10.5, fontWeight: 500, marginTop: 2, textTransform: 'uppercase', letterSpacing: '0.5px' }}
+                style={{ fontSize: 11, fontWeight: 600, marginTop: 2, textTransform: 'uppercase', letterSpacing: '0.5px' }}
               >
                 {bucket.label}
               </div>
@@ -124,22 +118,23 @@ export const ResultsRecap: React.FC<ResultsRecapProps> = ({
           ))}
         </div>
 
-        {/* Best call line */}
+        {/* Best call line — gold left border */}
         {bestCallName && bestCallActual != null && (
           <div
             className="text-muted-foreground"
             style={{
-              fontSize: 12,
+              fontSize: 13,
               fontWeight: 500,
-              padding: '10px 12px',
+              padding: '12px 14px',
               background: 'hsl(var(--muted) / 0.5)',
               borderRadius: 8,
               display: 'flex',
               alignItems: 'center',
-              gap: 6,
+              gap: 8,
+              borderLeft: '3px solid #D4A853',
             }}
           >
-            <span style={{ fontSize: 14 }}>🎯</span>
+            <Target className="w-4 h-4 flex-shrink-0" style={{ color: '#D4A853' }} />
             <span>
               <span className="text-foreground" style={{ fontWeight: 600 }}>
                 Best call:

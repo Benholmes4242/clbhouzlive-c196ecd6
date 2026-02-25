@@ -1,6 +1,5 @@
 /**
- * PredictionLeaderboard - Unified OWGR-style table
- * 4 picks, all identical styling. OFF LEAD column.
+ * PredictionLeaderboard - OWGR-style table with theme-aware headers
  */
 
 import React from 'react';
@@ -19,7 +18,6 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
 }) => {
   if (allPicks.length === 0) return null;
 
-  // All 5 picks in one flat list
   const rows = allPicks.slice(0, 5);
 
   return (
@@ -29,32 +27,32 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
       className="overflow-hidden"
     >
-      {/* Column header row — no background */}
+      {/* Column header row */}
       <div
         className="flex items-center px-4"
         style={{
           padding: '10px 16px',
-          borderBottom: '1px solid rgba(0,0,0,0.08)',
+          borderBottom: '1px solid hsl(var(--border) / 0.3)',
         }}
       >
         <div className="flex-1 min-w-0">
-          <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' as const, color: 'rgba(0,0,0,0.35)' }}>
+          <span className="text-muted-foreground" style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase' as const }}>
             OUR TOP 5
           </span>
         </div>
         <div className="w-[52px] flex-shrink-0 text-center">
-          <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1px', color: 'rgba(0,0,0,0.35)' }}>
+          <span className="text-muted-foreground" style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '1px' }}>
             ACTUAL
           </span>
         </div>
         <div className="w-[75px] flex-shrink-0 text-center">
-          <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1px', color: 'rgba(0,0,0,0.35)', whiteSpace: 'nowrap' }}>
+          <span className="text-muted-foreground" style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '1px', whiteSpace: 'nowrap' }}>
             OFF LEAD
           </span>
         </div>
       </div>
 
-      {/* All 4 rows — identical styling */}
+      {/* Rows */}
       {rows.map((prediction, i) => (
         <div key={prediction.playerId}>
           <PredictionScorecardRow
@@ -63,7 +61,7 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
             isCompleted={isCompleted}
           />
           {i < rows.length - 1 && (
-            <div className="border-b" style={{ borderColor: 'rgba(0, 0, 0, 0.04)' }} />
+            <div className="border-b border-border/20" />
           )}
         </div>
       ))}

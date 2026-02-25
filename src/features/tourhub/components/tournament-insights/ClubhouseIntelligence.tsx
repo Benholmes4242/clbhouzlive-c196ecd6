@@ -1,6 +1,6 @@
 /**
  * ClubhouseIntelligence - Course breakdown
- * Renders flat on page background (no card wrapper)
+ * Theme-aware, animated chevron
  */
 
 import { memo, useState } from 'react';
@@ -30,7 +30,7 @@ export const ClubhouseIntelligence = memo(function ClubhouseIntelligence({
       viewport={{ once: true }}
       className="px-4 pb-5 pt-0"
     >
-      <h3 className="mb-2.5" style={{ fontSize: '17px', fontWeight: 600, color: '#1C1917' }}>
+      <h3 className="mb-3 text-foreground" style={{ fontSize: '18px', fontWeight: 700 }}>
         Course Breakdown
       </h3>
 
@@ -50,12 +50,13 @@ export const ClubhouseIntelligence = memo(function ClubhouseIntelligence({
           className="flex items-center gap-1.5 mt-3 text-[13px] font-semibold bg-transparent border-none cursor-pointer p-0 transition-opacity duration-200 text-foreground hover:opacity-70 active:opacity-70"
         >
           {isExpanded ? 'Show less' : 'Show more'}
-          <ChevronDown
-            className="w-3.5 h-3.5 transition-transform duration-200 text-foreground"
-            style={{
-              transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-            }}
-          />
+          <motion.span
+            animate={{ rotate: isExpanded ? 180 : 0 }}
+            transition={{ duration: 0.2 }}
+            className="inline-flex"
+          >
+            <ChevronDown className="w-3.5 h-3.5 text-foreground" />
+          </motion.span>
         </button>
       )}
     </motion.div>

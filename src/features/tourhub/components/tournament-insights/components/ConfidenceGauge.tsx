@@ -1,7 +1,6 @@
 /**
  * ConfidenceGauge — Circular SVG confidence ring
- * Arc color is driven by the parent's accentColor prop.
- * Animates from 0 → target on mount (once).
+ * 60px ring, 5px stroke, theme-aware track
  */
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -9,9 +8,7 @@ import { ConfidenceTier } from '../types';
 
 interface ConfidenceGaugeProps {
   tier: ConfidenceTier;
-  /** The arc color — matches the card's accent */
   accentColor?: string;
-  /** Delay before arc animation starts (ms) */
   animationDelay?: number;
   isWithdrawn?: boolean;
 }
@@ -24,12 +21,12 @@ const tierToPercentage: Record<ConfidenceTier, number> = {
 
 const ConfidenceGauge: React.FC<ConfidenceGaugeProps> = ({
   tier,
-  accentColor = '#9CA3AF',
+  accentColor = '#94A3B8',
   animationDelay = 500,
   isWithdrawn = false,
 }) => {
   const percentage = isWithdrawn ? 0 : tierToPercentage[tier];
-  const arcColor = isWithdrawn ? '#9CA3AF' : accentColor;
+  const arcColor = isWithdrawn ? '#94A3B8' : accentColor;
   const [animatedPct, setAnimatedPct] = useState(0);
   const hasAnimated = useRef(false);
   const gaugeRef = useRef<HTMLDivElement>(null);
@@ -53,8 +50,8 @@ const ConfidenceGauge: React.FC<ConfidenceGaugeProps> = ({
     return () => observer.disconnect();
   }, [percentage, animationDelay]);
 
-  const size = 54;
-  const strokeWidth = 4;
+  const size = 60;
+  const strokeWidth = 5;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const dashOffset = circumference - (circumference * animatedPct) / 100;
@@ -62,12 +59,13 @@ const ConfidenceGauge: React.FC<ConfidenceGaugeProps> = ({
   return (
     <div ref={gaugeRef} className="flex flex-col items-center gap-1">
       <span
+        className="text-muted-foreground"
         style={{
-          fontSize: 9.5,
+          fontSize: 10,
           fontWeight: 600,
           letterSpacing: '0.5px',
           textTransform: 'uppercase' as const,
-          color: 'rgba(0,0,0,0.3)',
+          opacity: 0.6,
         }}
       >
         AI Confidence
@@ -79,7 +77,7 @@ const ConfidenceGauge: React.FC<ConfidenceGaugeProps> = ({
             cy={size / 2}
             r={radius}
             fill="none"
-            stroke="rgba(0,0,0,0.06)"
+            stroke="hsl(var(--muted-foreground) / 0.08)"
             strokeWidth={strokeWidth}
           />
           <circle
@@ -100,11 +98,11 @@ const ConfidenceGauge: React.FC<ConfidenceGaugeProps> = ({
           className="absolute inset-0 flex items-center justify-center"
           style={{ color: arcColor }}
         >
-          <span style={{ fontSize: 15, fontWeight: 700, lineHeight: 1 }}>
+          <span style={{ fontSize: 17, fontWeight: 800, lineHeight: 1 }}>
             {isWithdrawn ? '—' : percentage}
           </span>
           {!isWithdrawn && (
-            <span style={{ fontSize: 10, fontWeight: 600, marginTop: 1 }}>%</span>
+            <span style={{ fontSize: 11, fontWeight: 600, marginTop: 1 }}>%</span>
           )}
         </div>
       </div>

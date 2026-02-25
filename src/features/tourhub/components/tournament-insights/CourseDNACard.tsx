@@ -1,6 +1,6 @@
 /**
  * CourseDNACard - What wins here
- * Renders flat on page background (no card wrapper)
+ * Theme-aware, premium skill importance bars
  */
 
 import { memo } from 'react';
@@ -14,28 +14,24 @@ interface CourseDNACardProps {
   courseName?: string;
 }
 
-// Tier → fill percentage for continuous bar
 const tierToFill: Record<ImportanceTier, number> = {
   critical: 100,
   significant: 80,
   useful: 50,
 };
 
-// Tier → hex color
 const tierToHexColor: Record<ImportanceTier, string> = {
   critical: '#FF3B30',
   significant: '#FF9500',
   useful: '#3478F6',
 };
 
-// Tier → display label
 const tierToLabel: Record<ImportanceTier, string> = {
   critical: 'CRITICAL',
   significant: 'SIGNIFICANT',
   useful: 'USEFUL',
 };
 
-// Map: database icon name string → lucide-react component
 const iconNameMap: Record<string, LucideIcon> = {
   flag: Flag,
   circle: Circle,
@@ -48,7 +44,6 @@ const iconNameMap: Record<string, LucideIcon> = {
   'rotate-ccw': RotateCcw,
 };
 
-// Fallback: resolve from label text when icon name is missing or unrecognized
 const getIconFromLabel = (label: string): LucideIcon => {
   const lower = label.toLowerCase();
   if (lower.includes('approach')) return Target;
@@ -62,7 +57,6 @@ const getIconFromLabel = (label: string): LucideIcon => {
   return Flag;
 };
 
-// Try icon name first, then label, then default
 const resolveIcon = (iconName?: string, label?: string): LucideIcon => {
   if (iconName && iconNameMap[iconName.toLowerCase()]) {
     return iconNameMap[iconName.toLowerCase()];
@@ -70,7 +64,6 @@ const resolveIcon = (iconName?: string, label?: string): LucideIcon => {
   return label ? getIconFromLabel(label) : Flag;
 };
 
-// Icon container background based on tier (light mode)
 const getIconBg = (tier: ImportanceTier): string => {
   switch (tier) {
     case 'critical': return 'rgba(255, 59, 48, 0.08)';
@@ -84,11 +77,11 @@ export const CourseDNACard = memo(function CourseDNACard({ items, inline, course
 
   return (
     <div className="px-4 py-5">
-      <h3 className="mb-4" style={{ fontSize: '16px', fontWeight: 600, color: '#1C1917' }}>
+      <h3 className="mb-4 text-foreground" style={{ fontSize: '18px', fontWeight: 700 }}>
         What Matters{courseName ? ` at ${courseName}` : ''}
       </h3>
 
-      <div className="flex flex-col gap-2.5">
+      <div className="flex flex-col gap-3">
         {items.map((item, i) => {
           const IconComponent = resolveIcon(item.icon, item.label);
           const hexColor = tierToHexColor[item.tier];
@@ -105,16 +98,15 @@ export const CourseDNACard = memo(function CourseDNACard({ items, inline, course
                 ease: [0.16, 1, 0.3, 1]
               }}
               viewport={{ once: true }}
-              className="flex items-center gap-3 p-3.5 px-4 rounded-xl"
-              style={{ background: '#F8F9FA' }}
+              className="flex items-center gap-3 p-4 rounded-xl bg-muted/50"
             >
-              {/* Skill icon */}
+              {/* Skill icon — 40x40 */}
               <div 
-                className="w-9 h-9 rounded-[10px] flex items-center justify-center flex-shrink-0"
+                className="w-10 h-10 rounded-[10px] flex items-center justify-center flex-shrink-0"
                 style={{ background: getIconBg(item.tier) }}
               >
                 <IconComponent 
-                  className="w-[18px] h-[18px]" 
+                  className="w-5 h-5" 
                   style={{ color: hexColor }}
                   strokeWidth={2} 
                 />
@@ -123,22 +115,19 @@ export const CourseDNACard = memo(function CourseDNACard({ items, inline, course
               {/* Name, tag, and bar */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-2">
-                  <span style={{ fontSize: '14px', fontWeight: 600, color: '#1C1917' }}>
+                  <span className="text-foreground" style={{ fontSize: '14px', fontWeight: 600 }}>
                     {item.label}
                   </span>
                   <span 
                     className="uppercase"
-                    style={{ fontSize: '9px', fontWeight: 500, color: hexColor, letterSpacing: '0.05em' }}
+                    style={{ fontSize: '10px', fontWeight: 600, color: hexColor, letterSpacing: '0.05em' }}
                   >
                     {tierToLabel[item.tier]}
                   </span>
                 </div>
                 
-                {/* Continuous progress bar with glow */}
-                <div 
-                  className="h-1 w-full rounded-sm"
-                  style={{ background: 'rgba(0, 0, 0, 0.06)' }}
-                >
+                {/* Progress bar — 6px height, rounded-full */}
+                <div className="h-1.5 w-full rounded-full bg-muted">
                   <motion.div
                     initial={{ width: 0 }}
                     whileInView={{ width: `${fillPercent}%` }}
@@ -148,7 +137,7 @@ export const CourseDNACard = memo(function CourseDNACard({ items, inline, course
                       ease: [0.16, 1, 0.3, 1] 
                     }}
                     viewport={{ once: true }}
-                    className="h-full rounded-sm"
+                    className="h-full rounded-full"
                     style={{ 
                       background: hexColor,
                       boxShadow: `0 0 8px ${hexColor}33`,
