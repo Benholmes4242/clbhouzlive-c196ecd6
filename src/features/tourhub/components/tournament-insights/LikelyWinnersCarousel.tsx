@@ -206,24 +206,23 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
               }}
             >
               {/* Avatar + Name row */}
-              <div className="flex items-start gap-3.5" style={{ paddingRight: 20, paddingTop: 0, paddingBottom: 0 }}>
-                {/* Player photo — fills top-left corner */}
+              <div className="flex items-start gap-3.5 p-5 pb-0">
                 <div className="relative flex-shrink-0">
                   <img
                     src={pick.avatarUrl || PLAYER_SILHOUETTE_URL}
                     alt={pick.name}
-                    className="object-cover"
+                    className="object-cover border border-border"
                     style={{
-                      width: isFeatured ? 80 : 70,
-                      height: isFeatured ? 80 : 70,
-                      borderRadius: '0 0 16px 0',
+                      width: isFeatured ? 64 : 56,
+                      height: isFeatured ? 64 : 56,
+                      borderRadius: '34%',
                     }}
                     loading="lazy"
                     onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
                   />
                   {pick.isWithdrawn && (
                     <div
-                      className="absolute top-1 right-1 px-1.5 py-0.5 rounded-md font-bold uppercase"
+                      className="absolute -top-1 -right-1 px-1.5 py-0.5 rounded-md font-bold uppercase"
                       style={{
                         fontSize: '9px',
                         letterSpacing: '0.5px',
@@ -237,7 +236,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                   )}
                 </div>
 
-                <div className="flex-1 min-w-0 pt-3">
+                <div className="flex-1 min-w-0">
                   <span
                     className="block tracking-tight text-foreground"
                     style={{
@@ -272,8 +271,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                   </div>
                 </div>
 
-                {/* Confidence gauge — top right of card */}
-                <div className="pt-3">
+                <div>
                   <ConfidenceGauge
                     tier={pick.confidenceTier}
                     variant={isFeatured ? 'gold' : 'neutral'}
