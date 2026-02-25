@@ -151,7 +151,7 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
             width: config.mobileAvatarSize,
             height: config.mobileAvatarSize,
             borderRadius: '50%',
-            border: `${config.borderWidth}px solid ${borderColor}`,
+            border: 'none',
             boxShadow: `0 ${position === 1 ? '8px 24px' : '4px 12px'} ${config.shadowColor}`,
           }}
         >
