@@ -16,7 +16,7 @@ import React, { useState, useEffect, useCallback, useRef, useMemo, type RefObjec
 import { toast } from 'sonner';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence, useDragControls } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Smile, ChevronLeft, ChevronRight, Heart, X, MessageCircle, MoreHorizontal, Copy, Flag, Ban, Trash2, Eye, Pencil, Check } from 'lucide-react';
 import {
   AlertDialog,
@@ -1040,7 +1040,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
     
     const handleResize = () => {
       const keyboardHeight = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop);
-      const panelBottom = window.innerHeight * 0.8;
+      const panelBottom = window.innerHeight * 0.7;
       const keyboardTop = window.innerHeight - keyboardHeight;
       const overlap = panelBottom - keyboardTop;
       setKeyboardOffset(Math.max(0, overlap));
@@ -1329,47 +1329,6 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   const captionNeedsTruncation = cleanCaption && cleanCaption.length > 120;
   const displayCaption = expandedCaption ? cleanCaption : cleanCaption?.slice(0, 120);
 
-  // Drag controls for swipe-up-to-dismiss (only header + drag handle zones)
-  const dragControls = useDragControls();
-
-  // Status bar color switching — force dark (black) icons when panel is open over light bg
-  useEffect(() => {
-    if (!isOpen) return;
-
-    // 1. Web standard: theme-color meta tag
-    let meta = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement | null;
-    const existed = !!meta;
-    const originalColor = meta?.getAttribute('content') || '';
-    if (!meta) {
-      meta = document.createElement('meta');
-      meta.name = 'theme-color';
-      document.head.appendChild(meta);
-    }
-    meta.setAttribute('content', isDark ? '#0d0d0d' : '#FFFFFF');
-
-    // 2. Median.co native wrapper fallback — safely wrapped
-    try {
-      if (typeof (window as any).median?.statusbar?.set === 'function') {
-        (window as any).median.statusbar.set({ style: isDark ? 'light' : 'dark' });
-      }
-    } catch (e) {
-      // Silently ignore — not in Median context
-    }
-
-    return () => {
-      if (existed && meta) {
-        meta.setAttribute('content', originalColor);
-      } else {
-        meta?.remove();
-      }
-      try {
-        if (typeof (window as any).median?.statusbar?.set === 'function') {
-          (window as any).median.statusbar.set({ style: 'light' });
-        }
-      } catch (e) {}
-    };
-  }, [isOpen, isDark]);
-
   const content = (
     <AnimatePresence mode="wait">
       {isOpen && (
@@ -1389,29 +1348,19 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
             onClick={onClose}
           />
 
-          {/* Comments Panel — slides down from top, 80vh height, full width */}
+          {/* Comments Panel — slides down from top, 70vh height, full width */}
           <motion.div
             initial={{ y: '-100%' }}
             animate={{ y: 0 }}
             exit={{ y: '-100%' }}
             transition={SPRING_SNAPPY}
-            drag="y"
-            dragControls={dragControls}
-            dragListener={false}
-            dragConstraints={{ top: 0, bottom: 0 }}
-            dragElastic={{ top: 0.4, bottom: 0 }}
-            onDragEnd={(_, info) => {
-              if (info.offset.y < -80 || info.velocity.y < -500) {
-                onClose();
-              }
-            }}
             className={cn(
               'fixed inset-x-0 top-0 z-[101] w-full rounded-b-3xl',
               'flex flex-col',
               !isDark && (isGrey ? 'bg-muted' : 'bg-[#f8fafc]')
             )}
             style={{
-              height: '80vh',
+              height: '70vh',
               boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
               ...(isDark ? { background: '#0d0d0d' } : {}),
             }}
@@ -1438,9 +1387,8 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
             
             {/* Header - Centered clean design */}
             <div 
-              onPointerDown={(e) => dragControls.start(e)}
               className={cn(
-                "relative z-10 flex-shrink-0 pt-[max(env(safe-area-inset-top,0px),47px)] border-b cursor-grab active:cursor-grabbing",
+                "relative z-10 flex-shrink-0 pt-[max(env(safe-area-inset-top,0px),47px)] border-b",
                 isDark ? "border-white/8" : "border-border/50"
               )}
               style={isDark ? {
@@ -1956,11 +1904,8 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                 </motion.div>
               </div>
             </motion.div>
-            {/* Drag handle — bottom of panel, draggable zone */}
-            <div 
-              onPointerDown={(e) => dragControls.start(e)}
-              className="flex justify-center py-2 flex-shrink-0 cursor-grab active:cursor-grabbing"
-            >
+            {/* Drag handle — bottom of panel */}
+            <div className="flex justify-center py-2 flex-shrink-0">
               <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
             </div>
           </motion.div>
@@ -1993,7 +1938,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                   "rounded-[16px] overflow-hidden shadow-xl"
                 )}
                 style={{ 
-                  bottom: 'calc(20vh + 12px)',
+                  bottom: 'calc(30vh + 12px)',
                   left: '16px',
                   right: '16px',
                   maxWidth: 'calc(100% - 32px)',
@@ -2020,7 +1965,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
             query={mentionQuery}
             onSelect={handleMentionSelect}
             zIndex={110}
-            bottomOffset={Math.round(window.innerHeight * 0.2) + 12 + keyboardOffset}
+            bottomOffset={Math.round(window.innerHeight * 0.3) + 12 + keyboardOffset}
           />
 
           {/* Action Sheet */}
