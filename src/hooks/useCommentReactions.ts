@@ -57,12 +57,11 @@ export function useCommentReactions(postId: string, userId?: string) {
     staleTime: 10000, // 10 seconds
   });
   
-  // Toggle a reaction
+  // Toggle a reaction with optimistic update
   const toggleReactionMutation = useMutation({
     mutationFn: async ({ commentId, reactionType }: { commentId: string; reactionType: GolfReactionType }) => {
       if (!userId) throw new Error('Must be logged in');
       
-      // Check if reaction exists
       const { data: existing } = await supabase
         .from('comment_reactions')
         .select('id')
@@ -72,15 +71,13 @@ export function useCommentReactions(postId: string, userId?: string) {
         .single();
       
       if (existing) {
-        // Remove reaction
         const { error } = await supabase
           .from('comment_reactions')
           .delete()
           .eq('id', existing.id);
         if (error) throw error;
-        return { action: 'removed' };
+        return { action: 'removed' as const, reactionType };
       } else {
-        // Add reaction
         const { error } = await supabase
           .from('comment_reactions')
           .insert({
@@ -89,10 +86,38 @@ export function useCommentReactions(postId: string, userId?: string) {
             reaction_type: reactionType,
           });
         if (error) throw error;
-        return { action: 'added' };
+        return { action: 'added' as const, reactionType };
       }
     },
-    onSuccess: () => {
+    onMutate: async ({ commentId, reactionType }) => {
+      await queryClient.cancelQueries({ queryKey: ['comment-reactions', postId] });
+      const prev = queryClient.getQueryData(['comment-reactions', postId]);
+
+      // Optimistically update the reactions map
+      queryClient.setQueryData(['comment-reactions', postId], (old: any) => {
+        if (!old || !(old instanceof Map)) return old;
+        const newMap = new Map(old);
+        const commentReactions = new Map(newMap.get(commentId) || new Map());
+        const existing = commentReactions.get(reactionType) as { count: number; userHasReacted: boolean } || { count: 0, userHasReacted: false };
+        
+        if (existing.userHasReacted) {
+          commentReactions.set(reactionType, { count: Math.max(0, existing.count - 1), userHasReacted: false });
+        } else {
+          commentReactions.set(reactionType, { count: existing.count + 1, userHasReacted: true });
+        }
+        
+        newMap.set(commentId, commentReactions);
+        return newMap;
+      });
+
+      return { prev };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.prev) {
+        queryClient.setQueryData(['comment-reactions', postId], context.prev);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['comment-reactions', postId] });
     },
   });

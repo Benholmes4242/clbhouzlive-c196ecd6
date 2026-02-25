@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronRight, Loader2 } from 'lucide-react';
+import { Virtuoso } from 'react-virtuoso';
 import { cn } from '@/lib/utils';
 import { CommentItem } from '@/components/comments/CommentItem';
 import { CommentsEmptyState } from '@/components/comments/CommentsEmptyState';
@@ -79,9 +80,11 @@ export const CommentsList: React.FC<CommentsListProps> = ({
 }) => {
   const navigate = useNavigate();
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const useVirtualized = comments.length > 50;
 
-  // Infinite scroll via IntersectionObserver
+  // Infinite scroll via IntersectionObserver (for non-virtualized mode)
   useEffect(() => {
+    if (useVirtualized) return; // Virtuoso handles this
     const sentinel = sentinelRef.current;
     const container = commentsListRef.current;
     if (!sentinel || !container || !hasNextPage || isFetchingNextPage) return;
@@ -94,7 +97,7 @@ export const CommentsList: React.FC<CommentsListProps> = ({
     );
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, onFetchNextPage, commentsListRef]);
+  }, [hasNextPage, isFetchingNextPage, onFetchNextPage, commentsListRef, useVirtualized]);
 
   const handleMentionTap = useCallback(async (username: string) => {
     const cleaned = username.toLowerCase();
@@ -114,6 +117,117 @@ export const CommentsList: React.FC<CommentsListProps> = ({
     }
   }, [navigate, onClose]);
 
+  const renderCommentRow = useCallback((comment: CommentWithReplies) => {
+    const repliesExpanded = expandedReplies.has(comment.id);
+    const initialReplies = comment.replies.slice(0, 2);
+    const visibleReplies = repliesExpanded ? comment.replies : initialReplies;
+    const totalReplies = comment.total_replies_count ?? comment.replies_count;
+    const hiddenRepliesCount = totalReplies - initialReplies.length;
+    const isOwnComment = currentUserId === comment.user_id;
+    const isThisCaddiePick = caddiePickCommentId === comment.id;
+
+    return (
+      <div key={comment.id} className="mb-2">
+        <CommentItem
+          comment={comment}
+          isDark={isDark}
+          isGrey={isGrey}
+          onLike={onToggleLike}
+          onReply={onReply}
+          isLiking={isTogglingLike}
+          isOwnComment={isOwnComment}
+          onLongPress={onLongPress}
+          isAuthor={creatorUserId === comment.user_id}
+          isHighlighted={highlightedCommentId === comment.id}
+          isHidden={hiddenCommentIds.has(comment.id)}
+          isRevealed={revealedCommentIds.has(comment.id)}
+          onReveal={() => onRevealComment(comment.id)}
+          commentRef={registerCommentRef(comment.id)}
+          isCaddiePick={isThisCaddiePick}
+          onLongPressReaction={onOpenReactionPicker}
+          reactionCounts={getReactionsForComment(comment.id).reactions}
+          userReactions={getReactionsForComment(comment.id).userReactions}
+          onReactionToggle={(commentId, type) => onToggleReaction({ commentId, reactionType: type })}
+          onMentionTap={handleMentionTap}
+        />
+
+        {/* Replies */}
+        {(comment.replies.length > 0 || totalReplies > 0) && (
+          <div className="relative ml-4">
+            <div
+              className="absolute w-[2px] rounded-full"
+              style={{
+                left: '18px',
+                top: '0px',
+                bottom: visibleReplies.length > 0 ? '24px' : '16px',
+                background: isDark
+                  ? 'linear-gradient(to bottom, rgba(255,255,255,0.12), rgba(255,255,255,0.04))'
+                  : 'linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.03))',
+              }}
+            />
+            <div className="pt-1 pb-2">
+              {visibleReplies.map((reply, replyIndex) => (
+                <CommentItem
+                  key={reply.id}
+                  comment={reply}
+                  isDark={isDark}
+                  isGrey={isGrey}
+                  onLike={onToggleLike}
+                  isReply
+                  isLiking={isTogglingLike}
+                  showDivider={replyIndex > 0}
+                  isOwnComment={currentUserId === reply.user_id}
+                  onLongPress={onLongPress}
+                  isAuthor={creatorUserId === reply.user_id}
+                  isHighlighted={highlightedCommentId === reply.id}
+                  isHidden={hiddenCommentIds.has(reply.id)}
+                  isRevealed={revealedCommentIds.has(reply.id)}
+                  onReveal={() => onRevealComment(reply.id)}
+                  commentRef={registerCommentRef(reply.id)}
+                  onLongPressReaction={onOpenReactionPicker}
+                  reactionCounts={getReactionsForComment(reply.id).reactions}
+                  userReactions={getReactionsForComment(reply.id).userReactions}
+                  onReactionToggle={(commentId, type) => onToggleReaction({ commentId, reactionType: type })}
+                  onMentionTap={handleMentionTap}
+                />
+              ))}
+
+              {hiddenRepliesCount > 0 && !repliesExpanded && (
+                <button
+                  onClick={() => {
+                    onLoadAllReplies(comment.id);
+                    onToggleReplies(comment.id);
+                  }}
+                  className={cn(
+                    "relative z-10 flex items-center gap-1.5 text-[12px] font-medium py-2.5 pl-[32px] active:scale-[0.97] transition-transform",
+                    isDark ? "text-white/50 hover:text-white/70" : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <ChevronRight className="w-3.5 h-3.5" />
+                  View {hiddenRepliesCount} more {hiddenRepliesCount === 1 ? 'reply' : 'replies'}
+                </button>
+              )}
+              {repliesExpanded && totalReplies > 2 && (
+                <button
+                  onClick={() => onToggleReplies(comment.id)}
+                  className={cn(
+                    "relative z-10 flex items-center gap-1.5 text-[12px] font-medium py-2.5 pl-[32px] active:scale-[0.97] transition-transform",
+                    isDark ? "text-white/50 hover:text-white/70" : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  Hide replies
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }, [isDark, isGrey, currentUserId, creatorUserId, caddiePickCommentId, highlightedCommentId,
+      hiddenCommentIds, revealedCommentIds, expandedReplies, isTogglingLike,
+      onToggleLike, onReply, onLongPress, onRevealComment, onToggleReplies, onLoadAllReplies,
+      onOpenReactionPicker, getReactionsForComment, onToggleReaction, registerCommentRef, handleMentionTap]);
+
   return (
     <motion.div
       ref={commentsListRef}
@@ -130,115 +244,25 @@ export const CommentsList: React.FC<CommentsListProps> = ({
         <CommentsSkeleton isDark={isDark} count={5} />
       ) : comments.length === 0 ? (
         <CommentsEmptyState isDark={isDark} onQuickReact={onQuickReact} />
+      ) : useVirtualized ? (
+        <Virtuoso
+          data={comments}
+          useWindowScroll={false}
+          overscan={200}
+          endReached={() => { if (hasNextPage && !isFetchingNextPage) onFetchNextPage(); }}
+          itemContent={(_, comment) => renderCommentRow(comment)}
+          components={{
+            Footer: () => isFetchingNextPage ? (
+              <div className="flex items-center justify-center py-4">
+                <Loader2 className={cn("w-5 h-5 animate-spin", isDark ? "text-white/40" : "text-muted-foreground")} />
+              </div>
+            ) : null,
+          }}
+          style={{ height: '100%' }}
+        />
       ) : (
         <div>
-          {comments.map((comment) => {
-            const repliesExpanded = expandedReplies.has(comment.id);
-            const initialReplies = comment.replies.slice(0, 2);
-            const visibleReplies = repliesExpanded ? comment.replies : initialReplies;
-            const totalReplies = comment.total_replies_count ?? comment.replies_count;
-            const hiddenRepliesCount = totalReplies - initialReplies.length;
-            const isOwnComment = currentUserId === comment.user_id;
-            const isThisCaddiePick = caddiePickCommentId === comment.id;
-
-            return (
-              <div key={comment.id} className="mb-2">
-                <CommentItem
-                  comment={comment}
-                  isDark={isDark}
-                  isGrey={isGrey}
-                  onLike={onToggleLike}
-                  onReply={onReply}
-                  isLiking={isTogglingLike}
-                  isOwnComment={isOwnComment}
-                  onLongPress={onLongPress}
-                  isAuthor={creatorUserId === comment.user_id}
-                  isHighlighted={highlightedCommentId === comment.id}
-                  isHidden={hiddenCommentIds.has(comment.id)}
-                  isRevealed={revealedCommentIds.has(comment.id)}
-                  onReveal={() => onRevealComment(comment.id)}
-                  commentRef={registerCommentRef(comment.id)}
-                  isCaddiePick={isThisCaddiePick}
-                  onLongPressReaction={onOpenReactionPicker}
-                  reactionCounts={getReactionsForComment(comment.id).reactions}
-                  userReactions={getReactionsForComment(comment.id).userReactions}
-                  onReactionToggle={(commentId, type) => onToggleReaction({ commentId, reactionType: type })}
-                  onMentionTap={handleMentionTap}
-                />
-
-                {/* Replies */}
-                {(comment.replies.length > 0 || totalReplies > 0) && (
-                  <div className="relative ml-4">
-                    <div
-                      className="absolute w-[2px] rounded-full"
-                      style={{
-                        left: '18px',
-                        top: '0px',
-                        bottom: visibleReplies.length > 0 ? '24px' : '16px',
-                        background: isDark
-                          ? 'linear-gradient(to bottom, rgba(255,255,255,0.12), rgba(255,255,255,0.04))'
-                          : 'linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.03))',
-                      }}
-                    />
-                    <div className="pt-1 pb-2">
-                      {visibleReplies.map((reply, replyIndex) => (
-                        <CommentItem
-                          key={reply.id}
-                          comment={reply}
-                          isDark={isDark}
-                          isGrey={isGrey}
-                          onLike={onToggleLike}
-                          isReply
-                          isLiking={isTogglingLike}
-                          showDivider={replyIndex > 0}
-                          isOwnComment={currentUserId === reply.user_id}
-                          onLongPress={onLongPress}
-                          isAuthor={creatorUserId === reply.user_id}
-                          isHighlighted={highlightedCommentId === reply.id}
-                          isHidden={hiddenCommentIds.has(reply.id)}
-                          isRevealed={revealedCommentIds.has(reply.id)}
-                          onReveal={() => onRevealComment(reply.id)}
-                          commentRef={registerCommentRef(reply.id)}
-                          onLongPressReaction={onOpenReactionPicker}
-                          reactionCounts={getReactionsForComment(reply.id).reactions}
-                          userReactions={getReactionsForComment(reply.id).userReactions}
-                          onReactionToggle={(commentId, type) => onToggleReaction({ commentId, reactionType: type })}
-                          onMentionTap={handleMentionTap}
-                        />
-                      ))}
-
-                      {hiddenRepliesCount > 0 && !repliesExpanded && (
-                        <button
-                          onClick={() => {
-                            onLoadAllReplies(comment.id);
-                            onToggleReplies(comment.id);
-                          }}
-                          className={cn(
-                            "relative z-10 flex items-center gap-1.5 text-[12px] font-medium py-2.5 pl-[32px] active:scale-[0.97] transition-transform",
-                            isDark ? "text-white/50 hover:text-white/70" : "text-muted-foreground hover:text-foreground"
-                          )}
-                        >
-                          <ChevronRight className="w-3.5 h-3.5" />
-                          View {hiddenRepliesCount} more {hiddenRepliesCount === 1 ? 'reply' : 'replies'}
-                        </button>
-                      )}
-                      {repliesExpanded && totalReplies > 2 && (
-                        <button
-                          onClick={() => onToggleReplies(comment.id)}
-                          className={cn(
-                            "relative z-10 flex items-center gap-1.5 text-[12px] font-medium py-2.5 pl-[32px] active:scale-[0.97] transition-transform",
-                            isDark ? "text-white/50 hover:text-white/70" : "text-muted-foreground hover:text-foreground"
-                          )}
-                        >
-                          Hide replies
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+          {comments.map((comment) => renderCommentRow(comment))}
 
           {/* Infinite scroll sentinel */}
           <div ref={sentinelRef} className="h-px" />

@@ -35,6 +35,8 @@ import { ReportCommentModal } from '@/components/comments/ReportCommentModal';
 import { BlockUserModal } from '@/components/comments/BlockUserModal';
 import { GolfReactionPicker, GolfReactionType } from '@/components/comments/GolfReactionPicker';
 import { TypingPresence } from '@/components/comments/TypingPresence';
+import { LivePresenceBar } from '@/components/comments/LivePresenceBar';
+import { RichCommentToolbar } from '@/components/comments/RichCommentToolbar';
 import { triggerHaptic } from '@/components/comments/utils';
 
 interface CommentsPageProps {
@@ -425,6 +427,15 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               onSortChange={setSortMode}
             />
 
+            {/* Live presence bar */}
+            <LivePresenceBar
+              postId={postId}
+              currentUserId={currentUserId}
+              currentUserName={activeActor?.name}
+              currentUserAvatar={activeActor?.avatarUrl}
+              isDark={isDark}
+            />
+
             {/* Comments list */}
             <CommentsList
               comments={sortedComments}
@@ -468,6 +479,16 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               currentUserName={activeActor?.name}
               isDark={isDark}
               isTyping={newComment.length > 0}
+            />
+
+            {/* Rich comment toolbar */}
+            <RichCommentToolbar
+              isDark={isDark}
+              isVisible={keyboardOffset > 0 || newComment.length > 0}
+              onInsertText={(text) => {
+                setNewComment(prev => prev + text);
+                setTimeout(() => inputRef.current?.focus(), 50);
+              }}
             />
 
             {/* Input */}
