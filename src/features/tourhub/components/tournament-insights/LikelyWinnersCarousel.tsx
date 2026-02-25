@@ -178,10 +178,10 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
       >
         {allPicks.map((pick, i) => {
           const isFeatured = i === 0;
-          // Color tiers: 0 = amber, 1-2 = emerald, 3-4 = blue
+          // Color tiers: 0 = amber, 1-2 = emerald, 3-4 = grey
           const accentColor = i === 0 ? 'rgba(245,158,11,0.9)'
             : i <= 2 ? '#10B981'
-            : '#3B82F6';
+            : '#9CA3AF';
 
           return (
             <motion.div
@@ -274,7 +274,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                 <div>
                   <ConfidenceGauge
                     tier={pick.confidenceTier}
-                    variant={isFeatured ? 'gold' : 'neutral'}
+                    accentColor={accentColor}
                     animationDelay={400 + i * 80}
                     isWithdrawn={pick.isWithdrawn}
                   />
