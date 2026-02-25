@@ -11,13 +11,20 @@ type IntelligenceTab = 'courseDNA' | 'predictions';
 interface IntelligenceTabSwitcherProps {
   activeTab: IntelligenceTab;
   onTabChange: (tab: IntelligenceTab) => void;
+  /** When true, show Top 5 Picks first (left) instead of Course DNA */
+  picksFirst?: boolean;
 }
 
-const IntelligenceTabSwitcher: React.FC<IntelligenceTabSwitcherProps> = ({ activeTab, onTabChange }) => {
-  const tabs: { id: IntelligenceTab; label: string }[] = [
-    { id: 'courseDNA', label: 'Course DNA' },
-    { id: 'predictions', label: 'Top 5 Picks' },
-  ];
+const IntelligenceTabSwitcher: React.FC<IntelligenceTabSwitcherProps> = ({ activeTab, onTabChange, picksFirst = false }) => {
+  const tabs: { id: IntelligenceTab; label: string }[] = picksFirst
+    ? [
+        { id: 'predictions', label: 'Top 5 Picks' },
+        { id: 'courseDNA', label: 'Course DNA' },
+      ]
+    : [
+        { id: 'courseDNA', label: 'Course DNA' },
+        { id: 'predictions', label: 'Top 5 Picks' },
+      ];
 
   return (
     <div className="flex items-stretch rounded-xl overflow-hidden bg-transparent mb-4">
