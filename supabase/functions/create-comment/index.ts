@@ -1,6 +1,6 @@
 /**
  * create-comment — Edge function for server-side comment creation.
- * Handles: validation, rate limiting, mention extraction, comment count sync.
+ * Handles: validation, rate limiting, mention extraction, comment count sync, voice notes.
  */
 
 const corsHeaders = {
@@ -40,17 +40,20 @@ Deno.serve(async (req: Request) => {
     const userId = claimsData.claims.sub;
 
     const body = await req.json();
-    const { postId, content, parentId, actorType, actorId } = body;
+    const { postId, content, parentId, actorType, actorId, mediaUrl, mediaType, voiceDurationSeconds } = body;
 
     // --- Validation ---
-    if (!postId || !content || typeof content !== 'string') {
-      return new Response(JSON.stringify({ error: 'postId and content are required' }), {
+    if (!postId) {
+      return new Response(JSON.stringify({ error: 'postId is required' }), {
         status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    const trimmed = content.trim();
-    if (trimmed.length === 0) {
+    // Voice comments can have empty content
+    const isVoiceComment = mediaType === 'voice' && mediaUrl;
+    const trimmed = (content || '').trim();
+
+    if (!isVoiceComment && trimmed.length === 0) {
       return new Response(JSON.stringify({ error: 'Content cannot be empty' }), {
         status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -77,16 +80,22 @@ Deno.serve(async (req: Request) => {
     }
 
     // --- Insert comment ---
+    const insertData: Record<string, unknown> = {
+      post_id: postId,
+      user_id: userId,
+      content: isVoiceComment && !trimmed ? '[Voice note]' : trimmed,
+      parent_id: parentId || null,
+      actor_type: actorType || 'personal',
+      actor_id: actorId || userId,
+    };
+
+    if (mediaUrl) insertData.media_url = mediaUrl;
+    if (mediaType) insertData.media_type = mediaType;
+    if (voiceDurationSeconds) insertData.voice_duration_seconds = voiceDurationSeconds;
+
     const { data: comment, error: insertError } = await supabase
       .from('post_comments')
-      .insert({
-        post_id: postId,
-        user_id: userId,
-        content: trimmed,
-        parent_id: parentId || null,
-        actor_type: actorType || 'personal',
-        actor_id: actorId || userId,
-      })
+      .insert(insertData)
       .select('id, created_at')
       .single();
 
@@ -110,7 +119,6 @@ Deno.serve(async (req: Request) => {
     }
 
     if (mentions.length > 0) {
-      // Look up mentioned users
       const { data: taggedEntities } = await supabase
         .from('taggable_entities')
         .select('entity_id, entity_type, username')

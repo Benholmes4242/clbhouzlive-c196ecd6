@@ -6161,10 +6161,13 @@ export type Database = {
           deleted_at: string | null
           id: string
           is_edited: boolean | null
+          media_type: string | null
+          media_url: string | null
           parent_id: string | null
           post_id: string
           updated_at: string
           user_id: string
+          voice_duration_seconds: number | null
         }
         Insert: {
           actor_id: string
@@ -6174,10 +6177,13 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           is_edited?: boolean | null
+          media_type?: string | null
+          media_url?: string | null
           parent_id?: string | null
           post_id: string
           updated_at?: string
           user_id: string
+          voice_duration_seconds?: number | null
         }
         Update: {
           actor_id?: string
@@ -6187,10 +6193,13 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           is_edited?: boolean | null
+          media_type?: string | null
+          media_url?: string | null
           parent_id?: string | null
           post_id?: string
           updated_at?: string
           user_id?: string
+          voice_duration_seconds?: number | null
         }
         Relationships: [
           {

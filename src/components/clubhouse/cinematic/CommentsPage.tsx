@@ -146,7 +146,10 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
     
     // Sort by mode
     if (sortMode === 'best') {
-      sorted.sort((a, b) => (b.likes_count + b.replies_count) - (a.likes_count + a.replies_count));
+      sorted.sort((a, b) => {
+        const getScore = (c: typeof a) => (c.likes_count || 0) + (c.replies_count || 0) + (getReactionsForComment(c.id).reactions?.length || 0);
+        return getScore(b) - getScore(a);
+      });
     }
     // 'newest' is the default order from the paginated query (ascending created_at)
     
@@ -158,7 +161,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
       }
     }
     return sorted;
-  }, [comments, caddiePickCommentId, sortMode]);
+  }, [comments, caddiePickCommentId, sortMode, getReactionsForComment]);
 
   // --- Callbacks ---
   const revealComment = useCallback((commentId: string) => {

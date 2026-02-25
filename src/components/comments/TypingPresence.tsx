@@ -80,10 +80,10 @@ export const TypingPresence: React.FC<TypingPresenceProps> = ({
 
   const label =
     typingUsers.length === 1
-      ? `${typingUsers[0]} is typing`
+      ? `${typingUsers[0]} is weighing in...`
       : typingUsers.length === 2
-        ? `${typingUsers[0]} and ${typingUsers[1]} are typing`
-        : `${typingUsers[0]} and ${typingUsers.length - 1} others are typing`;
+        ? `${typingUsers[0]} and ${typingUsers[1]} are weighing in...`
+        : `${typingUsers[0]} and ${typingUsers.length - 1} others are weighing in...`;
 
   return (
     <AnimatePresence>

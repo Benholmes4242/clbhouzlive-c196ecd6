@@ -1,44 +1,79 @@
-import { useState, useRef, useCallback } from 'react';
+/**
+ * useVoiceRecording — Dual-mode hook:
+ *   Mode 1 (default): Voice Comment — records audio, uploads to storage, returns URL
+ *   Mode 2: Transcribe — sends to voice-to-text, returns transcribed text
+ */
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { v4 as uuidv4 } from 'uuid';
+
+type VoiceMode = 'voice-comment' | 'transcribe';
 
 interface UseVoiceRecordingProps {
   onTranscriptionComplete?: (text: string) => void;
+  onVoiceNoteComplete?: (mediaUrl: string, durationSeconds: number) => void;
+  mode?: VoiceMode;
 }
 
-export const useVoiceRecording = ({ onTranscriptionComplete }: UseVoiceRecordingProps = {}) => {
+export const useVoiceRecording = ({
+  onTranscriptionComplete,
+  onVoiceNoteComplete,
+  mode = 'transcribe',
+}: UseVoiceRecordingProps = {}) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [recordingDuration, setRecordingDuration] = useState(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const streamRef = useRef<MediaStream | null>(null);
+  const startTimeRef = useRef<number>(0);
+  const timerRef = useRef<number | null>(null);
   const { toast } = useToast();
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (mediaRecorderRef.current?.state === 'recording') {
+        mediaRecorderRef.current.stop();
+      }
+      streamRef.current?.getTracks().forEach(t => t.stop());
+      if (timerRef.current) window.clearInterval(timerRef.current);
+    };
+  }, []);
 
   const startRecording = useCallback(async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
+      const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           sampleRate: 16000,
           channelCount: 1,
           echoCancellation: true,
           noiseSuppression: true,
-          autoGainControl: true
-        } 
+          autoGainControl: true,
+        },
       });
 
-      // Feature detect MIME type
+      streamRef.current = stream;
       const supported = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : undefined;
       mediaRecorderRef.current = new MediaRecorder(stream, supported ? { mimeType: supported } : undefined);
-
       audioChunksRef.current = [];
+      startTimeRef.current = Date.now();
+      setRecordingDuration(0);
+
+      // Timer for duration display
+      timerRef.current = window.setInterval(() => {
+        setRecordingDuration(Math.floor((Date.now() - startTimeRef.current) / 1000));
+      }, 1000);
+
       let safetyTimer: number | null = null;
 
-      // Add 60s safety cap
-      mediaRecorderRef.current.onstart = () => { 
+      mediaRecorderRef.current.onstart = () => {
         safetyTimer = window.setTimeout(() => {
           if (mediaRecorderRef.current?.state === 'recording') {
             mediaRecorderRef.current.stop();
           }
-        }, 60_000); 
+        }, 60_000);
       };
 
       mediaRecorderRef.current.ondataavailable = (event) => {
@@ -49,72 +84,97 @@ export const useVoiceRecording = ({ onTranscriptionComplete }: UseVoiceRecording
 
       mediaRecorderRef.current.onstop = async () => {
         if (safetyTimer) window.clearTimeout(safetyTimer);
-        
+        if (timerRef.current) window.clearInterval(timerRef.current);
+
+        const durationSeconds = Math.floor((Date.now() - startTimeRef.current) / 1000);
+
         try {
           const blob = new Blob(audioChunksRef.current, { type: supported ?? 'audio/webm' });
-          
-          // Simpler base64 conversion via FileReader
-          const base64String = await new Promise<string>((resolve, reject) => {
-            const r = new FileReader();
-            r.onerror = () => reject(r.error);
-            r.onload = () => resolve(((r.result as string) || '').split(',')[1] || '');
-            r.readAsDataURL(blob);
-          });
 
-          // Send to voice-to-text edge function
-          const { data, error } = await supabase.functions.invoke('voice-to-text', {
-            body: { audio: base64String }
-          });
+          if (mode === 'voice-comment') {
+            // Upload to Supabase Storage
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error('Not authenticated');
 
-          if (error) throw error;
+            const commentId = uuidv4();
+            const filePath = `${user.id}/${commentId}.webm`;
 
-          const transcribedText = data.text;
+            const { error: uploadError } = await supabase.storage
+              .from('comment-voice-notes')
+              .upload(filePath, blob, {
+                contentType: supported ?? 'audio/webm',
+                upsert: false,
+              });
 
-          if (transcribedText && transcribedText.trim()) {
-            onTranscriptionComplete?.(transcribedText);
-            
+            if (uploadError) throw uploadError;
+
+            onVoiceNoteComplete?.(filePath, durationSeconds);
+
             toast({
               title: "Voice note recorded",
-              description: `"${transcribedText.slice(0, 50)}${transcribedText.length > 50 ? '...' : ''}"`,
+              description: `${durationSeconds}s voice note ready to send`,
             });
           } else {
-            toast({
-              title: "No speech detected",
-              description: "Please try recording again and speak clearly",
-              variant: "destructive"
+            // Transcribe mode — send to voice-to-text
+            const base64String = await new Promise<string>((resolve, reject) => {
+              const r = new FileReader();
+              r.onerror = () => reject(r.error);
+              r.onload = () => resolve(((r.result as string) || '').split(',')[1] || '');
+              r.readAsDataURL(blob);
             });
+
+            const { data, error } = await supabase.functions.invoke('voice-to-text', {
+              body: { audio: base64String },
+            });
+
+            if (error) throw error;
+
+            const transcribedText = data.text;
+
+            if (transcribedText && transcribedText.trim()) {
+              onTranscriptionComplete?.(transcribedText);
+              toast({
+                title: "Voice note recorded",
+                description: `"${transcribedText.slice(0, 50)}${transcribedText.length > 50 ? '...' : ''}"`,
+              });
+            } else {
+              toast({
+                title: "No speech detected",
+                description: "Please try recording again and speak clearly",
+                variant: "destructive",
+              });
+            }
           }
         } catch (error) {
           console.error('Error processing audio:', error);
           toast({
-            title: "Transcription failed",
-            description: "Failed to convert speech to text. Please try again.",
-            variant: "destructive"
+            title: mode === 'voice-comment' ? "Upload failed" : "Transcription failed",
+            description: "Please try again.",
+            variant: "destructive",
           });
         } finally {
-          // Always stop tracks to release microphone
           stream.getTracks().forEach(t => t.stop());
+          streamRef.current = null;
           setIsProcessing(false);
         }
       };
 
-      mediaRecorderRef.current.start(1000); // Collect data every second
+      mediaRecorderRef.current.start(1000);
       setIsRecording(true);
 
       toast({
         title: "Recording started",
         description: "Speak your note...",
       });
-
     } catch (error) {
       console.error('Error starting recording:', error);
       toast({
         title: "Microphone access denied",
         description: "Please allow microphone access to record voice notes",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
-  }, []);
+  }, [mode, onTranscriptionComplete, onVoiceNoteComplete, toast]);
 
   const stopRecording = useCallback(() => {
     if (mediaRecorderRef.current && isRecording) {
@@ -124,19 +184,30 @@ export const useVoiceRecording = ({ onTranscriptionComplete }: UseVoiceRecording
 
       toast({
         title: "Processing recording",
-        description: "Converting speech to text...",
+        description: mode === 'voice-comment' ? "Uploading voice note..." : "Converting speech to text...",
       });
     }
-  }, [isRecording]);
+  }, [isRecording, mode, toast]);
 
-  const processAudioRecording = async (audioBlob: Blob) => {
-    // This function is no longer needed as processing is handled inline in onstop
-  };
+  const cancelRecording = useCallback(() => {
+    if (mediaRecorderRef.current && isRecording) {
+      // Remove the onstop handler to prevent processing
+      mediaRecorderRef.current.onstop = () => {
+        streamRef.current?.getTracks().forEach(t => t.stop());
+        streamRef.current = null;
+      };
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      if (timerRef.current) window.clearInterval(timerRef.current);
+    }
+  }, [isRecording]);
 
   return {
     isRecording,
     isProcessing,
+    recordingDuration,
     startRecording,
-    stopRecording
+    stopRecording,
+    cancelRecording,
   };
 };

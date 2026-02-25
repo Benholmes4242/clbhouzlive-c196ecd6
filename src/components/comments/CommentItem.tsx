@@ -7,6 +7,9 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/comments/MentionText';
 import { CaddiePickBadge } from '@/components/comments/CaddiePickBadge';
 import { ReactionDisplay } from '@/components/comments/ReactionDisplay';
+import { VoiceNotePlayer } from '@/components/comments/VoiceNotePlayer';
+import { FloatingReaction } from '@/components/comments/FloatingReaction';
+import { AnimatedCount } from '@/components/comments/AnimatedCount';
 import { triggerHaptic } from '@/components/comments/utils';
 import type { CommentWithReplies, CommentReply } from '@/hooks/useCommentsWithReplies';
 import type { GolfReactionType } from '@/components/comments/GolfReactionPicker';
@@ -64,6 +67,8 @@ export const CommentItem: React.FC<CommentItemProps> = ({
   const [showRipple, setShowRipple] = useState(false);
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const [isPressing, setIsPressing] = useState(false);
+  const [floatingReactionTrigger, setFloatingReactionTrigger] = useState(0);
+  const [floatingEmoji, setFloatingEmoji] = useState('');
 
   const handleLike = () => {
     if (!comment.has_liked) {
@@ -227,6 +232,16 @@ export const CommentItem: React.FC<CommentItemProps> = ({
             onMentionTap={onMentionTap}
           />
 
+          {/* Voice note player */}
+          {(comment as any).media_type === 'voice' && (comment as any).media_url && (
+            <VoiceNotePlayer
+              mediaUrl={(comment as any).media_url}
+              durationSeconds={(comment as any).voice_duration_seconds || 0}
+              commentId={comment.id}
+              isDark={isDark}
+            />
+          )}
+
           {!isReply && onReply && (
             <button
               onClick={() => {
@@ -243,8 +258,8 @@ export const CommentItem: React.FC<CommentItemProps> = ({
           )}
         </div>
 
-        {/* Reactions and Like button area */}
-        <div className="flex items-center gap-1.5 flex-shrink-0 pr-1">
+        {/* Reactions, FloatingReaction, and Like button area */}
+        <div className="flex items-center gap-1.5 flex-shrink-0 pr-1 relative">
           {isOwnComment && (
             <button
               onClick={(e) => {
@@ -266,10 +281,20 @@ export const CommentItem: React.FC<CommentItemProps> = ({
             <ReactionDisplay
               reactions={reactionCounts}
               userReactions={userReactions || []}
-              onReactionClick={(type) => onReactionToggle?.(comment.id, type)}
+              onReactionClick={(type) => {
+                onReactionToggle?.(comment.id, type);
+                const emoji = { heart: '❤️', fire: '🔥', flag: '⛳', eagle: '🦅', birdie: '🐦', clap: '👏' }[type];
+                if (emoji) {
+                  setFloatingEmoji(emoji);
+                  setFloatingReactionTrigger(prev => prev + 1);
+                }
+              }}
               isDark={isDark}
             />
           )}
+
+          {/* Floating reaction animation */}
+          <FloatingReaction emoji={floatingEmoji} trigger={floatingReactionTrigger} />
 
           <motion.button
             whileTap={{ scale: 0.75 }}
@@ -340,14 +365,15 @@ export const CommentItem: React.FC<CommentItemProps> = ({
             </motion.div>
           </motion.button>
           {comment.likes_count > 0 && (
-            <span className={cn(
-              "text-xs -ml-2",
-              comment.has_liked
-                ? "text-like"
-                : isDark ? "text-white/50" : "text-muted-foreground/70"
-            )}>
-              {comment.likes_count}
-            </span>
+            <AnimatedCount
+              count={comment.likes_count}
+              className={cn(
+                "text-xs -ml-2",
+                comment.has_liked
+                  ? "text-like"
+                  : isDark ? "text-white/50" : "text-muted-foreground/70"
+              )}
+            />
           )}
         </div>
       </motion.div>

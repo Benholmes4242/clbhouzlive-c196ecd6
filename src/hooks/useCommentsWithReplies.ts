@@ -1,13 +1,14 @@
 /**
  * useCommentsWithReplies - Enhanced comments hook with cursor-based pagination,
  * likes, and single-level replies. Supports actor-aware comments.
+ * Uses create-comment edge function for validation + rate limiting.
  */
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
-import { createMentionNotifications } from '@/utils/mentionExtractor';
 import { useActiveActor } from '@/context/ActiveActorContext';
+import { toast } from 'sonner';
 
 const PAGE_SIZE = 20;
 const INITIAL_REPLIES = 3;
@@ -25,6 +26,9 @@ export interface CommentReply {
   is_edited?: boolean;
   likes_count: number;
   has_liked: boolean;
+  media_url?: string | null;
+  media_type?: string | null;
+  voice_duration_seconds?: number | null;
 }
 
 export interface CommentWithReplies {
@@ -44,6 +48,9 @@ export interface CommentWithReplies {
   replies_count: number;
   /** Total reply count (may exceed replies.length when not all are loaded) */
   total_replies_count: number;
+  media_url?: string | null;
+  media_type?: string | null;
+  voice_duration_seconds?: number | null;
 }
 
 interface PageData {
@@ -118,6 +125,8 @@ export function useCommentsWithReplies(postId: string | null) {
           user_name: ri.user_name, avatar_url: ri.avatar_url, content: reply.content,
           created_at: reply.created_at, updated_at: reply.updated_at, is_edited: reply.is_edited,
           likes_count: likesCount.get(reply.id) || 0, has_liked: userLikes.has(reply.id),
+          media_url: reply.media_url, media_type: reply.media_type,
+          voice_duration_seconds: reply.voice_duration_seconds,
         };
       });
 
@@ -130,6 +139,8 @@ export function useCommentsWithReplies(postId: string | null) {
         replies: enrichedReplies,
         replies_count: enrichedReplies.length,
         total_replies_count: comment._total_replies_count ?? enrichedReplies.length,
+        media_url: comment.media_url, media_type: comment.media_type,
+        voice_duration_seconds: comment.voice_duration_seconds,
       };
     });
   }, []);
@@ -153,7 +164,7 @@ export function useCommentsWithReplies(postId: string | null) {
       // Fetch top-level comments page
       let query = supabase
         .from('post_comments')
-        .select('id, user_id, actor_type, actor_id, content, created_at, updated_at, parent_id, is_edited')
+        .select('id, user_id, actor_type, actor_id, content, created_at, updated_at, parent_id, is_edited, media_url, media_type, voice_duration_seconds')
         .eq('post_id', postId)
         .is('parent_id', null)
         .is('deleted_at', null)
@@ -182,10 +193,10 @@ export function useCommentsWithReplies(postId: string | null) {
         replyCountMap.set(r.parent_id!, (replyCountMap.get(r.parent_id!) || 0) + 1);
       });
 
-      // Fetch first N replies per parent (using a single query, then slice client-side)
+      // Fetch first N replies per parent
       const { data: allReplies } = await supabase
         .from('post_comments')
-        .select('id, user_id, actor_type, actor_id, content, created_at, updated_at, parent_id, is_edited')
+        .select('id, user_id, actor_type, actor_id, content, created_at, updated_at, parent_id, is_edited, media_url, media_type, voice_duration_seconds')
         .in('parent_id', parentIds)
         .is('deleted_at', null)
         .order('created_at', { ascending: true });
@@ -226,7 +237,7 @@ export function useCommentsWithReplies(postId: string | null) {
     if (!postId) return;
     const { data: allReplies } = await supabase
       .from('post_comments')
-      .select('id, user_id, actor_type, actor_id, content, created_at, updated_at, parent_id, is_edited')
+      .select('id, user_id, actor_type, actor_id, content, created_at, updated_at, parent_id, is_edited, media_url, media_type, voice_duration_seconds')
       .eq('parent_id', commentId)
       .is('deleted_at', null)
       .order('created_at', { ascending: true });
@@ -257,28 +268,50 @@ export function useCommentsWithReplies(postId: string | null) {
     });
   }, [postId, user?.id, queryClient, enrichComments]);
 
-  // Add comment mutation with optimistic update
+  // Add comment mutation — uses create-comment edge function
   const addCommentMutation = useMutation({
-    mutationFn: async ({ content, parentId }: { content: string; parentId?: string }): Promise<string> => {
+    mutationFn: async ({ content, parentId, mediaUrl, mediaType, voiceDurationSeconds }: {
+      content: string;
+      parentId?: string;
+      mediaUrl?: string;
+      mediaType?: string;
+      voiceDurationSeconds?: number;
+    }): Promise<string> => {
       if (!postId || !user?.id) throw new Error('Missing postId or user');
 
-      const { data, error } = await supabase
-        .from('post_comments')
-        .insert({
-          post_id: postId,
-          user_id: user.id,
+      const { data, error } = await supabase.functions.invoke('create-comment', {
+        body: {
+          postId,
           content,
-          parent_id: parentId || null,
-          actor_type: actorType,
-          actor_id: actorId,
-        })
-        .select('id')
-        .single();
+          parentId: parentId || null,
+          actorType: actorType,
+          actorId: actorId,
+          mediaUrl: mediaUrl || null,
+          mediaType: mediaType || null,
+          voiceDurationSeconds: voiceDurationSeconds || null,
+        }
+      });
 
-      if (error) throw error;
+      if (error) {
+        // Parse edge function error
+        const message = error.message || 'Failed to post comment';
+        throw new Error(message);
+      }
 
-      await createMentionNotifications(content, user.id, 'comment', data.id, postId);
+      if (data?.error) {
+        // Edge function returned an error in body
+        const msg = data.error;
+        if (msg.includes('Rate limited')) {
+          toast.error('Slow down — you can post up to 5 comments per minute');
+        } else if (msg.includes('empty')) {
+          toast.error("Comment can't be empty");
+        } else if (msg.includes('too long')) {
+          toast.error('Comment is too long (max 2,000 characters)');
+        }
+        throw new Error(msg);
+      }
 
+      // Handle reply notifications client-side (edge function doesn't do this yet)
       if (parentId) {
         const { data: parentComment } = await supabase
           .from('post_comments')
@@ -326,7 +359,7 @@ export function useCommentsWithReplies(postId: string | null) {
 
       return data.id;
     },
-    onMutate: async ({ content, parentId }) => {
+    onMutate: async ({ content, parentId, mediaUrl, mediaType, voiceDurationSeconds }) => {
       // Optimistic insert
       await queryClient.cancelQueries({ queryKey: ['post-comments-with-replies', postId] });
       const prev = queryClient.getQueryData(['post-comments-with-replies', postId]);
@@ -346,6 +379,9 @@ export function useCommentsWithReplies(postId: string | null) {
         replies: [],
         replies_count: 0,
         total_replies_count: 0,
+        media_url: mediaUrl || null,
+        media_type: mediaType || null,
+        voice_duration_seconds: voiceDurationSeconds || null,
       };
 
       if (!parentId) {
@@ -485,13 +521,9 @@ export function useCommentsWithReplies(postId: string | null) {
 
       if (error) throw error;
 
+      // Re-extract mentions via edge function is not needed for edits since
+      // the edge function only handles creation. Client-side mention cleanup:
       await supabase.from('comment_mentions').delete().eq('comment_id', commentId);
-
-      try {
-        await createMentionNotifications(content, user.id, 'comment', commentId, postId!);
-      } catch (err) {
-        console.warn('[useCommentsWithReplies] Mention extraction failed:', err);
-      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['post-comments-with-replies', postId] });
@@ -501,8 +533,8 @@ export function useCommentsWithReplies(postId: string | null) {
   return {
     comments,
     commentsLoading,
-    addComment: (content: string, parentId?: string): Promise<string> =>
-      addCommentMutation.mutateAsync({ content, parentId }),
+    addComment: (content: string, parentId?: string, opts?: { mediaUrl?: string; mediaType?: string; voiceDurationSeconds?: number }): Promise<string> =>
+      addCommentMutation.mutateAsync({ content, parentId, ...opts }),
     isAddingComment: addCommentMutation.isPending,
     toggleCommentLike: (commentId: string) => toggleLikeMutation.mutate(commentId),
     isTogglingLike: toggleLikeMutation.isPending,

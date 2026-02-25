@@ -22,3 +22,5 @@ export { FloatingReaction } from './FloatingReaction';
 export { LivePresenceBar } from './LivePresenceBar';
 export { RichCommentToolbar } from './RichCommentToolbar';
 export { generateCommentLink, parseCommentLink, getSmartNotificationCopy } from './CommentDeepLink';
+export { VoiceNotePlayer } from './VoiceNotePlayer';
+export { AnimatedCount } from './AnimatedCount';
