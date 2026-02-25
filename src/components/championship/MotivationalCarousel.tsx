@@ -199,7 +199,7 @@ export const MotivationalCarousel: React.FC<Props> = ({
 
         {/* Text */}
         <div className="flex-1 min-w-0">
-          <p className="text-[17px] font-semibold text-foreground truncate">
+          <p className="text-[15px] font-semibold text-foreground line-clamp-2">
             {renderMessage(currentMessage.message)}
           </p>
           {currentMessage.subMessage && (

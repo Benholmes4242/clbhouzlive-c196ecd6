@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { PillToggle } from '@/components/ui/PillToggle';
 import type { ChampionshipArenaMode, DivisionSlug } from '@/types/championship';
@@ -32,11 +32,19 @@ export function ChampionshipFilters({
   className,
 }: ChampionshipFiltersProps) {
   const { data: divisions } = useDivisionConfig();
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Ensure scroll starts at 0 so "Global" is always fully visible
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollLeft = 0;
+    }
+  }, []);
 
   return (
     <div className={cn('py-2 space-y-3 w-full', className)}>
       {/* Arena Mode - Pill Toggle */}
-      <div className="flex justify-center overflow-x-auto pb-1">
+      <div ref={scrollRef} className="flex justify-center overflow-x-auto pb-1 scroll-pl-4">
         <PillToggle 
           options={scopeOptions} 
           selected={arenaMode} 

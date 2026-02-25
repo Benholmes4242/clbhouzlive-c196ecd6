@@ -138,14 +138,7 @@ export function HandicapPodiumSlot({
               width: config.avatarSize,
               height: config.avatarSize,
               borderRadius: '50%',
-              border: rank === 1
-                ? `${config.borderWidth}px solid transparent`
-                : `${config.borderWidth}px solid ${config.borderGradient}`,
-              backgroundImage: rank === 1
-                ? `linear-gradient(var(--background), var(--background)), ${config.borderGradient}`
-                : undefined,
-              backgroundOrigin: rank === 1 ? 'border-box' : undefined,
-              backgroundClip: rank === 1 ? 'padding-box, border-box' : undefined,
+              border: 'none',
               boxShadow: config.glowShadow,
             }}
           >
@@ -211,12 +204,13 @@ export function HandicapPodiumSlot({
         {/* Handicap category badge */}
         {statusLabel && (
           <div
-            className="text-xs font-semibold uppercase tracking-wide mt-1.5 rounded-lg"
+            className="inline-flex items-center justify-center text-xs font-semibold uppercase tracking-wide mt-1.5 rounded-lg text-center"
             style={{
               background: badgeStyle.bg,
               color: badgeStyle.text,
               border: `1px solid ${badgeStyle.border}`,
               padding: '4px 10px',
+              width: 'auto',
             }}
           >
             {statusLabel}
