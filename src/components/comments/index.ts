@@ -14,3 +14,4 @@ export { MentionText } from './MentionText';
 export { CommentingAsIndicator } from './CommentingAsIndicator';
 export { triggerHaptic, QUICK_REACTIONS, REPORT_REASONS } from './utils';
 export { default as CommentPreview } from './CommentPreview';
+export { CommentsSkeleton, CommentSkeleton } from './CommentsSkeleton';

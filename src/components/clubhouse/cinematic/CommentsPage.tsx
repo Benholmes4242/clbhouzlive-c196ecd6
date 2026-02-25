@@ -84,6 +84,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   newCommentRef.current = newComment;
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [replyingTo, setReplyingTo] = useState<ReplyingToState | null>(null);
+  const [sortMode, setSortMode] = useState<'best' | 'newest'>('newest');
   const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set());
   const [selectedComment, setSelectedComment] = useState<CommentWithReplies | CommentReply | null>(null);
   const [showActionSheet, setShowActionSheet] = useState(false);
@@ -138,11 +139,23 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
 
   // --- Sorted comments ---
   const sortedComments = useMemo(() => {
-    if (!caddiePickCommentId || !comments.length) return comments;
-    const idx = comments.findIndex(c => c.id === caddiePickCommentId);
-    if (idx === -1) return comments;
-    return [comments[idx], ...comments.filter(c => c.id !== caddiePickCommentId)];
-  }, [comments, caddiePickCommentId]);
+    let sorted = [...comments];
+    
+    // Sort by mode
+    if (sortMode === 'best') {
+      sorted.sort((a, b) => (b.likes_count + b.replies_count) - (a.likes_count + a.replies_count));
+    }
+    // 'newest' is the default order from the paginated query (ascending created_at)
+    
+    // Pin caddie pick to top regardless of sort
+    if (caddiePickCommentId) {
+      const idx = sorted.findIndex(c => c.id === caddiePickCommentId);
+      if (idx > 0) {
+        sorted = [sorted[idx], ...sorted.filter(c => c.id !== caddiePickCommentId)];
+      }
+    }
+    return sorted;
+  }, [comments, caddiePickCommentId, sortMode]);
 
   // --- Callbacks ---
   const revealComment = useCallback((commentId: string) => {
@@ -371,7 +384,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            transition={SPRING_SNAPPY}
+            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
             className={cn(
               'fixed inset-x-0 bottom-0 z-[101] w-full rounded-t-3xl',
               'flex flex-col',
@@ -407,6 +420,8 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               isDark={isDark}
               commentCount={comments.length}
               onClose={onClose}
+              sortMode={sortMode}
+              onSortChange={setSortMode}
             />
 
             {/* Comments list */}
