@@ -17,7 +17,7 @@ interface HandicapPodiumSlotProps {
 const POSITION_CONFIG = {
   1: {
     avatarSize: 110,
-    borderWidth: 3,
+    borderWidth: 0.5,
     borderGradient: 'linear-gradient(135deg, #D4A853, #F0D78C, #D4A853)',
     badgeSize: 28,
     nameClass: 'text-base font-bold',
@@ -27,7 +27,7 @@ const POSITION_CONFIG = {
   },
   2: {
     avatarSize: 80,
-    borderWidth: 2.5,
+    borderWidth: 0.5,
     borderGradient: '#A8B4C0',
     badgeSize: 24,
     nameClass: 'text-sm font-semibold',
@@ -37,7 +37,7 @@ const POSITION_CONFIG = {
   },
   3: {
     avatarSize: 80,
-    borderWidth: 2.5,
+    borderWidth: 0.5,
     borderGradient: '#C4956A',
     badgeSize: 24,
     nameClass: 'text-sm font-semibold',

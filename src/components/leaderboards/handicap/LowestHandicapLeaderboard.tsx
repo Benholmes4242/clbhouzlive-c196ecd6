@@ -129,7 +129,7 @@ function HandicapRow({
         src={entry.avatar_url}
         alt={entry.display_name || 'Golfer'}
         fallback={initials}
-        ringColor={rank <= 3 ? RANK_BADGE_COLORS[rank]?.bg : undefined}
+        hideRing
       />
 
       {/* Name & category */}

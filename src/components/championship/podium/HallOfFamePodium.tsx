@@ -19,7 +19,7 @@ const POSITION_CONFIG = {
   1: {
     avatarSize: 110,
     mobileAvatarSize: 90,
-    borderWidth: 3,
+    borderWidth: 0.5,
     badgeSize: 28,
     nameClass: 'text-lg font-bold',
     statClass: 'text-base',
@@ -33,7 +33,7 @@ const POSITION_CONFIG = {
   2: {
     avatarSize: 80,
     mobileAvatarSize: 68,
-    borderWidth: 2.5,
+    borderWidth: 0.5,
     badgeSize: 24,
     nameClass: 'text-sm font-semibold',
     statClass: 'text-sm',
@@ -46,7 +46,7 @@ const POSITION_CONFIG = {
   3: {
     avatarSize: 80,
     mobileAvatarSize: 68,
-    borderWidth: 2.5,
+    borderWidth: 0.5,
     badgeSize: 24,
     nameClass: 'text-sm font-semibold',
     statClass: 'text-sm',

@@ -43,7 +43,7 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
   isCurrentUser,
   onClick,
 }) => {
-  const ringColor = rank <= 3 ? getRankColor(rank) : undefined;
+  
 
   return (
     <div
@@ -82,10 +82,9 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
         <SquircleAvatar
           src={avatarUrl}
           size={44}
-          ringColor={ringColor}
           alt={name}
           fallback={name?.charAt(0) || '?'}
-          thinRing
+          hideRing
         />
       </div>
 

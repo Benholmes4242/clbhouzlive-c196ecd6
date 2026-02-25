@@ -70,7 +70,7 @@ export const LeaderboardRowV2: React.FC<LeaderboardRowV2Props> = ({
         src={avatarUrl}
         alt={name}
         fallback={initials}
-        top100Count={courses}
+        hideRing
         className="flex-shrink-0"
       />
 
