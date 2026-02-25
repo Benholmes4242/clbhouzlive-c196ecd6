@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -11,94 +11,13 @@ interface Top100JourneyHeroProps {
   className?: string;
 }
 
-const MILESTONES = [5, 10, 25, 50, 75, 100];
-
-function getNextMilestone(completed: number): number {
-  return MILESTONES.find(m => m > completed) ?? 100;
-}
-
-function getStageLabel(completed: number): string {
-  if (completed >= 100) return 'Grand Slam';
-  if (completed >= 50) return '50 Club';
-  if (completed >= 20) return '20 Club';
-  if (completed >= 10) return 'Explorer';
-  if (completed >= 5) return 'Rookie';
-  return 'Getting Started';
-}
-
-interface ProgressRingProps {
-  completed: number;
-  total: number;
-  size?: number;
-  strokeWidth?: number;
-}
-
-const ProgressRing: React.FC<ProgressRingProps> = ({
-  completed,
-  total,
-  size = 80,
-  strokeWidth = 8,
-}) => {
-  const [animatedProgress, setAnimatedProgress] = useState(0);
-
-  const radius = (size - strokeWidth) / 2;
-  const circumference = radius * 2 * Math.PI;
-  const progress = Math.min(animatedProgress / total, 1);
-  const strokeDashoffset = circumference - progress * circumference;
-
-  useEffect(() => {
-    const timer = setTimeout(() => setAnimatedProgress(completed), 100);
-    return () => clearTimeout(timer);
-  }, [completed]);
-
-  return (
-    <div className="relative flex-shrink-0" style={{ width: size, height: size }}>
-      <svg width={size} height={size} className="transform -rotate-90">
-        <defs>
-          <linearGradient id="outstandingGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="rgba(245, 158, 11, 0.9)" />
-            <stop offset="100%" stopColor="rgba(251, 191, 36, 0.9)" />
-          </linearGradient>
-        </defs>
-        <circle
-          cx={size / 2} cy={size / 2} r={radius}
-          fill="none" stroke="currentColor" strokeWidth={strokeWidth}
-          className="text-muted"
-        />
-        <circle
-          cx={size / 2} cy={size / 2} r={radius}
-          fill="none" stroke="url(#outstandingGradient)"
-          strokeWidth={strokeWidth} strokeLinecap="round"
-          strokeDasharray={circumference} strokeDashoffset={strokeDashoffset}
-          className="transition-all duration-700 ease-out"
-        />
-      </svg>
-      {/* Center: completed/total fraction */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className="font-bold text-foreground" style={{ fontSize: 15 }}>
-          {completed}
-        </span>
-        <span className="text-muted-foreground font-semibold" style={{ fontSize: 11 }}>
-          /{total}
-        </span>
-      </div>
-    </div>
-  );
-};
-
 export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
   completedCourses,
-  totalCourses = 100,
   listCount,
   className,
 }) => {
   const navigate = useNavigate();
   const isZeroProgress = completedCourses === 0;
-  const nextMilestone = completedCourses >= 100 ? 100 : getNextMilestone(completedCourses);
-
-  const handleClick = () => {
-    navigate('/top100?tab=my-progress');
-  };
 
   return (
     <motion.section
@@ -109,9 +28,9 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
     >
       <button
         type="button"
-        onClick={handleClick}
+        onClick={() => navigate('/top100?tab=my-progress')}
         className={cn(
-          'relative w-full p-4',
+          'w-full p-4',
           'rounded-2xl',
           'bg-card/92 backdrop-blur-sm',
           'border border-border/50',
@@ -123,69 +42,51 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
         )}
         aria-label="View your Top 100 Journey"
       >
-        {/* Progress Ring + milestone label — top right */}
-        <div className="absolute top-4 right-4 flex flex-col items-center">
-          <ProgressRing
-            completed={completedCourses}
-            total={nextMilestone}
-            size={72}
-            strokeWidth={7}
-          />
-          <span className="text-[10px] text-muted-foreground mt-1 font-medium">
-            Next: {nextMilestone}
-          </span>
-        </div>
+        <h2
+          className="text-[22px] font-bold text-foreground mb-2"
+          style={{ letterSpacing: '-0.3px' }}
+        >
+          Your Top 100 Journey
+        </h2>
 
-        {/* Text content */}
-        <div className="pr-24">
-          <h2
-            className="text-[22px] font-bold text-foreground mb-2"
-            style={{ letterSpacing: '-0.3px' }}
-          >
-            Your Top 100 Journey
-          </h2>
-
-          <div className="flex items-baseline gap-2 mb-1">
-            <span
-              className="text-3xl font-bold"
-              style={{
-                background: 'linear-gradient(to right, rgba(245, 158, 11, 0.9), rgba(251, 191, 36, 0.9))',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}
-            >
-              {completedCourses}
-            </span>
-            <span className="text-sm text-muted-foreground">
-              courses completed
-            </span>
-          </div>
-
-          {listCount > 0 && (
-            <p className="text-xs text-muted-foreground mb-3">
-              Across {listCount} Top 100 {listCount === 1 ? 'list' : 'lists'}
-            </p>
-          )}
-
-          {listCount === 0 && <div className="mb-3" />}
-
+        <div className="flex items-baseline gap-2">
           <span
-            className={cn(
-              'inline-flex items-center gap-0.5',
-              'px-4 py-2.5',
-              'text-sm font-medium',
-              'bg-muted text-foreground',
-              'rounded-lg',
-              'hover:bg-muted/80',
-              'active:scale-[0.97]',
-              'transition-all duration-150',
-              'whitespace-nowrap'
-            )}
+            className="text-3xl font-bold"
+            style={{
+              background: 'linear-gradient(to right, rgba(245, 158, 11, 0.9), rgba(251, 191, 36, 0.9))',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
           >
-            {isZeroProgress ? 'Start your Top 100 Journey' : 'View your Top 100 Journey'}
-            <ChevronRight size={14} />
+            {completedCourses}
+          </span>
+          <span className="text-sm text-muted-foreground">
+            courses completed
           </span>
         </div>
+
+        {listCount > 0 && (
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Across {listCount} Top 100 {listCount === 1 ? 'list' : 'lists'}
+          </p>
+        )}
+
+        <span
+          className={cn(
+            'inline-flex items-center gap-0.5 mt-3',
+            'px-4 py-2.5',
+            'text-sm font-medium',
+            'bg-muted text-foreground',
+            'rounded-lg',
+            'hover:bg-muted/80',
+            'active:scale-[0.97]',
+            'transition-all duration-150',
+            'whitespace-nowrap'
+          )}
+        >
+          {isZeroProgress ? 'Start your Top 100 Journey' : 'View your Top 100 Journey'}
+          <ChevronRight size={14} />
+        </span>
       </button>
     </motion.section>
   );
