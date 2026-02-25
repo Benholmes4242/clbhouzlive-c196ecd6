@@ -1,0 +1,1 @@
+ALTER TABLE comment_reactions DROP CONSTRAINT IF EXISTS valid_reaction_type;
