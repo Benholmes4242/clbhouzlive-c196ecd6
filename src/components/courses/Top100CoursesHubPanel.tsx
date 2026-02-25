@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
 import VirtualizedCourseList from './VirtualizedCourseList';
 import { type AppSelectOption } from '@/components/ui/AppSelect';
 
-type Top100SortOption = 'official' | 'community_rating';
+type Top100SortOption = 'official' | 'user_rating';
 
 /** Known Top 100 list slugs for validation. */
 const KNOWN_LIST_SLUGS = ['global', 'gb-i', 'usa', 'europe'];
@@ -46,7 +46,7 @@ const Top100CoursesHubPanel = () => {
   const [sortOption, setSortOption] = useState<Top100SortOption>(() => {
     const saved = readSavedFilters();
     const val = saved?.sort;
-    return val === 'community_rating' || val === 'user_rating' ? 'community_rating' : 'official';
+    return val === 'user_rating' ? 'user_rating' : 'official';
   });
 
   // Scroll restoration ref
@@ -95,12 +95,11 @@ const Top100CoursesHubPanel = () => {
     
     return [...courses].sort((a, b) => {
       switch (sortOption) {
-        case 'community_rating': {
-          const ratingA = Number.isFinite(Number(a.average_rating)) ? Number(a.average_rating) : -1;
-          const ratingB = Number.isFinite(Number(b.average_rating)) ? Number(b.average_rating) : -1;
+        case 'user_rating':
+          const ratingA = a.average_rating ?? -1;
+          const ratingB = b.average_rating ?? -1;
           if (ratingB !== ratingA) return ratingB - ratingA;
           return (a.name ?? '').localeCompare(b.name ?? '');
-        }
         case 'official':
         default:
           const rankA = selectedList.includes('global') ? a.list_memberships.find((m: any) => m.list_slug.includes('global'))?.rank :
@@ -167,7 +166,7 @@ const Top100CoursesHubPanel = () => {
 
   const sortOptions: AppSelectOption<Top100SortOption>[] = [
     { value: 'official', label: 'Official ranking' },
-    { value: 'community_rating', label: 'Community Rating' },
+    { value: 'user_rating', label: 'Community rating' },
   ];
 
   const handleResetFilters = () => {
