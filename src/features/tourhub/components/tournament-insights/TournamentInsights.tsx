@@ -154,7 +154,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
         viewport={{ once: true }}
-        className="mb-4"
+        style={{ marginBottom: '24px' }}
       >
         <div className="mb-1">
           <h2
@@ -163,7 +163,6 @@ export const TournamentInsights = memo(function TournamentInsights() {
           >
             Tournament Intelligence
           </h2>
-          {/* Subtitle only when NOT live — toggle replaces it */}
           {!isLive && (
             <p className="mt-1 text-muted-foreground/60" style={{ fontSize: '13px', fontWeight: 500 }}>
               AI analysis of course fit, form, and field strength
@@ -171,9 +170,9 @@ export const TournamentInsights = memo(function TournamentInsights() {
           )}
         </div>
 
-        {/* Live/Upcoming toggle — matches CourseTabs wrapper */}
+        {/* Live/Upcoming toggle */}
         {(isLive || hasUpcoming) && (
-          <div className="py-3">
+          <div style={{ paddingTop: '12px' }}>
             <LiveUpcomingToggle
               activeView={intelligenceView}
               onViewChange={setIntelligenceView}
@@ -211,8 +210,8 @@ export const TournamentInsights = memo(function TournamentInsights() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-0 pt-7 bg-background"
-            style={{ borderTop: '1px solid rgba(0, 0, 0, 0.05)' }}
+            className="mt-0 pt-6 bg-background"
+            style={{ borderTop: '1px solid hsl(var(--border) / 0.3)' }}
           >
             <motion.div
               initial={{ opacity: 0, y: 16 }}
@@ -265,8 +264,8 @@ export const TournamentInsights = memo(function TournamentInsights() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-0 pt-7 bg-background"
-            style={{ borderTop: '1px solid rgba(0, 0, 0, 0.05)' }}
+            className="mt-0 pt-6 bg-background"
+            style={{ borderTop: '1px solid hsl(var(--border) / 0.3)' }}
           >
             {nextTournamentInsights ? (
               <>
@@ -330,8 +329,8 @@ export const TournamentInsights = memo(function TournamentInsights() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-0 pt-5 bg-background"
-            style={{ borderTop: '1px solid rgba(0, 0, 0, 0.05)' }}
+            className="mt-0 pt-6 bg-background"
+            style={{ borderTop: '1px solid hsl(var(--border) / 0.3)' }}
           >
             {isWaitingForPlay ? (
               /* ── WAITING FOR PLAY: show predictions + Course DNA, not empty tracker ── */
@@ -414,22 +413,20 @@ export const TournamentInsights = memo(function TournamentInsights() {
                     padding: '14px 16px',
                     margin: '12px 0',
                     borderRadius: '12px',
-                    background: 'rgba(0,0,0,0.03)',
-                    border: '1px solid rgba(0,0,0,0.06)',
                     cursor: 'pointer',
                   }}
-                  className="active:scale-[0.98] transition-transform"
+                  className="active:scale-[0.98] transition-transform bg-muted/50 border border-border/40"
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span style={{ fontSize: '14px' }}>🧬</span>
-                    <span style={{ fontSize: '13.5px', fontWeight: 600, color: 'rgba(0,0,0,0.7)' }}>
+                    <span className="text-foreground/70" style={{ fontSize: '13.5px', fontWeight: 600 }}>
                       {showCourseDNA ? 'Hide Course DNA' : 'View Course DNA'}
                     </span>
                   </div>
                   <span
+                    className="text-muted-foreground"
                     style={{
                       fontSize: '16px',
-                      color: 'rgba(0,0,0,0.3)',
                       transform: showCourseDNA ? 'rotate(90deg)' : 'rotate(0deg)',
                       transition: 'transform 0.2s ease',
                       display: 'inline-block',
@@ -486,8 +483,8 @@ export const TournamentInsights = memo(function TournamentInsights() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-0 pt-7 bg-background"
-            style={{ borderTop: '1px solid rgba(0, 0, 0, 0.05)' }}
+            className="mt-0 pt-6 bg-background"
+            style={{ borderTop: '1px solid hsl(var(--border) / 0.3)' }}
           >
             {nextTournamentInsights ? (
               <>
@@ -551,8 +548,8 @@ export const TournamentInsights = memo(function TournamentInsights() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-0 pt-7 bg-background"
-            style={{ borderTop: '1px solid rgba(0, 0, 0, 0.05)' }}
+            className="mt-0 pt-6 bg-background"
+            style={{ borderTop: '1px solid hsl(var(--border) / 0.3)' }}
           >
             {nextTournamentInsights ? (
               <>
@@ -616,8 +613,8 @@ export const TournamentInsights = memo(function TournamentInsights() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-0 pt-5 bg-background space-y-4"
-            style={{ borderTop: '1px solid rgba(0, 0, 0, 0.05)' }}
+            className="mt-0 pt-6 bg-background space-y-4"
+            style={{ borderTop: '1px solid hsl(var(--border) / 0.3)' }}
           >
             {tracker ? (
               <>

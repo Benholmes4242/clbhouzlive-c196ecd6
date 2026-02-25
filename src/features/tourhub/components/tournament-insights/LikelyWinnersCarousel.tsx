@@ -1,7 +1,6 @@
 /**
  * TopPicksCarousel (formerly LikelyWinnersCarousel)
- * World-class visual redesign — UI only, no data changes.
- * #1 pick hero treatment, circular confidence gauge, contextual reason icons.
+ * Premium player scouting cards with confidence gauges.
  */
 
 import { memo, useState, useRef, useCallback, useEffect } from 'react';
@@ -45,8 +44,11 @@ const ICON_MAP: Record<ReasonIconResult['icon'], React.ComponentType<any>> = {
 function ReasonIcon({ text }: { text: string }) {
   const { icon, color } = getReasonIcon(text);
   const IconComp = ICON_MAP[icon] || Sparkles;
-  return <IconComp className="w-4 h-4 flex-shrink-0 mt-[1px]" style={{ color, opacity: 0.7 }} strokeWidth={1.8} />;
+  return <IconComp className="w-[18px] h-[18px] flex-shrink-0 mt-[1px]" style={{ color, opacity: 0.8 }} strokeWidth={1.8} />;
 }
+
+// Refined accent colors
+const ACCENT_COLORS = ['#E8920B', '#059669', '#059669', '#94A3B8', '#94A3B8'];
 
 export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
   featured,
@@ -83,7 +85,6 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
     })),
   ];
 
-  // Track scroll for dot indicators
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -99,7 +100,6 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
     return () => el.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
 
-  // Mark animated after first render
   useEffect(() => {
     hasAnimatedRef.current = true;
   }, []);
@@ -112,11 +112,11 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         viewport={{ once: true }}
-        className="mb-3.5"
+        className="mb-4"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#1C1917' }}>
+            <h3 className="text-foreground" style={{ fontSize: '18px', fontWeight: 700 }}>
               Top 5 Picks
             </h3>
           </div>
@@ -134,25 +134,24 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
-              className="mt-2 p-3 rounded-xl"
+              className="mt-2 p-3 rounded-xl bg-card border border-border/50"
               style={{
-                background: '#FFFDF5',
-                border: '1px solid rgba(255,184,0,0.2)',
                 fontSize: '12px',
                 lineHeight: 1.5,
-                color: 'rgba(0,0,0,0.6)',
               }}
             >
-              AI confidence is calculated from course history, recent form, strokes gained metrics, and field strength. Higher scores indicate stronger statistical alignment with what this course rewards.
+              <span className="text-muted-foreground">
+                AI confidence is calculated from course history, recent form, strokes gained metrics, and field strength. Higher scores indicate stronger statistical alignment with what this course rewards.
+              </span>
             </motion.div>
           )}
         </AnimatePresence>
       </motion.div>
 
-      {/* Swipeable carousel */}
+      {/* Swipeable carousel — gap-4 for breathing room */}
       <div
         ref={scrollRef}
-        className="flex gap-3 pb-2 -mx-4 px-4"
+        className="flex gap-4 pb-2 -mx-4 px-4"
         style={{
           overflowX: 'auto',
           overflowY: 'hidden',
@@ -165,10 +164,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
       >
         {allPicks.map((pick, i) => {
           const isFeatured = i === 0;
-          // Color tiers: 0 = amber, 1-2 = emerald, 3-4 = grey
-          const accentColor = i === 0 ? 'rgba(245,158,11,0.9)'
-            : i <= 2 ? '#10B981'
-            : '#9CA3AF';
+          const accentColor = ACCENT_COLORS[i] ?? '#94A3B8';
 
           return (
             <motion.div
@@ -181,15 +177,15 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                 ease: [0.16, 1, 0.3, 1],
               }}
               viewport={{ once: true }}
-              className="rounded-2xl flex-shrink-0 relative overflow-hidden"
+              className="rounded-2xl flex-shrink-0 relative overflow-hidden bg-card"
               style={{
                 width: isFeatured ? 'calc(100% - 28px)' : 'calc(100% - 36px)',
                 minWidth: isFeatured ? 'calc(100% - 28px)' : 'calc(100% - 36px)',
                 scrollSnapAlign: 'start',
-                background: '#FFFFFF',
-                border: '1px solid rgba(0,0,0,0.06)',
-                borderLeft: `3px solid ${accentColor}`,
+                border: '1px solid hsl(var(--border) / 0.4)',
+                borderLeft: `4px solid ${accentColor}`,
                 opacity: pick.isWithdrawn ? 0.6 : undefined,
+                boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
               }}
             >
               {/* Avatar + Name row */}
@@ -198,12 +194,13 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                   <img
                     src={pick.avatarUrl || PLAYER_SILHOUETTE_URL}
                     alt={pick.name}
-                    className="object-cover border border-border"
+                    className="object-cover"
                     style={{
-                      width: isFeatured ? 64 : 56,
-                      height: isFeatured ? 64 : 56,
+                      width: isFeatured ? 72 : 60,
+                      height: isFeatured ? 72 : 60,
                       borderRadius: '34%',
                       objectPosition: 'center 20%',
+                      border: `2px solid ${accentColor}`,
                     }}
                     loading="lazy"
                     onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
@@ -236,10 +233,10 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                   >
                     {pick.name}
                   </span>
-                    <div className="flex items-center gap-1.5">
-                     {pick.countryCode && (
-                       <CountryFlag country={pick.countryCode} size="sm" className="rounded-sm" />
-                     )}
+                  <div className="flex items-center gap-1.5">
+                    {pick.countryCode && (
+                      <CountryFlag country={pick.countryCode} size="sm" className="rounded-sm" />
+                    )}
                     {pick.promoted && (
                       <span
                         className="text-[10px] font-semibold px-2 py-0.5 rounded-md inline-block"
@@ -264,7 +261,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                 </div>
               </div>
 
-              {/* Bullet points with contextual icons */}
+              {/* Bullet points */}
               {pick.bullets.length > 0 && (
                 <div className="flex flex-col gap-2.5 px-5 pb-5 pt-3">
                   {pick.bullets.slice(0, 3).map((bullet, j) => (
@@ -272,7 +269,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                       <ReasonIcon text={bullet} />
                       <span
                         className="text-muted-foreground"
-                        style={{ fontSize: 13, lineHeight: 1.5 }}
+                        style={{ fontSize: 14, lineHeight: 1.625 }}
                       >
                         {bullet}
                       </span>
@@ -285,7 +282,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
         })}
       </div>
 
-      {/* Dot indicators — pill for active, circle for inactive */}
+      {/* Dot indicators — 20px active pill */}
       {allPicks.length > 1 && (
         <div className="flex items-center justify-center gap-1.5 mt-3">
           {allPicks.map((_, i) => (
@@ -293,9 +290,11 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
               key={i}
               className="rounded-full transition-all duration-200"
               style={{
-                width: i === activeIndex ? '16px' : '6px',
+                width: i === activeIndex ? '20px' : '6px',
                 height: '6px',
-                background: i === activeIndex ? 'hsl(var(--foreground))' : 'rgba(0,0,0,0.12)',
+                background: i === activeIndex
+                  ? 'hsl(var(--foreground))'
+                  : 'hsl(var(--muted-foreground) / 0.2)',
               }}
             />
           ))}

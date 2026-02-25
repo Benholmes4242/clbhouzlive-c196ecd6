@@ -1,52 +1,36 @@
 /**
- * IntelligenceTabSwitcher - Matches LiveUpcomingToggle style
- * Transparent track, white active pill with shadow
+ * IntelligenceTabSwitcher - Wrapper around shared SegmentedControl
  */
 
 import React from 'react';
-import { cn } from '@/lib/utils';
+import SegmentedControl from './SegmentedControl';
 
 type IntelligenceTab = 'courseDNA' | 'predictions';
 
 interface IntelligenceTabSwitcherProps {
   activeTab: IntelligenceTab;
   onTabChange: (tab: IntelligenceTab) => void;
-  /** When true, show Top 5 Picks first (left) instead of Course DNA */
   picksFirst?: boolean;
 }
 
 const IntelligenceTabSwitcher: React.FC<IntelligenceTabSwitcherProps> = ({ activeTab, onTabChange, picksFirst = false }) => {
-  const tabs: { id: IntelligenceTab; label: string }[] = picksFirst
+  const options = picksFirst
     ? [
-        { id: 'predictions', label: 'Top 5 Picks' },
-        { id: 'courseDNA', label: 'Course DNA' },
+        { label: 'Top 5 Picks', value: 'predictions' },
+        { label: 'Course DNA', value: 'courseDNA' },
       ]
     : [
-        { id: 'courseDNA', label: 'Course DNA' },
-        { id: 'predictions', label: 'Top 5 Picks' },
+        { label: 'Course DNA', value: 'courseDNA' },
+        { label: 'Top 5 Picks', value: 'predictions' },
       ];
 
   return (
-    <div className="flex items-stretch rounded-xl overflow-hidden bg-transparent mb-4">
-      {tabs.map((tab) => {
-        const isActive = activeTab === tab.id;
-
-        return (
-          <button
-            key={tab.id}
-            onClick={() => onTabChange(tab.id)}
-            className={cn(
-              "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98] flex items-center justify-center",
-              isActive
-                ? "bg-foreground text-background m-1 rounded-lg"
-                : "text-muted-foreground hover:text-foreground rounded-lg active:bg-card/50"
-            )}
-          >
-            {tab.label}
-          </button>
-        );
-      })}
-    </div>
+    <SegmentedControl
+      options={options}
+      value={activeTab}
+      onChange={(v) => onTabChange(v as IntelligenceTab)}
+      className="mb-4"
+    />
   );
 };
 

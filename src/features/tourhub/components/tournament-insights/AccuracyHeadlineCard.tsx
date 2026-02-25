@@ -1,5 +1,6 @@
 /**
  * AccuracyHeadlineCard - Shows prediction accuracy summary with progress bar and grade
+ * Flat card — no shadow (matches flat card standard)
  */
 
 import React from 'react';
@@ -42,8 +43,7 @@ export const AccuracyHeadlineCard: React.FC<AccuracyHeadlineCardProps> = ({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      className="rounded-2xl bg-card border border-border overflow-hidden"
-      style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)' }}
+      className="rounded-2xl bg-card border border-border/50 overflow-hidden"
     >
       <div className="p-4">
         {/* Header */}
@@ -56,7 +56,7 @@ export const AccuracyHeadlineCard: React.FC<AccuracyHeadlineCardProps> = ({
 
         {/* Progress bar */}
         <div className="mb-3">
-          <div className="h-2.5 w-full rounded-full overflow-hidden" style={{ backgroundColor: '#f3f4f6' }}>
+          <div className="h-2.5 w-full rounded-full overflow-hidden bg-muted">
             <motion.div
               className="h-full rounded-full"
               style={{

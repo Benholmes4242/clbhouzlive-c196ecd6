@@ -1,7 +1,6 @@
 /**
- * PredictionScorecardRow - OWGR-style row: PLAYER | ACTUAL | OFF LEAD
- * OFF LEAD = actualPosition - 1 (how far from the leader)
- * No dark horse logic — all rows identical.
+ * PredictionScorecardRow - OWGR-style row
+ * 48px squircle avatars, 15px names, theme-aware colors
  */
 
 import React from 'react';
@@ -44,13 +43,13 @@ function formatScore(score: number | null): string {
 
 function getOffLeadDisplay(prediction: TrackedPrediction, isCompleted?: boolean): OffLeadDisplay {
   if (prediction.performanceStatus === 'cut') {
-    return { text: 'CUT', color: 'rgba(0,0,0,0.3)' };
+    return { text: 'CUT', color: 'hsl(var(--muted-foreground) / 0.5)' };
   }
   if (prediction.performanceStatus === 'withdrawn') {
-    return { text: 'WD', color: 'rgba(0,0,0,0.3)' };
+    return { text: 'WD', color: 'hsl(var(--muted-foreground) / 0.5)' };
   }
   if (prediction.actualPosition === null || prediction.performanceStatus === 'not-started') {
-    return { text: '—', color: 'rgba(0,0,0,0.2)' };
+    return { text: '—', color: 'hsl(var(--muted-foreground) / 0.3)' };
   }
 
   const offLead = prediction.actualPosition - 1;
@@ -59,7 +58,7 @@ function getOffLeadDisplay(prediction: TrackedPrediction, isCompleted?: boolean)
     return { text: formatScore(prediction.score), color: 'rgba(22,163,74,0.9)', fontWeight: 700 };
   }
 
-  return { text: offLead, color: 'rgba(220,38,38,0.75)', fontWeight: 600, isDownArrow: true };
+  return { text: offLead, color: 'rgba(220,38,38,0.85)', fontWeight: 600, isDownArrow: true };
 }
 
 export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
@@ -81,14 +80,14 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
         ease: [0.16, 1, 0.3, 1],
         delay: index * 0.05,
       }}
-      className="flex items-center px-4"
-      style={{ opacity: isWD ? 0.5 : isCut ? 0.6 : 1, height: '68px' }}
+      className="flex items-center px-4 py-3.5"
+      style={{ opacity: isWD ? 0.5 : isCut ? 0.6 : 1 }}
     >
-      {/* PLAYER — Avatar + Name */}
+      {/* PLAYER — 48px squircle Avatar + Name */}
       <div className="flex items-center gap-2.5 flex-1 min-w-0">
         <div
-          className="overflow-hidden border border-border/50 flex-shrink-0"
-          style={{ width: '40px', height: '40px', borderRadius: '13px' }}
+          className="overflow-hidden border border-border/50 flex-shrink-0 bg-muted"
+          style={{ width: '48px', height: '48px', borderRadius: '34%' }}
         >
           {avatarUrl ? (
             <div className="relative w-full h-full">
@@ -97,6 +96,7 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
                 src={avatarUrl}
                 alt={prediction.playerName}
                 className="relative z-10 w-full h-full object-cover"
+                style={{ objectPosition: 'center 20%' }}
                 loading="lazy"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
@@ -109,14 +109,13 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
         </div>
         <div className="min-w-0 flex-1">
           <p
-            className="text-sm font-semibold text-foreground truncate leading-tight"
-            style={{ textDecoration: isCut ? 'line-through' : undefined }}
+            className="font-semibold text-foreground truncate leading-tight"
+            style={{ fontSize: '15px', textDecoration: isCut ? 'line-through' : undefined }}
           >
             {prediction.playerName}
           </p>
-          {/* Score line — only when player has posted a real score */}
           {prediction.actualPosition !== null && prediction.score !== null && (
-            <p className="text-[11px] text-muted-foreground leading-tight" style={{ marginTop: '3px' }}>
+            <p className="text-muted-foreground leading-tight" style={{ fontSize: '13px', marginTop: '3px' }}>
               {prediction.score === 0 ? 'E' : prediction.score > 0 ? `+${prediction.score}` : prediction.score}
               {prediction.thru !== null && prediction.thru > 0 ? ` · thru ${prediction.thru}` : ''}
               {prediction.currentRound ? ` · R${prediction.currentRound}` : ''}
@@ -127,12 +126,12 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
 
       {/* ACTUAL */}
       <div className="w-[52px] flex-shrink-0 text-center">
-        <span className="text-sm font-semibold text-foreground">
+        <span className="font-semibold text-foreground" style={{ fontSize: '17px' }}>
           {formatActual(prediction, isCompleted)}
         </span>
       </div>
 
-      {/* OFF LEAD — matches header width of 75px, centred */}
+      {/* OFF LEAD */}
       <motion.div
         className="w-[75px] flex-shrink-0 text-center"
         initial={{ scale: 0.8, opacity: 0 }}
