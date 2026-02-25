@@ -27,7 +27,7 @@ export const SEASON_CONFIG: Record<SeasonId, SeasonConfig> = {
     label: 'Pre-Season',
     title: 'Pre-Season Training',
     subtitle: 'Get match ready',
-    themeColor: '#B8E600', // Bright lime - energy, anticipation
+    themeColor: '#98FBCB', // Fresh mint - energy, anticipation
     Icon: Dumbbell,
   },
   major: {
