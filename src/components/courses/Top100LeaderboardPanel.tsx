@@ -44,17 +44,19 @@ const Top100LeaderboardPanel = () => {
     <div className="w-full pb-6">
       <Tabs value={view} onValueChange={handleViewChange} className="w-full">
         <div className="px-3">
-          {/* Two-line tab labels with Apple-style polish */}
-          <div className="flex gap-2 p-1 bg-muted rounded-xl">
+          <div
+            className="flex gap-1 rounded-[14px] p-[3px]"
+            style={{ backgroundColor: 'rgba(0, 0, 0, 0.03)' }}
+          >
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => handleViewChange(tab.id)}
                 className={cn(
-                  'flex-1 py-2.5 px-2 rounded-lg text-center transition-all duration-200 active:scale-[0.97]',
+                  'flex-1 py-2.5 px-2 rounded-xl text-center transition-all duration-200 active:scale-[0.97]',
                   view === tab.id
-                    ? 'bg-card border border-border'
-                    : 'text-muted-foreground hover:bg-card/50'
+                    ? 'bg-card text-foreground font-semibold'
+                    : 'bg-transparent text-muted-foreground font-medium'
                 )}
               >
                 <span className={cn(
