@@ -1,6 +1,6 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CommentItem } from '@/components/comments/CommentItem';
 import { CommentsEmptyState } from '@/components/comments/CommentsEmptyState';
@@ -23,6 +23,11 @@ interface CommentsListProps {
   expandedReplies: Set<string>;
   listVisible: boolean;
   keyboardOffset: number;
+  // Pagination
+  hasNextPage: boolean;
+  isFetchingNextPage: boolean;
+  onFetchNextPage: () => void;
+  onLoadAllReplies: (commentId: string) => void;
   // Callbacks
   onToggleLike: (commentId: string) => void;
   isTogglingLike: boolean;
@@ -36,7 +41,6 @@ interface CommentsListProps {
   onToggleReaction: (params: { commentId: string; reactionType: GolfReactionType }) => void;
   registerCommentRef: (commentId: string) => (el: HTMLDivElement | null) => void;
   onClose: () => void;
-  // Refs
   commentsListRef: React.RefObject<HTMLDivElement>;
 }
 
@@ -54,6 +58,10 @@ export const CommentsList: React.FC<CommentsListProps> = ({
   expandedReplies,
   listVisible,
   keyboardOffset,
+  hasNextPage,
+  isFetchingNextPage,
+  onFetchNextPage,
+  onLoadAllReplies,
   onToggleLike,
   isTogglingLike,
   onReply,
@@ -69,6 +77,23 @@ export const CommentsList: React.FC<CommentsListProps> = ({
   commentsListRef,
 }) => {
   const navigate = useNavigate();
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  // Infinite scroll via IntersectionObserver
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    const container = commentsListRef.current;
+    if (!sentinel || !container || !hasNextPage || isFetchingNextPage) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) onFetchNextPage();
+      },
+      { root: container, rootMargin: '200px' }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, onFetchNextPage, commentsListRef]);
 
   const handleMentionTap = useCallback(async (username: string) => {
     const cleaned = username.toLowerCase();
@@ -112,10 +137,10 @@ export const CommentsList: React.FC<CommentsListProps> = ({
         <div>
           {comments.map((comment) => {
             const repliesExpanded = expandedReplies.has(comment.id);
-            const visibleReplies = repliesExpanded
-              ? comment.replies
-              : comment.replies.slice(0, 2);
-            const hiddenRepliesCount = comment.replies.length - 2;
+            const initialReplies = comment.replies.slice(0, 2);
+            const visibleReplies = repliesExpanded ? comment.replies : initialReplies;
+            const totalReplies = comment.total_replies_count ?? comment.replies_count;
+            const hiddenRepliesCount = totalReplies - initialReplies.length;
             const isOwnComment = currentUserId === comment.user_id;
             const isThisCaddiePick = caddiePickCommentId === comment.id;
 
@@ -145,7 +170,7 @@ export const CommentsList: React.FC<CommentsListProps> = ({
                 />
 
                 {/* Replies */}
-                {comment.replies.length > 0 && (
+                {(comment.replies.length > 0 || totalReplies > 0) && (
                   <div className="relative ml-4">
                     <div
                       className="absolute w-[2px] rounded-full"
@@ -187,7 +212,10 @@ export const CommentsList: React.FC<CommentsListProps> = ({
 
                       {hiddenRepliesCount > 0 && !repliesExpanded && (
                         <button
-                          onClick={() => onToggleReplies(comment.id)}
+                          onClick={() => {
+                            onLoadAllReplies(comment.id);
+                            onToggleReplies(comment.id);
+                          }}
                           className={cn(
                             "relative z-10 flex items-center gap-1.5 text-[12px] font-medium py-2.5 pl-[32px] active:scale-[0.97] transition-transform",
                             isDark ? "text-white/50 hover:text-white/70" : "text-muted-foreground hover:text-foreground"
@@ -197,7 +225,7 @@ export const CommentsList: React.FC<CommentsListProps> = ({
                           View {hiddenRepliesCount} more {hiddenRepliesCount === 1 ? 'reply' : 'replies'}
                         </button>
                       )}
-                      {repliesExpanded && comment.replies.length > 2 && (
+                      {repliesExpanded && totalReplies > 2 && (
                         <button
                           onClick={() => onToggleReplies(comment.id)}
                           className={cn(
@@ -214,6 +242,15 @@ export const CommentsList: React.FC<CommentsListProps> = ({
               </div>
             );
           })}
+
+          {/* Infinite scroll sentinel */}
+          <div ref={sentinelRef} className="h-px" />
+
+          {isFetchingNextPage && (
+            <div className="flex items-center justify-center py-4">
+              <Loader2 className={cn("w-5 h-5 animate-spin", isDark ? "text-white/40" : "text-muted-foreground")} />
+            </div>
+          )}
         </div>
       )}
     </motion.div>

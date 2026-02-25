@@ -120,6 +120,10 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
     isDeletingComment,
     updateComment,
     isUpdatingComment,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    loadAllReplies,
   } = useCommentsWithReplies(postId);
 
   const { hiddenCommentIds, hideComment } = useHiddenComments(postId);
@@ -435,6 +439,10 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               registerCommentRef={registerCommentRef}
               onClose={onClose}
               commentsListRef={commentsListRef as React.RefObject<HTMLDivElement>}
+              hasNextPage={hasNextPage}
+              isFetchingNextPage={isFetchingNextPage}
+              onFetchNextPage={() => fetchNextPage()}
+              onLoadAllReplies={loadAllReplies}
             />
 
             {/* Input */}
