@@ -13,7 +13,7 @@ import { ArrowLeft, RotateCcw } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { cn } from '@/lib/utils';
 import { MapCourseSheet, MapProgressOrb } from './map';
-import { MAP_CONFIG } from '@/config/maps';
+import { MAP_CONFIG, applyClbhouzMapStyle } from '@/config/maps';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 
 type StatusFilter = 'all' | 'played' | 'want_to_play' | 'not_played';
@@ -125,7 +125,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 
     mapRef.current = new mapboxgl.Map({
       container: mapContainerRef.current,
-      style: 'mapbox://styles/mapbox/satellite-streets-v12',
+      style: MAP_CONFIG.STYLE_URL,
       center: regionConfig.center,
       zoom: regionConfig.zoom,
       minZoom: 1.5,
@@ -145,13 +145,18 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
       setMapLoaded(true);
     });
 
-    // Globe atmosphere for cinematic space effect
+    // Apply clean minimal base style + globe atmosphere
     mapInstance.on('style.load', () => {
+      applyClbhouzMapStyle(mapInstance, {
+        showPlaceLabels: true,
+        showWaterLabels: true,
+      });
+
       mapInstance.setFog({
-        color: 'rgb(10, 15, 30)',
-        'high-color': 'rgb(20, 30, 60)',
+        color: 'rgb(220, 215, 206)',
+        'high-color': 'rgb(180, 190, 210)',
         'horizon-blend': 0.08,
-        'space-color': 'rgb(5, 8, 18)',
+        'space-color': 'rgb(8, 10, 22)',
         'star-intensity': 0.12,
       });
     });
@@ -300,7 +305,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           ],
           'circle-color': 'rgba(255,255,255,0.7)',
           'circle-stroke-width': 1.5,
-          'circle-stroke-color': NOT_PLAYED_COLOR,
+          'circle-stroke-color': 'rgba(0,0,0,0.12)',
         },
       });
 
@@ -358,8 +363,9 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             16, 18,  // Even larger when very zoomed in
           ],
           'circle-color': PLAYED_COLOR,
-          'circle-stroke-width': 2.5,
-          'circle-stroke-color': 'rgba(255,255,255,0.5)',
+          'circle-opacity': 1.0,
+          'circle-stroke-width': 2,
+          'circle-stroke-color': 'rgba(255,255,255,0.8)',
         },
       });
 
@@ -369,7 +375,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         type: 'symbol',
         source: 'courses',
         filter: ['!', ['has', 'point_count']],
-        minzoom: 7,  // Show labels as soon as courses are individually visible
+        minzoom: 7,
         layout: {
           'text-field': ['get', 'name'],
           'text-size': [
@@ -388,9 +394,9 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           'text-font': ['Inter Semi Bold', 'Arial Unicode MS Bold'],
         },
         paint: {
-          'text-color': '#ffffff',
-          'text-halo-color': 'rgba(0,0,0,0.6)',
-          'text-halo-width': 2,
+          'text-color': 'rgba(0,0,0,0.55)',
+          'text-halo-color': 'rgba(255,255,255,0.85)',
+          'text-halo-width': 1.5,
           'text-halo-blur': 0.5,
           'text-opacity': [
             'interpolate', ['linear'], ['zoom'],

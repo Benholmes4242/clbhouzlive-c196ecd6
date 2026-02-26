@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { MAP_CONFIG } from '@/config/maps';
+import { MAP_CONFIG, applyClbhouzMapStyle } from '@/config/maps';
 import { MapIcon } from 'lucide-react';
 
 mapboxgl.accessToken = MAP_CONFIG.TOKEN;
@@ -95,12 +95,17 @@ export const MiniGlobePreview: React.FC<MiniGlobePreviewProps> = ({
     mapRef.current = map;
 
     map.on('style.load', () => {
+      applyClbhouzMapStyle(map, {
+        showPlaceLabels: false,
+        showWaterLabels: false,
+      });
+
       map.setFog({
-        color: 'rgb(15, 20, 35)',
-        'high-color': 'rgb(30, 40, 70)',
+        color: 'rgb(220, 215, 206)',
+        'high-color': 'rgb(180, 190, 210)',
         'horizon-blend': 0.06,
         'space-color': 'rgb(8, 10, 22)',
-        'star-intensity': 0.1,
+        'star-intensity': 0.08,
       });
     });
 
