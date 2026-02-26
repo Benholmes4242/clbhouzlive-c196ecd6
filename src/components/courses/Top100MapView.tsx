@@ -612,9 +612,10 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         {/* Back button — canonical glass, one size smaller */}
         <button
           onClick={() => onClose ? onClose() : navigate(-1)}
-          className="glass-card fixed left-4 z-40 w-9 h-9 flex items-center justify-center !rounded-full active:scale-[0.92] active:bg-white/20 transition-all duration-150"
+          className="glass-card fixed left-4 z-40 w-9 h-9 flex items-center justify-center !rounded-full !overflow-visible active:scale-[0.92] active:bg-white/20 transition-all duration-150"
           style={{
             top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
+            position: 'fixed',
           }}
           aria-label="Go back"
         >
