@@ -490,9 +490,6 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
       {/* Section 3 – Sort & Filter controls (16px from search) */}
       <div className="px-5 pt-1 pb-4 bg-muted">
-        <p className="mb-4 text-xs font-semibold tracking-[0.08em] text-muted-foreground">
-          Sort &amp; filter
-        </p>
         {/* Sort tabs */}
         <Tabs value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)} className="w-full">
           <TabsList className="bg-transparent border-0 px-0 py-0 gap-0 w-full flex justify-center">
