@@ -19,7 +19,8 @@ export function usePlayedCourseCoordinates(userId: string | undefined) {
       const { data, error } = await supabase
         .from('course_ratings')
         .select('golf_courses!course_ratings_course_id_fkey(latitude, longitude)')
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .eq('is_mock', false);
 
       if (error) throw error;
 
