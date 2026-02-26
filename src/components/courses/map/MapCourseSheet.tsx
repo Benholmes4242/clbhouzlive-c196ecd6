@@ -317,10 +317,9 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
             {/* CTAs */}
             <div className="space-y-3 mt-6">
               <button
-                className="w-full py-3.5 rounded-xl text-[15px] font-semibold active:scale-[0.98] active:opacity-90 transition-all duration-150"
+                className="w-full py-3.5 rounded-xl text-[15px] font-semibold text-foreground active:scale-[0.98] active:opacity-90 transition-all duration-150"
                 style={{
                   background: 'rgba(255, 255, 255, 0.95)',
-                  color: '#1a1a1a',
                 }}
                 onClick={() => navigate(`/courses/${course.id}`)}
               >
