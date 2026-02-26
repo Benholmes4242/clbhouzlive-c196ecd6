@@ -180,26 +180,29 @@ const Top100Hub = () => {
               </div>
 
               {/* Always render List view - Map is shown in modal */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {summariesLoading ? (
                   <div className="col-span-full text-center py-12 text-muted-foreground">
                     Loading Top 100 lists...
                   </div>
                 ) : (
                   (() => {
-                    const usedPhrases = new Set<string>();
-                    return listSummaries?.map((list) => {
-                      const card = (
-                        <Top100RegionCard
-                          key={list.id}
-                          list={list}
-                          onClick={() => navigate(`/top100/${list.slug}`)}
-                          userId={session?.user?.id}
-                          usedPhrases={usedPhrases}
-                        />
-                      );
-                      return card;
+                    // Sort cards: highest progress first, 0% last
+                    const sorted = [...(listSummaries || [])].sort((a, b) => {
+                      const progA = a.total_courses > 0 ? a.played_count / a.total_courses : 0;
+                      const progB = b.total_courses > 0 ? b.played_count / b.total_courses : 0;
+                      return progB - progA;
                     });
+                    const usedPhrases = new Set<string>();
+                    return sorted.map((list) => (
+                      <Top100RegionCard
+                        key={list.id}
+                        list={list}
+                        onClick={() => navigate(`/top100/${list.slug}`)}
+                        userId={session?.user?.id}
+                        usedPhrases={usedPhrases}
+                      />
+                    ));
                   })()
                 )}
               </div>
