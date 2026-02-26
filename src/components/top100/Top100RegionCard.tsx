@@ -32,22 +32,18 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
   const hero = list.hero_course;
   const topRank = hero?.rank_in_list ?? null;
   const listSlug = list.slug as 'global' | 'gb-i' | 'usa' | 'europe';
-
-  // Check if this is the primary (Worldwide) journey
   const isPrimary = listSlug === 'global';
-  
-  // Get progress insight phrase using new milestone-aware copy system
+  const isZeroProgress = rated === 0;
+
   const getJourneyPhrase = () => {
     if (rated === 0) return 'Start your journey';
-    if (rated >= total) return 'Journey complete';
+    if (rated >= total) return 'Conquered ✨';
     const phrase = getProgressInsight(completion, listSlug, userId, usedPhrases);
-    // Add to used phrases set to prevent duplicates across cards in viewport
     usedPhrases?.add(phrase);
     return phrase;
   };
   const journeyPhrase = getJourneyPhrase();
 
-  // Map short labels to full display names
   const getDisplayLabel = (shortLabel: string, slug: string) => {
     if (slug === 'global' || shortLabel === 'Global') return 'Global Top 100';
     if (shortLabel === 'GB&I') return 'GB&I Top 100';
@@ -57,7 +53,6 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
   };
 
   const displayLabel = getDisplayLabel(list.short_label || list.name, list.slug);
-
   const isHero = variant === 'hero';
 
   return (
@@ -68,39 +63,49 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
         'group relative overflow-hidden',
         'bg-foreground text-white',
         isHero ? [
-          // Full-width hero: no rounded corners, negative margins to break out of gutters
           'rounded-none -mx-4',
-          'h-[17.5rem]' // Match course-hero-container height (280px)
+          'h-[17.5rem]',
         ] : [
-          // Default card style with rounded corners - polished interactions
-          'rounded-sq-lg',
+          'rounded-2xl',
           'shadow-[0_4px_20px_rgba(0,0,0,0.15)]',
           'transition-all duration-200 ease-out',
           'hover:shadow-[0_8px_30px_rgba(0,0,0,0.2)] hover:scale-[1.01]',
           'active:scale-[0.98]',
-          'h-[300px] sm:h-[320px] cursor-pointer',
-          // Subtle emphasis for primary (Worldwide) journey
-          isPrimary && 'ring-1 ring-white/10'
+          'cursor-pointer',
+          isPrimary && 'ring-1 ring-white/10',
         ]
       )}
+      style={!isHero ? { aspectRatio: '16 / 10' } : undefined}
       onClick={onClick}
     >
-      {/* Background image */}
+      {/* Background image with conditional desaturation for 0% progress */}
       {hero?.cover_image_url ? (
         <>
           <img
             src={hero.cover_image_url}
             alt={hero.name}
-            className="absolute inset-0 h-full w-full object-cover"
+            className={cn(
+              'absolute inset-0 h-full w-full object-cover transition-[filter] duration-500',
+              isZeroProgress && !isHero && 'saturate-[0.7]'
+            )}
             loading="lazy"
           />
-          {/* Top gradient for title legibility */}
-          <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/50 via-black/25 to-transparent" />
-          {/* Bottom gradient for content legibility - stronger */}
-          <div className={cn(
-            "absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t via-black/40 to-transparent",
-            isPrimary ? "from-black/80" : "from-black/75"
-          )} />
+          {/* Three-zone cinematic gradient overlay */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: `
+                linear-gradient(to bottom,
+                  rgba(0,0,0,0.45) 0%,
+                  rgba(0,0,0,0.15) 30%,
+                  transparent 40%,
+                  transparent 55%,
+                  rgba(0,0,0,0.25) 65%,
+                  rgba(0,0,0,0.65) 100%
+                )
+              `,
+            }}
+          />
         </>
       ) : (
         <div className="absolute inset-0 bg-gradient-to-br from-foreground/80 to-foreground" />
@@ -130,7 +135,10 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
       {/* Hero variant: Title at bottom like Course Details */}
       {isHero ? (
         <div className="absolute bottom-8 left-6 text-white z-10">
-          <h1 className="text-4xl md:text-5xl font-semibold mb-1.5 drop-shadow-2xl">
+          <h1
+            className="text-4xl md:text-5xl font-semibold mb-1.5"
+            style={{ textShadow: '0 1px 6px rgba(0,0,0,0.4)' }}
+          >
             {displayLabel}
           </h1>
         </div>
@@ -138,7 +146,10 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
         <>
           {/* Default variant: Title at top */}
           <div className="absolute left-4 right-4 top-4 sm:top-5">
-            <h2 className="truncate whitespace-nowrap text-lg sm:text-xl font-semibold tracking-tight text-white">
+            <h2
+              className="truncate whitespace-nowrap text-[22px] font-bold tracking-tight text-white"
+              style={{ textShadow: '0 1px 6px rgba(0,0,0,0.4)' }}
+            >
               {displayLabel}
             </h2>
           </div>
@@ -146,44 +157,43 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
           {/* Bottom content for default variant */}
           <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col gap-1.5 px-4 pb-4">
             {/* Progress summary with animated number */}
-            <p className="text-[13px] text-white font-medium">
-              Rated <AnimatedNumber value={rated} minCh={1} className="font-semibold" /> of {total} courses
+            <p className="text-[15px] text-white font-medium" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.3)' }}>
+              Rated <AnimatedNumber value={rated} minCh={1} className="font-bold text-[16px]" /> of {total} courses
             </p>
 
-            {/* Progress bar + percentage - animated */}
+            {/* Progress bar + percentage - 4px white fill */}
             <div className="flex items-center gap-2.5">
-              <AnimatedProgressBar
-                percentage={completion}
-                height="h-[5px]"
-                bgColor="bg-white/30"
-                fillColor="bg-white"
-                className="flex-1"
-                delay={0.15}
-              />
-              <AnimatedNumber 
-                value={completion} 
-                suffix="%" 
+              <div className="flex-1 h-1 bg-white/25 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-white rounded-full transition-all duration-700 ease-out"
+                  style={{ width: `${completion}%` }}
+                />
+              </div>
+              <AnimatedNumber
+                value={completion}
+                suffix="%"
                 minCh={2}
                 delay={0.2}
-                className="text-[11px] font-semibold text-white tabular-nums min-w-[28px] text-right"
+                className="text-[12px] font-semibold text-white/80 tabular-nums min-w-[28px] text-right"
               />
             </div>
 
-            {/* Journey tone phrase - soft emotional reinforcement */}
-            <p className="text-[11px] text-white/60 mt-0.5">
+            {/* Journey tone phrase */}
+            <p className="text-[13px] text-white/70 mt-0.5" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.2)' }}>
               {journeyPhrase}
             </p>
 
-            {/* View courses button - premium glass styling */}
+            {/* View courses button - elevated glass styling */}
             {showCta && (
               <div className="mt-2.5 flex justify-end">
                 <Button
                   variant="secondary"
                   size="sm"
                   className={cn(
-                    'rounded-sq-sm px-4 py-1.5 text-xs font-medium',
+                    'rounded-xl px-5 py-2.5 text-[14px] font-semibold',
                     'bg-white/95 backdrop-blur-sm text-foreground',
-                    'border border-white/20 shadow-sm',
+                    'border border-white/20',
+                    'shadow-[0_2px_8px_rgba(0,0,0,0.15)]',
                     'hover:bg-white hover:shadow-md',
                     'active:scale-[0.97] transition-all duration-150'
                   )}
