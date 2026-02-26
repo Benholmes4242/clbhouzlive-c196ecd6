@@ -109,7 +109,9 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       <div 
         className="relative overflow-hidden bg-muted"
         style={{
-          height: 'calc(16rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
+          height: '45dvh',
+          minHeight: '220px',
+          maxHeight: '400px',
           marginTop: 0,
         }}
       >
