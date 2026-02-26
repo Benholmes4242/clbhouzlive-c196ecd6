@@ -9,6 +9,7 @@ interface LocationMapCardProps {
   name: string;
   locationText: string;
   showOwnerPrompt?: boolean;
+  colorful?: boolean;
 }
 
 /**
@@ -21,6 +22,7 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
   name,
   locationText,
   showOwnerPrompt = false,
+  colorful = false,
 }) => {
   const [expanded, setExpanded] = useState(false);
 
@@ -68,6 +70,7 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
           height={200}
           showExpandButton={true}
           onExpand={() => setExpanded(true)}
+          colorful={colorful}
         />
         
         {/* Location meta footer */}
@@ -86,6 +89,7 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
         lng={lng}
         name={name}
         locationText={locationText}
+        colorful={colorful}
       />
     </>
   );

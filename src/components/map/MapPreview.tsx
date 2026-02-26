@@ -15,6 +15,7 @@ interface MapPreviewProps {
   showExpandButton?: boolean;
   onExpand?: () => void;
   interactive?: boolean;
+  colorful?: boolean;
 }
 
 /**
@@ -31,6 +32,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
   showExpandButton = true,
   onExpand,
   interactive = false,
+  colorful = false,
 }) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -61,7 +63,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
 
       const map = new mapboxgl.Map({
         container: mapContainerRef.current,
-        style: MAP_CONFIG.STYLE_URL,
+        style: colorful ? 'mapbox://styles/mapbox/streets-v12' : MAP_CONFIG.STYLE_URL,
         center: [lng, lat],
         zoom,
         interactive,
@@ -111,7 +113,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
         mapRef.current = null;
       }
     };
-  }, [lat, lng, zoom, markerColor, interactive, mapInitialized, hasValidCoords]);
+  }, [lat, lng, zoom, markerColor, interactive, mapInitialized, hasValidCoords, colorful]);
 
   // Reset map when coordinates change
   useEffect(() => {

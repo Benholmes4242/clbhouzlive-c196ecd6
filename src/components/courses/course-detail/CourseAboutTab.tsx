@@ -276,6 +276,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               lng={coords.lng}
               name={course.name}
               locationText={formatCourseLocation(course)}
+              colorful
             />
           </div>
         )}
