@@ -9,6 +9,28 @@ mapboxgl.accessToken = MAP_CONFIG.TOKEN;
 const ROTATION_SPEED = 0.15;
 const RESUME_DELAY = 3000;
 
+// Shared fog config — matches full map (FIX 10)
+const GLOBE_FOG_CONFIG: mapboxgl.FogSpecification = {
+  color: 'rgb(220, 215, 206)',
+  'high-color': 'rgb(180, 190, 210)',
+  'horizon-blend': 0.08,
+  'space-color': 'rgb(8, 10, 22)',
+  'star-intensity': 0.12,
+};
+
+// FIX 5: Continent centroids for custom label layer
+const CONTINENT_CENTROIDS: GeoJSON.FeatureCollection = {
+  type: 'FeatureCollection',
+  features: [
+    { type: 'Feature', geometry: { type: 'Point', coordinates: [15, 50] }, properties: { name: 'EUROPE' } },
+    { type: 'Feature', geometry: { type: 'Point', coordinates: [100, 35] }, properties: { name: 'ASIA' } },
+    { type: 'Feature', geometry: { type: 'Point', coordinates: [20, 5] }, properties: { name: 'AFRICA' } },
+    { type: 'Feature', geometry: { type: 'Point', coordinates: [-100, 45] }, properties: { name: 'NORTH AMERICA' } },
+    { type: 'Feature', geometry: { type: 'Point', coordinates: [-60, -15] }, properties: { name: 'SOUTH AMERICA' } },
+    { type: 'Feature', geometry: { type: 'Point', coordinates: [135, -25] }, properties: { name: 'OCEANIA' } },
+  ],
+};
+
 interface MiniGlobePreviewProps {
   playedCoordinates: { lat: number; lng: number }[];
   seasonColor: string;
@@ -81,14 +103,14 @@ export const MiniGlobePreview: React.FC<MiniGlobePreviewProps> = ({
       center: [10, 30],
       zoom: 1.3,
       minZoom: 1,
-      maxZoom: 4,
+      maxZoom: 2.2, // FIX 9: Cap zoom to keep globe spherical
       interactive: true,
       pitchWithRotate: false,
       doubleClickZoom: false,
+      scrollZoom: false, // FIX 9: Prevent accidental scroll zoom
       attributionControl: false,
       fadeDuration: 0,
     };
-    // Force 1x rendering for perf (not in official types)
     (mapOptions as any).pixelRatio = 1;
     const map = new mapboxgl.Map(mapOptions);
 
@@ -101,17 +123,37 @@ export const MiniGlobePreview: React.FC<MiniGlobePreviewProps> = ({
         showContinentLabels: true,
       });
 
-      map.setFog({
-        color: 'rgb(220, 215, 206)',
-        'high-color': 'rgb(180, 190, 210)',
-        'horizon-blend': 0.06,
-        'space-color': 'rgb(8, 10, 22)',
-        'star-intensity': 0.08,
-      });
+      // FIX 10: Unified fog
+      map.setFog(GLOBE_FOG_CONFIG);
     });
 
     map.on('load', () => {
       setIsLoaded(true);
+
+      // FIX 5: Add custom continent labels
+      map.addSource('continent-labels', {
+        type: 'geojson',
+        data: CONTINENT_CENTROIDS,
+      });
+
+      map.addLayer({
+        id: 'continent-labels-layer',
+        type: 'symbol',
+        source: 'continent-labels',
+        layout: {
+          'text-field': ['get', 'name'],
+          'text-font': ['Inter Semi Bold', 'Arial Unicode MS Bold'],
+          'text-size': 11,
+          'text-letter-spacing': 0.15,
+          'text-transform': 'uppercase',
+          'text-allow-overlap': false,
+        },
+        paint: {
+          'text-color': 'rgba(0, 0, 0, 0.25)',
+          'text-halo-color': 'rgba(255, 255, 255, 0.6)',
+          'text-halo-width': 1.5,
+        },
+      });
 
       // Add played courses source
       map.addSource('played-courses', {
@@ -126,34 +168,33 @@ export const MiniGlobePreview: React.FC<MiniGlobePreviewProps> = ({
         },
       });
 
-      // Glow layer
+      // FIX 8: Glow layer — increased presence
       map.addLayer({
         id: 'played-glow',
         type: 'circle',
         source: 'played-courses',
         paint: {
-          'circle-radius': 8,
+          'circle-radius': 12,
           'circle-color': seasonColor,
-          'circle-opacity': 0.15,
-          'circle-blur': 0.8,
+          'circle-opacity': 0.25,
+          'circle-blur': 1.0,
         },
       });
 
-      // Pin layer
+      // FIX 8: Pin layer — increased size and stroke
       map.addLayer({
         id: 'played-pins',
         type: 'circle',
         source: 'played-courses',
         paint: {
-          'circle-radius': 4,
+          'circle-radius': 5,
           'circle-color': seasonColor,
           'circle-stroke-width': 1.5,
-          'circle-stroke-color': 'rgba(255,255,255,0.6)',
-          'circle-opacity': 0.9,
+          'circle-stroke-color': 'rgba(255,255,255,0.8)',
+          'circle-opacity': 1.0,
         },
       });
 
-      // Start rotation
       rotateGlobe();
     });
 
@@ -169,11 +210,10 @@ export const MiniGlobePreview: React.FC<MiniGlobePreviewProps> = ({
       map.remove();
       mapRef.current = null;
     };
-    // Only init once — playedCoordinates & seasonColor are baked in at init
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isVisible]);
 
-  // Update source data when coordinates change after init
+  // Update source data when coordinates change
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !isLoaded) return;
@@ -212,12 +252,10 @@ export const MiniGlobePreview: React.FC<MiniGlobePreviewProps> = ({
         width: 'calc(100vw - 20px)',
       }}
     >
-      {/* Loading placeholder */}
       {!isLoaded && (
         <div className="absolute inset-0 bg-muted animate-pulse rounded-2xl" />
       )}
 
-      {/* Mapbox container */}
       <div
         ref={containerRef}
         className="absolute inset-0"
@@ -227,7 +265,7 @@ export const MiniGlobePreview: React.FC<MiniGlobePreviewProps> = ({
         }}
       />
 
-      {/* Inner vignette for depth */}
+      {/* Inner vignette */}
       <div
         className="pointer-events-none absolute inset-0 rounded-2xl"
         style={{

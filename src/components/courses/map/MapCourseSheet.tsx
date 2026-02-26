@@ -1,7 +1,6 @@
 /**
  * MapCourseSheet - World-class bottom sheet for selected course on the Top 100 Map
- * Draggable between peek, half, and full states with course photo hero
- * Features premium liquid glass aesthetic, smooth spring animations, and journey actions
+ * FIX 7: Dark glass treatment matching filter tray and legend badges
  */
 
 import React, { useState, useCallback } from 'react';
@@ -21,13 +20,11 @@ interface MapCourseSheetProps {
   course: Top100MapCourse | null;
   onClose: () => void;
   scope: string;
-  /** Height of the filter tray in pixels - sheet positions above this */
   filterTrayHeight?: number;
 }
 
 type SheetState = 'peek' | 'half' | 'full';
 
-// Filter tray height constant (matches the fixed filter tray)
 const DEFAULT_FILTER_TRAY_HEIGHT = 120;
 
 // Fetch course thumbnail image
@@ -80,7 +77,6 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
   const [imageLoaded, setImageLoaded] = useState(false);
   const sheetRef = React.useRef<HTMLDivElement>(null);
 
-  // Reset sheet state when course changes (for seamless marker switching)
   React.useEffect(() => {
     if (course) {
       setSheetState('half');
@@ -88,18 +84,14 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
     }
   }, [course?.id]);
 
-  // Keyboard handler for Escape to close
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && course) {
-        onClose();
-      }
+      if (e.key === 'Escape' && course) onClose();
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [course, onClose]);
 
-  // Focus management when sheet opens
   React.useEffect(() => {
     if (course && sheetRef.current) {
       const firstButton = sheetRef.current.querySelector('button');
@@ -123,7 +115,6 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
           .eq('course_id', course.id)
           .eq('user_id', user.id);
       } else {
-        // Remove any existing first
         await supabase.from('course_shortlists').delete()
           .eq('course_id', course.id)
           .eq('user_id', user.id);
@@ -136,7 +127,6 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
     },
     onSuccess: () => {
       toast.success(isWantToPlay ? 'Removed from Want to Play' : 'Added to Want to Play');
-      // Use predicate to match all query variations
       queryClient.invalidateQueries({ 
         predicate: q => Array.isArray(q.queryKey) && q.queryKey[0] === 'course-shortlist-status' 
       });
@@ -158,24 +148,17 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
   const handleDragEnd = useCallback(
     (_: any, info: PanInfo) => {
       const { velocity, offset } = info;
-      
-      // If swiped down fast or far, close the sheet
       if (velocity.y > 400 || offset.y > 80) {
         onClose();
         return;
       }
-      
-      // Otherwise snap back (no state changes since we only have one state now)
     },
     [onClose]
   );
 
   const getRegionLabel = (scopeKey: string): string => {
     const labels: Record<string, string> = {
-      global: 'Global',
-      'gb-i': 'GB&I',
-      usa: 'USA',
-      europe: 'Europe',
+      global: 'Global', 'gb-i': 'GB&I', usa: 'USA', europe: 'Europe',
     };
     return labels[scopeKey] || 'Global';
   };
@@ -197,7 +180,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
     }
     return { 
       text: 'Not Played', 
-      className: 'bg-white/95 text-muted-foreground dark:bg-muted/95 dark:text-muted-foreground shadow-sm' 
+      className: 'bg-white/20 text-white/80 backdrop-blur-md' 
     };
   };
 
@@ -208,7 +191,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
 
   return (
     <AnimatePresence mode="wait">
-      {/* Invisible backdrop - tap to dismiss */}
+      {/* Invisible backdrop */}
       <motion.div
         key="sheet-backdrop"
         initial={{ opacity: 0 }}
@@ -219,7 +202,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
         onClick={onClose}
       />
       
-      {/* Sheet - fixed, positioned above filter tray */}
+      {/* FIX 7: Sheet with dark glass */}
       <motion.div
         ref={sheetRef}
         key={`sheet-${course.id}`}
@@ -243,20 +226,20 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
         className="fixed left-0 right-0 z-50 flex flex-col rounded-t-3xl"
         style={{ 
           bottom: filterTrayHeight,
-          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.06) 50%, rgba(255, 255, 255, 0.10) 100%)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          border: '1px solid rgba(255, 255, 255, 0.25)',
+          background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.45) 50%, rgba(0, 0, 0, 0.5) 100%)',
+          backdropFilter: 'blur(28px) saturate(1.6)',
+          WebkitBackdropFilter: 'blur(28px) saturate(1.6)',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
           borderBottom: 'none',
-          boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.35)',
+          boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
         }}
       >
-        {/* Drag handle pill - visual affordance for swiping */}
+        {/* Drag handle */}
         <div className="flex-shrink-0 pt-3 pb-2 flex justify-center cursor-grab active:cursor-grabbing">
-          <div className="w-10 h-1 rounded-full bg-white/40" />
+          <div className="w-10 h-1 rounded-full bg-white/30" />
         </div>
 
-        {/* Expand/collapse hint button */}
+        {/* Expand/collapse */}
         <button
           onClick={() => setSheetState(sheetState === 'full' ? 'half' : 'full')}
           className={cn(
@@ -275,15 +258,13 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
           />
         </button>
 
-        {/* Content - no scroll, auto height */}
         <div className="flex-shrink-0">
-          {/* Course hero image - optimized height for all content to fit in half state */}
+          {/* Course hero image */}
           <div className="relative w-full h-36 flex-shrink-0 overflow-hidden">
             {thumbnailImage ? (
               <>
-                {/* Blur-up placeholder */}
                 {!imageLoaded && (
-                  <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted/80 dark:from-muted dark:to-muted/80 animate-pulse" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/5 animate-pulse" />
                 )}
                 <img
                   src={thumbnailImage}
@@ -294,16 +275,15 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                   )}
                   onLoad={() => setImageLoaded(true)}
                 />
-                {/* Gradient overlay for text legibility */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
               </>
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-emerald-100 to-emerald-200 dark:from-emerald-900/30 dark:to-emerald-800/30 flex items-center justify-center">
-                <Flag className="h-12 w-12 text-emerald-400 dark:text-emerald-600 opacity-60" />
+              <div className="w-full h-full bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center">
+                <Flag className="h-12 w-12 text-white/30" />
               </div>
             )}
             
-            {/* Status badge overlaid on image - premium pill */}
+            {/* Status badge */}
             <div className="absolute top-3 right-3">
               <span
                 className={cn(
@@ -318,9 +298,8 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
             </div>
           </div>
 
-          {/* Course info - below hero with refined spacing */}
+          {/* Course info */}
           <div className="px-5 pt-4 pb-6">
-            {/* Course name with tooltip for truncated text */}
             <h3 
               id="course-sheet-title"
               className="text-xl font-bold text-white leading-tight line-clamp-2"
@@ -329,7 +308,6 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
               {course.name}
             </h3>
 
-            {/* Location with tooltip */}
             <p 
               className="text-sm text-white/60 mt-1.5 line-clamp-1"
               title={`${course.sub_country ? `${course.sub_country}, ` : ''}${course.country}${course.region ? ` · ${course.region}` : ''}`}
@@ -339,9 +317,8 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
               {course.region && ` · ${course.region}`}
             </p>
 
-            {/* Pill badges row - glass styling */}
+            {/* Pill badges */}
             <div className="flex flex-wrap items-center gap-2 mt-4">
-              {/* Rank pill with icon - glass background */}
               {typeof course.rank === 'number' && (
                 <span className="glass-pill inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white/90">
                   <Globe className="h-3.5 w-3.5" />
@@ -349,7 +326,6 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                 </span>
               )}
               
-              {/* User rating pill - amber accent on glass */}
               {course.user_has_rated && course.user_rating && (
                 <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/30 backdrop-blur-md text-xs font-semibold text-amber-200 border border-amber-400/30">
                   <Star className="h-3.5 w-3.5 fill-current" />
@@ -358,10 +334,9 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
               )}
             </div>
 
-            {/* CTAs - only visible when half/full - glass button styling */}
+            {/* CTAs */}
             {showCtAs && (
               <div className="space-y-3 mt-6">
-                {/* Primary action - View course - bright white for visibility */}
                 <Button
                   className={cn(
                     'w-full h-11',
@@ -375,16 +350,14 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                   View course
                 </Button>
                 
-                {/* Journey actions - only if not played */}
                 {!course.user_has_rated && user && (
                   <div className="flex gap-2.5">
-                    {/* Mark as Played */}
                     <Button
                       variant="outline"
                       className={cn(
                         'flex-1 h-11',
-                        'border-white/30 bg-white/10 text-white',
-                        'hover:bg-white/20 hover:border-white/40',
+                        'border-white/20 bg-white/10 text-white',
+                        'hover:bg-white/20 hover:border-white/30',
                         'active:scale-[0.98] transition-all duration-150'
                       )}
                       onClick={() => navigate(`/courses/${course.id}/rate`)}
@@ -393,14 +366,13 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                       Mark Played
                     </Button>
                     
-                    {/* Want to Play toggle */}
                     <Button
                       variant={isWantToPlay ? 'default' : 'outline'}
                       className={cn(
                         "flex-1 h-11 transition-all duration-200",
                         isWantToPlay 
                           ? 'bg-[#F7931E] hover:bg-[#F7931E]/90 text-white shadow-[0_2px_8px_rgba(247,147,30,0.25)]' 
-                          : 'border-white/30 bg-white/10 text-white hover:bg-white/20 hover:border-white/40',
+                          : 'border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/30',
                         'active:scale-[0.98]'
                       )}
                       onClick={() => toggleWantToPlayMutation.mutate()}

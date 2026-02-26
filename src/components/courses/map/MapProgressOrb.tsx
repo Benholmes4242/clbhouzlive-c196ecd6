@@ -1,7 +1,7 @@
 /**
  * MapProgressOrb - Floating progress orb for Top 100 Map
  * Shows % complete, expands to show milestone info
- * Now a standalone component (not positioned absolutely)
+ * FIX 4: Uses dynamic season color instead of hardcoded #3EBD93
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -16,6 +16,8 @@ interface MapProgressOrbProps {
   playedCount: number;
   totalCount: number;
   scope: Top100MapScope;
+  /** Dynamic season accent color */
+  seasonColor?: string;
   onMilestoneClick?: () => void;
 }
 
@@ -23,6 +25,7 @@ export const MapProgressOrb: React.FC<MapProgressOrbProps> = ({
   playedCount,
   totalCount,
   scope,
+  seasonColor = '#3EBD93',
   onMilestoneClick,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -98,7 +101,7 @@ export const MapProgressOrb: React.FC<MapProgressOrbProps> = ({
           onClick={handleToggle}
           className="glass-card relative flex items-center justify-center w-12 h-12 rounded-full hover:bg-white/15 active:scale-95 transition-all duration-150"
         >
-          {/* Progress ring - orange accent on glass */}
+          {/* Progress ring - dynamic season color */}
           <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 48 48">
             <circle
               cx="24"
@@ -113,7 +116,7 @@ export const MapProgressOrb: React.FC<MapProgressOrbProps> = ({
               cy="24"
               r="20"
               fill="none"
-              stroke="#3EBD93"
+              stroke={seasonColor}
               strokeWidth="2.5"
               strokeDasharray={`${(percentage / 100) * 125.6} 125.6`}
               strokeLinecap="round"
