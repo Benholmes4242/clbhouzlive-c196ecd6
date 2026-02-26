@@ -15,11 +15,9 @@ export interface LeaderboardEntryWithPlayer extends SrLeaderboardRow {
   player: SrPlayerRow | null;
 }
 
-function getScoreColor(toPar: number | null): string {
-  if (toPar === null || toPar === undefined) return 'rgba(255,255,255,0.9)';
-  if (toPar < 0) return '#22C55E';
-  if (toPar > 0) return '#FF6B6B';
-  return 'rgba(255,255,255,0.7)';
+// Match mini leaderboard: all scores are white
+function getScoreColor(_toPar: number | null): string {
+  return '#FFFFFF';
 }
 
 function formatScore(toPar: number | null): string {
@@ -164,7 +162,7 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({ entr
       <div className="flex items-center gap-2 flex-1 min-w-0" style={{ paddingLeft: 4 }}>
         <div
           className="overflow-hidden flex-shrink-0"
-          style={{ width: 24, height: 25, borderRadius: '34%', border: '1.5px solid #F8FAFC', background: '#F8FAFC' }}
+          style={{ width: 32, height: 33, borderRadius: '34%', border: '1.5px solid #F8FAFC', background: '#F8FAFC' }}
         >
           {photoUrl ? (
             <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }} />
@@ -172,7 +170,7 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({ entr
             <div className="w-full h-full flex items-center justify-center" style={{ background: '#F8FAFC', fontSize: 8, fontWeight: 600, color: '#64748B' }}>{initials}</div>
           )}
         </div>
-        <span className="truncate" style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.9)' }}>
+        <span className="truncate" style={{ fontSize: 14, fontWeight: 500, color: '#FFFFFF' }}>
           {displayName}
         </span>
       </div>
