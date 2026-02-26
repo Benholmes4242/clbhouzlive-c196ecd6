@@ -71,7 +71,7 @@ function PositionBadge({ position, tied, isMissedCut, status }: {
   
   return (
     <div className={cn(
-      "w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0",
+      "w-[22px] h-[22px] rounded-full flex items-center justify-center text-[8px] font-bold shrink-0",
       isTop3 ? podiumStyles[position] : "bg-muted text-muted-foreground"
     )}>
       {display}
