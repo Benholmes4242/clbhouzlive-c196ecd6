@@ -4,35 +4,15 @@
  */
 
 import React from 'react';
-import { motion } from 'framer-motion';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
-import { formatThruDisplay } from '../../utils/formatThruDisplay';
+import type { Database } from '@/integrations/supabase/types';
 
-// Generic type — accepts rows from useTourLeaderboard (sr_leaderboards + sr_players join)
-interface FullLeaderboardEntry {
-  id: string;
-  tournament_id: string;
-  position: number | null;
-  position_tied?: boolean | null;
-  tied?: boolean | null;
-  score?: number | null;
-  to_par?: number | null;
-  thru?: number | null;
-  strokes?: number | null;
-  status?: string | null;
-  round_1?: number | null;
-  round_2?: number | null;
-  round_3?: number | null;
-  round_4?: number | null;
-  player: {
-    id: string;
-    first_name: string | null;
-    last_name: string | null;
-    country?: string | null;
-    sr_id?: string | null;
-    tour_code?: string | null;
-  } | null;
-  [key: string]: any;
+// Derive types from the actual Supabase schema
+type SrLeaderboardRow = Database['public']['Tables']['sr_leaderboards']['Row'];
+type SrPlayerRow = Database['public']['Tables']['sr_players']['Row'];
+
+export interface LeaderboardEntryWithPlayer extends SrLeaderboardRow {
+  player: SrPlayerRow | null;
 }
 
 function getScoreColor(toPar: number | null): string {
@@ -48,12 +28,13 @@ function formatScore(toPar: number | null): string {
   return toPar > 0 ? `+${toPar}` : `${toPar}`;
 }
 
-function formatThru(entry: FullLeaderboardEntry): string {
+function formatThru(entry: LeaderboardEntryWithPlayer): string {
   if (entry.status === 'cut') return 'CUT';
   if (entry.status === 'wd') return 'WD';
   if (entry.status === 'dq') return 'DQ';
   if (entry.thru === null || entry.thru === undefined) return '-';
-  if (entry.thru === 18 || entry.thru === 0) return 'F';
+  if (entry.thru === 18) return 'F';
+  if (entry.thru === 0) return '-';
   return `${entry.thru}`;
 }
 
@@ -107,9 +88,11 @@ export function ExpandedLeaderboardEmpty() {
 }
 
 // Column headers
-function ColumnHeaders() {
+const ColumnHeaders = React.memo(function ColumnHeaders() {
   return (
     <div
+      role="presentation"
+      aria-hidden="true"
       className="expanded-lb-col-headers"
       style={{
         position: 'sticky',
@@ -135,25 +118,28 @@ function ColumnHeaders() {
       <span style={{ width: 40, textAlign: 'right', flexShrink: 0 }}>THRU</span>
     </div>
   );
-}
+});
 
 // Single player row
-function ExpandedLeaderboardRow({ entry, tourCode }: { entry: FullLeaderboardEntry; tourCode: string }) {
+const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({ entry, tourCode }: { entry: LeaderboardEntryWithPlayer; tourCode: string }) {
   const player = entry.player;
   if (!player) return null;
 
   const firstName = player.first_name || '';
   const lastName = player.last_name || '';
-  const displayName = `${firstName[0] || ''}. ${lastName}`;
-  const fullName = `${firstName} ${lastName}`;
+  const displayName = firstName && firstName[0]
+    ? `${firstName[0]}. ${lastName}`
+    : lastName || 'Unknown';
+  const fullName = player.full_name || `${firstName} ${lastName}`.trim();
   const photoUrl = getPlayerHeadshotUrl(fullName, tourCode);
   const initials = `${firstName[0] || ''}${lastName[0] || ''}`.toUpperCase();
-  const posDisplay = (entry.position_tied || entry.tied) ? `T${entry.position}` : `${entry.position ?? '-'}`;
+  const posDisplay = entry.position_tied ? `T${entry.position}` : `${entry.position ?? '-'}`;
   const thruDisplay = formatThru(entry);
   const isCut = entry.status === 'cut' || entry.status === 'wd' || entry.status === 'dq';
 
   return (
     <div
+      role="listitem"
       className="flex items-center"
       style={{
         padding: '10px 16px',
@@ -199,10 +185,10 @@ function ExpandedLeaderboardRow({ entry, tourCode }: { entry: FullLeaderboardEnt
         fontFamily: "'JetBrains Mono','SF Mono',monospace",
         fontSize: 14,
         fontWeight: 700,
-        color: getScoreColor(entry.score ?? entry.to_par ?? null),
+        color: getScoreColor(entry.score ?? null),
         fontVariantNumeric: 'tabular-nums',
       }}>
-        {formatScore(entry.score ?? entry.to_par ?? null)}
+        {formatScore(entry.score ?? null)}
       </span>
 
       {/* Thru */}
@@ -219,10 +205,10 @@ function ExpandedLeaderboardRow({ entry, tourCode }: { entry: FullLeaderboardEnt
       </span>
     </div>
   );
-}
+});
 
 interface ExpandedLeaderboardListProps {
-  entries: FullLeaderboardEntry[];
+  entries: LeaderboardEntryWithPlayer[];
   tourCode: string;
   onTouchStart: (e: React.TouchEvent) => void;
   onTouchMove: (e: React.TouchEvent) => void;
@@ -232,6 +218,8 @@ interface ExpandedLeaderboardListProps {
 export function ExpandedLeaderboardList({ entries, tourCode, onTouchStart, onTouchMove, onTouchEnd }: ExpandedLeaderboardListProps) {
   return (
     <div
+      role="list"
+      aria-label="Tournament leaderboard"
       className="expanded-lb-scroll"
       style={{
         flex: 1,

@@ -323,11 +323,10 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
   // Back button handling when expanded
   useEffect(() => {
     if (!isExpanded) return;
+    window.history.pushState({ expandedLeaderboard: true }, '');
     const handlePopState = () => {
-      window.history.pushState(null, '', window.location.href);
       onToggleExpand();
     };
-    window.history.pushState(null, '', window.location.href);
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, [isExpanded, onToggleExpand]);
@@ -470,34 +469,25 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
         {isActive && (
           <motion.div
             layout
-            animate={isExpanded ? 'expanded' : 'collapsed'}
-            variants={{
-              collapsed: {
-                bottom: 20, left: 16, right: 'auto' as any, top: 'auto' as any,
-                maxWidth: 'min(350px, calc(100% - 32px))',
-                borderRadius: 12,
-                background: 'rgba(0, 0, 0, 0.35)',
-                backdropFilter: 'blur(20px)',
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
-              },
-              expanded: {
-                bottom: 16, left: 12, right: 12, top: 60,
-                maxWidth: 'none',
-                borderRadius: 16,
-                background: 'rgba(0, 0, 0, 0.45)',
-                backdropFilter: 'blur(24px)',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.35)',
-              },
-            }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
             onTouchStart={isExpanded ? handleExpandedTouch : undefined}
             onTouchMove={isExpanded ? handleExpandedTouch : undefined}
             onTouchEnd={isExpanded ? handleExpandedTouch : undefined}
             style={{ 
               position: 'absolute',
+              bottom: isExpanded ? 16 : 20,
+              left: isExpanded ? 12 : 16,
+              ...(isExpanded
+                ? { right: 12, top: 'calc(env(safe-area-inset-top, 20px) + 40px)' }
+                : { maxWidth: 'min(350px, calc(100% - 32px))' }
+              ),
               minWidth: isExpanded ? undefined : '280px',
-              padding: isExpanded ? '20px 0 0 0' : '20px 20px 14px 20px',
+              borderRadius: isExpanded ? 16 : 12,
+              background: isExpanded ? 'rgba(0, 0, 0, 0.45)' : 'rgba(0, 0, 0, 0.35)',
+              backdropFilter: isExpanded ? 'blur(24px)' : 'blur(20px)',
               WebkitBackdropFilter: isExpanded ? 'blur(24px)' : 'blur(20px)',
+              boxShadow: isExpanded ? '0 8px 32px rgba(0, 0, 0, 0.35)' : '0 4px 16px rgba(0, 0, 0, 0.25)',
+              padding: isExpanded ? '20px 0 0 0' : '20px 20px 14px 20px',
               border: '1px solid rgba(255, 255, 255, 0.10)',
               overflow: 'hidden',
               zIndex: isExpanded ? 20 : 10,
@@ -906,9 +896,18 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
 
             </AnimatePresence>
 
-            {/* Carousel Dots - Inside card, below CTA — hidden when expanded */}
-            {totalSlides > 1 && !isExpanded && (
-              <div className="flex items-center justify-center" style={{ gap: '6px', marginTop: '8px' }}>
+            {/* Carousel Dots - Inside card, below CTA — fade out when expanded */}
+            {totalSlides > 1 && (
+              <div
+                className="flex items-center justify-center"
+                style={{
+                  gap: '6px',
+                  marginTop: '8px',
+                  opacity: isExpanded ? 0 : 1,
+                  transition: 'opacity 0.3s ease',
+                  pointerEvents: isExpanded ? 'none' : 'auto',
+                }}
+              >
                 {Array.from({ length: totalSlides }).map((_, index) => (
                   <button
                     key={index}
