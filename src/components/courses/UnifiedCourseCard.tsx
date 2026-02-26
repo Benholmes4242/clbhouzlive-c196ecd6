@@ -237,7 +237,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
 
             {/* Location - increased spacing from title */}
             {!hideLocation && (
-              <p className="text-xs text-muted-foreground truncate">
+              <p className="text-xs text-muted-foreground/60 truncate">
                 {course.locationText}
               </p>
             )}

@@ -112,7 +112,7 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
       {/* Header - small caps styling */}
       <div className="px-4 flex items-start justify-between mb-4">
         <div>
-          <h2 className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground/60">
+          <h2 className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground/60">
             Your {listName.replace('Great Britain & Ireland', 'GB&I')} Leaderboard
           </h2>
           <p className="text-[11px] text-muted-foreground/50 mt-1">
@@ -156,8 +156,8 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
               onClick={() => navigate(`/profile/${friend.username}`)}
               className={`
                 flex-shrink-0 w-[76px] p-1.5 rounded-xl bg-card border transition-all text-center active:scale-[0.95]
-                ${isCurrentUser ? 'border-amber-400 ring-2 ring-amber-400/20' : ''}
-                ${isClosestCompetitor && !isCurrentUser ? 'border-amber-300 shadow-[0_0_8px_rgba(251,191,36,0.25)]' : ''}
+                ${isCurrentUser ? 'border-[#D4A853] ring-2 ring-[#D4A853]/20' : ''}
+                ${isClosestCompetitor && !isCurrentUser ? 'border-[#D4A853]/60 shadow-[0_0_8px_rgba(212,168,83,0.25)]' : ''}
                 ${!isCurrentUser && !isClosestCompetitor ? 'border-border/60' : ''}
               `}
             >

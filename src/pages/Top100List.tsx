@@ -370,12 +370,12 @@ const Top100List = () => {
     return (
       <PageRoot className="min-h-screen bg-[var(--bg-page)]" immersive immersiveStatusBar>
         <main className="pb-20">
-          <div className="animate-pulse space-y-4 pt-4">
+          <div className="animate-pulse space-y-4 pt-0">
             <div className="h-[260px] bg-muted" />
-            <div className="h-20 bg-muted rounded-2xl mx-4" />
-            <div className="h-32 bg-muted rounded-2xl mx-4" />
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-24 bg-muted rounded-3xl mx-4" />
+            <div className="h-20 bg-card/60 border border-border/40 rounded-2xl mx-4" />
+            <div className="h-32 bg-card/60 border border-border/40 rounded-2xl mx-4" />
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="aspect-[16/9] bg-card/60 border border-border/40 rounded-none mx-0" />
             ))}
           </div>
         </main>

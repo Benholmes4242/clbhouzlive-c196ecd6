@@ -104,7 +104,7 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
           >
-            <h1 className="text-white text-[26px] font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">
+            <h1 className="text-white text-[22px] font-extrabold tracking-[-0.3px] drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">
               {displayLabel}
             </h1>
           </motion.div>
