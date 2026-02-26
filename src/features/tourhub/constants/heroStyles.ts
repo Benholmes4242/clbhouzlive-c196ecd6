@@ -16,7 +16,6 @@ export const HEADER_HEIGHT = 55;
 /** Base hero height values */
 export const HERO_HEIGHT = '90dvh';
 export const HERO_MIN_HEIGHT = 420;
-export const HERO_MAX_HEIGHT = 650;
 
 /** For pages WITH a header (hero bleeds behind header + safe area) */
 export const HERO_BLEED_MARGIN_WITH_HEADER = `calc(-${HEADER_HEIGHT}px - env(safe-area-inset-top, 0px))`;
@@ -30,14 +29,12 @@ export const HERO_STYLES = {
     marginTop: HERO_BLEED_MARGIN_WITH_HEADER,
     height: `calc(${HERO_HEIGHT} + ${HEADER_HEIGHT}px + env(safe-area-inset-top, 0px))`,
     minHeight: `calc(${HERO_MIN_HEIGHT}px + ${HEADER_HEIGHT}px + env(safe-area-inset-top, 0px))`,
-    maxHeight: `calc(${HERO_MAX_HEIGHT}px + ${HEADER_HEIGHT}px + env(safe-area-inset-top, 0px))`,
   },
   /** Hero container - for pages WITHOUT header (only bleeds behind safe area) */
   containerNoHeader: {
     marginTop: HERO_BLEED_MARGIN_NO_HEADER,
     height: `calc(${HERO_HEIGHT} + env(safe-area-inset-top, 0px))`,
     minHeight: `calc(${HERO_MIN_HEIGHT}px + env(safe-area-inset-top, 0px))`,
-    maxHeight: `calc(${HERO_MAX_HEIGHT}px + env(safe-area-inset-top, 0px))`,
   },
   /** Content inside hero should use this to stay below notch */
   content: {
