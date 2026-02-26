@@ -102,7 +102,7 @@ export function Top100RecentRoundsCarousel({
     <section className={cn("w-full px-4", className)}>
       {/* Section header - consistent styling */}
       <div className="mb-4">
-        <h3 className="text-[13px] font-bold uppercase tracking-[1.5px] text-muted-foreground">
+        <h3 className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground">
           Recent Top 100 rounds
         </h3>
       </div>

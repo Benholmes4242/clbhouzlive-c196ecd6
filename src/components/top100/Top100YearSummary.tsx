@@ -61,7 +61,7 @@ export function Top100YearSummary({
   return (
     <section>
       {/* Stats Row - card with subtle dividers between columns */}
-      <div className="bg-card border border-border/60 rounded-2xl p-5 min-h-[72px] shadow-sm">
+      <div className="bg-card border border-border/60 rounded-2xl p-5 min-h-[72px]">
         <div className="grid grid-cols-4 gap-0">
           {/* Year */}
           <div className="relative">

@@ -159,7 +159,7 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ region, index, onClick }) =
             {/* Progress bar - always show for incomplete */}
             {!isComplete && (
               <div className="flex items-center gap-2 mt-3">
-                <div className="flex-1 h-1.5 bg-muted/40 rounded-full overflow-hidden">
+                <div className="flex-1 h-2 bg-muted/40 rounded-full overflow-hidden">
                   <motion.div 
                     className="h-full rounded-full"
                     style={{ backgroundColor: '#3EBD93' }}

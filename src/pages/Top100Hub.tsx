@@ -103,26 +103,26 @@ const Top100Hub = () => {
           <div className="space-y-block pt-6">
           {/* Hero Section - polished spacing and hierarchy */}
           <div className="mx-auto flex max-w-5xl flex-col gap-sub px-4 pb-1">
-            <h1 className="text-center text-2xl sm:text-3xl font-semibold tracking-tight text-foreground">
+            <h1 className="text-center text-[22px] sm:text-[28px] font-extrabold tracking-[-0.3px] text-foreground">
               World's Top 100 Golf Courses
             </h1>
-            <p className="text-center text-sm text-muted-foreground/70">
+            <p className="text-center text-[13px] font-medium text-muted-foreground/60">
               Explore the most prestigious golf courses across the globe
             </p>
           </div>
 
           {/* Tabs: Courses | My Progress - Pill toggle style */}
           <Tabs value={activeTab} onValueChange={(v) => handleTabChange(v as ValidTab)} className="w-full">
-            <TabsList className="flex p-1 rounded-xl overflow-hidden bg-muted mb-block">
+            <TabsList className="flex gap-1 rounded-lg bg-transparent mb-block">
               <TabsTrigger 
                 value="courses" 
-                className="flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all duration-150 active:scale-[0.97] data-[state=active]:m-1 data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-border data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:text-foreground data-[state=inactive]:hover:bg-card/50 data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none"
+                className="flex-1 py-2 px-4 text-sm rounded-lg transition-all duration-150 active:scale-[0.97] data-[state=active]:bg-foreground data-[state=active]:text-background data-[state=active]:font-semibold data-[state=active]:shadow-none data-[state=active]:border-0 data-[state=inactive]:text-muted-foreground data-[state=inactive]:font-medium data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none"
               >
                 Courses
               </TabsTrigger>
               <TabsTrigger 
                 value="my-progress" 
-                className="flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all duration-150 active:scale-[0.97] data-[state=active]:m-1 data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-border data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:text-foreground data-[state=inactive]:hover:bg-card/50 data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none"
+                className="flex-1 py-2 px-4 text-sm rounded-lg transition-all duration-150 active:scale-[0.97] data-[state=active]:bg-foreground data-[state=active]:text-background data-[state=active]:font-semibold data-[state=active]:shadow-none data-[state=active]:border-0 data-[state=inactive]:text-muted-foreground data-[state=inactive]:font-medium data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none"
               >
                 My Progress
               </TabsTrigger>
