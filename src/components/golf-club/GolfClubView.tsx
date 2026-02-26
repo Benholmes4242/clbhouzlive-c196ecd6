@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { IoMdArrowBack } from 'react-icons/io';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -126,20 +126,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         {/* Dark gradient overlay for text legibility - matches PostPlayRatingModal */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
         
-        {/* Glass back button - positioned below safe area */}
-        {!isInModal && (
-          <button
-            type="button"
-            onClick={() => safeGoBack(navigate, '/courses')}
-            className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 active:scale-95 transition-all z-10"
-            style={{ top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
-            aria-label="Back"
-          >
-            <ArrowLeft className="h-5 w-5 text-white" />
-          </button>
-        )}
-        
-        {/* Back button for modal */}
+        {/* Back button for modal only — standalone page uses text link below hero */}
         {isInModal && onClose && (
           <button
             onClick={onClose}
@@ -172,6 +159,20 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           )}
         </div>
       </div>
+
+      {/* ← Back text link below hero */}
+      {!isInModal && (
+        <div className="px-4 pt-3 pb-0 bg-muted">
+          <button
+            type="button"
+            onClick={() => safeGoBack(navigate, '/courses')}
+            className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
+          >
+            <ChevronLeft size={14} />
+            Back
+          </button>
+        </div>
+      )}
 
       {/* Claimed By Badge */}
       <div className="px-4 pt-3 pb-1 bg-muted">
