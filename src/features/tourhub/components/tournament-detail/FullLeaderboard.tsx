@@ -12,6 +12,13 @@ import { RoundSelector } from './RoundSelector';
 import { TOUR_COLORS } from '../../constants/colors';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
 
+interface RawRoundData {
+  thru?: number;
+  score?: number;
+  strokes?: number;
+  sequence?: number;
+}
+
 interface FullLeaderboardEntry {
   id: string;
   position: number;
@@ -26,6 +33,7 @@ interface FullLeaderboardEntry {
   round_2?: number | null;
   round_3?: number | null;
   round_4?: number | null;
+  raw_data?: any;
   player?: {
     id: string;
     full_name: string;
@@ -33,6 +41,15 @@ interface FullLeaderboardEntry {
     country?: string | null;
     country_code?: string | null;
   };
+}
+
+/** Get live round data from raw_data for a given round number (1-indexed) */
+function getLiveRoundData(entry: FullLeaderboardEntry, roundNum: number): { score: number | null; thru: number | null } | null {
+  const rounds = (entry.raw_data as any)?.rounds as RawRoundData[] | undefined;
+  if (!rounds || rounds.length < roundNum) return null;
+  const round = rounds[roundNum - 1];
+  if (!round || (round.thru === 0 && round.strokes === 0)) return null;
+  return { score: round.score ?? null, thru: round.thru ?? null };
 }
 
 interface FullLeaderboardProps {
@@ -118,12 +135,18 @@ export function FullLeaderboard({
   const [selectedRound, setSelectedRound] = useState('Overall');
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Detect available rounds — check both completed (round_N) and live (raw_data.rounds)
   const availableRounds = useMemo(() => {
     const rounds: string[] = ['Overall'];
-    if (entries.some(e => e.round_1 != null)) rounds.push('R1');
-    if (entries.some(e => e.round_2 != null)) rounds.push('R2');
-    if (entries.some(e => e.round_3 != null)) rounds.push('R3');
-    if (entries.some(e => e.round_4 != null)) rounds.push('R4');
+    for (let r = 1; r <= 4; r++) {
+      const roundKey = `round_${r}` as keyof FullLeaderboardEntry;
+      const hasCompleted = entries.some(e => e[roundKey] != null);
+      const hasLive = entries.some(e => {
+        const live = getLiveRoundData(e, r);
+        return live !== null && (live.thru ?? 0) > 0;
+      });
+      if (hasCompleted || hasLive) rounds.push(`R${r}`);
+    }
     return rounds;
   }, [entries]);
 
@@ -135,17 +158,30 @@ export function FullLeaderboard({
     );
   }, [entries, searchQuery]);
 
+  // Sort for round views — use live round score (to-par) from raw_data when round_N is null
   const sortedEntries = useMemo(() => {
     if (selectedRound === 'Overall') return filteredEntries;
 
-    const roundKey = `round_${selectedRound.replace('R', '')}` as keyof FullLeaderboardEntry;
+    const roundNum = parseInt(selectedRound.replace('R', ''), 10);
+    const roundKey = `round_${roundNum}` as keyof FullLeaderboardEntry;
+
     return [...filteredEntries].sort((a, b) => {
-      const aVal = a[roundKey] as number | null;
-      const bVal = b[roundKey] as number | null;
-      if (aVal === null && bVal === null) return 0;
-      if (aVal === null) return 1;
-      if (bVal === null) return -1;
-      return aVal - bVal;
+      // Prefer completed round strokes; fall back to live round score (to-par)
+      const aCompleted = a[roundKey] as number | null;
+      const bCompleted = b[roundKey] as number | null;
+      if (aCompleted != null && bCompleted != null) return aCompleted - bCompleted;
+      if (aCompleted != null) return -1;
+      if (bCompleted != null) return 1;
+
+      // Both null — use live round score (to-par, lower is better)
+      const aLive = getLiveRoundData(a, roundNum);
+      const bLive = getLiveRoundData(b, roundNum);
+      const aScore = aLive?.score ?? null;
+      const bScore = bLive?.score ?? null;
+      if (aScore === null && bScore === null) return 0;
+      if (aScore === null) return 1;
+      if (bScore === null) return -1;
+      return aScore - bScore;
     });
   }, [filteredEntries, selectedRound]);
 
@@ -260,12 +296,21 @@ export function FullLeaderboard({
         {sortedEntries.map((entry, index) => {
           const isMissedCut = entry.status === 'MC' || entry.status === 'CUT';
           const isWD = entry.status === 'WD';
-          const isTop3 = entry.position <= 3 && !isMissedCut && !isWD;
           const showCutLine = index === cutLineIndex;
 
-          const roundScoreForSelected = selectedRound !== 'Overall'
-            ? (entry as any)[`round_${selectedRound.replace('R', '')}`] as number | null
-            : null;
+          const isRoundView = selectedRound !== 'Overall';
+          const roundNum = isRoundView ? parseInt(selectedRound.replace('R', ''), 10) : 0;
+          const completedRoundScore = isRoundView ? ((entry as any)[`round_${roundNum}`] as number | null) : null;
+          const liveRound = isRoundView ? getLiveRoundData(entry, roundNum) : null;
+
+          // For round view: use completed strokes, or live to-par score
+          const roundScoreForSelected = completedRoundScore ?? null;
+          const liveRoundScore = liveRound?.score ?? null;
+          const liveRoundThru = liveRound?.thru ?? null;
+
+          // Compute position in round view from sort order
+          const displayPosition = isRoundView ? index + 1 : entry.position;
+          const isTop3 = displayPosition <= 3 && !isMissedCut && !isWD;
 
           return (
             <motion.div
@@ -289,13 +334,13 @@ export function FullLeaderboard({
                   "flex items-center gap-2 px-4 py-3 transition-all duration-200 min-h-[52px]",
                    "hover:bg-muted/40 active:scale-[0.995]",
                    entry.position === 1 && !isMissedCut && !isWD && "bg-amber-50/30 dark:bg-amber-900/10 border-l-[3px] border-l-amber-400",
-                   isTop3 && entry.position !== 1 && "bg-amber-50/10 dark:bg-amber-900/5",
+                   isTop3 && displayPosition !== 1 && "bg-amber-50/10 dark:bg-amber-900/5",
                   (isMissedCut || isWD) && "opacity-50",
                 )}
               >
                 <PositionBadge
-                  position={entry.position}
-                  tied={entry.position_tied}
+                  position={displayPosition}
+                  tied={isRoundView ? false : entry.position_tied}
                   isMissedCut={isMissedCut}
                   status={entry.status}
                 />
@@ -345,14 +390,34 @@ export function FullLeaderboard({
                 <div className="w-12 text-center">
                   {selectedRound === 'Overall' ? (
                     <ScoreToPar score={entry.score} className="text-sm" />
-                  ) : (
+                  ) : roundScoreForSelected != null ? (
                     <ScoreCell score={roundScoreForSelected} className="text-sm font-semibold" />
+                  ) : liveRoundScore != null ? (
+                    <ScoreToPar score={liveRoundScore} className="text-sm" />
+                  ) : (
+                    <span className="text-muted-foreground/50 text-sm" style={{ fontVariantNumeric: 'tabular-nums' }}>—</span>
                   )}
                 </div>
 
-                {/* Thru - always shown */}
+                {/* Thru - shown for overall or round view */}
                 <div className="w-10 text-center">
                   {(() => {
+                    // Round view: show round-specific thru from raw_data
+                    if (isRoundView && liveRoundThru != null && liveRoundThru > 0) {
+                      if (liveRoundThru >= 18) {
+                        return <span className="text-[10px] text-emerald-600 font-medium">F</span>;
+                      }
+                      return (
+                        <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
+                          {liveRoundThru}
+                        </span>
+                      );
+                    }
+                    // Round view with completed round — show F
+                    if (isRoundView && roundScoreForSelected != null) {
+                      return <span className="text-[10px] text-emerald-600 font-medium">F</span>;
+                    }
+
                     if (isLive) {
                       const display = formatThruDisplay(
                         entry.thru, entry.round_1, entry.round_2, entry.round_3, entry.round_4,

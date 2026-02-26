@@ -643,8 +643,9 @@ async function syncLeaderboard(
 
     if (player) {
       const rounds = entry.rounds || [];
-      const latestRound = rounds.length > 0 ? rounds[rounds.length - 1] : null;
-      const derivedThru = latestRound?.thru ?? entry.thru ?? null;
+      // Fix 1: Find the last round with actual activity (thru > 0), not the last array element
+      const activeRound = [...rounds].reverse().find((r: any) => r.thru > 0) || null;
+      const derivedThru = activeRound?.thru ?? entry.thru ?? null;
       const derivedStatus = entry.status || (entry.position != null ? 'active' : null);
 
       const { error } = await supabase.from('sr_leaderboards').upsert({
@@ -655,10 +656,13 @@ async function syncLeaderboard(
         score: entry.score,
         strokes: entry.strokes,
         thru: derivedThru,
-        round_1: rounds[0]?.strokes,
-        round_2: rounds[1]?.strokes,
-        round_3: rounds[2]?.strokes,
-        round_4: rounds[3]?.strokes,
+        // Fix 3: Set thru_updated_at when we have a valid thru value
+        thru_updated_at: derivedThru !== null && derivedThru > 0 ? new Date().toISOString() : null,
+        // Fix 2: Only store round strokes when the round is complete (thru >= 18)
+        round_1: rounds[0]?.thru >= 18 ? rounds[0]?.strokes : null,
+        round_2: rounds[1]?.thru >= 18 ? rounds[1]?.strokes : null,
+        round_3: rounds[2]?.thru >= 18 ? rounds[2]?.strokes : null,
+        round_4: rounds[3]?.thru >= 18 ? rounds[3]?.strokes : null,
         money: entry.money,
         points: entry.points,
         status: derivedStatus,

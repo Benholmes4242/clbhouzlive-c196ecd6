@@ -80,7 +80,7 @@ function PositionBadge({ position, tied, isMissedCut, status }: {
 }
 
 function ThruDisplay({ thru }: { thru: number | null }) {
-  if (thru === null) return null;
+  if (thru === null || thru === 0) return null;
   if (thru >= 18) {
     return <span className="text-[10px] text-emerald-600 font-medium">F</span>;
   }
