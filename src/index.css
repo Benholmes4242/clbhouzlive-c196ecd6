@@ -4473,6 +4473,32 @@ html[data-immersive="true"] .app-shell--topSpacer {
   display: none !important;
 }
 
+/* Canonical glass styling for expanded map zoom controls */
+.expanded-map-glass-controls .mapboxgl-ctrl-group {
+  background: rgba(0, 0, 0, 0.28) !important;
+  backdrop-filter: blur(16px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+
+.expanded-map-glass-controls .mapboxgl-ctrl-group button {
+  background: transparent !important;
+  border: none !important;
+  width: 36px !important;
+  height: 36px !important;
+}
+
+.expanded-map-glass-controls .mapboxgl-ctrl-group button + button {
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.expanded-map-glass-controls .mapboxgl-ctrl-group button .mapboxgl-ctrl-icon {
+  filter: invert(1) !important;
+}
+
 /* Center zoom controls vertically on Top 100 Map */
 .top100-map-shell .mapboxgl-ctrl-bottom-right {
   bottom: auto !important;

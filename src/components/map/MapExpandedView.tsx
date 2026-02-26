@@ -158,7 +158,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
         <div className="flex flex-col flex-1 pb-5 gap-4">
           {/* Map - full bleed on mobile, rounded on desktop */}
           <div 
-            className="relative h-[calc(100vh-300px)] max-h-[52vh] rounded-none overflow-hidden border border-border/60 sm:border-border/40 bg-surface-alt w-[100vw] left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 sm:rounded-2xl sm:mx-4" 
+            className="relative h-[calc(100vh-300px)] max-h-[52vh] rounded-none overflow-hidden border border-border/60 sm:border-border/40 bg-surface-alt w-[100vw] left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 sm:rounded-2xl sm:mx-4 expanded-map-glass-controls" 
             style={{ minHeight: `${MAP_CONFIG.HEIGHT.EXPANDED_MIN}px` }}
           >
             <div ref={mapContainerRef} className="w-full h-full" />

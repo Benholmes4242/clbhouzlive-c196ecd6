@@ -147,7 +147,14 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
       {showExpandButton && onExpand && (
         <button
           type="button"
-          className="pointer-events-none absolute bottom-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/70 backdrop-blur-sm text-white text-xs font-medium shadow-lg"
+          className="pointer-events-none absolute bottom-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-white text-xs font-medium"
+          style={{
+            background: 'rgba(0, 0, 0, 0.28)',
+            backdropFilter: 'blur(16px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+            border: '1px solid rgba(255, 255, 255, 0.12)',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
+          }}
         >
           <Maximize2 className="h-3 w-3" />
           <span>Tap to expand</span>
