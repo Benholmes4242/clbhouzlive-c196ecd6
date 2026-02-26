@@ -9,7 +9,7 @@ import {
   Top100MapCourse,
   CourseJourneyStatus,
 } from '@/hooks/useTop100MapCourses';
-import { ArrowLeft, RotateCcw } from 'lucide-react';
+import { RotateCcw } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { cn } from '@/lib/utils';
 import { MapCourseSheet, MapProgressOrb } from './map';
@@ -59,10 +59,10 @@ const WANT_TO_PLAY_COLOR = '#F7931E';
 // Shared fog config
 const GLOBE_FOG_CONFIG: mapboxgl.FogSpecification = {
   color: 'rgb(220, 215, 206)',
-  'high-color': 'rgb(180, 190, 210)',
-  'horizon-blend': 0.08,
+  'high-color': 'rgb(160, 172, 192)',
+  'horizon-blend': 0.04,
   'space-color': 'rgb(8, 10, 22)',
-  'star-intensity': 0.12,
+  'star-intensity': 0.06,
 };
 
 const Top100MapView: React.FC<Top100MapViewProps> = ({
@@ -609,17 +609,23 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           </div>
         )}
 
-        {/* Close / Back button */}
-        {onClose && (
-          <button
-            onClick={onClose}
-            className="fixed left-4 z-40 w-11 h-11 flex items-center justify-center glass-card rounded-xl active:scale-[0.95] transition-transform"
-            style={{ top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)' }}
-            aria-label="Close map"
-          >
-            <ArrowLeft className="w-5 h-5 text-white" />
-          </button>
-        )}
+        {/* FIX 13: Always-visible back button */}
+        <button
+          onClick={() => onClose ? onClose() : navigate(-1)}
+          className="fixed left-4 z-40 w-11 h-11 flex items-center justify-center rounded-full active:scale-[0.92] active:bg-white/20 transition-all duration-150"
+          style={{
+            top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
+            background: 'rgba(0, 0, 0, 0.45)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+          }}
+          aria-label="Go back"
+        >
+          <svg className="w-5 h-5 text-white/90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
 
         {/* Legend badges — dynamic season color */}
         <div className="pointer-events-none absolute top-0 left-0 right-0 z-20 px-3 pt-[calc(max(env(safe-area-inset-top,0px),47px)+12px)]">
@@ -647,8 +653,8 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           </div>
         </div>
 
-        {/* Bottom-right control stack */}
-        <div className="pointer-events-none absolute right-3 bottom-36 z-20 flex flex-col items-center gap-2.5">
+        {/* FIX 12: Bottom-right control stack — positioned above filter tray */}
+        <div className="pointer-events-none absolute right-3 bottom-52 z-20 flex flex-col items-center gap-2.5">
           <div className="pointer-events-auto">
             <MapProgressOrb
               playedCount={ratedCount}
