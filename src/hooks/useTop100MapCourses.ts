@@ -73,9 +73,10 @@ export function useTop100MapCourses(scope: Top100MapScope, userId?: string) {
         // Fetch ratings
         const { data: ratings, error: ratingsError } = await supabase
           .from('course_ratings')
-          .select('course_id, rating')
-          .eq('user_id', userId)
-          .not('rating', 'is', null);
+        .select('course_id, rating')
+        .eq('user_id', userId)
+        .eq('is_mock', false)
+        .not('rating', 'is', null);
 
         if (!ratingsError && ratings) {
           ratings.forEach((r: any) => {
@@ -88,7 +89,7 @@ export function useTop100MapCourses(scope: Top100MapScope, userId?: string) {
           .from('course_shortlists')
           .select('course_id, list_key')
           .eq('user_id', userId)
-          .eq('list_key', 'want_to_play');
+          .in('list_key', ['want_to_play', 'wishlist']);
 
         if (!shortlistError && shortlists) {
           shortlists.forEach((s: any) => {
@@ -103,7 +104,7 @@ export function useTop100MapCourses(scope: Top100MapScope, userId?: string) {
 
       (memberships || []).forEach((m: any) => {
         const course = m.golf_courses;
-        if (!course || !course.latitude || !course.longitude) {
+        if (!course || course.latitude == null || course.longitude == null) {
           skippedNoCoords++;
           return;
         }
