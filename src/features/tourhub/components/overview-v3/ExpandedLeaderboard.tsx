@@ -1,0 +1,258 @@
+/**
+ * ExpandedLeaderboard — Full-field leaderboard rendered inside the hero glass card
+ * Dark-glass aesthetic with sticky column headers and internal scrolling.
+ */
+
+import React from 'react';
+import { motion } from 'framer-motion';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { formatThruDisplay } from '../../utils/formatThruDisplay';
+
+// Generic type — accepts rows from useTourLeaderboard (sr_leaderboards + sr_players join)
+interface FullLeaderboardEntry {
+  id: string;
+  tournament_id: string;
+  position: number | null;
+  position_tied?: boolean | null;
+  tied?: boolean | null;
+  score?: number | null;
+  to_par?: number | null;
+  thru?: number | null;
+  strokes?: number | null;
+  status?: string | null;
+  round_1?: number | null;
+  round_2?: number | null;
+  round_3?: number | null;
+  round_4?: number | null;
+  player: {
+    id: string;
+    first_name: string | null;
+    last_name: string | null;
+    country?: string | null;
+    sr_id?: string | null;
+    tour_code?: string | null;
+  } | null;
+  [key: string]: any;
+}
+
+function getScoreColor(toPar: number | null): string {
+  if (toPar === null || toPar === undefined) return 'rgba(255,255,255,0.9)';
+  if (toPar < 0) return '#22C55E';
+  if (toPar > 0) return '#FF6B6B';
+  return 'rgba(255,255,255,0.7)';
+}
+
+function formatScore(toPar: number | null): string {
+  if (toPar === null || toPar === undefined) return '-';
+  if (toPar === 0) return 'E';
+  return toPar > 0 ? `+${toPar}` : `${toPar}`;
+}
+
+function formatThru(entry: FullLeaderboardEntry): string {
+  if (entry.status === 'cut') return 'CUT';
+  if (entry.status === 'wd') return 'WD';
+  if (entry.status === 'dq') return 'DQ';
+  if (entry.thru === null || entry.thru === undefined) return '-';
+  if (entry.thru === 18 || entry.thru === 0) return 'F';
+  return `${entry.thru}`;
+}
+
+// Skeleton for loading state
+export function ExpandedLeaderboardSkeleton() {
+  return (
+    <div className="expanded-lb-scroll" style={{ flex: 1, padding: '0 16px' }}>
+      {Array.from({ length: 10 }).map((_, i) => (
+        <div key={i} className="flex items-center justify-between" style={{ padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-3 rounded" style={{ background: 'rgba(255,255,255,0.08)', animation: 'shimmer 1.8s infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 75%)' }} />
+            <div className="w-6 h-6 rounded-full" style={{ background: 'rgba(255,255,255,0.08)' }} />
+            <div className="w-24 h-3 rounded" style={{ background: 'rgba(255,255,255,0.08)', animation: 'shimmer 1.8s infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 75%)' }} />
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="w-8 h-3 rounded" style={{ background: 'rgba(255,255,255,0.08)' }} />
+            <div className="w-5 h-3 rounded" style={{ background: 'rgba(255,255,255,0.08)' }} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Error state
+export function ExpandedLeaderboardError({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, padding: 32 }}>
+      <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)' }}>Unable to load leaderboard</span>
+      <button
+        onClick={onRetry}
+        style={{
+          fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.9)',
+          padding: '8px 16px', borderRadius: 8,
+          background: 'rgba(255,255,255,0.12)', border: 'none',
+        }}
+      >
+        Tap to retry
+      </button>
+    </div>
+  );
+}
+
+// Empty state
+export function ExpandedLeaderboardEmpty() {
+  return (
+    <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
+      <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)' }}>Leaderboard data unavailable</span>
+    </div>
+  );
+}
+
+// Column headers
+function ColumnHeaders() {
+  return (
+    <div
+      className="expanded-lb-col-headers"
+      style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 2,
+        background: 'rgba(0, 0, 0, 0.5)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        display: 'flex',
+        alignItems: 'center',
+        padding: '8px 16px',
+        borderBottom: '1px solid rgba(255,255,255,0.08)',
+        fontSize: 10,
+        fontWeight: 700,
+        textTransform: 'uppercase' as const,
+        letterSpacing: '0.05em',
+        color: 'rgba(255,255,255,0.5)',
+      }}
+    >
+      <span style={{ width: 32, textAlign: 'center', flexShrink: 0 }}>POS</span>
+      <span style={{ flex: 1, paddingLeft: 8 }}>PLAYER</span>
+      <span style={{ width: 56, textAlign: 'right', flexShrink: 0 }}>TO PAR</span>
+      <span style={{ width: 40, textAlign: 'right', flexShrink: 0 }}>THRU</span>
+    </div>
+  );
+}
+
+// Single player row
+function ExpandedLeaderboardRow({ entry, tourCode }: { entry: FullLeaderboardEntry; tourCode: string }) {
+  const player = entry.player;
+  if (!player) return null;
+
+  const firstName = player.first_name || '';
+  const lastName = player.last_name || '';
+  const displayName = `${firstName[0] || ''}. ${lastName}`;
+  const fullName = `${firstName} ${lastName}`;
+  const photoUrl = getPlayerHeadshotUrl(fullName, tourCode);
+  const initials = `${firstName[0] || ''}${lastName[0] || ''}`.toUpperCase();
+  const posDisplay = (entry.position_tied || entry.tied) ? `T${entry.position}` : `${entry.position ?? '-'}`;
+  const thruDisplay = formatThru(entry);
+  const isCut = entry.status === 'cut' || entry.status === 'wd' || entry.status === 'dq';
+
+  return (
+    <div
+      className="flex items-center"
+      style={{
+        padding: '10px 16px',
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
+        opacity: isCut ? 0.4 : 1,
+      }}
+    >
+      {/* Position */}
+      <span style={{
+        width: 32,
+        textAlign: 'center',
+        flexShrink: 0,
+        fontSize: 12,
+        fontWeight: 600,
+        color: entry.position === 1 ? '#FACC15' : 'rgba(255,255,255,0.5)',
+        fontVariantNumeric: 'tabular-nums',
+      }}>
+        {posDisplay}
+      </span>
+
+      {/* Avatar + Name */}
+      <div className="flex items-center gap-2 flex-1 min-w-0" style={{ paddingLeft: 4 }}>
+        <div
+          className="overflow-hidden flex-shrink-0"
+          style={{ width: 24, height: 25, borderRadius: '34%', border: '1.5px solid #F8FAFC', background: '#F8FAFC' }}
+        >
+          {photoUrl ? (
+            <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }} />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center" style={{ background: '#F8FAFC', fontSize: 8, fontWeight: 600, color: '#64748B' }}>{initials}</div>
+          )}
+        </div>
+        <span className="truncate" style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.9)' }}>
+          {displayName}
+        </span>
+      </div>
+
+      {/* To Par */}
+      <span style={{
+        width: 56,
+        textAlign: 'right',
+        flexShrink: 0,
+        fontFamily: "'JetBrains Mono','SF Mono',monospace",
+        fontSize: 14,
+        fontWeight: 700,
+        color: getScoreColor(entry.score ?? entry.to_par ?? null),
+        fontVariantNumeric: 'tabular-nums',
+      }}>
+        {formatScore(entry.score ?? entry.to_par ?? null)}
+      </span>
+
+      {/* Thru */}
+      <span style={{
+        width: 40,
+        textAlign: 'right',
+        flexShrink: 0,
+        fontSize: 12,
+        fontWeight: 500,
+        color: thruDisplay === 'F' ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.7)',
+        fontVariantNumeric: 'tabular-nums',
+      }}>
+        {thruDisplay}
+      </span>
+    </div>
+  );
+}
+
+interface ExpandedLeaderboardListProps {
+  entries: FullLeaderboardEntry[];
+  tourCode: string;
+  onTouchStart: (e: React.TouchEvent) => void;
+  onTouchMove: (e: React.TouchEvent) => void;
+  onTouchEnd: (e: React.TouchEvent) => void;
+}
+
+export function ExpandedLeaderboardList({ entries, tourCode, onTouchStart, onTouchMove, onTouchEnd }: ExpandedLeaderboardListProps) {
+  return (
+    <div
+      className="expanded-lb-scroll"
+      style={{
+        flex: 1,
+        overflowY: 'auto',
+        overflowX: 'hidden',
+        WebkitOverflowScrolling: 'touch',
+        overscrollBehavior: 'contain',
+        touchAction: 'pan-y',
+      }}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
+      <ColumnHeaders />
+      {entries.map((entry) => (
+        <ExpandedLeaderboardRow
+          key={entry.id}
+          entry={entry}
+          tourCode={tourCode}
+        />
+      ))}
+    </div>
+  );
+}
