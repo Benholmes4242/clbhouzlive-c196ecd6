@@ -41,6 +41,8 @@ export interface PostWizardHeaderProps {
   
   hasHeroAbove?: boolean;
   isEditMode?: boolean;
+  /** When true, renders glass-styled translucent buttons for dark hero background */
+  glassMode?: boolean;
 }
 
 export function PostWizardHeader({
@@ -67,6 +69,7 @@ export function PostWizardHeader({
   onNext,
   hasHeroAbove = false,
   isEditMode = false,
+  glassMode = false,
 }: PostWizardHeaderProps) {
   const getInitials = (name: string) => name.charAt(0).toUpperCase();
   const [showTooltip, setShowTooltip] = useState(false);
@@ -115,19 +118,34 @@ export function PostWizardHeader({
       ? 'Schedule'
       : isLastStep ? 'Post' : 'Next';
 
+  // Glass mode styles
+  const glassCircle = glassMode
+    ? { background: 'rgba(255, 255, 255, 0.08)', border: '1px solid rgba(255, 255, 255, 0.12)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }
+    : {};
+  const glassIconColor = glassMode ? 'rgba(255, 255, 255, 0.7)' : undefined;
+  const glassMutedColor = glassMode ? 'rgba(255, 255, 255, 0.45)' : undefined;
+
   return (
     <header 
-      className="sticky top-0 z-10 flex items-center justify-between px-3 bg-[#F8FAFC]"
+      className={cn(
+        "sticky top-0 z-10 flex items-center justify-between px-3",
+        !glassMode && "bg-[#F8FAFC]"
+      )}
       style={{ 
-        height: hasHeroAbove ? '55px' : 'calc(55px + max(env(safe-area-inset-top, 0px), 47px))',
-        paddingTop: hasHeroAbove ? '0px' : 'max(env(safe-area-inset-top, 0px), 47px)',
+        height: glassMode ? 'auto' : hasHeroAbove ? '55px' : 'calc(55px + max(env(safe-area-inset-top, 0px), 47px))',
+        paddingTop: glassMode ? 'calc(max(env(safe-area-inset-top, 0px), 20px) + 16px)' : hasHeroAbove ? '0px' : 'max(env(safe-area-inset-top, 0px), 47px)',
+        paddingBottom: glassMode ? '12px' : undefined,
       }}
     >
       {/* Left: Close button */}
       <div className="flex items-center gap-1 min-w-[72px]">
         <button
           onClick={onBack}
-          className="w-9 h-9 rounded-full bg-muted text-foreground flex items-center justify-center active:bg-muted/80 transition-colors"
+          className={cn(
+            "w-9 h-9 rounded-full flex items-center justify-center transition-colors",
+            !glassMode && "bg-muted text-foreground active:bg-muted/80"
+          )}
+          style={glassMode ? { ...glassCircle, color: glassIconColor } : {}}
           aria-label={isFirstStep ? 'Close' : 'Back'}
         >
           {isFirstStep ? (
@@ -140,10 +158,14 @@ export function PostWizardHeader({
         {!isEditMode && isFirstStep && draftCount > 0 && (
           <button
             onClick={onOpenDrafts}
-            className="w-8 h-8 rounded-full flex items-center justify-center relative transition-colors hover:bg-muted"
+            className={cn(
+              "w-8 h-8 rounded-full flex items-center justify-center relative transition-colors",
+              !glassMode && "hover:bg-muted"
+            )}
+            style={glassMode ? glassCircle : {}}
             aria-label={`View ${draftCount} drafts`}
           >
-            <FileEdit className="h-3.5 w-3.5 text-muted-foreground" />
+            <FileEdit className="h-3.5 w-3.5" style={{ color: glassMutedColor || 'hsl(var(--muted-foreground))' }} />
             <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-[14px] rounded-full bg-primary text-primary-foreground text-[8px] font-semibold flex items-center justify-center">
               {draftCount > 9 ? '9+' : draftCount}
             </span>
@@ -158,17 +180,29 @@ export function PostWizardHeader({
         ) : (
           <button 
             onClick={onOpenProfileSelector}
-            className="flex items-center gap-1 px-2 py-1 rounded-full transition-colors hover:bg-muted/60 active:bg-muted/80"
+            className={cn(
+              "flex items-center gap-1 px-2 py-1 rounded-full transition-colors",
+              !glassMode && "hover:bg-muted/60 active:bg-muted/80"
+            )}
           >
-            <SquircleAvatar
-              size={28}
-              src={actorAvatarUrl}
-              alt={actorName}
-              fallback={getInitials(actorName)}
-              hideRing
-            />
+            <div 
+              className="rounded-full overflow-hidden"
+              style={{
+                width: '32px', height: '32px',
+                border: glassMode ? '2px solid rgba(255, 255, 255, 0.15)' : undefined,
+                background: !actorAvatarUrl && glassMode ? 'linear-gradient(135deg, #f59e0b, #d97706)' : undefined,
+              }}
+            >
+              <SquircleAvatar
+                size={28}
+                src={actorAvatarUrl}
+                alt={actorName}
+                fallback={getInitials(actorName)}
+                hideRing
+              />
+            </div>
             {actorVerified && <VerifiedBadge size="sm" />}
-            <ChevronDown className="h-3 w-3 text-muted-foreground" />
+            <ChevronDown className="h-3 w-3" style={{ color: glassMode ? 'rgba(255, 255, 255, 0.4)' : 'hsl(var(--muted-foreground))' }} />
           </button>
         )}
       </div>
@@ -180,12 +214,14 @@ export function PostWizardHeader({
             <button
               onClick={handleClockTap}
               className={cn(
-                "w-9 h-9 rounded-full flex items-center justify-center relative transition-colors hover:bg-muted",
+                "w-9 h-9 rounded-full flex items-center justify-center relative transition-colors",
+                !glassMode && "hover:bg-muted",
                 showTooltip && "animate-pulse"
               )}
+              style={glassMode ? { ...glassCircle, color: glassMutedColor } : {}}
               aria-label={scheduledCount > 0 ? `View ${scheduledCount} scheduled posts` : "Schedule post"}
             >
-              <Clock className="h-4 w-4 text-muted-foreground" />
+              <Clock className="h-4 w-4" style={{ color: glassMutedColor || 'hsl(var(--muted-foreground))' }} />
               {scheduledCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] rounded-full bg-primary text-primary-foreground text-[9px] font-semibold flex items-center justify-center">
                   {scheduledCount > 9 ? '9+' : scheduledCount}
@@ -232,11 +268,22 @@ export function PostWizardHeader({
             onClick={onNext}
             disabled={!canProceed || isSubmitting}
             className={cn(
-              'px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 active:scale-[0.97]',
+              'px-5 py-2 rounded-full text-sm transition-all duration-200 active:scale-[0.97]',
               !canProceed || isSubmitting
-                ? 'bg-muted text-muted-foreground cursor-not-allowed'
-                : 'bg-primary text-primary-foreground shadow-sm'
+                ? glassMode
+                  ? 'cursor-not-allowed'
+                  : 'bg-muted text-muted-foreground cursor-not-allowed'
+                : 'shadow-sm'
             )}
+            style={
+              !canProceed || isSubmitting
+                ? glassMode
+                  ? { ...glassCircle, color: 'rgba(255, 255, 255, 0.3)', fontSize: '14px', fontWeight: 600, letterSpacing: '0.02em', borderRadius: '20px' }
+                  : {}
+                : canProceed && !isSubmitting
+                  ? { background: 'linear-gradient(135deg, #f59e0b, #fbbf24)', color: 'white', fontWeight: 700, boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)', border: 'none' }
+                  : {}
+            }
           >
             {isSubmitting ? (
               <span className="flex items-center gap-1.5">
