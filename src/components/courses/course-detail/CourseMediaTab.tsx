@@ -322,9 +322,6 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
         {/* Sort/Filter Bar */}
         {hasAnyMedia && (
           <section className="px-4 pt-8 pb-6 bg-muted">
-            <p className="mb-4 text-xs font-semibold tracking-[0.08em] text-muted-foreground">
-              Sort &amp; filter
-            </p>
             <Tabs value={filterMode} onValueChange={(v) => setFilterMode(v as MediaFilterMode)} className="w-full">
               <TabsList className="bg-transparent border-0 px-0 py-0 gap-0 w-full flex justify-center">
                 {filterOptions.map((option) => (
