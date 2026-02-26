@@ -86,9 +86,9 @@ const Top100Hub = () => {
     return (
       <PageRoot className="min-h-screen bg-[var(--bg-page)]">
         <main className="px-4 md:container md:mx-auto md:px-0 py-6 pb-20">
-          <div className="animate-pulse space-y-4">
-            <div className="h-64 bg-muted rounded-sq-md" />
-            <div className="h-64 bg-muted rounded-sq-md" />
+          <div className="space-y-4">
+            <div className="aspect-[16/10] bg-card/60 border border-border/40 rounded-2xl clb-skeleton" />
+            <div className="aspect-[16/10] bg-card/60 border border-border/40 rounded-2xl clb-skeleton" />
           </div>
         </main>
       </PageRoot>
@@ -156,7 +156,7 @@ const Top100Hub = () => {
                     className={cn(
                       'inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 active:scale-[0.97]',
                       viewMode === 'list'
-                        ? 'm-1 bg-card text-foreground shadow-sm border border-border'
+                        ? 'm-1 bg-card text-foreground border border-border'
                         : 'text-muted-foreground hover:text-foreground hover:bg-card/50'
                     )}
                   >
@@ -170,7 +170,7 @@ const Top100Hub = () => {
                     className={cn(
                       'inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 active:scale-[0.97]',
                       viewMode === 'map'
-                        ? 'm-1 bg-card text-foreground shadow-sm border border-border'
+                        ? 'm-1 bg-card text-foreground border border-border'
                         : 'text-muted-foreground hover:text-foreground hover:bg-card/50'
                     )}
                   >
@@ -181,7 +181,7 @@ const Top100Hub = () => {
               </div>
 
               {/* Always render List view - Map is shown in modal */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {summariesLoading ? (
                   <div className="col-span-full text-center py-12 text-muted-foreground">
                     Loading Top 100 lists...

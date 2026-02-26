@@ -67,9 +67,8 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
           'h-[17.5rem]',
         ] : [
           'rounded-2xl',
-          'shadow-[0_4px_20px_rgba(0,0,0,0.15)]',
           'transition-all duration-200 ease-out',
-          'hover:shadow-[0_8px_30px_rgba(0,0,0,0.2)] hover:scale-[1.01]',
+          'hover:scale-[1.01]',
           'active:scale-[0.98]',
           'cursor-pointer',
           isPrimary && 'ring-1 ring-white/10',
