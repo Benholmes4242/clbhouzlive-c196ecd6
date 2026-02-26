@@ -242,7 +242,7 @@ export function ExpandedLeaderboardList({ entries, tourCode, onTouchStart, onTou
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
-      <ColumnHeaders />
+      {/* Column headers removed for cleaner look */}
       {entries.map((entry) => (
         <ExpandedLeaderboardRow
           key={entry.id}
