@@ -496,6 +496,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
               flexDirection: isExpanded ? 'column' as const : undefined,
             }}
             initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
           >
             {/* ─── COMPLETED: tournament name goes straight to top ─── */}
