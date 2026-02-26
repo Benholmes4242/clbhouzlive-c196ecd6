@@ -25,13 +25,6 @@ interface Top100ListLeaderboardProps {
 
 /**
  * Social leaderboard showing friends' progress with relative position indicators.
- * 
- * Polish applied:
- * - Small caps section header with letter-spacing
- * - Improved empty state with icon
- * - Staggered animation on friend cards
- * - Semantic design tokens
- * - Tap feedback on cards
  */
 export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
   friends,
@@ -49,7 +42,7 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
   if (friends.length === 0) {
     return (
       <section className="px-4">
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.1em] text-muted-foreground/60 mb-4">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground/60 mb-4">
           Your {listName.replace('Great Britain & Ireland', 'GB&I')} Leaderboard
         </h2>
         <motion.div 
@@ -83,7 +76,7 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
   if (allFriendsHaveZero && currentUserPlayed === 0) {
     return (
       <section className="px-4">
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.1em] text-muted-foreground/60 mb-4">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground/60 mb-4">
           Your {listName.replace('Great Britain & Ireland', 'GB&I')} Leaderboard
         </h2>
         <motion.div 
@@ -119,7 +112,7 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
       {/* Header - small caps styling */}
       <div className="px-4 flex items-start justify-between mb-4">
         <div>
-          <h2 className="text-[11px] font-semibold uppercase tracking-[0.1em] text-muted-foreground/60">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground/60">
             Your {listName.replace('Great Britain & Ireland', 'GB&I')} Leaderboard
           </h2>
           <p className="text-[11px] text-muted-foreground/50 mt-1">
@@ -162,24 +155,23 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
               transition={{ duration: 0.3, delay: index * 0.05 }}
               onClick={() => navigate(`/profile/${friend.username}`)}
               className={`
-                flex-shrink-0 w-[68px] p-1.5 rounded-xl bg-card border transition-all text-center active:scale-[0.95]
+                flex-shrink-0 w-[76px] p-1.5 rounded-xl bg-card border transition-all text-center active:scale-[0.95]
                 ${isCurrentUser ? 'border-amber-400 ring-2 ring-amber-400/20' : ''}
                 ${isClosestCompetitor && !isCurrentUser ? 'border-amber-300 shadow-[0_0_8px_rgba(251,191,36,0.25)]' : ''}
                 ${!isCurrentUser && !isClosestCompetitor ? 'border-border/60' : ''}
               `}
             >
-              {/* Avatar - thin grey ring (no colored achievement rings) */}
+              {/* Avatar - no border ring per avatar-border-removal-policy */}
               <div className="relative mx-auto mb-1">
                 <SquircleAvatar
-                  size={36}
+                  size={40}
                   src={friend.avatarUrl}
                   alt={friend.name}
                   fallback={friend.name[0]?.toUpperCase() || '?'}
-                  thinRing
                 />
-                {/* Mini progress badge - slightly smaller and darker */}
+                {/* Mini progress badge */}
                 <div 
-                  className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-foreground flex items-center justify-center text-[7px] font-bold text-background"
+                  className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-foreground flex items-center justify-center text-[8px] font-bold text-background"
                   title={`${friend.playedOnList}/${totalInList} played`}
                 >
                   {friend.playedOnList}
@@ -187,15 +179,15 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
               </div>
 
               {/* Name - centered, truncated */}
-              <div className="text-[10px] font-medium text-foreground truncate px-0.5">
+              <div className="text-[11px] font-medium text-foreground truncate px-0.5">
                 {friend.name.split(' ')[0]}
               </div>
 
-              {/* Relative position indicator - smaller */}
+              {/* Relative position indicator */}
               <div className={`
-                mt-0.5 flex items-center justify-center gap-0.5 text-[8px] font-medium rounded-full px-1 py-0.5
+                mt-0.5 flex items-center justify-center gap-0.5 text-[9px] font-medium rounded-full px-1 py-0.5
                 ${isAhead ? 'bg-emerald-50 text-emerald-600' : ''}
-                ${isBehind ? 'bg-muted text-muted-foreground' : ''}
+                ${isBehind ? 'bg-rose-50 text-rose-500' : ''}
                 ${isSame ? 'bg-amber-50 text-amber-600' : ''}
               `}>
                 {isAhead && (

@@ -17,13 +17,6 @@ interface Top100ListProgressCardProps {
 /**
  * Progress card shown below hero with next milestone info and motivational copy.
  * Uses regional color theming for accent elements.
- * 
- * Polish applied:
- * - Tappable card → navigates to achievements
- * - Milestone icon
- * - Hover/press states
- * - Bold milestone number
- * - Semantic design tokens
  */
 export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
   playedCount,
@@ -41,12 +34,12 @@ export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
     navigate('/achievements');
   };
 
-  // Spacing: Progress bar → Next milestone = 16px (M) - handled by mt-4
+  // Spacing: Progress bar → Next milestone = 20px - handled by mt-5
   if (isComplete) {
     return (
       <motion.button
         onClick={handleClick}
-        className="mx-4 mt-4 w-[calc(100%-2rem)] text-left px-4 py-3.5 rounded-sq-md border transition-all duration-150 group"
+        className="mx-4 mt-5 w-[calc(100%-2rem)] text-left px-4 py-3.5 rounded-sq-md border transition-all duration-150 group"
         style={{
           background: `linear-gradient(135deg, rgba(var(--region-${listSlug === 'gb-i' ? 'gbi' : listSlug}), 0.08) 0%, transparent 100%)`,
           borderColor: theme.ringColor,
@@ -86,18 +79,22 @@ export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
   return (
     <motion.button
       onClick={handleClick}
-      className="mx-4 mt-4 w-[calc(100%-2rem)] text-left px-4 py-3.5 rounded-sq-md bg-card border border-border shadow-sm transition-all duration-150 group hover:border-border hover:shadow-md"
+      className="mx-4 mt-5 w-[calc(100%-2rem)] text-left px-4 py-3.5 rounded-sq-md bg-card border border-border shadow-sm transition-all duration-150 group hover:border-border hover:shadow-md"
+      style={{ borderLeftWidth: '3px', borderLeftColor: theme.ringColor }}
       whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.99 }}
     >
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-            <Target className="w-5 h-5 text-muted-foreground" />
+          <div 
+            className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+            style={{ backgroundColor: `${theme.ringColor}1A` }}
+          >
+            <Target className="w-5 h-5" style={{ color: theme.ringColor }} />
           </div>
           <div className="min-w-0">
             <p className="text-sm font-semibold text-foreground">
-              Next milestone: <span className="text-lg tabular-nums"><AnimatedNumber value={nextMilestone ?? 0} minCh={1} /></span>
+              Next milestone: <span className="text-xl font-bold tabular-nums" style={{ color: theme.ringColor }}><AnimatedNumber value={nextMilestone ?? 0} minCh={1} /></span>
             </p>
             <p className="text-xs text-muted-foreground mt-0.5">
               <AnimatedNumber value={toGo} minCh={1} delay={0.05} /> course{toGo !== 1 ? 's' : ''} to go
@@ -105,7 +102,7 @@ export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <p className="text-xs font-medium text-muted-foreground italic whitespace-nowrap">
+          <p className="text-[13px] font-medium text-muted-foreground italic whitespace-nowrap">
             {statusCopy}
           </p>
           <ChevronRight className="w-4 h-4 text-muted-foreground/60 group-hover:text-muted-foreground transition-colors" />
