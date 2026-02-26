@@ -643,11 +643,11 @@ export function PostWizard({
           exit={{ opacity: 0 }}
           className="light fixed inset-0 z-[9999] flex flex-col overflow-hidden pb-safe"
             style={{ 
-              touchAction: 'pan-y pinch-zoom',
-              overscrollBehavior: 'contain',
-              background: (state.currentStep === 'media' && state.mediaItems.length === 0)
-                ? 'linear-gradient(180deg, #1a1008 0%, #2a1a0a 12%, #33200c 28%, #f8f6f3 55%, #f9f8f6 100%)'
-                : '#F8FAFC',
+              ...{
+                touchAction: 'pan-y pinch-zoom',
+                overscrollBehavior: 'contain',
+              },
+              backgroundColor: '#F8FAFC',
             }}
         >
           {showSuccess ? (
@@ -668,7 +668,7 @@ export function PostWizard({
             <>
               {/* Header + progress bar — single amber surface that bleeds behind status bar */}
               <div className="flex-shrink-0" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}>
-               <PostWizardHeader
+                <PostWizardHeader
                   currentStep={state.currentStep}
                   currentStepIndex={currentStepIndex}
                   totalSteps={totalSteps}
@@ -692,7 +692,6 @@ export function PostWizard({
                   onNext={handleNext}
                   hasHeroAbove
                   isEditMode={state.isEditMode}
-                  glassMode={state.currentStep === 'media' && state.mediaItems.length === 0}
                 />
               </div>
 
