@@ -100,7 +100,7 @@ export const Top100ProgressTimeline: React.FC<Top100ProgressTimelineProps> = ({
         {/* Timeline bars - animated on first render */}
         <div className="flex items-end gap-1 h-16">
           {monthsData.map((month, idx) => {
-            const heightPercent = month.count > 0 ? Math.max(20, (month.count / maxCount) * 100) : 8;
+            const heightPercent = month.count > 0 ? Math.max(20, (month.count / maxCount) * 100) : 6;
             const isActive = month.count > 0;
             const isCurrent = idx === new Date().getMonth();
 
@@ -114,14 +114,13 @@ export const Top100ProgressTimeline: React.FC<Top100ProgressTimelineProps> = ({
                   'hover:opacity-90 active:scale-[0.97] transition-all duration-200',
                   isActive
                     ? 'shadow-sm'
-                    : 'bg-muted/60 hover:bg-muted/80'
+                    : ''
                 )}
                 style={{ 
                   height: `${heightPercent}%`,
-                  // Outstanding gradient fill for active bars (amber to gold)
                   background: isActive 
-                    ? 'linear-gradient(to top, #f59e0b, #fbbf24)'
-                    : undefined,
+                    ? 'linear-gradient(to top, #3EBD93, #5EDBB5)'
+                    : 'hsl(var(--muted) / 0.3)',
                   // Animate grow from bottom
                   animation: `bar-grow 0.5s ease-out ${idx * 0.03}s both`,
                 }}

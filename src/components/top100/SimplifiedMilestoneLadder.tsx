@@ -180,10 +180,12 @@ const MilestoneRow: React.FC<MilestoneRowProps> = ({
         <div
           className="absolute w-0.5 z-0"
           style={{
-            left: '40px', // Center of 80px badge
-            top: '96px', // Badge bottom
+            left: '40px',
+            top: '96px',
             height: '12px',
-            backgroundColor: 'hsl(var(--border))',
+            backgroundColor: milestone.isUnlocked 
+              ? '#3EBD93' 
+              : 'hsl(var(--border))',
           }}
         />
       )}
@@ -204,6 +206,9 @@ const MilestoneRow: React.FC<MilestoneRowProps> = ({
               "w-20 h-[100px] object-contain",
               !milestone.isUnlocked && "opacity-40 grayscale-[60%]"
             )}
+            style={milestone.isUnlocked ? {
+              filter: 'drop-shadow(0 4px 20px rgba(212, 168, 83, 0.3))',
+            } : undefined}
           />
         </motion.div>
       </button>
@@ -234,16 +239,24 @@ const MilestoneRow: React.FC<MilestoneRowProps> = ({
             {/* Progress bar for current target */}
             {isCurrent && !milestone.isUnlocked && (
               <div className="flex items-center gap-2 mt-3">
-                <div className="flex-1 h-1.5 bg-muted/50 rounded-full overflow-hidden">
+                <div className="flex-1 h-2 bg-muted/50 rounded-full overflow-hidden">
                   <motion.div 
-                    className="h-full rounded-full"
+                    className="h-full rounded-full relative overflow-hidden"
                     style={{ backgroundColor: tierColor }}
                     initial={{ width: 0 }}
                     animate={{ width: `${progressPercent}%` }}
                     transition={{ duration: 0.5, delay: 0.2 }}
-                  />
+                  >
+                    {/* Pulse glow when close to milestone */}
+                    {remaining <= 2 && (
+                      <div
+                        className="absolute inset-0 rounded-full animate-pulse"
+                        style={{ backgroundColor: tierColor, opacity: 0.4 }}
+                      />
+                    )}
+                  </motion.div>
                 </div>
-                <span className="text-xs text-muted-foreground tabular-nums">
+                <span className="text-sm font-semibold text-muted-foreground tabular-nums">
                   {totalPlayed}/{milestone.threshold}
                 </span>
               </div>

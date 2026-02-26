@@ -31,11 +31,11 @@ function StatItem({
   return (
     <div className="text-center flex flex-col items-center gap-1 group cursor-default transition-colors hover:bg-muted/30 rounded-lg py-1 -my-1">
       {/* Icon - consistent muted color with hover state */}
-      <Icon className="w-3.5 h-3.5 text-muted-foreground/50 group-hover:text-muted-foreground/70 transition-colors" />
-      <p className="text-sm font-semibold leading-tight text-foreground tabular-nums">
+      <Icon className="w-5 h-5 text-muted-foreground/50 group-hover:text-muted-foreground/70 transition-colors" />
+      <p className="text-xl font-bold leading-tight text-foreground tabular-nums">
         {value}
       </p>
-      <p className="text-[11px] font-medium text-muted-foreground">
+      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
         {label}
       </p>
       {/* Micro-delta line (A4) */}
