@@ -38,7 +38,6 @@ const CLUBHOUSE_ROUTES = [
 
 // Routes that use the warm gradient Cleo design
 const WARM_GRADIENT_ROUTES = [
-  '/hub',
   '/messages',
 ];
 
