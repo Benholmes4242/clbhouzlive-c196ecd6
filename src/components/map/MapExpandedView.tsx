@@ -3,7 +3,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { MapPin } from 'lucide-react';
+import { MapPin, X } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { createGlassyMarkerElement } from './MapMarker';
 import { MAP_CONFIG } from '@/config/maps';
@@ -101,7 +101,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
       map.addControl(new mapboxgl.NavigationControl({ visualizePitch: false }), 'top-right');
 
       // Glassy orange marker (xs size)
-      const markerEl = createGlassyMarkerElement('xs');
+      const markerEl = createGlassyMarkerElement('sm');
       new mapboxgl.Marker({ element: markerEl, anchor: 'bottom' })
         .setLngLat([lng, lat])
         .addTo(map);
@@ -136,10 +136,26 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent 
         side="bottom" 
-        className="h-[85vh] sm:h-[80vh] flex flex-col p-0"
+        className="h-[85vh] sm:h-[80vh] flex flex-col p-0 !rounded-t-2xl"
+        hideCloseButton
       >
+        {/* Drag handle */}
+        <div className="flex justify-center pt-3 pb-1">
+          <div className="w-8 h-1 rounded-full bg-muted-foreground/30" />
+        </div>
+
+        {/* Custom close button with 44px tap target */}
+        <button
+          type="button"
+          onClick={() => onOpenChange(false)}
+          className="absolute right-2 top-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-sm opacity-70 hover:opacity-100 transition-opacity"
+          aria-label="Close"
+        >
+          <X className="h-4 w-4" />
+        </button>
+
         {/* Header - swipe to close area */}
-        <div {...swipeHandlers} className="px-4 pt-3">
+        <div {...swipeHandlers} className="px-4 pt-1">
           <div className="flex items-start justify-between mb-4">
             <div>
               <h2 className="text-base font-semibold flex items-center gap-2">
@@ -155,7 +171,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
           </div>
         </div>
         
-        <div className="flex flex-col flex-1 pb-5 gap-4">
+        <div className="flex flex-col flex-1 pb-[calc(max(20px,env(safe-area-inset-bottom,0px))+8px)] gap-4">
           {/* Map - full bleed on mobile, rounded on desktop */}
           <div 
             className="relative h-[calc(100vh-300px)] max-h-[52vh] rounded-none overflow-hidden border border-border/60 sm:border-border/40 bg-surface-alt w-[100vw] left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 sm:rounded-2xl sm:mx-4 expanded-map-glass-controls" 
@@ -165,17 +181,17 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
           </div>
 
           {/* Navigation CTAs */}
-          <div className="flex flex-col sm:flex-row gap-2 px-4">
+          <div className="flex flex-col sm:flex-row gap-3 px-4">
             {isIOS && (
               <Button
-                className="flex-1 bg-[var(--surface-slate)] text-white hover:bg-[var(--surface-slate)]/90 shadow-none"
+                className="flex-1 bg-foreground text-background hover:bg-foreground/90 shadow-none"
                 onClick={() => window.open(appleMapsUrl, '_blank')}
               >
                 Open in Apple Maps
               </Button>
             )}
             <Button
-              className={isIOS ? "flex-1" : "flex-1 bg-[var(--surface-slate)] text-white hover:bg-[var(--surface-slate)]/90"}
+              className={isIOS ? "flex-1" : "flex-1 bg-foreground text-background hover:bg-foreground/90"}
               variant={isIOS ? 'outline' : 'default'}
               onClick={() => window.open(googleMapsUrl, '_blank')}
             >
