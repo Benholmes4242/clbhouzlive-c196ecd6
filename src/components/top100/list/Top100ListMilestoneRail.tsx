@@ -95,7 +95,7 @@ export const Top100ListMilestoneRail: React.FC<Top100ListMilestoneRailProps> = (
     <section>
       {/* Header - small caps styling */}
       <div className="px-4 flex items-center justify-between mb-4">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground/60">
+        <h2 className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground/60">
           Your Milestones
         </h2>
         <motion.button

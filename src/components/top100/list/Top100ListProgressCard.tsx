@@ -79,7 +79,7 @@ export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
   return (
     <motion.button
       onClick={handleClick}
-      className="mx-4 mt-5 w-[calc(100%-2rem)] text-left px-4 py-3.5 rounded-sq-md bg-card border border-border shadow-sm transition-all duration-150 group hover:border-border hover:shadow-md"
+      className="mx-4 mt-5 w-[calc(100%-2rem)] text-left px-4 py-3.5 rounded-sq-md bg-card border border-border transition-all duration-150 group hover:border-border"
       style={{ borderLeftWidth: '3px', borderLeftColor: theme.ringColor }}
       whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.99 }}
