@@ -1174,30 +1174,32 @@ export default function CreateMomentModal({
         onTouchEnd={handleSheetTouchEnd}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* LinkedIn-style Header */}
-        <div style={{ paddingTop: 'env(safe-area-inset-top, 0px)', background: '#F8FAFC' }}>
-          <CreateMomentHeader
-            selectedActor={effectiveActor}
-            onOpenPostingOptions={() => setShowPostingOptionsSheet(true)}
-            onClose={animateAndClose}
-            draftCount={draftCount}
-            onOpenDrafts={() => setShowDraftsSheet(true)}
-            scheduledCount={scheduledCount}
-            onOpenScheduled={() => setShowScheduledPostsSheet(true)}
-            onOpenScheduleSheet={() => setShowScheduleSheet(true)}
-            canPost={canPost && !uploadProgress.isUploading}
-            isSubmitting={isScheduling || uploadProgress.isUploading}
-            onPost={isEditMode ? handlePublishScheduledNow : handlePost}
-            isEditMode={isEditMode}
-          />
+        {/* Header — glass variant when on hero (no media), default otherwise */}
+        {hasMedia && (
+          <div style={{ paddingTop: 'env(safe-area-inset-top, 0px)', background: '#F8FAFC' }}>
+            <CreateMomentHeader
+              selectedActor={effectiveActor}
+              onOpenPostingOptions={() => setShowPostingOptionsSheet(true)}
+              onClose={animateAndClose}
+              draftCount={draftCount}
+              onOpenDrafts={() => setShowDraftsSheet(true)}
+              scheduledCount={scheduledCount}
+              onOpenScheduled={() => setShowScheduledPostsSheet(true)}
+              onOpenScheduleSheet={() => setShowScheduleSheet(true)}
+              canPost={canPost && !uploadProgress.isUploading}
+              isSubmitting={isScheduling || uploadProgress.isUploading}
+              onPost={isEditMode ? handlePublishScheduledNow : handlePost}
+              isEditMode={isEditMode}
+            />
           
-          {/* Upload Progress Bar */}
-          <UploadProgressBar
-            isUploading={uploadProgress.isUploading}
-            uploadedCount={uploadProgress.uploadedCount}
-            totalCount={uploadProgress.totalCount}
-          />
-        </div>
+            {/* Upload Progress Bar */}
+            <UploadProgressBar
+              isUploading={uploadProgress.isUploading}
+              uploadedCount={uploadProgress.uploadedCount}
+              totalCount={uploadProgress.totalCount}
+            />
+          </div>
+        )}
 
         {/* Media Stage - grey background */}
         <section
@@ -1227,13 +1229,59 @@ export default function CreateMomentModal({
               onDragStateChange={setIsInteractingWithMedia}
             />
           ) : (
-            <CreateMomentHero
-              hasMedia={false}
-              isBusinessActor={isBusinessActor}
-              isTyping={isTyping}
-              onPickFromCamera={handlePickFromCamera}
-              onPickFromLibrary={handlePickFromLibrary}
-            />
+            <div className="relative flex flex-col h-full">
+              {/* Glass header overlaid on the amber hero */}
+              <div className="absolute top-0 left-0 right-0 z-10">
+                <CreateMomentHeader
+                  selectedActor={effectiveActor}
+                  onOpenPostingOptions={() => setShowPostingOptionsSheet(true)}
+                  onClose={animateAndClose}
+                  draftCount={draftCount}
+                  onOpenDrafts={() => setShowDraftsSheet(true)}
+                  scheduledCount={scheduledCount}
+                  onOpenScheduled={() => setShowScheduledPostsSheet(true)}
+                  onOpenScheduleSheet={() => setShowScheduleSheet(true)}
+                  canPost={canPost && !uploadProgress.isUploading}
+                  isSubmitting={isScheduling || uploadProgress.isUploading}
+                  onPost={isEditMode ? handlePublishScheduledNow : handlePost}
+                  isEditMode={isEditMode}
+                  variant="glass"
+                />
+              </div>
+              <CreateMomentHero
+                hasMedia={false}
+                isBusinessActor={isBusinessActor}
+                isTyping={isTyping}
+                onPickFromCamera={handlePickFromCamera}
+                onPickFromLibrary={handlePickFromLibrary}
+                onSelectTemplate={(templateId) => {
+                  // Templates open gallery with category pre-selected
+                  const categoryMap: Record<string, string> = {
+                    'course-vlog': 'course-vlog',
+                    'tournament': 'tournament',
+                    'hole-in-one': 'hole-in-one',
+                    'best-shots': 'best-shots',
+                    'course-review': 'review',
+                  };
+                  const cat = categoryMap[templateId];
+                  if (cat) setSelectedCategories([cat]);
+                  handlePickFromLibrary();
+                }}
+                onQuickAction={(actionId) => {
+                  switch (actionId) {
+                    case 'best-shots':
+                      handlePickFromLibrary();
+                      break;
+                    case 'tag-partners':
+                      // Focus tags — no existing sheet, just a no-op for now
+                      break;
+                    case 'add-location':
+                      setShowCourseSearchSheet(true);
+                      break;
+                  }
+                }}
+              />
+            </div>
           )}
         </section>
 
