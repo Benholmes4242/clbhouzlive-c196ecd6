@@ -22,7 +22,7 @@ const HIDDEN_ROUTES = [
   '/auth',
   '/admin-setup',
   '/onboarding',
-  // Add more full-screen routes as needed
+  '/map',
 ];
 
 // Route prefixes where bottom navigation should be hidden
