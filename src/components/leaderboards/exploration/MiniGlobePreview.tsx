@@ -276,7 +276,8 @@ export const MiniGlobePreview: React.FC<MiniGlobePreviewProps> = ({
       {/* Explore Map CTA — canonical glass */}
       <button
         onClick={onTapExplore}
-        className="glass-card absolute bottom-3 right-3 flex items-center gap-1.5 !rounded-xl px-3 py-2 text-xs font-semibold text-white active:scale-95 transition-transform"
+        className="glass-card absolute bottom-3 right-3 flex items-center gap-1.5 !rounded-xl !overflow-visible px-3 py-2 text-xs font-semibold text-white active:scale-95 transition-transform"
+        style={{ position: 'absolute' }}
       >
         Explore Map
         <MapIcon className="h-3.5 w-3.5" />
