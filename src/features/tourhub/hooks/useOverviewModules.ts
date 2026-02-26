@@ -204,7 +204,7 @@ export function useLiveRightNow() {
       return tournamentsWithLeaders;
     },
     staleTime: 5 * 1000,          // 5s — Realtime handles freshness
-    refetchInterval: false,        // No polling — Realtime pushes updates
+    refetchInterval: 30_000,       // 30s polling fallback for dropped realtime connections
     refetchOnWindowFocus: true,
   });
 }

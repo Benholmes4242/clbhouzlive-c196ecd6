@@ -39,6 +39,8 @@ export function useLeaderboardRealtime(tournamentId: string | null | undefined) 
           queryClient.invalidateQueries({ queryKey: ['tournament-leaders-winners'] });
           queryClient.invalidateQueries({ queryKey: ['live-arena'] });
           queryClient.invalidateQueries({ queryKey: ['hero-carousel-data'] });
+          queryClient.invalidateQueries({ queryKey: ['overview-live-right-now'] });
+          queryClient.invalidateQueries({ queryKey: ['live-leader-teaser'] });
         }
       )
       .subscribe((status) => {
@@ -88,6 +90,8 @@ export function useMultiLeaderboardRealtime(tournamentIds: (string | null | unde
             queryClient.invalidateQueries({ queryKey: ['tournament-leaders-winners'] });
             queryClient.invalidateQueries({ queryKey: ['live-arena'] });
             queryClient.invalidateQueries({ queryKey: ['hero-carousel-data'] });
+            queryClient.invalidateQueries({ queryKey: ['overview-live-right-now'] });
+            queryClient.invalidateQueries({ queryKey: ['live-leader-teaser'] });
           }
         }
       )
