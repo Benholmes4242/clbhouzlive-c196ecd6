@@ -45,21 +45,31 @@ export function useLiveLeaderTeaser() {
 
       if (!tournament) return null;
 
-      // Get the leader (position 1) from that tournament's leaderboard
-      const { data: leader } = await supabase
+      // Get all players at position 1 from that tournament's leaderboard
+      const { data: leaders } = await supabase
         .from('sr_leaderboards')
         .select('score, position, player_id, sr_players!sr_leaderboards_player_id_fkey(full_name)')
         .eq('tournament_id', tournament.id)
-        .eq('position', 1)
-        .limit(1)
-        .maybeSingle();
+        .eq('position', 1);
 
-      if (!leader) return null;
+      if (!leaders || leaders.length === 0) return null;
 
-      const playerData = leader.sr_players as unknown as { full_name: string } | null;
+      const first = leaders[0];
+      const tiedCount = leaders.length;
+
+      if (tiedCount > 1) {
+        return {
+          playerName: `${tiedCount} tied for the lead`,
+          playerId: null,
+          score: first.score,
+          tournamentId: tournament.id,
+          tournamentName: tournament.name,
+          isTied: true,
+        };
+      }
+
+      const playerData = first.sr_players as unknown as { full_name: string } | null;
       const fullName = playerData?.full_name || 'Unknown';
-      
-      // Format the last name initial + last name style
       const nameParts = fullName.split(' ');
       const displayName = nameParts.length >= 2
         ? `${nameParts[0][0]}. ${nameParts.slice(1).join(' ')}`
@@ -67,10 +77,11 @@ export function useLiveLeaderTeaser() {
 
       return {
         playerName: displayName,
-        playerId: leader.player_id,
-        score: leader.score,
+        playerId: first.player_id,
+        score: first.score,
         tournamentId: tournament.id,
         tournamentName: tournament.name,
+        isTied: false,
       };
     },
     staleTime: 60_000, // 1 minute
