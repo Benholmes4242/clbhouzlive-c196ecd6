@@ -15,6 +15,7 @@ interface MapExpandedViewProps {
   lng: number;
   name: string;
   locationText?: string;
+  colorful?: boolean;
 }
 
 /**
@@ -28,6 +29,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
   lng,
   name,
   locationText,
+  colorful = false,
 }) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -82,7 +84,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
 
       const map = new mapboxgl.Map({
         container: mapContainerRef.current,
-        style: MAP_CONFIG.STYLE_URL,
+        style: colorful ? 'mapbox://styles/mapbox/streets-v12' : MAP_CONFIG.STYLE_URL,
         center: [lng, lat],
         zoom: MAP_CONFIG.ZOOM.EXPANDED,
         interactive: true,
