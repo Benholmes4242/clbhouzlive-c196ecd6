@@ -111,6 +111,7 @@ const ShareReviewPage = lazy(() => import("./pages/ShareReviewPage"));
 const UserCoursesPage = lazy(() => import("./pages/UserCoursesPage"));
 const MyRatings = lazy(() => import("./pages/MyRatings"));
 const JourneyListPage = lazy(() => import("./pages/JourneyListPage"));
+const MapPage = lazy(() => import("./pages/MapPage"));
 const News = lazy(() => import("./pages/News"));
 
 // Explore pages
@@ -321,6 +322,7 @@ function AppRoutes() {
         <Route path="/user/:username/courses" element={<Suspense fallback={<CoursesListSkeleton />}><UserCoursesPage /></Suspense>} />
         <Route path="/my-ratings" element={<Suspense fallback={<CoursesListSkeleton />}><MyRatings /></Suspense>} />
         <Route path="/journey" element={<Suspense fallback={<CoursesListSkeleton />}><JourneyListPage /></Suspense>} />
+        <Route path="/map" element={<Suspense fallback={null}><MapPage /></Suspense>} />
         <Route path="/friends-activity" element={<Suspense fallback={<CoursesListSkeleton />}><FriendsActivityPage /></Suspense>} />
         <Route path="/news" element={<Suspense fallback={<GenericPageSkeleton />}><News /></Suspense>} />
         

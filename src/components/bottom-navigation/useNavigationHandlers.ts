@@ -20,6 +20,8 @@ export const useNavigationHandlers = () => {
       setActiveTab('clubhouse');
     } else if (location.pathname.startsWith('/tourhub')) {
       setActiveTab('tourhub');
+    } else if (location.pathname === '/map' || location.pathname.startsWith('/courses')) {
+      setActiveTab('courses');
     }
   }, [location.pathname]);
 

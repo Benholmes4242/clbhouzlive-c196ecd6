@@ -128,12 +128,8 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
           <Sparkles className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
           <p>
             Every course you mark becomes part of your journey — view them anytime on your{' '}
-            <Link to="/courses?tab=top100" className="text-muted-foreground underline underline-offset-2 hover:text-foreground">
+            <Link to="/map" className="text-muted-foreground underline underline-offset-2 hover:text-foreground">
               map
-            </Link>{' '}
-            or{' '}
-            <Link to="/journey" className="text-muted-foreground underline underline-offset-2 hover:text-foreground">
-              journey page
             </Link>.
           </p>
         </div>
