@@ -9,7 +9,7 @@ import { StepProps } from '../types';
 import { StudioEdits } from '@/types/studio';
 import { ComposerMediaItem } from '@/hooks/useSnapModal';
 import { PermissionDeniedCard } from '../components';
-import { PostTemplate } from '../components/PostTemplateSelector';
+import { PostTemplateSelector, PostTemplate } from '../components/PostTemplateSelector';
 import { useFirstRunFlag } from '@/hooks/useFirstRunFlag';
 import { useToast } from '@/hooks/use-toast';
 
@@ -455,24 +455,6 @@ export function MediaStep({
     dispatch({ type: 'SET_BADGES', payload: [] });
   }, [dispatch]);
 
-  // Mounted state for staggered entrance animation
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    if (!hasMedia) {
-      const t = setTimeout(() => setMounted(true), 100);
-      return () => clearTimeout(t);
-    }
-  }, [hasMedia]);
-
-  // Template cards data with unique gradients
-  const TEMPLATE_CARDS: (PostTemplate & { desc: string; gradient: string })[] = [
-    { id: 'course-vlog', emoji: '🎬', label: 'Course Vlog', desc: 'Document your round', gradient: 'linear-gradient(135deg, #2a1f0a 0%, #4a3510 50%, #3a2a0a 100%)', icon: Camera, categories: ['course-vlog'], captionStructure: 'Course: \nConditions: \nHighlights: \nRating: /10' },
-    { id: 'tournament', emoji: '🏆', label: 'Tournament', desc: 'Competition day', gradient: 'linear-gradient(135deg, #1a2a1a 0%, #2a4a2a 50%, #1a3a1a 100%)', icon: Camera, categories: ['tournament'], captionStructure: 'Event: \nCourse: \nScore: \nHighlights:' },
-    { id: 'hole-in-one', emoji: '🎯', label: 'Hole-in-One', desc: 'Celebrate the ace', gradient: 'linear-gradient(135deg, #3a1a1a 0%, #5a2020 50%, #4a1a1a 100%)', icon: Camera, categories: ['achievement'], captionStructure: 'HOLE IN ONE! 🎯\nCourse: \nHole: \nYards: \nClub:', badges: ['hole-in-one'] },
-    { id: 'society-day', emoji: '📸', label: 'Best Shots', desc: 'Showcase photos', gradient: 'linear-gradient(135deg, #1a2030 0%, #2a3a5a 50%, #1a2a4a 100%)', icon: Camera, categories: ['society'], captionStructure: 'Society: \nCourse: \nWinner: \nBest Moment:' },
-    { id: 'review', emoji: '⭐', label: 'Course Review', desc: 'Rate & review', gradient: 'linear-gradient(135deg, #2a2010 0%, #4a3a18 50%, #3a2a10 100%)', icon: Camera, categories: ['review'], captionStructure: 'Course: \nCondition: \nLayout: \nOverall: /10' },
-  ];
-
   // Empty state
   if (!hasMedia) {
     if (permissionDenied) {
@@ -485,233 +467,80 @@ export function MediaStep({
     }
     
     return (
-      <div 
-        className="h-full flex flex-col relative overflow-y-auto"
-        style={{
-          background: 'linear-gradient(180deg, #1a1008 0%, #2a1a0a 12%, #33200c 28%, #f8f6f3 55%, #f9f8f6 100%)',
-        }}
-      >
-        {/* Ambient amber glow */}
-        <div 
-          className="absolute pointer-events-none"
-          style={{
-            top: '-60px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '380px',
-            height: '380px',
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(245, 158, 11, 0.10) 0%, rgba(251, 191, 36, 0.04) 40%, transparent 70%)',
-            zIndex: 1,
-          }}
-        />
-
-        {/* Grain texture overlay */}
-        <div 
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            opacity: 0.03,
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-            zIndex: 1,
-          }}
-        />
-
+      <div className="h-full flex flex-col items-center justify-center px-8 relative">
         {/* Skeleton loading banner */}
         <PickerLoadingBanner isVisible={isPickerOpen} />
         
-        {/* Content container — max-width for tablet/desktop */}
-        <div 
-          className="relative flex flex-col items-center w-full max-w-[430px] mx-auto px-6 z-[2]"
-          style={{ paddingTop: '48px', paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 40px)' }}
+        <motion.div 
+          className="flex flex-col items-center text-center w-full max-w-sm"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
         >
-          {/* === PHASE 4: Glass Capture Card === */}
-          <motion.div 
-            className="w-full relative"
-            style={{
-              opacity: mounted ? 1 : 0,
-              transform: mounted ? 'translateY(0)' : 'translateY(20px)',
-              transition: 'all 0.6s cubic-bezier(0.32, 0.72, 0, 1) 0.15s',
-            }}
-          >
+          {/* Branded camera icon */}
+          <div className="relative h-20 w-20 rounded-[28%] bg-muted flex items-center justify-center mb-6">
+            <Camera className="h-9 w-9 text-muted-foreground" />
             <div 
-              className="relative rounded-3xl overflow-hidden"
-              style={{
-                background: 'rgba(255, 255, 255, 0.05)',
-                backdropFilter: 'blur(24px)',
-                WebkitBackdropFilter: 'blur(24px)',
-                border: '1px solid rgba(245, 158, 11, 0.12)',
-                padding: '32px 24px 28px',
-              }}
+              className="absolute inset-0 rounded-[28%] bg-muted/50 animate-ping" 
+              style={{ animationDuration: '3s' }} 
+            />
+          </div>
+          
+          <h3 className="text-xl font-bold tracking-tight text-gray-900 mb-1.5">
+            Create Your Moment
+          </h3>
+          <p className="text-sm font-medium text-gray-500 mb-1">
+            Photos and videos from your round
+          </p>
+          <p className="text-xs text-gray-400 mb-8">
+            Up to {POST_LIMITS.MAX_MEDIA_COUNT} photos & videos
+          </p>
+          
+          {/* Action buttons — Camera (primary) & Gallery (outlined) */}
+          <div className="flex gap-3 w-full max-w-[280px]">
+            <button
+              onClick={handleCamera}
+              disabled={isPickerOpen}
+              className="flex-1 flex items-center justify-center gap-2 h-14 rounded-2xl bg-primary text-primary-foreground font-semibold text-sm active:scale-[0.97] transition-all disabled:opacity-50"
             >
-              {/* Amber accent line */}
-              <div 
-                className="absolute top-0 left-1/2 -translate-x-1/2"
-                style={{
-                  width: '60px',
-                  height: '2px',
-                  borderRadius: '1px',
-                  background: 'linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.4), transparent)',
-                }}
-              />
-
-              {/* Inner glow */}
-              <div 
-                className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
-                style={{
-                  top: '-30px',
-                  width: '240px',
-                  height: '120px',
-                  borderRadius: '50%',
-                  background: 'radial-gradient(circle, rgba(245, 158, 11, 0.06) 0%, transparent 70%)',
-                }}
-              />
-
-              {/* Title section */}
-              <div className="text-center mb-6 relative">
-                <h3 
-                  className="font-bold mb-1.5"
-                  style={{ fontSize: '22px', color: 'white', letterSpacing: '-0.02em', lineHeight: 1.2 }}
-                >
-                  Create Your Moment
-                </h3>
-                <p style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.5)', fontWeight: 500 }}>
-                  Up to {POST_LIMITS.MAX_MEDIA_COUNT} photos & videos from your round
-                </p>
-              </div>
-
-              {/* Camera & Gallery buttons */}
-              <div className="flex gap-3">
-                <motion.button
-                  onClick={handleCamera}
-                  disabled={isPickerOpen}
-                  whileTap={{ scale: 0.97 }}
-                  className="flex-1 flex flex-col items-center justify-center gap-2 rounded-2xl transition-all disabled:opacity-50"
-                  style={{
-                    height: '80px',
-                    background: 'rgba(255, 255, 255, 0.06)',
-                    border: '1px solid rgba(255, 255, 255, 0.10)',
-                    backdropFilter: 'blur(8px)',
-                    WebkitBackdropFilter: 'blur(8px)',
-                  }}
-                >
-                  <span style={{ fontSize: '28px' }}>📷</span>
-                  <span style={{ fontSize: '14px', fontWeight: 600, color: 'rgba(255, 255, 255, 0.8)' }}>Camera</span>
-                </motion.button>
-                <motion.button
-                  onClick={handleGallery}
-                  disabled={isPickerOpen}
-                  whileTap={{ scale: 0.97 }}
-                  className="flex-1 flex flex-col items-center justify-center gap-2 rounded-2xl transition-all disabled:opacity-50"
-                  style={{
-                    height: '80px',
-                    background: 'rgba(255, 255, 255, 0.06)',
-                    border: '1px solid rgba(255, 255, 255, 0.10)',
-                    backdropFilter: 'blur(8px)',
-                    WebkitBackdropFilter: 'blur(8px)',
-                  }}
-                >
-                  <span style={{ fontSize: '28px' }}>🖼️</span>
-                  <span style={{ fontSize: '14px', fontWeight: 600, color: 'rgba(255, 255, 255, 0.8)' }}>Gallery</span>
-                </motion.button>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* === PHASE 5: Template Cards Carousel === */}
-          <div
-            style={{
-              opacity: mounted ? 1 : 0,
-              transform: mounted ? 'translateY(0)' : 'translateY(20px)',
-              transition: 'all 0.6s cubic-bezier(0.32, 0.72, 0, 1) 0.3s',
-              marginTop: '32px',
-              width: '100%',
-            }}
-          >
-            <p 
-              className="uppercase mb-3.5"
-              style={{ 
-                fontSize: '11px', fontWeight: 600, letterSpacing: '0.1em', 
-                color: 'rgba(120, 100, 70, 0.5)', paddingLeft: '0px',
-              }}
+              <Camera className="h-5 w-5" />
+              Camera
+            </button>
+            <button
+              onClick={handleGallery}
+              disabled={isPickerOpen}
+              className="flex-1 flex items-center justify-center gap-2 h-14 rounded-2xl bg-transparent border-2 border-border text-foreground font-semibold text-sm active:scale-[0.97] transition-all disabled:opacity-50"
             >
-              Start from a template
-            </p>
-            <div 
-              className="flex gap-3 overflow-x-auto -mx-6 px-6 pb-1"
-              style={{ 
-                scrollbarWidth: 'none', 
-                WebkitOverflowScrolling: 'touch',
-                scrollSnapType: 'x proximity',
-              }}
-            >
-              {TEMPLATE_CARDS.map((tpl) => {
-                const isActive = activeTemplateId === tpl.id;
-                return (
-                  <motion.button
-                    key={tpl.id}
-                    onClick={() => {
-                      triggerHaptic('light');
-                      if (isActive) handleDeselectTemplate();
-                      else handleSelectTemplate(tpl);
-                    }}
-                    whileTap={{ scale: 0.97 }}
-                    className="flex-shrink-0 flex flex-col justify-between text-left rounded-2xl transition-all"
-                    style={{
-                      minWidth: '120px',
-                      height: '150px',
-                      padding: '16px 14px',
-                      background: tpl.gradient,
-                      border: isActive ? '1px solid rgba(245, 158, 11, 0.3)' : '1px solid transparent',
-                      scrollSnapAlign: 'start',
-                    }}
-                  >
-                    <span style={{ fontSize: '32px' }}>{tpl.emoji}</span>
-                    <div>
-                      <p style={{ fontSize: '13px', fontWeight: 700, color: 'white' }}>{tpl.label}</p>
-                      <p style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.4)' }}>{tpl.desc}</p>
-                    </div>
-                  </motion.button>
-                );
-              })}
-            </div>
+              <Images className="h-5 w-5 text-muted-foreground" />
+              Gallery
+            </button>
           </div>
 
-          {/* === PHASE 6: Quick Actions === */}
-          <div
-            className="flex justify-center gap-8"
-            style={{
-              opacity: mounted ? 1 : 0,
-              transform: mounted ? 'translateY(0)' : 'translateY(15px)',
-              transition: 'all 0.6s cubic-bezier(0.32, 0.72, 0, 1) 0.45s',
-              padding: '36px 24px 24px',
-            }}
-          >
-            {[
-              { emoji: '📸', label: 'Best shots' },
-              { emoji: '👋', label: 'Tag partners' },
-              { emoji: '📍', label: 'Add location' },
-            ].map((action) => (
-              <div key={action.label} className="flex flex-col items-center gap-2">
-                <div 
-                  className="flex items-center justify-center"
-                  style={{
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: '50%',
-                    background: 'rgba(168, 162, 158, 0.08)',
-                    border: '1px solid rgba(168, 162, 158, 0.12)',
-                    fontSize: '20px',
-                  }}
-                >
-                  {action.emoji}
-                </div>
-                <span style={{ fontSize: '11px', fontWeight: 500, color: '#78716c' }}>
-                  {action.label}
-                </span>
-              </div>
-            ))}
+          {/* Post Templates */}
+          <div className="w-full mt-8">
+            <PostTemplateSelector
+              onSelectTemplate={handleSelectTemplate}
+              onDeselectTemplate={handleDeselectTemplate}
+              activeTemplateId={activeTemplateId}
+            />
           </div>
-        </div>
+          
+          {/* Quick action chips */}
+          <div className="flex flex-wrap justify-center gap-2 mt-6">
+            <span className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-white border border-gray-200 shadow-sm text-sm font-medium text-gray-600 active:bg-gray-50 transition-colors">
+              <Camera className="h-4 w-4 text-muted-foreground" />
+              Best shots
+            </span>
+            <span className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-white border border-gray-200 shadow-sm text-sm font-medium text-gray-600 active:bg-gray-50 transition-colors">
+              <AtSign className="h-4 w-4 text-muted-foreground" />
+              Tag partners
+            </span>
+            <span className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-white border border-gray-200 shadow-sm text-sm font-medium text-gray-600 active:bg-gray-50 transition-colors">
+              <MapPin className="h-4 w-4 text-muted-foreground" />
+              Add location
+            </span>
+          </div>
+        </motion.div>
       </div>
     );
   }

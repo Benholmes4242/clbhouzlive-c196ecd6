@@ -150,12 +150,9 @@ export function PostWizard({
   const [isPositioningText, setIsPositioningText] = useState(false);
   const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
 
-  // Whether we're on the dark hero (media step with no media)
-  const isOnDarkHero = state.currentStep === 'media' && state.mediaItems.length === 0 && !state.isEditMode;
-
   // Control native status bar appearance when wizard is open
-  // "dark" = white icons for dark hero background, "light" = black icons for light backgrounds
-  useMedianStatusBar(isOnDarkHero ? "dark" : "light", "transparent", true, false, isOpen);
+  // "light" = black icons for light backgrounds (#F8FAFC)
+  useMedianStatusBar("light", "transparent", true, false, isOpen);
 
   // Lock body scroll when open
   useEffect(() => {
@@ -650,7 +647,7 @@ export function PostWizard({
                 touchAction: 'pan-y pinch-zoom',
                 overscrollBehavior: 'contain',
               },
-              backgroundColor: isOnDarkHero ? 'transparent' : '#F8FAFC',
+              backgroundColor: '#F8FAFC',
             }}
         >
           {showSuccess ? (
@@ -670,19 +667,7 @@ export function PostWizard({
           ) : (
             <>
               {/* Header + progress bar — single amber surface that bleeds behind status bar */}
-              <div 
-                className="flex-shrink-0" 
-                style={{ 
-                  paddingTop: isOnDarkHero ? '0px' : 'max(env(safe-area-inset-top, 0px), 47px)',
-                  position: isOnDarkHero ? 'absolute' : undefined,
-                  top: isOnDarkHero ? '0' : undefined,
-                  left: isOnDarkHero ? '0' : undefined,
-                  right: isOnDarkHero ? '0' : undefined,
-                  zIndex: isOnDarkHero ? 20 : undefined,
-                  paddingLeft: isOnDarkHero ? 'env(safe-area-inset-left, 0px)' : undefined,
-                  paddingRight: isOnDarkHero ? 'env(safe-area-inset-right, 0px)' : undefined,
-                }}
-              >
+              <div className="flex-shrink-0" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}>
                 <PostWizardHeader
                   currentStep={state.currentStep}
                   currentStepIndex={currentStepIndex}
@@ -705,9 +690,8 @@ export function PostWizard({
                   canProceed={canProceed}
                   isSubmitting={state.isSubmitting}
                   onNext={handleNext}
-                  hasHeroAbove={!isOnDarkHero}
+                  hasHeroAbove
                   isEditMode={state.isEditMode}
-                  glassMode={isOnDarkHero}
                 />
               </div>
 
