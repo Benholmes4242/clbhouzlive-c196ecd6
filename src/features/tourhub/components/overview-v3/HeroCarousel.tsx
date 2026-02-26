@@ -14,7 +14,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, Trophy, Menu, X } from 'lucide-react';
+import { ChevronRight, ChevronsUp, Trophy, Menu, X } from 'lucide-react';
 import { openTourNav } from '../../contexts/TourNavContext';
 import { cn } from '@/lib/utils';
 import { 
@@ -722,8 +722,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           }}
                           aria-label="View full leaderboard"
                         >
-                          <span>View Leaderboard</span>
-                          <ChevronRight className="w-4 h-4 cta-chevron" />
+                          <ChevronsUp size={16} style={{ color: 'rgba(255, 255, 255, 0.7)' }} />
+                          <span>View Full Leaderboard</span>
                         </button>
                       ) : !isExpanded ? (
                         <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta">
