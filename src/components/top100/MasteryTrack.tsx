@@ -142,7 +142,7 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ region, index, onClick }) =
           <div className="flex-1 min-w-0">
             {/* Region name */}
             <h4 className={cn(
-              "font-bold text-base",
+              "font-bold text-lg",
               isComplete ? "text-foreground" : "text-muted-foreground"
             )}>
               {fullName}
@@ -150,7 +150,7 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ region, index, onClick }) =
             
             {/* Description/tagline */}
             <p className={cn(
-              "text-sm mt-0.5",
+              "text-sm mt-0.5 leading-relaxed",
               isComplete ? "text-muted-foreground" : "text-muted-foreground/40"
             )}>
               {tagline}
@@ -161,14 +161,16 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ region, index, onClick }) =
               <div className="flex items-center gap-2 mt-3">
                 <div className="flex-1 h-1.5 bg-muted/40 rounded-full overflow-hidden">
                   <motion.div 
-                    className="h-full rounded-full bg-[#334E3D]"
+                    className="h-full rounded-full"
+                    style={{ backgroundColor: '#3EBD93' }}
                     initial={{ width: 0 }}
                     animate={{ width: `${progressPercent}%` }}
                     transition={{ duration: 0.5, delay: 0.3 }}
                   />
                 </div>
-                <span className="text-xs text-muted-foreground tabular-nums">
-                  {region.played}/{region.total}
+                <span className="text-sm font-semibold tabular-nums">
+                  <span style={{ color: '#3EBD93' }}>{region.played}</span>
+                  <span className="text-muted-foreground">/{region.total}</span>
                 </span>
               </div>
             )}

@@ -124,7 +124,7 @@ export const Top100LoggingStreak: React.FC<Top100LoggingStreakProps> = ({
           <button
             type="button"
             onClick={onLogRound}
-            className="text-xs font-medium text-primary hover:underline whitespace-nowrap py-2.5 px-3 -mr-3 rounded-lg active:scale-[0.97] transition-transform"
+            className="text-sm font-semibold text-background bg-foreground px-4 py-2 rounded-full whitespace-nowrap active:scale-[0.97] transition-transform"
           >
             Log now
           </button>
@@ -155,7 +155,7 @@ export const Top100LoggingStreak: React.FC<Top100LoggingStreakProps> = ({
                 className={cn(
                   'w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium transition-all',
                   hasLog
-                    ? 'bg-gradient-to-br from-orange-500/20 to-amber-500/20 text-orange-600 shadow-[0_0_8px_rgba(249,115,22,0.3)]'
+                    ? 'bg-gradient-to-br from-emerald-500/20 to-teal-500/20 text-emerald-600 shadow-[0_0_8px_rgba(62,189,147,0.3)]'
                     : isCurrent
                     ? 'bg-muted/80 border-2 border-dashed border-primary/40 text-muted-foreground animate-[pulse_3s_ease-in-out_infinite]'
                     : 'bg-muted/40 text-muted-foreground/50 border border-dashed border-muted-foreground/20'

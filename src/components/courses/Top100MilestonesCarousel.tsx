@@ -130,7 +130,7 @@ export function Top100MilestonesCarousel({
   return (
     <section className="space-y-2 mt-6">
       {/* Section header - consistent styling */}
-      <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-2 px-4">
+      <h3 className="text-[13px] font-bold uppercase tracking-[1.5px] text-muted-foreground mb-2 px-4">
         Achievements
       </h3>
       <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground/60 mb-3 px-4">
@@ -169,9 +169,12 @@ export function Top100MilestonesCarousel({
                       src={badgeImage}
                       alt={milestone.tierName}
                       className={cn(
-                        "w-[75px] h-[90px] object-contain transition-all",
+                        "w-[85px] h-[100px] object-contain transition-all",
                         !isUnlocked && "opacity-40 grayscale-[60%]"
                       )}
+                      style={isUnlocked ? {
+                        filter: 'drop-shadow(0 4px 20px rgba(212, 168, 83, 0.3))',
+                      } : undefined}
                     />
                   </div>
 
@@ -197,10 +200,10 @@ export function Top100MilestonesCarousel({
         </CarouselContent>
       </Carousel>
 
-      {/* Progress line - gradient fill with glow */}
+      {/* Progress line - 8px height with shimmer */}
       <div className="mx-4 mt-4">
         <div 
-          className="h-1.5 rounded-full bg-muted/80 overflow-hidden"
+          className="h-2 rounded-full bg-muted/80 overflow-hidden"
           role="progressbar"
           aria-valuenow={Math.round(progressPct)}
           aria-valuemin={0}
@@ -208,14 +211,29 @@ export function Top100MilestonesCarousel({
           aria-label={`Overall milestone progress: ${totalPlayed} courses played`}
         >
           <div
-            className="h-full rounded-full transition-all duration-700 ease-out"
+            className="h-full rounded-full transition-all duration-700 ease-out relative overflow-hidden"
             style={{ 
               width: `${progressPct}%`, 
               background: `linear-gradient(90deg, ${targetColor} 0%, ${targetColor}CC 100%)`,
               boxShadow: `0 0 10px ${targetColor}40, 0 0 4px ${targetColor}30`,
             }}
-          />
+          >
+            {/* Shimmer animation */}
+            <div
+              className="absolute inset-0"
+              style={{
+                background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)',
+                animation: 'shimmer 2.5s ease-in-out infinite',
+              }}
+            />
+          </div>
         </div>
+        <style>{`
+          @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+          }
+        `}</style>
       </div>
 
       {/* Dot indicators - only show when scrollable */}
