@@ -640,7 +640,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
               <span className="text-[11px] font-medium text-white/90">Played</span>
             </div>
             <div className="glass-card flex items-center gap-1.5 px-3 py-2 rounded-full">
-              <span className="inline-block h-2.5 w-2.5 rounded-full border-2 border-[#F7931E] bg-transparent shadow-[0_0_4px_rgba(247,147,30,0.4)]" aria-hidden="true" />
+              <span className="inline-block h-2.5 w-2.5 rounded-full border-2 bg-transparent shadow-[0_0_4px_rgba(247,147,30,0.4)]" style={{ borderColor: WANT_TO_PLAY_COLOR }} aria-hidden="true" />
               <span className="text-[11px] font-medium text-white/90">Want to Play</span>
             </div>
             <div className="glass-card flex items-center gap-1.5 px-3 py-2 rounded-full">
@@ -707,7 +707,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             
             <button
               onClick={handleResetView}
-              className="glass-card flex items-center justify-center w-11 h-11 rounded-xl text-white/70 hover:bg-white/10 active:bg-white/20 active:scale-[0.92] transition-all duration-150"
+              className="glass-card flex items-center justify-center w-11 h-11 rounded-xl text-white/80 hover:bg-white/10 active:bg-white/20 active:scale-[0.92] transition-all duration-150"
               aria-label="Reset map view"
             >
               <RotateCcw className="h-4 w-4" aria-hidden="true" />
@@ -766,7 +766,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 
           {/* Status filter row — dark glass pills */}
           <div 
-            className="flex items-center gap-1 p-1 rounded-xl bg-white/8"
+            className="flex items-center gap-1 p-1 rounded-xl bg-white/[0.08]"
             role="group"
             aria-label="Filter courses by status"
           >
@@ -789,7 +789,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                     'transition-all duration-200',
                     'active:scale-[0.96]',
                     isActive
-                      ? 'bg-white/90 text-foreground shadow-sm'
+                      ? 'bg-white/90 text-foreground'
                       : 'text-white/60 hover:text-white/80 hover:bg-white/[0.08]'
                   )}
                 >
@@ -819,7 +819,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                     'transition-all duration-200 border',
                     'active:scale-[0.96]',
                     isActive
-                      ? 'bg-white/90 text-foreground border-white/50 shadow-sm'
+                      ? 'bg-white/90 text-foreground border-white/50'
                       : 'bg-white/[0.08] border-white/12 text-white/60 hover:border-white/30 hover:bg-white/[0.12] hover:text-white/80'
                   )}
                 >
