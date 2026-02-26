@@ -650,8 +650,11 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           </div>
         </div>
 
-        {/* FIX 12: Bottom-right control stack — positioned above filter tray */}
-        <div className="pointer-events-none absolute right-3 bottom-52 z-20 flex flex-col items-center gap-2.5">
+        {/* Bottom-right control stack — hides when course sheet is open */}
+        <div className={cn(
+          "pointer-events-none absolute right-3 bottom-52 z-20 flex flex-col items-center gap-2.5 transition-all duration-300",
+          selectedCourse ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-100 translate-y-0'
+        )}>
           <div className="pointer-events-auto">
             <MapProgressOrb
               playedCount={ratedCount}
