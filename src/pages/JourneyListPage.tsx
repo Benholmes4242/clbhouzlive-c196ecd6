@@ -18,7 +18,7 @@ const tabTriggerClass = cn(
   "relative px-4 py-2 text-sm font-medium transition-colors",
   "text-muted-foreground data-[state=active]:text-foreground",
   "data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-0 data-[state=active]:after:right-0",
-  "data-[state=active]:after:h-0.5 data-[state=active]:after:bg-[hsl(var(--tab-orange))]"
+  "data-[state=active]:after:h-[3px] data-[state=active]:after:rounded-full data-[state=active]:after:bg-[hsl(var(--tab-orange))]"
 );
 
 interface JourneyCourseCardProps {

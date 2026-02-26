@@ -39,42 +39,36 @@ const MyCoursesTabs = ({
   const { user: currentUser } = useSupabaseSession();
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <TabsList className="grid w-full grid-cols-3 h-auto">
+      <TabsList className="flex items-center gap-1 w-full bg-transparent border-0 p-0 h-auto">
         <TabsTrigger 
           value="all"
-          className="flex flex-col items-center gap-1 py-3 relative data-[state=active]:bg-transparent hover:bg-muted/50 data-[state=active]:text-foreground data-[state=active]:shadow-none"
+          className="relative flex-1 text-sm min-h-[44px] py-2 font-medium bg-transparent border-0 shadow-none rounded-none
+            data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground data-[state=active]:font-semibold
+            text-muted-foreground hover:text-foreground active:scale-[0.97] transition-all duration-200
+            after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:rounded-full after:transition-all after:duration-200
+            data-[state=active]:after:bg-[hsl(var(--tab-orange))] data-[state=inactive]:after:bg-transparent"
         >
-          <span className="text-sm font-medium">All Courses</span>
-          {activeTab === 'all' && (
-            <div 
-              className="w-1.5 h-1.5 rounded-full bg-[#b66b41] mt-1 animate-fade-in"
-              style={{ marginTop: '4px' }}
-            />
-          )}
+          All Courses
         </TabsTrigger>
         <TabsTrigger 
           value="top100"
-          className="flex flex-col items-center gap-1 py-3 relative data-[state=active]:bg-transparent hover:bg-muted/50 data-[state=active]:text-foreground data-[state=active]:shadow-none"
+          className="relative flex-1 text-sm min-h-[44px] py-2 font-medium bg-transparent border-0 shadow-none rounded-none
+            data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground data-[state=active]:font-semibold
+            text-muted-foreground hover:text-foreground active:scale-[0.97] transition-all duration-200
+            after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:rounded-full after:transition-all after:duration-200
+            data-[state=active]:after:bg-[hsl(var(--tab-orange))] data-[state=inactive]:after:bg-transparent"
         >
-          <span className="text-sm font-medium">Top 100</span>
-          {activeTab === 'top100' && (
-            <div 
-              className="w-1.5 h-1.5 rounded-full bg-[#b66b41] mt-1 animate-fade-in"
-              style={{ marginTop: '4px' }}
-            />
-          )}
+          Top 100
         </TabsTrigger>
         <TabsTrigger 
           value="recent"
-          className="flex flex-col items-center gap-1 py-3 relative data-[state=active]:bg-transparent hover:bg-muted/50 data-[state=active]:text-foreground data-[state=active]:shadow-none"
+          className="relative flex-1 text-sm min-h-[44px] py-2 font-medium bg-transparent border-0 shadow-none rounded-none
+            data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground data-[state=active]:font-semibold
+            text-muted-foreground hover:text-foreground active:scale-[0.97] transition-all duration-200
+            after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:rounded-full after:transition-all after:duration-200
+            data-[state=active]:after:bg-[hsl(var(--tab-orange))] data-[state=inactive]:after:bg-transparent"
         >
-          <span className="text-sm font-medium">Recent</span>
-          {activeTab === 'recent' && (
-            <div 
-              className="w-1.5 h-1.5 rounded-full bg-[#b66b41] mt-1 animate-fade-in"
-              style={{ marginTop: '4px' }}
-            />
-          )}
+          Recent
         </TabsTrigger>
       </TabsList>
 

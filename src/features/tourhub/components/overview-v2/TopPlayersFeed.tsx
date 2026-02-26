@@ -104,7 +104,7 @@ export function TopPlayersFeed({ players, maxEvents, maxCuts }: TopPlayersFeedPr
               "transition-colors duration-200 ease-out",
               // Orange underline using after pseudo-element
               "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2",
-              "after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))]",
+              "after:h-[3px] after:rounded-full after:bg-[hsl(var(--tab-orange))]",
               "after:transition-all after:duration-200 after:ease-out",
               sortBy === opt.value
                 ? 'text-foreground after:w-full after:opacity-[0.85]'

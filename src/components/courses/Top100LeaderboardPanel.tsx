@@ -46,7 +46,7 @@ const Top100LeaderboardPanel = () => {
               <TabsTrigger
                 key={tab.id}
                 value={tab.id}
-                className="relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none min-h-[44px] data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out active:scale-[0.98] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]"
+                className="relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none min-h-[44px] data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out active:scale-[0.97] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[3px] after:rounded-full after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]"
               >
                 {tab.label}
               </TabsTrigger>
