@@ -33,7 +33,7 @@ export function Top100ProgressHeroSkeleton() {
 export function Top100YearSummarySkeleton() {
   return (
     <div className="px-4 mb-6">
-      <div className="bg-white/60 border border-slate-200/40 rounded-2xl p-5 min-h-[72px]">
+      <div className="bg-card/60 border border-border/40 rounded-2xl p-5 min-h-[72px]">
         <div className="grid grid-cols-4 gap-6">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="flex flex-col items-center gap-1">
@@ -50,7 +50,7 @@ export function Top100YearSummarySkeleton() {
 
 export function Top100TimelineSkeleton() {
   return (
-    <div className="bg-white/60 border border-slate-200/40 rounded-xl p-4">
+    <div className="bg-card/60 border border-border/40 rounded-xl p-4">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 clb-skeleton rounded" />
@@ -78,7 +78,7 @@ export function Top100TimelineSkeleton() {
 
 export function Top100StreakSkeleton() {
   return (
-    <div className="bg-white/60 border border-slate-200/40 rounded-xl p-4">
+    <div className="bg-card/60 border border-border/40 rounded-xl p-4">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-full clb-skeleton" />
         <div className="flex-1 space-y-1.5">

@@ -130,10 +130,10 @@ export function Top100MilestonesCarousel({
   return (
     <section className="space-y-2 mt-6">
       {/* Section header - consistent styling */}
-      <h3 className="text-[13px] font-bold uppercase tracking-[1.5px] text-muted-foreground mb-2 px-4">
+      <h3 className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground mb-2 px-4">
         Achievements
       </h3>
-      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground/60 mb-3 px-4">
+      <p className="text-[10px] font-medium uppercase tracking-[1.5px] text-muted-foreground/60 mb-3 px-4">
         Milestone achievements (all lists)
       </p>
 

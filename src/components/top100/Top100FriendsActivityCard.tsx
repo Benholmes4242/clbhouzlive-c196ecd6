@@ -41,21 +41,21 @@ const Top100FriendsActivityCard: React.FC<Top100FriendsActivityCardProps> = ({
     // Podium styling for ranks 1-3
     if (rank === 1) {
       return (
-        <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2 py-[2px] text-xs font-semibold text-amber-700">
+        <span className="inline-flex items-center rounded-full border border-[#D4A853]/30 bg-[#D4A853]/10 px-2 py-[2px] text-xs font-semibold text-[#D4A853]">
           #{rank}
         </span>
       );
     }
     if (rank === 2) {
       return (
-        <span className="inline-flex items-center rounded-full border border-slate-300 bg-slate-100 px-2 py-[2px] text-xs font-semibold text-slate-700">
+        <span className="inline-flex items-center rounded-full border border-[#A8B4C0]/30 bg-[#A8B4C0]/10 px-2 py-[2px] text-xs font-semibold text-[#A8B4C0]">
           #{rank}
         </span>
       );
     }
     if (rank === 3) {
       return (
-        <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-2 py-[2px] text-xs font-semibold text-orange-600">
+        <span className="inline-flex items-center rounded-full border border-[#C4956A]/30 bg-[#C4956A]/10 px-2 py-[2px] text-xs font-semibold text-[#C4956A]">
           #{rank}
         </span>
       );
@@ -74,7 +74,7 @@ const Top100FriendsActivityCard: React.FC<Top100FriendsActivityCardProps> = ({
   }
 
   return (
-    <Card className="bg-card border border-border/60 rounded-xl shadow-sm overflow-hidden">
+    <Card className="bg-card border border-border/60 rounded-xl overflow-hidden">
       {/* Header - Always visible, clickable */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
@@ -96,7 +96,7 @@ const Top100FriendsActivityCard: React.FC<Top100FriendsActivityCardProps> = ({
         
         {/* Top 10 pill on its own row */}
         <div className="flex justify-start mt-3">
-          <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2.5 py-[2px] text-xs font-semibold text-amber-700">
+          <span className="inline-flex items-center rounded-full border border-[#D4A853]/30 bg-[#D4A853]/10 px-2.5 py-[2px] text-xs font-semibold text-[#D4A853]">
             Top 10
           </span>
         </div>

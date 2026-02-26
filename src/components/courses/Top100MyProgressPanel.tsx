@@ -17,7 +17,7 @@ import {
   Top100StreakSkeleton,
 } from '@/components/top100/Top100ProgressSkeletons';
 import { MILESTONE_THEMES } from '@/lib/globalAchievementMilestoneSystem';
-import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
+
 
 import { useTop100FriendsSnapshot } from '@/hooks/useTop100FriendsSnapshot';
 import Top100FriendsActivityCard from '@/components/top100/Top100FriendsActivityCard';
@@ -225,7 +225,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   }
 
   return (
-    <div className="w-full max-w-full pb-24 animate-fade-in">
+    <div className="w-full max-w-full animate-fade-in">
       {/* ============================================
           SECTION A: HERO / IDENTITY - section band, no card
           Background: bg-slate-50, pt-8 pb-10
@@ -252,7 +252,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
           SECTION C: MOMENTUM
           ============================================ */}
       <section className="bg-card px-4 py-8 border-t border-border/30">
-        <h3 className="text-[13px] font-bold uppercase tracking-[1.5px] text-muted-foreground mb-4">
+        <h3 className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground mb-4">
           Momentum
         </h3>
         <div className="space-y-4">
@@ -346,7 +346,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
           Most recent earned + next to unlock
           ============================================ */}
       <section className="mt-8 px-4">
-        <h2 className="text-[13px] font-bold uppercase tracking-[1.5px] text-muted-foreground mb-4">Journey Map</h2>
+        <h2 className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground mb-4">Journey Map</h2>
         <SimplifiedMilestoneLadder
           totalPlayed={data.totalTop100Played}
           onMilestoneClick={openMilestoneSheet}
@@ -389,8 +389,6 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
         data={achievementSheetData}
       />
 
-      {/* Scroll to top FAB */}
-      <ScrollToTopGlass />
     </div>
   );
 };
