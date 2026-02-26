@@ -732,12 +732,14 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         course={selectedCourse}
         onClose={() => setSelectedCourse(null)}
         scope={scope}
-        filterTrayHeight={162}
       />
 
-      {/* FIX 6: Fixed bottom control tray - DARK glass */}
+      {/* FIX 6: Fixed bottom control tray - DARK glass — hides when course sheet is open */}
       <div 
-        className="fixed bottom-0 left-0 right-0 z-30 rounded-t-3xl px-5 pt-4 pb-[calc(max(0.75rem,env(safe-area-inset-bottom,0px))+12px)]"
+        className={cn(
+          "fixed bottom-0 left-0 right-0 z-30 rounded-t-3xl px-5 pt-4 pb-[calc(max(0.75rem,env(safe-area-inset-bottom,0px))+12px)] transition-all duration-300",
+          selectedCourse ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-100 translate-y-0'
+        )}
         style={{
           background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.45) 100%)',
           backdropFilter: 'blur(28px) saturate(1.6)',
