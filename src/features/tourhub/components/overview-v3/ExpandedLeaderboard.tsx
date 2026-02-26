@@ -226,61 +226,41 @@ interface ExpandedLeaderboardListProps {
 
 export function ExpandedLeaderboardList({ entries, tourCode, onTouchStart, onTouchMove, onTouchEnd }: ExpandedLeaderboardListProps) {
   const [visibleCount, setVisibleCount] = useState(30);
-  const [isAtBottom, setIsAtBottom] = useState(false);
 
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     const el = e.currentTarget;
     if (el.scrollTop + el.clientHeight >= el.scrollHeight - 200) {
       setVisibleCount(prev => Math.min(prev + 30, entries.length));
     }
-    setIsAtBottom(el.scrollTop + el.clientHeight >= el.scrollHeight - 10);
   }, [entries.length]);
 
   return (
-    <div style={{ position: 'relative', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
-      <div
-        role="list"
-        aria-label="Tournament leaderboard"
-        className="expanded-lb-scroll"
-        style={{
-          flex: 1,
-          minHeight: 0,
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          WebkitOverflowScrolling: 'touch',
-          overscrollBehavior: 'contain',
-          touchAction: 'pan-y',
-          paddingTop: 8,
-        }}
-        onScroll={handleScroll}
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
-      >
-        {entries.slice(0, visibleCount).map((entry) => (
-          <ExpandedLeaderboardRow
-            key={entry.id}
-            entry={entry}
-            tourCode={tourCode}
-          />
-        ))}
-      </div>
-      {/* Bottom fade gradient */}
-      {!isAtBottom && (
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: 48,
-            background: 'linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.45))',
-            borderRadius: '0 0 16px 16px',
-            pointerEvents: 'none',
-            zIndex: 3,
-          }}
+    <div
+      role="list"
+      aria-label="Tournament leaderboard"
+      className="expanded-lb-scroll"
+      style={{
+        flex: 1,
+        minHeight: 0,
+        overflowY: 'auto',
+        overflowX: 'hidden',
+        WebkitOverflowScrolling: 'touch',
+        overscrollBehavior: 'contain',
+        touchAction: 'pan-y',
+        paddingTop: 8,
+      }}
+      onScroll={handleScroll}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
+      {entries.slice(0, visibleCount).map((entry) => (
+        <ExpandedLeaderboardRow
+          key={entry.id}
+          entry={entry}
+          tourCode={tourCode}
         />
-      )}
+      ))}
     </div>
   );
 }
