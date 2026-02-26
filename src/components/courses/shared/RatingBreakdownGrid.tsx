@@ -38,7 +38,7 @@ export const RatingBreakdownGrid: React.FC<RatingBreakdownGridProps> = ({
                 {formatScore(cat.value)}
               </span>
             </div>
-            <div className="h-2 bg-muted rounded-full overflow-hidden">
+            <div className="h-2 bg-[#E7E5E4] rounded-full overflow-hidden">
               <div
                 className={cn('h-full rounded-full transition-all duration-300', barColorClass)}
                 style={{ width: `${(score / 10) * 100}%` }}
