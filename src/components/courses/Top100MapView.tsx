@@ -506,7 +506,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           <button
             onClick={onClose}
             className="fixed left-4 z-40 w-11 h-11 flex items-center justify-center glass-card rounded-xl active:scale-[0.95] transition-transform"
-            style={{ top: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+            style={{ top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)' }}
             aria-label="Close map"
           >
             <ArrowLeft className="w-5 h-5 text-white" />
@@ -514,7 +514,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         )}
 
         {/* Top overlay zone - Legend as premium glass pills (with safe area for notch) */}
-        <div className="pointer-events-none absolute top-0 left-0 right-0 z-20 px-3 pt-[max(env(safe-area-inset-top,0px),47px)]">
+        <div className="pointer-events-none absolute top-0 left-0 right-0 z-20 px-3" style={{ paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)' }}>
           <div 
             className="pointer-events-auto flex items-center gap-1.5 w-fit ml-auto"
             role="group"
@@ -622,8 +622,9 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 
       {/* Fixed bottom control tray - liquid glass with progress bar */}
       <div 
-        className="fixed bottom-0 left-0 right-0 z-30 rounded-t-3xl px-5 pt-4 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+        className="fixed bottom-0 left-0 right-0 z-30 rounded-t-3xl px-5 pt-4"
         style={{
+          paddingBottom: 'calc(max(0.75rem, env(safe-area-inset-bottom, 0px)) + 12px)',
           background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.14) 50%, rgba(255, 255, 255, 0.18) 100%)',
           backdropFilter: 'blur(28px) saturate(1.6)',
           WebkitBackdropFilter: 'blur(28px) saturate(1.6)',
