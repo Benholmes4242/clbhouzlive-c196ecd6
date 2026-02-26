@@ -15,15 +15,15 @@ import { cn } from '@/lib/utils';
 import { MapCourseSheet, MapProgressOrb } from './map';
 import { MAP_CONFIG, applyClbhouzMapStyle } from '@/config/maps';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+import { useSeasonCalendar } from '@/hooks/championship';
+import { getSeasonConfig, type SeasonId } from '@/lib/seasonConfig';
 
 type StatusFilter = 'all' | 'played' | 'want_to_play' | 'not_played';
 
 interface Top100MapViewProps {
   scope: Top100MapScope;
   onScopeChange?: (scope: Top100MapScope) => void;
-  /** When true, map fills 100% of parent height instead of fixed 480px */
   fullHeight?: boolean;
-  /** Callback to close the modal (for full-bleed mode) */
   onClose?: () => void;
 }
 
@@ -54,12 +54,16 @@ const REGION_CONFIG: Record<
   },
 };
 
-// Marker colors - Played = slate, Want to Play = orange outline, Not Played = muted
-const PLAYED_COLOR = '#3EBD93'; // Season color (Pre-Season mint)
-const WANT_TO_PLAY_COLOR = '#F7931E'; // Orange stroke, hollow center
-const NOT_PLAYED_COLOR = '#94a3b8'; // Light grey (slate-400)
-const CLUSTER_COLOR_MIXED = '#334155'; // slate-700
-const CLUSTER_COLOR_MOSTLY_PLAYED = '#3EBD93'; // Season color for played-majority clusters
+const WANT_TO_PLAY_COLOR = '#F7931E';
+
+// Shared fog config
+const GLOBE_FOG_CONFIG: mapboxgl.FogSpecification = {
+  color: 'rgb(220, 215, 206)',
+  'high-color': 'rgb(180, 190, 210)',
+  'horizon-blend': 0.08,
+  'space-color': 'rgb(8, 10, 22)',
+  'star-intensity': 0.12,
+};
 
 const Top100MapView: React.FC<Top100MapViewProps> = ({
   scope,
@@ -70,7 +74,6 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
   const navigate = useNavigate();
   const { session } = useSupabaseSession();
   
-  // Safe area bleed: transparent status bar with white icons for full-bleed map
   useMedianStatusBar("dark", "transparent", true, false);
 
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -80,6 +83,19 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [hasInitialFit, setHasInitialFit] = useState(false);
   const [mapLoaded, setMapLoaded] = useState(false);
+
+  // Dynamic season color
+  const { data: seasonCalendar } = useSeasonCalendar();
+  const seasonColor = useMemo(() => {
+    const activeSeason = seasonCalendar?.find(s => s.is_current);
+    if (!activeSeason?.name) return '#3EBD93';
+    const lower = activeSeason.name.toLowerCase();
+    let id: SeasonId = 'preseason';
+    if (lower.includes('major')) id = 'major';
+    else if (lower.includes('summer')) id = 'summer';
+    else if (lower.includes('off-season') || lower.includes('offseason')) id = 'offseason';
+    return getSeasonConfig(id).themeColor;
+  }, [seasonCalendar]);
 
   const {
     data: courses = [],
@@ -96,28 +112,26 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
     return courses;
   }, [courses, statusFilter]);
 
-  // Official list size - derived dynamically from query results
   const officialTotal = courses.length;
   const ratedCount = courses.filter((c) => c.journey_status === 'played').length;
   const wantToPlayCount = courses.filter((c) => c.journey_status === 'want_to_play').length;
   const remaining = Math.max(officialTotal - ratedCount, 0);
   const progressPercent = officialTotal > 0 ? Math.round((ratedCount / officialTotal) * 100) : 0;
 
-  // Count unique regions explored
   const regionsExplored = useMemo(() => {
     const playedCourses = courses.filter((c) => c.journey_status === 'played');
     const countries = new Set(playedCourses.map((c) => c.country).filter(Boolean));
     return countries.size;
   }, [courses]);
 
-  // Reset state when scope changes
+  // Reset filter/selection on scope change (but NOT the map)
   useEffect(() => {
     setHasInitialFit(false);
     setSelectedCourse(null);
     setStatusFilter('all');
   }, [scope]);
 
-  // Initialise map with premium styling
+  // FIX 1: Initialize map ONCE on mount — no scope dependency
   useEffect(() => {
     if (!mapContainerRef.current || !MAP_CONFIG.TOKEN || mapRef.current) return;
 
@@ -145,20 +159,13 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
       setMapLoaded(true);
     });
 
-    // Apply clean minimal base style + globe atmosphere
     mapInstance.on('style.load', () => {
       applyClbhouzMapStyle(mapInstance, {
         showPlaceLabels: true,
         showWaterLabels: true,
       });
 
-      mapInstance.setFog({
-        color: 'rgb(220, 215, 206)',
-        'high-color': 'rgb(180, 190, 210)',
-        'horizon-blend': 0.08,
-        'space-color': 'rgb(8, 10, 22)',
-        'star-intensity': 0.12,
-      });
+      mapInstance.setFog(GLOBE_FOG_CONFIG);
     });
 
     return () => {
@@ -168,9 +175,22 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
       mapRef.current = null;
       setMapLoaded(false);
     };
-  }, [scope]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // Fit to bounds when courses load with smooth animation
+  // FIX 1: Animate camera to new region on scope change
+  useEffect(() => {
+    if (!mapRef.current || !mapLoaded) return;
+    const config = REGION_CONFIG[scope];
+    mapRef.current.flyTo({
+      center: config.center,
+      zoom: config.zoom,
+      duration: 1200,
+      essential: true,
+    });
+  }, [scope, mapLoaded]);
+
+  // Fit to bounds when courses load
   useEffect(() => {
     if (!mapRef.current || hasInitialFit || !courses.length || !regionConfig) {
       return;
@@ -189,24 +209,18 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
       duration: 600,
     });
 
-    if (scope === 'usa') {
-      const currentZoom = mapInstance.getZoom();
-      mapInstance.setZoom(currentZoom + 1);
-      mapInstance.setCenter(regionConfig.center);
-    }
-
     setHasInitialFit(true);
-  }, [courses, hasInitialFit, regionConfig, scope]);
+  }, [courses, hasInitialFit, regionConfig]);
 
-  // Clustering + layers with differentiated markers for 3 states
+  // Clustering + layers
   useEffect(() => {
-    if (!mapRef.current) return;
+    if (!mapRef.current || !mapLoaded) return;
 
     const mapInstance = mapRef.current;
 
     const addClustering = () => {
-      // Clean up existing layers (including course-labels)
-      ['course-labels', 'clusters', 'cluster-count', 'played-points', 'want-to-play-points', 'want-to-play-glow', 'not-played-points'].forEach((id) => {
+      // Clean up existing layers
+      ['not-played-shadow', 'course-labels', 'clusters', 'cluster-halo', 'cluster-accent', 'cluster-count', 'played-points', 'want-to-play-points', 'want-to-play-glow', 'not-played-points'].forEach((id) => {
         if (mapInstance.getLayer(id)) mapInstance.removeLayer(id);
       });
       if (mapInstance.getSource('courses')) mapInstance.removeSource('courses');
@@ -231,6 +245,8 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             user_has_rated: course.user_has_rated,
             user_rating: course.user_rating,
             journey_status: course.journey_status,
+            isPlayed: course.journey_status === 'played',
+            isWantToPlay: course.journey_status === 'want_to_play',
           },
         })),
       };
@@ -242,11 +258,32 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         clusterMaxZoom: 7,
         clusterRadius: 45,
         clusterProperties: {
-          played_count: ['+', ['case', ['==', ['get', 'journey_status'], 'played'], 1, 0]],
+          played_count: ['+', ['case', ['get', 'isPlayed'], 1, 0]],
+          want_to_play_count: ['+', ['case', ['get', 'isWantToPlay'], 1, 0]],
         },
       });
 
-      // Cluster circles - color based on played ratio, premium depth styling
+      // FIX 3: Cluster halo (soft shadow)
+      mapInstance.addLayer({
+        id: 'cluster-halo',
+        type: 'circle',
+        source: 'courses',
+        filter: ['has', 'point_count'],
+        paint: {
+          'circle-radius': [
+            'interpolate', ['linear'], ['get', 'point_count'],
+            2, 22,
+            10, 26,
+            25, 30,
+            50, 34,
+            100, 38,
+          ],
+          'circle-color': 'rgba(0, 0, 0, 0.08)',
+          'circle-blur': 1,
+        },
+      });
+
+      // FIX 3: Cluster circles - dark frosted glass
       mapInstance.addLayer({
         id: 'clusters',
         type: 'circle',
@@ -254,22 +291,43 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         filter: ['has', 'point_count'],
         paint: {
           'circle-radius': [
-            'step',
-            ['get', 'point_count'],
-            20, 5,
-            24, 15,
-            28, 30,
-            32,
+            'interpolate', ['linear'], ['get', 'point_count'],
+            2, 18,
+            10, 22,
+            25, 26,
+            50, 30,
+            100, 34,
           ],
-          'circle-color': [
+          'circle-color': 'rgba(0, 0, 0, 0.35)',
+          'circle-stroke-width': 1.5,
+          'circle-stroke-color': 'rgba(255, 255, 255, 0.2)',
+          'circle-blur': 0,
+        },
+      });
+
+      // FIX 3: Cluster accent ring — season color inner ring when mostly played
+      mapInstance.addLayer({
+        id: 'cluster-accent',
+        type: 'circle',
+        source: 'courses',
+        filter: ['has', 'point_count'],
+        paint: {
+          'circle-radius': [
+            'interpolate', ['linear'], ['get', 'point_count'],
+            2, 15,
+            10, 19,
+            25, 23,
+            50, 27,
+            100, 31,
+          ],
+          'circle-color': 'transparent',
+          'circle-stroke-width': 1.5,
+          'circle-stroke-color': [
             'case',
             ['>', ['/', ['get', 'played_count'], ['get', 'point_count']], 0.5],
-            CLUSTER_COLOR_MOSTLY_PLAYED,
-            CLUSTER_COLOR_MIXED,
+            seasonColor + '99', // 60% opacity
+            'rgba(255, 255, 255, 0.15)',
           ],
-          'circle-stroke-width': 3,
-          'circle-stroke-color': 'rgba(255,255,255,0.6)',
-          'circle-blur': 0,
         },
       });
 
@@ -282,14 +340,34 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         layout: {
           'text-field': '{point_count_abbreviated}',
           'text-font': ['Inter Semi Bold', 'Arial Unicode MS Bold'],
-          'text-size': 13,
+          'text-size': 12,
         },
         paint: {
-          'text-color': '#ffffff',
+          'text-color': 'rgba(255, 255, 255, 0.9)',
         },
       });
 
-      // NOT PLAYED points (render first, bottom layer) - muted grey, zoom-responsive sizing with larger tap targets
+      // FIX 2: Not Played shadow layer
+      mapInstance.addLayer({
+        id: 'not-played-shadow',
+        type: 'circle',
+        source: 'courses',
+        filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'journey_status'], 'none']],
+        paint: {
+          'circle-radius': [
+            'interpolate', ['linear'], ['zoom'],
+            4, 9,
+            8, 11,
+            12, 15,
+            16, 19,
+          ],
+          'circle-color': 'rgba(0, 0, 0, 0.06)',
+          'circle-blur': 0.8,
+          'circle-opacity-transition': { duration: 300, delay: 0 },
+        },
+      });
+
+      // FIX 2: Not Played points — frosted ghost circles
       mapInstance.addLayer({
         id: 'not-played-points',
         type: 'circle',
@@ -298,18 +376,20 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         paint: {
           'circle-radius': [
             'interpolate', ['linear'], ['zoom'],
-            4, 8,    // Larger tap target at world view
-            8, 10,   // Medium at country view  
-            12, 14,  // Larger when zoomed to region
-            16, 18,  // Even larger when very zoomed in
+            4, 8,
+            8, 10,
+            12, 14,
+            16, 18,
           ],
-          'circle-color': 'rgba(255,255,255,0.7)',
+          'circle-color': 'rgba(255, 255, 255, 0.5)',
           'circle-stroke-width': 1.5,
-          'circle-stroke-color': 'rgba(0,0,0,0.12)',
+          'circle-stroke-color': 'rgba(0, 0, 0, 0.2)',
+          'circle-opacity': 1.0,
+          'circle-opacity-transition': { duration: 300, delay: 0 },
         },
       });
 
-      // WANT TO PLAY glow layer (subtle halo for visibility)
+      // Want to Play glow
       mapInstance.addLayer({
         id: 'want-to-play-glow',
         type: 'circle',
@@ -325,10 +405,11 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           ],
           'circle-color': 'rgba(247, 147, 30, 0.2)',
           'circle-blur': 0.8,
+          'circle-opacity-transition': { duration: 300, delay: 0 },
         },
       });
 
-      // WANT TO PLAY points (middle layer) - outlined orange, larger tap targets
+      // Want to Play points
       mapInstance.addLayer({
         id: 'want-to-play-points',
         type: 'circle',
@@ -337,7 +418,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         paint: {
           'circle-radius': [
             'interpolate', ['linear'], ['zoom'],
-            4, 8,    // Larger tap target
+            4, 8,
             8, 10,
             12, 14,
             16, 18,
@@ -345,10 +426,11 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           'circle-color': 'rgba(255,255,255,0.95)',
           'circle-stroke-width': 2.5,
           'circle-stroke-color': WANT_TO_PLAY_COLOR,
+          'circle-opacity-transition': { duration: 300, delay: 0 },
         },
       });
 
-      // PLAYED points (render on top) - filled dark, larger tap targets
+      // FIX 4: Played points — dynamic season color
       mapInstance.addLayer({
         id: 'played-points',
         type: 'circle',
@@ -357,19 +439,20 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         paint: {
           'circle-radius': [
             'interpolate', ['linear'], ['zoom'],
-            4, 8,    // Larger tap target at world view
-            8, 10,   // Medium at country view
-            12, 14,  // Larger when zoomed to region
-            16, 18,  // Even larger when very zoomed in
+            4, 8,
+            8, 10,
+            12, 14,
+            16, 18,
           ],
-          'circle-color': PLAYED_COLOR,
+          'circle-color': seasonColor,
           'circle-opacity': 1.0,
           'circle-stroke-width': 2,
           'circle-stroke-color': 'rgba(255,255,255,0.8)',
+          'circle-opacity-transition': { duration: 300, delay: 0 },
         },
       });
 
-      // Course name labels - visible when courses are no longer clustered (zoom > 7)
+      // Course name labels
       mapInstance.addLayer({
         id: 'course-labels',
         type: 'symbol',
@@ -427,7 +510,6 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         });
       });
 
-      // Individual point click → open bottom sheet
       const handlePointClick = (e: mapboxgl.MapMouseEvent) => {
         const feature = e.features?.[0];
         if (!feature) return;
@@ -448,7 +530,6 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
       mapInstance.on('click', 'want-to-play-points', handlePointClick);
       mapInstance.on('click', 'not-played-points', handlePointClick);
 
-      // Cursor styles
       ['clusters', 'played-points', 'want-to-play-points', 'not-played-points'].forEach((layer) => {
         mapInstance.on('mouseenter', layer, () => {
           mapInstance.getCanvas().style.cursor = 'pointer';
@@ -464,7 +545,16 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
     } else {
       mapInstance.once('load', addClustering);
     }
-  }, [filteredCourses]);
+  }, [filteredCourses, mapLoaded, seasonColor]);
+
+  // Update played pin color when season color changes
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapLoaded) return;
+    if (map.getLayer('played-points')) {
+      map.setPaintProperty('played-points', 'circle-color', seasonColor);
+    }
+  }, [seasonColor, mapLoaded]);
 
   const handleResetView = useCallback(() => {
     if (!mapRef.current || !regionConfig) return;
@@ -494,7 +584,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
       'top100-map-shell relative',
       fullHeight ? 'h-full' : 'space-y-2'
     )}>
-      {/* Map container - full-bleed to top when fullHeight */}
+      {/* Map container */}
       <div className={cn(
         'relative overflow-hidden',
         fullHeight ? 'absolute inset-0' : 'rounded-sq-lg',
@@ -509,7 +599,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           )}
         />
 
-        {/* Loading overlay with shimmer */}
+        {/* Loading overlay */}
         {(isLoading || !mapLoaded) && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-muted/80 dark:bg-background/80 backdrop-blur-sm">
             <div className="flex flex-col items-center gap-3">
@@ -519,7 +609,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           </div>
         )}
 
-        {/* Close / Back button - top-left, safe area aware */}
+        {/* Close / Back button */}
         {onClose && (
           <button
             onClick={onClose}
@@ -531,7 +621,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           </button>
         )}
 
-        {/* Top overlay zone - Legend as premium glass pills (with safe area for notch) */}
+        {/* Legend badges — dynamic season color */}
         <div className="pointer-events-none absolute top-0 left-0 right-0 z-20 px-3 pt-[calc(max(env(safe-area-inset-top,0px),47px)+12px)]">
           <div 
             className="pointer-events-auto flex items-center gap-2 w-fit ml-auto"
@@ -539,7 +629,11 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             aria-label="Map legend"
           >
             <div className="glass-card flex items-center gap-1.5 px-3 py-2 rounded-full">
-              <span className="inline-block h-2.5 w-2.5 rounded-full bg-[#3EBD93] shadow-sm" aria-hidden="true" />
+              <span 
+                className="inline-block h-2.5 w-2.5 rounded-full shadow-sm" 
+                style={{ backgroundColor: seasonColor }}
+                aria-hidden="true" 
+              />
               <span className="text-[11px] font-medium text-white/90">Played</span>
             </div>
             <div className="glass-card flex items-center gap-1.5 px-3 py-2 rounded-full">
@@ -547,27 +641,25 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
               <span className="text-[11px] font-medium text-white/90">Want to Play</span>
             </div>
             <div className="glass-card flex items-center gap-1.5 px-3 py-2 rounded-full">
-              <span className="inline-block h-2.5 w-2.5 rounded-full border-[1.5px] border-white/60 bg-transparent" aria-hidden="true" />
+              <span className="inline-block h-2.5 w-2.5 rounded-full border-[1.5px] border-white/60 bg-white/50" aria-hidden="true" />
               <span className="text-[11px] font-medium text-white/90">Not Played</span>
             </div>
           </div>
         </div>
 
-        {/* Bottom-right control stack: orb + zoom controls - positioned above footer */}
+        {/* Bottom-right control stack */}
         <div className="pointer-events-none absolute right-3 bottom-36 z-20 flex flex-col items-center gap-2.5">
-          {/* Progress orb */}
           <div className="pointer-events-auto">
             <MapProgressOrb
               playedCount={ratedCount}
               totalCount={officialTotal}
               scope={scope}
+              seasonColor={seasonColor}
               onMilestoneClick={() => navigate('/top100?tab=my-progress')}
             />
           </div>
           
-          {/* Unified control buttons - liquid glass */}
           <div className="pointer-events-auto flex flex-col gap-2">
-            {/* Zoom controls */}
             <div 
               className="glass-card flex flex-col rounded-xl overflow-hidden"
               role="group"
@@ -607,7 +699,6 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
               </button>
             </div>
             
-            {/* Reset view button */}
             <button
               onClick={handleResetView}
               className="glass-card flex items-center justify-center w-11 h-11 rounded-xl text-white/70 hover:bg-white/10 active:bg-white/20 active:scale-[0.92] transition-all duration-150"
@@ -618,7 +709,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           </div>
         </div>
 
-        {/* Empty state overlay for 0 courses played - positioned above footer */}
+        {/* Empty state */}
         {ratedCount === 0 && !isLoading && mapLoaded && (
           <div className="pointer-events-none absolute inset-x-0 bottom-44 z-10 flex justify-center">
             <div className="glass-card pointer-events-auto px-4 py-3 rounded-xl text-center">
@@ -630,7 +721,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         )}
       </div>
 
-      {/* Course bottom sheet - fixed, positioned above filters */}
+      {/* Course bottom sheet */}
       <MapCourseSheet
         course={selectedCourse}
         onClose={() => setSelectedCourse(null)}
@@ -638,45 +729,43 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         filterTrayHeight={162}
       />
 
-      {/* Fixed bottom control tray - liquid glass with progress bar */}
+      {/* FIX 6: Fixed bottom control tray - DARK glass */}
       <div 
         className="fixed bottom-0 left-0 right-0 z-30 rounded-t-3xl px-5 pt-4 pb-[calc(max(0.75rem,env(safe-area-inset-bottom,0px))+12px)]"
         style={{
-          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.18) 50%, rgba(255, 255, 255, 0.22) 100%)',
+          background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.45) 100%)',
           backdropFilter: 'blur(28px) saturate(1.6)',
           WebkitBackdropFilter: 'blur(28px) saturate(1.6)',
-          border: '1px solid rgba(255, 255, 255, 0.35)',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
           borderBottom: 'none',
-          boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+          boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
         }}
       >
         <div className="space-y-3">
-          {/* Progress bar - orange accent on glass */}
+          {/* Progress bar — season color */}
           <div className="relative">
-            <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
-              {/* Glow behind */}
+            <div className="h-1.5 bg-white/15 rounded-full overflow-hidden">
               <div 
                 className="absolute inset-0 rounded-full blur-sm opacity-60"
                 style={{
-                  background: '#3EBD93',
+                  background: seasonColor,
                   width: `${progressPercent}%`,
                   transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
                 }}
               />
-              {/* Main bar */}
               <div 
                 className="h-full rounded-full relative z-10 transition-all duration-700 ease-out"
                 style={{ 
                   width: `${progressPercent}%`,
-                  background: '#3EBD93'
+                  background: seasonColor
                 }}
               />
             </div>
           </div>
 
-          {/* Status filter row - glass pills */}
+          {/* Status filter row — dark glass pills */}
           <div 
-            className="flex items-center gap-1 p-1 rounded-xl bg-white/10"
+            className="flex items-center gap-1 p-1 rounded-xl bg-white/8"
             role="group"
             aria-label="Filter courses by status"
           >
@@ -700,7 +789,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                     'active:scale-[0.96]',
                     isActive
                       ? 'bg-white/90 text-foreground shadow-sm'
-                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                      : 'text-white/60 hover:text-white/80 hover:bg-white/[0.08]'
                   )}
                 >
                   {labels[filter]}
@@ -709,7 +798,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             })}
           </div>
 
-          {/* Region chips row - glass pills */}
+          {/* Region chips row — dark glass pills */}
           <div 
             className="flex items-center gap-1.5"
             role="group"
@@ -730,7 +819,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                     'active:scale-[0.96]',
                     isActive
                       ? 'bg-white/90 text-foreground border-white/50 shadow-sm'
-                      : 'bg-white/10 border-white/20 text-white/70 hover:border-white/40 hover:bg-white/20 hover:text-white'
+                      : 'bg-white/[0.08] border-white/12 text-white/60 hover:border-white/30 hover:bg-white/[0.12] hover:text-white/80'
                   )}
                 >
                   {labels[regionScope]}
