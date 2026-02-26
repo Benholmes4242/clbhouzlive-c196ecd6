@@ -6,7 +6,7 @@ import { MapIcon } from 'lucide-react';
 
 mapboxgl.accessToken = MAP_CONFIG.TOKEN;
 
-const ROTATION_SPEED = 0.3;
+const ROTATION_SPEED = 0.15;
 const RESUME_DELAY = 3000;
 
 interface MiniGlobePreviewProps {
@@ -20,7 +20,7 @@ export const MiniGlobePreview: React.FC<MiniGlobePreviewProps> = ({
   playedCoordinates,
   seasonColor,
   onTapExplore,
-  height = 220,
+  height = 264,
 }) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -98,6 +98,7 @@ export const MiniGlobePreview: React.FC<MiniGlobePreviewProps> = ({
       applyClbhouzMapStyle(map, {
         showPlaceLabels: false,
         showWaterLabels: false,
+        showContinentLabels: true,
       });
 
       map.setFog({
