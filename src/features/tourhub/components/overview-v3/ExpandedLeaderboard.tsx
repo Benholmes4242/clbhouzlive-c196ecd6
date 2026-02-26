@@ -3,7 +3,7 @@
  * Dark-glass aesthetic with sticky column headers and internal scrolling.
  */
 
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import type { Database } from '@/integrations/supabase/types';
 
@@ -173,7 +173,7 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({ entr
           style={{ width: 32, height: 33, borderRadius: '34%', border: '1.5px solid #F8FAFC', background: '#F8FAFC' }}
         >
           {photoUrl ? (
-            <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }} />
+            <img src={photoUrl} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover object-top" onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }} />
           ) : (
             <div className="w-full h-full flex items-center justify-center" style={{ background: '#F8FAFC', fontSize: 8, fontWeight: 600, color: '#64748B' }}>{initials}</div>
           )}
@@ -225,6 +225,15 @@ interface ExpandedLeaderboardListProps {
 }
 
 export function ExpandedLeaderboardList({ entries, tourCode, onTouchStart, onTouchMove, onTouchEnd }: ExpandedLeaderboardListProps) {
+  const [visibleCount, setVisibleCount] = useState(30);
+
+  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 200) {
+      setVisibleCount(prev => Math.min(prev + 30, entries.length));
+    }
+  }, [entries.length]);
+
   return (
     <div
       role="list"
@@ -240,12 +249,12 @@ export function ExpandedLeaderboardList({ entries, tourCode, onTouchStart, onTou
         touchAction: 'pan-y',
         paddingTop: 8,
       }}
+      onScroll={handleScroll}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
-      {/* Column headers removed for cleaner look */}
-      {entries.map((entry) => (
+      {entries.slice(0, visibleCount).map((entry) => (
         <ExpandedLeaderboardRow
           key={entry.id}
           entry={entry}
