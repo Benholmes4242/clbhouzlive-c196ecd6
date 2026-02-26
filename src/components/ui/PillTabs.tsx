@@ -14,8 +14,7 @@ interface PillTabsProps {
 }
 
 /**
- * Shared pill-style tab component used across Media and Reviews tabs.
- * Selected state uses light slate background with consistent styling.
+ * Shared tab component with orange underline active state.
  */
 export const PillTabs: React.FC<PillTabsProps> = ({
   options,
@@ -24,7 +23,7 @@ export const PillTabs: React.FC<PillTabsProps> = ({
   className,
 }) => {
   return (
-    <div className={cn('flex items-center gap-2 flex-wrap', className)}>
+    <div className={cn('flex items-center gap-1', className)}>
       {options.map((option) => {
         const isActive = activeId === option.id;
         
@@ -33,11 +32,11 @@ export const PillTabs: React.FC<PillTabsProps> = ({
             key={option.id}
             onClick={() => onChange(option.id)}
             className={cn(
-              'px-4 py-2 rounded-full text-sm font-medium transition-all',
-              'border',
+              'relative px-3 py-2 min-h-[44px] text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.97]',
+              'after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:rounded-full after:transition-all after:duration-200',
               isActive
-                ? 'bg-slate-100 text-slate-900 border-slate-200'
-                : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                ? 'text-foreground font-semibold after:bg-[hsl(var(--tab-orange))]'
+                : 'text-muted-foreground font-medium hover:text-foreground after:bg-transparent'
             )}
             type="button"
           >

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 
 export interface SegmentedTabOption {
   value: string;
@@ -14,31 +15,28 @@ interface SegmentedTabsProps {
 }
 
 /**
- * Global SegmentedTabs component
- * Uses consistent styling across all tabs in the application
- * - Uses global radius token (var(--radius) = 0.5rem/8px)
- * - Matches Golf Courses page tab styling
- * - Reusable for any tabbed interface
+ * Global SegmentedTabs component — orange underline pattern
  */
 export function SegmentedTabs({ options, value, onChange, className = '' }: SegmentedTabsProps) {
   return (
     <Tabs value={value} onValueChange={onChange}>
       <TabsList 
-        className={`grid w-full rounded-sq-md bg-muted/70 border border-border/60 px-1.5 py-1.5 ${className}`}
-        style={{ 
-          gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))`
-        }}
+        className={cn(
+          'flex items-center gap-1 bg-transparent border-0 p-0 h-auto',
+          className
+        )}
       >
         {options.map((option) => (
           <TabsTrigger 
             key={option.value}
             value={option.value}
-            className="rounded-sq-sm text-sm px-3 py-1 font-medium 
-              data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:text-foreground data-[state=active]:font-semibold
-              data-[state=active]:border-b-2 data-[state=active]:border-primary/60
-              text-muted-foreground hover:text-foreground 
-              active:scale-[0.97] 
-              transition-all duration-motion-fast ease-standard"
+            className="relative text-sm px-3 py-2 min-h-[44px] font-medium bg-transparent border-0 shadow-none rounded-none
+              data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground data-[state=active]:font-semibold
+              text-muted-foreground hover:text-foreground
+              active:scale-[0.97] transition-all duration-200
+              after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:rounded-full after:transition-all after:duration-200
+              data-[state=active]:after:bg-[hsl(var(--tab-orange))]
+              data-[state=inactive]:after:bg-transparent"
           >
             {option.label}
           </TabsTrigger>
