@@ -12,10 +12,10 @@ const RESUME_DELAY = 3000;
 // Shared fog config — matches full map (FIX 10)
 const GLOBE_FOG_CONFIG: mapboxgl.FogSpecification = {
   color: 'rgb(220, 215, 206)',
-  'high-color': 'rgb(180, 190, 210)',
-  'horizon-blend': 0.08,
+  'high-color': 'rgb(160, 172, 192)',
+  'horizon-blend': 0.04,
   'space-color': 'rgb(8, 10, 22)',
-  'star-intensity': 0.12,
+  'star-intensity': 0.06,
 };
 
 // FIX 5: Continent centroids for custom label layer
@@ -269,7 +269,7 @@ export const MiniGlobePreview: React.FC<MiniGlobePreviewProps> = ({
       <div
         className="pointer-events-none absolute inset-0 rounded-2xl"
         style={{
-          boxShadow: 'inset 0 0 40px rgba(0,0,0,0.25)',
+          boxShadow: 'inset 0 0 30px rgba(0,0,0,0.2)',
         }}
       />
 
