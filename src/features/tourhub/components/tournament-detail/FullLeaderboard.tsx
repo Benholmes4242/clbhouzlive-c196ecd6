@@ -62,7 +62,7 @@ interface FullLeaderboardProps {
 }
 
 function ScoreCell({ score, className }: { score: number | null; className?: string }) {
-  if (score === null || score === undefined) {
+  if (score === null || score === undefined || score <= 0) {
     return <span className={cn("text-muted-foreground/50", className)} style={{ fontVariantNumeric: 'tabular-nums' }}>—</span>;
   }
   return <span className={cn("font-semibold text-foreground", className)} style={{ fontVariantNumeric: 'tabular-nums' }}>{score}</span>;
