@@ -53,7 +53,6 @@ import { AchievementsSkeleton } from '@/components/skeletons/AchievementsSkeleto
 import { ActivityPageSkeleton } from '@/components/skeletons/ActivityPageSkeleton';
 import { HubSkeleton } from '@/components/skeletons/HubSkeleton';
 import { RateCoursePageSkeleton } from '@/components/skeletons/RateCoursePageSkeleton';
-import { HubProvider } from '@/features/hub/useHub';
 import { initRecentMediaListener } from '@/hooks/usePostSubmission/recentMediaListener';
 import { longPressHandler } from '@/utils/longPressHandler';
 import AppShell from '@/components/AppShell';
@@ -172,34 +171,14 @@ const AdminTourPage = lazy(() => import("./pages/admin/AdminTourPage").then(m =>
 const ChannelProfile = lazy(() => import("./pages/ChannelProfile"));
 const GameDetailView = lazy(() => import("./features/game/GameDetailView"));
 
-// Hub components (lazy load when feature flag is enabled)
-const HubHomePage = lazy(() => import("./features/hub/pages/HubPageNew").then(m => ({ default: m.HubPageNew })));
-const HubGolfersPage = lazy(() => import("./features/hub/pages/HubGolfersPage").then(m => ({ default: m.HubGolfersPage })));
-const HubEchoChatPage = lazy(() => import("./features/hub/pages/HubEchoChatPage").then(m => ({ default: m.HubEchoChatPage })));
+// Hub lazy imports removed — Hub page decommissioned
 
 // Echo full-page experience
 const EchoPage = lazy(() => import("./pages/EchoPage"));
-const HubCreateGamePage = lazy(() => import("./features/hub/pages/HubCreateGamePage").then(m => ({ default: m.HubCreateGamePage })));
-const HubGamesPage = lazy(() => import("./features/hub/pages/HubGamesPage").then(m => ({ default: m.HubGamesPage })));
-const HubYourGamesPage = lazy(() => import("./features/hub/pages/HubYourGamesPage").then(m => ({ default: m.HubYourGamesPage })));
-const HubMessagesListPage = lazy(() => import("./features/hub/pages/HubMessagesListPage").then(m => ({ default: m.HubMessagesListPage })));
-const HubChatPlaceholderPage = lazy(() => import("./features/hub/pages/HubChatPlaceholderPage").then(m => ({ default: m.HubChatPlaceholderPage })));
-const HubEchoHistoryPage = lazy(() => import("./features/hub/pages/HubEchoHistoryPage").then(m => ({ default: m.HubEchoHistoryPage })));
-const HubEchoSharePage = lazy(() => import("./features/hub/pages/HubEchoSharePage").then(m => ({ default: m.HubEchoSharePage })));
-const HubEchoTagsPage = lazy(() => import("./features/hub/pages/HubEchoTagsPage"));
-const HubEchoHistoryDetailPage = lazy(() => import("./features/hub/pages/HubEchoHistoryDetailPage"));
-const GameDetailPage = lazy(() => import("./features/hub/pages/GameDetailPage").then(m => ({ default: m.GameDetailPage })));
-const TripDetailPage = lazy(() => import("./features/hub/pages/TripDetailPage").then(m => ({ default: m.TripDetailPage })));
-const HubTripPage = lazy(() => import("./features/hub/pages/HubTripPage"));
 
 // Games feature pages
 const DiscoverGamesPage = lazy(() => import("./features/games/pages/DiscoverGamesPage"));
 
-// Simple redirect component for /hub/game/:id → /game/:id
-function HubGameRedirect() {
-  const { id } = useParams<{ id: string }>();
-  return <Navigate to={`/game/${id}`} replace />;
-}
 
 // Public Echo Share Page
 const EchoSharePage = lazy(() => import("./pages/EchoSharePage").then(m => ({ default: m.EchoSharePage })));
@@ -520,25 +499,9 @@ function AppRoutes() {
         <Route path="/tourhub/college-golf/compare" element={<Suspense fallback={<GenericPageSkeleton />}><TourNavWrapper><CollegeComparePage /></TourNavWrapper></Suspense>} />
         <Route path="/tourhub/college-golf/:collegeSlug" element={<Suspense fallback={<GenericPageSkeleton />}><TourNavWrapper><CollegeProfilePage /></TourNavWrapper></Suspense>} />
         
-        {/* Hub routes - standard pages */}
-        <Route path="/hub" element={<Suspense fallback={<HubSkeleton />}><HubHomePage /></Suspense>} />
-        <Route path="/hub/golfers" element={<Suspense fallback={<HubSkeleton />}><HubGolfersPage /></Suspense>} />
-        <Route path="/hub/echo" element={<Suspense fallback={<HubSkeleton />}><HubEchoChatPage /></Suspense>} />
-        <Route path="/hub/create-game" element={<Suspense fallback={<HubSkeleton />}><HubCreateGamePage /></Suspense>} />
-        <Route path="/hub/games" element={<Suspense fallback={<HubSkeleton />}><HubGamesPage /></Suspense>} />
-        <Route path="/hub/games/:gameId" element={<Suspense fallback={<HubSkeleton />}><GameDetailPage /></Suspense>} />
-        <Route path="/hub/trips/:tripId" element={<Suspense fallback={<HubSkeleton />}><TripDetailPage /></Suspense>} />
-        <Route path="/hub/your-games" element={<Suspense fallback={<HubSkeleton />}><HubYourGamesPage /></Suspense>} />
-        <Route path="/hub/messages" element={<Suspense fallback={<HubSkeleton />}><HubMessagesListPage /></Suspense>} />
-        <Route path="/hub/messages/:conversationId" element={<Suspense fallback={<HubSkeleton />}><HubChatPlaceholderPage /></Suspense>} />
-        <Route path="/hub/echo/history" element={<Suspense fallback={<HubSkeleton />}><HubEchoHistoryPage /></Suspense>} />
-        <Route path="/hub/echo/history/chat/:id" element={<Suspense fallback={<HubSkeleton />}><HubEchoHistoryDetailPage /></Suspense>} />
-        <Route path="/hub/echo/tags" element={<Suspense fallback={<HubSkeleton />}><HubEchoTagsPage /></Suspense>} />
-        <Route path="/echo/share/:token" element={<Suspense fallback={<HubSkeleton />}><HubEchoSharePage /></Suspense>} />
-        <Route path="/hub/new" element={<Navigate to="/hub/echo/history" replace />} />
-        <Route path="/hub/trip/:tripId" element={<Suspense fallback={<HubSkeleton />}><HubTripPage /></Suspense>} />
-        {/* Redirect /hub/game/:id to /game/:id */}
-        <Route path="/hub/game/:id" element={<HubGameRedirect />} />
+        {/* Hub routes removed — redirects to clubhouse */}
+        <Route path="/hub" element={<Navigate to="/clubhouse" replace />} />
+        <Route path="/hub/*" element={<Navigate to="/clubhouse" replace />} />
         
         <Route path="*" element={<Suspense fallback={<GenericPageSkeleton />}><NotFound /></Suspense>} />
       </Routes>
@@ -693,7 +656,6 @@ const AppInner: React.FC = () => {
                 
                   <UIProvider>
                     <ToastHost>
-                      <HubProvider>
                         <ActiveActorProvider>
                           
                           <ScrollToTop />
@@ -734,7 +696,6 @@ const AppInner: React.FC = () => {
                           <Sonner />
                           <GlobalBottomNavigation />
                         </ActiveActorProvider>
-                      </HubProvider>
                     </ToastHost>
                   </UIProvider>
                 

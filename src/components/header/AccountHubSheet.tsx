@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { Check, Plus, User, Bell, Upload, Settings, Building2, Shield, LogOut, ChevronRight, Sparkles, MessageCircle } from 'lucide-react';
+import { Check, Plus, User, Bell, Upload, Settings, Building2, Shield, LogOut, ChevronRight, Sparkles, MessageCircle, Activity } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
@@ -440,7 +440,7 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
 
           {/* Quick Actions Row */}
           <div style={{ padding: `12px ${SHEET_PADDING}px` }}>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <QuickActionButton
                 icon={<User className="w-[18px] h-[18px]" />}
                 label="View profile"
@@ -448,6 +448,12 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
                 useLightTheme={useLightTheme}
                 onMouseEnter={prefetchHandlers.onMouseEnter}
                 onTouchStart={prefetchHandlers.onTouchStart}
+              />
+              <QuickActionButton
+                icon={<Activity className="w-[18px] h-[18px]" />}
+                label="Echo"
+                onClick={() => handleNavigate('/echo')}
+                useLightTheme={useLightTheme}
               />
               <QuickActionButton
                 icon={<MessageCircle className="w-[18px] h-[18px]" />}

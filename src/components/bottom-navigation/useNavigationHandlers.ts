@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { navigationTabs } from './navigationTabs';
-import { useHub } from '@/features/hub/useHub';
 
 import { prefetchClubhouseVideos } from '@/utils/clubhouseVideoPrefetch';
 import { prefetchProfileVideos, resolveUsernameToId } from '@/utils/profileVideoPrefetch';
@@ -10,7 +9,6 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 export const useNavigationHandlers = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { open: openHub } = useHub();
   const { activeActor } = useActiveActor();
   const [activeTab, setActiveTab] = useState('clubhouse');
 
@@ -22,9 +20,6 @@ export const useNavigationHandlers = () => {
       setActiveTab('clubhouse');
     } else if (location.pathname.startsWith('/tourhub')) {
       setActiveTab('tourhub');
-    } else if (location.pathname.startsWith('/hub')) {
-      // Keep hub icon active for all /hub/* routes
-      setActiveTab('hub');
     }
   }, [location.pathname]);
 
@@ -40,12 +35,9 @@ export const useNavigationHandlers = () => {
     if (tab.path) {
       console.log('useNavigationHandlers: Navigating to:', tab.path);
       setActiveTab(tab.id);
-      
 
-      // If navigating to Hub, use Hub context to capture origin
-      if (tab.path === '/hub' || tab.path.startsWith('/hub')) {
-        openHub();
-      } else if (tab.path === '/profile') {
+
+      if (tab.path === '/profile') {
         // Profile tab: navigate to business profile when acting as business
         if (activeActor?.type === 'business' && activeActor?.slug) {
           navigate(`/business/${activeActor.slug}`, { replace: true });

@@ -20,7 +20,7 @@ import './index.css'
 import './styles/superellipse.css'
 import './styles/theme.css'
 import './styles/theme-tokens.css'
-import '@/features/hub/home/hubTheme.css'
+
 import { initializePerformanceMonitoring } from './utils/performanceInit'
 import { initWebVitals, sendToAnalytics, initPerformanceObserver } from './analytics/webVitals'
 import './utils/echoDocNavHeight'

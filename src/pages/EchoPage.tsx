@@ -83,7 +83,11 @@ export default function EchoPage() {
 
   const handleBack = useCallback(() => {
     haptic('light');
-    navigate('/hub');
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/clubhouse');
+    }
   }, [navigate]);
 
   const handleNewChat = useCallback(() => {

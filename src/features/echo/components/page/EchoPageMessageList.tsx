@@ -6,9 +6,9 @@
 import React, { useRef, useEffect, useState, useCallback, TouchEvent } from 'react';
  import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Loader2 } from 'lucide-react';
- import { EchoResponseCard } from '@/features/hub/components/echo-v2/EchoResponseCard';
- import { EchoUserBubble } from '@/features/hub/components/echo-v2/EchoUserBubble';
- import { EchoThinkingCard } from '@/features/hub/components/echo-v2/EchoThinkingCard';
+ import { EchoResponseCard } from '@/features/echo/components/ui/EchoResponseCard';
+ import { EchoUserBubble } from '@/features/echo/components/ui/EchoUserBubble';
+ import { EchoThinkingCard } from '@/features/echo/components/ui/EchoThinkingCard';
  import type { EchoMessage } from '@/features/echo/state/echoTypes';
  import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
