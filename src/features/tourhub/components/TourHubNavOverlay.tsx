@@ -206,16 +206,20 @@ export function TourHubNavOverlay({
         : null;
       return (
         <p className="text-[13px] mt-1 text-muted-foreground">
-          <span 
-            className="font-medium transition-opacity active:opacity-70 cursor-pointer"
-            onClick={(e) => {
-              e.stopPropagation();
-              if (leaderTeaser.playerId) handlePlayerClick(leaderTeaser.playerId);
-            }}
-          >
-            {leaderTeaser.playerName}
-          </span>
-          {' leads at '}
+          {leaderTeaser.isTied ? (
+            <span className="font-medium">{leaderTeaser.playerName}</span>
+          ) : (
+            <span 
+              className="font-medium transition-opacity active:opacity-70 cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (leaderTeaser.playerId) handlePlayerClick(leaderTeaser.playerId);
+              }}
+            >
+              {leaderTeaser.playerName}
+            </span>
+          )}
+          {leaderTeaser.isTied ? ' at ' : ' leads at '}
           {scoreStr !== null && (
             <span style={{ color: leaderTeaser.score !== null && leaderTeaser.score < 0 ? TOUR_COLORS.scoreUnderPar : undefined }}>
               {scoreStr}

@@ -125,7 +125,7 @@ export function StatusBar({
         <>
           <span className="text-xs text-emerald-600/60">·</span>
           <span className="text-xs font-medium text-emerald-700 truncate">
-            {leaderName} leads{leaderScore ? ` at ${leaderScore}` : ''}
+            {leaderName}{leaderScore ? ` at ${leaderScore}` : ''}
           </span>
         </>
       )}
