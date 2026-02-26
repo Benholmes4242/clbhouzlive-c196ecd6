@@ -203,10 +203,11 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby="course-sheet-title"
-        className="glass-card fixed left-0 right-0 bottom-0 z-50 flex flex-col !rounded-b-none"
+        className="glass-card fixed left-0 right-0 bottom-0 z-50 flex flex-col !rounded-b-none !overflow-visible"
         style={{ 
           borderRadius: '24px 24px 0 0',
           borderBottom: 'none',
+          position: 'fixed',
         }}
       >
         {/* Drag handle */}
