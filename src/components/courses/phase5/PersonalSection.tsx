@@ -51,11 +51,11 @@ export const PersonalSection: React.FC<PersonalSectionProps> = ({
   }
 
   return (
-    <section className={cn("px-4 py-5 bg-white space-y-5", className)}>
+    <section className={cn("px-4 py-5 bg-card space-y-5", className)}>
       {/* Section header */}
       <div className="flex items-center gap-2">
-        <User className="h-4 w-4 text-slate-500" />
-        <h3 className="text-base font-semibold text-slate-900">Your Journey</h3>
+        <User className="h-4 w-4 text-muted-foreground" />
+        <h3 className="text-base font-semibold text-foreground">Your Journey</h3>
       </div>
 
       {/* Status toggle - always show */}

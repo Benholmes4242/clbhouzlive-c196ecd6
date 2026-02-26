@@ -364,7 +364,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         {/* Skeleton reviews */}
         <section className="px-4 pt-3 pb-4 bg-muted space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="rounded-2xl bg-card shadow-sm px-4 py-3 animate-pulse">
+            <div key={i} className="rounded-2xl bg-card border border-border px-4 py-3 animate-pulse">
               <div className="flex gap-3">
                 <div className="w-10 h-10 bg-muted rounded-lg" />
                 <div className="flex-1 space-y-2">
@@ -473,7 +473,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
             placeholder="Search reviews (name or keywords)"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-11 pl-10 pr-10 border border-border bg-card text-base placeholder:text-[15px] placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-border focus:ring-offset-1 focus:border-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition rounded-sq-sm"
+            className="w-full h-11 pl-10 pr-10 border border-border bg-card text-base placeholder:text-[15px] placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-border focus:ring-offset-1 focus:border-foreground transition rounded-sq-sm"
           />
           {/* Clear button */}
           {searchQuery && (

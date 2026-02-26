@@ -142,7 +142,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   const progress = isVisible ? (communityAverage / 10) * circumference : 0;
 
   return (
-    <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+    <div className="bg-card rounded-2xl border border-border overflow-hidden">
       {/* Header */}
       <div className="p-5 pb-4">
         <div className="flex items-start justify-between">
@@ -207,7 +207,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
       {/* Highlights */}
       {highlights && highlights.length > 0 && (
         <div className="px-5 pb-4">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[1.5px] mb-2">
             Highlights
           </p>
           <div className="flex flex-wrap gap-2">

@@ -63,7 +63,7 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
     <button
       type="button"
       onClick={() => navigate('/golferssharedcourses')}
-      className="w-full rounded-3xl bg-card shadow-sm px-4 py-4 flex items-center justify-between hover:bg-muted/60 transition text-left"
+      className="w-full rounded-2xl bg-card border border-border px-4 py-4 flex items-center justify-between hover:bg-muted/60 transition text-left"
     >
       <div className="flex flex-col min-w-0 flex-1">
         <span className="text-sm font-medium text-foreground">

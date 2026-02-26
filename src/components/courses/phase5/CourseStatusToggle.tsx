@@ -93,7 +93,7 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
           className={cn(
             "flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all active:scale-95",
             isPlayed
-              ? `${playedBgColor} text-white shadow-md ${playedShadowColor}`
+              ? `${playedBgColor} text-white ${playedShadowColor}`
               : "bg-muted text-muted-foreground hover:bg-secondary"
           )}
         >

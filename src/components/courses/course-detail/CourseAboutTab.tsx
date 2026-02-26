@@ -161,7 +161,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       </section>
 
       {/* Spacer */}
-      <div className="h-3 bg-muted" />
+      <div className="h-6 bg-muted" />
 
       {/* 3. Your Journey Section */}
       {user && (
@@ -169,7 +169,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       )}
 
       {/* Spacer */}
-      <div className="h-3 bg-muted" />
+      <div className="h-6 bg-muted" />
 
       {/* 4. Friends Who've Played */}
       <section className="px-4 pt-4 pb-4 bg-muted md:px-6">
@@ -177,7 +177,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       </section>
 
       {/* Spacer */}
-      <div className="h-3 bg-muted" />
+      <div className="h-6 bg-muted" />
 
       {/* 5. About Section */}
       {course.description && (
@@ -239,7 +239,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       )}
 
       {/* Spacer */}
-      <div className="h-3 bg-muted" />
+      <div className="h-6 bg-muted" />
 
       {/* 6. Top 100 Spotlight */}
       {course.id && (
@@ -255,7 +255,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <CourseTop100Summary />
 
       {/* Spacer */}
-      <div className="h-3 bg-muted" />
+      <div className="h-6 bg-muted" />
 
       {/* 8. Location Section */}
       <section className="pt-6 pb-5 bg-muted md:pt-8">
@@ -290,7 +290,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       </section>
 
       {/* Spacer */}
-      <div className="h-3 bg-muted" />
+      <div className="h-6 bg-muted" />
 
       {/* 9. CTA for users who haven't rated yet */}
       {user && !userRating && ratingAggregates && ratingAggregates.review_count > 0 && (
@@ -306,7 +306,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       )}
 
       {/* Spacer */}
-      <div className="h-3 bg-muted" />
+      <div className="h-6 bg-muted" />
 
       {/* Claim This Course CTA - only for unclaimed courses with a club_id */}
       {!courseClaim && course.club_id && (
@@ -317,7 +317,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       )}
 
       {/* Spacer */}
-      <div className="h-3 bg-muted" />
+      <div className="h-6 bg-muted" />
 
       {/* 10. Media Section */}
       <section className="pt-6 pb-5 bg-muted space-y-3 md:pt-8">
@@ -328,7 +328,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       </section>
 
       {/* Spacer */}
-      <div className="h-3 bg-muted" />
+      <div className="h-6 bg-muted" />
 
       {/* 11. Explore More Links */}
       <CourseExploreLinks course={course} />

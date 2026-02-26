@@ -73,12 +73,12 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
         return (
           <div key={item.key} className="flex items-center gap-2">
             {/* Label - consistent width */}
-            <span className="w-[76px] text-[13px] text-slate-600 shrink-0">
+            <span className="w-[76px] text-[13px] text-muted-foreground shrink-0">
               {item.label}
             </span>
 
             {/* Bar track */}
-            <div className="flex-1 h-[6px] bg-[#e5e7eb] rounded-full overflow-hidden">
+            <div className="flex-1 h-[6px] bg-secondary rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-300"
                 style={{
@@ -89,7 +89,7 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
             </div>
 
             {/* Count - tabular numerals for alignment */}
-            <span className="w-6 text-right text-xs text-slate-500 tabular-nums shrink-0">
+            <span className="w-6 text-right text-xs text-muted-foreground/60 tabular-nums shrink-0">
               {item.count}
             </span>
           </div>
