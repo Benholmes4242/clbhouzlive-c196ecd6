@@ -217,23 +217,6 @@ export function TournamentDetailPage() {
             {/* Champion section for completed tournaments */}
             {isCompleted && tournamentId && <EventWinnerCard tournamentId={tournamentId} />}
             
-            {/* Champion placeholder — only for non-completed tournaments */}
-            {!isCompleted && (
-              <motion.div
-                className="py-6 border-t border-border"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-              >
-                <div className="flex flex-col items-center text-center py-6 space-y-3">
-                  <Trophy className="w-12 h-12 text-amber-500/60" />
-                  <h3 className="text-base font-semibold text-foreground">Champion unlocking soon</h3>
-                  <p className="text-xs text-muted-foreground max-w-[260px]">
-                    Official results will appear once the event concludes
-                  </p>
-                </div>
-              </motion.div>
-            )}
             {isCompleted && tournamentId && <EventMomentsList tournamentId={tournamentId} limit={5} />}
             
             {hasLeaderboard && (
