@@ -55,11 +55,11 @@ const REGION_CONFIG: Record<
 };
 
 // Marker colors - Played = slate, Want to Play = orange outline, Not Played = muted
-const PLAYED_COLOR = '#0F172A'; // slate-900 (dark)
+const PLAYED_COLOR = '#3EBD93'; // Season color (Pre-Season mint)
 const WANT_TO_PLAY_COLOR = '#F7931E'; // Orange stroke, hollow center
 const NOT_PLAYED_COLOR = '#94a3b8'; // Light grey (slate-400)
 const CLUSTER_COLOR_MIXED = '#334155'; // slate-700
-const CLUSTER_COLOR_MOSTLY_PLAYED = '#0F172A'; // slate-900 (not orange)
+const CLUSTER_COLOR_MOSTLY_PLAYED = '#3EBD93'; // Season color for played-majority clusters
 
 const Top100MapView: React.FC<Top100MapViewProps> = ({
   scope,
@@ -125,12 +125,13 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 
     mapRef.current = new mapboxgl.Map({
       container: mapContainerRef.current,
-      style: MAP_CONFIG.STYLE_URL,
+      style: 'mapbox://styles/mapbox/satellite-streets-v12',
       center: regionConfig.center,
       zoom: regionConfig.zoom,
       minZoom: 1.5,
       maxZoom: 12,
       attributionControl: false,
+      projection: 'globe',
     });
 
     const mapInstance = mapRef.current;
@@ -142,6 +143,17 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 
     mapInstance.on('load', () => {
       setMapLoaded(true);
+    });
+
+    // Globe atmosphere for cinematic space effect
+    mapInstance.on('style.load', () => {
+      mapInstance.setFog({
+        color: 'rgb(10, 15, 30)',
+        'high-color': 'rgb(20, 30, 60)',
+        'horizon-blend': 0.08,
+        'space-color': 'rgb(5, 8, 18)',
+        'star-intensity': 0.12,
+      });
     });
 
     return () => {
@@ -376,8 +388,8 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           'text-font': ['Inter Semi Bold', 'Arial Unicode MS Bold'],
         },
         paint: {
-          'text-color': '#1e293b',
-          'text-halo-color': '#ffffff',
+          'text-color': '#ffffff',
+          'text-halo-color': 'rgba(0,0,0,0.6)',
           'text-halo-width': 2,
           'text-halo-blur': 0.5,
           'text-opacity': [
@@ -506,7 +518,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           <button
             onClick={onClose}
             className="fixed left-4 z-40 w-11 h-11 flex items-center justify-center glass-card rounded-xl active:scale-[0.95] transition-transform"
-            style={{ top: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+            style={{ top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)' }}
             aria-label="Close map"
           >
             <ArrowLeft className="w-5 h-5 text-white" />
@@ -514,23 +526,23 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         )}
 
         {/* Top overlay zone - Legend as premium glass pills (with safe area for notch) */}
-        <div className="pointer-events-none absolute top-0 left-0 right-0 z-20 px-3 pt-[max(env(safe-area-inset-top,0px),47px)]">
+        <div className="pointer-events-none absolute top-0 left-0 right-0 z-20 px-3 pt-[calc(max(env(safe-area-inset-top,0px),47px)+12px)]">
           <div 
-            className="pointer-events-auto flex items-center gap-1.5 w-fit ml-auto"
+            className="pointer-events-auto flex items-center gap-2 w-fit ml-auto"
             role="group"
             aria-label="Map legend"
           >
-            <div className="glass-card flex items-center gap-1.5 px-2.5 py-1.5 rounded-full">
-              <span className="inline-block h-2.5 w-2.5 rounded-full bg-foreground shadow-sm" aria-hidden="true" />
-              <span className="text-[10px] font-medium text-white/90">Played</span>
+            <div className="glass-card flex items-center gap-1.5 px-3 py-2 rounded-full">
+              <span className="inline-block h-2.5 w-2.5 rounded-full bg-[#3EBD93] shadow-sm" aria-hidden="true" />
+              <span className="text-[11px] font-medium text-white/90">Played</span>
             </div>
-            <div className="glass-card flex items-center gap-1.5 px-2.5 py-1.5 rounded-full">
+            <div className="glass-card flex items-center gap-1.5 px-3 py-2 rounded-full">
               <span className="inline-block h-2.5 w-2.5 rounded-full border-2 border-[#F7931E] bg-transparent shadow-[0_0_4px_rgba(247,147,30,0.4)]" aria-hidden="true" />
-              <span className="text-[10px] font-medium text-white/90">Want to Play</span>
+              <span className="text-[11px] font-medium text-white/90">Want to Play</span>
             </div>
-            <div className="glass-card flex items-center gap-1.5 px-2.5 py-1.5 rounded-full">
-              <span className="inline-block h-2 w-2 rounded-full border-[1.5px] border-white/60 bg-transparent" aria-hidden="true" />
-              <span className="text-[10px] font-medium text-white/90">Not Played</span>
+            <div className="glass-card flex items-center gap-1.5 px-3 py-2 rounded-full">
+              <span className="inline-block h-2.5 w-2.5 rounded-full border-[1.5px] border-white/60 bg-transparent" aria-hidden="true" />
+              <span className="text-[11px] font-medium text-white/90">Not Played</span>
             </div>
           </div>
         </div>
@@ -617,19 +629,19 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         course={selectedCourse}
         onClose={() => setSelectedCourse(null)}
         scope={scope}
-        filterTrayHeight={150}
+        filterTrayHeight={162}
       />
 
       {/* Fixed bottom control tray - liquid glass with progress bar */}
       <div 
-        className="fixed bottom-0 left-0 right-0 z-30 rounded-t-3xl px-5 pt-4 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+        className="fixed bottom-0 left-0 right-0 z-30 rounded-t-3xl px-5 pt-4 pb-[calc(max(0.75rem,env(safe-area-inset-bottom,0px))+12px)]"
         style={{
-          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.14) 50%, rgba(255, 255, 255, 0.18) 100%)',
+          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.18) 50%, rgba(255, 255, 255, 0.22) 100%)',
           backdropFilter: 'blur(28px) saturate(1.6)',
           WebkitBackdropFilter: 'blur(28px) saturate(1.6)',
           border: '1px solid rgba(255, 255, 255, 0.35)',
           borderBottom: 'none',
-          boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+          boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
         }}
       >
         <div className="space-y-3">
@@ -640,7 +652,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
               <div 
                 className="absolute inset-0 rounded-full blur-sm opacity-60"
                 style={{
-                  background: 'hsl(var(--tab-orange))',
+                  background: '#3EBD93',
                   width: `${progressPercent}%`,
                   transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
                 }}
@@ -650,7 +662,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                 className="h-full rounded-full relative z-10 transition-all duration-700 ease-out"
                 style={{ 
                   width: `${progressPercent}%`,
-                  background: 'hsl(var(--tab-orange))'
+                  background: '#3EBD93'
                 }}
               />
             </div>
