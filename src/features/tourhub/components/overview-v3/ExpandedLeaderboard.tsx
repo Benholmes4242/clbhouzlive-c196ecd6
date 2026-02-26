@@ -232,11 +232,13 @@ export function ExpandedLeaderboardList({ entries, tourCode, onTouchStart, onTou
       className="expanded-lb-scroll"
       style={{
         flex: 1,
+        minHeight: 0,
         overflowY: 'auto',
         overflowX: 'hidden',
         WebkitOverflowScrolling: 'touch',
         overscrollBehavior: 'contain',
         touchAction: 'pan-y',
+        paddingTop: 8,
       }}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
