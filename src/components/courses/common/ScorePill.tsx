@@ -28,7 +28,7 @@ export const ScorePill: React.FC<ScorePillProps> = ({ score, size = 'md' }) => {
         baseClasses,
         isOutstanding 
           ? 'bg-[#f59e0b]/10 border-[#f59e0b]/30 text-[#d97706]'
-          : 'bg-[#CBD5E1]/10 border-[#CBD5E1]/20 text-[#94A3B8]'
+          : 'bg-[#A8A29E]/10 border-[#A8A29E]/20 text-[#78716C]'
       )}
     >
       {score === 10 ? '10' : score.toFixed(1)}

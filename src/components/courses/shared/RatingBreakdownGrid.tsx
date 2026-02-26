@@ -28,7 +28,7 @@ export const RatingBreakdownGrid: React.FC<RatingBreakdownGridProps> = ({
         const isOutstanding = score >= 9;
         const barColorClass = isOutstanding
           ? 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]'
-          : 'bg-[#d1d5db]';
+          : 'bg-[#A8A29E]';
 
         return (
           <div key={cat.label} className="flex flex-col gap-1">

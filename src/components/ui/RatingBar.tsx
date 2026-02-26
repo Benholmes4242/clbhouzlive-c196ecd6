@@ -36,7 +36,7 @@ export function RatingBar({
   return (
     <div
       className={cn(
-        'relative w-full h-1.5 bg-[#e5e7eb] rounded-full overflow-hidden',
+        'relative w-full h-1.5 bg-[#E7E5E4] rounded-full overflow-hidden',
         className
       )}
     >
@@ -45,7 +45,7 @@ export function RatingBar({
           'absolute inset-y-0 left-0 rounded-full transition-all duration-300',
           isOutstanding 
             ? 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]' 
-            : 'bg-[#d1d5db]'
+            : 'bg-[#A8A29E]'
         )}
         style={{ width: `${pct}%` }}
       />

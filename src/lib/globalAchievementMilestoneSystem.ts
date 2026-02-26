@@ -126,13 +126,13 @@ const RATING_AMBER_LIGHT = '#fbbf24'; // amber-400 for gradient end
 
 // All non-outstanding tiers use Slate styling
 const grayTheme = {
-  accent: RATING_SLATE,
-  bgLight: '#CBD5E10D',  // 5% opacity
-  bgDark: '#CBD5E11A',   // 10% opacity
-  bgClass: 'bg-[#CBD5E1]/10',
-  borderClass: 'border-[#CBD5E1]/20',
-  textClass: 'text-[#94A3B8]',  // slate-400 for text
-  barFillClass: 'bg-[#CBD5E1]', // slate-300 for bars
+  accent: '#A8A29E',
+  bgLight: '#A8A29E0D',  // 5% opacity
+  bgDark: '#A8A29E1A',   // 10% opacity
+  bgClass: 'bg-[#A8A29E]/10',
+  borderClass: 'border-[#A8A29E]/20',
+  textClass: 'text-[#78716C]',  // stone-500 for text
+  barFillClass: 'bg-[#A8A29E]', // warm stone for bars
 };
 
 // Outstanding uses Amber/Orange gradient styling
