@@ -134,25 +134,33 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({ entr
   const posDisplay = entry.position_tied ? `T${entry.position}` : `${entry.position ?? '-'}`;
   const thruDisplay = formatThru(entry);
   const isCut = entry.status === 'cut' || entry.status === 'wd' || entry.status === 'dq';
+  const isLeader = entry.position === 1;
+  const isChaser = !isLeader;
 
   return (
     <div
       role="listitem"
       className="flex items-center"
       style={{
-        padding: '10px 16px',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
+        padding: isLeader ? '10px 16px' : '10px 16px',
+        borderBottom: isLeader ? 'none' : '1px solid rgba(255,255,255,0.06)',
         opacity: isCut ? 0.4 : 1,
+        ...(isLeader ? {
+          background: 'rgba(255, 255, 255, 0.08)',
+          borderRadius: 10,
+          margin: '0 8px',
+          padding: '10px 8px',
+        } : {}),
       }}
     >
-      {/* Position */}
+      {/* Position — matches .leaderboard-position / chaser dimming */}
       <span style={{
-        width: 32,
+        width: 22,
         textAlign: 'center',
         flexShrink: 0,
         fontSize: 12,
         fontWeight: 600,
-        color: entry.position === 1 ? '#FACC15' : 'rgba(255,255,255,0.5)',
+        color: isChaser ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.5)',
         fontVariantNumeric: 'tabular-nums',
       }}>
         {posDisplay}
@@ -170,20 +178,24 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({ entr
             <div className="w-full h-full flex items-center justify-center" style={{ background: '#F8FAFC', fontSize: 8, fontWeight: 600, color: '#64748B' }}>{initials}</div>
           )}
         </div>
-        <span className="truncate" style={{ fontSize: 14, fontWeight: 500, color: '#FFFFFF' }}>
+        <span className="truncate" style={{
+          fontSize: 14,
+          fontWeight: isLeader ? 700 : 500,
+          color: isChaser ? 'rgba(255,255,255,0.85)' : '#FFFFFF',
+        }}>
           {displayName}
         </span>
       </div>
 
-      {/* To Par */}
+      {/* To Par — matches .leaderboard-score sizing */}
       <span style={{
         width: 56,
         textAlign: 'right',
         flexShrink: 0,
-        fontFamily: "'JetBrains Mono','SF Mono',monospace",
-        fontSize: 14,
-        fontWeight: 700,
-        color: getScoreColor(entry.score ?? null),
+        fontFamily: "'JetBrains Mono','SF Mono','Courier New',monospace",
+        fontSize: isLeader ? 22 : 16,
+        fontWeight: isLeader ? 800 : 700,
+        color: '#FFFFFF',
         fontVariantNumeric: 'tabular-nums',
       }}>
         {formatScore(entry.score ?? null)}
@@ -204,7 +216,6 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({ entr
     </div>
   );
 });
-
 interface ExpandedLeaderboardListProps {
   entries: LeaderboardEntryWithPlayer[];
   tourCode: string;
