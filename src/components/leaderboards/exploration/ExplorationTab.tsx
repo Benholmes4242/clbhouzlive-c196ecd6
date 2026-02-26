@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useLayoutEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExplorationLeaderboard, useUserExplorationStatus } from '@/hooks/leaderboards';
 import { useSeasonCalendar } from '@/hooks/championship';
@@ -16,9 +17,10 @@ import {
 } from '../shared';
 import { CountrySelector } from '../shared/CountrySelector';
 import { ExplorationPodium } from './ExplorationPodium';
-import { GlobalProgressMap } from './GlobalProgressMap';
+import { MiniGlobePreview } from './MiniGlobePreview';
 import { GlobalGolfersMapStatsRow } from './GlobalGolfersMapStatsRow';
 import { ClubSearchBar } from './ClubSearchBar';
+import { usePlayedCourseCoordinates } from '@/hooks/usePlayedCourseCoordinates';
 import type { LeaderboardScope, ExplorationMetric } from '@/types/leaderboards';
 
 // --- Constants ---
@@ -85,6 +87,7 @@ function loadSavedFilters() {
 
 export function ExplorationTab() {
   const { user } = useSupabaseSession();
+  const navigate = useNavigate();
   const savedFilters = useRef(loadSavedFilters()).current;
 
   // Season color derivation
@@ -217,6 +220,11 @@ export function ExplorationTab() {
 
   // User's exploration status for world map
   const { data: userStatus } = useUserExplorationStatus({ userId: user?.id });
+  const { data: playedCoordinates } = usePlayedCourseCoordinates(user?.id);
+
+  const handleExploreMap = useCallback(() => {
+    navigate('/top100?view=map');
+  }, [navigate]);
 
   // Scroll restore
   useEffect(() => {
@@ -333,12 +341,11 @@ export function ExplorationTab() {
   return (
     <div className="flex flex-col px-5 pt-4" style={{ gap: 20 }}>
       {/* 1. World Map — 16px below sub-tabs (pt-4) */}
-      {user && userStatus && (
-        <GlobalProgressMap 
-          playedContinents={userStatus.continent_list ?? []}
-          playedCountries={userStatus.country_list ?? []}
-          mapView={metric}
+      {user && (
+        <MiniGlobePreview
+          playedCoordinates={playedCoordinates ?? []}
           seasonColor={seasonThemeColor}
+          onTapExplore={handleExploreMap}
         />
       )}
 
