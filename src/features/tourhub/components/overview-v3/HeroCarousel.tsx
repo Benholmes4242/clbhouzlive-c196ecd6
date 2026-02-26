@@ -14,7 +14,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, Trophy, Menu, Maximize2, X } from 'lucide-react';
+import { ChevronRight, Trophy, Menu, X } from 'lucide-react';
 import { openTourNav } from '../../contexts/TourNavContext';
 import { cn } from '@/lib/utils';
 import { 
@@ -704,28 +704,33 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         )}
                       </AnimatePresence>
 
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                      {isLive && leaders.length > 0 && !isExpanded ? (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); e.preventDefault(); onToggleExpand(); }}
+                          className="hero-text-cta"
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            padding: 0,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: 4,
+                            width: '100%',
+                            marginTop: 8,
+                          }}
+                          aria-label="View full leaderboard"
+                        >
+                          <span>View Leaderboard</span>
+                          <ChevronRight className="w-4 h-4 cta-chevron" />
+                        </button>
+                      ) : !isExpanded ? (
                         <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta">
                           <span>See All</span>
                           <ChevronRight className="w-4 h-4 cta-chevron" />
                         </Link>
-                        {isLive && leaders.length > 0 && (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); e.preventDefault(); onToggleExpand(); }}
-                            aria-label="Expand leaderboard"
-                            style={{
-                              width: 32, height: 32,
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              background: 'rgba(255, 255, 255, 0.1)',
-                              borderRadius: 8,
-                              border: '1px solid rgba(255, 255, 255, 0.15)',
-                              cursor: 'pointer', padding: 0,
-                            }}
-                          >
-                            <Maximize2 size={16} style={{ color: 'rgba(255, 255, 255, 0.7)' }} />
-                          </button>
-                        )}
-                      </div>
+                      ) : null}
                     </>
                   )}
                 </motion.div>
