@@ -642,11 +642,24 @@ async function syncLeaderboard(
     }
 
     if (player) {
-      const rounds = entry.rounds || [];
-      // Fix 1: Find the last round with actual activity (thru > 0), not the last array element
-      const activeRound = [...rounds].reverse().find((r: any) => r.thru > 0) || null;
-      const derivedThru = activeRound?.thru ?? entry.thru ?? null;
+      const roundsRaw = Array.isArray(entry.rounds) ? entry.rounds : [];
+      const rounds = roundsRaw.map((r: any) => ({
+        thru: typeof r?.thru === 'number' ? r.thru : parseInt(String(r?.thru ?? ''), 10) || 0,
+        strokes: typeof r?.strokes === 'number' ? r.strokes : parseInt(String(r?.strokes ?? ''), 10) || 0,
+      }));
+
+      const activeRound = rounds.length > 0
+        ? [...rounds].reverse().find((r: any) => r.thru > 0 && r.strokes > 0) || null
+        : null;
+      const fallbackThru = typeof entry.thru === 'number' ? entry.thru : parseInt(String(entry.thru ?? ''), 10) || 0;
+      const derivedThru = activeRound?.thru ?? (fallbackThru > 0 ? fallbackThru : null);
       const derivedStatus = entry.status || (entry.position != null ? 'active' : null);
+
+      if ((entry.player?.last_name || entry.last_name) === 'Smotherman') {
+        console.log('[LiveSync Debug] Smotherman rounds:', JSON.stringify(roundsRaw));
+        console.log('[LiveSync Debug] Smotherman activeRound:', JSON.stringify(activeRound));
+        console.log('[LiveSync Debug] Smotherman derivedThru:', derivedThru);
+      }
 
       const { error } = await supabase.from('sr_leaderboards').upsert({
         tournament_id: tournamentDbId,
@@ -656,13 +669,13 @@ async function syncLeaderboard(
         score: entry.score,
         strokes: entry.strokes,
         thru: derivedThru,
-        // Fix 3: Set thru_updated_at when we have a valid thru value
+        // Set thru_updated_at when we have a valid thru value
         thru_updated_at: derivedThru !== null && derivedThru > 0 ? new Date().toISOString() : null,
-        // Fix 2: Only store round strokes when the round is complete (thru >= 18)
-        round_1: rounds[0]?.thru >= 18 ? rounds[0]?.strokes : null,
-        round_2: rounds[1]?.thru >= 18 ? rounds[1]?.strokes : null,
-        round_3: rounds[2]?.thru >= 18 ? rounds[2]?.strokes : null,
-        round_4: rounds[3]?.thru >= 18 ? rounds[3]?.strokes : null,
+        // Only store round strokes when the round is complete (thru >= 18) and strokes > 0
+        round_1: rounds.length > 0 && rounds[0]?.thru >= 18 && rounds[0]?.strokes > 0 ? rounds[0]?.strokes : null,
+        round_2: rounds.length > 1 && rounds[1]?.thru >= 18 && rounds[1]?.strokes > 0 ? rounds[1]?.strokes : null,
+        round_3: rounds.length > 2 && rounds[2]?.thru >= 18 && rounds[2]?.strokes > 0 ? rounds[2]?.strokes : null,
+        round_4: rounds.length > 3 && rounds[3]?.thru >= 18 && rounds[3]?.strokes > 0 ? rounds[3]?.strokes : null,
         money: entry.money,
         points: entry.points,
         status: derivedStatus,
