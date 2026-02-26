@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { getRegionTheme } from '@/lib/regionTheme';
 import { AnimatedNumber } from '@/components/ui/motion';
 import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
@@ -86,16 +86,7 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
             <div className="w-full h-full bg-gradient-to-br from-foreground/70 to-foreground" />
           )}
           
-          {/* Glass back button - positioned below safe area, 44px tap target */}
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-xl bg-black/30 backdrop-blur-sm hover:bg-black/40 active:scale-[0.92] transition-all z-10"
-            style={{ top: 'calc(1rem + max(env(safe-area-inset-top, 0px), 47px))' }}
-            aria-label="Back"
-          >
-            <ArrowLeft className="h-5 w-5 text-white" />
-          </button>
+          {/* Glass back button removed — text link below hero */}
           
           {/* Title at bottom of hero */}
           <motion.div 
@@ -164,6 +155,18 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
           </div>
         </div>
       )}
+
+      {/* ← Back text link below hero */}
+      <div className="px-4 pt-3">
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
+        >
+          <ChevronLeft size={14} />
+          Back
+        </button>
+      </div>
     </>
   );
 };
