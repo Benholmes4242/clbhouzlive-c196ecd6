@@ -76,7 +76,7 @@ export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
 }) => {
   return (
     <div 
-      className="flex flex-wrap items-center justify-start gap-2" 
+      className="flex flex-wrap items-center justify-center gap-2" 
       role="group" 
       aria-label="Filter reviews by rating"
     >

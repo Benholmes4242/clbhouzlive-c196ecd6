@@ -434,33 +434,32 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
     <div className="flex flex-col">
       {/* Compact rating context */}
-      <section className="px-4 py-3 bg-muted">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5">
-              <span className="text-2xl font-semibold text-foreground tabular-nums">
-                {communityScore.toFixed(1)}
-              </span>
-              <span className={cn(
-                "text-sm font-medium uppercase",
-                communityScore >= 9 ? "text-[#d97706]" : "text-muted-foreground"
-              )}>
-                {getScoreTier(communityScore).label}
-              </span>
-            </div>
-            <span className="text-sm text-muted-foreground">
-              · {ratingCount} {ratingCount === 1 ? 'rating' : 'ratings'}
-            </span>
+      <section className="px-4 py-4 bg-muted">
+        <div className="flex flex-col items-center gap-1">
+          <span className="text-[40px] font-extrabold leading-none text-foreground tabular-nums">
+            {communityScore.toFixed(1)}
+          </span>
+          <span className={cn(
+            "text-sm font-bold uppercase tracking-[0.05em]",
+            communityScore >= 9 ? "text-[#d97706]" : "text-muted-foreground"
+          )}>
+            {getScoreTier(communityScore).label}
+          </span>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mt-0.5">
+            <span>{ratingCount} {ratingCount === 1 ? 'rating' : 'ratings'}</span>
+            {myReview && (
+              <>
+                <span>·</span>
+                <button
+                  onClick={handleRateClick}
+                  className="flex items-center gap-1.5 text-muted-foreground active:scale-[0.98] transition-transform"
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                  Edit yours
+                </button>
+              </>
+            )}
           </div>
-          {myReview && (
-            <button
-              onClick={handleRateClick}
-              className="flex items-center gap-1.5 text-sm text-muted-foreground active:scale-[0.98] transition-transform min-h-[44px] px-3"
-            >
-              <Pencil className="w-3.5 h-3.5" />
-              Edit yours
-            </button>
-          )}
         </div>
       </section>
 
