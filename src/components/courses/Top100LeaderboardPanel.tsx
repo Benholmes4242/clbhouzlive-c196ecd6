@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Tabs, TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { ChampionshipLeaderboardView } from '@/components/championship';
 import { CoursesLeaderboardView } from '@/components/leaderboard/CoursesLeaderboardView';
@@ -11,13 +11,11 @@ type LeaderboardView = 'championship' | 'courses' | 'exploration' | 'handicap';
 const Top100LeaderboardPanel = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Wire view from URL - default to championship (was 'players')
   const getInitialView = (): LeaderboardView => {
     const param = searchParams.get('view');
     if (param === 'courses' || param === 'championship' || param === 'exploration' || param === 'handicap') {
       return param;
     }
-    // Legacy support: 'players' maps to 'championship'
     if (param === 'players') return 'championship';
     return 'championship';
   };
@@ -32,48 +30,28 @@ const Top100LeaderboardPanel = () => {
     setSearchParams(nextParams, { replace: true });
   };
 
-  // Tab configuration with two-line labels and new order
   const tabs = [
-    { id: 'championship' as const, line1: 'Top 100', line2: 'Leaders' },
-    { id: 'exploration' as const, line1: 'Global', line2: 'Golfers' },
-    { id: 'courses' as const, line1: 'Leading', line2: 'Courses' },
-    { id: 'handicap' as const, line1: 'Handicap', line2: 'Leaders' },
+    { id: 'championship' as const, label: 'Top 100' },
+    { id: 'exploration' as const, label: 'Global' },
+    { id: 'courses' as const, label: 'Courses' },
+    { id: 'handicap' as const, label: 'Handicap' },
   ];
 
   return (
     <div className="w-full pb-6">
       <Tabs value={view} onValueChange={handleViewChange} className="w-full">
         <div className="px-3">
-          <div
-            className="flex gap-1 rounded-[14px] p-[3px]"
-            style={{ backgroundColor: 'rgba(0, 0, 0, 0.03)' }}
-          >
+          <TabsList className="bg-transparent border-0 px-0 py-0 gap-0 w-full flex justify-center">
             {tabs.map((tab) => (
-              <button
+              <TabsTrigger
                 key={tab.id}
-                onClick={() => handleViewChange(tab.id)}
-                className={cn(
-                  'flex-1 py-2.5 px-2 rounded-xl text-center transition-all duration-200 active:scale-[0.97]',
-                  view === tab.id
-                    ? 'bg-card text-foreground font-semibold'
-                    : 'bg-transparent text-muted-foreground font-medium'
-                )}
+                value={tab.id}
+                className="relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none min-h-[44px] data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out active:scale-[0.98] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]"
               >
-                <span className={cn(
-                  'block text-[11px] font-semibold leading-tight',
-                  view === tab.id ? 'text-foreground' : 'text-muted-foreground'
-                )}>
-                  {tab.line1}
-                </span>
-                <span className={cn(
-                  'block text-[11px] font-medium leading-tight',
-                  view === tab.id ? 'text-foreground' : 'text-muted-foreground'
-                )}>
-                  {tab.line2}
-                </span>
-              </button>
+                {tab.label}
+              </TabsTrigger>
             ))}
-          </div>
+          </TabsList>
         </div>
 
         <TabsContent value="championship" className="mt-0">
