@@ -27,7 +27,7 @@ const TIER_CONFIG: Array<{ key: RatingTierKey; dataKey: keyof RatingTierDistribu
 
 // UNIFIED COLOR SYSTEM - Amber for Outstanding only, Gray for rest
 const OUTSTANDING_COLOR = '#f59e0b'; // Amber-500
-const NEUTRAL_COLOR = '#d1d5db';     // Gray-300 - matches slider bars
+const NEUTRAL_COLOR = '#A8A29E';     // Warm stone - better contrast
 const EMPTY_COLOR = '#f3f4f6';       // gray-100
 
 /**

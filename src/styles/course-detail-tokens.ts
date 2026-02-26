@@ -21,48 +21,48 @@ export const courseDetailTokens = {
       chipText: 'text-[#d97706]',
     },
     excellent: {
-      bg: 'bg-[#9ca3af]/5',
-      border: 'border-[#9ca3af]/20',
-      text: 'text-[#6b7280]',
-      fill: 'bg-[#d1d5db]',
-      badge: 'bg-[#9ca3af] text-white',
-      activeBg: 'bg-[#9ca3af]',
+      bg: 'bg-[#A8A29E]/5',
+      border: 'border-[#A8A29E]/20',
+      text: 'text-[#78716C]',
+      fill: 'bg-[#A8A29E]',
+      badge: 'bg-[#A8A29E] text-white',
+      activeBg: 'bg-[#A8A29E]',
       activeText: 'text-white',
-      chipBg: 'bg-[#9ca3af]/5',
-      chipText: 'text-[#6b7280]',
+      chipBg: 'bg-[#A8A29E]/5',
+      chipText: 'text-[#78716C]',
     },
     veryGood: {
-      bg: 'bg-[#9ca3af]/5',
-      border: 'border-[#9ca3af]/20',
-      text: 'text-[#6b7280]',
-      fill: 'bg-[#d1d5db]',
-      badge: 'bg-[#9ca3af] text-white',
-      activeBg: 'bg-[#9ca3af]',
+      bg: 'bg-[#A8A29E]/5',
+      border: 'border-[#A8A29E]/20',
+      text: 'text-[#78716C]',
+      fill: 'bg-[#A8A29E]',
+      badge: 'bg-[#A8A29E] text-white',
+      activeBg: 'bg-[#A8A29E]',
       activeText: 'text-white',
-      chipBg: 'bg-[#9ca3af]/5',
-      chipText: 'text-[#6b7280]',
+      chipBg: 'bg-[#A8A29E]/5',
+      chipText: 'text-[#78716C]',
     },
     good: {
-      bg: 'bg-[#9ca3af]/5',
-      border: 'border-[#9ca3af]/20',
-      text: 'text-[#6b7280]',
-      fill: 'bg-[#d1d5db]',
-      badge: 'bg-[#9ca3af] text-white',
-      activeBg: 'bg-[#9ca3af]',
+      bg: 'bg-[#A8A29E]/5',
+      border: 'border-[#A8A29E]/20',
+      text: 'text-[#78716C]',
+      fill: 'bg-[#A8A29E]',
+      badge: 'bg-[#A8A29E] text-white',
+      activeBg: 'bg-[#A8A29E]',
       activeText: 'text-white',
-      chipBg: 'bg-[#9ca3af]/5',
-      chipText: 'text-[#6b7280]',
+      chipBg: 'bg-[#A8A29E]/5',
+      chipText: 'text-[#78716C]',
     },
     fair: {
-      bg: 'bg-[#9ca3af]/5',
-      border: 'border-[#9ca3af]/20',
-      text: 'text-[#6b7280]',
-      fill: 'bg-[#d1d5db]',
-      badge: 'bg-[#9ca3af] text-white',
-      activeBg: 'bg-[#9ca3af]',
+      bg: 'bg-[#A8A29E]/5',
+      border: 'border-[#A8A29E]/20',
+      text: 'text-[#78716C]',
+      fill: 'bg-[#A8A29E]',
+      badge: 'bg-[#A8A29E] text-white',
+      activeBg: 'bg-[#A8A29E]',
       activeText: 'text-white',
-      chipBg: 'bg-[#9ca3af]/5',
-      chipText: 'text-[#6b7280]',
+      chipBg: 'bg-[#A8A29E]/5',
+      chipText: 'text-[#78716C]',
     },
   },
 
@@ -102,20 +102,20 @@ export const courseDetailTokens = {
   // Score ring gradient colors - AMBER FOR OUTSTANDING ONLY, Gray for rest
   scoreRing: {
     outstanding: { from: '#f59e0b', to: '#fbbf24' }, // Amber gradient
-    excellent: { from: '#d1d5db', to: '#d1d5db' },   // Gray-300
-    veryGood: { from: '#d1d5db', to: '#d1d5db' },    // Gray-300
-    good: { from: '#d1d5db', to: '#d1d5db' },        // Gray-300
-    fair: { from: '#d1d5db', to: '#d1d5db' },        // Gray-300
+    excellent: { from: '#A8A29E', to: '#A8A29E' },   // Warm stone
+    veryGood: { from: '#A8A29E', to: '#A8A29E' },    // Warm stone
+    good: { from: '#A8A29E', to: '#A8A29E' },        // Warm stone
+    fair: { from: '#A8A29E', to: '#A8A29E' },        // Warm stone
   },
 } as const;
 
 // Tier gradient mapping for distribution bars - AMBER FOR OUTSTANDING ONLY, Gray for rest
 export const tierGradients: Record<string, string> = {
   Outstanding: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
-  Excellent: 'bg-[#d1d5db]',
-  'Very Good': 'bg-[#d1d5db]',
-  Good: 'bg-[#d1d5db]',
-  Fair: 'bg-[#d1d5db]',
+  Excellent: 'bg-[#A8A29E]',
+  'Very Good': 'bg-[#A8A29E]',
+  Good: 'bg-[#A8A29E]',
+  Fair: 'bg-[#A8A29E]',
 };
 
 export type TierKey = keyof typeof courseDetailTokens.tiers;
