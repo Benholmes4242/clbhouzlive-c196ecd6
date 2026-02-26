@@ -139,19 +139,18 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
           className="flex items-center gap-2 min-w-0 active:opacity-70 transition-opacity"
         >
           <div
-            className="overflow-hidden flex-shrink-0 border border-white/10"
-            style={{ width: '32px', height: '33px', borderRadius: '34%' }}
+            className="overflow-hidden flex-shrink-0"
+            style={{ width: '32px', height: '33px', borderRadius: '34%', border: '1.5px solid #F8FAFC', background: '#F8FAFC' }}
           >
             {photoUrl ? (
               <img
                 src={photoUrl}
                 alt={abbreviatedName}
                 className="w-full h-full object-cover object-top"
-                style={{ backgroundColor: 'rgba(255,255,255,0.08)' }}
-                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
               />
             ) : (
-              <div className="w-full h-full bg-white/10 flex items-center justify-center text-white/60 text-[10px] font-semibold">{initials}</div>
+              <div className="w-full h-full flex items-center justify-center text-white/60 text-[10px] font-semibold" style={{ background: '#F8FAFC' }}>{initials}</div>
             )}
           </div>
           <span className={cn("leaderboard-name truncate", isFirst && "font-bold")}>
@@ -206,16 +205,17 @@ function CondensedTieRow({ row, index, isActive }: { row: LiveLeaderboardRow; in
                   width: 28,
                   height: 29,
                   borderRadius: '34%',
-                  border: '1.5px solid rgba(255,255,255,0.2)',
+                  border: '1.5px solid #F8FAFC',
+                  background: '#F8FAFC',
                   marginLeft: i > 0 ? -8 : 0,
                   zIndex: 4 - i,
                   position: 'relative',
                 }}
               >
                 {photoUrl ? (
-                  <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                  <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }} />
                 ) : (
-                  <div style={{ width: '100%', height: '100%', background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>{initials}</div>
+                  <div style={{ width: '100%', height: '100%', background: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>{initials}</div>
                 )}
               </div>
             );
