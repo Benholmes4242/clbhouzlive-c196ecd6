@@ -235,61 +235,32 @@ export function ExpandedLeaderboardList({ entries, tourCode, onTouchStart, onTou
   }, [entries.length]);
 
   return (
-    <div style={{ position: 'relative', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
-      {/* Top fade */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 24,
-          background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.45), transparent)',
-          pointerEvents: 'none',
-          zIndex: 3,
-        }}
-      />
-      <div
-        role="list"
-        aria-label="Tournament leaderboard"
-        className="expanded-lb-scroll"
-        style={{
-          flex: 1,
-          minHeight: 0,
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          WebkitOverflowScrolling: 'touch',
-          overscrollBehavior: 'contain',
-          touchAction: 'pan-y',
-          paddingTop: 8,
-        }}
-        onScroll={handleScroll}
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
-      >
-        {entries.slice(0, visibleCount).map((entry) => (
-          <ExpandedLeaderboardRow
-            key={entry.id}
-            entry={entry}
-            tourCode={tourCode}
-          />
-        ))}
-      </div>
-      {/* Bottom fade */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: 40,
-          background: 'linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.45))',
-          borderRadius: '0 0 16px 16px',
-          pointerEvents: 'none',
-          zIndex: 3,
-        }}
-      />
+    <div
+      role="list"
+      aria-label="Tournament leaderboard"
+      className="expanded-lb-scroll"
+      style={{
+        flex: 1,
+        minHeight: 0,
+        overflowY: 'auto',
+        overflowX: 'hidden',
+        WebkitOverflowScrolling: 'touch',
+        overscrollBehavior: 'contain',
+        touchAction: 'pan-y',
+        paddingTop: 8,
+      }}
+      onScroll={handleScroll}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
+      {entries.slice(0, visibleCount).map((entry) => (
+        <ExpandedLeaderboardRow
+          key={entry.id}
+          entry={entry}
+          tourCode={tourCode}
+        />
+      ))}
     </div>
   );
 }
