@@ -25,6 +25,7 @@ const Top100Hub = () => {
   const { data: listSummaries, isLoading: summariesLoading } = useTop100ListSummaries(session?.user?.id);
 
   const tabFromUrl = searchParams.get('tab');
+  const viewFromUrl = searchParams.get('view');
   
   // Validate tab and use safe default - removed 'leaderboard' tab
   const validTabs = ['courses', 'my-progress'] as const;
@@ -44,8 +45,8 @@ const Top100Hub = () => {
   // View mode state for toggle highlight
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   
-  // Map modal state
-  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
+  // Map modal state — auto-open if ?view=map
+  const [isMapModalOpen, setIsMapModalOpen] = useState(viewFromUrl === 'map');
   
   const [selectedListSlug, setSelectedListSlug] = useState<Top100MapScope>('global');
 
