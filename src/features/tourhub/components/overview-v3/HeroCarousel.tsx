@@ -546,25 +546,15 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                            'KORN FERRY'}
                         </span>
                       </div>
-                      {/* Expand/Collapse icon — only for live with leaderboard data */}
-                      {isLive && leaders.length > 0 && (
-                        isExpanded ? (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); e.preventDefault(); onToggleExpand(); }}
-                            aria-label="Collapse leaderboard"
-                            style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                          >
-                            <X style={{ width: 18, height: 18, color: 'rgba(255,255,255,0.6)' }} />
-                          </button>
-                        ) : (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); e.preventDefault(); onToggleExpand(); }}
-                            aria-label="Expand leaderboard"
-                            style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                          >
-                            <Maximize2 style={{ width: 18, height: 18, color: 'rgba(255,255,255,0.6)' }} />
-                          </button>
-                        )
+                      {/* Close icon — only when expanded */}
+                      {isLive && leaders.length > 0 && isExpanded && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); e.preventDefault(); onToggleExpand(); }}
+                          aria-label="Collapse leaderboard"
+                          style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        >
+                          <X style={{ width: 18, height: 18, color: 'rgba(255,255,255,0.6)' }} />
+                        </button>
                       )}
                     </div>
                   </div>
@@ -714,10 +704,28 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         )}
                       </AnimatePresence>
 
-                      <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta w-full">
-                        <span>See All</span>
-                        <ChevronRight className="w-4 h-4 cta-chevron" />
-                      </Link>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                        <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta">
+                          <span>See All</span>
+                          <ChevronRight className="w-4 h-4 cta-chevron" />
+                        </Link>
+                        {isLive && leaders.length > 0 && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); e.preventDefault(); onToggleExpand(); }}
+                            aria-label="Expand leaderboard"
+                            style={{
+                              width: 32, height: 32,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              background: 'rgba(255, 255, 255, 0.1)',
+                              borderRadius: 8,
+                              border: '1px solid rgba(255, 255, 255, 0.15)',
+                              cursor: 'pointer', padding: 0,
+                            }}
+                          >
+                            <Maximize2 size={16} style={{ color: 'rgba(255, 255, 255, 0.7)' }} />
+                          </button>
+                        )}
+                      </div>
                     </>
                   )}
                 </motion.div>
