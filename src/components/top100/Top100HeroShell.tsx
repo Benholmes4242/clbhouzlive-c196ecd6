@@ -28,7 +28,6 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
   const navigate = useNavigate();
   const [imageLoaded, setImageLoaded] = useState(false);
   const hero = list.hero_course;
-  const topRank = hero?.rank_in_list ?? null;
   const listSlug = list.slug as 'global' | 'gb-i' | 'usa' | 'europe';
   
   // Get regional theme for progress bar color
@@ -54,7 +53,7 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
       <div 
         className="relative overflow-hidden bg-background"
         style={{
-          height: 'calc(16rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
+          height: 'calc(18rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
           marginTop: 0,
         }}
       >
@@ -80,10 +79,8 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
                 animate={{ opacity: imageLoaded ? 1 : 0 }}
                 transition={{ duration: 0.5, ease: 'easeOut' }}
               />
-              {/* Top gradient for header area */}
-              <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/40 to-transparent pointer-events-none" />
-              {/* Bottom gradient for title */}
-              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+              {/* Single consolidated gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/30 pointer-events-none" />
             </>
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-foreground/70 to-foreground" />
@@ -93,7 +90,7 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 active:scale-[0.92] transition-all z-10"
+            className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-xl bg-black/30 backdrop-blur-sm hover:bg-black/40 active:scale-[0.92] transition-all z-10"
             style={{ top: 'calc(1rem + max(env(safe-area-inset-top, 0px), 47px))' }}
             aria-label="Back"
           >
@@ -107,7 +104,7 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
           >
-            <h1 className="text-white text-2xl font-semibold drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">
+            <h1 className="text-white text-[26px] font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">
               {displayLabel}
             </h1>
           </motion.div>
@@ -115,16 +112,18 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
 
       {/* PROGRESS SECTION - on page background with semantic text */}
       {showProgress && (
-        <div className="w-full px-4 py-4 bg-muted/30">
+        <div className="w-full px-4 py-4 bg-muted/20">
           {/* Top row: X / total (primary) + % complete (secondary) */}
           <div className="flex items-baseline justify-between gap-4">
-            <div className="text-foreground">
-              <AnimatedNumber 
-                value={playedCount}
-                minCh={1}
-                className="text-3xl font-semibold leading-none tabular-nums"
-              />
-              <span className="text-muted-foreground text-lg ml-0.5 font-light">/{totalCount}</span>
+            <div className="flex items-baseline">
+              <span style={{ color: theme.ringColor }}>
+                <AnimatedNumber 
+                  value={playedCount}
+                  minCh={1}
+                  className="text-[34px] font-bold leading-none tabular-nums"
+                />
+              </span>
+              <span className="text-muted-foreground/60 text-base ml-0.5 font-normal">/{totalCount}</span>
             </div>
 
             <div className="flex items-baseline gap-1.5 text-foreground">

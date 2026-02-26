@@ -415,9 +415,9 @@ const Top100List = () => {
         )}
 
         {/* 3. Social Leaderboard */}
-        {/* Spacing: Next milestone → Leaderboard = 24px (L) */}
+        {/* Spacing: Next milestone → Leaderboard = 28px */}
         {session && (
-          <div className="mt-6">
+          <div className="mt-7">
             <Top100ListLeaderboard
               friends={friendsSummary}
               totalInList={totalCount}
@@ -439,8 +439,8 @@ const Top100List = () => {
         <div ref={listTopRef} />
 
         {/* 5. Filter Chips */}
-        {/* Spacing: Token rail → Filter = 16px (M) */}
-        <div ref={filterRef} className="mt-4">
+        {/* Spacing: Token rail → Filter = 24px */}
+        <div ref={filterRef} className="mt-6">
           <Top100ListFilterChips
             activeFilter={filterChip}
             onFilterChange={handleFilterChange}
@@ -454,7 +454,7 @@ const Top100List = () => {
         {/* 6. Course List with Journey Insights */}
         {/* Spacing: Filter → Divider = 24px (L), Divider → List = 16px (M) */}
         {/* Combined: Filter → List = 16px (M) since no explicit divider component */}
-        <section className="mt-4 pb-6 sm:space-y-3">
+        <section className="mt-4 pb-6 space-y-3">
           {filteredAndSortedCourses.map((course, index) => {
             // Insert insight card every N courses
             const shouldInsertInsight = 

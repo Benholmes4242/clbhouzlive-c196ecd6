@@ -23,22 +23,19 @@ interface Top100ListMilestoneRailProps {
 }
 
 // Token dimensions - SDS global squircle shape (matches SquircleAvatar)
-const TOKEN_SIZE = 78; // width
-const TOKEN_HEIGHT = TOKEN_SIZE * 1.05; // SquircleAvatar uses aspectRatio: 1 / 1.05 (allows sub-pixel height)
+const TOKEN_SIZE = 88; // width — bigger for premium feel
+const TOKEN_HEIGHT = TOKEN_SIZE * 1.05;
 const TOKEN_LABEL_HEIGHT = 22;
-const SQUIRCLE_RADIUS = '34%'; // SDS squircle border-radius
-const SQUIRCLE_RADIUS_PERCENT = 0.34; // Numeric version for SVG calculations
+const SQUIRCLE_RADIUS = '34%';
+const SQUIRCLE_RADIUS_PERCENT = 0.34;
 const RING_TRACK_COLOR = 'hsl(var(--border))';
 
 /**
  * Calculate the perimeter of a rounded rectangle (squircle with border-radius)
- * This matches CSS border-radius: 34% exactly
  */
 function calculateRoundedRectPerimeter(w: number, h: number, rx: number, ry: number): number {
-  // Perimeter = 2 * (straight edges) + elliptical corners
   const straightWidth = w - 2 * rx;
   const straightHeight = h - 2 * ry;
-  // Approximate ellipse quarter arc: π/2 * sqrt((rx² + ry²) / 2) per corner
   const cornerArc = (Math.PI / 2) * Math.sqrt((rx * rx + ry * ry) / 2);
   return 2 * straightWidth + 2 * straightHeight + 4 * cornerArc;
 }
@@ -46,12 +43,6 @@ function calculateRoundedRectPerimeter(w: number, h: number, rx: number, ry: num
 /**
  * Horizontal swipeable milestone rail with collectible token design.
  * Regional color theming - each list has its own accent color.
- * 
- * Visual states:
- * - UNLOCKED: Solid regional accent ring
- * - NEXT UP: SVG progress arc (track + arc on same path)
- * - LOCKED: Thin neutral grey ring
- * - COMPLETED (100 tile only): Trophy with gold accent
  */
 export const Top100ListMilestoneRail: React.FC<Top100ListMilestoneRailProps> = ({
   playedCount,
@@ -70,18 +61,16 @@ export const Top100ListMilestoneRail: React.FC<Top100ListMilestoneRailProps> = (
     setMilestones(getAllMilestonesWithState(playedCount));
   }, [playedCount]);
 
-  // Filter milestones: only unlocked + next_up (hide all locked beyond next_up)
+  // Filter milestones: only unlocked + next_up
   const visibleMilestones = useMemo(() => {
     return milestones.filter(m => m.state === 'unlocked' || m.state === 'next_up');
   }, [milestones]);
 
-  // Show ghost tile only if not complete
   const showGhostTile = playedCount < 100;
 
   // Auto-scroll to next up milestone on mount
   useEffect(() => {
     if (!nextUpRef.current) return;
-    
     const timer = setTimeout(() => {
       nextUpRef.current?.scrollIntoView({
         behavior: 'smooth',
@@ -89,7 +78,6 @@ export const Top100ListMilestoneRail: React.FC<Top100ListMilestoneRailProps> = (
         block: 'nearest',
       });
     }, 100);
-    
     return () => clearTimeout(timer);
   }, [milestones]);
 
@@ -105,9 +93,9 @@ export const Top100ListMilestoneRail: React.FC<Top100ListMilestoneRailProps> = (
 
   return (
     <section>
-      {/* Header - small caps styling with animated arrow */}
+      {/* Header - small caps styling */}
       <div className="px-4 flex items-center justify-between mb-4">
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.1em] text-muted-foreground/60">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground/60">
           Your Milestones
         </h2>
         <motion.button
@@ -146,9 +134,8 @@ export const Top100ListMilestoneRail: React.FC<Top100ListMilestoneRailProps> = (
                 onClick={handleTileClick}
               />
             ))}
-            {/* Ghost tile - only show if not complete */}
             {showGhostTile && (
-              <GhostTile onClick={handleTileClick} />
+              <GhostTile onClick={handleTileClick} theme={theme} />
             )}
           </TooltipProvider>
         </div>
@@ -188,11 +175,9 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
   const isHundredTile = threshold === 100;
   const showCompletionHero = isListComplete && isHundredTile;
 
-  // Reduced motion check
   const prefersReducedMotion = typeof window !== 'undefined' 
     && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
-  // Calculate progress for next up (0..1)
   const getProgress = (): number => {
     if (!isNextUp) return isUnlocked || showCompletionHero ? 1 : 0;
     return Math.min(1, Math.max(0, playedCount / threshold));
@@ -202,12 +187,11 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
   const ringThickness = showCompletionHero ? 4 : isNextUp ? 4 : isUnlocked ? 3 : 2;
   const ringBorderColor = (isUnlocked || showCompletionHero) ? theme.ringColor : RING_TRACK_COLOR;
 
-  // For non-NEXT UP states, use CSS border ring
   const ringContainerStyle: React.CSSProperties = isNextUp ? {
     width: TOKEN_SIZE,
     height: TOKEN_HEIGHT,
     borderRadius: SQUIRCLE_RADIUS,
-    border: 'none', // No CSS border for NEXT UP - SVG handles it
+    border: 'none',
     boxSizing: 'border-box',
     overflow: 'hidden',
     background: 'transparent',
@@ -221,19 +205,16 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
     background: 'transparent',
   };
 
-  // Aspirational copy for next up
   const aspirationalCopy = isNextUp && toGo !== undefined 
     ? getAspirationalCopy(toGo, threshold) 
     : null;
 
-  // Tooltip for detailed progress
   const tooltipText = isNextUp && toGo !== undefined
     ? getMilestoneTooltip(playedCount, toGo, threshold)
     : isUnlocked
       ? `Milestone achieved — ${threshold} courses played.`
       : `Unlocks at ${threshold} courses played.`;
 
-  // SVG dimensions for NEXT UP ring - uses rect with rx/ry to match CSS border-radius: 34%
   const strokeWidth = 4;
   const inset = strokeWidth / 2;
   const rectWidth = TOKEN_SIZE - strokeWidth;
@@ -259,7 +240,7 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
         className="relative flex items-center justify-center"
         style={{ width: TOKEN_SIZE, height: TOKEN_HEIGHT }}
       >
-        {/* Subtle halo for next up only - uses regional color */}
+        {/* Subtle halo for next up only */}
         {isNextUp && !prefersReducedMotion && (
           <motion.div
             className="absolute inset-0 pointer-events-none"
@@ -272,14 +253,13 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
 
         {/* Ring container */}
         <div className="relative z-10" style={ringContainerStyle}>
-          {/* NEXT UP: SVG squircle ring with track + progress arc using rect rx/ry to match SDS */}
+          {/* NEXT UP: SVG squircle ring */}
           {isNextUp && (
             <svg
               className="absolute inset-0 w-full h-full pointer-events-none"
               viewBox={`0 0 ${TOKEN_SIZE} ${TOKEN_HEIGHT}`}
               fill="none"
             >
-              {/* Track rect (grey, full squircle) */}
               <rect
                 x={inset}
                 y={inset}
@@ -291,7 +271,6 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
                 strokeWidth={strokeWidth}
                 fill="none"
               />
-              {/* Progress arc (same geometry, overlays track) */}
               {prefersReducedMotion ? (
                 <rect
                   x={inset}
@@ -326,13 +305,12 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
             </svg>
           )}
 
-
           {/* Center content */}
           <div className="relative w-full h-full flex items-center justify-center">
             {showCompletionHero ? (
-              <Trophy className="w-6 h-6" style={{ color: theme.ringColor }} />
+              <Trophy className="w-7 h-7" style={{ color: theme.ringColor }} />
             ) : (
-              <span className={`text-xl font-bold text-foreground`}>
+              <span className="text-2xl font-extrabold text-foreground">
                 {threshold}
               </span>
             )}
@@ -340,8 +318,8 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
         </div>
       </div>
 
-      {/* Subtext below token - aspirational copy for next up */}
-      <span className={`text-[10px] font-medium mt-1 ${
+      {/* Subtext below token */}
+      <span className={`text-[11px] font-medium mt-1 ${
         showCompletionHero
           ? 'text-amber-700/80'
           : isNextUp 
@@ -361,7 +339,6 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
     </motion.button>
   );
 
-  // Wrap with tooltip for detailed progress info
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -382,13 +359,13 @@ MilestoneToken.displayName = 'MilestoneToken';
 
 /**
  * Ghost tile - appears at end of rail when playedCount < 100
- * Signals "more ahead" without revealing future milestones
  */
 interface GhostTileProps {
   onClick: () => void;
+  theme: ReturnType<typeof getRegionTheme>;
 }
 
-const GhostTile: React.FC<GhostTileProps> = ({ onClick }) => {
+const GhostTile: React.FC<GhostTileProps> = ({ onClick, theme }) => {
   return (
     <motion.button
       whileTap={{ scale: 0.96 }}
@@ -412,13 +389,13 @@ const GhostTile: React.FC<GhostTileProps> = ({ onClick }) => {
           background: 'hsl(var(--card) / 0.6)',
         }}
       >
-        {/* Padlock icon in center */}
-        <GiPadlock className="w-5 h-5 text-muted-foreground/50" />
+        {/* Padlock icon in center — regional theme color at 30% */}
+        <GiPadlock className="w-5 h-5" style={{ color: theme.ringColor, opacity: 0.3 }} />
       </div>
 
       {/* Copy below token */}
       <div className="flex flex-col items-center mt-1">
-        <span className="text-[10px] font-medium text-muted-foreground">
+        <span className="text-[11px] font-medium text-muted-foreground">
           More ahead
         </span>
         <span className="text-[9px] text-muted-foreground/50">
