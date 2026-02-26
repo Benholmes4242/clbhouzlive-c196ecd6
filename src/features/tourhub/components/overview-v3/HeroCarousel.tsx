@@ -307,8 +307,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
     isExpanded && isLive ? tournament.id : ''
   );
   
-  // Realtime updates when expanded
-  useLeaderboardRealtime(isExpanded && isLive ? tournament.id : null);
+  // Realtime updates — always subscribe when live so collapsed hero stays fresh
+  useLeaderboardRealtime(isLive ? tournament.id : null);
 
   // Body scroll lock when expanded
   useEffect(() => {
