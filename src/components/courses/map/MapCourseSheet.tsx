@@ -1,14 +1,12 @@
 /**
- * MapCourseSheet - World-class bottom sheet for selected course on the Top 100 Map
- * FIX 7: Dark glass treatment matching filter tray and legend badges
+ * MapCourseSheet - Dark glass bottom sheet for selected course on the Top 100 Map
  */
 
 import React, { useState, useCallback } from 'react';
 import '@/styles/hero-glass.css';
 import { useNavigate } from 'react-router-dom';
-import { Globe, Star, Bookmark, ChevronUp, Flag, Check, Loader2 } from 'lucide-react';
+import { Globe, Star, Bookmark, Flag, Check, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { Top100MapCourse } from '@/hooks/useTop100MapCourses';
 import { supabase } from '@/integrations/supabase/client';
@@ -20,12 +18,7 @@ interface MapCourseSheetProps {
   course: Top100MapCourse | null;
   onClose: () => void;
   scope: string;
-  filterTrayHeight?: number;
 }
-
-type SheetState = 'peek' | 'half' | 'full';
-
-const DEFAULT_FILTER_TRAY_HEIGHT = 120;
 
 // Fetch course thumbnail image
 const useCourseImage = (courseId: string | undefined) => {
@@ -68,18 +61,15 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
   course,
   onClose,
   scope,
-  filterTrayHeight = DEFAULT_FILTER_TRAY_HEIGHT,
 }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useSupabaseSession();
-  const [sheetState, setSheetState] = useState<SheetState>('half');
   const [imageLoaded, setImageLoaded] = useState(false);
   const sheetRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     if (course) {
-      setSheetState('half');
       setImageLoaded(false);
     }
   }, [course?.id]);
@@ -92,20 +82,11 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [course, onClose]);
 
-  React.useEffect(() => {
-    if (course && sheetRef.current) {
-      const firstButton = sheetRef.current.querySelector('button');
-      firstButton?.focus();
-    }
-  }, [course?.id]);
-  
   const { data: thumbnailImage } = useCourseImage(course?.id);
   const { data: shortlistStatus } = useCourseShortlistStatus(course?.id, user?.id);
 
-  // Treat both want_to_play and legacy wishlist as want_to_play
   const isWantToPlay = shortlistStatus?.list_key === 'want_to_play' || shortlistStatus?.list_key === 'wishlist';
 
-  // Mutation to toggle want to play
   const toggleWantToPlayMutation = useMutation({
     mutationFn: async () => {
       if (!user?.id || !course?.id) throw new Error('Not authenticated');
@@ -186,7 +167,6 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
 
   if (!course) return null;
 
-  const showCtAs = sheetState === 'half' || sheetState === 'full';
   const statusBadge = getStatusLabel();
 
   return (
@@ -202,7 +182,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
         onClick={onClose}
       />
       
-      {/* FIX 7: Sheet with dark glass */}
+      {/* Dark glass sheet — sits at bottom: 0 */}
       <motion.div
         ref={sheetRef}
         key={`sheet-${course.id}`}
@@ -223,44 +203,24 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby="course-sheet-title"
-        className="fixed left-0 right-0 z-50 flex flex-col rounded-t-3xl"
+        className="fixed left-0 right-0 bottom-0 z-50 flex flex-col"
         style={{ 
-          bottom: filterTrayHeight,
-          background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.45) 50%, rgba(0, 0, 0, 0.5) 100%)',
-          backdropFilter: 'blur(28px) saturate(1.6)',
-          WebkitBackdropFilter: 'blur(28px) saturate(1.6)',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
-          borderBottom: 'none',
-          boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
+          background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.6) 100%)',
+          backdropFilter: 'blur(32px) saturate(1.6)',
+          WebkitBackdropFilter: 'blur(32px) saturate(1.6)',
+          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '24px 24px 0 0',
+          boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.3)',
         }}
       >
         {/* Drag handle */}
-        <div className="flex-shrink-0 pt-3 pb-2 flex justify-center cursor-grab active:cursor-grabbing">
-          <div className="w-10 h-1 rounded-full bg-white/30" />
+        <div className="flex-shrink-0 flex justify-center cursor-grab active:cursor-grabbing" style={{ margin: '12px auto 8px' }}>
+          <div className="rounded-full" style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255, 255, 255, 0.25)' }} />
         </div>
 
-        {/* Expand/collapse */}
-        <button
-          onClick={() => setSheetState(sheetState === 'full' ? 'half' : 'full')}
-          className={cn(
-            'absolute top-2.5 right-3 p-2.5 rounded-full',
-            'text-white/60 hover:text-white/90',
-            'hover:bg-white/10',
-            'active:scale-[0.95] transition-all duration-150'
-          )}
-          aria-label={sheetState === 'full' ? 'Collapse sheet' : 'Expand sheet'}
-        >
-          <ChevronUp
-            className={cn(
-              'h-4 w-4 transition-transform duration-300',
-              sheetState === 'full' && 'rotate-180'
-            )}
-          />
-        </button>
-
         <div className="flex-shrink-0">
-          {/* Course hero image */}
-          <div className="relative w-full h-36 flex-shrink-0 overflow-hidden">
+          {/* Course hero image with gradient fade */}
+          <div className="relative w-full h-40 flex-shrink-0 overflow-hidden">
             {thumbnailImage ? (
               <>
                 {!imageLoaded && (
@@ -275,7 +235,13 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                   )}
                   onLoad={() => setImageLoaded(true)}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+                {/* Gradient fade from image into dark glass */}
+                <div
+                  className="absolute bottom-0 left-0 right-0 h-16"
+                  style={{
+                    background: 'linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.7))'
+                  }}
+                />
               </>
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center">
@@ -283,7 +249,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
               </div>
             )}
             
-            {/* Status badge */}
+            {/* Status badge over image */}
             <div className="absolute top-3 right-3">
               <span
                 className={cn(
@@ -299,7 +265,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
           </div>
 
           {/* Course info */}
-          <div className="px-5 pt-4 pb-6">
+          <div className="px-5 pt-3 pb-0">
             <h3 
               id="course-sheet-title"
               className="text-xl font-bold text-white leading-tight line-clamp-2"
@@ -309,7 +275,8 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
             </h3>
 
             <p 
-              className="text-sm text-white/60 mt-1.5 line-clamp-1"
+              className="text-sm mt-1.5 line-clamp-1"
+              style={{ color: 'rgba(255, 255, 255, 0.5)' }}
               title={`${course.sub_country ? `${course.sub_country}, ` : ''}${course.country}${course.region ? ` · ${course.region}` : ''}`}
             >
               {course.sub_country && `${course.sub_country}, `}
@@ -317,80 +284,98 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
               {course.region && ` · ${course.region}`}
             </p>
 
-            {/* Pill badges */}
+            {/* Unified dark chip badges */}
             <div className="flex flex-wrap items-center gap-2 mt-4">
               {typeof course.rank === 'number' && (
-                <span className="glass-pill inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white/90">
-                  <Globe className="h-3.5 w-3.5" />
-                  #{course.rank} {getRegionLabel(scope)}
-                </span>
+                <div
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                  }}
+                >
+                  <Globe className="h-3.5 w-3.5" style={{ color: 'rgba(255, 255, 255, 0.7)' }} />
+                  <span className="text-xs font-semibold" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+                    #{course.rank} {getRegionLabel(scope)}
+                  </span>
+                </div>
               )}
               
               {course.user_has_rated && course.user_rating && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/30 backdrop-blur-md text-xs font-semibold text-amber-200 border border-amber-400/30">
-                  <Star className="h-3.5 w-3.5 fill-current" />
-                  Your rating: {course.user_rating.toFixed(1)}
-                </span>
+                <div
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                  }}
+                >
+                  <Star className="h-3.5 w-3.5 fill-current text-amber-400" />
+                  <span className="text-xs font-semibold" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+                    Your rating: {course.user_rating.toFixed(1)}
+                  </span>
+                </div>
               )}
             </div>
 
             {/* CTAs */}
-            {showCtAs && (
-              <div className="space-y-3 mt-6">
-                <Button
-                  className={cn(
-                    'w-full h-11',
-                    'bg-white/95 hover:bg-white',
-                    'text-foreground',
-                    'font-medium shadow-lg',
-                    'active:scale-[0.98] transition-all duration-150'
-                  )}
-                  onClick={() => navigate(`/courses/${course.id}`)}
-                >
-                  View course
-                </Button>
-                
-                {!course.user_has_rated && user && (
-                  <div className="flex gap-2.5">
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        'flex-1 h-11',
-                        'border-white/20 bg-white/10 text-white',
-                        'hover:bg-white/20 hover:border-white/30',
-                        'active:scale-[0.98] transition-all duration-150'
-                      )}
-                      onClick={() => navigate(`/courses/${course.id}/rate`)}
-                    >
-                      <Check className="h-4 w-4 mr-1.5" />
-                      Mark Played
-                    </Button>
-                    
-                    <Button
-                      variant={isWantToPlay ? 'default' : 'outline'}
-                      className={cn(
-                        "flex-1 h-11 transition-all duration-200",
-                        isWantToPlay 
-                          ? 'bg-[#F7931E] hover:bg-[#F7931E]/90 text-white shadow-[0_2px_8px_rgba(247,147,30,0.25)]' 
-                          : 'border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/30',
-                        'active:scale-[0.98]'
-                      )}
-                      onClick={() => toggleWantToPlayMutation.mutate()}
-                      disabled={isUpdating}
-                    >
-                      {isUpdating ? (
-                        <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
-                      ) : (
-                        <Bookmark className={cn('h-4 w-4 mr-1.5', isWantToPlay && 'fill-current')} />
-                      )}
-                      {isWantToPlay ? '✓ Want to Play' : 'Want to Play'}
-                    </Button>
-                  </div>
-                )}
-              </div>
-            )}
+            <div className="space-y-3 mt-6">
+              <button
+                className="w-full py-3.5 rounded-xl text-[15px] font-semibold active:scale-[0.98] active:opacity-90 transition-all duration-150"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.95)',
+                  color: '#1a1a1a',
+                }}
+                onClick={() => navigate(`/courses/${course.id}`)}
+              >
+                View course
+              </button>
+              
+              {!course.user_has_rated && user && (
+                <div className="flex gap-2.5">
+                  <button
+                    className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium active:scale-[0.98] transition-all duration-150"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      color: 'rgba(255, 255, 255, 0.85)',
+                    }}
+                    onClick={() => navigate(`/courses/${course.id}/rate`)}
+                  >
+                    <Check className="h-4 w-4" />
+                    Mark Played
+                  </button>
+                  
+                  <button
+                    className={cn(
+                      "flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium active:scale-[0.98] transition-all duration-150",
+                    )}
+                    style={isWantToPlay ? {
+                      background: '#F7931E',
+                      color: '#ffffff',
+                      boxShadow: '0 2px 8px rgba(247,147,30,0.25)',
+                    } : {
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      color: 'rgba(255, 255, 255, 0.85)',
+                    }}
+                    onClick={() => toggleWantToPlayMutation.mutate()}
+                    disabled={isUpdating}
+                  >
+                    {isUpdating ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Bookmark className={cn('h-4 w-4', isWantToPlay && 'fill-current')} />
+                    )}
+                    {isWantToPlay ? '✓ Want to Play' : 'Want to Play'}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
+
+        {/* Bottom safe area */}
+        <div style={{ paddingBottom: 'calc(max(16px, env(safe-area-inset-bottom, 0px)))' }} />
       </motion.div>
     </AnimatePresence>
   );
