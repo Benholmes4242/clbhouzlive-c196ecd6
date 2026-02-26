@@ -933,7 +933,7 @@ async function syncTeeTimes(
           pairing_id: pairing.id,
           back_nine: pairing.back_nine || pairing.starting_hole === 10 || false,
           raw_data: pairing,
-        }, { onConflict: 'tournament_id,round_number,tee_time,tee_number' }).select().single();
+        }, { onConflict: 'tournament_id,round_number,pairing_id' }).select().single();
 
         if (!teeError && teeTime && pairing.players) {
           for (let i = 0; i < pairing.players.length; i++) {
