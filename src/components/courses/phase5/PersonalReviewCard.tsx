@@ -100,7 +100,7 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
 
   return (
     <div className={cn(
-      "bg-gradient-to-br from-card to-muted/50 rounded-2xl border border-border shadow-sm overflow-hidden",
+      "bg-gradient-to-br from-card to-muted/50 rounded-2xl border border-border overflow-hidden",
       className
     )}>
       {/* Header with date */}

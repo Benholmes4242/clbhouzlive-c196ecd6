@@ -33,7 +33,7 @@ export function CourseTabs({ activeTab, onChange, reviewCount, mediaCount }: Cou
 
   return (
     <section className="px-4 py-3 bg-muted">
-      <div className="flex items-stretch rounded-xl overflow-hidden bg-secondary">
+      <div className="flex items-stretch rounded-xl overflow-hidden bg-transparent">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
@@ -43,8 +43,8 @@ export function CourseTabs({ activeTab, onChange, reviewCount, mediaCount }: Cou
               className={cn(
                 "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98]",
                 isActive 
-                  ? "bg-card text-foreground shadow-sm m-1 rounded-lg" 
-                  : "text-muted-foreground hover:text-foreground rounded-lg active:bg-card/50"
+                  ? "bg-foreground text-background shadow-none m-1 rounded-lg" 
+                  : "text-muted-foreground hover:text-foreground rounded-lg active:bg-transparent"
               )}
             >
               {getLabel(tab)}

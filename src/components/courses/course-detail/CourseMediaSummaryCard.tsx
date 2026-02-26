@@ -25,7 +25,7 @@ export const CourseMediaSummaryCard: React.FC<CourseMediaSummaryCardProps> = ({
           {/* Heading with amber accent bar — matches About tab SectionHeading */}
           <div className="flex items-center gap-3">
             <div className="w-8 h-0.5 bg-gradient-to-r from-amber-400 to-transparent" />
-            <h2 className="text-lg font-semibold text-foreground">Course Media</h2>
+            <h2 className="text-[22px] font-bold tracking-[-0.3px] text-foreground">Course Media</h2>
           </div>
 
           {/* Counts */}

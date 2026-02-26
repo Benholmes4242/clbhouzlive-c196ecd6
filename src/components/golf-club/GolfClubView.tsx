@@ -142,7 +142,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
 
         {/* Course name and location overlay on image - matches PostPlayRatingModal */}
         <div className="absolute inset-x-0 bottom-4 px-4">
-          <h1 className="text-4xl md:text-5xl font-semibold text-white drop-shadow-2xl mb-1.5">
+          <h1 className="text-[22px] md:text-[28px] font-extrabold tracking-[-0.3px] text-white drop-shadow-2xl mb-1.5">
             {course.name}
           </h1>
           <p className="text-lg md:text-xl text-white opacity-90 drop-shadow-lg mb-2">
@@ -168,7 +168,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           <button
             type="button"
             onClick={() => safeGoBack(navigate, '/courses')}
-            className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
+            className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity min-h-[44px]"
           >
             <ChevronLeft size={14} />
             Back
