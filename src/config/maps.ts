@@ -50,6 +50,8 @@ export function applyClbhouzMapStyle(
     waterColor?: string;
     /** Dark mode — inverts palette. Default false */
     darkMode?: boolean;
+    /** Show continent-level labels only (used for mini-globe). Default false */
+    showContinentLabels?: boolean;
   },
 ) {
   const {
@@ -58,6 +60,7 @@ export function applyClbhouzMapStyle(
     landColor = '#F2F0EB',
     waterColor = '#D4E4F1',
     darkMode = false,
+    showContinentLabels = false,
   } = options ?? {};
 
   const layers = map.getStyle().layers;
@@ -113,6 +116,23 @@ export function applyClbhouzMapStyle(
     if (!showWaterLabels && id.startsWith('water') && id.includes('label')) {
       map.removeLayer(id);
       continue;
+    }
+
+    // --- CONTINENT-ONLY LABEL MODE ---
+    if (!showPlaceLabels && id.includes('label')) {
+      if (showContinentLabels && id === 'continent-label') {
+        try { map.setPaintProperty(id, 'text-color', darkMode ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.25)'); } catch {}
+        try { map.setPaintProperty(id, 'text-halo-color', darkMode ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.6)'); } catch {}
+        try { map.setPaintProperty(id, 'text-halo-width', 1.5); } catch {}
+        try { map.setLayoutProperty(id, 'text-size', 11); } catch {}
+        try { map.setLayoutProperty(id, 'text-letter-spacing', 0.15); } catch {}
+        try { map.setLayoutProperty(id, 'text-transform', 'uppercase'); } catch {}
+        continue;
+      }
+      if (!id.startsWith('water')) {
+        map.removeLayer(id);
+        continue;
+      }
     }
   }
 
