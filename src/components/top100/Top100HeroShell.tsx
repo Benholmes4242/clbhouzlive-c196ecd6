@@ -53,7 +53,7 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
       <div 
         className="relative overflow-hidden bg-background"
         style={{
-          height: 'calc(18rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
+          height: '45dvh',
           marginTop: 0,
         }}
       >
@@ -99,6 +99,18 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
               {displayLabel}
             </h1>
           </motion.div>
+      </div>
+
+      {/* ← Back text link below hero, above progress */}
+      <div className="px-4 pt-3 pb-0">
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
+        >
+          <ChevronLeft size={14} />
+          Back
+        </button>
       </div>
 
       {/* PROGRESS SECTION - on page background with semantic text */}
@@ -155,18 +167,6 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
           </div>
         </div>
       )}
-
-      {/* ← Back text link below hero */}
-      <div className="px-4 pt-3">
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
-        >
-          <ChevronLeft size={14} />
-          Back
-        </button>
-      </div>
     </>
   );
 };
