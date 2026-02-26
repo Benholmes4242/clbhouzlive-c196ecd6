@@ -64,11 +64,6 @@ export function TournamentDetailTabs({ activeTab, onTabChange, className, tourna
               )}
             >
               {tab.label}
-              
-              {/* LIVE dot on Leaderboard tab */}
-              {isLive && tab.value === 'leaderboard' && (
-                <span className="w-1.5 h-1.5 rounded-full bg-[rgba(245,158,11,0.9)] flex-shrink-0" />
-              )}
             </button>
           );
         })}
