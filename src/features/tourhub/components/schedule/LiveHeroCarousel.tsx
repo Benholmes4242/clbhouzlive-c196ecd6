@@ -20,14 +20,14 @@ import { getCourseImage } from '../../utils/placeholders';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import '@/styles/hero-glass.css';
 
-/** Player avatar for carousel live card */
+/** Player avatar for carousel live card — uses shared FrostedAvatar spec (#F8FAFC bg + border) */
 function PlayerAvatar({ fullName, tourCode, displayName, size = 36 }: { fullName?: string; tourCode?: string; displayName: string; size?: number }) {
   const [imgError, setImgError] = useState(false);
   const src = getPlayerHeadshotUrl(fullName || displayName, tourCode || 'pga');
   return (
     <div style={{
       width: size, height: size, borderRadius: '34%', overflow: 'hidden', flexShrink: 0,
-      border: '1.5px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.1)',
+      border: '1.5px solid #F8FAFC', background: '#F8FAFC',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
       <img src={imgError ? PLAYER_SILHOUETTE_URL : src} alt={displayName}
