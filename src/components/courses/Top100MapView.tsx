@@ -609,20 +609,16 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           </div>
         )}
 
-        {/* FIX 13: Always-visible back button */}
+        {/* Back button — canonical glass, one size smaller */}
         <button
           onClick={() => onClose ? onClose() : navigate(-1)}
-          className="fixed left-4 z-40 w-11 h-11 flex items-center justify-center rounded-full active:scale-[0.92] active:bg-white/20 transition-all duration-150"
+          className="glass-card fixed left-4 z-40 w-9 h-9 flex items-center justify-center !rounded-full active:scale-[0.92] active:bg-white/20 transition-all duration-150"
           style={{
             top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
-            background: 'rgba(0, 0, 0, 0.45)',
-            backdropFilter: 'blur(24px)',
-            WebkitBackdropFilter: 'blur(24px)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
           }}
           aria-label="Go back"
         >
-          <svg className="w-5 h-5 text-white/90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg className="w-4 h-4 text-white/90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="15 18 9 12 15 6" />
           </svg>
         </button>
@@ -734,20 +730,13 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         scope={scope}
       />
 
-      {/* FIX 6: Fixed bottom control tray - DARK glass — hides when course sheet is open */}
+      {/* Filter tray — canonical glass, hides when course sheet is open */}
       <div 
         className={cn(
-          "fixed bottom-0 left-0 right-0 z-30 rounded-t-3xl px-5 pt-4 pb-[calc(max(0.75rem,env(safe-area-inset-bottom,0px))+12px)] transition-all duration-300",
+          "glass-card fixed bottom-0 left-0 right-0 z-30 !rounded-t-3xl !rounded-b-none px-5 pt-4 pb-[calc(max(0.75rem,env(safe-area-inset-bottom,0px))+12px)] transition-all duration-300",
           selectedCourse ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-100 translate-y-0'
         )}
-        style={{
-          background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.45) 100%)',
-          backdropFilter: 'blur(28px) saturate(1.6)',
-          WebkitBackdropFilter: 'blur(28px) saturate(1.6)',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
-          borderBottom: 'none',
-          boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
-        }}
+        style={{ borderBottom: 'none' }}
       >
         <div className="space-y-3">
           {/* Progress bar — season color */}
