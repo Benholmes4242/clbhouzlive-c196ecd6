@@ -90,7 +90,7 @@ export function PlayerAvatar({
   /** Tour code for R2 folder lookup — e.g. 'pga', 'euro', 'lpga', 'liv' */
   tourCode?: string;
   size?: number;
-  /** Use frosted glass styling (rgba(255,255,255,0.1) bg + frosted border) — for glass card contexts */
+  /** Use frosted glass styling (#F8FAFC solid bg + border) — for glass card contexts */
   frosted?: boolean;
 }) {
   // PRIMARY: R2 headshot by full name + tour. FALLBACK: silhouette.
@@ -226,13 +226,14 @@ export function PodiumRunnerRow({
               width: 22,
               height: 22,
               borderRadius: '34%',
-              background: 'rgba(255,255,255,0.12)',
+              background: '#F8FAFC',
+              border: '1.5px solid #F8FAFC',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: 9,
               fontWeight: 600,
-              color: 'rgba(255,255,255,0.6)',
+              color: '#64748B',
               flexShrink: 0,
             }}>
               +{moreCount}
