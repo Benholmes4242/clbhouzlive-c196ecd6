@@ -1,21 +1,20 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, Move, ArrowLeft, Layers, ChevronUp, Type } from 'lucide-react';
+import { Plus, Layers, ChevronUp, Type } from 'lucide-react';
 import { StudioEdits, TextOverlay, TextStyle } from '@/types/studio';
 import { nanoid } from 'nanoid';
-import { cn } from '@/lib/utils';
 
 type StudioPanelTextProps = {
   edits: StudioEdits;
   updateEdits: (patch: Partial<StudioEdits>) => void;
   onApply: () => void;
   onReset: () => void;
+  // Legacy props - kept for compat
   isPositioningText?: boolean;
   onTogglePositionMode?: () => void;
   activeOverlayId?: string | null;
   onSelectOverlay?: (id: string | null) => void;
 };
 
-// 8 style presets with preview labels
 const STYLE_PRESETS: { id: TextStyle; label: string; preview: string }[] = [
   { id: 'modern_bold', label: 'Bold', preview: 'Aa' },
   { id: 'classic_serif', label: 'Serif', preview: 'Aa' },
@@ -27,13 +26,11 @@ const STYLE_PRESETS: { id: TextStyle; label: string; preview: string }[] = [
   { id: 'scoreboard', label: 'Scoreboard', preview: 'AB' },
 ];
 
-// Expanded 16-color palette
 const COLORS = [
   '#FFFFFF', '#0a0a0a', '#FF9C40', '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6',
   '#F1F5F9', '#6B7280', '#F97316', '#06B6D4', '#EC4899', '#14B8A6', '#D97706', '#6366F1',
 ];
 
-// Font class preview mapping for style chips
 const PREVIEW_FONTS: Record<TextStyle, string> = {
   modern_bold: 'font-sans font-extrabold',
   classic_serif: 'font-serif italic',
@@ -43,7 +40,6 @@ const PREVIEW_FONTS: Record<TextStyle, string> = {
   neon: 'font-sans font-bold',
   glass: 'font-sans font-semibold',
   scoreboard: 'font-mono font-bold uppercase',
-  // Legacy
   modern: 'font-sans font-bold',
   classic: 'font-serif italic',
 };
@@ -53,8 +49,6 @@ export default function StudioPanelText({
   updateEdits, 
   onApply, 
   onReset,
-  isPositioningText = false,
-  onTogglePositionMode,
   activeOverlayId,
   onSelectOverlay
 }: StudioPanelTextProps) {
@@ -116,7 +110,6 @@ export default function StudioPanelText({
   const bringToFront = useCallback((id: string) => {
     const index = textBoxes.findIndex(box => box.id === id);
     if (index === -1 || index === textBoxes.length - 1) return;
-    
     const updated = [...textBoxes];
     const [item] = updated.splice(index, 1);
     updated.push(item);
@@ -127,49 +120,28 @@ export default function StudioPanelText({
   const selected = textBoxes.find(box => box.id === selectedBox);
   const hasTextLayers = textBoxes.length > 0;
 
-  // Compact view when positioning
-  if (isPositioningText) {
-    return (
-      <div className="flex flex-col h-full max-h-[20vh] py-4 px-4">
-        <div className="flex items-center justify-between mb-3">
-          <h4 className="font-semibold text-foreground">Position text</h4>
-          <button
-            onClick={onTogglePositionMode}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-medium text-sm"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to editing
-          </button>
-        </div>
-        <p className="text-xs text-muted-foreground text-center">
-          Drag to move • Pinch to resize • Use handle to rotate
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col h-full">
       {/* Layers header */}
       <div className="px-3 pt-2 pb-1.5 flex items-center gap-2">
-        <Layers className="w-3.5 h-3.5 text-muted-foreground" />
-        <span className="text-xs font-medium text-muted-foreground">Layers</span>
-        <span className="text-[11px] text-muted-foreground/50 ml-auto">{textBoxes.length}</span>
+        <Layers className="w-3.5 h-3.5" style={{ color: '#AEAEB2' }} />
+        <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#AEAEB2' }}>Layers</span>
+        <span className="text-[11px] ml-auto" style={{ color: '#f59e0b' }}>{textBoxes.length}</span>
       </div>
       
       {/* Text boxes list OR empty state */}
       <div className="flex-1 overflow-y-auto px-3 pb-2">
         {!hasTextLayers ? (
-          /* Inviting empty state CTA */
           <button
             onClick={addTextBox}
-            className="w-full py-6 rounded-xl bg-muted/20 hover:bg-muted/40 transition-colors flex flex-col items-center justify-center gap-2"
+            className="w-full py-6 rounded-xl transition-colors flex flex-col items-center justify-center gap-2"
+            style={{ background: 'rgba(255,255,255,0.04)' }}
           >
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <Type className="w-5 h-5 text-primary" />
+            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(245,158,11,0.15)' }}>
+              <Type className="w-5 h-5" style={{ color: '#f59e0b' }} />
             </div>
-            <span className="text-sm font-medium text-foreground">Tap to add text overlay</span>
-            <span className="text-[11px] text-muted-foreground">Add captions, titles, or labels</span>
+            <span className="text-sm font-medium text-white">Tap to add text overlay</span>
+            <span className="text-[11px]" style={{ color: '#AEAEB2' }}>Add captions, titles, or labels</span>
           </button>
         ) : (
           <div className="space-y-1">
@@ -179,7 +151,6 @@ export default function StudioPanelText({
               
               return (
                 <div key={box.id}>
-                  {/* Layer row */}
                   <div
                     role="button"
                     tabIndex={0}
@@ -190,39 +161,34 @@ export default function StudioPanelText({
                         handleSelectBox(box.id);
                       }
                     }}
-                    className={cn(
-                      "w-full px-2 py-1.5 rounded-md border text-left transition-colors cursor-pointer",
-                      isSelected
-                        ? 'border-primary/40 bg-primary/5'
-                        : 'border-border/40 bg-card hover:bg-muted/30'
-                    )}
+                    className="w-full px-2 py-1.5 rounded-md text-left transition-colors cursor-pointer"
+                    style={{
+                      border: isSelected ? '1px solid rgba(245,158,11,0.4)' : '1px solid rgba(255,255,255,0.08)',
+                      background: isSelected ? 'rgba(245,158,11,0.08)' : 'transparent',
+                    }}
                   >
                     <div className="flex items-center justify-between gap-1.5">
                       <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                        <span className="text-[13px] font-medium text-foreground truncate">{box.text}</span>
-                        <span className="text-[10px] text-muted-foreground/70 flex-shrink-0">
+                        <span className="text-[13px] font-medium text-white truncate">{box.text}</span>
+                        <span className="text-[10px] flex-shrink-0" style={{ color: '#AEAEB2' }}>
                           {STYLE_PRESETS.find(p => p.id === box.style)?.label} · {(box.scale * 100).toFixed(0)}%
                         </span>
                       </div>
                       <div className="flex items-center gap-1">
                         {!isTopLayer && isSelected && (
                           <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              bringToFront(box.id);
-                            }}
-                            className="text-muted-foreground/50 hover:text-foreground p-0.5"
+                            onClick={(e) => { e.stopPropagation(); bringToFront(box.id); }}
+                            className="p-0.5"
+                            style={{ color: '#AEAEB2' }}
                             title="Bring to front"
                           >
                             <ChevronUp className="w-3 h-3" />
                           </button>
                         )}
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            removeBox(box.id);
-                          }}
-                          className="text-muted-foreground/50 hover:text-destructive text-[10px] font-medium"
+                          onClick={(e) => { e.stopPropagation(); removeBox(box.id); }}
+                          className="text-[10px] font-medium"
+                          style={{ color: '#EF4444' }}
                         >
                           Remove
                         </button>
@@ -230,50 +196,45 @@ export default function StudioPanelText({
                     </div>
                   </div>
 
-                  {/* Inline controls for selected layer — text input sits directly below its layer */}
+                  {/* Inline controls for selected layer */}
                   {isSelected && selected && (
                     <div className="mt-1.5 space-y-2.5 pb-2">
-                      {/* Text input — directly below the layer it belongs to */}
                       <input
                         type="text"
                         value={selected.text}
                         onChange={(e) => updateBox(selected.id, { text: e.target.value })}
                         placeholder="Enter text..."
-                        className="w-full px-2.5 py-1.5 rounded-md border border-border/60 text-sm focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-ring/20 bg-card text-foreground"
+                        className="w-full px-2.5 py-1.5 rounded-md text-sm focus:outline-none text-white"
+                        style={{
+                          background: 'rgba(255,255,255,0.06)',
+                          border: '1px solid rgba(255,255,255,0.12)',
+                          caretColor: '#f59e0b',
+                        }}
                       />
 
-                      {/* Position on media button */}
-                      {onTogglePositionMode && (
-                        <button
-                          onClick={onTogglePositionMode}
-                          className="w-full py-2 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors flex items-center justify-center gap-1.5 text-muted-foreground text-xs font-medium"
-                        >
-                          <Move className="w-3.5 h-3.5" />
-                          Position on media
-                        </button>
-                      )}
+                      {/* Hint about positioning */}
+                      <p className="text-center text-[11px]" style={{ color: '#AEAEB2' }}>
+                        Drag overlays on the preview above to reposition
+                      </p>
 
                       {/* Style selector */}
                       <div>
-                        <label className="block text-[11px] font-medium text-muted-foreground mb-1.5">Style</label>
+                        <label className="block text-[11px] font-medium mb-1.5" style={{ color: '#AEAEB2' }}>Style</label>
                         <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-0.5 px-0.5">
                           {STYLE_PRESETS.map(preset => (
                             <button
                               key={preset.id}
                               onClick={() => updateBox(selected.id, { style: preset.id })}
-                              className={cn(
-                                "flex-shrink-0 flex flex-col items-center gap-0.5 px-2.5 py-2 rounded-md border transition-all min-w-[52px]",
-                                selected.style === preset.id
-                                  ? 'border-primary bg-primary text-primary-foreground'
-                                  : 'border-border/40 bg-card text-foreground hover:bg-muted/30'
-                              )}
+                              className="flex-shrink-0 flex flex-col items-center gap-0.5 px-2.5 py-2 rounded-xl transition-all min-w-[52px]"
+                              style={selected.style === preset.id ? {
+                                background: '#f59e0b',
+                                color: '#FFFFFF',
+                              } : {
+                                background: 'rgba(255,255,255,0.08)',
+                                color: '#FFFFFF',
+                              }}
                             >
-                              <span 
-                                className={cn(
-                                  "text-base leading-none",
-                                  PREVIEW_FONTS[preset.id],
-                                )}
-                              >
+                              <span className={`text-base leading-none ${PREVIEW_FONTS[preset.id]}`}>
                                 {preset.preview}
                               </span>
                               <span className="text-[9px] font-medium">{preset.label}</span>
@@ -282,9 +243,9 @@ export default function StudioPanelText({
                         </div>
                       </div>
 
-                      {/* Size slider — custom styled */}
+                      {/* Size slider */}
                       <div className="flex items-center gap-2">
-                        <label className="text-[11px] font-medium text-muted-foreground w-8">Size</label>
+                        <label className="text-[11px] font-medium w-8" style={{ color: '#AEAEB2' }}>Size</label>
                         <input
                           type="range"
                           min="0.6"
@@ -292,40 +253,44 @@ export default function StudioPanelText({
                           step="0.1"
                           value={selected.scale}
                           onChange={(e) => updateBox(selected.id, { scale: parseFloat(e.target.value) })}
-                          className="flex-1 h-1.5 bg-muted rounded-full appearance-none cursor-pointer
+                          className="flex-1 h-1.5 rounded-full appearance-none cursor-pointer
                             [&::-webkit-slider-thumb]:appearance-none
                             [&::-webkit-slider-thumb]:w-5
                             [&::-webkit-slider-thumb]:h-5
                             [&::-webkit-slider-thumb]:rounded-full
-                            [&::-webkit-slider-thumb]:bg-primary
                             [&::-webkit-slider-thumb]:shadow-md
                             [&::-webkit-slider-thumb]:cursor-grab
                             [&::-webkit-slider-thumb]:active:cursor-grabbing
                             [&::-moz-range-thumb]:w-5
                             [&::-moz-range-thumb]:h-5
                             [&::-moz-range-thumb]:rounded-full
-                            [&::-moz-range-thumb]:bg-primary
                             [&::-moz-range-thumb]:border-0
                             [&::-moz-range-thumb]:shadow-md"
+                          style={{
+                            background: 'rgba(255,255,255,0.1)',
+                            // @ts-ignore
+                            '--tw-slider-thumb-bg': '#f59e0b',
+                          }}
                         />
-                        <span className="text-[11px] text-muted-foreground w-8 text-right font-mono">{(selected.scale * 100).toFixed(0)}%</span>
+                        <span className="text-[11px] w-8 text-right font-mono" style={{ color: '#AEAEB2' }}>{(selected.scale * 100).toFixed(0)}%</span>
                       </div>
 
-                      {/* Color picker — expanded 16 colors */}
+                      {/* Color picker */}
                       <div>
-                        <label className="block text-[11px] font-medium text-muted-foreground mb-1.5">Color</label>
+                        <label className="block text-[11px] font-medium mb-1.5" style={{ color: '#AEAEB2' }}>Color</label>
                         <div className="flex gap-1.5 flex-wrap">
                           {COLORS.map(color => (
                             <button
                               key={color}
                               onClick={() => updateBox(selected.id, { color })}
-                              className={cn(
-                                "w-7 h-7 rounded-md border-2 transition-all",
-                                selected.color === color
-                                  ? 'border-primary scale-105 ring-1 ring-primary/20'
-                                  : 'border-border/40 hover:scale-105'
-                              )}
-                              style={{ backgroundColor: color }}
+                              className="w-7 h-7 rounded-md transition-all"
+                              style={{
+                                backgroundColor: color,
+                                border: selected.color === color ? '2px solid white' : '2px solid rgba(255,255,255,0.12)',
+                                outline: selected.color === color ? '2px solid transparent' : undefined,
+                                outlineOffset: selected.color === color ? '2px' : undefined,
+                                transform: selected.color === color ? 'scale(1.05)' : undefined,
+                              }}
                             />
                           ))}
                         </div>
@@ -336,10 +301,11 @@ export default function StudioPanelText({
               );
             })}
             
-            {/* Add another button */}
+            {/* Add another */}
             <button
               onClick={addTextBox}
-              className="w-full py-1.5 mt-0.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors flex items-center justify-center gap-1 text-[11px]"
+              className="w-full py-1.5 mt-0.5 rounded-md transition-colors flex items-center justify-center gap-1 text-[11px]"
+              style={{ color: '#f59e0b' }}
             >
               <Plus className="w-3 h-3" />
               <span className="font-medium">Add another</span>

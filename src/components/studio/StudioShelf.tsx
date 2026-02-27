@@ -1,12 +1,16 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, RotateCcw } from 'lucide-react';
+import { ArrowLeft, RotateCcw } from 'lucide-react';
 import { StudioEdits, StudioTool } from '@/types/studio';
 import StudioToolRail from './StudioToolRail';
 import StudioPanelMusic from './panels/StudioPanelMusic';
 import StudioPanelText from './panels/StudioPanelText';
 import StudioPanelFilter from './panels/StudioPanelFilter';
 import StudioPanelEdit from './panels/StudioPanelEdit';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
+import { CropEditor } from '@/components/studio/CropEditor';
+import { getFilterClass } from '@/utils/studioFilters';
+import { aspectRatioToNumber } from '@/utils/studioEdit';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,6 +34,7 @@ type StudioShelfProps = {
   edits: StudioEdits;
   updateEdits: (patch: Partial<StudioEdits>) => void;
   clearEdits: () => void;
+  // Legacy props kept for compatibility but no longer used
   isPositioningText?: boolean;
   onTogglePositionMode?: () => void;
   activeOverlayId?: string | null;
@@ -48,12 +53,11 @@ export default function StudioShelf({
   edits,
   updateEdits,
   clearEdits,
-  isPositioningText = false,
-  onTogglePositionMode,
   activeOverlayId,
   onSelectOverlay
 }: StudioShelfProps) {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const canvasRef = useRef<HTMLDivElement>(null);
 
   // Detect if user has made any changes
   const hasChanges = useMemo(() => {
@@ -70,16 +74,12 @@ export default function StudioShelf({
     );
   }, [edits]);
 
-  // Focus trap and keyboard handling
+  // Keyboard handling
   useEffect(() => {
     if (!open) return;
-
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        handleCancelAttempt();
-      }
+      if (e.key === 'Escape') handleCancelAttempt();
     };
-
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [open, hasChanges]);
@@ -118,87 +118,178 @@ export default function StudioShelf({
     clearEdits();
   };
 
-  const isCollapsed = activeTool === 'text' && isPositioningText;
+  // Build transform for media
+  const mediaTransform = useMemo(() => {
+    const parts: string[] = [];
+    if (edits.rotate) parts.push(`rotate(${edits.rotate}deg)`);
+    if (edits.flipH) parts.push('scaleX(-1)');
+    if (edits.flipV) parts.push('scaleY(-1)');
+    return parts.length > 0 ? parts.join(' ') : undefined;
+  }, [edits.rotate, edits.flipH, edits.flipV]);
+
+  const filterClass = edits.filter ? getFilterClass(edits.filter) : '';
+  const filterOpacity = edits.filterIntensity != null ? edits.filterIntensity / 100 : 1;
+
+  // CropEditor aspect ratio
+  const cropAspect = useMemo(() => {
+    return edits.crop?.ratio ? aspectRatioToNumber(edits.crop.ratio) : undefined;
+  }, [edits.crop?.ratio]);
+
+  // Handle text overlay updates from the canvas renderer
+  const handleTextOverlayChange = useCallback((overlays: any[]) => {
+    updateEdits({ textOverlays: overlays });
+  }, [updateEdits]);
+
+  // CropEditor handlers
+  const handleCropComplete = useCallback((croppedArea: any, croppedAreaPixels: any) => {
+    updateEdits({
+      crop: {
+        ratio: edits.crop?.ratio || 'original',
+        area: {
+          x: croppedArea.x,
+          y: croppedArea.y,
+          width: croppedArea.width,
+          height: croppedArea.height,
+        },
+        zoom: edits.crop?.zoom || 1,
+      },
+    });
+  }, [edits.crop?.ratio, edits.crop?.zoom, updateEdits]);
+
+  const handleCropZoomChange = useCallback((newZoom: number) => {
+    updateEdits({
+      crop: {
+        ...edits.crop,
+        ratio: edits.crop?.ratio || 'original',
+        zoom: newZoom,
+      },
+    });
+  }, [edits.crop, updateEdits]);
+
+  const showCropOnCanvas = activeTool === 'edit' && activeMediaType === 'image' && !!activeMediaPreviewUrl;
 
   return (
     <AnimatePresence>
       {open && (
         <>
-          {/* Backdrop */}
+          {/* Fullscreen overlay */}
           <motion.div
-            className="fixed inset-0 z-[9998] bg-black/40"
-            style={{
-              pointerEvents: isCollapsed ? 'none' : 'auto',
-              opacity: isCollapsed ? 0 : undefined,
-            }}
+            className="fixed inset-0 z-[9999] bg-black flex flex-col"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.24, ease: 'easeOut' }}
-            onClick={isCollapsed ? undefined : handleCancelAttempt}
-          />
-
-          {/* Studio Shelf */}
-          <motion.div
-            className="light fixed inset-x-0 bottom-0 z-[9999] rounded-t-2xl overflow-hidden flex flex-col bg-card shadow-xl"
-            style={{
-              height: isCollapsed ? 'auto' : '75vh',
-              maxHeight: isCollapsed ? '20vh' : '75vh',
-            }}
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ 
-              type: 'spring',
-              damping: 28,
-              stiffness: 300,
-            }}
+            transition={{ duration: 0.25 }}
           >
-            {/* Grabber */}
-            <div className="flex justify-center pt-3 pb-2">
-              <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+            {/* Top Bar */}
+            <div
+              className="flex items-center justify-between px-4 py-3 z-10 flex-shrink-0"
+              style={{
+                background: 'rgba(0,0,0,0.5)',
+                backdropFilter: 'blur(16px)',
+              }}
+            >
+              <button
+                onClick={handleCancelAttempt}
+                className="flex items-center gap-1.5 text-sm font-medium"
+                style={{ color: 'rgba(255,255,255,0.8)' }}
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back
+              </button>
+              <div className="flex items-center gap-3">
+                {hasChanges && (
+                  <button
+                    onClick={handleResetAll}
+                    className="flex items-center gap-1 text-sm font-medium"
+                    style={{ color: '#EF4444' }}
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    Reset
+                  </button>
+                )}
+                <button
+                  onClick={() => onClose()}
+                  className="px-4 py-1.5 rounded-full text-sm font-semibold"
+                  style={{
+                    background: '#f59e0b',
+                    color: '#FFFFFF',
+                    boxShadow: '0 2px 8px rgba(245,158,11,0.3)',
+                  }}
+                >
+                  Done
+                </button>
+              </div>
             </div>
 
-            {/* Header */}
-            {!isCollapsed && (
-              <div className="flex items-center justify-between px-4 pb-2 border-b border-border/60">
-                <div>
-                  <h3 className="text-base font-semibold text-foreground">
-                    Studio
-                  </h3>
-                  <p className="text-[11px] mt-0.5 text-muted-foreground">
-                    Enhance your moment
-                  </p>
+            {/* Live Media Canvas */}
+            <div
+              ref={canvasRef}
+              className="flex-1 relative bg-black flex items-center justify-center overflow-hidden min-h-0"
+            >
+              {/* Show CropEditor when crop tool is active for images */}
+              {showCropOnCanvas ? (
+                <div className="absolute inset-0">
+                  <CropEditor
+                    imageSrc={activeMediaPreviewUrl!}
+                    aspectRatio={cropAspect}
+                    initialZoom={edits.crop?.zoom || 1}
+                    onCropComplete={handleCropComplete}
+                    onZoomChange={handleCropZoomChange}
+                  />
                 </div>
-                <div className="flex items-center gap-2">
-                  {hasChanges && (
-                    <button
-                      onClick={handleResetAll}
-                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-destructive/70 hover:bg-destructive/5 transition-colors"
-                      aria-label="Reset all edits"
-                    >
-                      <RotateCcw className="w-3 h-3" />
-                      Reset
-                    </button>
+              ) : (
+                <>
+                  {/* Media element with live filter */}
+                  {activeMediaType === 'video' ? (
+                    <video
+                      src={activeMediaPreviewUrl || undefined}
+                      poster={activeMediaThumbnailUrl || undefined}
+                      className={`max-w-full max-h-full object-contain ${filterClass}`}
+                      style={{
+                        opacity: filterOpacity,
+                        transform: mediaTransform,
+                      }}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                    />
+                  ) : (
+                    <img
+                      src={activeMediaPreviewUrl || undefined}
+                      className={`max-w-full max-h-full object-contain ${filterClass}`}
+                      style={{
+                        opacity: filterOpacity,
+                        transform: mediaTransform,
+                      }}
+                      alt="Studio preview"
+                    />
                   )}
-                  <button
-                    onClick={handleCancelAttempt}
-                    className="w-7 h-7 rounded-full flex items-center justify-center transition-colors bg-muted/50 hover:bg-muted"
-                    aria-label="Close Studio"
-                  >
-                    <X className="w-3.5 h-3.5 text-foreground" />
-                  </button>
-                </div>
-              </div>
-            )}
+
+                  {/* Text overlays — draggable on the canvas */}
+                  {edits.textOverlays && edits.textOverlays.length > 0 && (
+                    <TextOverlayRenderer
+                      textOverlays={edits.textOverlays}
+                      isEditable={activeTool === 'text'}
+                      onChange={handleTextOverlayChange}
+                      containerRef={canvasRef as React.RefObject<HTMLDivElement>}
+                      activeOverlayId={activeOverlayId}
+                      onSelectOverlay={onSelectOverlay}
+                      safeAreaContext="create"
+                    />
+                  )}
+                </>
+              )}
+            </div>
 
             {/* Tool Rail */}
-            {!isCollapsed && (
-              <StudioToolRail activeTool={activeTool} setActiveTool={setActiveTool} />
-            )}
+            <StudioToolRail activeTool={activeTool} setActiveTool={setActiveTool} />
 
-            {/* Tool Panels */}
-            <div className={isCollapsed ? '' : 'flex-1 min-h-0 overflow-hidden'}>
+            {/* Panel Area */}
+            <div
+              className="overflow-y-auto flex-shrink-0"
+              style={{ height: '35vh', background: '#1A1A1A' }}
+            >
               <AnimatePresence mode="wait">
                 {activeTool === 'music' && (
                   <motion.div
@@ -221,7 +312,7 @@ export default function StudioShelf({
                 {activeTool === 'text' && (
                   <motion.div
                     key="text"
-                    className={isCollapsed ? '' : 'h-full'}
+                    className="h-full"
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
@@ -232,8 +323,6 @@ export default function StudioShelf({
                       updateEdits={updateEdits}
                       onApply={handleApply}
                       onReset={handleReset}
-                      isPositioningText={isPositioningText}
-                      onTogglePositionMode={onTogglePositionMode}
                       activeOverlayId={activeOverlayId}
                       onSelectOverlay={onSelectOverlay}
                     />
@@ -273,6 +362,7 @@ export default function StudioShelf({
                       updateEdits={updateEdits}
                       mediaType={activeMediaType}
                       mediaUrl={activeMediaPreviewUrl || undefined}
+                      showCropCanvas={false}
                     />
                   </motion.div>
                 )}
@@ -293,10 +383,10 @@ export default function StudioShelf({
                       >
                         ✨
                       </motion.div>
-                      <p className="text-sm font-medium text-foreground">
+                      <p className="text-sm font-medium text-white">
                         Choose a tool to enhance your moment
                       </p>
-                      <p className="text-xs mt-1 text-muted-foreground">
+                      <p className="text-xs mt-1" style={{ color: '#AEAEB2' }}>
                         Add music, text, filters, or fine-tune your clip
                       </p>
                     </div>
@@ -304,27 +394,6 @@ export default function StudioShelf({
                 )}
               </AnimatePresence>
             </div>
-
-            {/* Footer */}
-            {!isCollapsed && (
-              <div 
-                className="px-5 pt-3 pb-4 flex gap-3 border-t border-border/30 bg-card"
-                style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 12px), 16px)' }}
-              >
-                <button
-                  onClick={handleCancelAttempt}
-                  className="flex-1 h-11 rounded-xl text-sm font-medium transition-colors border border-border/40 bg-background text-foreground hover:bg-muted/30"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => onClose()}
-                  className="flex-1 h-11 rounded-xl text-sm font-semibold transition-all bg-primary text-primary-foreground hover:bg-primary/90"
-                >
-                  Done
-                </button>
-              </div>
-            )}
           </motion.div>
 
           {/* Cancel Confirmation Dialog */}

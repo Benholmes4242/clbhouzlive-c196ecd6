@@ -68,7 +68,6 @@ export function ReviewWizard({
   // Studio & Badges state
   const [showStudio, setShowStudio] = useState(false);
   const [studioTool, setStudioTool] = useState<StudioTool>(null);
-  const [isPositioningText, setIsPositioningText] = useState(false);
   const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
   const [selectedBadges] = useState<string[]>([]);
   const [studioEditsByMediaId, setStudioEditsByMediaId] = useState<Record<string, StudioEdits>>({});
@@ -333,7 +332,6 @@ export function ReviewWizard({
   const handleCloseStudio = useCallback(() => {
     setShowStudio(false);
     setStudioTool(null);
-    setIsPositioningText(false);
   }, []);
 
   const handleUpdateStudioEdits = useCallback((patch: Partial<StudioEdits>) => {
@@ -621,8 +619,6 @@ export function ReviewWizard({
               edits={activeMediaEdits}
               updateEdits={handleUpdateStudioEdits}
               clearEdits={handleClearStudioEdits}
-              isPositioningText={isPositioningText}
-              onTogglePositionMode={() => setIsPositioningText(!isPositioningText)}
               activeOverlayId={activeOverlayId}
               onSelectOverlay={setActiveOverlayId}
             />
