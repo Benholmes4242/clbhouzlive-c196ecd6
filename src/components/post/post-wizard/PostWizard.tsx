@@ -154,7 +154,6 @@ export function PostWizard({
   // Studio state
   const [showStudio, setShowStudio] = useState(false);
   const [studioTool, setStudioTool] = useState<StudioTool>('filter');
-  const [isPositioningText, setIsPositioningText] = useState(false);
   const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
 
   // Toolbar tooltips
@@ -522,7 +521,6 @@ export function PostWizard({
   const handleCloseStudio = useCallback(() => {
     setShowStudio(false);
     setStudioTool('filter');
-    setIsPositioningText(false);
     setActiveOverlayId(null);
   }, []);
 
@@ -872,8 +870,6 @@ export function PostWizard({
                 edits={activeStudioEdits}
                 updateEdits={handleUpdateStudioEdits}
                 clearEdits={handleClearStudioEdits}
-                isPositioningText={isPositioningText}
-                onTogglePositionMode={() => setIsPositioningText(prev => !prev)}
                 activeOverlayId={activeOverlayId}
                 onSelectOverlay={setActiveOverlayId}
               />

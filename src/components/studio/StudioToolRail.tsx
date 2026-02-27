@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { Music, Type, Sparkles, Crop } from 'lucide-react';
 import { StudioTool } from '@/types/studio';
-import { cn } from '@/lib/utils';
 
 type ToolButtonProps = {
   icon: React.ReactNode;
@@ -14,12 +13,14 @@ const ToolButton = ({ icon, label, active, onClick }: ToolButtonProps) => (
   <motion.button
     onClick={onClick}
     whileTap={{ scale: 0.97 }}
-    className={cn(
-      "flex flex-col items-center justify-center gap-1 py-2.5 px-4 rounded-xl transition-all duration-150",
-      active 
-        ? "bg-primary text-primary-foreground" 
-        : "bg-muted/50 text-muted-foreground hover:bg-muted border border-border/40"
-    )}
+    className="flex flex-col items-center justify-center gap-1 py-2.5 px-4 rounded-xl transition-all duration-150"
+    style={active ? {
+      background: '#f59e0b',
+      color: '#FFFFFF',
+    } : {
+      background: 'transparent',
+      color: '#AEAEB2',
+    }}
   >
     <div className="transition-colors">
       {icon}
@@ -37,7 +38,14 @@ type StudioToolRailProps = {
 
 export default function StudioToolRail({ activeTool, setActiveTool }: StudioToolRailProps) {
   return (
-    <div className="grid grid-cols-4 gap-2.5 px-4 py-2.5 bg-card border-b border-border/60">
+    <div
+      className="grid grid-cols-4 gap-2.5 px-4 py-2.5 flex-shrink-0"
+      style={{
+        background: '#1A1A1A',
+        borderTop: '1px solid rgba(255,255,255,0.1)',
+        borderBottom: '1px solid rgba(255,255,255,0.1)',
+      }}
+    >
       <ToolButton
         icon={<Music className="w-5 h-5" />}
         label="Music"
