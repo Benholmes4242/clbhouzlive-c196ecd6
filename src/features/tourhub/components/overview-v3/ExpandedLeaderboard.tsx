@@ -129,7 +129,7 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({ entr
     ? `${firstName[0]}. ${lastName}`
     : lastName || 'Unknown';
   const fullName = player.full_name || `${firstName} ${lastName}`.trim();
-  const photoUrl = getPlayerHeadshotUrl(fullName, tourCode, player.headshot_override);
+  const photoUrl = getPlayerHeadshotUrl(fullName, tourCode);
   const initials = `${firstName[0] || ''}${lastName[0] || ''}`.toUpperCase();
   const posDisplay = entry.position_tied ? `T${entry.position}` : `${entry.position ?? '-'}`;
   const thruDisplay = formatThru(entry);
