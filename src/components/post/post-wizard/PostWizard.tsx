@@ -1,12 +1,12 @@
-// Post Wizard - Main Component
-// Multi-step post creation wizard following Review Wizard pattern
+// Post Wizard - Single-Screen Composer
+// Replaces the 3-step wizard with a unified composer surface.
+// State engine (usePostWizard), upload pipeline, and all services are unchanged.
 
-import React, { useEffect, useCallback, useState, useMemo } from 'react';
+import React, { useEffect, useCallback, useState, useMemo, useRef } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, AlertTriangle, RefreshCw } from 'lucide-react';
+import { X, AlertTriangle, RefreshCw, Image, Camera, MapPin, Tag, UserPlus, Plus, Globe, ChevronDown, LucideIcon } from 'lucide-react';
 import { ErrorBoundary as ReactErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { PostWizardProps } from './types';
 import { usePostWizard } from './usePostWizard';
@@ -22,32 +22,77 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { postKeys } from '@/queryKeys/posts';
 import { toast } from 'sonner';
-import { StudioTool, StudioEdits } from '@/types/studio';
 import type { DraftWithMedia } from '@/services/drafts';
 import { Button } from '@/components/ui/button';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { pickMediaFiles, validateMediaFiles } from '@/utils/media/pickMediaFiles';
+import { normalizeFilesToMediaItems } from '@/lib/mediaUtils';
+import { TaggableEntity } from '@/components/post/create-moment/types';
+import { MentionBottomSheet, MentionSuggestion } from './steps/MentionBottomSheet';
+import { POST_LIMITS } from '@/constants/postLimits';
 
-// Step components
-import { MediaStep, CaptionStep, ConfirmStep } from './steps';
-
-// Sheets from existing modal
-import { 
-  MomentBadgesSheet, 
+// Sheets
+import {
+  MomentBadgesSheet,
   MomentCategorySheet,
   DraftsAndScheduledSheet,
   ScheduleSheet,
 } from '@/components/post/create-moment/sheets';
 import { CourseSearchSheet } from '@/components/courses/CourseSearchSheet';
 import PostingOptionsSheet from '@/components/post/create-moment/PostingOptionsSheet';
-import StudioShelf from '@/components/studio/StudioShelf';
-
-// Apple-style action sheet for discard confirmation
 import { DiscardActionSheet } from './DiscardActionSheet';
 
-/**
- * Fix 1: Scoped error boundary for CourseSearchSheet.
- * Search failures render inline "Couldn't load" message instead of killing the wizard.
- */
+// ---------------------------------------------------------------------------
+// Inline helper components
+// ---------------------------------------------------------------------------
+
+function ToolButton({ icon: Icon, onClick, label }: { icon: LucideIcon; onClick: () => void; label: string }) {
+  return (
+    <button
+      onClick={onClick}
+      aria-label={label}
+      className="w-[42px] h-[42px] rounded-[10px] flex items-center justify-center transition-all active:scale-[0.88]"
+      style={{ color: '#f59e0b' }}
+    >
+      <Icon className="w-6 h-6" />
+    </button>
+  );
+}
+
+function CharacterRing({ current, max }: { current: number; max: number }) {
+  const circumference = 2 * Math.PI * 10;
+  const ratio = Math.min(current / max, 1);
+  const offset = circumference * (1 - ratio);
+  const strokeColor = ratio > 0.95 ? '#FF3B30' : ratio > 0.8 ? '#FF9500' : '#f59e0b';
+  const showCount = ratio > 0.8;
+
+  return (
+    <div className="flex items-center gap-2">
+      {showCount && (
+        <span className="text-[12px] font-medium tabular-nums" style={{ color: strokeColor }}>
+          {max - current}
+        </span>
+      )}
+      <svg width="26" height="26" style={{ transform: 'rotate(-90deg)' }}>
+        <circle cx="13" cy="13" r="10" fill="none" stroke="#E8E8ED" strokeWidth="2.5" />
+        {current > 0 && (
+          <circle
+            cx="13" cy="13" r="10" fill="none" stroke={strokeColor} strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            style={{ transition: 'stroke-dashoffset 0.35s cubic-bezier(0.16,1,0.3,1), stroke 0.25s ease' }}
+          />
+        )}
+      </svg>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// CourseSearchSheet error boundary
+// ---------------------------------------------------------------------------
+
 function CourseSearchSheetFallback({ resetErrorBoundary }: FallbackProps) {
   return (
     <div className="fixed inset-x-0 bottom-0 z-[10011] rounded-t-[24px] bg-background p-8 text-center"
@@ -74,6 +119,10 @@ function CourseSearchSheetBoundary(props: React.ComponentProps<typeof CourseSear
   );
 }
 
+// ---------------------------------------------------------------------------
+// Main PostWizard Component
+// ---------------------------------------------------------------------------
+
 export function PostWizard({
   isOpen,
   onClose,
@@ -89,13 +138,6 @@ export function PostWizard({
   const {
     state,
     dispatch,
-    nextStep,
-    prevStep,
-    isFirstStep,
-    isLastStep,
-    currentStepIndex,
-    totalSteps,
-    canProceedFromMedia,
     canSubmit,
     reset,
     setCategories,
@@ -106,8 +148,10 @@ export function PostWizard({
     setSubmitting,
     setVisibility,
     setBadges,
-    setStudioEdits,
-    setActiveMediaId,
+    addMedia,
+    removeMedia,
+    setCaption,
+    setTags,
     loadDraft,
     loadExistingPost,
   } = usePostWizard({
@@ -116,25 +160,17 @@ export function PostWizard({
     initialActorOverride,
   });
 
-  // Active actor context for profile info
-  const { activeActor, setActiveActor, availableActors, isLoading: actorLoading } = useActiveActor();
-  
-  // Derived personal and business actors from availableActors
-  const personalActor = useMemo(() => 
-    availableActors.find(a => a.type === 'personal'), 
-    [availableActors]
-  );
-  const businessActors = useMemo(() => 
-    availableActors.filter(a => a.type === 'business'), 
-    [availableActors]
-  );
-  
-  // Drafts and scheduled posts
+  // Active actor context
+  const { activeActor, setActiveActor, availableActors } = useActiveActor();
+
+  const personalActor = useMemo(() => availableActors.find(a => a.type === 'personal'), [availableActors]);
+  const businessActors = useMemo(() => availableActors.filter(a => a.type === 'business'), [availableActors]);
+
+  // Drafts
   const { drafts, createDraft, canCreateDraft, uploadMedia } = useDrafts();
   const { scheduledPosts } = useScheduledPosts();
 
   // Sheet states
-  const [showStudio, setShowStudio] = useState(false);
   const [showBadgesSheet, setShowBadgesSheet] = useState(false);
   const [showCategorySheet, setShowCategorySheet] = useState(false);
   const [showCourseSearch, setShowCourseSearch] = useState(false);
@@ -145,25 +181,23 @@ export function PostWizard({
   const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
 
-  // Studio state
-  const [studioTool, setStudioTool] = useState<StudioTool>(null);
-  const [isPositioningText, setIsPositioningText] = useState(false);
-  const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
+  // Mention state
+  const [showMentions, setShowMentions] = useState(false);
+  const [mentionQuery, setMentionQuery] = useState('');
+  const [cursorPosition, setCursorPosition] = useState(0);
+  const captionRef = useRef<HTMLTextAreaElement>(null);
 
-  // Control native status bar appearance when wizard is open
-  // "light" = black icons for light backgrounds (#F8FAFC)
+  // Status bar
   useMedianStatusBar("light", "transparent", true, false, isOpen);
 
-  // Lock body scroll when open
+  // Lock body scroll
   useEffect(() => {
     if (!isOpen) return;
-
     const scrollY = window.scrollY;
     document.body.style.overflow = 'hidden';
     document.body.style.position = 'fixed';
     document.body.style.top = `-${scrollY}px`;
     document.body.style.width = '100%';
-
     return () => {
       document.body.style.overflow = '';
       document.body.style.position = '';
@@ -173,7 +207,7 @@ export function PostWizard({
     };
   }, [isOpen]);
 
-  // Reset state when modal closes
+  // Reset on close
   useEffect(() => {
     if (!isOpen) {
       reset();
@@ -182,24 +216,24 @@ export function PostWizard({
     }
   }, [isOpen, reset]);
 
-  // Load existing post data for edit mode
+  // Load existing post for edit
   useEffect(() => {
     if (isOpen && editPostData && !state.isEditMode) {
       loadExistingPost(editPostData);
     }
   }, [isOpen, editPostData, state.isEditMode, loadExistingPost]);
 
-  // Sync actor from context
+  // Sync actor
   useEffect(() => {
     if (activeActor && !initialActorOverride) {
-      setActor({
-        type: activeActor.type === 'business' ? 'business' : 'personal',
-        id: activeActor.id,
-      });
+      setActor({ type: activeActor.type === 'business' ? 'business' : 'personal', id: activeActor.id });
     }
   }, [activeActor, initialActorOverride, setActor]);
 
-  // Handle close with dirty check
+  // ---------------------------------------------------------------------------
+  // Handlers
+  // ---------------------------------------------------------------------------
+
   const handleClose = useCallback(() => {
     if (state.isDirty) {
       setShowCloseConfirm(true);
@@ -208,48 +242,115 @@ export function PostWizard({
     }
   }, [state.isDirty, onClose]);
 
-  // Confirm close (discard changes)
   const confirmClose = useCallback(() => {
     setShowCloseConfirm(false);
     onClose();
   }, [onClose]);
 
-  // Handle back navigation
-  const handleBack = useCallback(() => {
-    if (isFirstStep) {
-      handleClose();
-    } else {
-      prevStep();
-    }
-  }, [isFirstStep, handleClose, prevStep]);
+  // Media picker
+  const handleAddMedia = useCallback(async (source?: 'camera' | 'gallery') => {
+    const remainingSlots = 10 - state.mediaItems.length;
+    if (remainingSlots <= 0) return;
 
-  // Handle submission
+    try {
+      const files = await pickMediaFiles({
+        accept: source === 'camera' ? 'image/*' : 'image/*,video/*',
+        capture: source === 'camera' ? 'environment' : undefined,
+        multiple: remainingSlots > 1,
+        maxFiles: remainingSlots,
+      });
+      if (files.length > 0) {
+        const result = await normalizeFilesToMediaItems(files);
+        if (result.errors?.length) {
+          result.errors.forEach(err => toast.error(`${err.fileName}: ${err.error}`));
+        }
+        if (result.validItems?.length) {
+          addMedia(result.validItems);
+        }
+      }
+    } catch {
+      // User cancelled picker
+    }
+  }, [state.mediaItems.length, addMedia]);
+
+  // Caption change with @mention detection
+  const handleCaptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    setCaption(value);
+    
+    // Auto-resize
+    e.target.style.height = 'auto';
+    e.target.style.height = e.target.scrollHeight + 'px';
+
+    const cursor = e.target.selectionStart || 0;
+    setCursorPosition(cursor);
+
+    const textBeforeCursor = value.slice(0, cursor);
+    const mentionMatch = textBeforeCursor.match(/@(\w*)$/);
+    if (mentionMatch) {
+      setMentionQuery(mentionMatch[1]);
+      setShowMentions(true);
+    } else {
+      setShowMentions(false);
+      setMentionQuery('');
+    }
+  }, [setCaption]);
+
+  // Mention selection
+  const handleMentionSelect = useCallback((mention: MentionSuggestion) => {
+    const caption = state.caption;
+    const textBeforeCursor = caption.slice(0, cursorPosition);
+    const textAfterCursor = caption.slice(cursorPosition);
+    const beforeMention = textBeforeCursor.replace(/@\w*$/, '');
+    const displayName = mention.username || mention.name;
+    const newCaption = `${beforeMention}@${displayName} ${textAfterCursor}`;
+    
+    setCaption(newCaption);
+    setShowMentions(false);
+    setMentionQuery('');
+
+    const tagEntity: TaggableEntity = {
+      id: mention.id,
+      entity_id: mention.entity_id,
+      entity_type: mention.entity_type,
+      name: mention.name,
+      username: mention.username,
+      avatar_url: mention.avatar_url,
+    };
+    if (!state.selectedTags.some(t => t.id === mention.id)) {
+      dispatch({ type: 'SET_TAGS', payload: [...state.selectedTags, tagEntity] });
+    }
+
+    setTimeout(() => {
+      if (captionRef.current) {
+        captionRef.current.focus();
+        const newPos = beforeMention.length + displayName.length + 2;
+        captionRef.current.setSelectionRange(newPos, newPos);
+      }
+    }, 50);
+  }, [state.caption, state.selectedTags, cursorPosition, setCaption, dispatch]);
+
+  // Submission (preserved verbatim from old PostWizard)
   const handleSubmit = useCallback(async () => {
     if (state.isSubmitting || !canSubmit) return;
-    
-    // If no categories, show category sheet first
+
+    // Require category
     if (state.selectedCategories.length === 0) {
       setShowCategorySheet(true);
       return;
     }
-    
+
     setSubmitting(true);
-    
+
     try {
-      // EDIT MODE: Run UPDATE instead of INSERT
+      // EDIT MODE
       if (state.isEditMode && state.editPostId) {
         if (!user?.id) {
           toast.error('You must be logged in to edit a post.');
           setSubmitting(false);
           return;
         }
-        // Convert categories to string IDs
-        const categoryIds = state.selectedCategories.map(cat => 
-          typeof cat === 'string' ? cat : cat.id
-        );
-        
-        // Safe UPDATE — only user-controlled fields, with ownership guard
-        // Use auth user ID (not actor ID) since posts.user_id = auth.uid()
+        const categoryIds = state.selectedCategories.map(cat => typeof cat === 'string' ? cat : cat.id);
         const { data: updatedRows, error } = await supabase
           .from('posts')
           .update({
@@ -260,21 +361,16 @@ export function PostWizard({
             updated_at: new Date().toISOString(),
           })
           .eq('id', state.editPostId)
-          .eq('user_id', user.id) // CRITICAL: use auth user ID, not actor ID
+          .eq('user_id', user.id)
           .select('id');
-        
-        if (error) {
-          throw new Error(`Failed to update post: ${error.message}`);
-        }
 
-        // Check if the update actually modified a row
+        if (error) throw new Error(`Failed to update post: ${error.message}`);
         if (!updatedRows || updatedRows.length === 0) {
           toast.error('This post could not be updated. It may have been deleted.');
           dispatch({ type: 'SET_SUBMITTING', payload: false });
           return;
         }
 
-        // Invalidate caches (same keys as usePostDeletion)
         queryClient.invalidateQueries({ queryKey: ['trending-posts'] });
         queryClient.invalidateQueries({ queryKey: ['infinite-followed-posts'] });
         queryClient.invalidateQueries({ queryKey: ['actor-posts'] });
@@ -286,48 +382,23 @@ export function PostWizard({
         queryClient.invalidateQueries({ queryKey: ['pinned-posts'] });
         queryClient.invalidateQueries({ queryKey: ['featured-post'] });
         queryClient.invalidateQueries({ queryKey: ['creator-features'] });
-        // Fix 7: Actor-specific cache invalidation
-        queryClient.invalidateQueries({ 
-          queryKey: postKeys.actorPosts(state.actor.type as 'personal' | 'business', state.actor.id) 
-        });
-        // Fix 8: Single-post cache invalidation
+        queryClient.invalidateQueries({ queryKey: postKeys.actorPosts(state.actor.type as 'personal' | 'business', state.actor.id) });
         queryClient.invalidateQueries({ queryKey: ['post', state.editPostId] });
-        
-        // Fix 6: Dispatch postUpdated event (matches delete flow pattern)
         window.dispatchEvent(new CustomEvent('postUpdated'));
-        
         toast.success('Post updated');
         onClose();
         return;
       }
 
-      // CREATE MODE: Normal insert flow
-      // Extract files from media items
-      const files = state.mediaItems
-        .filter(item => item.file)
-        .map(item => item.file as File);
-      
-      // Build course info from first selected course (for backwards compat)
+      // CREATE MODE
+      const files = state.mediaItems.filter(item => item.file).map(item => item.file as File);
       const firstCourse = state.selectedCourses[0];
       const courseInfo = firstCourse?.id && firstCourse?.name
-        ? {
-            id: firstCourse.id,
-            name: firstCourse.name,
-            country: firstCourse.country || '',
-          }
+        ? { id: firstCourse.id, name: firstCourse.name, country: firstCourse.country || '' }
         : undefined;
-      
-      // Build courseIds array with defensive filter for multi-course support
-      const courseIds = state.selectedCourses
-        .map(c => c?.id)
-        .filter((id): id is string => Boolean(id));
-      
-      // Convert categories to string IDs for the upload
-      const categoryIds = state.selectedCategories.map(cat => 
-        typeof cat === 'string' ? cat : cat.id
-      );
-      
-      // Enqueue upload with resilience
+      const courseIds = state.selectedCourses.map(c => c?.id).filter((id): id is string => Boolean(id));
+      const categoryIds = state.selectedCategories.map(cat => typeof cat === 'string' ? cat : cat.id);
+
       await enqueuePostUploadWithResilience({
         userId: state.actor.id,
         actorType: state.actor.type,
@@ -344,273 +415,129 @@ export function PostWizard({
         badges: state.selectedBadges,
         scheduledAt: state.scheduledAt ?? undefined,
       });
-      
-      // Show success screen
+
       setShowSuccess(true);
-      
     } catch (error) {
       console.error('[PostWizard] Submission failed:', error);
       toast.error(state.isEditMode ? 'Failed to update post.' : 'Failed to post. Please try again.');
     } finally {
       setSubmitting(false);
     }
-  }, [state, canSubmit, setSubmitting, onClose]);
+  }, [state, canSubmit, setSubmitting, onClose, user, queryClient, dispatch]);
 
-  // Handle next/submit
-  const handleNext = useCallback(() => {
-    if (isLastStep) {
-      handleSubmit();
-    } else {
-      nextStep();
-    }
-  }, [isLastStep, nextStep, handleSubmit]);
-
-  // Handle course selection (add to list)
+  // Course handler
   const handleCourseSelect = useCallback((course: { id: string; name: string; country: string; region?: string }) => {
     try {
-      // Validate course object before adding
       if (!course?.id || !course?.name) {
-        console.error('PostWizard: Invalid course object received:', course);
         setShowCourseSearch(false);
         return;
       }
-      
       addCourse(course);
       setShowCourseSearch(false);
-    } catch (error) {
-      console.error('PostWizard: Error adding course:', error);
+    } catch {
       setShowCourseSearch(false);
-      // Fail gracefully - don't crash the wizard
     }
   }, [addCourse]);
 
-  // Handle category selection
   const handleCategoriesChange = useCallback((categories: string[]) => {
     setCategories(categories as any);
   }, [setCategories]);
 
-  // Handle badges selection
   const handleBadgesChange = useCallback((badges: string[]) => {
     setBadges(badges);
   }, [setBadges]);
 
-  // Handle profile/visibility selection from PostingOptionsSheet
   const handleActorChange = useCallback((actor: { type: 'personal' | 'business'; id: string; name: string; avatarUrl?: string }) => {
     setActor({ type: actor.type, id: actor.id });
-    // Also update context so it persists
     const selected = availableActors.find(a => a.id === actor.id);
-    if (selected) {
-      setActiveActor(selected);
-    }
+    if (selected) setActiveActor(selected);
   }, [setActor, availableActors, setActiveActor]);
 
-  // Handle visibility change
   const handleVisibilityChange = useCallback((visibility: 'anyone' | 'followers' | 'private') => {
     setVisibility(visibility);
   }, [setVisibility]);
 
-  // Handle schedule selection
   const handleScheduleSelect = useCallback((date: Date) => {
     setScheduledAt(date);
     setShowScheduleSheet(false);
   }, [setScheduledAt]);
 
-  // Handle draft loading
   const handleLoadDraft = useCallback((draft: DraftWithMedia) => {
     loadDraft(draft);
     setShowDraftsSheet(false);
     toast.success('Draft loaded');
   }, [loadDraft]);
 
-  // Handle save draft (for Drafts sheet)
   const handleSaveDraft = useCallback(async () => {
-    if (!canCreateDraft) {
-      toast.error('Maximum drafts reached');
-      return;
-    }
-    
+    if (!canCreateDraft) { toast.error('Maximum drafts reached'); return; }
     try {
-      // Convert categories to string IDs
-      const categoryIds = state.selectedCategories.map(cat => 
-        typeof cat === 'string' ? cat : cat.id
-      );
-      
+      const categoryIds = state.selectedCategories.map(cat => typeof cat === 'string' ? cat : cat.id);
       await createDraft({
-        actorType: state.actor.type,
-        actorId: state.actor.id,
-        content: state.caption || null,
-        visibility: state.visibility,
-        categories: categoryIds,
-        badges: state.selectedBadges,
+        actorType: state.actor.type, actorId: state.actor.id,
+        content: state.caption || null, visibility: state.visibility,
+        categories: categoryIds, badges: state.selectedBadges,
         courseId: state.selectedCourses[0]?.id || null,
         courseName: state.selectedCourses[0]?.name || null,
         courseCountry: state.selectedCourses[0]?.country || null,
       });
-      
       toast.success('Draft saved');
-    } catch (error) {
-      console.error('[PostWizard] Failed to save draft:', error);
-      toast.error('Failed to save draft');
-    }
+    } catch { toast.error('Failed to save draft'); }
   }, [state, canCreateDraft, createDraft]);
 
-  // Handle save draft and close (for Discard Action Sheet)
   const handleSaveDraftAndClose = useCallback(async () => {
-    if (!canCreateDraft) {
-      toast.error('Maximum drafts reached');
-      return;
-    }
-    
+    if (!canCreateDraft) { toast.error('Maximum drafts reached'); return; }
     setIsSavingDraft(true);
-    
     try {
-      // Convert categories to string IDs
-      const categoryIds = state.selectedCategories.map(cat => 
-        typeof cat === 'string' ? cat : cat.id
-      );
-      
-      // Create the draft first
+      const categoryIds = state.selectedCategories.map(cat => typeof cat === 'string' ? cat : cat.id);
       const draft = await createDraft({
-        actorType: state.actor.type,
-        actorId: state.actor.id,
-        content: state.caption || null,
-        visibility: state.visibility,
-        categories: categoryIds,
-        badges: state.selectedBadges,
+        actorType: state.actor.type, actorId: state.actor.id,
+        content: state.caption || null, visibility: state.visibility,
+        categories: categoryIds, badges: state.selectedBadges,
         courseId: state.selectedCourses[0]?.id || null,
         courseName: state.selectedCourses[0]?.name || null,
         courseCountry: state.selectedCourses[0]?.country || null,
       });
-      
-      // Upload media if draft was created and there are media items with files
       if (draft?.id && state.mediaItems.length > 0) {
         const mediaWithFiles = state.mediaItems.filter(item => item.file);
         if (mediaWithFiles.length > 0) {
-          await uploadMedia(
-            draft.id,
-            mediaWithFiles,
-            (mediaId) => state.studioEditsByMediaId[mediaId]
-          );
+          await uploadMedia(draft.id, mediaWithFiles, (mediaId) => state.studioEditsByMediaId[mediaId]);
         }
       }
-      
       toast.success('Draft saved');
       setShowCloseConfirm(false);
       onClose();
-    } catch (error) {
-      console.error('[PostWizard] Failed to save draft:', error);
-      toast.error('Failed to save draft');
-    } finally {
-      setIsSavingDraft(false);
-    }
+    } catch { toast.error('Failed to save draft'); } finally { setIsSavingDraft(false); }
   }, [state, canCreateDraft, createDraft, uploadMedia, onClose]);
 
-  // Studio handlers
-  const handleOpenStudio = useCallback(() => {
-    // Set first media as active if none selected
-    if (!state.activeMediaId && state.mediaItems.length > 0) {
-      setActiveMediaId(state.mediaItems[0].id);
-    }
-    setShowStudio(true);
-  }, [state.activeMediaId, state.mediaItems, setActiveMediaId]);
-
-  const handleCloseStudio = useCallback(() => {
-    setShowStudio(false);
-    setStudioTool(null);
-    setIsPositioningText(false);
-  }, []);
-
-  const handleUpdateStudioEdits = useCallback((patch: Partial<StudioEdits>) => {
-    if (!state.activeMediaId) return;
-    
-    const currentEdits = state.studioEditsByMediaId[state.activeMediaId] || {};
-    setStudioEdits(state.activeMediaId, { ...currentEdits, ...patch });
-  }, [state.activeMediaId, state.studioEditsByMediaId, setStudioEdits]);
-
-  const handleClearStudioEdits = useCallback(() => {
-    if (!state.activeMediaId) return;
-    setStudioEdits(state.activeMediaId, {});
-  }, [state.activeMediaId, setStudioEdits]);
-
-  // Get active media info for studio
-  const activeMedia = useMemo(() => {
-    if (!state.activeMediaId) return null;
-    return state.mediaItems.find(m => m.id === state.activeMediaId) || null;
-  }, [state.activeMediaId, state.mediaItems]);
-
-  const activeMediaEdits = useMemo((): StudioEdits => {
-    if (!state.activeMediaId) return {};
-    return state.studioEditsByMediaId[state.activeMediaId] || {};
-  }, [state.activeMediaId, state.studioEditsByMediaId]);
-
-  // Determine if next button should be enabled
-  const canProceed = useMemo(() => {
-    switch (state.currentStep) {
-      case 'media':
-        return canProceedFromMedia;
-      case 'caption':
-        // Now requires at least 1 category to proceed
-        return state.selectedCategories.length > 0;
-      case 'confirm':
-        return canSubmit && state.selectedCategories.length > 0;
-      default:
-        return false;
-    }
-  }, [state.currentStep, canProceedFromMedia, canSubmit, state.selectedCategories.length]);
-
-  // Get actor display info
-  const actorDisplayInfo = useMemo(() => {
-    if (state.actor.type === 'personal' && personalActor) {
-      return {
-        name: personalActor.name,
-        avatarUrl: personalActor.avatarUrl,
-        verified: personalActor.verified,
-      };
-    }
-    const business = businessActors?.find(b => b.id === state.actor.id);
-    if (business) {
-      return {
-        name: business.name,
-        avatarUrl: business.avatarUrl,
-        verified: business.verified,
-      };
-    }
-    return { name: 'You', avatarUrl: undefined, verified: false };
-  }, [state.actor, personalActor, businessActors]);
-
-  // Build selected actor for PostingOptionsSheet
-  const selectedActorForSheet = useMemo(() => {
-    const found = availableActors.find(a => a.id === state.actor.id);
-    return found || null;
-  }, [availableActors, state.actor.id]);
-
-  // Handle success actions — navigate to Clubhouse feed
-  // Note: Post upload is fire-and-forget (background), so we can't deep-link to the specific post.
-  // We navigate to /clubhouse so the user sees the feed where their post will appear.
-  const handleViewPost = useCallback(() => {
-    onClose();
-    navigate('/clubhouse');
-  }, [onClose, navigate]);
-
-  const handleCreateAnother = useCallback(() => {
-    reset();
-    setShowSuccess(false);
-  }, [reset]);
-
-  const handleSuccessDone = useCallback(() => {
-    onClose();
-  }, [onClose]);
-
-  // Handle "Leave a Review" from success screen
+  // Success handlers
+  const handleViewPost = useCallback(() => { onClose(); navigate('/clubhouse'); }, [onClose, navigate]);
+  const handleCreateAnother = useCallback(() => { reset(); setShowSuccess(false); }, [reset]);
+  const handleSuccessDone = useCallback(() => { onClose(); }, [onClose]);
   const handleLeaveReview = useCallback((course: { id: string; name: string; country: string; region?: string }) => {
-    // Capture media files BEFORE closing (reset would revoke blob URLs)
-    const mediaFiles: File[] = state.mediaItems
-      .map(item => item.file)
-      .filter(Boolean) as File[];
-    
+    const mediaFiles = state.mediaItems.map(item => item.file).filter(Boolean) as File[];
     onRequestReview?.(course, mediaFiles);
     onClose();
   }, [onClose, onRequestReview, state.mediaItems]);
+
+  // Actor display info
+  const actorDisplayInfo = useMemo(() => {
+    if (state.actor.type === 'personal' && personalActor) {
+      return { name: personalActor.name, avatarUrl: personalActor.avatarUrl };
+    }
+    const business = businessActors?.find(b => b.id === state.actor.id);
+    if (business) return { name: business.name, avatarUrl: business.avatarUrl };
+    return { name: 'You', avatarUrl: undefined };
+  }, [state.actor, personalActor, businessActors]);
+
+  const selectedActorForSheet = useMemo(() => {
+    return availableActors.find(a => a.id === state.actor.id) || null;
+  }, [availableActors, state.actor.id]);
+
+  // Visibility label
+  const visibilityLabel = state.visibility === 'anyone' ? 'Anyone' : state.visibility === 'followers' ? 'Followers' : 'Private';
+
+  // Can post
+  const canPost = (state.mediaItems.length > 0 || state.isEditMode) && !state.isSubmitting && !!user;
 
   if (!isOpen) return null;
 
@@ -623,213 +550,258 @@ export function PostWizard({
               <X className="h-6 w-6 text-destructive" />
             </div>
             <h2 className="text-lg font-semibold text-foreground mb-2">Something went wrong</h2>
-            <p className="text-sm text-muted-foreground mb-6">
-              Something went wrong. Please try again.
-            </p>
-            <button
-              onClick={onClose}
-              className="w-full px-4 py-3 bg-primary text-white font-medium rounded-xl hover:bg-primary/90 transition-colors"
-            >
+            <p className="text-sm text-muted-foreground mb-6">Please try again.</p>
+            <button onClick={onClose} className="w-full px-4 py-3 bg-primary text-white font-medium rounded-xl hover:bg-primary/90 transition-colors">
               Close
             </button>
           </div>
         </div>
       }
     >
-      <AnimatePresence>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="light fixed inset-0 z-[9999] flex flex-col overflow-hidden pb-safe"
-            style={{ 
-              ...{
-                touchAction: 'pan-y pinch-zoom',
-                overscrollBehavior: 'contain',
-              },
-              backgroundColor: '#F8FAFC',
-            }}
-        >
-          {showSuccess ? (
-            <PostSuccessScreen
+      <div
+        className="light fixed inset-0 z-[9999] flex flex-col overflow-hidden"
+        style={{ backgroundColor: '#FFFFFF', touchAction: 'pan-y pinch-zoom', overscrollBehavior: 'contain' }}
+      >
+        {showSuccess ? (
+          <PostSuccessScreen
+            isScheduled={!!state.scheduledAt}
+            scheduledAt={state.scheduledAt}
+            firstMediaUrl={state.mediaItems[0]?.previewUrl || null}
+            firstMediaType={state.mediaItems[0]?.type || 'image'}
+            mediaCount={state.mediaItems.length}
+            onViewPost={handleViewPost}
+            onCreateAnother={handleCreateAnother}
+            onDone={handleSuccessDone}
+            taggedCourse={state.selectedCourses[0] || null}
+            onLeaveReview={onRequestReview ? handleLeaveReview : undefined}
+            isBusinessActor={state.actor.type === 'business'}
+          />
+        ) : (
+          <>
+            {/* Header */}
+            <PostWizardHeader
+              onClose={handleClose}
+              onPost={handleSubmit}
+              canPost={canPost}
+              isSubmitting={state.isSubmitting}
+              isEditMode={state.isEditMode}
               isScheduled={!!state.scheduledAt}
-              scheduledAt={state.scheduledAt}
-              firstMediaUrl={state.mediaItems[0]?.previewUrl || null}
-              firstMediaType={state.mediaItems[0]?.type || 'image'}
-              mediaCount={state.mediaItems.length}
-              onViewPost={handleViewPost}
-              onCreateAnother={handleCreateAnother}
-              onDone={handleSuccessDone}
-              taggedCourse={state.selectedCourses[0] || null}
-              onLeaveReview={onRequestReview ? handleLeaveReview : undefined}
-              isBusinessActor={state.actor.type === 'business'}
             />
-          ) : (
-            <>
-              {/* Header + progress bar — single amber surface that bleeds behind status bar */}
-              <div className="flex-shrink-0" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}>
-                <PostWizardHeader
-                  currentStep={state.currentStep}
-                  currentStepIndex={currentStepIndex}
-                  totalSteps={totalSteps}
-                  isFirstStep={isFirstStep}
-                  isLastStep={isLastStep}
-                  actor={state.actor}
-                  actorName={actorDisplayInfo.name}
-                  actorAvatarUrl={actorDisplayInfo.avatarUrl}
-                  actorVerified={actorDisplayInfo.verified}
-                  onOpenProfileSelector={() => setShowProfileSelector(true)}
-                  draftCount={drafts?.length ?? 0}
-                  scheduledCount={scheduledPosts?.length ?? 0}
-                  scheduledAt={state.scheduledAt}
-                  onClearSchedule={() => setScheduledAt(null)}
-                  onBack={handleBack}
-                  onOpenDrafts={() => setShowDraftsSheet(true)}
-                  onOpenScheduled={() => setShowDraftsSheet(true)}
-                  onOpenScheduleSheet={() => setShowScheduleSheet(true)}
-                  canProceed={canProceed}
-                  isSubmitting={state.isSubmitting}
-                  onNext={handleNext}
-                  hasHeroAbove
-                  isEditMode={state.isEditMode}
-                />
+
+            {/* Scrollable Composer */}
+            <div className="flex-1 overflow-y-auto px-5 pt-5 pb-6" style={{ scrollbarWidth: 'none' }}>
+              <div className="flex items-start gap-3 max-w-[680px] mx-auto">
+                {/* Avatar */}
+                <div
+                  className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center mt-0.5 overflow-hidden"
+                  style={{ background: 'linear-gradient(145deg, #f59e0b 0%, #b45309 100%)', boxShadow: '0 2px 8px rgba(245,158,11,0.20)' }}
+                >
+                  {actorDisplayInfo.avatarUrl ? (
+                    <img src={actorDisplayInfo.avatarUrl} className="w-full h-full object-cover" alt="" />
+                  ) : (
+                    <span className="text-white font-semibold text-[15px]">
+                      {actorDisplayInfo.name?.[0]?.toUpperCase() || 'U'}
+                    </span>
+                  )}
+                </div>
+
+                {/* Compose area */}
+                <div className="flex-1 min-w-0 flex flex-col gap-3.5">
+                  {/* User info + audience pill */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-[15px] font-semibold tracking-tight" style={{ color: '#1A1A1A' }}>
+                      {actorDisplayInfo.name || 'You'}
+                    </span>
+                    <button
+                      onClick={() => setShowProfileSelector(true)}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border text-[12px] font-medium active:scale-[0.95] active:bg-[rgba(245,158,11,0.05)] transition-all"
+                      style={{ borderColor: 'rgba(0,0,0,0.07)', color: '#d97706' }}
+                    >
+                      <Globe className="w-3 h-3" style={{ color: '#f59e0b' }} />
+                      <span>{visibilityLabel}</span>
+                      <ChevronDown className="w-2.5 h-2.5 opacity-55" style={{ color: '#f59e0b' }} />
+                    </button>
+                  </div>
+
+                  {/* Caption textarea */}
+                  <textarea
+                    ref={captionRef}
+                    value={state.caption}
+                    onChange={handleCaptionChange}
+                    placeholder="Share your round, tip, or moment..."
+                    maxLength={POST_LIMITS.MAX_CAPTION_LENGTH}
+                    className="w-full min-h-[130px] bg-transparent border-none outline-none text-[20px] font-normal leading-[1.42] tracking-tight resize-none"
+                    style={{ caretColor: '#f59e0b', color: '#1A1A1A' }}
+                  />
+
+                  {/* Media Zone */}
+                  <div>
+                    {state.mediaItems.length === 0 ? (
+                      <button
+                        onClick={() => handleAddMedia()}
+                        className="w-full flex flex-col items-center justify-center gap-2 py-7 rounded-2xl cursor-pointer transition-all active:scale-[0.985] active:bg-[rgba(245,158,11,0.04)]"
+                        style={{ border: '1.5px dashed rgba(245,158,11,0.25)' }}
+                      >
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(245,158,11,0.10)' }}>
+                          <Image className="w-[19px] h-[19px]" style={{ color: '#f59e0b' }} />
+                        </div>
+                        <span className="text-[13px] font-medium tracking-tight" style={{ color: '#AEAEB2' }}>
+                          Add photo or video
+                        </span>
+                      </button>
+                    ) : (
+                      <div className="flex gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
+                        {state.mediaItems.map((item, index) => (
+                          <div key={item.id} className="relative flex-shrink-0 w-[140px] h-[140px] rounded-2xl overflow-hidden">
+                            {item.type === 'video' ? (
+                              <video src={item.previewUrl} className="w-full h-full object-cover" muted playsInline />
+                            ) : (
+                              <img src={item.previewUrl} className="w-full h-full object-cover" alt="" />
+                            )}
+                            <button
+                              onClick={() => removeMedia(item.id)}
+                              className="absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center"
+                              style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(20px)' }}
+                            >
+                              <X className="w-3 h-3 text-white" />
+                            </button>
+                            {index === 0 && state.mediaItems.length > 1 && (
+                              <span
+                                className="absolute bottom-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-semibold text-white"
+                                style={{ background: 'rgba(245,158,11,0.85)' }}
+                              >
+                                Cover
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                        {state.mediaItems.length < 10 && (
+                          <button
+                            onClick={() => handleAddMedia()}
+                            className="flex-shrink-0 w-[140px] h-[140px] rounded-2xl flex items-center justify-center active:scale-[0.96] transition-transform"
+                            style={{ border: '1.5px dashed rgba(245,158,11,0.25)' }}
+                          >
+                            <Plus className="w-6 h-6" style={{ color: '#f59e0b' }} />
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Tagged courses */}
+                  {state.selectedCourses.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {state.selectedCourses.map((course) => (
+                        <span
+                          key={course.id}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[12px] font-medium"
+                          style={{ background: 'rgba(245,158,11,0.10)', color: '#92400e' }}
+                        >
+                          <MapPin className="w-3 h-3" />
+                          {course.name}
+                          <button onClick={() => removeCourse(course.id)} className="ml-0.5">
+                            <X className="w-3 h-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
+            </div>
 
-              {/* Step content - fills remaining space */}
-              <main className="flex-1 min-h-0 overflow-y-auto">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={state.currentStep}
-                    initial={{ opacity: 0, x: 300 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -300 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                    className="h-full"
-                  >
-                    {state.currentStep === 'media' && (
-                      <MediaStep
-                        state={state}
-                        dispatch={dispatch}
-                        onOpenStudio={handleOpenStudio}
-                        onOpenBadges={() => setShowBadgesSheet(true)}
-                      />
-                    )}
-                    {state.currentStep === 'caption' && (
-                      <CaptionStep
-                        state={state}
-                        dispatch={dispatch}
-                        onOpenCourseSearch={() => setShowCourseSearch(true)}
-                        onOpenCategories={() => setShowCategorySheet(true)}
-                      />
-                    )}
-                    {state.currentStep === 'confirm' && (
-                      <ConfirmStep
-                        state={state}
-                        dispatch={dispatch}
-                        onOpenCategories={() => setShowCategorySheet(true)}
-                        onEditCaption={() => dispatch({ type: 'SET_STEP', payload: 'caption' })}
-                        onEditLocation={() => {
-                          dispatch({ type: 'SET_STEP', payload: 'caption' });
-                          setTimeout(() => setShowCourseSearch(true), 150);
-                        }}
-                      />
-                    )}
-                  </motion.div>
-                </AnimatePresence>
-              </main>
+            {/* Bottom Toolbar */}
+            <div
+              className="flex-shrink-0 flex items-center justify-between px-5 pt-2.5"
+              style={{
+                borderTop: '0.5px solid rgba(0,0,0,0.07)',
+                paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 28px)',
+              }}
+            >
+              <div className="flex items-center gap-0.5">
+                <ToolButton icon={Image} onClick={() => handleAddMedia('gallery')} label="Photo" />
+                <ToolButton icon={Camera} onClick={() => handleAddMedia('camera')} label="Camera" />
+                <ToolButton icon={MapPin} onClick={() => setShowCourseSearch(true)} label="Tag Course" />
+                <ToolButton icon={Tag} onClick={() => setShowCategorySheet(true)} label="Category" />
+                <ToolButton icon={UserPlus} onClick={() => { /* tag friends — future */ }} label="Tag Friends" />
+              </div>
+              <CharacterRing current={state.caption.length} max={POST_LIMITS.MAX_CAPTION_LENGTH} />
+            </div>
 
-              {/* Apple-style Discard Action Sheet */}
-              <DiscardActionSheet
-                open={showCloseConfirm}
-                onDiscard={confirmClose}
-                onSaveToDrafts={handleSaveDraftAndClose}
-                onKeepEditing={() => setShowCloseConfirm(false)}
-                isSaving={isSavingDraft}
-                canSaveDraft={canCreateDraft}
-              />
+            {/* Discard Action Sheet */}
+            <DiscardActionSheet
+              open={showCloseConfirm}
+              onDiscard={confirmClose}
+              onSaveToDrafts={handleSaveDraftAndClose}
+              onKeepEditing={() => setShowCloseConfirm(false)}
+              isSaving={isSavingDraft}
+              canSaveDraft={canCreateDraft}
+            />
 
-              {/* Sheets & Overlays */}
-              
-              {/* Profile Selector */}
-              <PostingOptionsSheet
-                isOpen={showProfileSelector}
-                onClose={() => setShowProfileSelector(false)}
-                selectedActor={selectedActorForSheet}
-                availableActors={availableActors}
-                onActorChange={handleActorChange}
-                visibility={state.visibility}
-                onVisibilityChange={handleVisibilityChange}
-              />
+            {/* Profile Selector */}
+            <PostingOptionsSheet
+              isOpen={showProfileSelector}
+              onClose={() => setShowProfileSelector(false)}
+              selectedActor={selectedActorForSheet}
+              availableActors={availableActors}
+              onActorChange={handleActorChange}
+              visibility={state.visibility}
+              onVisibilityChange={handleVisibilityChange}
+            />
 
-              {/* Badges Sheet */}
-              <MomentBadgesSheet
-                isOpen={showBadgesSheet}
-                onClose={() => setShowBadgesSheet(false)}
-                selectedBadges={state.selectedBadges}
-                onBadgesChange={handleBadgesChange}
-              />
+            {/* Badges Sheet */}
+            <MomentBadgesSheet
+              isOpen={showBadgesSheet}
+              onClose={() => setShowBadgesSheet(false)}
+              selectedBadges={state.selectedBadges}
+              onBadgesChange={handleBadgesChange}
+            />
 
-              {/* Category Sheet */}
-              <MomentCategorySheet
-                isOpen={showCategorySheet}
-                onClose={() => setShowCategorySheet(false)}
-                selectedCategories={state.selectedCategories.map(c => typeof c === 'string' ? c : c.id)}
-                onCategoriesChange={handleCategoriesChange}
-              />
+            {/* Category Sheet */}
+            <MomentCategorySheet
+              isOpen={showCategorySheet}
+              onClose={() => setShowCategorySheet(false)}
+              selectedCategories={state.selectedCategories.map(c => typeof c === 'string' ? c : c.id)}
+              onCategoriesChange={handleCategoriesChange}
+            />
 
-              {/* Course Search Sheet */}
-              <CourseSearchSheetBoundary
-                isOpen={showCourseSearch}
-                onClose={() => setShowCourseSearch(false)}
-                onSelectCourse={handleCourseSelect}
-                userId={state.actor.id || undefined}
-                existingCourseIds={state.selectedCourses.map(c => c.id).filter(Boolean)}
-              />
+            {/* Course Search */}
+            <CourseSearchSheetBoundary
+              isOpen={showCourseSearch}
+              onClose={() => setShowCourseSearch(false)}
+              onSelectCourse={handleCourseSelect}
+              userId={state.actor.id || undefined}
+              existingCourseIds={state.selectedCourses.map(c => c.id).filter(Boolean)}
+            />
 
-              {/* Drafts & Scheduled Sheet */}
-              <DraftsAndScheduledSheet
-                isOpen={showDraftsSheet}
-                onClose={() => setShowDraftsSheet(false)}
-                onLoadDraft={handleLoadDraft}
-                onEditScheduledPost={() => {
-                  setShowDraftsSheet(false);
-                }}
-                onSaveDraft={handleSaveDraft}
-                canSaveDraft={canCreateDraft && state.isDirty}
-              />
+            {/* Drafts & Scheduled */}
+            <DraftsAndScheduledSheet
+              isOpen={showDraftsSheet}
+              onClose={() => setShowDraftsSheet(false)}
+              onLoadDraft={handleLoadDraft}
+              onEditScheduledPost={() => setShowDraftsSheet(false)}
+              onSaveDraft={handleSaveDraft}
+              canSaveDraft={canCreateDraft && state.isDirty}
+            />
 
-              {/* Schedule Sheet */}
-              <ScheduleSheet
-                isOpen={showScheduleSheet}
-                onClose={() => setShowScheduleSheet(false)}
-                onSchedule={handleScheduleSelect}
-                initialDate={state.scheduledAt ?? undefined}
-              />
+            {/* Schedule Sheet */}
+            <ScheduleSheet
+              isOpen={showScheduleSheet}
+              onClose={() => setShowScheduleSheet(false)}
+              onSchedule={handleScheduleSelect}
+              initialDate={state.scheduledAt ?? undefined}
+            />
 
-              {/* Studio Shelf */}
-              {activeMedia && (
-                <StudioShelf
-                  open={showStudio}
-                  onClose={handleCloseStudio}
-                  activeTool={studioTool}
-                  setActiveTool={setStudioTool}
-                  activeMediaId={activeMedia.id}
-                  activeMediaType={activeMedia.type}
-                  activeMediaPreviewUrl={activeMedia.previewUrl}
-                  activeMediaThumbnailUrl={(activeMedia as any).posterUrl || activeMedia.previewUrl}
-                  edits={activeMediaEdits}
-                  updateEdits={handleUpdateStudioEdits}
-                  clearEdits={handleClearStudioEdits}
-                  isPositioningText={isPositioningText}
-                  onTogglePositionMode={() => setIsPositioningText(!isPositioningText)}
-                  activeOverlayId={activeOverlayId}
-                  onSelectOverlay={setActiveOverlayId}
-                />
-              )}
-            </>
-          )}
-        </motion.div>
-      </AnimatePresence>
+            {/* Mention suggestions */}
+            <MentionBottomSheet
+              open={showMentions}
+              onOpenChange={setShowMentions}
+              query={mentionQuery}
+              onSelect={handleMentionSelect}
+            />
+          </>
+        )}
+      </div>
     </ErrorBoundary>,
     document.body
   );

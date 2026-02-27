@@ -1,256 +1,78 @@
-// PostWizardHeader - Header with profile selector, schedule, drafts
-// World-class wizard header with backdrop blur and context-aware CTA
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { X, ChevronDown, FileEdit, Clock, Loader2, ChevronLeft, Calendar } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
-import { PostWizardStep, ActorRef } from './types';
-import { format } from 'date-fns';
-
-const SCHEDULE_TOOLTIP_KEY = 'pw-schedule-tooltip-seen';
+// PostWizardHeader - Minimal composer header: Cancel | Title | Post
+import { Flag, Loader2 } from 'lucide-react';
 
 export interface PostWizardHeaderProps {
-  currentStep: PostWizardStep;
-  currentStepIndex: number;
-  totalSteps: number;
-  isFirstStep: boolean;
-  isLastStep: boolean;
-  
-  actor: ActorRef;
-  actorName: string;
-  actorAvatarUrl?: string;
-  actorVerified?: boolean;
-  onOpenProfileSelector: () => void;
-  
-  draftCount: number;
-  scheduledCount: number;
-  
-  scheduledAt?: Date | null;
-  onClearSchedule?: () => void;
-  
-  onBack: () => void;
-  onOpenDrafts: () => void;
-  onOpenScheduled: () => void;
-  onOpenScheduleSheet: () => void;
-  
-  canProceed: boolean;
+  onClose: () => void;
+  onPost: () => void;
+  canPost: boolean;
   isSubmitting: boolean;
-  onNext: () => void;
-  
-  hasHeroAbove?: boolean;
   isEditMode?: boolean;
+  isScheduled?: boolean;
 }
 
 export function PostWizardHeader({
-  currentStep,
-  currentStepIndex,
-  totalSteps,
-  isFirstStep,
-  isLastStep,
-  actor,
-  actorName,
-  actorAvatarUrl,
-  actorVerified,
-  onOpenProfileSelector,
-  draftCount,
-  scheduledCount,
-  scheduledAt,
-  onClearSchedule,
-  onBack,
-  onOpenDrafts,
-  onOpenScheduled,
-  onOpenScheduleSheet,
-  canProceed,
+  onClose,
+  onPost,
+  canPost,
   isSubmitting,
-  onNext,
-  hasHeroAbove = false,
   isEditMode = false,
+  isScheduled = false,
 }: PostWizardHeaderProps) {
-  const getInitials = (name: string) => name.charAt(0).toUpperCase();
-  const [showTooltip, setShowTooltip] = useState(false);
-  const tooltipSeenRef = useRef(false);
-  
-  // One-time tooltip for schedule discoverability
-  useEffect(() => {
-    if (!isFirstStep || tooltipSeenRef.current) return;
-    try {
-      const seen = localStorage.getItem(SCHEDULE_TOOLTIP_KEY);
-      if (seen) {
-        tooltipSeenRef.current = true;
-        return;
-      }
-      const timer = setTimeout(() => setShowTooltip(true), 800);
-      return () => clearTimeout(timer);
-    } catch {}
-  }, [isFirstStep]);
-
-  const dismissTooltip = useCallback(() => {
-    setShowTooltip(false);
-    tooltipSeenRef.current = true;
-    try { localStorage.setItem(SCHEDULE_TOOLTIP_KEY, '1'); } catch {}
-  }, []);
-
-  // Auto-dismiss tooltip after 3 seconds
-  useEffect(() => {
-    if (!showTooltip) return;
-    const timer = setTimeout(dismissTooltip, 3000);
-    return () => clearTimeout(timer);
-  }, [showTooltip, dismissTooltip]);
-
-  const handleClockTap = () => {
-    dismissTooltip();
-    if (scheduledCount > 0) {
-      onOpenScheduled();
-    } else {
-      onOpenScheduleSheet();
-    }
-  };
-  
-  const hasSchedule = !!scheduledAt;
-  const nextButtonText = isEditMode
-    ? (isLastStep ? 'Save Changes' : 'Next')
-    : hasSchedule
-      ? 'Schedule'
-      : isLastStep ? 'Post' : 'Next';
+  const buttonLabel = isSubmitting
+    ? (isEditMode ? 'Saving…' : isScheduled ? 'Scheduling…' : 'Posting…')
+    : (isEditMode ? 'Save' : isScheduled ? 'Schedule' : 'Post');
 
   return (
-    <header 
-      className="sticky top-0 z-10 flex items-center justify-between px-3 bg-[#F8FAFC]"
-      style={{ 
-        height: hasHeroAbove ? '55px' : 'calc(55px + max(env(safe-area-inset-top, 0px), 47px))',
-        paddingTop: hasHeroAbove ? '0px' : 'max(env(safe-area-inset-top, 0px), 47px)',
+    <header
+      className="flex items-center justify-between px-5 flex-shrink-0"
+      style={{
+        height: 'calc(52px + max(env(safe-area-inset-top, 0px), 47px))',
+        paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+        borderBottom: '0.5px solid rgba(0,0,0,0.07)',
       }}
     >
-      {/* Left: Close button */}
-      <div className="flex items-center gap-1 min-w-[72px]">
-        <button
-          onClick={onBack}
-          className="w-9 h-9 rounded-full bg-muted text-foreground flex items-center justify-center active:bg-muted/80 transition-colors"
-          aria-label={isFirstStep ? 'Close' : 'Back'}
-        >
-          {isFirstStep ? (
-            <X className="h-4 w-4" />
-          ) : (
-            <ChevronLeft className="h-5 w-5" />
-          )}
-        </button>
-        
-        {!isEditMode && isFirstStep && draftCount > 0 && (
-          <button
-            onClick={onOpenDrafts}
-            className="w-8 h-8 rounded-full flex items-center justify-center relative transition-colors hover:bg-muted"
-            aria-label={`View ${draftCount} drafts`}
-          >
-            <FileEdit className="h-3.5 w-3.5 text-muted-foreground" />
-            <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-[14px] rounded-full bg-primary text-primary-foreground text-[8px] font-semibold flex items-center justify-center">
-              {draftCount > 9 ? '9+' : draftCount}
-            </span>
-          </button>
-        )}
-      </div>
-      
-      {/* Center: Avatar-only profile selector (hidden in edit mode) */}
-      <div className="flex-1 flex justify-center">
-        {isEditMode ? (
-          <span className="text-sm font-semibold text-foreground">Edit Post</span>
-        ) : (
-          <button 
-            onClick={onOpenProfileSelector}
-            className="flex items-center gap-1 px-2 py-1 rounded-full transition-colors hover:bg-muted/60 active:bg-muted/80"
-          >
-            <SquircleAvatar
-              size={28}
-              src={actorAvatarUrl}
-              alt={actorName}
-              fallback={getInitials(actorName)}
-              hideRing
-            />
-            {actorVerified && <VerifiedBadge size="sm" />}
-            <ChevronDown className="h-3 w-3 text-muted-foreground" />
-          </button>
-        )}
-      </div>
-      
-      {/* Right: Context-aware CTA */}
-      <div className="flex items-center gap-1 min-w-[72px] justify-end">
-        {!isEditMode && isFirstStep && (
-          <div className="relative">
-            <button
-              onClick={handleClockTap}
-              className={cn(
-                "w-9 h-9 rounded-full flex items-center justify-center relative transition-colors hover:bg-muted",
-                showTooltip && "animate-pulse"
-              )}
-              aria-label={scheduledCount > 0 ? `View ${scheduledCount} scheduled posts` : "Schedule post"}
-            >
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              {scheduledCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] rounded-full bg-primary text-primary-foreground text-[9px] font-semibold flex items-center justify-center">
-                  {scheduledCount > 9 ? '9+' : scheduledCount}
-                </span>
-              )}
-            </button>
-            
-            <AnimatePresence>
-              {showTooltip && (
-                <motion.div
-                  initial={{ opacity: 0, y: -4, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -4, scale: 0.95 }}
-                  transition={{ duration: 0.2 }}
-                  onClick={dismissTooltip}
-                  className="absolute top-full right-0 mt-2 px-3 py-1.5 bg-foreground text-background text-xs font-medium rounded-lg whitespace-nowrap shadow-lg z-20"
-                >
-                  Schedule your post
-                  <div className="absolute -top-1 right-3 w-2 h-2 bg-foreground rotate-45" />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        )}
+      {/* Cancel */}
+      <button
+        onClick={onClose}
+        className="text-[17px] font-normal min-w-[72px] text-left active:opacity-60 transition-opacity"
+        style={{ color: '#7A7A7A' }}
+      >
+        Cancel
+      </button>
 
-        {!isEditMode && isLastStep && !isFirstStep && (
-          <button
-            onClick={onOpenScheduleSheet}
-            className={cn(
-              "w-8 h-8 rounded-full flex items-center justify-center transition-colors",
-              hasSchedule 
-                ? "bg-primary/10 text-primary" 
-                : "text-muted-foreground hover:bg-muted"
-            )}
-            aria-label="Schedule post"
-          >
-            <Calendar className="h-4 w-4" />
-          </button>
-        )}
-        
-        {/* Next/Post/Schedule button — amber accent */}
-        <div className="flex flex-col items-end">
-            <button
-            onClick={onNext}
-            disabled={!canProceed || isSubmitting}
-            className={cn(
-              'px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 active:scale-[0.97]',
-              !canProceed || isSubmitting
-                ? 'bg-muted text-muted-foreground cursor-not-allowed'
-                : 'bg-primary text-primary-foreground shadow-sm'
-            )}
-          >
-            {isSubmitting ? (
-              <span className="flex items-center gap-1.5">
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                {isEditMode ? 'Saving…' : hasSchedule ? 'Scheduling…' : 'Posting…'}
-              </span>
-            ) : (
-              <span className="flex items-center gap-1.5">
-                {hasSchedule && isLastStep && <Calendar className="h-3.5 w-3.5" />}
-                {nextButtonText}
-              </span>
-            )}
-          </button>
+      {/* Center title */}
+      <div className="flex items-center gap-[7px]">
+        <div
+          className="w-[22px] h-[22px] rounded-[6px] flex items-center justify-center"
+          style={{ background: 'linear-gradient(145deg, #f59e0b 0%, #d97706 100%)' }}
+        >
+          <Flag className="w-[13px] h-[13px] text-white" />
         </div>
+        <span className="text-[17px] font-semibold tracking-tight" style={{ color: '#1A1A1A' }}>
+          {isEditMode ? 'Edit Post' : 'New Post'}
+        </span>
+      </div>
+
+      {/* Post button */}
+      <div className="min-w-[72px] flex justify-end">
+        <button
+          onClick={onPost}
+          disabled={!canPost || isSubmitting}
+          className="text-[15px] font-semibold px-[18px] py-[7px] rounded-full transition-all duration-400 active:scale-[0.96]"
+          style={{
+            color: canPost ? '#FFFFFF' : '#AEAEB2',
+            background: canPost ? '#f59e0b' : '#F5F5F7',
+            boxShadow: canPost ? '0 2px 12px rgba(245,158,11,0.22)' : 'none',
+            pointerEvents: canPost ? 'auto' : 'none',
+          }}
+        >
+          {isSubmitting ? (
+            <span className="flex items-center gap-1.5">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              {buttonLabel}
+            </span>
+          ) : buttonLabel}
+        </button>
       </div>
     </header>
   );
