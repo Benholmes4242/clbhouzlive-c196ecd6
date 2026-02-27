@@ -73,7 +73,7 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
         <button
           onClick={onClose}
           className="w-9 h-9 rounded-full flex items-center justify-center"
-          style={{ background: 'rgba(255,255,255,0.15)' }}
+          style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(24px) saturate(180%)', border: '1px solid rgba(255,255,255,0.15)', boxShadow: '0 8px 32px rgba(0,0,0,0.35)' }}
           aria-label="Close preview"
         >
           <X className="w-5 h-5 text-white" />
@@ -87,7 +87,9 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
               className="px-3 py-1.5 rounded-full text-xs font-semibold text-white"
               style={{
                 background: 'rgba(0,0,0,0.45)',
-                backdropFilter: 'blur(16px)',
+                backdropFilter: 'blur(24px) saturate(180%)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
               }}
             >
               Set as Cover
@@ -97,7 +99,7 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
           <button
             onClick={handleStudio}
             className="w-9 h-9 rounded-full flex items-center justify-center"
-            style={{ background: 'rgba(255,255,255,0.15)' }}
+            style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(24px) saturate(180%)', border: '1px solid rgba(255,255,255,0.15)', boxShadow: '0 8px 32px rgba(0,0,0,0.35)' }}
             aria-label="Edit in studio"
           >
             <Wand2 className="w-5 h-5 text-white" />
@@ -130,8 +132,10 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
                   <div
                     className="absolute bottom-16 left-4 px-2 py-0.5 rounded-md text-white text-xs font-medium"
                     style={{
-                      background: 'rgba(0,0,0,0.55)',
-                      backdropFilter: 'blur(8px)',
+                      background: 'rgba(0,0,0,0.45)',
+                      backdropFilter: 'blur(24px) saturate(180%)',
+                      border: '1px solid rgba(255,255,255,0.15)',
+                      boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
                     }}
                   >
                     {formatDuration(item.duration)}
