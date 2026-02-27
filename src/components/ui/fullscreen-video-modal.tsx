@@ -4,6 +4,7 @@ import { Button } from './button';
 import EnhancedVideoPlayer from './enhanced-video-player';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { cn } from '@/lib/utils';
@@ -142,6 +143,14 @@ const FullscreenVideoModal: React.FC<FullscreenVideoModalProps> = ({
                     onClick={togglePlayPause}
                   />
                 </div>
+                {/* Text overlays */}
+                {studioEdit?.textOverlays?.length > 0 && (
+                  <TextOverlayRenderer
+                    textOverlays={studioEdit.textOverlays}
+                    isEditable={false}
+                    safeAreaContext="feed"
+                  />
+                )}
               </div>
             );
           })()}

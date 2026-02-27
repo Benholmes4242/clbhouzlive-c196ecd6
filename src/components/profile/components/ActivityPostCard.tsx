@@ -9,6 +9,7 @@ import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { getStreamPoster } from '@/utils/stream';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { cn } from '@/lib/utils';
 
 interface ActivityPostCardProps {
@@ -97,6 +98,15 @@ const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardPr
                 />
               </div>
             </div>
+          )}
+          
+          {/* Text overlays */}
+          {studioEdits?.textOverlays?.length > 0 && (
+            <TextOverlayRenderer
+              textOverlays={studioEdits.textOverlays}
+              isEditable={false}
+              safeAreaContext="feed"
+            />
           )}
 
           {/* Review overlay - always visible for review posts */}

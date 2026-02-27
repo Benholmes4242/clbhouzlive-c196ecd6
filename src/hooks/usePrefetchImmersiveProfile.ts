@@ -23,7 +23,7 @@ async function prefetchUserBundle(userId: string) {
     
   const media = supabase
     .from('posts')
-    .select('id, created_at, badges, post_media(id, media_url, media_type, width, height, duration_seconds)')
+    .select('id, created_at, badges, post_media(id, media_url, media_type, width, height, duration_seconds, studio_edits, filter_id)')
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
     .limit(20);

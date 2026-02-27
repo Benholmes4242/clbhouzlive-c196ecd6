@@ -15,6 +15,8 @@ import { OverlayCorners } from '@/components/shared/overlay';
 import { Play } from 'lucide-react';
 import { UniversalMediaItem, UniversalGridConfig } from './types';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
+import { getFilterClass } from '@/utils/studioFilters';
+import { getPixelLayerStyle } from '@/utils/studioEdit';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { useInView } from 'react-intersection-observer';
 
@@ -42,6 +44,9 @@ const HeroTile = memo<HeroTileProps>(({
   const isVideo = item.type === 'video';
   const thumbnailSrc = item.thumbnailUrl || item.url;
   const shouldAutoplay = config.heroAutoplay && isVideo;
+  const studioEdits = (item as any).studioEdits;
+  const filterClass = getFilterClass(studioEdits?.filter || (item as any).filterId);
+  const pixelStyle = getPixelLayerStyle(studioEdits);
   
   const handleClick = useCallback(() => {
     onPress?.(item);
@@ -63,30 +68,34 @@ const HeroTile = memo<HeroTileProps>(({
       whileHover={{ scale: 1.01 }}
       transition={{ duration: 0.2 }}
     >
-      {/* Thumbnail */}
-      <img
-        src={thumbnailSrc}
-        alt=""
-        className="absolute inset-0 h-full w-full object-cover"
-        loading="eager"
-        draggable={false}
-      />
+      {/* Thumbnail with filter */}
+      <div className={cn("absolute inset-0 w-full h-full", filterClass)} style={pixelStyle}>
+        <img
+          src={thumbnailSrc}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover"
+          loading="eager"
+          draggable={false}
+        />
+      </div>
       
       {/* Video layer - UNIFIED WITH CLUBHOUSE */}
       {isVideo && item.playbackUrl && (
-        <HLSPlayer
-          ref={playerRef}
-          src={item.playbackUrl}
-          autoplay={isVisible && shouldAutoplay}
-          muted
-          loop
-          objectFit="cover"
-          managedByMediaRuntime={false}
-          externallyManaged={false}
-          preload="auto"
-          mediaId={uidFromNode({ src: item.playbackUrl }) || item.postId}
-          className="absolute inset-0 h-full w-full"
-        />
+        <div className={cn("absolute inset-0 w-full h-full", filterClass)} style={pixelStyle}>
+          <HLSPlayer
+            ref={playerRef}
+            src={item.playbackUrl}
+            autoplay={isVisible && shouldAutoplay}
+            muted
+            loop
+            objectFit="cover"
+            managedByMediaRuntime={false}
+            externallyManaged={false}
+            preload="auto"
+            mediaId={uidFromNode({ src: item.playbackUrl }) || item.postId}
+            className="absolute inset-0 h-full w-full"
+          />
+        </div>
       )}
       
       {/* Text overlays from studio_edits */}

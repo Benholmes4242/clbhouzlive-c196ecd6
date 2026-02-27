@@ -11,6 +11,7 @@ import { StudioEdits } from '@/types/studio';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import UnifiedVideoPlayer, { UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 
 // Helper to detect if URL requires HLS player
 const isHlsUrl = (url: string): boolean => {
@@ -416,6 +417,15 @@ export default function CarouselSlide({
           </div>
         )}
 
+        {/* Text overlays */}
+        {studioEdits?.textOverlays?.length > 0 && (
+          <TextOverlayRenderer
+            textOverlays={studioEdits.textOverlays}
+            isEditable={false}
+            safeAreaContext="feed"
+          />
+        )}
+
         {/* Countdown timer - bottom-left of video */}
         {loaded && duration > 0 && !hideVideoOverlays && (
           <div className="absolute bottom-2 left-2 z-20 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-xs font-medium text-white">
@@ -492,6 +502,14 @@ export default function CarouselSlide({
         decoding="async"
         draggable={false}
       />
+      {/* Text overlays */}
+      {studioEdits?.textOverlays?.length > 0 && (
+        <TextOverlayRenderer
+          textOverlays={studioEdits.textOverlays}
+          isEditable={false}
+          safeAreaContext="feed"
+        />
+      )}
     </div>
   );
 }

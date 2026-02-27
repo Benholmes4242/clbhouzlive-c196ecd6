@@ -8,6 +8,8 @@ import PostMeta from '@/components/posts/PostMeta';
 import type { RegisterMediaFn } from '@/media';
 import type { CommunityContentItem } from '@/hooks/community/useCommunityFeed';
 import { getFilterClass } from '@/utils/studioFilters';
+import { getPixelLayerStyle } from '@/utils/studioEdit';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import type { CardOrientation } from '@/hooks/community/useNaturalFlowLayout';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
@@ -69,6 +71,8 @@ export const CommunityNaturalFlowCard = React.memo(function CommunityNaturalFlow
   const isVideo = item.type === 'video';
   const hasMedia = !!item.src;
   const filterClass = getFilterClass((item as any).filterId);
+  const studioEdits = (item as any).studioEdits;
+  const pixelStyle = getPixelLayerStyle(studioEdits);
   
   // Generate poster URL for video poster-first display
   const posterUrl = useMemo(() => {
@@ -176,7 +180,7 @@ export const CommunityNaturalFlowCard = React.memo(function CommunityNaturalFlow
         {isVideo && hasMedia ? (
           <>
             {/* Filtered pixel layer */}
-            <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
+            <div className={cn("absolute inset-0 w-full h-full", filterClass)} style={pixelStyle}>
               <HLSPlayer
                 ref={playerRef}
                 src={item.src}
@@ -203,7 +207,7 @@ export const CommunityNaturalFlowCard = React.memo(function CommunityNaturalFlow
             )}
           </>
         ) : hasMedia ? (
-          <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
+          <div className={cn("absolute inset-0 w-full h-full", filterClass)} style={pixelStyle}>
             <img
               src={item.src}
               alt={item.title || 'Photo'}
@@ -216,6 +220,15 @@ export const CommunityNaturalFlowCard = React.memo(function CommunityNaturalFlow
         )}
 
         {/* Subtle hover effect */}
+        {/* Text overlays */}
+        {studioEdits?.textOverlays?.length > 0 && (
+          <TextOverlayRenderer
+            textOverlays={studioEdits.textOverlays}
+            isEditable={false}
+            safeAreaContext="feed"
+          />
+        )}
+
         <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
 
         {/* Like counter - bottom left, glass style */}
