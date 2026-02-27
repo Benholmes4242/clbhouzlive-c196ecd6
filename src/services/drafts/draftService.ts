@@ -3,7 +3,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import type { Json } from '@/integrations/supabase/types';
-import type { Draft, DraftSaveInput, DraftMediaItem, DraftWithMedia } from './types';
+import type { Draft, DraftSaveInput, DraftMediaItem, DraftWithMedia, DraftCourseData } from './types';
 
 /**
  * Fetch all drafts for the current user (with media)
@@ -51,6 +51,7 @@ export async function fetchUserDrafts(): Promise<DraftWithMedia[]> {
     courseId: d.course_id,
     courseName: d.course_name,
     courseCountry: d.course_country,
+    courseData: (d as any).course_data as DraftCourseData[] | null,
     studioMusic: d.studio_music as Draft['studioMusic'],
     audioMode: d.audio_mode as Draft['audioMode'],
     createdAt: d.created_at,
@@ -105,22 +106,25 @@ export async function createDraft(input: DraftSaveInput): Promise<Draft | null> 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
+  const insertPayload: Record<string, unknown> = {
+    user_id: user.id,
+    actor_type: input.actorType,
+    actor_id: input.actorId,
+    content: input.content || null,
+    visibility: input.visibility || 'anyone',
+    categories: input.categories || [],
+    badges: input.badges || [],
+    course_id: input.courseId || null,
+    course_name: input.courseName || null,
+    course_country: input.courseCountry || null,
+    course_data: input.courseData || null,
+    studio_music: input.studioMusic || null,
+    audio_mode: input.audioMode || null,
+  };
+
   const { data, error } = await supabase
     .from('post_drafts')
-    .insert({
-      user_id: user.id,
-      actor_type: input.actorType,
-      actor_id: input.actorId,
-      content: input.content || null,
-      visibility: input.visibility || 'anyone',
-      categories: input.categories || [],
-      badges: input.badges || [],
-      course_id: input.courseId || null,
-      course_name: input.courseName || null,
-      course_country: input.courseCountry || null,
-      studio_music: input.studioMusic || null,
-      audio_mode: input.audioMode || null,
-    })
+    .insert(insertPayload as any)
     .select()
     .single();
 
@@ -141,6 +145,7 @@ export async function createDraft(input: DraftSaveInput): Promise<Draft | null> 
     courseId: data.course_id,
     courseName: data.course_name,
     courseCountry: data.course_country,
+    courseData: (data as any).course_data as DraftCourseData[] | null,
     studioMusic: data.studio_music as Draft['studioMusic'],
     audioMode: data.audio_mode as Draft['audioMode'],
     createdAt: data.created_at,
@@ -163,6 +168,7 @@ export async function updateDraft(draftId: string, input: Partial<DraftSaveInput
   if (input.courseId !== undefined) updateData.course_id = input.courseId;
   if (input.courseName !== undefined) updateData.course_name = input.courseName;
   if (input.courseCountry !== undefined) updateData.course_country = input.courseCountry;
+  if (input.courseData !== undefined) updateData.course_data = input.courseData;
   if (input.studioMusic !== undefined) updateData.studio_music = input.studioMusic;
   if (input.audioMode !== undefined) updateData.audio_mode = input.audioMode;
 
@@ -370,6 +376,7 @@ export async function getDraft(draftId: string): Promise<DraftWithMedia | null> 
     courseId: draft.course_id,
     courseName: draft.course_name,
     courseCountry: draft.course_country,
+    courseData: (draft as any).course_data as DraftCourseData[] | null,
     studioMusic: draft.studio_music as Draft['studioMusic'],
     audioMode: draft.audio_mode as Draft['audioMode'],
     createdAt: draft.created_at,

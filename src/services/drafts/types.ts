@@ -35,6 +35,7 @@ export interface Draft {
   courseId?: string | null;
   courseName?: string | null;
   courseCountry?: string | null;
+  courseData?: DraftCourseData[] | null;
   studioMusic?: {
     trackId: string;
     title: string;
@@ -49,6 +50,13 @@ export interface Draft {
   media?: DraftMediaItem[];
 }
 
+export interface DraftCourseData {
+  id: string;
+  name: string;
+  country: string;
+  region?: string;
+}
+
 export interface DraftSaveInput {
   actorType: DraftActorType;
   actorId: string;
@@ -59,6 +67,7 @@ export interface DraftSaveInput {
   courseId?: string | null;
   courseName?: string | null;
   courseCountry?: string | null;
+  courseData?: DraftCourseData[] | null;
   studioMusic?: {
     trackId: string;
     title: string;
