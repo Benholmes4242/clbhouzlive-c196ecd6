@@ -40,7 +40,7 @@ export const RichCaptionInput = forwardRef<RichCaptionInputHandle, RichCaptionIn
       mentions,
       onCursorChange,
       onMentionQueryChange,
-      placeholder = 'Share your round, tip, or moment...',
+      placeholder = "What's on your mind?",
       maxLength = 2200,
       accentColor = '#f59e0b',
     },
