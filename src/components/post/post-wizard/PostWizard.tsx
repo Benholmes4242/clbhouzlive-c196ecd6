@@ -703,6 +703,7 @@ export function PostWizard({
                             isCover={index === state.coverIndex}
                             totalItems={state.mediaItems.length}
                             hasStudioEdits={hasNonEmptyStudioEdits(state.studioEditsByMediaId[item.id])}
+                            studioEdits={state.studioEditsByMediaId[item.id]}
                             onRemove={() => removeMedia(item.id)}
                             onExpand={() => setPreviewMediaIndex(index)}
                             onStudio={() => handleOpenStudio(item.id)}
@@ -779,6 +780,7 @@ export function PostWizard({
                   onStudio={handleOpenStudio}
                   coverIndex={state.coverIndex}
                   onSetCover={(index) => setCoverIndex(index)}
+                  studioEditsByMediaId={state.studioEditsByMediaId}
                 />
               )}
             </AnimatePresence>

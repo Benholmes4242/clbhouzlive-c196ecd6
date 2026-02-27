@@ -1,5 +1,10 @@
 import { X, Wand2, Play } from 'lucide-react';
 import type { OrderedMediaItem } from '../types';
+import type { StudioEdits } from '@/types/studio';
+import { getFilterClass } from '@/utils/studioFilters';
+import { getRotateStyle } from '@/utils/studioEdit';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
+import { cn } from '@/lib/utils';
 
 interface MediaThumbnailProps {
   item: OrderedMediaItem;
@@ -7,6 +12,7 @@ interface MediaThumbnailProps {
   isCover: boolean;
   totalItems: number;
   hasStudioEdits: boolean;
+  studioEdits?: StudioEdits;
   onRemove: () => void;
   onExpand: () => void;
   onStudio: () => void;
@@ -18,27 +24,64 @@ export function MediaThumbnail({
   isCover,
   totalItems,
   hasStudioEdits,
+  studioEdits,
   onRemove,
   onExpand,
   onStudio,
   onSetCover,
 }: MediaThumbnailProps) {
+  const filterClass = studioEdits?.filter && studioEdits.filter !== 'normal'
+    ? getFilterClass(studioEdits.filter)
+    : '';
+
+  const transformStyle: React.CSSProperties = {
+    ...getRotateStyle(studioEdits?.rotate),
+    ...(studioEdits?.flipH ? { transform: `${getRotateStyle(studioEdits?.rotate).transform || ''} scaleX(-1)`.trim() } : {}),
+    ...(studioEdits?.flipV ? { transform: `${getRotateStyle(studioEdits?.rotate).transform || ''} scaleY(-1)`.trim() } : {}),
+  };
+
+  // Build combined transform string
+  const transforms: string[] = [];
+  if (studioEdits?.rotate) transforms.push(`rotate(${studioEdits.rotate}deg)`);
+  if (studioEdits?.flipH) transforms.push('scaleX(-1)');
+  if (studioEdits?.flipV) transforms.push('scaleY(-1)');
+  const mediaTransformStyle: React.CSSProperties = transforms.length > 0
+    ? { transform: transforms.join(' '), transformOrigin: 'center' }
+    : {};
+
   return (
     <div className="relative flex-shrink-0 w-[140px] h-[140px] rounded-2xl overflow-hidden group">
-      {/* Media */}
-      {item.type === 'video' ? (
-        <video
-          src={item.previewUrl}
-          className="w-full h-full object-cover"
-          autoPlay
-          loop
-          muted
-          playsInline
-          poster={item.thumbnailUrl}
-        />
-      ) : (
-        <img src={item.previewUrl} className="w-full h-full object-cover" alt="" />
-      )}
+      {/* Media with studio edits applied */}
+      <div className="relative w-full h-full">
+        {item.type === 'video' ? (
+          <video
+            src={item.previewUrl}
+            className={cn('w-full h-full object-cover', filterClass)}
+            style={mediaTransformStyle}
+            autoPlay
+            loop
+            muted
+            playsInline
+            poster={item.thumbnailUrl}
+          />
+        ) : (
+          <img
+            src={item.previewUrl}
+            className={cn('w-full h-full object-cover', filterClass)}
+            style={mediaTransformStyle}
+            alt=""
+          />
+        )}
+
+        {/* Text overlays on thumbnail (non-editable, scaled to thumbnail size) */}
+        {studioEdits?.textOverlays && studioEdits.textOverlays.length > 0 && (
+          <TextOverlayRenderer
+            textOverlays={studioEdits.textOverlays}
+            isEditable={false}
+            safeAreaContext="feed"
+          />
+        )}
+      </div>
 
       {/* Play icon overlay for videos */}
       {item.type === 'video' && (
