@@ -39,6 +39,7 @@ import { MediaThumbnail } from './components/MediaThumbnail';
 import { MediaPreviewViewer } from './components/MediaPreviewViewer';
 import { RichCaptionInput, type RichCaptionInputHandle } from './components/RichCaptionInput';
 import { TagPeopleSheet } from './components/TagPeopleSheet';
+import { useToolbarTooltips, ToolbarTooltipBubble } from './components/ToolbarTooltip';
 
 // Sheets
 import {
@@ -155,6 +156,9 @@ export function PostWizard({
   // Studio state
   const [showStudio, setShowStudio] = useState(false);
 
+  // Toolbar tooltips
+  const { showCourseTooltip, showFriendsTooltip, dismissCourseTooltip, dismissFriendsTooltip } = useToolbarTooltips();
+
   // Media preview viewer state
   const [previewMediaIndex, setPreviewMediaIndex] = useState<number | null>(null);
 
@@ -249,7 +253,9 @@ export function PostWizard({
   // Caption change handler for RichCaptionInput
   const handleCaptionChange = useCallback((plainText: string) => {
     setCaption(plainText);
-  }, [setCaption]);
+    dismissCourseTooltip();
+    dismissFriendsTooltip();
+  }, [setCaption, dismissCourseTooltip, dismissFriendsTooltip]);
 
   // Cursor position handler — triggers mention detection
   const handleCursorChange = useCallback((position: number) => {
@@ -651,7 +657,7 @@ export function PostWizard({
                     }}
                     onCursorChange={handleCursorChange}
                     onMentionQueryChange={handleMentionQueryChange}
-                    placeholder="What's on your mind?"
+                    placeholder="Share your round, tip, or moment..."
                     maxLength={POST_LIMITS.MAX_CAPTION_LENGTH}
                     accentColor="#f59e0b"
                   />
@@ -732,9 +738,15 @@ export function PostWizard({
               <div className="flex items-center gap-0.5">
                 <ToolButton icon={Image} onClick={() => handleAddMedia('gallery')} label="Photo" />
                 <ToolButton icon={Camera} onClick={() => handleAddMedia('camera')} label="Camera" />
-                <ToolButton icon={MapPin} onClick={() => setShowCourseSearch(true)} label="Tag Course" />
+                <div className="relative">
+                  <ToolButton icon={MapPin} onClick={() => { dismissCourseTooltip(); setShowCourseSearch(true); }} label="Tag Course" />
+                  <ToolbarTooltipBubble text="Tag a golf course" visible={showCourseTooltip} />
+                </div>
                 <ToolButton icon={Tag} onClick={() => setShowCategorySheet(true)} label="Category" />
-                <ToolButton icon={UserPlus} onClick={() => setShowTagPeople(true)} label="Tag Friends" />
+                <div className="relative">
+                  <ToolButton icon={UserPlus} onClick={() => { dismissFriendsTooltip(); setShowTagPeople(true); }} label="Tag Friends" />
+                  <ToolbarTooltipBubble text="Tag friends or businesses" visible={showFriendsTooltip} />
+                </div>
               </div>
               <CharacterRing current={state.caption.length} max={POST_LIMITS.MAX_CAPTION_LENGTH} />
             </div>

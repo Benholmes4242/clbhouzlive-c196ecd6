@@ -42,7 +42,7 @@ export function PostWizardHeader({
 
       {/* Center title */}
       <span className="text-[17px] font-semibold tracking-tight" style={{ color: '#1A1A1A' }}>
-        {isEditMode ? 'Edit Post' : 'New Moment'}
+        {isEditMode ? 'Edit Post' : 'New Post'}
       </span>
 
       {/* Post button */}
