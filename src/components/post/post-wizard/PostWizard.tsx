@@ -291,9 +291,7 @@ export function PostWizard({
       [atStart, atEnd]
     );
 
-    // Also update the plain text in state
-    const newCaption = `${beforeMention}@${displayName} ${textAfterCursor}`;
-    setCaption(newCaption);
+    // Caption is updated internally by insertMention via onChange — do not double-set
     setShowMentions(false);
     setMentionQuery('');
 
