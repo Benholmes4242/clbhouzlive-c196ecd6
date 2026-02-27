@@ -50,6 +50,11 @@ export const RichCaptionInput = forwardRef<RichCaptionInputHandle, RichCaptionIn
     const [isEmpty, setIsEmpty] = useState(!value);
     const isComposingRef = useRef(false);
     const suppressInputRef = useRef(false);
+    const mentionsRef = useRef(mentions);
+
+    useEffect(() => {
+      mentionsRef.current = mentions;
+    }, [mentions]);
 
     // Expose imperative methods
     useImperativeHandle(ref, () => ({
@@ -70,9 +75,9 @@ export const RichCaptionInput = forwardRef<RichCaptionInputHandle, RichCaptionIn
         suppressInputRef.current = true;
         onChange(newText);
 
-        // Re-render with mentions
+        // Re-render with mentions — use ref for latest mentions array
         requestAnimationFrame(() => {
-          renderWithMentions(el, newText, [...mentions, entity], accentColor);
+          renderWithMentions(el, newText, [...mentionsRef.current, entity], accentColor);
           setIsEmpty(false);
           placeCaretAtEnd(el);
           suppressInputRef.current = false;
@@ -81,7 +86,7 @@ export const RichCaptionInput = forwardRef<RichCaptionInputHandle, RichCaptionIn
       focus() {
         editorRef.current?.focus();
       },
-    }));
+    }), [mentions, value, accentColor]);
 
     // Sync value from parent when it changes externally (e.g. draft load)
     useEffect(() => {
