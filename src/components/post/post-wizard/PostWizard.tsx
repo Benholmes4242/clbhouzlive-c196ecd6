@@ -657,7 +657,7 @@ export function PostWizard({
                     }}
                     onCursorChange={handleCursorChange}
                     onMentionQueryChange={handleMentionQueryChange}
-                    placeholder="Share your round, tip, or moment..."
+                    placeholder="Share your moment..."
                     maxLength={POST_LIMITS.MAX_CAPTION_LENGTH}
                     accentColor="#f59e0b"
                   />
