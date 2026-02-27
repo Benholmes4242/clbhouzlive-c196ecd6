@@ -26,27 +26,30 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
   const [showPlayIcon, setShowPlayIcon] = useState(false);
+  const [isSwiping, setIsSwiping] = useState(false);
+  const [swipeOffset, setSwipeOffset] = useState(0);
 
   const item = items[currentIndex];
   const isCover = currentIndex === coverIndex;
-  const edits = studioEditsByMediaId?.[item?.id];
 
-  const filterClass = edits?.filter && edits.filter !== 'normal'
-    ? getFilterClass(edits.filter)
-    : '';
-  const pixelStyle = getPixelLayerStyle(edits);
-  const cropClass = getCropWrapperClass(edits?.crop);
-
-  // Reset playback state on slide change & pause old video (prevents audio bleed)
+  // Pause non-active videos & play active one on slide change
   useEffect(() => {
     setIsPlaying(true);
-    setIsMuted(false);
     setShowPlayIcon(false);
-    return () => {
-      if (videoRef.current) {
-        videoRef.current.pause();
+
+    // Pause all non-active videos
+    const allVideos = document.querySelectorAll('.preview-viewer-slide video');
+    allVideos.forEach(v => {
+      const video = v as HTMLVideoElement;
+      if (video !== videoRef.current) {
+        video.pause();
       }
-    };
+    });
+
+    // Play the active video
+    if (videoRef.current && videoRef.current.paused) {
+      videoRef.current.play().catch(() => {});
+    }
   }, [currentIndex]);
 
   // Release decoder on viewer close
@@ -61,12 +64,25 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
   }, []);
 
   const goTo = useCallback((idx: number) => {
+    // Pause current video before switching
+    videoRef.current?.pause();
     setCurrentIndex(Math.max(0, Math.min(items.length - 1, idx)));
   }, [items.length]);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     const touch = e.touches[0];
     touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+    setIsSwiping(true);
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!touchStartRef.current) return;
+    const touch = e.touches[0];
+    const dx = touch.clientX - touchStartRef.current.x;
+    const dy = touch.clientY - touchStartRef.current.y;
+    // If vertical movement dominates, don't track horizontal swipe
+    if (Math.abs(dy) > Math.abs(dx) * 1.5) return;
+    setSwipeOffset(dx);
   }, []);
 
   const handleTouchEnd = useCallback((e: React.TouchEvent) => {
@@ -75,18 +91,24 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
     const dx = touch.clientX - touchStartRef.current.x;
     const dy = touch.clientY - touchStartRef.current.y;
     touchStartRef.current = null;
+    setIsSwiping(false);
+    setSwipeOffset(0);
 
+    // Tap detection (not a swipe)
+    if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+
+    // Swipe down to close
     if (dy > 100 && Math.abs(dx) < 80) {
       onClose();
       return;
     }
 
-    if (Math.abs(dx) > 50 && Math.abs(dy) < 80) {
-      if (dx < 0 && currentIndex < items.length - 1) {
-        goTo(currentIndex + 1);
-      } else if (dx > 0 && currentIndex > 0) {
-        goTo(currentIndex - 1);
-      }
+    // Swipe left/right to navigate
+    const threshold = 50;
+    if (dx < -threshold && currentIndex < items.length - 1) {
+      goTo(currentIndex + 1);
+    } else if (dx > threshold && currentIndex > 0) {
+      goTo(currentIndex - 1);
     }
   }, [currentIndex, items.length, goTo, onClose]);
 
@@ -126,6 +148,7 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
       transition={{ duration: 0.25 }}
       className="fixed inset-0 z-[10002] flex flex-col bg-black"
       onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
       {/* Top bar */}
@@ -169,116 +192,139 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
         </div>
       </div>
 
-      {/* Media display */}
-      <div className="flex-1 flex items-center justify-center overflow-hidden">
-        <AnimatePresence mode="popLayout">
-          <motion.div
-            key={currentIndex}
-            initial={{ opacity: 0, scale: 0.92 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.92 }}
-            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full h-full flex items-center justify-center relative"
-          >
-            <div className={cn('relative w-full h-full flex items-center justify-center', cropClass)}>
-              {item.type === 'video' ? (
-                <div className="relative w-full h-full flex items-center justify-center" onClick={togglePlayback}>
-                  <video
-                    ref={videoRef}
-                    src={item.previewUrl}
-                    poster={item.thumbnailUrl}
-                    autoPlay
-                    playsInline
-                    className={cn('max-w-full max-h-full object-contain', filterClass)}
-                    style={pixelStyle}
-                    onPlay={() => setIsPlaying(true)}
-                    onPause={() => setIsPlaying(false)}
-                  />
+      {/* 3-item sliding window: prev, current, next */}
+      <div className="flex-1 relative overflow-hidden min-h-0">
+        {[-1, 0, 1].map(offset => {
+          const idx = currentIndex + offset;
+          if (idx < 0 || idx >= items.length) return null;
 
-                  {/* Tap-to-play/pause animated icon */}
-                  <AnimatePresence>
-                    {showPlayIcon && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.5 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.5 }}
-                        transition={{ duration: 0.3 }}
-                        className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                      >
-                        <div
-                          className="w-16 h-16 rounded-full flex items-center justify-center"
-                          style={{
-                            background: 'rgba(0,0,0,0.45)',
-                            backdropFilter: 'blur(24px) saturate(180%)',
-                            border: '1px solid rgba(255,255,255,0.15)',
-                          }}
-                        >
-                          {isPlaying ? (
-                            <Play className="w-7 h-7 text-white ml-1" />
-                          ) : (
-                            <Pause className="w-7 h-7 text-white" />
-                          )}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+          const slideItem = items[idx];
+          const isActive = offset === 0;
+          const slideEdits = studioEditsByMediaId?.[slideItem.id];
+          const slideFilterClass = slideEdits?.filter && slideEdits.filter !== 'normal'
+            ? getFilterClass(slideEdits.filter)
+            : '';
+          const slidePixelStyle = getPixelLayerStyle(slideEdits);
+          const slideCropClass = getCropWrapperClass(slideEdits?.crop);
 
-                  {/* Mute/unmute button — bottom right */}
-                  <button
-                    onClick={toggleMute}
-                    className="absolute bottom-4 right-4 w-9 h-9 rounded-full flex items-center justify-center z-10"
-                    style={{
-                      background: 'rgba(0,0,0,0.45)',
-                      backdropFilter: 'blur(24px) saturate(180%)',
-                      border: '1px solid rgba(255,255,255,0.15)',
-                      boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
-                    }}
-                    aria-label={isMuted ? 'Unmute' : 'Mute'}
+          return (
+            <div
+              key={slideItem.id}
+              className="absolute inset-0 flex items-center justify-center preview-viewer-slide"
+              style={{
+                transform: `translateX(calc(${offset * 100}% + ${isSwiping ? swipeOffset : 0}px))`,
+                transition: isSwiping ? 'none' : 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+                willChange: 'transform',
+                zIndex: isActive ? 2 : 1,
+              }}
+            >
+              <div className={cn('relative w-full h-full flex items-center justify-center', slideCropClass)}>
+                {slideItem.type === 'video' ? (
+                  <div
+                    className="relative w-full h-full flex items-center justify-center"
+                    onClick={isActive ? togglePlayback : undefined}
                   >
-                    {isMuted ? (
-                      <VolumeX className="w-4 h-4 text-white" />
-                    ) : (
-                      <Volume2 className="w-4 h-4 text-white" />
+                    <video
+                      ref={isActive ? videoRef : undefined}
+                      src={slideItem.previewUrl}
+                      poster={slideItem.thumbnailUrl}
+                      preload="auto"
+                      autoPlay={isActive}
+                      playsInline
+                      muted={!isActive || isMuted}
+                      className={cn('max-w-full max-h-full object-contain', slideFilterClass)}
+                      style={slidePixelStyle}
+                      onPlay={isActive ? () => setIsPlaying(true) : undefined}
+                      onPause={isActive ? () => setIsPlaying(false) : undefined}
+                    />
+
+                    {/* Tap-to-play/pause icon — only on active slide */}
+                    {isActive && (
+                      <AnimatePresence>
+                        {showPlayIcon && (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.5 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.5 }}
+                            transition={{ duration: 0.3 }}
+                            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                          >
+                            <div
+                              className="w-16 h-16 rounded-full flex items-center justify-center"
+                              style={{
+                                background: 'rgba(0,0,0,0.5)',
+                                backdropFilter: 'blur(12px)',
+                              }}
+                            >
+                              {isPlaying ? (
+                                <Pause className="w-7 h-7 text-white" fill="white" />
+                              ) : (
+                                <Play className="w-7 h-7 text-white ml-1" fill="white" />
+                              )}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     )}
-                  </button>
 
-                  {/* Text overlays */}
-                  {edits?.textOverlays && edits.textOverlays.length > 0 && (
-                    <TextOverlayRenderer
-                      textOverlays={edits.textOverlays}
-                      isEditable={false}
-                      safeAreaContext="feed"
-                    />
-                  )}
-                </div>
-              ) : (
-                <>
-                  <img
-                    src={item.previewUrl}
-                    className={cn('max-w-full max-h-full object-contain', filterClass)}
-                    style={pixelStyle}
-                    alt=""
-                    draggable={false}
-                  />
+                    {/* Mute button — only on active slide */}
+                    {isActive && (
+                      <button
+                        onClick={toggleMute}
+                        className="absolute bottom-4 right-4 w-8 h-8 rounded-full flex items-center justify-center z-10"
+                        style={{
+                          background: 'rgba(0,0,0,0.45)',
+                          backdropFilter: 'blur(16px)',
+                          border: '1px solid rgba(255,255,255,0.15)',
+                        }}
+                        aria-label={isMuted ? 'Unmute' : 'Mute'}
+                      >
+                        {isMuted ? (
+                          <VolumeX className="w-4 h-4 text-white" />
+                        ) : (
+                          <Volume2 className="w-4 h-4 text-white" />
+                        )}
+                      </button>
+                    )}
 
-                  {/* Text overlays (non-editable) */}
-                  {edits?.textOverlays && edits.textOverlays.length > 0 && (
-                    <TextOverlayRenderer
-                      textOverlays={edits.textOverlays}
-                      isEditable={false}
-                      safeAreaContext="feed"
+                    {/* Text overlays — only on active slide */}
+                    {isActive && slideEdits?.textOverlays && slideEdits.textOverlays.length > 0 && (
+                      <TextOverlayRenderer
+                        textOverlays={slideEdits.textOverlays}
+                        isEditable={false}
+                        safeAreaContext="feed"
+                      />
+                    )}
+                  </div>
+                ) : (
+                  <div className="relative w-full h-full flex items-center justify-center">
+                    <img
+                      src={slideItem.previewUrl}
+                      alt=""
+                      className={cn('max-w-full max-h-full object-contain', slideFilterClass)}
+                      style={slidePixelStyle}
+                      draggable={false}
                     />
-                  )}
-                </>
-              )}
+
+                    {/* Text overlays — only on active slide */}
+                    {isActive && slideEdits?.textOverlays && slideEdits.textOverlays.length > 0 && (
+                      <TextOverlayRenderer
+                        textOverlays={slideEdits.textOverlays}
+                        isEditable={false}
+                        safeAreaContext="feed"
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
-          </motion.div>
-        </AnimatePresence>
+          );
+        })}
       </div>
 
       {/* Video scrubber — above dots, only for videos */}
       {item.type === 'video' && (
-        <div className="flex-shrink-0 px-4 relative" style={{ height: 3 }}>
+        <div className="flex-shrink-0 px-4 relative" style={{ height: 3 }} key={`scrubber-${currentIndex}`}>
           <VideoScrubber
             videoEl={videoRef.current}
             variant="wizard"
