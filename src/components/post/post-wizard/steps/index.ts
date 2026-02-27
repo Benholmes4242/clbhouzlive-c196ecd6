@@ -1,4 +1,3 @@
-// Step components barrel export
-export { MediaStep } from './MediaStep';
-export { CaptionStep } from './CaptionStep';
-export { ConfirmStep } from './ConfirmStep';
+// Steps eliminated in single-screen redesign
+// MentionBottomSheet retained for @mention functionality
+export { MentionBottomSheet } from './MentionBottomSheet';
