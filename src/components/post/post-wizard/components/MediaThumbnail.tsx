@@ -10,12 +10,7 @@ interface MediaThumbnailProps {
   onRemove: () => void;
   onExpand: () => void;
   onStudio: () => void;
-}
-
-function formatDuration(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m}:${s.toString().padStart(2, '0')}`;
+  onSetCover?: () => void;
 }
 
 export function MediaThumbnail({
@@ -26,6 +21,7 @@ export function MediaThumbnail({
   onRemove,
   onExpand,
   onStudio,
+  onSetCover,
 }: MediaThumbnailProps) {
   return (
     <div className="relative flex-shrink-0 w-[140px] h-[140px] rounded-2xl overflow-hidden group">
@@ -89,24 +85,26 @@ export function MediaThumbnail({
         <X className="w-3 h-3 text-white" />
       </button>
 
-      {/* Cover badge */}
-      {isCover && totalItems > 1 && (
-        <span
-          className="absolute bottom-2 right-2 z-[2] px-2 py-0.5 rounded-full text-[10px] font-semibold text-white"
-          style={{ background: 'rgba(245,158,11,0.85)' }}
+      {/* Cover selection — only show when multiple items */}
+      {totalItems > 1 && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!isCover) onSetCover?.();
+          }}
+          className="absolute bottom-2 right-2 z-[2] px-2 py-0.5 rounded-md text-[10px] font-semibold transition-all"
+          style={isCover ? {
+            background: '#f59e0b',
+            color: '#FFFFFF',
+            boxShadow: '0 1px 4px rgba(245,158,11,0.3)',
+          } : {
+            background: 'rgba(0,0,0,0.40)',
+            backdropFilter: 'blur(8px)',
+            color: 'rgba(255,255,255,0.7)',
+          }}
         >
-          Cover
-        </span>
-      )}
-
-      {/* Video duration indicator */}
-      {item.type === 'video' && item.duration && (
-        <span
-          className="absolute top-2 left-2 z-[2] px-1.5 py-0.5 rounded text-[10px] font-medium text-white"
-          style={{ background: 'rgba(0,0,0,0.55)' }}
-        >
-          {formatDuration(item.duration)}
-        </span>
+          {isCover ? 'Cover' : 'Set Cover'}
+        </button>
       )}
     </div>
   );

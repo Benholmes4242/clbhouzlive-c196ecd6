@@ -116,6 +116,7 @@ export function PostWizard({
     setStudioEdits,
     setCaption,
     setTags,
+    setCoverIndex,
     loadDraft,
     loadExistingPost,
   } = usePostWizard({
@@ -690,6 +691,7 @@ export function PostWizard({
                             onRemove={() => removeMedia(item.id)}
                             onExpand={() => setPreviewMediaIndex(index)}
                             onStudio={() => handleOpenStudio(item.id)}
+                            onSetCover={() => setCoverIndex(index)}
                           />
                         ))}
                         {state.mediaItems.length < 10 && (
@@ -760,6 +762,8 @@ export function PostWizard({
                   initialIndex={previewMediaIndex}
                   onClose={() => setPreviewMediaIndex(null)}
                   onStudio={handleOpenStudio}
+                  coverIndex={state.coverIndex}
+                  onSetCover={(index) => setCoverIndex(index)}
                 />
               )}
             </AnimatePresence>
