@@ -1,6 +1,7 @@
 // Post Wizard State Management Hook
 import { useReducer, useCallback, useMemo, useRef } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { supabase } from '@/integrations/supabase/client';
 import {
   PostWizardState,
   PostWizardAction,
@@ -427,8 +428,8 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
     });
   }, []);
 
-  // Load existing post into wizard for editing
-  const loadExistingPost = useCallback((postData: import('@/lib/fetchPostForEdit').PostForEdit) => {
+  // Load existing post into wizard for editing (BLOCKER 2 FIX: hydrate tags)
+  const loadExistingPost = useCallback(async (postData: import('@/lib/fetchPostForEdit').PostForEdit) => {
     const { post, media, courses } = postData;
 
     // Convert post_media rows to OrderedMediaItems (read-only in Phase 1)
@@ -445,6 +446,41 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
       duration: m.duration_seconds ?? undefined,
     }));
 
+    // Fetch post tags for edit mode hydration
+    let hydratedTags: TaggableEntity[] = [];
+    try {
+      const { data: postTags } = await supabase
+        .from('post_tags')
+        .select(`
+          id,
+          tagged_entity_id,
+          taggable_entities!inner (
+            id,
+            entity_id,
+            entity_type,
+            name,
+            username,
+            profile_image_url
+          )
+        `)
+        .eq('post_id', post.id);
+
+      if (postTags && postTags.length > 0) {
+        hydratedTags = postTags
+          .filter((pt: any) => pt.taggable_entities)
+          .map((pt: any) => ({
+            id: pt.taggable_entities.id,
+            entity_id: pt.taggable_entities.entity_id,
+            entity_type: pt.taggable_entities.entity_type as 'user' | 'business',
+            name: pt.taggable_entities.name || 'Unknown',
+            username: pt.taggable_entities.username,
+            avatar_url: pt.taggable_entities.profile_image_url || undefined,
+          }));
+      }
+    } catch (e) {
+      console.error('Failed to hydrate post tags for edit:', e);
+    }
+
     dispatch({
       type: 'LOAD_EXISTING_POST',
       payload: {
@@ -453,6 +489,7 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
           mediaItems,
           activeMediaId: mediaItems.length > 0 ? mediaItems[0].id : null,
           caption: post.content || '',
+          selectedTags: hydratedTags,
           selectedCourses: courses.map(c => ({
             id: c.id,
             name: c.name,
