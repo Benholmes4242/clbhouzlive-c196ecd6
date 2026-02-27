@@ -44,10 +44,10 @@ export function MediaThumbnail({
       {item.type === 'video' && (
         <div className="absolute inset-0 z-[1] flex items-center justify-center pointer-events-none">
           <div
-            className="w-10 h-10 rounded-full flex items-center justify-center"
-            style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(8px)' }}
+            className="w-8 h-8 rounded-full flex items-center justify-center"
+            style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(24px) saturate(180%)', border: '1px solid rgba(255,255,255,0.15)', boxShadow: '0 8px 32px rgba(0,0,0,0.35)' }}
           >
-            <Play className="w-4 h-4 text-white ml-0.5" fill="white" />
+            <Play className="w-3.5 h-3.5 text-white ml-0.5" fill="white" />
           </div>
         </div>
       )}
@@ -63,7 +63,7 @@ export function MediaThumbnail({
       <button
         onClick={(e) => { e.stopPropagation(); onStudio(); }}
         className="absolute bottom-2 left-2 z-[2] w-7 h-7 rounded-full flex items-center justify-center"
-        style={{ background: 'rgba(0,0,0,0.50)', backdropFilter: 'blur(16px)' }}
+        style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(24px) saturate(180%)', border: '1px solid rgba(255,255,255,0.15)', boxShadow: '0 8px 32px rgba(0,0,0,0.35)' }}
         aria-label="Edit in studio"
       >
         <Wand2 className="w-3.5 h-3.5 text-white" />
@@ -79,7 +79,7 @@ export function MediaThumbnail({
       <button
         onClick={(e) => { e.stopPropagation(); onRemove(); }}
         className="absolute top-2 right-2 z-[2] w-7 h-7 rounded-full flex items-center justify-center"
-        style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(20px)' }}
+        style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(24px) saturate(180%)', border: '1px solid rgba(255,255,255,0.15)', boxShadow: '0 8px 32px rgba(0,0,0,0.35)' }}
         aria-label="Remove media"
       >
         <X className="w-3 h-3 text-white" />
@@ -98,8 +98,9 @@ export function MediaThumbnail({
             color: '#FFFFFF',
             boxShadow: '0 1px 4px rgba(245,158,11,0.3)',
           } : {
-            background: 'rgba(0,0,0,0.40)',
-            backdropFilter: 'blur(8px)',
+            background: 'rgba(0,0,0,0.45)',
+            backdropFilter: 'blur(24px) saturate(180%)',
+            border: '1px solid rgba(255,255,255,0.15)',
             color: 'rgba(255,255,255,0.7)',
           }}
         >
