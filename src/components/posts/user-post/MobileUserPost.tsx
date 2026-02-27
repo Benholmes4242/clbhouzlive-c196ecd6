@@ -19,7 +19,7 @@ import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { cn } from '@/lib/utils';
-import { AchievementBadgesOverlay } from '@/components/post/badges/AchievementBadgesOverlay';
+
 
 interface MobileUserPostProps {
   post: UserPostData;
@@ -247,8 +247,6 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
           </div>
         </div>
 
-        {/* Achievement Badges overlay - top left below user info */}
-        <AchievementBadgesOverlay badgeIds={post.badges} className="top-14 left-2.5" />
 
         {/* Media Navigation Arrows */}
         {post.post_media.length > 1 && (

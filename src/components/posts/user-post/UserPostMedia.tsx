@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { useToast } from '@/hooks/use-toast';
-import { AchievementBadgesOverlay } from '@/components/post/badges/AchievementBadgesOverlay';
+
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 
 interface UserPostMediaProps {
@@ -121,8 +121,6 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
     
     return (
       <div key={mediaItem.id} className="w-full aspect-square relative">
-        {/* Achievement Badges overlay - top left */}
-        <AchievementBadgesOverlay badgeIds={badges} />
         
         {/* Golf Course Badge overlay on each media item - top right */}
         {courses.length > 0 && (

@@ -28,7 +28,7 @@ import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { Loader2 } from 'lucide-react';
 import { StudioTool, StudioEdits } from '@/types/studio';
 import StudioShelf from '@/components/studio/StudioShelf';
-import { MomentBadgesSheet } from '@/components/post/create-moment/sheets';
+
 
 import { WizardHeader } from './WizardHeader';
 import { WizardHeroImage } from './WizardHeroImage';
@@ -70,8 +70,7 @@ export function ReviewWizard({
   const [studioTool, setStudioTool] = useState<StudioTool>(null);
   const [isPositioningText, setIsPositioningText] = useState(false);
   const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
-  const [showBadgesSheet, setShowBadgesSheet] = useState(false);
-  const [selectedBadges, setSelectedBadges] = useState<string[]>([]);
+  const [selectedBadges] = useState<string[]>([]);
   const [studioEditsByMediaId, setStudioEditsByMediaId] = useState<Record<string, StudioEdits>>({});
   const [reviewActiveMediaId, setReviewActiveMediaId] = useState<string | null>(null);
   
@@ -540,7 +539,7 @@ export function ReviewWizard({
                         onRetryMedia={wizard.retryMedia}
                         onReorderMedia={wizard.reorderMedia}
                         onOpenStudio={handleOpenStudio}
-                        onOpenBadges={() => setShowBadgesSheet(true)}
+                        onOpenBadges={() => {}}
                         studioEditsByMediaId={studioEditsByMediaId}
                         activeMediaId={reviewActiveMediaId}
                         onActiveMediaChange={setReviewActiveMediaId}
@@ -607,13 +606,6 @@ export function ReviewWizard({
             onSelectCourse={() => {}}
           />
 
-          {/* Badges Sheet */}
-          <MomentBadgesSheet
-            isOpen={showBadgesSheet}
-            onClose={() => setShowBadgesSheet(false)}
-            selectedBadges={selectedBadges}
-            onBadgesChange={setSelectedBadges}
-          />
 
           {/* Studio Shelf */}
           {activeMedia && (

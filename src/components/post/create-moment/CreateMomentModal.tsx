@@ -43,7 +43,7 @@ import { CourseSearchSheet } from "@/components/courses/CourseSearchSheet";
 import CreateMomentHeader from "./CreateMomentHeader";
 import PostingOptionsSheet from "./PostingOptionsSheet";
 import { UploadProgressBar } from "./UploadProgressBar";
-import { MomentCategorySheet, EnhanceMomentSheet, MomentBadgesSheet, SmartCompilationSheet, DraftsAndScheduledSheet, ScheduleSheet } from "./sheets";
+import { SmartCompilationSheet, DraftsAndScheduledSheet, ScheduleSheet } from "./sheets";
 import { CreateMomentProps, GolfCourse, TaggableEntity, MomentVisibility } from "./types";
 import type { DraftWithMedia } from "@/services/drafts";
 
@@ -740,9 +740,7 @@ export default function CreateMomentModal({
         files,
         mediaItems: media,
         studioEditsByMediaId,
-        categories: selectedCategories,
         visibility,
-        badges: selectedBadges,
       });
       
       // Start tracking with the SAME job ID used by the pipeline
@@ -816,9 +814,7 @@ export default function CreateMomentModal({
         files,
         mediaItems: media,
         studioEditsByMediaId: {},
-        categories: selectedCategories,
         visibility,
-        badges: selectedBadges,
         scheduledAt,
       });
       
@@ -1391,23 +1387,6 @@ export default function CreateMomentModal({
       />
 
       {/* Bottom Sheets */}
-      <MomentCategorySheet
-        isOpen={showCategorySheet}
-        onClose={() => {
-          setShowCategorySheet(false);
-          // Clear pending schedule if user dismisses without selecting
-          if (pendingScheduledAt) {
-            setPendingScheduledAt(null);
-          }
-        }}
-        selectedCategories={selectedCategories}
-        onCategoriesChange={setSelectedCategories}
-        onConfirm={handleCategoryConfirm}
-        caption={caption}
-        hasCourse={!!course}
-        mediaTypes={media.map(m => m.type === 'video' ? 'video' : 'photo')}
-      />
-
       <PostingOptionsSheet
         isOpen={showPostingOptionsSheet}
         onClose={() => setShowPostingOptionsSheet(false)}
@@ -1416,31 +1395,6 @@ export default function CreateMomentModal({
         onActorChange={(actor) => setLocalActorOverride(actor)}
         visibility={visibility}
         onVisibilityChange={setVisibility}
-      />
-
-      <EnhanceMomentSheet
-        isOpen={showEnhanceSheet}
-        onClose={() => setShowEnhanceSheet(false)}
-        onOpenStudio={() => {
-          setShowEnhanceSheet(false);
-          openStudio();
-        }}
-        onOpenBadges={() => {
-          setShowEnhanceSheet(false);
-          setShowBadgesSheet(true);
-        }}
-        onOpenSmartCompilation={() => {
-          setShowEnhanceSheet(false);
-          setShowSmartCompilationSheet(true);
-        }}
-        videoCount={videoCount}
-      />
-
-      <MomentBadgesSheet
-        isOpen={showBadgesSheet}
-        onClose={() => setShowBadgesSheet(false)}
-        selectedBadges={selectedBadges}
-        onBadgesChange={setSelectedBadges}
       />
 
 

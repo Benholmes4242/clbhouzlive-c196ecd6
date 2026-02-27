@@ -9,7 +9,7 @@ import { formatRelativeTime, formatLikes } from '@/utils/dateFormat';
 import { buildImageThumbnailUrl, buildVideoPosterUrl } from '@/utils/mediaThumbs';
 import { clsx } from 'clsx';
 import ClubTagPill from '@/components/clubhouse/ClubTagPill';
-import { AchievementBadgesOverlay } from '@/components/post/badges/AchievementBadgesOverlay';
+
 
 interface CinematicVideoCardProps {
   item: ExploreContentItem;
@@ -107,9 +107,6 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
           className="top-2 right-2 [&>div]:!px-1.5 [&>div]:!py-0.5 [&>div]:!text-meta [&_svg]:!w-4 [&_svg]:!h-4"
         />
         )}
-
-        {/* Achievement Badges - Top Left */}
-        <AchievementBadgesOverlay badgeIds={item.badges} className="top-2 left-2" />
 
         {/* Duration Badge - Bottom Left */}
         {duration > 0 && (
