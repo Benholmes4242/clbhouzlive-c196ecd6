@@ -487,6 +487,7 @@ export function PostWizard({
         courseId: state.selectedCourses[0]?.id || null,
         courseName: state.selectedCourses[0]?.name || null,
         courseCountry: state.selectedCourses[0]?.country || null,
+        courseData: state.selectedCourses.length > 0 ? state.selectedCourses.map(c => ({ id: c.id, name: c.name, country: c.country, region: c.region })) : null,
       });
       toast.success('Draft saved');
     } catch { toast.error('Failed to save draft'); }
@@ -504,6 +505,7 @@ export function PostWizard({
         courseId: state.selectedCourses[0]?.id || null,
         courseName: state.selectedCourses[0]?.name || null,
         courseCountry: state.selectedCourses[0]?.country || null,
+        courseData: state.selectedCourses.length > 0 ? state.selectedCourses.map(c => ({ id: c.id, name: c.name, country: c.country, region: c.region })) : null,
       });
       if (draft?.id && state.mediaItems.length > 0) {
         const mediaWithFiles = state.mediaItems.filter(item => item.file);

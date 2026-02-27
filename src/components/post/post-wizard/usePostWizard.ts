@@ -381,14 +381,25 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
       duration: m.durationSeconds ?? undefined,
     }));
 
-    // Build course info if available
-    const selectedCourse: GolfCourse | null = draft.courseId 
-      ? {
-          id: draft.courseId,
-          name: draft.courseName || '',
-          country: draft.courseCountry || '',
-        }
-      : null;
+    // Build course info — prefer course_data array, fallback to single courseId
+    const courseDataArr = (draft as any).courseData ?? (draft as any).course_data;
+    let selectedCourses: GolfCourse[] = [];
+    if (Array.isArray(courseDataArr) && courseDataArr.length > 0) {
+      selectedCourses = courseDataArr
+        .filter((c: any) => c.id && c.name)
+        .map((c: any) => ({
+          id: c.id,
+          name: c.name,
+          country: c.country || '',
+          region: c.region || undefined,
+        }));
+    } else if (draft.courseId) {
+      selectedCourses = [{
+        id: draft.courseId,
+        name: draft.courseName || '',
+        country: draft.courseCountry || '',
+      }];
+    }
 
     // Build studio edits map
     const studioEditsByMediaId: Record<string, StudioEdits> = {};
@@ -397,15 +408,6 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
         studioEditsByMediaId[m.id] = m.studioEdits as StudioEdits;
       }
     });
-
-    // Build course info if available - convert to array
-    const selectedCourses: GolfCourse[] = draft.courseId 
-      ? [{
-          id: draft.courseId,
-          name: draft.courseName || '',
-          country: draft.courseCountry || '',
-        }]
-      : [];
 
     dispatch({
       type: 'LOAD_DRAFT',

@@ -1,0 +1,2 @@
+ALTER TABLE post_drafts ADD COLUMN IF NOT EXISTS course_data jsonb DEFAULT NULL;
+COMMENT ON COLUMN post_drafts.course_data IS 'JSON array of tagged courses [{id, name, country, region}]. Supersedes single course_id for multi-course support.';

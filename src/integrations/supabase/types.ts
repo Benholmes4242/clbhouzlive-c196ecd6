@@ -6331,6 +6331,7 @@ export type Database = {
           categories: string[] | null
           content: string | null
           course_country: string | null
+          course_data: Json | null
           course_id: string | null
           course_name: string | null
           created_at: string | null
@@ -6348,6 +6349,7 @@ export type Database = {
           categories?: string[] | null
           content?: string | null
           course_country?: string | null
+          course_data?: Json | null
           course_id?: string | null
           course_name?: string | null
           created_at?: string | null
@@ -6365,6 +6367,7 @@ export type Database = {
           categories?: string[] | null
           content?: string | null
           course_country?: string | null
+          course_data?: Json | null
           course_id?: string | null
           course_name?: string | null
           created_at?: string | null
