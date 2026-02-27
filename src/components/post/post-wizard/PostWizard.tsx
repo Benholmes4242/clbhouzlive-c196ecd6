@@ -545,7 +545,7 @@ export function PostWizard({
     >
       <div
         className="light fixed inset-0 z-[9999] flex flex-col overflow-hidden"
-        style={{ backgroundColor: '#FFFFFF', touchAction: 'pan-y pinch-zoom', overscrollBehavior: 'contain' }}
+        style={{ backgroundColor: '#F8FAFC', touchAction: 'pan-y pinch-zoom', overscrollBehavior: 'contain' }}
       >
         {showSuccess ? (
           <PostSuccessScreen
