@@ -813,7 +813,7 @@ export function PostWizard({
                     const removed = state.selectedTags.filter(t => !newTags.some(n => n.id === t.id));
                     let currentCaption = state.caption + appendText;
                     removed.forEach(tag => {
-                      const mentionText = `@${(tag.username || tag.name).replace(/\\s+/g, '')}`;
+                      const mentionText = `@${(tag.username || tag.name).replace(/\s+/g, '')}`;
                       const escapeRegex = mentionText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                       const removeRegex = new RegExp(`\\s*${escapeRegex}`, 'gi');
                       currentCaption = currentCaption.replace(removeRegex, '');
