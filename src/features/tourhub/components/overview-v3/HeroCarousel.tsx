@@ -114,7 +114,7 @@ interface LeaderboardRowProps {
 function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreFlash, positionDelta = 0 }: LeaderboardRowProps) {
   const navigate = useNavigate();
   const abbreviatedName = `${leader.player.firstName[0]}. ${leader.player.lastName}`;
-  const photoUrl = getPlayerHeadshotUrl(`${leader.player.firstName} ${leader.player.lastName}`, leader.player.tourCode ?? 'pga');
+  const photoUrl = getPlayerHeadshotUrl(leader.player.fullName, leader.player.tourCode ?? 'pga');
   const initials = `${leader.player.firstName[0]}${leader.player.lastName[0]}`.toUpperCase();
   const thruDisplay = formatThruDisplay(leader.thru, leader.round_1, leader.round_2, leader.round_3, leader.round_4, leader.status, leader.thruUpdatedAt, leader.tournamentTimezone);
   
@@ -198,7 +198,7 @@ function CondensedTieRow({ row, index, isActive }: { row: LiveLeaderboardRow; in
         {/* Stacked avatars */}
         <div className="flex items-center flex-shrink-0">
           {row.players.slice(0, 4).map((player, i) => {
-            const photoUrl = getPlayerHeadshotUrl(`${player.player.firstName} ${player.player.lastName}`, player.player.tourCode ?? 'pga');
+            const photoUrl = getPlayerHeadshotUrl(player.player.fullName, player.player.tourCode ?? 'pga');
             const initials = `${player.player.firstName[0]}${player.player.lastName[0]}`.toUpperCase();
             return (
               <div
