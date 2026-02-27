@@ -2,19 +2,23 @@ import { useState, useCallback, useRef } from 'react';
 import { X, Wand2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { OrderedMediaItem } from '../types';
+import { formatDuration } from '@/utils/formatDuration';
 
 interface MediaPreviewViewerProps {
   items: OrderedMediaItem[];
   initialIndex: number;
   onClose: () => void;
   onStudio: (itemId: string) => void;
+  onSetCover?: (index: number) => void;
+  coverIndex: number;
 }
 
-export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio }: MediaPreviewViewerProps) {
+export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onSetCover, coverIndex }: MediaPreviewViewerProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
 
   const item = items[currentIndex];
+  const isCover = currentIndex === coverIndex;
 
   const goTo = useCallback((idx: number) => {
     setCurrentIndex(Math.max(0, Math.min(items.length - 1, idx)));
@@ -74,14 +78,31 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio }: M
         >
           <X className="w-5 h-5 text-white" />
         </button>
-        <button
-          onClick={handleStudio}
-          className="w-9 h-9 rounded-full flex items-center justify-center"
-          style={{ background: 'rgba(255,255,255,0.15)' }}
-          aria-label="Edit in studio"
-        >
-          <Wand2 className="w-5 h-5 text-white" />
-        </button>
+
+        <div className="flex items-center gap-2">
+          {/* Set as Cover button — only for non-cover items when multiple */}
+          {items.length > 1 && !isCover && (
+            <button
+              onClick={() => onSetCover?.(currentIndex)}
+              className="px-3 py-1.5 rounded-full text-xs font-semibold text-white"
+              style={{
+                background: 'rgba(0,0,0,0.45)',
+                backdropFilter: 'blur(16px)',
+              }}
+            >
+              Set as Cover
+            </button>
+          )}
+
+          <button
+            onClick={handleStudio}
+            className="w-9 h-9 rounded-full flex items-center justify-center"
+            style={{ background: 'rgba(255,255,255,0.15)' }}
+            aria-label="Edit in studio"
+          >
+            <Wand2 className="w-5 h-5 text-white" />
+          </button>
+        </div>
       </div>
 
       {/* Media display */}
@@ -93,17 +114,30 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio }: M
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.92 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full h-full flex items-center justify-center"
+            className="w-full h-full flex items-center justify-center relative"
           >
             {item.type === 'video' ? (
-              <video
-                src={item.previewUrl}
-                poster={item.thumbnailUrl}
-                controls
-                autoPlay
-                playsInline
-                className="max-w-full max-h-full object-contain rounded-lg"
-              />
+              <>
+                <video
+                  src={item.previewUrl}
+                  poster={item.thumbnailUrl}
+                  controls
+                  autoPlay
+                  playsInline
+                  className="max-w-full max-h-full object-contain rounded-lg"
+                />
+                {item.duration != null && (
+                  <div
+                    className="absolute bottom-16 left-4 px-2 py-0.5 rounded-md text-white text-xs font-medium"
+                    style={{
+                      background: 'rgba(0,0,0,0.55)',
+                      backdropFilter: 'blur(8px)',
+                    }}
+                  >
+                    {formatDuration(item.duration)}
+                  </div>
+                )}
+              </>
             ) : (
               <div className="w-full h-full overflow-auto" style={{ touchAction: 'pinch-zoom pan-x pan-y' }}>
                 <img
