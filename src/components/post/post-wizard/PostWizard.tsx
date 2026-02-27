@@ -271,7 +271,7 @@ export function PostWizard({
     const textBeforeCursor = caption.slice(0, cursorPosition);
     const textAfterCursor = caption.slice(cursorPosition);
     const beforeMention = textBeforeCursor.replace(/@\w*$/, '');
-    const displayName = mention.username || mention.name;
+    const displayName = (mention.username || mention.name).replace(/\s+/g, '');
 
     // Use the RichCaptionInput's insertMention method
     const atStart = beforeMention.length;
