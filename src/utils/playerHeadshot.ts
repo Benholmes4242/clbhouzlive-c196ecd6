@@ -27,13 +27,15 @@ const TOUR_FOLDER: Record<string, string> = {
  * Returns the R2 headshot URL for a player.
  * Falls back to the shared silhouette placeholder if tour code is unknown.
  *
- * @param playerName  - Exact full_name value from the database e.g. "Rory McIlroy"
- * @param tourCode    - Tour code from database e.g. "pga", "euro", "liv"
+ * @param playerName       - Exact full_name value from the database e.g. "Rory McIlroy"
+ * @param tourCode         - Tour code from database e.g. "pga", "euro", "liv"
+ * @param headshotOverride - Optional override filename (without extension) for R2 lookup
  */
-export function getPlayerHeadshotUrl(playerName: string, tourCode: string): string {
+export function getPlayerHeadshotUrl(playerName: string, tourCode: string, headshotOverride?: string | null): string {
   const folder = TOUR_FOLDER[tourCode];
-  if (!folder || !playerName) return SILHOUETTE;
-  const encoded = encodeURIComponent(playerName);
+  if (!folder || (!playerName && !headshotOverride)) return SILHOUETTE;
+  const nameKey = headshotOverride || playerName;
+  const encoded = encodeURIComponent(nameKey);
   return `${R2_BASE}/${folder}/${encoded}.webp`;
 }
 

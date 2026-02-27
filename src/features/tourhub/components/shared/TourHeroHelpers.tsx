@@ -78,6 +78,7 @@ export function PlayerAvatar({
   pgaTourId,
   displayName,
   fullName,
+  headshotOverride,
   tourCode,
   size = 44,
   frosted = false,
@@ -87,6 +88,8 @@ export function PlayerAvatar({
   displayName: string;
   /** Full name for R2 lookup — e.g. "Jacob Bridgeman". Falls back to displayName if omitted. */
   fullName?: string;
+  /** Override filename for R2 lookup when full_name doesn't match */
+  headshotOverride?: string | null;
   /** Tour code for R2 folder lookup — e.g. 'pga', 'euro', 'lpga', 'liv' */
   tourCode?: string;
   size?: number;
@@ -95,7 +98,7 @@ export function PlayerAvatar({
 }) {
   // PRIMARY: R2 headshot by full name + tour. FALLBACK: silhouette.
   const nameForLookup = fullName || displayName;
-  const resolved = getPlayerHeadshotUrl(nameForLookup, tourCode || 'pga') || PLAYER_SILHOUETTE_URL;
+  const resolved = getPlayerHeadshotUrl(nameForLookup, tourCode || 'pga', headshotOverride) || PLAYER_SILHOUETTE_URL;
   const initials = displayName
     .split(/[\s.]/)
     .filter(Boolean)

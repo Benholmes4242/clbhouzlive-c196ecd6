@@ -1,0 +1,1 @@
+ALTER TABLE public.sr_players ADD COLUMN IF NOT EXISTS headshot_override TEXT DEFAULT NULL;

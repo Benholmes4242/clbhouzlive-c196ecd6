@@ -8705,6 +8705,7 @@ export type Database = {
           full_name: string | null
           gender: string | null
           handedness: string | null
+          headshot_override: string | null
           height: string | null
           id: string
           is_amateur: boolean | null
@@ -8735,6 +8736,7 @@ export type Database = {
           full_name?: string | null
           gender?: string | null
           handedness?: string | null
+          headshot_override?: string | null
           height?: string | null
           id?: string
           is_amateur?: boolean | null
@@ -8765,6 +8767,7 @@ export type Database = {
           full_name?: string | null
           gender?: string | null
           handedness?: string | null
+          headshot_override?: string | null
           height?: string | null
           id?: string
           is_amateur?: boolean | null

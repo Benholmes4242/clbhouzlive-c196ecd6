@@ -114,7 +114,7 @@ interface LeaderboardRowProps {
 function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreFlash, positionDelta = 0 }: LeaderboardRowProps) {
   const navigate = useNavigate();
   const abbreviatedName = `${leader.player.firstName[0]}. ${leader.player.lastName}`;
-  const photoUrl = getPlayerHeadshotUrl(leader.player.fullName, leader.player.tourCode ?? 'pga');
+  const photoUrl = getPlayerHeadshotUrl(leader.player.fullName, leader.player.tourCode ?? 'pga', leader.player.headshotOverride);
   const initials = `${leader.player.firstName[0]}${leader.player.lastName[0]}`.toUpperCase();
   const thruDisplay = formatThruDisplay(leader.thru, leader.round_1, leader.round_2, leader.round_3, leader.round_4, leader.status, leader.thruUpdatedAt, leader.tournamentTimezone);
   
@@ -198,7 +198,7 @@ function CondensedTieRow({ row, index, isActive }: { row: LiveLeaderboardRow; in
         {/* Stacked avatars */}
         <div className="flex items-center flex-shrink-0">
           {row.players.slice(0, 4).map((player, i) => {
-            const photoUrl = getPlayerHeadshotUrl(player.player.fullName, player.player.tourCode ?? 'pga');
+            const photoUrl = getPlayerHeadshotUrl(player.player.fullName, player.player.tourCode ?? 'pga', player.player.headshotOverride);
             const initials = `${player.player.firstName[0]}${player.player.lastName[0]}`.toUpperCase();
             return (
               <div
@@ -760,7 +760,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         >
                           {/* 60px photo */}
                           <button onClick={handlePlayerTap(podiumWinner.playerId)} className="transition-opacity active:opacity-70" style={{ flexShrink: 0 }}>
-                            <PlayerAvatar displayName={podiumWinner.displayName} fullName={podiumWinner.fullName} tourCode={tournament.tourSlug} size={60} frosted />
+                            <PlayerAvatar displayName={podiumWinner.displayName} fullName={podiumWinner.fullName} headshotOverride={podiumWinner.headshotOverride} tourCode={tournament.tourSlug} size={60} frosted />
                           </button>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             {/* Name + score */}
