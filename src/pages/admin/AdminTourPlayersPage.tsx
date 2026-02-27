@@ -1,21 +1,28 @@
-import { useState, useMemo, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useState, useMemo, useCallback, useRef } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Search, Users, Link2, Link2Off, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Users, Link2, Link2Off, ChevronLeft, ChevronRight, Upload, Trash2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 
 // Tour display config
 const TOURS: Record<string, { label: string; color: string }> = {
@@ -30,7 +37,6 @@ const TOURS: Record<string, { label: string; color: string }> = {
 const ALL_TOUR_CODES = Object.keys(TOURS);
 const PAGE_SIZE = 50;
 
-// Types
 interface PlayerRow {
   id: string;
   full_name: string | null;
@@ -53,32 +59,186 @@ interface PlayerRow {
   created_at: string | null;
 }
 
-// Fetch all players using batched pagination
 async function fetchAllPlayers(): Promise<PlayerRow[]> {
   const batchSize = 1000;
   let offset = 0;
   let allRows: PlayerRow[] = [];
   let hasMore = true;
-
   while (hasMore) {
     const { data, error } = await supabase
       .from('sr_players')
       .select('id, full_name, first_name, last_name, country, country_code, tour_codes, college, birth_date, turned_pro, handedness, height, weight, residence, is_amateur, pga_tour_id, photo_asset_id, updated_at, created_at')
       .order('full_name', { ascending: true })
       .range(offset, offset + batchSize - 1);
-
     if (error) throw error;
     allRows = allRows.concat(data ?? []);
     hasMore = (data?.length ?? 0) === batchSize;
     offset += batchSize;
   }
-
   return allRows;
 }
 
-function PlayerDetailDialog({ player, open, onClose }: { player: PlayerRow | null; open: boolean; onClose: () => void }) {
+/* ───────── Photo Management Sheet ───────── */
+function PhotoManagementSheet({
+  player,
+  open,
+  onClose,
+}: {
+  player: PlayerRow | null;
+  open: boolean;
+  onClose: () => void;
+}) {
+  const queryClient = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [removing, setRemoving] = useState(false);
+  const [imgKey, setImgKey] = useState(0); // force re-render after upload
+
   if (!player) return null;
 
+  const primaryTour = player.tour_codes?.[0] || '';
+  const playerName = player.full_name || '';
+  const headshotUrl = playerName
+    ? getPlayerHeadshotUrl(playerName, primaryTour || 'pga')
+    : PLAYER_SILHOUETTE_URL;
+
+  const handleUpload = async (file: File) => {
+    if (!playerName) return;
+    setUploading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('playerName', playerName);
+      formData.append('tourCode', primaryTour || 'misc');
+      // Always try to delete old photo in the same tour folder
+      formData.append('oldTourCode', primaryTour || 'misc');
+
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/manage-player-headshot`,
+        {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${session.access_token}` },
+          body: formData,
+        }
+      );
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Upload failed');
+
+      toast.success('Headshot uploaded successfully');
+      setImgKey(k => k + 1);
+      queryClient.invalidateQueries({ queryKey: ['admin-tour-players-all'] });
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemove = async () => {
+    if (!playerName) return;
+    setRemoving(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
+
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/manage-player-headshot`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            playerName,
+            tourCode: primaryTour || 'misc',
+          }),
+        }
+      );
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Delete failed');
+
+      toast.success('Headshot removed');
+      setImgKey(k => k + 1);
+      queryClient.invalidateQueries({ queryKey: ['admin-tour-players-all'] });
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setRemoving(false);
+    }
+  };
+
+  return (
+    <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
+      <SheetContent side="bottom" className="rounded-t-2xl px-4 pb-8">
+        <SheetHeader className="mb-6">
+          <SheetTitle className="text-lg font-bold">Manage Photo</SheetTitle>
+        </SheetHeader>
+
+        <div className="flex flex-col items-center gap-5">
+          {/* Current headshot preview */}
+          <img
+            key={imgKey}
+            src={headshotUrl + `?v=${imgKey}`}
+            alt={playerName}
+            className="w-28 h-28 rounded-2xl object-cover object-top bg-muted border border-border"
+            onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+          />
+          <div className="text-center">
+            <div className="font-semibold text-foreground">{playerName}</div>
+            <div className="text-sm text-muted-foreground">
+              {player.tour_codes?.length
+                ? player.tour_codes.map(c => TOURS[c]?.label || c).join(', ')
+                : 'No tour'}
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex flex-col gap-3 w-full max-w-xs">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleUpload(file);
+                e.target.value = '';
+              }}
+            />
+            <Button
+              className="w-full gap-2"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading || removing}
+            >
+              {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+              {uploading ? 'Uploading…' : 'Upload New Photo'}
+            </Button>
+            <Button
+              variant="destructive"
+              className="w-full gap-2"
+              onClick={handleRemove}
+              disabled={uploading || removing}
+            >
+              {removing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+              {removing ? 'Removing…' : 'Remove Photo'}
+            </Button>
+          </div>
+        </div>
+
+        {/* Safe area spacer */}
+        <div style={{ height: 'env(safe-area-inset-bottom)' }} />
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+/* ───────── Player Detail Dialog ───────── */
+function PlayerDetailDialog({ player, open, onClose }: { player: PlayerRow | null; open: boolean; onClose: () => void }) {
+  if (!player) return null;
   const primaryTour = player.tour_codes?.[0] || 'pga';
   const headshotUrl = player.full_name ? getPlayerHeadshotUrl(player.full_name, primaryTour) : PLAYER_SILHOUETTE_URL;
   const hasHeadshot = !!player.photo_asset_id;
@@ -133,12 +293,14 @@ function PlayerDetailDialog({ player, open, onClose }: { player: PlayerRow | nul
   );
 }
 
+/* ───────── Main Page ───────── */
 export function AdminTourPlayersPage() {
   const [search, setSearch] = useState('');
   const [tourFilter, setTourFilter] = useState<string>('all');
   const [matchFilter, setMatchFilter] = useState<string>('all');
   const [page, setPage] = useState(0);
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerRow | null>(null);
+  const [photoPlayer, setPhotoPlayer] = useState<PlayerRow | null>(null);
 
   const { data: players = [], isLoading } = useQuery({
     queryKey: ['admin-tour-players-all'],
@@ -146,23 +308,11 @@ export function AdminTourPlayersPage() {
     staleTime: 5 * 60 * 1000,
   });
 
-  // Filtered list
   const filtered = useMemo(() => {
     let result = players;
-
-    // Tour filter
-    if (tourFilter !== 'all') {
-      result = result.filter(p => p.tour_codes?.includes(tourFilter));
-    }
-
-    // Match filter (photo_asset_id presence)
-    if (matchFilter === 'matched') {
-      result = result.filter(p => !!p.photo_asset_id);
-    } else if (matchFilter === 'unmatched') {
-      result = result.filter(p => !p.photo_asset_id);
-    }
-
-    // Search
+    if (tourFilter !== 'all') result = result.filter(p => p.tour_codes?.includes(tourFilter));
+    if (matchFilter === 'matched') result = result.filter(p => !!p.photo_asset_id);
+    else if (matchFilter === 'unmatched') result = result.filter(p => !p.photo_asset_id);
     if (search.trim()) {
       const q = search.trim().toLowerCase();
       result = result.filter(p =>
@@ -171,34 +321,26 @@ export function AdminTourPlayersPage() {
         p.country_code?.toLowerCase().includes(q)
       );
     }
-
     return result;
   }, [players, tourFilter, matchFilter, search]);
 
-  // Pagination
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paged = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
-  // Reset page on filter change
   const handleSearch = useCallback((v: string) => { setSearch(v); setPage(0); }, []);
   const handleTourFilter = useCallback((v: string) => { setTourFilter(v); setPage(0); }, []);
   const handleMatchFilter = useCallback((v: string) => { setMatchFilter(v); setPage(0); }, []);
 
-  // Summary stats
   const stats = useMemo(() => {
     const total = players.length;
     const matched = players.filter(p => !!p.photo_asset_id).length;
     const byTour: Record<string, number> = {};
-    for (const code of ALL_TOUR_CODES) {
-      byTour[code] = players.filter(p => p.tour_codes?.includes(code)).length;
-    }
-    const noTour = players.filter(p => !p.tour_codes?.length).length;
-    return { total, matched, unmatched: total - matched, byTour, noTour };
+    for (const code of ALL_TOUR_CODES) byTour[code] = players.filter(p => p.tour_codes?.includes(code)).length;
+    return { total, matched, unmatched: total - matched, byTour };
   }, [players]);
 
   return (
     <div className="space-y-6">
-      {/* Page header */}
       <div>
         <h1 className="text-2xl font-bold text-foreground">Tour Players</h1>
         <p className="text-sm text-muted-foreground mt-1">Master roster of all tour players across every tour</p>
@@ -206,40 +348,23 @@ export function AdminTourPlayersPage() {
 
       {/* Summary stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-        <Card>
-          <CardContent className="pt-4 pb-3 px-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Users className="w-4 h-4 text-muted-foreground" />
-              <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">Total</span>
-            </div>
-            <span className="text-2xl font-bold text-foreground">{stats.total.toLocaleString()}</span>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-4 pb-3 px-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Link2 className="w-4 h-4 text-emerald-600" />
-              <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">Matched</span>
-            </div>
-            <span className="text-2xl font-bold text-foreground">{stats.matched.toLocaleString()}</span>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-4 pb-3 px-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Link2Off className="w-4 h-4 text-red-500" />
-              <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">Unmatched</span>
-            </div>
-            <span className="text-2xl font-bold text-foreground">{stats.unmatched.toLocaleString()}</span>
-          </CardContent>
-        </Card>
+        <Card><CardContent className="pt-4 pb-3 px-4">
+          <div className="flex items-center gap-2 mb-1"><Users className="w-4 h-4 text-muted-foreground" /><span className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">Total</span></div>
+          <span className="text-2xl font-bold text-foreground">{stats.total.toLocaleString()}</span>
+        </CardContent></Card>
+        <Card><CardContent className="pt-4 pb-3 px-4">
+          <div className="flex items-center gap-2 mb-1"><Link2 className="w-4 h-4 text-emerald-600" /><span className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">Matched</span></div>
+          <span className="text-2xl font-bold text-foreground">{stats.matched.toLocaleString()}</span>
+        </CardContent></Card>
+        <Card><CardContent className="pt-4 pb-3 px-4">
+          <div className="flex items-center gap-2 mb-1"><Link2Off className="w-4 h-4 text-red-500" /><span className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">Unmatched</span></div>
+          <span className="text-2xl font-bold text-foreground">{stats.unmatched.toLocaleString()}</span>
+        </CardContent></Card>
         {ALL_TOUR_CODES.filter(c => stats.byTour[c] > 0).map(code => (
-          <Card key={code}>
-            <CardContent className="pt-4 pb-3 px-4">
-              <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">{TOURS[code]?.label}</span>
-              <div className="text-2xl font-bold text-foreground mt-1">{stats.byTour[code].toLocaleString()}</div>
-            </CardContent>
-          </Card>
+          <Card key={code}><CardContent className="pt-4 pb-3 px-4">
+            <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">{TOURS[code]?.label}</span>
+            <div className="text-2xl font-bold text-foreground mt-1">{stats.byTour[code].toLocaleString()}</div>
+          </CardContent></Card>
         ))}
       </div>
 
@@ -247,37 +372,24 @@ export function AdminTourPlayersPage() {
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search by name or country…"
-            value={search}
-            onChange={(e) => handleSearch(e.target.value)}
-            className="pl-9"
-          />
+          <Input placeholder="Search by name or country…" value={search} onChange={(e) => handleSearch(e.target.value)} className="pl-9" />
         </div>
         <Select value={tourFilter} onValueChange={handleTourFilter}>
-          <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="All Tours" />
-          </SelectTrigger>
+          <SelectTrigger className="w-[160px]"><SelectValue placeholder="All Tours" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Tours</SelectItem>
-            {ALL_TOUR_CODES.map(code => (
-              <SelectItem key={code} value={code}>{TOURS[code].label}</SelectItem>
-            ))}
+            {ALL_TOUR_CODES.map(code => <SelectItem key={code} value={code}>{TOURS[code].label}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={matchFilter} onValueChange={handleMatchFilter}>
-          <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="All Status" />
-          </SelectTrigger>
+          <SelectTrigger className="w-[160px]"><SelectValue placeholder="All Status" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Status</SelectItem>
             <SelectItem value="matched">Matched</SelectItem>
             <SelectItem value="unmatched">Unmatched</SelectItem>
           </SelectContent>
         </Select>
-        <span className="text-sm text-muted-foreground ml-auto">
-          {filtered.length.toLocaleString()} player{filtered.length !== 1 ? 's' : ''}
-        </span>
+        <span className="text-sm text-muted-foreground ml-auto">{filtered.length.toLocaleString()} player{filtered.length !== 1 ? 's' : ''}</span>
       </div>
 
       {/* Table */}
@@ -315,73 +427,54 @@ export function AdminTourPlayersPage() {
                           <img
                             src={headshotUrl}
                             alt=""
-                            className="w-8 h-8 shrink-0 rounded-full object-cover object-top bg-muted"
+                            className="w-8 h-8 shrink-0 rounded-full object-cover object-top bg-muted cursor-pointer hover:ring-2 hover:ring-primary/50 transition-shadow"
                             onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPhotoPlayer(player);
+                            }}
                           />
                           <span className="font-medium text-foreground">
                             {player.full_name || `${player.first_name || ''} ${player.last_name || ''}`.trim() || 'Unknown'}
                           </span>
                         </div>
                       </TableCell>
-                      <TableCell className="text-muted-foreground text-sm">
-                        {player.country_code || player.country || '—'}
-                      </TableCell>
+                      <TableCell className="text-muted-foreground text-sm">{player.country_code || player.country || '—'}</TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
-                          {player.tour_codes?.length ? (
-                            player.tour_codes.map(code => (
-                              <Badge key={code} variant="secondary" className={`text-[10px] px-1.5 py-0 ${TOURS[code]?.color || ''}`}>
-                                {TOURS[code]?.label || code}
-                              </Badge>
-                            ))
-                          ) : (
-                            <span className="text-xs text-muted-foreground">None</span>
-                          )}
+                          {player.tour_codes?.length ? player.tour_codes.map(code => (
+                            <Badge key={code} variant="secondary" className={`text-[10px] px-1.5 py-0 ${TOURS[code]?.color || ''}`}>
+                              {TOURS[code]?.label || code}
+                            </Badge>
+                          )) : <span className="text-xs text-muted-foreground">None</span>}
                         </div>
                       </TableCell>
                       <TableCell>
                         {hasHeadshot ? (
-                          <Badge variant="secondary" className="bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 text-[10px]">
-                            Matched
-                          </Badge>
+                          <Badge variant="secondary" className="bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 text-[10px]">Matched</Badge>
                         ) : (
-                          <Badge variant="secondary" className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 text-[10px]">
-                            Unmatched
-                          </Badge>
+                          <Badge variant="secondary" className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 text-[10px]">Unmatched</Badge>
                         )}
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground">
-                        {player.updated_at
-                          ? formatDistanceToNow(new Date(player.updated_at), { addSuffix: true })
-                          : '—'}
+                        {player.updated_at ? formatDistanceToNow(new Date(player.updated_at), { addSuffix: true }) : '—'}
                       </TableCell>
                     </TableRow>
                   );
                 })}
                 {paged.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                      No players found
-                    </TableCell>
-                  </TableRow>
+                  <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No players found</TableCell></TableRow>
                 )}
               </TableBody>
             </Table>
           </div>
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">
-                Page {page + 1} of {totalPages}
-              </span>
+              <span className="text-sm text-muted-foreground">Page {page + 1} of {totalPages}</span>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage(p => p - 1)}>
-                  <ChevronLeft className="w-4 h-4" />
-                </Button>
-                <Button variant="outline" size="sm" disabled={page >= totalPages - 1} onClick={() => setPage(p => p + 1)}>
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
+                <Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage(p => p - 1)}><ChevronLeft className="w-4 h-4" /></Button>
+                <Button variant="outline" size="sm" disabled={page >= totalPages - 1} onClick={() => setPage(p => p + 1)}><ChevronRight className="w-4 h-4" /></Button>
               </div>
             </div>
           )}
@@ -389,11 +482,10 @@ export function AdminTourPlayersPage() {
       )}
 
       {/* Player detail dialog */}
-      <PlayerDetailDialog
-        player={selectedPlayer}
-        open={!!selectedPlayer}
-        onClose={() => setSelectedPlayer(null)}
-      />
+      <PlayerDetailDialog player={selectedPlayer} open={!!selectedPlayer} onClose={() => setSelectedPlayer(null)} />
+
+      {/* Photo management sheet */}
+      <PhotoManagementSheet player={photoPlayer} open={!!photoPlayer} onClose={() => setPhotoPlayer(null)} />
     </div>
   );
 }

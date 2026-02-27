@@ -175,3 +175,6 @@ verify_jwt = false
 
 [functions.create-comment]
 verify_jwt = false
+
+[functions.manage-player-headshot]
+verify_jwt = false
