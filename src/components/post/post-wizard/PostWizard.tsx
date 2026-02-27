@@ -3,6 +3,8 @@
 // State engine (usePostWizard), upload pipeline, and all services are unchanged.
 
 import React, { useEffect, useCallback, useState, useMemo, useRef } from 'react';
+import StudioShelf from '@/components/studio/StudioShelf';
+import type { StudioTool, StudioEdits } from '@/types/studio';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
@@ -149,6 +151,9 @@ export function PostWizard({
 
   // Studio state
   const [showStudio, setShowStudio] = useState(false);
+  const [studioTool, setStudioTool] = useState<StudioTool>('filter');
+  const [isPositioningText, setIsPositioningText] = useState(false);
+  const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
 
   // Toolbar tooltips
   const { showCourseTooltip, showFriendsTooltip, dismissCourseTooltip, dismissFriendsTooltip } = useToolbarTooltips();
@@ -512,6 +517,34 @@ export function PostWizard({
     setPreviewMediaIndex(null);
   }, [setActiveMediaId]);
 
+  const handleCloseStudio = useCallback(() => {
+    setShowStudio(false);
+    setStudioTool('filter');
+    setIsPositioningText(false);
+    setActiveOverlayId(null);
+  }, []);
+
+  // Derive the active media item for studio
+  const activeStudioItem = showStudio
+    ? state.mediaItems.find(m => m.id === state.activeMediaId)
+    : null;
+
+  // Current edits for the active media item
+  const activeStudioEdits: StudioEdits = state.activeMediaId
+    ? (state.studioEditsByMediaId[state.activeMediaId] || {})
+    : {};
+
+  const handleUpdateStudioEdits = useCallback((patch: Partial<StudioEdits>) => {
+    if (!state.activeMediaId) return;
+    const current = state.studioEditsByMediaId[state.activeMediaId] || {};
+    setStudioEdits(state.activeMediaId, { ...current, ...patch });
+  }, [state.activeMediaId, state.studioEditsByMediaId, setStudioEdits]);
+
+  const handleClearStudioEdits = useCallback(() => {
+    if (!state.activeMediaId) return;
+    setStudioEdits(state.activeMediaId, {} as StudioEdits);
+  }, [state.activeMediaId, setStudioEdits]);
+
   // Actor display info
   const actorDisplayInfo = useMemo(() => {
     if (state.actor.type === 'personal' && personalActor) {
@@ -823,6 +856,27 @@ export function PostWizard({
                 />
               )}
             </AnimatePresence>
+
+            {/* Studio Shelf */}
+            {showStudio && activeStudioItem && (
+              <StudioShelf
+                open={showStudio}
+                onClose={handleCloseStudio}
+                activeTool={studioTool}
+                setActiveTool={setStudioTool}
+                activeMediaId={activeStudioItem.id}
+                activeMediaType={activeStudioItem.type}
+                activeMediaPreviewUrl={activeStudioItem.previewUrl}
+                activeMediaThumbnailUrl={activeStudioItem.thumbnailUrl || null}
+                edits={activeStudioEdits}
+                updateEdits={handleUpdateStudioEdits}
+                clearEdits={handleClearStudioEdits}
+                isPositioningText={isPositioningText}
+                onTogglePositionMode={() => setIsPositioningText(prev => !prev)}
+                activeOverlayId={activeOverlayId}
+                onSelectOverlay={setActiveOverlayId}
+              />
+            )}
           </>
         )}
       </div>
