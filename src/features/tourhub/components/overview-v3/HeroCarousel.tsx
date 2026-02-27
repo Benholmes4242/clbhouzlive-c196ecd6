@@ -109,12 +109,14 @@ interface LeaderboardRowProps {
   isLeader: boolean;
   scoreFlash?: 'birdie' | 'bogey' | null;
   positionDelta?: number;
+  tournamentTourSlug?: string;
 }
 
-function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreFlash, positionDelta = 0 }: LeaderboardRowProps) {
+function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreFlash, positionDelta = 0, tournamentTourSlug }: LeaderboardRowProps) {
   const navigate = useNavigate();
   const abbreviatedName = `${leader.player.firstName[0]}. ${leader.player.lastName}`;
-  const photoUrl = getPlayerHeadshotUrl(leader.player.fullName, leader.player.tourCode ?? 'pga', leader.player.headshotOverride);
+  const effectiveTourCode = leader.player.tourCode ?? tournamentTourSlug ?? 'pga';
+  const photoUrl = getPlayerHeadshotUrl(leader.player.fullName, effectiveTourCode, leader.player.headshotOverride);
   const initials = `${leader.player.firstName[0]}${leader.player.lastName[0]}`.toUpperCase();
   const thruDisplay = formatThruDisplay(leader.thru, leader.round_1, leader.round_2, leader.round_3, leader.round_4, leader.status, leader.thruUpdatedAt, leader.tournamentTimezone);
   
@@ -150,7 +152,7 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
                 src={photoUrl}
                 alt={abbreviatedName}
                 className="w-full h-full object-cover object-top"
-                onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+                onError={(e) => { console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-white/60 text-[10px] font-semibold" style={{ background: '#F8FAFC' }}>{initials}</div>
@@ -183,7 +185,7 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
 }
 
 // Condensed tie row for live leaderboard
-function CondensedTieRow({ row, index, isActive }: { row: LiveLeaderboardRow; index: number; isActive: boolean }) {
+function CondensedTieRow({ row, index, isActive, tournamentTourSlug }: { row: LiveLeaderboardRow; index: number; isActive: boolean; tournamentTourSlug?: string }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 14 }}
@@ -198,7 +200,8 @@ function CondensedTieRow({ row, index, isActive }: { row: LiveLeaderboardRow; in
         {/* Stacked avatars */}
         <div className="flex items-center flex-shrink-0">
           {row.players.slice(0, 4).map((player, i) => {
-            const photoUrl = getPlayerHeadshotUrl(player.player.fullName, player.player.tourCode ?? 'pga', player.player.headshotOverride);
+            const effectiveTourCode = player.player.tourCode ?? tournamentTourSlug ?? 'pga';
+            const photoUrl = getPlayerHeadshotUrl(player.player.fullName, effectiveTourCode, player.player.headshotOverride);
             const initials = `${player.player.firstName[0]}${player.player.lastName[0]}`.toUpperCase();
             return (
               <div
@@ -216,7 +219,7 @@ function CondensedTieRow({ row, index, isActive }: { row: LiveLeaderboardRow; in
                 }}
               >
                 {photoUrl ? (
-                  <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }} />
+                  <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" onError={(e) => { console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }} />
                 ) : (
                   <div style={{ width: '100%', height: '100%', background: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>{initials}</div>
                 )}
@@ -660,6 +663,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                                         isLeader={true}
                                         scoreFlash={scoreFlashes[player.player.id] || null}
                                         positionDelta={positionDeltas[player.player.id] || 0}
+                                        tournamentTourSlug={tournament.tourSlug}
                                       />
                                     );
                                   });
@@ -668,7 +672,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                                 // Tied chasers — condensed row
                                 if (row.isTied && !isFirst) {
                                   const idx = rowIndex++;
-                                  return <CondensedTieRow key={`tie-${row.position}`} row={row} index={idx} isActive={isActive} />;
+                                  return <CondensedTieRow key={`tie-${row.position}`} row={row} index={idx} isActive={isActive} tournamentTourSlug={tournament.tourSlug} />;
                                 }
 
                                 // Single player row
@@ -683,6 +687,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                                     isLeader={row.players[0].position === 1}
                                     scoreFlash={scoreFlashes[row.players[0].player.id] || null}
                                     positionDelta={positionDeltas[row.players[0].player.id] || 0}
+                                    tournamentTourSlug={tournament.tourSlug}
                                   />
                                 );
                               });
