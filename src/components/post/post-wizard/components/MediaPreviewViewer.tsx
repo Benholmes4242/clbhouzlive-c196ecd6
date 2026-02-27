@@ -154,7 +154,7 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
       {/* Top bar */}
       <div
         className="flex items-center justify-between px-4 pb-2 flex-shrink-0"
-        style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
+        style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 20px)' }}
       >
         <button
           onClick={onClose}
@@ -337,7 +337,7 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
       {items.length > 1 && (
         <div
           className="flex items-center justify-center gap-1.5 pt-3 flex-shrink-0"
-          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}
+          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 32px)' }}
         >
           {items.map((_, idx) => (
             <button
@@ -356,7 +356,7 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
 
       {/* Bottom safe area spacer when no dots */}
       {items.length <= 1 && (
-        <div className="flex-shrink-0" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)' }} />
+        <div className="flex-shrink-0" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }} />
       )}
     </motion.div>
   );
