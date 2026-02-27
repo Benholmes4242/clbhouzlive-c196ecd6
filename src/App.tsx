@@ -167,6 +167,7 @@ const AdminSettingsPage = lazy(() => import("./pages/admin/AdminSettingsPage").t
 const Top100GeocodingPage = lazy(() => import("./pages/admin/Top100GeocodingPage").then(m => ({ default: m.Top100GeocodingPage })));
 const AdminTestLabPage = lazy(() => import("./pages/admin/AdminTestLabPage"));
 const AdminTourPage = lazy(() => import("./pages/admin/AdminTourPage").then(m => ({ default: m.AdminTourPage })));
+const AdminTourPlayersPage = lazy(() => import("./pages/admin/AdminTourPlayersPage"));
 
 
 const ChannelProfile = lazy(() => import("./pages/ChannelProfile"));
@@ -456,6 +457,11 @@ function AppRoutes() {
           <Route path="tour" element={
             <PanelGuard need="admins">
               <Suspense fallback={<GenericPageSkeleton />}><AdminTourPage /></Suspense>
+            </PanelGuard>
+          } />
+          <Route path="tour-players" element={
+            <PanelGuard need="admins">
+              <Suspense fallback={<GenericPageSkeleton />}><AdminTourPlayersPage /></Suspense>
             </PanelGuard>
           } />
           <Route path="test-lab" element={
