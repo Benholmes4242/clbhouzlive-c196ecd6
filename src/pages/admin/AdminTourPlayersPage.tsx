@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Search, Users, Link2, Link2Off, ChevronLeft, ChevronRight, Upload, Trash2, Loader2 } from 'lucide-react';
+import { Search, Users, ChevronLeft, ChevronRight, Upload, Trash2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
@@ -241,8 +241,6 @@ function PlayerDetailDialog({ player, open, onClose }: { player: PlayerRow | nul
   if (!player) return null;
   const primaryTour = player.tour_codes?.[0] || 'pga';
   const headshotUrl = player.full_name ? getPlayerHeadshotUrl(player.full_name, primaryTour) : PLAYER_SILHOUETTE_URL;
-  const hasHeadshot = !!player.photo_asset_id;
-
   const fields = [
     { label: 'Full Name', value: player.full_name },
     { label: 'Country', value: player.country },
@@ -257,7 +255,6 @@ function PlayerDetailDialog({ player, open, onClose }: { player: PlayerRow | nul
     { label: 'Residence', value: player.residence },
     { label: 'Amateur', value: player.is_amateur ? 'Yes' : 'No' },
     { label: 'PGA Tour ID', value: player.pga_tour_id },
-    { label: 'Photo Asset', value: hasHeadshot ? 'Matched ✓' : 'No headshot' },
     { label: 'DB ID', value: player.id },
     { label: 'Created', value: player.created_at ? new Date(player.created_at).toLocaleDateString() : null },
     { label: 'Updated', value: player.updated_at ? formatDistanceToNow(new Date(player.updated_at), { addSuffix: true }) : null },
@@ -297,7 +294,7 @@ function PlayerDetailDialog({ player, open, onClose }: { player: PlayerRow | nul
 export function AdminTourPlayersPage() {
   const [search, setSearch] = useState('');
   const [tourFilter, setTourFilter] = useState<string>('all');
-  const [matchFilter, setMatchFilter] = useState<string>('all');
+  
   const [page, setPage] = useState(0);
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerRow | null>(null);
   const [photoPlayer, setPhotoPlayer] = useState<PlayerRow | null>(null);
@@ -311,8 +308,6 @@ export function AdminTourPlayersPage() {
   const filtered = useMemo(() => {
     let result = players;
     if (tourFilter !== 'all') result = result.filter(p => p.tour_codes?.includes(tourFilter));
-    if (matchFilter === 'matched') result = result.filter(p => !!p.photo_asset_id);
-    else if (matchFilter === 'unmatched') result = result.filter(p => !p.photo_asset_id);
     if (search.trim()) {
       const q = search.trim().toLowerCase();
       result = result.filter(p =>
@@ -322,21 +317,20 @@ export function AdminTourPlayersPage() {
       );
     }
     return result;
-  }, [players, tourFilter, matchFilter, search]);
+  }, [players, tourFilter, search]);
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paged = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   const handleSearch = useCallback((v: string) => { setSearch(v); setPage(0); }, []);
   const handleTourFilter = useCallback((v: string) => { setTourFilter(v); setPage(0); }, []);
-  const handleMatchFilter = useCallback((v: string) => { setMatchFilter(v); setPage(0); }, []);
+  
 
   const stats = useMemo(() => {
     const total = players.length;
-    const matched = players.filter(p => !!p.photo_asset_id).length;
     const byTour: Record<string, number> = {};
     for (const code of ALL_TOUR_CODES) byTour[code] = players.filter(p => p.tour_codes?.includes(code)).length;
-    return { total, matched, unmatched: total - matched, byTour };
+    return { total, byTour };
   }, [players]);
 
   return (
@@ -351,14 +345,6 @@ export function AdminTourPlayersPage() {
         <Card><CardContent className="pt-4 pb-3 px-4">
           <div className="flex items-center gap-2 mb-1"><Users className="w-4 h-4 text-muted-foreground" /><span className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">Total</span></div>
           <span className="text-2xl font-bold text-foreground">{stats.total.toLocaleString()}</span>
-        </CardContent></Card>
-        <Card><CardContent className="pt-4 pb-3 px-4">
-          <div className="flex items-center gap-2 mb-1"><Link2 className="w-4 h-4 text-emerald-600" /><span className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">Matched</span></div>
-          <span className="text-2xl font-bold text-foreground">{stats.matched.toLocaleString()}</span>
-        </CardContent></Card>
-        <Card><CardContent className="pt-4 pb-3 px-4">
-          <div className="flex items-center gap-2 mb-1"><Link2Off className="w-4 h-4 text-red-500" /><span className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">Unmatched</span></div>
-          <span className="text-2xl font-bold text-foreground">{stats.unmatched.toLocaleString()}</span>
         </CardContent></Card>
         {ALL_TOUR_CODES.filter(c => stats.byTour[c] > 0).map(code => (
           <Card key={code}><CardContent className="pt-4 pb-3 px-4">
@@ -381,14 +367,6 @@ export function AdminTourPlayersPage() {
             {ALL_TOUR_CODES.map(code => <SelectItem key={code} value={code}>{TOURS[code].label}</SelectItem>)}
           </SelectContent>
         </Select>
-        <Select value={matchFilter} onValueChange={handleMatchFilter}>
-          <SelectTrigger className="w-[160px]"><SelectValue placeholder="All Status" /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="matched">Matched</SelectItem>
-            <SelectItem value="unmatched">Unmatched</SelectItem>
-          </SelectContent>
-        </Select>
         <span className="text-sm text-muted-foreground ml-auto">{filtered.length.toLocaleString()} player{filtered.length !== 1 ? 's' : ''}</span>
       </div>
 
@@ -404,7 +382,7 @@ export function AdminTourPlayersPage() {
                   <TableHead>Player</TableHead>
                   <TableHead>Country</TableHead>
                   <TableHead>Tour(s)</TableHead>
-                  <TableHead>Status</TableHead>
+                  
                   <TableHead>Updated</TableHead>
                 </TableRow>
               </TableHeader>
@@ -414,7 +392,6 @@ export function AdminTourPlayersPage() {
                   const headshotUrl = player.full_name
                     ? getPlayerHeadshotUrl(player.full_name, primaryTour)
                     : PLAYER_SILHOUETTE_URL;
-                  const hasHeadshot = !!player.photo_asset_id;
 
                   return (
                     <TableRow
@@ -449,13 +426,6 @@ export function AdminTourPlayersPage() {
                           )) : <span className="text-xs text-muted-foreground">None</span>}
                         </div>
                       </TableCell>
-                      <TableCell>
-                        {hasHeadshot ? (
-                          <Badge variant="secondary" className="bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 text-[10px]">Matched</Badge>
-                        ) : (
-                          <Badge variant="secondary" className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 text-[10px]">Unmatched</Badge>
-                        )}
-                      </TableCell>
                       <TableCell className="text-xs text-muted-foreground">
                         {player.updated_at ? formatDistanceToNow(new Date(player.updated_at), { addSuffix: true }) : '—'}
                       </TableCell>
@@ -463,7 +433,7 @@ export function AdminTourPlayersPage() {
                   );
                 })}
                 {paged.length === 0 && (
-                  <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No players found</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={4} className="text-center py-8 text-muted-foreground">No players found</TableCell></TableRow>
                 )}
               </TableBody>
             </Table>
