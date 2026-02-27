@@ -39,6 +39,7 @@ export function CourseSearchSheet({
   const [suggestions, setSuggestions] = useState<Course[]>([]);
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const [selectingId, setSelectingId] = useState<string | null>(null);
+  const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -138,7 +139,6 @@ export function CourseSearchSheet({
   useEffect(() => {
     if (focusedIndex >= 0 && resultsRef.current) {
       const children = resultsRef.current.children;
-      // Account for the section label element
       const resultElements = Array.from(children).filter(el => el.getAttribute('role') === 'button');
       const item = resultElements[focusedIndex] as HTMLElement;
       item?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
@@ -180,42 +180,47 @@ export function CourseSearchSheet({
             exit={{ y: '100%' }}
             transition={{ type: 'tween', duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
             className={cn(
-              "fixed z-[10011] overflow-hidden flex flex-col bg-card light",
+              "fixed z-[10011] overflow-hidden flex flex-col light",
               isMobile 
-                ? 'inset-x-0 bottom-0 rounded-t-[24px]' 
+                ? 'inset-x-0 bottom-0 rounded-t-[20px]' 
                 : 'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl rounded-2xl',
               "shadow-[0_-4px_32px_rgba(0,0,0,0.1)]"
             )}
             style={{
               maxHeight: '65vh',
               paddingBottom: isMobile ? 'env(safe-area-inset-bottom)' : 0,
+              backgroundColor: '#FFFFFF',
             }}
           >
             {/* Handle bar */}
             {isMobile && (
               <div className="flex justify-center pt-2.5 pb-1">
-                <div className="w-10 h-1 bg-muted-foreground/30 rounded-full" />
+                <div className="w-9 h-1 rounded-full" style={{ backgroundColor: '#E0E0E0' }} />
               </div>
             )}
 
             {/* Header */}
             <div className="px-5 pb-4">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-foreground">
+                <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#1A1A1A' }}>
                   Choose Golf Club
                 </h3>
                 <button
                   onClick={onClose}
-                  className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-muted/50 transition-colors"
+                  className="w-8 h-8 rounded-full flex items-center justify-center transition-colors active:opacity-60"
+                  style={{ color: '#AEAEB2' }}
                   aria-label="Close search"
                 >
-                  <X className="w-4 h-4 text-muted-foreground" />
+                  <X className="w-4.5 h-4.5" />
                 </button>
               </div>
               
               {/* Search input */}
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
+                <Search
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-200"
+                  style={{ color: isFocused ? '#f59e0b' : '#AEAEB2' }}
+                />
                 <input
                   ref={inputRef}
                   type="text"
@@ -223,7 +228,16 @@ export function CourseSearchSheet({
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="w-full h-11 pl-10 pr-10 rounded-xl bg-muted/30 border-0 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-shadow duration-200"
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={() => setIsFocused(false)}
+                  className="w-full h-11 pl-10 pr-10 rounded-xl text-sm transition-all duration-200 focus:outline-none"
+                  style={{
+                    backgroundColor: '#F5F5F7',
+                    color: '#1A1A1A',
+                    caretColor: '#f59e0b',
+                    border: isFocused ? '1.5px solid #f59e0b' : '1.5px solid rgba(0,0,0,0.07)',
+                    boxShadow: isFocused ? '0 0 0 3px rgba(245,158,11,0.10)' : 'none',
+                  }}
                   autoComplete="off"
                   autoCapitalize="off"
                   spellCheck="false"
@@ -231,10 +245,11 @@ export function CourseSearchSheet({
                 {query && (
                   <button
                     onClick={() => setQuery('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full flex items-center justify-center hover:bg-muted/50 transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full flex items-center justify-center transition-colors"
+                    style={{ color: '#AEAEB2' }}
                     aria-label="Clear search"
                   >
-                    <X className="w-3.5 h-3.5 text-muted-foreground" />
+                    <X className="w-3.5 h-3.5" />
                   </button>
                 )}
               </div>
@@ -250,19 +265,23 @@ export function CourseSearchSheet({
                   <SkeletonList rows={6} />
                 ) : error ? (
                   <div className="p-8 text-center">
-                    <p className="text-sm text-muted-foreground mb-3">Trouble loading courses</p>
+                    <p className="text-sm mb-3" style={{ color: '#7A7A7A' }}>Trouble loading courses</p>
                     <button
                       onClick={() => window.location.reload()}
-                      className="text-sm text-primary font-medium hover:underline"
+                      className="text-sm font-medium hover:underline"
+                      style={{ color: '#f59e0b' }}
                     >
                       Retry
                     </button>
                   </div>
                 ) : items?.length ? (
                   <div>
-                    {/* Suggestions label — only when showing user's courses */}
+                    {/* Suggestions label */}
                     {!isSearchMode && (
-                      <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-medium mb-2 mt-1 px-1">
+                      <p
+                        className="uppercase tracking-wider mb-2 mt-1 px-1"
+                        style={{ fontSize: '12px', fontWeight: 600, color: '#AEAEB2' }}
+                      >
                         Your courses
                       </p>
                     )}
@@ -280,18 +299,20 @@ export function CourseSearchSheet({
                         animate={!loading}
                       />
                     ))}
-                    {/* Bottom padding for scroll */}
                     <div className="h-6" />
                   </div>
                 ) : (
                   <div className="py-12 text-center">
-                    <div className="w-12 h-12 rounded-full bg-muted/30 mx-auto mb-4 flex items-center justify-center">
-                      <MapPin className="w-5 h-5 text-muted-foreground/50" />
+                    <div
+                      className="w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center"
+                      style={{ backgroundColor: 'rgba(245,158,11,0.10)' }}
+                    >
+                      <MapPin className="w-5 h-5" style={{ color: '#f59e0b' }} />
                     </div>
-                    <p className="text-sm font-medium text-foreground">
+                    <p style={{ fontSize: '16px', fontWeight: 600, color: '#1A1A1A' }}>
                       {query ? "No courses found" : "Search for a course"}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p style={{ fontSize: '13px', fontWeight: 400, color: '#AEAEB2', marginTop: '4px' }}>
                       {query ? "Try a different search term" : "Start typing to find courses"}
                     </p>
                   </div>
@@ -300,7 +321,10 @@ export function CourseSearchSheet({
 
               {/* Bottom scroll fade */}
               {items && items.length > 4 && (
-                <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-card to-transparent pointer-events-none" />
+                <div
+                  className="absolute bottom-0 left-0 right-0 h-6 pointer-events-none"
+                  style={{ background: 'linear-gradient(to top, #FFFFFF, transparent)' }}
+                />
               )}
             </div>
           </motion.div>
@@ -342,12 +366,16 @@ function ResultRow({ course, index, onClick, isFocused, onMouseEnter, isAlreadyA
       transition={{ duration: 0.15, delay: Math.min(index * 0.05, 0.3) }}
       whileTap={!isAlreadyAdded ? { scale: 0.98 } : {}}
       className={cn(
-        "p-3 rounded-xl cursor-pointer transition-colors duration-100",
-        isFocused && "bg-muted/30 ring-1 ring-primary/20",
+        "p-3 rounded-xl cursor-pointer transition-all duration-150",
         isAlreadyAdded && "opacity-50 cursor-not-allowed",
-        isSelecting && "bg-primary/10",
-        !isAlreadyAdded && !isFocused && !isSelecting && "active:bg-muted/40"
       )}
+      style={{
+        backgroundColor: isSelecting
+          ? 'rgba(245,158,11,0.10)'
+          : isFocused
+            ? 'rgba(245,158,11,0.06)'
+            : 'transparent',
+      }}
       onClick={isAlreadyAdded ? undefined : onClick}
       onKeyDown={isAlreadyAdded ? undefined : handleKeyDown}
       onMouseEnter={onMouseEnter}
@@ -357,20 +385,30 @@ function ResultRow({ course, index, onClick, isFocused, onMouseEnter, isAlreadyA
           <img 
             src={course.thumbnail_image} 
             alt="" 
-            className="w-12 h-12 rounded-xl object-cover flex-shrink-0 border border-border/30"
+            className="w-12 h-12 object-cover flex-shrink-0"
+            style={{
+              borderRadius: '10px',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+            }}
             onError={() => setImgError(true)}
           />
         ) : (
-          <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-muted/30">
-            <MapPin className="w-5 h-5 text-muted-foreground" />
+          <div
+            className="w-12 h-12 flex items-center justify-center flex-shrink-0"
+            style={{
+              borderRadius: '10px',
+              backgroundColor: 'rgba(245,158,11,0.08)',
+            }}
+          >
+            <MapPin className="w-5 h-5" style={{ color: '#f59e0b' }} />
           </div>
         )}
         
         <div className="flex-1 min-w-0">
-          <div className="font-medium text-sm truncate text-foreground">
+          <div className="truncate" style={{ fontSize: '15px', fontWeight: 600, color: '#1A1A1A' }}>
             {course.name}
           </div>
-          <div className="text-xs flex items-center gap-1.5 mt-0.5 text-muted-foreground">
+          <div className="flex items-center gap-1.5 mt-0.5" style={{ fontSize: '13px', color: '#7A7A7A' }}>
             {(() => {
               const flagCode = getFlagCode(course.country);
               return flagCode ? (
@@ -383,25 +421,37 @@ function ResultRow({ course, index, onClick, isFocused, onMouseEnter, isAlreadyA
             })()}
             <span className="truncate">{course.sub_country || course.region}</span>
             {course.rating != null && (
-              <span className="text-foreground font-semibold">
-                • {course.rating.toFixed(1)}
-                <span className="text-[11px] text-muted-foreground/50 font-normal ml-0.5">/ 10</span>
+              <span>
+                •{' '}
+                <span style={{ color: '#d97706', fontWeight: 600 }}>
+                  {course.rating.toFixed(1)}
+                </span>
+                <span style={{ color: '#AEAEB2', fontWeight: 400, fontSize: '11px', marginLeft: '2px' }}>/ 10</span>
               </span>
             )}
           </div>
         </div>
 
         {isAlreadyAdded && (
-          <div className="flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-            <Check className="w-3 h-3" />
+          <div
+            className="flex items-center gap-1 px-2 py-0.5"
+            style={{
+              backgroundColor: 'rgba(245,158,11,0.10)',
+              color: '#d97706',
+              fontSize: '11px',
+              fontWeight: 600,
+              borderRadius: '980px',
+            }}
+          >
+            <Check className="w-3 h-3" style={{ color: '#f59e0b' }} />
             Added
           </div>
         )}
       </div>
 
-      {/* Inset divider — after thumbnail column */}
+      {/* Inset divider */}
       {!isLast && (
-        <div className="ml-[60px] mt-3 border-b border-border/20" />
+        <div className="ml-[60px] mt-3" style={{ borderBottom: '0.5px solid rgba(0,0,0,0.07)' }} />
       )}
     </motion.div>
   );
@@ -412,10 +462,10 @@ function SkeletonList({ rows = 6 }: { rows?: number }) {
     <div className="space-y-2 p-1">
       {Array.from({ length: rows }).map((_, i) => (
         <div key={i} className="flex items-center gap-3 p-3">
-          <div className="w-12 h-12 rounded-xl flex-shrink-0 bg-muted/40 animate-pulse" />
+          <div className="w-12 h-12 flex-shrink-0 animate-pulse" style={{ borderRadius: '10px', backgroundColor: 'rgba(0,0,0,0.06)' }} />
           <div className="flex-1 space-y-2">
-            <div className="h-4 rounded-lg w-3/4 bg-muted/40 animate-pulse" />
-            <div className="h-3 rounded-lg w-1/2 bg-muted/40 animate-pulse" />
+            <div className="h-4 rounded-lg w-3/4 animate-pulse" style={{ backgroundColor: 'rgba(0,0,0,0.06)' }} />
+            <div className="h-3 rounded-lg w-1/2 animate-pulse" style={{ backgroundColor: 'rgba(0,0,0,0.06)' }} />
           </div>
         </div>
       ))}
