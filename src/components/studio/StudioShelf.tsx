@@ -34,8 +34,9 @@ type StudioShelfProps = {
   edits: StudioEdits;
   updateEdits: (patch: Partial<StudioEdits>) => void;
   clearEdits: () => void;
-  // Legacy props kept for compatibility but no longer used
+  /** @deprecated No longer used in fullscreen studio */
   isPositioningText?: boolean;
+  /** @deprecated No longer used in fullscreen studio */
   onTogglePositionMode?: () => void;
   activeOverlayId?: string | null;
   onSelectOverlay?: (id: string | null) => void;
@@ -127,8 +128,12 @@ export default function StudioShelf({
     return parts.length > 0 ? parts.join(' ') : undefined;
   }, [edits.rotate, edits.flipH, edits.flipV]);
 
-  const filterClass = edits.filter ? getFilterClass(edits.filter) : '';
-  const filterOpacity = edits.filterIntensity != null ? edits.filterIntensity / 100 : 1;
+  const filterClass = edits.filter && edits.filter !== 'normal' ? getFilterClass(edits.filter) : '';
+  const filterIntensity = edits.filterIntensity ?? 100;
+  const hasActiveFilter = !!(edits.filter && edits.filter !== 'normal');
+
+  // Compare mode: filter panel can temporarily hide the filter on canvas
+  const [isComparing, setIsComparing] = useState(false);
 
   // CropEditor aspect ratio
   const cropAspect = useMemo(() => {
@@ -168,6 +173,9 @@ export default function StudioShelf({
 
   const showCropOnCanvas = activeTool === 'edit' && activeMediaType === 'image' && !!activeMediaPreviewUrl;
 
+  // Should we show the filter on canvas? Not during compare mode
+  const showFilterOnCanvas = hasActiveFilter && !isComparing;
+
   return (
     <AnimatePresence>
       {open && (
@@ -175,6 +183,10 @@ export default function StudioShelf({
           {/* Fullscreen overlay */}
           <motion.div
             className="fixed inset-0 z-[9999] bg-black flex flex-col"
+            style={{
+              paddingTop: 'env(safe-area-inset-top)',
+              paddingBottom: 'env(safe-area-inset-bottom)',
+            }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -225,6 +237,7 @@ export default function StudioShelf({
             <div
               ref={canvasRef}
               className="flex-1 relative bg-black flex items-center justify-center overflow-hidden min-h-0"
+              style={{ touchAction: 'none' }}
             >
               {/* Show CropEditor when crop tool is active for images */}
               {showCropOnCanvas ? (
@@ -233,38 +246,64 @@ export default function StudioShelf({
                     imageSrc={activeMediaPreviewUrl!}
                     aspectRatio={cropAspect}
                     initialZoom={edits.crop?.zoom || 1}
+                    initialCrop={edits.crop?.area ? {
+                      x: edits.crop.area.x,
+                      y: edits.crop.area.y,
+                    } : undefined}
                     onCropComplete={handleCropComplete}
                     onZoomChange={handleCropZoomChange}
                   />
                 </div>
               ) : (
                 <>
-                  {/* Media element with live filter */}
-                  {activeMediaType === 'video' ? (
-                    <video
-                      src={activeMediaPreviewUrl || undefined}
-                      poster={activeMediaThumbnailUrl || undefined}
-                      className={`max-w-full max-h-full object-contain ${filterClass}`}
-                      style={{
-                        opacity: filterOpacity,
-                        transform: mediaTransform,
-                      }}
-                      autoPlay
-                      loop
-                      muted
-                      playsInline
-                    />
-                  ) : (
-                    <img
-                      src={activeMediaPreviewUrl || undefined}
-                      className={`max-w-full max-h-full object-contain ${filterClass}`}
-                      style={{
-                        opacity: filterOpacity,
-                        transform: mediaTransform,
-                      }}
-                      alt="Studio preview"
-                    />
-                  )}
+                  {/* Dual-layer media: base (unfiltered) + filtered overlay for intensity blending */}
+                  <div className="relative flex items-center justify-center w-full h-full">
+                    {/* Base layer: always unfiltered, always fully opaque */}
+                    {activeMediaType === 'video' ? (
+                      <video
+                        src={activeMediaPreviewUrl || undefined}
+                        poster={activeMediaThumbnailUrl || undefined}
+                        className="max-w-full max-h-full object-contain"
+                        style={{ transform: mediaTransform }}
+                        autoPlay loop muted playsInline
+                      />
+                    ) : (
+                      <img
+                        src={activeMediaPreviewUrl || undefined}
+                        className="max-w-full max-h-full object-contain"
+                        style={{ transform: mediaTransform }}
+                        alt="Studio preview"
+                      />
+                    )}
+
+                    {/* Filter layer: overlaid with opacity = intensity for blending */}
+                    {showFilterOnCanvas && (
+                      <>
+                        {activeMediaType === 'video' ? (
+                          <video
+                            src={activeMediaPreviewUrl || undefined}
+                            poster={activeMediaThumbnailUrl || undefined}
+                            className={`absolute inset-0 max-w-full max-h-full object-contain m-auto ${filterClass}`}
+                            style={{
+                              transform: mediaTransform,
+                              opacity: filterIntensity / 100,
+                            }}
+                            autoPlay loop muted playsInline
+                          />
+                        ) : (
+                          <img
+                            src={activeMediaPreviewUrl || undefined}
+                            className={`absolute inset-0 max-w-full max-h-full object-contain m-auto ${filterClass}`}
+                            style={{
+                              transform: mediaTransform,
+                              opacity: filterIntensity / 100,
+                            }}
+                            alt=""
+                          />
+                        )}
+                      </>
+                    )}
+                  </div>
 
                   {/* Text overlays — draggable on the canvas */}
                   {edits.textOverlays && edits.textOverlays.length > 0 && (
@@ -344,6 +383,8 @@ export default function StudioShelf({
                       onApply={handleApply}
                       onReset={handleReset}
                       previewUrl={activeMediaThumbnailUrl || activeMediaPreviewUrl}
+                      onCompareStart={() => setIsComparing(true)}
+                      onCompareEnd={() => setIsComparing(false)}
                     />
                   </motion.div>
                 )}

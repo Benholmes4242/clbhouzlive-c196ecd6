@@ -8,6 +8,8 @@ type StudioPanelFilterProps = {
   onApply: () => void;
   onReset: () => void;
   previewUrl?: string | null;
+  onCompareStart?: () => void;
+  onCompareEnd?: () => void;
 };
 
 const FILTER_OPTIONS: { id: FilterId; label: string }[] = [
@@ -28,22 +30,32 @@ const FilterCard = memo(function FilterCard({
   isSelected,
   onSelect,
   previewUrl,
+  onCompareStart,
+  onCompareEnd,
 }: {
   filter: { id: FilterId; label: string };
   isSelected: boolean;
   onSelect: (id: FilterId) => void;
   previewUrl?: string | null;
+  onCompareStart?: () => void;
+  onCompareEnd?: () => void;
 }) {
   const [isComparing, setIsComparing] = useState(false);
   const timerRef = useRef<number>();
 
   const handlePointerDown = () => {
-    timerRef.current = window.setTimeout(() => setIsComparing(true), 300);
+    timerRef.current = window.setTimeout(() => {
+      setIsComparing(true);
+      onCompareStart?.();
+    }, 300);
   };
 
   const handlePointerUp = () => {
     if (timerRef.current) clearTimeout(timerRef.current);
-    setIsComparing(false);
+    if (isComparing) {
+      setIsComparing(false);
+      onCompareEnd?.();
+    }
   };
 
   return (
@@ -109,7 +121,9 @@ const FilterCard = memo(function FilterCard({
 export default function StudioPanelFilter({ 
   edits, 
   updateEdits, 
-  previewUrl 
+  previewUrl,
+  onCompareStart,
+  onCompareEnd,
 }: StudioPanelFilterProps) {
   const [selectedFilter, setSelectedFilter] = useState<FilterId>(edits?.filter || 'normal');
   const [intensity, setIntensity] = useState(edits?.filterIntensity ?? 100);
@@ -156,6 +170,8 @@ export default function StudioPanelFilter({
               isSelected={selectedFilter === filter.id}
               onSelect={handleSelectFilter}
               previewUrl={previewUrl}
+              onCompareStart={onCompareStart}
+              onCompareEnd={onCompareEnd}
             />
           ))}
         </div>
