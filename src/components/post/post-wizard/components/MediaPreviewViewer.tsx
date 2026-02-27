@@ -98,8 +98,9 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio }: M
             {item.type === 'video' ? (
               <video
                 src={item.previewUrl}
-                poster={(item as any).posterUrl}
+                poster={item.thumbnailUrl}
                 controls
+                autoPlay
                 playsInline
                 className="max-w-full max-h-full object-contain rounded-lg"
               />

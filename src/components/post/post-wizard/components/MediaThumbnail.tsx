@@ -1,4 +1,4 @@
-import { X, Wand2 } from 'lucide-react';
+import { X, Wand2, Play } from 'lucide-react';
 import type { OrderedMediaItem } from '../types';
 
 interface MediaThumbnailProps {
@@ -31,9 +31,29 @@ export function MediaThumbnail({
     <div className="relative flex-shrink-0 w-[140px] h-[140px] rounded-2xl overflow-hidden group">
       {/* Media */}
       {item.type === 'video' ? (
-        <video src={item.previewUrl} className="w-full h-full object-cover" muted playsInline />
+        <video
+          src={item.previewUrl}
+          className="w-full h-full object-cover"
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster={item.thumbnailUrl}
+        />
       ) : (
         <img src={item.previewUrl} className="w-full h-full object-cover" alt="" />
+      )}
+
+      {/* Play icon overlay for videos */}
+      {item.type === 'video' && (
+        <div className="absolute inset-0 z-[1] flex items-center justify-center pointer-events-none">
+          <div
+            className="w-10 h-10 rounded-full flex items-center justify-center"
+            style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(8px)' }}
+          >
+            <Play className="w-4 h-4 text-white ml-0.5" fill="white" />
+          </div>
+        </div>
       )}
 
       {/* Tap to expand (full thumbnail area) */}
