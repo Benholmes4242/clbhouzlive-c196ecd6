@@ -9,7 +9,7 @@ import { StudioEdits, StudioTool, TextOverlay } from "@/types/studio";
 import SoundtrackStrip from "@/components/studio/SoundtrackStrip";
 import TextOverlayRenderer from "@/components/studio/TextOverlayRenderer";
 import { useToast } from "@/hooks/use-toast";
-import { AchievementBadgesOverlay } from "@/components/post/badges/AchievementBadgesOverlay";
+
 
 
 interface CreateMomentMediaStageProps {
@@ -219,11 +219,6 @@ export default function CreateMomentMediaStage({
         )}
 
 
-        {/* Achievement badges overlay - top left below header */}
-        <AchievementBadgesOverlay 
-          badgeIds={selectedBadges} 
-          className="left-4 top-[calc(env(safe-area-inset-top,0px)+52px)]"
-        />
 
         {/* Video timestamp - bottom left corner for videos only - consistent pill style */}
         {currentItem?.type === 'video' && currentItem?.duration && (

@@ -82,10 +82,7 @@ export interface UploadJob {
   // Review-specific fields (only used when type === 'review')
   reviewData?: ReviewDataPayload;
   
-  // v2 fields
-  categories?: string[];
   visibility?: 'anyone' | 'followers' | 'private';
-  badges?: string[];
   
   // Scheduling fields
   scheduledAt?: Date | null;
@@ -153,10 +150,7 @@ export interface UploadJobInput {
     duration?: number;
   }>;
   studioEditsByMediaId?: Record<string, StudioEditsPayload>;
-  // New v2 fields
-  categories?: string[];
   visibility?: 'anyone' | 'followers' | 'private';
-  badges?: string[];
   // Scheduling
   scheduledAt?: Date | null;
   
@@ -179,8 +173,5 @@ export interface SerializedUploadJob {
   error?: string;
   // Files cannot be serialized - job will be marked failed on restore
   fileCount: number;
-  // v2 fields
-  categories?: string[];
   visibility?: 'anyone' | 'followers' | 'private';
-  badges?: string[];
 }

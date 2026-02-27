@@ -39,10 +39,7 @@ class UploadManager {
       // Review-specific fields (stored for processReviewJob)
       reviewData: input.reviewData,
 
-      // v2 fields
-      categories: input.categories,
       visibility: input.visibility,
-      badges: input.badges,
       
       // Scheduling
       scheduledAt: input.scheduledAt,
@@ -254,9 +251,7 @@ class UploadManager {
         progress: job.progress,
         error: job.error,
         fileCount: job.files.length,
-        categories: job.categories,
         visibility: job.visibility,
-        badges: job.badges,
       }));
 
       localStorage.setItem(STORAGE_KEY, JSON.stringify(serialized));
@@ -296,10 +291,8 @@ class UploadManager {
           status: wasMidUpload ? 'failed' : s.status,
           progress: s.progress,
           error: wasMidUpload ? 'Upload interrupted - page was refreshed' : s.error,
-          files: [], // Files cannot be restored
-          categories: s.categories,
+          files: [],
           visibility: s.visibility,
-          badges: s.badges,
         };
 
         this.jobs.set(s.jobId, job);

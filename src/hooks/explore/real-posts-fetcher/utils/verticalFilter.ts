@@ -32,9 +32,7 @@ export function getPrimaryVideoMedia(post: RawPostData): RawMediaData | null {
  */
 export function passesVerticalFilter(post: RawPostData): VerticalFilterResult {
   // Check if this is a review post - allow image-only review posts into Clubhouse
-  const isReviewPost = 
-    (Array.isArray(post.categories) && post.categories.includes('review')) ||
-    !!post.source_review_id;
+  const isReviewPost = !!post.source_review_id;
   
   if (isReviewPost) {
     // Review posts are allowed regardless of media type

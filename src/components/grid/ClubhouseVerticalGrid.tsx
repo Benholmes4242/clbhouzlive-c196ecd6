@@ -248,7 +248,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
 
     const shortsOnly = dedupedPosts.filter(post => {
       // Review posts bypass video-only requirement
-      const isReviewPost = post.categories?.includes('review');
+      const isReviewPost = !!post.sourceReviewId;
       
       if (isReviewPost) {
         // Review posts: allow if they have any media (photo or video)
@@ -268,7 +268,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     
     const filtered = shortsOnly.filter(post => {
       // Review posts bypass portrait check
-      if (post.categories?.includes('review')) {
+      if (!!post.sourceReviewId) {
         return true;
       }
       

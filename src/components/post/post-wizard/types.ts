@@ -1,6 +1,6 @@
 // Post Wizard Types - Foundation for multi-step post creation
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
-import { TaggableEntity, GolfCourse, MomentVisibility, MomentCategory } from "../create-moment/types";
+import { TaggableEntity, GolfCourse, MomentVisibility } from "../create-moment/types";
 import { StudioEdits } from "@/types/studio";
 
 // Re-export StudioEdits for convenience
@@ -35,8 +35,6 @@ export interface PostWizardState {
   caption: string;
   selectedTags: TaggableEntity[];
   selectedCourses: GolfCourse[]; // Multi-course support (array)
-  selectedCategories: MomentCategory[];
-  selectedBadges: string[]; // Badge IDs
   
   // Settings
   visibility: MomentVisibility;
@@ -77,8 +75,6 @@ export type PostWizardAction =
   | { type: 'REMOVE_COURSE'; payload: string }
   | { type: 'REORDER_COURSES'; payload: GolfCourse[] }
   | { type: 'CLEAR_COURSES' }
-  | { type: 'SET_CATEGORIES'; payload: MomentCategory[] }
-  | { type: 'SET_BADGES'; payload: string[] }
   | { type: 'SET_VISIBILITY'; payload: MomentVisibility }
   | { type: 'SET_ACTOR'; payload: ActorRef }
   | { type: 'SET_SCHEDULED_AT'; payload: Date | null }
@@ -116,7 +112,6 @@ export interface PostSubmissionPayload {
   mediaItems: OrderedMediaItem[];
   selectedCourse: GolfCourse | null;
   selectedTags: TaggableEntity[];
-  categories: string[];
   visibility: MomentVisibility;
   actor: ActorRef;
   coverIndex: number;

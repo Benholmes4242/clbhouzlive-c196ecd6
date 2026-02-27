@@ -25,7 +25,7 @@ import { PostActionBar } from '@/components/posts/PostActionBar';
 import { toast } from 'sonner';
 import TaggedText from '@/components/posts/TaggedText';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
-import { AchievementBadgesOverlay } from '@/components/post/badges/AchievementBadgesOverlay';
+
 import { RatingPill } from '@/components/ui/RatingPill';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { isPosterFailed } from '@/utils/posterPrefetch';
@@ -610,8 +610,6 @@ const TaggedPostCard = React.memo(function TaggedPostCard({
               />
             )}
 
-            {/* Achievement Badges Overlay - Top Left */}
-            {!isReview && <AchievementBadgesOverlay badgeIds={post.badges} className="top-2 left-2" />}
           </div>
         )}
 

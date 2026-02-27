@@ -11,7 +11,7 @@ import {
   StudioEdits,
 } from './types';
 import { ComposerMediaItem } from '@/hooks/useSnapModal';
-import { TaggableEntity, GolfCourse, MomentVisibility, MomentCategory } from '../create-moment/types';
+import { TaggableEntity, GolfCourse, MomentVisibility } from '../create-moment/types';
 import type { DraftWithMedia } from '@/services/drafts';
 import { revokeMediaItemUrls } from '@/lib/mediaUtils';
 
@@ -27,9 +27,7 @@ const createInitialState = (userId?: string): PostWizardState => ({
   activeMediaId: null,
   caption: '',
   selectedTags: [],
-  selectedCourses: [], // Multi-course support
-  selectedCategories: [],
-  selectedBadges: [],
+  selectedCourses: [],
   visibility: 'anyone',
   actor: { type: 'personal', id: userId || '' },
   scheduledAt: null,
@@ -73,7 +71,6 @@ function postWizardReducer(
       return {
         ...state,
         mediaItems: allItems,
-        // Set first media as active if none set
         activeMediaId: state.activeMediaId || (allItems.length > 0 ? allItems[0].id : null),
         isDirty: true,
       };
@@ -81,14 +78,11 @@ function postWizardReducer(
 
     case 'REMOVE_MEDIA': {
       const filtered = state.mediaItems.filter((m) => m.id !== action.payload);
-      // Reindex orders
       const reordered = filtered.map((item, idx) => ({ ...item, order: idx }));
-      // Adjust cover index if needed
       let newCoverIndex = state.coverIndex;
       if (newCoverIndex >= reordered.length) {
         newCoverIndex = Math.max(0, reordered.length - 1);
       }
-      // Update active media if removed
       let newActiveId = state.activeMediaId;
       if (state.activeMediaId === action.payload) {
         newActiveId = reordered.length > 0 ? reordered[0].id : null;
@@ -141,18 +135,13 @@ function postWizardReducer(
     // Multi-course actions
     case 'ADD_COURSE': {
       const course = action.payload;
-      
-      // Validate course object has required fields
       if (!course?.id || !course?.name) {
         console.error('usePostWizard: Invalid course in ADD_COURSE action:', course);
         return state;
       }
-      
-      // Prevent duplicates
       if (state.selectedCourses.some(c => c.id === course.id)) {
         return state;
       }
-      
       return { 
         ...state, 
         selectedCourses: [...state.selectedCourses, course],
@@ -181,12 +170,6 @@ function postWizardReducer(
         isDirty: true 
       };
 
-    case 'SET_CATEGORIES':
-      return { ...state, selectedCategories: action.payload, isDirty: true };
-
-    case 'SET_BADGES':
-      return { ...state, selectedBadges: action.payload, isDirty: true };
-
     case 'SET_VISIBILITY':
       return { ...state, visibility: action.payload, isDirty: true };
 
@@ -212,7 +195,7 @@ function postWizardReducer(
         isEditMode: true,
         editPostId: action.payload.postId,
         isDirty: false,
-        currentStep: 'caption', // Skip media step in Phase 1
+        currentStep: 'caption',
       };
 
     default:
@@ -230,11 +213,8 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
   const { user } = useSupabaseSession();
   const userId = user?.id;
 
-  // Initialize state with options
   const initialState = useMemo(() => {
     const base = createInitialState(userId);
-    
-    // Apply initial media
     if (options.initialMedia?.length) {
       base.mediaItems = options.initialMedia.map((item, idx) => ({
         ...item,
@@ -242,23 +222,17 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
       }));
       base.activeMediaId = base.mediaItems[0]?.id || null;
     }
-    
-    // Apply initial courses
     if (options.initialCourses?.length) {
       base.selectedCourses = options.initialCourses;
     }
-    
-    // Apply actor override
     if (options.initialActorOverride) {
       base.actor = options.initialActorOverride;
     }
-    
     return base;
   }, [userId, options.initialMedia, options.initialCourses, options.initialActorOverride]);
 
   const [state, dispatch] = useReducer(postWizardReducer, initialState);
 
-  // Ref for stable access to mediaItems in callbacks (prevents infinite loops)
   const mediaItemsRef = useRef(state.mediaItems);
   mediaItemsRef.current = state.mediaItems;
 
@@ -281,7 +255,6 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
   }, []);
 
   const removeMedia = useCallback((mediaId: string) => {
-    // Find the item being removed and revoke its blob URLs to prevent memory leaks
     const itemToRemove = mediaItemsRef.current.find(item => item.id === mediaId);
     if (itemToRemove) {
       revokeMediaItemUrls([itemToRemove]);
@@ -331,14 +304,6 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
     dispatch({ type: 'CLEAR_COURSES' });
   }, []);
 
-  const setCategories = useCallback((categories: MomentCategory[]) => {
-    dispatch({ type: 'SET_CATEGORIES', payload: categories });
-  }, []);
-
-  const setBadges = useCallback((badges: string[]) => {
-    dispatch({ type: 'SET_BADGES', payload: badges });
-  }, []);
-
   // Settings helpers
   const setVisibility = useCallback((visibility: MomentVisibility) => {
     dispatch({ type: 'SET_VISIBILITY', payload: visibility });
@@ -358,7 +323,6 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
   }, []);
 
   const reset = useCallback(() => {
-    // Revoke blob URLs before clearing state to prevent memory leaks
     if (mediaItemsRef.current.length > 0) {
       revokeMediaItemUrls(mediaItemsRef.current);
     }
@@ -367,13 +331,12 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
 
   // Load draft into wizard state
   const loadDraft = useCallback((draft: DraftWithMedia) => {
-    // Convert draft media to OrderedMediaItems
     const mediaItems: OrderedMediaItem[] = (draft.media || []).map((m, idx) => ({
       id: m.id,
       type: m.mediaType as 'image' | 'video',
       previewUrl: m.mediaUrl,
       posterUrl: m.posterUrl || undefined,
-      file: undefined, // Draft media already uploaded - no file needed
+      file: undefined,
       order: m.displayOrder ?? idx,
       width: m.width ?? undefined,
       height: m.height ?? undefined,
@@ -381,7 +344,6 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
       duration: m.durationSeconds ?? undefined,
     }));
 
-    // Build course info — prefer course_data array, fallback to single courseId
     const courseDataArr = (draft as any).courseData ?? (draft as any).course_data;
     let selectedCourses: GolfCourse[] = [];
     if (Array.isArray(courseDataArr) && courseDataArr.length > 0) {
@@ -401,7 +363,6 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
       }];
     }
 
-    // Build studio edits map
     const studioEditsByMediaId: Record<string, StudioEdits> = {};
     (draft.media || []).forEach(m => {
       if (m.studioEdits) {
@@ -416,8 +377,6 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
         activeMediaId: mediaItems.length > 0 ? mediaItems[0].id : null,
         caption: draft.content || '',
         selectedCourses,
-        selectedCategories: (draft.categories || []) as unknown as MomentCategory[],
-        selectedBadges: draft.badges || [],
         visibility: draft.visibility || 'anyone',
         actor: {
           type: draft.actorType || 'personal',
@@ -430,17 +389,16 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
     });
   }, []);
 
-  // Load existing post into wizard for editing (BLOCKER 2 FIX: hydrate tags)
+  // Load existing post into wizard for editing
   const loadExistingPost = useCallback(async (postData: import('@/lib/fetchPostForEdit').PostForEdit) => {
     const { post, media, courses } = postData;
 
-    // Convert post_media rows to OrderedMediaItems (read-only in Phase 1)
     const mediaItems: OrderedMediaItem[] = media.map((m, idx) => ({
       id: m.id,
       type: m.media_type as 'image' | 'video',
       previewUrl: m.media_url,
       posterUrl: m.poster_url || undefined,
-      file: undefined, // Existing media — no File object
+      file: undefined,
       order: m.display_order ?? idx,
       width: m.width ?? undefined,
       height: m.height ?? undefined,
@@ -498,8 +456,6 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
             country: c.country,
             region: c.region || undefined,
           })),
-          selectedCategories: (post.categories || []) as unknown as MomentCategory[],
-          selectedBadges: post.badges || [],
           visibility: (post.visibility || 'anyone') as MomentVisibility,
           actor: {
             type: post.actor_type as 'personal' | 'business',
@@ -513,12 +469,9 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
 
   // Validation
   const canProceedFromMedia = state.mediaItems.length > 0;
-  // Caption step now requires at least 1 category to proceed
-  const canProceedFromCaption = state.selectedCategories.length > 0;
-  // In edit mode, allow submit even without new media files (existing media is kept)
+  const canProceedFromCaption = true; // No category requirement
   const canSubmit = (state.mediaItems.length > 0 || state.isEditMode) && !state.isSubmitting && !!user;
 
-  // Step index for progress display
   const currentStepIndex = STEP_ORDER.indexOf(state.currentStep);
   const totalSteps = STEP_ORDER.length;
   const isFirstStep = currentStepIndex === 0;
@@ -552,8 +505,6 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
     removeCourse,
     reorderCourses,
     clearCourses,
-    setCategories,
-    setBadges,
     
     // Settings
     setVisibility,

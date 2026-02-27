@@ -14,10 +14,6 @@ export const POST_LIMITS = {
   MAX_VIDEO_DURATION_SECONDS: 3600,
   /** Auto-save interval in milliseconds (30 seconds) */
   AUTO_SAVE_INTERVAL_MS: 30000,
-  /** Maximum number of categories per post */
-  MAX_CATEGORIES: 5,
-  /** Maximum number of badges per post */
-  MAX_BADGES: 10,
   /** Maximum number of tags per post */
   MAX_TAGS: 20,
 } as const;

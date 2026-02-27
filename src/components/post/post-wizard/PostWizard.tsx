@@ -6,7 +6,7 @@ import React, { useEffect, useCallback, useState, useMemo, useRef } from 'react'
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
-import { X, AlertTriangle, RefreshCw, Image, Camera, MapPin, Tag, UserPlus, Plus, Globe, ChevronDown } from 'lucide-react';
+import { X, AlertTriangle, RefreshCw, Image, Camera, MapPin, UserPlus, Plus, Globe, ChevronDown } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
 import { ErrorBoundary as ReactErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { PostWizardProps } from './types';
@@ -43,8 +43,6 @@ import { useToolbarTooltips, ToolbarTooltipBubble } from './components/ToolbarTo
 
 // Sheets
 import {
-  MomentBadgesSheet,
-  MomentCategorySheet,
   DraftsAndScheduledSheet,
   ScheduleSheet,
 } from '@/components/post/create-moment/sheets';
@@ -103,14 +101,12 @@ export function PostWizard({
     dispatch,
     canSubmit,
     reset,
-    setCategories,
     addCourse,
     removeCourse,
     setActor,
     setScheduledAt,
     setSubmitting,
     setVisibility,
-    setBadges,
     addMedia,
     removeMedia,
     setActiveMediaId,
@@ -136,8 +132,6 @@ export function PostWizard({
   const { scheduledPosts } = useScheduledPosts();
 
   // Sheet states
-  const [showBadgesSheet, setShowBadgesSheet] = useState(false);
-  const [showCategorySheet, setShowCategorySheet] = useState(false);
   const [showCourseSearch, setShowCourseSearch] = useState(false);
   const [showProfileSelector, setShowProfileSelector] = useState(false);
   const [showDraftsSheet, setShowDraftsSheet] = useState(false);
@@ -281,7 +275,6 @@ export function PostWizard({
     const beforeMention = textBeforeCursor.replace(/@\w*$/, '');
     const displayName = (mention.username || mention.name).replace(/\s+/g, '');
 
-    // Use the RichCaptionInput's insertMention method
     const atStart = beforeMention.length;
     const atEnd = cursorPosition;
 
@@ -297,7 +290,6 @@ export function PostWizard({
       [atStart, atEnd]
     );
 
-    // Caption is updated internally by insertMention via onChange — do not double-set
     setShowMentions(false);
     setMentionQuery('');
 
@@ -314,15 +306,9 @@ export function PostWizard({
     }
   }, [state.caption, state.selectedTags, cursorPosition, setCaption, dispatch]);
 
-  // Submission (preserved verbatim from old PostWizard)
+  // Submission
   const handleSubmit = useCallback(async () => {
     if (state.isSubmitting || !canSubmit) return;
-
-    // Require category
-    if (state.selectedCategories.length === 0) {
-      setShowCategorySheet(true);
-      return;
-    }
 
     setSubmitting(true);
 
@@ -334,13 +320,10 @@ export function PostWizard({
           setSubmitting(false);
           return;
         }
-        const categoryIds = state.selectedCategories.map(cat => typeof cat === 'string' ? cat : cat.id);
         const { data: updatedRows, error } = await supabase
           .from('posts')
           .update({
             content: state.caption.trim() || null,
-            categories: categoryIds,
-            badges: state.selectedBadges,
             visibility: state.visibility,
             course_id: state.selectedCourses[0]?.id || null,
             updated_at: new Date().toISOString(),
@@ -411,7 +394,6 @@ export function PostWizard({
         ? { id: firstCourse.id, name: firstCourse.name, country: firstCourse.country || '' }
         : undefined;
       const courseIds = state.selectedCourses.map(c => c?.id).filter((id): id is string => Boolean(id));
-      const categoryIds = state.selectedCategories.map(cat => typeof cat === 'string' ? cat : cat.id);
 
       await enqueuePostUploadWithResilience({
         userId: state.actor.id,
@@ -424,9 +406,7 @@ export function PostWizard({
         files,
         mediaItems: state.mediaItems,
         studioEditsByMediaId: state.studioEditsByMediaId,
-        categories: categoryIds,
         visibility: state.visibility,
-        badges: state.selectedBadges,
         scheduledAt: state.scheduledAt ?? undefined,
       });
 
@@ -453,14 +433,6 @@ export function PostWizard({
     }
   }, [addCourse]);
 
-  const handleCategoriesChange = useCallback((categories: string[]) => {
-    setCategories(categories as any);
-  }, [setCategories]);
-
-  const handleBadgesChange = useCallback((badges: string[]) => {
-    setBadges(badges);
-  }, [setBadges]);
-
   const handleActorChange = useCallback((actor: { type: 'personal' | 'business'; id: string; name: string; avatarUrl?: string }) => {
     setActor({ type: actor.type, id: actor.id });
     const selected = availableActors.find(a => a.id === actor.id);
@@ -485,11 +457,10 @@ export function PostWizard({
   const handleSaveDraft = useCallback(async () => {
     if (!canCreateDraft) { toast.error('Maximum drafts reached'); return; }
     try {
-      const categoryIds = state.selectedCategories.map(cat => typeof cat === 'string' ? cat : cat.id);
       await createDraft({
         actorType: state.actor.type, actorId: state.actor.id,
         content: state.caption || null, visibility: state.visibility,
-        categories: categoryIds, badges: state.selectedBadges,
+        categories: [], badges: [],
         courseId: state.selectedCourses[0]?.id || null,
         courseName: state.selectedCourses[0]?.name || null,
         courseCountry: state.selectedCourses[0]?.country || null,
@@ -503,11 +474,10 @@ export function PostWizard({
     if (!canCreateDraft) { toast.error('Maximum drafts reached'); return; }
     setIsSavingDraft(true);
     try {
-      const categoryIds = state.selectedCategories.map(cat => typeof cat === 'string' ? cat : cat.id);
       const draft = await createDraft({
         actorType: state.actor.type, actorId: state.actor.id,
         content: state.caption || null, visibility: state.visibility,
-        categories: categoryIds, badges: state.selectedBadges,
+        categories: [], badges: [],
         courseId: state.selectedCourses[0]?.id || null,
         courseName: state.selectedCourses[0]?.name || null,
         courseCountry: state.selectedCourses[0]?.country || null,
@@ -539,7 +509,7 @@ export function PostWizard({
   const handleOpenStudio = useCallback((mediaId: string) => {
     setActiveMediaId(mediaId);
     setShowStudio(true);
-    setPreviewMediaIndex(null); // Close viewer if open
+    setPreviewMediaIndex(null);
   }, [setActiveMediaId]);
 
   // Actor display info
@@ -742,7 +712,6 @@ export function PostWizard({
                   <ToolButton icon={MapPin} onClick={() => { dismissCourseTooltip(); setShowCourseSearch(true); }} label="Tag Course" />
                   <ToolbarTooltipBubble text="Tag a golf course" visible={showCourseTooltip} />
                 </div>
-                <ToolButton icon={Tag} onClick={() => setShowCategorySheet(true)} label="Category" />
                 <div className="relative">
                   <ToolButton icon={UserPlus} onClick={() => { dismissFriendsTooltip(); setShowTagPeople(true); }} label="Tag Friends" />
                   <ToolbarTooltipBubble text="Tag friends or businesses" visible={showFriendsTooltip} />
@@ -784,22 +753,6 @@ export function PostWizard({
               onActorChange={handleActorChange}
               visibility={state.visibility}
               onVisibilityChange={handleVisibilityChange}
-            />
-
-            {/* Badges Sheet */}
-            <MomentBadgesSheet
-              isOpen={showBadgesSheet}
-              onClose={() => setShowBadgesSheet(false)}
-              selectedBadges={state.selectedBadges}
-              onBadgesChange={handleBadgesChange}
-            />
-
-            {/* Category Sheet */}
-            <MomentCategorySheet
-              isOpen={showCategorySheet}
-              onClose={() => setShowCategorySheet(false)}
-              selectedCategories={state.selectedCategories.map(c => typeof c === 'string' ? c : c.id)}
-              onCategoriesChange={handleCategoriesChange}
             />
 
             {/* Course Search */}
@@ -845,7 +798,6 @@ export function PostWizard({
                   onClose={() => setShowTagPeople(false)}
                   selectedTags={state.selectedTags}
                   onTagsChange={(newTags) => {
-                    // Compute newly added tags
                     const newlyAdded = newTags.filter(t => !state.selectedTags.some(p => p.id === t.id));
                     let appendText = '';
                     newlyAdded.forEach(tag => {
@@ -853,7 +805,6 @@ export function PostWizard({
                       appendText += ` @${mentionText}`;
                     });
 
-                    // WARNING 8 FIX: Remove @mentions for deselected people
                     const removed = state.selectedTags.filter(t => !newTags.some(n => n.id === t.id));
                     let currentCaption = state.caption + appendText;
                     removed.forEach(tag => {

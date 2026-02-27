@@ -10,7 +10,7 @@ import { CaptionOverlay } from './overlays/CaptionOverlay';
 import { InteractionIconsOverlay } from './overlays/InteractionIconsOverlay';
 import { MediaNavigationDots } from './overlays/MediaNavigationDots';
 import { MediaContainer } from './MediaContainer';
-import { AchievementBadgesOverlay } from '@/components/post/badges/AchievementBadgesOverlay';
+
 
 interface IndexFeedPostProps {
   post: UserPostData;
@@ -158,8 +158,6 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
           source="index"
         />
 
-        {/* Achievement Badges overlay - top left below user info */}
-        <AchievementBadgesOverlay badgeIds={post.badges} className="top-14 left-2" />
 
         {/* Maximize Button for both Desktop and Mobile */}
         <div className="absolute top-3 right-3 z-20">
