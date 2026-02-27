@@ -243,8 +243,11 @@ export function PostWizard({
 
   // Media picker
   const handleAddMedia = useCallback(async (source?: 'camera' | 'gallery') => {
-    const remainingSlots = 10 - state.mediaItems.length;
-    if (remainingSlots <= 0) return;
+    const remainingSlots = POST_LIMITS.MAX_MEDIA_COUNT - state.mediaItems.length;
+    if (remainingSlots <= 0) {
+      toast.error(`Maximum ${POST_LIMITS.MAX_MEDIA_COUNT} photos & videos per post`);
+      return;
+    }
 
     try {
       const files = await pickMediaFiles({
@@ -710,7 +713,7 @@ export function PostWizard({
                             onSetCover={() => setCoverIndex(index)}
                           />
                         ))}
-                        {state.mediaItems.length < 10 && (
+                        {state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT && (
                           <button
                             onClick={() => handleAddMedia()}
                             className="flex-shrink-0 w-[140px] h-[140px] rounded-2xl flex items-center justify-center active:scale-[0.96] transition-transform"
@@ -721,9 +724,22 @@ export function PostWizard({
                         )}
                       </div>
                     )}
-                  </div>
+                   </div>
 
-                  {/* Tagged courses */}
+                  {/* Media counter */}
+                  {state.mediaItems.length > 0 && (
+                    <p
+                      className="text-[11px] font-medium tabular-nums text-center mt-1"
+                      style={{
+                        color: state.mediaItems.length >= POST_LIMITS.MAX_MEDIA_COUNT
+                          ? '#EF4444'
+                          : '#AEAEB2',
+                      }}
+                    >
+                      {state.mediaItems.length}/{POST_LIMITS.MAX_MEDIA_COUNT}
+                    </p>
+                  )}
+
                   {state.selectedCourses.length > 0 && (
                     <div className="flex flex-wrap gap-1.5">
                       {state.selectedCourses.map((course) => (
