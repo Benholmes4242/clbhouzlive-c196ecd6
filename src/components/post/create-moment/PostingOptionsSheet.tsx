@@ -132,8 +132,9 @@ export function PostingOptionsSheet({
                       }}
                     >
                       <div
-                        className="rounded-full flex-shrink-0 overflow-hidden"
+                        className="flex-shrink-0 overflow-hidden"
                         style={{
+                          borderRadius: '34%',
                           border: isSelected ? '2px solid #f59e0b' : '2px solid transparent',
                           padding: '1px',
                         }}

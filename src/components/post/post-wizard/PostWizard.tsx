@@ -4,6 +4,7 @@
 
 import React, { useEffect, useCallback, useState, useMemo, useRef } from 'react';
 import StudioShelf from '@/components/studio/StudioShelf';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { StudioTool, StudioEdits } from '@/types/studio';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
@@ -618,18 +619,14 @@ export function PostWizard({
             <div className="flex-1 overflow-y-auto px-5 pt-5 pb-6" style={{ scrollbarWidth: 'none' }}>
               <div className="flex items-start gap-3 max-w-[680px] mx-auto">
                 {/* Avatar */}
-                <div
-                  className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center mt-0.5 overflow-hidden"
-                  style={{ background: 'linear-gradient(145deg, #f59e0b 0%, #b45309 100%)', boxShadow: '0 2px 8px rgba(245,158,11,0.20)' }}
-                >
-                  {actorDisplayInfo.avatarUrl ? (
-                    <img src={actorDisplayInfo.avatarUrl} className="w-full h-full object-cover" alt="" />
-                  ) : (
-                    <span className="text-white font-semibold text-[15px]">
-                      {actorDisplayInfo.name?.[0]?.toUpperCase() || 'U'}
-                    </span>
-                  )}
-                </div>
+                <SquircleAvatar
+                  size={40}
+                  src={actorDisplayInfo.avatarUrl}
+                  alt={actorDisplayInfo.name || 'You'}
+                  fallback={actorDisplayInfo.name?.[0]?.toUpperCase() || 'U'}
+                  hideRing
+                  className="mt-0.5"
+                />
 
                 {/* Compose area */}
                 <div className="flex-1 min-w-0 flex flex-col gap-3.5">
