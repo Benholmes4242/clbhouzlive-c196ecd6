@@ -157,6 +157,7 @@ export async function generateVideoPoster(videoFile: File): Promise<string> {
       video.onseeked = null;
       video.onerror = null;
       video.oncanplay = null;
+      URL.revokeObjectURL(blobUrl);
     };
     
     const captureFrame = () => {

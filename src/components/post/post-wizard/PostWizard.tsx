@@ -87,6 +87,16 @@ function CourseSearchSheetBoundary(props: React.ComponentProps<typeof CourseSear
 // Helpers
 // ---------------------------------------------------------------------------
 
+function countGraphemes(str: string): number {
+  try {
+    // @ts-ignore — Intl.Segmenter available in modern browsers (Chrome 87+, Safari 15.4+)
+    const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+    return [...segmenter.segment(str)].length;
+  } catch {
+    return [...str].length;
+  }
+}
+
 function hasNonEmptyStudioEdits(edits?: StudioEdits): boolean {
   if (!edits) return false;
   return !!(
@@ -414,7 +424,13 @@ export function PostWizard({
       }
 
       // CREATE MODE
-      const files = state.mediaItems.filter(item => item.file).map(item => item.file as File);
+      // Reorder media items so cover is first (display_order: 0)
+      const reorderedItems = [...state.mediaItems];
+      if (state.coverIndex > 0 && state.coverIndex < reorderedItems.length) {
+        const [coverItem] = reorderedItems.splice(state.coverIndex, 1);
+        reorderedItems.unshift(coverItem);
+      }
+      const files = reorderedItems.filter(item => item.file).map(item => item.file as File);
       const firstCourse = state.selectedCourses[0];
       const courseInfo = firstCourse?.id && firstCourse?.name
         ? { id: firstCourse.id, name: firstCourse.name, country: firstCourse.country || '' }
@@ -430,7 +446,7 @@ export function PostWizard({
         courseIds,
         selectedTags: state.selectedTags,
         files,
-        mediaItems: state.mediaItems,
+        mediaItems: reorderedItems,
         studioEditsByMediaId: state.studioEditsByMediaId,
         visibility: state.visibility,
         scheduledAt: state.scheduledAt ?? undefined,
@@ -782,7 +798,7 @@ export function PostWizard({
                   <ToolbarTooltipBubble text="Tag friends or businesses" visible={showFriendsTooltip} />
                 </div>
               </div>
-              <CharacterRing current={state.caption.length} max={POST_LIMITS.MAX_CAPTION_LENGTH} />
+              <CharacterRing current={countGraphemes(state.caption)} max={POST_LIMITS.MAX_CAPTION_LENGTH} />
             </div>
 
             {/* === OVERLAYS === */}

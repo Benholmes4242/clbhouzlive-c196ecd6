@@ -111,8 +111,23 @@ export const RichCaptionInput = forwardRef<RichCaptionInputHandle, RichCaptionIn
       const plainText = serializeToPlainText(el);
 
       // Enforce max length
-      if (maxLength && plainText.length > maxLength) {
-        const truncated = plainText.slice(0, maxLength);
+      let graphemeLength: number;
+      let truncate: (s: string, max: number) => string;
+      try {
+        // @ts-ignore — Intl.Segmenter available in modern browsers
+        const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+        const segments = [...segmenter.segment(plainText)];
+        graphemeLength = segments.length;
+        truncate = (s, max) => {
+          // @ts-ignore
+          return [...new Intl.Segmenter('en', { granularity: 'grapheme' }).segment(s)].slice(0, max).map((seg: any) => seg.segment).join('');
+        };
+      } catch {
+        graphemeLength = [...plainText].length;
+        truncate = (s, max) => [...s].slice(0, max).join('');
+      }
+      if (maxLength && graphemeLength > maxLength) {
+        const truncated = truncate(plainText, maxLength);
         renderWithMentions(el, truncated, mentions, accentColor);
         onChange(truncated);
         return;

@@ -130,11 +130,13 @@ export function MentionBottomSheet({
 
         {/* Results list */}
         {!isLoading && suggestions.length > 0 && (
-          <div className="px-4 pb-4 space-y-2 overflow-y-auto max-h-[calc(50vh-80px)]">
+          <div className="px-4 pb-4 space-y-2 overflow-y-auto max-h-[calc(50vh-80px)]" role="listbox" aria-label="Mention suggestions">
             {suggestions.map((suggestion) => (
               <button
                 key={suggestion.id}
                 type="button"
+                role="option"
+                aria-selected={false}
                 onMouseDown={(e) => {
                   // Prevent input blur on desktop without killing click synthesis
                   e.preventDefault();
