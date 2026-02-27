@@ -8,9 +8,6 @@ type StudioPanelTextProps = {
   updateEdits: (patch: Partial<StudioEdits>) => void;
   onApply: () => void;
   onReset: () => void;
-  // Legacy props - kept for compat
-  isPositioningText?: boolean;
-  onTogglePositionMode?: () => void;
   activeOverlayId?: string | null;
   onSelectOverlay?: (id: string | null) => void;
 };

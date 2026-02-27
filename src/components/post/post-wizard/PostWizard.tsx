@@ -84,6 +84,23 @@ function CourseSearchSheetBoundary(props: React.ComponentProps<typeof CourseSear
 }
 
 // ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function hasNonEmptyStudioEdits(edits?: StudioEdits): boolean {
+  if (!edits) return false;
+  return !!(
+    (edits.filter && edits.filter !== 'normal') ||
+    (edits.textOverlays && edits.textOverlays.length > 0) ||
+    edits.music ||
+    edits.crop ||
+    (edits.rotate && edits.rotate !== 0) ||
+    edits.flipH ||
+    edits.flipV
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Main PostWizard Component
 // ---------------------------------------------------------------------------
 
@@ -685,7 +702,7 @@ export function PostWizard({
                             index={index}
                             isCover={index === state.coverIndex}
                             totalItems={state.mediaItems.length}
-                            hasStudioEdits={!!state.studioEditsByMediaId[item.id]}
+                            hasStudioEdits={hasNonEmptyStudioEdits(state.studioEditsByMediaId[item.id])}
                             onRemove={() => removeMedia(item.id)}
                             onExpand={() => setPreviewMediaIndex(index)}
                             onStudio={() => handleOpenStudio(item.id)}
