@@ -47,18 +47,6 @@ function postWizardReducer(
     case 'SET_STEP':
       return { ...state, currentStep: action.payload };
 
-    case 'NEXT_STEP': {
-      const currentIndex = STEP_ORDER.indexOf(state.currentStep);
-      const nextStep = STEP_ORDER[currentIndex + 1];
-      return nextStep ? { ...state, currentStep: nextStep } : state;
-    }
-
-    case 'PREV_STEP': {
-      const currentIndex = STEP_ORDER.indexOf(state.currentStep);
-      const prevStep = STEP_ORDER[currentIndex - 1];
-      return prevStep ? { ...state, currentStep: prevStep } : state;
-    }
-
     case 'SET_MEDIA':
       return { ...state, mediaItems: action.payload, isDirty: true };
 
@@ -237,18 +225,7 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
   const mediaItemsRef = useRef(state.mediaItems);
   mediaItemsRef.current = state.mediaItems;
 
-  // Navigation helpers
-  const goToStep = useCallback((step: PostWizardStep) => {
-    dispatch({ type: 'SET_STEP', payload: step });
-  }, []);
-
-  const nextStep = useCallback(() => {
-    dispatch({ type: 'NEXT_STEP' });
-  }, []);
-
-  const prevStep = useCallback(() => {
-    dispatch({ type: 'PREV_STEP' });
-  }, []);
+  // Navigation helpers (legacy — kept for LOAD_DRAFT compatibility)
 
   // Media helpers
   const addMedia = useCallback((items: ComposerMediaItem[]) => {
@@ -263,9 +240,6 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
     dispatch({ type: 'REMOVE_MEDIA', payload: mediaId });
   }, []);
 
-  const reorderMedia = useCallback((items: OrderedMediaItem[]) => {
-    dispatch({ type: 'REORDER_MEDIA', payload: items });
-  }, []);
 
   const setCoverIndex = useCallback((index: number) => {
     dispatch({ type: 'SET_COVER_INDEX', payload: index });
@@ -297,13 +271,6 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
     dispatch({ type: 'REMOVE_COURSE', payload: courseId });
   }, []);
 
-  const reorderCourses = useCallback((courses: GolfCourse[]) => {
-    dispatch({ type: 'REORDER_COURSES', payload: courses });
-  }, []);
-
-  const clearCourses = useCallback(() => {
-    dispatch({ type: 'CLEAR_COURSES' });
-  }, []);
 
   // Settings helpers
   const setVisibility = useCallback((visibility: MomentVisibility) => {
@@ -482,19 +449,9 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
     state,
     dispatch,
     
-    // Navigation
-    goToStep,
-    nextStep,
-    prevStep,
-    currentStepIndex,
-    totalSteps,
-    isFirstStep,
-    isLastStep,
-    
     // Media
     addMedia,
     removeMedia,
-    reorderMedia,
     setCoverIndex,
     setActiveMediaId,
     setStudioEdits,
@@ -504,8 +461,6 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
     setTags,
     addCourse,
     removeCourse,
-    reorderCourses,
-    clearCourses,
     
     // Settings
     setVisibility,

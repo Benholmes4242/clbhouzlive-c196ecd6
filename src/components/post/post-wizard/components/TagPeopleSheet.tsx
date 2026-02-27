@@ -111,6 +111,9 @@ export function TagPeopleSheet({
       {/* Sheet */}
       <motion.div
         className="fixed inset-x-0 bottom-0 z-[10011] flex flex-col"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Tag people"
         style={{
           backgroundColor: '#FFFFFF',
           borderTopLeftRadius: 20,

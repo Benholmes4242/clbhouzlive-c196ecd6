@@ -113,30 +113,38 @@ export function MediaThumbnail({
         aria-label="Preview media fullscreen"
       />
 
-      {/* Studio edit button (bottom-left) */}
+      {/* Studio edit button (bottom-left) — enlarged tap target */}
       <button
         onClick={(e) => { e.stopPropagation(); onStudio(); }}
-        className="absolute bottom-2 left-2 z-[2] w-7 h-7 rounded-full flex items-center justify-center"
-        style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(24px) saturate(180%)', border: '1px solid rgba(255,255,255,0.15)', boxShadow: '0 8px 32px rgba(0,0,0,0.35)' }}
+        className="absolute -bottom-1 -left-1 z-[2] w-9 h-9 flex items-center justify-center"
         aria-label="Edit in studio"
       >
-        <Wand2 className="w-3.5 h-3.5 text-white" />
-        {hasStudioEdits && (
-          <div
-            className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2"
-            style={{ backgroundColor: '#f59e0b', borderColor: 'rgba(0,0,0,0.50)' }}
-          />
-        )}
+        <div
+          className="w-7 h-7 rounded-full flex items-center justify-center relative"
+          style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(24px) saturate(180%)', border: '1px solid rgba(255,255,255,0.15)', boxShadow: '0 8px 32px rgba(0,0,0,0.35)' }}
+        >
+          <Wand2 className="w-3.5 h-3.5 text-white" />
+          {hasStudioEdits && (
+            <div
+              className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2"
+              style={{ backgroundColor: '#f59e0b', borderColor: 'rgba(0,0,0,0.50)' }}
+            />
+          )}
+        </div>
       </button>
 
-      {/* Remove button (top-right) */}
+      {/* Remove button (top-right) — enlarged tap target */}
       <button
         onClick={(e) => { e.stopPropagation(); onRemove(); }}
-        className="absolute top-2 right-2 z-[2] w-7 h-7 rounded-full flex items-center justify-center"
-        style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(24px) saturate(180%)', border: '1px solid rgba(255,255,255,0.15)', boxShadow: '0 8px 32px rgba(0,0,0,0.35)' }}
+        className="absolute -top-1 -right-1 z-[2] w-9 h-9 flex items-center justify-center"
         aria-label="Remove media"
       >
-        <X className="w-3 h-3 text-white" />
+        <div
+          className="w-7 h-7 rounded-full flex items-center justify-center"
+          style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(24px) saturate(180%)', border: '1px solid rgba(255,255,255,0.15)', boxShadow: '0 8px 32px rgba(0,0,0,0.35)' }}
+        >
+          <X className="w-3 h-3 text-white" />
+        </div>
       </button>
 
       {/* Cover selection — only show when multiple items */}
