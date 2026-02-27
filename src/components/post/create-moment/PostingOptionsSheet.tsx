@@ -13,12 +13,6 @@ interface VisibilityOption {
   label: string;
   description: string;
   icon: React.ReactNode;
-  /** Color tokens for contextual meaning */
-  color: {
-    bg: string;
-    bgSelected: string;
-    text: string;
-  };
 }
 
 const VISIBILITY_OPTIONS: VisibilityOption[] = [
@@ -27,33 +21,18 @@ const VISIBILITY_OPTIONS: VisibilityOption[] = [
     label: 'Anyone',
     description: 'Visible to everyone on Clbhouz',
     icon: <Globe className="w-5 h-5" />,
-    color: {
-      bg: 'rgba(16, 185, 129, 0.08)',       // emerald-500 / 8%
-      bgSelected: 'rgba(16, 185, 129, 0.15)', // emerald-500 / 15%
-      text: '#059669',                        // emerald-600
-    },
   },
   {
     value: 'followers',
     label: 'Followers',
     description: 'Only your followers can see this',
     icon: <Users className="w-5 h-5" />,
-    color: {
-      bg: 'rgba(245, 158, 11, 0.08)',        // amber-500 / 8%
-      bgSelected: 'rgba(245, 158, 11, 0.15)', // amber-500 / 15%
-      text: '#d97706',                         // amber-600
-    },
   },
   {
     value: 'private',
     label: 'Private',
     description: 'Visible only to you',
     icon: <Lock className="w-5 h-5" />,
-    color: {
-      bg: 'rgba(100, 116, 139, 0.08)',        // slate-500 / 8%
-      bgSelected: 'rgba(100, 116, 139, 0.15)', // slate-500 / 15%
-      text: '#64748b',                          // slate-500
-    },
   },
 ];
 
@@ -101,7 +80,6 @@ export function PostingOptionsSheet({
 
   return (
     <AnimatePresence>
-      {/* P1: Add .light class so all children inherit correct theme tokens */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -118,20 +96,23 @@ export function PostingOptionsSheet({
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-          className="absolute bottom-0 left-0 right-0 bg-card rounded-t-3xl overflow-hidden"
-          style={{ maxHeight: '85vh' }}
+          className="absolute bottom-0 left-0 right-0 rounded-t-3xl overflow-hidden"
+          style={{ maxHeight: '85vh', backgroundColor: '#FFFFFF' }}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Handle — semantic token */}
+          {/* Handle */}
           <div className="flex justify-center pt-3 pb-1">
-            <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+            <div className="w-9 h-1 rounded-full" style={{ backgroundColor: '#E0E0E0' }} />
           </div>
 
           {/* Scrollable Content */}
           <div className="overflow-y-auto" style={{ maxHeight: 'calc(85vh - 80px)' }}>
             {/* Account Section */}
             <div className="px-5 pt-3 pb-4">
-              <h3 className="text-xs font-medium text-primary uppercase tracking-wide mb-3">
+              <h3
+                className="uppercase tracking-wider mb-3"
+                style={{ fontSize: '12px', fontWeight: 600, color: '#AEAEB2' }}
+              >
                 Account
               </h3>
               
@@ -144,41 +125,50 @@ export function PostingOptionsSheet({
                       key={`${actor.type}-${actor.id}`}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => handleActorSelect(actor)}
-                      className={cn(
-                        "w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200",
-                        isSelected 
-                          ? "bg-primary/5 border border-primary/20"
-                          : "bg-muted/10 border border-transparent hover:bg-muted/20"
-                      )}
+                      className="w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200"
+                      style={{
+                        backgroundColor: isSelected ? 'rgba(245,158,11,0.06)' : 'transparent',
+                        border: isSelected ? '1px solid rgba(245,158,11,0.20)' : '1px solid transparent',
+                      }}
                     >
-                      <SquircleAvatar
-                        size={40}
-                        src={actor.avatarUrl}
-                        alt={actor.name}
-                        fallback={getInitials(actor.name)}
-                        hideRing
-                      />
+                      <div
+                        className="rounded-full flex-shrink-0 overflow-hidden"
+                        style={{
+                          border: isSelected ? '2px solid #f59e0b' : '2px solid transparent',
+                          padding: '1px',
+                        }}
+                      >
+                        <SquircleAvatar
+                          size={40}
+                          src={actor.avatarUrl}
+                          alt={actor.name}
+                          fallback={getInitials(actor.name)}
+                          hideRing
+                        />
+                      </div>
                       
                       <div className="flex-1 text-left min-w-0">
                         <div className="flex items-center gap-1.5">
-                          <span className="font-medium text-sm text-foreground truncate">
+                          <span
+                            className="truncate"
+                            style={{ fontSize: '15px', fontWeight: 600, color: '#1A1A1A' }}
+                          >
                             {actor.name}
                           </span>
                           {actor.verified && <VerifiedBadge size="sm" />}
                         </div>
-                        <p className="text-xs text-muted-foreground mt-0.5">
+                        <p style={{ fontSize: '13px', fontWeight: 400, color: '#7A7A7A', marginTop: '2px' }}>
                           {actor.type === 'personal' ? 'Personal profile' : 'Business account'}
                         </p>
                       </div>
                       
-                      {/* Radio indicator with animated inner dot */}
+                      {/* Radio indicator */}
                       <div 
-                        className={cn(
-                          "w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200 border-2",
-                          isSelected 
-                            ? "border-primary bg-primary"
-                            : "border-muted-foreground/30 bg-transparent"
-                        )}
+                        className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200"
+                        style={{
+                          border: isSelected ? 'none' : '1.5px solid #E0E0E0',
+                          backgroundColor: isSelected ? '#f59e0b' : 'transparent',
+                        }}
                       >
                         <AnimatePresence>
                           {isSelected && (
@@ -198,12 +188,15 @@ export function PostingOptionsSheet({
               </div>
             </div>
 
-            {/* Divider — consistent padding */}
-            <div className="mx-5 h-px bg-border" />
+            {/* Divider */}
+            <div className="mx-5 h-px" style={{ backgroundColor: 'rgba(0,0,0,0.07)' }} />
 
             {/* Who Can See Section */}
             <div className="px-5 pt-4 pb-2">
-              <h3 className="text-xs font-medium text-primary uppercase tracking-wide mb-3">
+              <h3
+                className="uppercase tracking-wider mb-3"
+                style={{ fontSize: '12px', fontWeight: 600, color: '#AEAEB2' }}
+              >
                 Who can see this?
               </h3>
               
@@ -216,41 +209,39 @@ export function PostingOptionsSheet({
                       key={option.value}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => handleVisibilitySelect(option.value)}
-                      className={cn(
-                        "w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200",
-                        isSelected 
-                          ? "bg-primary/5 border border-primary/20"
-                          : "bg-muted/10 border border-transparent hover:bg-muted/20"
-                      )}
+                      className="w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200"
+                      style={{
+                        backgroundColor: isSelected ? 'rgba(245,158,11,0.06)' : 'transparent',
+                        border: isSelected ? '1px solid rgba(245,158,11,0.20)' : '1px solid transparent',
+                      }}
                     >
-                      {/* Icon circle — contextual color coding */}
+                      {/* Icon circle */}
                       <div 
                         className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-200"
                         style={{
-                          backgroundColor: isSelected ? option.color.bgSelected : option.color.bg,
-                          color: option.color.text,
+                          backgroundColor: isSelected ? 'rgba(245,158,11,0.10)' : 'rgba(0,0,0,0.04)',
+                          color: isSelected ? '#f59e0b' : '#AEAEB2',
                         }}
                       >
                         {option.icon}
                       </div>
                       
                       <div className="flex-1 text-left">
-                        <p className="font-medium text-sm text-foreground">
+                        <p style={{ fontSize: '15px', fontWeight: 600, color: '#1A1A1A' }}>
                           {option.label}
                         </p>
-                        <p className="text-xs text-muted-foreground mt-0.5">
+                        <p style={{ fontSize: '13px', fontWeight: 400, color: '#7A7A7A', marginTop: '2px' }}>
                           {option.description}
                         </p>
                       </div>
                       
-                      {/* Radio indicator with animated inner dot */}
+                      {/* Radio indicator */}
                       <div 
-                        className={cn(
-                          "w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200 border-2",
-                          isSelected 
-                            ? "border-primary bg-primary"
-                            : "border-muted-foreground/30 bg-transparent"
-                        )}
+                        className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200"
+                        style={{
+                          border: isSelected ? 'none' : '1.5px solid #E0E0E0',
+                          backgroundColor: isSelected ? '#f59e0b' : 'transparent',
+                        }}
                       >
                         <AnimatePresence>
                           {isSelected && (
@@ -271,14 +262,25 @@ export function PostingOptionsSheet({
             </div>
           </div>
 
-          {/* Done Button — brand primary, safe-area aware */}
+          {/* Done Button */}
           <div 
-            className="px-5 pt-3 border-t border-border"
-            style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)' }}
+            className="px-5 pt-3"
+            style={{
+              paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
+              borderTop: '0.5px solid rgba(0,0,0,0.07)',
+            }}
           >
             <button
               onClick={handleDone}
-              className="w-full h-12 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[0.98] bg-primary text-primary-foreground hover:bg-primary/90"
+              className="w-full h-12 font-semibold transition-all duration-200 active:scale-[0.98]"
+              style={{
+                backgroundColor: '#f59e0b',
+                color: '#FFFFFF',
+                fontSize: '15px',
+                fontWeight: 600,
+                borderRadius: '12px',
+                boxShadow: '0 2px 12px rgba(245,158,11,0.22)',
+              }}
             >
               Done
             </button>
