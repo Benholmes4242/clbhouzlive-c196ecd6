@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { X, Search, Check } from 'lucide-react';
+import { X, Search, Check, UserPlus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import type { TaggableEntity } from '@/components/post/create-moment/types';
@@ -23,6 +23,7 @@ export function TagPeopleSheet({
   const [results, setResults] = useState<TaggableEntity[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [localSelected, setLocalSelected] = useState<TaggableEntity[]>([]);
+  const [searchFocused, setSearchFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Sync local selection when sheet opens
@@ -142,21 +143,36 @@ export function TagPeopleSheet({
 
         {/* Search */}
         <div className="px-5 pb-3">
-          <div
-            className="flex items-center gap-2.5 px-3.5 rounded-xl"
-            style={{ backgroundColor: '#F5F5F7', height: 44 }}
-          >
-            <Search className="w-4 h-4 flex-shrink-0" style={{ color: '#AEAEB2' }} />
+          <div className="relative">
+            <Search
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 flex-shrink-0 transition-colors duration-200"
+              style={{ color: searchFocused ? '#f59e0b' : '#AEAEB2' }}
+            />
             <input
               ref={inputRef}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              onFocus={() => setSearchFocused(true)}
+              onBlur={() => setSearchFocused(false)}
               placeholder="Search people and businesses..."
-              className="flex-1 bg-transparent text-[15px] outline-none placeholder:text-[#C7C7CC]"
-              style={{ color: '#1A1A1A' }}
+              className="w-full text-[15px] outline-none transition-all duration-200"
+              style={{
+                backgroundColor: '#F5F5F7',
+                color: '#1A1A1A',
+                caretColor: '#f59e0b',
+                height: 44,
+                borderRadius: 12,
+                paddingLeft: 40,
+                paddingRight: 40,
+                border: searchFocused ? '1.5px solid #f59e0b' : '1.5px solid rgba(0,0,0,0.07)',
+                boxShadow: searchFocused ? '0 0 0 3px rgba(245,158,11,0.10)' : 'none',
+              }}
             />
             {query && (
-              <button onClick={() => setQuery('')} className="active:scale-90 transition-transform">
+              <button
+                onClick={() => setQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 active:scale-90 transition-transform"
+              >
                 <X className="w-4 h-4" style={{ color: '#AEAEB2' }} />
               </button>
             )}
@@ -178,9 +194,10 @@ export function TagPeopleSheet({
                   key={tag.id}
                   className="flex items-center gap-1.5 rounded-full flex-shrink-0"
                   style={{
-                    backgroundColor: '#F9F8F6',
+                    backgroundColor: '#F5F5F7',
                     height: 28,
                     padding: '0 12px 0 8px',
+                    borderRadius: 980,
                   }}
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
@@ -235,9 +252,12 @@ export function TagPeopleSheet({
                   />
                 </div>
               ) : results.length === 0 ? (
-                <p className="text-center text-sm py-8" style={{ color: '#AEAEB2' }}>
-                  No results found
-                </p>
+                <div className="text-center py-10">
+                  <UserPlus className="w-6 h-6 mx-auto mb-2" style={{ color: '#AEAEB2' }} />
+                  <p className="text-sm" style={{ color: '#AEAEB2', fontWeight: 400 }}>
+                    No results found
+                  </p>
+                </div>
               ) : (
                 results.map((entity) => (
                   <PersonRow
@@ -282,13 +302,15 @@ export function TagPeopleSheet({
         >
           <button
             onClick={handleDone}
-            className="w-full font-semibold text-white active:scale-[0.97] transition-transform"
+            className="w-full font-semibold active:scale-[0.97] transition-all"
             style={{
-              backgroundColor: localSelected.length > 0 ? accentColor : '#F5F5F7',
+              backgroundColor: localSelected.length > 0 ? '#f59e0b' : '#F5F5F7',
               color: localSelected.length > 0 ? '#FFFFFF' : '#AEAEB2',
               height: 48,
-              borderRadius: 16,
-              fontSize: 16,
+              borderRadius: 12,
+              fontSize: 15,
+              fontWeight: 600,
+              boxShadow: localSelected.length > 0 ? '0 2px 12px rgba(245,158,11,0.22)' : 'none',
             }}
           >
             Done{localSelected.length > 0 ? ` (${localSelected.length})` : ''}
@@ -315,8 +337,19 @@ function PersonRow({
   return (
     <button
       onClick={onToggle}
-      className="w-full flex items-center gap-3 px-2 rounded-xl active:bg-black/[0.03] transition-colors"
-      style={{ height: 60 }}
+      className="w-full flex items-center gap-3 px-2 rounded-xl transition-colors duration-150"
+      style={{ height: 60, backgroundColor: 'transparent' }}
+      onMouseDown={(e) => {
+        const el = e.currentTarget;
+        el.style.backgroundColor = 'rgba(245,158,11,0.06)';
+      }}
+      onMouseUp={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+      onTouchStart={(e) => {
+        const el = e.currentTarget;
+        el.style.backgroundColor = 'rgba(245,158,11,0.06)';
+      }}
+      onTouchEnd={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
     >
       {/* Avatar */}
       <div
