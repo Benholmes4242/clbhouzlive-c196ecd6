@@ -48,7 +48,7 @@ export function PlayerAvatar({
         alt={playerName}
         className="w-full h-full object-cover object-top"
         loading="lazy"
-        onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+        onError={(e) => { console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
       />
     </div>
   );
@@ -88,7 +88,7 @@ export function BatchPlayerAvatar({
         alt={playerName}
         className="w-full h-full object-cover object-top"
         loading="lazy"
-        onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+        onError={(e) => { console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
       />
     </div>
   );
