@@ -225,12 +225,12 @@ function renderWithMentions(
   // Build a set of usernames to match against
   const mentionMap = new Map<string, TaggableEntity>();
   for (const m of mentions) {
-    const username = (m.username || m.name).toLowerCase().replace(/\s+/g, '_').replace(/[^\w]/g, '');
+    const username = (m.username || m.name).toLowerCase().replace(/\s+/g, '_');
     mentionMap.set(username, m);
   }
 
   // Split text by @mentions and render
-  const regex = /@(\w+)/g;
+  const regex = /@([\w.@'+\-]+)/g;
   let lastIndex = 0;
   let match: RegExpExecArray | null;
 
