@@ -236,7 +236,7 @@ function renderWithMentions(
   }
 
   // Split text by @mentions and render
-  const regex = /@([\w.@'+\-]+)/g;
+  const regex = /@([\w.'+\-]+)/g;
   let lastIndex = 0;
   let match: RegExpExecArray | null;
 
@@ -266,7 +266,7 @@ function renderWithMentions(
         user-select: all;
         line-height: inherit;
       `;
-      span.textContent = `@${entity.username || entity.name}`;
+      span.textContent = `@${(entity.username || entity.name).replace(/\s+/g, '')}`;
       el.appendChild(span);
     } else {
       // No matching mention — render as plain text
