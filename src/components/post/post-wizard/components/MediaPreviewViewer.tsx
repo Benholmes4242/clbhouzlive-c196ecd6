@@ -1,12 +1,12 @@
-import { useState, useCallback, useRef } from 'react';
-import { X, Wand2 } from 'lucide-react';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { X, Wand2, Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { OrderedMediaItem } from '../types';
 import type { StudioEdits } from '@/types/studio';
-import { formatDuration } from '@/utils/formatDuration';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getPixelLayerStyle, getCropWrapperClass } from '@/utils/studioEdit';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
+import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { cn } from '@/lib/utils';
 
 interface MediaPreviewViewerProps {
@@ -22,6 +22,10 @@ interface MediaPreviewViewerProps {
 export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onSetCover, coverIndex, studioEditsByMediaId }: MediaPreviewViewerProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
+  const [showPlayIcon, setShowPlayIcon] = useState(false);
 
   const item = items[currentIndex];
   const isCover = currentIndex === coverIndex;
@@ -32,6 +36,13 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
     : '';
   const pixelStyle = getPixelLayerStyle(edits);
   const cropClass = getCropWrapperClass(edits?.crop);
+
+  // Reset playback state on slide change
+  useEffect(() => {
+    setIsPlaying(true);
+    setIsMuted(false);
+    setShowPlayIcon(false);
+  }, [currentIndex]);
 
   const goTo = useCallback((idx: number) => {
     setCurrentIndex(Math.max(0, Math.min(items.length - 1, idx)));
@@ -67,6 +78,28 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
     if (item) onStudio(item.id);
   }, [item, onStudio]);
 
+  const togglePlayback = useCallback(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.paused) {
+      video.play();
+      setIsPlaying(true);
+    } else {
+      video.pause();
+      setIsPlaying(false);
+    }
+    setShowPlayIcon(true);
+    setTimeout(() => setShowPlayIcon(false), 600);
+  }, []);
+
+  const toggleMute = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = !video.muted;
+    setIsMuted(!isMuted);
+  }, [isMuted]);
+
   if (!item) return null;
 
   return (
@@ -75,12 +108,15 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
-      className="fixed inset-0 z-[10002] flex flex-col bg-black/95"
+      className="fixed inset-0 z-[10002] flex flex-col bg-black"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
       {/* Top bar */}
-      <div className="flex items-center justify-between px-4 pt-safe-or-4 pb-2 flex-shrink-0">
+      <div
+        className="flex items-center justify-between px-4 pb-2 flex-shrink-0"
+        style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
+      >
         <button
           onClick={onClose}
           className="w-9 h-9 rounded-full flex items-center justify-center"
@@ -118,7 +154,7 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
       </div>
 
       {/* Media display */}
-      <div className="flex-1 flex items-center justify-center overflow-hidden px-2">
+      <div className="flex-1 flex items-center justify-center overflow-hidden">
         <AnimatePresence mode="popLayout">
           <motion.div
             key={currentIndex}
@@ -128,58 +164,119 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="w-full h-full flex items-center justify-center relative"
           >
-            <div className={cn('relative', cropClass)}>
+            <div className={cn('relative w-full h-full flex items-center justify-center', cropClass)}>
               {item.type === 'video' ? (
-                <>
+                <div className="relative w-full h-full flex items-center justify-center" onClick={togglePlayback}>
                   <video
+                    ref={videoRef}
                     src={item.previewUrl}
                     poster={item.thumbnailUrl}
-                    controls
                     autoPlay
                     playsInline
-                    className={cn('max-w-full max-h-full object-contain rounded-lg', filterClass)}
+                    className={cn('max-w-full max-h-full object-contain', filterClass)}
                     style={pixelStyle}
+                    onPlay={() => setIsPlaying(true)}
+                    onPause={() => setIsPlaying(false)}
                   />
-                  {item.duration != null && (
-                    <div
-                      className="absolute bottom-16 left-4 px-2 py-0.5 rounded-md text-white text-xs font-medium"
-                      style={{
-                        background: 'rgba(0,0,0,0.45)',
-                        backdropFilter: 'blur(24px) saturate(180%)',
-                        border: '1px solid rgba(255,255,255,0.15)',
-                        boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
-                      }}
-                    >
-                      {formatDuration(item.duration)}
-                    </div>
+
+                  {/* Tap-to-play/pause animated icon */}
+                  <AnimatePresence>
+                    {showPlayIcon && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.5 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.5 }}
+                        transition={{ duration: 0.3 }}
+                        className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                      >
+                        <div
+                          className="w-16 h-16 rounded-full flex items-center justify-center"
+                          style={{
+                            background: 'rgba(0,0,0,0.45)',
+                            backdropFilter: 'blur(24px) saturate(180%)',
+                            border: '1px solid rgba(255,255,255,0.15)',
+                          }}
+                        >
+                          {isPlaying ? (
+                            <Play className="w-7 h-7 text-white ml-1" />
+                          ) : (
+                            <Pause className="w-7 h-7 text-white" />
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Mute/unmute button — bottom right */}
+                  <button
+                    onClick={toggleMute}
+                    className="absolute bottom-4 right-4 w-9 h-9 rounded-full flex items-center justify-center z-10"
+                    style={{
+                      background: 'rgba(0,0,0,0.45)',
+                      backdropFilter: 'blur(24px) saturate(180%)',
+                      border: '1px solid rgba(255,255,255,0.15)',
+                      boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
+                    }}
+                    aria-label={isMuted ? 'Unmute' : 'Mute'}
+                  >
+                    {isMuted ? (
+                      <VolumeX className="w-4 h-4 text-white" />
+                    ) : (
+                      <Volume2 className="w-4 h-4 text-white" />
+                    )}
+                  </button>
+
+                  {/* Text overlays */}
+                  {edits?.textOverlays && edits.textOverlays.length > 0 && (
+                    <TextOverlayRenderer
+                      textOverlays={edits.textOverlays}
+                      isEditable={false}
+                      safeAreaContext="feed"
+                    />
+                  )}
+                </div>
+              ) : (
+                <>
+                  <img
+                    src={item.previewUrl}
+                    className={cn('max-w-full max-h-full object-contain', filterClass)}
+                    style={pixelStyle}
+                    alt=""
+                    draggable={false}
+                  />
+
+                  {/* Text overlays (non-editable) */}
+                  {edits?.textOverlays && edits.textOverlays.length > 0 && (
+                    <TextOverlayRenderer
+                      textOverlays={edits.textOverlays}
+                      isEditable={false}
+                      safeAreaContext="feed"
+                    />
                   )}
                 </>
-              ) : (
-                <img
-                  src={item.previewUrl}
-                  className={cn('max-w-full max-h-[80vh] object-contain rounded-lg', filterClass)}
-                  style={pixelStyle}
-                  alt=""
-                  draggable={false}
-                />
-              )}
-
-              {/* Text overlays (non-editable) */}
-              {edits?.textOverlays && edits.textOverlays.length > 0 && (
-                <TextOverlayRenderer
-                  textOverlays={edits.textOverlays}
-                  isEditable={false}
-                  safeAreaContext="feed"
-                />
               )}
             </div>
           </motion.div>
         </AnimatePresence>
       </div>
 
+      {/* Video scrubber — above dots, only for videos */}
+      {item.type === 'video' && (
+        <div className="flex-shrink-0 px-4 relative" style={{ height: 3 }}>
+          <VideoScrubber
+            videoEl={videoRef.current}
+            variant="wizard"
+            height={3}
+          />
+        </div>
+      )}
+
       {/* Pagination dots */}
       {items.length > 1 && (
-        <div className="flex items-center justify-center gap-1.5 pb-safe-or-6 pt-3 flex-shrink-0">
+        <div
+          className="flex items-center justify-center gap-1.5 pt-3 flex-shrink-0"
+          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}
+        >
           {items.map((_, idx) => (
             <button
               key={idx}
@@ -193,6 +290,11 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
             />
           ))}
         </div>
+      )}
+
+      {/* Bottom safe area spacer when no dots */}
+      {items.length <= 1 && (
+        <div className="flex-shrink-0" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)' }} />
       )}
     </motion.div>
   );
