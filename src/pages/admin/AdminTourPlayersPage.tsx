@@ -289,7 +289,6 @@ export function AdminTourPlayersPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[50px]"></TableHead>
                   <TableHead>Player</TableHead>
                   <TableHead>Country</TableHead>
                   <TableHead>Tour(s)</TableHead>
@@ -312,15 +311,17 @@ export function AdminTourPlayersPage() {
                       onClick={() => setSelectedPlayer(player)}
                     >
                       <TableCell>
-                        <img
-                          src={headshotUrl}
-                          alt=""
-                          className="w-8 h-8 rounded-full object-cover bg-muted"
-                          onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-                        />
-                      </TableCell>
-                      <TableCell className="font-medium text-foreground">
-                        {player.full_name || `${player.first_name || ''} ${player.last_name || ''}`.trim() || 'Unknown'}
+                        <div className="flex items-center gap-2.5">
+                          <img
+                            src={headshotUrl}
+                            alt=""
+                            className="w-8 h-8 shrink-0 rounded-full object-cover object-top bg-muted"
+                            onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+                          />
+                          <span className="font-medium text-foreground">
+                            {player.full_name || `${player.first_name || ''} ${player.last_name || ''}`.trim() || 'Unknown'}
+                          </span>
+                        </div>
                       </TableCell>
                       <TableCell className="text-muted-foreground text-sm">
                         {player.country_code || player.country || '—'}
