@@ -336,6 +336,7 @@ export function PostWizard({
             categories: categoryIds,
             badges: state.selectedBadges,
             visibility: state.visibility,
+            course_id: state.selectedCourses[0]?.id || null,
             updated_at: new Date().toISOString(),
           })
           .eq('id', state.editPostId)
@@ -347,6 +348,35 @@ export function PostWizard({
           toast.error('This post could not be updated. It may have been deleted.');
           dispatch({ type: 'SET_SUBMITTING', payload: false });
           return;
+        }
+
+        // Persist course changes: delete-and-reinsert post_courses
+        await supabase.from('post_courses').delete().eq('post_id', state.editPostId);
+        if (state.selectedCourses.length > 0) {
+          const courseRows = state.selectedCourses.map((course, index) => ({
+            post_id: state.editPostId!,
+            course_id: course.id,
+            display_order: index,
+          }));
+          await supabase.from('post_courses').insert(courseRows);
+        }
+
+        // Persist tag changes: delete-and-reinsert post_tags
+        await supabase.from('post_tags').delete().eq('post_id', state.editPostId);
+        if (state.selectedTags.length > 0) {
+          const tagRows = state.selectedTags.map(tag => {
+            const displayText = `@${(tag.username || tag.name).replace(/\s+/g, '')}`;
+            const caption = state.caption.toLowerCase();
+            const startIndex = caption.indexOf(displayText.toLowerCase());
+            const endIndex = startIndex >= 0 ? startIndex + displayText.length : displayText.length;
+            return {
+              post_id: state.editPostId!,
+              tagged_entity_id: tag.id,
+              start_index: Math.max(0, startIndex),
+              end_index: endIndex,
+            };
+          });
+          await supabase.from('post_tags').insert(tagRows);
         }
 
         queryClient.invalidateQueries({ queryKey: ['trending-posts'] });
@@ -676,9 +706,9 @@ export function PostWizard({
                           className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[12px] font-medium"
                           style={{ background: 'rgba(245,158,11,0.10)', color: '#92400e' }}
                         >
-                          <MapPin className="w-3 h-3" />
-                          {course.name}
-                          <button onClick={() => removeCourse(course.id)} className="ml-0.5">
+                          <MapPin className="w-3 h-3 flex-shrink-0" />
+                          <span className="truncate max-w-[180px]">{course.name}</span>
+                          <button onClick={() => removeCourse(course.id)} className="ml-0.5 flex-shrink-0">
                             <X className="w-3 h-3" />
                           </button>
                         </span>
