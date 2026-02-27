@@ -371,6 +371,9 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate }) => {
           <LinkItem to="/admin/tour" icon={Trophy} onClick={onNavigate}>
             Tour Data
           </LinkItem>
+          <LinkItem to="/admin/tour-players" icon={Users} onClick={onNavigate}>
+            Tour Players
+          </LinkItem>
           <LinkItem to="/admin/courses" icon={FileInput} onClick={onNavigate}>
             Course Import
           </LinkItem>
