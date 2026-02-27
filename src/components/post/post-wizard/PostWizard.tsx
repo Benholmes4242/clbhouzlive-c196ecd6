@@ -711,6 +711,7 @@ export function PostWizard({
                             onExpand={() => setPreviewMediaIndex(index)}
                             onStudio={() => handleOpenStudio(item.id)}
                             onSetCover={() => setCoverIndex(index)}
+                            isViewerOpen={previewMediaIndex !== null}
                           />
                         ))}
                         {state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT && (
