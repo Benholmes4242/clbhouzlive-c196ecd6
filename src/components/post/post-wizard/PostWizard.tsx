@@ -616,7 +616,7 @@ export function PostWizard({
                     mentions={state.selectedTags}
                     onCursorChange={handleCursorChange}
                     onMentionQueryChange={handleMentionQueryChange}
-                    placeholder="Share your round, tip, or moment..."
+                    placeholder="What's on your mind?"
                     maxLength={POST_LIMITS.MAX_CAPTION_LENGTH}
                     accentColor="#f59e0b"
                   />
