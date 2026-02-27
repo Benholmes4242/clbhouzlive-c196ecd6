@@ -56,7 +56,7 @@ export function useProfilePrefetch(userId: string | undefined) {
       queryFn: async () => {
         const { data } = await supabase
           .from('posts')
-          .select('id, created_at, post_media(id, media_url, media_type)')
+          .select('id, created_at, post_media(id, media_url, media_type, studio_edits, filter_id)')
           .eq('user_id', userId)
           .eq('status', 'published')
           .order('created_at', { ascending: false })
@@ -108,7 +108,7 @@ export function usePostPrefetch(postId: string | undefined) {
             content,
             created_at,
             status,
-            post_media(id, media_url, media_type, width, height)
+            post_media(id, media_url, media_type, width, height, studio_edits, filter_id)
           `)
           .eq('id', postId)
           .single();

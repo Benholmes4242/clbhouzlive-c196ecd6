@@ -30,6 +30,8 @@ import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 import { FLAGS } from '@/config/flags';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
+import { cn } from '@/lib/utils';
 
 
 // Video ref management - keep only current + neighbors to prevent memory leaks
@@ -786,9 +788,16 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 </div>
               )}
 
+              {(() => {
+                const mediaStudioEdits = (currentMedia as any).studio_edits;
+                const mediaFilterClass = getFilterClass(mediaStudioEdits?.filter || (currentMedia as any).filter_id);
+                const mediaCropClass = getCropWrapperClass(mediaStudioEdits?.crop);
+                const mediaPixelStyle = getPixelLayerStyle(mediaStudioEdits);
+                return (
               <div 
-                className="absolute inset-0 w-full h-full flex items-center justify-center overflow-hidden"
+                className={cn("absolute inset-0 w-full h-full flex items-center justify-center overflow-hidden", mediaCropClass)}
               >
+                <div className={cn("w-full h-full", mediaFilterClass)} style={mediaPixelStyle}>
                 {currentMedia.media_type === 'video' ? (
                   <VideoWithAutoplay
                     src={currentMedia.media_url}
@@ -804,8 +813,16 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                     src={currentMedia.media_url}
                     alt={item.title}
                     currentMediaIndex={currentMediaIndex}
-                    scale={1} // This will be managed internally by the component
+                    scale={1}
                     onSwipeDisabled={setSwipeDisabled}
+                  />
+                )}
+                </div>
+                {mediaStudioEdits?.textOverlays?.length > 0 && (
+                  <TextOverlayRenderer
+                    textOverlays={mediaStudioEdits.textOverlays}
+                    isEditable={false}
+                    safeAreaContext="feed"
                   />
                 )}
                 
@@ -840,6 +857,8 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                   </div>
                 )}
               </div>
+              );
+              })()}
 
               {/* Post Metadata - Bottom Left */}
               <PostMetadata

@@ -7,6 +7,7 @@ import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { cn } from '@/lib/utils';
 import { VideoPlayIndicator } from '@/components/ui/VideoPlayIndicator';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 
 /**
  * Square Card Media Component
@@ -73,6 +74,15 @@ const SquareCardMedia: React.FC<CardMediaProps> = memo(({
           />
         </div>
       </div>
+      
+      {/* Text overlays */}
+      {studioEdits?.textOverlays?.length > 0 && (
+        <TextOverlayRenderer
+          textOverlays={studioEdits.textOverlays}
+          isEditable={false}
+          safeAreaContext="feed"
+        />
+      )}
       
       {/* Video play icon - bottom left, matching VideoPlayIndicator */}
       {media.media_type === 'video' && (

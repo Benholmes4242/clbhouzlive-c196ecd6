@@ -6,6 +6,8 @@ import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '@/media/components/Un
 import { RegisterMediaFn } from '@/media';
 import { Images, Trophy } from 'lucide-react';
 import { getFilterClass } from '@/utils/studioFilters';
+import { getPixelLayerStyle } from '@/utils/studioEdit';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 
 interface StandardPostTileProps {
   item: ActivityMediaItem;
@@ -39,6 +41,8 @@ const StandardPostTile: React.FC<StandardPostTileProps> = ({
   const containerRef = useRef<HTMLButtonElement>(null);
   const hasReportedReadyRef = useRef(false);
   const filterClass = getFilterClass(filterId);
+  const studioEdits = (item as any).studioEdits;
+  const pixelStyle = getPixelLayerStyle(studioEdits);
   const [resolvedDurationSeconds, setResolvedDurationSeconds] = useState<number | null | undefined>(
     item.durationSeconds
   );
@@ -117,7 +121,7 @@ const StandardPostTile: React.FC<StandardPostTileProps> = ({
       onClick={handleClick}
     >
       {/* Filtered pixel layer */}
-      <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
+      <div className={cn("absolute inset-0 w-full h-full", filterClass)} style={pixelStyle}>
         {/* 1) Priority thumbnail for first 6 tiles - prevents white flash */}
         <img
           src={thumbnailSrc}
@@ -149,6 +153,15 @@ const StandardPostTile: React.FC<StandardPostTileProps> = ({
               className="absolute inset-0 h-full w-full object-cover"
             />
           </div>
+        )}
+
+        {/* Text overlays */}
+        {studioEdits?.textOverlays?.length > 0 && (
+          <TextOverlayRenderer
+            textOverlays={studioEdits.textOverlays}
+            isEditable={false}
+            safeAreaContext="feed"
+          />
         )}
       </div>
 
