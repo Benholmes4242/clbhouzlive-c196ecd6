@@ -57,7 +57,8 @@ export const RichCaptionInput = forwardRef<RichCaptionInputHandle, RichCaptionIn
         const el = editorRef.current;
         if (!el) return;
 
-        const displayText = `@${entity.username || entity.name}`;
+        const sanitizedName = (entity.username || entity.name).replace(/\s+/g, '');
+        const displayText = `@${sanitizedName}`;
 
         // Serialize current content, splice in mention, re-render
         const currentText = serializeToPlainText(el);
@@ -225,7 +226,7 @@ function renderWithMentions(
   // Build a set of usernames to match against
   const mentionMap = new Map<string, TaggableEntity>();
   for (const m of mentions) {
-    const username = (m.username || m.name).toLowerCase().replace(/\s+/g, '_');
+    const username = (m.username || m.name).toLowerCase().replace(/\s+/g, '');
     mentionMap.set(username, m);
   }
 
