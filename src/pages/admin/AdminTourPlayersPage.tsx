@@ -226,7 +226,7 @@ function PhotoManagementSheet({
             <div className="font-semibold text-foreground">{playerName}</div>
             <div className="text-sm text-muted-foreground">
               {player.tour_codes?.length
-                ? player.tour_codes.map(c => TOURS[c]?.label || c).join(', ')
+                ? player.tour_codes.map(c => TOURS[c.toLowerCase()]?.label || c).join(', ')
                 : 'No tour'}
             </div>
           </div>
@@ -374,7 +374,7 @@ export function AdminTourPlayersPage() {
 
   const filtered = useMemo(() => {
     let result = players;
-    if (tourFilter !== 'all') result = result.filter(p => p.tour_codes?.includes(tourFilter));
+    if (tourFilter !== 'all') result = result.filter(p => p.tour_codes?.some(c => c.toLowerCase() === tourFilter.toLowerCase()));
     if (search.trim()) {
       const q = search.trim().toLowerCase();
       result = result.filter(p =>
@@ -396,7 +396,7 @@ export function AdminTourPlayersPage() {
   const stats = useMemo(() => {
     const total = players.length;
     const byTour: Record<string, number> = {};
-    for (const code of ALL_TOUR_CODES) byTour[code] = players.filter(p => p.tour_codes?.includes(code)).length;
+    for (const code of ALL_TOUR_CODES) byTour[code] = players.filter(p => p.tour_codes?.some(c => c.toLowerCase() === code)).length;
     return { total, byTour };
   }, [players]);
 
@@ -487,8 +487,8 @@ export function AdminTourPlayersPage() {
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
                           {player.tour_codes?.length ? player.tour_codes.map(code => (
-                            <Badge key={code} variant="secondary" className={`text-[10px] px-1.5 py-0 ${TOURS[code]?.color || ''}`}>
-                              {TOURS[code]?.label || code}
+                            <Badge key={code} variant="secondary" className={`text-[10px] px-1.5 py-0 ${TOURS[code.toLowerCase()]?.color || ''}`}>
+                              {TOURS[code.toLowerCase()]?.label || code}
                             </Badge>
                           )) : <span className="text-xs text-muted-foreground">None</span>}
                         </div>
