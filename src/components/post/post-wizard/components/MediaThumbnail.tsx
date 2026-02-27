@@ -17,6 +17,7 @@ interface MediaThumbnailProps {
   onExpand: () => void;
   onStudio: () => void;
   onSetCover?: () => void;
+  isViewerOpen?: boolean;
 }
 
 export function MediaThumbnail({
@@ -29,6 +30,7 @@ export function MediaThumbnail({
   onExpand,
   onStudio,
   onSetCover,
+  isViewerOpen,
 }: MediaThumbnailProps) {
   const filterClass = studioEdits?.filter && studioEdits.filter !== 'normal'
     ? getFilterClass(studioEdits.filter)
@@ -54,16 +56,25 @@ export function MediaThumbnail({
       {/* Media with studio edits applied */}
       <div className="relative w-full h-full">
         {item.type === 'video' ? (
-          <video
-            src={item.previewUrl}
-            className={cn('w-full h-full object-cover', filterClass)}
-            style={mediaTransformStyle}
-            autoPlay
-            loop
-            muted
-            playsInline
-            poster={item.thumbnailUrl}
-          />
+          isViewerOpen ? (
+            <img
+              src={item.thumbnailUrl || item.previewUrl}
+              className={cn('w-full h-full object-cover', filterClass)}
+              style={mediaTransformStyle}
+              alt=""
+            />
+          ) : (
+            <video
+              src={item.previewUrl}
+              className={cn('w-full h-full object-cover', filterClass)}
+              style={mediaTransformStyle}
+              autoPlay
+              loop
+              muted
+              playsInline
+              poster={item.thumbnailUrl}
+            />
+          )
         ) : (
           <img
             src={item.previewUrl}

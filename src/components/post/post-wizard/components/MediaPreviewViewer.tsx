@@ -37,12 +37,28 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
   const pixelStyle = getPixelLayerStyle(edits);
   const cropClass = getCropWrapperClass(edits?.crop);
 
-  // Reset playback state on slide change
+  // Reset playback state on slide change & pause old video (prevents audio bleed)
   useEffect(() => {
     setIsPlaying(true);
     setIsMuted(false);
     setShowPlayIcon(false);
+    return () => {
+      if (videoRef.current) {
+        videoRef.current.pause();
+      }
+    };
   }, [currentIndex]);
+
+  // Release decoder on viewer close
+  useEffect(() => {
+    return () => {
+      if (videoRef.current) {
+        videoRef.current.pause();
+        videoRef.current.removeAttribute('src');
+        videoRef.current.load();
+      }
+    };
+  }, []);
 
   const goTo = useCallback((idx: number) => {
     setCurrentIndex(Math.max(0, Math.min(items.length - 1, idx)));
