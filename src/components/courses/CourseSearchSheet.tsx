@@ -423,7 +423,7 @@ function ResultRow({ course, index, onClick, isFocused, onMouseEnter, isAlreadyA
             {course.rating != null && (
               <span>
                 •{' '}
-                <span style={{ color: '#d97706', fontWeight: 600 }}>
+                <span style={{ color: course.rating >= 9.0 ? '#d97706' : '#78716C', fontWeight: 600 }}>
                   {course.rating.toFixed(1)}
                 </span>
                 <span style={{ color: '#AEAEB2', fontWeight: 400, fontSize: '11px', marginLeft: '2px' }}>/ 10</span>
