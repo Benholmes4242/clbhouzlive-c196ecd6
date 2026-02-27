@@ -38,6 +38,7 @@ import { CharacterRing } from './components/CharacterRing';
 import { MediaThumbnail } from './components/MediaThumbnail';
 import { MediaPreviewViewer } from './components/MediaPreviewViewer';
 import { RichCaptionInput, type RichCaptionInputHandle } from './components/RichCaptionInput';
+import { TagPeopleSheet } from './components/TagPeopleSheet';
 
 // Sheets
 import {
@@ -143,6 +144,7 @@ export function PostWizard({
   const [showSuccess, setShowSuccess] = useState(false);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+  const [showTagPeople, setShowTagPeople] = useState(false);
 
   // Mention state
   const [showMentions, setShowMentions] = useState(false);
@@ -699,7 +701,7 @@ export function PostWizard({
                 <ToolButton icon={Camera} onClick={() => handleAddMedia('camera')} label="Camera" />
                 <ToolButton icon={MapPin} onClick={() => setShowCourseSearch(true)} label="Tag Course" />
                 <ToolButton icon={Tag} onClick={() => setShowCategorySheet(true)} label="Category" />
-                <ToolButton icon={UserPlus} onClick={() => { /* tag friends — future */ }} label="Tag Friends" />
+                <ToolButton icon={UserPlus} onClick={() => setShowTagPeople(true)} label="Tag Friends" />
               </div>
               <CharacterRing current={state.caption.length} max={POST_LIMITS.MAX_CAPTION_LENGTH} />
             </div>
@@ -789,6 +791,31 @@ export function PostWizard({
               query={mentionQuery}
               onSelect={handleMentionSelect}
             />
+
+            {/* Tag People Sheet */}
+            <AnimatePresence>
+              {showTagPeople && (
+                <TagPeopleSheet
+                  isOpen={showTagPeople}
+                  onClose={() => setShowTagPeople(false)}
+                  selectedTags={state.selectedTags}
+                  onTagsChange={(newTags) => {
+                    const newlyAdded = newTags.filter(t => !state.selectedTags.some(p => p.id === t.id));
+                    let appendText = '';
+                    newlyAdded.forEach(tag => {
+                      const mentionText = (tag.username || tag.name).replace(/\s+/g, '');
+                      appendText += ` @${mentionText}`;
+                    });
+                    if (appendText) {
+                      setCaption((state.caption + appendText).trim());
+                    }
+                    setTags(newTags);
+                    setShowTagPeople(false);
+                  }}
+                  accentColor="#f59e0b"
+                />
+              )}
+            </AnimatePresence>
           </>
         )}
       </div>
