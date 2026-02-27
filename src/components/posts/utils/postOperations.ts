@@ -20,11 +20,11 @@ export const createPostTags = async (
   console.log('Creating post tags for post:', postId, 'with tags:', selectedTags);
 
   try {
-    // Calculate tag positions based on caption content
+    // Calculate tag positions based on caption content (space-stripped to match composer format)
     const postTagsData = selectedTags.map(tag => {
-      const displayText = tag.username ? `@${tag.username}` : `@${tag.name}`;
-      const startIndex = caption.indexOf(displayText);
-      const endIndex = startIndex + displayText.length;
+      const displayText = `@${(tag.username || tag.name).replace(/\s+/g, '')}`;
+      const startIndex = caption.toLowerCase().indexOf(displayText.toLowerCase());
+      const endIndex = startIndex >= 0 ? startIndex + displayText.length : displayText.length;
       
       return {
         post_id: postId,
@@ -55,12 +55,14 @@ export const createTagNotifications = async (
   selectedTags: TaggableEntity[],
   userId: string
 ): Promise<void> => {
-  // Only create notifications for user tags that exist
-  const userTags = selectedTags.filter(tag => tag.entity_type === 'user');
+  // Filter tags that need notifications (users + businesses)
+  const notifiableTags = selectedTags.filter(tag => 
+    tag.entity_type === 'user' || tag.entity_type === 'business'
+  );
   
-  if (userTags.length === 0) return;
+  if (notifiableTags.length === 0) return;
 
-  console.log('Creating tag notifications for:', userTags);
+  console.log('Creating tag notifications for:', notifiableTags);
 
   try {
     // Get user's profile for notification content
@@ -72,22 +74,47 @@ export const createTagNotifications = async (
 
     const userName = userProfile?.display_name || userProfile?.username || 'Someone';
 
-    // Create notifications for tagged users
-    for (const tag of userTags) {
+    // Create notifications for tagged entities
+    for (const tag of notifiableTags) {
       // Don't notify the user if they tagged themselves
       if (tag.entity_id === userId) continue;
 
-      await supabase.rpc('send_push_notification', {
-        target_user_id: tag.entity_id,
-        notification_type: 'tag',
-        title: 'Tagged in Post',
-        message: `${userName} tagged you in their post`,
-        data: {
-          post_id: postId,
-          tagger_id: userId,
-          tagger_name: userName
+      if (tag.entity_type === 'user') {
+        await supabase.rpc('send_push_notification', {
+          target_user_id: tag.entity_id,
+          notification_type: 'tag',
+          title: 'Tagged in Post',
+          message: `${userName} tagged you in their post`,
+          data: {
+            post_id: postId,
+            tagger_id: userId,
+            tagger_name: userName
+          }
+        });
+      } else if (tag.entity_type === 'business') {
+        // WARNING 5 FIX: Resolve business owner and notify them
+        const { data: members } = await supabase
+          .from('business_members')
+          .select('user_profile_id')
+          .eq('business_id', tag.entity_id)
+          .eq('role', 'owner')
+          .limit(1);
+
+        const ownerId = members?.[0]?.user_profile_id;
+        if (ownerId && ownerId !== userId) {
+          await supabase.rpc('send_push_notification', {
+            target_user_id: ownerId,
+            notification_type: 'tag',
+            title: 'Business Tagged',
+            message: `${userName} tagged your business in their post`,
+            data: {
+              post_id: postId,
+              tagger_id: userId,
+              tagger_name: userName
+            }
+          });
         }
-      });
+      }
     }
 
     console.log('Tag notifications created successfully');

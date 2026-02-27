@@ -12,6 +12,7 @@ interface RichCaptionInputProps {
   value: string;
   onChange: (plainText: string) => void;
   mentions: TaggableEntity[];
+  onMentionsChanged?: (survivingMentions: TaggableEntity[]) => void;
   onCursorChange?: (position: number) => void;
   onMentionQueryChange?: (query: string | null) => void;
   placeholder?: string;
@@ -38,6 +39,7 @@ export const RichCaptionInput = forwardRef<RichCaptionInputHandle, RichCaptionIn
       value,
       onChange,
       mentions,
+      onMentionsChanged,
       onCursorChange,
       onMentionQueryChange,
       placeholder = "What's on your mind?",
@@ -119,14 +121,25 @@ export const RichCaptionInput = forwardRef<RichCaptionInputHandle, RichCaptionIn
       setIsEmpty(!plainText);
       onChange(plainText);
 
+      // BLOCKER 1 FIX: Sync selectedTags by checking which mentions still exist in the text
+      if (onMentionsChanged && mentions.length > 0) {
+        const surviving = mentions.filter(m => {
+          const token = (m.username || m.name).replace(/\s+/g, '').toLowerCase();
+          return plainText.toLowerCase().includes(`@${token}`);
+        });
+        if (surviving.length !== mentions.length) {
+          onMentionsChanged(surviving);
+        }
+      }
+
       // Detect cursor for mention query
       const cursor = getCaretOffset(el);
       onCursorChange?.(cursor);
 
       const textBeforeCursor = plainText.slice(0, cursor);
-      const mentionMatch = textBeforeCursor.match(/@(\w*)$/);
+      const mentionMatch = textBeforeCursor.match(/@([\p{L}\p{N}_]*)$/u);
       onMentionQueryChange?.(mentionMatch ? mentionMatch[1] : null);
-    }, [onChange, maxLength, mentions, accentColor, onCursorChange, onMentionQueryChange]);
+    }, [onChange, maxLength, mentions, accentColor, onCursorChange, onMentionQueryChange, onMentionsChanged]);
 
     // Paste as plain text
     const handlePaste = useCallback((e: React.ClipboardEvent) => {
@@ -146,7 +159,7 @@ export const RichCaptionInput = forwardRef<RichCaptionInputHandle, RichCaptionIn
 
       const plainText = serializeToPlainText(el);
       const textBeforeCursor = plainText.slice(0, cursor);
-      const mentionMatch = textBeforeCursor.match(/@(\w*)$/);
+      const mentionMatch = textBeforeCursor.match(/@([\p{L}\p{N}_]*)$/u);
       onMentionQueryChange?.(mentionMatch ? mentionMatch[1] : null);
     }, [onCursorChange, onMentionQueryChange]);
 
@@ -162,7 +175,7 @@ export const RichCaptionInput = forwardRef<RichCaptionInputHandle, RichCaptionIn
           </div>
         )}
 
-        {/* ContentEditable div */}
+        {/* ContentEditable div — WARNING 7: suppress autocorrect/spellcheck */}
         <div
           ref={editorRef}
           contentEditable
@@ -176,6 +189,11 @@ export const RichCaptionInput = forwardRef<RichCaptionInputHandle, RichCaptionIn
             isComposingRef.current = false;
             handleInput();
           }}
+          autoCorrect="off"
+          spellCheck={false}
+          data-gramm="false"
+          data-gramm_editor="false"
+          data-enable-grammarly="false"
           className="w-full min-h-[130px] bg-transparent outline-none text-[20px] font-normal leading-[1.42] tracking-tight"
           style={{
             caretColor: accentColor,
@@ -195,6 +213,11 @@ export const RichCaptionInput = forwardRef<RichCaptionInputHandle, RichCaptionIn
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+/** Normalize curly/smart quotes to straight quotes for consistent matching */
+function normalizeQuotes(str: string): string {
+  return str.replace(/[\u2018\u2019\u2032]/g, "'");
+}
 
 /** Serialize a contentEditable element to plain text, converting mention spans to @username */
 function serializeToPlainText(el: HTMLElement): string {
@@ -228,15 +251,17 @@ function renderWithMentions(
 
   if (!text) return;
 
-  // Build a set of usernames to match against
+  // Build a set of usernames to match against (with quote normalization)
   const mentionMap = new Map<string, TaggableEntity>();
   for (const m of mentions) {
-    const username = (m.username || m.name).toLowerCase().replace(/\s+/g, '');
+    const username = normalizeQuotes(
+      (m.username || m.name).toLowerCase().replace(/\s+/g, '')
+    );
     mentionMap.set(username, m);
   }
 
-  // Split text by @mentions and render
-  const regex = /@([\w.'+\-]+)/g;
+  // BLOCKER 4 + WARNING 6: Unicode-aware regex with smart quote support
+  const regex = /@([\p{L}\p{N}_.'+\-\u2019]+)/gu;
   let lastIndex = 0;
   let match: RegExpExecArray | null;
 
@@ -247,8 +272,8 @@ function renderWithMentions(
       el.appendChild(document.createTextNode(beforeText));
     }
 
-    const username = match[1].toLowerCase();
-    const entity = mentionMap.get(username);
+    const captured = normalizeQuotes(match[1].toLowerCase());
+    const entity = mentionMap.get(captured);
 
     if (entity) {
       // Render as styled mention span

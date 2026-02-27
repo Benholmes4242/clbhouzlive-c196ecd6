@@ -614,6 +614,9 @@ export function PostWizard({
                     value={state.caption}
                     onChange={handleCaptionChange}
                     mentions={state.selectedTags}
+                    onMentionsChanged={(surviving) => {
+                      setTags(surviving);
+                    }}
                     onCursorChange={handleCursorChange}
                     onMentionQueryChange={handleMentionQueryChange}
                     placeholder="What's on your mind?"
@@ -798,15 +801,26 @@ export function PostWizard({
                   onClose={() => setShowTagPeople(false)}
                   selectedTags={state.selectedTags}
                   onTagsChange={(newTags) => {
+                    // Compute newly added tags
                     const newlyAdded = newTags.filter(t => !state.selectedTags.some(p => p.id === t.id));
                     let appendText = '';
                     newlyAdded.forEach(tag => {
                       const mentionText = (tag.username || tag.name).replace(/\s+/g, '');
                       appendText += ` @${mentionText}`;
                     });
-                    if (appendText) {
-                      setCaption((state.caption + appendText).trim());
-                    }
+
+                    // WARNING 8 FIX: Remove @mentions for deselected people
+                    const removed = state.selectedTags.filter(t => !newTags.some(n => n.id === t.id));
+                    let currentCaption = state.caption + appendText;
+                    removed.forEach(tag => {
+                      const mentionText = `@${(tag.username || tag.name).replace(/\\s+/g, '')}`;
+                      const escapeRegex = mentionText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                      const removeRegex = new RegExp(`\\s*${escapeRegex}`, 'gi');
+                      currentCaption = currentCaption.replace(removeRegex, '');
+                    });
+                    currentCaption = currentCaption.trim();
+
+                    setCaption(currentCaption);
                     setTags(newTags);
                     setShowTagPeople(false);
                   }}
