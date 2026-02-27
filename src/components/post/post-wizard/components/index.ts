@@ -1,3 +1,10 @@
+export { RichCaptionInput } from './RichCaptionInput';
+export type { RichCaptionInputHandle } from './RichCaptionInput';
+export { MediaPreviewViewer } from './MediaPreviewViewer';
+export { MediaThumbnail } from './MediaThumbnail';
+export { ToolButton } from './ToolButton';
+export { CharacterRing } from './CharacterRing';
+export { useMentionDetection } from './useMentionDetection';
 export { PermissionDeniedCard } from './PermissionDeniedCard';
 export { MediaSourceTabs, type MediaSourceTab } from './MediaSourceTabs';
 export { PostTemplateSelector } from './PostTemplateSelector';

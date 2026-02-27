@@ -6,7 +6,8 @@ import React, { useEffect, useCallback, useState, useMemo, useRef } from 'react'
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
-import { X, AlertTriangle, RefreshCw, Image, Camera, MapPin, Tag, UserPlus, Plus, Globe, ChevronDown, LucideIcon } from 'lucide-react';
+import { X, AlertTriangle, RefreshCw, Image, Camera, MapPin, Tag, UserPlus, Plus, Globe, ChevronDown } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
 import { ErrorBoundary as ReactErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { PostWizardProps } from './types';
 import { usePostWizard } from './usePostWizard';
@@ -31,6 +32,13 @@ import { TaggableEntity } from '@/components/post/create-moment/types';
 import { MentionBottomSheet, MentionSuggestion } from './steps/MentionBottomSheet';
 import { POST_LIMITS } from '@/constants/postLimits';
 
+// New extracted components
+import { ToolButton } from './components/ToolButton';
+import { CharacterRing } from './components/CharacterRing';
+import { MediaThumbnail } from './components/MediaThumbnail';
+import { MediaPreviewViewer } from './components/MediaPreviewViewer';
+import { RichCaptionInput, type RichCaptionInputHandle } from './components/RichCaptionInput';
+
 // Sheets
 import {
   MomentBadgesSheet,
@@ -41,53 +49,6 @@ import {
 import { CourseSearchSheet } from '@/components/courses/CourseSearchSheet';
 import PostingOptionsSheet from '@/components/post/create-moment/PostingOptionsSheet';
 import { DiscardActionSheet } from './DiscardActionSheet';
-
-// ---------------------------------------------------------------------------
-// Inline helper components
-// ---------------------------------------------------------------------------
-
-function ToolButton({ icon: Icon, onClick, label }: { icon: LucideIcon; onClick: () => void; label: string }) {
-  return (
-    <button
-      onClick={onClick}
-      aria-label={label}
-      className="w-[42px] h-[42px] rounded-[10px] flex items-center justify-center transition-all active:scale-[0.88]"
-      style={{ color: '#f59e0b' }}
-    >
-      <Icon className="w-6 h-6" />
-    </button>
-  );
-}
-
-function CharacterRing({ current, max }: { current: number; max: number }) {
-  const circumference = 2 * Math.PI * 10;
-  const ratio = Math.min(current / max, 1);
-  const offset = circumference * (1 - ratio);
-  const strokeColor = ratio > 0.95 ? '#FF3B30' : ratio > 0.8 ? '#FF9500' : '#f59e0b';
-  const showCount = ratio > 0.8;
-
-  return (
-    <div className="flex items-center gap-2">
-      {showCount && (
-        <span className="text-[12px] font-medium tabular-nums" style={{ color: strokeColor }}>
-          {max - current}
-        </span>
-      )}
-      <svg width="26" height="26" style={{ transform: 'rotate(-90deg)' }}>
-        <circle cx="13" cy="13" r="10" fill="none" stroke="#E8E8ED" strokeWidth="2.5" />
-        {current > 0 && (
-          <circle
-            cx="13" cy="13" r="10" fill="none" stroke={strokeColor} strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeDasharray={circumference}
-            strokeDashoffset={offset}
-            style={{ transition: 'stroke-dashoffset 0.35s cubic-bezier(0.16,1,0.3,1), stroke 0.25s ease' }}
-          />
-        )}
-      </svg>
-    </div>
-  );
-}
 
 // ---------------------------------------------------------------------------
 // CourseSearchSheet error boundary
@@ -150,6 +111,8 @@ export function PostWizard({
     setBadges,
     addMedia,
     removeMedia,
+    setActiveMediaId,
+    setStudioEdits,
     setCaption,
     setTags,
     loadDraft,
@@ -185,7 +148,13 @@ export function PostWizard({
   const [showMentions, setShowMentions] = useState(false);
   const [mentionQuery, setMentionQuery] = useState('');
   const [cursorPosition, setCursorPosition] = useState(0);
-  const captionRef = useRef<HTMLTextAreaElement>(null);
+  const captionInputRef = useRef<RichCaptionInputHandle>(null);
+
+  // Studio state
+  const [showStudio, setShowStudio] = useState(false);
+
+  // Media preview viewer state
+  const [previewMediaIndex, setPreviewMediaIndex] = useState<number | null>(null);
 
   // Status bar
   useMedianStatusBar("light", "transparent", true, false, isOpen);
@@ -213,6 +182,8 @@ export function PostWizard({
       reset();
       setShowSuccess(false);
       setShowCloseConfirm(false);
+      setPreviewMediaIndex(null);
+      setShowStudio(false);
     }
   }, [isOpen, reset]);
 
@@ -273,28 +244,26 @@ export function PostWizard({
     }
   }, [state.mediaItems.length, addMedia]);
 
-  // Caption change with @mention detection
-  const handleCaptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
-    setCaption(value);
-    
-    // Auto-resize
-    e.target.style.height = 'auto';
-    e.target.style.height = e.target.scrollHeight + 'px';
+  // Caption change handler for RichCaptionInput
+  const handleCaptionChange = useCallback((plainText: string) => {
+    setCaption(plainText);
+  }, [setCaption]);
 
-    const cursor = e.target.selectionStart || 0;
-    setCursorPosition(cursor);
+  // Cursor position handler — triggers mention detection
+  const handleCursorChange = useCallback((position: number) => {
+    setCursorPosition(position);
+  }, []);
 
-    const textBeforeCursor = value.slice(0, cursor);
-    const mentionMatch = textBeforeCursor.match(/@(\w*)$/);
-    if (mentionMatch) {
-      setMentionQuery(mentionMatch[1]);
+  // Mention query handler from RichCaptionInput
+  const handleMentionQueryChange = useCallback((query: string | null) => {
+    if (query !== null) {
+      setMentionQuery(query);
       setShowMentions(true);
     } else {
       setShowMentions(false);
       setMentionQuery('');
     }
-  }, [setCaption]);
+  }, []);
 
   // Mention selection
   const handleMentionSelect = useCallback((mention: MentionSuggestion) => {
@@ -303,8 +272,25 @@ export function PostWizard({
     const textAfterCursor = caption.slice(cursorPosition);
     const beforeMention = textBeforeCursor.replace(/@\w*$/, '');
     const displayName = mention.username || mention.name;
+
+    // Use the RichCaptionInput's insertMention method
+    const atStart = beforeMention.length;
+    const atEnd = cursorPosition;
+
+    captionInputRef.current?.insertMention(
+      {
+        id: mention.id,
+        entity_id: mention.entity_id,
+        entity_type: mention.entity_type,
+        name: mention.name,
+        username: mention.username,
+        avatar_url: mention.avatar_url,
+      },
+      [atStart, atEnd]
+    );
+
+    // Also update the plain text in state
     const newCaption = `${beforeMention}@${displayName} ${textAfterCursor}`;
-    
     setCaption(newCaption);
     setShowMentions(false);
     setMentionQuery('');
@@ -320,14 +306,6 @@ export function PostWizard({
     if (!state.selectedTags.some(t => t.id === mention.id)) {
       dispatch({ type: 'SET_TAGS', payload: [...state.selectedTags, tagEntity] });
     }
-
-    setTimeout(() => {
-      if (captionRef.current) {
-        captionRef.current.focus();
-        const newPos = beforeMention.length + displayName.length + 2;
-        captionRef.current.setSelectionRange(newPos, newPos);
-      }
-    }, 50);
   }, [state.caption, state.selectedTags, cursorPosition, setCaption, dispatch]);
 
   // Submission (preserved verbatim from old PostWizard)
@@ -519,6 +497,13 @@ export function PostWizard({
     onClose();
   }, [onClose, onRequestReview, state.mediaItems]);
 
+  // Studio handlers
+  const handleOpenStudio = useCallback((mediaId: string) => {
+    setActiveMediaId(mediaId);
+    setShowStudio(true);
+    setPreviewMediaIndex(null); // Close viewer if open
+  }, [setActiveMediaId]);
+
   // Actor display info
   const actorDisplayInfo = useMemo(() => {
     if (state.actor.type === 'personal' && personalActor) {
@@ -623,15 +608,17 @@ export function PostWizard({
                     </button>
                   </div>
 
-                  {/* Caption textarea */}
-                  <textarea
-                    ref={captionRef}
+                  {/* Rich Caption Input (contentEditable with inline mentions) */}
+                  <RichCaptionInput
+                    ref={captionInputRef}
                     value={state.caption}
                     onChange={handleCaptionChange}
+                    mentions={state.selectedTags}
+                    onCursorChange={handleCursorChange}
+                    onMentionQueryChange={handleMentionQueryChange}
                     placeholder="Share your round, tip, or moment..."
                     maxLength={POST_LIMITS.MAX_CAPTION_LENGTH}
-                    className="w-full min-h-[130px] bg-transparent border-none outline-none text-[20px] font-normal leading-[1.42] tracking-tight resize-none"
-                    style={{ caretColor: '#f59e0b', color: '#1A1A1A' }}
+                    accentColor="#f59e0b"
                   />
 
                   {/* Media Zone */}
@@ -652,28 +639,17 @@ export function PostWizard({
                     ) : (
                       <div className="flex gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
                         {state.mediaItems.map((item, index) => (
-                          <div key={item.id} className="relative flex-shrink-0 w-[140px] h-[140px] rounded-2xl overflow-hidden">
-                            {item.type === 'video' ? (
-                              <video src={item.previewUrl} className="w-full h-full object-cover" muted playsInline />
-                            ) : (
-                              <img src={item.previewUrl} className="w-full h-full object-cover" alt="" />
-                            )}
-                            <button
-                              onClick={() => removeMedia(item.id)}
-                              className="absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center"
-                              style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(20px)' }}
-                            >
-                              <X className="w-3 h-3 text-white" />
-                            </button>
-                            {index === 0 && state.mediaItems.length > 1 && (
-                              <span
-                                className="absolute bottom-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-semibold text-white"
-                                style={{ background: 'rgba(245,158,11,0.85)' }}
-                              >
-                                Cover
-                              </span>
-                            )}
-                          </div>
+                          <MediaThumbnail
+                            key={item.id}
+                            item={item}
+                            index={index}
+                            isCover={index === state.coverIndex}
+                            totalItems={state.mediaItems.length}
+                            hasStudioEdits={!!state.studioEditsByMediaId[item.id]}
+                            onRemove={() => removeMedia(item.id)}
+                            onExpand={() => setPreviewMediaIndex(index)}
+                            onStudio={() => handleOpenStudio(item.id)}
+                          />
                         ))}
                         {state.mediaItems.length < 10 && (
                           <button
@@ -727,6 +703,20 @@ export function PostWizard({
               </div>
               <CharacterRing current={state.caption.length} max={POST_LIMITS.MAX_CAPTION_LENGTH} />
             </div>
+
+            {/* === OVERLAYS === */}
+
+            {/* Fullscreen Media Preview Viewer */}
+            <AnimatePresence>
+              {previewMediaIndex !== null && (
+                <MediaPreviewViewer
+                  items={state.mediaItems}
+                  initialIndex={previewMediaIndex}
+                  onClose={() => setPreviewMediaIndex(null)}
+                  onStudio={handleOpenStudio}
+                />
+              )}
+            </AnimatePresence>
 
             {/* Discard Action Sheet */}
             <DiscardActionSheet
