@@ -131,22 +131,13 @@ export function PostingOptionsSheet({
                         border: isSelected ? '1px solid rgba(245,158,11,0.20)' : '1px solid transparent',
                       }}
                     >
-                      <div
-                        className="flex-shrink-0 overflow-hidden"
-                        style={{
-                          borderRadius: '34%',
-                          border: isSelected ? '2px solid #f59e0b' : '2px solid transparent',
-                          padding: '1px',
-                        }}
-                      >
-                        <SquircleAvatar
+                      <SquircleAvatar
                           size={40}
                           src={actor.avatarUrl}
                           alt={actor.name}
                           fallback={getInitials(actor.name)}
                           hideRing
                         />
-                      </div>
                       
                       <div className="flex-1 text-left min-w-0">
                         <div className="flex items-center gap-1.5">
