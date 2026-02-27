@@ -18,6 +18,7 @@ import { queueImageProcessing } from '@/services/imageProcessing';
 import { toast } from 'sonner';
 import { generateStreamThumbnailUrl, generateStreamHlsUrl } from '@/config/cloudflareStream';
 import type { UploadJobInput } from './types';
+import { POST_LIMITS } from '@/constants/postLimits';
 
 // Static imports - avoids dynamic/static import conflicts that cause memory issues during build
 import { uploadToCloudflareR2 } from '@/utils/cloudflareUpload';
@@ -57,6 +58,12 @@ async function getImageDimensions(file: File): Promise<{ width: number; height: 
  * @throws Error if no files are provided (posts require at least one media file)
  */
 export function enqueuePostUpload(input: UploadJobInput): string {
+  // Safety net: cap media at limit
+  if (input.files && input.files.length > POST_LIMITS.MAX_MEDIA_COUNT) {
+    console.warn(`[uploadPipeline] Post exceeded media limit: ${input.files.length} items, truncating to ${POST_LIMITS.MAX_MEDIA_COUNT}`);
+    input.files = input.files.slice(0, POST_LIMITS.MAX_MEDIA_COUNT);
+  }
+
   // Check for restored media (already uploaded, no File objects)
   const hasRestoredMedia = input.mediaItems?.some(m => m.isRestored && m.restoredMediaUrl);
   const hasNewFiles = input.files && input.files.length > 0;

@@ -1,5 +1,6 @@
 // Post Wizard State Management Hook
 import { useReducer, useCallback, useMemo, useRef } from 'react';
+import { POST_LIMITS } from '@/constants/postLimits';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 import {
@@ -67,7 +68,7 @@ function postWizardReducer(
         ...item,
         order: startOrder + idx,
       }));
-      const allItems = [...state.mediaItems, ...newItems];
+      const allItems = [...state.mediaItems, ...newItems].slice(0, POST_LIMITS.MAX_MEDIA_COUNT);
       return {
         ...state,
         mediaItems: allItems,
