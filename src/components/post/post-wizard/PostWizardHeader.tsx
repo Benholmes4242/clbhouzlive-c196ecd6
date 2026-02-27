@@ -1,5 +1,5 @@
 // PostWizardHeader - Minimal composer header: Cancel | Title | Post
-import { Flag, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 export interface PostWizardHeaderProps {
   onClose: () => void;
@@ -41,17 +41,9 @@ export function PostWizardHeader({
       </button>
 
       {/* Center title */}
-      <div className="flex items-center gap-[7px]">
-        <div
-          className="w-[22px] h-[22px] rounded-[6px] flex items-center justify-center"
-          style={{ background: 'linear-gradient(145deg, #f59e0b 0%, #d97706 100%)' }}
-        >
-          <Flag className="w-[13px] h-[13px] text-white" />
-        </div>
-        <span className="text-[17px] font-semibold tracking-tight" style={{ color: '#1A1A1A' }}>
-          {isEditMode ? 'Edit Post' : 'New Post'}
-        </span>
-      </div>
+      <span className="text-[17px] font-semibold tracking-tight" style={{ color: '#1A1A1A' }}>
+        {isEditMode ? 'Edit Post' : 'New Moment'}
+      </span>
 
       {/* Post button */}
       <div className="min-w-[72px] flex justify-end">
