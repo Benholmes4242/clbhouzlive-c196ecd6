@@ -17,6 +17,8 @@ export interface TournamentFinisher {
   lastName: string;
   /** Full name for R2 headshot lookup — e.g. "Jacob Bridgeman" */
   fullName: string;
+  /** Override filename for R2 lookup when full_name doesn't match */
+  headshotOverride: string | null;
   score: number | null;
   money: number | null;
   position: number;
@@ -66,6 +68,7 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
             first_name,
             last_name,
             full_name,
+            headshot_override,
             photo_url,
             pga_tour_id
           )
@@ -102,6 +105,7 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
           firstName: firstName || '',
           lastName: lastName || '',
           fullName: player?.full_name || `${firstName || ''} ${lastName || ''}`.trim() || 'Unknown',
+          headshotOverride: player?.headshot_override || null,
           score: entry.score,
           money: entry.money,
           position: entry.position,

@@ -677,6 +677,7 @@ export interface LeaderEntry {
     firstName: string;
     lastName: string;
     fullName: string;
+    headshotOverride?: string | null;
     country: string | null;
     photoUrl: string | null;
     pgaTourId: string | null;
@@ -722,6 +723,7 @@ export function useTournamentTopLeaders(tournamentId: string | null) {
             first_name,
             last_name,
             full_name,
+            headshot_override,
             country,
             photo_url,
             pga_tour_id,
@@ -759,6 +761,7 @@ export function useTournamentTopLeaders(tournamentId: string | null) {
             firstName: row.player.first_name,
             lastName: row.player.last_name,
             fullName: row.player.full_name || `${row.player.first_name} ${row.player.last_name}`,
+            headshotOverride: row.player.headshot_override ?? null,
             country: row.player.country,
             photoUrl: row.player.photo_url,
             pgaTourId: row.player.pga_tour_id ?? null,

@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Search, Users, ChevronLeft, ChevronRight, Upload, Trash2, Loader2 } from 'lucide-react';
+import { Search, Users, ChevronLeft, ChevronRight, Upload, Trash2, Loader2, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
@@ -55,6 +55,7 @@ interface PlayerRow {
   is_amateur: boolean | null;
   pga_tour_id: string | null;
   photo_asset_id: string | null;
+  headshot_override: string | null;
   updated_at: string | null;
   created_at: string | null;
 }
@@ -67,7 +68,7 @@ async function fetchAllPlayers(): Promise<PlayerRow[]> {
   while (hasMore) {
     const { data, error } = await supabase
       .from('sr_players')
-      .select('id, full_name, first_name, last_name, country, country_code, tour_codes, college, birth_date, turned_pro, handedness, height, weight, residence, is_amateur, pga_tour_id, photo_asset_id, updated_at, created_at')
+      .select('id, full_name, first_name, last_name, country, country_code, tour_codes, college, birth_date, turned_pro, handedness, height, weight, residence, is_amateur, pga_tour_id, photo_asset_id, headshot_override, updated_at, created_at')
       .order('full_name', { ascending: true })
       .range(offset, offset + batchSize - 1);
     if (error) throw error;
@@ -92,15 +93,44 @@ function PhotoManagementSheet({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [removing, setRemoving] = useState(false);
-  const [imgKey, setImgKey] = useState(0); // force re-render after upload
+  const [imgKey, setImgKey] = useState(0);
+  const [overrideValue, setOverrideValue] = useState('');
+  const [savingOverride, setSavingOverride] = useState(false);
+  const [overrideInitialized, setOverrideInitialized] = useState(false);
+
+  // Sync override field when player changes
+  if (player && !overrideInitialized) {
+    setOverrideValue(player.headshot_override || '');
+    setOverrideInitialized(true);
+  }
 
   if (!player) return null;
 
   const primaryTour = player.tour_codes?.[0] || '';
   const playerName = player.full_name || '';
-  const headshotUrl = playerName
-    ? getPlayerHeadshotUrl(playerName, primaryTour || 'pga')
+  const lookupName = overrideValue.trim() || playerName;
+  const headshotUrl = lookupName
+    ? getPlayerHeadshotUrl(lookupName, primaryTour || 'pga')
     : PLAYER_SILHOUETTE_URL;
+
+  const handleSaveOverride = async () => {
+    setSavingOverride(true);
+    try {
+      const val = overrideValue.trim() || null;
+      const { error } = await supabase
+        .from('sr_players')
+        .update({ headshot_override: val } as any)
+        .eq('id', player.id);
+      if (error) throw error;
+      toast.success(val ? `Override set to "${val}"` : 'Override cleared');
+      queryClient.invalidateQueries({ queryKey: ['admin-tour-players-all'] });
+      setImgKey(k => k + 1);
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setSavingOverride(false);
+    }
+  };
 
   const handleUpload = async (file: File) => {
     if (!playerName) return;
@@ -171,8 +201,13 @@ function PhotoManagementSheet({
     }
   };
 
+  const handleClose = () => {
+    setOverrideInitialized(false);
+    onClose();
+  };
+
   return (
-    <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
+    <Sheet open={open} onOpenChange={(v) => !v && handleClose()}>
       <SheetContent side="bottom" className="rounded-t-2xl px-4 pb-8">
         <SheetHeader className="mb-6">
           <SheetTitle className="text-lg font-bold">Manage Photo</SheetTitle>
@@ -194,6 +229,38 @@ function PhotoManagementSheet({
                 ? player.tour_codes.map(c => TOURS[c]?.label || c).join(', ')
                 : 'No tour'}
             </div>
+          </div>
+
+          {/* Headshot Override */}
+          <div className="w-full max-w-xs space-y-1.5">
+            <label className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium flex items-center gap-1">
+              <Pencil className="w-3 h-3" /> Headshot Override
+            </label>
+            <p className="text-[11px] text-muted-foreground">
+              If the R2 filename doesn't match the player's full name, enter the correct filename here (without .webp).
+            </p>
+            <div className="flex gap-2">
+              <Input
+                value={overrideValue}
+                onChange={(e) => setOverrideValue(e.target.value)}
+                placeholder={playerName || 'e.g. A Lim Kim'}
+                className="text-sm"
+              />
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleSaveOverride}
+                disabled={savingOverride}
+                className="shrink-0"
+              >
+                {savingOverride ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Save'}
+              </Button>
+            </div>
+            {player.headshot_override && (
+              <p className="text-[11px] text-amber-600 dark:text-amber-400">
+                Currently overriding to: "{player.headshot_override}"
+              </p>
+            )}
           </div>
 
           {/* Actions */}
@@ -240,7 +307,7 @@ function PhotoManagementSheet({
 function PlayerDetailDialog({ player, open, onClose }: { player: PlayerRow | null; open: boolean; onClose: () => void }) {
   if (!player) return null;
   const primaryTour = player.tour_codes?.[0] || 'pga';
-  const headshotUrl = player.full_name ? getPlayerHeadshotUrl(player.full_name, primaryTour) : PLAYER_SILHOUETTE_URL;
+  const headshotUrl = player.full_name ? getPlayerHeadshotUrl(player.full_name, primaryTour, player.headshot_override) : PLAYER_SILHOUETTE_URL;
   const fields = [
     { label: 'Full Name', value: player.full_name },
     { label: 'Country', value: player.country },
@@ -390,7 +457,7 @@ export function AdminTourPlayersPage() {
                 {paged.map((player) => {
                   const primaryTour = player.tour_codes?.[0] || 'pga';
                   const headshotUrl = player.full_name
-                    ? getPlayerHeadshotUrl(player.full_name, primaryTour)
+                    ? getPlayerHeadshotUrl(player.full_name, primaryTour, player.headshot_override)
                     : PLAYER_SILHOUETTE_URL;
 
                   return (
