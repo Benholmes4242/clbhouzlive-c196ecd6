@@ -1,18 +1,21 @@
 /**
  * Step 1: Rate Your Experience
- * Modern segmented amber-fill track sliders with large numeric displays
- * 0.1 increment snap, tier labels, premium custom feel
+ * Compact course row + amber-fill sliders with animated values
+ * Hero variant for overall, compact variant for categories
  */
 
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getScoreTier } from '@/utils/getScoreTier';
 import { triggerHaptic } from '@/lib/ui/haptics';
+import { formatCourseLocation } from '@/utils/courseLocation';
 import type { ReviewBreakdowns } from '../types';
+import type { ReviewWizardCourse } from '../types';
 
 interface RateStepProps {
   rating: number | null;
   breakdowns: ReviewBreakdowns;
+  course: ReviewWizardCourse | null;
   onRatingChange: (rating: number) => void;
   onBreakdownChange: (key: keyof ReviewBreakdowns, value: number | null) => void;
 }
@@ -24,7 +27,6 @@ const BREAKDOWN_FIELDS = [
   { key: 'facilities' as const, label: 'Practice Facilities', description: 'Range, putting green, and amenities' },
 ];
 
-/** Snap to nearest 0.1 */
 function snapToTenth(value: number): number {
   return Math.round(value * 10) / 10;
 }
@@ -45,9 +47,8 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size, ariaLab
   const prevWholeRef = useRef<number>(Math.floor(value));
 
   const trackHeight = size === 'hero' ? 8 : 6;
-  const thumbSize = size === 'hero' ? 24 : 20;
-  const thumbActiveSize = size === 'hero' ? 28 : 24;
-  const numberSize = size === 'hero' ? 48 : 32;
+  const thumbSize = size === 'hero' ? 28 : 22;
+  const thumbActiveSize = size === 'hero' ? 32 : 26;
 
   const getValueFromPosition = useCallback((clientX: number) => {
     if (!trackRef.current) return value;
@@ -107,7 +108,6 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size, ariaLab
 
   const percent = (value / 10) * 100;
   const tierData = touched ? getScoreTier(value) : null;
-  const isOutstanding = tierData?.isOutstanding ?? false;
 
   return (
     <div
@@ -122,59 +122,6 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size, ariaLab
       tabIndex={0}
       onKeyDown={handleKeyDown}
     >
-      {/* Number display — ALWAYS centered, not following thumb */}
-      <div className="w-full text-center mb-1">
-        {touched ? (
-          <AnimatePresence mode="wait">
-            <motion.span
-              key={value.toFixed(1)}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.2 }}
-              className="font-bold tabular-nums leading-none inline-block"
-              style={{
-                fontSize: numberSize,
-                color: isOutstanding ? '#f59e0b' : 'hsl(var(--foreground))',
-                ...(isOutstanding ? { textShadow: '0 1px 8px rgba(245, 158, 11, 0.25)' } : {}),
-              }}
-            >
-              {value.toFixed(1)}
-            </motion.span>
-          </AnimatePresence>
-        ) : (
-          <span
-            className="inline-block rounded-full bg-border"
-            style={{ width: 20, height: 2 }}
-          />
-        )}
-        {size === 'hero' && touched && (
-          <span
-            className="block text-[11px] font-semibold uppercase tracking-wider mt-0.5 text-muted-foreground"
-            style={{ whiteSpace: 'nowrap' }}
-          >
-            YOUR RATING
-          </span>
-        )}
-      </div>
-
-      {/* Tier label (hero only) */}
-      {size === 'hero' && touched && tierData && (
-        <div className="flex justify-center mb-3">
-          <AnimatePresence mode="wait">
-            <motion.span
-              key={tierData.label}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15 }}
-              className={`text-[13px] font-bold uppercase ${isOutstanding ? 'text-amber-500' : 'text-foreground/60'}`}
-            >
-              {tierData.label.toUpperCase()}
-            </motion.span>
-          </AnimatePresence>
-        </div>
-      )}
-
       {/* Track container with touch area */}
       <div
         ref={trackRef}
@@ -187,39 +134,44 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size, ariaLab
       >
         {/* Track background */}
         <div
-          className="absolute left-0 right-0 bg-border"
+          className="absolute left-0 right-0"
           style={{
             height: trackHeight,
             borderRadius: trackHeight / 2,
             top: '50%',
             transform: 'translateY(-50%)',
+            background: 'hsl(var(--muted))',
           }}
         />
-        {/* Track fill */}
+        {/* Track fill — amber gradient */}
         <div
-          className="absolute left-0 bg-primary"
+          className="absolute left-0"
           style={{
             height: trackHeight,
             borderRadius: trackHeight / 2,
             width: `${percent}%`,
             top: '50%',
             transform: 'translateY(-50%)',
+            background: size === 'hero'
+              ? 'linear-gradient(90deg, #f59e0b, #fbbf24)'
+              : '#f59e0b',
             transition: isDragging ? 'none' : 'width 50ms ease',
           }}
         />
-        {/* Thumb */}
+        {/* Thumb — white with amber border */}
         <div
-          className="absolute border-primary"
           style={{
+            position: 'absolute',
             width: isDragging ? thumbActiveSize : thumbSize,
             height: isDragging ? thumbActiveSize : thumbSize,
             borderRadius: '50%',
-            backgroundColor: 'white',
+            backgroundColor: '#FFFFFF',
             borderWidth: isDragging ? 3 : 2,
             borderStyle: 'solid',
+            borderColor: '#f59e0b',
             boxShadow: isDragging
-              ? '0 2px 6px rgba(0,0,0,0.2)'
-              : '0 1px 3px rgba(0,0,0,0.15)',
+              ? '0 0 0 4px rgba(245, 158, 11, 0.15), 0 2px 8px rgba(0,0,0,0.1)'
+              : '0 1px 3px rgba(0,0,0,0.1)',
             left: `${percent}%`,
             top: '50%',
             transform: 'translate(-50%, -50%)',
@@ -229,7 +181,6 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size, ariaLab
           }}
         />
       </div>
-
     </div>
   );
 }
@@ -237,6 +188,7 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size, ariaLab
 export function RateStep({ 
   rating, 
   breakdowns, 
+  course,
   onRatingChange, 
   onBreakdownChange 
 }: RateStepProps) {
@@ -251,7 +203,6 @@ export function RateStep({
     return initial;
   });
 
-  // Handle async loading of breakdown values in edit mode
   useEffect(() => {
     BREAKDOWN_FIELDS.forEach(({ key }) => {
       if (breakdowns[key] !== null && breakdowns[key] !== undefined) {
@@ -278,73 +229,145 @@ export function RateStep({
     onBreakdownChange(key, val);
   }, [onBreakdownChange]);
 
+  const locationText = course ? formatCourseLocation({
+    sub_country: course.sub_country,
+    region: course.region,
+    country: course.country,
+  }) : '';
+
+  const overallTier = overallTouched && rating !== null ? getScoreTier(rating) : null;
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 300 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -300 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      className="shrink-0 px-4 pt-6"
+      className="shrink-0"
       style={{ background: 'transparent' }}
     >
-      {/* Main Rating Section */}
-      <div className="mb-6">
-        <h2 className="text-xl font-bold tracking-tight text-foreground mb-6 text-center">
-          Your overall rating
-        </h2>
+      {/* Compact course row */}
+      {course && (
+        <div className="flex items-center gap-3 px-4 py-3 border-b" style={{ borderColor: 'hsl(var(--border) / 0.5)' }}>
+          {course.thumbnail_image ? (
+            <img
+              src={course.thumbnail_image}
+              alt={course.name}
+              loading="eager"
+              className="w-14 h-14 rounded-xl object-cover shrink-0"
+            />
+          ) : (
+            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-green-400 to-blue-500 shrink-0" />
+          )}
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-foreground text-[15px] truncate">{course.name}</p>
+            {locationText && (
+              <p className="text-sm text-muted-foreground truncate">{locationText}</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Overall Rating — hero treatment */}
+      <div className="px-4 pt-6 pb-4">
+        <p className="text-center text-lg font-semibold text-foreground">Your Verdict</p>
         
-          <SegmentedSlider
-            value={rating ?? 5}
-            onChange={handleOverallChange}
-            touched={overallTouched}
-            onFirstTouch={() => setOverallTouched(true)}
-            size="hero"
-            ariaLabel="Overall rating"
-          />
+        {/* Animated value display */}
+        <div className="flex justify-center py-4">
+          {overallTouched && rating !== null ? (
+            <motion.span
+              key={rating.toFixed(1)}
+              initial={{ opacity: 0, y: -8, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              className="text-5xl font-bold tabular-nums leading-none"
+              style={{ color: '#f59e0b' }}
+            >
+              {rating.toFixed(1)}
+            </motion.span>
+          ) : (
+            <span className="text-5xl font-bold text-muted-foreground/30 leading-none">
+              —
+            </span>
+          )}
+        </div>
+
+        {/* Tier label */}
+        {overallTouched && overallTier && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center text-sm font-medium text-muted-foreground mb-3"
+          >
+            {overallTier.label}
+          </motion.p>
+        )}
+
+        <SegmentedSlider
+          value={rating ?? 5}
+          onChange={handleOverallChange}
+          touched={overallTouched}
+          onFirstTouch={() => setOverallTouched(true)}
+          size="hero"
+          ariaLabel="Overall rating"
+        />
       </div>
 
-      {/* Section divider */}
-      <div className="mx-0 h-px my-4 bg-border" />
+      {/* Divider */}
+      <div className="mx-4 h-px bg-border" />
 
-      {/* Sub-Category Ratings */}
-      <div>
-        <h3 className="text-base font-semibold text-foreground mb-5">
+      {/* Category Ratings */}
+      <div className="px-4 pt-4">
+        <h3 className="text-base font-semibold text-foreground mb-2">
           Rate each area
         </h3>
         
-        <div className="space-y-0">
-          {BREAKDOWN_FIELDS.map(({ key, label, description }, index) => {
-            const score = breakdowns[key];
-            const isTouched = touchedFields[key];
-            
-            return (
-              <React.Fragment key={key}>
-                {index > 0 && (
-                  <div className="h-px my-1 bg-border/40" />
-                )}
-                <motion.div 
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.06, duration: 0.25 }}
-                  style={{ paddingTop: 12, paddingBottom: 12 }}
-                >
-                  <p className="text-[15px] font-bold text-foreground mb-0.5">{label}</p>
-                  
-                  <SegmentedSlider
-                    value={score ?? 5}
-                    onChange={(val) => handleBreakdownChange(key, val)}
-                    touched={isTouched}
-                    onFirstTouch={() => setTouchedFields(prev => ({ ...prev, [key]: true }))}
-                    size="compact"
-                    ariaLabel={`${label} rating`}
-                  />
-                  
-                  <p className="text-[13px] text-muted-foreground mt-0.5">{description}</p>
-                </motion.div>
-              </React.Fragment>
-            );
-          })}
-        </div>
+        {BREAKDOWN_FIELDS.map(({ key, label, description }, index) => {
+          const score = breakdowns[key];
+          const isTouched = touchedFields[key];
+          
+          return (
+            <React.Fragment key={key}>
+              {index > 0 && (
+                <div className="h-px bg-border/40" />
+              )}
+              <motion.div 
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.06, duration: 0.25 }}
+                className="py-3"
+              >
+                {/* Label + value inline */}
+                <div className="flex items-center justify-between mb-0.5">
+                  <p className="text-[15px] font-bold text-foreground">{label}</p>
+                  {isTouched && score !== null ? (
+                    <motion.span
+                      key={score?.toFixed(1)}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="text-lg font-bold tabular-nums"
+                      style={{ color: '#f59e0b' }}
+                    >
+                      {score?.toFixed(1)}
+                    </motion.span>
+                  ) : (
+                    <span className="text-lg font-bold text-muted-foreground/30">—</span>
+                  )}
+                </div>
+                
+                <SegmentedSlider
+                  value={score ?? 5}
+                  onChange={(val) => handleBreakdownChange(key, val)}
+                  touched={isTouched}
+                  onFirstTouch={() => setTouchedFields(prev => ({ ...prev, [key]: true }))}
+                  size="compact"
+                  ariaLabel={`${label} rating`}
+                />
+                
+                <p className="text-[13px] text-muted-foreground mt-0.5">{description}</p>
+              </motion.div>
+            </React.Fragment>
+          );
+        })}
       </div>
       
       {/* Bottom spacer */}

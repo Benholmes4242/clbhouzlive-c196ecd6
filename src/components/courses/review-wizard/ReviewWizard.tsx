@@ -30,7 +30,6 @@ import { StudioEdits } from '@/types/studio';
 
 
 import { WizardHeader } from './WizardHeader';
-import { WizardHeroImage } from './WizardHeroImage';
 import { WizardProgress } from './WizardProgress';
 import { DiscardActionSheet } from './DiscardActionSheet';
 import { RemoveReviewActionSheet } from './RemoveReviewActionSheet';
@@ -54,8 +53,6 @@ export function ReviewWizard({
   const { shareReview, isSharing } = useShareReview();
   const { activeActor, availableActors } = useActiveActor();
   
-  // Status bar is set dynamically after wizard state is available (see below)
-  
 
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -75,7 +72,6 @@ export function ReviewWizard({
   // Sync with global actor on open (but only use personal for reviews)
   useEffect(() => {
     if (isOpen && activeActor) {
-      // For reviews, always default to personal profile if available
       const personalActor = availableActors.find(a => a.type === 'personal');
       if (personalActor) {
         setSelectedActor(personalActor);
@@ -114,7 +110,7 @@ export function ReviewWizard({
     }
   }, [isOpen]);
 
-  // Scroll lock - save position and lock body when modal opens
+  // Scroll lock
   useLayoutEffect(() => {
     if (!isOpen) return;
     
@@ -148,26 +144,17 @@ export function ReviewWizard({
     existingRating,
     initialMediaFiles,
     onSuccess: () => {
-      // For edit mode - go directly to success
       wizard.goToStep('success');
     },
     onPreview: () => {
-      // For new reviews - go to preview step
       wizard.goToStep('preview');
     },
   });
 
-  // Immersive steps (1 & 2) get transparent status bar so hero bleeds through;
-  // non-immersive steps (3, 4, preview) use solid light background
-  const isImmersiveStep = isOpen && typeof wizard.state.step === 'number' && (wizard.state.step === 1 || wizard.state.step === 2);
-  useMedianStatusBar(
-    isImmersiveStep ? "dark" : "light",
-    "transparent",
-    isOpen,
-    false
-  );
+  // All steps use light status bar (no more immersive hero)
+  useMedianStatusBar("light", "transparent", isOpen, false);
 
-  // Navigation guard while submitting or has unsaved changes
+  // Navigation guard
   const hasUnsavedChanges = wizard.state.rating !== null || 
     wizard.state.review.length > 0 || 
     wizard.allMedia.length > 0;
@@ -183,14 +170,12 @@ export function ReviewWizard({
       : "You have unsaved changes. Are you sure you want to leave?",
   });
 
-  // Handle close with confirmation
   const handleClose = useCallback(() => {
     if (isPostSubmit) {
       wizard.cleanup();
       onClose();
       return;
     }
-
     if (hasUnsavedChanges) {
       setShowCloseConfirm(true);
     } else {
@@ -205,7 +190,6 @@ export function ReviewWizard({
     onClose();
   }, [wizard, onClose]);
 
-  // Handle view review - navigate to course page Reviews tab with deep link
   const handleViewReview = useCallback(() => {
     if (wizard.submittedRatingId && activeCourse) {
       wizard.cleanup();
@@ -214,7 +198,6 @@ export function ReviewWizard({
     }
   }, [wizard.submittedRatingId, activeCourse, wizard, onClose, navigate]);
 
-  // Handle view post - navigate to the shared post in Clubhouse
   const handleViewPost = useCallback(() => {
     wizard.cleanup();
     onClose();
@@ -225,12 +208,9 @@ export function ReviewWizard({
     }
   }, [sharedPostId, wizard.submittedRatingId, activeCourse, wizard, onClose, navigate]);
 
-  // Handle share from preview step
   const handleShareFromPreview = useCallback(async () => {
     if (!wizard.submittedRatingId || !activeCourse) return;
     
-    // Fetch media directly from the database (since background upload may have completed)
-    // This ensures we get the actual uploaded URLs, not stale local state
     const { data: dbMedia, error: mediaError } = await supabase
       .from('course_review_media')
       .select('id, media_url, media_type, poster_url, stream_id')
@@ -263,19 +243,15 @@ export function ReviewWizard({
     }
   }, [wizard, activeCourse, shareReview]);
 
-  // Handle skip share from preview step
   const handleSkipShare = useCallback(() => {
     wizard.goToStep('success');
   }, [wizard]);
 
-  // Handle close from preview step - shows confirmation since review is already saved
   const handleCloseFromPreview = useCallback(() => {
-    // Review is already saved, so just close (user can skip share without confirmation)
     wizard.cleanup();
     onClose();
   }, [wizard, onClose]);
 
-  // Handle remove review (edit mode only)
   const handleRemoveReviewClick = useCallback(() => {
     setShowDeleteConfirm(true);
   }, []);
@@ -286,23 +262,16 @@ export function ReviewWizard({
     try {
       await wizard.deleteReview();
       setShowDeleteConfirm(false);
-      
-      // Show success toast
       toast.success('Review removed');
-      
-      // Cleanup and navigate back to course page
       wizard.cleanup();
       navigate(`/courses/${activeCourse.id}`, { replace: true });
     } catch (error) {
-      // Error toast is handled in the mutation
       setShowDeleteConfirm(false);
     }
   }, [activeCourse, wizard, toast, navigate]);
 
-  // Handle back within wizard
   const handleBack = useCallback(() => {
     if (wizard.state.step === 1) {
-      // On step 1, back should trigger close confirmation if changes made
       if (hasUnsavedChanges) {
         setShowCloseConfirm(true);
       } else {
@@ -313,13 +282,11 @@ export function ReviewWizard({
     }
   }, [wizard, hasUnsavedChanges, handleClose]);
 
-  // Get active media info (retained for future Studio re-enablement)
   const activeMedia = useMemo(() => {
     if (!reviewActiveMediaId) return null;
     return wizard.allMedia.find(m => m.id === reviewActiveMediaId) || null;
   }, [reviewActiveMediaId, wizard.allMedia]);
 
-  // Handle done from success screens
   const handleDone = useCallback(() => {
     wizard.cleanup();
     onClose();
@@ -327,7 +294,6 @@ export function ReviewWizard({
 
   if (!isOpen) return null;
 
-  // Build creator object for preview
   const creator = userProfile ? {
     id: userProfile.id,
     name: userProfile.display_name || userProfile.username || 'You',
@@ -335,11 +301,7 @@ export function ReviewWizard({
     avatar: userProfile.profile_photo_url || undefined,
   } : { id: '', name: 'You' };
 
-  // Determine if we're showing the step UI (header, progress) - only on steps 1-4
   const showStepUI = typeof wizard.state.step === 'number';
-  
-  // Hero image only on steps 1 & 2 (immersive bleed); steps 3 & 4 use standard safe area
-  const showHeroImage = showStepUI && (wizard.state.step === 1 || wizard.state.step === 2);
 
   return createPortal(
     <AnimatePresence>
@@ -362,65 +324,34 @@ export function ReviewWizard({
               backgroundColor: wizard.state.step === 'preview' ? undefined : '#F8FAFC',
             }}
           >
-            {/* Hero image - extends into safe area */}
-            {showHeroImage && typeof wizard.state.step === 'number' && (
-              <WizardHeroImage 
-                course={activeCourse} 
-                currentStep={wizard.state.step as 1 | 2 | 3 | 4}
-                onBack={wizard.prevStep}
+            {/* Header — consistent across all steps */}
+            {showStepUI && (
+              <WizardHeader
+                currentStep={wizard.state.step}
+                totalSteps={4}
+                isEditMode={isEditMode}
+                canProceed={wizard.canProceed}
+                isSubmitting={wizard.isSubmitting}
+                isDeleting={wizard.isDeleting}
+                isLoadingUser={wizard.isLoadingUser}
+                selectedActor={selectedActor}
+                onBack={handleBack}
+                onNext={wizard.nextStep}
+                onSubmit={() => wizard.submit()}
                 onClose={handleClose}
-                hideBackButton={true}
+                onDelete={handleRemoveReviewClick}
+                onOpenProfileSelector={() => setShowPostingOptions(true)}
               />
             )}
 
-            {/* Steps with hero (1 & 2): Header below hero */}
-            {showStepUI && showHeroImage && (
-                <WizardHeader
-                  currentStep={wizard.state.step}
-                  totalSteps={4}
-                  isEditMode={isEditMode}
-                  canProceed={wizard.canProceed}
-                  isSubmitting={wizard.isSubmitting}
-                  isDeleting={wizard.isDeleting}
-                  isLoadingUser={wizard.isLoadingUser}
-                  hasHeroAbove={true}
-                  selectedActor={selectedActor}
-                  onBack={handleBack}
-                  onNext={wizard.nextStep}
-                  onSubmit={() => wizard.submit()}
-                  onClose={handleClose}
-                  onDelete={handleRemoveReviewClick}
-                  onOpenProfileSelector={() => setShowPostingOptions(true)}
-                />
+            {/* Progress bar — below header, above content */}
+            {showStepUI && (
+              <WizardProgress currentStep={wizard.state.step} totalSteps={4} />
             )}
 
-            {/* Steps without hero (3 & 4): Header with safe area */}
-            {showStepUI && !showHeroImage && (
-                <WizardHeader
-                  currentStep={wizard.state.step}
-                  totalSteps={4}
-                  isEditMode={isEditMode}
-                  canProceed={wizard.canProceed}
-                  isSubmitting={wizard.isSubmitting}
-                  isDeleting={wizard.isDeleting}
-                  isLoadingUser={wizard.isLoadingUser}
-                  hasHeroAbove={false}
-                  selectedActor={selectedActor}
-                  onBack={handleBack}
-                  onNext={wizard.nextStep}
-                  onSubmit={() => wizard.submit()}
-                  onClose={handleClose}
-                  onDelete={handleRemoveReviewClick}
-                  onOpenProfileSelector={() => setShowPostingOptions(true)}
-                />
-            )}
-
-            {/* Content Area - flex-1 with internal structure */}
+            {/* Content Area */}
             <div className="flex-1 flex flex-col min-h-0 relative">
-
-              {/* Step Content - grows to fill, scrollable */}
               <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
-                {/* Overlay portal container for dropdowns */}
                 <div ref={overlayRootRef} className="contents" />
                 <OverlayPortalProvider container={overlayRoot}>
                   <AnimatePresence mode="wait">
@@ -469,6 +400,7 @@ export function ReviewWizard({
                         key="rate"
                         rating={wizard.state.rating}
                         breakdowns={wizard.state.breakdowns}
+                        course={activeCourse}
                         onRatingChange={wizard.setRating}
                         onBreakdownChange={wizard.setBreakdown}
                       />
@@ -517,13 +449,11 @@ export function ReviewWizard({
                 </OverlayPortalProvider>
               </div>
 
-              {/* Scroll fade indicator — signals more content below */}
+              {/* Scroll fade indicator */}
               {typeof wizard.state.step === 'number' && (
-                <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-background to-transparent pointer-events-none z-10" />
+                <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-[#F8FAFC] to-transparent pointer-events-none z-10" />
               )}
             </div>
-
-            {/* Footer navigation REMOVED - now in header */}
           </motion.div>
 
           {/* Apple-style Exit Confirmation Action Sheet */}
@@ -545,7 +475,7 @@ export function ReviewWizard({
             onVisibilityChange={setVisibility}
           />
 
-          {/* Delete review confirmation - iOS-style action sheet */}
+          {/* Delete review confirmation */}
           <RemoveReviewActionSheet
             open={showDeleteConfirm}
             onRemove={confirmDeleteReview}
@@ -553,15 +483,12 @@ export function ReviewWizard({
             isRemoving={wizard.isDeleting}
           />
 
-          {/* Course search for adding another review - REMOVED per requirements */}
+          {/* Course search */}
           <CourseSearchSheet
             isOpen={showCourseSearch}
             onClose={() => setShowCourseSearch(false)}
             onSelectCourse={() => {}}
           />
-
-
-          {/* Studio Shelf — removed until course_review_media supports studio_edits column */}
         </>
       )}
     </AnimatePresence>,

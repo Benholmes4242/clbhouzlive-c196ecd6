@@ -1,5 +1,5 @@
 /**
- * Review Wizard Header - Amber-themed, Post Wizard-aligned
+ * Review Wizard Header - Consistent across all steps
  * Profile selector, trash icon (edit mode only), Next/Submit button
  */
 
@@ -19,7 +19,6 @@ interface WizardHeaderProps {
   isSubmitting: boolean;
   isDeleting?: boolean;
   isLoadingUser?: boolean;
-  hasHeroAbove?: boolean;
   selectedActor: ActiveActor | null;
   onBack: () => void;
   onNext: () => void;
@@ -37,7 +36,6 @@ export function WizardHeader({
   isSubmitting,
   isDeleting = false,
   isLoadingUser = false,
-  hasHeroAbove = false,
   selectedActor,
   onBack,
   onNext,
@@ -50,7 +48,6 @@ export function WizardHeader({
   const isFirstStep = isNumericStep && currentStep === 1;
   const isLastStep = isNumericStep && currentStep === totalSteps;
   
-  // Determine if Next should be Skip (for optional steps 2 and 3)
   const isOptionalStep = isNumericStep && (currentStep === 2 || currentStep === 3);
   const showSkip = isOptionalStep && !canProceed;
   
@@ -58,13 +55,10 @@ export function WizardHeader({
     ? (isEditMode ? 'Update' : 'Submit') 
     : (showSkip ? 'Skip' : 'Next');
   
-  // Fix 1: Remove isLoadingUser from submit gate — by Step 4, user is already authenticated.
   const isNextEnabled = isLastStep 
     ? (canProceed && !isSubmitting && !isDeleting)
     : (showSkip || (canProceed && !isDeleting));
 
-
-  // Only show header for numeric steps (1-4)
   if (!isNumericStep) return null;
   
   const getInitials = (name: string) => name.charAt(0).toUpperCase();
@@ -90,42 +84,29 @@ export function WizardHeader({
     <header 
       className="sticky top-0 z-10 flex items-center justify-between px-3"
       style={{ 
-        paddingTop: hasHeroAbove ? '0px' : 'max(env(safe-area-inset-top, 0px), 47px)',
-        minHeight: hasHeroAbove ? '48px' : 'calc(48px + max(env(safe-area-inset-top, 0px), 47px))',
+        paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+        minHeight: 'calc(48px + max(env(safe-area-inset-top, 0px), 47px))',
         background: 'transparent'
       }}
     >
       {/* Left: Close/Back + Trash (edit mode only) */}
       <div className="flex items-center gap-1 min-w-[72px]">
-        {hasHeroAbove ? (
-          /* Steps 1-2: Pill below hero */
-          <button
-            onClick={handleBackOrClose}
-            className="w-9 h-9 rounded-full bg-muted/80 text-foreground flex items-center justify-center active:bg-muted active:scale-[0.97] transition-all duration-100 disabled:opacity-50"
-            aria-label={isFirstStep ? 'Close' : 'Back'}
-            disabled={isSubmitting || isDeleting}
-          >
-            {isFirstStep ? (
-              <X className="h-4 w-4" />
-            ) : (
-              <ChevronLeft className="h-5 w-5" />
-            )}
-          </button>
-        ) : (
-          /* Steps 3-4 */
-          <button
-            onClick={handleBackOrClose}
-            className="w-9 h-9 rounded-full bg-muted/80 text-foreground flex items-center justify-center active:bg-muted active:scale-[0.97] transition-all duration-100 disabled:opacity-50"
-            aria-label={isFirstStep ? 'Close' : 'Back'}
-            disabled={isSubmitting || isDeleting}
-          >
-            {isFirstStep ? (
-              <X className="h-4 w-4" />
-            ) : (
-              <ChevronLeft className="h-5 w-5" />
-            )}
-          </button>
-        )}
+        <button
+          onClick={handleBackOrClose}
+          className="w-9 h-9 rounded-full flex items-center justify-center active:scale-[0.97] transition-all duration-100 disabled:opacity-50"
+          style={{
+            background: 'hsl(var(--muted) / 0.8)',
+            border: '1.5px solid hsl(var(--border))',
+          }}
+          aria-label={isFirstStep ? 'Close' : 'Back'}
+          disabled={isSubmitting || isDeleting}
+        >
+          {isFirstStep ? (
+            <X className="h-4 w-4 text-foreground" />
+          ) : (
+            <ChevronLeft className="h-5 w-5 text-foreground" />
+          )}
+        </button>
         
         {/* Trash icon - Edit Mode only */}
         {isEditMode && (
@@ -156,7 +137,7 @@ export function WizardHeader({
             className="shadow-sm"
           />
           {selectedActor?.verified && <VerifiedBadge size="sm" />}
-          <ChevronDown className="h-3.5 w-3.5 text-gray-400" />
+          <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
         </button>
       </div>
       
@@ -165,17 +146,17 @@ export function WizardHeader({
         <button
           onClick={handleNextOrSubmit}
           disabled={!isNextEnabled}
-          className={cn(
-            'px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 active:scale-[0.97]',
-            isNextEnabled
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-muted text-muted-foreground cursor-not-allowed'
-          )}
+          className="px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 active:scale-[0.97]"
+          style={{
+            background: isNextEnabled ? '#1C1C1E' : 'hsl(var(--muted))',
+            color: isNextEnabled ? '#FFFFFF' : 'hsl(var(--muted-foreground))',
+            opacity: isNextEnabled ? 1 : 0.5,
+          }}
         >
           {isSubmitting ? (
             <span className="flex items-center gap-1.5">
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              {isEditMode ? 'Updating...' : 'Submitting...'}
+              {isEditMode ? 'Updating…' : 'Submitting…'}
             </span>
           ) : (
             nextButtonText
