@@ -326,7 +326,7 @@ export function RateStep({
           const isTouched = touchedFields[key];
           
           return (
-            <React.Fragment key={key}>
+            <div key={key}>
               {index > 0 && (
                 <div className="h-px bg-border/40" />
               )}
@@ -365,7 +365,7 @@ export function RateStep({
                 
                 <p className="text-[13px] text-muted-foreground mt-0.5">{description}</p>
               </motion.div>
-            </React.Fragment>
+            </div>
           );
         })}
       </div>
