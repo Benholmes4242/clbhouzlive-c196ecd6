@@ -15,7 +15,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { logBootEvent } from '@/utils/bootTimeline';
-import { hlsBlobCache } from '@/utils/hlsBlobCache';
+
 import { videoDebug } from '@/config/videoDebug';
 
 const MIN_SKELETON_MS = 150; // Minimum skeleton display to prevent flicker
@@ -43,7 +43,7 @@ export function useClubhouseSkeletonTiming(
   const maxTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const minTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hasHiddenRef = useRef(false);
-  const cacheCheckIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  
   const firstVideoReadyFiredRef = useRef(false);
 
   // Signal that first video is ready to play (called from video canplaythrough)
@@ -62,33 +62,12 @@ export function useClubhouseSkeletonTiming(
     // giving ~300ms total for the video to render visible frames.
     setTimeout(() => {
       setIsFirstVideoReady(true);
-    }, 100);
+    }, 200);
   }, []);
 
-  // INSTANT VIDEO: Check blob cache periodically for pre-cached videos
-  // If segments are already cached, we can signal ready early
-  useEffect(() => {
-    if (hasHiddenRef.current || isFirstVideoReady || !hasPosts) return;
-    
-    cacheCheckIntervalRef.current = setInterval(() => {
-      const stats = hlsBlobCache.getOverallStats();
-      if (stats.readyCount > 0 && !firstVideoReadyFiredRef.current) {
-        logBootEvent('SKELETON_CACHE_HIT', {
-          elapsed: Date.now() - startTimeRef.current,
-          readyCount: stats.readyCount,
-        });
-        videoDebug('bootstrap', 'Cache hit - first video segments ready', { readyCount: stats.readyCount });
-        firstVideoReadyFiredRef.current = true;
-        setIsFirstVideoReady(true);
-      }
-    }, 50);
-    
-    return () => {
-      if (cacheCheckIntervalRef.current) {
-        clearInterval(cacheCheckIntervalRef.current);
-      }
-    };
-  }, [isFirstVideoReady, hasPosts]);
+  // Cache polling removed: readyCount > 0 does NOT mean the video element
+  // has attached, decoded, and started playing. Only signalFirstFrameReady()
+  // (fired after canplaythrough + 100ms buffer) should dismiss the skeleton.
 
   // Safety timeout - show content after MAX_SKELETON_MS regardless of video state
   // This prevents indefinite skeleton if video loading fails
