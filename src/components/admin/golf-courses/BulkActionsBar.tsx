@@ -24,7 +24,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { GolfCourse } from './types';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -39,7 +39,7 @@ export function BulkActionsBar({
   onClearSelection,
   onSuccess 
 }: BulkActionsBarProps) {
-  const { toast } = useToast();
+  
   const queryClient = useQueryClient();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -73,10 +73,7 @@ export function BulkActionsBar({
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 
-    toast({
-      title: 'Export Complete',
-      description: `Exported ${selectedCourses.length} courses to CSV`,
-    });
+    toast.success('Export Complete', { description: `Exported ${selectedCourses.length} courses to CSV` });
   };
 
   const handleBulkDelete = async () => {
@@ -91,10 +88,7 @@ export function BulkActionsBar({
 
       if (error) throw error;
 
-      toast({
-        title: 'Courses Deleted',
-        description: `Successfully deleted ${selectedCourses.length} courses`,
-      });
+      toast.success('Courses Deleted', { description: `Successfully deleted ${selectedCourses.length} courses` });
 
       onClearSelection();
       queryClient.invalidateQueries({ queryKey: ['admin-golf-courses'] });
@@ -102,11 +96,7 @@ export function BulkActionsBar({
       onSuccess?.();
     } catch (error) {
       console.error('Bulk delete error:', error);
-      toast({
-        title: 'Delete Failed',
-        description: 'Failed to delete courses. Please try again.',
-        variant: 'destructive',
-      });
+      toast.error('Delete Failed', { description: 'Failed to delete courses. Please try again.' });
     } finally {
       setIsDeleting(false);
       setDeleteDialogOpen(false);

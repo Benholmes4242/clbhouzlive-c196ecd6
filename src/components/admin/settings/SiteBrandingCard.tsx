@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Globe } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { updateTitleMeta, updateFaviconInHead, verifyFaviconLoaded } from './branding/faviconUtils';
 import TabTitleSection from './branding/TabTitleSection';
 import FaviconSection from './branding/FaviconSection';
@@ -11,7 +11,7 @@ import BrandingActions from './branding/BrandingActions';
 import TroubleshootingInfo from './branding/TroubleshootingInfo';
 
 const SiteBrandingCard = () => {
-  const { toast } = useToast();
+  
   const [faviconFile, setFaviconFile] = useState<File | null>(null);
   const [faviconUrl, setFaviconUrl] = useState('');
   const [tabTitle, setTabTitle] = useState('clbhouz | golf\'s digital community');
@@ -87,10 +87,7 @@ const SiteBrandingCard = () => {
       fileInput.value = '';
     }
     
-    toast({
-      title: "Reset Complete",
-      description: "Branding has been reset to default values. The favicon should update shortly.",
-    });
+    toast.success("Reset Complete", { description: "Branding has been reset to default values. The favicon should update shortly." });
   };
 
   return (

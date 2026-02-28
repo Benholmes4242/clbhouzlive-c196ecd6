@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useId } from 'react';
 import { Play, Upload, Trash2, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
 interface ProfileVideoCircleProps {
@@ -37,7 +37,7 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
   const [isMuted, setIsMuted] = useState(true);
   const [showControls, setShowControls] = useState(false);
   const [showVideo, setShowVideo] = useState(true); // true = show video, false = show photo
-  const { toast } = useToast();
+  
 
   // Generate stable media ID
   const mediaId = useId();
@@ -100,21 +100,13 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
 
     // Validate file type
     if (!file.type.startsWith('video/')) {
-      toast({
-        title: "Invalid file type",
-        description: "Please select a video file.",
-        variant: "destructive"
-      });
+      toast.error("Invalid file type", { description: "Please select a video file." });
       return;
     }
 
     // Validate file size (100MB max)
     if (file.size > 100 * 1024 * 1024) {
-      toast({
-        title: "File too large",
-        description: "Video file must be less than 100MB.",
-        variant: "destructive"
-      });
+      toast.error("File too large", { description: "Video file must be less than 100MB." });
       return;
     }
 
@@ -124,11 +116,7 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
     
     video.onloadedmetadata = () => {
       if (video.duration > 20) {
-        toast({
-          title: "Video too long",
-          description: "Video must be 20 seconds or less.",
-          variant: "destructive"
-        });
+        toast.error("Video too long", { description: "Video must be 20 seconds or less." });
         return;
       }
       
@@ -136,11 +124,7 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
     };
 
     video.onerror = () => {
-      toast({
-        title: "Invalid video",
-        description: "Could not read video file.",
-        variant: "destructive"
-      });
+      toast.error("Invalid video", { description: "Could not read video file." });
     };
 
     video.src = URL.createObjectURL(file);
@@ -152,21 +136,13 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      toast({
-        title: "Invalid file type",
-        description: "Please select an image file.",
-        variant: "destructive"
-      });
+      toast.error("Invalid file type", { description: "Please select an image file." });
       return;
     }
 
     // Validate file size (10MB max)
     if (file.size > 10 * 1024 * 1024) {
-      toast({
-        title: "File too large",
-        description: "Image file must be less than 10MB.",
-        variant: "destructive"
-      });
+      toast.error("File too large", { description: "Image file must be less than 10MB." });
       return;
     }
 

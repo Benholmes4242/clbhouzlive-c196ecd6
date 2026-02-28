@@ -19,7 +19,7 @@ import { Search, X, Star, Plus, Trash2, ChevronUp, ChevronDown, GripVertical, Tr
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import {
   DndContext,
   closestCenter,
@@ -224,7 +224,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
+  
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   
@@ -335,19 +335,12 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
 
   const handleAddCourse = (courseId: string) => {
     if (topTen.length >= 10) {
-      toast({
-        title: 'Top 10 is full',
-        description: 'Remove a course to add another',
-        variant: 'destructive',
-      });
+      toast.error('Top 10 is full', { description: 'Remove a course to add another' });
       return;
     }
 
     addCourse(courseId);
-    toast({
-      title: 'Course added',
-      description: 'Successfully added to your Top 10',
-    });
+    toast.success('Course added', { description: 'Successfully added to your Top 10' });
   };
 
   const handleRateFirst = (courseId: string) => {
@@ -358,12 +351,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
   const handleRemoveCourse = (courseId: string) => {
     const course = topTen.find(c => c.course_id === courseId);
     removeCourse(courseId);
-    toast({
-      title: 'Course removed',
-      description: course?.is_pinned 
-        ? 'Removed from your Top 10' 
-        : 'Course excluded from auto-population',
-    });
+    toast.success('Course removed', { description: course?.is_pinned ? 'Removed from your Top 10' : 'Course excluded from auto-population' });
   };
 
   const handleMoveUp = (index: number) => {
@@ -397,18 +385,11 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
       
       await queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses'], refetchType: 'all' });
       
-      toast({
-        title: 'Reset complete',
-        description: 'Your Top 10 now shows your highest-rated courses',
-      });
+      toast.success('Reset complete', { description: 'Your Top 10 now shows your highest-rated courses' });
       setShowResetConfirm(false);
       onClose();
     } catch (err) {
-      toast({
-        title: 'Error',
-        description: 'Failed to reset. Please try again.',
-        variant: 'destructive',
-      });
+      toast.error('Error', { description: 'Failed to reset. Please try again.' });
     } finally {
       setIsResetting(false);
     }

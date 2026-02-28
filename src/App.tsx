@@ -1,5 +1,5 @@
 import React, { Suspense, lazy, useEffect, useMemo } from "react";
-import { Toaster } from "@/components/ui/toaster";
+
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -60,7 +60,7 @@ import { ReviewIslandLoader } from '@/ReviewIslandLoader';
 import { supabase } from '@/integrations/supabase/client';
 import { migrateChatHistory } from '@/utils/chatHistoryMigration';
 import { PanelGuard } from "@/components/admin/PanelGuard";
-import { ToastHost } from '@/components/toast/ToastHost';
+
 import { AchievementToastContainer } from '@/components/achievements/AchievementToastContainer';
 import { LevelUpToastContainer } from '@/components/achievements/LevelUpToastContainer';
 import { useAchievementSharing } from '@/hooks/useAchievementSharing';
@@ -663,7 +663,7 @@ const AppInner: React.FC = () => {
               <BottomNavigationProvider>
                 
                   <UIProvider>
-                    <ToastHost>
+                    
                         <ActiveActorProvider>
                           
                           <ScrollToTop />
@@ -700,11 +700,11 @@ const AppInner: React.FC = () => {
                               </FullscreenPlayerProvider>
                             </GlobalAudioProvider>
                           </MediaSystemProvider>
-                          <Toaster />
+                          
                           <Sonner />
                           <GlobalBottomNavigation />
                         </ActiveActorProvider>
-                    </ToastHost>
+                    
                   </UIProvider>
                 
               </BottomNavigationProvider>

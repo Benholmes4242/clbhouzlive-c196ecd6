@@ -31,7 +31,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Trash2, Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import type { AdminUser } from '@/hooks/useAdmin';
 
 interface UserManagementProps {
@@ -40,7 +40,7 @@ interface UserManagementProps {
 }
 
 const UserManagement: React.FC<UserManagementProps> = ({ users, onRoleChange }) => {
-  const { toast } = useToast();
+  
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [localUsers, setLocalUsers] = useState<AdminUser[]>(users);
 
@@ -110,17 +110,10 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, onRoleChange }) 
         throw new Error(data.error);
       }
       
-      toast({
-        title: "Success",
-        description: `Password reset email sent to ${userEmail}`,
-      });
+      toast.success("Success", { description: `Password reset email sent to ${userEmail}` });
     } catch (error: any) {
       console.error('Error sending password reset:', error);
-      toast({
-        title: "Error",
-        description: `Failed to send password reset: ${error.message}`,
-        variant: "destructive",
-      });
+      toast.error("Error", { description: `Failed to send password reset: ${error.message}` });
     } finally {
       setActionLoading(null);
     }
@@ -151,17 +144,10 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, onRoleChange }) 
       // Remove user from local state only after successful deletion
       setLocalUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
       
-      toast({
-        title: "Success",
-        description: `User ${userEmail} has been deleted successfully`,
-      });
+      toast.success("Success", { description: `User ${userEmail} has been deleted successfully` });
     } catch (error: any) {
       console.error('Error deleting user:', error);
-      toast({
-        title: "Error",
-        description: `Failed to delete user: ${error.message}`,
-        variant: "destructive",
-      });
+      toast.error("Error", { description: `Failed to delete user: ${error.message}` });
     } finally {
       setActionLoading(null);
     }

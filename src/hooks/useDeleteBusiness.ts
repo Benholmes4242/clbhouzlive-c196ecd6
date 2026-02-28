@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from './use-toast';
+import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
 /**
@@ -8,7 +8,6 @@ import { useNavigate } from 'react-router-dom';
  */
 export function useDeleteBusiness() {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
   const navigate = useNavigate();
 
   return useMutation({
@@ -57,20 +56,13 @@ export function useDeleteBusiness() {
       queryClient.invalidateQueries({ queryKey: ['my-businesses'] });
       queryClient.invalidateQueries({ queryKey: ['business-profile'] });
 
-      toast({
-        title: 'Business profile deleted',
-        description: 'The business profile has been removed from Clbhouz.',
-      });
+      toast.success('Business profile deleted', { description: 'The business profile has been removed from Clbhouz.' });
 
       navigate('/businesses/manage');
     },
     onError: (error: Error) => {
       console.error('Delete business error:', error);
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to delete business profile. Please try again.',
-        variant: 'destructive',
-      });
+      toast.error('Error', { description: error.message || 'Failed to delete business profile. Please try again.' });
     },
   });
 }

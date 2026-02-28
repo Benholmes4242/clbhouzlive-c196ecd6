@@ -18,7 +18,7 @@ import ThreadDivider from '@/features/echo/components/ThreadDivider';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MarkdownMessage } from './MarkdownMessage';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useVoiceRecording } from '@/hooks/useVoiceRecording';
 import { useConversationSession } from '@/hooks/useConversationSession';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
@@ -71,7 +71,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
   const [newMessageCount, setNewMessageCount] = useState(0);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const chatScrollRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
+  
 
   // Get current user ID for profile
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
@@ -179,19 +179,12 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
 
       if (error) throw error;
 
-      toast({
-        title: "Caddie note saved",
-        description: "Your voice note has been added to your caddie logs",
-      });
+      toast.success("Caddie note saved", { description: "Your voice note has been added to your caddie logs" });
 
 
     } catch (error) {
       console.error('Error saving voice note:', error);
-      toast({
-        title: "Error saving note",
-        description: "Failed to save your caddie note. Please try again.",
-        variant: "destructive"
-      });
+      toast.error("Error saving note", { description: "Failed to save your caddie note. Please try again." });
     }
   }
 
@@ -264,21 +257,14 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             const data = await response.json();
             const location = `${data.city || data.locality || ''}, ${data.principalSubdivision || ''}`.trim().replace(/^,\s*/, '');
             setUserLocation(location);
-            toast({
-              title: "Location detected",
-              description: `Using ${location} for location-based queries`,
-            });
+            toast.success("Location detected", { description: `Using ${location} for location-based queries` });
           } catch (error) {
             console.error('Error getting location name:', error);
           }
         },
         (error) => {
           console.error('Error getting location:', error);
-          toast({
-            title: "Location access denied",
-            description: "Please enable location access or specify your city manually",
-            variant: "destructive"
-          });
+          toast.error("Location access denied", { description: "Please enable location access or specify your city manually" });
         }
       );
     }
@@ -378,11 +364,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
 
     } catch (error) {
       console.error('Error sending message:', error);
-      toast({
-        title: "Error",
-        description: "Failed to get AI response. Please try again.",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "Failed to get AI response. Please try again." });
 
       const errorMessage: ChatMessageData = {
         id: Date.now().toString() + '_error',
@@ -416,10 +398,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
     savedInsights.push(insight);
     localStorage.setItem('clbhouz_ai_saved', JSON.stringify(savedInsights));
     
-    toast({
-      title: "Saved to Insights",
-      description: "This tip has been saved to your AI insights",
-    });
+    toast.success("Saved to Insights", { description: "This tip has been saved to your AI insights" });
   };
 
   const requestMoreDetail = (originalMessage: string) => {

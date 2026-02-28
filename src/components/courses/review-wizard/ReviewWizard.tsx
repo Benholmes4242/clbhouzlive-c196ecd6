@@ -21,7 +21,7 @@ import { CourseSearchSheet } from '@/components/courses/CourseSearchSheet';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { OverlayPortalProvider } from '@/context/OverlayPortalContext';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useShareReview } from '@/hooks/useShareReview';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
@@ -51,7 +51,7 @@ export function ReviewWizard({
   initialMediaFiles,
 }: ReviewWizardProps) {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  
   const { shareReview, isSharing } = useShareReview();
   const { activeActor, availableActors } = useActiveActor();
   
@@ -293,10 +293,7 @@ export function ReviewWizard({
       setShowDeleteConfirm(false);
       
       // Show success toast
-      toast({
-        title: 'Review removed',
-        description: 'Your review has been successfully removed.',
-      });
+      toast.success('Review removed', { description: 'Your review has been successfully removed.' });
       
       // Cleanup and navigate back to course page
       wizard.cleanup();

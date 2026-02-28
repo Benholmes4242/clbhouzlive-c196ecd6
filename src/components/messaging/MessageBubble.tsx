@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/context-menu';
 import { Reply, Pencil, Trash2, MapPin, ExternalLink, Check, CheckCheck, Copy, Forward, Star } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import CountryFlag from '@/components/ui/country-flag';
@@ -74,7 +74,7 @@ export function MessageBubble({
   const [isPressed, setIsPressed] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
-  const { toast } = useToast();
+  
 
   // Check if message is saved on mount
   useEffect(() => {
@@ -263,7 +263,7 @@ export function MessageBubble({
     haptic('light');
     if (message.content) {
       navigator.clipboard.writeText(message.content);
-      toast({ title: 'Copied to clipboard' });
+      toast.success('Copied to clipboard');
     }
   };
 
@@ -277,12 +277,10 @@ export function MessageBubble({
       
       const nowSaved = data === true;
       setIsSaved(nowSaved);
-      toast({ 
-        title: nowSaved ? "Saved to Caddie's Picks ⛳" : "Removed from Caddie's Picks"
-      });
+      toast.success(nowSaved ? "Saved to Caddie's Picks ⛳" : "Removed from Caddie's Picks");
     } catch (error) {
       console.error('Error toggling saved message:', error);
-      toast({ title: 'Failed to save message', variant: 'destructive' });
+      toast.error('Failed to save message');
     }
   };
 

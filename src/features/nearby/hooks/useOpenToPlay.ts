@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useLocationPermission } from '@/features/nearby/hooks/useLocationPermission';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { haptic } from '@/utils/haptics';
 
 const DURATION_MINUTES = 30;
@@ -16,7 +16,7 @@ type OpenState = {
 export function useOpenToPlay() {
   const { user } = useSupabaseSession();
   const { getCurrentLocation } = useLocationPermission();
-  const { toast } = useToast();
+  
 
   // local cache so UI can render instantly
   const [state, setState] = useState<OpenState>(() => {
@@ -60,11 +60,7 @@ export function useOpenToPlay() {
     // Check visibility_mode or visible_nearby to ensure consistency
     const isHidden = statusData?.visibility_mode === 'hidden' || statusData?.visible_nearby === false;
     if (isHidden) {
-      toast({
-        title: 'Change visibility first',
-        description: 'You need to be visible to use Open to Play.',
-        variant: 'destructive',
-      });
+      toast.error('Change visibility first', { description: 'You need to be visible to use Open to Play.' });
       return;
     }
 
@@ -72,11 +68,7 @@ export function useOpenToPlay() {
     const loc = await getCurrentLocation();
     if (!loc) {
       // Block immediately - no optimistic update
-      toast({
-        title: 'Location needed',
-        description: 'Turn on location to go Open to Play.',
-        variant: 'destructive',
-      });
+      toast.error('Location needed', { description: 'Turn on location to go Open to Play.' });
       return;
     }
 
@@ -115,21 +107,14 @@ export function useOpenToPlay() {
         active: false,
         expiresAt: null,
       });
-      toast({
-        title: 'Error',
-        description: 'Could not set Open to Play.',
-        variant: 'destructive',
-      });
+      toast.error('Error', { description: 'Could not set Open to Play.' });
       return;
     }
 
     // Success toast + haptic
     haptic('medium');
-    toast({
-      title: 'Open to Play Active',
-      description: 'Nearby golfers can see you are available for the next 30 mins.',
-    });
-  }, [user?.id, getCurrentLocation, toast]);
+    toast.success('Open to Play Active', { description: 'Nearby golfers can see you are available for the next 30 mins.' });
+  }, [user?.id, getCurrentLocation]);
 
   // Cancel broadcast with optimistic UI
   const cancel = useCallback(async () => {
@@ -159,21 +144,14 @@ export function useOpenToPlay() {
       console.error('OpenToPlay cancel error', error);
       // REVERT on failure
       persistLocal(previousState);
-      toast({
-        title: 'Error',
-        description: 'Could not clear Open to Play.',
-        variant: 'destructive',
-      });
+      toast.error('Error', { description: 'Could not clear Open to Play.' });
       return;
     }
 
     // Success toast + haptic
     haptic('light');
-    toast({
-      title: 'Open to Play off',
-      description: 'You are no longer broadcasting availability.',
-    });
-  }, [user?.id, state, toast]);
+    toast.success('Open to Play off', { description: 'You are no longer broadcasting availability.' });
+  }, [user?.id, state]);
 
   // Auto-expire locally and in DB when the timer runs out
   useEffect(() => {

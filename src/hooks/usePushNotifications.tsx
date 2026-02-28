@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface PushNotificationState {
   isSupported: boolean;
@@ -12,7 +12,7 @@ interface PushNotificationState {
 
 export const usePushNotifications = () => {
   const { user } = useSupabaseSession();
-  const { toast } = useToast();
+  
   const [state, setState] = useState<PushNotificationState>({
     isSupported: false,
     permission: null,
@@ -58,11 +58,7 @@ export const usePushNotifications = () => {
 
   const requestPermission = async (): Promise<boolean> => {
     if (!state.isSupported) {
-      toast({
-        title: "Not Supported",
-        description: "Push notifications are not supported in this browser",
-        variant: "destructive",
-      });
+      toast.error("Not Supported", { description: "Push notifications are not supported in this browser" });
       return false;
     }
 
@@ -76,26 +72,15 @@ export const usePushNotifications = () => {
         await registerServiceWorker();
         await updateSubscriptionStatus(true);
         
-        toast({
-          title: "Success",
-          description: "Push notifications enabled successfully",
-        });
+        toast.success("Success", { description: "Push notifications enabled successfully" });
         return true;
       } else {
-        toast({
-          title: "Permission Denied",
-          description: "Push notification permission was denied",
-          variant: "destructive",
-        });
+        toast.error("Permission Denied", { description: "Push notification permission was denied" });
         return false;
       }
     } catch (error) {
       console.error('Error requesting permission:', error);
-      toast({
-        title: "Error",
-        description: "Failed to enable push notifications",
-        variant: "destructive",
-      });
+      toast.error("Error", { description: "Failed to enable push notifications" });
       return false;
     } finally {
       setState(prev => ({ ...prev, isLoading: false }));
@@ -142,17 +127,10 @@ export const usePushNotifications = () => {
     
     try {
       await updateSubscriptionStatus(false);
-      toast({
-        title: "Unsubscribed",
-        description: "Push notifications have been disabled",
-      });
+      toast.success("Unsubscribed", { description: "Push notifications have been disabled" });
     } catch (error) {
       console.error('Error unsubscribing:', error);
-      toast({
-        title: "Error",
-        description: "Failed to disable push notifications",
-        variant: "destructive",
-      });
+      toast.error("Error", { description: "Failed to disable push notifications" });
     } finally {
       setState(prev => ({ ...prev, isLoading: false }));
     }

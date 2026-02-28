@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Star } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import MediaFileHandler from '@/components/posts/MediaFileHandler';
 import MediaPreview from '@/components/posts/MediaPreview';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
@@ -26,7 +26,7 @@ const CourseRatingSystem = ({
   currentReview,
   hasRated
 }: CourseRatingSystemProps) => {
-  const { toast } = useToast();
+  
   const queryClient = useQueryClient();
   const { optimisticNewRating, rollback, scheduleBackgroundSync } = useOptimisticRatingUpdate();
   const [selectedRating, setSelectedRating] = useState<number | null>(currentRating);
@@ -108,10 +108,7 @@ const CourseRatingSystem = ({
       await queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
       await queryClient.refetchQueries({ queryKey: ['explore-courses'], exact: false, type: 'active' });
       
-      toast({
-        title: "Rating Submitted! ✨",
-        description: `You rated ${courseName} ${selectedRating}`,
-      });
+      toast.success("Rating Submitted! ✨", { description: `You rated ${courseName} ${selectedRating}` });
       
       setIsSubmitting(false);
     },
@@ -119,11 +116,7 @@ const CourseRatingSystem = ({
       // Rollback optimistic update on error
       rollback(context);
       console.error('Error submitting rating:', error);
-      toast({
-        title: "Error",
-        description: "Failed to submit rating. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Error", { description: "Failed to submit rating. Please try again." });
       setIsSubmitting(false);
     },
     onSettled: () => {
@@ -134,11 +127,7 @@ const CourseRatingSystem = ({
 
   const handleSubmit = () => {
     if (!selectedRating) {
-      toast({
-        title: "Rating Required",
-        description: "Please select a rating before submitting.",
-        variant: "destructive",
-      });
+      toast.error("Rating Required", { description: "Please select a rating before submitting." });
       return;
     }
 
