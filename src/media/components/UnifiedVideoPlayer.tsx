@@ -453,6 +453,13 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
       const handlePlaying = () => {
         // Note: isBuffering is now managed by useBufferingIndicator hook
         updatePlaybackState('playing');
+        
+        // Poster crossfade: trigger on 'playing' (not 'loadeddata') so the
+        // poster only fades once frames are actively rendering.
+        if (!hasFirstFrame) {
+          setHasFirstFrame(true);
+          setShowPlaceholder(false);
+        }
       };
 
       const handleCanPlay = () => {
@@ -478,8 +485,8 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           clearTimeout(firstFrameTimeoutRef.current);
           firstFrameTimeoutRef.current = null;
         }
-        setHasFirstFrame(true);
-        setShowPlaceholder(false);
+        // Poster crossfade moved to 'playing' handler — loadeddata only
+        // means the first frame is decoded, not that playback has started.
         updatePlaybackState('ready');
         onLoadedData?.();
       };
