@@ -131,7 +131,7 @@ export function ConfirmStep({
               </button>
             </div>
             <div className="text-center">
-              <span className="text-4xl font-bold tabular-nums" style={{ color: '#f59e0b' }}>
+              <span className="text-4xl font-bold tabular-nums" style={{ color: tierData?.accent ?? '#f59e0b' }}>
                 {rating.toFixed(1)}
               </span>
               <span className="text-lg text-muted-foreground font-medium ml-1">/10</span>
@@ -174,7 +174,7 @@ export function ConfirmStep({
                       <div className="flex items-center gap-2 mt-1">
                         <span
                           className="text-lg font-bold tabular-nums"
-                          style={{ color: value >= 9 ? '#f59e0b' : 'hsl(var(--foreground))' }}
+                          style={{ color: getScoreTier(value).accent }}
                         >
                           {value.toFixed(1)}
                         </span>
@@ -183,7 +183,7 @@ export function ConfirmStep({
                             className="h-full rounded-full transition-all duration-300"
                             style={{
                               width: `${(value / 10) * 100}%`,
-                              background: value >= 9 ? '#f59e0b' : 'hsl(var(--foreground) / 0.6)',
+                              background: getScoreTier(value).accent,
                             }}
                           />
                         </div>
