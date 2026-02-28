@@ -195,7 +195,7 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
       });
     } else {
       navigator.clipboard.writeText(shareUrl).then(() => {
-        toast.success('Link copied to clipboard!');
+        toast.success('Copied to clipboard');
       }).catch(() => {
         toast.error('Failed to copy link');
       });

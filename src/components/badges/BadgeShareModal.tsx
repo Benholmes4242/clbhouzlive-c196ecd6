@@ -98,8 +98,7 @@ export const BadgeShareModal: React.FC<BadgeShareModalProps> = ({
       await navigator.clipboard.writeText(badgeUrl);
       
       toast({
-        title: "🔗 Link Copied!",
-        description: "Badge link copied to clipboard!",
+        title: "Copied to clipboard",
       });
     } catch (error) {
       console.error('Error copying link:', error);
