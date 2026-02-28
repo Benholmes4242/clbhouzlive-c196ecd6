@@ -12,7 +12,7 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useReviewUpload } from '@/uploads/useReviewUpload';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -116,7 +116,7 @@ export function useReviewWizard({
   onPreview,
   initialMediaFiles,
 }: UseReviewWizardOptions) {
-  const { toast } = useToast();
+  
   const queryClient = useQueryClient();
   const { optimisticDeleteReview, rollback: rollbackOptimistic, confirmUpdate } = useOptimisticReviewUpdate();
   
@@ -329,11 +329,7 @@ export function useReviewWizard({
     onError: (error) => {
       console.error('[useReviewWizard] Submit error:', error);
       submissionInProgressRef.current = false; // Reset ref so user can retry
-      toast({
-        title: 'Error',
-        description: 'Failed to save your review. Please try again.',
-        variant: 'destructive',
-      });
+      toast.error('Failed to save your review. Please try again.');
     },
   });
 
@@ -567,30 +563,15 @@ export function useReviewWizard({
     // Auth check inside handleSubmit — by Step 4, user was already authenticated.
     // This catches session expiry edge case.
     if (!currentUserId) {
-      toast({
-        title: 'Session expired',
-        description: 'Please sign in again to submit your review.',
-        variant: 'destructive',
-      });
-      return;
+      toast.error('Session expired', { description: 'Please sign in again to submit your review.' });
     }
     
     if (!course) {
-      toast({
-        title: 'Error',
-        description: 'No course selected. Please go back and select a course.',
-        variant: 'destructive',
-      });
-      return;
+      toast.error('No course selected. Please go back and select a course.');
     }
     
     if (!state.rating) {
-      toast({
-        title: 'Rating Required',
-        description: 'Please provide a rating before submitting.',
-        variant: 'destructive',
-      });
-      return;
+      toast.error('Rating Required', { description: 'Please provide a rating before submitting.' });
     }
     
     submissionInProgressRef.current = true;
@@ -743,11 +724,7 @@ export function useReviewWizard({
       if (context?.snapshot && course?.id && currentUserId) {
         rollbackOptimistic(course.id, currentUserId, context.snapshot);
       }
-      toast({
-        title: 'Error',
-        description: 'Failed to remove your review. Please try again.',
-        variant: 'destructive',
-      });
+      toast.error('Failed to remove your review. Please try again.');
     },
   });
 

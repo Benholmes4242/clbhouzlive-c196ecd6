@@ -9,7 +9,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { emitHub } from '@/lib/hubEvents';
 
@@ -32,7 +32,7 @@ export function useGameJoinRequests(gameId?: string) {
   const [requests, setRequests] = useState<GameJoinRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [acceptedGameIds, setAcceptedGameIds] = useState<Set<string>>(new Set());
-  const { toast } = useToast();
+  
 
   // Fetch user's accepted game requests on mount (where rsvp_status = 'going')
   useEffect(() => {
@@ -194,26 +194,17 @@ export function useGameJoinRequests(gameId?: string) {
         .eq('user_id', user.id)
         .maybeSingle();
 
-      if (existing) {
+        if (existing) {
         if (existing.rsvp_status === 'requested') {
-          toast({
-            title: "Request already sent",
-            description: "You've already requested to join this game.",
-          });
+          toast("Request already sent", { description: "You've already requested to join this game." });
           return;
         }
         if (existing.rsvp_status === 'going' || existing.rsvp_status === 'invited') {
-          toast({
-            title: "Already joined",
-            description: "You're already in this game.",
-          });
+          toast("Already joined", { description: "You're already in this game." });
           return;
         }
         if (existing.rsvp_status === 'rejected') {
-          toast({
-            title: "Unable to join",
-            description: "This game is no longer available to you.",
-          });
+          toast("Unable to join", { description: "This game is no longer available to you." });
           return;
         }
       }
@@ -231,17 +222,10 @@ export function useGameJoinRequests(gameId?: string) {
 
       if (error) throw error;
 
-      toast({
-        title: "Request sent",
-        description: "You'll get a response from the group host.",
-      });
+      toast.success("Request sent", { description: "You'll get a response from the group host." });
     } catch (error) {
       console.error('Error creating join request:', error);
-      toast({
-        title: "Error",
-        description: "Failed to send join request. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to send join request. Please try again.");
     }
   };
 
@@ -267,11 +251,7 @@ export function useGameJoinRequests(gameId?: string) {
 
       if (!response.ok) {
         if (response.status === 409) {
-          toast({
-            title: "Game is full",
-            description: "No open seats available.",
-            variant: "destructive",
-          });
+          toast.error("Game is full", { description: "No open seats available." });
           return;
         }
         throw new Error(result.error || 'Failed to accept request');
@@ -280,19 +260,12 @@ export function useGameJoinRequests(gameId?: string) {
       // Emit hub event for instant local UI update
       emitHub('game:joined', { gameId: targetGameId, requestId });
 
-      toast({
-        title: "They're in 👍",
-        description: "We've notified them they're added to your game.",
-      });
+      toast.success("They're in 👍", { description: "We've notified them they're added to your game." });
 
       fetchRequests();
     } catch (error) {
       console.error('Error accepting request:', error);
-      toast({
-        title: "Error",
-        description: "Failed to accept request. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to accept request. Please try again.");
     }
   };
 
@@ -320,19 +293,12 @@ export function useGameJoinRequests(gameId?: string) {
         throw new Error(result.error || 'Failed to decline request');
       }
 
-      toast({
-        title: "We've let them know the round is full",
-        description: "Request declined.",
-      });
+      toast.success("We've let them know the round is full", { description: "Request declined." });
 
       fetchRequests();
     } catch (error) {
       console.error('Error declining request:', error);
-      toast({
-        title: "Error",
-        description: "Failed to decline request. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to decline request. Please try again.");
     }
   };
 

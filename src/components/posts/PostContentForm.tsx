@@ -4,7 +4,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { X, ImagePlus, Loader2 } from 'lucide-react';
 import MediaFileHandler from './MediaFileHandler';
 import TagInput from './TagInput';
@@ -24,7 +24,7 @@ interface PostContentFormProps {
 
 const PostContentForm = ({ onSubmit, isSubmitting = false }: PostContentFormProps) => {
   const { user } = useSupabaseSession();
-  const { toast } = useToast();
+  
   const [content, setContent] = useState('');
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [selectedTags, setSelectedTags] = useState<TaggableEntity[]>([]);
@@ -45,11 +45,7 @@ const PostContentForm = ({ onSubmit, isSubmitting = false }: PostContentFormProp
     const hasVideos = mediaFiles.some(file => file.type.startsWith('video/'));
     
     if (hasVideos && mediaFiles.length > 1) {
-      toast({
-        title: "Multiple files with video",
-        description: "For best performance, please share videos one at a time.",
-        variant: "destructive"
-      });
+      toast.error("Multiple files with video", { description: "For best performance, please share videos one at a time." });
       return;
     }
 

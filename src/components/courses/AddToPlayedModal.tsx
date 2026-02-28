@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Upload, X } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -33,7 +33,7 @@ interface AddToPlayedModalProps {
 }
 
 const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedModalProps) => {
-  const { toast } = useToast();
+  
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
   const { optimisticNewRating, rollback, scheduleBackgroundSync } = useOptimisticRatingUpdate();
@@ -135,11 +135,7 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
       await queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
       await queryClient.refetchQueries({ queryKey: ['explore-courses'], exact: false, type: 'active' });
       
-      toast({
-        title: "Rating submitted!",
-        description: `${course.name} has been added to your rated courses.`,
-      });
-      
+      toast.success("Rating submitted!", { description: `${course.name} has been added to your rated courses.` });
       onSuccess();
       onClose();
       setRating([7]);
@@ -150,11 +146,7 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
       // Rollback optimistic update on error
       rollback(context);
       console.error('Error adding rating:', error);
-      toast({
-        title: "Error",
-        description: "Failed to submit rating. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to submit rating. Please try again.");
     },
     onSettled: () => {
       // Schedule a background sync to ensure eventual consistency

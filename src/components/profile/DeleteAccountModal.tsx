@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
 interface DeleteAccountModalProps {
@@ -29,17 +29,12 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
 }) => {
   const [confirmationText, setConfirmationText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
-  const { toast } = useToast();
+  
   const navigate = useNavigate();
 
   const handleDeleteAccount = async () => {
     if (confirmationText !== 'DELETE') {
-      toast({
-        title: "Confirmation failed",
-        description: "Please type 'DELETE' to confirm account deletion.",
-        variant: "destructive",
-      });
-      return;
+      toast.error("Confirmation failed", { description: "Please type 'DELETE' to confirm account deletion." });
     }
 
     setIsDeleting(true);
@@ -59,21 +54,14 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
 
       if (error) throw error;
 
-      toast({
-        title: "Account deleted",
-        description: "Your account has been deleted. You will be redirected.",
-      });
+      toast.success("Account deleted", { description: "Your account has been deleted. You will be redirected." });
 
       // Sign out and redirect
       await supabase.auth.signOut();
       navigate('/auth');
     } catch (error: any) {
       console.error('Error deleting account:', error);
-      toast({
-        title: "Deletion failed",
-        description: "Failed to delete account. Please contact support if this continues.",
-        variant: "destructive",
-      });
+      toast.error("Deletion failed", { description: "Failed to delete account. Please contact support if this continues." });
     } finally {
       setIsDeleting(false);
       onClose();

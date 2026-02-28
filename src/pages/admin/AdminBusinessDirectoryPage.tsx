@@ -24,7 +24,7 @@ import { format } from 'date-fns';
 import { BusinessFilters, type VerificationFilter } from '@/components/admin/business/BusinessFilters';
 import { BusinessDetailDrawer } from '@/components/admin/business/BusinessDetailDrawer';
 import { useBusinessActions } from '@/hooks/admin/useBusinessDetails';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 const PAGE_SIZE = 25;
 
@@ -46,7 +46,7 @@ type SortDirection = 'asc' | 'desc';
 const AdminBusinessDirectoryPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { toast } = useToast();
+  
   const { verifyBusiness, unverifyBusiness, deleteBusiness, loading: actionLoading } = useBusinessActions();
 
   // Filters & search
@@ -157,12 +157,11 @@ const AdminBusinessDirectoryPage = () => {
       : await verifyBusiness(business.id);
     
     if (result.success) {
-      toast({ 
-        title: business.is_verified ? 'Unverified' : 'Verified', 
+      toast.success(business.is_verified ? 'Unverified' : 'Verified', { 
         description: `${business.name} ${business.is_verified ? 'verification removed' : 'is now verified'}` 
       });
     } else {
-      toast({ title: 'Error', description: 'Action failed', variant: 'destructive' });
+      toast.error('Action failed');
     }
   };
 
@@ -172,9 +171,9 @@ const AdminBusinessDirectoryPage = () => {
     
     const result = await deleteBusiness(business.id);
     if (result.success) {
-      toast({ title: 'Deleted', description: `${business.name} has been deleted` });
+      toast.success('Deleted', { description: `${business.name} has been deleted` });
     } else {
-      toast({ title: 'Error', description: 'Failed to delete', variant: 'destructive' });
+      toast.error('Failed to delete');
     }
   };
 

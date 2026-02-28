@@ -7,12 +7,12 @@ import { Search, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CountryFlag from '@/components/ui/country-flag';
 import { countryToFlagCode } from '@/utils/countryFlags';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 const CountryFlagsManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
-  const { toast } = useToast();
+  
 
   const flagEntries = Object.entries(countryToFlagCode);
 
@@ -25,17 +25,10 @@ const CountryFlagsManagement = () => {
     try {
       await navigator.clipboard.writeText(text);
       setCopiedCode(text);
-      toast({
-        title: "Copied to clipboard",
-        description: `${type === 'country' ? 'Country name' : 'Flag code'} copied successfully`,
-      });
+      toast.success(`${type === 'country' ? 'Country name' : 'Flag code'} copied successfully`);
       setTimeout(() => setCopiedCode(null), 2000);
     } catch (err) {
-      toast({
-        title: "Failed to copy",
-        description: "Please try again",
-        variant: "destructive"
-      });
+      toast.error("Failed to copy");
     }
   };
 

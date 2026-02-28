@@ -3,7 +3,7 @@ import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { uploadToCloudflareR2 } from '@/utils/cloudflareUpload';
 
 interface CourseImageUploadProps {
@@ -20,7 +20,7 @@ const CourseImageUpload: React.FC<CourseImageUploadProps> = ({
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentImageUrl || null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
+  
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -29,12 +29,7 @@ const CourseImageUpload: React.FC<CourseImageUploadProps> = ({
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
-      toast({
-        title: "Invalid file type",
-        description: "Please upload a JPG, PNG, or WebP image",
-        variant: "destructive",
-      });
-      return;
+      toast.error("Invalid file type", { description: "Please upload a JPG, PNG, or WebP image" });
     }
 
     setIsUploading(true);
@@ -58,17 +53,10 @@ const CourseImageUpload: React.FC<CourseImageUploadProps> = ({
       setPreviewUrl(result.publicUrl!);
       onImageChange(result.publicUrl!);
 
-      toast({
-        title: "Success",
-        description: "Course image uploaded successfully",
-      });
+      toast.success("Course image uploaded successfully");
     } catch (error: any) {
       console.error('Error uploading image:', error);
-      toast({
-        title: "Upload failed",
-        description: `Failed to upload image: ${error.message}`,
-        variant: "destructive",
-      });
+      toast.error("Upload failed", { description: `Failed to upload image: ${error.message}` });
     } finally {
       setIsUploading(false);
       // Clear the input so the same file can be selected again

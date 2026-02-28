@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { SlideOver } from '@/components/ui/slide-over';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface MapThumbnailProps {
   clubId: string;
@@ -41,7 +41,7 @@ const MapThumbnail = ({
   const lastFocusedRef = React.useRef<HTMLElement | null>(null);
   const dialogRef = React.useRef<HTMLDivElement | null>(null);
   const isMobile = useIsMobile();
-  const { toast } = useToast();
+  
 
   const generateMapUrl = async (lat: number, lng: number, size: string, zoom: number = 13, mapType?: MapThumbnailProps['mapType']): Promise<string | null> => {
     try {
@@ -92,11 +92,7 @@ const MapThumbnail = ({
 
       if (error) {
         console.error('Geocoding error:', error);
-        toast({
-          title: "Geocoding failed",
-          description: "Could not find location for this club",
-          variant: "destructive"
-        });
+        toast.error("Could not find location for this club");
         return;
       }
 
@@ -106,11 +102,7 @@ const MapThumbnail = ({
       }
     } catch (error) {
       console.error('Error geocoding club:', error);
-      toast({
-        title: "Error",
-        description: "Failed to geocode club location",
-        variant: "destructive"
-      });
+        toast.error("Failed to geocode club location");
     } finally {
       setIsLoading(false);
     }

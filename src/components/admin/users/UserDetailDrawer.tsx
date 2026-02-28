@@ -48,7 +48,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { useUserDetails, useUserActions, type UserDetailData } from '@/hooks/admin/useUserDetails';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface UserDetailDrawerProps {
@@ -59,7 +59,7 @@ interface UserDetailDrawerProps {
 }
 
 export function UserDetailDrawer({ userId, open, onOpenChange, onUserDeleted }: UserDetailDrawerProps) {
-  const { toast } = useToast();
+  
   const queryClient = useQueryClient();
   const { data: user, isLoading, error } = useUserDetails(userId);
   const { loading: actionLoading, changeRole, deleteUser, resetPassword } = useUserActions();
@@ -68,10 +68,10 @@ export function UserDetailDrawer({ userId, open, onOpenChange, onUserDeleted }: 
     if (!user) return;
     const result = await changeRole(user.id, newRole);
     if (result.success) {
-      toast({ title: 'Role updated', description: `User role changed to ${newRole}` });
+      toast.success('Role updated', { description: `User role changed to ${newRole}` });
       queryClient.invalidateQueries({ queryKey: ['admin-user-details', userId] });
     } else {
-      toast({ title: 'Error', description: 'Failed to update role', variant: 'destructive' });
+      toast.error('Failed to update role');
     }
   };
 
@@ -79,9 +79,9 @@ export function UserDetailDrawer({ userId, open, onOpenChange, onUserDeleted }: 
     if (!user) return;
     const result = await resetPassword(user.id, user.email);
     if (result.success) {
-      toast({ title: 'Success', description: `Password reset email sent to ${user.email}` });
+      toast.success('Success', { description: `Password reset email sent to ${user.email}` });
     } else {
-      toast({ title: 'Error', description: 'Failed to send reset email', variant: 'destructive' });
+      toast.error('Failed to send reset email');
     }
   };
 
@@ -89,17 +89,17 @@ export function UserDetailDrawer({ userId, open, onOpenChange, onUserDeleted }: 
     if (!user) return;
     const result = await deleteUser(user.id, user.email);
     if (result.success) {
-      toast({ title: 'User deleted', description: `${user.email} has been deleted` });
+      toast.success('User deleted', { description: `${user.email} has been deleted` });
       onOpenChange(false);
       onUserDeleted?.();
     } else {
-      toast({ title: 'Error', description: 'Failed to delete user', variant: 'destructive' });
+      toast.error('Failed to delete user');
     }
   };
 
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
-    toast({ title: 'Copied', description: `${label} copied to clipboard` });
+    toast.success('Copied', { description: `${label} copied to clipboard` });
   };
 
   const getInitials = (name: string | null, email: string) => {

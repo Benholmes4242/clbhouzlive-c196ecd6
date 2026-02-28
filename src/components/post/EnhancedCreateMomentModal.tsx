@@ -10,7 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 import BackgroundMusicSelector from '../posts/BackgroundMusicSelector';
 import { useTaggableEntities } from '@/hooks/useTaggableEntities';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface TaggableEntity {
@@ -80,7 +80,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
   } | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const { entities, searchEntities } = useTaggableEntities();
-  const { toast } = useToast();
+  
   const [modalMode, setModalMode] = useState<'selection' | 'upload'>('selection');
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isButtonShaking, setIsButtonShaking] = useState(false);
@@ -207,11 +207,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
       setIsButtonShaking(true);
       setTimeout(() => setIsButtonShaking(false), 600);
       
-      toast({
-        title: "Upload failed",
-        description: errorMessage,
-        variant: "destructive"
-      });
+      toast.error("Upload failed", { description: errorMessage });
     }
   };
 
