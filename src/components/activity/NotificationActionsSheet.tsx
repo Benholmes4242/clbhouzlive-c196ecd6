@@ -10,7 +10,7 @@ import { ActivityNotification } from '@/hooks/useActivityFeed';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQueryClient } from '@tanstack/react-query';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface NotificationActionsSheetProps {
   open: boolean;
@@ -29,7 +29,6 @@ export const NotificationActionsSheet: React.FC<NotificationActionsSheetProps> =
 }) => {
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
-  const { toast } = useToast();
 
   if (!notification) return null;
 
@@ -48,12 +47,10 @@ export const NotificationActionsSheet: React.FC<NotificationActionsSheetProps> =
     onClose();
   };
 
-  // Mute notification type (Fix 8)
   const handleMuteType = async () => {
     if (!user?.id) return;
     
     try {
-      // Upsert preferences with the new muted type
       const { data: existing } = await supabase
         .from('notification_preferences')
         .select('muted_types')
@@ -72,8 +69,7 @@ export const NotificationActionsSheet: React.FC<NotificationActionsSheetProps> =
           }, { onConflict: 'user_id' });
         
         queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
-        toast({
-          title: "Notifications muted",
+        toast.success("Notifications muted", {
           description: `You won't see ${notificationType.replace(/_/g, ' ')} notifications anymore.`,
         });
       }
@@ -84,7 +80,6 @@ export const NotificationActionsSheet: React.FC<NotificationActionsSheetProps> =
     onClose();
   };
 
-  // Mute notifications from user (Fix 8)
   const handleMuteUser = async () => {
     if (!user?.id || !actorId) return;
     
@@ -107,8 +102,7 @@ export const NotificationActionsSheet: React.FC<NotificationActionsSheetProps> =
           }, { onConflict: 'user_id' });
         
         queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
-        toast({
-          title: "User muted",
+        toast.success("User muted", {
           description: `You won't see notifications from ${actorName} anymore.`,
         });
       }
@@ -145,7 +139,6 @@ export const NotificationActionsSheet: React.FC<NotificationActionsSheetProps> =
             )}
           </button>
 
-          {/* Mute notification type */}
           <button
             onClick={handleMuteType}
             className="w-full flex items-center gap-3 px-4 py-3 text-left rounded-sq-sm hover:bg-muted/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
@@ -155,7 +148,6 @@ export const NotificationActionsSheet: React.FC<NotificationActionsSheetProps> =
             <span className="text-[0.875rem] font-medium">Mute {notificationType.replace(/_/g, ' ')} notifications</span>
           </button>
 
-          {/* Mute notifications from user */}
           {actorId && notification.actor_type === 'user' && (
             <button
               onClick={handleMuteUser}
@@ -177,7 +169,6 @@ export const NotificationActionsSheet: React.FC<NotificationActionsSheetProps> =
           </button>
         </div>
 
-        {/* Safe area padding for iOS */}
         <div className="h-[env(safe-area-inset-bottom)]" />
       </DrawerContent>
     </Drawer>

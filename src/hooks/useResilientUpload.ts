@@ -5,7 +5,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { nanoid } from 'nanoid';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useConnectionStatus } from '@/hooks/useConnectionStatus';
 import { 
   saveUploadJob, 
@@ -61,7 +61,6 @@ const MAX_RETRIES = 3;
 const RETRY_BASE_DELAY = 1000; // 1 second
 
 export function useResilientUpload() {
-  const { toast } = useToast();
   const { isOnline, wasOffline } = useConnectionStatus();
   const cloudflareStream = useCloudflareStream();
   const { uploadToR2 } = useCloudflareR2();
@@ -328,8 +327,7 @@ export function useResilientUpload() {
     const finalJob = await getUploadJob(jobId);
     if (finalJob) {
       if (finalJob.overallStatus === 'paused') {
-        toast({
-          title: "Upload paused",
+        toast("Upload paused", {
           description: "Waiting for internet connection...",
           duration: 5000
         });
@@ -339,10 +337,8 @@ export function useResilientUpload() {
         updateJobProgress(finalJob, onProgress);
         
         const failedCount = finalJob.mediaItems.filter(m => m.status === 'failed').length;
-        toast({
-          title: "Some uploads failed",
+        toast.error("Some uploads failed", {
           description: `${failedCount} file(s) couldn't be uploaded. Tap to retry.`,
-          variant: "destructive",
           duration: 5000
         });
         
@@ -367,7 +363,7 @@ export function useResilientUpload() {
     }
 
     return jobId;
-  }, [cloudflareStream, uploadToR2, toast, updateJobProgress]);
+  }, [cloudflareStream, uploadToR2, updateJobProgress]);
 
   const resumeUpload = useCallback(async (
     jobId: string,
@@ -406,10 +402,8 @@ export function useResilientUpload() {
     // For now, if mediaFiles aren't provided, we can only retry failed items that have uploadUrl
     if (!mediaFiles) {
       console.warn('[ResilientUpload] No files provided for resume - cannot continue without original files');
-      toast({
-        title: "Cannot resume",
+      toast.error("Cannot resume", {
         description: "Original files are no longer available. Please re-select your media.",
-        variant: "destructive"
       });
       onError?.('Original files not available');
       return;
@@ -451,7 +445,7 @@ export function useResilientUpload() {
       }
       updateJobProgress(finalJob, onProgress);
     }
-  }, [toast, updateJobProgress]);
+  }, [updateJobProgress]);
 
   const pauseUpload = useCallback(async (jobId: string) => {
     const job = await getUploadJob(jobId);

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export interface BusinessMember {
   id: string;
@@ -74,7 +74,6 @@ export function useBusinessInvites(businessId?: string) {
 
 export function useCreateInvite(businessId: string) {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
 
   return useMutation({
     mutationFn: async ({ email, role }: { email: string; role: BusinessInvite['role'] }) => {
@@ -108,17 +107,16 @@ export function useCreateInvite(businessId: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['business-invites', businessId] });
-      toast({ title: 'Invitation sent' });
+      toast.success('Invitation sent');
     },
     onError: (error: Error) => {
-      toast({ title: 'Failed to send invitation', description: error.message, variant: 'destructive' });
+      toast.error('Failed to send invitation', { description: error.message });
     },
   });
 }
 
 export function useRevokeInvite(businessId: string) {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
 
   return useMutation({
     mutationFn: async (inviteId: string) => {
@@ -131,14 +129,13 @@ export function useRevokeInvite(businessId: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['business-invites', businessId] });
-      toast({ title: 'Invitation revoked' });
+      toast.success('Invitation revoked');
     },
   });
 }
 
 export function useAcceptInvite() {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
 
   return useMutation({
     mutationFn: async (token: string) => {
@@ -150,17 +147,16 @@ export function useAcceptInvite() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-businesses'] });
-      toast({ title: 'Invitation accepted', description: 'You are now a team member' });
+      toast.success('Invitation accepted', { description: 'You are now a team member' });
     },
     onError: (error: Error) => {
-      toast({ title: 'Failed to accept invitation', description: error.message, variant: 'destructive' });
+      toast.error('Failed to accept invitation', { description: error.message });
     },
   });
 }
 
 export function useRemoveMember(businessId: string) {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
 
   return useMutation({
     mutationFn: async (memberUserId: string) => {
@@ -175,17 +171,16 @@ export function useRemoveMember(businessId: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['business-team', businessId] });
-      toast({ title: 'Member removed' });
+      toast.success('Member removed');
     },
     onError: (error: Error) => {
-      toast({ title: 'Failed to remove member', description: error.message, variant: 'destructive' });
+      toast.error('Failed to remove member', { description: error.message });
     },
   });
 }
 
 export function useUpdateMemberRole(businessId: string) {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
 
   return useMutation({
     mutationFn: async ({ memberUserId, newRole }: { memberUserId: string; newRole: string }) => {
@@ -201,10 +196,10 @@ export function useUpdateMemberRole(businessId: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['business-team', businessId] });
-      toast({ title: 'Role updated' });
+      toast.success('Role updated');
     },
     onError: (error: Error) => {
-      toast({ title: 'Failed to update role', description: error.message, variant: 'destructive' });
+      toast.error('Failed to update role', { description: error.message });
     },
   });
 }

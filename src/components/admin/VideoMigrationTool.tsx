@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Check, AlertCircle, Video, ArrowRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface MigrationResult {
   success: boolean;
@@ -18,7 +18,6 @@ interface MigrationResult {
 const VideoMigrationTool = () => {
   const [isMigrating, setIsMigrating] = useState(false);
   const [result, setResult] = useState<MigrationResult | null>(null);
-  const { toast } = useToast();
 
   const handleMigrateVideos = async () => {
     setIsMigrating(true);
@@ -34,15 +33,12 @@ const VideoMigrationTool = () => {
       setResult(data);
       
       if (data.success !== false) {
-        toast({
-          title: "Migration Complete!",
+        toast.success("Migration Complete!", {
           description: `Successfully migrated ${data.migratedVideos || 0} videos from R2 to Cloudflare Stream.`,
         });
       } else {
-        toast({
-          title: "Migration Failed",
+        toast.error("Migration Failed", {
           description: data.message || "An error occurred during migration",
-          variant: "destructive",
         });
       }
       
@@ -54,10 +50,8 @@ const VideoMigrationTool = () => {
         message: error instanceof Error ? error.message : 'Failed to migrate videos'
       });
       
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: "Failed to start video migration. Check console for details.",
-        variant: "destructive",
       });
     } finally {
       setIsMigrating(false);

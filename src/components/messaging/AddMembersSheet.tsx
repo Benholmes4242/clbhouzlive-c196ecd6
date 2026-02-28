@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useDebounce } from '@/hooks/useDebounce';
 import { cn } from '@/lib/utils';
@@ -31,7 +31,6 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
   existingMemberIds,
   onMembersAdded,
 }) => {
-  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<UserResult[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<UserResult[]>([]);
@@ -89,20 +88,14 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
       
       if (error) throw error;
       
-      toast({ 
-        title: `${data} member${data !== 1 ? 's' : ''} added` 
-      });
+      toast.success(`${data} member${data !== 1 ? 's' : ''} added`);
       
       setSelectedUsers([]);
       setSearchQuery('');
       onMembersAdded();
       onClose();
     } catch (error: any) {
-      toast({ 
-        title: 'Failed to add members', 
-        description: error.message,
-        variant: 'destructive' 
-      });
+      toast.error('Failed to add members', { description: error.message });
     } finally {
       setIsAdding(false);
     }

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import type { ShopItem } from './useSeasonShop';
 
 export interface UserCosmeticUnlock {
@@ -12,7 +12,6 @@ export interface UserCosmeticUnlock {
 }
 
 export function useUserCosmetics(userId?: string) {
-  const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: unlocks, isLoading } = useQuery({
@@ -90,16 +89,13 @@ export function useUserCosmetics(userId?: string) {
       queryClient.invalidateQueries({ queryKey: ['user-cosmetics', userId] });
       queryClient.invalidateQueries({ queryKey: ['user-season-currency', userId] });
       
-      toast({
-        title: 'Item Unlocked!',
+      toast.success('Item Unlocked!', {
         description: 'Your new cosmetic has been added to your collection.',
       });
     },
     onError: (error: Error) => {
-      toast({
-        title: 'Unlock Failed',
+      toast.error('Unlock Failed', {
         description: error.message,
-        variant: 'destructive',
       });
     },
   });

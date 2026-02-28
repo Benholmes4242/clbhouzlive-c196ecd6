@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { adminInvite } from "@/lib/adminInviteApi";
 import { usePanelRole } from "@/hooks/usePanelRole";
 import { panelCan } from "@/lib/panelCan";
@@ -25,7 +25,6 @@ import { useBulkSelect } from "@/hooks/useBulkSelect";
 import { BulkActionBar, SelectModeHeader } from "@/components/admin/BulkActionBar";
 import { SelectModeButton } from "@/components/admin/SelectModeButton";
 import { revokeBulkInvites } from "@/lib/adminBulkApi";
-import { toast as sonnerToast } from "sonner";
 
 type InviteRow = {
   id: string;
@@ -40,7 +39,6 @@ type InviteRow = {
 };
 
 export function AdminInvitesPage() {
-  const { toast } = useToast();
   const { role } = usePanelRole();
   const can = panelCan(role);
   const isMobile = useIsMobile();
@@ -73,7 +71,7 @@ export function AdminInvitesPage() {
       const result = await bulkSelect.executeBulk(async (ids) => {
         return await revokeBulkInvites(ids);
       });
-      sonnerToast.success(`Revoked ${result.success.length} invites`, {
+      toast.success(`Revoked ${result.success.length} invites`, {
         description: result.failed.length > 0 ? `${result.failed.length} failed` : undefined,
         action: {
           label: 'View Audit Log',
@@ -83,7 +81,7 @@ export function AdminInvitesPage() {
       await load();
       bulkSelect.exitSelectMode();
     } catch (error: any) {
-      sonnerToast.error('Bulk revoke failed', { description: error.message });
+      toast.error('Bulk revoke failed', { description: error.message });
     }
   };
 
@@ -95,7 +93,7 @@ export function AdminInvitesPage() {
       setRows(res?.data ?? []);
     } catch (e: any) {
       setError("Failed to load invites");
-      toast({ title: "Failed to load invites", description: e.message, variant: "destructive" });
+      toast.error("Failed to load invites", { description: e.message });
     } finally {
       setLoading(false);
     }
@@ -104,41 +102,41 @@ export function AdminInvitesPage() {
   const createInvite = async () => {
     try {
       if (!email.trim()) {
-        toast({ title: "Email required", variant: "destructive" });
+        toast.error("Email required");
         return;
       }
       await adminInvite("create_invite", { email: email.trim(), role: inviteRole, notes: notes || undefined });
-      toast({ title: "Invite created" });
+      toast.success("Invite created");
       setEmail("");
       setNotes("");
       setInviteRole("limited");
       await load();
     } catch (e: any) {
-      toast({ title: "Failed to create invite", description: e.message, variant: "destructive" });
+      toast.error("Failed to create invite", { description: e.message });
     }
   };
 
   const revoke = async (invite: InviteRow) => {
     try {
       await adminInvite("revoke_invite", { id: invite.id });
-      toast({ title: "Invite revoked" });
+      toast.success("Invite revoked");
       setSelectedInvite(null);
       await load();
     } catch (e: any) {
-      toast({ title: "Failed to revoke invite", description: e.message, variant: "destructive" });
+      toast.error("Failed to revoke invite", { description: e.message });
     }
   };
 
   const copyLink = async (token?: string | null) => {
     if (!token) {
-      toast({ title: "No token on invite", variant: "destructive" });
+      toast.error("No token on invite");
       return;
     }
     const base = window?.location?.origin || "https://www.clbhouz.co.uk";
     const url = `${base}/admin/invite-accept?token=${token}`;
     try {
       await navigator.clipboard.writeText(url);
-      toast({ title: "Invite link copied" });
+      toast.success("Invite link copied");
     } catch {
       const ta = document.createElement("textarea");
       ta.value = url;
@@ -146,7 +144,7 @@ export function AdminInvitesPage() {
       ta.select();
       document.execCommand("copy");
       ta.remove();
-      toast({ title: "Invite link copied" });
+      toast.success("Invite link copied");
     }
   };
 

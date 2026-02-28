@@ -4,12 +4,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Check, AlertCircle } from 'lucide-react';
 import { configureR2Cors } from '@/utils/configureCors';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export const CorsConfigTool = () => {
   const [isConfiguring, setIsConfiguring] = useState(false);
   const [result, setResult] = useState<{ success: boolean; message?: string; error?: string } | null>(null);
-  const { toast } = useToast();
 
   const handleConfigureCors = async () => {
     setIsConfiguring(true);
@@ -23,8 +22,7 @@ export const CorsConfigTool = () => {
         message: 'CORS policy configured successfully! R2 images should now load in preview.'
       });
       
-      toast({
-        title: "Success!",
+      toast.success("Success!", {
         description: "R2 CORS configured. Refresh the page to see images load.",
       });
       
@@ -36,10 +34,8 @@ export const CorsConfigTool = () => {
         error: error instanceof Error ? error.message : 'Failed to configure CORS'
       });
       
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: "Failed to configure CORS. Check console for details.",
-        variant: "destructive",
       });
     } finally {
       setIsConfiguring(false);
