@@ -26,12 +26,14 @@ export function useCourseClaim(courseId: string | undefined) {
       if (!course?.club_id) return null;
 
       // Find claiming business
-      const { data: business } = await supabase
+      const { data: businesses } = await supabase
         .from('business_accounts')
         .select('id, name, slug, is_verified, logo_url')
         .eq('club_id', course.club_id)
         .eq('is_deleted', false)
-        .single();
+        .limit(1);
+
+      const business = businesses?.[0] ?? null;
 
       return (business as ClaimingBusiness) || null;
     },
