@@ -733,7 +733,7 @@ export function PostWizard({
                         {state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT && (
                           <button
                             onClick={() => handleAddMedia()}
-                            className="flex-shrink-0 w-[140px] h-[140px] rounded-2xl flex items-center justify-center active:scale-[0.96] transition-transform"
+                            className="flex-shrink-0 w-[160px] h-[160px] rounded-2xl flex items-center justify-center active:scale-[0.96] transition-transform"
                             style={{ border: '1.5px dashed rgba(245,158,11,0.25)' }}
                           >
                             <Plus className="w-6 h-6" style={{ color: '#f59e0b' }} />
