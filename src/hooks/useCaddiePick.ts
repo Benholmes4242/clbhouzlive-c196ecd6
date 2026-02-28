@@ -45,7 +45,7 @@ export function useCaddiePick(postId: string) {
     },
     onError: (error) => {
       console.error('Failed to remove Caddie\'s Pick:', error);
-      toast.error("Failed to remove Caddie's Pick");
+      toast.error("Couldn't remove pick");
     },
   });
 

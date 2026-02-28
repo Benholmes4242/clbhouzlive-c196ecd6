@@ -175,9 +175,9 @@ const BusinessVerificationsPage = () => {
     },
     onSuccess: (result) => {
       if (result.status === 'approved') {
-        toast.success('Business verified successfully.');
+        toast.success('Business verified');
       } else if (result.status === 'rejected') {
-        toast.success('Verification request rejected.');
+        toast.success('Verification rejected');
       } else {
         toast.success(`Approval recorded (${result.approvals} of ${result.required})`);
       }

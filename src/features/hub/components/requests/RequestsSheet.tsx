@@ -104,7 +104,7 @@ export function RequestsSheet({ isOpen, onClose }: RequestsSheetProps) {
             .eq('id', request.game_id);
         }
 
-        toast.success("Added to your game 👍");
+        toast.success("Request accepted");
       } else {
         // Update trip_participants rsvp_status to 'going'
         const { error } = await supabase
@@ -117,7 +117,7 @@ export function RequestsSheet({ isOpen, onClose }: RequestsSheetProps) {
 
         if (error) throw error;
 
-        toast.success("Added to your trip 👍");
+        toast.success("Request accepted");
       }
 
       // Invalidate relevant queries
@@ -134,7 +134,7 @@ export function RequestsSheet({ isOpen, onClose }: RequestsSheetProps) {
         next.delete(request.id);
         return next;
       });
-      toast.error("Failed to accept request. Please try again.");
+      toast.error("Couldn't accept request", { description: "Please try again" });
     } finally {
       setProcessingId(null);
     }
@@ -188,7 +188,7 @@ export function RequestsSheet({ isOpen, onClose }: RequestsSheetProps) {
         next.delete(request.id);
         return next;
       });
-      toast.error("Failed to decline request. Please try again.");
+      toast.error("Couldn't decline request", { description: "Please try again" });
     } finally {
       setProcessingId(null);
     }

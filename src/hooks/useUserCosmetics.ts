@@ -89,12 +89,10 @@ export function useUserCosmetics(userId?: string) {
       queryClient.invalidateQueries({ queryKey: ['user-cosmetics', userId] });
       queryClient.invalidateQueries({ queryKey: ['user-season-currency', userId] });
       
-      toast.success('Item Unlocked!', {
-        description: 'Your new cosmetic has been added to your collection.',
-      });
+      toast.success('Item unlocked');
     },
     onError: (error: Error) => {
-      toast.error('Unlock Failed', {
+      toast.error("Couldn't unlock item", {
         description: error.message,
       });
     },

@@ -123,7 +123,7 @@ const EditRatingModal = ({
     },
     onError: (error) => {
       console.error('Error updating rating:', error);
-      toast.error("Failed to update rating. Please try again.");
+      toast.error("Couldn't update rating", { description: "Please try again" });
       setIsSubmitting(false);
     },
   });
@@ -170,14 +170,14 @@ const EditRatingModal = ({
       await queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
       await queryClient.refetchQueries({ queryKey: ['explore-courses'], exact: false, type: 'active' });
       
-      toast.success("Rating removed", { description: `You removed your rating for ${courseName}` });
+      toast.success("Rating removed");
       
       setIsSubmitting(false);
       onClose();
     },
     onError: (error) => {
       console.error('Error deleting rating:', error);
-      toast.error("Failed to remove rating. Please try again.");
+      toast.error("Couldn't remove rating", { description: "Please try again" });
       setIsSubmitting(false);
     },
   });

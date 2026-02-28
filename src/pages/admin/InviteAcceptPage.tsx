@@ -46,9 +46,7 @@ export function InviteAcceptPage() {
       setRole(data.role);
       setMessage(`Admin access granted! You now have ${data.role} admin privileges.`);
       
-      toast.success("Success", {
-        description: "Admin invitation accepted successfully",
-      });
+      toast.success("Access granted");
 
       setTimeout(() => {
         navigate("/admin");
@@ -56,7 +54,7 @@ export function InviteAcceptPage() {
     } catch (error: any) {
       setStatus("error");
       setMessage(error.message || "Failed to accept invitation. It may be invalid or expired.");
-      toast.error("Error", {
+      toast.error("Couldn't accept invite", {
         description: error.message,
       });
     }

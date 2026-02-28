@@ -118,13 +118,13 @@ export const CoachFinderModal: React.FC<CoachFinderModalProps> = ({
       if (data?.chosen && Array.isArray(data.chosen)) {
         setCoaches(data.chosen);
         setStep('results');
-        toast.success(`Found ${data.chosen.length} coach${data.chosen.length === 1 ? '' : 'es'} in your area!`);
+        toast.success(`${data.chosen.length} coach${data.chosen.length === 1 ? '' : 'es'} found`);
       } else {
-        toast.error('No coaches found in your area. Try expanding your search radius.');
+        toast.error('No coaches found', { description: 'Try expanding your search radius' });
       }
     } catch (error: any) {
       console.error('Error finding coaches:', error);
-      toast.error('An unexpected error occurred. Please try again.');
+      toast.error('Something went wrong', { description: 'Please try again' });
     } finally {
       setIsLoading(false);
     }

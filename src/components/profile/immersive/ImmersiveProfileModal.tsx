@@ -180,14 +180,14 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
 
     } catch (error) {
       console.error('Error deleting media:', error);
-      toast.error("Failed to delete media. Please try again.");
+      toast.error("Couldn't delete media", { description: "Please try again" });
     }
   }, [currentItem, session?.user?.id, userId, localMediaItems, activeIndex, onClose]);
 
   // Handle edit media (placeholder for future implementation)
   const handleEditMedia = useCallback(() => {
     console.log('Edit media:', currentItem?.id);
-    toast("Coming soon", { description: "Media editing will be available soon!" });
+    toast("Coming soon");
   }, [currentItem?.id]);
 
   const logTelemetryEvent = useCallback(async (event: string, data: any = {}) => {

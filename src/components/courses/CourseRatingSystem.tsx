@@ -108,7 +108,7 @@ const CourseRatingSystem = ({
       await queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
       await queryClient.refetchQueries({ queryKey: ['explore-courses'], exact: false, type: 'active' });
       
-      toast.success("Rating Submitted! ✨", { description: `You rated ${courseName} ${selectedRating}` });
+      toast.success("Rating submitted");
       
       setIsSubmitting(false);
     },

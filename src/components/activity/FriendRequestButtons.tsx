@@ -68,7 +68,7 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
     
     if (isMock) {
       setState('accepted');
-      toast.success(`You're now friends with ${requesterName}!`);
+      toast.success("Friend added");
       return;
     }
     
@@ -128,7 +128,7 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
       }
 
       setState('accepted');
-      toast.success(`You're now friends with ${requesterName}!`);
+      toast.success("Friend added");
       
       // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ['activity-feed'] });

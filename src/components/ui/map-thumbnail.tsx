@@ -102,7 +102,7 @@ const MapThumbnail = ({
       }
     } catch (error) {
       console.error('Error geocoding club:', error);
-        toast.error("Failed to geocode club location");
+        toast.error("Couldn't geocode location");
     } finally {
       setIsLoading(false);
     }

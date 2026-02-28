@@ -59,7 +59,7 @@ const AdminSetupPage = () => {
         setValidToken(true);
       } catch (error) {
         console.error('Error verifying token:', error);
-        toast.error("Error", { description: "Failed to verify invitation." });
+        toast.error("Couldn't verify invitation");
         navigate('/');
       } finally {
         setVerifying(false);

@@ -54,7 +54,7 @@ export function usePinPost(businessId: string) {
     },
     onError: (error) => {
       console.error('Error pinning post:', error);
-      toast.error('Failed to pin post');
+      toast.error("Couldn't pin post");
     },
   });
 
@@ -78,7 +78,7 @@ export function usePinPost(businessId: string) {
     },
     onError: (error) => {
       console.error('Error unpinning post:', error);
-      toast.error('Failed to unpin post');
+      toast.error("Couldn't unpin post");
     },
   });
 

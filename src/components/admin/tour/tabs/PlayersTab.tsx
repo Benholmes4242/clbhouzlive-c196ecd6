@@ -91,9 +91,7 @@ export const PlayersTab: React.FC<PlayersTabProps> = ({
       return result;
     },
     onSuccess: (data) => {
-      toast.success(`Headshot uploaded successfully!`, {
-        description: `Photo URL: ${data.publicUrl}`,
-      });
+      toast.success("Headshot uploaded");
       setSelectedPlayerId('');
       setPlayerSearch('');
       setUploadPreview(null);

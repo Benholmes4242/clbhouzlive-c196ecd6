@@ -222,10 +222,10 @@ export function useGameJoinRequests(gameId?: string) {
 
       if (error) throw error;
 
-      toast.success("Request sent", { description: "You'll get a response from the group host." });
+      toast.success("Request sent");
     } catch (error) {
       console.error('Error creating join request:', error);
-      toast.error("Failed to send join request. Please try again.");
+      toast.error("Couldn't send request", { description: "Please try again" });
     }
   };
 
@@ -251,7 +251,7 @@ export function useGameJoinRequests(gameId?: string) {
 
       if (!response.ok) {
         if (response.status === 409) {
-          toast.error("Game is full", { description: "No open seats available." });
+          toast.error("Game is full");
           return;
         }
         throw new Error(result.error || 'Failed to accept request');
@@ -260,12 +260,12 @@ export function useGameJoinRequests(gameId?: string) {
       // Emit hub event for instant local UI update
       emitHub('game:joined', { gameId: targetGameId, requestId });
 
-      toast.success("They're in 👍", { description: "We've notified them they're added to your game." });
+      toast.success("Request accepted");
 
       fetchRequests();
     } catch (error) {
       console.error('Error accepting request:', error);
-      toast.error("Failed to accept request. Please try again.");
+      toast.error("Couldn't accept request", { description: "Please try again" });
     }
   };
 
@@ -293,12 +293,12 @@ export function useGameJoinRequests(gameId?: string) {
         throw new Error(result.error || 'Failed to decline request');
       }
 
-      toast.success("We've let them know the round is full", { description: "Request declined." });
+      toast.success("Request declined");
 
       fetchRequests();
     } catch (error) {
       console.error('Error declining request:', error);
-      toast.error("Failed to decline request. Please try again.");
+      toast.error("Couldn't decline request", { description: "Please try again" });
     }
   };
 

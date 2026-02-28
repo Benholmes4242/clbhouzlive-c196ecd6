@@ -401,11 +401,11 @@ const BusinessPostCard = React.memo(function BusinessPostCard({
   }, [post.id, businessName]);
 
   const handleEditCaption = useCallback(() => {
-    toast.info('Edit caption coming soon');
+    toast.info('Coming soon');
   }, []);
 
   const handleChangeVisibility = useCallback(() => {
-    toast.info('Visibility settings coming soon');
+    toast.info('Coming soon');
   }, []);
 
   const handlePinToTop = useCallback(() => {
@@ -436,7 +436,7 @@ const BusinessPostCard = React.memo(function BusinessPostCard({
       window.location.reload();
     } catch (err) {
       console.error('Delete post error:', err);
-      toast.error('Failed to delete post');
+      toast.error("Couldn't delete post");
     }
   }, [post.id]);
 

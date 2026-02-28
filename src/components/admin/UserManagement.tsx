@@ -110,10 +110,10 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, onRoleChange }) 
         throw new Error(data.error);
       }
       
-      toast.success("Success", { description: `Password reset email sent to ${userEmail}` });
+      toast.success("Password reset sent");
     } catch (error: any) {
       console.error('Error sending password reset:', error);
-      toast.error("Error", { description: `Failed to send password reset: ${error.message}` });
+      toast.error("Couldn't send reset email", { description: error.message });
     } finally {
       setActionLoading(null);
     }

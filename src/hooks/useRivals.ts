@@ -129,7 +129,7 @@ export function useRivals(userId?: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['rivals', userId] });
-      toast.success('Rival added successfully');
+      toast.success('Rival added');
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to add rival');

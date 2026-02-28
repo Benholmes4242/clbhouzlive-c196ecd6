@@ -116,11 +116,11 @@ const BulkCourseImporter = () => {
       console.log('Bulk import successful:', data);
       setImportResult(data);
       queryClient.invalidateQueries({ queryKey: ['courses'] });
-      toast.success(`Import Complete! Added ${data.insertedCourses} new courses, skipped ${data.skippedCourses} duplicates.`);
+      toast.success("Import complete", { description: `${data.insertedCourses} added, ${data.skippedCourses} skipped` });
     },
     onError: (error) => {
       console.error('Bulk import failed:', error);
-      toast.error("Failed to import golf courses. Please try again.");
+      toast.error("Couldn't import courses", { description: "Please try again" });
     },
   });
 

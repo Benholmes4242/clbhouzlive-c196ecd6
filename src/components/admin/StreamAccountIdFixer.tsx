@@ -23,13 +23,13 @@ export function StreamAccountIdFixer() {
       
       setResult(data);
       if (data.success) {
-        toast.success(`Fixed ${data.updatedUrls} Stream URLs with correct account ID`);
+        toast.success(`Fixed ${data.updatedUrls} Stream URLs`);
       } else {
-        toast.error("Failed to fix Stream account IDs");
+        toast.error("Couldn't fix Stream IDs");
       }
     } catch (error) {
       console.error('Error:', error);
-      toast.error("Failed to fix Stream account IDs");
+      toast.error("Couldn't fix Stream IDs");
       setResult({ error: error.message, success: false });
     } finally {
       setIsFixing(false);

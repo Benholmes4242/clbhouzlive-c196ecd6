@@ -39,7 +39,7 @@ const CourseScraper = () => {
     },
     onError: (error) => {
       console.error('Scraping failed:', error);
-      toast.error("Failed to scrape golf course data. Please try again.");
+      toast.error("Couldn't scrape course data", { description: "Please try again" });
     },
   });
 

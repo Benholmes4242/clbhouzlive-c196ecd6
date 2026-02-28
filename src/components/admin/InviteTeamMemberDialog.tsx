@@ -60,13 +60,13 @@ const InviteTeamMemberDialog = () => {
         // Don't throw error here - invitation was created successfully
       }
 
-      toast.success(`Invitation sent to ${email}`);
+      toast.success("Invite sent");
 
       setEmail('');
       setOpen(false);
     } catch (error) {
       console.error('Error sending invitation:', error);
-      toast.error("Failed to send invitation");
+      toast.error("Couldn't send invite");
     } finally {
       setLoading(false);
     }

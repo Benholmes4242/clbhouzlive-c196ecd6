@@ -147,7 +147,7 @@ const EnhancedExcelCourseImporter = () => {
       };
       setImportHistory(prev => [historyEntry, ...prev]);
       
-      toast.success("Import Complete!", { description: `Added ${data.insertedCourses} new courses${data.updatedCourses ? `, updated ${data.updatedCourses}` : ''}, skipped ${data.skippedCourses} duplicates${data.errors > 0 ? `, ${data.errors} errors` : ''}.` });
+      toast.success("Import complete", { description: `${data.insertedCourses} added${data.updatedCourses ? `, ${data.updatedCourses} updated` : ''}, ${data.skippedCourses} skipped${data.errors > 0 ? `, ${data.errors} errors` : ''}` });
       setProgress(100);
       setShowPreview(false);
     },
