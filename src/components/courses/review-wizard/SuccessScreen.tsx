@@ -93,16 +93,16 @@ export function SuccessScreen({
           initial={{ scale: 0.8, opacity: 0.6 }}
           animate={{ scale: 1.8, opacity: 0 }}
           transition={{ duration: 0.8, delay: 0.35 }}
-          className={`absolute inset-0 w-20 h-20 rounded-full ${isOutstanding ? 'bg-amber-300/40' : 'bg-slate-300/40'}`}
+          className={`absolute inset-0 w-20 h-20 rounded-full ${isOutstanding ? 'bg-amber-300/40' : 'bg-muted/40'}`}
         />
         <motion.div
           initial={{ scale: 0.8, opacity: 0.5 }}
           animate={{ scale: 1.5, opacity: 0 }}
           transition={{ duration: 0.7, delay: 0.55 }}
-          className={`absolute inset-0 w-20 h-20 rounded-full ${isOutstanding ? 'bg-amber-200/30' : 'bg-slate-200/30'}`}
+          className={`absolute inset-0 w-20 h-20 rounded-full ${isOutstanding ? 'bg-amber-200/30' : 'bg-muted/30'}`}
         />
-        <div className={`w-20 h-20 rounded-full flex items-center justify-center relative z-10 ${isOutstanding ? 'bg-amber-100' : 'bg-slate-100'}`}>
-          <CheckCircle2 className={`h-10 w-10 ${isOutstanding ? 'text-amber-500' : 'text-slate-500'}`} />
+        <div className={`w-20 h-20 rounded-full flex items-center justify-center relative z-10 ${isOutstanding ? 'bg-amber-100' : 'bg-muted'}`}>
+          <CheckCircle2 className={`h-10 w-10 ${isOutstanding ? 'text-amber-500' : 'text-muted-foreground'}`} />
         </div>
       </motion.div>
 
@@ -114,14 +114,14 @@ export function SuccessScreen({
         className="space-y-2 mb-3"
       >
         <h2 className="text-xl font-semibold text-foreground">
-          {isShared ? 'Posted to Clubhouse!' : (isEditMode ? 'Review Updated!' : 'Review Saved!')}
+          {isShared ? 'Shared to Clubhouse' : (isEditMode ? 'Review updated' : 'Review saved')}
         </h2>
         <p className="text-muted-foreground max-w-xs mx-auto">
           {isShared 
-            ? `Your review of ${course?.name || 'the course'} has been shared to your profile and the Clubhouse feed.`
+            ? 'Now live on Clubhouse'
             : isEditMode
-              ? `Your review of ${course?.name || 'the course'} has been updated.`
-              : `Your review of ${course?.name || 'the course'} has been saved.`
+              ? `Updated your verdict on ${course?.name || 'the course'}`
+              : `Your verdict on ${course?.name || 'the course'} is live`
           }
         </p>
       </motion.div>
@@ -134,11 +134,11 @@ export function SuccessScreen({
           transition={{ delay: 0.28 }}
           className="mb-8"
         >
-          <span className={`text-lg ${isOutstanding ? 'font-bold text-amber-500' : 'font-semibold text-slate-600'}`} style={{ fontVariantNumeric: 'tabular-nums' }}>
+          <span className={`text-lg ${isOutstanding ? 'font-bold text-amber-500' : 'font-semibold text-foreground/60'}`} style={{ fontVariantNumeric: 'tabular-nums' }}>
             {rating === 10 ? '10' : rating.toFixed(1)}
           </span>
-          <span className={`text-lg mx-1.5 ${isOutstanding ? 'font-bold text-amber-500' : 'font-semibold text-slate-600'}`}>·</span>
-          <span className={`text-lg uppercase tracking-wide ${isOutstanding ? 'font-bold text-amber-500' : 'font-semibold text-slate-600'}`}>
+          <span className={`text-lg mx-1.5 ${isOutstanding ? 'font-bold text-amber-500' : 'font-semibold text-foreground/60'}`}>·</span>
+          <span className={`text-lg uppercase tracking-wide ${isOutstanding ? 'font-bold text-amber-500' : 'font-semibold text-foreground/60'}`}>
             {tierData.label}
           </span>
         </motion.div>

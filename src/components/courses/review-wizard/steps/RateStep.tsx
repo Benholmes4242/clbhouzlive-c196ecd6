@@ -7,6 +7,7 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getScoreTier } from '@/utils/getScoreTier';
+import { triggerHaptic } from '@/lib/ui/haptics';
 import type { ReviewBreakdowns } from '../types';
 
 interface RateStepProps {
@@ -35,11 +36,13 @@ interface SegmentedSliderProps {
   touched: boolean;
   onFirstTouch: () => void;
   size: 'hero' | 'compact';
+  ariaLabel: string;
 }
 
-function SegmentedSlider({ value, onChange, touched, onFirstTouch, size }: SegmentedSliderProps) {
+function SegmentedSlider({ value, onChange, touched, onFirstTouch, size, ariaLabel }: SegmentedSliderProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const prevWholeRef = useRef<number>(Math.floor(value));
 
   const trackHeight = size === 'hero' ? 8 : 6;
   const thumbSize = size === 'hero' ? 24 : 20;
@@ -58,10 +61,12 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size }: Segme
     e.stopPropagation();
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
     setIsDragging(true);
+    triggerHaptic('light');
     if (!touched) {
       onFirstTouch();
     }
     const newValue = getValueFromPosition(e.clientX);
+    prevWholeRef.current = Math.floor(newValue);
     onChange(newValue);
   }, [touched, onFirstTouch, getValueFromPosition, onChange]);
 
@@ -70,8 +75,30 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size }: Segme
     e.preventDefault();
     e.stopPropagation();
     const newValue = getValueFromPosition(e.clientX);
+    const newWhole = Math.floor(newValue);
+    if (newWhole !== prevWholeRef.current) {
+      triggerHaptic('light');
+      prevWholeRef.current = newWhole;
+    }
     onChange(newValue);
   }, [isDragging, getValueFromPosition, onChange]);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (!touched) onFirstTouch();
+      const newVal = Math.min(10, snapToTenth((value ?? 5) + 0.1));
+      onChange(newVal);
+      triggerHaptic('light');
+    }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (!touched) onFirstTouch();
+      const newVal = Math.max(0, snapToTenth((value ?? 5) - 0.1));
+      onChange(newVal);
+      triggerHaptic('light');
+    }
+  }, [value, touched, onFirstTouch, onChange]);
 
   const handlePointerUp = useCallback((e: React.PointerEvent) => {
     e.stopPropagation();
@@ -83,7 +110,18 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size }: Segme
   const isOutstanding = tierData?.isOutstanding ?? false;
 
   return (
-    <div className="relative w-full select-none" style={{ touchAction: 'none' }}>
+    <div
+      className="relative w-full select-none"
+      style={{ touchAction: 'none' }}
+      role="slider"
+      aria-label={ariaLabel}
+      aria-valuemin={0}
+      aria-valuemax={10}
+      aria-valuenow={touched ? value : undefined}
+      aria-valuetext={touched && tierData ? `${value.toFixed(1)} out of 10, ${tierData.label}` : 'Not set'}
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+    >
       {/* Number display — ALWAYS centered, not following thumb */}
       <div className="w-full text-center mb-1">
         {touched ? (
@@ -96,7 +134,7 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size }: Segme
               className="font-bold tabular-nums leading-none inline-block"
               style={{
                 fontSize: numberSize,
-                color: isOutstanding ? '#f59e0b' : '#1F2937',
+                color: isOutstanding ? '#f59e0b' : 'hsl(var(--foreground))',
                 ...(isOutstanding ? { textShadow: '0 1px 8px rgba(245, 158, 11, 0.25)' } : {}),
               }}
             >
@@ -105,8 +143,8 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size }: Segme
           </AnimatePresence>
         ) : (
           <span
-            className="inline-block rounded-full"
-            style={{ width: 20, height: 2, backgroundColor: '#E5E7EB' }}
+            className="inline-block rounded-full bg-border"
+            style={{ width: 20, height: 2 }}
           />
         )}
         {size === 'hero' && touched && (
@@ -149,11 +187,10 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size }: Segme
       >
         {/* Track background */}
         <div
-          className="absolute left-0 right-0"
+          className="absolute left-0 right-0 bg-border"
           style={{
             height: trackHeight,
             borderRadius: trackHeight / 2,
-            backgroundColor: '#E5E7EB',
             top: '50%',
             transform: 'translateY(-50%)',
           }}
@@ -256,13 +293,14 @@ export function RateStep({
           Your overall rating
         </h2>
         
-        <SegmentedSlider
-          value={rating ?? 5}
-          onChange={handleOverallChange}
-          touched={overallTouched}
-          onFirstTouch={() => setOverallTouched(true)}
-          size="hero"
-        />
+          <SegmentedSlider
+            value={rating ?? 5}
+            onChange={handleOverallChange}
+            touched={overallTouched}
+            onFirstTouch={() => setOverallTouched(true)}
+            size="hero"
+            ariaLabel="Overall rating"
+          />
       </div>
 
       {/* Section divider */}
@@ -298,6 +336,7 @@ export function RateStep({
                     touched={isTouched}
                     onFirstTouch={() => setTouchedFields(prev => ({ ...prev, [key]: true }))}
                     size="compact"
+                    ariaLabel={`${label} rating`}
                   />
                   
                   <p className="text-[13px] text-muted-foreground mt-0.5">{description}</p>

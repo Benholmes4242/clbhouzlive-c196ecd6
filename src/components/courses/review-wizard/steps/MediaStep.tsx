@@ -6,7 +6,7 @@
 
 import React, { useRef, useCallback, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Camera, AlertCircle, Images, Loader2, Check, Wand2, Award } from 'lucide-react';
+import { Plus, Camera, AlertCircle, Images, Loader2, Check } from 'lucide-react';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import type { ReviewMediaItem } from '../types';
 import type { ReviewWizardCourse } from '../types';
@@ -15,8 +15,8 @@ import { ComposerMediaItem } from '@/hooks/useSnapModal';
 import { pickMediaFiles, validateMediaFiles } from '@/utils/media/pickMediaFiles';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { PermissionDeniedCard } from '@/components/post/post-wizard/components/PermissionDeniedCard';
-import { useFirstRunFlag } from '@/hooks/useFirstRunFlag';
 import { StudioEdits } from '@/types/studio';
+import { toast } from 'sonner';
 
 interface MediaStepProps {
   media: ReviewMediaItem[];
@@ -28,8 +28,6 @@ interface MediaStepProps {
   onSetCover: (id: string) => void;
   onRetryMedia?: (id: string) => void;
   onReorderMedia: (fromIndex: number, toIndex: number) => void;
-  onOpenStudio: () => void;
-  onOpenBadges: () => void;
   studioEditsByMediaId?: Record<string, StudioEdits>;
   activeMediaId: string | null;
   onActiveMediaChange: (mediaId: string) => void;
@@ -49,8 +47,6 @@ export function MediaStep({
   onSetCover,
   onRetryMedia = () => {},
   onReorderMedia,
-  onOpenStudio,
-  onOpenBadges,
   studioEditsByMediaId = {},
   activeMediaId,
   onActiveMediaChange,
@@ -61,9 +57,6 @@ export function MediaStep({
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [permissionDenied, setPermissionDenied] = useState<'camera' | 'photos' | null>(null);
   
-  // First-run flags for Studio & Badges discovery
-  const studioFirstRun = useFirstRunFlag('reviewWizard:studio');
-  const badgesFirstRun = useFirstRunFlag('reviewWizard:badges');
   
   // Track previous media count to detect max reached
   const prevMediaCountRef = useRef(media.length);
@@ -170,6 +163,7 @@ export function MediaStep({
     const remainingSlots = MAX_MEDIA_ITEMS - media.length;
     
     if (remainingSlots <= 0) {
+      toast.error("Limit reached", { description: "Maximum 10 items per review" });
       return;
     }
     
@@ -326,51 +320,22 @@ export function MediaStep({
               {media.length}/{MAX_MEDIA_ITEMS}
             </p>
             
-            {/* Three buttons row */}
+            {/* Add button */}
             <div className="flex items-center justify-center gap-4">
-              {/* Add button */}
-              <button
-                onClick={handleGallery}
-                disabled={!canAddMore || isPickerOpen}
-                className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-muted text-sm font-medium text-foreground active:bg-muted/80 transition-colors ${!canAddMore ? 'opacity-30 cursor-not-allowed' : ''}`}
-              >
-                {isPickerOpen ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Plus className="h-4 w-4" />
-                )}
-                Add
-              </button>
-              
-              {/* Studio button */}
-              <button
-                onClick={() => {
-                  studioFirstRun.markSeen();
-                  onOpenStudio();
-                }}
-                className="relative flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-muted text-sm font-medium text-foreground active:bg-muted/80 transition-colors"
-              >
-                <Wand2 className="h-4 w-4" />
-                Studio
-                {!studioFirstRun.hasSeen && (
-                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-primary animate-pulse" />
-                )}
-              </button>
-              
-              {/* Badges button */}
-              <button
-                onClick={() => {
-                  badgesFirstRun.markSeen();
-                  onOpenBadges();
-                }}
-                className="relative flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-muted text-sm font-medium text-foreground active:bg-muted/80 transition-colors"
-              >
-                <Award className="h-4 w-4" />
-                Badges
-                {!badgesFirstRun.hasSeen && (
-                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-primary animate-pulse" />
-                )}
-              </button>
+              {canAddMore && (
+                <button
+                  onClick={handleGallery}
+                  disabled={isPickerOpen}
+                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-muted text-sm font-medium text-foreground active:bg-muted/80 transition-colors disabled:opacity-50"
+                >
+                  {isPickerOpen ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Plus className="h-4 w-4" />
+                  )}
+                  Add
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -447,12 +412,12 @@ export function MediaStep({
                 </button>
               </div>
               
-              {/* Tip chips */}
+              {/* Tip chips — static labels, not interactive */}
               <div className="flex flex-wrap justify-center gap-2 mb-4">
                 {TIP_CHIPS.map(chip => (
                   <span 
                     key={chip}
-                    className="text-[11px] bg-muted text-muted-foreground rounded-full px-3 py-1"
+                    className="text-[11px] bg-muted/50 text-muted-foreground rounded-full px-2.5 py-1 select-none"
                   >
                     {chip}
                   </span>

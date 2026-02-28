@@ -36,6 +36,16 @@ const TITLE_DANGER_THRESHOLD = 95;
 const REVIEW_WARN_THRESHOLD = 0.8;
 const REVIEW_DANGER_THRESHOLD = 0.95;
 
+function countGraphemes(str: string): number {
+  try {
+    // @ts-ignore – Intl.Segmenter not yet in all TS libs
+    const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+    return [...segmenter.segment(str)].length;
+  } catch {
+    return [...str].length;
+  }
+}
+
 export function WriteStep({
   title,
   review,
@@ -44,8 +54,8 @@ export function WriteStep({
   onReviewChange,
   onTagsChange,
 }: WriteStepProps) {
-  const reviewLength = review.length;
-  const titleLength = title.length;
+  const reviewLength = countGraphemes(review);
+  const titleLength = countGraphemes(title);
   const [isTitleFocused, setIsTitleFocused] = useState(false);
   const [isReviewFocused, setIsReviewFocused] = useState(false);
   
@@ -129,15 +139,15 @@ export function WriteStep({
   }, [review, onReviewChange]);
 
   const getTitleCounterColor = () => {
-    if (titleLength >= MAX_TITLE_LENGTH * (TITLE_DANGER_THRESHOLD / 100)) return 'text-red-500 font-medium';
+    if (titleLength >= MAX_TITLE_LENGTH * (TITLE_DANGER_THRESHOLD / 100)) return 'text-destructive font-medium';
     if (titleLength >= TITLE_WARN_THRESHOLD) return 'text-amber-500';
-    return 'text-gray-400';
+    return 'text-muted-foreground';
   };
 
   const getReviewCounterColor = () => {
-    if (reviewLength >= MAX_REVIEW_LENGTH * REVIEW_DANGER_THRESHOLD) return 'text-red-500 font-medium';
+    if (reviewLength >= MAX_REVIEW_LENGTH * REVIEW_DANGER_THRESHOLD) return 'text-destructive font-medium';
     if (reviewLength >= MAX_REVIEW_LENGTH * REVIEW_WARN_THRESHOLD) return 'text-amber-500';
-    return 'text-gray-400';
+    return 'text-muted-foreground';
   };
 
   const showPromptChips = isReviewFocused && reviewLength < 50;

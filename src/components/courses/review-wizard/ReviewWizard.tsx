@@ -26,8 +26,7 @@ import { useShareReview } from '@/hooks/useShareReview';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { Loader2 } from 'lucide-react';
-import { StudioTool, StudioEdits } from '@/types/studio';
-import StudioShelf from '@/components/studio/StudioShelf';
+import { StudioEdits } from '@/types/studio';
 
 
 import { WizardHeader } from './WizardHeader';
@@ -65,11 +64,7 @@ export function ReviewWizard({
   const [activeCourse, setActiveCourse] = useState<ReviewWizardCourse | null>(course);
   const [sharedPostId, setSharedPostId] = useState<string | null>(null);
   
-  // Studio & Badges state
-  const [showStudio, setShowStudio] = useState(false);
-  const [studioTool, setStudioTool] = useState<StudioTool>(null);
-  const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
-  const [selectedBadges] = useState<string[]>([]);
+  // Studio edits state (retained for media display, Studio UI removed until backend supports persistence)
   const [studioEditsByMediaId, setStudioEditsByMediaId] = useState<Record<string, StudioEdits>>({});
   const [reviewActiveMediaId, setReviewActiveMediaId] = useState<string | null>(null);
   
@@ -318,45 +313,11 @@ export function ReviewWizard({
     }
   }, [wizard, hasUnsavedChanges, handleClose]);
 
-  // Studio handlers
-  const handleOpenStudio = useCallback(() => {
-    if (!reviewActiveMediaId && wizard.allMedia.length > 0) {
-      setReviewActiveMediaId(wizard.allMedia[0].id);
-    }
-    setShowStudio(true);
-  }, [reviewActiveMediaId, wizard.allMedia]);
-
-  const handleCloseStudio = useCallback(() => {
-    setShowStudio(false);
-    setStudioTool(null);
-  }, []);
-
-  const handleUpdateStudioEdits = useCallback((patch: Partial<StudioEdits>) => {
-    if (!reviewActiveMediaId) return;
-    setStudioEditsByMediaId(prev => ({
-      ...prev,
-      [reviewActiveMediaId]: { ...(prev[reviewActiveMediaId] || {}), ...patch },
-    }));
-  }, [reviewActiveMediaId]);
-
-  const handleClearStudioEdits = useCallback(() => {
-    if (!reviewActiveMediaId) return;
-    setStudioEditsByMediaId(prev => ({
-      ...prev,
-      [reviewActiveMediaId]: {},
-    }));
-  }, [reviewActiveMediaId]);
-
-  // Get active media info for studio
+  // Get active media info (retained for future Studio re-enablement)
   const activeMedia = useMemo(() => {
     if (!reviewActiveMediaId) return null;
     return wizard.allMedia.find(m => m.id === reviewActiveMediaId) || null;
   }, [reviewActiveMediaId, wizard.allMedia]);
-
-  const activeMediaEdits = useMemo((): StudioEdits => {
-    if (!reviewActiveMediaId) return {};
-    return studioEditsByMediaId[reviewActiveMediaId] || {};
-  }, [reviewActiveMediaId, studioEditsByMediaId]);
 
   // Handle done from success screens
   const handleDone = useCallback(() => {
@@ -533,8 +494,6 @@ export function ReviewWizard({
                         onSetCover={wizard.setCoverMedia}
                         onRetryMedia={wizard.retryMedia}
                         onReorderMedia={wizard.reorderMedia}
-                        onOpenStudio={handleOpenStudio}
-                        onOpenBadges={() => {}}
                         studioEditsByMediaId={studioEditsByMediaId}
                         activeMediaId={reviewActiveMediaId}
                         onActiveMediaChange={setReviewActiveMediaId}
@@ -602,24 +561,7 @@ export function ReviewWizard({
           />
 
 
-          {/* Studio Shelf */}
-          {activeMedia && (
-            <StudioShelf
-              open={showStudio}
-              onClose={handleCloseStudio}
-              activeTool={studioTool}
-              setActiveTool={setStudioTool}
-              activeMediaId={activeMedia.id}
-              activeMediaType={activeMedia.type}
-              activeMediaPreviewUrl={activeMedia.previewUrl}
-              activeMediaThumbnailUrl={activeMedia.posterUrl || activeMedia.previewUrl}
-              edits={activeMediaEdits}
-              updateEdits={handleUpdateStudioEdits}
-              clearEdits={handleClearStudioEdits}
-              activeOverlayId={activeOverlayId}
-              onSelectOverlay={setActiveOverlayId}
-            />
-          )}
+          {/* Studio Shelf — removed until course_review_media supports studio_edits column */}
         </>
       )}
     </AnimatePresence>,

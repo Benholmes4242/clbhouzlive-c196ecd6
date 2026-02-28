@@ -24,7 +24,7 @@ interface ConfirmStepProps {
 }
 
 function getRatingTextColor(score: number): string {
-  return score >= 9.0 ? 'text-amber-500' : 'text-slate-600';
+  return score >= 9.0 ? 'text-amber-500' : 'text-foreground/60';
 }
 
 function isOutstandingScore(score: number): boolean {
@@ -57,7 +57,7 @@ function RatingDisplay({ value, size = 'lg' }: { value: number; size?: 'sm' | 'l
         {value.toFixed(1)}
       </span>
       <span className={cn(
-        "text-gray-400",
+        "text-muted-foreground",
         size === 'lg' ? "text-sm" : "text-[10px]"
       )}>
         /10
