@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useVideoCompression } from './useVideoCompression';
 import { useChunkedUpload } from './useChunkedUpload';
 import { useCloudflareStream } from './useCloudflareStream';
@@ -33,7 +33,7 @@ interface BackgroundUploadData {
 }
 
 export const useBackgroundUpload = () => {
-  const { toast } = useToast();
+  
   const { shouldCompress, triggerCompression } = useVideoCompression();
   const { uploadFileInChunks } = useChunkedUpload();
   const cloudflareStream = useCloudflareStream();
@@ -286,15 +286,11 @@ export const useBackgroundUpload = () => {
     // Completion notifications removed - black center confirmation is sufficient
     // Only show error notifications if uploads fail completely
     if (failedUploads.length === mediaFiles.length) {
-      toast({
-        title: "Upload Failed",
-        description: "Some files couldn't be uploaded. Your post is still live without media.",
-        variant: "destructive"
-      });
+      toast.error("Upload Failed", { description: "Some files couldn't be uploaded. Your post is still live without media." });
     }
 
     console.log(`Background upload completed for post ${postId}`);
-  }, [toast, shouldCompress, triggerCompression, uploadFileInChunks, cloudflareStream, uploadToR2]);
+  }, [shouldCompress, triggerCompression, uploadFileInChunks, cloudflareStream, uploadToR2]);
 
   return {
     startBackgroundUpload,

@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/types/badges';
 import { Share2, Copy, Camera, Pin, MessageSquare } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -20,7 +20,7 @@ export const BadgeShareModal: React.FC<BadgeShareModalProps> = ({
 }) => {
   const [isSharing, setIsSharing] = useState(false);
   const [isPinning, setIsPinning] = useState(false);
-  const { toast } = useToast();
+  
   const { user } = useSupabaseSession();
 
   const getTierGradient = (tier: Badge['tier']) => {
@@ -49,19 +49,12 @@ export const BadgeShareModal: React.FC<BadgeShareModalProps> = ({
 
       if (error) throw error;
 
-      toast({
-        title: "✨ Story Shared!",
-        description: "Your badge achievement has been shared to your story!",
-      });
+      toast.success("✨ Story Shared!", { description: "Your badge achievement has been shared to your story!" });
       
       onClose();
     } catch (error) {
       console.error('Error sharing story:', error);
-      toast({
-        title: "❌ Error",
-        description: "Failed to share your achievement. Please try again.",
-        variant: "destructive"
-      });
+      toast.error("❌ Error", { description: "Failed to share your achievement. Please try again." });
     } finally {
       setIsSharing(false);
     }
@@ -74,19 +67,12 @@ export const BadgeShareModal: React.FC<BadgeShareModalProps> = ({
     try {
       // For now, just show a success message without actual pinning
       // This will be fully implemented once types are updated
-      toast({
-        title: "📌 Badge Pinned!",
-        description: "This badge is now showcased on your profile!",
-      });
+      toast.success("📌 Badge Pinned!", { description: "This badge is now showcased on your profile!" });
       
       onClose();
     } catch (error) {
       console.error('Error pinning badge:', error);
-      toast({
-        title: "❌ Error",
-        description: "Failed to pin badge. Please try again.",
-        variant: "destructive"
-      });
+      toast.error("❌ Error", { description: "Failed to pin badge. Please try again." });
     } finally {
       setIsPinning(false);
     }
@@ -97,16 +83,10 @@ export const BadgeShareModal: React.FC<BadgeShareModalProps> = ({
       const badgeUrl = `${window.location.origin}/badge/${badge.id}`;
       await navigator.clipboard.writeText(badgeUrl);
       
-      toast({
-        title: "Copied to clipboard",
-      });
+      toast.success("Copied to clipboard");
     } catch (error) {
       console.error('Error copying link:', error);
-      toast({
-        title: "❌ Error",
-        description: "Failed to copy link. Please try again.",
-        variant: "destructive"
-      });
+      toast.error("❌ Error", { description: "Failed to copy link. Please try again." });
     }
   };
 
@@ -164,10 +144,7 @@ export const BadgeShareModal: React.FC<BadgeShareModalProps> = ({
     link.href = canvas.toDataURL();
     link.click();
 
-    toast({
-      title: "📸 Image Downloaded!",
-      description: "Badge image saved to your device!",
-    });
+    toast.success("📸 Image Downloaded!", { description: "Badge image saved to your device!" });
   };
 
   return (

@@ -13,7 +13,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import CountryFlag from '@/components/ui/country-flag';
 
 interface Course {
@@ -44,7 +44,7 @@ const CoursePickerModal: React.FC<CoursePickerModalProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCourses, setSelectedCourses] = useState<Set<string>>(new Set());
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
+  
 
   // Get all courses for the region
   const { data: allCourses = [] } = useQuery({
@@ -139,21 +139,14 @@ const CoursePickerModal: React.FC<CoursePickerModalProps> = ({
 
       if (error) throw error;
 
-      toast({
-        title: "Courses Added!",
-        description: `Added ${selectedCourses.size} course${selectedCourses.size > 1 ? 's' : ''} with default rating. Tap to edit your rating.`,
-      });
+      toast.success("Courses Added!", { description: `Added ${selectedCourses.size} course${selectedCourses.size > 1 ? 's' : ''} with default rating. Tap to edit your rating.` });
 
       onCoursesAdded();
       setSelectedCourses(new Set());
       onClose();
     } catch (error) {
       console.error('Error adding courses:', error);
-      toast({
-        title: "Error",
-        description: "Failed to add courses. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Error", { description: "Failed to add courses. Please try again." });
     } finally {
       setIsSubmitting(false);
     }

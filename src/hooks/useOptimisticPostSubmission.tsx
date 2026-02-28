@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useBackgroundUpload } from './useBackgroundUpload';
 import { validateFiles } from '@/components/posts/utils/fileValidation';
 import { handlePostTags } from './usePostSubmission/uploadUtils';
@@ -29,7 +29,7 @@ interface PostSubmissionData {
 }
 
 export const useOptimisticPostSubmission = () => {
-  const { toast } = useToast();
+  
   const { startBackgroundUpload } = useBackgroundUpload();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -54,11 +54,7 @@ export const useOptimisticPostSubmission = () => {
       // No media, no post (except for achievement posts)
       if ((!mediaFiles || mediaFiles.length === 0) && !achievementId) {
         console.error('No media files provided for post submission');
-        toast({
-          title: "Upload Error",
-          description: "Please select at least one photo or video",
-          variant: "destructive"
-        });
+        toast.error("Upload Error", { description: "Please select at least one photo or video" });
         onError?.();
         return;
       }
@@ -66,11 +62,7 @@ export const useOptimisticPostSubmission = () => {
       // File format validation (no size limits, just format check)
       const validation = validateFiles(mediaFiles);
       if (!validation.isValid) {
-        toast({
-          title: "Upload Error",
-          description: validation.error,
-          variant: "destructive"
-        });
+        toast.error("Upload Error", { description: validation.error });
         onError?.();
         return;
       }
@@ -159,11 +151,7 @@ export const useOptimisticPostSubmission = () => {
           console.error('Failed to rollback post:', deleteError);
         }
         
-        toast({
-          title: "Upload Failed",
-          description: "Failed to upload media files. Post not created.",
-          variant: "destructive"
-        });
+        toast.error("Upload Failed", { description: "Failed to upload media files. Post not created." });
         onError?.();
         return;
       }
@@ -245,11 +233,7 @@ export const useOptimisticPostSubmission = () => {
         }
       }
       
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive"
-      });
+      toast.error("Error", { description: errorMessage });
     } finally {
       setIsSubmitting(false);
     }

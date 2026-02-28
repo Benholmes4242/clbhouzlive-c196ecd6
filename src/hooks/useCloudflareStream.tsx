@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { edgePost } from '@/utils/callEdge';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl, CLOUDFLARE_STREAM_CONFIG } from '@/config/cloudflareStream';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface CloudflareStreamUploadResult {
   success: boolean;
@@ -25,7 +25,7 @@ interface UploadOptions {
 export const useCloudflareStream = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const { toast } = useToast();
+  
 
   const uploadVideo = async (file: File, options: UploadOptions = {}): Promise<CloudflareStreamUploadResult> => {
     setIsUploading(true);
@@ -69,10 +69,7 @@ export const useCloudflareStream = () => {
 
       console.log('Video uploaded successfully to Cloudflare Stream:', data.videoId);
 
-      toast({
-        title: "Your post is out there!",
-        duration: 2000,
-      });
+      toast.success("Your post is out there!", { duration: 2000 });
 
       return {
         success: true,
@@ -85,11 +82,7 @@ export const useCloudflareStream = () => {
     } catch (error) {
       console.error('Video upload error:', error);
       
-      toast({
-        title: "Upload failed",
-        description: error instanceof Error ? error.message : "Failed to upload video to Cloudflare Stream",
-        variant: "destructive"
-      });
+      toast.error("Upload failed", { description: error instanceof Error ? error.message : "Failed to upload video to Cloudflare Stream" });
 
       return {
         success: false,

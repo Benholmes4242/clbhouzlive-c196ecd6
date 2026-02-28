@@ -13,7 +13,7 @@ import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useCourseRatingDistribution } from '@/hooks/useCourseRatingDistribution';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserCourseRating } from '@/hooks/useUserCourseRating';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
 import CourseLocationPills from './CourseLocationPills';
@@ -73,7 +73,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   const [showSuggestEdit, setShowSuggestEdit] = useState(false);
   const isMobile = useIsMobile();
   const { user } = useSupabaseSession();
-  const { toast } = useToast();
+  
   const navigate = useNavigate();
   const { data: businessClaim } = useBusinessClaimForCourse(course.id);
   const { data: courseClaim } = useCourseClaim(course.id);
@@ -111,10 +111,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
   const handleRateClick = () => {
     if (!user) {
-      toast({
-        title: "Sign in required",
-        description: "Please sign in to rate courses",
-      });
+      toast("Sign in required", { description: "Please sign in to rate courses" });
       navigate('/auth');
       return;
     }

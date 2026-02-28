@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { Loader2, MapPin, AlertCircle, CheckCircle2, ArrowRight, Building2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
@@ -26,7 +26,7 @@ const BATCH_SIZE = 10;
 const BATCH_DELAY_MS = 500;
 
 export function GolfClubsGeocodingBackfill() {
-  const { toast } = useToast();
+  
   const [isProcessing, setIsProcessing] = useState(false);
   const [stats, setStats] = useState<ClubStats | null>(null);
   const [progress, setProgress] = useState<{
@@ -80,17 +80,10 @@ export function GolfClubsGeocodingBackfill() {
         clubsNeedingGeocode,
       });
 
-      toast({
-        title: "Scan Complete",
-        description: `${clubsWithCourseCoords} clubs can copy coords from courses, ${clubsNeedingGeocode} need geocoding`,
-      });
+      toast.success("Scan Complete", { description: `${clubsWithCourseCoords} clubs can copy coords from courses, ${clubsNeedingGeocode} need geocoding` });
     } catch (error: any) {
       console.error('Error scanning clubs:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to scan clubs",
-        variant: "destructive",
-      });
+      toast.error("Error", { description: error.message || "Failed to scan clubs" });
     } finally {
       setIsProcessing(false);
     }
@@ -109,7 +102,7 @@ export function GolfClubsGeocodingBackfill() {
         .or('latitude.is.null,longitude.is.null');
 
       if (!clubsWithoutCoords || clubsWithoutCoords.length === 0) {
-        toast({ title: "No Work Needed", description: "All clubs already have coordinates!" });
+        toast.success("No Work Needed", { description: "All clubs already have coordinates!" });
         setIsProcessing(false);
         return;
       }
@@ -134,7 +127,7 @@ export function GolfClubsGeocodingBackfill() {
       const clubsToCopy = clubsWithoutCoords.filter(c => coordsMap.has(c.id));
       
       if (clubsToCopy.length === 0) {
-        toast({ title: "No Work Needed", description: "No clubs have linked courses with coordinates to copy." });
+        toast.success("No Work Needed", { description: "No clubs have linked courses with coordinates to copy." });
         setIsProcessing(false);
         return;
       }
@@ -176,17 +169,10 @@ export function GolfClubsGeocodingBackfill() {
         }
       }
 
-      toast({
-        title: "Copy Complete",
-        description: `Copied coordinates for ${progress?.successful || clubsToCopy.length} clubs from their linked courses`,
-      });
+      toast.success("Copy Complete", { description: `Copied coordinates for ${progress?.successful || clubsToCopy.length} clubs from their linked courses` });
     } catch (error: any) {
       console.error('Copy error:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Copy failed",
-        variant: "destructive",
-      });
+      toast.error("Error", { description: error.message || "Copy failed" });
     } finally {
       setIsProcessing(false);
     }

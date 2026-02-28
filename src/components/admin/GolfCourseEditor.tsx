@@ -17,7 +17,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
 import { X, ExternalLink, ChevronRight } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -134,7 +134,7 @@ type DraftFormShape = {
 };
 
 const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating, onClose }) => {
-  const { toast } = useToast();
+  
   const queryClient = useQueryClient();
   const { user } = useSupabaseSession();
   const { register, handleSubmit, reset, formState: { errors, isDirty } } = useForm();
@@ -404,10 +404,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         'Admin'
       );
       
-      toast({
-        title: "Success",
-        description: isCreating ? "Golf course created successfully" : "Golf course updated successfully",
-      });
+      toast.success("Success", { description: isCreating ? "Golf course created successfully" : "Golf course updated successfully" });
       // Force refetch of golf courses data
       queryClient.invalidateQueries({ queryKey: ['admin-golf-courses'] });
       queryClient.refetchQueries({ queryKey: ['admin-golf-courses'] });
@@ -415,11 +412,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
     },
     onError: (error: any) => {
       console.error('Save mutation error:', error);
-      toast({
-        title: "Error",
-        description: `Failed to ${isCreating ? 'create' : 'update'} golf course: ${error.message}`,
-        variant: "destructive",
-      });
+      toast.error("Error", { description: `Failed to ${isCreating ? 'create' : 'update'} golf course: ${error.message}` });
     },
   });
 
@@ -435,19 +428,12 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       if (error) throw error;
     },
     onSuccess: () => {
-      toast({
-        title: "Success",
-        description: "Golf course deleted successfully",
-      });
+      toast.success("Success", { description: "Golf course deleted successfully" });
       queryClient.invalidateQueries({ queryKey: ['admin-golf-courses'] });
       onClose();
     },
     onError: (error) => {
-      toast({
-        title: "Error",
-        description: `Failed to delete golf course: ${error.message}`,
-        variant: "destructive",
-      });
+      toast.error("Error", { description: `Failed to delete golf course: ${error.message}` });
     },
   });
 
@@ -461,21 +447,14 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       if (error) throw error;
     },
     onSuccess: () => {
-      toast({
-        title: "Success",
-        description: "Review deleted successfully",
-      });
+      toast.success("Success", { description: "Review deleted successfully" });
       queryClient.invalidateQueries({ queryKey: ['course-ratings', course?.id] });
       // Invalidate exploration stats for map updates
       queryClient.invalidateQueries({ queryKey: ['user-exploration-status'] });
       queryClient.invalidateQueries({ queryKey: ['exploration-leaderboard'] });
     },
     onError: (error) => {
-      toast({
-        title: "Error",
-        description: `Failed to delete review: ${error.message}`,
-        variant: "destructive",
-      });
+      toast.error("Error", { description: `Failed to delete review: ${error.message}` });
     },
   });
 
@@ -488,39 +467,23 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
     
     // Validate required fields
     if (!data.name || data.name.trim() === '') {
-      toast({
-        title: "Error",
-        description: "Please enter a golf course name",
-        variant: "destructive",
-      });
+      toast.error("Error", { description: "Please enter a golf course name" });
       return;
     }
 
     if (!selectedCountry || selectedCountry.trim() === '') {
-      toast({
-        title: "Error",
-        description: "Please select a country/region",
-        variant: "destructive",
-      });
+      toast.error("Error", { description: "Please select a country/region" });
       return;
     }
 
     if (!selectedSubCountry || selectedSubCountry.trim() === '') {
-      toast({
-        title: "Error",
-        description: "Please select a sub-country",
-        variant: "destructive",
-      });
+      toast.error("Error", { description: "Please select a sub-country" });
       return;
     }
 
     // Validate Top 100s rankings - only if regional ranking region is selected
     if (regionalRankingRegion && !regionalRank) {
-      toast({
-        title: "Error",
-        description: "Please select a rank for the regional Top 100",
-        variant: "destructive",
-      });
+      toast.error("Error", { description: "Please select a rank for the regional Top 100" });
       return;
     }
 

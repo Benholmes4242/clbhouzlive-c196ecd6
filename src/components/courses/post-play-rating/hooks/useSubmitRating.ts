@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { ToastAction } from '@/components/ui/toast';
+import { toast } from 'sonner';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import type { Course, ExistingMedia } from '../types';
 import type { ReviewVideoDraft } from '@/hooks/useReviewVideoUpload';
@@ -43,7 +42,7 @@ export function useSubmitRating({
   onSuccess,
   onError,
 }: UseSubmitRatingOptions) {
-  const { toast } = useToast();
+  
   const queryClient = useQueryClient();
   
   const mutation = useMutation({
@@ -230,11 +229,7 @@ export function useSubmitRating({
         errorMessage = "Rating validation failed. Please ensure all scores are between 0.5 and 10.0 with one decimal place.";
       }
       
-      toast({
-        title: "Error Submitting Rating",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      toast.error("Error Submitting Rating", { description: errorMessage });
       
       onError();
     },

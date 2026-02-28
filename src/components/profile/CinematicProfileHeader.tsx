@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useSwipeable } from 'react-swipeable';
 
 interface CinematicProfileHeaderProps {
@@ -45,7 +45,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const photoRef = useRef<HTMLImageElement | null>(null);
   const photoInputRef = useRef<HTMLInputElement | null>(null);
   const [isHovering, setIsHovering] = useState(false);
-  const { toast } = useToast();
 
   // Fallback image if no profile photo - using standard shipped asset
   const fallbackImage = '/placeholder.svg';
@@ -62,20 +61,12 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      toast({
-        title: "Invalid file type",
-        description: "Please select an image file.",
-        variant: "destructive"
-      });
+      toast.error("Invalid file type", { description: "Please select an image file." });
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      toast({
-        title: "File too large",
-        description: "Image file must be less than 10MB.",
-        variant: "destructive"
-      });
+      toast.error("File too large", { description: "Image file must be less than 10MB." });
       return;
     }
 
