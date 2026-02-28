@@ -717,7 +717,7 @@ export function GameInviteTestLab() {
       
       addLog('RSVP sent', 'Acceptance recorded', 'success');
       
-      toast.success('Ben accepted!');
+      toast.success('RSVP confirmed');
     } catch (error: any) {
       addLog('Error', error.message, 'error');
       toast.error(error.message);

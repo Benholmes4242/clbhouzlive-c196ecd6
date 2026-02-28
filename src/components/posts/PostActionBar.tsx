@@ -66,7 +66,7 @@ export function PostActionBar({
       }
     } else {
       await navigator.clipboard.writeText(url);
-      toast.success('Link copied');
+      toast.success('Copied to clipboard');
     }
   }, [postId, shareTitle]);
 

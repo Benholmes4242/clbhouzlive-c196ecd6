@@ -115,7 +115,7 @@ export function Top100GeocodingBackfill() {
       const courses = await checkMissingCoordinates();
       
       if (courses.length === 0) {
-        toast.success("All Top 100 courses already have coordinates!");
+        toast.success("All courses already have coordinates");
         setIsProcessing(false);
         return;
       }

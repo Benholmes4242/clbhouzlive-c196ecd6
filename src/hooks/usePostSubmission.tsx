@@ -206,7 +206,7 @@ export const usePostSubmission = () => {
         }
       }
       
-      toast.error("Error", { description: errorMessage });
+      toast.error("Couldn't post", { description: errorMessage });
     } finally {
       setIsSubmitting(false);
     }

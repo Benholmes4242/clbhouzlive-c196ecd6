@@ -821,7 +821,7 @@ export const VideoPlayerModal: React.FC = () => {
                     
                     {/* Save button (stub) */}
                     <button
-                      onClick={() => toast.info('Save feature coming soon!')}
+                      onClick={() => toast.info('Coming soon')}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 text-white/70 hover:bg-white/20 hover:text-white transition-all"
                     >
                       <Bookmark className="h-4 w-4" />

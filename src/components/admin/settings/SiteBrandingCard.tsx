@@ -87,7 +87,7 @@ const SiteBrandingCard = () => {
       fileInput.value = '';
     }
     
-    toast.success("Reset Complete", { description: "Branding has been reset to default values. The favicon should update shortly." });
+    toast.success("Reset complete");
   };
 
   return (

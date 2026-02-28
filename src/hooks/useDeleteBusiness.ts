@@ -56,13 +56,13 @@ export function useDeleteBusiness() {
       queryClient.invalidateQueries({ queryKey: ['my-businesses'] });
       queryClient.invalidateQueries({ queryKey: ['business-profile'] });
 
-      toast.success('Business profile deleted', { description: 'The business profile has been removed from Clbhouz.' });
+      toast.success('Business deleted');
 
       navigate('/businesses/manage');
     },
     onError: (error: Error) => {
       console.error('Delete business error:', error);
-      toast.error('Error', { description: error.message || 'Failed to delete business profile. Please try again.' });
+      toast.error("Couldn't delete business", { description: error.message || 'Please try again' });
     },
   });
 }

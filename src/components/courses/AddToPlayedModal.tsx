@@ -135,7 +135,7 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
       await queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
       await queryClient.refetchQueries({ queryKey: ['explore-courses'], exact: false, type: 'active' });
       
-      toast.success("Rating submitted!", { description: `${course.name} has been added to your rated courses.` });
+      toast.success("Rating saved");
       onSuccess();
       onClose();
       setRating([7]);

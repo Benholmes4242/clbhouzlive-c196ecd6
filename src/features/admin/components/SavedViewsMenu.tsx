@@ -84,7 +84,7 @@ export function SavedViewsMenu({
 
   const handleCopyLink = () => {
     onCopyLink();
-    toast.success('Link copied to clipboard');
+    toast.success('Copied to clipboard');
   };
 
   return (

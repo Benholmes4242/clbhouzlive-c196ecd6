@@ -35,11 +35,11 @@ const ImageProcessor: React.FC = () => {
       setProcessedImageUrl(processedUrl);
       
       console.log('Background removal completed');
-      toast.success('Background removed successfully!');
+      toast.success('Background removed');
       
     } catch (error) {
       console.error('Error processing image:', error);
-      toast.error('Failed to process image. Using original image instead.');
+      toast.error("Couldn't process image");
       setProcessedImageUrl('/lovable-uploads/05bdf179-35ec-4957-af0a-907d2d47b4d6.png');
     } finally {
       setIsProcessing(false);

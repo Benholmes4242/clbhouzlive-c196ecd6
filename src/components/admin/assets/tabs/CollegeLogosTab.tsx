@@ -84,7 +84,7 @@ export const CollegeLogosTab: React.FC<CollegeLogosTabProps> = ({
       return response.data;
     },
     onSuccess: () => {
-      toast.success('Logo uploaded successfully');
+      toast.success('Logo updated');
       onRefresh();
     },
     onError: (error) => {
@@ -128,7 +128,7 @@ export const CollegeLogosTab: React.FC<CollegeLogosTabProps> = ({
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('File too large. Max 5MB.');
+      toast.error('File too large', { description: 'Max 5MB' });
       return;
     }
 
@@ -150,7 +150,7 @@ export const CollegeLogosTab: React.FC<CollegeLogosTabProps> = ({
       !colleges.find(c => c.normalized_name === name && c.logo_url)
     );
     if (missingLogos.length === 0) {
-      toast.info('All top 20 colleges already have logos!');
+      toast.info('All top 20 colleges already have logos');
       return;
     }
     fetchLogosMutation.mutate({ normalized_names: missingLogos });

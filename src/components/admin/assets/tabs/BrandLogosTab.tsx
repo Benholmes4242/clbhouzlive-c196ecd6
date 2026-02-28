@@ -104,13 +104,13 @@ export const BrandLogosTab: React.FC<BrandLogosTabProps> = ({
 
       if (dbError) throw dbError;
 
-      toast.success('Logo uploaded successfully');
+      toast.success('Logo updated');
       onRefresh();
       setPendingUpload(null);
       setSelectedCategory('');
       if (fileInputRef.current) fileInputRef.current.value = '';
     } catch (error: any) {
-      toast.error(`Failed to upload logo: ${error.message}`);
+      toast.error("Couldn't upload logo", { description: error.message });
     } finally {
       setUploading(false);
     }

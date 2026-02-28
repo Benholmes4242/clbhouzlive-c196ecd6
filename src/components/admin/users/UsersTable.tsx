@@ -169,11 +169,11 @@ export function UsersTable({ users, readOnly = false }: UsersTableProps) {
       // Remove user from local state only after successful deletion
       setLocalUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
       
-      toast.success("Success", { description: `User ${userEmail} has been deleted successfully` });
+      toast.success("User deleted");
       track("admin_user_deleted", { target_user_id: userId });
     } catch (error: any) {
       console.error('Error deleting user:', error);
-      toast.error("Error", { description: `Failed to delete user: ${error.message}` });
+      toast.error("Couldn't delete user", { description: error.message });
     } finally {
       setActionLoading(null);
     }

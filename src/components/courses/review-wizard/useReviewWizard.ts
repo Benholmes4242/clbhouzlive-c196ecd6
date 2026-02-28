@@ -329,7 +329,7 @@ export function useReviewWizard({
     onError: (error) => {
       console.error('[useReviewWizard] Submit error:', error);
       submissionInProgressRef.current = false; // Reset ref so user can retry
-      toast.error('Failed to save your review. Please try again.');
+      toast.error("Couldn't save review", { description: "Please try again" });
     },
   });
 
@@ -724,7 +724,7 @@ export function useReviewWizard({
       if (context?.snapshot && course?.id && currentUserId) {
         rollbackOptimistic(course.id, currentUserId, context.snapshot);
       }
-      toast.error('Failed to remove your review. Please try again.');
+      toast.error("Couldn't remove review", { description: "Please try again" });
     },
   });
 

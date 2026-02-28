@@ -81,14 +81,14 @@ export function BusinessProfileHeader({
       }
     } else {
       await navigator.clipboard.writeText(url);
-      toast.success('Link copied to clipboard');
+      toast.success('Copied to clipboard');
     }
   };
 
   const handleCopyLink = async () => {
     const url = window.location.href;
     await navigator.clipboard.writeText(url);
-    toast.success('Link copied');
+    toast.success('Copied to clipboard');
   };
 
   // Generate initials from business name

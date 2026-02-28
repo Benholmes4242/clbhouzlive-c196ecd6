@@ -78,9 +78,7 @@ export function useVisibility() {
       if (error) {
         console.error('updateMode error', error);
         setMode(previousMode);
-        toast.error('Error', {
-          description: 'Could not update visibility.',
-        });
+        toast.error("Couldn't update visibility");
         return;
       }
 

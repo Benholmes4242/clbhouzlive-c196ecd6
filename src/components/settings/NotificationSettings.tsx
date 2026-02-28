@@ -64,7 +64,7 @@ const NotificationSettings = () => {
       }
     } catch (error) {
       console.error('Error loading notification preferences:', error);
-      toast.error("Error", { description: "Failed to load notification preferences" });
+      toast.error("Couldn't load preferences");
     } finally {
       setIsLoading(false);
     }
@@ -82,10 +82,10 @@ const NotificationSettings = () => {
 
       if (error) throw error;
 
-      toast.success("Success", { description: "Notification preferences updated" });
+      toast.success("Settings saved");
     } catch (error) {
       console.error('Error updating notification preferences:', error);
-      toast.error("Error", { description: "Failed to update notification preferences" });
+      toast.error("Couldn't save preferences");
     } finally {
       setIsSaving(false);
     }

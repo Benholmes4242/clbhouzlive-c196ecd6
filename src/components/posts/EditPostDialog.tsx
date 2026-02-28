@@ -81,9 +81,7 @@ const EditPostDialog = ({ open, onOpenChange, post, onPostUpdated }: EditPostDia
       });
     } catch (error) {
       console.error('Error removing media:', error);
-      toast.error("Error", {
-        description: "Failed to remove media. Please try again.",
-      });
+      toast.error("Couldn't remove media");
     }
   };
 
@@ -132,17 +130,15 @@ const EditPostDialog = ({ open, onOpenChange, post, onPostUpdated }: EditPostDia
         await uploadNewMedia(file);
       }
 
-      toast.success("Post updated!", {
-        description: "Your post has been updated successfully."
-      });
+      toast.success("Post updated");
 
       onOpenChange(false);
       onPostUpdated?.();
 
     } catch (error) {
       console.error('Error updating post:', error);
-      toast.error("Error", {
-        description: "Failed to update post. Please try again.",
+      toast.error("Couldn't update post", {
+        description: "Please try again",
       });
     } finally {
       setIsSubmitting(false);

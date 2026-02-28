@@ -132,7 +132,7 @@ const CaddieLogs: React.FC<CaddieLogsProps> = ({
       setLogs(data || []);
     } catch (error) {
       console.error('Error fetching caddie logs:', error);
-      toast.error("Error", { description: "Failed to load caddie logs" });
+      toast.error("Couldn't load logs");
     } finally {
       setIsLoading(false);
     }
@@ -148,10 +148,10 @@ const CaddieLogs: React.FC<CaddieLogsProps> = ({
       if (error) throw error;
 
       setLogs(logs.filter(log => log.id !== logId));
-      toast.success("Log deleted", { description: "Caddie log has been removed" });
+      toast.success("Log deleted");
     } catch (error) {
       console.error('Error deleting log:', error);
-      toast.error("Error", { description: "Failed to delete log" });
+      toast.error("Couldn't delete log");
     }
   };
 
@@ -171,10 +171,10 @@ const CaddieLogs: React.FC<CaddieLogsProps> = ({
       setEditingLog(null);
       setEditContent('');
       
-      toast.success("Log updated", { description: "Your caddie log has been saved" });
+      toast.success("Log updated");
     } catch (error) {
       console.error('Error updating log:', error);
-      toast.error("Error", { description: "Failed to update log" });
+      toast.error("Couldn't update log");
     }
   };
 

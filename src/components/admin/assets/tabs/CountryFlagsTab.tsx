@@ -37,10 +37,10 @@ export const CountryFlagsTab: React.FC<CountryFlagsTabProps> = ({ flagCount }) =
     try {
       await navigator.clipboard.writeText(text);
       setCopiedCode(text);
-      toast.success(`${type === 'country' ? 'Country name' : 'Flag code'} copied`);
+      toast.success('Copied to clipboard');
       setTimeout(() => setCopiedCode(null), 2000);
     } catch (err) {
-      toast.error('Failed to copy');
+      toast.error("Couldn't copy");
     }
   };
 

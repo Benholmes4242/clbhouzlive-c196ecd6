@@ -98,7 +98,7 @@ export default function Squircle({ creator, index, onAvatarClick, onLabelClick, 
     if (!creator.username) return;
     const url = `${window.location.origin}/user/${creator.username}`;
     navigator.clipboard.writeText(url);
-    toast.success('Profile link copied!');
+    toast.success('Copied to clipboard');
     setMenuOpen(false);
   };
 

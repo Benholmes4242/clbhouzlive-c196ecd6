@@ -125,11 +125,11 @@ const SetTestUserPhotoButton: React.FC = () => {
       
       if (error) throw error;
       
-      toast.success('Test user photo set!');
+      toast.success('Photo updated');
       queryClient.invalidateQueries({ queryKey: ['test-user'] });
     } catch (err) {
       console.error('Error setting test user photo:', err);
-      toast.error('Failed to set photo');
+      toast.error("Couldn't set photo");
     } finally {
       setLoading(false);
     }

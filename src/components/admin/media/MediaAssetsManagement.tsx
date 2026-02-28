@@ -113,9 +113,7 @@ export default function MediaAssetsManagement() {
       return result;
     },
     onSuccess: (data) => {
-      toast.success(`Headshot uploaded successfully!`, {
-        description: `Photo URL: ${data.publicUrl}`,
-      });
+      toast.success('Headshot uploaded');
       setSelectedPlayerId('');
       setPlayerSearch('');
       setUploadPreview(null);
@@ -123,7 +121,7 @@ export default function MediaAssetsManagement() {
       queryClient.invalidateQueries({ queryKey: ['player-search'] });
     },
     onError: (error: any) => {
-      toast.error(`Upload failed: ${error.message}`);
+      toast.error("Upload failed", { description: error.message });
     },
   });
 

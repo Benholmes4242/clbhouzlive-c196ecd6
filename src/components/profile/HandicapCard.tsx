@@ -164,10 +164,10 @@ const HandicapCard: React.FC<HandicapCardProps> = ({
         eg_app_connected: true,
       }));
 
-      toast.success("Official handicap connected successfully");
+      toast.success("Handicap connected");
     } catch (error) {
       console.error('Error connecting handicap:', error);
-      toast.error("Failed to connect handicap. Please try again.");
+      toast.error("Couldn't connect handicap", { description: "Please try again" });
     }
   }
 
@@ -193,10 +193,10 @@ const HandicapCard: React.FC<HandicapCardProps> = ({
         home_club: data.homeClub,
       }));
 
-      toast.success("Handicap saved successfully");
+      toast.success("Handicap saved");
     } catch (error) {
       console.error('Error saving handicap:', error);
-      toast.error("Failed to save handicap. Please try again.");
+      toast.error("Couldn't save handicap", { description: "Please try again" });
     }
   }
 };

@@ -293,7 +293,7 @@ export function ReviewWizard({
       setShowDeleteConfirm(false);
       
       // Show success toast
-      toast.success('Review removed', { description: 'Your review has been successfully removed.' });
+      toast.success('Review removed');
       
       // Cleanup and navigate back to course page
       wizard.cleanup();

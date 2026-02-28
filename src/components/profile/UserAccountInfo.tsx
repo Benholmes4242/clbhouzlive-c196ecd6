@@ -49,10 +49,10 @@ const UserAccountInfo: React.FC<UserAccountInfoProps> = ({
       if (profileError) throw profileError;
 
       onProfileUpdate();
-      toast.success("Profile updated", { description: "Your account information has been updated successfully." });
+      toast.success("Profile updated");
     } catch (error: any) {
       console.error('Error updating profile:', error);
-      toast.error(error.message || "Failed to update profile");
+      toast.error("Couldn't update profile");
     } finally {
       setIsUpdating(false);
     }

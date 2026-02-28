@@ -45,12 +45,12 @@ export const useBlockActions = ({ currentUserId }: UseBlockActionsProps) => {
         .delete()
         .or(`and(follower_id.eq.${currentUserId},following_id.eq.${targetUserId}),and(follower_id.eq.${targetUserId},following_id.eq.${currentUserId})`);
 
-      toast.success('User blocked');
+      toast.success('Blocked');
       invalidateQueries();
       return true;
     } catch (error) {
       console.error('Error blocking user:', error);
-      toast.error('Failed to block user');
+      toast.error("Couldn't block user");
       return false;
     } finally {
       setLoading(false);
@@ -68,12 +68,12 @@ export const useBlockActions = ({ currentUserId }: UseBlockActionsProps) => {
 
       if (error) throw error;
 
-      toast.success('User unblocked');
+      toast.success('Unblocked');
       invalidateQueries();
       return true;
     } catch (error) {
       console.error('Error unblocking user:', error);
-      toast.error('Failed to unblock user');
+      toast.error("Couldn't unblock user");
       return false;
     } finally {
       setLoading(false);

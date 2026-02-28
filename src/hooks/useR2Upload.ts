@@ -46,7 +46,7 @@ export const useR2Upload = () => {
 
       if (data?.success && (data?.url || data?.publicUrl)) {
         const imageUrl = data.url || data.publicUrl; // Handle both response formats
-        toast.success("Upload successful", { description: "Profile photo uploaded successfully!" });
+        toast.success("Photo updated");
         return { success: true, imageUrl };
       } else {
         const errorMsg = data?.error || 'Unknown upload error';

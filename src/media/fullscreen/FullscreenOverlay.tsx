@@ -141,7 +141,7 @@ export const FullscreenOverlay: React.FC<FullscreenOverlayProps> = ({
       }
     } else {
       await navigator.clipboard.writeText(shareUrl);
-      toast.success('Link copied');
+      toast.success('Copied to clipboard');
     }
     parentOnShare?.();
   }, [item, parentOnShare]);

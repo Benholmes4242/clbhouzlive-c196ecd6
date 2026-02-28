@@ -88,7 +88,7 @@ const PostPlayRatingModal = ({
   } = useReviewVideoUpload({
     uploadSessionId,
     userId: currentUserId,
-    onError: (msg) => toast.error('Video Upload Error', { description: msg }),
+    onError: (msg) => toast.error('Upload failed', { description: msg }),
   });
   
   // Cleanup pending videos on unmount
@@ -181,7 +181,7 @@ const PostPlayRatingModal = ({
       formState.setButtonText(BUTTON_TEXT.added);
       setTimeout(() => {
         if (!hasAnyMedia) {
-          toast.success(isEditMode ? 'Rating updated' : 'Rating saved', { description: `Your rating for ${course?.name || 'this course'} has been saved.` });
+          toast.success(isEditMode ? 'Rating updated' : 'Rating saved');
           formState.setIsSubmitting(false);
           formState.setButtonText(BUTTON_TEXT.addToPlayed);
           onClose();
@@ -230,7 +230,7 @@ const PostPlayRatingModal = ({
   
   const handleSubmit = async () => {
     if (!state.overallRating) {
-      toast.error("Rating Required", { description: "Please leave at least an overall rating to mark this course as played." });
+      toast.error("Rating required", { description: "Please leave at least an overall rating" });
       return;
     }
 
@@ -272,7 +272,7 @@ const PostPlayRatingModal = ({
     if (!error) {
       formState.setExistingMedia(state.existingMediaItems.filter(m => m.id !== id));
     } else {
-      toast.error("Error", { description: "Failed to remove media" });
+      toast.error("Couldn't remove media");
     }
   };
   

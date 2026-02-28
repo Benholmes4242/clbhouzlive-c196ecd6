@@ -89,7 +89,7 @@ const RatingConfirmationView = React.memo(function RatingConfirmationView(props:
     });
     
     if (shareState !== 'shared') {
-      toast.success('Rating saved', { description: `Your rating for ${courseName} has been saved.` });
+      toast.success('Rating saved');
     }
     
     onBack();

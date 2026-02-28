@@ -1109,11 +1109,11 @@ export default function CreateMomentModal({
       
       if (success) {
         await refetchScheduledPosts();
-        toast.success('Post published!');
+        toast.success('Posted');
         clearEditMode();
         onClose();
       } else {
-        toast.error('Failed to publish post');
+        toast.error("Couldn't publish post");
       }
     } catch (error) {
       console.error('[CreateMomentModal] Failed to publish scheduled post:', error);

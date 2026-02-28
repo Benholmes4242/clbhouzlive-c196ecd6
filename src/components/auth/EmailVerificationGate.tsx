@@ -41,10 +41,10 @@ export const EmailVerificationGate: React.FC<EmailVerificationGateProps> = ({ em
       });
 
       if (error) {
-        toast.error('Failed to resend verification email');
+        toast.error("Couldn't resend email");
         console.error('Resend error:', error);
       } else {
-        toast.success('Verification email sent!');
+        toast.success('Verification email sent');
         setCooldown(RESEND_COOLDOWN_SECONDS);
       }
     } catch (err) {

@@ -377,7 +377,7 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
 
   const handleCopyLink = useCallback(async () => {
     await navigator.clipboard.writeText(`${window.location.origin}/clubhouse/post/${item.id}`);
-    toast.success('Link copied');
+    toast.success('Copied to clipboard');
   }, [item.id]);
 
   const handleSend = useCallback(async () => {
@@ -390,7 +390,7 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
       }
     } else {
       await navigator.clipboard.writeText(url);
-      toast.success('Link copied');
+      toast.success('Copied to clipboard');
     }
   }, [item.id, item.title]);
 

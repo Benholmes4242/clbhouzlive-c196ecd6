@@ -107,13 +107,13 @@ export function useOpenToPlay() {
         active: false,
         expiresAt: null,
       });
-      toast.error('Error', { description: 'Could not set Open to Play.' });
+      toast.error("Couldn't activate");
       return;
     }
 
     // Success toast + haptic
     haptic('medium');
-    toast.success('Open to Play Active', { description: 'Nearby golfers can see you are available for the next 30 mins.' });
+    toast.success('Open to Play active');
   }, [user?.id, getCurrentLocation]);
 
   // Cancel broadcast with optimistic UI
@@ -144,7 +144,7 @@ export function useOpenToPlay() {
       console.error('OpenToPlay cancel error', error);
       // REVERT on failure
       persistLocal(previousState);
-      toast.error('Error', { description: 'Could not clear Open to Play.' });
+      toast.error("Couldn't deactivate");
       return;
     }
 

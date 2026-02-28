@@ -112,7 +112,7 @@ export function useRemoveRating({
     },
     onError: (error: any) => {
       console.error('[Delete Rating] Error:', error);
-      toast.error("Failed to remove course. Please try again.");
+      toast.error("Couldn't remove course", { description: "Please try again" });
     },
   });
 

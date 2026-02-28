@@ -170,7 +170,7 @@ export default function CollegeLogoManager() {
     );
     
     if (missingLogos.length === 0) {
-      toast.info('All top 20 colleges already have logos!');
+      toast.info('All top 20 colleges already have logos');
       return;
     }
     

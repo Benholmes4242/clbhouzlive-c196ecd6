@@ -35,7 +35,7 @@ const BrandingActions = ({ tabTitle, faviconFile, faviconUrl, onReset }: Brandin
       // Verify the file can be loaded as an image
       const isValid = await verifyFaviconLoaded(fileUrl);
       if (!isValid) {
-        toast.error("Error", { description: "The selected file cannot be used as a favicon. Please choose a valid image file." });
+        toast.error("Invalid favicon file");
         return;
       }
       
@@ -44,14 +44,14 @@ const BrandingActions = ({ tabTitle, faviconFile, faviconUrl, onReset }: Brandin
       // Don't save blob URLs to localStorage as they're temporary
       localStorage.removeItem('site_favicon_url');
       
-      toast.warning("Warning", { description: "File uploads are temporary and will be lost when you refresh the page. Use a permanent URL for persistent favicons. The favicon should appear shortly." });
+      toast.warning("Temporary upload", { description: "Use a permanent URL for persistent favicons" });
     } else if (faviconUrl.trim()) {
       console.log('Updating favicon with URL:', faviconUrl);
       
       // Verify the URL can be loaded as an image
       const isValid = await verifyFaviconLoaded(faviconUrl);
       if (!isValid) {
-        toast.error("Error", { description: "The favicon URL cannot be loaded. Please check the URL and ensure it's a valid, publicly accessible image." });
+        toast.error("Couldn't load favicon URL");
         return;
       }
       
@@ -60,9 +60,9 @@ const BrandingActions = ({ tabTitle, faviconFile, faviconUrl, onReset }: Brandin
       // Save to localStorage for persistence
       localStorage.setItem('site_favicon_url', faviconUrl);
       
-      toast.success("Success", { description: "Favicon and tab title updated successfully! The favicon should appear within a few seconds. You may need to refresh the page or clear browser cache if it doesn't appear immediately." });
+      toast.success("Branding updated");
     } else {
-      toast.success("Success", { description: "Tab title updated successfully!" });
+      toast.success("Title updated");
     }
 
     // Log current localStorage state

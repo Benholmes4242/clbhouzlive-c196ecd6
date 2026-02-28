@@ -284,7 +284,7 @@ const BusinessVerificationTab = () => {
     onSuccess: async (result) => {
       const business = selectedRequest?.business;
       if (result.status === 'approved') {
-        toast.success('Business verified successfully.');
+        toast.success('Business verified');
         // Notify business owners
         if (business) {
           try {

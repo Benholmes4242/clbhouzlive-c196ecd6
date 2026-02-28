@@ -187,7 +187,7 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
 
   const handleCopyLink = useCallback(async () => {
     await navigator.clipboard.writeText(`${window.location.origin}/clubhouse/post/${video.id}`);
-    toast.success('Link copied');
+    toast.success('Copied to clipboard');
   }, [video.id]);
 
   const handleSend = useCallback(async () => {
@@ -200,7 +200,7 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
       }
     } else {
       await navigator.clipboard.writeText(url);
-      toast.success('Link copied');
+      toast.success('Copied to clipboard');
     }
   }, [video.id, video.title]);
 
