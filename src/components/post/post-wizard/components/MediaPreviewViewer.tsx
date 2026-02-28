@@ -158,12 +158,13 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
         {/* Floating controls overlay — sits ON TOP of media */}
         <div
           className="absolute inset-x-0 top-0 z-10 pointer-events-none"
-          style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}
+          style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 48px)' }}
         >
           <div
-            className="absolute inset-x-0 top-0 h-28"
+            className="absolute inset-x-0 top-0"
             style={{
-              background: 'linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.25) 50%, transparent 100%)',
+              height: 'calc(env(safe-area-inset-top, 0px) + 120px)',
+              background: 'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)',
               pointerEvents: 'none',
             }}
           />
