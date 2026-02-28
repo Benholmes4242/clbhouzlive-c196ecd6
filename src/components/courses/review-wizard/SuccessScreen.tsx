@@ -110,7 +110,7 @@ export function SuccessScreen({
             border: '1.5px solid rgba(245,158,11,0.2)',
           }}
         >
-          <span className="text-xl font-bold" style={{ color: '#f59e0b' }}>
+          <span className="text-xl font-bold" style={{ color: tierData.accent }}>
             {rating === 10 ? '10' : rating.toFixed(1)}
           </span>
           <span className="text-sm text-muted-foreground ml-1">/10</span>

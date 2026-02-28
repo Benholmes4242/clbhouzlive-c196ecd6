@@ -280,7 +280,7 @@ export function RateStep({
               initial={{ opacity: 0, y: -8, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               className="text-5xl font-bold tabular-nums leading-none"
-              style={{ color: '#f59e0b' }}
+              style={{ color: getScoreTier(rating).accent }}
             >
               {rating.toFixed(1)}
             </motion.span>
@@ -345,7 +345,7 @@ export function RateStep({
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       className="text-lg font-bold tabular-nums"
-                      style={{ color: '#f59e0b' }}
+                      style={{ color: getScoreTier(score).accent }}
                     >
                       {score?.toFixed(1)}
                     </motion.span>
