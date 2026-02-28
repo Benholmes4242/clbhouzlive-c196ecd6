@@ -52,7 +52,7 @@ export function MediaThumbnail({
     : {};
 
   return (
-    <div className="relative flex-shrink-0 w-[140px] h-[140px] rounded-2xl overflow-hidden group">
+    <div className="relative flex-shrink-0 w-[160px] h-[160px] rounded-2xl overflow-hidden group">
       {/* Media with studio edits applied */}
       <div className="relative w-full h-full">
         {item.type === 'video' ? (
@@ -116,7 +116,7 @@ export function MediaThumbnail({
       {/* Studio edit button (bottom-left) — enlarged tap target */}
       <button
         onClick={(e) => { e.stopPropagation(); onStudio(); }}
-        className="absolute -bottom-1 -left-1 z-[2] w-9 h-9 flex items-center justify-center"
+        className="absolute bottom-1.5 left-1.5 z-[2] w-9 h-9 flex items-center justify-center"
         aria-label="Edit in studio"
       >
         <div
@@ -136,7 +136,7 @@ export function MediaThumbnail({
       {/* Remove button (top-right) — enlarged tap target */}
       <button
         onClick={(e) => { e.stopPropagation(); onRemove(); }}
-        className="absolute -top-1 -right-1 z-[2] w-9 h-9 flex items-center justify-center"
+        className="absolute top-1.5 right-1.5 z-[2] w-9 h-9 flex items-center justify-center"
         aria-label="Remove media"
       >
         <div
