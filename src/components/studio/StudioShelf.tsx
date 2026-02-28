@@ -194,7 +194,7 @@ export default function StudioShelf({
             {/* Top bar — compact, sits in safe area above media */}
             <div
               className="flex-shrink-0 bg-black"
-              style={{ paddingTop: '59px' }}
+              style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 44px)' }}
             >
               <div className="flex items-center justify-between px-4 h-11">
                 <button
