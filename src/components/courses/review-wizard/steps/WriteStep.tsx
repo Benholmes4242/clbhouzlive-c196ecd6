@@ -147,7 +147,7 @@ export function WriteStep({
           The Verdict
         </h2>
         <p className="text-sm text-muted-foreground mt-1">
-          Optional — skip to let your ratings speak
+          Optional – skip to let your ratings speak
         </p>
       </div>
 
@@ -242,7 +242,7 @@ export function WriteStep({
 
         {/* Prompt chips — always visible when body is short */}
         {reviewLength < 50 && (
-          <div className="flex flex-wrap gap-2 pt-1">
+          <div className="flex flex-wrap gap-2 pt-1 justify-center">
             {PROMPT_CHIPS.map(prompt => (
               <span
                 key={prompt}

@@ -179,8 +179,8 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                       </>
                     ) : (
                       <>
-                       <stop offset="0%" stopColor="#d1d5db" />
-                       <stop offset="100%" stopColor="#d1d5db" />
+                       <stop offset="0%" stopColor="#A8A29E" />
+                       <stop offset="100%" stopColor="#A8A29E" />
                       </>
                     )}
                   </linearGradient>
@@ -246,7 +246,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
             const isOutstandingCat = score >= 9;
             const barColorClass = isOutstandingCat 
              ? 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]' 
-             : 'bg-[#CBD5E1]';
+             : 'bg-[#A8A29E]';
             
             return (
               <div key={cat.id} className="space-y-1.5">
