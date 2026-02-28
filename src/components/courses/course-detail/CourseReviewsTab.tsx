@@ -430,7 +430,10 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       {/* Compact rating context */}
       <section className="px-4 py-4 bg-muted">
         <div className="flex flex-col items-center gap-1">
-          <span className="text-[40px] font-extrabold leading-none text-foreground tabular-nums">
+          <span className={cn(
+            "text-[40px] font-extrabold leading-none tabular-nums",
+            communityScore >= 9 ? "text-[#d97706]" : "text-[#78716C]"
+          )}>
             {communityScore.toFixed(1)}
           </span>
           <span className={cn(

@@ -132,7 +132,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
           "px-2.5 py-1 rounded-lg text-sm font-bold",
           score >= 9 
             ? 'bg-[#f59e0b] text-white'
-            : 'bg-[#9ca3af] text-white'
+            : 'bg-[#A8A29E] text-white'
         )}>
           {score.toFixed(1)}
         </div>

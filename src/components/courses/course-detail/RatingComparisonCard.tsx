@@ -83,14 +83,14 @@ const RatingComparisonCard: React.FC<RatingComparisonProps> = ({ userRating, agg
             </div>
 
             {/* Dual bars - brand color for Outstanding (9+), grey gradient otherwise */}
-            <div className="relative h-2.5 w-full rounded-full bg-gray-100 overflow-hidden">
+            <div className="relative h-2.5 w-full rounded-full bg-[#E7E5E4] overflow-hidden">
               {/* Community bar (background) */}
               {row.community !== null && (
                 <div
                   className={`absolute inset-y-0 left-0 rounded-full ${
                     row.community >= 9 
-                      ? 'bg-[#C1A84C]/30' 
-                      : 'bg-[#334E3D]/20'
+                      ? 'bg-[#f59e0b]/30' 
+                      : 'bg-[#A8A29E]/30'
                   }`}
                   style={{ width: `${getPercentage(row.community)}%` }}
                 />
@@ -101,8 +101,8 @@ const RatingComparisonCard: React.FC<RatingComparisonProps> = ({ userRating, agg
                 <div
                   className={`relative h-full rounded-full transition-[width] duration-500 ease-out ${
                     row.you >= 9 
-                      ? 'bg-[#C1A84C]' 
-                      : 'bg-[#334E3D]'
+                      ? 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]' 
+                      : 'bg-[#A8A29E]'
                   }`}
                   style={{ width: `${getPercentage(row.you)}%` }}
                 />
