@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { validateFiles } from '@/components/posts/utils/fileValidation';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { edgePost } from '@/utils/callEdge';
@@ -20,7 +20,6 @@ interface PostSubmissionData {
 }
 
 export const usePostSubmission = () => {
-  const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const submitPost = async ({
@@ -38,11 +37,7 @@ export const usePostSubmission = () => {
       // Validate files first
       const validation = validateFiles(mediaFiles);
       if (!validation.isValid) {
-        toast({
-          title: "Upload Error",
-          description: validation.error,
-          variant: "destructive"
-        });
+        toast.error("Upload Error", { description: validation.error });
         onError?.();
         return;
       }
@@ -91,7 +86,6 @@ export const usePostSubmission = () => {
             // For videos, try Cloudflare Stream first, then fallback to R2
             if (file.type.startsWith('video/')) {
               try {
-                // Create FormData for Cloudflare Stream upload
                 const formData = new FormData();
                 formData.append('file', file);
                 formData.append('metadata', JSON.stringify({
@@ -106,7 +100,6 @@ export const usePostSubmission = () => {
                   
                   console.log(`Successfully uploaded video to Cloudflare Stream: ${hlsUrl}`);
                   
-                  // Create media record for video with dimensions for vertical-only filtering
                   const mediaRecord: any = {
                     post_id: postData.id,
                     media_type: 'video',
@@ -114,8 +107,6 @@ export const usePostSubmission = () => {
                     stream_id: streamData.videoId,
                   };
 
-                  // Include dimensions if available (enables vertical-only gate immediately)
-                  // AR = width / height, clamped to 4 decimals
                   if (streamData.width && streamData.height) {
                     mediaRecord.width = streamData.width;
                     mediaRecord.height = streamData.height;
@@ -156,7 +147,6 @@ export const usePostSubmission = () => {
 
             console.log(`Successfully uploaded ${file.name}, public URL: ${publicUrl}`);
 
-            // Create media record
             const { error: mediaError } = await supabase
               .from('post_media')
               .insert({
@@ -177,7 +167,6 @@ export const usePostSubmission = () => {
           }
         });
 
-        // Wait for all uploads to complete
         const uploadResults = await Promise.all(uploadPromises);
         const failedUploads = uploadResults.filter(result => !result.success);
         
@@ -206,7 +195,6 @@ export const usePostSubmission = () => {
       console.error('Error submitting post:', error);
       onError?.();
       
-      // Provide more specific error messages
       let errorMessage = "Failed to create post. Please try again.";
       if (error instanceof Error) {
         if (error.message.includes('Failed to upload')) {
@@ -218,11 +206,7 @@ export const usePostSubmission = () => {
         }
       }
       
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive"
-      });
+      toast.error("Error", { description: errorMessage });
     } finally {
       setIsSubmitting(false);
     }

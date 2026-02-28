@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useToast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { MapPin, Play, Pause, RotateCcw } from 'lucide-react';
 
@@ -25,14 +25,13 @@ const GeocodeUtility = () => {
     skipped: 0
   });
   const [currentClub, setCurrentClub] = useState<string>('');
-  const { toast } = useToast();
 
   const fetchClubsWithoutCoordinates = async () => {
     const { data, error } = await supabase
       .from('golf_courses')
       .select('id, name, region, country, sub_country')
       .is('latitude', null)
-      .limit(100); // Process in batches
+      .limit(100);
 
     if (error) {
       console.error('Error fetching clubs:', error);
@@ -73,9 +72,8 @@ const GeocodeUtility = () => {
     const clubs = await fetchClubsWithoutCoordinates();
     
     if (clubs.length === 0) {
-      toast({
-        title: "No clubs found",
-        description: "All clubs already have coordinates or no clubs exist",
+      toast.success('No clubs found', {
+        description: 'All clubs already have coordinates or no clubs exist',
       });
       setIsRunning(false);
       return;
@@ -91,7 +89,6 @@ const GeocodeUtility = () => {
 
     for (let i = 0; i < clubs.length; i++) {
       if (isPaused) {
-        // Wait for unpause
         while (isPaused && isRunning) {
           await new Promise(resolve => setTimeout(resolve, 100));
         }
@@ -111,15 +108,13 @@ const GeocodeUtility = () => {
         failed: prev.failed + (success ? 0 : 1)
       }));
 
-      // Rate limiting - wait 1 second between requests
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
     setIsRunning(false);
     setCurrentClub('');
     
-    toast({
-      title: "Geocoding complete",
+    toast.success('Geocoding complete', {
       description: `Processed ${stats.processed} clubs. ${stats.successful} successful, ${stats.failed} failed.`,
     });
   };

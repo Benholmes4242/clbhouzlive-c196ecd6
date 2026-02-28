@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle, XCircle, Mail } from "lucide-react";
@@ -9,7 +9,6 @@ import { Loader2, CheckCircle, XCircle, Mail } from "lucide-react";
 export function InviteAcceptPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [message, setMessage] = useState("");
   const [role, setRole] = useState<string | null>(null);
@@ -27,11 +26,9 @@ export function InviteAcceptPage() {
       return;
     }
 
-    // Check if user is authenticated
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
-      // Redirect to login with return URL
       const returnUrl = encodeURIComponent(`/admin/invite-accept?token=${token}`);
       navigate(`/login?returnUrl=${returnUrl}`);
       return;
@@ -49,22 +46,18 @@ export function InviteAcceptPage() {
       setRole(data.role);
       setMessage(`Admin access granted! You now have ${data.role} admin privileges.`);
       
-      toast({
-        title: "Success",
+      toast.success("Success", {
         description: "Admin invitation accepted successfully",
       });
 
-      // Redirect to admin panel after 2 seconds
       setTimeout(() => {
         navigate("/admin");
       }, 2000);
     } catch (error: any) {
       setStatus("error");
       setMessage(error.message || "Failed to accept invitation. It may be invalid or expired.");
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: error.message,
-        variant: "destructive",
       });
     }
   };

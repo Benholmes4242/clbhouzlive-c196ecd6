@@ -8,9 +8,7 @@ import { StudioEdits, StudioTool, TextOverlay } from "@/types/studio";
 
 import SoundtrackStrip from "@/components/studio/SoundtrackStrip";
 import TextOverlayRenderer from "@/components/studio/TextOverlayRenderer";
-import { useToast } from "@/hooks/use-toast";
-
-
+import { toast } from "sonner";
 
 interface CreateMomentMediaStageProps {
   media: ComposerMediaItem[];
@@ -21,23 +19,15 @@ interface CreateMomentMediaStageProps {
   onRemoveMedia: (mediaId: string) => void;
   onReorder: (fromIndex: number, toIndex: number) => void;
   getEdits: (mediaId: string) => StudioEdits;
-  // Studio integration for editable text overlays
   activeTool?: StudioTool;
   onUpdateEdits?: (mediaId: string, patch: Partial<StudioEdits>) => void;
-  // Position mode - enables drag/pinch/rotate
   isPositioningText?: boolean;
-  // Active overlay selection (synced with panel)
   activeOverlayId?: string | null;
   onSelectOverlay?: (id: string | null) => void;
-  // Achievement badges selected for this post
   selectedBadges?: string[];
-  // Callback when drag state changes (to block sheet dismiss)
   onDragStateChange?: (isDragging: boolean) => void;
-  // Per-item processing state (videos being processed)
   processingMediaIds?: Set<string>;
-  // Per-item warning state (poster generation failed)
   warningMediaIds?: Set<string>;
-  // Items being animated out before removal
   removingMediaIds?: Set<string>;
 }
 
@@ -62,7 +52,6 @@ export default function CreateMomentMediaStage({
   removingMediaIds,
 }: CreateMomentMediaStageProps) {
   const prefersReducedMotion = useReducedMotion();
-  const { toast } = useToast();
   const stageContainerRef = useRef<HTMLDivElement>(null);
   const mediaContainerRef = useRef<HTMLDivElement>(null);
   const carouselRef = useRef<{ scrollToIndex: (index: number) => void } | null>(null);
@@ -102,8 +91,7 @@ export default function CreateMomentMediaStage({
   }, [media, getEdits]);
 
   const handleMuteBlocked = () => {
-    toast({
-      description: "Original audio is muted because a track is applied.",
+    toast("Original audio is muted because a track is applied.", {
       duration: 2000,
     });
   };
@@ -217,8 +205,6 @@ export default function CreateMomentMediaStage({
             </p>
           </div>
         )}
-
-
 
         {/* Video timestamp - bottom left corner for videos only - consistent pill style */}
         {currentItem?.type === 'video' && currentItem?.duration && (

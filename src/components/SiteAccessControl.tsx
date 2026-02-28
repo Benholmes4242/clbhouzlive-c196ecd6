@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { DoorClosed, Shield } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
 interface SiteAccessControlProps {
@@ -18,13 +18,10 @@ const SiteAccessControl: React.FC<SiteAccessControlProps> = ({ children }) => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const { user } = useSupabaseSession();
-  const { toast } = useToast();
 
-  // Check if user already has access
   useEffect(() => {
     const checkAccess = async () => {
       try {
-        // Check if user is an admin (admins get automatic access)
         if (user) {
           const { data: hasAdminRole } = await supabase.rpc('is_admin');
           if (hasAdminRole) {
@@ -34,7 +31,6 @@ const SiteAccessControl: React.FC<SiteAccessControlProps> = ({ children }) => {
           }
         }
 
-        // Check local storage for valid secure access
         const storedAccessStr = localStorage.getItem('siteAccess');
         
         if (storedAccessStr) {
@@ -48,11 +44,9 @@ const SiteAccessControl: React.FC<SiteAccessControlProps> = ({ children }) => {
               const expiryDate = new Date(accessData.expiresAt);
               const now = new Date();
               
-              // Check if access is still valid
               if (now < expiryDate) {
                 setHasAccess(true);
               } else {
-                // Clear expired access
                 localStorage.removeItem('siteAccess');
               }
             }
@@ -77,7 +71,6 @@ const SiteAccessControl: React.FC<SiteAccessControlProps> = ({ children }) => {
     setError('');
     
     try {
-      // Validate access code using secure backend function
       const { data, error } = await supabase.functions.invoke('secure-site-access', {
         body: {
           accessCode: accessCode,
@@ -90,7 +83,6 @@ const SiteAccessControl: React.FC<SiteAccessControlProps> = ({ children }) => {
       }
 
       if (data.success) {
-        // Store secure session data
         const accessData = {
           granted: true,
           timestamp: Date.now(),
@@ -102,8 +94,7 @@ const SiteAccessControl: React.FC<SiteAccessControlProps> = ({ children }) => {
         localStorage.setItem('siteAccess', JSON.stringify(accessData));
         setHasAccess(true);
         
-        toast({
-          title: 'Access Granted',
+        toast.success('Access Granted', {
           description: 'Welcome to clubhouz!',
         });
       } else {
@@ -138,7 +129,6 @@ const SiteAccessControl: React.FC<SiteAccessControlProps> = ({ children }) => {
       <Card className="w-full max-w-md">
         <CardContent className="p-8">
           <div className="text-center space-y-6">
-            {/* Security Icon */}
             <div className="flex justify-center">
               <div className="w-16 h-16 rounded-full bg-muted/20 flex items-center justify-center">
                 <Shield className="h-8 w-8 text-muted-foreground" />
@@ -152,7 +142,6 @@ const SiteAccessControl: React.FC<SiteAccessControlProps> = ({ children }) => {
               </p>
             </div>
             
-            {/* Access Code Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <Input

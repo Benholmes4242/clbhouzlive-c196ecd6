@@ -6,93 +6,43 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Loader2, Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-interface EmailChangeSectionProps {
-  currentEmail?: string;
-}
+interface EmailChangeSectionProps { currentEmail?: string; }
 
 const EmailChangeSection: React.FC<EmailChangeSectionProps> = ({ currentEmail }) => {
-  const { toast } = useToast();
   const [newEmail, setNewEmail] = useState('');
   const [confirmEmail, setConfirmEmail] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const isValidEmail = (email: string) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
-
-  const canChangeEmail = () => {
-    return newEmail && 
-           confirmEmail && 
-           newEmail === confirmEmail && 
-           isValidEmail(newEmail) && 
-           newEmail !== currentEmail;
-  };
+  const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const canChangeEmail = () => newEmail && confirmEmail && newEmail === confirmEmail && isValidEmail(newEmail) && newEmail !== currentEmail;
 
   const handleEmailChange = async () => {
     if (!canChangeEmail()) return;
-
     setLoading(true);
     try {
-      // Use secure email change endpoint
       const { data, error } = await supabase.functions.invoke('secure-email-change', {
-        body: {
-          newEmail: newEmail,
-          currentEmail: currentEmail
-        }
+        body: { newEmail, currentEmail }
       });
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
 
-      if (error) {
-        throw error;
-      }
-
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      toast({
-        title: "Email Updated Successfully",
+      toast.success("Email Updated Successfully", {
         description: `Your email address has been changed. You'll be signed out in a few seconds to re-authenticate with your new email.`,
       });
-
-      // Clear form
       setNewEmail('');
       setConfirmEmail('');
-      
-      // Sign out user to force re-login with new email
-      setTimeout(() => {
-        supabase.auth.signOut();
-      }, 3000);
-      
+      setTimeout(() => { supabase.auth.signOut(); }, 3000);
     } catch (error: any) {
-      console.error('Error changing email:', error);
-      
       let errorMessage = error.message || "Failed to change email";
-      
-      // Handle specific error cases
-      if (error.message?.includes('cooldown')) {
-        errorMessage = "Email change is in cooldown period. Please wait before changing your email again.";
-      } else if (error.message?.includes('already in use')) {
-        errorMessage = "This email address is already in use by another account.";
-      }
-      
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      if (error.message?.includes('cooldown')) errorMessage = "Email change is in cooldown period. Please wait before changing your email again.";
+      else if (error.message?.includes('already in use')) errorMessage = "This email address is already in use by another account.";
+      toast.error("Error", { description: errorMessage });
     } finally {
       setLoading(false);
     }
@@ -100,86 +50,24 @@ const EmailChangeSection: React.FC<EmailChangeSectionProps> = ({ currentEmail })
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Mail className="h-5 w-5" />
-          Change Email Address
-        </CardTitle>
-      </CardHeader>
+      <CardHeader><CardTitle className="flex items-center gap-2"><Mail className="h-5 w-5" />Change Email Address</CardTitle></CardHeader>
       <CardContent className="space-y-4">
-        <div>
-          <Label htmlFor="current-email">Current Email</Label>
-          <Input
-            id="current-email"
-            type="email"
-            value={currentEmail || ''}
-            disabled
-            className="bg-gray-100"
-          />
-        </div>
-
+        <div><Label htmlFor="current-email">Current Email</Label><Input id="current-email" type="email" value={currentEmail || ''} disabled className="bg-gray-100" /></div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="new-email">New Email</Label>
-            <Input
-              id="new-email"
-              type="email"
-              value={newEmail}
-              onChange={(e) => setNewEmail(e.target.value)}
-              placeholder="Enter new email address"
-              disabled={loading}
-            />
-          </div>
-          <div>
-            <Label htmlFor="confirm-email">Confirm New Email</Label>
-            <Input
-              id="confirm-email"
-              type="email"
-              value={confirmEmail}
-              onChange={(e) => setConfirmEmail(e.target.value)}
-              placeholder="Confirm new email address"
-              disabled={loading}
-            />
-          </div>
+          <div><Label htmlFor="new-email">New Email</Label><Input id="new-email" type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="Enter new email address" disabled={loading} /></div>
+          <div><Label htmlFor="confirm-email">Confirm New Email</Label><Input id="confirm-email" type="email" value={confirmEmail} onChange={(e) => setConfirmEmail(e.target.value)} placeholder="Confirm new email address" disabled={loading} /></div>
         </div>
-
-        {newEmail && confirmEmail && newEmail !== confirmEmail && (
-          <p className="text-sm text-destructive">Email addresses do not match</p>
-        )}
-
-        {newEmail && !isValidEmail(newEmail) && (
-          <p className="text-sm text-destructive">Please enter a valid email address</p>
-        )}
-
-        {newEmail && newEmail === currentEmail && (
-          <p className="text-sm text-muted-foreground">This is your current email address</p>
-        )}
-
+        {newEmail && confirmEmail && newEmail !== confirmEmail && <p className="text-sm text-destructive">Email addresses do not match</p>}
+        {newEmail && !isValidEmail(newEmail) && <p className="text-sm text-destructive">Please enter a valid email address</p>}
+        {newEmail && newEmail === currentEmail && <p className="text-sm text-muted-foreground">This is your current email address</p>}
         <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button
-              disabled={!canChangeEmail() || loading}
-              className="w-full md:w-auto"
-            >
-              {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Change Email
-            </Button>
-          </AlertDialogTrigger>
+          <AlertDialogTrigger asChild><Button disabled={!canChangeEmail() || loading} className="w-full md:w-auto">{loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Change Email</Button></AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Change Email Address</AlertDialogTitle>
-               <AlertDialogDescription>
-                You are about to change your email from <strong>{currentEmail}</strong> to <strong>{newEmail}</strong>.
-                <br /><br />
-                Your email will be updated immediately and you will need to sign in again with your new email address.
-              </AlertDialogDescription>
+              <AlertDialogDescription>You are about to change your email from <strong>{currentEmail}</strong> to <strong>{newEmail}</strong>.<br /><br />Your email will be updated immediately and you will need to sign in again with your new email address.</AlertDialogDescription>
             </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleEmailChange}>
-                Change Email Now
-              </AlertDialogAction>
-            </AlertDialogFooter>
+            <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={handleEmailChange}>Change Email Now</AlertDialogAction></AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
       </CardContent>

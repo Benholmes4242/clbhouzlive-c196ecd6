@@ -15,7 +15,7 @@
    AlertDialogTitle,
  } from '@/components/ui/alert-dialog';
  import { supabase } from '@/integrations/supabase/client';
- import { useToast } from '@/hooks/use-toast';
+ import { toast } from 'sonner';
  import { haptic } from '@/utils/haptics';
  
  interface BlockUserDialogProps {
@@ -33,7 +33,6 @@
    userName,
    onBlocked,
  }: BlockUserDialogProps) {
-   const { toast } = useToast();
    const [blocking, setBlocking] = useState(false);
  
    const handleBlock = async () => {
@@ -47,8 +46,7 @@
  
        if (error) throw error;
  
-       toast({
-         title: 'User blocked',
+       toast.success('User blocked', {
          description: `${userName} can no longer message you.`,
        });
  
@@ -56,10 +54,7 @@
        onOpenChange(false);
      } catch (error) {
        console.error('Error blocking user:', error);
-       toast({
-         title: 'Failed to block user',
-         variant: 'destructive',
-       });
+       toast.error('Failed to block user');
      } finally {
        setBlocking(false);
      }
