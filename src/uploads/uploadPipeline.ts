@@ -784,16 +784,7 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
         : job.scheduledAt || undefined,
     });
     
-    // Show success toast (only for non-scheduled posts)
-    if (!job.scheduledAt) {
-      toast.success('Your moment has been posted!', {
-        duration: 4000,
-      });
-    } else {
-      toast.success('Your moment has been scheduled!', {
-        duration: 4000,
-      });
-    }
+    // PostSuccessScreen handles all post-success feedback
 
   } catch (error: any) {
     console.error('[uploadPipeline] processJob failed:', error);
@@ -1283,7 +1274,7 @@ async function processReviewJob(jobId: string, job: any): Promise<void> {
       actorId: job.actorId,
     });
     
-    toast.success('Your review has been posted!', {
+    toast.success('Review posted', {
       description: reviewData.courseName,
     });
     

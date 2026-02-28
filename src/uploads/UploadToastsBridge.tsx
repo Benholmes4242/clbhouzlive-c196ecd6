@@ -24,22 +24,14 @@ export function UploadToastsBridge() {
     });
 
     const offComplete = uploadEventBus.on('upload:complete', (evt) => {
-      // Don't show "Posted" toast for scheduled posts - they have their own toast
+      // PostSuccessScreen handles all post-success feedback — no toast here
+
+      // Still invalidate queries so content appears
       if (evt.isScheduled) {
-        // Still invalidate scheduled posts query
         queryClient.invalidateQueries({ queryKey: ['scheduled-posts'] });
         queryClient.invalidateQueries({ queryKey: ['scheduled-posts-count'] });
-        return;
       }
-      
-      // Show success toast for immediately published posts
-      toast({
-        title: "Posted ✓",
-        description: "Now live on clbhouz",
-        duration: TOAST_DURATION_MS,
-      });
 
-      // Invalidate the actor-scoped feed so media appears immediately
       if (evt.actorType && evt.actorId) {
         queryClient.invalidateQueries({ 
           queryKey: postKeys.actorPosts(evt.actorType, evt.actorId) 
@@ -49,7 +41,6 @@ export function UploadToastsBridge() {
         });
       }
       
-      // Also invalidate trending for good measure
       queryClient.invalidateQueries({ 
         queryKey: postKeys.trending() 
       });

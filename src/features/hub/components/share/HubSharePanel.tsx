@@ -141,7 +141,7 @@ export function HubSharePanel({
     try {
       await navigator.clipboard.writeText(getShareUrl());
       setLinkCopied(true);
-      toast.success('Link copied!');
+      toast.success('Copied to clipboard');
       setTimeout(() => setLinkCopied(false), 2000);
     } catch {
       toast.error('Failed to copy link');

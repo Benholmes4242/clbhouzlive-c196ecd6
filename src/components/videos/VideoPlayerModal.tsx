@@ -833,7 +833,7 @@ export const VideoPlayerModal: React.FC = () => {
                       onClick={() => {
                         const url = `${window.location.origin}/video/${videoData.id}`;
                         navigator.clipboard.writeText(url);
-                        toast.success('Link copied to clipboard!');
+                        toast.success('Copied to clipboard');
                       }}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 text-white/70 hover:bg-white/20 hover:text-white transition-all"
                     >
