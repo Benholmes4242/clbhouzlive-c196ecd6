@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from './use-toast';
+import { toast } from 'sonner';
 
 /**
  * Check if current user is following a business
@@ -49,7 +49,7 @@ export function useBusinessFollowersCount(businessId: string | undefined) {
  */
 export function useBusinessFollowMutation(businessId: string, userId: string | undefined) {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
+  
 
   const statusKey = ['business-follow-status', businessId, userId];
   const countKey = ['business-followers-count', businessId];
@@ -76,7 +76,7 @@ export function useBusinessFollowMutation(businessId: string, userId: string | u
         queryClient.setQueryData(statusKey, context.prevStatus);
         queryClient.setQueryData(countKey, context.prevCount);
       }
-      toast({ title: 'Error', description: 'Failed to follow business.', variant: 'destructive' });
+      toast.error('Error', { description: 'Failed to follow business.' });
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: statusKey });
@@ -108,7 +108,7 @@ export function useBusinessFollowMutation(businessId: string, userId: string | u
         queryClient.setQueryData(statusKey, context.prevStatus);
         queryClient.setQueryData(countKey, context.prevCount);
       }
-      toast({ title: 'Error', description: 'Failed to unfollow business.', variant: 'destructive' });
+      toast.error('Error', { description: 'Failed to unfollow business.' });
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: statusKey });

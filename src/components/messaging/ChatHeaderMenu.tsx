@@ -25,7 +25,7 @@
    DropdownMenuTrigger,
  } from '@/components/ui/dropdown-menu';
  import { supabase } from '@/integrations/supabase/client';
- import { useToast } from '@/hooks/use-toast';
+ import { toast } from 'sonner';
  import { haptic } from '@/utils/haptics';
  import { BlockUserDialog } from './BlockUserDialog';
  import { ReportSheet } from './ReportSheet';
@@ -58,7 +58,7 @@
    otherUserName = 'User',
  }: ChatHeaderMenuProps) {
    const navigate = useNavigate();
-   const { toast } = useToast();
+   
    const [showBlockDialog, setShowBlockDialog] = useState(false);
    const [showReportSheet, setShowReportSheet] = useState(false);
    
@@ -83,15 +83,10 @@
        
        if (error) throw error;
        
-       toast({
-         title: isMuted ? 'Notifications unmuted' : 'Notifications muted',
-       });
+       toast.success(isMuted ? 'Notifications unmuted' : 'Notifications muted');
      } catch (error) {
        console.error('Error toggling mute:', error);
-       toast({
-         title: 'Failed to update notifications',
-         variant: 'destructive',
-       });
+       toast.error('Failed to update notifications');
      }
    };
  
@@ -108,11 +103,11 @@
        
        if (error) throw error;
        
-       toast({ title: 'Chat cleared' });
+       toast.success('Chat cleared');
        window.location.reload(); // Refresh to show empty chat
      } catch (error) {
        console.error('Error clearing chat:', error);
-       toast({ title: 'Failed to clear chat', variant: 'destructive' });
+       toast.error('Failed to clear chat');
      }
    };
  
@@ -138,11 +133,11 @@
        
        if (error) throw error;
        
-       toast({ title: 'Left group' });
+       toast.success('Left group');
        onBack?.();
      } catch (error) {
        console.error('Error leaving group:', error);
-       toast({ title: 'Failed to leave group', variant: 'destructive' });
+       toast.error('Failed to leave group');
      }
    };
  

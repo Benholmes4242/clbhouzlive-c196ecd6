@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Bell, Info } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface NotificationPreferences {
   new_follower: boolean;
@@ -19,7 +19,7 @@ interface NotificationPreferences {
 
 const NotificationSettings = () => {
   const { user } = useSupabaseSession();
-  const { toast } = useToast();
+  
   const [preferences, setPreferences] = useState<NotificationPreferences>({
     new_follower: true,
     post_likes: true,
@@ -64,11 +64,7 @@ const NotificationSettings = () => {
       }
     } catch (error) {
       console.error('Error loading notification preferences:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load notification preferences",
-        variant: "destructive",
-      });
+      toast.error("Error", { description: "Failed to load notification preferences" });
     } finally {
       setIsLoading(false);
     }
@@ -86,17 +82,10 @@ const NotificationSettings = () => {
 
       if (error) throw error;
 
-      toast({
-        title: "Success",
-        description: "Notification preferences updated",
-      });
+      toast.success("Success", { description: "Notification preferences updated" });
     } catch (error) {
       console.error('Error updating notification preferences:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update notification preferences",
-        variant: "destructive",
-      });
+      toast.error("Error", { description: "Failed to update notification preferences" });
     } finally {
       setIsSaving(false);
     }

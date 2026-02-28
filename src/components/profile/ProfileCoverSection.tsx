@@ -4,7 +4,7 @@ import { Camera, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 
 interface ProfileCoverSectionProps {
@@ -21,7 +21,7 @@ const ProfileCoverSection: React.FC<ProfileCoverSectionProps> = ({
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { user } = useSupabaseSession();
-  const { toast } = useToast();
+  
 
   const handleCoverUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -37,11 +37,7 @@ const ProfileCoverSection: React.FC<ProfileCoverSectionProps> = ({
 
       if (!uploadResult.success) {
         console.error('Error uploading cover image:', uploadResult.error);
-        toast({
-          title: "Upload failed",
-          description: uploadResult.error || "Failed to upload cover image",
-          variant: "destructive"
-        });
+        toast.error("Upload failed", { description: uploadResult.error || "Failed to upload cover image" });
         return;
       }
 

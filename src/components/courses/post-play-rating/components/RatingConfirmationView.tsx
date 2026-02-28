@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -12,7 +12,7 @@ import type { RatingConfirmationViewProps, ExistingMedia, ShareState } from '../
 
 const RatingConfirmationView = React.memo(function RatingConfirmationView(props: RatingConfirmationViewProps) {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  
   const { user } = useSupabaseSession();
   const { data: userProfile } = useUserProfile(user?.id);
   
@@ -89,10 +89,7 @@ const RatingConfirmationView = React.memo(function RatingConfirmationView(props:
     });
     
     if (shareState !== 'shared') {
-      toast({
-        title: 'Rating saved',
-        description: `Your rating for ${courseName} has been saved.`,
-      });
+      toast.success('Rating saved', { description: `Your rating for ${courseName} has been saved.` });
     }
     
     onBack();

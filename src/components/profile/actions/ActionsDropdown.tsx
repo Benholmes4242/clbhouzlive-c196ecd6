@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface ActionsDropdownProps {
   friendStatus: 'pending' | 'accepted' | null;
@@ -23,7 +23,7 @@ const ActionsDropdown: React.FC<ActionsDropdownProps> = ({
   onRemoveFriend,
   username
 }) => {
-  const { toast } = useToast();
+  
   const triggerRef = useRef<HTMLButtonElement>(null);
 
   // Blur trigger on close to prevent stuck focus ring
@@ -59,18 +59,12 @@ const ActionsDropdown: React.FC<ActionsDropdownProps> = ({
           </DropdownMenuItem>
         )}
         <DropdownMenuItem onClick={() => {
-          toast({
-            title: "Coming soon",
-            description: "Block user functionality will be available soon.",
-          });
+          toast.info("Coming soon", { description: "Block user functionality will be available soon." });
         }}>
           Block User
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => {
-          toast({
-            title: "Coming soon", 
-            description: "Report user functionality will be available soon.",
-          });
+          toast.info("Coming soon", { description: "Report user functionality will be available soon." });
         }}>
           Report User
         </DropdownMenuItem>

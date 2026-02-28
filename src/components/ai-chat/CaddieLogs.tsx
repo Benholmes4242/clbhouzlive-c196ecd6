@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Search, Edit, Trash2, MapPin, Calendar, Mic, MicOff, Send } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { channelManager } from '@/utils/supabaseChannelManager';
 
 interface CaddieLog {
@@ -43,7 +43,7 @@ const CaddieLogs: React.FC<CaddieLogsProps> = ({
   const [editingLog, setEditingLog] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const { toast } = useToast();
+  
 
   // Auto-scroll is now managed by parent AIChatOverlay
   // Remove local auto-scroll since parent provides the ScrollArea and ref
@@ -132,11 +132,7 @@ const CaddieLogs: React.FC<CaddieLogsProps> = ({
       setLogs(data || []);
     } catch (error) {
       console.error('Error fetching caddie logs:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load caddie logs",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "Failed to load caddie logs" });
     } finally {
       setIsLoading(false);
     }
@@ -152,17 +148,10 @@ const CaddieLogs: React.FC<CaddieLogsProps> = ({
       if (error) throw error;
 
       setLogs(logs.filter(log => log.id !== logId));
-      toast({
-        title: "Log deleted",
-        description: "Caddie log has been removed",
-      });
+      toast.success("Log deleted", { description: "Caddie log has been removed" });
     } catch (error) {
       console.error('Error deleting log:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete log",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "Failed to delete log" });
     }
   };
 
@@ -182,17 +171,10 @@ const CaddieLogs: React.FC<CaddieLogsProps> = ({
       setEditingLog(null);
       setEditContent('');
       
-      toast({
-        title: "Log updated",
-        description: "Your caddie log has been saved",
-      });
+      toast.success("Log updated", { description: "Your caddie log has been saved" });
     } catch (error) {
       console.error('Error updating log:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update log",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "Failed to update log" });
     }
   };
 

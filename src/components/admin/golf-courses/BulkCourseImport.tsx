@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Progress } from '@/components/ui/progress';
 
@@ -612,7 +612,7 @@ const BulkCourseImport: React.FC = () => {
   const [isImporting, setIsImporting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [importedCount, setImportedCount] = useState(0);
-  const { toast } = useToast();
+  
 
   const handleImport = async () => {
     setIsImporting(true);
@@ -653,17 +653,10 @@ const BulkCourseImport: React.FC = () => {
         setProgress(((i + 1) / totalCourses) * 100);
       }
 
-      toast({
-        title: "Import Complete",
-        description: `Successfully imported ${importedCount} new courses`,
-      });
+      toast.success("Import Complete", { description: `Successfully imported ${importedCount} new courses` });
     } catch (error) {
       console.error('Import error:', error);
-      toast({
-        title: "Import Error",
-        description: "Failed to import courses",
-        variant: "destructive",
-      });
+      toast.error("Import Error", { description: "Failed to import courses" });
     } finally {
       setIsImporting(false);
     }

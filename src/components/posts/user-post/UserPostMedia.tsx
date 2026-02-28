@@ -8,7 +8,7 @@ import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { cn } from '@/lib/utils';
 import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 
@@ -37,7 +37,7 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
   isClubhouse = false,
   badges
 }) => {
-  const { toast } = useToast();
+  
   const { isGloballyMuted } = useGlobalAudio();
   
   // Track active slide index for per-slide autoplay control
@@ -83,10 +83,7 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
   }, [media]);
 
   const handleMuteBlocked = () => {
-    toast({
-      description: "Original audio is muted because a track is applied.",
-      duration: 2000,
-    });
+    toast("Original audio is muted because a track is applied.", { duration: 2000 });
   };
 
   if (!media || media.length === 0) return null;

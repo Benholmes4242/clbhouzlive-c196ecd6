@@ -30,11 +30,7 @@ const AdminSetupPage = () => {
   useEffect(() => {
     const verifyToken = async () => {
       if (!token) {
-        toast({
-          title: "Invalid Link",
-          description: "This invitation link is invalid or has expired.",
-          variant: "destructive",
-        });
+        toast.error("Invalid Link", { description: "This invitation link is invalid or has expired." });
         navigate('/');
         return;
       }
