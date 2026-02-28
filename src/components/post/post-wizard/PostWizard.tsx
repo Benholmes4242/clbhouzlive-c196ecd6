@@ -189,8 +189,15 @@ export function PostWizard({
   // Media preview viewer state
   const [previewMediaIndex, setPreviewMediaIndex] = useState<number | null>(null);
 
-  // Status bar
-  useMedianStatusBar("light", "transparent", true, false, isOpen);
+  // Status bar — switch to dark (white icons) when fullscreen viewer is open over black
+  const isViewerOpen = previewMediaIndex !== null;
+  useMedianStatusBar(
+    isViewerOpen ? "dark" : "light",
+    "transparent",
+    true,
+    false,
+    isOpen
+  );
 
   // Lock body scroll
   useEffect(() => {
