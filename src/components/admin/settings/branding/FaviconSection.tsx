@@ -3,7 +3,7 @@ import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { AlertTriangle } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface FaviconSectionProps {
   faviconFile: File | null;
@@ -18,18 +18,11 @@ const FaviconSection = ({
   onFaviconFileChange, 
   onFaviconUrlChange 
 }: FaviconSectionProps) => {
-  const { toast } = useToast();
-
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Check if it's an image file
       if (!file.type.startsWith('image/')) {
-        toast({
-          title: "Error",
-          description: "Please select a valid image file (PNG, JPG, etc.)",
-          variant: "destructive",
-        });
+        toast.error("Please select a valid image file (PNG, JPG, etc.)");
         return;
       }
       onFaviconFileChange(file);

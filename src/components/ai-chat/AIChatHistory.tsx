@@ -6,7 +6,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useConversationSession } from '@/hooks/useConversationSession';
 import { useCaddieLogs } from '@/hooks/useCaddieLogs';
 import { useEchoProtection } from '@/hooks/useEchoProtection';
@@ -42,7 +42,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({
   layout = 'overlay'
 }) => {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  
   const isPageMode = layout === 'page';
 
   // State
@@ -170,19 +170,12 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({
         setExpandedCard(null);
       }
       
-      toast({
-        title: "Conversation deleted",
-        description: "The conversation has been removed from your history",
-      });
+      toast.success("Conversation deleted");
     } catch (error) {
       console.error('Error deleting conversation:', error);
-      toast({
-        title: "Delete failed",
-        description: "Failed to delete the conversation. Please try again.",
-        variant: "destructive"
-      });
+      toast.error("Failed to delete the conversation. Please try again.");
     }
-  }, [session, removeConversation, expandedCard, toast]);
+  }, [session, removeConversation, expandedCard]);
 
   const deleteSwingAnalysis = useCallback(async (analysisId: string) => {
     try {
@@ -192,19 +185,12 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({
         setExpandedCard(null);
       }
       
-      toast({
-        title: "Analysis deleted",
-        description: "The swing analysis has been removed from your history",
-      });
+      toast.success("Analysis deleted");
     } catch (error) {
       console.error('Error deleting swing analysis:', error);
-      toast({
-        title: "Delete failed",
-        description: "Failed to delete the swing analysis. Please try again.",
-        variant: "destructive"
-      });
+      toast.error("Failed to delete the swing analysis. Please try again.");
     }
-  }, [removeSwingAnalysis, expandedCard, toast]);
+  }, [removeSwingAnalysis, expandedCard]);
 
   // Shared props for all mode views
   const modeViewProps = {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, CheckSquare } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import GolfCoursesTable from './golf-courses/GolfCoursesTable';
 import CascadingFilters from './golf-courses/CascadingFilters';
@@ -21,7 +21,7 @@ import { Loader2 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 const GolfCoursesManagement = () => {
-  const { toast } = useToast();
+  
   const navigate = useNavigate();
   const [regionalFilter, setRegionalFilter] = useState<RegionalFilter>({
     scope: 'all',

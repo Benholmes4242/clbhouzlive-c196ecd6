@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Music, Play, Pause, Volume2, VolumeX } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface MusicTrack {
   id: string;
@@ -52,7 +52,7 @@ const BackgroundMusicSelector: React.FC<BackgroundMusicSelectorProps> = ({
   disabled = false,
   hasVideo = false
 }) => {
-  const { toast } = useToast();
+  
   const [selectedTrack, setSelectedTrack] = useState<MusicTrack>(MUSIC_TRACKS[0]);
   const [replaceOriginalAudio, setReplaceOriginalAudio] = useState(true);
   const [isPlaying, setIsPlaying] = useState<string | null>(null);
@@ -159,11 +159,7 @@ const BackgroundMusicSelector: React.FC<BackgroundMusicSelectorProps> = ({
       }
     } catch (error) {
       console.error('Audio playback failed:', error);
-      toast({
-        title: "Audio preview unavailable",
-        description: "Unable to play preview for this track",
-        variant: "destructive"
-      });
+      toast.error("Unable to play preview for this track");
     }
   };
 

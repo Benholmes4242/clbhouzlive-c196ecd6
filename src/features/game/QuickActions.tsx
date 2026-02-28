@@ -2,7 +2,7 @@ import React from 'react';
 import { MapPin, Calendar, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { buildIcs, downloadIcs } from '@/utils/ics';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { Game } from '@/features/nearby/types';
 
 interface QuickActionsProps {
@@ -11,15 +11,9 @@ interface QuickActionsProps {
 }
 
 export function QuickActions({ game, onInsertMessage }: QuickActionsProps) {
-  const { toast } = useToast();
-
   const handleDirections = () => {
     if (!game.lat || !game.lng) {
-      toast({
-        title: 'No location',
-        description: 'This game does not have a location set',
-        variant: 'destructive',
-      });
+      toast.error('This game does not have a location set');
       return;
     }
 
@@ -39,10 +33,7 @@ export function QuickActions({ game, onInsertMessage }: QuickActionsProps) {
       durationHours: 3,
     });
     downloadIcs(icsContent);
-    toast({
-      title: 'Calendar event created',
-      description: 'Check your downloads',
-    });
+    toast.success('Calendar event created');
   };
 
   const handleShareMeetingPoint = () => {

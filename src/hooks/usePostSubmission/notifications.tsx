@@ -1,71 +1,49 @@
 
 import React from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { getFileErrorMessage } from '@/components/posts/utils/fileValidation';
 import { uploadMediaWithRetry } from '@/components/posts/utils/mediaUpload';
 import { showToast } from '@/utils/toast';
 
 export const usePostNotifications = () => {
-  const { toast } = useToast();
 
   const showValidationError = (error: string) => {
-    toast({
-      title: "Upload Error",
-      description: error,
-      variant: "destructive",
-      duration: 5000
-    });
+    toast.error(error, { duration: 5000 });
   };
 
   const showVideoUploadProgress = () => {
-    toast({
-      title: "Uploading video...",
+    toast("Uploading video...", {
       description: "Your video is being processed. This may take a moment.",
       duration: 4000
     });
   };
 
   const showVideoProcessingProgress = () => {
-    toast({
-      title: "Processing video...",
+    toast("Processing video...", {
       description: "Almost done! Your video is being uploaded.",
       duration: 3000
     });
   };
 
   const showFileUploadError = (file: File, error: any, postId: string, userId: string) => {
-    toast({
-      title: "Upload Error",
-      description: getFileErrorMessage(file, error),
-      variant: "destructive",
+    toast.error(getFileErrorMessage(file, error), {
       duration: 8000,
-      action: (
-        <button
-          onClick={() => {
-            uploadMediaWithRetry(file, postId, userId).catch(console.error);
-          }}
-          className="inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium"
-        >
-          Retry
-        </button>
-      )
+      action: {
+        label: "Retry",
+        onClick: () => {
+          uploadMediaWithRetry(file, postId, userId).catch(console.error);
+        }
+      }
     });
   };
 
   const showUploadFailedError = (errorMessage: string, retryFn: () => void) => {
-    toast({
-      title: "Upload failed",
-      description: `${errorMessage}. Tap to retry uploading your post.`,
-      variant: "destructive",
+    toast.error(`${errorMessage}. Tap to retry uploading your post.`, {
       duration: 8000,
-      action: (
-        <button
-          onClick={retryFn}
-          className="inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium"
-        >
-          Retry
-        </button>
-      )
+      action: {
+        label: "Retry",
+        onClick: retryFn
+      }
     });
   };
 

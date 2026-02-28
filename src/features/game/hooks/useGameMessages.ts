@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { channelManager } from '@/utils/supabaseChannelManager';
 
 interface GameThread {
@@ -33,7 +33,7 @@ export function useGameMessages(gameId: string | null) {
   const [messages, setMessages] = useState<GameMessage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
-  const { toast } = useToast();
+  
 
   useEffect(() => {
     if (!gameId) {
@@ -77,11 +77,7 @@ export function useGameMessages(gameId: string | null) {
       setupRealtimeSubscription(threadData.id);
     } catch (error) {
       console.error('Error setting up thread:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load messages',
-        variant: 'destructive',
-      });
+      toast.error('Failed to load messages');
     } finally {
       setIsLoading(false);
     }
@@ -155,11 +151,7 @@ export function useGameMessages(gameId: string | null) {
       if (error) throw error;
     } catch (error) {
       console.error('Error sending message:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to send message',
-        variant: 'destructive',
-      });
+      toast.error('Failed to send message');
     } finally {
       setIsSending(false);
     }

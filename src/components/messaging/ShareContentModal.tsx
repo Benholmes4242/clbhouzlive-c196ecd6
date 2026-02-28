@@ -7,7 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import type { MessageType, SharedCourse } from '@/types/messaging';
@@ -44,7 +44,7 @@ export function ShareContentModal({
   onShare 
 }: ShareContentModalProps) {
   const { user } = useSupabaseSession();
-  const { toast } = useToast();
+  
   const [activeTab, setActiveTab] = useState<TabType>('courses');
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -108,10 +108,7 @@ export function ShareContentModal({
     const totalFiles = selectedMedia.length + files.length;
     
     if (totalFiles > MAX_MEDIA) {
-      toast({ 
-        title: `Maximum ${MAX_MEDIA} items allowed`,
-        variant: 'destructive'
-      });
+      toast.error(`Maximum ${MAX_MEDIA} items allowed`);
       return;
     }
     
@@ -135,7 +132,7 @@ export function ShareContentModal({
     if (mediaInputRef.current) {
       mediaInputRef.current.value = '';
     }
-  }, [selectedMedia.length, toast]);
+  }, [selectedMedia.length]);
 
   const removeMedia = (index: number) => {
     setSelectedMedia(prev => prev.filter((_, i) => i !== index));
@@ -182,10 +179,7 @@ export function ShareContentModal({
       handleClose();
     } catch (error) {
       console.error('Error uploading media:', error);
-      toast({ 
-        title: 'Failed to upload media',
-        variant: 'destructive'
-      });
+      toast.error('Failed to upload media');
     } finally {
       setIsUploading(false);
     }

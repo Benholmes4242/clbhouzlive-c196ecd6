@@ -4,10 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 const GeneralSettingsCard = () => {
-  const { toast } = useToast();
+  
   const [siteName, setSiteName] = useState('clbhouz');
   const [siteDescription, setSiteDescription] = useState('The golf social network');
   const [contactEmail, setContactEmail] = useState('admin@clbhouz.com');
@@ -33,16 +33,9 @@ const GeneralSettingsCard = () => {
       localStorage.setItem('general_site_description', siteDescription);
       localStorage.setItem('general_contact_email', contactEmail);
 
-      toast({
-        title: "Settings saved",
-        description: "General settings have been updated successfully.",
-      });
+      toast.success("Settings saved");
     } catch (error) {
-      toast({
-        title: "Error saving settings",
-        description: "Failed to save general settings. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to save general settings. Please try again.");
     } finally {
       setIsLoading(false);
     }

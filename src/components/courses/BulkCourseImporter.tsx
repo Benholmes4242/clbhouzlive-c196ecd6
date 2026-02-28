@@ -6,13 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle, Upload, AlertCircle } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { Database } from '@/integrations/supabase/types';
 
 type Continent = Database['public']['Enums']['continent'];
 
 const BulkCourseImporter = () => {
-  const { toast } = useToast();
+  
   const queryClient = useQueryClient();
   const [importResult, setImportResult] = useState<any>(null);
 
@@ -116,18 +116,11 @@ const BulkCourseImporter = () => {
       console.log('Bulk import successful:', data);
       setImportResult(data);
       queryClient.invalidateQueries({ queryKey: ['courses'] });
-      toast({
-        title: "Import Complete!",
-        description: `Added ${data.insertedCourses} new courses, skipped ${data.skippedCourses} duplicates.`,
-      });
+      toast.success(`Import Complete! Added ${data.insertedCourses} new courses, skipped ${data.skippedCourses} duplicates.`);
     },
     onError: (error) => {
       console.error('Bulk import failed:', error);
-      toast({
-        title: "Import Failed",
-        description: "Failed to import golf courses. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to import golf courses. Please try again.");
     },
   });
 

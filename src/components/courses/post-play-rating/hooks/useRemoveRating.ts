@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import type { Course } from '../types';
 
 interface UseRemoveRatingOptions {
@@ -14,7 +14,6 @@ export function useRemoveRating({
   existingRating,
   onSuccess,
 }: UseRemoveRatingOptions) {
-  const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
@@ -113,11 +112,7 @@ export function useRemoveRating({
     },
     onError: (error: any) => {
       console.error('[Delete Rating] Error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to remove course. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to remove course. Please try again.");
     },
   });
 

@@ -15,7 +15,7 @@ import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { ActivityPageSkeleton } from '@/components/skeletons/ActivityPageSkeleton';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 const ActivityPage: React.FC = () => {
   // ============================================
@@ -42,7 +42,7 @@ const ActivityPage: React.FC = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { activeActor } = useActiveActor();
-  const { toast } = useToast();
+  
   
   // Track if we've already marked notifications as seen this session
   const hasMarkedSeen = useRef(false);
@@ -216,10 +216,7 @@ const ActivityPage: React.FC = () => {
     if (n.context_url && n.entity_type && n.entity_id) {
       const exists = await checkContentExists(n.entity_type, n.entity_id);
       if (!exists) {
-        toast({
-          title: "Content unavailable",
-          description: "This content may have been deleted or removed.",
-        });
+        toast("Content unavailable", { description: "This content may have been deleted or removed." });
         // Optionally remove from view
         handleDelete(n.id);
         return;
