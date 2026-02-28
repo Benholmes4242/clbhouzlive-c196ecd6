@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Lock, AlertTriangle } from "lucide-react";
 import { PiWaveform } from 'react-icons/pi';
-import { useToast } from "@/hooks/use-toast";
+import { toast } from 'sonner';
 
 interface EchoProtectionProps {
   isOpen: boolean;
@@ -23,16 +23,13 @@ const EchoProtection: React.FC<EchoProtectionProps> = ({
 }) => {
   const [password, setPassword] = useState('');
   const [attempts, setAttempts] = useState(0);
-  const { toast } = useToast();
+  
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (password === ECHO_PASSWORD) {
-      toast({
-        title: "Access Granted",
-        description: `Echo AI ${operation} authorized`,
-      });
+      toast.success("Access Granted", { description: `Echo AI ${operation} authorized` });
       setPassword('');
       setAttempts(0);
       onSuccess();
@@ -42,18 +39,10 @@ const EchoProtection: React.FC<EchoProtectionProps> = ({
       setAttempts(newAttempts);
       setPassword('');
       
-      toast({
-        title: "Access Denied",
-        description: `Incorrect password. Attempt ${newAttempts}/3`,
-        variant: "destructive"
-      });
+      toast.error("Access Denied", { description: `Incorrect password. Attempt ${newAttempts}/3` });
 
       if (newAttempts >= 3) {
-        toast({
-          title: "Too Many Attempts",
-          description: "Echo AI protection engaged. Please contact administrator.",
-          variant: "destructive"
-        });
+        toast.error("Too Many Attempts", { description: "Echo AI protection engaged. Please contact administrator." });
         onClose();
       }
     }

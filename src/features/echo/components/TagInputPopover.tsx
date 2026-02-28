@@ -7,7 +7,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Plus } from 'lucide-react';
 import { suggestTags, addTagsToThread } from '../api/tags';
 import { echoHistoryAnalytics } from '../analytics/echoHistoryAnalytics';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export interface TagInputPopoverProps {
   threadId: string;
@@ -58,12 +58,12 @@ export const TagInputPopover: React.FC<TagInputPopoverProps> = ({
     const normalizedTag = tag.toLowerCase().trim();
     
     if (!normalizedTag || normalizedTag.length > 32) {
-      toast({ description: 'Tag must be 1-32 characters', variant: 'destructive', duration: 2000 });
+      toast.error('Tag must be 1-32 characters', { duration: 2000 });
       return;
     }
 
     if (existingTags.includes(normalizedTag)) {
-      toast({ description: 'Tag already exists', variant: 'destructive', duration: 2000 });
+      toast.error('Tag already exists', { duration: 2000 });
       return;
     }
 
@@ -72,11 +72,11 @@ export const TagInputPopover: React.FC<TagInputPopoverProps> = ({
       await addTagsToThread(threadId, [normalizedTag]);
       echoHistoryAnalytics.tagAdded({ thread_id: threadId, tag: normalizedTag });
       onTagAdded(normalizedTag);
-      toast({ description: `Tagged: ${normalizedTag}`, duration: 2000 });
+      toast.success(`Tagged: ${normalizedTag}`, { duration: 2000 });
       onClose();
     } catch (error) {
       console.error('Failed to add tag:', error);
-      toast({ description: 'Failed to add tag', variant: 'destructive', duration: 2000 });
+      toast.error('Failed to add tag', { duration: 2000 });
     } finally {
       setLoading(false);
     }

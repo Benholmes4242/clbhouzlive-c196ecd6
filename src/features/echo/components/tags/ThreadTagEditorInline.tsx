@@ -4,7 +4,7 @@ import { TagChip } from './TagChip';
 import { TagInput } from './TagInput';
 import { setTagsForThread, removeTagFromThread } from '../../api/tags';
 import { trackTagsSet, trackTagRemoved } from '../../analytics/tags';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Edit2, Check, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -19,7 +19,7 @@ export function ThreadTagEditorInline({ threadId, initialTags, className }: Thre
   const [tags, setTags] = useState<string[]>(initialTags);
   const [isEditing, setIsEditing] = useState(false);
   const [originalTags, setOriginalTags] = useState<string[]>(initialTags);
-  const { toast } = useToast();
+  
   const queryClient = useQueryClient();
 
   // Update local state when initialTags changes
@@ -53,17 +53,10 @@ export function ThreadTagEditorInline({ threadId, initialTags, className }: Thre
       setOriginalTags(tags);
       setIsEditing(false);
       
-      toast({
-        title: "Tags updated",
-        description: "Your tags have been saved successfully.",
-      });
+      toast.success("Tags updated");
     } catch (error) {
       console.error('Failed to save tags:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save tags. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to save tags. Please try again.");
       
       // Revert on error
       setTags(originalTags);
@@ -105,11 +98,7 @@ export function ThreadTagEditorInline({ threadId, initialTags, className }: Thre
       setOriginalTags(newTags);
     } catch (error) {
       console.error('Failed to remove tag:', error);
-      toast({
-        title: "Error",
-        description: "Failed to remove tag. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to remove tag. Please try again.");
       
       // Revert on error
       setTags(originalTags);

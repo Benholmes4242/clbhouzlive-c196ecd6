@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { X, RefreshCw, Eye, EyeOff } from 'lucide-react';
 import { getShareInfoForThread, rotateShareLink, setShareRedactions } from '../api/shareActions';
 import { fetchThreadDetails } from '../api/threadDetails';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { echoHistoryAnalytics } from '../analytics/echoHistoryAnalytics';
 
 interface Message {
@@ -66,7 +66,7 @@ export const ShareManagementDialog: React.FC<ShareManagementDialogProps> = ({
       setRedactions(initialState);
     } catch (error) {
       console.error('Failed to load share data:', error);
-      toast({ description: 'Failed to load share settings', variant: 'destructive' });
+      toast.error('Failed to load share settings');
     } finally {
       setLoading(false);
     }
@@ -80,10 +80,10 @@ export const ShareManagementDialog: React.FC<ShareManagementDialogProps> = ({
       await navigator.clipboard.writeText(url);
       setShareToken(newToken);
       echoHistoryAnalytics.shareRotated({ thread_id: threadId });
-      toast({ description: 'New link copied. Old link revoked.', duration: 2000 });
+      toast.success('New link copied. Old link revoked.', { duration: 2000 });
     } catch (error) {
       console.error('Failed to rotate link:', error);
-      toast({ description: 'Failed to rotate link', variant: 'destructive' });
+      toast.error('Failed to rotate link');
     } finally {
       setSaving(false);
     }
@@ -112,10 +112,10 @@ export const ShareManagementDialog: React.FC<ShareManagementDialogProps> = ({
         mask_count: maskCount,
       });
       
-      toast({ description: 'Redaction rules updated', duration: 2000 });
+      toast.success('Redaction rules updated', { duration: 2000 });
     } catch (error) {
       console.error('Failed to save redactions:', error);
-      toast({ description: 'Failed to save redactions', variant: 'destructive' });
+      toast.error('Failed to save redactions');
     } finally {
       setSaving(false);
     }

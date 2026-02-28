@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useCourseReviews, type ReviewsSortBy, type CourseReview, type ReviewMediaItem } from '@/hooks/useCourseReviews';
 import { useReviewResponses, useSubmitReviewResponse } from '@/hooks/useReviewResponses';
@@ -57,7 +57,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const location = useLocation();
-  const { toast } = useToast();
+  
   const queryClient = useQueryClient();
 
   // Business claim context + review responses
@@ -216,10 +216,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   const handleToggleHelpful = (reviewId: string, action: 'helpful' | 'unhelpful' | 'clear') => {
     if (!user) {
-      toast({
-        title: 'Sign in required',
-        description: 'Please sign in to vote on reviews',
-      });
+      toast('Sign in required', { description: 'Please sign in to vote on reviews' });
       navigate('/auth');
       return;
     }
@@ -228,10 +225,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   const handleRateClick = () => {
     if (!user) {
-      toast({
-        title: 'Sign in required',
-        description: 'Please sign in to rate courses',
-      });
+      toast('Sign in required', { description: 'Please sign in to rate courses' });
       navigate('/auth');
       return;
     }

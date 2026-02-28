@@ -8,7 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { MessageCircle, Plus, Archive, ChevronDown, ChevronRight, Users, Check, CheckCheck, BellOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { SwipeableConversationItem } from './SwipeableConversationItem';
 import type { ConversationWithDetails } from '@/types/messaging';
 
@@ -183,7 +183,7 @@ export function ConversationList({
   const [showSwipeHint, setShowSwipeHint] = useState(() => {
     return !localStorage.getItem('swipeHintDismissed');
   });
-  const { toast } = useToast();
+  
 
   // Dismiss hint after 10 seconds
   useEffect(() => {
@@ -207,10 +207,10 @@ export function ConversationList({
       
       await fetchConversations();
       await refetchArchived();
-      toast({ title: 'Chat archived' });
+      toast.success('Chat archived');
     } catch (error) {
       console.error('Error archiving:', error);
-      toast({ title: 'Failed to archive', variant: 'destructive' });
+      toast.error('Failed to archive');
     }
   };
 
@@ -218,7 +218,7 @@ export function ConversationList({
     const success = await unarchive(conversationId);
     if (success) {
       await fetchConversations();
-      toast({ title: 'Chat unarchived' });
+      toast.success('Chat unarchived');
     }
   };
 
@@ -235,10 +235,10 @@ export function ConversationList({
       if (error) throw error;
       
       await fetchConversations();
-      toast({ title: 'Conversation deleted' });
+      toast.success('Conversation deleted');
     } catch (error) {
       console.error('Error deleting conversation:', error);
-      toast({ title: 'Failed to delete conversation', variant: 'destructive' });
+      toast.error('Failed to delete conversation');
     }
   };
 

@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AlertTriangle, User, Lock, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import DeleteAccountModal from './DeleteAccountModal';
 
 interface UserAccountInfoProps {
@@ -32,7 +32,7 @@ const UserAccountInfo: React.FC<UserAccountInfoProps> = ({
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   
-  const { toast } = useToast();
+  
 
   const handleUpdateProfile = async () => {
     setIsUpdating(true);
@@ -49,17 +49,10 @@ const UserAccountInfo: React.FC<UserAccountInfoProps> = ({
       if (profileError) throw profileError;
 
       onProfileUpdate();
-      toast({
-        title: "Profile updated",
-        description: "Your account information has been updated successfully.",
-      });
+      toast.success("Profile updated", { description: "Your account information has been updated successfully." });
     } catch (error: any) {
       console.error('Error updating profile:', error);
-      toast({
-        title: "Update failed",
-        description: error.message || "Failed to update profile",
-        variant: "destructive",
-      });
+      toast.error(error.message || "Failed to update profile");
     } finally {
       setIsUpdating(false);
     }
@@ -67,20 +60,12 @@ const UserAccountInfo: React.FC<UserAccountInfoProps> = ({
 
   const handlePasswordChange = async () => {
     if (newPassword !== confirmPassword) {
-      toast({
-        title: "Password mismatch",
-        description: "New passwords do not match",
-        variant: "destructive",
-      });
+      toast.error("New passwords do not match");
       return;
     }
 
     if (newPassword.length < 6) {
-      toast({
-        title: "Password too short",
-        description: "Password must be at least 6 characters long",
-        variant: "destructive",
-      });
+      toast.error("Password must be at least 6 characters long");
       return;
     }
 
@@ -96,17 +81,10 @@ const UserAccountInfo: React.FC<UserAccountInfoProps> = ({
       setNewPassword('');
       setConfirmPassword('');
 
-      toast({
-        title: "Password updated",
-        description: "Your password has been changed successfully.",
-      });
+      toast.success("Password updated");
     } catch (error: any) {
       console.error('Error updating password:', error);
-      toast({
-        title: "Password update failed",
-        description: error.message || "Failed to update password",
-        variant: "destructive",
-      });
+      toast.error(error.message || "Failed to update password");
     } finally {
       setIsUpdatingPassword(false);
     }

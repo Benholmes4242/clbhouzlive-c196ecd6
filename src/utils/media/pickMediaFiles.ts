@@ -5,7 +5,7 @@
  * Works reliably in both web browsers and Median.co's webview.
  */
 
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface PickMediaOptions {
   accept?: string;        // default: 'image/*,video/*'
@@ -25,11 +25,7 @@ export function validateMediaFiles(files: File[]): File[] {
   return files.filter(file => {
     // Size check
     if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-      toast({ 
-        title: `${file.name} is too large`, 
-        description: `Maximum size is ${MAX_FILE_SIZE_MB}MB`,
-        variant: 'destructive' 
-      });
+      toast.error(`${file.name} is too large`, { description: `Maximum size is ${MAX_FILE_SIZE_MB}MB` });
       return false;
     }
     
@@ -38,11 +34,7 @@ export function validateMediaFiles(files: File[]): File[] {
     const isVideo = file.type.startsWith('video/');
     
     if (!isImage && !isVideo) {
-      toast({ 
-        title: `${file.name} is not supported`, 
-        description: 'Please select images or videos',
-        variant: 'destructive' 
-      });
+      toast.error(`${file.name} is not supported`, { description: 'Please select images or videos' });
       return false;
     }
     
@@ -93,10 +85,7 @@ export function pickMediaFiles(options: PickMediaOptions = {}): Promise<File[]> 
       // Apply max files limit if specified
       if (maxFiles && files.length > maxFiles) {
         files = files.slice(0, maxFiles);
-        toast({
-          title: `Limited to ${maxFiles} items`,
-          description: `Only the first ${maxFiles} items were selected`,
-        });
+        toast(`Limited to ${maxFiles} items`, { description: `Only the first ${maxFiles} items were selected` });
       }
       
       cleanup();

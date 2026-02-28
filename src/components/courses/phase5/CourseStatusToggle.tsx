@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 import { useCoursePersonalStatus } from '@/hooks/useCoursePersonalStatus';
 import { useNavigate, Link } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { getScoreTier } from '@/utils/getScoreTier';
 
 interface CourseStatusToggleProps {
@@ -27,7 +27,7 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
 }) => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
-  const { toast } = useToast();
+  
   const { status, isLoading, setWantToPlay, isUpdating } = useCoursePersonalStatus(courseId);
 
   if (!user) {
@@ -65,10 +65,10 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
     
     if (status.status === 'want_to_play') {
       await setWantToPlay(false);
-      toast({ description: "Removed from Want to Play", duration: 2000 });
+      toast("Removed from Want to Play", { duration: 2000 });
     } else {
       await setWantToPlay(true);
-      toast({ description: "Added to Want to Play", duration: 2000 });
+      toast("Added to Want to Play", { duration: 2000 });
     }
   };
 
