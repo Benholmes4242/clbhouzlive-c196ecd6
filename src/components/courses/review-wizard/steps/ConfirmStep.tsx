@@ -120,7 +120,7 @@ export function ConfirmStep({
             }}
           >
             <div className="flex items-center justify-between mb-2">
-              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Your rating</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Your rating</p>
               <button
                 type="button"
                 onClick={() => onGoToStep(1)}
@@ -151,7 +151,7 @@ export function ConfirmStep({
             variants={staggerDelay(sectionIndex++)}
           >
             <div className="flex items-center justify-between mb-3">
-              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Breakdown</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Breakdown</p>
               <button
                 type="button"
                 onClick={() => onGoToStep(1)}
@@ -206,7 +206,7 @@ export function ConfirmStep({
             style={{ background: 'hsl(var(--muted) / 0.5)' }}
           >
             <div className="flex items-center justify-between mb-2">
-              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Review</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Review</p>
               <button
                 type="button"
                 onClick={() => onGoToStep(2)}
@@ -230,7 +230,7 @@ export function ConfirmStep({
             variants={staggerDelay(sectionIndex++)}
           >
             <div className="flex items-center justify-between mb-2">
-              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Media</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Media</p>
               <button
                 type="button"
                 onClick={() => onGoToStep(3)}
@@ -242,7 +242,7 @@ export function ConfirmStep({
             </div>
             <div className="flex gap-2 overflow-x-auto">
               {mediaThumbnails.map((item, idx) => (
-                <div key={item.id} className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0" style={{ background: 'hsl(var(--muted))' }}>
+                <div key={item.id} className="relative w-[72px] h-[72px] rounded-xl overflow-hidden shrink-0" style={{ background: 'hsl(var(--muted))' }}>
                   <img src={item.previewUrl || item.posterUrl || ''} alt="" className="w-full h-full object-cover" />
                   {idx === mediaThumbnails.length - 1 && remainingMedia > 0 && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center">

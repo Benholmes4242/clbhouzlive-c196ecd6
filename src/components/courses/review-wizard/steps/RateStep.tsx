@@ -313,13 +313,13 @@ export function RateStep({
       </div>
 
       {/* Divider */}
-      <div className="mx-4 h-px bg-border" />
+      <div className="mx-4 h-px bg-border/40" />
 
       {/* Category Ratings */}
       <div className="px-4 pt-4">
-        <h3 className="text-base font-semibold text-foreground mb-2">
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
           Rate each area
-        </h3>
+        </p>
         
         {BREAKDOWN_FIELDS.map(({ key, label, description }, index) => {
           const score = breakdowns[key];
@@ -328,7 +328,7 @@ export function RateStep({
           return (
             <div key={key}>
               {index > 0 && (
-                <div className="h-px bg-border/40" />
+                <div className="mx-4 h-px bg-border/40" />
               )}
               <motion.div 
                 initial={{ opacity: 0, y: 8 }}
