@@ -166,8 +166,8 @@ export function WriteStep({
               : '1.5px solid transparent',
           }}
         >
-          <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
-            Your take in one line
+          <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+            Headline
           </label>
           <input
             id="review-title"
@@ -209,7 +209,7 @@ export function WriteStep({
               : '1.5px solid transparent',
           }}
         >
-          <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+          <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
             Your review
           </label>
           <textarea
@@ -246,7 +246,7 @@ export function WriteStep({
             {PROMPT_CHIPS.map(prompt => (
               <span
                 key={prompt}
-                className="text-xs text-muted-foreground bg-muted/60 px-3 py-1.5 rounded-full select-none"
+                className="text-xs text-muted-foreground/60 bg-muted/30 px-2.5 py-1 rounded-full select-none"
               >
                 {prompt}
               </span>

@@ -5,7 +5,7 @@
 
 import React, { useRef, useCallback, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, AlertCircle, Images, Loader2 } from 'lucide-react';
+import { Plus, AlertCircle, Images, Loader2, ImageIcon, Camera } from 'lucide-react';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import type { ReviewMediaItem } from '../types';
 import type { ReviewWizardCourse } from '../types';
@@ -277,6 +277,29 @@ export function MediaStep({
                 </div>
                 <span className="text-sm font-semibold text-foreground">Add photo or video</span>
               </button>
+              <div className="flex justify-center gap-3 mt-4">
+                <button
+                  onClick={handlePickMedia}
+                  disabled={isPickerOpen}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium disabled:opacity-50"
+                  style={{
+                    background: 'hsl(var(--muted) / 0.6)',
+                    border: '1.5px solid hsl(var(--border))',
+                  }}
+                >
+                  <ImageIcon className="w-4 h-4" />
+                  Gallery
+                </button>
+                <button
+                  onClick={handlePickMedia}
+                  disabled={isPickerOpen}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium text-white disabled:opacity-50"
+                  style={{ background: '#1C1C1E' }}
+                >
+                  <Camera className="w-4 h-4" />
+                  Camera
+                </button>
+              </div>
               <p className="text-xs text-muted-foreground/60 mt-3 text-center">
                 Optional — up to {MAX_MEDIA_ITEMS} photos & videos
               </p>
