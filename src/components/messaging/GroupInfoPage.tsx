@@ -15,7 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { ConversationWithDetails, ParticipantWithProfile } from '@/types/messaging';
 import { AddMembersSheet } from './AddMembersSheet';
@@ -49,7 +49,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
   onUpdate,
 }) => {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [isEditingName, setIsEditingName] = useState(false);
@@ -77,11 +77,11 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         p_name: groupName.trim(),
       });
       if (error) throw error;
-      toast({ title: 'Group name updated' });
+      toast.success('Group name updated');
       setIsEditingName(false);
       onUpdate();
     } catch (error: any) {
-      toast({ title: 'Failed to update', description: error.message, variant: 'destructive' });
+      toast.error('Failed to update', { description: error.message });
     }
   };
 
@@ -92,11 +92,11 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         p_description: description.trim(),
       });
       if (error) throw error;
-      toast({ title: 'Description updated' });
+      toast.success('Description updated');
       setIsEditingDescription(false);
       onUpdate();
     } catch (error: any) {
-      toast({ title: 'Failed to update', description: error.message, variant: 'destructive' });
+      toast.error('Failed to update', { description: error.message });
     }
   };
 
@@ -116,10 +116,10 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         p_avatar_url: publicUrl,
       });
       if (error) throw error;
-      toast({ title: 'Group photo updated' });
+      toast.success('Group photo updated');
       onUpdate();
     } catch (error: any) {
-      toast({ title: 'Failed to upload', description: error.message, variant: 'destructive' });
+      toast.error('Failed to upload', { description: error.message });
     } finally {
       setIsUploading(false);
     }
@@ -134,11 +134,11 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         p_mute: newMuted,
       });
       if (error) throw error;
-      toast({ title: newMuted ? 'Notifications muted' : 'Notifications unmuted' });
+      toast.success(newMuted ? 'Notifications muted' : 'Notifications unmuted');
       onUpdate();
     } catch (error: any) {
       setIsMutedLocal(!newMuted);
-      toast({ title: 'Failed to update', variant: 'destructive' });
+      toast.error('Failed to update');
     }
   };
 
@@ -150,10 +150,10 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         p_new_role: 'admin',
       });
       if (error) throw error;
-      toast({ title: 'Member is now an admin' });
+      toast.success('Member is now an admin');
       onUpdate();
     } catch (error: any) {
-      toast({ title: 'Failed to update', description: error.message, variant: 'destructive' });
+      toast.error('Failed to update', { description: error.message });
     }
   };
 
@@ -165,10 +165,10 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         p_new_role: 'member',
       });
       if (error) throw error;
-      toast({ title: 'Admin rights removed' });
+      toast.success('Admin rights removed');
       onUpdate();
     } catch (error: any) {
-      toast({ title: 'Failed to update', description: error.message, variant: 'destructive' });
+      toast.error('Failed to update', { description: error.message });
     }
   };
 
@@ -179,10 +179,10 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         p_user_id: userId,
       });
       if (error) throw error;
-      toast({ title: 'Member removed' });
+      toast.success('Member removed');
       onUpdate();
     } catch (error: any) {
-      toast({ title: 'Failed to remove', description: error.message, variant: 'destructive' });
+      toast.error('Failed to remove', { description: error.message });
     }
   };
 
@@ -193,10 +193,10 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         p_conversation_id: conversation.id,
       });
       if (error) throw error;
-      toast({ title: 'You left the group' });
+      toast.success('You left the group');
       navigate('/messages');
     } catch (error: any) {
-      toast({ title: 'Failed to leave', description: error.message, variant: 'destructive' });
+      toast.error('Failed to leave', { description: error.message });
     }
   };
 
@@ -207,10 +207,10 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         p_archive: true,
       });
       if (error) throw error;
-      toast({ title: 'Chat archived' });
+      toast.success('Chat archived');
       navigate('/messages');
     } catch (error: any) {
-      toast({ title: 'Failed to archive', variant: 'destructive' });
+      toast.error('Failed to archive');
     }
   };
 
@@ -221,10 +221,10 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         p_conversation_id: conversation.id,
       });
       if (error) throw error;
-      toast({ title: 'Group deleted' });
+      toast.success('Group deleted');
       navigate('/messages');
     } catch (error: any) {
-      toast({ title: 'Failed to delete group', description: error.message, variant: 'destructive' });
+      toast.error('Failed to delete group', { description: error.message });
     }
   };
 

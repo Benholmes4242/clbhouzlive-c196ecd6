@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Upload, Trash2, Loader2, Sun, Moon } from 'lucide-react';
 import { useTheme } from '@/components/theme-provider';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,7 +33,7 @@ interface Logo {
 }
 
 const LogosManagement = () => {
-  const { toast } = useToast();
+  
   const { theme } = useTheme();
   const [logos, setLogos] = useState<Logo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -65,11 +65,7 @@ const LogosManagement = () => {
       setLogos(data || []);
     } catch (error: any) {
       console.error('Error fetching logos:', error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch logos",
-        variant: "destructive",
-      });
+      toast.error("Failed to fetch logos");
     } finally {
       setLoading(false);
     }
@@ -78,11 +74,7 @@ const LogosManagement = () => {
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !selectedCategory) {
-      toast({
-        title: "Error",
-        description: "Please select a file and category",
-        variant: "destructive",
-      });
+      toast.error("Please select a file and category");
       return;
     }
     setPendingUpload(file);
@@ -120,10 +112,7 @@ const LogosManagement = () => {
 
       if (dbError) throw dbError;
 
-      toast({
-        title: "Success",
-        description: "Logo uploaded and set as active successfully",
-      });
+      toast.success("Logo uploaded and set as active successfully");
 
       fetchLogos();
       setPendingUpload(null);
@@ -134,11 +123,7 @@ const LogosManagement = () => {
       if (fileInput) fileInput.value = '';
     } catch (error: any) {
       console.error('Error uploading logo:', error);
-      toast({
-        title: "Error",
-        description: "Failed to upload logo",
-        variant: "destructive",
-      });
+      toast.error("Failed to upload logo");
     } finally {
       setUploading(false);
     }
@@ -157,19 +142,12 @@ const LogosManagement = () => {
 
       if (error) throw error;
 
-      toast({
-        title: "Success",
-        description: "Logo deleted successfully",
-      });
+      toast.success("Logo deleted successfully");
 
       fetchLogos();
     } catch (error: any) {
       console.error('Error deleting logo:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete logo",
-        variant: "destructive",
-      });
+      toast.error("Failed to delete logo");
     }
   };
 

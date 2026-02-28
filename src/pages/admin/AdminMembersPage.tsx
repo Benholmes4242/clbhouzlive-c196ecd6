@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { adminRoleManage } from "@/lib/adminRoleApi";
 import { getUserIdByEmail } from "@/lib/usersLookup";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { track } from "@/lib/telemetry";
 import { Button } from "@/components/ui/button";
@@ -45,7 +45,6 @@ export function AdminMembersPage() {
     message: string;
   } | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const { toast } = useToast();
   const isMobile = useIsMobile();
 
   // Mobile state
@@ -59,11 +58,7 @@ export function AdminMembersPage() {
       setRows(res.data || []);
     } catch (error: any) {
       setError("Failed to load admins");
-      toast({
-        title: "Error",
-        description: `Failed to load admins: ${error.message}`,
-        variant: "destructive",
-      });
+      toast.error(`Failed to load admins: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -72,83 +67,75 @@ export function AdminMembersPage() {
   useEffect(() => {
     load();
     track("admin_members_opened");
-  }, [toast]);
+  }, []);
 
   const grantLimited = async (user_id: string, notes?: string, expires_at?: string) => {
     try {
       await adminRoleManage("grant_limited", { user_id, notes, expires_at });
-      toast({ title: "Success", description: "Limited admin access granted" });
+      toast.success("Limited admin access granted");
       track("admin_role_granted", { target_user_id: user_id, role: "limited", expires_at });
       await load();
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast.error(error.message);
     }
   };
 
   const grantFull = async (user_id: string, notes?: string) => {
     try {
       await adminRoleManage("grant_full", { user_id, notes });
-      toast({ title: "Success", description: "Full admin access granted" });
+      toast.success("Full admin access granted");
       track("admin_role_granted", { target_user_id: user_id, role: "full" });
       await load();
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast.error(error.message);
     }
   };
 
   const downgrade = async (user_id: string, notes?: string) => {
     try {
       await adminRoleManage("downgrade", { user_id, notes });
-      toast({ title: "Success", description: "Admin downgraded to limited" });
+      toast.success("Admin downgraded to limited");
       track("admin_role_downgraded", { target_user_id: user_id });
       setSelectedMember(null);
       await load();
     } catch (error: any) {
       const message = error?.message || "Failed to downgrade admin";
-      toast({
-        title: message.includes("last full admin") ? "Cannot downgrade" : "Error",
-        description: message,
-        variant: "destructive",
-      });
+      toast.error(message.includes("last full admin") ? "Cannot downgrade" : message);
     }
   };
 
   const revoke = async (user_id: string, notes?: string) => {
     try {
       await adminRoleManage("revoke", { user_id, notes });
-      toast({ title: "Success", description: "Admin access revoked" });
+      toast.success("Admin access revoked");
       track("admin_role_revoked", { target_user_id: user_id });
       setSelectedMember(null);
       await load();
     } catch (error: any) {
       const message = error?.message || "Failed to revoke admin role";
-      toast({
-        title: message.includes("last full admin") ? "Cannot revoke" : "Error",
-        description: message,
-        variant: "destructive",
-      });
+      toast.error(message.includes("last full admin") ? "Cannot revoke" : message);
     }
   };
 
   const setExpiry = async (user_id: string, expires_at: string, notes?: string) => {
     try {
       await adminRoleManage("set_expiry", { user_id, expires_at, notes });
-      toast({ title: "Success", description: "Expiry date set" });
+      toast.success("Expiry date set");
       setSelectedMember(null);
       await load();
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast.error(error.message);
     }
   };
 
   const clearExpiry = async (user_id: string, notes?: string) => {
     try {
       await adminRoleManage("clear_expiry", { user_id, notes });
-      toast({ title: "Success", description: "Expiry date cleared" });
+      toast.success("Expiry date cleared");
       setSelectedMember(null);
       await load();
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast.error(error.message);
     }
   };
 
@@ -172,7 +159,7 @@ export function AdminMembersPage() {
       setAuditRows(res.data || []);
       track("admin_audit_viewed", { target_user_id });
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast.error(error.message);
     }
   };
 
@@ -211,8 +198,7 @@ export function AdminMembersPage() {
   // Toast for expiring admins on load
   useEffect(() => {
     if (expiringSoon.length > 0 && !loading) {
-      toast({
-        title: "Admin memberships expiring soon",
+      toast.warning("Admin memberships expiring soon", {
         description: `${expiringSoon.length} admin${expiringSoon.length>1?"s":""} expiring within 7 days.`,
       });
     }
@@ -637,11 +623,11 @@ function AddMemberInline(props: {
 }) {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
+  
   
   const handleGrant = async (type: "limited" | "full") => {
     if (!input.trim()) {
-      toast({ title: "Please enter a user ID or email", variant: "destructive" });
+      toast.error("Please enter a user ID or email");
       return;
     }
 
@@ -652,7 +638,7 @@ function AddMemberInline(props: {
       if (input.includes("@")) {
         const resolved = await getUserIdByEmail(input);
         if (!resolved) {
-          toast({ title: "User not found", description: "No user with that email", variant: "destructive" });
+          toast.error("User not found", { description: "No user with that email" });
           setLoading(false);
           return;
         }

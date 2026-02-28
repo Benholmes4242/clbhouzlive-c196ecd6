@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { Badge, UserBadge, BadgeProgress } from '@/types/badges';
 
 // Import the new badge unlock modal
@@ -13,7 +13,7 @@ if (typeof window !== 'undefined') {
 }
 
 export const useBadges = (userId?: string) => {
-  const { toast } = useToast();
+  
   const queryClient = useQueryClient();
   const [unlockedBadge, setUnlockedBadge] = useState<Badge | null>(null);
   const [showUnlockModal, setShowUnlockModal] = useState(false);
@@ -92,11 +92,7 @@ export const useBadges = (userId?: string) => {
         
         // Show toast for additional badges if more than one
         if (newBadges.length > 1) {
-          toast({
-            title: `🏅 ${newBadges.length} New Badges Earned!`,
-            description: "Check your achievements to see all unlocked badges!",
-            duration: 5000,
-          });
+          toast.success(`🏅 ${newBadges.length} New Badges Earned!`, { description: "Check your achievements to see all unlocked badges!", duration: 5000 });
         }
         
         // Refresh badge data

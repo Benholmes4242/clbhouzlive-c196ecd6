@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface R2UploadResult {
   success: boolean;
@@ -10,7 +10,6 @@ interface R2UploadResult {
 
 export const useR2Upload = () => {
   const [uploading, setUploading] = useState(false);
-  const { toast } = useToast();
 
   const uploadImage = async (file: File): Promise<R2UploadResult> => {
     if (!file) {
@@ -41,39 +40,24 @@ export const useR2Upload = () => {
 
       if (error) {
         console.error('R2 upload error:', error);
-        toast({
-          title: "Upload failed",
-          description: error.message || "Failed to upload image to R2",
-          variant: "destructive"
-        });
+        toast.error("Upload failed", { description: error.message || "Failed to upload image to R2" });
         return { success: false, error: error.message };
       }
 
       if (data?.success && (data?.url || data?.publicUrl)) {
         const imageUrl = data.url || data.publicUrl; // Handle both response formats
-        toast({
-          title: "Upload successful",
-          description: "Profile photo uploaded successfully!",
-        });
+        toast.success("Upload successful", { description: "Profile photo uploaded successfully!" });
         return { success: true, imageUrl };
       } else {
         const errorMsg = data?.error || 'Unknown upload error';
-        toast({
-          title: "Upload failed",
-          description: errorMsg,
-          variant: "destructive"
-        });
+        toast.error("Upload failed", { description: errorMsg });
         return { success: false, error: errorMsg };
       }
 
     } catch (error) {
       console.error('R2 upload error:', error);
       const errorMsg = error instanceof Error ? error.message : 'Upload failed';
-      toast({
-        title: "Upload failed",
-        description: errorMsg,
-        variant: "destructive"
-      });
+      toast.error("Upload failed", { description: errorMsg });
       return { success: false, error: errorMsg };
     } finally {
       setUploading(false);
