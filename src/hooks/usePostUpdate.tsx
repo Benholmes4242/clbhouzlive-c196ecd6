@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface TaggableEntity {
   id: string;
@@ -24,7 +24,7 @@ interface UpdatePostData {
 
 export const usePostUpdate = () => {
   const [isUpdating, setIsUpdating] = useState(false);
-  const { toast } = useToast();
+  
 
   const updatePost = async (postId: string, data: UpdatePostData, existingMediaUrls: string[] = []) => {
     setIsUpdating(true);
@@ -50,23 +50,13 @@ export const usePostUpdate = () => {
       // Tags and course tagging temporarily disabled due to missing database tables
 
       console.log('All updates completed successfully');
-      toast({
-        title: "Success!",
-        description: "Your updates have been saved!",
-        className: "bg-green-600 text-white border-green-600",
-        duration: 3000,
-      });
+      toast.success("Your updates have been saved!", { duration: 3000 });
 
       return { success: true };
 
     } catch (error) {
       console.error('Full error updating post:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save updates. Please try again.",
-        variant: "destructive",
-        duration: 3000,
-      });
+      toast.error("Failed to save updates. Please try again.", { duration: 3000 });
       
       return { success: false, error };
     } finally {

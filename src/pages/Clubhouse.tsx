@@ -13,7 +13,7 @@ import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { NewSeasonBanner } from '@/components/feed/NewSeasonBanner';
 import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
 import { useSeasonRecap } from '@/hooks/useSeasonRecap';
@@ -89,7 +89,7 @@ const ClubhouseContent = () => {
   const location = useLocation();
   const clubhouseRootRef = useRef<HTMLDivElement>(null);
   const feedContainerRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
+  
   
   // Tab state from context
   const tabContext = useClubhouseTab();
@@ -273,11 +273,7 @@ const ClubhouseContent = () => {
     },
     onError: (error) => {
       console.error('Like/unlike error:', error);
-      toast({
-        title: "Error",
-        description: "We couldn't update your like. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("We couldn't update your like. Please try again.");
     }
   });
 

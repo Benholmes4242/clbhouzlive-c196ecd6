@@ -3,7 +3,7 @@ import { getRecentErrors, clearErrorLog } from '@/utils/errorLogger';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle, Download, Trash2, RefreshCw } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { PageRoot } from '@/components/layout/PageRoot';
 
 /**
@@ -12,7 +12,7 @@ import { PageRoot } from '@/components/layout/PageRoot';
  */
 export default function ErrorLogPage() {
   const [errors, setErrors] = useState<any[]>([]);
-  const { toast } = useToast();
+  
 
   const loadErrors = () => {
     const recentErrors = getRecentErrors();
@@ -26,10 +26,7 @@ export default function ErrorLogPage() {
   const handleClear = () => {
     clearErrorLog();
     setErrors([]);
-    toast({
-      title: 'Error log cleared',
-      description: 'All logged errors have been removed',
-    });
+    toast.success('Error log cleared');
   };
 
   const handleDownload = () => {
@@ -42,18 +39,12 @@ export default function ErrorLogPage() {
     link.click();
     URL.revokeObjectURL(url);
 
-    toast({
-      title: 'Log downloaded',
-      description: 'Error log has been saved to your device',
-    });
+    toast.success('Log downloaded');
   };
 
   const handleRefresh = () => {
     loadErrors();
-    toast({
-      title: 'Refreshed',
-      description: 'Error log reloaded',
-    });
+    toast.success('Refreshed');
   };
 
   return (

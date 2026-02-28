@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { Loader2, MapPin, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
@@ -17,7 +17,7 @@ const BATCH_SIZE = 5; // Process 5 courses at a time to respect API limits
 const BATCH_DELAY_MS = 2000; // 2 second delay between batches
 
 export function Top100GeocodingBackfill() {
-  const { toast } = useToast();
+  
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState<{
     total: number;
@@ -62,19 +62,12 @@ export function Top100GeocodingBackfill() {
       const count = uniqueCoursesMap.size;
       setCoursesWithoutCoords(count);
 
-      toast({
-        title: "Scan Complete",
-        description: `Found ${count} Top 100 courses missing coordinates`,
-      });
+      toast.success(`Found ${count} Top 100 courses missing coordinates`);
 
       return Array.from(uniqueCoursesMap.values());
     } catch (error: any) {
       console.error('Error checking coordinates:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to check coordinates",
-        variant: "destructive",
-      });
+      toast.error(error.message || "Failed to check coordinates");
       return [];
     }
   };
@@ -122,10 +115,7 @@ export function Top100GeocodingBackfill() {
       const courses = await checkMissingCoordinates();
       
       if (courses.length === 0) {
-        toast({
-          title: "No Work Needed",
-          description: "All Top 100 courses already have coordinates!",
-        });
+        toast.success("All Top 100 courses already have coordinates!");
         setIsProcessing(false);
         return;
       }
@@ -158,18 +148,11 @@ export function Top100GeocodingBackfill() {
         }
       }
 
-      toast({
-        title: "Backfill Complete",
-        description: `Successfully geocoded ${progress?.successful || 0} out of ${courses.length} courses`,
-      });
+      toast.success(`Successfully geocoded ${progress?.successful || 0} out of ${courses.length} courses`);
 
     } catch (error: any) {
       console.error('Backfill error:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Backfill failed",
-        variant: "destructive",
-      });
+      toast.error(error.message || "Backfill failed");
     } finally {
       setIsProcessing(false);
     }

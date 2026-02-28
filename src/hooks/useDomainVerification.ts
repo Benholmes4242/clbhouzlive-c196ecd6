@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export interface DomainVerification {
   id: string;
@@ -13,11 +13,11 @@ export interface DomainVerification {
   verified_at: string | null;
 }
 
-export function useDomainVerification(requestId?: string) {
+export function useDomainVerification(requestId: string | null) {
   return useQuery({
     queryKey: ['domain-verification', requestId],
-    enabled: !!requestId,
     queryFn: async () => {
+      if (!requestId) return null;
       const { data, error } = await supabase
         .from('business_domain_verifications')
         .select('*')
@@ -25,7 +25,6 @@ export function useDomainVerification(requestId?: string) {
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle();
-
       if (error) throw error;
       return data as DomainVerification | null;
     },
@@ -34,7 +33,6 @@ export function useDomainVerification(requestId?: string) {
 
 export function useRequestDomainCheck() {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
 
   return useMutation({
     mutationFn: async ({ requestId, domain }: { requestId: string; domain: string }) => {
@@ -49,17 +47,16 @@ export function useRequestDomainCheck() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-business-verification-requests'] });
-      toast({ title: 'Domain verification requested' });
+      toast.success('Domain verification requested');
     },
     onError: (error: Error) => {
-      toast({ title: 'Failed to request domain verification', description: error.message, variant: 'destructive' });
+      toast.error('Failed to request domain verification', { description: error.message });
     },
   });
 }
 
 export function useSendDomainCode(businessId: string) {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
 
   return useMutation({
     mutationFn: async ({ requestId, email }: { requestId: string; email: string }) => {
@@ -72,17 +69,16 @@ export function useSendDomainCode(businessId: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['domain-verification'] });
-      toast({ title: 'Verification code sent', description: 'Check your email for the 6-digit code' });
+      toast.success('Verification code sent', { description: 'Check your email for the 6-digit code' });
     },
     onError: (error: Error) => {
-      toast({ title: 'Failed to send code', description: error.message, variant: 'destructive' });
+      toast.error('Failed to send code', { description: error.message });
     },
   });
 }
 
 export function useVerifyDomainCode() {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
 
   return useMutation({
     mutationFn: async ({ verificationId, code }: { verificationId: string; code: string }) => {
@@ -98,10 +94,10 @@ export function useVerifyDomainCode() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['domain-verification'] });
       queryClient.invalidateQueries({ queryKey: ['business-verification-request'] });
-      toast({ title: 'Domain verified!', description: 'Your business domain has been confirmed' });
+      toast.success('Domain verified!', { description: 'Your business domain has been confirmed' });
     },
     onError: (error: Error) => {
-      toast({ title: 'Verification failed', description: error.message, variant: 'destructive' });
+      toast.error('Verification failed', { description: error.message });
     },
   });
 }

@@ -8,10 +8,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Download, Globe, AlertCircle, CheckCircle } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 const CourseScraper = () => {
-  const { toast } = useToast();
+  
   const queryClient = useQueryClient();
   const [url, setUrl] = useState('https://www.top100golfcourses.com/');
   const [scrapeResult, setScrapeResult] = useState<any>(null);
@@ -35,28 +35,17 @@ const CourseScraper = () => {
       console.log('Scraping successful:', data);
       setScrapeResult(data);
       queryClient.invalidateQueries({ queryKey: ['courses'] });
-      toast({
-        title: "Scraping Complete!",
-        description: `Found ${data.coursesFound} courses, inserted ${data.coursesInserted} new courses.`,
-      });
+      toast.success(`Scraping Complete! Found ${data.coursesFound} courses, inserted ${data.coursesInserted} new courses.`);
     },
     onError: (error) => {
       console.error('Scraping failed:', error);
-      toast({
-        title: "Scraping Failed",
-        description: "Failed to scrape golf course data. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to scrape golf course data. Please try again.");
     },
   });
 
   const handleScrape = () => {
     if (!url.trim()) {
-      toast({
-        title: "URL Required",
-        description: "Please enter a URL to scrape.",
-        variant: "destructive",
-      });
+      toast.error("Please enter a URL to scrape.");
       return;
     }
     setScrapeResult(null);

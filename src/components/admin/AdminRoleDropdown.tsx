@@ -10,7 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 interface AdminProfile {
   id: string;
@@ -30,7 +30,7 @@ interface AdminRoleDropdownProps {
 
 const AdminRoleDropdown = ({ profile, currentUserId, onRoleChanged }: AdminRoleDropdownProps) => {
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
+  
 
   const getCurrentRole = () => {
     if (profile.temp_admin_expires && new Date(profile.temp_admin_expires) > new Date()) {
@@ -71,19 +71,12 @@ const AdminRoleDropdown = ({ profile, currentUserId, onRoleChanged }: AdminRoleD
 
       if (error) throw error;
 
-      toast({
-        title: "Success",
-        description: `Role updated to ${newRole === 'temp_admin' ? 'Temporary Admin' : newRole === 'review_only' ? 'Review Only' : 'Full Admin'}`,
-      });
+      toast.success(`Role updated to ${newRole === 'temp_admin' ? 'Temporary Admin' : newRole === 'review_only' ? 'Review Only' : 'Full Admin'}`);
 
       onRoleChanged();
     } catch (error) {
       console.error('Error updating role:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update role",
-        variant: "destructive",
-      });
+      toast.error("Failed to update role");
     } finally {
       setLoading(false);
     }

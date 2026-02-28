@@ -14,21 +14,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { UserPlus, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 const InviteTeamMemberDialog = () => {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
-
   const handleInvite = async () => {
     if (!email) {
-      toast({
-        title: "Error",
-        description: "Please enter an email address",
-        variant: "destructive",
-      });
+      toast.error("Please enter an email address");
       return;
     }
 
@@ -66,20 +60,13 @@ const InviteTeamMemberDialog = () => {
         // Don't throw error here - invitation was created successfully
       }
 
-      toast({
-        title: "Invitation Sent",
-        description: `Invitation sent to ${email}`,
-      });
+      toast.success(`Invitation sent to ${email}`);
 
       setEmail('');
       setOpen(false);
     } catch (error) {
       console.error('Error sending invitation:', error);
-      toast({
-        title: "Error",
-        description: "Failed to send invitation",
-        variant: "destructive",
-      });
+      toast.error("Failed to send invitation");
     } finally {
       setLoading(false);
     }
