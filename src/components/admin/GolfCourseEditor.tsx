@@ -404,7 +404,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         'Admin'
       );
       
-      toast.success("Success", { description: isCreating ? "Golf course created successfully" : "Golf course updated successfully" });
+      toast.success(isCreating ? "Course created" : "Course updated");
       // Force refetch of golf courses data
       queryClient.invalidateQueries({ queryKey: ['admin-golf-courses'] });
       queryClient.refetchQueries({ queryKey: ['admin-golf-courses'] });
@@ -412,7 +412,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
     },
     onError: (error: any) => {
       console.error('Save mutation error:', error);
-      toast.error("Error", { description: `Failed to ${isCreating ? 'create' : 'update'} golf course: ${error.message}` });
+      toast.error(`Couldn't ${isCreating ? 'create' : 'update'} course`, { description: error.message });
     },
   });
 
@@ -428,12 +428,12 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Success", { description: "Golf course deleted successfully" });
+      toast.success("Course deleted");
       queryClient.invalidateQueries({ queryKey: ['admin-golf-courses'] });
       onClose();
     },
     onError: (error) => {
-      toast.error("Error", { description: `Failed to delete golf course: ${error.message}` });
+      toast.error("Couldn't delete course", { description: error.message });
     },
   });
 
@@ -447,14 +447,14 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Success", { description: "Review deleted successfully" });
+      toast.success("Review deleted");
       queryClient.invalidateQueries({ queryKey: ['course-ratings', course?.id] });
       // Invalidate exploration stats for map updates
       queryClient.invalidateQueries({ queryKey: ['user-exploration-status'] });
       queryClient.invalidateQueries({ queryKey: ['exploration-leaderboard'] });
     },
     onError: (error) => {
-      toast.error("Error", { description: `Failed to delete review: ${error.message}` });
+      toast.error("Couldn't delete review", { description: error.message });
     },
   });
 

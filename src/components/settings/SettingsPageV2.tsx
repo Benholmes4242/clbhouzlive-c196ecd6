@@ -198,7 +198,7 @@ export function SettingsPageV2() {
       queryClient.setQueryData(['user-profile', user.id], rollbackUpdate);
       queryClient.setQueryData(['creator-features', user.id], rollbackUpdate);
       
-      toast.error('Failed to update Creator Mode');
+      toast.error("Couldn't update setting");
     } finally {
       setIsUpdatingCreator(false);
     }
@@ -221,7 +221,7 @@ export function SettingsPageV2() {
       );
     }
     
-    toast.success('Creator Mode enabled!');
+    toast.success('Creator Mode enabled');
   };
 
   // Handler for "Go to Hub" button
@@ -288,7 +288,7 @@ export function SettingsPageV2() {
       queryClient.setQueryData(['user-profile', user.id], rollbackUpdate);
       queryClient.setQueryData(['creator-features', user.id], rollbackUpdate);
       
-      toast.error('Failed to update creator-only mode');
+      toast.error("Couldn't update setting");
     } finally {
       setIsUpdatingCreator(false);
       setShowCreatorOnlyConfirm(false);
@@ -317,7 +317,7 @@ export function SettingsPageV2() {
     } catch (err) {
       console.error('[Settings] public toggle error:', err);
       setIsPublic(!checked);
-      toast.error('Failed to update profile visibility');
+      toast.error("Couldn't update setting");
     } finally {
       setIsUpdatingPrivacy(false);
     }
@@ -343,7 +343,7 @@ export function SettingsPageV2() {
     } catch (err) {
       console.error('[Settings] handicap toggle error:', err);
       setShowHandicap(!checked);
-      toast.error('Failed to update handicap visibility');
+      toast.error("Couldn't update setting");
     } finally {
       setIsUpdatingHandicap(false);
     }
@@ -397,7 +397,7 @@ export function SettingsPageV2() {
       navigate('/auth');
     } catch (err) {
       console.error('[Settings] delete account error:', err);
-      toast.error('Failed to delete account. Please contact support.');
+      toast.error("Couldn't delete account", { description: "Please contact support" });
     } finally {
       setIsDeleting(false);
       setShowDeleteConfirm(false);

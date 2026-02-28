@@ -340,7 +340,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
     }
 
     addCourse(courseId);
-    toast.success('Course added', { description: 'Successfully added to your Top 10' });
+    toast.success('Course added');
   };
 
   const handleRateFirst = (courseId: string) => {

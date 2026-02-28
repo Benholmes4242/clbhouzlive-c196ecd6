@@ -21,11 +21,11 @@ export function useCaddiePick(postId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['post', postId] });
       queryClient.invalidateQueries({ queryKey: ['post-comments-with-replies', postId] });
-      toast.success("Caddie's Pick set!");
+      toast.success("Caddie's Pick set");
     },
     onError: (error) => {
       console.error('Failed to set Caddie\'s Pick:', error);
-      toast.error("Failed to set Caddie's Pick");
+      toast.error("Couldn't set Caddie's Pick");
     },
   });
 

@@ -43,10 +43,7 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
           .eq('follower_id', currentUserId)
           .eq('following_id', targetUserId);
         
-        toast.success("Unfollowed successfully", {
-          description: "You are no longer following this user.",
-          duration: 1500,
-        });
+        toast.success("Unfollowed");
       } else {
         await supabase
           .from('user_follows')
@@ -58,19 +55,13 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
             ignoreDuplicates: true 
           });
         
-        toast.success("Following successfully", {
-          description: "You are now following this user.",
-          duration: 1500,
-        });
+        toast.success("Following");
       }
       
       invalidateAllRelatedQueries();
     } catch (error) {
       console.error('Error toggling follow:', error);
-      toast.error("Error", {
-        description: "Failed to update follow status. Please try again.",
-        duration: 3000,
-      });
+      toast.error("Couldn't update follow");
     } finally {
       setLoading(false);
     }

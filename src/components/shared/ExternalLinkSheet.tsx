@@ -33,7 +33,7 @@ export const ExternalLinkSheet: React.FC<ExternalLinkSheetProps> = ({
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
-      toast.success('Link copied to clipboard');
+      toast.success('Copied to clipboard');
       
       // Reset copied state after 2 seconds
       setTimeout(() => setCopied(false), 2000);

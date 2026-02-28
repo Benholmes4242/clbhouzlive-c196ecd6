@@ -520,7 +520,7 @@ const ProfilePageV2Content: React.FC = () => {
                     navigator.share({ title: displayName, url: window.location.href }).catch(() => {});
                   } else {
                     navigator.clipboard.writeText(window.location.href);
-                    toast.success('Link copied');
+                    toast.success('Copied to clipboard');
                   }
                 }}>
                   <Share2 className="w-4 h-4 mr-2" />
@@ -528,7 +528,7 @@ const ProfilePageV2Content: React.FC = () => {
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => {
                   navigator.clipboard.writeText(window.location.href);
-                  toast.success('Link copied');
+                  toast.success('Copied to clipboard');
                 }}>
                   <Link2 className="w-4 h-4 mr-2" />
                   Copy link
@@ -621,7 +621,7 @@ const ProfilePageV2Content: React.FC = () => {
                     navigator.share({ title: displayName, url: window.location.href }).catch(() => {});
                   } else {
                     navigator.clipboard.writeText(window.location.href);
-                    toast.success('Link copied');
+                    toast.success('Copied to clipboard');
                   }
                 }}>
                   <Share2 className="w-4 h-4 mr-2" />
@@ -629,7 +629,7 @@ const ProfilePageV2Content: React.FC = () => {
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => {
                   navigator.clipboard.writeText(window.location.href);
-                  toast.success('Link copied');
+                  toast.success('Copied to clipboard');
                 }}>
                   <Link2 className="w-4 h-4 mr-2" />
                   Copy link

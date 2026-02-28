@@ -83,10 +83,10 @@
        
        if (error) throw error;
        
-       toast.success(isMuted ? 'Notifications unmuted' : 'Notifications muted');
+       toast.success(isMuted ? 'Unmuted' : 'Muted');
      } catch (error) {
        console.error('Error toggling mute:', error);
-       toast.error('Failed to update notifications');
+       toast.error("Couldn't update");
      }
    };
  
@@ -107,7 +107,7 @@
        window.location.reload(); // Refresh to show empty chat
      } catch (error) {
        console.error('Error clearing chat:', error);
-       toast.error('Failed to clear chat');
+       toast.error("Couldn't clear chat");
      }
    };
  
@@ -137,7 +137,7 @@
        onBack?.();
      } catch (error) {
        console.error('Error leaving group:', error);
-       toast.error('Failed to leave group');
+       toast.error("Couldn't leave group");
      }
    };
  

@@ -180,12 +180,12 @@ export function HubSharePanel({
         .map(([id]) => id);
       
       if (selectedOptions.length > 0) {
-        toast.success('Shared successfully!');
+        toast.success('Shared');
       }
       
       onClose();
     } catch (error) {
-      toast.error('Failed to share');
+      toast.error("Couldn't share");
     } finally {
       setIsPosting(false);
     }

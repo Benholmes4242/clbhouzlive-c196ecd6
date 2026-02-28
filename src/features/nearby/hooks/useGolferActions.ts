@@ -74,7 +74,7 @@ export function useGolferActions(golferId: string, initialFollowing = false, ind
       }
       setIsFollowing(!isFollowing); // Revert local state
       
-      toast.error('Failed to update follow status', { description: 'Please try again' });
+      toast.error("Couldn't update follow", { description: 'Please try again' });
     },
     onSettled: () => {
       // Refetch to ensure consistency

@@ -54,14 +54,14 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
 
       if (error) throw error;
 
-      toast.success("Account deleted", { description: "Your account has been deleted. You will be redirected." });
+      toast.success("Account deleted");
 
       // Sign out and redirect
       await supabase.auth.signOut();
       navigate('/auth');
     } catch (error: any) {
       console.error('Error deleting account:', error);
-      toast.error("Deletion failed", { description: "Failed to delete account. Please contact support if this continues." });
+      toast.error("Couldn't delete account", { description: "Please contact support" });
     } finally {
       setIsDeleting(false);
       onClose();

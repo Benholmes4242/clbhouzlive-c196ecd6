@@ -23,13 +23,13 @@ export function DatabaseUrlUpdater() {
       
       setResult(data);
       if (data.success) {
-        toast.success(`Successfully updated ${data.updatedUrls} database URLs to use Stream`);
+        toast.success(`Updated ${data.updatedUrls} URLs`);
       } else {
-        toast.error("Failed to update database URLs");
+        toast.error("Couldn't update URLs");
       }
     } catch (error) {
       console.error('Error:', error);
-      toast.error("Failed to update database URLs");
+      toast.error("Couldn't update URLs");
       setResult({ error: error.message, success: false });
     } finally {
       setIsUpdating(false);

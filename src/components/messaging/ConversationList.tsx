@@ -210,7 +210,7 @@ export function ConversationList({
       toast.success('Chat archived');
     } catch (error) {
       console.error('Error archiving:', error);
-      toast.error('Failed to archive');
+      toast.error("Couldn't archive");
     }
   };
 
@@ -238,7 +238,7 @@ export function ConversationList({
       toast.success('Conversation deleted');
     } catch (error) {
       console.error('Error deleting conversation:', error);
-      toast.error('Failed to delete conversation');
+      toast.error("Couldn't delete conversation");
     }
   };
 

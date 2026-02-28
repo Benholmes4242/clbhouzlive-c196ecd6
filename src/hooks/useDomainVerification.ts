@@ -50,7 +50,7 @@ export function useRequestDomainCheck() {
       toast.success('Domain verification requested');
     },
     onError: (error: Error) => {
-      toast.error('Failed to request domain verification', { description: error.message });
+      toast.error("Couldn't request verification", { description: error.message });
     },
   });
 }
@@ -72,7 +72,7 @@ export function useSendDomainCode(businessId: string) {
       toast.success('Verification code sent', { description: 'Check your email for the 6-digit code' });
     },
     onError: (error: Error) => {
-      toast.error('Failed to send code', { description: error.message });
+      toast.error("Couldn't send code", { description: error.message });
     },
   });
 }
@@ -94,7 +94,7 @@ export function useVerifyDomainCode() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['domain-verification'] });
       queryClient.invalidateQueries({ queryKey: ['business-verification-request'] });
-      toast.success('Domain verified!', { description: 'Your business domain has been confirmed' });
+      toast.success('Domain verified');
     },
     onError: (error: Error) => {
       toast.error('Verification failed', { description: error.message });

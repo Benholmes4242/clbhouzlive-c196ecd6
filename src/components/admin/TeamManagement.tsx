@@ -97,10 +97,10 @@ const TeamManagement = () => {
   const handleRevokeAccess = async (member: AdminTeamMember) => {
     const result = await revokeAccess(member.user_id, member.email);
     if (result.success) {
-      toast.success('Access revoked', { description: `${member.email} has been removed` });
+      toast.success('Access revoked');
       queryClient.invalidateQueries({ queryKey: ['admin-team-list'] });
     } else {
-      toast.error('Error', { description: 'Failed to revoke access' });
+      toast.error("Couldn't revoke access");
     }
   };
 
@@ -110,17 +110,17 @@ const TeamManagement = () => {
       toast.success('Invite resent', { description: `Invitation extended for ${invitation.email}` });
       queryClient.invalidateQueries({ queryKey: ['admin-team-list'] });
     } else {
-      toast.error('Error', { description: 'Failed to resend invite' });
+      toast.error("Couldn't resend invite");
     }
   };
 
   const handleCancelInvite = async (invitation: AdminInvitation) => {
     const result = await cancelInvite(invitation.id);
     if (result.success) {
-      toast.success('Invite cancelled', { description: `Invitation for ${invitation.email} has been cancelled` });
+      toast.success('Invite cancelled');
       queryClient.invalidateQueries({ queryKey: ['admin-team-list'] });
     } else {
-      toast.error('Error', { description: 'Failed to cancel invite' });
+      toast.error("Couldn't cancel invite");
     }
   };
 

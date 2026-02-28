@@ -144,10 +144,10 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, onRoleChange }) 
       // Remove user from local state only after successful deletion
       setLocalUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
       
-      toast.success("Success", { description: `User ${userEmail} has been deleted successfully` });
+      toast.success("User deleted");
     } catch (error: any) {
       console.error('Error deleting user:', error);
-      toast.error("Error", { description: `Failed to delete user: ${error.message}` });
+      toast.error("Couldn't delete user", { description: error.message });
     } finally {
       setActionLoading(null);
     }

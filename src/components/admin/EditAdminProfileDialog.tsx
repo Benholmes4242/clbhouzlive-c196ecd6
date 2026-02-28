@@ -61,7 +61,7 @@ const EditAdminProfileDialog = ({
 
   const handleSave = async () => {
     if (!firstName.trim() || !lastName.trim() || !email.trim()) {
-      toast.error("Error", { description: "Please fill in all required fields" });
+      toast.error("Please fill in all fields");
       return;
     }
 
@@ -114,13 +114,13 @@ const EditAdminProfileDialog = ({
         if (roleError) throw roleError;
       }
 
-      toast.success("Success", { description: "Profile updated successfully" });
+      toast.success("Profile updated");
 
       onProfileUpdated();
       onOpenChange(false);
     } catch (error) {
       console.error('Error updating profile:', error);
-      toast.error("Error", { description: "Failed to update profile" });
+      toast.error("Couldn't update profile");
     } finally {
       setLoading(false);
     }

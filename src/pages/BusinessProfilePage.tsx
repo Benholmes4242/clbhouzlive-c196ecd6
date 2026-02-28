@@ -135,13 +135,13 @@ const BusinessProfilePage: React.FC = () => {
       } catch {}
     } else {
       await navigator.clipboard.writeText(url);
-      toast.success('Link copied to clipboard');
+      toast.success('Copied to clipboard');
     }
   };
 
   const handleCopyLink = async () => {
     await navigator.clipboard.writeText(window.location.href);
-    toast.success('Link copied');
+    toast.success('Copied to clipboard');
   };
 
   // Format URL for display

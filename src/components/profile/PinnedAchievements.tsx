@@ -155,7 +155,7 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
       });
     } catch (error) {
       console.error('Error updating achievement visibility:', error);
-      toast.error('Failed to update achievement visibility');
+      toast.error("Couldn't update achievements");
     }
   };
 
@@ -184,10 +184,10 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
 
       setPinnedAchievementIds(tempPinnedIds);
       setIsManagePinsOpen(false);
-      toast.success('Pins updated', { description: 'Your pinned achievements have been saved' });
+      toast.success('Pins updated');
     } catch (error) {
       console.error('Error saving pinned achievements:', error);
-      toast.error('Failed to save pinned achievements');
+      toast.error("Couldn't save pins");
     }
   };
 

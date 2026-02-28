@@ -348,7 +348,7 @@ const TaggedPostCard = React.memo(function TaggedPostCard({
 
   const handleCopyLink = useCallback(async () => {
     await navigator.clipboard.writeText(`${window.location.origin}/clubhouse/post/${post.id}`);
-    toast.success('Link copied');
+    toast.success('Copied to clipboard');
   }, [post.id]);
 
   const handleSend = useCallback(async () => {
@@ -359,7 +359,7 @@ const TaggedPostCard = React.memo(function TaggedPostCard({
       } catch {}
     } else {
       await navigator.clipboard.writeText(url);
-      toast.success('Link copied');
+      toast.success('Copied to clipboard');
     }
   }, [post.id, authorName]);
 

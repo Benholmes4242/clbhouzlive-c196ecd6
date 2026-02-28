@@ -93,7 +93,7 @@ export function AdminInvitesPage() {
       setRows(res?.data ?? []);
     } catch (e: any) {
       setError("Failed to load invites");
-      toast.error("Failed to load invites", { description: e.message });
+      toast.error("Couldn't load invites", { description: e.message });
     } finally {
       setLoading(false);
     }
@@ -112,7 +112,7 @@ export function AdminInvitesPage() {
       setInviteRole("limited");
       await load();
     } catch (e: any) {
-      toast.error("Failed to create invite", { description: e.message });
+      toast.error("Couldn't create invite", { description: e.message });
     }
   };
 
@@ -123,7 +123,7 @@ export function AdminInvitesPage() {
       setSelectedInvite(null);
       await load();
     } catch (e: any) {
-      toast.error("Failed to revoke invite", { description: e.message });
+      toast.error("Couldn't revoke invite", { description: e.message });
     }
   };
 

@@ -92,11 +92,11 @@ export function NotificationSettingsPage() {
         .eq('id', user.id);
 
       if (error) throw error;
-      toast.success('Preferences saved');
+      toast.success('Settings saved');
     } catch (err) {
       console.error('[NotificationSettings] update error:', err);
       setPreferences(preferences); // Rollback
-      toast.error('Failed to save');
+      toast.error("Couldn't save");
     } finally {
       setIsSaving(false);
     }

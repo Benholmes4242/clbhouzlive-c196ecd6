@@ -100,7 +100,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
 
   // Handle share
   const handleShare = () => {
-    toast.success('Share feature coming soon!');
+    toast.info('Coming soon');
   };
 
   // Dynamic title

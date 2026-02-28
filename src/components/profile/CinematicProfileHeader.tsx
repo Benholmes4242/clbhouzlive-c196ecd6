@@ -61,12 +61,12 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      toast.error("Invalid file type", { description: "Please select an image file." });
+      toast.error("Unsupported file");
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      toast.error("File too large", { description: "Image file must be less than 10MB." });
+      toast.error("File too large", { description: "Max 10MB for photos" });
       return;
     }
 

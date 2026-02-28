@@ -175,12 +175,12 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
         if (error) throw error;
       }
 
-      toast.success('Media saved successfully!');
+      toast.success('Media saved');
       onMediaUpdate();
       onClose();
     } catch (error: any) {
       console.error('Save error:', error);
-      toast.error(error.message || 'Failed to save media');
+      toast.error("Couldn't save media");
     } finally {
       setSaving(false);
     }

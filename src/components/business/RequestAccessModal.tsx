@@ -125,7 +125,7 @@ export const RequestAccessModal: React.FC<RequestAccessModalProps> = ({
       if (error.code === '23505') {
         toast.error('You already have a pending request for this business');
       } else {
-        toast.error('Failed to submit request');
+        toast.error("Couldn't submit request");
       }
     } finally {
       setSubmitting(false);

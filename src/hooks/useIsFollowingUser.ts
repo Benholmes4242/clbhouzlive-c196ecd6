@@ -59,7 +59,7 @@ export function useUserFollowMutation(
         queryClient.setQueryData(['user-follow-status', viewerUserId, targetUserId], context.previousStatus);
       }
       console.error('Follow error:', error);
-      toast.error('Failed to follow user');
+      toast.error("Couldn't follow");
     },
     onSettled: () => {
       // Invalidate related queries
@@ -94,7 +94,7 @@ export function useUserFollowMutation(
         queryClient.setQueryData(['user-follow-status', viewerUserId, targetUserId], context.previousStatus);
       }
       console.error('Unfollow error:', error);
-      toast.error('Failed to unfollow user');
+      toast.error("Couldn't unfollow");
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['user-follow-status', viewerUserId, targetUserId] });

@@ -107,7 +107,7 @@ const AccountTypeOnboarding: React.FC = () => {
       if (selectedType === 'individual' && selectedCollege) {
         toast.success('College badge added');
       } else {
-        toast.success('Profile set up successfully!');
+        toast.success('Profile created');
       }
       
       // Navigate to profile page

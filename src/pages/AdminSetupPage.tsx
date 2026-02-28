@@ -126,13 +126,13 @@ const AdminSetupPage = () => {
 
         if (inviteError) throw inviteError;
 
-        toast.success("Welcome!", { description: "Your admin account has been created successfully." });
+        toast.success("Admin account created");
 
         navigate('/admin');
       }
     } catch (error) {
       console.error('Error setting up admin account:', error);
-      toast.error("Setup Failed", { description: "Failed to create your admin account. Please try again." });
+      toast.error("Setup failed", { description: "Please try again" });
     } finally {
       setLoading(false);
     }

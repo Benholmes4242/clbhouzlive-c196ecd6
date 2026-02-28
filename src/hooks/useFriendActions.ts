@@ -81,7 +81,7 @@ export const useFriendActions = ({ currentUserId }: UseFriendActionsProps) => {
       return true;
     } catch (error) {
       console.error('Error sending friend request:', error);
-      toast.error('Failed to send friend request');
+      toast.error("Couldn't send request");
       return false;
     } finally {
       setLoading(false);
@@ -116,7 +116,7 @@ export const useFriendActions = ({ currentUserId }: UseFriendActionsProps) => {
       return true;
     } catch (error) {
       console.error('Error accepting friend request:', error);
-      toast.error('Failed to accept friend request');
+      toast.error("Couldn't accept request");
       return false;
     } finally {
       setLoading(false);
@@ -148,7 +148,7 @@ export const useFriendActions = ({ currentUserId }: UseFriendActionsProps) => {
       return true;
     } catch (error) {
       console.error('Error declining friend request:', error);
-      toast.error('Failed to decline friend request');
+      toast.error("Couldn't decline request");
       return false;
     } finally {
       setLoading(false);
@@ -180,7 +180,7 @@ export const useFriendActions = ({ currentUserId }: UseFriendActionsProps) => {
       return true;
     } catch (error) {
       console.error('Error cancelling friend request:', error);
-      toast.error('Failed to cancel friend request');
+      toast.error("Couldn't cancel request");
       return false;
     } finally {
       setLoading(false);
@@ -212,7 +212,7 @@ export const useFriendActions = ({ currentUserId }: UseFriendActionsProps) => {
       return true;
     } catch (error) {
       console.error('Error removing friend:', error);
-      toast.error('Failed to remove friend');
+      toast.error("Couldn't remove friend");
       return false;
     } finally {
       setLoading(false);

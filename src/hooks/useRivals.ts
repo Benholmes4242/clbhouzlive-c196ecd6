@@ -153,7 +153,7 @@ export function useRivals(userId?: string) {
       toast.success('Rival removed');
     },
     onError: () => {
-      toast.error('Failed to remove rival');
+      toast.error("Couldn't remove rival");
     },
   });
 

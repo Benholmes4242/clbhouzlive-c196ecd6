@@ -73,7 +73,7 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
 
     setHasRegisteredInterest(true);
     setIsRegistering(false);
-    toast.success("You're on the list!");
+    toast.success("You're on the list");
     
     // Invalidate queries
     queryClient.invalidateQueries({ queryKey: ['profile'], exact: false });

@@ -318,7 +318,7 @@ const AccessGateInner: React.FC<AccessGateV2Props> = ({ children }) => {
         setValidationCache('valid');
         scheduleRenew(expiresAt, checkOrRefresh);
         
-        toast.success("Access Granted - Welcome to clubhouz!");
+        toast.success("Access granted");
         captureEvent('gate_submit', { success: true });
         captureEvent('gate_access_granted');
         

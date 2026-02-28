@@ -29,7 +29,7 @@ export function ManualVideoMigration() {
       });
 
       if (response.ok) {
-        toast.success("Database references updated successfully");
+        toast.success("References updated");
         setR2Url("");
         setStreamUrl("");
       } else {
@@ -37,7 +37,7 @@ export function ManualVideoMigration() {
       }
     } catch (error) {
       console.error('Error:', error);
-      toast.error("Failed to update database references");
+      toast.error("Couldn't update references");
     } finally {
       setIsUpdating(false);
     }

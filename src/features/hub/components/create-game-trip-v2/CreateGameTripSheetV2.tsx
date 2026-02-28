@@ -373,7 +373,7 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
       queryClient.invalidateQueries({ queryKey: ['your-games-trips'] });
       queryClient.invalidateQueries({ queryKey: ['user-games'] });
       
-      toast.success('Game created!');
+      toast.success('Game created');
       
       // Open share panel
       if (data?.game_id || data?.game?.id) {

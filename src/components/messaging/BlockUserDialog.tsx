@@ -54,7 +54,7 @@
        onOpenChange(false);
      } catch (error) {
        console.error('Error blocking user:', error);
-       toast.error('Failed to block user');
+       toast.error("Couldn't block user");
      } finally {
        setBlocking(false);
      }

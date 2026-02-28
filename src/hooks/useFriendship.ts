@@ -146,12 +146,12 @@ export function useFriendship(targetUserId: string | undefined) {
       // Notification is created by database trigger - no frontend insert needed
     },
     onSuccess: () => {
-      toast.success('Friend request accepted!');
+      toast.success('Request accepted');
       invalidateQueries();
     },
     onError: (error) => {
       console.error('Error accepting request:', error);
-      toast.error('Failed to accept request');
+      toast.error("Couldn't accept request");
     },
   });
 

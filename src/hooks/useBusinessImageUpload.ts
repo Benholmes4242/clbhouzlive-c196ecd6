@@ -49,7 +49,7 @@ export function useBusinessImageUpload(businessId: string | undefined) {
       return uploadResult.publicUrl;
     } catch (error) {
       console.error('Error uploading logo:', error);
-      toast.error('Failed to upload logo');
+      toast.error("Couldn't upload logo");
       return null;
     } finally {
       setUploadingLogo(false);
@@ -76,7 +76,7 @@ export function useBusinessImageUpload(businessId: string | undefined) {
       toast.success('Logo removed');
     } catch (error) {
       console.error('Error removing logo:', error);
-      toast.error('Failed to remove logo');
+      toast.error("Couldn't remove logo");
     }
   }, [businessId, queryClient, invalidateAllBusinessQueries]);
 
@@ -107,12 +107,12 @@ export function useBusinessImageUpload(businessId: string | undefined) {
       );
 
       await invalidateAllBusinessQueries();
-      toast.success('Cover photo updated');
+      toast.success('Cover updated');
       
       return uploadResult.publicUrl;
     } catch (error) {
       console.error('Error uploading cover:', error);
-      toast.error('Failed to upload cover photo');
+      toast.error("Couldn't upload cover");
       return null;
     } finally {
       setUploadingCover(false);
@@ -139,7 +139,7 @@ export function useBusinessImageUpload(businessId: string | undefined) {
       toast.success('Cover photo removed');
     } catch (error) {
       console.error('Error removing cover:', error);
-      toast.error('Failed to remove cover photo');
+      toast.error("Couldn't remove cover");
     }
   }, [businessId, queryClient, invalidateAllBusinessQueries]);
 

@@ -80,10 +80,10 @@ export function GolfClubsGeocodingBackfill() {
         clubsNeedingGeocode,
       });
 
-      toast.success("Scan Complete", { description: `${clubsWithCourseCoords} clubs can copy coords from courses, ${clubsNeedingGeocode} need geocoding` });
+      toast.success("Scan complete");
     } catch (error: any) {
       console.error('Error scanning clubs:', error);
-      toast.error("Error", { description: error.message || "Failed to scan clubs" });
+      toast.error("Couldn't scan clubs");
     } finally {
       setIsProcessing(false);
     }
@@ -169,10 +169,10 @@ export function GolfClubsGeocodingBackfill() {
         }
       }
 
-      toast.success("Copy Complete", { description: `Copied coordinates for ${progress?.successful || clubsToCopy.length} clubs from their linked courses` });
+      toast.success("Coordinates copied");
     } catch (error: any) {
       console.error('Copy error:', error);
-      toast.error("Error", { description: error.message || "Copy failed" });
+      toast.error("Couldn't copy coordinates");
     } finally {
       setIsProcessing(false);
     }
