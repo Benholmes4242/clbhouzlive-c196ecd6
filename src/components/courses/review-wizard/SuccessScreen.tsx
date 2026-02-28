@@ -1,13 +1,11 @@
 /**
- * Success Screen — Amber-themed, matching Post Wizard success
- * Rating summary, confetti, radial glow
+ * Success Screen — Frosted glass + amber gradient checkmark
+ * Matches PostSuccessScreen aesthetic
  */
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Eye, ExternalLink, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import confetti from 'canvas-confetti';
+import { Check, Eye, ExternalLink, X } from 'lucide-react';
 import { getScoreTier } from '@/utils/getScoreTier';
 import type { ReviewWizardCourse, SuccessVariant } from './types';
 
@@ -36,143 +34,128 @@ export function SuccessScreen({
 }: SuccessScreenProps) {
   const isShared = variant === 'shared';
   const tierData = rating ? getScoreTier(rating) : null;
-  const isOutstanding = rating != null && rating >= 9.0;
-  
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      confetti({
-        particleCount: isEditMode ? 35 : (isShared ? 80 : 50),
-        spread: isShared ? 70 : 60,
-        origin: { y: 0.6 },
-        colors: isShared
-          ? ['#f59e0b', '#fbbf24', '#fcd34d', '#ffffff', '#64748b']
-          : ['#f59e0b', '#fbbf24', '#fcd34d', '#ffffff'],
-        disableForReducedMotion: true,
-      });
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [isShared, isEditMode]);
   
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-      className="relative flex-1 flex flex-col items-center justify-center p-6 text-center"
-      style={{ backgroundColor: 'transparent' }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center"
+      style={{
+        background: 'rgba(255,255,255,0.92)',
+        backdropFilter: 'blur(40px) saturate(200%)',
+      }}
     >
       {/* Close button */}
       <button
         onClick={onDone}
-        className="absolute top-4 right-4 z-50 w-9 h-9 rounded-full bg-muted/80 flex items-center justify-center text-foreground hover:bg-muted transition-colors active:scale-[0.97]"
+        className="absolute top-4 right-4 z-50 w-9 h-9 rounded-full flex items-center justify-center transition-colors active:scale-[0.97]"
+        style={{
+          background: 'hsl(var(--muted) / 0.8)',
+          border: '1.5px solid hsl(var(--border))',
+        }}
         aria-label="Close"
       >
-        <X className="h-5 w-5" />
+        <X className="h-5 w-5 text-foreground" />
       </button>
 
-      {/* Course thumbnail */}
-      {course?.thumbnail_image && (
-        <motion.img
-          src={course.thumbnail_image}
-          alt={course.name}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05, duration: 0.3 }}
-          className="w-14 h-14 rounded-xl object-cover shadow-md mb-4"
-        />
-      )}
-
-      {/* Success icon with pulse rings */}
+      {/* Amber gradient checkmark */}
       <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.15 }}
-        className="mb-6 relative"
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.2 }}
+        className="w-20 h-20 rounded-full flex items-center justify-center mb-6"
+        style={{
+          background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
+          boxShadow: '0 8px 32px rgba(245, 158, 11, 0.3)',
+        }}
       >
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0.6 }}
-          animate={{ scale: 1.8, opacity: 0 }}
-          transition={{ duration: 0.8, delay: 0.35 }}
-          className={`absolute inset-0 w-20 h-20 rounded-full ${isOutstanding ? 'bg-amber-300/40' : 'bg-muted/40'}`}
-        />
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0.5 }}
-          animate={{ scale: 1.5, opacity: 0 }}
-          transition={{ duration: 0.7, delay: 0.55 }}
-          className={`absolute inset-0 w-20 h-20 rounded-full ${isOutstanding ? 'bg-amber-200/30' : 'bg-muted/30'}`}
-        />
-        <div className={`w-20 h-20 rounded-full flex items-center justify-center relative z-10 ${isOutstanding ? 'bg-amber-100' : 'bg-muted'}`}>
-          <CheckCircle2 className={`h-10 w-10 ${isOutstanding ? 'text-amber-500' : 'text-muted-foreground'}`} />
-        </div>
+        <Check className="w-10 h-10 text-white" strokeWidth={3} />
       </motion.div>
 
-      {/* Success message */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
+      {/* Title */}
+      <motion.h2
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="space-y-2 mb-3"
+        transition={{ delay: 0.4 }}
+        className="text-2xl font-bold text-foreground"
       >
-        <h2 className="text-xl font-semibold text-foreground">
-          {isShared ? 'Shared to Clubhouse' : (isEditMode ? 'Review updated' : 'Review saved')}
-        </h2>
-        <p className="text-muted-foreground max-w-xs mx-auto">
-          {isShared 
-            ? 'Now live on Clubhouse'
-            : isEditMode
-              ? `Updated your verdict on ${course?.name || 'the course'}`
-              : `Your verdict on ${course?.name || 'the course'} is live`
-          }
-        </p>
-      </motion.div>
+        {isShared ? 'Shared to Clubhouse' : (isEditMode ? 'Review updated' : 'Review saved')}
+      </motion.h2>
 
-      {/* Rating summary */}
+      {/* Description */}
+      <motion.p
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+        className="text-sm text-muted-foreground mt-2 text-center px-8"
+      >
+        {isShared 
+          ? 'Now live on Clubhouse'
+          : isEditMode
+            ? `Updated your verdict on ${course?.name || 'the course'}`
+            : `Your verdict on ${course?.name || 'the course'} is live`
+        }
+      </motion.p>
+
+      {/* Rating pill */}
       {rating != null && tierData && (
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.28 }}
-          className="mb-8"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.6 }}
+          className="mt-6 px-5 py-2.5 rounded-full"
+          style={{
+            background: 'linear-gradient(135deg, rgba(245,158,11,0.1), rgba(245,158,11,0.05))',
+            border: '1.5px solid rgba(245,158,11,0.2)',
+          }}
         >
-          <span className={`text-lg ${isOutstanding ? 'font-bold text-amber-500' : 'font-semibold text-foreground/60'}`} style={{ fontVariantNumeric: 'tabular-nums' }}>
+          <span className="text-xl font-bold" style={{ color: '#f59e0b' }}>
             {rating === 10 ? '10' : rating.toFixed(1)}
           </span>
-          <span className={`text-lg mx-1.5 ${isOutstanding ? 'font-bold text-amber-500' : 'font-semibold text-foreground/60'}`}>·</span>
-          <span className={`text-lg uppercase tracking-wide ${isOutstanding ? 'font-bold text-amber-500' : 'font-semibold text-foreground/60'}`}>
-            {tierData.label}
-          </span>
+          <span className="text-sm text-muted-foreground ml-1">/10</span>
+          <span className="text-sm text-muted-foreground ml-2">{tierData.label}</span>
         </motion.div>
       )}
-      {(rating == null || !tierData) && <div className="mb-8" />}
 
       {/* Actions */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="flex flex-col w-full gap-3 max-w-xs"
+        transition={{ delay: 0.7 }}
+        className="flex gap-3 mt-8"
       >
         {isShared ? (
           <button
             onClick={onViewPost}
-            className="w-full h-12 gap-2 bg-primary text-primary-foreground font-semibold rounded-full active:scale-[0.97] transition-all duration-200 flex items-center justify-center"
+            className="px-6 py-3 rounded-full text-sm font-semibold text-white active:scale-[0.97] transition-all"
+            style={{ background: '#1C1C1E' }}
           >
-            <ExternalLink className="h-4 w-4" />
-            View Post
+            <span className="flex items-center gap-2">
+              <ExternalLink className="h-4 w-4" />
+              View post
+            </span>
           </button>
         ) : (
           <button
             onClick={onViewReview}
-            className="w-full h-12 gap-2 bg-primary text-primary-foreground font-semibold rounded-full active:scale-[0.97] transition-all duration-200 flex items-center justify-center"
+            className="px-6 py-3 rounded-full text-sm font-semibold text-white active:scale-[0.97] transition-all"
+            style={{ background: '#1C1C1E' }}
           >
-            <Eye className="h-4 w-4" />
-            View Review
+            <span className="flex items-center gap-2">
+              <Eye className="h-4 w-4" />
+              View review
+            </span>
           </button>
         )}
         
-        <Button variant="ghost" onClick={onDone} className="w-full h-12 text-muted-foreground hover:text-foreground">
+        <button
+          onClick={onDone}
+          className="px-6 py-3 rounded-full text-sm font-semibold text-foreground active:scale-[0.97] transition-all"
+          style={{ border: '1.5px solid hsl(var(--border))' }}
+        >
           Done
-        </Button>
+        </button>
       </motion.div>
     </motion.div>
   );

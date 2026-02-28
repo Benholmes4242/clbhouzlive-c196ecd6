@@ -1,12 +1,11 @@
 /**
  * Step 3: Add Photos & Videos
- * Uses native OS picker via pickMediaFiles utility
- * Amber-themed empty state, media stage + footer with Studio & Badges
+ * Amber-themed empty state with pill buttons, clean media stage
  */
 
 import React, { useRef, useCallback, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Camera, AlertCircle, Images, Loader2, Check } from 'lucide-react';
+import { Plus, Camera, AlertCircle, Images, Loader2 } from 'lucide-react';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import type { ReviewMediaItem } from '../types';
 import type { ReviewWizardCourse } from '../types';
@@ -53,19 +52,15 @@ export function MediaStep({
 }: MediaStepProps) {
   const mediaInputRef = useRef<HTMLInputElement>(null);
   
-  // Loading states
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [permissionDenied, setPermissionDenied] = useState<'camera' | 'photos' | null>(null);
   
-  
-  // Track previous media count to detect max reached
   const prevMediaCountRef = useRef(media.length);
   const [showMaxPulse, setShowMaxPulse] = useState(false);
 
-  // Keep activeMediaId in sync when media changes
   useEffect(() => {
     if (media.length === 0) {
-      // no-op, parent handles
+      // no-op
     } else if (activeMediaId && !media.find(m => m.id === activeMediaId)) {
       onActiveMediaChange(media[0]?.id || '');
     } else if (!activeMediaId && media.length > 0) {
@@ -73,7 +68,6 @@ export function MediaStep({
     }
   }, [media, activeMediaId, onActiveMediaChange]);
   
-  // Detect when max is reached for pulse animation
   useEffect(() => {
     if (media.length === MAX_MEDIA_ITEMS && prevMediaCountRef.current < MAX_MEDIA_ITEMS) {
       setShowMaxPulse(true);
@@ -101,20 +95,14 @@ export function MediaStep({
       }
     });
 
-    if (imageFiles.length > 0) {
-      onAddImages(imageFiles);
-    }
-
-    videoFiles.forEach(video => {
-      onAddVideo(video);
-    });
+    if (imageFiles.length > 0) onAddImages(imageFiles);
+    videoFiles.forEach(video => onAddVideo(video));
 
     if (mediaInputRef.current) {
       mediaInputRef.current.value = '';
     }
   }, [media.length, onAddImages, onAddVideo]);
 
-  // Process files from picker
   const handleFilesFromPicker = useCallback((files: File[]) => {
     if (files.length === 0) return;
     
@@ -135,7 +123,6 @@ export function MediaStep({
     }
   }, [media.length, onAddImages, onAddVideo]);
 
-  // Open camera with loading state
   const handleCamera = useCallback(async () => {
     setPermissionDenied(null);
     setIsPickerOpen(true);
@@ -156,7 +143,6 @@ export function MediaStep({
     }
   }, [handleFilesFromPicker]);
 
-  // Open gallery via native OS picker
   const handleGallery = useCallback(async () => {
     setPermissionDenied(null);
     
@@ -185,14 +171,9 @@ export function MediaStep({
     }
   }, [media.length, handleFilesFromPicker]);
 
-
   const canAddMore = media.length < MAX_MEDIA_ITEMS;
-  
-  // Calculate counts
   const failedCount = media.filter(m => m.status === 'failed').length;
-  const processingCount = media.filter(m => m.status === 'uploading' || m.status === 'queued').length;
 
-  // Convert ReviewMediaItem[] to ComposerMediaItem[] for CreateMomentMediaStage
   const composerMedia: ComposerMediaItem[] = media.map((item) => ({
     id: item.id,
     type: item.type,
@@ -210,12 +191,10 @@ export function MediaStep({
     triggerHaptic('selection');
   }, [onReorderMedia]);
 
-  // Get edits for a specific media item
   const getEdits = useCallback((mediaId: string): StudioEdits => {
     return studioEditsByMediaId[mediaId] ?? {};
   }, [studioEditsByMediaId]);
 
-  // Hidden file input for images and videos
   const fileInput = (
     <input
       ref={mediaInputRef}
@@ -227,7 +206,6 @@ export function MediaStep({
     />
   );
 
-  // Course location text for context bar
   const locationText = course ? formatCourseLocation({
     sub_country: course.sub_country,
     region: course.region,
@@ -245,10 +223,11 @@ export function MediaStep({
     >
       {fileInput}
       
-      {/* Course context bar — visual continuity from Steps 1-2 hero */}
+      {/* Course context bar */}
       {course && (
         <motion.div 
-          className="shrink-0 flex items-center gap-3 px-4 py-2.5 border-b border-border/30"
+          className="shrink-0 flex items-center gap-3 px-4 py-2.5 border-b"
+          style={{ borderColor: 'hsl(var(--border) / 0.3)' }}
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25 }}
@@ -272,7 +251,7 @@ export function MediaStep({
         </motion.div>
       )}
 
-      {/* Status info - show failed count if any */}
+      {/* Status info */}
       {failedCount > 0 && (
         <div className="bg-destructive/10 rounded-lg px-3 py-2 flex items-center gap-2 mx-4 mt-4">
           <AlertCircle className="h-4 w-4 text-destructive" />
@@ -285,7 +264,6 @@ export function MediaStep({
       {/* Media content */}
       {media.length > 0 ? (
         <div className="flex-1 flex flex-col min-h-0">
-          {/* Media stage - takes remaining space */}
           <div className="flex-1 min-h-0 relative">
             <CreateMomentMediaStage
               media={composerMedia}
@@ -298,7 +276,7 @@ export function MediaStep({
               getEdits={getEdits}
             />
             
-            {/* Media counter pill - top left, matching post wizard style */}
+            {/* Media counter pill */}
             {media.length > 1 && (
               <div className="absolute top-3 left-3 z-30 flex items-center px-2 py-1 rounded-full bg-black/60 backdrop-blur-xl border border-white/10 shadow-lg shadow-black/20">
                 <span className="text-[10px] text-white font-medium tabular-nums">
@@ -310,23 +288,31 @@ export function MediaStep({
           
           {/* Bottom footer bar */}
           <div 
-            className="flex-shrink-0 border-t border-border/30 px-4 py-3"
+            className="flex-shrink-0 px-4 py-3"
             style={{ 
+              borderTop: '1px solid hsl(var(--border) / 0.3)',
               paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
             }}
           >
-            {/* Counter — centered */}
-            <p className="text-sm text-muted-foreground font-medium tabular-nums text-center mb-2">
+            <p
+              className="text-sm font-medium tabular-nums text-center mb-2"
+              style={{
+                color: media.length >= MAX_MEDIA_ITEMS ? 'hsl(var(--destructive))' : 'hsl(var(--muted-foreground))',
+              }}
+            >
               {media.length}/{MAX_MEDIA_ITEMS}
             </p>
             
-            {/* Add button */}
-            <div className="flex items-center justify-center gap-4">
+            <div className="flex items-center justify-center">
               {canAddMore && (
                 <button
                   onClick={handleGallery}
                   disabled={isPickerOpen}
-                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-muted text-sm font-medium text-foreground active:bg-muted/80 transition-colors disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-full text-sm font-medium text-foreground active:scale-[0.97] transition-all disabled:opacity-50"
+                  style={{
+                    background: 'hsl(var(--muted) / 0.8)',
+                    border: '1.5px solid hsl(var(--border))',
+                  }}
                 >
                   {isPickerOpen ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -340,7 +326,7 @@ export function MediaStep({
           </div>
         </div>
       ) : (
-        /* Empty state — amber-themed, matching Post Wizard */
+        /* Empty state — amber-themed */
         <div 
           className="h-full flex items-center justify-center p-5 relative"
           style={{ background: 'transparent' }}
@@ -364,68 +350,63 @@ export function MediaStep({
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
             >
-              {/* Icon with ping */}
-              <div className="relative mb-5">
-                <motion.div 
-                  className="h-20 w-20 bg-muted flex items-center justify-center"
-                  style={{ borderRadius: '28%' }}
-                >
-                  <Camera className="h-9 w-9 text-muted-foreground" />
-                </motion.div>
-                {/* Ping animation */}
-                <div 
-                  className="absolute inset-0 bg-muted/50 animate-ping"
-                  style={{ borderRadius: '28%', animationDuration: '3s' }}
-                />
+              {/* Amber-tinted icon */}
+              <div
+                className="w-20 h-20 rounded-3xl flex items-center justify-center mb-5"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(245,158,11,0.1), rgba(245,158,11,0.05))',
+                  border: '1.5px solid rgba(245,158,11,0.15)',
+                }}
+              >
+                <Camera className="w-8 h-8" style={{ color: '#f59e0b' }} />
               </div>
               
-              {/* Text - visible hierarchy */}
-              <h3 className="text-xl font-bold tracking-tight text-foreground mb-1.5">
+              <h3 className="text-lg font-bold text-foreground">
                 Course Highlights
               </h3>
-              <p className="text-sm font-medium text-muted-foreground text-center mb-1">
-                Show off the course
-              </p>
-              <p className="text-xs text-muted-foreground/70 text-center mb-6">
-                Up to {MAX_MEDIA_ITEMS} photos & videos
+              <p className="text-sm text-muted-foreground mt-1 text-center">
+                Show off the course — up to {MAX_MEDIA_ITEMS} photos & videos
               </p>
               
-              {/* CTA buttons */}
-              <div className="flex gap-3 mb-5 w-full">
+              {/* Action buttons — pill style */}
+              <div className="flex gap-3 mt-6">
                 <button
                   onClick={handleCamera}
                   disabled={isPickerOpen}
-                  className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground font-medium active:scale-[0.97] transition-all duration-100 disabled:opacity-50"
-                  style={{ height: 56, borderRadius: 16 }}
+                  className="flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold text-white active:scale-[0.97] transition-all disabled:opacity-50"
+                  style={{ background: '#1C1C1E' }}
                 >
-                  <Camera className="h-5 w-5" />
+                  <Camera className="w-4 h-4" />
                   Camera
                 </button>
                 <button
                   onClick={handleGallery}
                   disabled={isPickerOpen}
-                  className="flex-1 flex items-center justify-center gap-2 font-medium text-foreground border-2 border-border active:scale-[0.97] transition-all duration-100 disabled:opacity-50"
-                  style={{ height: 56, borderRadius: 16 }}
+                  className="flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold text-foreground active:scale-[0.97] transition-all disabled:opacity-50"
+                  style={{
+                    background: 'hsl(var(--muted) / 0.8)',
+                    border: '1.5px solid hsl(var(--border))',
+                  }}
                 >
-                  <Images className="h-5 w-5" />
+                  <Images className="w-4 h-4" />
                   Gallery
                 </button>
               </div>
               
-              {/* Tip chips — static labels, not interactive */}
-              <div className="flex flex-wrap justify-center gap-2 mb-4">
-                {TIP_CHIPS.map(chip => (
-                  <span 
-                    key={chip}
-                    className="text-[11px] bg-muted/50 text-muted-foreground rounded-full px-2.5 py-1 select-none"
+              {/* Suggestion labels — non-interactive */}
+              <div className="flex flex-wrap justify-center gap-2 mt-5">
+                {TIP_CHIPS.map(tip => (
+                  <span
+                    key={tip}
+                    className="text-xs text-muted-foreground/70 px-2.5 py-1 rounded-full select-none"
+                    style={{ background: 'hsl(var(--muted) / 0.4)' }}
                   >
-                    {chip}
+                    {tip}
                   </span>
                 ))}
               </div>
               
-              {/* Optional indicator */}
-              <p className="text-[11px] text-muted-foreground/70">
+              <p className="text-xs text-muted-foreground/60 mt-4 text-center">
                 Optional — your ratings and review speak for themselves
               </p>
             </motion.div>

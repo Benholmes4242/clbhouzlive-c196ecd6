@@ -1,6 +1,6 @@
 /**
  * Wizard Progress Indicator
- * Horizontal progress bar — amber gradient for review flow
+ * Amber gradient bar with spring animation
  * Hidden on post-submit screens (preview, success, share-success)
  */
 
@@ -14,7 +14,6 @@ interface WizardProgressProps {
 }
 
 export function WizardProgress({ currentStep, totalSteps = 4 }: WizardProgressProps) {
-  // Hide progress bar on post-submit screens
   if (currentStep === 'preview' || currentStep === 'success' || currentStep === 'share-success') {
     return null;
   }
@@ -22,12 +21,13 @@ export function WizardProgress({ currentStep, totalSteps = 4 }: WizardProgressPr
   const progressPercent = (currentStep / totalSteps) * 100;
 
   return (
-    <div className="h-1 w-full bg-muted/50">
+    <div className="h-1 mx-4 rounded-full overflow-hidden bg-muted">
       <motion.div
-        className="h-full bg-primary"
+        className="h-full rounded-full"
+        style={{ background: 'linear-gradient(90deg, #f59e0b, #fbbf24)' }}
         initial={{ width: '0%' }}
         animate={{ width: `${progressPercent}%` }}
-        transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       />
     </div>
   );
