@@ -1,21 +1,23 @@
 /**
  * Step 3: Add Photos & Videos
- * Amber-themed empty state with pill buttons, clean media stage
+ * PostWizard-style thumbnail strip with fullscreen viewer
  */
 
 import React, { useRef, useCallback, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Camera, AlertCircle, Images, Loader2 } from 'lucide-react';
+import { Plus, AlertCircle, Images, Loader2 } from 'lucide-react';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import type { ReviewMediaItem } from '../types';
 import type { ReviewWizardCourse } from '../types';
-import CreateMomentMediaStage from '@/components/post/create-moment/CreateMomentMediaStage';
 import { ComposerMediaItem } from '@/hooks/useSnapModal';
 import { pickMediaFiles, validateMediaFiles } from '@/utils/media/pickMediaFiles';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { PermissionDeniedCard } from '@/components/post/post-wizard/components/PermissionDeniedCard';
 import { StudioEdits } from '@/types/studio';
 import { toast } from 'sonner';
+import { MediaThumbnail } from '@/components/post/post-wizard/components/MediaThumbnail';
+import { MediaPreviewViewer } from '@/components/post/post-wizard/components/MediaPreviewViewer';
+import type { OrderedMediaItem } from '@/components/post/post-wizard/types';
 
 interface MediaStepProps {
   media: ReviewMediaItem[];
@@ -34,8 +36,6 @@ interface MediaStepProps {
 
 const MAX_MEDIA_ITEMS = 10;
 
-const TIP_CHIPS = ['Fairways & greens', 'Signature holes', 'Clubhouse & views'];
-
 export function MediaStep({
   media,
   coverMediaId,
@@ -50,24 +50,12 @@ export function MediaStep({
   activeMediaId,
   onActiveMediaChange,
 }: MediaStepProps) {
-  const mediaInputRef = useRef<HTMLInputElement>(null);
-  
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [permissionDenied, setPermissionDenied] = useState<'camera' | 'photos' | null>(null);
-  
-  const prevMediaCountRef = useRef(media.length);
+  const [previewMediaIndex, setPreviewMediaIndex] = useState<number | null>(null);
   const [showMaxPulse, setShowMaxPulse] = useState(false);
+  const prevMediaCountRef = useRef(media.length);
 
-  useEffect(() => {
-    if (media.length === 0) {
-      // no-op
-    } else if (activeMediaId && !media.find(m => m.id === activeMediaId)) {
-      onActiveMediaChange(media[0]?.id || '');
-    } else if (!activeMediaId && media.length > 0) {
-      onActiveMediaChange(media[0].id);
-    }
-  }, [media, activeMediaId, onActiveMediaChange]);
-  
   useEffect(() => {
     if (media.length === MAX_MEDIA_ITEMS && prevMediaCountRef.current < MAX_MEDIA_ITEMS) {
       setShowMaxPulse(true);
@@ -76,32 +64,6 @@ export function MediaStep({
     }
     prevMediaCountRef.current = media.length;
   }, [media.length]);
-
-  const handleMediaSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
-
-    const remainingSlots = MAX_MEDIA_ITEMS - media.length;
-    const filesToProcess = files.slice(0, remainingSlots);
-
-    const imageFiles: File[] = [];
-    const videoFiles: File[] = [];
-
-    filesToProcess.forEach(file => {
-      if (file.type.startsWith('video/')) {
-        videoFiles.push(file);
-      } else if (file.type.startsWith('image/')) {
-        imageFiles.push(file);
-      }
-    });
-
-    if (imageFiles.length > 0) onAddImages(imageFiles);
-    videoFiles.forEach(video => onAddVideo(video));
-
-    if (mediaInputRef.current) {
-      mediaInputRef.current.value = '';
-    }
-  }, [media.length, onAddImages, onAddVideo]);
 
   const handleFilesFromPicker = useCallback((files: File[]) => {
     if (files.length === 0) return;
@@ -123,27 +85,7 @@ export function MediaStep({
     }
   }, [media.length, onAddImages, onAddVideo]);
 
-  const handleCamera = useCallback(async () => {
-    setPermissionDenied(null);
-    setIsPickerOpen(true);
-    
-    try {
-      const files = await pickMediaFiles({ 
-        accept: 'image/*,video/*', 
-        capture: 'environment',
-        multiple: false 
-      });
-      
-      setIsPickerOpen(false);
-      handleFilesFromPicker(files);
-    } catch (error) {
-      console.error('[ReviewWizard MediaStep] Camera error:', error);
-      setIsPickerOpen(false);
-      triggerHaptic('error');
-    }
-  }, [handleFilesFromPicker]);
-
-  const handleGallery = useCallback(async () => {
+  const handlePickMedia = useCallback(async () => {
     setPermissionDenied(null);
     
     const remainingSlots = MAX_MEDIA_ITEMS - media.length;
@@ -174,37 +116,20 @@ export function MediaStep({
   const canAddMore = media.length < MAX_MEDIA_ITEMS;
   const failedCount = media.filter(m => m.status === 'failed').length;
 
-  const composerMedia: ComposerMediaItem[] = media.map((item) => ({
+  // Convert ReviewMediaItem[] to OrderedMediaItem[] for PostWizard components
+  const composerMedia: OrderedMediaItem[] = media.map((item, index) => ({
     id: item.id,
     type: item.type,
     previewUrl: item.previewUrl,
     thumbnailUrl: item.posterUrl || item.previewUrl,
     file: (item as any).file,
-    order: 0,
+    order: index,
     uploadStatus: item.status === 'uploading' || item.status === 'queued' ? 'uploading' : 
                   item.status === 'failed' ? 'failed' : undefined,
     uploadProgress: item.progress?.percent,
   }));
 
-  const handleReorder = useCallback((fromIndex: number, toIndex: number) => {
-    onReorderMedia(fromIndex, toIndex);
-    triggerHaptic('selection');
-  }, [onReorderMedia]);
-
-  const getEdits = useCallback((mediaId: string): StudioEdits => {
-    return studioEditsByMediaId[mediaId] ?? {};
-  }, [studioEditsByMediaId]);
-
-  const fileInput = (
-    <input
-      ref={mediaInputRef}
-      type="file"
-      accept="image/*,video/*"
-      multiple
-      onChange={handleMediaSelect}
-      className="hidden"
-    />
-  );
+  const coverMediaIndex = media.findIndex(m => m.id === coverMediaId);
 
   const locationText = course ? formatCourseLocation({
     sub_country: course.sub_country,
@@ -221,8 +146,6 @@ export function MediaStep({
       className="flex flex-col h-full overflow-hidden relative"
       style={{ background: 'transparent' }}
     >
-      {fileInput}
-      
       {/* Course context bar */}
       {course && (
         <motion.div 
@@ -251,7 +174,7 @@ export function MediaStep({
         </motion.div>
       )}
 
-      {/* Status info */}
+      {/* Upload error banner */}
       {failedCount > 0 && (
         <div className="bg-destructive/10 rounded-lg px-3 py-2 flex items-center gap-2 mx-4 mt-4">
           <AlertCircle className="h-4 w-4 text-destructive" />
@@ -263,72 +186,57 @@ export function MediaStep({
 
       {/* Media content */}
       {media.length > 0 ? (
-        <div className="flex-1 flex flex-col min-h-0">
-          <div className="flex-1 min-h-0 relative">
-            <CreateMomentMediaStage
-              media={composerMedia}
-              activeMediaId={activeMediaId}
-              coverMediaId={coverMediaId}
-              onActiveMediaChange={onActiveMediaChange}
-              onSetCover={onSetCover}
-              onRemoveMedia={onRemoveMedia}
-              onReorder={handleReorder}
-              getEdits={getEdits}
-            />
-            
-            {/* Media counter pill */}
-            {media.length > 1 && (
-              <div className="absolute top-3 left-3 z-30 flex items-center px-2 py-1 rounded-full bg-black/60 backdrop-blur-xl border border-white/10 shadow-lg shadow-black/20">
-                <span className="text-[10px] text-white font-medium tabular-nums">
-                  {(activeMediaId ? media.findIndex(m => m.id === activeMediaId) : 0) + 1}/{media.length}
-                </span>
-              </div>
+        <div className="flex-1 flex flex-col min-h-0 px-4 pt-4">
+          {/* Horizontal scrolling thumbnail strip */}
+          <div className="flex gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
+            {composerMedia.map((item, index) => (
+              <MediaThumbnail
+                key={item.id}
+                item={item}
+                index={index}
+                isCover={index === coverMediaIndex}
+                totalItems={composerMedia.length}
+                hasStudioEdits={false}
+                showStudio={false}
+                onRemove={() => onRemoveMedia(item.id)}
+                onExpand={() => setPreviewMediaIndex(index)}
+                onStudio={() => {}}
+                onSetCover={() => onSetCover(item.id)}
+                isViewerOpen={previewMediaIndex !== null}
+              />
+            ))}
+
+            {/* "+" add more tile */}
+            {canAddMore && (
+              <button
+                onClick={handlePickMedia}
+                disabled={isPickerOpen}
+                className="flex-shrink-0 w-[160px] h-[160px] rounded-2xl flex items-center justify-center disabled:opacity-50"
+                style={{ border: '1.5px dashed rgba(245,158,11,0.25)' }}
+              >
+                {isPickerOpen ? (
+                  <Loader2 className="w-6 h-6 animate-spin" style={{ color: '#f59e0b' }} />
+                ) : (
+                  <Plus className="w-6 h-6" style={{ color: '#f59e0b' }} />
+                )}
+              </button>
             )}
           </div>
-          
-          {/* Bottom footer bar */}
-          <div 
-            className="flex-shrink-0 px-4 py-3"
-            style={{ 
-              borderTop: '1px solid hsl(var(--border) / 0.3)',
-              paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
+
+          {/* Counter */}
+          <p
+            className="text-sm font-medium tabular-nums text-center mt-2"
+            style={{
+              color: media.length >= MAX_MEDIA_ITEMS ? 'hsl(var(--destructive))' : 'hsl(var(--muted-foreground))',
             }}
           >
-            <p
-              className="text-sm font-medium tabular-nums text-center mb-2"
-              style={{
-                color: media.length >= MAX_MEDIA_ITEMS ? 'hsl(var(--destructive))' : 'hsl(var(--muted-foreground))',
-              }}
-            >
-              {media.length}/{MAX_MEDIA_ITEMS}
-            </p>
-            
-            <div className="flex items-center justify-center">
-              {canAddMore && (
-                <button
-                  onClick={handleGallery}
-                  disabled={isPickerOpen}
-                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-full text-sm font-medium text-foreground active:scale-[0.97] transition-all disabled:opacity-50"
-                  style={{
-                    background: 'hsl(var(--muted) / 0.8)',
-                    border: '1.5px solid hsl(var(--border))',
-                  }}
-                >
-                  {isPickerOpen ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Plus className="h-4 w-4" />
-                  )}
-                  Add
-                </button>
-              )}
-            </div>
-          </div>
+            {media.length}/{MAX_MEDIA_ITEMS}
+          </p>
         </div>
       ) : (
-        /* Empty state — amber-themed */
+        /* Empty state — dashed amber tile */
         <div 
-          className="h-full flex items-center justify-center p-5 relative"
+          className="flex-1 flex flex-col items-center justify-center p-5"
           style={{ background: 'transparent' }}
         >
           {permissionDenied ? (
@@ -336,83 +244,63 @@ export function MediaStep({
               type={permissionDenied}
               onRetry={() => {
                 setPermissionDenied(null);
-                if (permissionDenied === 'camera') {
-                  handleCamera();
-                } else {
-                  handleGallery();
-                }
+                handlePickMedia();
               }}
             />
           ) : (
             <motion.div 
-              className="text-center flex flex-col items-center w-full max-w-sm"
+              className="w-full max-w-sm flex flex-col items-center"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
             >
-              {/* Amber-tinted icon */}
-              <div
-                className="w-20 h-20 rounded-3xl flex items-center justify-center mb-5"
+              <button
+                onClick={handlePickMedia}
+                disabled={isPickerOpen}
+                className="w-full aspect-[16/10] rounded-2xl flex flex-col items-center justify-center gap-3 disabled:opacity-50"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(245,158,11,0.1), rgba(245,158,11,0.05))',
-                  border: '1.5px solid rgba(245,158,11,0.15)',
+                  border: '2px dashed rgba(245, 158, 11, 0.3)',
+                  background: 'rgba(245, 158, 11, 0.02)',
                 }}
               >
-                <Camera className="w-8 h-8" style={{ color: '#f59e0b' }} />
-              </div>
-              
-              <h3 className="text-lg font-bold text-foreground">
-                Course Highlights
-              </h3>
-              <p className="text-sm text-muted-foreground mt-1 text-center">
-                Show off the course — up to {MAX_MEDIA_ITEMS} photos & videos
-              </p>
-              
-              {/* Action buttons — pill style */}
-              <div className="flex gap-3 mt-6">
-                <button
-                  onClick={handleCamera}
-                  disabled={isPickerOpen}
-                  className="flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold text-white active:scale-[0.97] transition-all disabled:opacity-50"
-                  style={{ background: '#1C1C1E' }}
-                >
-                  <Camera className="w-4 h-4" />
-                  Camera
-                </button>
-                <button
-                  onClick={handleGallery}
-                  disabled={isPickerOpen}
-                  className="flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold text-foreground active:scale-[0.97] transition-all disabled:opacity-50"
+                <div
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center"
                   style={{
-                    background: 'hsl(var(--muted) / 0.8)',
-                    border: '1.5px solid hsl(var(--border))',
+                    background: 'linear-gradient(135deg, rgba(245,158,11,0.12), rgba(245,158,11,0.05))',
                   }}
                 >
-                  <Images className="w-4 h-4" />
-                  Gallery
-                </button>
-              </div>
-              
-              {/* Suggestion labels — non-interactive */}
-              <div className="flex flex-wrap justify-center gap-2 mt-5">
-                {TIP_CHIPS.map(tip => (
-                  <span
-                    key={tip}
-                    className="text-xs text-muted-foreground/70 px-2.5 py-1 rounded-full select-none"
-                    style={{ background: 'hsl(var(--muted) / 0.4)' }}
-                  >
-                    {tip}
-                  </span>
-                ))}
-              </div>
-              
-              <p className="text-xs text-muted-foreground/60 mt-4 text-center">
-                Optional — your ratings and review speak for themselves
+                  {isPickerOpen ? (
+                    <Loader2 className="w-6 h-6 animate-spin" style={{ color: '#f59e0b' }} />
+                  ) : (
+                    <Images className="w-6 h-6" style={{ color: '#f59e0b' }} />
+                  )}
+                </div>
+                <span className="text-sm font-semibold text-foreground">Add photo or video</span>
+              </button>
+              <p className="text-xs text-muted-foreground/60 mt-3 text-center">
+                Optional — up to {MAX_MEDIA_ITEMS} photos & videos
               </p>
             </motion.div>
           )}
         </div>
       )}
+
+      {/* Fullscreen media viewer */}
+      <AnimatePresence>
+        {previewMediaIndex !== null && (
+          <MediaPreviewViewer
+            items={composerMedia}
+            initialIndex={previewMediaIndex}
+            onClose={() => setPreviewMediaIndex(null)}
+            onSetCover={(index) => {
+              const item = composerMedia[index];
+              if (item) onSetCover(item.id);
+            }}
+            coverIndex={coverMediaIndex}
+            showStudio={false}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

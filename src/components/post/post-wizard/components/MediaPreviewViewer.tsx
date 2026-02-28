@@ -13,13 +13,15 @@ interface MediaPreviewViewerProps {
   items: OrderedMediaItem[];
   initialIndex: number;
   onClose: () => void;
-  onStudio: (itemId: string) => void;
+  onStudio?: (itemId: string) => void;
   onSetCover?: (index: number) => void;
   coverIndex: number;
   studioEditsByMediaId?: Record<string, StudioEdits>;
+  /** Hide the studio wand button (default: true) */
+  showStudio?: boolean;
 }
 
-export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onSetCover, coverIndex, studioEditsByMediaId }: MediaPreviewViewerProps) {
+export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onSetCover, coverIndex, studioEditsByMediaId, showStudio = true }: MediaPreviewViewerProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -192,18 +194,20 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
                   Set as Cover
                 </button>
               )}
-              <button
-                onClick={handleStudio}
-                className="pointer-events-auto w-9 h-9 rounded-full flex items-center justify-center"
-                style={{
-                  background: 'rgba(0,0,0,0.35)',
-                  backdropFilter: 'blur(16px) saturate(180%)',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                }}
-                aria-label="Open studio"
-              >
-                <Wand2 className="w-4 h-4 text-white" />
-              </button>
+              {showStudio && (
+                <button
+                  onClick={handleStudio}
+                  className="pointer-events-auto w-9 h-9 rounded-full flex items-center justify-center"
+                  style={{
+                    background: 'rgba(0,0,0,0.35)',
+                    backdropFilter: 'blur(16px) saturate(180%)',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                  }}
+                  aria-label="Open studio"
+                >
+                  <Wand2 className="w-4 h-4 text-white" />
+                </button>
+              )}
             </div>
           </div>
         </div>
