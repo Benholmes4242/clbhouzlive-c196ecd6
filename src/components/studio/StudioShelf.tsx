@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, RotateCcw } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { StudioEdits, StudioTool } from '@/types/studio';
 import StudioToolRail from './StudioToolRail';
 import StudioPanelMusic from './panels/StudioPanelMusic';
@@ -192,53 +192,64 @@ export default function StudioShelf({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
           >
-            {/* Top Bar */}
-            <div
-              className="flex items-center justify-between px-4 py-3 z-10 flex-shrink-0"
-              style={{
-                background: 'rgba(0,0,0,0.5)',
-                backdropFilter: 'blur(16px)',
-              }}
-            >
-              <button
-                onClick={handleCancelAttempt}
-                className="flex items-center gap-1.5 text-sm font-medium"
-                style={{ color: 'rgba(255,255,255,0.8)' }}
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back
-              </button>
-              <div className="flex items-center gap-3">
-                {hasChanges && (
-                  <button
-                    onClick={handleResetAll}
-                    className="flex items-center gap-1 text-sm font-medium"
-                    style={{ color: '#EF4444' }}
-                  >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                    Reset
-                  </button>
-                )}
-                <button
-                  onClick={() => onClose()}
-                  className="px-4 py-1.5 rounded-full text-sm font-semibold"
-                  style={{
-                    background: '#f59e0b',
-                    color: '#FFFFFF',
-                    boxShadow: '0 2px 8px rgba(245,158,11,0.3)',
-                  }}
-                >
-                  Done
-                </button>
-              </div>
-            </div>
-
-            {/* Live Media Canvas */}
+            {/* Live Media Canvas — now starts at top, full height */}
             <div
               ref={canvasRef}
               className="flex-1 relative bg-black flex items-center justify-center overflow-hidden min-h-0"
               style={{ touchAction: 'none' }}
             >
+              {/* Floating controls overlay — sits ON TOP of media */}
+              <div
+                className="absolute inset-x-0 top-0 z-10 pointer-events-none"
+                style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
+              >
+                <div
+                  className="absolute inset-x-0 top-0 h-24"
+                  style={{
+                    background: 'linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)',
+                    pointerEvents: 'none',
+                  }}
+                />
+                <div className="relative flex items-center justify-between px-4">
+                  <button
+                    onClick={handleCancelAttempt}
+                    className="pointer-events-auto flex items-center gap-1 px-3 py-1.5 rounded-full"
+                    style={{
+                      background: 'rgba(0,0,0,0.35)',
+                      backdropFilter: 'blur(16px) saturate(180%)',
+                      border: '1px solid rgba(255,255,255,0.12)',
+                    }}
+                  >
+                    <ArrowLeft className="w-4 h-4 text-white" />
+                    <span className="text-white text-sm font-medium">Back</span>
+                  </button>
+                  <div className="flex items-center gap-2 pointer-events-auto">
+                    {hasChanges && (
+                      <button
+                        onClick={handleResetAll}
+                        className="px-3 py-1.5 rounded-full text-sm font-medium text-white"
+                        style={{
+                          background: 'rgba(0,0,0,0.35)',
+                          backdropFilter: 'blur(16px) saturate(180%)',
+                          border: '1px solid rgba(255,255,255,0.12)',
+                        }}
+                      >
+                        Reset
+                      </button>
+                    )}
+                    <button
+                      onClick={() => onClose()}
+                      className="px-4 py-1.5 rounded-full text-sm font-semibold text-white"
+                      style={{
+                        background: '#f59e0b',
+                        boxShadow: '0 4px 16px rgba(245, 158, 11, 0.3)',
+                      }}
+                    >
+                      Done
+                    </button>
+                  </div>
+                </div>
+              </div>
               {/* Show CropEditor when crop tool is active for images */}
               {showCropOnCanvas ? (
                 <div className="absolute inset-0">
