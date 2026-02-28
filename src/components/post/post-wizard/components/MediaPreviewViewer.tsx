@@ -151,49 +151,62 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Top bar */}
-      <div
-        className="flex items-center justify-between px-4 pb-2 flex-shrink-0"
-        style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 20px)' }}
-      >
-        <button
-          onClick={onClose}
-          className="w-9 h-9 rounded-full flex items-center justify-center"
-          style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(24px) saturate(180%)', border: '1px solid rgba(255,255,255,0.15)', boxShadow: '0 8px 32px rgba(0,0,0,0.35)' }}
-          aria-label="Close preview"
-        >
-          <X className="w-5 h-5 text-white" />
-        </button>
-
-        <div className="flex items-center gap-2">
-          {items.length > 1 && !isCover && (
-            <button
-              onClick={() => onSetCover?.(currentIndex)}
-              className="px-3 py-1.5 rounded-full text-xs font-semibold text-white"
-              style={{
-                background: 'rgba(0,0,0,0.45)',
-                backdropFilter: 'blur(24px) saturate(180%)',
-                border: '1px solid rgba(255,255,255,0.15)',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
-              }}
-            >
-              Set as Cover
-            </button>
-          )}
-
-          <button
-            onClick={handleStudio}
-            className="w-9 h-9 rounded-full flex items-center justify-center"
-            style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(24px) saturate(180%)', border: '1px solid rgba(255,255,255,0.15)', boxShadow: '0 8px 32px rgba(0,0,0,0.35)' }}
-            aria-label="Edit in studio"
-          >
-            <Wand2 className="w-5 h-5 text-white" />
-          </button>
-        </div>
-      </div>
-
       {/* 3-item sliding window: prev, current, next */}
       <div className="flex-1 relative overflow-hidden min-h-0">
+        {/* Floating controls overlay — sits ON TOP of media */}
+        <div
+          className="absolute inset-x-0 top-0 z-10 pointer-events-none"
+          style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}
+        >
+          <div
+            className="absolute inset-x-0 top-0 h-28"
+            style={{
+              background: 'linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.25) 50%, transparent 100%)',
+              pointerEvents: 'none',
+            }}
+          />
+          <div className="relative flex items-center justify-between px-4">
+            <button
+              onClick={onClose}
+              className="pointer-events-auto w-9 h-9 rounded-full flex items-center justify-center"
+              style={{
+                background: 'rgba(0,0,0,0.35)',
+                backdropFilter: 'blur(16px) saturate(180%)',
+                border: '1px solid rgba(255,255,255,0.12)',
+              }}
+              aria-label="Close preview"
+            >
+              <X className="w-4.5 h-4.5 text-white" />
+            </button>
+            <div className="flex items-center gap-2 pointer-events-auto">
+              {items.length > 1 && !isCover && (
+                <button
+                  onClick={() => onSetCover?.(currentIndex)}
+                  className="px-3 py-1.5 rounded-full text-xs font-semibold text-white"
+                  style={{
+                    background: 'rgba(0,0,0,0.35)',
+                    backdropFilter: 'blur(16px) saturate(180%)',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                  }}
+                >
+                  Set as Cover
+                </button>
+              )}
+              <button
+                onClick={handleStudio}
+                className="pointer-events-auto w-9 h-9 rounded-full flex items-center justify-center"
+                style={{
+                  background: 'rgba(0,0,0,0.35)',
+                  backdropFilter: 'blur(16px) saturate(180%)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                }}
+                aria-label="Open studio"
+              >
+                <Wand2 className="w-4 h-4 text-white" />
+              </button>
+            </div>
+          </div>
+        </div>
         {[-1, 0, 1].map(offset => {
           const idx = currentIndex + offset;
           if (idx < 0 || idx >= items.length) return null;
