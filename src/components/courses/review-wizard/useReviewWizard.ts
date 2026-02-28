@@ -563,15 +563,18 @@ export function useReviewWizard({
     // Auth check inside handleSubmit — by Step 4, user was already authenticated.
     // This catches session expiry edge case.
     if (!currentUserId) {
-      toast.error('Session expired', { description: 'Please sign in again to submit your review.' });
+      toast.error('Session expired', { description: 'Please sign in again' });
+      return;
     }
     
     if (!course) {
-      toast.error('No course selected. Please go back and select a course.');
+      toast.error('Course not found');
+      return;
     }
     
     if (!state.rating) {
-      toast.error('Rating Required', { description: 'Please provide a rating before submitting.' });
+      toast.error('Rating required');
+      return;
     }
     
     submissionInProgressRef.current = true;
