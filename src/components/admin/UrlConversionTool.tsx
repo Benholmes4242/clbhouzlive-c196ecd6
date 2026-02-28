@@ -18,14 +18,14 @@ const UrlConversionTool: React.FC = () => {
       if (error) throw error;
       setResult(data);
       if (data.success) {
-        toast.success("URL Conversion Complete", { description: `Successfully updated ${data.totalUpdated} media URLs to R2` });
+        toast.success("Conversion complete", { description: `${data.totalUpdated} URLs updated` });
       } else {
-        toast.error("Conversion Failed", { description: data.error || "Unknown error occurred" });
+        toast.error("Conversion failed", { description: data.error || "Unknown error" });
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       setResult({ success: false, error: errorMessage });
-      toast.error("Conversion Failed", { description: errorMessage });
+      toast.error("Conversion failed", { description: errorMessage });
     } finally {
       setIsConverting(false);
     }

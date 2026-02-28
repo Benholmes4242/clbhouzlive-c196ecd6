@@ -146,7 +146,7 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
       // Rollback optimistic update on error
       rollback(context);
       console.error('Error adding rating:', error);
-      toast.error("Failed to submit rating. Please try again.");
+      toast.error("Couldn't submit rating", { description: "Please try again" });
     },
     onSettled: () => {
       // Schedule a background sync to ensure eventual consistency

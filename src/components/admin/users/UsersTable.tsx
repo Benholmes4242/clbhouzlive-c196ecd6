@@ -132,11 +132,11 @@ export function UsersTable({ users, readOnly = false }: UsersTableProps) {
         throw new Error(data.error);
       }
       
-      toast.success("Success", { description: `Password reset email sent to ${userEmail}` });
+      toast.success("Password reset sent");
       track("admin_password_reset", { target_user_id: userId });
     } catch (error: any) {
       console.error('Error sending password reset:', error);
-      toast.error("Error", { description: `Failed to send password reset: ${error.message}` });
+      toast.error("Couldn't send reset email", { description: error.message });
     } finally {
       setActionLoading(null);
     }

@@ -56,7 +56,7 @@ export function ThreadTagEditorInline({ threadId, initialTags, className }: Thre
       toast.success("Tags updated");
     } catch (error) {
       console.error('Failed to save tags:', error);
-      toast.error("Failed to save tags. Please try again.");
+      toast.error("Couldn't save tags");
       
       // Revert on error
       setTags(originalTags);
@@ -98,7 +98,7 @@ export function ThreadTagEditorInline({ threadId, initialTags, className }: Thre
       setOriginalTags(newTags);
     } catch (error) {
       console.error('Failed to remove tag:', error);
-      toast.error("Failed to remove tag. Please try again.");
+      toast.error("Couldn't remove tag");
       
       // Revert on error
       setTags(originalTags);

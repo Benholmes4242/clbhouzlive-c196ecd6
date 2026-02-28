@@ -129,7 +129,7 @@ export function useCreatorFeatures(userId?: string) {
       toast.success('Featured video updated');
     },
     onError: () => {
-      toast.error('Failed to update featured video');
+      toast.error("Couldn't update featured video");
     },
   });
 
@@ -165,7 +165,7 @@ export function useCreatorFeatures(userId?: string) {
       toast.success('Post pinned');
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Failed to pin post');
+      toast.error(error.message || "Couldn't pin post");
     },
   });
 
@@ -190,7 +190,7 @@ export function useCreatorFeatures(userId?: string) {
       toast.success('Post unpinned');
     },
     onError: () => {
-      toast.error('Failed to unpin post');
+      toast.error("Couldn't unpin post");
     },
   });
 

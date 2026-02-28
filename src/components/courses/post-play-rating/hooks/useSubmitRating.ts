@@ -229,7 +229,7 @@ export function useSubmitRating({
         errorMessage = "Rating validation failed. Please ensure all scores are between 0.5 and 10.0 with one decimal place.";
       }
       
-      toast.error("Error Submitting Rating", { description: errorMessage });
+      toast.error("Couldn't submit rating", { description: errorMessage });
       
       onError();
     },

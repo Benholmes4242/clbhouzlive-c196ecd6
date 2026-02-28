@@ -10,15 +10,13 @@ export function useGameTaggedSeat() {
 
       if (error) throw error;
 
-      toast.success("Seat confirmed ✓", {
-        description: "You're in! The host has been notified.",
-      });
+      toast.success("Seat confirmed");
 
       return { success: true };
     } catch (error) {
       console.error('Error accepting tagged seat:', error);
-      toast.error("Error", {
-        description: "Failed to accept seat. Please try again.",
+      toast.error("Couldn't confirm seat", {
+        description: "Please try again",
       });
       return { success: false, error };
     }
@@ -32,15 +30,13 @@ export function useGameTaggedSeat() {
 
       if (error) throw error;
 
-      toast.success("Seat declined", {
-        description: "The host has been notified and the seat is now available.",
-      });
+      toast.success("Seat declined");
 
       return { success: true };
     } catch (error) {
       console.error('Error declining tagged seat:', error);
-      toast.error("Error", {
-        description: "Failed to decline seat. Please try again.",
+      toast.error("Couldn't decline seat", {
+        description: "Please try again",
       });
       return { success: false, error };
     }
@@ -55,15 +51,13 @@ export function useGameTaggedSeat() {
 
       if (error) throw error;
 
-      toast.success("Seat released", {
-        description: "The player has been notified and the seat is now available.",
-      });
+      toast.success("Seat released");
 
       return { success: true };
     } catch (error) {
       console.error('Error releasing tagged seat:', error);
-      toast.error("Error", {
-        description: "Failed to release seat. Please try again.",
+      toast.error("Couldn't release seat", {
+        description: "Please try again",
       });
       return { success: false, error };
     }

@@ -81,7 +81,7 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
       posthog.capture('invite_submit', { success: res.ok && data?.ok });
 
       if (res.ok && data?.ok) {
-        toast.success("Thanks! We'll be in touch soon.");
+        toast.success("Request submitted");
         onOpenChange(false);
         setEmail("");
         setName("");

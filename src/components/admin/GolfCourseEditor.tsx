@@ -467,23 +467,23 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
     
     // Validate required fields
     if (!data.name || data.name.trim() === '') {
-      toast.error("Error", { description: "Please enter a golf course name" });
+      toast.error("Missing course name");
       return;
     }
 
     if (!selectedCountry || selectedCountry.trim() === '') {
-      toast.error("Error", { description: "Please select a country/region" });
+      toast.error("Missing country");
       return;
     }
 
     if (!selectedSubCountry || selectedSubCountry.trim() === '') {
-      toast.error("Error", { description: "Please select a sub-country" });
+      toast.error("Missing sub-country");
       return;
     }
 
     // Validate Top 100s rankings - only if regional ranking region is selected
     if (regionalRankingRegion && !regionalRank) {
-      toast.error("Error", { description: "Please select a rank for the regional Top 100" });
+      toast.error("Missing regional rank");
       return;
     }
 

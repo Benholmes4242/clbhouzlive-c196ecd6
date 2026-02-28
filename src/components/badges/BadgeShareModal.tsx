@@ -49,12 +49,12 @@ export const BadgeShareModal: React.FC<BadgeShareModalProps> = ({
 
       if (error) throw error;
 
-      toast.success("✨ Story Shared!", { description: "Your badge achievement has been shared to your story!" });
+      toast.success("Shared");
       
       onClose();
     } catch (error) {
       console.error('Error sharing story:', error);
-      toast.error("❌ Error", { description: "Failed to share your achievement. Please try again." });
+      toast.error("Couldn't share");
     } finally {
       setIsSharing(false);
     }
@@ -67,12 +67,12 @@ export const BadgeShareModal: React.FC<BadgeShareModalProps> = ({
     try {
       // For now, just show a success message without actual pinning
       // This will be fully implemented once types are updated
-      toast.success("📌 Badge Pinned!", { description: "This badge is now showcased on your profile!" });
+      toast.success("Badge pinned");
       
       onClose();
     } catch (error) {
       console.error('Error pinning badge:', error);
-      toast.error("❌ Error", { description: "Failed to pin badge. Please try again." });
+      toast.error("Couldn't pin badge");
     } finally {
       setIsPinning(false);
     }
@@ -86,7 +86,7 @@ export const BadgeShareModal: React.FC<BadgeShareModalProps> = ({
       toast.success("Copied to clipboard");
     } catch (error) {
       console.error('Error copying link:', error);
-      toast.error("❌ Error", { description: "Failed to copy link. Please try again." });
+      toast.error("Couldn't copy link");
     }
   };
 
@@ -144,7 +144,7 @@ export const BadgeShareModal: React.FC<BadgeShareModalProps> = ({
     link.href = canvas.toDataURL();
     link.click();
 
-    toast.success("📸 Image Downloaded!", { description: "Badge image saved to your device!" });
+    toast.success("Image downloaded");
   };
 
   return (

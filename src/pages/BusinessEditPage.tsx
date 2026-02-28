@@ -215,7 +215,7 @@ const BusinessEditPage = () => {
   
   useEffect(() => {
     if (!membershipLoading && membership && !canEdit) {
-      toast.error("You don't have permission to edit this business");
+      toast.error("Permission needed");
       navigate(`/business/${id}`);
     }
   }, [membershipLoading, membership, canEdit, id, navigate]);
@@ -385,7 +385,7 @@ const BusinessEditPage = () => {
       }, 1500);
     } catch (error) {
       console.error('Error updating business profile:', error);
-      toast.error('Unable to save your changes. Please try again.');
+      toast.error("Couldn't save", { description: "Please try again" });
     } finally {
       setSaving(false);
     }

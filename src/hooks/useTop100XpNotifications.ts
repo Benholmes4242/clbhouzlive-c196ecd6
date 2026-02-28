@@ -26,8 +26,8 @@ export function useTop100XpNotifications() {
           // Show toast for Top 100 bonus
           if (newEvent.reason === 'top100_new_course') {
             const courseName = newEvent.metadata?.course_name;
-            toast.success('New Top 100 unlocked! 🎉', {
-              description: `+${newEvent.amount} XP${courseName ? ` · ${courseName}` : ' · Another step on your global journey'}`,
+            toast.success('Top 100 unlocked', {
+              description: `+${newEvent.amount} XP${courseName ? ` · ${courseName}` : ''}`,
               duration: 5000,
             });
           }

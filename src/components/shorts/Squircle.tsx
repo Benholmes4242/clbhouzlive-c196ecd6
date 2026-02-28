@@ -89,7 +89,7 @@ export default function Squircle({ creator, index, onAvatarClick, onLabelClick, 
 
   const handleNotInterested = () => {
     NotInterested.add(creator.id, 30);
-    toast.success(`Hidden ${creator.display_name || creator.username || 'this creator'} for 30 days`);
+    toast.success('Hidden for 30 days');
     setMenuOpen(false);
     window.location.reload();
   };

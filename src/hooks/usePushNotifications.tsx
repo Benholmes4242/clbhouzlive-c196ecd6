@@ -72,7 +72,7 @@ export const usePushNotifications = () => {
         await registerServiceWorker();
         await updateSubscriptionStatus(true);
         
-        toast.success("Success", { description: "Push notifications enabled successfully" });
+        toast.success("Notifications enabled");
         return true;
       } else {
         toast.error("Permission Denied", { description: "Push notification permission was denied" });
@@ -80,7 +80,7 @@ export const usePushNotifications = () => {
       }
     } catch (error) {
       console.error('Error requesting permission:', error);
-      toast.error("Error", { description: "Failed to enable push notifications" });
+      toast.error("Couldn't enable notifications");
       return false;
     } finally {
       setState(prev => ({ ...prev, isLoading: false }));
@@ -130,7 +130,7 @@ export const usePushNotifications = () => {
       toast.success("Unsubscribed", { description: "Push notifications have been disabled" });
     } catch (error) {
       console.error('Error unsubscribing:', error);
-      toast.error("Error", { description: "Failed to disable push notifications" });
+      toast.error("Couldn't disable notifications");
     } finally {
       setState(prev => ({ ...prev, isLoading: false }));
     }

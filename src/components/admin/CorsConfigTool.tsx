@@ -22,9 +22,7 @@ export const CorsConfigTool = () => {
         message: 'CORS policy configured successfully! R2 images should now load in preview.'
       });
       
-      toast.success("Success!", {
-        description: "R2 CORS configured. Refresh the page to see images load.",
-      });
+      toast.success("CORS configured");
       
     } catch (error) {
       console.error('CORS configuration error:', error);
@@ -34,9 +32,7 @@ export const CorsConfigTool = () => {
         error: error instanceof Error ? error.message : 'Failed to configure CORS'
       });
       
-      toast.error("Error", {
-        description: "Failed to configure CORS. Check console for details.",
-      });
+      toast.error("Couldn't configure CORS");
     } finally {
       setIsConfiguring(false);
     }

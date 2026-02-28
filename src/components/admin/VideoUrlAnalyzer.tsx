@@ -38,13 +38,13 @@ export function VideoUrlAnalyzer() {
       
       setResult(data);
       if (data.success) {
-        toast.success(`Analysis complete: ${data.summary.total_videos} videos analyzed`);
+        toast.success("Analysis complete");
       } else {
-        toast.error("Failed to analyze video URLs");
+        toast.error("Couldn't analyze URLs");
       }
     } catch (error) {
       console.error('Error:', error);
-      toast.error("Failed to analyze video URLs");
+      toast.error("Couldn't analyze URLs");
       setResult({ 
         error: error.message, 
         success: false,

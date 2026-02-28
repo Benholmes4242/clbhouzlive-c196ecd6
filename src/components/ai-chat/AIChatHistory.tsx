@@ -173,7 +173,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({
       toast.success("Conversation deleted");
     } catch (error) {
       console.error('Error deleting conversation:', error);
-      toast.error("Failed to delete the conversation. Please try again.");
+      toast.error("Couldn't delete conversation");
     }
   }, [session, removeConversation, expandedCard]);
 
@@ -188,7 +188,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({
       toast.success("Analysis deleted");
     } catch (error) {
       console.error('Error deleting swing analysis:', error);
-      toast.error("Failed to delete the swing analysis. Please try again.");
+      toast.error("Couldn't delete analysis");
     }
   }, [removeSwingAnalysis, expandedCard]);
 

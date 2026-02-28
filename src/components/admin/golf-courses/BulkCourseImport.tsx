@@ -653,7 +653,7 @@ const BulkCourseImport: React.FC = () => {
         setProgress(((i + 1) / totalCourses) * 100);
       }
 
-      toast.success("Import Complete", { description: `Successfully imported ${importedCount} new courses` });
+      toast.success("Import complete", { description: `${importedCount} courses imported` });
     } catch (error) {
       console.error('Import error:', error);
       toast.error("Import Error", { description: "Failed to import courses" });

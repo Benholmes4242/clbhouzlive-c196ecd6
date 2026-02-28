@@ -32,8 +32,8 @@ const EmailChangeSection: React.FC<EmailChangeSectionProps> = ({ currentEmail })
       if (error) throw error;
       if (data.error) throw new Error(data.error);
 
-      toast.success("Email Updated Successfully", {
-        description: `Your email address has been changed. You'll be signed out in a few seconds to re-authenticate with your new email.`,
+      toast.success("Email updated", {
+        description: "You'll be signed out shortly to re-authenticate.",
       });
       setNewEmail('');
       setConfirmEmail('');
@@ -42,7 +42,7 @@ const EmailChangeSection: React.FC<EmailChangeSectionProps> = ({ currentEmail })
       let errorMessage = error.message || "Failed to change email";
       if (error.message?.includes('cooldown')) errorMessage = "Email change is in cooldown period. Please wait before changing your email again.";
       else if (error.message?.includes('already in use')) errorMessage = "This email address is already in use by another account.";
-      toast.error("Error", { description: errorMessage });
+      toast.error("Couldn't update email", { description: errorMessage });
     } finally {
       setLoading(false);
     }

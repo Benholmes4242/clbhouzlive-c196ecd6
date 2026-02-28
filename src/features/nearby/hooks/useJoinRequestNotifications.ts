@@ -31,7 +31,7 @@ export function useJoinRequestNotifications() {
             if (!status) return;
 
             if (status === 'approved') {
-              toast.success("You're in! The game has been added to Your Games → Joined.");
+              toast.success("You're in");
               queryClient.invalidateQueries({ queryKey: ['userGames'] });
               queryClient.invalidateQueries({ queryKey: ['games'] });
               queryClient.invalidateQueries({ queryKey: ['gameJoinRequests'] });

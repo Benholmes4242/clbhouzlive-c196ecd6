@@ -76,7 +76,7 @@ const AdminRoleDropdown = ({ profile, currentUserId, onRoleChanged }: AdminRoleD
       onRoleChanged();
     } catch (error) {
       console.error('Error updating role:', error);
-      toast.error("Failed to update role");
+      toast.error("Couldn't update role");
     } finally {
       setLoading(false);
     }

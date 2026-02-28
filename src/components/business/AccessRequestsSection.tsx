@@ -133,7 +133,7 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
       if (data?.already_resolved) {
         toast.info(`Request already ${data.status}`);
       } else {
-        toast.success(`Approved ${requesterName} — added to team`);
+        toast.success("Request approved");
       }
 
       // Wait another frame to ensure UI is stable before invalidations

@@ -53,7 +53,7 @@ const CourseImageUpload: React.FC<CourseImageUploadProps> = ({
       setPreviewUrl(result.publicUrl!);
       onImageChange(result.publicUrl!);
 
-      toast.success("Course image uploaded successfully");
+      toast.success("Image uploaded");
     } catch (error: any) {
       console.error('Error uploading image:', error);
       toast.error("Upload failed", { description: `Failed to upload image: ${error.message}` });

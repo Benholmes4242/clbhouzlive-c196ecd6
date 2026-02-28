@@ -35,7 +35,7 @@ const GeneralSettingsCard = () => {
 
       toast.success("Settings saved");
     } catch (error) {
-      toast.error("Failed to save general settings. Please try again.");
+      toast.error("Couldn't save settings");
     } finally {
       setIsLoading(false);
     }

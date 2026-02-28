@@ -50,13 +50,13 @@ export const usePostUpdate = () => {
       // Tags and course tagging temporarily disabled due to missing database tables
 
       console.log('All updates completed successfully');
-      toast.success("Your updates have been saved!", { duration: 3000 });
+      toast.success("Post updated", { duration: 3000 });
 
       return { success: true };
 
     } catch (error) {
       console.error('Full error updating post:', error);
-      toast.error("Failed to save updates. Please try again.", { duration: 3000 });
+      toast.error("Couldn't save", { description: "Please try again", duration: 3000 });
       
       return { success: false, error };
     } finally {

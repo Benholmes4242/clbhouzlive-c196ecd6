@@ -65,7 +65,7 @@ const LogosManagement = () => {
       setLogos(data || []);
     } catch (error: any) {
       console.error('Error fetching logos:', error);
-      toast.error("Failed to fetch logos");
+      toast.error("Couldn't fetch logos");
     } finally {
       setLoading(false);
     }
@@ -112,7 +112,7 @@ const LogosManagement = () => {
 
       if (dbError) throw dbError;
 
-      toast.success("Logo uploaded and set as active successfully");
+      toast.success("Logo uploaded");
 
       fetchLogos();
       setPendingUpload(null);
@@ -123,7 +123,7 @@ const LogosManagement = () => {
       if (fileInput) fileInput.value = '';
     } catch (error: any) {
       console.error('Error uploading logo:', error);
-      toast.error("Failed to upload logo");
+      toast.error("Couldn't upload logo");
     } finally {
       setUploading(false);
     }
@@ -142,12 +142,12 @@ const LogosManagement = () => {
 
       if (error) throw error;
 
-      toast.success("Logo deleted successfully");
+      toast.success("Logo deleted");
 
       fetchLogos();
     } catch (error: any) {
       console.error('Error deleting logo:', error);
-      toast.error("Failed to delete logo");
+      toast.error("Couldn't delete logo");
     }
   };
 

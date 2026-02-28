@@ -364,7 +364,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
 
     } catch (error) {
       console.error('Error sending message:', error);
-      toast.error("Error", { description: "Failed to get AI response. Please try again." });
+      toast.error("Couldn't get response", { description: "Please try again" });
 
       const errorMessage: ChatMessageData = {
         id: Date.now().toString() + '_error',

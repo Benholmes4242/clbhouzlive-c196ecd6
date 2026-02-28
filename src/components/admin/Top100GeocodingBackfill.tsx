@@ -148,7 +148,7 @@ export function Top100GeocodingBackfill() {
         }
       }
 
-      toast.success(`Successfully geocoded ${progress?.successful || 0} out of ${courses.length} courses`);
+      toast.success(`Geocoding complete`, { description: `${progress?.successful || 0} of ${courses.length} courses` });
 
     } catch (error: any) {
       console.error('Backfill error:', error);

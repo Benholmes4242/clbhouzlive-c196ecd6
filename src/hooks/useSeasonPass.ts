@@ -48,12 +48,10 @@ export function useSeasonPass(userId?: string, seasonId?: string) {
       queryClient.invalidateQueries({ queryKey: ['user-cosmetics', userId] });
       queryClient.invalidateQueries({ queryKey: ['user-season-currency', userId] });
       
-      toast.success('Premium Pass Activated!', {
-        description: 'You now have access to premium rewards and exclusive cosmetics!',
-      });
+      toast.success('Pass activated');
     },
     onError: (error: Error) => {
-      toast.error('Upgrade Failed', {
+      toast.error("Couldn't activate pass", {
         description: error.message,
       });
     },

@@ -13,7 +13,7 @@ interface QuickActionsProps {
 export function QuickActions({ game, onInsertMessage }: QuickActionsProps) {
   const handleDirections = () => {
     if (!game.lat || !game.lng) {
-      toast.error('This game does not have a location set');
+      toast.error('No location set');
       return;
     }
 
@@ -33,7 +33,7 @@ export function QuickActions({ game, onInsertMessage }: QuickActionsProps) {
       durationHours: 3,
     });
     downloadIcs(icsContent);
-    toast.success('Calendar event created');
+    toast.success('Added to calendar');
   };
 
   const handleShareMeetingPoint = () => {

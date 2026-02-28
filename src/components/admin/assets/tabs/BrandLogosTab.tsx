@@ -120,7 +120,7 @@ export const BrandLogosTab: React.FC<BrandLogosTabProps> = ({
     try {
       const { error } = await supabase.from('logos').delete().eq('id', logo.id);
       if (error) throw error;
-      toast.success('Logo deleted successfully');
+      toast.success('Logo deleted');
       onRefresh();
     } catch (error: any) {
       toast.error(`Failed to delete logo: ${error.message}`);

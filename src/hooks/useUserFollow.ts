@@ -102,7 +102,7 @@ export function useUserFollow(targetUserId: string | null) {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
       
       // Show success message
-      toast.success(action === 'follow' ? 'Following!' : 'Unfollowed');
+      toast.success(action === 'follow' ? 'Following' : 'Unfollowed');
     },
   });
 

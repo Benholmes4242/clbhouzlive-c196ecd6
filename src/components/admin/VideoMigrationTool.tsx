@@ -33,12 +33,12 @@ const VideoMigrationTool = () => {
       setResult(data);
       
       if (data.success !== false) {
-        toast.success("Migration Complete!", {
-          description: `Successfully migrated ${data.migratedVideos || 0} videos from R2 to Cloudflare Stream.`,
+        toast.success("Migration complete", {
+          description: `${data.migratedVideos || 0} videos migrated`,
         });
       } else {
-        toast.error("Migration Failed", {
-          description: data.message || "An error occurred during migration",
+        toast.error("Migration failed", {
+          description: data.message || "An error occurred",
         });
       }
       
@@ -50,9 +50,7 @@ const VideoMigrationTool = () => {
         message: error instanceof Error ? error.message : 'Failed to migrate videos'
       });
       
-      toast.error("Error", {
-        description: "Failed to start video migration. Check console for details.",
-      });
+      toast.error("Couldn't start migration");
     } finally {
       setIsMigrating(false);
     }
