@@ -3,7 +3,7 @@
 
 import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { uploadEventBus } from './uploadEventBus';
 import { postKeys } from '@/queryKeys/posts';
 
@@ -11,13 +11,11 @@ const TOAST_DURATION_MS = 2000;
 const TOAST_DURATION_ERROR_MS = 4000;
 
 export function UploadToastsBridge() {
-  const { toast } = useToast();
   const queryClient = useQueryClient();
 
   useEffect(() => {
     const offEnqueued = uploadEventBus.on('upload:enqueued', (evt) => {
-      toast({
-        title: "Uploading...",
+      toast("Uploading...", {
         description: "Your post will appear soon.",
         duration: TOAST_DURATION_MS,
       });
@@ -47,10 +45,8 @@ export function UploadToastsBridge() {
     });
 
     const offFailed = uploadEventBus.on('upload:failed', (evt) => {
-      toast({
-        title: "Upload failed",
+      toast.error("Upload failed", {
         description: evt.error || "Tap to retry",
-        variant: "destructive",
         duration: TOAST_DURATION_ERROR_MS,
       });
     });
@@ -60,7 +56,7 @@ export function UploadToastsBridge() {
       offComplete();
       offFailed();
     };
-  }, [toast, queryClient]);
+  }, [queryClient]);
 
   return null;
 }

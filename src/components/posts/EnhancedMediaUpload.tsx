@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import MediaDropzone from './MediaDropzone';
 import EnhancedMediaPreviewGrid from './EnhancedMediaPreviewGrid';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useChunkedUpload } from '@/hooks/useChunkedUpload';
 
 interface MediaFile {
@@ -52,7 +52,6 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
   className,
   autoUpload = false
 }) => {
-  const { toast } = useToast();
   const { uploadFileInChunks } = useChunkedUpload();
   
   // Define large file threshold (50MB)
@@ -78,10 +77,8 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
 
       // Check if we've reached max files
       if (totalMediaCount + validFiles.length >= maxFiles) {
-        toast({
-          title: "Too many files",
+        toast.error("Too many files", {
           description: `Maximum ${maxFiles} files allowed`,
-          variant: "destructive",
         });
         return;
       }
@@ -95,10 +92,8 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
       });
 
       if (!isValidType) {
-        toast({
-          title: "Invalid file type",
+        toast.error("Invalid file type", {
           description: `${file.name} is not a supported file type`,
-          variant: "destructive",
         });
         return;
       }
@@ -161,15 +156,11 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
         onFilesUploaded([{ file: mediaFile.file, url: uploadUrl }]);
       }
 
-      const uploadToast = toast({
-        title: "Upload complete",
+      toast.success("Upload complete", {
         description: `${mediaFile.file.name} uploaded successfully`,
+        duration: 2000,
       });
 
-      // Auto-dismiss after 2 seconds
-      setTimeout(() => {
-        uploadToast.dismiss();
-      }, 2000);
 
     } catch (error) {
       console.error('Upload failed:', error);
@@ -184,13 +175,11 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
         } : f
       ));
       
-      toast({
-        title: "Upload failed",
+      toast.error("Upload failed", {
         description: errorMessage,
-        variant: "destructive"
       });
     }
-  }, [uploadFileInChunks, onFilesUploaded, toast]);
+  }, [uploadFileInChunks, onFilesUploaded]);
 
   const handleFilesSelected = useCallback((files: File[]) => {
     console.log('EnhancedMediaUpload: Files selected:', files.map(f => f.name));
@@ -229,12 +218,11 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
     });
 
     if (validFiles.length > 0) {
-      toast({
-        title: "Files added",
+      toast.success("Files added", {
         description: `${validFiles.length} file(s) added successfully`,
       });
     }
-  }, [totalMediaCount, maxFiles, acceptedTypes, onFilesChange, toast, autoUpload, uploadFile]);
+  }, [totalMediaCount, maxFiles, acceptedTypes, onFilesChange, autoUpload, uploadFile]);
 
   const handleRemoveExistingMedia = useCallback((mediaId: string) => {
     setExistingMedia(prev => {
@@ -297,11 +285,10 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
       return updated;
     });
 
-    toast({
-      title: "Image edited",
+    toast.success("Image edited", {
       description: "Your changes have been applied",
     });
-  }, [onFilesChange, toast]);
+  }, [onFilesChange]);
 
   const handleRotateFile = useCallback((fileId: string, rotation: number) => {
     setMediaFiles(prev => {
@@ -318,11 +305,10 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
       return updated;
     });
 
-    toast({
-      title: "Media rotated",
+    toast.success("Media rotated", {
       description: `Rotated ${rotation}°`,
     });
-  }, [toast]);
+  }, []);
 
   const handleRotateExistingMedia = useCallback((mediaId: string) => {
     setExistingMedia(prev => {
@@ -339,11 +325,10 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
       });
     });
 
-    toast({
-      title: "Media rotated",
+    toast.success("Media rotated", {
       description: "Existing media rotated 90°",
     });
-  }, [toast]);
+  }, []);
 
   // Initialize mediaFiles when initialFiles changes
   React.useEffect(() => {

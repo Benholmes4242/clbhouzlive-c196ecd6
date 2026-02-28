@@ -1,9 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export function useGameTaggedSeat() {
-  const { toast } = useToast();
-
   const acceptTaggedSeat = async (gameId: string) => {
     try {
       const { error } = await supabase.rpc('game_tag_accept', {
@@ -12,18 +10,15 @@ export function useGameTaggedSeat() {
 
       if (error) throw error;
 
-      toast({
-        title: "Seat confirmed ✓",
+      toast.success("Seat confirmed ✓", {
         description: "You're in! The host has been notified.",
       });
 
       return { success: true };
     } catch (error) {
       console.error('Error accepting tagged seat:', error);
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: "Failed to accept seat. Please try again.",
-        variant: "destructive",
       });
       return { success: false, error };
     }
@@ -37,18 +32,15 @@ export function useGameTaggedSeat() {
 
       if (error) throw error;
 
-      toast({
-        title: "Seat declined",
+      toast.success("Seat declined", {
         description: "The host has been notified and the seat is now available.",
       });
 
       return { success: true };
     } catch (error) {
       console.error('Error declining tagged seat:', error);
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: "Failed to decline seat. Please try again.",
-        variant: "destructive",
       });
       return { success: false, error };
     }
@@ -63,18 +55,15 @@ export function useGameTaggedSeat() {
 
       if (error) throw error;
 
-      toast({
-        title: "Seat released",
+      toast.success("Seat released", {
         description: "The player has been notified and the seat is now available.",
       });
 
       return { success: true };
     } catch (error) {
       console.error('Error releasing tagged seat:', error);
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: "Failed to release seat. Please try again.",
-        variant: "destructive",
       });
       return { success: false, error };
     }

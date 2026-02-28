@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useLocationPermission } from './useLocationPermission';
 import { calculateDistance, formatDistance } from '../distance';
 import { NEARBY_RADIUS_METERS } from '../config';
@@ -63,7 +63,6 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
   const [isLoading, setIsLoading] = useState(true);
   const [hasMore, setHasMore] = useState(false);
   const [cursor, setCursor] = useState<{ start_time: string; id: string } | null>(null);
-  const { toast } = useToast();
   const { currentLocation, requestPermission } = useLocationPermission();
 
   const currentUserId = supabase.auth.getUser().then(u => u.data.user?.id);
@@ -397,10 +396,8 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
     try {
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) {
-        toast({
-          title: 'Not authenticated',
+        toast.error('Not authenticated', {
           description: 'Please sign in to create a game',
-          variant: 'destructive',
         });
         return;
       }
@@ -415,10 +412,8 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
           userLat = newLocation.lat;
           userLng = newLocation.lng;
         } else {
-          toast({
-            title: 'Location required',
+          toast.error('Location required', {
             description: 'Please enable location to create a game',
-            variant: 'destructive',
           });
           return;
         }
@@ -429,10 +424,8 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
       const token = authData.session?.access_token;
 
       if (!token) {
-        toast({
-          title: 'Authentication error',
+        toast.error('Authentication error', {
           description: 'Please sign in again',
-          variant: 'destructive',
         });
         return;
       }
@@ -490,8 +483,7 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
       // Emit hub event for instant local UI update
       emitHub('game:created', { gameId: newBeacon.id });
 
-      toast({
-        title: 'Game posted',
+      toast.success('Game posted', {
         description: 'Nearby golfers can now see your game',
       });
 
@@ -499,10 +491,8 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
     } catch (error) {
       console.error('Error in createBeacon:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to create game';
-      toast({
-        title: 'Failed to create game',
+      toast.error('Failed to create game', {
         description: errorMessage,
-        variant: 'destructive',
       });
     }
   };
@@ -510,10 +500,8 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
   const cancelBeacon = async (beaconId: string) => {
     const { data: user } = await supabase.auth.getUser();
     if (!user.user) {
-      toast({
-        title: 'Not authenticated',
+      toast.error('Not authenticated', {
         description: 'Please sign in to cancel a game',
-        variant: 'destructive',
       });
       return;
     }
@@ -549,8 +537,7 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
       // Emit hub event for instant local UI update
       emitHub('game:cancelled', { gameId: beaconId });
 
-      toast({
-        title: 'Game cancelled',
+      toast.success('Game cancelled', {
         description: 'Your game is no longer visible',
       });
 
@@ -562,10 +549,8 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
       setNearbyBeacons(previousNearby);
       
       console.error('Error cancelling beacon:', error);
-      toast({
-        title: 'Failed to cancel game',
+      toast.error('Failed to cancel game', {
         description: error instanceof Error ? error.message : 'Please try again',
-        variant: 'destructive',
       });
     }
   };
@@ -577,8 +562,7 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
 
       // For v1, we'll open a message flow instead of directly updating participants
       // This is because RLS only allows hosts to update their own beacons
-      toast({
-        title: 'Join game',
+      toast('Join game', {
         description: 'Message the host to join this game (coming soon)',
       });
 

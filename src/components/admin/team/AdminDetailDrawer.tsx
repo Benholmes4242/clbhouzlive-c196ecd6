@@ -49,7 +49,7 @@ import {
   User,
 } from 'lucide-react';
 import { useAdminDetails, useAdminTeamActions, type AdminDetailData } from '@/hooks/admin/useAdminTeamDetails';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 
@@ -61,7 +61,6 @@ interface AdminDetailDrawerProps {
 }
 
 export function AdminDetailDrawer({ userId, open, onOpenChange, onAdminRevoked }: AdminDetailDrawerProps) {
-  const { toast } = useToast();
   const queryClient = useQueryClient();
   const { data: admin, isLoading, error } = useAdminDetails(userId);
   const { loading: actionLoading, updateRole, extendAccess, revokeAccess } = useAdminTeamActions();
@@ -72,11 +71,11 @@ export function AdminDetailDrawer({ userId, open, onOpenChange, onAdminRevoked }
     if (!admin) return;
     const result = await updateRole(admin.user_id, newRole as 'full' | 'limited');
     if (result.success) {
-      toast({ title: 'Role updated', description: `Admin role changed to ${newRole}` });
+      toast.success('Role updated', { description: `Admin role changed to ${newRole}` });
       queryClient.invalidateQueries({ queryKey: ['admin-team-list'] });
       queryClient.invalidateQueries({ queryKey: ['admin-detail', userId] });
     } else {
-      toast({ title: 'Error', description: 'Failed to update role', variant: 'destructive' });
+      toast.error('Error', { description: 'Failed to update role' });
     }
   };
 
@@ -84,13 +83,13 @@ export function AdminDetailDrawer({ userId, open, onOpenChange, onAdminRevoked }
     if (!admin || !selectedDate) return;
     const result = await extendAccess(admin.user_id, selectedDate.toISOString());
     if (result.success) {
-      toast({ title: 'Access extended', description: `Access extended to ${format(selectedDate, 'PPP')}` });
+      toast.success('Access extended', { description: `Access extended to ${format(selectedDate, 'PPP')}` });
       queryClient.invalidateQueries({ queryKey: ['admin-team-list'] });
       queryClient.invalidateQueries({ queryKey: ['admin-detail', userId] });
       setSelectedDate(undefined);
       setDatePickerOpen(false);
     } else {
-      toast({ title: 'Error', description: 'Failed to extend access', variant: 'destructive' });
+      toast.error('Error', { description: 'Failed to extend access' });
     }
   };
 
@@ -98,17 +97,17 @@ export function AdminDetailDrawer({ userId, open, onOpenChange, onAdminRevoked }
     if (!admin) return;
     const result = await revokeAccess(admin.user_id, admin.email);
     if (result.success) {
-      toast({ title: 'Access revoked', description: `${admin.email} has been removed from the team` });
+      toast.success('Access revoked', { description: `${admin.email} has been removed from the team` });
       onOpenChange(false);
       onAdminRevoked?.();
     } else {
-      toast({ title: 'Error', description: 'Failed to revoke access', variant: 'destructive' });
+      toast.error('Error', { description: 'Failed to revoke access' });
     }
   };
 
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
-    toast({ title: 'Copied', description: `${label} copied to clipboard` });
+    toast.success('Copied', { description: `${label} copied to clipboard` });
   };
 
   const getInitials = (firstName: string, lastName: string) => {

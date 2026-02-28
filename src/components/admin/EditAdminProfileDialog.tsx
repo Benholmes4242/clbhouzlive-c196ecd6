@@ -21,7 +21,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from 'sonner';
 
 interface AdminProfile {
   id: string;
@@ -58,15 +58,10 @@ const EditAdminProfileDialog = ({
     return profile.role || 'admin';
   });
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
 
   const handleSave = async () => {
     if (!firstName.trim() || !lastName.trim() || !email.trim()) {
-      toast({
-        title: "Error",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
+      toast.error("Error", { description: "Please fill in all required fields" });
       return;
     }
 
@@ -119,20 +114,13 @@ const EditAdminProfileDialog = ({
         if (roleError) throw roleError;
       }
 
-      toast({
-        title: "Success",
-        description: "Profile updated successfully",
-      });
+      toast.success("Success", { description: "Profile updated successfully" });
 
       onProfileUpdated();
       onOpenChange(false);
     } catch (error) {
       console.error('Error updating profile:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update profile",
-        variant: "destructive",
-      });
+      toast.error("Error", { description: "Failed to update profile" });
     } finally {
       setLoading(false);
     }

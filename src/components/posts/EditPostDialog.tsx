@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { X, Image, Video } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface PostMedia {
   id: string;
@@ -27,7 +27,6 @@ interface EditPostDialogProps {
 
 const EditPostDialog = ({ open, onOpenChange, post, onPostUpdated }: EditPostDialogProps) => {
   const { user } = useSupabaseSession();
-  const { toast } = useToast();
   const [content, setContent] = useState(post.content || '');
   const [existingMedia, setExistingMedia] = useState<PostMedia[]>(post.post_media || []);
   const [newMediaFiles, setNewMediaFiles] = useState<File[]>([]);
@@ -77,16 +76,13 @@ const EditPostDialog = ({ open, onOpenChange, post, onPostUpdated }: EditPostDia
       if (error) throw error;
 
       setExistingMedia(prev => prev.filter(media => media.id !== mediaId));
-      toast({
-        title: "Media removed",
+      toast.success("Media removed", {
         description: "The media has been removed from your post."
       });
     } catch (error) {
       console.error('Error removing media:', error);
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: "Failed to remove media. Please try again.",
-        variant: "destructive"
       });
     }
   };
@@ -95,7 +91,6 @@ const EditPostDialog = ({ open, onOpenChange, post, onPostUpdated }: EditPostDia
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}.${fileExt}`;
     
-    // Upload to Cloudflare R2 instead of Supabase storage
     const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
     const uploadResult = await uploadToCloudflareR2(file, 'clbhouz-post-images', fileName);
 
@@ -123,7 +118,6 @@ const EditPostDialog = ({ open, onOpenChange, post, onPostUpdated }: EditPostDia
 
     setIsSubmitting(true);
     try {
-      // Update the post content
       const { error: postError } = await supabase
         .from('posts')
         .update({
@@ -134,13 +128,11 @@ const EditPostDialog = ({ open, onOpenChange, post, onPostUpdated }: EditPostDia
 
       if (postError) throw postError;
 
-      // Upload new media files
       for (const file of newMediaFiles) {
         await uploadNewMedia(file);
       }
 
-      toast({
-        title: "Post updated!",
+      toast.success("Post updated!", {
         description: "Your post has been updated successfully."
       });
 
@@ -149,10 +141,8 @@ const EditPostDialog = ({ open, onOpenChange, post, onPostUpdated }: EditPostDia
 
     } catch (error) {
       console.error('Error updating post:', error);
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: "Failed to update post. Please try again.",
-        variant: "destructive"
       });
     } finally {
       setIsSubmitting(false);
@@ -177,7 +167,6 @@ const EditPostDialog = ({ open, onOpenChange, post, onPostUpdated }: EditPostDia
             />
           </div>
 
-          {/* Existing Media */}
           {existingMedia.length > 0 && (
             <div className="space-y-2">
               <Label>Current Media:</Label>
@@ -227,7 +216,6 @@ const EditPostDialog = ({ open, onOpenChange, post, onPostUpdated }: EditPostDia
             </div>
           </div>
 
-          {/* New Media Files */}
           {newMediaFiles.length > 0 && (
             <div className="space-y-2">
               <Label>New Files to Add:</Label>
