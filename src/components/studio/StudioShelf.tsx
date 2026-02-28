@@ -184,7 +184,6 @@ export default function StudioShelf({
           <motion.div
             className="fixed inset-0 z-[9999] bg-black flex flex-col"
             style={{
-              paddingTop: 'env(safe-area-inset-top)',
               paddingBottom: 'env(safe-area-inset-bottom)',
             }}
             initial={{ opacity: 0 }}
@@ -192,64 +191,45 @@ export default function StudioShelf({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
           >
-            {/* Live Media Canvas — now starts at top, full height */}
+            {/* Top bar — compact, sits in safe area above media */}
+            <div
+              className="flex-shrink-0 bg-black"
+              style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+            >
+              <div className="flex items-center justify-between px-4 h-11">
+                <button
+                  onClick={handleCancelAttempt}
+                  className="flex items-center gap-1 -ml-1"
+                >
+                  <ArrowLeft className="w-5 h-5 text-white/90" />
+                  <span className="text-sm font-medium text-white/90">Back</span>
+                </button>
+                <div className="flex items-center gap-3">
+                  {hasChanges && (
+                    <button
+                      onClick={handleResetAll}
+                      className="text-sm font-medium text-white/60"
+                    >
+                      Reset
+                    </button>
+                  )}
+                  <button
+                    onClick={() => onClose()}
+                    className="px-4 py-1.5 rounded-full text-sm font-semibold text-white"
+                    style={{ background: '#f59e0b' }}
+                  >
+                    Done
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Live Media Canvas */}
             <div
               ref={canvasRef}
               className="flex-1 relative bg-black flex items-center justify-center overflow-hidden min-h-0"
               style={{ touchAction: 'none' }}
             >
-              {/* Floating controls overlay — sits ON TOP of media */}
-              <div
-                className="absolute inset-x-0 top-0 z-10 pointer-events-none"
-                style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
-              >
-                <div
-                  className="absolute inset-x-0 top-0 h-24"
-                  style={{
-                    background: 'linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)',
-                    pointerEvents: 'none',
-                  }}
-                />
-                <div className="relative flex items-center justify-between px-4">
-                  <button
-                    onClick={handleCancelAttempt}
-                    className="pointer-events-auto flex items-center gap-1 px-3 py-1.5 rounded-full"
-                    style={{
-                      background: 'rgba(0,0,0,0.35)',
-                      backdropFilter: 'blur(16px) saturate(180%)',
-                      border: '1px solid rgba(255,255,255,0.12)',
-                    }}
-                  >
-                    <ArrowLeft className="w-4 h-4 text-white" />
-                    <span className="text-white text-sm font-medium">Back</span>
-                  </button>
-                  <div className="flex items-center gap-2 pointer-events-auto">
-                    {hasChanges && (
-                      <button
-                        onClick={handleResetAll}
-                        className="px-3 py-1.5 rounded-full text-sm font-medium text-white"
-                        style={{
-                          background: 'rgba(0,0,0,0.35)',
-                          backdropFilter: 'blur(16px) saturate(180%)',
-                          border: '1px solid rgba(255,255,255,0.12)',
-                        }}
-                      >
-                        Reset
-                      </button>
-                    )}
-                    <button
-                      onClick={() => onClose()}
-                      className="px-4 py-1.5 rounded-full text-sm font-semibold text-white"
-                      style={{
-                        background: '#f59e0b',
-                        boxShadow: '0 4px 16px rgba(245, 158, 11, 0.3)',
-                      }}
-                    >
-                      Done
-                    </button>
-                  </div>
-                </div>
-              </div>
               {/* Show CropEditor when crop tool is active for images */}
               {showCropOnCanvas ? (
                 <div className="absolute inset-0">
