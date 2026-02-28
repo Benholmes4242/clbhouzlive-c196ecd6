@@ -13,7 +13,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { haptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
 
@@ -40,7 +40,6 @@ export function ReportSheet({
   reportedConversationId,
   reportType,
 }: ReportSheetProps) {
-  const { toast } = useToast();
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
   const [details, setDetails] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -61,8 +60,7 @@ export function ReportSheet({
 
       if (error) throw error;
 
-      toast({
-        title: 'Report submitted',
+      toast.success('Report submitted', {
         description: "We'll review this shortly. Thank you for helping keep the community safe.",
       });
 
@@ -71,10 +69,7 @@ export function ReportSheet({
       setDetails('');
     } catch (error) {
       console.error('Error submitting report:', error);
-      toast({
-        title: 'Failed to submit report',
-        variant: 'destructive',
-      });
+      toast.error('Failed to submit report');
     } finally {
       setSubmitting(false);
     }

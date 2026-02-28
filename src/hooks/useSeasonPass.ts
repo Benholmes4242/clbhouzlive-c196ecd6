@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export interface SeasonPassTier {
   id: string;
@@ -11,7 +11,6 @@ export interface SeasonPassTier {
 }
 
 export function useSeasonPass(userId?: string, seasonId?: string) {
-  const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
@@ -49,16 +48,13 @@ export function useSeasonPass(userId?: string, seasonId?: string) {
       queryClient.invalidateQueries({ queryKey: ['user-cosmetics', userId] });
       queryClient.invalidateQueries({ queryKey: ['user-season-currency', userId] });
       
-      toast({
-        title: 'Premium Pass Activated!',
+      toast.success('Premium Pass Activated!', {
         description: 'You now have access to premium rewards and exclusive cosmetics!',
       });
     },
     onError: (error: Error) => {
-      toast({
-        title: 'Upgrade Failed',
+      toast.error('Upgrade Failed', {
         description: error.message,
-        variant: 'destructive',
       });
     },
   });

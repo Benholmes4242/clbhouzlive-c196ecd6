@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Upload, Eye } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { parseExcelFile } from './excel-importer/csvUtils';
 import { ExcelCourseData, ImportResult, DebugInfo } from './excel-importer/types';
 import FileUpload from './excel-importer/FileUpload';
@@ -16,7 +15,6 @@ import ErrorDisplay from './excel-importer/ErrorDisplay';
 import FormatInfo from './excel-importer/FormatInfo';
 
 const ExcelCourseImporter = () => {
-  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [file, setFile] = useState<File | null>(null);
   const [previewData, setPreviewData] = useState<ExcelCourseData[]>([]);
@@ -58,11 +56,9 @@ const ExcelCourseImporter = () => {
               errors.push({ course: course.name, error: error.message });
             } else {
               insertedCourses.push(data);
-              console.log('Inserted course:', course.name);
             }
           } else {
             skippedCourses.push(existingCourse);
-            console.log('Course already exists:', course.name);
           }
         } catch (error) {
           console.error('Error processing course:', course.name, error);
@@ -81,11 +77,9 @@ const ExcelCourseImporter = () => {
       };
     },
     onSuccess: (data) => {
-      console.log('Excel import successful:', data);
       setImportResult(data);
       queryClient.invalidateQueries({ queryKey: ['courses'] });
-      toast({
-        title: "Import Complete!",
+      toast.success("Import Complete", {
         description: `Added ${data.insertedCourses} new courses, skipped ${data.skippedCourses} duplicates${data.errors > 0 ? `, ${data.errors} errors` : ''}.`,
       });
       setProgress(100);
@@ -93,10 +87,8 @@ const ExcelCourseImporter = () => {
     },
     onError: (error) => {
       console.error('Excel import failed:', error);
-      toast({
-        title: "Import Failed",
+      toast.error("Import Failed", {
         description: "Failed to import golf courses from Excel file. Please check the format and try again.",
-        variant: "destructive",
       });
       setProgress(0);
     },
@@ -104,8 +96,6 @@ const ExcelCourseImporter = () => {
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
-    console.log('File selected:', selectedFile);
-    
     if (selectedFile) {
       setFile(selectedFile);
       setImportResult(null);
@@ -114,8 +104,7 @@ const ExcelCourseImporter = () => {
       setShowPreview(false);
       setDebugInfo(null);
       
-      toast({
-        title: "File Selected",
+      toast.success("File Selected", {
         description: `Selected: ${selectedFile.name} (${(selectedFile.size / 1024).toFixed(1)} KB)`,
       });
 
@@ -137,41 +126,28 @@ const ExcelCourseImporter = () => {
 
   const handleImport = async () => {
     if (!file) {
-      toast({
-        title: "No File Selected",
+      toast.error("No File Selected", {
         description: "Please select a CSV file first.",
-        variant: "destructive",
       });
       return;
     }
 
-    console.log('Starting import process with file:', file.name);
     setParseError(null);
-
     try {
       const { data: coursesData } = await parseExcelFile(file);
-      console.log('Parsed data:', coursesData);
-      
       if (coursesData.length === 0) {
         setParseError("No valid course data found in the file. Please check the format.");
-        toast({
-          title: "No Data Found",
+        toast.error("No Data Found", {
           description: "No valid course data found in the file.",
-          variant: "destructive",
         });
         return;
       }
-      
       importMutation.mutate(coursesData);
     } catch (error) {
       console.error('Error parsing file:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       setParseError(errorMessage);
-      toast({
-        title: "File Parse Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      toast.error("File Parse Error", { description: errorMessage });
     }
   };
 

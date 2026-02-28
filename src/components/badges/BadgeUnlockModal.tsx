@@ -3,7 +3,6 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/types/badges';
 import { Share2, Sparkles, Volume2, VolumeX } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
 import { BadgeShareModal } from './BadgeShareModal';
 
@@ -22,10 +21,8 @@ export const BadgeUnlockModal: React.FC<BadgeUnlockModalProps> = ({
 }) => {
   const [showShareModal, setShowShareModal] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
-  const { toast } = useToast();
   const { playUnlockSound, isSoundEnabled, toggleSound } = useSoundEffects();
 
-  // Trigger animations and sound when modal opens
   useEffect(() => {
     if (isOpen && badge) {
       setIsAnimating(true);
@@ -33,7 +30,6 @@ export const BadgeUnlockModal: React.FC<BadgeUnlockModalProps> = ({
         playUnlockSound();
       }
       
-      // Celebration confetti effect
       setTimeout(() => {
         setIsAnimating(false);
       }, 2000);
@@ -70,7 +66,6 @@ export const BadgeUnlockModal: React.FC<BadgeUnlockModalProps> = ({
         <DialogContent className="sm:max-w-md bg-gradient-to-br from-green-900/20 to-emerald-900/20 border-emerald-600/30 backdrop-blur-xl">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.1)_0%,transparent_50%)]" />
           
-          {/* Sound Toggle */}
           <Button
             variant="ghost"
             size="icon"
@@ -83,7 +78,6 @@ export const BadgeUnlockModal: React.FC<BadgeUnlockModalProps> = ({
           <div className="relative text-center py-6">
             <DialogTitle className="sr-only">New Badge Unlocked</DialogTitle>
             
-            {/* Celebration Header */}
             <div className="mb-6">
               <div className="flex items-center justify-center mb-4">
                 <Sparkles className={`h-8 w-8 text-yellow-400 ${isAnimating ? 'animate-spin' : ''}`} />
@@ -93,7 +87,6 @@ export const BadgeUnlockModal: React.FC<BadgeUnlockModalProps> = ({
               <div className="w-24 h-1 bg-gradient-to-r from-yellow-400 to-orange-400 mx-auto rounded-full" />
             </div>
 
-            {/* Badge Display */}
             <div className={`relative mx-auto mb-6 ${isAnimating ? 'animate-bounce' : ''}`}>
               <div 
                 className={`w-32 h-32 rounded-full bg-gradient-to-br ${getTierGradient(badge.tier)} 
@@ -103,7 +96,6 @@ export const BadgeUnlockModal: React.FC<BadgeUnlockModalProps> = ({
                 <span className="text-5xl">{badge.emoji}</span>
               </div>
               
-              {/* Tier Label */}
               <div className={`absolute -bottom-2 left-1/2 transform -translate-x-1/2 
                 px-3 py-1 rounded-full bg-gradient-to-r ${getTierGradient(badge.tier)} 
                 text-white text-xs font-bold uppercase tracking-wider shadow-lg`}>
@@ -111,19 +103,16 @@ export const BadgeUnlockModal: React.FC<BadgeUnlockModalProps> = ({
               </div>
             </div>
 
-            {/* Badge Info */}
             <div className="mb-6">
               <h3 className="text-xl font-bold text-white mb-2">{badge.display_name}</h3>
               <p className="text-white/80 text-sm mb-4 max-w-xs mx-auto">{badge.description}</p>
               
-              {/* XP Gained */}
               <div className="flex items-center justify-center bg-yellow-500/20 border border-yellow-400/30 rounded-lg py-3 px-4 mb-4">
                 <Sparkles className="h-5 w-5 text-yellow-400 mr-2" />
                 <span className="text-white font-semibold">+{xpGained} XP Earned!</span>
               </div>
             </div>
 
-            {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3">
               <Button
                 onClick={() => setShowShareModal(true)}
@@ -142,7 +131,6 @@ export const BadgeUnlockModal: React.FC<BadgeUnlockModalProps> = ({
             </div>
           </div>
 
-          {/* Animated Background Elements */}
           {isAnimating && (
             <>
               <div className="absolute top-10 left-10 w-2 h-2 bg-yellow-400 rounded-full animate-ping" />
@@ -154,7 +142,6 @@ export const BadgeUnlockModal: React.FC<BadgeUnlockModalProps> = ({
         </DialogContent>
       </Dialog>
 
-      {/* Share Modal */}
       <BadgeShareModal
         isOpen={showShareModal}
         onClose={() => setShowShareModal(false)}

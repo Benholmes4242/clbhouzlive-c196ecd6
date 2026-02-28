@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { getMediaType } from '@/utils/getMediaType';
 import { getFileKey } from '@/hooks/useReviewVideoUpload';
 import { MAX_REVIEW_MEDIA_ITEMS } from '../constants';
@@ -17,7 +17,6 @@ export function useMediaSelection({
   onVideoUpload,
   setLocalVideoPosters,
 }: UseMediaSelectionOptions) {
-  const { toast } = useToast();
 
   const handleMediaSelected = useCallback(async (files: File[]) => {
     console.log('[Media Audit] CHECKPOINT A - Picked items:', files);
@@ -35,29 +34,24 @@ export function useMediaSelection({
       })
     );
 
-    // Respect 6-item maximum (existing media + images + video drafts)
     const remainingSlots = MAX_REVIEW_MEDIA_ITEMS - totalMediaCount;
     const filesToAdd = files.slice(0, Math.max(0, remainingSlots));
 
     if (filesToAdd.length === 0) {
       if (remainingSlots <= 0) {
-        toast({
-          title: `${MAX_REVIEW_MEDIA_ITEMS} of ${MAX_REVIEW_MEDIA_ITEMS} added`,
+        toast.success(`${MAX_REVIEW_MEDIA_ITEMS} of ${MAX_REVIEW_MEDIA_ITEMS} added`, {
           description: `You can attach up to ${MAX_REVIEW_MEDIA_ITEMS} photos or videos per review.`,
         });
       }
       return;
     }
 
-    // Show toast if user tried to add more than allowed
     if (files.length > remainingSlots && remainingSlots > 0) {
-      toast({
-        title: `${MAX_REVIEW_MEDIA_ITEMS} of ${MAX_REVIEW_MEDIA_ITEMS} added`,
+      toast.success(`${MAX_REVIEW_MEDIA_ITEMS} of ${MAX_REVIEW_MEDIA_ITEMS} added`, {
         description: `You can attach up to ${MAX_REVIEW_MEDIA_ITEMS} photos or videos per review.`,
       });
     }
 
-    // Split into images vs videos
     const imageFiles: File[] = [];
     const videoFiles: File[] = [];
     
@@ -72,7 +66,6 @@ export function useMediaSelection({
 
     console.log('[Media Audit] CHECKPOINT B - Split:', { imageFiles: imageFiles.length, videoFiles: videoFiles.length });
 
-    // Handle images: create previews for immediate display
     if (imageFiles.length > 0) {
       const newPreviews = new Map<string, string>();
       for (const file of imageFiles) {
@@ -84,12 +77,10 @@ export function useMediaSelection({
       console.log('[Media Audit] CHECKPOINT C1 - Image previews created:', newPreviews.size);
     }
 
-    // Handle videos: create local blob URL for preview, then start upload
     if (videoFiles.length > 0) {
       for (const file of videoFiles) {
         const fileKey = getFileKey(file);
         
-        // Create video blob URL for thumbnail preview
         try {
           const videoUrl = URL.createObjectURL(file);
           setLocalVideoPosters((prev) => {
@@ -101,12 +92,11 @@ export function useMediaSelection({
           console.warn('[Media Audit] Local poster generation failed:', posterErr);
         }
         
-        // Start upload-on-select (runs in background via useReviewVideoUpload)
         onVideoUpload(file);
       }
       console.log('[Media Audit] CHECKPOINT C2 - Videos queued for upload:', videoFiles.length);
     }
-  }, [totalMediaCount, onImagesAdded, onVideoUpload, setLocalVideoPosters, toast]);
+  }, [totalMediaCount, onImagesAdded, onVideoUpload, setLocalVideoPosters]);
 
   return { handleMediaSelected };
 }
