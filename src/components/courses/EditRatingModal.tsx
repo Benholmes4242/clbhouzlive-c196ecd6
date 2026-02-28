@@ -10,7 +10,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
 import { X } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { getScoreTier } from '@/utils/getScoreTier';
 
@@ -42,7 +42,7 @@ const EditRatingModal = ({
   isOpen,
   onClose
 }: ExtendedEditRatingModalProps) => {
-  const { toast } = useToast();
+  
   const queryClient = useQueryClient();
   const [rating, setRating] = useState<number | null>(currentRating);
   const [review, setReview] = useState(currentReview || '');
@@ -116,21 +116,14 @@ const EditRatingModal = ({
       await queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
       await queryClient.refetchQueries({ queryKey: ['explore-courses'], exact: false, type: 'active' });
       
-      toast({
-        title: "Rating Updated!",
-        description: `You updated your rating for ${courseName} to ${rating}`,
-      });
+      toast.success("Rating updated", { description: `You updated your rating for ${courseName} to ${rating}` });
       
       setIsSubmitting(false);
       onClose();
     },
     onError: (error) => {
       console.error('Error updating rating:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update rating. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to update rating. Please try again.");
       setIsSubmitting(false);
     },
   });
@@ -177,21 +170,14 @@ const EditRatingModal = ({
       await queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
       await queryClient.refetchQueries({ queryKey: ['explore-courses'], exact: false, type: 'active' });
       
-      toast({
-        title: "Rating Removed",
-        description: `You removed your rating for ${courseName}`,
-      });
+      toast.success("Rating removed", { description: `You removed your rating for ${courseName}` });
       
       setIsSubmitting(false);
       onClose();
     },
     onError: (error) => {
       console.error('Error deleting rating:', error);
-      toast({
-        title: "Error",
-        description: "Failed to remove rating. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to remove rating. Please try again.");
       setIsSubmitting(false);
     },
   });

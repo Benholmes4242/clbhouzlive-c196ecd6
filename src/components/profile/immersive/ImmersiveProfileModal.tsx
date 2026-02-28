@@ -11,7 +11,7 @@ import ImmersiveIdentityDock from './ImmersiveIdentityDock';
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useVideoProgressSync } from '@/hooks/useVideoProgressSync';
 import { useVideoPreloader } from '@/hooks/useVideoPreloader';
 import { USE_VIDEO_PROGRESS_SYNC_V1 } from '@/utils/featureFlags';
@@ -84,7 +84,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
   const [isMobileTransitioning, setIsMobileTransitioning] = useState(false);
   const { session } = useSupabaseSession();
   const { uploadVideo } = useCloudflareStream();
-  const { toast } = useToast();
+  
   
   const currentItem = localMediaItems[activeIndex];
   const totalItems = localMediaItems.length;
@@ -176,29 +176,19 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
         return;
       }
 
-      toast({
-        title: "Media deleted",
-        description: "The media has been successfully deleted.",
-      });
+      toast.success("Media deleted");
 
     } catch (error) {
       console.error('Error deleting media:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete media. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to delete media. Please try again.");
     }
-  }, [currentItem, session?.user?.id, userId, localMediaItems, activeIndex, onClose, toast]);
+  }, [currentItem, session?.user?.id, userId, localMediaItems, activeIndex, onClose]);
 
   // Handle edit media (placeholder for future implementation)
   const handleEditMedia = useCallback(() => {
     console.log('Edit media:', currentItem?.id);
-    toast({
-      title: "Coming soon",
-      description: "Media editing will be available soon!",
-    });
-  }, [currentItem?.id, toast]);
+    toast("Coming soon", { description: "Media editing will be available soon!" });
+  }, [currentItem?.id]);
 
   const logTelemetryEvent = useCallback(async (event: string, data: any = {}) => {
     if (!session?.user?.id) return;
@@ -271,11 +261,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
     
     // Only accept video files
     if (!file.type.startsWith('video/')) {
-      toast({
-        title: "Invalid file type",
-        description: "Only videos are allowed for immersive media.",
-        variant: "destructive",
-      });
+      toast.error("Only videos are allowed for immersive media.");
       return;
     }
     

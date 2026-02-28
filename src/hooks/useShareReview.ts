@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
@@ -28,7 +28,7 @@ interface ShareReviewResult {
 
 export function useShareReview() {
   const [isSharing, setIsSharing] = useState(false);
-  const { toast } = useToast();
+  
   const queryClient = useQueryClient();
 
   const shareReview = async ({
@@ -57,10 +57,7 @@ export function useShareReview() {
         .maybeSingle();
 
       if (existingPost) {
-        toast({
-          title: 'Already shared',
-          description: 'This review has already been shared to your profile.',
-        });
+        toast('Already shared', { description: 'This review has already been shared to your profile.' });
         return { success: true, postId: existingPost.id, alreadyShared: true };
       }
 
@@ -152,19 +149,12 @@ export function useShareReview() {
         hasVideo: media.some(m => m.media_type === 'video'),
       });
 
-      toast({
-        title: 'Review shared',
-        description: 'Your review is now visible in Clubhouse and on your profile.',
-      });
+      toast.success('Review shared', { description: 'Your review is now visible in Clubhouse and on your profile.' });
 
       return { success: true, postId };
     } catch (err: any) {
       console.error('[ShareReview] Error:', err);
-      toast({
-        title: 'Failed to share',
-        description: err.message || 'Something went wrong. Please try again.',
-        variant: 'destructive',
-      });
+      toast.error(err.message || 'Something went wrong. Please try again.');
       return { success: false, error: err.message };
     } finally {
       setIsSharing(false);

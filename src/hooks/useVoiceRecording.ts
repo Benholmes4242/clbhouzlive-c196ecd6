@@ -5,7 +5,7 @@
  */
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 
 type VoiceMode = 'voice-comment' | 'transcribe';
@@ -29,7 +29,7 @@ export const useVoiceRecording = ({
   const streamRef = useRef<MediaStream | null>(null);
   const startTimeRef = useRef<number>(0);
   const timerRef = useRef<number | null>(null);
-  const { toast } = useToast();
+  
 
   // Cleanup on unmount
   useEffect(() => {
@@ -110,10 +110,7 @@ export const useVoiceRecording = ({
 
             onVoiceNoteComplete?.(filePath, durationSeconds);
 
-            toast({
-              title: "Voice note recorded",
-              description: `${durationSeconds}s voice note ready to send`,
-            });
+            toast.success("Voice note recorded", { description: `${durationSeconds}s voice note ready to send` });
           } else {
             // Transcribe mode — send to voice-to-text
             const base64String = await new Promise<string>((resolve, reject) => {
@@ -133,25 +130,14 @@ export const useVoiceRecording = ({
 
             if (transcribedText && transcribedText.trim()) {
               onTranscriptionComplete?.(transcribedText);
-              toast({
-                title: "Voice note recorded",
-                description: `"${transcribedText.slice(0, 50)}${transcribedText.length > 50 ? '...' : ''}"`,
-              });
+              toast.success("Voice note recorded", { description: `"${transcribedText.slice(0, 50)}${transcribedText.length > 50 ? '...' : ''}"` });
             } else {
-              toast({
-                title: "No speech detected",
-                description: "Please try recording again and speak clearly",
-                variant: "destructive",
-              });
+              toast.error("No speech detected", { description: "Please try recording again and speak clearly" });
             }
           }
         } catch (error) {
           console.error('Error processing audio:', error);
-          toast({
-            title: mode === 'voice-comment' ? "Upload failed" : "Transcription failed",
-            description: "Please try again.",
-            variant: "destructive",
-          });
+          toast.error(mode === 'voice-comment' ? "Upload failed" : "Transcription failed", { description: "Please try again." });
         } finally {
           stream.getTracks().forEach(t => t.stop());
           streamRef.current = null;
@@ -162,19 +148,12 @@ export const useVoiceRecording = ({
       mediaRecorderRef.current.start(1000);
       setIsRecording(true);
 
-      toast({
-        title: "Recording started",
-        description: "Speak your note...",
-      });
+      toast("Recording started", { description: "Speak your note..." });
     } catch (error) {
       console.error('Error starting recording:', error);
-      toast({
-        title: "Microphone access denied",
-        description: "Please allow microphone access to record voice notes",
-        variant: "destructive",
-      });
+      toast.error("Microphone access denied", { description: "Please allow microphone access to record voice notes" });
     }
-  }, [mode, onTranscriptionComplete, onVoiceNoteComplete, toast]);
+  }, [mode, onTranscriptionComplete, onVoiceNoteComplete]);
 
   const stopRecording = useCallback(() => {
     if (mediaRecorderRef.current && isRecording) {
@@ -182,12 +161,9 @@ export const useVoiceRecording = ({
       setIsRecording(false);
       setIsProcessing(true);
 
-      toast({
-        title: "Processing recording",
-        description: mode === 'voice-comment' ? "Uploading voice note..." : "Converting speech to text...",
-      });
+      toast(mode === 'voice-comment' ? "Uploading voice note..." : "Converting speech to text...");
     }
-  }, [isRecording, mode, toast]);
+  }, [isRecording, mode]);
 
   const cancelRecording = useCallback(() => {
     if (mediaRecorderRef.current && isRecording) {

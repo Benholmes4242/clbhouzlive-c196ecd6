@@ -6,17 +6,14 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toCSV, downloadCSV } from '../utils/csv';
 import { buildHistoryUrl } from '../utils/historyLinks';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 const COLORS = ['#6e9277', '#8aa491', '#b1c1b7', '#e0eee5', '#3b3b3b'];
 
 function CopyLinkButton({ url }: { url: string }) {
   const handleCopy = () => {
     navigator.clipboard.writeText(window.location.origin + url);
-    toast({
-      description: 'Link copied to clipboard',
-      duration: 2000,
-    });
+    toast.success('Copied to clipboard', { duration: 2000 });
   };
 
   return (

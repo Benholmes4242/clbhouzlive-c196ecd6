@@ -7,7 +7,7 @@ import { useFollowUser } from '@/hooks/useFollowUser';
 import { useFriendActions } from '@/hooks/useFriendActions';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useDebounce } from '@/hooks/useDebounce';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -106,14 +106,11 @@ const GolfersToFollowPage = () => {
     if (!success) {
       // Revert on failure
       updateFollowingStatus(userId, isFollowing);
-      toast({
-        description: isFollowing 
+      toast.error(isFollowing 
           ? 'Could not unfollow. Please try again.'
-          : 'Could not follow. Please try again.',
-        variant: 'destructive',
-      });
+          : 'Could not follow. Please try again.');
     } else if (isFollowing) {
-      toast({ description: `You've unfollowed ${userName}` });
+      toast(`You've unfollowed ${userName}`);
     }
     
     setActioningUserId(null);
@@ -136,10 +133,7 @@ const GolfersToFollowPage = () => {
         next.delete(userId);
         return next;
       });
-      toast({
-        description: 'Could not send request. Please try again.',
-        variant: 'destructive',
-      });
+      toast.error('Could not send request. Please try again.');
     }
     
     setActioningUserId(null);

@@ -10,7 +10,7 @@ import { X, Inbox } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { haptic } from '@/utils/haptics';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useHostPendingRequests, type PendingRequest } from '../../hooks/useHostPendingRequests';
 import { RequestRow } from './RequestRow';
@@ -104,7 +104,7 @@ export function RequestsSheet({ isOpen, onClose }: RequestsSheetProps) {
             .eq('id', request.game_id);
         }
 
-        toast({ title: "Added to your game 👍" });
+        toast.success("Added to your game 👍");
       } else {
         // Update trip_participants rsvp_status to 'going'
         const { error } = await supabase
@@ -117,7 +117,7 @@ export function RequestsSheet({ isOpen, onClose }: RequestsSheetProps) {
 
         if (error) throw error;
 
-        toast({ title: "Added to your trip 👍" });
+        toast.success("Added to your trip 👍");
       }
 
       // Invalidate relevant queries
@@ -134,11 +134,7 @@ export function RequestsSheet({ isOpen, onClose }: RequestsSheetProps) {
         next.delete(request.id);
         return next;
       });
-      toast({
-        title: "Error",
-        description: "Failed to accept request. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to accept request. Please try again.");
     } finally {
       setProcessingId(null);
     }
@@ -177,7 +173,7 @@ export function RequestsSheet({ isOpen, onClose }: RequestsSheetProps) {
       }
 
       // Generic message (anonymity-preserving)
-      toast({ title: "Let them know it's full" });
+      toast("Let them know it's full");
 
       // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ['hostPendingRequests'] });
@@ -192,11 +188,7 @@ export function RequestsSheet({ isOpen, onClose }: RequestsSheetProps) {
         next.delete(request.id);
         return next;
       });
-      toast({
-        title: "Error",
-        description: "Failed to decline request. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to decline request. Please try again.");
     } finally {
       setProcessingId(null);
     }

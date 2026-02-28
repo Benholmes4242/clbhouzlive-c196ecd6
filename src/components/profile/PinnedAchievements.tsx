@@ -8,7 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 import { EliteGameCardSkeleton } from '@/components/achievements/EliteGameCardSkeleton';
@@ -148,19 +148,14 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
       if (error) throw error;
 
       setShowAchievementsPublic(newValue);
-      toast({
-        title: newValue ? 'Achievements are now public' : 'Achievements are now private',
+      toast.success(newValue ? 'Achievements are now public' : 'Achievements are now private', {
         description: newValue 
           ? 'Others can see your pinned achievements' 
           : 'Your achievements are hidden from others',
       });
     } catch (error) {
       console.error('Error updating achievement visibility:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to update achievement visibility',
-        variant: 'destructive'
-      });
+      toast.error('Failed to update achievement visibility');
     }
   };
 
@@ -189,17 +184,10 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
 
       setPinnedAchievementIds(tempPinnedIds);
       setIsManagePinsOpen(false);
-      toast({
-        title: 'Pins updated',
-        description: 'Your pinned achievements have been saved',
-      });
+      toast.success('Pins updated', { description: 'Your pinned achievements have been saved' });
     } catch (error) {
       console.error('Error saving pinned achievements:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to save pinned achievements',
-        variant: 'destructive'
-      });
+      toast.error('Failed to save pinned achievements');
     }
   };
 

@@ -12,7 +12,7 @@ import { useFollowUser } from '@/hooks/useFollowUser';
 import { useFriendActions } from '@/hooks/useFriendActions';
 import { useRelationshipStatus } from '@/hooks/useRelationshipStatus';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import type { SocialUser } from '@/hooks/useSocialLists';
 import { getProfilePathById } from '@/lib/profileRoutes';
@@ -540,10 +540,7 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({ user, currentUserId, mode, on
 
     if (!success) {
       setOptimisticFollow(wasFollowing);
-      toast({
-        description: wasFollowing ? 'Could not unfollow.' : 'Could not follow.',
-        variant: 'destructive',
-      });
+      toast.error(wasFollowing ? 'Could not unfollow.' : 'Could not follow.');
     }
   };
 

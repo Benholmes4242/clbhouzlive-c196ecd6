@@ -10,7 +10,7 @@ import { createShareLink, revokeShareLink, getShareInfoForThread } from '../api/
 import { fetchThreadDetails } from '../api/threadDetails';
 import { getThreadTags, removeTagFromThread } from '../api/tags';
 import { echoHistoryAnalytics } from '../analytics/echoHistoryAnalytics';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { TagInputPopover } from './TagInputPopover';
 import { ShareManagementDialog } from './ShareManagementDialog';
 
@@ -106,10 +106,10 @@ export const RowContextMenu: React.FC<RowContextMenuProps> = ({
       const blob = new Blob([JSON.stringify(thread, null, 2)], { type: 'application/json' });
       const filename = `${(thread.title || 'conversation_' + thread.thread_id).replace(/[\\/:"*?<>|]+/g, '_')}.json`;
       downloadBlob(blob, filename);
-      toast({ description: 'Exported to JSON', duration: 2000 });
+      toast.success('Exported to JSON', { duration: 2000 });
     } catch (error) {
       console.error('Export failed:', error);
-      toast({ description: 'Failed to export', variant: 'destructive', duration: 3000 });
+      toast.error('Failed to export', { duration: 3000 });
     } finally {
       setLoading(false);
     }
@@ -125,10 +125,10 @@ export const RowContextMenu: React.FC<RowContextMenuProps> = ({
       const blob = new Blob([md], { type: 'text/markdown' });
       const filename = `${(thread.title || 'conversation_' + thread.thread_id).replace(/[\\/:"*?<>|]+/g, '_')}.md`;
       downloadBlob(blob, filename);
-      toast({ description: 'Exported to Markdown', duration: 2000 });
+      toast.success('Exported to Markdown', { duration: 2000 });
     } catch (error) {
       console.error('Export failed:', error);
-      toast({ description: 'Failed to export', variant: 'destructive', duration: 3000 });
+      toast.error('Failed to export', { duration: 3000 });
     } finally {
       setLoading(false);
     }
@@ -142,11 +142,11 @@ export const RowContextMenu: React.FC<RowContextMenuProps> = ({
       const url = `${window.location.origin}/echo/share/${token}`;
       await navigator.clipboard.writeText(url);
       echoHistoryAnalytics.shareCreated({ thread_id: threadId });
-      toast({ description: 'Share link copied to clipboard', duration: 2000 });
+      toast.success('Share link copied to clipboard', { duration: 2000 });
       setHasShare(true);
     } catch (error) {
       console.error('Share creation failed:', error);
-      toast({ description: 'Failed to create share link', variant: 'destructive', duration: 3000 });
+      toast.error('Failed to create share link', { duration: 3000 });
     } finally {
       setLoading(false);
     }
@@ -158,16 +158,16 @@ export const RowContextMenu: React.FC<RowContextMenuProps> = ({
     try {
       const info = await getShareInfoForThread(threadId);
       if (!info?.token) {
-        toast({ description: 'No active share link found', duration: 2000 });
+        toast('No active share link found', { duration: 2000 });
         return;
       }
       await revokeShareLink(info.token);
       echoHistoryAnalytics.shareRevoked({ thread_id: threadId });
-      toast({ description: 'Share link revoked', duration: 2000 });
+      toast.success('Share link revoked', { duration: 2000 });
       setHasShare(false);
     } catch (error) {
       console.error('Share revocation failed:', error);
-      toast({ description: 'Failed to revoke share link', variant: 'destructive', duration: 3000 });
+      toast.error('Failed to revoke share link', { duration: 3000 });
     } finally {
       setLoading(false);
     }
@@ -181,10 +181,10 @@ export const RowContextMenu: React.FC<RowContextMenuProps> = ({
       echoHistoryAnalytics.tagRemoved({ thread_id: threadId, tag });
       setThreadTags((prev) => prev.filter((t) => t !== tag));
       onTagsChange?.();
-      toast({ description: `Removed tag: ${tag}`, duration: 2000 });
+      toast.success(`Removed tag: ${tag}`, { duration: 2000 });
     } catch (error) {
       console.error('Failed to remove tag:', error);
-      toast({ description: 'Failed to remove tag', variant: 'destructive', duration: 2000 });
+      toast.error('Failed to remove tag', { duration: 2000 });
     } finally {
       setLoading(false);
     }

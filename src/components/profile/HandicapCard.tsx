@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import EnhancedHandicapLayout from './handicap/EnhancedHandicapLayout';
 import HandicapConnectModal from './handicap/HandicapConnectModal';
 import ManualHandicapModal from './handicap/ManualHandicapModal';
@@ -164,17 +164,10 @@ const HandicapCard: React.FC<HandicapCardProps> = ({
         eg_app_connected: true,
       }));
 
-      toast({
-        title: "Success",
-        description: "Official handicap connected successfully",
-      });
+      toast.success("Official handicap connected successfully");
     } catch (error) {
       console.error('Error connecting handicap:', error);
-      toast({
-        title: "Error",
-        description: "Failed to connect handicap. Please try again.",
-        variant: "destructive"
-      });
+      toast.error("Failed to connect handicap. Please try again.");
     }
   }
 
@@ -200,17 +193,10 @@ const HandicapCard: React.FC<HandicapCardProps> = ({
         home_club: data.homeClub,
       }));
 
-      toast({
-        title: "Success",
-        description: "Handicap saved successfully",
-      });
+      toast.success("Handicap saved successfully");
     } catch (error) {
       console.error('Error saving handicap:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save handicap. Please try again.",
-        variant: "destructive"
-      });
+      toast.error("Failed to save handicap. Please try again.");
     }
   }
 };
