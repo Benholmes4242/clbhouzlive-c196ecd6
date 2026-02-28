@@ -803,21 +803,6 @@ export function PostWizard({
 
             {/* === OVERLAYS === */}
 
-            {/* Fullscreen Media Preview Viewer */}
-            <AnimatePresence>
-              {previewMediaIndex !== null && (
-                <MediaPreviewViewer
-                  items={state.mediaItems}
-                  initialIndex={previewMediaIndex}
-                  onClose={() => setPreviewMediaIndex(null)}
-                  onStudio={handleOpenStudio}
-                  coverIndex={state.coverIndex}
-                  onSetCover={(index) => setCoverIndex(index)}
-                  studioEditsByMediaId={state.studioEditsByMediaId}
-                />
-              )}
-            </AnimatePresence>
-
             {/* Discard Action Sheet */}
             <DiscardActionSheet
               open={showCloseConfirm}
@@ -929,6 +914,21 @@ export function PostWizard({
           </>
         )}
       </div>
+
+      {/* Fullscreen Media Preview Viewer — rendered OUTSIDE overflow-hidden container */}
+      <AnimatePresence>
+        {previewMediaIndex !== null && (
+          <MediaPreviewViewer
+            items={state.mediaItems}
+            initialIndex={previewMediaIndex}
+            onClose={() => setPreviewMediaIndex(null)}
+            onStudio={handleOpenStudio}
+            coverIndex={state.coverIndex}
+            onSetCover={(index) => setCoverIndex(index)}
+            studioEditsByMediaId={state.studioEditsByMediaId}
+          />
+        )}
+      </AnimatePresence>
     </ErrorBoundary>,
     document.body
   );
