@@ -10,7 +10,7 @@ import {
   type AdminTeamMember,
   type AdminInvitation 
 } from '@/hooks/admin/useAdminTeamDetails';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { 
   AdminDetailDrawer, 
@@ -20,7 +20,7 @@ import {
 } from './team';
 
 const TeamManagement = () => {
-  const { toast } = useToast();
+  
   const queryClient = useQueryClient();
   const { data, isLoading, error } = useAdminTeamList();
   const { loading: actionLoading, resendInvite, cancelInvite, revokeAccess } = useAdminTeamActions();
@@ -97,30 +97,30 @@ const TeamManagement = () => {
   const handleRevokeAccess = async (member: AdminTeamMember) => {
     const result = await revokeAccess(member.user_id, member.email);
     if (result.success) {
-      toast({ title: 'Access revoked', description: `${member.email} has been removed` });
+      toast.success('Access revoked', { description: `${member.email} has been removed` });
       queryClient.invalidateQueries({ queryKey: ['admin-team-list'] });
     } else {
-      toast({ title: 'Error', description: 'Failed to revoke access', variant: 'destructive' });
+      toast.error('Error', { description: 'Failed to revoke access' });
     }
   };
 
   const handleResendInvite = async (invitation: AdminInvitation) => {
     const result = await resendInvite(invitation.id);
     if (result.success) {
-      toast({ title: 'Invite resent', description: `Invitation extended for ${invitation.email}` });
+      toast.success('Invite resent', { description: `Invitation extended for ${invitation.email}` });
       queryClient.invalidateQueries({ queryKey: ['admin-team-list'] });
     } else {
-      toast({ title: 'Error', description: 'Failed to resend invite', variant: 'destructive' });
+      toast.error('Error', { description: 'Failed to resend invite' });
     }
   };
 
   const handleCancelInvite = async (invitation: AdminInvitation) => {
     const result = await cancelInvite(invitation.id);
     if (result.success) {
-      toast({ title: 'Invite cancelled', description: `Invitation for ${invitation.email} has been cancelled` });
+      toast.success('Invite cancelled', { description: `Invitation for ${invitation.email} has been cancelled` });
       queryClient.invalidateQueries({ queryKey: ['admin-team-list'] });
     } else {
-      toast({ title: 'Error', description: 'Failed to cancel invite', variant: 'destructive' });
+      toast.error('Error', { description: 'Failed to cancel invite' });
     }
   };
 
@@ -147,7 +147,7 @@ const TeamManagement = () => {
     link.click();
     URL.revokeObjectURL(url);
     
-    toast({ title: 'Export complete', description: 'Admin team data exported to CSV' });
+    toast.success('Export complete', { description: 'Admin team data exported to CSV' });
   };
 
   if (isLoading) {

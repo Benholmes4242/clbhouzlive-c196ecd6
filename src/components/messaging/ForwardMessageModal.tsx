@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useMessaging } from '@/hooks/useMessaging';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { haptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
 import type { ConversationWithDetails } from '@/types/messaging';
@@ -38,7 +38,7 @@ export function ForwardMessageModal({
 }: ForwardMessageModalProps) {
   const { user } = useSupabaseSession();
   const { conversations, sendMessage } = useMessaging();
-  const { toast } = useToast();
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [forwarding, setForwarding] = useState<string | null>(null);
 
@@ -88,11 +88,11 @@ export function ForwardMessageModal({
         null
       );
 
-      toast({ title: 'Message forwarded' });
+      toast.success('Message forwarded');
       onOpenChange(false);
     } catch (error) {
       console.error('Error forwarding message:', error);
-      toast({ title: 'Failed to forward message', variant: 'destructive' });
+      toast.error('Failed to forward message');
     } finally {
       setForwarding(null);
     }

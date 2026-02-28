@@ -3,7 +3,7 @@ import { Play, X } from 'lucide-react';
 import { useLongPress } from '@/hooks/useLongPress';
 import { useCappedLoading } from '@/hooks/useCappedLoading';
 import { haptic } from '@/utils/haptics';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { getFilterClass } from '@/utils/studioFilters';
 import { cn } from '@/lib/utils';
 import { buildImageThumbnailUrl, buildVideoPosterUrl } from '@/utils/mediaThumbs';
@@ -76,8 +76,6 @@ export default function CarouselSlide({
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsPlayerRef = useRef<UnifiedVideoPlayerRef>(null);
   const objectUrlRef = useRef<string | null>(null);
-  const { toast } = useToast();
-  
   const showSkeleton = useCappedLoading(loaded, 600);
   const filterClass = getFilterClass(studioEdits?.filter);
   const cropClass = getCropWrapperClass(studioEdits?.crop);
@@ -85,7 +83,7 @@ export default function CarouselSlide({
   
   const longPressProps = useLongPress(() => {
     onSetCover?.(index);
-    toast({ description: 'Cover set' });
+    toast('Cover set');
     haptic('light');
   });
 

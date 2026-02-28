@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 export function useGolferActions(golferId: string, initialFollowing = false, index?: number) {
   const [isFollowing, setIsFollowing] = useState(initialFollowing);
   const queryClient = useQueryClient();
-  const { toast } = useToast();
+  
 
   const sendFriendRequest = () => {
     if (index !== undefined) {
@@ -18,10 +18,7 @@ export function useGolferActions(golferId: string, initialFollowing = false, ind
     }
     
     // TODO: Implement friend request mutation when friends system is integrated
-    toast({
-      title: 'Friend request',
-      description: 'Friend system coming soon',
-    });
+    toast('Friend system coming soon');
   };
 
   const followMutation = useMutation({
@@ -77,11 +74,7 @@ export function useGolferActions(golferId: string, initialFollowing = false, ind
       }
       setIsFollowing(!isFollowing); // Revert local state
       
-      toast({
-        title: 'Failed to update follow status',
-        description: 'Please try again',
-        variant: 'destructive',
-      });
+      toast.error('Failed to update follow status', { description: 'Please try again' });
     },
     onSettled: () => {
       // Refetch to ensure consistency
@@ -110,10 +103,7 @@ export function useGolferActions(golferId: string, initialFollowing = false, ind
     
     // TODO: Implement message/DM navigation
     console.log('Opening message for golfer:', golferId);
-    toast({
-      title: 'Messaging',
-      description: 'Direct messaging coming soon',
-    });
+    toast('Direct messaging coming soon');
   };
 
   return {

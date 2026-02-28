@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Upload, Eye } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { parseExcelFile } from './excel-importer/csvUtils';
 import { ExcelCourseData, ImportResult, DebugInfo } from './excel-importer/types';
 import DataPreview from './excel-importer/DataPreview';
@@ -20,7 +20,7 @@ import {
 } from '@/components/admin/course-import';
 
 const EnhancedExcelCourseImporter = () => {
-  const { toast } = useToast();
+  
   const queryClient = useQueryClient();
   const [file, setFile] = useState<File | null>(null);
   const [previewData, setPreviewData] = useState<ExcelCourseData[]>([]);
@@ -147,20 +147,13 @@ const EnhancedExcelCourseImporter = () => {
       };
       setImportHistory(prev => [historyEntry, ...prev]);
       
-      toast({
-        title: "Import Complete!",
-        description: `Added ${data.insertedCourses} new courses${data.updatedCourses ? `, updated ${data.updatedCourses}` : ''}, skipped ${data.skippedCourses} duplicates${data.errors > 0 ? `, ${data.errors} errors` : ''}.`,
-      });
+      toast.success("Import Complete!", { description: `Added ${data.insertedCourses} new courses${data.updatedCourses ? `, updated ${data.updatedCourses}` : ''}, skipped ${data.skippedCourses} duplicates${data.errors > 0 ? `, ${data.errors} errors` : ''}.` });
       setProgress(100);
       setShowPreview(false);
     },
     onError: (error) => {
       console.error('Excel import failed:', error);
-      toast({
-        title: "Import Failed",
-        description: "Failed to import golf courses from Excel file. Please check the format and try again.",
-        variant: "destructive",
-      });
+      toast.error("Import Failed", { description: "Failed to import golf courses from Excel file. Please check the format and try again." });
       setProgress(0);
     },
   });
@@ -177,10 +170,7 @@ const EnhancedExcelCourseImporter = () => {
     setValidationResult(null);
     setIsValidating(true);
     
-    toast({
-      title: "File Selected",
-      description: `Selected: ${selectedFile.name} (${(selectedFile.size / 1024).toFixed(1)} KB)`,
-    });
+    toast.success("File Selected", { description: `Selected: ${selectedFile.name} (${(selectedFile.size / 1024).toFixed(1)} KB)` });
 
     try {
       const { data: coursesData, debug } = await parseExcelFile(selectedFile);
@@ -204,7 +194,7 @@ const EnhancedExcelCourseImporter = () => {
     } finally {
       setIsValidating(false);
     }
-  }, [toast]);
+  }, []);
 
   const handleClear = useCallback(() => {
     setFile(null);
@@ -224,11 +214,7 @@ const EnhancedExcelCourseImporter = () => {
 
   const handleImport = async () => {
     if (!file || allData.length === 0) {
-      toast({
-        title: "No File Selected",
-        description: "Please select a valid CSV file first.",
-        variant: "destructive",
-      });
+      toast.error("No File Selected", { description: "Please select a valid CSV file first." });
       return;
     }
 

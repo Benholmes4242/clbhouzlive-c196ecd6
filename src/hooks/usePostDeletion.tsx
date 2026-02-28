@@ -1,11 +1,10 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { showToast } from '@/utils/toast';
 import { postKeys } from '@/queryKeys/posts';
 
 export const usePostDeletion = () => {
-  const { toast } = useToast();
   const queryClient = useQueryClient();
 
   /**
@@ -85,12 +84,7 @@ export const usePostDeletion = () => {
       return { success: true };
     } catch (error: any) {
       console.error('Error deleting post:', error);
-      toast({
-        title: "Delete failed",
-        description: error.message || "Failed to delete post. Please try again.",
-        variant: "destructive",
-        duration: 5000
-      });
+      toast.error("Delete failed", { description: error.message || "Failed to delete post. Please try again.", duration: 5000 });
       return { success: false, error };
     }
   };

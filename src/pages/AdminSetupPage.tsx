@@ -7,12 +7,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 const AdminSetupPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { toast } = useToast();
+  
   
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(true);
@@ -48,21 +48,13 @@ const AdminSetupPage = () => {
           .single();
 
         if (error || !data) {
-          toast({
-            title: "Invalid Invitation",
-            description: "This invitation is invalid or has already been used.",
-            variant: "destructive",
-          });
+          toast.error("Invalid Invitation", { description: "This invitation is invalid or has already been used." });
           navigate('/');
           return;
         }
 
         if (new Date(data.expires_at) < new Date()) {
-          toast({
-            title: "Expired Invitation",
-            description: "This invitation has expired.",
-            variant: "destructive",
-          });
+          toast.error("Expired Invitation", { description: "This invitation has expired." });
           navigate('/');
           return;
         }
@@ -71,11 +63,7 @@ const AdminSetupPage = () => {
         setValidToken(true);
       } catch (error) {
         console.error('Error verifying token:', error);
-        toast({
-          title: "Error",
-          description: "Failed to verify invitation.",
-          variant: "destructive",
-        });
+        toast.error("Error", { description: "Failed to verify invitation." });
         navigate('/');
       } finally {
         setVerifying(false);
@@ -83,26 +71,18 @@ const AdminSetupPage = () => {
     };
 
     verifyToken();
-  }, [token, navigate, toast]);
+  }, [token, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: "Password Mismatch",
-        description: "Passwords do not match.",
-        variant: "destructive",
-      });
+      toast.error("Password Mismatch", { description: "Passwords do not match." });
       return;
     }
 
     if (formData.password.length < 6) {
-      toast({
-        title: "Password Too Short",
-        description: "Password must be at least 6 characters long.",
-        variant: "destructive",
-      });
+      toast.error("Password Too Short", { description: "Password must be at least 6 characters long." });
       return;
     }
 
@@ -150,20 +130,13 @@ const AdminSetupPage = () => {
 
         if (inviteError) throw inviteError;
 
-        toast({
-          title: "Welcome!",
-          description: "Your admin account has been created successfully.",
-        });
+        toast.success("Welcome!", { description: "Your admin account has been created successfully." });
 
         navigate('/admin');
       }
     } catch (error) {
       console.error('Error setting up admin account:', error);
-      toast({
-        title: "Setup Failed",
-        description: "Failed to create your admin account. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Setup Failed", { description: "Failed to create your admin account. Please try again." });
     } finally {
       setLoading(false);
     }

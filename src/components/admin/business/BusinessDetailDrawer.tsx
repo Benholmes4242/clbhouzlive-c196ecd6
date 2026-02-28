@@ -42,7 +42,7 @@ import {
   Pencil,
 } from 'lucide-react';
 import { useBusinessDetails, useBusinessActions } from '@/hooks/admin/useBusinessDetails';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
 interface BusinessDetailDrawerProps {
@@ -53,7 +53,7 @@ interface BusinessDetailDrawerProps {
 }
 
 export function BusinessDetailDrawer({ businessId, open, onOpenChange, onBusinessDeleted }: BusinessDetailDrawerProps) {
-  const { toast } = useToast();
+  
   const navigate = useNavigate();
   const { data: business, isLoading, error } = useBusinessDetails(businessId);
   const { loading: actionLoading, verifyBusiness, unverifyBusiness, deleteBusiness } = useBusinessActions();
@@ -62,9 +62,9 @@ export function BusinessDetailDrawer({ businessId, open, onOpenChange, onBusines
     if (!business) return;
     const result = await verifyBusiness(business.id);
     if (result.success) {
-      toast({ title: 'Business verified', description: `${business.name} is now verified` });
+      toast.success('Business verified', { description: `${business.name} is now verified` });
     } else {
-      toast({ title: 'Error', description: 'Failed to verify business', variant: 'destructive' });
+      toast.error('Error', { description: 'Failed to verify business' });
     }
   };
 
@@ -72,9 +72,9 @@ export function BusinessDetailDrawer({ businessId, open, onOpenChange, onBusines
     if (!business) return;
     const result = await unverifyBusiness(business.id);
     if (result.success) {
-      toast({ title: 'Verification removed', description: `${business.name} verification has been removed` });
+      toast.success('Verification removed', { description: `${business.name} verification has been removed` });
     } else {
-      toast({ title: 'Error', description: 'Failed to remove verification', variant: 'destructive' });
+      toast.error('Error', { description: 'Failed to remove verification' });
     }
   };
 
@@ -82,17 +82,17 @@ export function BusinessDetailDrawer({ businessId, open, onOpenChange, onBusines
     if (!business) return;
     const result = await deleteBusiness(business.id);
     if (result.success) {
-      toast({ title: 'Business deleted', description: `${business.name} has been deleted` });
+      toast.success('Business deleted', { description: `${business.name} has been deleted` });
       onOpenChange(false);
       onBusinessDeleted?.();
     } else {
-      toast({ title: 'Error', description: 'Failed to delete business', variant: 'destructive' });
+      toast.error('Error', { description: 'Failed to delete business' });
     }
   };
 
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
-    toast({ title: 'Copied', description: `${label} copied to clipboard` });
+    toast.success('Copied', { description: `${label} copied to clipboard` });
   };
 
   const getInitials = (name: string) => {

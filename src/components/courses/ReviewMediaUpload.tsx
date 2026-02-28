@@ -2,7 +2,7 @@
 import React, { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { ImagePlus, Trash2, Upload, ImageIcon, Camera, FolderOpen } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import {
   Sheet,
   SheetContent,
@@ -19,18 +19,13 @@ interface ReviewMediaUploadProps {
 }
 
 const ReviewMediaUpload = ({ onMediaSelected, selectedMedia, onRemoveMedia, showAddMoreButton = false }: ReviewMediaUploadProps) => {
-  const { toast } = useToast();
   const [isDragOver, setIsDragOver] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
 
   const validateFiles = (files: File[]) => {
     // Check total file count (max 5)
     if (selectedMedia.length + files.length > 5) {
-      toast({
-        title: "Too many files",
-        description: "You can upload a maximum of 5 media files per review.",
-        variant: "destructive",
-      });
+      toast.error("Too many files", { description: "You can upload a maximum of 5 media files per review." });
       return false;
     }
     
@@ -40,11 +35,7 @@ const ReviewMediaUpload = ({ onMediaSelected, selectedMedia, onRemoveMedia, show
     const invalidFiles = files.filter(file => getMediaType(file) === 'unknown');
     if (invalidFiles.length > 0) {
       console.warn('[ReviewMediaUpload] Invalid files rejected:', invalidFiles.map(f => ({ name: f.name, type: f.type })));
-      toast({
-        title: "Invalid file type",
-        description: "Photos (JPG/PNG/HEIC) and videos (MP4/MOV) are supported.",
-        variant: "destructive",
-      });
+      toast.error("Invalid file type", { description: "Photos (JPG/PNG/HEIC) and videos (MP4/MOV) are supported." });
       return false;
     }
 

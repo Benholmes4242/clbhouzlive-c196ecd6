@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Star, ArrowLeft } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatCourseLocation, formatCourseLocationShort } from '@/utils/courseLocation';
@@ -41,7 +41,7 @@ const PostPlayRatingModal = ({
   onRemoveFromPlayed,
   isLoading = false
 }: PostPlayRatingModalProps) => {
-  const { toast } = useToast();
+  
   const { optimisticNewRating, optimisticEditRating, rollback, scheduleBackgroundSync } = useOptimisticRatingUpdate();
   
   // Capture flow type once on mount
@@ -88,7 +88,7 @@ const PostPlayRatingModal = ({
   } = useReviewVideoUpload({
     uploadSessionId,
     userId: currentUserId,
-    onError: (msg) => toast({ title: 'Video Upload Error', description: msg, variant: 'destructive' }),
+    onError: (msg) => toast.error('Video Upload Error', { description: msg }),
   });
   
   // Cleanup pending videos on unmount
@@ -181,10 +181,7 @@ const PostPlayRatingModal = ({
       formState.setButtonText(BUTTON_TEXT.added);
       setTimeout(() => {
         if (!hasAnyMedia) {
-          toast({
-            title: isEditMode ? 'Rating updated' : 'Rating saved',
-            description: `Your rating for ${course?.name || 'this course'} has been saved.`,
-          });
+          toast.success(isEditMode ? 'Rating updated' : 'Rating saved', { description: `Your rating for ${course?.name || 'this course'} has been saved.` });
           formState.setIsSubmitting(false);
           formState.setButtonText(BUTTON_TEXT.addToPlayed);
           onClose();
@@ -233,11 +230,7 @@ const PostPlayRatingModal = ({
   
   const handleSubmit = async () => {
     if (!state.overallRating) {
-      toast({
-        title: "Rating Required",
-        description: "Please leave at least an overall rating to mark this course as played.",
-        variant: "destructive",
-      });
+      toast.error("Rating Required", { description: "Please leave at least an overall rating to mark this course as played." });
       return;
     }
 
@@ -279,11 +272,7 @@ const PostPlayRatingModal = ({
     if (!error) {
       formState.setExistingMedia(state.existingMediaItems.filter(m => m.id !== id));
     } else {
-      toast({
-        title: "Error",
-        description: "Failed to remove media",
-        variant: "destructive",
-      });
+      toast.error("Error", { description: "Failed to remove media" });
     }
   };
   
