@@ -1460,6 +1460,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
 
       {/* Fixed video scrubber — flush above bottom nav */}
       {activeVideoEl && (() => {
+        console.log('[SCRUBBER-DEBUG]', { activeVideoEl: !!activeVideoEl, currentIndex });
         const currentPost = filteredPosts[currentIndex];
         if (!currentPost) return null;
         const mediaItems = currentPost.media && currentPost.media.length > 0 ? currentPost.media : [{
