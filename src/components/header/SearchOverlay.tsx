@@ -230,7 +230,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
 
           {/* Search input — canonical search bar: h-11, rounded-2xl, amber focus ring */}
           <div
-            className="flex-1 h-11 rounded-2xl bg-muted/50 border border-border/50 px-3.5 flex items-center gap-3 transition-all focus-within:shadow-lg focus-within:border-primary/40 focus-within:ring-[3px] focus-within:ring-primary/15"
+            className="flex-1 h-11 rounded-2xl bg-muted/50 border-[1.5px] border-border/50 px-3.5 flex items-center gap-3 transition-all focus-within:border-primary focus-within:ring-[3px] focus-within:ring-primary/25 focus-within:shadow-[0_0_0_3px_rgba(245,158,11,0.12)]"
           >
             <Search size={18} className="text-muted-foreground/60 shrink-0" />
             <input
