@@ -148,6 +148,9 @@ export function PosterFramePicker({
         ))}
       </div>
       </div>
+
+      {/* Bottom bar — matches top nav pattern */}
+      <div className="h-11 bg-black flex-shrink-0" />
     </div>
   );
 }
