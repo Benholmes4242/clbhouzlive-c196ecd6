@@ -345,6 +345,12 @@ export function useReviewWizard({
         
         // Media tab - reviews can include media
         queryClient.invalidateQueries({ queryKey: ['club-media', course.id] });
+        void queryClient.refetchQueries({ queryKey: ['club-media-paginated', course.id], type: 'all' });
+        
+        // Played status
+        if (currentUserId) {
+          void queryClient.refetchQueries({ queryKey: ['user-played-course', course.id, currentUserId], type: 'all' });
+        }
         
         // Legacy keys for backwards compatibility
         queryClient.invalidateQueries({ queryKey: ['course', course.id] });
@@ -781,6 +787,10 @@ export function useReviewWizard({
         }
       }
       queryClient.invalidateQueries({ queryKey: ['review-media'] });
+      queryClient.invalidateQueries({ queryKey: ['club-media-paginated'] });
+      if (course?.id && currentUserId) {
+        void queryClient.refetchQueries({ queryKey: ['user-played-course', course.id, currentUserId], type: 'all' });
+      }
       queryClient.invalidateQueries({ queryKey: ['posts'] });
       queryClient.invalidateQueries({ queryKey: ['user-posts'] });
       queryClient.invalidateQueries({ queryKey: ['profile-feed'] });
