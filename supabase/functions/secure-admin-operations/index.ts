@@ -24,10 +24,11 @@ const corsHeaders = (origin: string | null): HeadersInit => {
 };
 
 interface AdminOperationRequest {
-  action: 'delete_user' | 'reset_password';
+  action: 'delete_user' | 'reset_password' | 'suspend_user';
   targetUserId: string;
   targetEmail: string;
   reason?: string;
+  suspended?: boolean; // For suspend_user action: true = suspend, false = unsuspend
 }
 
 serve(async (req) => {
@@ -104,7 +105,7 @@ serve(async (req) => {
       });
     }
 
-    const { action, targetUserId, targetEmail, reason }: AdminOperationRequest = await req.json();
+    const { action, targetUserId, targetEmail, reason, suspended }: AdminOperationRequest = await req.json();
 
     // Block operations on admin accounts
     const { data: targetMem } = await supabase
@@ -177,6 +178,42 @@ serve(async (req) => {
           result = { success: true, message: `Password reset email sent to ${targetEmail}` };
         }
         break;
+
+      case 'suspend_user': {
+        const isSuspending = suspended !== false; // default to suspend if not specified
+        
+        const { error: suspendError } = await supabase
+          .from('user_profiles')
+          .update({ is_suspended: isSuspending })
+          .eq('id', targetUserId);
+
+        if (suspendError) {
+          console.error('Error suspending user:', suspendError);
+          auditDetails.error = suspendError.message;
+          auditDetails.suspended = isSuspending;
+          result = { error: suspendError.message };
+        } else {
+          // If suspending, also fail any pending scheduled posts immediately
+          if (isSuspending) {
+            const { error: postsError } = await supabase
+              .from('posts')
+              .update({ status: 'failed', updated_at: new Date().toISOString() })
+              .eq('user_id', targetUserId)
+              .eq('status', 'scheduled');
+
+            if (postsError) {
+              console.error('Error failing scheduled posts:', postsError);
+              auditDetails.scheduled_posts_error = postsError.message;
+            }
+          }
+
+          const actionLabel = isSuspending ? 'suspended' : 'unsuspended';
+          console.log(`Successfully ${actionLabel} user ${targetEmail}`);
+          auditDetails.suspended = isSuspending;
+          result = { success: true, message: `User ${targetEmail} ${actionLabel} successfully` };
+        }
+        break;
+      }
 
       default:
         return new Response(JSON.stringify({ error: 'Invalid action' }), {
