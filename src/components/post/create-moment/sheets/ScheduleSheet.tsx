@@ -129,7 +129,7 @@ export default function ScheduleSheet({
               <h2 className="text-xl font-semibold text-foreground">Schedule Post</h2>
               <button
                 onClick={onClose}
-                className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors"
+                className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors"
               >
                 <X size={16} />
               </button>
@@ -183,10 +183,10 @@ export default function ScheduleSheet({
                         onClick={() => date && isValid && setSelectedDate(date)}
                         className={cn(
                           "aspect-square rounded-full flex items-center justify-center text-sm font-medium transition-colors mx-auto w-10 h-10",
-                          isSelected && "bg-foreground text-background",
+                          isSelected && "bg-primary text-primary-foreground",
                           !isSelected && !isValid && "text-muted-foreground/30 cursor-not-allowed",
                           !isSelected && isValid && "hover:bg-muted text-foreground",
-                          isTodayDate && !isSelected && "text-blue-500 font-bold"
+                          isTodayDate && !isSelected && "text-primary font-bold"
                         )}
                       >
                         {date.getDate()}
@@ -201,7 +201,7 @@ export default function ScheduleSheet({
               {/* Time Picker */}
               <div className="mt-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <Clock className="w-4 h-4 text-muted-foreground" />
+                  <Clock className="w-4 h-4 text-primary" />
                   <span className="text-sm font-medium text-muted-foreground">Select Time</span>
                 </div>
                 
@@ -210,7 +210,7 @@ export default function ScheduleSheet({
                   <select aria-label="Hour"
                     value={selectedHour}
                     onChange={(e) => setSelectedHour(parseInt(e.target.value))}
-                    className="flex-1 h-14 rounded-xl bg-card border border-border text-center text-2xl font-semibold text-foreground appearance-none cursor-pointer focus:border-foreground focus:ring-1 focus:ring-foreground outline-none transition-all"
+                    className="flex-1 h-14 rounded-xl bg-card border border-border text-center text-2xl font-semibold text-foreground appearance-none cursor-pointer focus:border-primary focus:ring-1 focus:ring-primary/30 outline-none transition-all"
                   >
                     {Array.from({ length: 24 }, (_, i) => (
                       <option key={i} value={i}>
@@ -225,7 +225,7 @@ export default function ScheduleSheet({
                   <select aria-label="Minute"
                     value={selectedMinute}
                     onChange={(e) => setSelectedMinute(parseInt(e.target.value))}
-                    className="flex-1 h-14 rounded-xl bg-card border border-border text-center text-2xl font-semibold text-foreground appearance-none cursor-pointer focus:border-foreground focus:ring-1 focus:ring-foreground outline-none transition-all"
+                    className="flex-1 h-14 rounded-xl bg-card border border-border text-center text-2xl font-semibold text-foreground appearance-none cursor-pointer focus:border-primary focus:ring-1 focus:ring-primary/30 outline-none transition-all"
                   >
                     {[0, 15, 30, 45].map(m => (
                       <option key={m} value={m}>
@@ -243,8 +243,8 @@ export default function ScheduleSheet({
               {/* Summary Card */}
               <div className="mt-4 p-4 bg-muted rounded-2xl">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-card flex items-center justify-center">
-                    <Calendar className="w-5 h-5 text-muted-foreground" />
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Calendar className="w-5 h-5 text-primary" />
                   </div>
                   <div>
                     <p className="font-semibold text-foreground">
@@ -257,7 +257,7 @@ export default function ScheduleSheet({
                 </div>
                 
                 {!isValidScheduleTime && (
-                  <p className="text-xs text-red-500 mt-3">
+                  <p className="text-xs text-destructive mt-3">
                     Schedule must be at least 15 minutes from now
                   </p>
                 )}
@@ -269,7 +269,7 @@ export default function ScheduleSheet({
               <button
                 onClick={handleSchedule}
                 disabled={!isValidScheduleTime || isScheduling}
-                className="w-full h-14 bg-primary text-primary-foreground font-semibold rounded-full hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.97] transition-all duration-200"
+                className="w-full h-14 bg-primary text-primary-foreground font-semibold rounded-full hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100 disabled:cursor-not-allowed active:scale-[0.97] transition-all duration-200"
               >
                 {isScheduling ? "Scheduling..." : "Schedule Post"}
               </button>

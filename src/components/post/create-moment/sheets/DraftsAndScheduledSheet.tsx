@@ -117,7 +117,7 @@ export default function DraftsAndScheduledSheet({
             </DrawerTitle>
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors"
+              className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors"
               aria-label="Close"
             >
               <X className="w-4 h-4" />
@@ -141,7 +141,7 @@ export default function DraftsAndScheduledSheet({
                 <span className="flex items-center gap-1.5">
                   Drafts
                   {drafts.length > 0 && (
-                    <span className="bg-destructive text-destructive-foreground text-[10px] font-semibold rounded-full px-1.5 min-w-[18px] h-[18px] inline-flex items-center justify-center">
+                    <span className="bg-primary text-primary-foreground text-[10px] font-semibold rounded-full px-1.5 min-w-[18px] h-[18px] inline-flex items-center justify-center">
                       {drafts.length}
                     </span>
                   )}
@@ -149,7 +149,7 @@ export default function DraftsAndScheduledSheet({
                 {activeTab === 'drafts' && (
                   <motion.div 
                     layoutId="tab-underline"
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" 
+                    className="absolute bottom-0 left-0 right-0 h-[3px] bg-primary rounded-full" 
                   />
                 )}
               </button>
@@ -176,7 +176,7 @@ export default function DraftsAndScheduledSheet({
                 {activeTab === 'scheduled' && (
                   <motion.div 
                     layoutId="tab-underline"
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" 
+                    className="absolute bottom-0 left-0 right-0 h-[3px] bg-primary rounded-full" 
                   />
                 )}
               </button>
@@ -481,7 +481,7 @@ const DraftItem = React.memo(function DraftItem({
         {/* Content */}
         <div className="flex-1 min-w-0">
           <p className="font-medium text-foreground truncate">
-            {draft.content || <span className="text-muted-foreground italic">No caption</span>}
+            {draft.content || <span className="text-muted-foreground">No caption</span>}
           </p>
           <p className="text-sm text-muted-foreground">
             {getActorLabel(draft.actorType)} · Saved {formatDistanceToNow(new Date(draft.updatedAt), { addSuffix: true })}
