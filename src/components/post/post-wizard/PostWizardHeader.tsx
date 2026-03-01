@@ -1,5 +1,5 @@
-// PostWizardHeader - Minimal composer header: Cancel | Title | Post
-import { Loader2 } from 'lucide-react';
+// PostWizardHeader - Minimal composer header: Cancel | Title | [Clock] Post
+import { Loader2, Clock } from 'lucide-react';
 
 export interface PostWizardHeaderProps {
   onClose: () => void;
@@ -8,6 +8,8 @@ export interface PostWizardHeaderProps {
   isSubmitting: boolean;
   isEditMode?: boolean;
   isScheduled?: boolean;
+  isDirty?: boolean;
+  onOpenSchedule?: () => void;
 }
 
 export function PostWizardHeader({
@@ -17,6 +19,8 @@ export function PostWizardHeader({
   isSubmitting,
   isEditMode = false,
   isScheduled = false,
+  isDirty = false,
+  onOpenSchedule,
 }: PostWizardHeaderProps) {
   const buttonLabel = isSubmitting
     ? (isEditMode ? 'Saving…' : isScheduled ? 'Scheduling…' : 'Posting…')
@@ -45,8 +49,28 @@ export function PostWizardHeader({
         {isEditMode ? 'Edit Post' : 'New Moment'}
       </span>
 
-      {/* Post button */}
-      <div className="min-w-[72px] flex justify-end">
+      {/* Right side: Clock + Post button */}
+      <div className="min-w-[72px] flex items-center justify-end gap-1.5">
+        {/* Schedule clock icon — visible when composer has content */}
+        {isDirty && !isEditMode && onOpenSchedule && (
+          <button
+            onClick={onOpenSchedule}
+            className="w-9 h-9 rounded-full flex items-center justify-center active:scale-[0.90] transition-transform"
+            style={{
+              background: isScheduled ? 'rgba(245, 158, 11, 0.1)' : 'transparent',
+            }}
+            aria-label={isScheduled ? 'Change schedule' : 'Schedule post'}
+          >
+            <Clock
+              className="w-[19px] h-[19px]"
+              style={{
+                color: isScheduled ? '#f59e0b' : '#AEAEB2',
+              }}
+            />
+          </button>
+        )}
+
+        {/* Post / Schedule button */}
         <button
           onClick={onPost}
           disabled={!canPost || isSubmitting}

@@ -9,7 +9,7 @@ import type { StudioTool, StudioEdits } from '@/types/studio';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
-import { X, AlertTriangle, RefreshCw, Image, Camera, MapPin, UserPlus, Plus, Globe, ChevronDown } from 'lucide-react';
+import { X, AlertTriangle, RefreshCw, Image, Camera, MapPin, UserPlus, Plus, Globe, ChevronDown, Clock, FileText } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
 import { ErrorBoundary as ReactErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { PostWizardProps } from './types';
@@ -659,6 +659,8 @@ export function PostWizard({
               isSubmitting={state.isSubmitting}
               isEditMode={state.isEditMode}
               isScheduled={!!state.scheduledAt}
+              isDirty={state.isDirty}
+              onOpenSchedule={() => setShowScheduleSheet(true)}
             />
 
             {/* Scrollable Composer */}
@@ -807,6 +809,18 @@ export function PostWizard({
                 <div className="relative">
                   <ToolButton icon={UserPlus} onClick={() => { dismissFriendsTooltip(); setShowTagPeople(true); }} label="Tag Friends" />
                   <ToolbarTooltipBubble text="Tag friends or businesses" visible={showFriendsTooltip} />
+                </div>
+                {/* Drafts button */}
+                <div className="relative">
+                  <ToolButton icon={FileText} onClick={() => setShowDraftsSheet(true)} label="Drafts" />
+                  {drafts.length > 0 && (
+                    <span
+                      className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] rounded-full flex items-center justify-center text-[10px] font-bold text-white pointer-events-none"
+                      style={{ background: '#f59e0b' }}
+                    >
+                      {drafts.length}
+                    </span>
+                  )}
                 </div>
               </div>
               <CharacterRing current={countGraphemes(state.caption)} max={POST_LIMITS.MAX_CAPTION_LENGTH} />
