@@ -6442,6 +6442,7 @@ export type Database = {
           orientation: string | null
           original_media_url: string | null
           post_id: string
+          poster_timestamp: number | null
           poster_url: string | null
           processed_at: string | null
           processing_error: string | null
@@ -6472,6 +6473,7 @@ export type Database = {
           orientation?: string | null
           original_media_url?: string | null
           post_id: string
+          poster_timestamp?: number | null
           poster_url?: string | null
           processed_at?: string | null
           processing_error?: string | null
@@ -6502,6 +6504,7 @@ export type Database = {
           orientation?: string | null
           original_media_url?: string | null
           post_id?: string
+          poster_timestamp?: number | null
           poster_url?: string | null
           processed_at?: string | null
           processing_error?: string | null

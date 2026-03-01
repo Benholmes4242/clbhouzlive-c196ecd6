@@ -529,6 +529,13 @@ export function PostWizard({
     }});
   }, [state.mediaItems, dispatch]);
 
+  const handlePosterTimestampChange = useCallback((mediaIndex: number, timestamp: number | null) => {
+    dispatch({ type: 'UPDATE_MEDIA_ITEM', payload: {
+      id: state.mediaItems[mediaIndex]?.id,
+      updates: { posterTimestamp: timestamp },
+    }});
+  }, [state.mediaItems, dispatch]);
+
   const handleVisibilityChange = useCallback((visibility: 'anyone' | 'followers' | 'private') => {
     setVisibility(visibility);
   }, [setVisibility]);
@@ -1102,6 +1109,7 @@ export function PostWizard({
             onSetCover={(index) => setCoverIndex(index)}
             studioEditsByMediaId={state.studioEditsByMediaId}
             onTrimChange={handleTrimChange}
+            onPosterTimestampChange={handlePosterTimestampChange}
           />
         )}
       </AnimatePresence>

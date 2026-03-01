@@ -518,7 +518,8 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
           
           streamId = result.streamId;
           publicUrl = generateStreamHlsUrl(streamId);
-          posterUrl = generateStreamThumbnailUrl(streamId, { width: 1280, height: 720, time: 1 });
+          const posterTime = mediaItem?.posterTimestamp ?? 1;
+          posterUrl = generateStreamThumbnailUrl(streamId, { width: 1280, height: 720, time: posterTime });
           
           // Track for potential cleanup
           if (streamId) {
@@ -633,6 +634,8 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
             // Trim range (video only)
             trim_start: mediaItem?.trimStart ?? null,
             trim_end: mediaItem?.trimEnd ?? null,
+            // Poster frame timestamp
+            poster_timestamp: mediaItem?.posterTimestamp ?? null,
             // Include dimensions (works for both images and videos after TUS)
             ...(width && height && {
               width,
@@ -814,8 +817,9 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
             display_order: displayOrderOffset + idx,
             stream_id: item.restoredStreamId || null,
             poster_url: item.restoredStreamId 
-              ? generateStreamThumbnailUrl(item.restoredStreamId, { width: 1280, height: 720, time: 1 })
+              ? generateStreamThumbnailUrl(item.restoredStreamId, { width: 1280, height: 720, time: (item as any).posterTimestamp ?? 1 })
               : null,
+            poster_timestamp: (item as any).posterTimestamp ?? null,
             width: item.width || null,
             height: item.height || null,
             aspect_ratio: item.aspectRatio || null,
@@ -1076,7 +1080,8 @@ export async function retryFailedItems(jobId: string): Promise<boolean> {
         
         streamId = result.streamId;
         publicUrl = generateStreamHlsUrl(streamId);
-        posterUrl = generateStreamThumbnailUrl(streamId, { width: 1280, height: 720, time: 1 });
+        const retryPosterTime = mediaItem?.posterTimestamp ?? (mediaItem as any)?.posterTimestamp ?? 1;
+        posterUrl = generateStreamThumbnailUrl(streamId, { width: 1280, height: 720, time: retryPosterTime });
         uploadedStreamUids.push(streamId);
       } else {
         let fileToUpload = file;
@@ -1117,6 +1122,7 @@ export async function retryFailedItems(jobId: string): Promise<boolean> {
             filter_id: filterId,
             trim_start: mediaItem?.trimStart ?? null,
             trim_end: mediaItem?.trimEnd ?? null,
+            poster_timestamp: (mediaItem as any)?.posterTimestamp ?? null,
             ...(width && height && { width, height, aspect_ratio: aspectRatioVal, orientation }),
           })
           .eq('id', existingRowId);
@@ -1134,6 +1140,7 @@ export async function retryFailedItems(jobId: string): Promise<boolean> {
           filter_id: filterId,
           trim_start: mediaItem?.trimStart ?? null,
           trim_end: mediaItem?.trimEnd ?? null,
+          poster_timestamp: (mediaItem as any)?.posterTimestamp ?? null,
           ...(width && height && { width, height, aspect_ratio: aspectRatioVal, orientation }),
         });
       }
