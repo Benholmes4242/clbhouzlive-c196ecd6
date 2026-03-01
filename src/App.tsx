@@ -40,6 +40,7 @@ import { UploadToastsBridge } from '@/uploads/UploadToastsBridge';
 import UploadProgressBanner from '@/components/uploads/UploadProgressBanner';
 import GlobalBottomNavigation from '@/components/GlobalBottomNavigation';
 import { UploadResilienceProvider } from '@/contexts/UploadResilienceContext';
+import { useUploadGuard } from '@/hooks/useUploadGuard';
 import { FLAGS } from '@/config/flags';
 import { FEATURE_FLAGS } from '@/config/featureFlags';
 import { ClubhouseSkeleton } from '@/components/skeletons/ClubhouseSkeleton';
@@ -602,6 +603,9 @@ const AppInner: React.FC = () => {
   
   // Monitor global memory usage
   useGlobalMemoryMonitor(60000); // Check every minute
+  
+  // Warn on tab close during active uploads (P1-C)
+  useUploadGuard();
   
   // Track user presence for nearby golfers feature
   usePresenceTracker();

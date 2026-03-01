@@ -189,9 +189,9 @@ async function pollAndUpdateVideoMetadata(streamId: string, postMediaId: string)
     console.log(`[uploadPipeline] Starting metadata poll for streamId: ${streamId}, postMediaId: ${postMediaId}`);
     
     const metadata = await pollStreamMetadata(streamId, {
-      maxAttempts: 20, // 80 seconds max (4s intervals)
+      maxAttempts: 60, // 4 minutes max (4s intervals) — handles videos up to ~30 min
       intervalMs: 4000,
-      suppressRecoverableErrors: true, // Don't spam console for recoverable 429s
+      suppressRecoverableErrors: true,
     });
 
     if (metadata) {
@@ -216,7 +216,7 @@ async function pollAndUpdateReviewVideoMetadata(streamId: string, reviewMediaId:
     console.log(`[uploadPipeline] Starting review video metadata poll for streamId: ${streamId}, reviewMediaId: ${reviewMediaId}`);
     
     const metadata = await pollStreamMetadata(streamId, {
-      maxAttempts: 20, // 80 seconds max (4s intervals)
+      maxAttempts: 60, // 4 minutes max (4s intervals)
       intervalMs: 4000,
       suppressRecoverableErrors: true,
     });
@@ -1355,4 +1355,36 @@ export function retryJob(jobId: string): boolean {
   });
 
   return true;
+}
+
+/**
+ * Cancel an in-progress upload job.
+ * Cleans up the post row and any uploaded assets.
+ */
+export async function cancelJob(jobId: string): Promise<void> {
+  const job = uploadManager.getJob(jobId);
+  if (!job) return;
+
+  console.log(`[uploadPipeline] Cancelling job ${jobId}`);
+
+  // Clean up post row if created
+  if (job.postId) {
+    try {
+      await supabase.from('posts').delete().eq('id', job.postId);
+      console.log(`[uploadPipeline] Deleted post ${job.postId} from cancelled job`);
+    } catch (err) {
+      console.warn(`[uploadPipeline] Failed to delete post on cancel:`, err);
+    }
+  }
+
+  uploadManager.dismiss(jobId);
+  toast.success('Upload cancelled');
+}
+
+/**
+ * Check if there are any active (in-progress) uploads.
+ * Used for the beforeunload tab-close warning.
+ */
+export function hasActiveUploads(): boolean {
+  return uploadManager.getPendingJobs().length > 0;
 }

@@ -65,10 +65,10 @@ export function MediaStep({
     prevMediaCountRef.current = media.length;
   }, [media.length]);
 
-  const handleFilesFromPicker = useCallback((files: File[]) => {
+  const handleFilesFromPicker = useCallback(async (files: File[]) => {
     if (files.length === 0) return;
     
-    const validFiles = validateMediaFiles(files);
+    const validFiles = await validateMediaFiles(files);
     if (validFiles.length === 0) return;
     
     const remainingSlots = MAX_MEDIA_ITEMS - media.length;

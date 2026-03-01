@@ -6,12 +6,15 @@ export const POST_LIMITS = {
   MAX_MEDIA_COUNT: 10,
   /** Maximum caption length in characters */
   MAX_CAPTION_LENGTH: 2200,
-  /** Maximum video file size in bytes (1GB) */
-  MAX_VIDEO_SIZE_BYTES: 1024 * 1024 * 1024,
-  /** Maximum image file size in bytes (10MB) */
-  MAX_IMAGE_SIZE_BYTES: 10 * 1024 * 1024,
+  /** Maximum video file size in bytes (4GB) — comfortably under CF Stream's 30GB */
+  MAX_VIDEO_SIZE_BYTES: 4 * 1024 * 1024 * 1024,
+  MAX_VIDEO_SIZE_DISPLAY: '4GB',
+  /** Maximum image file size in bytes (50MB) — generous for RAW/HEIC */
+  MAX_IMAGE_SIZE_BYTES: 50 * 1024 * 1024,
+  MAX_IMAGE_SIZE_DISPLAY: '50MB',
   /** Maximum video duration in seconds (1 hour) */
   MAX_VIDEO_DURATION_SECONDS: 3600,
+  MAX_VIDEO_DURATION_DISPLAY: '1 hour',
   /** Auto-save interval in milliseconds (30 seconds) */
   AUTO_SAVE_INTERVAL_MS: 30000,
   /** Maximum number of tags per post */
@@ -31,12 +34,14 @@ export const ALLOWED_IMAGE_TYPES = [
   'image/png',
   'image/webp',
   'image/heic',
+  'image/heif',
+  'image/gif',
 ] as const;
 
 /**
  * Format bytes to human readable string
  */
-function formatBytes(bytes: number): string {
+export function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
   if (bytes < 1024 * 1024 * 1024) return `${Math.round(bytes / (1024 * 1024))} MB`;
@@ -46,7 +51,7 @@ function formatBytes(bytes: number): string {
 /**
  * Format duration to human readable string
  */
-function formatDuration(seconds: number): string {
+export function formatDuration(seconds: number): string {
   if (seconds < 60) return `${Math.round(seconds)} seconds`;
   if (seconds < 3600) return `${Math.round(seconds / 60)} minutes`;
   return `${(seconds / 3600).toFixed(1)} hours`;
@@ -75,21 +80,19 @@ export function validateMediaFile(
       };
     }
     
-    // Check video size (1GB limit)
     if (file.size > POST_LIMITS.MAX_VIDEO_SIZE_BYTES) {
       const sizeMB = formatBytes(file.size);
       return { 
         valid: false, 
-        error: `Video too large (${sizeMB}). Maximum is 1GB.` 
+        error: `Video too large (${sizeMB}). Maximum is ${POST_LIMITS.MAX_VIDEO_SIZE_DISPLAY}.` 
       };
     }
     
-    // Check video duration (1 hour limit)
     if (videoDuration && videoDuration > POST_LIMITS.MAX_VIDEO_DURATION_SECONDS) {
       const durationStr = formatDuration(videoDuration);
       return { 
         valid: false, 
-        error: `Video too long (${durationStr}). Maximum is 1 hour.` 
+        error: `Video too long (${durationStr}). Maximum is ${POST_LIMITS.MAX_VIDEO_DURATION_DISPLAY}.` 
       };
     }
   } else if (isImage) {
@@ -97,16 +100,15 @@ export function validateMediaFile(
     if (!allowedTypes.includes(file.type)) {
       return { 
         valid: false, 
-        error: `Unsupported image format. Use JPEG, PNG, WebP, or HEIC.` 
+        error: `Unsupported image format. Use JPEG, PNG, WebP, HEIC, or GIF.` 
       };
     }
     
-    // Check image size (10MB limit)
     if (file.size > POST_LIMITS.MAX_IMAGE_SIZE_BYTES) {
       const sizeMB = formatBytes(file.size);
       return { 
         valid: false, 
-        error: `Image too large (${sizeMB}). Maximum is 10MB.` 
+        error: `Image too large (${sizeMB}). Maximum is ${POST_LIMITS.MAX_IMAGE_SIZE_DISPLAY}.` 
       };
     }
   } else {
