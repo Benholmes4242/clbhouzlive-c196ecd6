@@ -211,6 +211,7 @@ export default function ScheduleSheet({
                     value={selectedHour}
                     onChange={(e) => setSelectedHour(parseInt(e.target.value))}
                     className="flex-1 h-14 rounded-xl bg-card border border-border text-center text-2xl font-semibold text-foreground appearance-none cursor-pointer focus:border-primary focus:ring-1 focus:ring-primary/30 outline-none transition-all"
+                    style={{ textAlign: 'center', textAlignLast: 'center' }}
                   >
                     {Array.from({ length: 24 }, (_, i) => (
                       <option key={i} value={i}>
@@ -226,6 +227,7 @@ export default function ScheduleSheet({
                     value={selectedMinute}
                     onChange={(e) => setSelectedMinute(parseInt(e.target.value))}
                     className="flex-1 h-14 rounded-xl bg-card border border-border text-center text-2xl font-semibold text-foreground appearance-none cursor-pointer focus:border-primary focus:ring-1 focus:ring-primary/30 outline-none transition-all"
+                    style={{ textAlign: 'center', textAlignLast: 'center' }}
                   >
                     {[0, 15, 30, 45].map(m => (
                       <option key={m} value={m}>
