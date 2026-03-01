@@ -96,7 +96,7 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
   const nextPlayerRef = useRef<UnifiedVideoPlayerRef>(null);
   // CHANGE 5: Use GlobalAudioContext as single source of truth for mute state.
   // Previously used useMediaSystemSafe().isMuted which is a separate, unsynchronised system.
-  const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
+  const { isGloballyMuted, setGlobalMute, markUserGestureUnmute } = useGlobalAudio();
   const { pauseAll } = useMediaSystemSafe();
   
   const currentItem = items[currentIndex];
@@ -148,6 +148,7 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
         case 'm':
         case 'M':
           runtimeUserMute();
+          if (isGloballyMuted) markUserGestureUnmute();
           setGlobalMute(!isGloballyMuted);
           break;
         case ' ':
@@ -331,6 +332,7 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
         <button
           onClick={() => {
             runtimeUserMute();
+            if (isGloballyMuted) markUserGestureUnmute();
             setGlobalMute(!isGloballyMuted);
           }}
           className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-black/65 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white hover:bg-black/80 transition-colors"

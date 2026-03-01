@@ -36,7 +36,7 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const hlsRef = useRef<any>(null);
   const { register, requestPlay, requestUnmute } = useSheetPlayback();
-  const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
+  const { isGloballyMuted, toggleGlobalMute, markUserGestureUnmute } = useGlobalAudio();
   const id = React.useId();
   
   const [playing, setPlaying] = useState(false);
@@ -217,12 +217,13 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
 
   const handleMuteToggle = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
+    if (isGloballyMuted) markUserGestureUnmute();
     toggleGlobalMute();
     // Immediately sync to video element
     if (videoRef.current) {
       videoRef.current.muted = !isGloballyMuted;
     }
-  }, [toggleGlobalMute, isGloballyMuted]);
+  }, [toggleGlobalMute, isGloballyMuted, markUserGestureUnmute]);
 
   // Sync global mute state to video element
   useEffect(() => {

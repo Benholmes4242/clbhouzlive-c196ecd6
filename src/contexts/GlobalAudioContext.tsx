@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo, useRef } from 'react';
 
 interface GlobalAudioContextType {
   isGloballyMuted: boolean;
@@ -7,6 +7,8 @@ interface GlobalAudioContextType {
   activeVideoId: string | null;
   setActiveVideo: (videoId: string | null) => void;
   isVideoActive: (videoId: string) => boolean;
+  markUserGestureUnmute: () => void;
+  isRecentUserGesture: () => boolean;
 }
 
 // Provide stable default context to prevent hook order issues
@@ -17,6 +19,8 @@ const defaultContext: GlobalAudioContextType = {
   activeVideoId: null,
   setActiveVideo: () => {},
   isVideoActive: () => false,
+  markUserGestureUnmute: () => {},
+  isRecentUserGesture: () => false,
   // Flag to detect when default context is being used
   __isDefault: true
 } as GlobalAudioContextType & { __isDefault?: boolean };
@@ -42,12 +46,11 @@ export const GlobalAudioProvider: React.FC<{ children: React.ReactNode }> = ({ c
   // Track which video is currently playing audio
   const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
 
+  // Track user gesture unmute to protect against autoplay-muted-fallback override
+  const userGestureUnmuteRef = useRef<number>(0);
+
   // Save state to sessionStorage whenever it changes
   useEffect(() => {
-    console.log('[MUTE-DEBUG] GlobalAudioContext sessionStorage write', {
-      isGloballyMuted,
-      timestamp: performance.now().toFixed(1),
-    });
     try {
       sessionStorage.setItem(AUDIO_STATE_KEY, JSON.stringify(isGloballyMuted));
     } catch {
@@ -65,15 +68,7 @@ export const GlobalAudioProvider: React.FC<{ children: React.ReactNode }> = ({ c
   }, []);
 
   const toggleGlobalMute = useCallback(() => {
-    setIsGloballyMuted(prev => {
-      const newVal = !prev;
-      console.log('[MUTE-DEBUG] GlobalAudioContext toggleGlobalMute', {
-        prev,
-        newVal,
-        timestamp: performance.now().toFixed(1),
-      });
-      return newVal;
-    });
+    setIsGloballyMuted(prev => !prev);
   }, []);
 
   const setActiveVideo = useCallback((videoId: string | null) => {
@@ -84,6 +79,14 @@ export const GlobalAudioProvider: React.FC<{ children: React.ReactNode }> = ({ c
     return activeVideoId === videoId;
   }, [activeVideoId]);
 
+  const markUserGestureUnmute = useCallback(() => {
+    userGestureUnmuteRef.current = Date.now();
+  }, []);
+
+  const isRecentUserGesture = useCallback(() => {
+    return Date.now() - userGestureUnmuteRef.current < 2000;
+  }, []);
+
   const value = useMemo(
     () => ({
       isGloballyMuted,
@@ -91,9 +94,11 @@ export const GlobalAudioProvider: React.FC<{ children: React.ReactNode }> = ({ c
       toggleGlobalMute,
       activeVideoId,
       setActiveVideo,
-      isVideoActive
+      isVideoActive,
+      markUserGestureUnmute,
+      isRecentUserGesture
     }),
-    [isGloballyMuted, setGlobalMute, toggleGlobalMute, activeVideoId, setActiveVideo, isVideoActive]
+    [isGloballyMuted, setGlobalMute, toggleGlobalMute, activeVideoId, setActiveVideo, isVideoActive, markUserGestureUnmute, isRecentUserGesture]
   );
 
   return (

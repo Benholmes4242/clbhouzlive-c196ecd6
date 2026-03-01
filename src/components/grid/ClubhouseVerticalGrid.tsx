@@ -223,7 +223,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { isGloballyMuted, setGlobalMute, setActiveVideo } = useGlobalAudio();
+  const { isGloballyMuted, setGlobalMute, setActiveVideo, isRecentUserGesture, markUserGestureUnmute } = useGlobalAudio();
   const queryClient = useQueryClient();
   
   const PORTRAIT_MIN_AR = 1.2;
@@ -489,13 +489,13 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
   // This listener keeps the React UI icon in sync with the actual audio state.
   useEffect(() => {
     const handleForcedMute = () => {
-      if (!isGloballyMuted) {
+      if (!isGloballyMuted && !isRecentUserGesture()) {
         setGlobalMute(true);
       }
     };
     window.addEventListener('autoplay-muted-fallback', handleForcedMute);
     return () => window.removeEventListener('autoplay-muted-fallback', handleForcedMute);
-  }, [isGloballyMuted, setGlobalMute]);
+  }, [isGloballyMuted, setGlobalMute, isRecentUserGesture]);
 
   // FIX #1: Sync activeVideoId with GlobalAudioContext when currentIndex changes
   // This ensures non-prefetched videos respect the global mute state
@@ -1299,6 +1299,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
             }}
             onMuteToggle={() => {
               const newMuted = !isGloballyMuted;
+              if (!newMuted) markUserGestureUnmute();
               // Update global state (drives all future renders via prop)
               setGlobalMute(newMuted);
               // Synchronous DOM mutation — takes effect immediately within the gesture call stack,
@@ -1395,7 +1396,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
             isOwnPost={currentPost.user?.id === user?.id}
             isVisible={true}
             onFollow={handleFollowToggle}
-            onMusicTap={() => setGlobalMute(!isGloballyMuted)}
+            onMusicTap={() => { if (isGloballyMuted) markUserGestureUnmute(); setGlobalMute(!isGloballyMuted); }}
             // Review mode props
             isReview={isReview}
             reviewData={reviewData}

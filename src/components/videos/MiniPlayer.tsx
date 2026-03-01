@@ -32,7 +32,7 @@ const PROGRESS_THROTTLE_MS = 5000;
  */
 export const MiniPlayer: React.FC = () => {
   const context = useVideoPlaybackSafe();
-  const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
+  const { isGloballyMuted, toggleGlobalMute, markUserGestureUnmute } = useGlobalAudio();
   
   const videoElRef = useRef<UnifiedVideoPlayerRef>(null);
   const pendingSeekRef = useRef<number | null>(null);
@@ -292,8 +292,9 @@ export const MiniPlayer: React.FC = () => {
 
   const handleMuteToggle = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
+    if (isGloballyMuted) markUserGestureUnmute();
     toggleGlobalMute();
-  }, [toggleGlobalMute]);
+  }, [toggleGlobalMute, isGloballyMuted, markUserGestureUnmute]);
 
   // Handle video ended - advance to next in queue
   const handleEnded = useCallback(() => {

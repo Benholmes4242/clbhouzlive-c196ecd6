@@ -209,7 +209,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
 
   const { user } = useSupabaseSession();
   const isMobile = useIsMobile();
-  const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
+  const { isGloballyMuted, setGlobalMute, markUserGestureUnmute } = useGlobalAudio();
   const { deletePost } = usePostDeletion();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [commentsModalOpen, setCommentsModalOpen] = useState(false);
@@ -489,8 +489,9 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   });
 
   const toggleGlobalMute = useCallback(() => {
+    if (isGloballyMuted) markUserGestureUnmute();
     setGlobalMute(!isGloballyMuted);
-  }, [isGloballyMuted, setGlobalMute]);
+  }, [isGloballyMuted, setGlobalMute, markUserGestureUnmute]);
 
   const handleLike = useCallback((postId: string) => {
     if (!user?.id) return;

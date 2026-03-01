@@ -24,7 +24,7 @@ const MOBILE_QUERY = '(pointer: coarse), (hover: none)';
 const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, className = '' }) => {
   const { highlights, isLoading, error } = useTop100Highlights(userId);
   const railRef = useRef<HTMLDivElement>(null);
-  const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
+  const { isGloballyMuted, toggleGlobalMute, markUserGestureUnmute } = useGlobalAudio();
   const [activeIndex, setActiveIndex] = useState(0);
   const { openFullscreen } = useUnifiedFullscreen('explore');
 
@@ -195,7 +195,7 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
                 <button
                   className="unmute-btn"
                   aria-label={isGloballyMuted ? 'Unmute' : 'Mute'}
-                  onClick={(e) => { e.stopPropagation(); toggleGlobalMute(); }}
+                  onClick={(e) => { e.stopPropagation(); if (isGloballyMuted) markUserGestureUnmute(); toggleGlobalMute(); }}
                   title={isGloballyMuted ? 'Unmute' : 'Mute'}
                 >
                   {isGloballyMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}

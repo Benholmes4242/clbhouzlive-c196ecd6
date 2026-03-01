@@ -124,10 +124,11 @@ const EngagementRail = ({
 }: EngagementRailProps) => {
   const isMobile = useIsMobile();
   const gap = isMobile ? 'gap-4' : 'gap-5'; // 16px mobile, 20px desktop
-  const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
+  const { isGloballyMuted, toggleGlobalMute, markUserGestureUnmute } = useGlobalAudio();
   const [railVisible, setRailVisible] = useState(false);
 
   const handleAudioToggle = () => {
+    if (isGloballyMuted) markUserGestureUnmute();
     toggleGlobalMute();
   };
 

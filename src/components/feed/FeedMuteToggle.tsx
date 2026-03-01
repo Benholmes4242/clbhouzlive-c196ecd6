@@ -23,7 +23,7 @@ const FeedMuteToggle: React.FC<FeedMuteToggleProps> = ({
   isVideoPost = false,
   postHasMusic = false 
 }) => {
-  const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
+  const { isGloballyMuted, toggleGlobalMute, markUserGestureUnmute } = useGlobalAudio();
 
   // Only show for video posts
   if (!isVideoPost) {
@@ -31,6 +31,7 @@ const FeedMuteToggle: React.FC<FeedMuteToggleProps> = ({
   }
 
   const handleToggle = () => {
+    if (isGloballyMuted) markUserGestureUnmute();
     toggleGlobalMute();
   };
 

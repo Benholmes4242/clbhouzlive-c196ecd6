@@ -50,7 +50,7 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
   const [showPosterPicker, setShowPosterPicker] = useState(false);
 
   // Fix 4: Use GlobalAudioContext for persistent mute state
-  const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
+  const { isGloballyMuted, toggleGlobalMute, markUserGestureUnmute } = useGlobalAudio();
 
   // Time readout state for video scrub bar
   const [videoTime, setVideoTime] = useState<{ current: number; duration: number }>({ current: 0, duration: 0 });
@@ -65,14 +65,6 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
 
   // Pause non-active videos & play active one on slide change
   useEffect(() => {
-    console.log('[MUTE-DEBUG] slide-change useEffect FIRED', {
-      currentIndex,
-      isGloballyMuted,
-      refTarget: videoRef.current ? `<video src="${videoRef.current.src?.slice(-40)}">` : 'NULL',
-      refMuted: videoRef.current?.muted,
-      timestamp: performance.now().toFixed(1),
-    });
-
     setIsPlaying(true);
     setShowPlayIcon(false);
     setShowTrimmer(false);
@@ -91,12 +83,6 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
     if (videoRef.current && videoRef.current.paused) {
       videoRef.current.play().catch(() => {});
     }
-
-    console.log('[MUTE-DEBUG] slide-change after play()', {
-      refMuted: videoRef.current?.muted,
-      refPaused: videoRef.current?.paused,
-      isGloballyMuted,
-    });
   }, [currentIndex]);
 
   // Release decoder on viewer close
@@ -208,135 +194,36 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
 
   const toggleMute = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    const preToggleGlobal = isGloballyMuted;
-    const preToggleDOM = videoRef.current?.muted;
-    const preToggleVolume = videoRef.current?.volume;
-    const refTarget = videoRef.current ? `<video src="${videoRef.current.src?.slice(-40)}">` : 'NULL';
-
-    console.log('[MUTE-DEBUG] toggleMute FIRED', {
-      preToggleGlobal,
-      preToggleDOM,
-      preToggleVolume,
-      refTarget,
-      currentIndex,
-      eventType: e.type,
-      eventTarget: (e.target as HTMLElement)?.tagName,
-      timestamp: performance.now().toFixed(1),
-    });
-
     const newMuted = !isGloballyMuted;
+
+    // Protect unmute from being overridden by autoplay-muted-fallback
+    if (!newMuted) {
+      markUserGestureUnmute();
+    }
+
     toggleGlobalMute();
 
     // Immediately sync DOM — don't wait for React re-render
     if (videoRef.current) {
       videoRef.current.muted = newMuted;
-      console.log('[MUTE-DEBUG] toggleMute DOM SET', {
-        setTo: newMuted,
-        actualAfterSet: videoRef.current.muted,
-        match: videoRef.current.muted === newMuted,
-      });
       // iOS requires play() within user gesture when unmuting
       if (!newMuted) {
-        videoRef.current.play().catch((err) => {
-          console.log('[MUTE-DEBUG] toggleMute play() REJECTED', err.message);
-        });
+        videoRef.current.play().catch(() => {});
       }
-    } else {
-      console.log('[MUTE-DEBUG] toggleMute videoRef.current is NULL — cannot set DOM');
     }
-  }, [toggleGlobalMute, isGloballyMuted, currentIndex]);
+  }, [toggleGlobalMute, isGloballyMuted, markUserGestureUnmute]);
 
   // Fix React muted attribute bug — React doesn't update video.muted after mount
   // currentIndex included so new video elements get synced on slide change
   useEffect(() => {
-    const domBefore = videoRef.current?.muted;
-    const refTarget = videoRef.current ? `<video src="${videoRef.current.src?.slice(-40)}">` : 'NULL';
-
-    console.log('[MUTE-DEBUG] muted-sync useEffect FIRED', {
-      isGloballyMuted,
-      currentIndex,
-      domBefore,
-      refTarget,
-      timestamp: performance.now().toFixed(1),
-    });
-
     if (videoRef.current) {
       videoRef.current.muted = isGloballyMuted;
-      console.log('[MUTE-DEBUG] muted-sync useEffect DOM SET', {
-        setTo: isGloballyMuted,
-        actualAfterSet: videoRef.current.muted,
-        match: videoRef.current.muted === isGloballyMuted,
-      });
       // If user has unmuted, ensure the new video plays with audio
       if (!isGloballyMuted) {
-        videoRef.current.play().catch((err) => {
-          console.log('[MUTE-DEBUG] muted-sync play() REJECTED', err.message);
-        });
+        videoRef.current.play().catch(() => {});
       }
-    } else {
-      console.log('[MUTE-DEBUG] muted-sync useEffect videoRef.current is NULL');
     }
   }, [isGloballyMuted, currentIndex]);
-
-  // Debug: video event listeners for mute state tracking
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const onVolumeChange = () => {
-      console.log('[MUTE-DEBUG] VIDEO EVENT volumechange', {
-        muted: video.muted,
-        volume: video.volume,
-        currentIndex,
-        isGloballyMuted,
-        timestamp: performance.now().toFixed(1),
-        stack: new Error().stack?.split('\n').slice(1, 4).join(' | '),
-      });
-    };
-
-    const onPlay = () => {
-      console.log('[MUTE-DEBUG] VIDEO EVENT play', {
-        muted: video.muted,
-        volume: video.volume,
-        timestamp: performance.now().toFixed(1),
-      });
-    };
-
-    const onPause = () => {
-      console.log('[MUTE-DEBUG] VIDEO EVENT pause', {
-        muted: video.muted,
-        timestamp: performance.now().toFixed(1),
-      });
-    };
-
-    video.addEventListener('volumechange', onVolumeChange);
-    video.addEventListener('play', onPlay);
-    video.addEventListener('pause', onPause);
-
-    console.log('[MUTE-DEBUG] Video listeners ATTACHED', {
-      src: video.src?.slice(-40),
-      muted: video.muted,
-      currentIndex,
-    });
-
-    return () => {
-      video.removeEventListener('volumechange', onVolumeChange);
-      video.removeEventListener('play', onPlay);
-      video.removeEventListener('pause', onPause);
-      console.log('[MUTE-DEBUG] Video listeners DETACHED');
-    };
-  }, [currentIndex, isGloballyMuted]);
-
-  // Debug: icon render state
-  const debugIconState = (() => {
-    console.log('[MUTE-DEBUG] RENDER icon', {
-      isGloballyMuted,
-      showingIcon: isGloballyMuted ? 'VolumeX (muted)' : 'Volume2 (unmuted)',
-      currentIndex,
-      timestamp: performance.now().toFixed(1),
-    });
-    return null;
-  })();
 
   if (!item) return null;
 
@@ -433,12 +320,13 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
         </div>
       </div>
 
-      {/* Media canvas */}
+      {/* Media area */}
       <div
-        className="flex-1 relative overflow-hidden min-h-0"
+        className="flex-1 relative overflow-hidden"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
+        onClick={item.type === 'video' ? togglePlayback : undefined}
       >
         {[-1, 0, 1].map(offset => {
           const idx = currentIndex + offset;
@@ -459,16 +347,15 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
               className="absolute inset-0 flex items-center justify-center preview-viewer-slide"
               style={{
                 transform: `translateX(calc(${offset * 100}% + ${isSwiping ? swipeOffset : 0}px))`,
-                transition: isSwiping ? 'none' : 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+                transition: isSwiping ? 'none' : 'transform 0.3s ease-out',
                 willChange: 'transform',
-                zIndex: isActive ? 2 : 1,
+                zIndex: isActive ? 1 : 0,
               }}
             >
               <div className={cn('relative w-full h-full flex items-center justify-center', slideCropClass)}>
                 {slideItem.type === 'video' ? (
                   <div
                     className="relative w-full h-full flex items-center justify-center"
-                    onClick={isActive ? togglePlayback : undefined}
                   >
                     <video
                       ref={isActive ? videoRef : undefined}
@@ -493,27 +380,19 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
                             initial={{ opacity: 0, scale: 0.5 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.5 }}
-                            transition={{ duration: 0.3 }}
                             className="absolute inset-0 flex items-center justify-center pointer-events-none"
                           >
-                            <div
-                              className="w-16 h-16 rounded-full flex items-center justify-center"
-                              style={{
-                                background: 'rgba(0,0,0,0.5)',
-                                backdropFilter: 'blur(12px)',
-                              }}
-                            >
+                            <div className="w-16 h-16 rounded-full bg-black/50 flex items-center justify-center">
                               {isPlaying ? (
-                                <Pause className="w-7 h-7 text-white" fill="white" />
+                                <Pause className="w-8 h-8 text-white" />
                               ) : (
-                                <Play className="w-7 h-7 text-white ml-1" fill="white" />
+                                <Play className="w-8 h-8 text-white ml-1" />
                               )}
                             </div>
                           </motion.div>
                         )}
                       </AnimatePresence>
                     )}
-
 
                     {/* Text overlays — only on active slide */}
                     {isActive && slideEdits?.textOverlays && slideEdits.textOverlays.length > 0 && (
