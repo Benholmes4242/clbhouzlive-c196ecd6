@@ -205,6 +205,7 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
       exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
       className="fixed inset-0 z-[10002] flex flex-col bg-black"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -214,7 +215,7 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
         {/* Floating controls overlay — sits ON TOP of media */}
         <div
           className="absolute inset-x-0 top-0 z-10 pointer-events-none"
-          style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 48px)' }}
+          style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 44px)' }}
         >
           <div
             className="absolute inset-x-0 top-0"
@@ -433,29 +434,33 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
 
       {/* Video trimmer — between video and scrubber */}
       {item.type === 'video' && showTrimmer && (
-        <VideoTrimmer
-          videoUrl={item.previewUrl}
-          duration={item.duration || 0}
-          onTrimChange={(trimStart, trimEnd) => {
-            onTrimChange?.(currentIndex, trimStart, trimEnd);
-          }}
-          initialStart={item.trimStart ?? undefined}
-          initialEnd={item.trimEnd ?? undefined}
-        />
+        <div className="flex-shrink-0 overflow-y-auto" style={{ maxHeight: '35vh' }}>
+          <VideoTrimmer
+            videoUrl={item.previewUrl}
+            duration={item.duration || 0}
+            onTrimChange={(trimStart, trimEnd) => {
+              onTrimChange?.(currentIndex, trimStart, trimEnd);
+            }}
+            initialStart={item.trimStart ?? undefined}
+            initialEnd={item.trimEnd ?? undefined}
+          />
+        </div>
       )}
 
       {/* Poster frame picker — mutually exclusive with trimmer */}
       {item.type === 'video' && showPosterPicker && (
-        <PosterFramePicker
-          videoUrl={item.previewUrl}
-          duration={item.duration || 0}
-          onSelect={(timestamp) => {
-            onPosterTimestampChange?.(currentIndex, timestamp);
-          }}
-          initialTime={item.posterTimestamp ?? undefined}
-          trimStart={item.trimStart}
-          trimEnd={item.trimEnd}
-        />
+        <div className="flex-shrink-0 overflow-y-auto" style={{ maxHeight: '35vh' }}>
+          <PosterFramePicker
+            videoUrl={item.previewUrl}
+            duration={item.duration || 0}
+            onSelect={(timestamp) => {
+              onPosterTimestampChange?.(currentIndex, timestamp);
+            }}
+            initialTime={item.posterTimestamp ?? undefined}
+            trimStart={item.trimStart}
+            trimEnd={item.trimEnd}
+          />
+        </div>
       )}
 
       {/* Video scrubber + time readout — above dots, only for videos */}
@@ -481,7 +486,7 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
       {items.length > 1 && (
         <div
           className="flex items-center justify-center gap-1.5 pt-3 flex-shrink-0"
-          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 32px)' }}
+          style={{ paddingBottom: '32px' }}
         >
           {items.map((_, idx) => (
             <button
@@ -499,7 +504,7 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
 
       {/* Bottom safe area spacer when no dots */}
       {items.length <= 1 && (
-        <div className="flex-shrink-0" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }} />
+        <div className="flex-shrink-0" style={{ paddingBottom: '24px' }} />
       )}
     </motion.div>
   );
