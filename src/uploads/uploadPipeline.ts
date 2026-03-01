@@ -346,8 +346,8 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
       badges: job.badges || [],
       // Scheduling support
       scheduledAt: job.scheduledAt || null,
-      // Create with 'uploading' status - will be updated to 'published' after media uploads complete
-      status: job.scheduledAt ? 'scheduled' : 'uploading',
+      // Always start as 'uploading' — set 'published' or 'scheduled' only in finalizePost after all media uploaded
+      status: 'uploading',
     });
 
     const postId = postData.id;
@@ -913,8 +913,24 @@ async function finalizePost(jobId: string, postId: string, job: any, uploadedStr
     await markStreamAssetsAttached(uploadedStreamUids, postId);
   }
 
-  // Update post status to 'published' (or keep 'scheduled' for scheduled posts)
-  if (!job.scheduledAt) {
+  // Update post status to 'published' or 'scheduled'
+  if (job.scheduledAt) {
+    const { error: statusError } = await supabase
+      .from('posts')
+      .update({
+        status: 'scheduled',
+        scheduled_at: job.scheduledAt instanceof Date
+          ? job.scheduledAt.toISOString()
+          : job.scheduledAt,
+      })
+      .eq('id', postId);
+    
+    if (statusError) {
+      console.warn('[uploadPipeline] Failed to update post status to scheduled:', statusError);
+    } else {
+      console.log(`[uploadPipeline] Post ${postId} now scheduled`);
+    }
+  } else {
     const { error: statusError } = await supabase
       .from('posts')
       .update({ status: 'published' })

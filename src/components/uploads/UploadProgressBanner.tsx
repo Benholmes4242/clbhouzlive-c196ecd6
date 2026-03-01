@@ -259,21 +259,30 @@ function UploadProgressItem({ upload, onDismiss, onRetry, onCancel }: UploadProg
 
           {/* Partial failure actions */}
           {isPartialFailure && (
-            <>
-              <button
-                onClick={onRetry}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors"
-              >
-                <RotateCcw className="h-3 w-3" />
-                Retry failed
-              </button>
+            upload.hasFiles !== false ? (
+              <>
+                <button
+                  onClick={onRetry}
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors"
+                >
+                  <RotateCcw className="h-3 w-3" />
+                  Retry failed
+                </button>
+                <button
+                  onClick={onCancel}
+                  className="px-2 py-1 rounded-full text-xs font-medium text-muted-foreground hover:bg-muted/50 transition-colors"
+                >
+                  Discard
+                </button>
+              </>
+            ) : (
               <button
                 onClick={onCancel}
                 className="px-2 py-1 rounded-full text-xs font-medium text-muted-foreground hover:bg-muted/50 transition-colors"
               >
-                Discard
+                Dismiss
               </button>
-            </>
+            )
           )}
 
           {/* Retry button — visible on failure if files are still available */}
@@ -331,8 +340,10 @@ function UploadProgressItem({ upload, onDismiss, onRetry, onCancel }: UploadProg
       {/* Details row */}
       <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
         <span className="truncate max-w-[200px]">
-          {isPartialFailure
-            ? `${upload.failedFiles} file${(upload.failedFiles || 0) !== 1 ? 's' : ''} failed — tap Retry to try again`
+        {isPartialFailure
+            ? (upload.hasFiles !== false
+              ? `${upload.failedFiles} file${(upload.failedFiles || 0) !== 1 ? 's' : ''} failed — tap Retry to try again`
+              : 'Upload interrupted — please create the post again')
             : upload.fileName}
         </span>
         <div className="flex items-center gap-3">
