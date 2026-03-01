@@ -376,11 +376,14 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
                             exit={{ opacity: 0, scale: 0.5 }}
                             className="absolute inset-0 flex items-center justify-center pointer-events-none"
                           >
-                            <div className="w-16 h-16 rounded-full bg-black/50 flex items-center justify-center">
+                            <div 
+                              className="w-12 h-12 rounded-full flex items-center justify-center"
+                              style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(24px) saturate(180%)', border: '1px solid rgba(255,255,255,0.15)', boxShadow: '0 8px 32px rgba(0,0,0,0.35)' }}
+                            >
                               {isPlaying ? (
-                                <Pause className="w-8 h-8 text-white" />
+                                <Pause className="w-5 h-5 text-white" fill="white" />
                               ) : (
-                                <Play className="w-8 h-8 text-white ml-1" />
+                                <Play className="w-5 h-5 text-white ml-0.5" fill="white" />
                               )}
                             </div>
                           </motion.div>
