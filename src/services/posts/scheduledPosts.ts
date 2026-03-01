@@ -16,6 +16,8 @@ export interface ScheduledPostMedia {
   filterId?: string | null;
   studioEdits?: any | null;
   streamId?: string | null;
+  trimStart?: number | null;
+  trimEnd?: number | null;
 }
 
 export interface ScheduledPost {
@@ -97,6 +99,8 @@ export async function fetchScheduledPosts(): Promise<ScheduledPost[]> {
       filterId: m.filter_id,
       studioEdits: m.studio_edits,
       streamId: m.stream_id,
+      trimStart: m.trim_start,
+      trimEnd: m.trim_end,
     })).sort((a: any, b: any) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0)),
   }));
 }
@@ -155,6 +159,8 @@ export async function fetchScheduledPostForEdit(postId: string): Promise<Schedul
       filterId: m.filter_id,
       studioEdits: m.studio_edits,
       streamId: m.stream_id,
+      trimStart: m.trim_start,
+      trimEnd: m.trim_end,
     })).sort((a: any, b: any) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0)),
     course: data.golf_courses ? {
       id: data.golf_courses.id,
