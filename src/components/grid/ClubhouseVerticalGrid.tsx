@@ -34,7 +34,7 @@ import { useSoftResume } from '@/hooks/useSoftResume';
 import { Top100OverlayPills } from '@/components/clubhouse/Top100OverlayPills';
 import { Squircle } from '@/components/ui/squircle';
 import { CinematicActionRail, CreatorCapsule, CommentsPage } from '@/components/clubhouse/cinematic';
-
+import { VideoScrubber } from '@/components/video/VideoScrubber';
 
 import { useVerticalFeedLogic } from './hooks/useVerticalFeedLogic';
 import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
@@ -233,7 +233,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     } catch { return true; }
   })());
   const [isMutedState, setIsMutedState] = useState<boolean>(isMutedRef.current);
-  const [videoProgress, setVideoProgress] = useState(0);
   const queryClient = useQueryClient();
   
   const PORTRAIT_MIN_AR = 1.2;
@@ -508,45 +507,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
         }
       }
     }
-  }, [currentIndex, filteredPosts]);
-
-  // Track video playback progress for inline scrubber
-  useEffect(() => {
-    let rafId: number;
-    const tick = () => {
-      const currentPostId = filteredPosts[currentIndex]?.id;
-      if (currentPostId) {
-        let videoEl: HTMLVideoElement | null = videoRefs.current[currentPostId] || null;
-        
-        // If ref isn't a video element, try to find one in the DOM for this post
-        if (videoEl && !(videoEl instanceof HTMLVideoElement)) {
-          videoEl = (videoEl as any).querySelector?.('video') || null;
-        }
-        
-        if (videoEl) {
-          const duration = videoEl.duration;
-          const currentTime = videoEl.currentTime;
-          
-          // Handle HLS streams where duration may be Infinity, NaN, or 0
-          if (duration && isFinite(duration) && duration > 0 && currentTime >= 0) {
-            setVideoProgress(currentTime / duration);
-          } else if (videoEl.buffered?.length > 0) {
-            // Fallback for HLS: use buffered end as approximate duration
-            const bufferedEnd = videoEl.buffered.end(videoEl.buffered.length - 1);
-            if (bufferedEnd > 0 && currentTime >= 0) {
-              setVideoProgress(Math.min(currentTime / bufferedEnd, 1));
-            }
-          }
-        } else {
-          setVideoProgress(0);
-        }
-      } else {
-        setVideoProgress(0);
-      }
-      rafId = requestAnimationFrame(tick);
-    };
-    rafId = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafId);
   }, [currentIndex, filteredPosts]);
 
   // Sync back to GlobalAudioContext on unmount
@@ -1498,37 +1458,35 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
         );
       })()}
 
-      {/* Video progress bar — fixed above bottom nav */}
-      {(() => {
+      {/* Fixed video scrubber — flush above bottom nav */}
+      {activeVideoEl && (() => {
+        console.log('[SCRUBBER-DEBUG]', { activeVideoEl: !!activeVideoEl, currentIndex });
         const currentPost = filteredPosts[currentIndex];
         if (!currentPost) return null;
-        const mediaItems = currentPost.media?.length > 0 ? currentPost.media : [{ media_type: currentPost.type }];
+        const mediaItems = currentPost.media && currentPost.media.length > 0 ? currentPost.media : [{
+          id: `${currentPost.id}-single`,
+          media_type: currentPost.type as 'video' | 'image',
+          media_url: currentPost.src
+        }];
         const currentMediaIdx = mediaIndices[currentPost.id] || 0;
         const activeMedia = mediaItems[currentMediaIdx] || mediaItems[0];
         if ((activeMedia as any)?.media_type !== 'video') return null;
-
         return (
           <div
             style={{
               position: 'fixed',
               left: 0,
               right: 0,
-              bottom: 'calc(var(--bottom-nav-height, 64px) + 30px)',
-              zIndex: 101,
-              height: 3,
-              background: 'rgba(255,255,255,0.15)',
-              pointerEvents: 'none',
+              bottom: 'calc(var(--bottom-nav-height, 64px))',
+              zIndex: 99,
+              pointerEvents: 'auto',
             }}
           >
-            <div
-              style={{
-                height: '100%',
-                width: `${videoProgress * 100}%`,
-                background: '#FFFFFF',
-                boxShadow: '0 0 8px rgba(255,255,255,0.45)',
-                borderRadius: 9999,
-                transition: 'width 0.1s linear',
-              }}
+            <VideoScrubber
+              videoEl={activeVideoEl}
+              mediaId={currentPost.id}
+              height={2}
+              className="pointer-events-auto"
             />
           </div>
         );
