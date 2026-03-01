@@ -192,8 +192,8 @@ async function pollAndUpdateVideoMetadata(streamId: string, postMediaId: string)
     console.log(`[uploadPipeline] Starting metadata poll for streamId: ${streamId}, postMediaId: ${postMediaId}`);
     
     const metadata = await pollStreamMetadata(streamId, {
-      maxAttempts: 60, // 4 minutes max (4s intervals) — handles videos up to ~30 min
-      intervalMs: 4000,
+      maxAttempts: 40, // 4 minutes max (6s intervals)
+      intervalMs: 6000,
       suppressRecoverableErrors: true,
     });
 
@@ -219,8 +219,8 @@ async function pollAndUpdateReviewVideoMetadata(streamId: string, reviewMediaId:
     console.log(`[uploadPipeline] Starting review video metadata poll for streamId: ${streamId}, reviewMediaId: ${reviewMediaId}`);
     
     const metadata = await pollStreamMetadata(streamId, {
-      maxAttempts: 60, // 4 minutes max (4s intervals)
-      intervalMs: 4000,
+      maxAttempts: 40, // 4 minutes max (6s intervals)
+      intervalMs: 6000,
       suppressRecoverableErrors: true,
     });
 
