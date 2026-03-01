@@ -6448,6 +6448,8 @@ export type Database = {
           processing_status: string | null
           stream_id: string | null
           studio_edits: Json | null
+          trim_end: number | null
+          trim_start: number | null
           upload_status: string
           width: number | null
         }
@@ -6476,6 +6478,8 @@ export type Database = {
           processing_status?: string | null
           stream_id?: string | null
           studio_edits?: Json | null
+          trim_end?: number | null
+          trim_start?: number | null
           upload_status?: string
           width?: number | null
         }
@@ -6504,6 +6508,8 @@ export type Database = {
           processing_status?: string | null
           stream_id?: string | null
           studio_edits?: Json | null
+          trim_end?: number | null
+          trim_start?: number | null
           upload_status?: string
           width?: number | null
         }

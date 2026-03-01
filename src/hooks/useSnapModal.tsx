@@ -49,6 +49,9 @@ export interface ComposerMediaItem {
   // Upload progress tracking
   uploadStatus?: MediaUploadStatus;
   uploadProgress?: number; // 0-100 for chunked uploads
+  // Trim range (video only)
+  trimStart?: number | null;
+  trimEnd?: number | null;
 }
 
 type SnapState = {

@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { X, Wand2, Play, Pause, Volume2, VolumeX } from 'lucide-react';
+import { X, Wand2, Play, Pause, Volume2, VolumeX, Scissors } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { OrderedMediaItem } from '../types';
 import type { StudioEdits } from '@/types/studio';
@@ -10,6 +10,7 @@ import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { cn } from '@/lib/utils';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
+import { VideoTrimmer } from './VideoTrimmer';
 
 function formatTime(seconds: number): string {
   if (!seconds || !isFinite(seconds)) return '0:00';
@@ -28,9 +29,11 @@ interface MediaPreviewViewerProps {
   studioEditsByMediaId?: Record<string, StudioEdits>;
   /** Hide the studio wand button (default: true) */
   showStudio?: boolean;
+  /** Callback when trim range changes */
+  onTrimChange?: (mediaIndex: number, trimStart: number | null, trimEnd: number | null) => void;
 }
 
-export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onSetCover, coverIndex, studioEditsByMediaId, showStudio = true }: MediaPreviewViewerProps) {
+export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onSetCover, coverIndex, studioEditsByMediaId, showStudio = true, onTrimChange }: MediaPreviewViewerProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const touchStartTime = useRef<number>(0);
@@ -39,6 +42,7 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
   const [showPlayIcon, setShowPlayIcon] = useState(false);
   const [isSwiping, setIsSwiping] = useState(false);
   const [swipeOffset, setSwipeOffset] = useState(0);
+  const [showTrimmer, setShowTrimmer] = useState(false);
 
   // Fix 4: Use GlobalAudioContext for persistent mute state
   const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
@@ -58,6 +62,7 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
   useEffect(() => {
     setIsPlaying(true);
     setShowPlayIcon(false);
+    setShowTrimmer(false); // Hide trimmer on slide change
 
     // Pause all non-active videos
     const allVideos = document.querySelectorAll('.preview-viewer-slide video');
@@ -241,6 +246,20 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
                   Set as Cover
                 </button>
               )}
+              {item.type === 'video' && (
+                <button
+                  onClick={() => setShowTrimmer(prev => !prev)}
+                  className={`pointer-events-auto w-9 h-9 rounded-full flex items-center justify-center ${showTrimmer ? 'bg-primary/20' : ''}`}
+                  style={{
+                    background: showTrimmer ? undefined : 'rgba(0,0,0,0.35)',
+                    backdropFilter: 'blur(16px) saturate(180%)',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                  }}
+                  aria-label="Trim video"
+                >
+                  <Scissors className="w-4 h-4 text-white" />
+                </button>
+              )}
               {showStudio && (
                 <button
                   onClick={handleStudio}
@@ -386,6 +405,19 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
           );
         })}
       </div>
+
+      {/* Video trimmer — between video and scrubber */}
+      {item.type === 'video' && showTrimmer && (
+        <VideoTrimmer
+          videoUrl={item.previewUrl}
+          duration={item.duration || 0}
+          onTrimChange={(trimStart, trimEnd) => {
+            onTrimChange?.(currentIndex, trimStart, trimEnd);
+          }}
+          initialStart={item.trimStart ?? undefined}
+          initialEnd={item.trimEnd ?? undefined}
+        />
+      )}
 
       {/* Video scrubber + time readout — above dots, only for videos */}
       {item.type === 'video' && (

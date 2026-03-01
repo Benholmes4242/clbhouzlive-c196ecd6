@@ -15,6 +15,8 @@ interface FeedVideoPlayerProps {
   preload?: 'none' | 'metadata' | 'auto';
   autoplay?: boolean;
   onClick?: () => void;
+  trimStart?: number | null;
+  trimEnd?: number | null;
 }
 
 // Unified ref type that provides basic video controls for both implementations

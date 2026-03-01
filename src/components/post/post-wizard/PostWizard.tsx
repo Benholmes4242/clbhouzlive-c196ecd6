@@ -522,6 +522,13 @@ export function PostWizard({
     if (selected) setActiveActor(selected);
   }, [setActor, availableActors, setActiveActor]);
 
+  const handleTrimChange = useCallback((mediaIndex: number, trimStart: number | null, trimEnd: number | null) => {
+    dispatch({ type: 'UPDATE_MEDIA_ITEM', payload: {
+      id: state.mediaItems[mediaIndex]?.id,
+      updates: { trimStart, trimEnd },
+    }});
+  }, [state.mediaItems, dispatch]);
+
   const handleVisibilityChange = useCallback((visibility: 'anyone' | 'followers' | 'private') => {
     setVisibility(visibility);
   }, [setVisibility]);
@@ -1094,6 +1101,7 @@ export function PostWizard({
             coverIndex={state.coverIndex}
             onSetCover={(index) => setCoverIndex(index)}
             studioEditsByMediaId={state.studioEditsByMediaId}
+            onTrimChange={handleTrimChange}
           />
         )}
       </AnimatePresence>

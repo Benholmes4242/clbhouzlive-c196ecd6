@@ -58,7 +58,7 @@ export async function fetchScheduledPosts(): Promise<ScheduledPost[]> {
       id, user_id, content, scheduled_at, status, created_at,
       actor_type, actor_id, categories, badges, visibility, course_id,
       studio_music, audio_mode,
-      post_media (id, media_type, media_url, poster_url, width, height, aspect_ratio, duration_seconds, display_order, filter_id, studio_edits, stream_id)
+      post_media (id, media_type, media_url, poster_url, width, height, aspect_ratio, duration_seconds, display_order, filter_id, studio_edits, stream_id, trim_start, trim_end)
     `)
     .eq('user_id', user.id)
     .eq('status', 'scheduled')
@@ -114,7 +114,7 @@ export async function fetchScheduledPostForEdit(postId: string): Promise<Schedul
       id, user_id, content, scheduled_at, status, created_at,
       actor_type, actor_id, categories, badges, visibility, course_id,
       studio_music, audio_mode,
-      post_media (id, media_type, media_url, poster_url, width, height, aspect_ratio, duration_seconds, display_order, filter_id, studio_edits, stream_id),
+      post_media (id, media_type, media_url, poster_url, width, height, aspect_ratio, duration_seconds, display_order, filter_id, studio_edits, stream_id, trim_start, trim_end),
       golf_courses!posts_course_id_fkey (id, name, country, region)
     `)
     .eq('id', postId)
