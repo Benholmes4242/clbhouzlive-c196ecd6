@@ -89,10 +89,13 @@ export function ConfirmStep({
             initial="hidden"
             animate="visible"
             variants={staggerDelay(sectionIndex++)}
-            className="flex items-center gap-3 py-3"
+            className="flex items-center gap-3 py-3 border-b"
+            style={{ borderColor: 'hsl(var(--border) / 0.5)' }}
           >
-            {course.thumbnail_image && (
-              <img src={course.thumbnail_image} alt={course.name} loading="eager" className="w-12 h-12 rounded-xl object-cover" />
+            {course.thumbnail_image ? (
+              <img src={course.thumbnail_image} alt={course.name} loading="eager" className="w-14 h-14 rounded-xl object-cover shrink-0" />
+            ) : (
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-green-400 to-blue-500 shrink-0" />
             )}
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-[15px] text-foreground truncate">{course.name}</h3>

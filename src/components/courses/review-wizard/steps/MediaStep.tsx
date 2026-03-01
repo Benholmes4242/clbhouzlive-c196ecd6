@@ -5,7 +5,7 @@
 
 import React, { useRef, useCallback, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, AlertCircle, Images, Loader2, ImageIcon, Camera } from 'lucide-react';
+import { Plus, AlertCircle, Images, Loader2 } from 'lucide-react';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import type { ReviewMediaItem } from '../types';
 import type { ReviewWizardCourse } from '../types';
@@ -148,8 +148,8 @@ export function MediaStep({
     >
       {/* Course context bar */}
       {course && (
-        <motion.div 
-          className="shrink-0 flex items-center gap-3 px-4 py-2.5 border-b"
+         <motion.div 
+          className="shrink-0 flex items-center gap-3 px-4 py-3 border-b"
           style={{ borderColor: 'hsl(var(--border) / 0.3)' }}
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
@@ -160,10 +160,10 @@ export function MediaStep({
               src={course.thumbnail_image} 
               alt={course.name}
               loading="eager"
-              className="w-10 h-10 rounded-lg object-cover shrink-0"
+              className="w-14 h-14 rounded-xl object-cover shrink-0"
             />
           ) : (
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-400 to-blue-500 shrink-0" />
+            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-green-400 to-blue-500 shrink-0" />
           )}
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold text-foreground truncate">{course.name}</p>
@@ -186,7 +186,7 @@ export function MediaStep({
 
       {/* Media content */}
       {media.length > 0 ? (
-        <div className="flex-1 flex flex-col min-h-0 px-4 pt-4">
+        <div className="flex-1 flex flex-col min-h-0 px-4 pt-3">
           {/* Horizontal scrolling thumbnail strip */}
           <div className="flex gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
             {composerMedia.map((item, index) => (
@@ -277,31 +277,8 @@ export function MediaStep({
                 </div>
                 <span className="text-sm font-semibold text-foreground">Add photo or video</span>
               </button>
-              <div className="flex justify-center gap-3 mt-4">
-                <button
-                  onClick={handlePickMedia}
-                  disabled={isPickerOpen}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium disabled:opacity-50"
-                  style={{
-                    background: 'hsl(var(--muted) / 0.6)',
-                    border: '1.5px solid hsl(var(--border))',
-                  }}
-                >
-                  <ImageIcon className="w-4 h-4" />
-                  Gallery
-                </button>
-                <button
-                  onClick={handlePickMedia}
-                  disabled={isPickerOpen}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium text-white disabled:opacity-50"
-                  style={{ background: '#1C1C1E' }}
-                >
-                  <Camera className="w-4 h-4" />
-                  Camera
-                </button>
-              </div>
               <p className="text-xs text-muted-foreground/60 mt-3 text-center">
-                Optional — up to {MAX_MEDIA_ITEMS} photos & videos
+                Share up to {MAX_MEDIA_ITEMS} photos & videos
               </p>
             </motion.div>
           )}
