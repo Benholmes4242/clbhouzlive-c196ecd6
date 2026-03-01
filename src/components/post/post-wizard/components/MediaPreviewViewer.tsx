@@ -8,6 +8,8 @@ import { getPixelLayerStyle, getCropWrapperClass } from '@/utils/studioEdit';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { cn } from '@/lib/utils';
+import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
 interface MediaPreviewViewerProps {
   items: OrderedMediaItem[];
@@ -24,12 +26,20 @@ interface MediaPreviewViewerProps {
 export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onSetCover, coverIndex, studioEditsByMediaId, showStudio = true }: MediaPreviewViewerProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const touchStartTime = useRef<number>(0);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(true);
-  const [isMuted, setIsMuted] = useState(false);
   const [showPlayIcon, setShowPlayIcon] = useState(false);
   const [isSwiping, setIsSwiping] = useState(false);
   const [swipeOffset, setSwipeOffset] = useState(0);
+
+  // Fix 4: Use GlobalAudioContext for persistent mute state
+  const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
+
+  // Fix 5: Pause all feed videos when viewer opens
+  useEffect(() => {
+    MediaRuntime.pauseAll();
+  }, []);
 
   const item = items[currentIndex];
   const isCover = currentIndex === coverIndex;
@@ -74,6 +84,7 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     const touch = e.touches[0];
     touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+    touchStartTime.current = Date.now();
     setIsSwiping(true);
   }, []);
 
@@ -105,12 +116,19 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
       return;
     }
 
-    // Swipe left/right to navigate
-    const threshold = 50;
-    if (dx < -threshold && currentIndex < items.length - 1) {
-      goTo(currentIndex + 1);
-    } else if (dx > threshold && currentIndex > 0) {
-      goTo(currentIndex - 1);
+    // Fix 6: Velocity-based swipe detection
+    const elapsed = Date.now() - touchStartTime.current;
+    const velocityX = Math.abs(dx) / Math.max(elapsed, 1); // px per ms
+    const isHorizontalSwipe =
+      (velocityX > 0.3 && Math.abs(dx) > 20) || // fast flick
+      Math.abs(dx) > 50; // slow drag (existing threshold)
+
+    if (isHorizontalSwipe) {
+      if (dx < 0 && currentIndex < items.length - 1) {
+        goTo(currentIndex + 1);
+      } else if (dx > 0 && currentIndex > 0) {
+        goTo(currentIndex - 1);
+      }
     }
   }, [currentIndex, items.length, goTo, onClose]);
 
@@ -134,11 +152,8 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
 
   const toggleMute = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    const video = videoRef.current;
-    if (!video) return;
-    video.muted = !video.muted;
-    setIsMuted(!isMuted);
-  }, [isMuted]);
+    toggleGlobalMute();
+  }, [toggleGlobalMute]);
 
   if (!item) return null;
 
@@ -171,7 +186,7 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
           <div className="relative flex items-center justify-between px-4">
             <button
               onClick={onClose}
-              className="pointer-events-auto w-9 h-9 rounded-full flex items-center justify-center"
+              className="pointer-events-auto w-11 h-11 rounded-full flex items-center justify-center"
               style={{
                 background: 'rgba(0,0,0,0.35)',
                 backdropFilter: 'blur(16px) saturate(180%)',
@@ -248,8 +263,9 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
                       poster={slideItem.thumbnailUrl}
                       preload="auto"
                       autoPlay={isActive}
+                      loop
                       playsInline
-                      muted={!isActive || isMuted}
+                      muted={!isActive || isGloballyMuted}
                       className={cn('max-w-full max-h-full object-contain', slideFilterClass)}
                       style={slidePixelStyle}
                       onPlay={isActive ? () => setIsPlaying(true) : undefined}
@@ -295,9 +311,9 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
                           backdropFilter: 'blur(16px)',
                           border: '1px solid rgba(255,255,255,0.15)',
                         }}
-                        aria-label={isMuted ? 'Unmute' : 'Mute'}
+                        aria-label={isGloballyMuted ? 'Unmute' : 'Mute'}
                       >
-                        {isMuted ? (
+                        {isGloballyMuted ? (
                           <VolumeX className="w-4 h-4 text-white" />
                         ) : (
                           <Volume2 className="w-4 h-4 text-white" />
@@ -361,11 +377,10 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
             <button
               key={idx}
               onClick={() => goTo(idx)}
-              className="w-2 h-2 rounded-full transition-all duration-200"
-              style={{
-                backgroundColor: idx === currentIndex ? '#f59e0b' : 'rgba(255,255,255,0.3)',
-                transform: idx === currentIndex ? 'scale(1.2)' : 'scale(1)',
-              }}
+              className={cn(
+                'rounded-full transition-all duration-200',
+                idx === currentIndex ? 'w-2 h-2 bg-primary scale-110' : 'w-1.5 h-1.5 bg-white/30'
+              )}
               aria-label={`Go to image ${idx + 1}`}
             />
           ))}
