@@ -11,6 +11,7 @@
 
 import * as tus from 'tus-js-client';
 import { supabase } from '@/integrations/supabase/client';
+import { POST_LIMITS } from '@/constants/postLimits';
 
 export interface TusUploadOptions {
   file: File;
@@ -40,7 +41,7 @@ export async function uploadVideoWithTus(options: TusUploadOptions): Promise<Tus
       body: {
         fileName: file.name,
         fileSizeBytes: file.size,
-        maxDurationSeconds: 3600, // 1 hour max
+        maxDurationSeconds: POST_LIMITS.MAX_VIDEO_DURATION_SECONDS,
         metadata: {
           name: file.name,
           ...metadata,

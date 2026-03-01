@@ -2,19 +2,18 @@
  * Persistent Upload Progress Banner
  * 
  * Shows at the top of the screen during active uploads with:
- * - File progress
- * - Upload speed
- * - ETA
- * - Pause/Resume/Cancel controls
+ * - File progress, upload speed, ETA
+ * - Retry button for failed uploads
+ * - Cancel button for in-progress uploads
  */
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Pause, Play, AlertCircle, CheckCircle, Loader2, Star } from 'lucide-react';
+import { X, AlertCircle, CheckCircle, Loader2, Star, RotateCcw } from 'lucide-react';
 import { uploadEventBus } from '@/uploads/uploadEventBus';
 import { formatBytes, formatDuration, formatBytesPerSecond } from '@/uploads/uploadSpeedTracker';
+import { retryJob, cancelJob } from '@/uploads/uploadPipeline';
 import { cn } from '@/lib/utils';
-import type { DetailedUploadProgress } from '@/uploads/uploadProgressTypes';
 
 interface ActiveUpload {
   jobId: string;
@@ -27,6 +26,7 @@ interface ActiveUpload {
   speed: number;
   eta: number;
   error?: string;
+  hasFiles?: boolean; // Whether File objects are still in memory
   metadata?: {
     courseName?: string;
   };
@@ -37,18 +37,13 @@ export function UploadProgressBanner() {
   const [dismissedJobs, setDismissedJobs] = useState<Set<string>>(new Set());
   
   useEffect(() => {
-    // Listen to upload events
     const handleEnqueued = (event: any) => {
       setActiveUploads(prev => {
-        // Don't add if already exists
         if (prev.some(u => u.jobId === event.jobId)) return prev;
-        
-        // Determine display text based on upload type
         const uploadType = event.uploadType || 'post';
         const displayText = uploadType === 'review'
           ? `Review: ${event.metadata?.courseName || 'Course'}`
           : 'Preparing...';
-        
         return [...prev, {
           jobId: event.jobId,
           uploadType,
@@ -59,6 +54,7 @@ export function UploadProgressBanner() {
           percentage: 0,
           speed: 0,
           eta: 0,
+          hasFiles: true,
           metadata: event.metadata,
         }];
       });
@@ -67,7 +63,6 @@ export function UploadProgressBanner() {
     const handleProgress = (event: any) => {
       setActiveUploads(prev => prev.map(u => {
         if (u.jobId !== event.jobId) return u;
-        
         return {
           ...u,
           currentFile: event.progress?.uploadedFiles || u.currentFile,
@@ -82,19 +77,12 @@ export function UploadProgressBanner() {
     const handleFileProgress = (event: any) => {
       setActiveUploads(prev => prev.map(u => {
         if (u.jobId !== event.jobId) return u;
-        
         const percentage = event.bytesTotal > 0 
           ? Math.round((event.bytesUploaded / event.bytesTotal) * 100)
           : event.progress || 0;
-        
-        // Handle status changes (paused, preparing, etc.)
         let status = u.status;
-        if (event.status === 'paused') {
-          status = 'paused';
-        } else if (event.status === 'preparing') {
-          status = 'uploading'; // Keep as uploading but update filename
-        }
-        
+        if (event.status === 'paused') status = 'paused';
+        else if (event.status === 'preparing') status = 'uploading';
         return {
           ...u,
           status,
@@ -113,8 +101,6 @@ export function UploadProgressBanner() {
         if (u.jobId !== event.jobId) return u;
         return { ...u, status: 'complete', percentage: 100 };
       }));
-      
-      // Auto-dismiss after 3 seconds
       setTimeout(() => {
         setActiveUploads(prev => prev.filter(u => u.jobId !== event.jobId));
       }, 3000);
@@ -131,8 +117,6 @@ export function UploadProgressBanner() {
     const unsubProgress = uploadEventBus.on('upload:progress', handleProgress);
     const unsubComplete = uploadEventBus.on('upload:complete', handleComplete);
     const unsubFailed = uploadEventBus.on('upload:failed', handleFailed);
-    
-    // Also listen for file-level progress if available
     const unsubFileProgress = uploadEventBus.on('file:upload-progress', handleFileProgress);
     
     return () => {
@@ -148,10 +132,22 @@ export function UploadProgressBanner() {
     setDismissedJobs(prev => new Set([...prev, jobId]));
     setActiveUploads(prev => prev.filter(u => u.jobId !== jobId));
   };
+
+  const handleRetry = (jobId: string) => {
+    const success = retryJob(jobId);
+    if (success) {
+      setActiveUploads(prev => prev.map(u => 
+        u.jobId === jobId ? { ...u, status: 'uploading', percentage: 0, error: undefined } : u
+      ));
+    }
+  };
+
+  const handleCancel = (jobId: string) => {
+    cancelJob(jobId);
+    setActiveUploads(prev => prev.filter(u => u.jobId !== jobId));
+  };
   
-  // Filter out dismissed jobs
   const visibleUploads = activeUploads.filter(u => !dismissedJobs.has(u.jobId));
-  
   if (visibleUploads.length === 0) return null;
   
   return (
@@ -168,6 +164,8 @@ export function UploadProgressBanner() {
               key={upload.jobId}
               upload={upload}
               onDismiss={() => handleDismiss(upload.jobId)}
+              onRetry={() => handleRetry(upload.jobId)}
+              onCancel={() => handleCancel(upload.jobId)}
             />
           ))}
         </div>
@@ -179,12 +177,14 @@ export function UploadProgressBanner() {
 interface UploadProgressItemProps {
   upload: ActiveUpload;
   onDismiss: () => void;
+  onRetry: () => void;
+  onCancel: () => void;
 }
 
-function UploadProgressItem({ upload, onDismiss }: UploadProgressItemProps) {
+function UploadProgressItem({ upload, onDismiss, onRetry, onCancel }: UploadProgressItemProps) {
   const isFailed = upload.status === 'failed';
   const isComplete = upload.status === 'complete';
-  const isPaused = upload.status === 'paused';
+  const isUploading = upload.status === 'uploading' || upload.status === 'paused';
   
   return (
     <div className="px-4 py-3">
@@ -194,7 +194,7 @@ function UploadProgressItem({ upload, onDismiss }: UploadProgressItemProps) {
           {isComplete ? (
             <CheckCircle className="h-4 w-4 text-green-500" />
           ) : isFailed ? (
-            <AlertCircle className="h-4 w-4 text-red-500" />
+            <AlertCircle className="h-4 w-4 text-destructive" />
           ) : upload.uploadType === 'review' ? (
             <Star className="h-4 w-4 text-primary animate-pulse" />
           ) : (
@@ -209,13 +209,37 @@ function UploadProgressItem({ upload, onDismiss }: UploadProgressItemProps) {
           </span>
         </div>
         
-        <button
-          onClick={onDismiss}
-          className="p-1.5 rounded-full hover:bg-muted/50 transition-colors"
-          aria-label="Dismiss"
-        >
-          <X className="h-4 w-4 text-muted-foreground" />
-        </button>
+        <div className="flex items-center gap-1">
+          {/* Cancel button — visible during active upload */}
+          {isUploading && (
+            <button
+              onClick={onCancel}
+              className="px-2 py-1 rounded-full text-xs font-medium text-muted-foreground hover:bg-muted/50 transition-colors"
+              aria-label="Cancel upload"
+            >
+              Cancel
+            </button>
+          )}
+
+          {/* Retry button — visible on failure if files are still available */}
+          {isFailed && upload.hasFiles !== false && (
+            <button
+              onClick={onRetry}
+              className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors"
+            >
+              <RotateCcw className="h-3 w-3" />
+              Retry
+            </button>
+          )}
+
+          <button
+            onClick={onDismiss}
+            className="p-1.5 rounded-full hover:bg-muted/50 transition-colors"
+            aria-label="Dismiss"
+          >
+            <X className="h-4 w-4 text-muted-foreground" />
+          </button>
+        </div>
       </div>
       
       {/* Progress bar */}
@@ -223,7 +247,7 @@ function UploadProgressItem({ upload, onDismiss }: UploadProgressItemProps) {
         <motion.div
           className={cn(
             "absolute inset-y-0 left-0 rounded-full",
-            isComplete ? "bg-green-500" : isFailed ? "bg-red-500" : "bg-primary"
+            isComplete ? "bg-green-500" : isFailed ? "bg-destructive" : "bg-primary"
           )}
           initial={{ width: 0 }}
           animate={{ width: `${upload.percentage}%` }}
@@ -250,7 +274,11 @@ function UploadProgressItem({ upload, onDismiss }: UploadProgressItemProps) {
       {/* Error message */}
       {isFailed && upload.error && (
         <div className="mt-2">
-          <span className="text-xs text-red-500">{upload.error}</span>
+          <span className="text-xs text-destructive">
+            {upload.hasFiles === false
+              ? 'Upload interrupted — please create the post again'
+              : upload.error}
+          </span>
         </div>
       )}
     </div>

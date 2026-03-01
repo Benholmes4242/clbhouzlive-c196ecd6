@@ -125,9 +125,12 @@ export interface UseMediaUploadReturn {
 // CONSTANTS
 // ============================================
 
+// Legacy hook — main pipeline uses uploadPipeline.ts with POST_LIMITS
+// Kept in sync for any direct callers of useMediaUpload
+import { POST_LIMITS } from '@/constants/postLimits';
 const MAX_FILE_SIZE = {
-  IMAGE: 50 * 1024 * 1024,  // 50MB
-  VIDEO: 500 * 1024 * 1024, // 500MB
+  IMAGE: POST_LIMITS.MAX_IMAGE_SIZE_BYTES,
+  VIDEO: POST_LIMITS.MAX_VIDEO_SIZE_BYTES,
 };
 
 const SUPPORTED_VIDEO_TYPES = [
