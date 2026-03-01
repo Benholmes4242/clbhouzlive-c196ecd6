@@ -525,6 +525,7 @@ export function PostWizard({
       analyticsEvents.track('post_scheduled', { schedule_minutes_ahead: minutesAhead });
     } else {
       toast.success('Schedule removed');
+      analyticsEvents.track('schedule_removed', {});
     }
   }, [setScheduledAt]);
 

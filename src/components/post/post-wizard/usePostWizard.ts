@@ -323,6 +323,7 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
       height: m.height ?? undefined,
       aspectRatio: m.aspectRatio ?? undefined,
       duration: m.durationSeconds ?? undefined,
+      isRestored: true,
     }));
 
     const courseDataArr = (draft as any).courseData ?? (draft as any).course_data;
@@ -384,6 +385,7 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
       height: m.height ?? undefined,
       aspectRatio: m.aspectRatio ?? undefined,
       duration: m.durationSeconds ?? undefined,
+      isRestored: true,
     }));
 
     const studioEditsByMediaId: Record<string, StudioEdits> = {};

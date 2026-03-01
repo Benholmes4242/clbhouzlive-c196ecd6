@@ -126,8 +126,10 @@ export default function DraftsAndScheduledSheet({
           
           {/* Tabs */}
           <div className="px-4 pb-0">
-            <div className="flex gap-6 border-b border-border/30">
+            <div role="tablist" className="flex gap-6 border-b border-border/30">
               <button
+                role="tab"
+                aria-selected={activeTab === 'drafts'}
                 onClick={() => setActiveTab('drafts')}
                 className={cn(
                   "pb-3 text-base font-medium transition-colors duration-200 relative",
@@ -153,6 +155,8 @@ export default function DraftsAndScheduledSheet({
               </button>
               
               <button
+                role="tab"
+                aria-selected={activeTab === 'scheduled'}
                 onClick={() => setActiveTab('scheduled')}
                 className={cn(
                   "pb-3 text-base font-medium transition-colors duration-200 relative",
@@ -282,6 +286,7 @@ export default function DraftsAndScheduledSheet({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
+                role="alertdialog" aria-label="Confirm delete all drafts"
                 className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-background/98 backdrop-blur-xl p-6 rounded-t-3xl"
               >
                 <AlertCircle size={40} className="text-destructive mb-4" />
@@ -353,8 +358,8 @@ export default function DraftsAndScheduledSheet({
 function DraftsEmptyState() {
   return (
     <div className="flex-1 flex flex-col items-center justify-center py-12 px-4">
-      <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(245,158,11,0.10)' }}>
-        <FileText className="w-7 h-7" style={{ color: '#f59e0b' }} />
+      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+        <FileText className="w-7 h-7 text-primary" />
       </div>
       <h3 className="text-lg font-semibold text-foreground mb-1">
         No drafts yet
@@ -370,8 +375,8 @@ function DraftsEmptyState() {
 function ScheduledEmptyState() {
   return (
     <div className="flex-1 flex flex-col items-center justify-center py-12 px-4">
-      <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(245,158,11,0.10)' }}>
-        <Calendar className="w-7 h-7" style={{ color: '#f59e0b' }} />
+      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+        <Calendar className="w-7 h-7 text-primary" />
       </div>
       <h3 className="text-lg font-semibold text-foreground mb-1">
         No scheduled posts
@@ -423,6 +428,7 @@ const DraftItem = React.memo(function DraftItem({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            role="alertdialog" aria-label="Confirm deletion"
             className="absolute inset-0 z-10 flex items-center justify-center gap-2 bg-background/95 backdrop-blur-sm rounded-2xl"
           >
             <button
@@ -551,6 +557,7 @@ const ScheduledItem = React.memo(function ScheduledItem({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            role="alertdialog" aria-label="Confirm action"
             className="absolute inset-0 z-10 flex items-center justify-center gap-2 bg-background/95 backdrop-blur-sm rounded-2xl"
           >
             <span className="text-sm font-medium text-foreground mr-2">

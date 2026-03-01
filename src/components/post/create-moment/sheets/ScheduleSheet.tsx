@@ -179,6 +179,7 @@ export default function ScheduleSheet({
                       <button
                         key={idx}
                         disabled={!isValid}
+                        aria-label={`${format(date, 'MMMM d, yyyy')}${isSelected ? ', selected' : ''}${!isValid ? ', unavailable' : ''}`}
                         onClick={() => date && isValid && setSelectedDate(date)}
                         className={cn(
                           "aspect-square rounded-full flex items-center justify-center text-sm font-medium transition-colors mx-auto w-10 h-10",
@@ -206,7 +207,7 @@ export default function ScheduleSheet({
                 
                 <div className="flex items-center gap-3">
                   {/* Hour */}
-                  <select
+                  <select aria-label="Hour"
                     value={selectedHour}
                     onChange={(e) => setSelectedHour(parseInt(e.target.value))}
                     className="flex-1 h-14 rounded-xl bg-card border border-border text-center text-2xl font-semibold text-foreground appearance-none cursor-pointer focus:border-foreground focus:ring-1 focus:ring-foreground outline-none transition-all"
@@ -221,7 +222,7 @@ export default function ScheduleSheet({
                   <span className="text-2xl font-bold text-muted-foreground">:</span>
                   
                   {/* Minute */}
-                  <select
+                  <select aria-label="Minute"
                     value={selectedMinute}
                     onChange={(e) => setSelectedMinute(parseInt(e.target.value))}
                     className="flex-1 h-14 rounded-xl bg-card border border-border text-center text-2xl font-semibold text-foreground appearance-none cursor-pointer focus:border-foreground focus:ring-1 focus:ring-foreground outline-none transition-all"
@@ -274,6 +275,7 @@ export default function ScheduleSheet({
               </button>
               {initialDate && (
                 <button
+                  aria-label="Remove scheduled time"
                   onClick={() => {
                     onSchedule(null);
                     onClose();
