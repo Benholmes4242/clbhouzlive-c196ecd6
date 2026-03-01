@@ -186,7 +186,7 @@ export function MediaStep({
 
       {/* Media content */}
       {media.length > 0 ? (
-        <div className="flex-1 flex flex-col min-h-0 px-4 pt-3">
+        <div className="flex-1 flex flex-col min-h-0 px-5 pt-2">
           {/* Horizontal scrolling thumbnail strip */}
           <div className="flex gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
             {composerMedia.map((item, index) => (
@@ -225,9 +225,9 @@ export function MediaStep({
 
           {/* Counter */}
           <p
-            className="text-sm font-medium tabular-nums text-center mt-2"
+            className="text-[11px] font-medium tabular-nums text-center mt-1"
             style={{
-              color: media.length >= MAX_MEDIA_ITEMS ? 'hsl(var(--destructive))' : 'hsl(var(--muted-foreground))',
+              color: media.length >= MAX_MEDIA_ITEMS ? '#EF4444' : '#AEAEB2',
             }}
           >
             {media.length}/{MAX_MEDIA_ITEMS}
