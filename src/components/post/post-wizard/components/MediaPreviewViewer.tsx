@@ -11,6 +11,13 @@ import { cn } from '@/lib/utils';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
+function formatTime(seconds: number): string {
+  if (!seconds || !isFinite(seconds)) return '0:00';
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
 interface MediaPreviewViewerProps {
   items: OrderedMediaItem[];
   initialIndex: number;
@@ -35,6 +42,9 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
 
   // Fix 4: Use GlobalAudioContext for persistent mute state
   const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
+
+  // Time readout state for video scrub bar
+  const [videoTime, setVideoTime] = useState<{ current: number; duration: number }>({ current: 0, duration: 0 });
 
   // Fix 5: Pause all feed videos when viewer opens
   useEffect(() => {
@@ -74,6 +84,27 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
       }
     };
   }, []);
+
+  // Track video time for readout
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || items[currentIndex]?.type !== 'video') {
+      setVideoTime({ current: 0, duration: 0 });
+      return;
+    }
+    const handleTimeUpdate = () => {
+      setVideoTime({ current: video.currentTime, duration: video.duration || 0 });
+    };
+    const handleLoadedMetadata = () => {
+      setVideoTime(prev => ({ ...prev, duration: video.duration || 0 }));
+    };
+    video.addEventListener('timeupdate', handleTimeUpdate);
+    video.addEventListener('loadedmetadata', handleLoadedMetadata);
+    return () => {
+      video.removeEventListener('timeupdate', handleTimeUpdate);
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+    };
+  }, [currentIndex, items]);
 
   const goTo = useCallback((idx: number) => {
     // Pause current video before switching
@@ -356,14 +387,22 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
         })}
       </div>
 
-      {/* Video scrubber — above dots, only for videos */}
+      {/* Video scrubber + time readout — above dots, only for videos */}
       {item.type === 'video' && (
-        <div className="flex-shrink-0 px-4 relative" style={{ height: 3 }} key={`scrubber-${currentIndex}`}>
-          <VideoScrubber
-            videoEl={videoRef.current}
-            variant="wizard"
-            height={3}
-          />
+        <div className="flex items-center gap-3 px-4 flex-shrink-0" key={`scrubber-${currentIndex}`}>
+          <div className="flex-1 relative" style={{ height: 3 }}>
+            <VideoScrubber
+              videoEl={videoRef.current}
+              variant="wizard"
+              height={3}
+            />
+          </div>
+          <span
+            className="text-[11px] font-medium tabular-nums text-white/70 flex-shrink-0"
+            style={{ minWidth: '70px', textAlign: 'right' }}
+          >
+            {formatTime(videoTime.current)} / {formatTime(videoTime.duration)}
+          </span>
         </div>
       )}
 
@@ -379,7 +418,7 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
               onClick={() => goTo(idx)}
               className={cn(
                 'rounded-full transition-all duration-200',
-                idx === currentIndex ? 'w-2 h-2 bg-primary scale-110' : 'w-1.5 h-1.5 bg-white/30'
+                idx === currentIndex ? 'w-2 h-2 bg-primary scale-110' : 'w-1.5 h-1.5 bg-primary/30'
               )}
               aria-label={`Go to image ${idx + 1}`}
             />
