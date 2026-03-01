@@ -34,6 +34,7 @@ import { normalizeFilesToMediaItems } from '@/lib/mediaUtils';
 import { TaggableEntity } from '@/components/post/create-moment/types';
 import { MentionBottomSheet, MentionSuggestion } from './steps/MentionBottomSheet';
 import { POST_LIMITS } from '@/constants/postLimits';
+import { useKeyboardHeight } from '@/hooks/useKeyboardHeight';
 
 // New extracted components
 import { ToolButton } from './components/ToolButton';
@@ -171,6 +172,9 @@ export function PostWizard({
   const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const [showTagPeople, setShowTagPeople] = useState(false);
+
+  // Keyboard height for sheet avoidance
+  const keyboardHeight = useKeyboardHeight();
 
   // Mention state
   const [showMentions, setShowMentions] = useState(false);
@@ -864,6 +868,7 @@ export function PostWizard({
               onOpenChange={setShowMentions}
               query={mentionQuery}
               onSelect={handleMentionSelect}
+              bottomOffset={keyboardHeight}
             />
 
             {/* Tag People Sheet */}
@@ -873,6 +878,7 @@ export function PostWizard({
                   isOpen={showTagPeople}
                   onClose={() => setShowTagPeople(false)}
                   selectedTags={state.selectedTags}
+                  bottomOffset={keyboardHeight}
                   onTagsChange={(newTags) => {
                     const newlyAdded = newTags.filter(t => !state.selectedTags.some(p => p.id === t.id));
                     let appendText = '';
