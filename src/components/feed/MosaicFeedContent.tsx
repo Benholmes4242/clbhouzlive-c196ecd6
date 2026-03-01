@@ -121,9 +121,11 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
       ? (item as UserPostWithType).post_media.map(pm => ({ 
           media_url: pm.media_url, 
           media_type: pm.media_type,
-          studio_edits: (pm as any).studio_edits 
+          studio_edits: (pm as any).studio_edits,
+          trim_start: (pm as any).trim_start as number | null,
+          trim_end: (pm as any).trim_end as number | null,
         }))
-      : [{ media_url: (item as VideoPost).content.videoUrl || (item as VideoPost).content.image || '', media_type: (item as VideoPost).content.type, studio_edits: null }];
+      : [{ media_url: (item as VideoPost).content.videoUrl || (item as VideoPost).content.image || '', media_type: (item as VideoPost).content.type, studio_edits: null, trim_start: null as number | null, trim_end: null as number | null }];
     const currentIndex = currentMediaIndex[item.id] || 0;
     const hasMultipleMedia = media.length > 1;
     
@@ -222,6 +224,8 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                               loop={true}
                               autoplay={idx === currentIndex && isVisible}
                               onClick={handleTileClick}
+                              trimStart={mediaItem.trim_start}
+                              trimEnd={mediaItem.trim_end}
                             />
                           ) : (
                             <img
@@ -297,6 +301,8 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                           loop={true}
                           autoplay={isVisible}
                           onClick={handleTileClick}
+                          trimStart={media[0].trim_start}
+                          trimEnd={media[0].trim_end}
                         />
                       ) : (
                         <img

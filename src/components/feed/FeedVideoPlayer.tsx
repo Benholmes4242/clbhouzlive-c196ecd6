@@ -1,8 +1,8 @@
 import React, { forwardRef, useImperativeHandle, useRef, useEffect, useState } from 'react';
-import { HLSPlayer, HLSPlayerRef } from '@/media';
-import { isCloudflareStreamUrl, uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { getCloudflareStreamHLS, getCloudflareStreamPoster } from '@/utils/cloudflareStreamAPI';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+import { UnifiedVideoPlayer } from '@/media/components/UnifiedVideoPlayer';
 
 interface FeedVideoPlayerProps {
   src: string;
@@ -42,9 +42,11 @@ const FeedVideoPlayer = forwardRef<FeedVideoPlayerRef, FeedVideoPlayerProps>(({
   playsInline = true,
   preload = 'metadata',
   autoplay = false,
-  onClick
+  onClick,
+  trimStart,
+  trimEnd,
 }, ref) => {
-  const playerRef = useRef<HLSPlayerRef>(null);
+  const playerRef = useRef<any>(null);
   const [apiHlsUrl, setApiHlsUrl] = useState<string | null>(null);
   const [apiPoster, setApiPoster] = useState<string | null>(null);
 
@@ -92,10 +94,9 @@ const FeedVideoPlayer = forwardRef<FeedVideoPlayerRef, FeedVideoPlayerProps>(({
     );
   }
 
-  // UNIFIED WITH CLUBHOUSE: Use HLSPlayer with visibility-based autoplay
+  // Use UnifiedVideoPlayer which supports trim enforcement
   return (
-    <HLSPlayer
-      ref={playerRef}
+    <UnifiedVideoPlayer
       src={hlsUrl}
       posterUrl={poster}
       muted={muted}
@@ -103,10 +104,12 @@ const FeedVideoPlayer = forwardRef<FeedVideoPlayerRef, FeedVideoPlayerProps>(({
       autoplay={autoplay}
       showMuteButton={false}
       managedByMediaRuntime={false}
-      externallyManaged={false}
       preload="auto"
       className={className}
       onClick={onClick}
+      trimStart={trimStart}
+      trimEnd={trimEnd}
+      surface="grid"
     />
   );
 });

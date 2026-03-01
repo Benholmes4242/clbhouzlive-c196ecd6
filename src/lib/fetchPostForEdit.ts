@@ -27,6 +27,8 @@ export interface PostForEdit {
     height: number | null;
     aspect_ratio: number | null;
     duration_seconds: number | null;
+    trim_start: number | null;
+    trim_end: number | null;
   }>;
   courses: Array<{
     id: string;
