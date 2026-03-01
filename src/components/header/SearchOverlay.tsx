@@ -65,6 +65,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
       image: club.logo_url || undefined
     })),
     ...businesses.map(business => {
+      // Format subtitle as "City, Country" only - no category, no full address
       const formatCityCountry = () => {
         if (business.city || business.country) {
           return [business.city, business.country].filter(Boolean).join(', ');
@@ -205,34 +206,28 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
       transition={{ duration: 0.2 }}
       className="fixed inset-0 z-[80] flex flex-col min-h-0 h-full"
       style={{
-        background: '#F8FAFC',
-        paddingTop: 'max(env(safe-area-inset-top, 0px), 8px)',
+        background: useLightTheme ? 'hsl(var(--background) / 0.98)' : 'rgba(10, 10, 10, 0.98)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
+        paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
       }}
-      aria-modal
-      role="dialog"
     >
-      {/* Drag handle */}
-      <div className="flex justify-center pt-2.5 pb-1">
-        <div className="w-9 h-1 rounded-full" style={{ background: '#E0E0E0' }} />
-      </div>
-
-      {/* Header with search bar */}
-      <div className="flex-shrink-0 px-4 pt-2 pb-3">
-        <div className="flex items-center gap-3">
-          {/* Close button — 40x40 canonical target */}
-          <button
-            onClick={onClose}
-            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-muted/60 transition-colors"
-            aria-label="Close search"
-          >
-            <X size={20} className="text-foreground/70" />
-          </button>
-
-          {/* Search input — canonical search bar: h-11, rounded-2xl, amber focus ring */}
-          <div
-            className="flex-1 h-11 rounded-2xl bg-muted/50 border-[1.5px] border-border/50 px-3.5 flex items-center gap-3 transition-all focus-within:border-primary focus-within:ring-[3px] focus-within:ring-primary/25 focus-within:shadow-[0_0_0_3px_rgba(245,158,11,0.12)]"
-          >
-            <Search size={18} className="text-muted-foreground/60 shrink-0" />
+      {/* Search bar at top - Enhanced */}
+      <div className={cn(
+        "flex-shrink-0 px-4 pt-4 pb-3 border-b",
+        useLightTheme ? "border-border/60" : "border-white/6"
+      )}>
+        <div className="max-w-2xl mx-auto">
+          <div className={cn(
+            "relative flex items-center gap-3 h-12 px-4 rounded-xl border transition-all",
+            useLightTheme 
+              ? "bg-muted/50 border-border focus-within:border-border/80 focus-within:bg-background focus-within:ring-2 focus-within:ring-ring/30" 
+              : "bg-white/8 border-white/10 focus-within:border-white/20 focus-within:ring-2 focus-within:ring-white/10"
+          )}>
+            <Search className={cn(
+              "h-5 w-5 flex-shrink-0",
+              useLightTheme ? "text-muted-foreground/60" : "text-white/50"
+            )} />
             <input
               ref={inputRef}
               type="text"
@@ -242,34 +237,56 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                 setActiveIndex(-1);
               }}
               onKeyDown={handleKeyDown}
-              placeholder="Search players, courses, businesses…"
-              className="w-full bg-transparent outline-none text-sm text-foreground placeholder:text-muted-foreground/50"
+              placeholder="Search players, courses, businesses..."
+              className={cn(
+                "flex-1 bg-transparent border-none outline-none text-base",
+                useLightTheme 
+                  ? "text-foreground placeholder:text-muted-foreground/60" 
+                  : "text-white placeholder:text-white/40"
+              )}
               autoComplete="off"
               spellCheck="false"
             />
             {query && (
               <button
                 onClick={() => setQuery('')}
-                className="p-1 rounded-full hover:bg-muted/80 transition-colors"
+                className={cn(
+                  "flex-shrink-0 p-2.5 rounded-full transition-all active:scale-[0.9]",
+                  useLightTheme ? "hover:bg-muted bg-muted/50" : "hover:bg-white/15 bg-white/10"
+                )}
                 aria-label="Clear search"
               >
-                <X size={16} className="text-muted-foreground/60" />
+                <X className={cn(
+                  "h-3.5 w-3.5",
+                  useLightTheme ? "text-muted-foreground" : "text-white/60"
+                )} />
               </button>
             )}
+            <button
+              onClick={onClose}
+              className={cn(
+                "flex-shrink-0 px-3 py-3 text-sm font-medium rounded-full transition-all active:scale-[0.97]",
+                useLightTheme 
+                  ? "text-muted-foreground hover:text-foreground hover:bg-muted" 
+                  : "text-white/50 hover:text-white/70 hover:bg-white/10"
+              )}
+            >
+              Cancel
+            </button>
           </div>
+          {/* Search hints */}
+          {!query && (
+            <p className={cn(
+              "text-xs mt-2 px-1",
+              useLightTheme ? "text-muted-foreground/60" : "text-white/30"
+            )}>
+              Try "Pebble Beach", "@username", or "Augusta"
+            </p>
+          )}
         </div>
-        {/* Search hint */}
-        {!query && (
-          <p className="text-xs mt-2 px-1 text-muted-foreground/50">
-            Try "Pebble Beach", "@username", or "Augusta"
-          </p>
-        )}
       </div>
 
-      {/* Inset divider — canonical: mx-4 h-px bg-border/40 */}
-      <div className="mx-4 h-px bg-border/40" />
-
-      {/* Results area */}
+      {/* Results area - iOS scroll fix: min-h-0 + momentum */}
       <div 
         className="flex-1 min-h-0 overflow-y-auto overscroll-contain"
         style={{ WebkitOverflowScrolling: 'touch' }}
@@ -280,36 +297,65 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
           {isLoading && query.trim() && (
             <div className="space-y-2">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="flex items-center gap-4 p-3 rounded-xl animate-pulse">
-                  <div className="w-10 h-10 rounded-full bg-muted" />
+                <div key={i} className="flex items-center gap-4 p-3 rounded-sq-md animate-pulse">
+                  <div className={cn(
+                    "w-10 h-10 rounded-full",
+                    useLightTheme ? "bg-muted" : "bg-white/10"
+                  )} />
                   <div className="flex-1 space-y-2">
-                    <div className="w-32 h-4 rounded bg-muted" />
-                    <div className="w-24 h-3 rounded bg-muted/50" />
+                    <div className={cn(
+                      "w-32 h-4 rounded",
+                      useLightTheme ? "bg-muted" : "bg-white/10"
+                    )} />
+                    <div className={cn(
+                      "w-24 h-3 rounded",
+                      useLightTheme ? "bg-muted/50" : "bg-white/5"
+                    )} />
                   </div>
                 </div>
               ))}
             </div>
           )}
 
-          {/* Empty state — canonical: bg-primary/10 circle + text-primary icon */}
+          {/* Empty state - Enhanced */}
           {showEmpty && (
             <div className="py-16 text-center px-6">
-              <div className="w-14 h-14 rounded-full bg-primary/10 mx-auto mb-4 flex items-center justify-center">
-                <Search className="h-7 w-7 text-primary" />
+              <div className={cn(
+                "w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center",
+                useLightTheme ? "bg-muted" : "bg-white/5"
+              )}>
+                <Search className={cn(
+                  "h-10 w-10",
+                  useLightTheme ? "text-muted-foreground/30" : "text-white/20"
+                )} />
               </div>
-              <h3 className="text-lg font-semibold mb-2 text-foreground">No results found</h3>
-              <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-                We couldn't find any matches for "{query}". Try a different course, player, or business.
+              <h3 className={cn(
+                "text-lg font-semibold mb-2",
+                useLightTheme ? "text-foreground" : "text-white"
+              )}>No results found</h3>
+              <p className={cn(
+                "text-sm max-w-sm mx-auto",
+                useLightTheme ? "text-muted-foreground" : "text-white/50"
+              )}>
+                We couldn't find any matches for "{query}". Try searching for a different course, player, or business.
               </p>
-              {/* Suggestion chips */}
+              {/* Search suggestions */}
               <div className="mt-6 space-y-2">
-                <p className="text-xs font-medium text-muted-foreground/60 uppercase tracking-wider">Try searching for:</p>
+                <p className={cn(
+                  "text-xs font-semibold uppercase tracking-wide",
+                  useLightTheme ? "text-muted-foreground" : "text-white/40"
+                )}>Try searching for:</p>
                 <div className="flex flex-wrap gap-2 justify-center">
                   {['Pebble Beach', 'St Andrews', 'Augusta'].map(term => (
                     <button
                       key={term}
                       onClick={() => setQuery(term)}
-                      className="px-3.5 py-2 rounded-xl text-sm font-medium bg-muted/50 hover:bg-primary/[0.06] active:bg-primary/10 text-foreground/80 transition-colors"
+                      className={cn(
+                        "px-3 py-1.5 rounded-full text-sm transition-colors",
+                        useLightTheme 
+                          ? "bg-muted hover:bg-muted/80 text-foreground"
+                          : "bg-white/10 hover:bg-white/15 text-white/70"
+                      )}
                     >
                       {term}
                     </button>
@@ -321,12 +367,31 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
 
           {/* Results */}
           {hasResults && !isLoading && (
-            <div className="space-y-5">
-              {/* People section */}
+            <div className="space-y-6">
+              {/* People section - Enhanced */}
               {peopleResults.length > 0 && (
                 <div>
-                  <SectionHeader icon={User} label="People" color="blue" />
-                  <div className="space-y-0.5">
+                  <div className={cn(
+                    "flex items-center gap-2.5 px-3 py-2.5 mb-1 sticky top-0 z-[2] backdrop-blur-md rounded-lg",
+                    useLightTheme 
+                      ? "bg-background/95" 
+                      : "bg-[rgba(10,10,10,0.95)]"
+                  )}>
+                    <div className={cn(
+                      "w-6 h-6 rounded-md flex items-center justify-center",
+                      useLightTheme ? "bg-blue-100" : "bg-blue-500/20"
+                    )}>
+                      <User className={cn(
+                        "h-3.5 w-3.5",
+                        useLightTheme ? "text-blue-600" : "text-blue-400"
+                      )} />
+                    </div>
+                    <span className={cn(
+                      "text-xs font-bold uppercase tracking-wide",
+                      useLightTheme ? "text-foreground" : "text-white/70"
+                    )}>People</span>
+                  </div>
+                  <div className="space-y-1">
                     {peopleResults.map((item, index) => (
                       <ResultRow 
                         key={item.id} 
@@ -335,17 +400,37 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                         onClick={() => handleResultSelect(item, index)}
                         query={query}
                         getInitials={getInitials}
+                        useLightTheme={useLightTheme}
                       />
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Courses section */}
+              {/* Courses section - Enhanced */}
               {courseResults.length > 0 && (
                 <div>
-                  <SectionHeader icon={MapPin} label="Clubs & Courses" color="amber" />
-                  <div className="space-y-0.5">
+                  <div className={cn(
+                    "flex items-center gap-2.5 px-3 py-2.5 mb-1 sticky top-0 z-[2] backdrop-blur-md rounded-lg",
+                    useLightTheme 
+                      ? "bg-background/95" 
+                      : "bg-[rgba(10,10,10,0.95)]"
+                  )}>
+                    <div className={cn(
+                      "w-6 h-6 rounded-md flex items-center justify-center",
+                      useLightTheme ? "bg-orange-100" : "bg-primary/20"
+                    )}>
+                      <MapPin className={cn(
+                        "h-3.5 w-3.5",
+                        useLightTheme ? "text-orange-600" : "text-primary"
+                      )} />
+                    </div>
+                    <span className={cn(
+                      "text-xs font-bold uppercase tracking-wide",
+                      useLightTheme ? "text-foreground" : "text-white/70"
+                    )}>Clubs & Courses</span>
+                  </div>
+                  <div className="space-y-1">
                     {courseResults.map((item, index) => (
                       <ResultRow 
                         key={item.id} 
@@ -354,17 +439,37 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                         onClick={() => handleResultSelect(item, peopleResults.length + index)}
                         query={query}
                         getInitials={getInitials}
+                        useLightTheme={useLightTheme}
                       />
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Business Profiles section */}
+              {/* Business Profiles section - Enhanced */}
               {businessResults.length > 0 && (
                 <div>
-                  <SectionHeader icon={Building} label="Business Profiles" color="purple" />
-                  <div className="space-y-0.5">
+                  <div className={cn(
+                    "flex items-center gap-2.5 px-3 py-2.5 mb-1 sticky top-0 z-[2] backdrop-blur-md rounded-lg",
+                    useLightTheme 
+                      ? "bg-background/95" 
+                      : "bg-[rgba(10,10,10,0.95)]"
+                  )}>
+                    <div className={cn(
+                      "w-6 h-6 rounded-md flex items-center justify-center",
+                      useLightTheme ? "bg-purple-100" : "bg-purple-500/20"
+                    )}>
+                      <Building className={cn(
+                        "h-3.5 w-3.5",
+                        useLightTheme ? "text-purple-600" : "text-purple-400"
+                      )} />
+                    </div>
+                    <span className={cn(
+                      "text-xs font-bold uppercase tracking-wide",
+                      useLightTheme ? "text-foreground" : "text-white/70"
+                    )}>Business Profiles</span>
+                  </div>
+                  <div className="space-y-1">
                     {businessResults.map((item, index) => (
                       <ResultRow 
                         key={item.id} 
@@ -373,6 +478,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                         onClick={() => handleResultSelect(item, peopleResults.length + courseResults.length + index)}
                         query={query}
                         getInitials={getInitials}
+                        useLightTheme={useLightTheme}
                       />
                     ))}
                   </div>
@@ -384,53 +490,79 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
           {/* Idle state: Recent + Trending */}
           {showIdle && (
             <div className="space-y-6">
-              {/* Recent searches */}
+              {/* Recent searches - Enhanced */}
               {recent.length > 0 && (
                 <div>
-                  <div className="flex items-center justify-between mb-3 px-1">
-                    <p className="text-xs font-medium text-muted-foreground/60 uppercase tracking-wider">
-                      Recent
-                    </p>
+                  <div className="flex items-center justify-between mb-3 px-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className={cn(
+                        "w-6 h-6 rounded-md flex items-center justify-center",
+                        useLightTheme ? "bg-muted" : "bg-white/10"
+                      )}>
+                        <Clock className={cn(
+                          "h-3.5 w-3.5",
+                          useLightTheme ? "text-muted-foreground" : "text-white/50"
+                        )} />
+                      </div>
+                      <span className={cn(
+                        "text-xs font-bold uppercase tracking-wide",
+                        useLightTheme ? "text-foreground" : "text-white/70"
+                      )}>Recent</span>
+                    </div>
                     <button
                       onClick={clearRecentSearches}
-                      className="py-1 px-2 text-xs font-medium text-primary hover:text-primary/80 transition-colors active:scale-[0.97]"
+                      className={cn(
+                        "py-3 px-2 text-xs font-medium transition-all active:scale-[0.97]",
+                        "text-primary hover:text-primary/80"
+                      )}
                     >
                       Clear all
                     </button>
                   </div>
-                  <div className="space-y-0.5">
-                    {recent.slice(0, 8).map((search) => (
+                  <div className="flex flex-wrap gap-2 px-3">
+                    {recent.slice(0, 8).map((search, index) => (
                       <button
                         key={search.id}
                         onClick={() => handleRecentSearchClick(search.query)}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-primary/[0.06] active:bg-primary/10 transition-colors text-left"
+                        className={cn(
+                          "max-w-[200px] truncate px-4 py-2.5 text-sm font-medium rounded-full transition-all active:scale-[0.97]",
+                          useLightTheme 
+                            ? "bg-muted hover:bg-muted/80 text-foreground hover:shadow-sm" 
+                            : "bg-white/10 hover:bg-white/15 text-white/80"
+                        )}
                       >
-                        <Clock size={16} className="text-muted-foreground/40 shrink-0" />
-                        <span className="text-sm text-foreground/80 truncate">{search.query}</span>
+                        {search.query}
                       </button>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Today's Picks */}
+              {/* Today's Picks - Daily rotating content */}
               {popularItems.length > 0 && (
                 <div>
-                  <div className="flex items-center justify-between px-1 mb-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 rounded-md flex items-center justify-center bg-gradient-to-br from-primary to-amber-500">
-                        <Sparkles className="h-3 w-3 text-white" />
+                  <div className="flex items-center justify-between px-3 mb-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className={cn(
+                        "w-6 h-6 rounded-md flex items-center justify-center bg-gradient-to-br",
+                        useLightTheme ? "from-orange-500 to-amber-500" : "from-primary to-amber-500"
+                      )}>
+                        <Sparkles className="h-3.5 w-3.5 text-white" />
                       </div>
-                      <p className="text-xs font-medium text-muted-foreground/60 uppercase tracking-wider">
-                        Today's Picks
-                      </p>
+                      <span className={cn(
+                        "text-xs font-bold uppercase tracking-wide",
+                        useLightTheme ? "text-foreground" : "text-white/70"
+                      )}>Today's Picks</span>
                     </div>
-                    <div className="flex items-center gap-1 text-[10px] text-muted-foreground/40">
+                    <div className={cn(
+                      "flex items-center gap-1 text-[10px]",
+                      useLightTheme ? "text-muted-foreground/60" : "text-white/30"
+                    )}>
                       <RefreshCw className="w-2.5 h-2.5" />
                       <span>Updates daily</span>
                     </div>
                   </div>
-                  <div className="space-y-0.5">
+                  <div className="space-y-1">
                     {popularItems.slice(0, 5).map((item, index) => (
                       <ResultRow 
                         key={item.id} 
@@ -439,6 +571,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                         onClick={() => handleResultSelect(item, recent.length + index)}
                         query=""
                         getInitials={getInitials}
+                        useLightTheme={useLightTheme}
                       />
                     ))}
                   </div>
@@ -446,44 +579,16 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
               )}
             </div>
           )}
-
-          {/* True empty — no query, no recent, no trending */}
-          {!query.trim() && recent.length === 0 && popularItems.length === 0 && (
-            <div className="flex flex-col items-center justify-center pt-20">
-              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <Search size={24} className="text-primary" />
-              </div>
-              <p className="text-sm text-muted-foreground">Search for anything</p>
-            </div>
-          )}
         </div>
       </div>
+
+      {/* Backdrop tap to close */}
+      <button
+        className="absolute inset-0 -z-10"
+        onClick={onClose}
+        aria-label="Close search"
+      />
     </motion.div>
-  );
-};
-
-// Section header component
-interface SectionHeaderProps {
-  icon: React.FC<{ className?: string }>;
-  label: string;
-  color: 'blue' | 'amber' | 'purple';
-}
-
-const colorMap = {
-  blue: { bg: 'bg-blue-100', text: 'text-blue-600' },
-  amber: { bg: 'bg-primary/10', text: 'text-primary' },
-  purple: { bg: 'bg-purple-100', text: 'text-purple-600' },
-};
-
-const SectionHeader: React.FC<SectionHeaderProps> = ({ icon: Icon, label, color }) => {
-  const c = colorMap[color];
-  return (
-    <div className="flex items-center gap-2.5 px-3 py-2 mb-1">
-      <div className={cn("w-6 h-6 rounded-md flex items-center justify-center", c.bg)}>
-        <Icon className={cn("h-3.5 w-3.5", c.text)} />
-      </div>
-      <span className="text-xs font-medium text-muted-foreground/60 uppercase tracking-wider">{label}</span>
-    </div>
   );
 };
 
@@ -494,49 +599,81 @@ interface ResultRowProps {
   onClick: () => void;
   query: string;
   getInitials: (name: string) => string;
+  useLightTheme?: boolean;
 }
 
-const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, getInitials }) => {
+const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, getInitials, useLightTheme = false }) => {
+  // Highlight matching text with subtle background
   const highlightText = (text: string) => {
     if (!query.trim() || query.length < 2) return text;
     const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
     const parts = text.split(regex);
     return parts.map((part, i) => 
       regex.test(part) ? (
-        <span key={i} className="bg-primary/[0.18] rounded-sm">{part}</span>
+        <span 
+          key={i} 
+          className="bg-amber-500/[0.18] rounded-sm"
+        >
+          {part}
+        </span>
       ) : part
     );
   };
 
+  // Get type-specific styling
   const getTypeStyles = () => {
     switch (item.type) {
       case 'user':
-        return { gradient: 'from-blue-500 to-blue-600', label: 'Golfer' };
+        return {
+          gradient: useLightTheme ? 'from-blue-500 to-blue-600' : 'from-blue-400 to-blue-600',
+          badge: useLightTheme ? 'bg-blue-50 text-blue-700' : 'bg-blue-500/20 text-blue-300',
+          label: 'Golfer'
+        };
       case 'business':
-        return { gradient: 'from-purple-500 to-purple-600', label: 'Business' };
+        return {
+          gradient: useLightTheme ? 'from-purple-500 to-purple-600' : 'from-purple-400 to-purple-600',
+          badge: useLightTheme ? 'bg-purple-50 text-purple-700' : 'bg-purple-500/20 text-purple-300',
+          label: 'Business',
+          hoverBg: useLightTheme ? 'hover:bg-purple-50/50' : 'hover:bg-purple-500/5'
+        };
       case 'course':
-        return { gradient: 'from-green-600 to-emerald-600', label: 'Course' };
+        return {
+          gradient: useLightTheme ? 'from-green-500 to-green-600' : 'from-green-400 to-green-600',
+          badge: useLightTheme ? 'bg-green-50 text-green-700' : 'bg-green-500/20 text-green-300',
+          label: 'Course'
+        };
       default:
-        return { gradient: 'from-muted-foreground/40 to-muted-foreground/60', label: '' };
+        return {
+          gradient: useLightTheme ? 'from-muted-foreground/40 to-muted-foreground/60' : 'from-white/40 to-white/60',
+          badge: useLightTheme ? 'bg-muted text-muted-foreground' : 'bg-white/10 text-white/60',
+          label: ''
+        };
     }
   };
 
   const typeStyles = getTypeStyles();
+
+  // Strip ranking from subtitle if present (e.g., "California, USA • #7" → "California, USA")
   const subtitleWithoutRanking = item.subtitle.replace(/\s*•\s*#\d+/, '');
 
   return (
     <button
       onClick={onClick}
       className={cn(
-        "w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left group active:scale-[0.99]",
-        isActive 
-          ? "bg-primary/[0.06] ring-1 ring-primary/20" 
-          : "hover:bg-primary/[0.06] active:bg-primary/10"
+        "w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left group active:scale-[0.99] bg-transparent active:bg-white/5",
+        useLightTheme 
+          ? isActive ? "bg-muted ring-1 ring-border" : "hover:bg-muted/50 active:bg-muted"
+          : isActive ? "bg-white/10 ring-1 ring-white/10" : ""
       )}
     >
-      {/* Avatar */}
+      {/* Avatar with ranking badge */}
       <div className="relative flex-shrink-0">
-        <div className="w-11 h-11 rounded-xl flex items-center justify-center overflow-hidden border border-border/50 group-hover:border-border/80 transition-colors bg-muted/50">
+        <div className={cn(
+          "w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden border-2 transition-colors",
+          useLightTheme 
+            ? "bg-muted border-border group-hover:border-border/80" 
+            : "bg-white/8 border-white/10 group-hover:border-white/20"
+        )}>
           {item.image ? (
             <img 
               src={item.image} 
@@ -553,8 +690,9 @@ const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, g
           )}
         </div>
         
+        {/* Business indicator badge */}
         {item.type === 'business' && (
-          <div className="absolute bottom-[-3px] left-[-3px] w-5 h-5 rounded-full flex items-center justify-center border-2 bg-purple-500" style={{ borderColor: '#F8FAFC' }}>
+          <div className="absolute bottom-[-4px] left-[-4px] w-5 h-5 rounded-full flex items-center justify-center border-2 bg-purple-500" style={{ borderColor: '#F8FAFC' }}>
             <Building className="w-2.5 h-2.5 text-white" />
           </div>
         )}
@@ -562,19 +700,35 @@ const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, g
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <div className="text-sm font-semibold truncate text-foreground group-hover:text-primary transition-colors">
+        <div className={cn(
+          "text-base font-semibold truncate transition-colors",
+          useLightTheme 
+            ? "text-foreground group-hover:text-primary" 
+            : "text-white group-hover:text-primary"
+        )}>
           {highlightText(item.title)}
         </div>
         <div className="flex items-center gap-1.5 mt-0.5">
           {item.type === 'course' && (
-            <MapPin className="w-3 h-3 flex-shrink-0 text-muted-foreground/40" />
+            <MapPin className={cn(
+              "w-3 h-3 flex-shrink-0",
+              useLightTheme ? "text-muted-foreground/50" : "text-white/40"
+            )} />
           )}
-          <span className="text-xs truncate text-muted-foreground">{subtitleWithoutRanking}</span>
+          <span className={cn(
+            "text-xs truncate",
+            useLightTheme ? "text-muted-foreground" : "text-white/50"
+          )}>{subtitleWithoutRanking}</span>
         </div>
       </div>
 
       {/* Chevron */}
-      <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground/30 group-hover:text-muted-foreground/50 transition-colors" />
+      <ChevronRight className={cn(
+        "h-5 w-5 flex-shrink-0 transition-colors",
+        useLightTheme 
+          ? "text-muted-foreground/30 group-hover:text-muted-foreground/50" 
+          : "text-white/20 group-hover:text-white/40"
+      )} />
     </button>
   );
 };
