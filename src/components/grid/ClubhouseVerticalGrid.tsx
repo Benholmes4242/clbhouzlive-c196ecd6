@@ -223,7 +223,16 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { isGloballyMuted, setGlobalMute, setActiveVideo, isRecentUserGesture, markUserGestureUnmute } = useGlobalAudio();
+  const { setGlobalMute, setActiveVideo } = useGlobalAudio();
+
+  // Self-contained mute system — ref is source of truth, state drives UI
+  const isMutedRef = useRef<boolean>((() => {
+    try {
+      const saved = sessionStorage.getItem('globalAudioState');
+      return saved !== null ? JSON.parse(saved) : true;
+    } catch { return true; }
+  })());
+  const [isMutedState, setIsMutedState] = useState<boolean>(isMutedRef.current);
   const queryClient = useQueryClient();
   
   const PORTRAIT_MIN_AR = 1.2;
@@ -484,18 +493,28 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     }
   }, [currentIndex, filteredPosts]);
 
-  // Sync forced mute fallback from safePlay back to global state
-  // When autoplay fails unmuted, safePlay forces video.muted = true imperatively.
-  // This listener keeps the React UI icon in sync with the actual audio state.
+  // autoplay-muted-fallback listener removed — local mute system is immune to external overrides
+
+  // Sync mute state when active video changes
   useEffect(() => {
-    const handleForcedMute = () => {
-      if (!isGloballyMuted && !isRecentUserGesture()) {
-        setGlobalMute(true);
+    const currentPostId = filteredPosts[currentIndex]?.id;
+    if (currentPostId) {
+      const videoEl = videoRefs.current[currentPostId];
+      if (videoEl) {
+        videoEl.muted = isMutedRef.current as boolean;
+        if (!(isMutedRef.current as boolean)) {
+          videoEl.play().catch(() => {});
+        }
       }
+    }
+  }, [currentIndex, filteredPosts]);
+
+  // Sync back to GlobalAudioContext on unmount
+  useEffect(() => {
+    return () => {
+      setGlobalMute(isMutedRef.current as boolean);
     };
-    window.addEventListener('autoplay-muted-fallback', handleForcedMute);
-    return () => window.removeEventListener('autoplay-muted-fallback', handleForcedMute);
-  }, [isGloballyMuted, setGlobalMute, isRecentUserGesture]);
+  }, [setGlobalMute]);
 
   // FIX #1: Sync activeVideoId with GlobalAudioContext when currentIndex changes
   // This ensures non-prefetched videos respect the global mute state
@@ -545,9 +564,9 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
       const videoRef = videoRefs.current[pausedPostIndex];
       const pausedMediaId = postIdToMediaId.get(pausedPostIdRef.current) || pausedPostIdRef.current;
       
-      if (videoRef && !isGloballyMuted) {
+      if (videoRef && !(isMutedRef.current as boolean)) {
         // Use soft resume for smooth audio fade-in
-        softResume(videoRef, isGloballyMuted);
+        softResume(videoRef, isMutedRef.current);
       } else {
         // Fallback to regular resume
         runtimeBridge.requestPlay(pausedMediaId, 'user');
@@ -556,7 +575,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
       pausedByCommentsRef.current = false;
       pausedPostIdRef.current = null;
     }
-  }, [commentsModalOpen, onCommentsOpenChange, currentPost?.id, runtimeBridge, postIdToMediaId, filteredPosts, videoRefs, isGloballyMuted, softResume]);
+  }, [commentsModalOpen, onCommentsOpenChange, currentPost?.id, runtimeBridge, postIdToMediaId, filteredPosts, videoRefs, softResume]);
 
   // Follow status query
   const { data: isFollowing } = useQuery({
@@ -875,7 +894,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
           // When audioMode is 'music_only', the video's original audio should be muted
           // so the music track can play instead
           const shouldMuteVideoForMusic = audioMode === 'music_only' && postHasMusic;
-          const videoMuted = isGloballyMuted || shouldMuteVideoForMusic;
+          const videoMuted = (isMutedRef.current as boolean) || shouldMuteVideoForMusic;
           
           return (
             <div
@@ -1019,7 +1038,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           volume: musicData.volume,
                         }}
                         isActive={index === currentIndex}
-                        isGloballyMuted={isGloballyMuted}
+                        isGloballyMuted={isMutedState}
                         postId={item.id}
                         hideUI
                       />
@@ -1285,7 +1304,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
             likesCount={currentPostEngagement.likesCount}
             commentsCount={currentPostEngagement.commentsCount}
             hasLiked={currentPostEngagement.hasLiked}
-            isMuted={isGloballyMuted}
+            isMuted={isMutedState}
             isVideo={activeMediaIsVideo}
             isVisible={true}
             onLike={() => {
@@ -1298,18 +1317,20 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
               onMeaningfulInteraction?.();
             }}
             onMuteToggle={() => {
-              const newMuted = !isGloballyMuted;
-              if (!newMuted) markUserGestureUnmute();
-              // Update global state (drives all future renders via prop)
-              setGlobalMute(newMuted);
-              // Synchronous DOM mutation — takes effect immediately within the gesture call stack,
-              // critical for iOS WebView which requires synchronous unmute inside a user gesture.
+              const newMuted = !(isMutedRef.current as boolean);
+              isMutedRef.current = newMuted;
+              setIsMutedState(newMuted);
+
+              // Directly sync DOM on active video
               const currentPostId = filteredPosts[currentIndex]?.id;
               if (currentPostId) {
                 const activeVideoEl = videoRefs.current[currentPostId];
                 if (activeVideoEl) {
                   activeVideoEl.muted = newMuted;
                   activeVideoEl.volume = newMuted ? 0 : 1;
+                  if (!newMuted) {
+                    activeVideoEl.play().catch(() => {});
+                  }
                 }
               }
               onMeaningfulInteraction?.();
@@ -1391,12 +1412,25 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
               title: currentMusicData.title,
               artist: currentMusicData.artist
             } : null}
-            isMusicPlaying={showMusicTrack && !isGloballyMuted}
+            isMusicPlaying={showMusicTrack && !isMutedState}
             isFollowing={isFollowing === true}
             isOwnPost={currentPost.user?.id === user?.id}
             isVisible={true}
             onFollow={handleFollowToggle}
-            onMusicTap={() => { if (isGloballyMuted) markUserGestureUnmute(); setGlobalMute(!isGloballyMuted); }}
+            onMusicTap={() => {
+              const newMuted = !(isMutedRef.current as boolean);
+              isMutedRef.current = newMuted;
+              setIsMutedState(newMuted);
+              const currentPostId = filteredPosts[currentIndex]?.id;
+              if (currentPostId) {
+                const activeVideoEl = videoRefs.current[currentPostId];
+                if (activeVideoEl) {
+                  activeVideoEl.muted = newMuted;
+                  activeVideoEl.volume = newMuted ? 0 : 1;
+                  if (!newMuted) activeVideoEl.play().catch(() => {});
+                }
+              }
+            }}
             // Review mode props
             isReview={isReview}
             reviewData={reviewData}
