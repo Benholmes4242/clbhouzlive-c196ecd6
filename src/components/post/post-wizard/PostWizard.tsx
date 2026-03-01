@@ -161,7 +161,7 @@ export function PostWizard({
   const businessActors = useMemo(() => availableActors.filter(a => a.type === 'business'), [availableActors]);
 
   // Drafts
-  const { drafts, createDraft, canCreateDraft, uploadMedia } = useDrafts();
+  const { drafts, createDraft, canCreateDraft, uploadMedia, updateDraft: updateDraftFn, getDraft: getDraftFn, deleteMedia: deleteDraftMediaFn, deleteDraft: deleteDraftFn } = useDrafts();
   const { scheduledPosts } = useScheduledPosts();
 
   // Sheet states
@@ -472,6 +472,16 @@ export function PostWizard({
         scheduledAt: state.scheduledAt ?? undefined,
       });
 
+      // If this post was created from a loaded draft, clean it up
+      if (state.currentDraftId) {
+        try {
+          await deleteDraftFn(state.currentDraftId);
+          console.log('[PostWizard] Deleted source draft:', state.currentDraftId);
+        } catch (err) {
+          console.warn('[PostWizard] Failed to delete source draft:', err);
+        }
+      }
+
       setShowSuccess(true);
     } catch (error) {
       console.error('[PostWizard] Submission failed:', error);
@@ -541,63 +551,114 @@ export function PostWizard({
     toast.success('Editing scheduled post');
   }, [loadScheduledPost]);
 
+  const draftSaveInput = useMemo(() => ({
+    actorType: state.actor.type as 'personal' | 'business',
+    actorId: state.actor.id,
+    content: state.caption || null,
+    visibility: state.visibility as 'anyone' | 'followers' | 'private',
+    categories: [] as string[],
+    badges: [] as string[],
+    courseId: state.selectedCourses[0]?.id || null,
+    courseName: state.selectedCourses[0]?.name || null,
+    courseCountry: state.selectedCourses[0]?.country || null,
+    courseData: state.selectedCourses.length > 0 ? state.selectedCourses.map(c => ({ id: c.id, name: c.name, country: c.country, region: c.region })) : null,
+  }), [state.actor, state.caption, state.visibility, state.selectedCourses]);
+
+  const getEdits = useCallback((mediaId: string) => state.studioEditsByMediaId[mediaId], [state.studioEditsByMediaId]);
+
+  // Sync media for draft updates: delete removed items, upload new ones
+  const syncDraftMedia = useCallback(async (draftId: string) => {
+    const existingDraft = await getDraftFn(draftId);
+    const existingMedia = existingDraft?.media || [];
+    const existingMediaIds = new Set(existingMedia.map(m => m.id));
+
+    // Items the user kept (restored from draft, still in wizard)
+    const currentRestoredIds = new Set(
+      state.mediaItems
+        .filter(item => (item as any).isRestored && item.id)
+        .map(item => item.id)
+    );
+
+    // Delete removed media (was in DB, no longer in wizard)
+    const removedMedia = existingMedia.filter(m => !currentRestoredIds.has(m.id));
+    for (const removed of removedMedia) {
+      await deleteDraftMediaFn(removed.id);
+    }
+    // Clean up storage for removed items
+    if (removedMedia.length > 0) {
+      const { cleanupDraftMedia } = await import('@/services/drafts/draftMediaUpload');
+      await cleanupDraftMedia(removedMedia);
+    }
+
+    // Upload new media (has file object, not restored)
+    const newMedia = state.mediaItems.filter(item => item.file && !(item as any).isRestored);
+    if (newMedia.length > 0) {
+      const result = await uploadMedia(draftId, newMedia, getEdits);
+      if (result.failed.length > 0) {
+        toast.warning(`Draft updated, but ${result.failed.length} new media file(s) failed to upload`);
+      }
+    }
+  }, [state.mediaItems, getDraftFn, deleteDraftMediaFn, uploadMedia, getEdits]);
+
   const handleSaveDraft = useCallback(async () => {
-    if (!canCreateDraft) { toast.error('Maximum drafts reached'); return; }
+    if (!state.currentDraftId && !canCreateDraft) { toast.error('Maximum drafts reached'); return; }
     setIsSavingDraft(true);
     try {
-      const draft = await createDraft({
-        actorType: state.actor.type, actorId: state.actor.id,
-        content: state.caption || null, visibility: state.visibility,
-        categories: [], badges: [],
-        courseId: state.selectedCourses[0]?.id || null,
-        courseName: state.selectedCourses[0]?.name || null,
-        courseCountry: state.selectedCourses[0]?.country || null,
-        courseData: state.selectedCourses.length > 0 ? state.selectedCourses.map(c => ({ id: c.id, name: c.name, country: c.country, region: c.region })) : null,
-      });
-      if (draft?.id && state.mediaItems.length > 0) {
-        const mediaWithFiles = state.mediaItems.filter(item => item.file);
-        if (mediaWithFiles.length > 0) {
-          const result = await uploadMedia(draft.id, mediaWithFiles, (mediaId) => state.studioEditsByMediaId[mediaId]);
-          if (result.failed.length > 0) {
-            toast.warning(`Draft saved, but ${result.failed.length} media file(s) failed to upload`);
-            return;
+      if (state.currentDraftId) {
+        // UPDATE existing draft
+        const success = await updateDraftFn(state.currentDraftId, draftSaveInput);
+        if (!success) { toast.error('Failed to update draft'); return; }
+        await syncDraftMedia(state.currentDraftId);
+        toast.success('Draft updated');
+      } else {
+        // CREATE new draft
+        const draft = await createDraft(draftSaveInput);
+        if (draft?.id && state.mediaItems.length > 0) {
+          const mediaWithFiles = state.mediaItems.filter(item => item.file);
+          if (mediaWithFiles.length > 0) {
+            const result = await uploadMedia(draft.id, mediaWithFiles, getEdits);
+            if (result.failed.length > 0) {
+              toast.warning(`Draft saved, but ${result.failed.length} media file(s) failed to upload`);
+              return;
+            }
           }
         }
+        toast.success('Draft saved');
       }
-      toast.success('Draft saved');
     } catch { toast.error('Failed to save draft'); } finally { setIsSavingDraft(false); }
-  }, [state, canCreateDraft, createDraft, uploadMedia]);
+  }, [state, canCreateDraft, createDraft, updateDraftFn, uploadMedia, getEdits, draftSaveInput, syncDraftMedia]);
 
   const handleSaveDraftAndClose = useCallback(async () => {
-    if (!canCreateDraft) { toast.error('Maximum drafts reached'); return; }
+    if (!state.currentDraftId && !canCreateDraft) { toast.error('Maximum drafts reached'); return; }
     setIsSavingDraft(true);
     try {
-      const draft = await createDraft({
-        actorType: state.actor.type, actorId: state.actor.id,
-        content: state.caption || null, visibility: state.visibility,
-        categories: [], badges: [],
-        courseId: state.selectedCourses[0]?.id || null,
-        courseName: state.selectedCourses[0]?.name || null,
-        courseCountry: state.selectedCourses[0]?.country || null,
-        courseData: state.selectedCourses.length > 0 ? state.selectedCourses.map(c => ({ id: c.id, name: c.name, country: c.country, region: c.region })) : null,
-      });
-      if (draft?.id && state.mediaItems.length > 0) {
-        const mediaWithFiles = state.mediaItems.filter(item => item.file);
-        if (mediaWithFiles.length > 0) {
-          const result = await uploadMedia(draft.id, mediaWithFiles, (mediaId) => state.studioEditsByMediaId[mediaId]);
-          if (result.failed.length > 0) {
-            toast.warning(`Draft saved, but ${result.failed.length} file(s) failed`);
-            setShowCloseConfirm(false);
-            onClose();
-            return;
+      if (state.currentDraftId) {
+        // UPDATE existing draft
+        const success = await updateDraftFn(state.currentDraftId, draftSaveInput);
+        if (!success) { toast.error('Failed to update draft'); return; }
+        await syncDraftMedia(state.currentDraftId);
+        toast.success('Draft updated');
+      } else {
+        // CREATE new draft
+        const draft = await createDraft(draftSaveInput);
+        if (draft?.id && state.mediaItems.length > 0) {
+          const mediaWithFiles = state.mediaItems.filter(item => item.file);
+          if (mediaWithFiles.length > 0) {
+            const result = await uploadMedia(draft.id, mediaWithFiles, getEdits);
+            if (result.failed.length > 0) {
+              toast.warning(`Draft saved, but ${result.failed.length} file(s) failed`);
+              setShowCloseConfirm(false);
+              onClose();
+              return;
+            }
           }
         }
+        toast.success('Draft saved');
       }
-      toast.success('Draft saved');
       setShowCloseConfirm(false);
       onClose();
     } catch { toast.error("Couldn't save draft"); } finally { setIsSavingDraft(false); }
-  }, [state, canCreateDraft, createDraft, uploadMedia, onClose]);
+  }, [state, canCreateDraft, createDraft, updateDraftFn, uploadMedia, getEdits, onClose, draftSaveInput, syncDraftMedia]);
 
   // Success handlers
   const handleViewPost = useCallback(() => { onClose(); navigate('/clubhouse'); }, [onClose, navigate]);

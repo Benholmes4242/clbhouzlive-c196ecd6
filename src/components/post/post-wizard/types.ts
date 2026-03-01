@@ -47,6 +47,9 @@ export interface PostWizardState {
   isEditMode: boolean;
   editPostId: string | null;
   
+  // Draft tracking
+  currentDraftId: string | null;
+  
   // UI State
   isSubmitting: boolean;
   isDirty: boolean;
