@@ -301,6 +301,8 @@ export function useOptimisticReviewUpdate() {
     queryClient.invalidateQueries({ queryKey: ['course-rating-aggregates', courseId] });
     queryClient.invalidateQueries({ queryKey: ['course-rating-distribution', courseId] });
     queryClient.invalidateQueries({ queryKey: ['club-media', courseId] });
+    queryClient.invalidateQueries({ queryKey: ['club-media-paginated', courseId] });
+    queryClient.invalidateQueries({ queryKey: ['user-played-course', courseId] });
   }, [queryClient]);
 
   return {
