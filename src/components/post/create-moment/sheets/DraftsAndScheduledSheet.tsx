@@ -20,6 +20,10 @@ interface DraftsAndScheduledSheetProps {
   onSaveDraft?: () => void;
   canSaveDraft?: boolean;
   defaultTab?: 'drafts' | 'scheduled';
+  /** When set, shows an overwrite confirmation overlay before loading this draft */
+  pendingOverwriteDraft?: DraftWithMedia | null;
+  onConfirmOverwrite?: () => void;
+  onCancelOverwrite?: () => void;
 }
 
 export default function DraftsAndScheduledSheet({ 
@@ -29,7 +33,10 @@ export default function DraftsAndScheduledSheet({
   onEditScheduledPost,
   onSaveDraft,
   canSaveDraft = false,
-  defaultTab = 'drafts'
+  defaultTab = 'drafts',
+  pendingOverwriteDraft,
+  onConfirmOverwrite,
+  onCancelOverwrite,
 }: DraftsAndScheduledSheetProps) {
   const [activeTab, setActiveTab] = useState<'drafts' | 'scheduled'>(defaultTab);
   
@@ -296,6 +303,38 @@ export default function DraftsAndScheduledSheet({
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Overwrite Confirmation Overlay */}
+          <AnimatePresence>
+            {pendingOverwriteDraft && onConfirmOverwrite && onCancelOverwrite && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-background/98 backdrop-blur-xl p-6 rounded-t-3xl"
+              >
+                <AlertCircle size={40} className="text-primary mb-4" />
+                <h3 className="text-lg font-semibold text-foreground mb-2">Replace current post?</h3>
+                <p className="text-sm text-muted-foreground text-center mb-6">
+                  Loading this draft will replace your current post content.
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={onConfirmOverwrite}
+                    className="px-6 py-2.5 text-sm font-medium text-primary-foreground bg-primary rounded-xl hover:bg-primary/90 transition-colors"
+                  >
+                    Replace
+                  </button>
+                  <button
+                    onClick={onCancelOverwrite}
+                    className="px-6 py-2.5 text-sm font-medium bg-muted text-foreground rounded-xl hover:bg-muted/80 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
           
           {/* Safe area padding */}
           <div className="pb-safe" />
@@ -484,6 +523,7 @@ const ScheduledItem = React.memo(function ScheduledItem({
   onDelete,
   onEdit,
 }: ScheduledItemProps) {
+  const [confirmAction, setConfirmAction] = useState<'publish' | 'delete' | null>(null);
   const scheduledDate = new Date(post.scheduledAt);
   const formattedDate = format(scheduledDate, 'MMM d, yyyy');
   const formattedTime = format(scheduledDate, 'h:mm a');
@@ -493,7 +533,48 @@ const ScheduledItem = React.memo(function ScheduledItem({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05, duration: 0.2 }}
+      className="relative"
     >
+      {/* Confirmation overlay */}
+      <AnimatePresence>
+        {confirmAction && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-10 flex items-center justify-center gap-2 bg-background/95 backdrop-blur-sm rounded-2xl"
+          >
+            <span className="text-sm font-medium text-foreground mr-2">
+              {confirmAction === 'publish' ? 'Publish now?' : 'Delete this post?'}
+            </span>
+            <button
+              onClick={() => {
+                if (confirmAction === 'publish') onPostNow();
+                else onDelete();
+                setConfirmAction(null);
+              }}
+              disabled={isPublishing || isDeleting}
+              className={cn(
+                "px-4 py-2 text-sm font-medium rounded-xl transition-colors disabled:opacity-50",
+                confirmAction === 'delete'
+                  ? "text-destructive-foreground bg-destructive hover:bg-destructive/90"
+                  : "text-primary-foreground bg-primary hover:bg-primary/90"
+              )}
+            >
+              {confirmAction === 'publish' 
+                ? (isPublishing ? 'Posting…' : 'Publish') 
+                : (isDeleting ? 'Deleting…' : 'Delete')}
+            </button>
+            <button
+              onClick={() => setConfirmAction(null)}
+              className="px-4 py-2 text-sm font-medium bg-muted text-foreground rounded-xl hover:bg-muted/80 transition-colors"
+            >
+              Cancel
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="p-3 bg-card rounded-2xl border border-border shadow-sm space-y-3 active:bg-muted/40 transition-colors duration-100">
         <div className="flex items-start gap-3">
           {/* Thumbnail */}
@@ -503,6 +584,7 @@ const ScheduledItem = React.memo(function ScheduledItem({
                 src={thumbnail}
                 alt=""
                 className="w-full h-full object-cover"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
@@ -527,7 +609,7 @@ const ScheduledItem = React.memo(function ScheduledItem({
 
           {/* Delete button */}
           <button
-            onClick={onDelete}
+            onClick={() => setConfirmAction('delete')}
             disabled={isDeleting}
             className="w-10 h-10 rounded-full flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors flex-shrink-0 disabled:opacity-50"
             aria-label="Delete scheduled post"
@@ -539,7 +621,7 @@ const ScheduledItem = React.memo(function ScheduledItem({
         {/* Action buttons */}
         <div className="flex items-center gap-2">
           <button 
-            onClick={onPostNow}
+            onClick={() => setConfirmAction('publish')}
             disabled={isPublishing}
             className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors flex items-center gap-1.5 disabled:opacity-50"
           >

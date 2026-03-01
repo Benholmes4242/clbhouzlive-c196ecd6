@@ -173,6 +173,7 @@ export function PostWizard({
   const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const [showTagPeople, setShowTagPeople] = useState(false);
+  const [pendingDraftToLoad, setPendingDraftToLoad] = useState<DraftWithMedia | null>(null);
 
   // Keyboard height for sheet avoidance
   const keyboardHeight = useKeyboardHeight();
@@ -515,10 +516,24 @@ export function PostWizard({
   }, [setScheduledAt]);
 
   const handleLoadDraft = useCallback((draft: DraftWithMedia) => {
+    const isWizardDirty = state.caption.trim().length > 0 || state.mediaItems.length > 0;
+    if (isWizardDirty) {
+      setPendingDraftToLoad(draft);
+      return;
+    }
     loadDraft(draft);
     setShowDraftsSheet(false);
     toast.success('Draft loaded');
-  }, [loadDraft]);
+  }, [loadDraft, state.caption, state.mediaItems.length]);
+
+  const confirmLoadDraft = useCallback(() => {
+    if (pendingDraftToLoad) {
+      loadDraft(pendingDraftToLoad);
+      setPendingDraftToLoad(null);
+      setShowDraftsSheet(false);
+      toast.success('Draft loaded');
+    }
+  }, [pendingDraftToLoad, loadDraft]);
 
   const handleEditScheduledPost = useCallback((post: import('@/services/posts/scheduledPosts').ScheduledPost) => {
     loadScheduledPost(post);
@@ -569,13 +584,19 @@ export function PostWizard({
       if (draft?.id && state.mediaItems.length > 0) {
         const mediaWithFiles = state.mediaItems.filter(item => item.file);
         if (mediaWithFiles.length > 0) {
-          await uploadMedia(draft.id, mediaWithFiles, (mediaId) => state.studioEditsByMediaId[mediaId]);
+          const result = await uploadMedia(draft.id, mediaWithFiles, (mediaId) => state.studioEditsByMediaId[mediaId]);
+          if (result.failed.length > 0) {
+            toast.warning(`Draft saved, but ${result.failed.length} file(s) failed`);
+            setShowCloseConfirm(false);
+            onClose();
+            return;
+          }
         }
       }
       toast.success('Draft saved');
       setShowCloseConfirm(false);
       onClose();
-    } catch { toast.error('Failed to save draft'); } finally { setIsSavingDraft(false); }
+    } catch { toast.error("Couldn't save draft"); } finally { setIsSavingDraft(false); }
   }, [state, canCreateDraft, createDraft, uploadMedia, onClose]);
 
   // Success handlers
@@ -891,11 +912,14 @@ export function PostWizard({
             {/* Drafts & Scheduled */}
             <DraftsAndScheduledSheet
               isOpen={showDraftsSheet}
-              onClose={() => setShowDraftsSheet(false)}
+              onClose={() => { setShowDraftsSheet(false); setPendingDraftToLoad(null); }}
               onLoadDraft={handleLoadDraft}
               onEditScheduledPost={handleEditScheduledPost}
               onSaveDraft={handleSaveDraft}
               canSaveDraft={canCreateDraft && state.isDirty}
+              pendingOverwriteDraft={pendingDraftToLoad}
+              onConfirmOverwrite={confirmLoadDraft}
+              onCancelOverwrite={() => setPendingDraftToLoad(null)}
             />
 
             {/* Schedule Sheet */}
