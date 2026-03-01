@@ -206,9 +206,6 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
       transition={{ duration: 0.25 }}
       className="fixed inset-0 z-[10002] flex flex-col bg-black"
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
     >
       {/* Solid black nav bar — matches Studio pattern */}
       <div
@@ -218,6 +215,8 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
         <div className="h-11 flex items-center justify-between px-4">
           <button
             onClick={onClose}
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchEnd={(e) => e.stopPropagation()}
             className="w-11 h-11 rounded-full flex items-center justify-center active:bg-white/10 transition-colors"
             aria-label="Close preview"
           >
@@ -280,7 +279,12 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
       </div>
 
       {/* Media canvas */}
-      <div className="flex-1 relative overflow-hidden min-h-0">
+      <div
+        className="flex-1 relative overflow-hidden min-h-0"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         {[-1, 0, 1].map(offset => {
           const idx = currentIndex + offset;
           if (idx < 0 || idx >= items.length) return null;
@@ -359,6 +363,8 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
                     {isActive && (
                       <button
                         onClick={toggleMute}
+                        onTouchStart={(e) => e.stopPropagation()}
+                        onTouchEnd={(e) => e.stopPropagation()}
                         className="absolute bottom-16 right-4 w-8 h-8 rounded-full flex items-center justify-center z-10"
                         style={{
                           background: 'rgba(0,0,0,0.45)',
@@ -412,7 +418,12 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
 
       {/* Video trimmer — between video and scrubber */}
       {item.type === 'video' && showTrimmer && (
-        <div className="flex-shrink-0 overflow-y-auto" style={{ maxHeight: '35vh' }}>
+        <div
+          className="flex-shrink-0 overflow-y-auto"
+          style={{ maxHeight: '35vh' }}
+          onTouchStart={(e) => e.stopPropagation()}
+          onTouchMove={(e) => e.stopPropagation()}
+        >
           <VideoTrimmer
             videoUrl={item.previewUrl}
             duration={item.duration || 0}
@@ -427,7 +438,12 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
 
       {/* Poster frame picker — mutually exclusive with trimmer */}
       {item.type === 'video' && showPosterPicker && (
-        <div className="flex-shrink-0 overflow-y-auto" style={{ maxHeight: '35vh' }}>
+        <div
+          className="flex-shrink-0 overflow-y-auto"
+          style={{ maxHeight: '35vh' }}
+          onTouchStart={(e) => e.stopPropagation()}
+          onTouchMove={(e) => e.stopPropagation()}
+        >
           <PosterFramePicker
             videoUrl={item.previewUrl}
             duration={item.duration || 0}
@@ -445,7 +461,12 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
       <div className="flex-shrink-0 bg-black">
         {/* Video scrubber + time readout */}
         {item.type === 'video' && (
-          <div className="flex items-center gap-3 px-4 pt-2" key={`scrubber-${currentIndex}`}>
+          <div
+            className="flex items-center gap-3 px-4 pt-2"
+            key={`scrubber-${currentIndex}`}
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
+          >
             <div className="flex-1 relative" style={{ height: 3 }}>
               <VideoScrubber
                 videoEl={videoRef.current}
@@ -464,7 +485,11 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
 
         {/* Pagination dots */}
         {items.length > 1 && (
-          <div className="flex items-center justify-center gap-1.5 py-3">
+          <div
+            className="flex items-center justify-center gap-1.5 py-3"
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
+          >
             {items.map((_, idx) => (
               <button
                 key={idx}
