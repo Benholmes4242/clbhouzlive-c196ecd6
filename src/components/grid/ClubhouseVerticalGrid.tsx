@@ -515,33 +515,34 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     let rafId: number;
     const tick = () => {
       const currentPostId = filteredPosts[currentIndex]?.id;
-      const refValue = currentPostId ? videoRefs.current[currentPostId] : null;
-      
-      // What type of element is the ref?
-      const tagName = refValue?.tagName;
-      const isVideoEl = refValue instanceof HTMLVideoElement;
-      
-      // If it's not a video, try to find one inside it
-      const actualVideo = isVideoEl ? refValue : (refValue as any)?.querySelector?.('video');
-      
-      console.log('[PROGRESS-DEBUG]', {
-        currentPostId: currentPostId?.slice(-8),
-        refTagName: tagName,
-        isVideoEl,
-        hasQuerySelector: !!(refValue as any)?.querySelector,
-        foundNestedVideo: !!actualVideo,
-        duration: actualVideo?.duration,
-        currentTime: actualVideo?.currentTime,
-        readyState: actualVideo?.readyState,
-        paused: actualVideo?.paused,
-      });
-
-      if (actualVideo && actualVideo.duration && isFinite(actualVideo.duration)) {
-        setVideoProgress(actualVideo.currentTime / actualVideo.duration);
+      if (currentPostId) {
+        let videoEl: HTMLVideoElement | null = videoRefs.current[currentPostId] || null;
+        
+        // If ref isn't a video element, try to find one in the DOM for this post
+        if (videoEl && !(videoEl instanceof HTMLVideoElement)) {
+          videoEl = (videoEl as any).querySelector?.('video') || null;
+        }
+        
+        if (videoEl) {
+          const duration = videoEl.duration;
+          const currentTime = videoEl.currentTime;
+          
+          // Handle HLS streams where duration may be Infinity, NaN, or 0
+          if (duration && isFinite(duration) && duration > 0 && currentTime >= 0) {
+            setVideoProgress(currentTime / duration);
+          } else if (videoEl.buffered?.length > 0) {
+            // Fallback for HLS: use buffered end as approximate duration
+            const bufferedEnd = videoEl.buffered.end(videoEl.buffered.length - 1);
+            if (bufferedEnd > 0 && currentTime >= 0) {
+              setVideoProgress(Math.min(currentTime / bufferedEnd, 1));
+            }
+          }
+        } else {
+          setVideoProgress(0);
+        }
       } else {
         setVideoProgress(0);
       }
-      
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
