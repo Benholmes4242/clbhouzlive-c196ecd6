@@ -477,7 +477,7 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
             <div className="flex-1 relative" style={{ height: 3 }}>
               <VideoScrubber
                 videoEl={videoRef.current}
-                variant="wizard"
+                variant="fullscreen"
                 height={3}
               />
             </div>
