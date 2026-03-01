@@ -26,16 +26,13 @@ export const useNavigationHandlers = () => {
   }, [location.pathname]);
 
   const handleTabClick = (tab: { id: string; path: string | null; isAction?: boolean }) => {
-    console.log('useNavigationHandlers: handleTabClick called with:', tab);
-    
     if (tab.isAction) {
-      console.log('useNavigationHandlers: Action tab detected, not handling navigation');
       // Action tabs are handled by the parent component (BottomNavigation)
       return;
     }
 
     if (tab.path) {
-      console.log('useNavigationHandlers: Navigating to:', tab.path);
+      setActiveTab(tab.id);
       setActiveTab(tab.id);
 
 
@@ -69,52 +66,27 @@ export const useNavigationHandlers = () => {
    * Prefetches videos when user hovers over Watch/Discover, Clubhouse/Home, or Profile tabs.
    */
   const handlePrefetch = useCallback((path: string) => {
-    console.log('[useNavigationHandlers] handlePrefetch called with:', path);
-
-    
     // Prefetch for Clubhouse/Home tab
     if (path === '/clubhouse' || path === '/' || path.includes('clubhouse')) {
-      console.log('[Navigation] Triggering clubhouse prefetch for path:', path);
-      prefetchClubhouseVideos().then(ids => {
-        if (ids && ids.length > 0) {
-          console.log('[Navigation] Clubhouse prefetch completed:', ids.length, 'videos');
-        }
-      });
+      prefetchClubhouseVideos();
     }
     
     // Prefetch for Profile page
     if (path.includes('/profile') || path.includes('/u/')) {
-      console.log('[Navigation] Triggering profile prefetch for path:', path);
-      
       // Extract userId or username from path
       const userIdMatch = path.match(/\/profile\/([^\/]+)/);
       const usernameMatch = path.match(/\/u\/([^\/]+)/);
       
       if (usernameMatch?.[1]) {
-        // Path has username - need to resolve to ID first
         resolveUsernameToId(usernameMatch[1]).then(userId => {
           if (userId) {
-            prefetchProfileVideos(userId).then(ids => {
-              if (ids && ids.length > 0) {
-                console.log('[Navigation] Profile prefetch completed:', ids.length, 'videos');
-              }
-            });
+            prefetchProfileVideos(userId);
           }
         });
       } else if (userIdMatch?.[1]) {
-        // Path has userId directly
-        prefetchProfileVideos(userIdMatch[1]).then(ids => {
-          if (ids && ids.length > 0) {
-            console.log('[Navigation] Profile prefetch completed:', ids.length, 'videos');
-          }
-        });
+        prefetchProfileVideos(userIdMatch[1]);
       } else {
-        // Own profile (no specific user in path)
-        prefetchProfileVideos().then(ids => {
-          if (ids && ids.length > 0) {
-            console.log('[Navigation] Own profile prefetch completed:', ids.length, 'videos');
-          }
-        });
+        prefetchProfileVideos();
       }
     }
   }, []);

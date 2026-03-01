@@ -45,12 +45,10 @@ export async function prefetchClubhouseVideos(): Promise<string[] | null> {
   const now = Date.now();
   
   if (now - lastPrefetchTime < PREFETCH_COOLDOWN_MS) {
-    console.log('[ClubhousePrefetch] Skipped - within cooldown');
     return lastPrefetchedIds;
   }
   
   if (prefetchPromise) {
-    console.log('[ClubhousePrefetch] Already in progress');
     return prefetchPromise;
   }
   
@@ -58,8 +56,6 @@ export async function prefetchClubhouseVideos(): Promise<string[] | null> {
   
   prefetchPromise = (async () => {
     try {
-      console.log('[ClubhousePrefetch] Starting instant video prefetch');
-      const startTime = performance.now();
       
       // Query matches useInfiniteClubhouseShorts / fetchClubhouseExploreShorts
       const { data, error } = await supabase
@@ -85,7 +81,6 @@ export async function prefetchClubhouseVideos(): Promise<string[] | null> {
       }
       
       if (!data || data.length === 0) {
-        console.log('[ClubhousePrefetch] No videos found');
         return null;
       }
       
@@ -103,7 +98,7 @@ export async function prefetchClubhouseVideos(): Promise<string[] | null> {
           // Skip if already prefetched
           if (!isPrefetchComplete(streamId)) {
             const hlsUrl = generateStreamHlsUrl(streamId);
-            console.log(`[ClubhousePrefetch] Prefetching [${prefetchedIds.length - 1}]: ${streamId.slice(0, 8)}`);
+            
             
             // Prefetch HLS (manifest + first 2 segments)
             prefetchPromises.push(preloadHlsManifest(hlsUrl, streamId));
@@ -119,8 +114,8 @@ export async function prefetchClubhouseVideos(): Promise<string[] | null> {
       await Promise.allSettled(criticalPromises);
       
       lastPrefetchedIds = prefetchedIds;
-      const elapsed = performance.now() - startTime;
-      console.log(`[ClubhousePrefetch] ✅ Instant prefetch for ${prefetchedIds.length} videos in ${elapsed.toFixed(0)}ms`);
+      
+      return prefetchedIds;
       
       return prefetchedIds;
     } catch (err) {
