@@ -44,6 +44,10 @@ export const GlobalAudioProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   // Save state to sessionStorage whenever it changes
   useEffect(() => {
+    console.log('[MUTE-DEBUG] GlobalAudioContext sessionStorage write', {
+      isGloballyMuted,
+      timestamp: performance.now().toFixed(1),
+    });
     try {
       sessionStorage.setItem(AUDIO_STATE_KEY, JSON.stringify(isGloballyMuted));
     } catch {
@@ -61,7 +65,15 @@ export const GlobalAudioProvider: React.FC<{ children: React.ReactNode }> = ({ c
   }, []);
 
   const toggleGlobalMute = useCallback(() => {
-    setIsGloballyMuted(prev => !prev);
+    setIsGloballyMuted(prev => {
+      const newVal = !prev;
+      console.log('[MUTE-DEBUG] GlobalAudioContext toggleGlobalMute', {
+        prev,
+        newVal,
+        timestamp: performance.now().toFixed(1),
+      });
+      return newVal;
+    });
   }, []);
 
   const setActiveVideo = useCallback((videoId: string | null) => {

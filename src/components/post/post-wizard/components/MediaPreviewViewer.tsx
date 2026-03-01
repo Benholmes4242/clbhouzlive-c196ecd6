@@ -65,6 +65,14 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
 
   // Pause non-active videos & play active one on slide change
   useEffect(() => {
+    console.log('[MUTE-DEBUG] slide-change useEffect FIRED', {
+      currentIndex,
+      isGloballyMuted,
+      refTarget: videoRef.current ? `<video src="${videoRef.current.src?.slice(-40)}">` : 'NULL',
+      refMuted: videoRef.current?.muted,
+      timestamp: performance.now().toFixed(1),
+    });
+
     setIsPlaying(true);
     setShowPlayIcon(false);
     setShowTrimmer(false);
@@ -83,6 +91,12 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
     if (videoRef.current && videoRef.current.paused) {
       videoRef.current.play().catch(() => {});
     }
+
+    console.log('[MUTE-DEBUG] slide-change after play()', {
+      refMuted: videoRef.current?.muted,
+      refPaused: videoRef.current?.paused,
+      isGloballyMuted,
+    });
   }, [currentIndex]);
 
   // Release decoder on viewer close
@@ -194,29 +208,135 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
 
   const toggleMute = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
+    const preToggleGlobal = isGloballyMuted;
+    const preToggleDOM = videoRef.current?.muted;
+    const preToggleVolume = videoRef.current?.volume;
+    const refTarget = videoRef.current ? `<video src="${videoRef.current.src?.slice(-40)}">` : 'NULL';
+
+    console.log('[MUTE-DEBUG] toggleMute FIRED', {
+      preToggleGlobal,
+      preToggleDOM,
+      preToggleVolume,
+      refTarget,
+      currentIndex,
+      eventType: e.type,
+      eventTarget: (e.target as HTMLElement)?.tagName,
+      timestamp: performance.now().toFixed(1),
+    });
+
     const newMuted = !isGloballyMuted;
     toggleGlobalMute();
+
     // Immediately sync DOM — don't wait for React re-render
     if (videoRef.current) {
       videoRef.current.muted = newMuted;
+      console.log('[MUTE-DEBUG] toggleMute DOM SET', {
+        setTo: newMuted,
+        actualAfterSet: videoRef.current.muted,
+        match: videoRef.current.muted === newMuted,
+      });
       // iOS requires play() within user gesture when unmuting
       if (!newMuted) {
-        videoRef.current.play().catch(() => {});
+        videoRef.current.play().catch((err) => {
+          console.log('[MUTE-DEBUG] toggleMute play() REJECTED', err.message);
+        });
       }
+    } else {
+      console.log('[MUTE-DEBUG] toggleMute videoRef.current is NULL — cannot set DOM');
     }
-  }, [toggleGlobalMute, isGloballyMuted]);
+  }, [toggleGlobalMute, isGloballyMuted, currentIndex]);
 
   // Fix React muted attribute bug — React doesn't update video.muted after mount
   // currentIndex included so new video elements get synced on slide change
   useEffect(() => {
+    const domBefore = videoRef.current?.muted;
+    const refTarget = videoRef.current ? `<video src="${videoRef.current.src?.slice(-40)}">` : 'NULL';
+
+    console.log('[MUTE-DEBUG] muted-sync useEffect FIRED', {
+      isGloballyMuted,
+      currentIndex,
+      domBefore,
+      refTarget,
+      timestamp: performance.now().toFixed(1),
+    });
+
     if (videoRef.current) {
       videoRef.current.muted = isGloballyMuted;
+      console.log('[MUTE-DEBUG] muted-sync useEffect DOM SET', {
+        setTo: isGloballyMuted,
+        actualAfterSet: videoRef.current.muted,
+        match: videoRef.current.muted === isGloballyMuted,
+      });
       // If user has unmuted, ensure the new video plays with audio
       if (!isGloballyMuted) {
-        videoRef.current.play().catch(() => {});
+        videoRef.current.play().catch((err) => {
+          console.log('[MUTE-DEBUG] muted-sync play() REJECTED', err.message);
+        });
       }
+    } else {
+      console.log('[MUTE-DEBUG] muted-sync useEffect videoRef.current is NULL');
     }
   }, [isGloballyMuted, currentIndex]);
+
+  // Debug: video event listeners for mute state tracking
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const onVolumeChange = () => {
+      console.log('[MUTE-DEBUG] VIDEO EVENT volumechange', {
+        muted: video.muted,
+        volume: video.volume,
+        currentIndex,
+        isGloballyMuted,
+        timestamp: performance.now().toFixed(1),
+        stack: new Error().stack?.split('\n').slice(1, 4).join(' | '),
+      });
+    };
+
+    const onPlay = () => {
+      console.log('[MUTE-DEBUG] VIDEO EVENT play', {
+        muted: video.muted,
+        volume: video.volume,
+        timestamp: performance.now().toFixed(1),
+      });
+    };
+
+    const onPause = () => {
+      console.log('[MUTE-DEBUG] VIDEO EVENT pause', {
+        muted: video.muted,
+        timestamp: performance.now().toFixed(1),
+      });
+    };
+
+    video.addEventListener('volumechange', onVolumeChange);
+    video.addEventListener('play', onPlay);
+    video.addEventListener('pause', onPause);
+
+    console.log('[MUTE-DEBUG] Video listeners ATTACHED', {
+      src: video.src?.slice(-40),
+      muted: video.muted,
+      currentIndex,
+    });
+
+    return () => {
+      video.removeEventListener('volumechange', onVolumeChange);
+      video.removeEventListener('play', onPlay);
+      video.removeEventListener('pause', onPause);
+      console.log('[MUTE-DEBUG] Video listeners DETACHED');
+    };
+  }, [currentIndex, isGloballyMuted]);
+
+  // Debug: icon render state
+  const debugIconState = (() => {
+    console.log('[MUTE-DEBUG] RENDER icon', {
+      isGloballyMuted,
+      showingIcon: isGloballyMuted ? 'VolumeX (muted)' : 'Volume2 (unmuted)',
+      currentIndex,
+      timestamp: performance.now().toFixed(1),
+    });
+    return null;
+  })();
 
   if (!item) return null;
 
