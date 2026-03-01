@@ -253,36 +253,95 @@ export function useReviewWizard({
         facilities: state.breakdowns.facilities || undefined,
       });
 
-      // FIX #2: Invalidate ALL relevant queries with complete, specific keys
-      // This ensures immediate UI updates across all tabs
-      
-      // Course-specific queries - include courseId for precise targeting
-      if (course?.id) {
-        // Reviews list - use exact: false to match all sort/filter variations
-        queryClient.invalidateQueries({ 
-          queryKey: ['course-reviews-full', course.id],
-          exact: false 
-        });
-        
-        // User's rating - MUST include both courseId AND userId
-        if (currentUserId) {
-          queryClient.invalidateQueries({ 
-            queryKey: ['user-course-rating', course.id, currentUserId] 
-          });
+      // --- Optimistic cache insert: show the review instantly ---
+      if (course?.id && currentUserId) {
+        try {
+          const optimisticReview = {
+            id: ratingId,
+            course_id: course.id,
+            user_id: currentUserId,
+            rating: state.rating,
+            design_score: state.breakdowns.design ?? null,
+            condition_score: state.breakdowns.condition ?? null,
+            clubhouse_score: state.breakdowns.clubhouse ?? null,
+            facilities_score: state.breakdowns.facilities ?? null,
+            review: state.review || null,
+            review_date: new Date().toISOString(),
+            helpful_count: 0,
+            unhelpful_count: 0,
+            is_mock: false,
+            user_profiles: {
+              id: currentUserId,
+              username: user?.user_metadata?.username || '',
+              display_name: user?.user_metadata?.display_name || '',
+              profile_photo_url: user?.user_metadata?.profile_photo_url || null,
+            },
+            course_review_media: [],
+            media: [],
+            _isOptimistic: true,
+          };
+
+          queryClient.setQueriesData(
+            { queryKey: ['course-reviews-full', course.id], exact: false },
+            (old: any) => {
+              if (!old || !Array.isArray(old)) return old;
+              return [optimisticReview, ...old.filter((r: any) => r.user_id !== currentUserId)];
+            }
+          );
+
+          // Optimistic aggregates update
+          queryClient.setQueryData(
+            ['course-rating-aggregates', course.id],
+            (old: any) => {
+              if (!old) return old;
+              const prevRating = isEditMode ? (existingRating?.rating || 0) : 0;
+              const newCount = isEditMode ? old.review_count : (old.review_count || 0) + 1;
+              const totalRating = isEditMode
+                ? (old.avg_overall_score || 0) * old.review_count - prevRating + (state.rating || 0)
+                : (old.avg_overall_score || 0) * (old.review_count || 0) + (state.rating || 0);
+              return {
+                ...old,
+                review_count: newCount,
+                avg_overall_score: newCount > 0 ? totalRating / newCount : 0,
+                text_review_count: (old.text_review_count || 0) + (state.review ? (isEditMode ? 0 : 1) : 0),
+                _isOptimistic: true,
+              };
+            }
+          );
+
+          // Set user rating cache
+          queryClient.setQueryData(
+            ['user-course-rating', course.id, currentUserId],
+            {
+              id: ratingId,
+              rating: state.rating,
+              review: state.review || null,
+              design_score: state.breakdowns.design ?? null,
+              condition_score: state.breakdowns.condition ?? null,
+              clubhouse_score: state.breakdowns.clubhouse ?? null,
+              facilities_score: state.breakdowns.facilities ?? null,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              _isOptimistic: true,
+            }
+          );
+        } catch (e) {
+          // Non-critical — refetch will fix it
         }
+      }
+
+      // --- Force refetch critical queries (not just invalidate) ---
+      // refetchQueries with type:'all' fetches even for inactive observers,
+      // ensuring fresh data when the user switches to the Reviews tab.
+      if (course?.id) {
+        void queryClient.refetchQueries({ queryKey: ['course-reviews-full', course.id], exact: false, type: 'all' });
+        void queryClient.refetchQueries({ queryKey: ['course-rating-aggregates', course.id], type: 'all' });
+        void queryClient.refetchQueries({ queryKey: ['course-rating-distribution', course.id], type: 'all' });
+        void queryClient.refetchQueries({ queryKey: ['course-detail', course.id], type: 'all' });
         
-        // Rating aggregates (average, count)
-        queryClient.invalidateQueries({ 
-          queryKey: ['course-rating-aggregates', course.id] 
-        });
-        
-        // Rating distribution (for chart)
-        queryClient.invalidateQueries({ 
-          queryKey: ['course-rating-distribution', course.id] 
-        });
-        
-        // Course detail page
-        queryClient.invalidateQueries({ queryKey: ['course-detail', course.id] });
+        if (currentUserId) {
+          void queryClient.refetchQueries({ queryKey: ['user-course-rating', course.id, currentUserId], type: 'all' });
+        }
         
         // Media tab - reviews can include media
         queryClient.invalidateQueries({ queryKey: ['club-media', course.id] });
@@ -317,6 +376,12 @@ export function useReviewWizard({
       queryClient.invalidateQueries({ queryKey: ['user-course-activity'] });
       queryClient.invalidateQueries({ queryKey: ['user-course-ratings-breakdown'] });
       queryClient.invalidateQueries({ queryKey: ['user-played-courses-full'] });
+      
+      // Previously missing invalidations
+      queryClient.invalidateQueries({ queryKey: ['user-course-reviews'] });
+      queryClient.invalidateQueries({ queryKey: ['reviews-of-the-week'] });
+      queryClient.invalidateQueries({ queryKey: ['user-exploration-status'] });
+      queryClient.invalidateQueries({ queryKey: ['exploration-leaderboard'] });
 
       // For edit mode, go directly to success
       // For new reviews, go to preview step first
@@ -690,6 +755,14 @@ export function useReviewWizard({
         confirmUpdate(course.id, currentUserId);
       }
 
+      // Force refetch critical queries for immediate UI update
+      if (course?.id) {
+        void queryClient.refetchQueries({ queryKey: ['course-reviews-full', course.id], exact: false, type: 'all' });
+        void queryClient.refetchQueries({ queryKey: ['course-rating-aggregates', course.id], type: 'all' });
+        void queryClient.refetchQueries({ queryKey: ['course-rating-distribution', course.id], type: 'all' });
+        void queryClient.refetchQueries({ queryKey: ['course-detail', course.id], type: 'all' });
+      }
+
       // Global queries
       queryClient.invalidateQueries({ queryKey: ['course-ratings'] });
       queryClient.invalidateQueries({ queryKey: ['user-course-rating'] });
@@ -716,10 +789,13 @@ export function useReviewWizard({
       queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
       queryClient.invalidateQueries({ queryKey: ['user-exploration-status'] });
       queryClient.invalidateQueries({ queryKey: ['exploration-leaderboard'] });
-      // Profile page queries (previously missing)
+      // Profile page queries
       queryClient.invalidateQueries({ queryKey: ['user-course-ratings-breakdown'] });
       queryClient.invalidateQueries({ queryKey: ['user-played-courses-full'] });
       queryClient.invalidateQueries({ queryKey: ['user-course-activity'] });
+      // Previously missing
+      queryClient.invalidateQueries({ queryKey: ['user-course-reviews'] });
+      queryClient.invalidateQueries({ queryKey: ['reviews-of-the-week'] });
     },
     onError: (error, _variables, context) => {
       console.error('[ReviewWizard] Delete error:', error);
