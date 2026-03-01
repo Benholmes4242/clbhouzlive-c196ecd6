@@ -34,7 +34,7 @@ import { useSoftResume } from '@/hooks/useSoftResume';
 import { Top100OverlayPills } from '@/components/clubhouse/Top100OverlayPills';
 import { Squircle } from '@/components/ui/squircle';
 import { CinematicActionRail, CreatorCapsule, CommentsPage } from '@/components/clubhouse/cinematic';
-import { VideoScrubber } from '@/components/video/VideoScrubber';
+
 
 import { useVerticalFeedLogic } from './hooks/useVerticalFeedLogic';
 import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
@@ -233,6 +233,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     } catch { return true; }
   })());
   const [isMutedState, setIsMutedState] = useState<boolean>(isMutedRef.current);
+  const [videoProgress, setVideoProgress] = useState(0);
   const queryClient = useQueryClient();
   
   const PORTRAIT_MIN_AR = 1.2;
@@ -507,6 +508,27 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
         }
       }
     }
+  }, [currentIndex, filteredPosts]);
+
+  // Track video playback progress for inline scrubber
+  useEffect(() => {
+    let rafId: number;
+    const tick = () => {
+      const currentPostId = filteredPosts[currentIndex]?.id;
+      if (currentPostId) {
+        const videoEl = videoRefs.current[currentPostId];
+        if (videoEl && videoEl.duration && isFinite(videoEl.duration)) {
+          setVideoProgress(videoEl.currentTime / videoEl.duration);
+        } else {
+          setVideoProgress(0);
+        }
+      } else {
+        setVideoProgress(0);
+      }
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
   }, [currentIndex, filteredPosts]);
 
   // Sync back to GlobalAudioContext on unmount
@@ -1458,18 +1480,15 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
         );
       })()}
 
-      {/* Fixed video scrubber — flush above bottom nav */}
-      {activeVideoEl && (() => {
+      {/* Video progress bar — fixed above bottom nav */}
+      {(() => {
         const currentPost = filteredPosts[currentIndex];
         if (!currentPost) return null;
-        const mediaItems = currentPost.media && currentPost.media.length > 0 ? currentPost.media : [{
-          id: `${currentPost.id}-single`,
-          media_type: currentPost.type as 'video' | 'image',
-          media_url: currentPost.src
-        }];
+        const mediaItems = currentPost.media?.length > 0 ? currentPost.media : [{ media_type: currentPost.type }];
         const currentMediaIdx = mediaIndices[currentPost.id] || 0;
         const activeMedia = mediaItems[currentMediaIdx] || mediaItems[0];
         if ((activeMedia as any)?.media_type !== 'video') return null;
+
         return (
           <div
             style={{
@@ -1478,15 +1497,20 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
               right: 0,
               bottom: 'calc(var(--bottom-nav-height, 64px))',
               zIndex: 101,
-              pointerEvents: 'auto',
+              height: 3,
+              background: 'rgba(255,255,255,0.15)',
+              pointerEvents: 'none',
             }}
           >
-            <VideoScrubber
-              videoEl={activeVideoEl}
-              mediaId={currentPost.id}
-              height={3}
-              variant="fullscreen"
-              className="pointer-events-auto"
+            <div
+              style={{
+                height: '100%',
+                width: `${videoProgress * 100}%`,
+                background: '#FFFFFF',
+                boxShadow: '0 0 8px rgba(255,255,255,0.45)',
+                borderRadius: 9999,
+                transition: 'width 0.1s linear',
+              }}
             />
           </div>
         );
