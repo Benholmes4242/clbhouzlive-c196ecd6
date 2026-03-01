@@ -104,6 +104,22 @@ export interface FileUploadFailedEvent {
   error: string;
 }
 
+// Visibility / background events
+export interface UploadBackgroundedEvent {
+  type: 'upload:backgrounded';
+  timestamp: number;
+}
+
+export interface UploadForegroundedEvent {
+  type: 'upload:foregrounded';
+  backgroundDurationSeconds: number;
+  connectionMayBeStale: boolean;
+}
+
+export interface UploadPageHidingEvent {
+  type: 'upload:page-hiding';
+}
+
 export type UploadEvent =
   | UploadEnqueuedEvent
   | UploadStatusEvent
@@ -115,4 +131,7 @@ export type UploadEvent =
   | FileUploadStartEvent
   | FileUploadProgressEvent
   | FileUploadCompleteEvent
-  | FileUploadFailedEvent;
+  | FileUploadFailedEvent
+  | UploadBackgroundedEvent
+  | UploadForegroundedEvent
+  | UploadPageHidingEvent;

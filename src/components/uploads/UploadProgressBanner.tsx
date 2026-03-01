@@ -137,6 +137,23 @@ export function UploadProgressBanner() {
     const unsubFailed = uploadEventBus.on('upload:failed', handleFailed);
     const unsubFileProgress = uploadEventBus.on('file:upload-progress', handleFileProgress);
     const unsubPartialFailure = uploadEventBus.on('upload:partial-failure', handlePartialFailure);
+
+    // Handle foregrounded after long background — show reconnecting status
+    const handleForegrounded = (event: any) => {
+      if (event.connectionMayBeStale) {
+        setActiveUploads(prev => prev.map(u => {
+          if (u.status !== 'uploading') return u;
+          return { ...u, fileName: 'Reconnecting...' };
+        }));
+        setTimeout(() => {
+          setActiveUploads(prev => prev.map(u => {
+            if (u.fileName !== 'Reconnecting...') return u;
+            return { ...u, fileName: 'Uploading...' };
+          }));
+        }, 3000);
+      }
+    };
+    const unsubForegrounded = uploadEventBus.on('upload:foregrounded', handleForegrounded);
     
     return () => {
       unsubEnqueued();
@@ -145,6 +162,7 @@ export function UploadProgressBanner() {
       unsubFailed();
       unsubFileProgress();
       unsubPartialFailure();
+      unsubForegrounded();
     };
   }, []);
   

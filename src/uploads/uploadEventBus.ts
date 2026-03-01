@@ -13,6 +13,9 @@ import type {
   FileUploadProgressEvent,
   FileUploadCompleteEvent,
   FileUploadFailedEvent,
+  UploadBackgroundedEvent,
+  UploadForegroundedEvent,
+  UploadPageHidingEvent,
 } from './uploadEvents';
 
 type UploadEventMap = {
@@ -29,6 +32,10 @@ type UploadEventMap = {
   'file:upload-progress': FileUploadProgressEvent;
   'file:upload-complete': FileUploadCompleteEvent;
   'file:upload-failed': FileUploadFailedEvent;
+  // Visibility / background events
+  'upload:backgrounded': UploadBackgroundedEvent;
+  'upload:foregrounded': UploadForegroundedEvent;
+  'upload:page-hiding': UploadPageHidingEvent;
 };
 
 export const uploadEventBus = new SimpleEventBus<UploadEventMap>();
