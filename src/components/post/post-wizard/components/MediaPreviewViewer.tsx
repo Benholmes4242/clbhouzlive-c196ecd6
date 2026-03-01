@@ -194,20 +194,29 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
 
   const toggleMute = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
+    const newMuted = !isGloballyMuted;
     toggleGlobalMute();
-    // iOS requires play() within user gesture when unmuting
-    if (videoRef.current && isGloballyMuted) {
-      videoRef.current.muted = false;
-      videoRef.current.play().catch(() => {});
+    // Immediately sync DOM — don't wait for React re-render
+    if (videoRef.current) {
+      videoRef.current.muted = newMuted;
+      // iOS requires play() within user gesture when unmuting
+      if (!newMuted) {
+        videoRef.current.play().catch(() => {});
+      }
     }
   }, [toggleGlobalMute, isGloballyMuted]);
 
   // Fix React muted attribute bug — React doesn't update video.muted after mount
+  // currentIndex included so new video elements get synced on slide change
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.muted = isGloballyMuted;
+      // If user has unmuted, ensure the new video plays with audio
+      if (!isGloballyMuted) {
+        videoRef.current.play().catch(() => {});
+      }
     }
-  }, [isGloballyMuted]);
+  }, [isGloballyMuted, currentIndex]);
 
   if (!item) return null;
 
