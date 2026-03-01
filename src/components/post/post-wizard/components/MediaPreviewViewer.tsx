@@ -355,11 +355,11 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
                       </AnimatePresence>
                     )}
 
-                    {/* Mute button — only on active slide */}
+                    {/* Mute button — only on active slide, lifted above bottom bar */}
                     {isActive && (
                       <button
                         onClick={toggleMute}
-                        className="absolute bottom-4 right-4 w-8 h-8 rounded-full flex items-center justify-center z-10"
+                        className="absolute bottom-16 right-4 w-8 h-8 rounded-full flex items-center justify-center z-10"
                         style={{
                           background: 'rgba(0,0,0,0.45)',
                           backdropFilter: 'blur(16px)',
@@ -441,49 +441,50 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
         </div>
       )}
 
-      {/* Video scrubber + time readout — above dots, only for videos */}
-      {item.type === 'video' && (
-        <div className="flex items-center gap-3 px-4 flex-shrink-0" key={`scrubber-${currentIndex}`}>
-          <div className="flex-1 relative" style={{ height: 3 }}>
-            <VideoScrubber
-              videoEl={videoRef.current}
-              variant="wizard"
-              height={3}
-            />
+      {/* Bottom bar — matches top nav bar pattern */}
+      <div className="flex-shrink-0 bg-black">
+        {/* Video scrubber + time readout */}
+        {item.type === 'video' && (
+          <div className="flex items-center gap-3 px-4 pt-2" key={`scrubber-${currentIndex}`}>
+            <div className="flex-1 relative" style={{ height: 3 }}>
+              <VideoScrubber
+                videoEl={videoRef.current}
+                variant="wizard"
+                height={3}
+              />
+            </div>
+            <span
+              className="text-[11px] font-medium tabular-nums text-white/70 flex-shrink-0"
+              style={{ minWidth: '70px', textAlign: 'right' }}
+            >
+              {formatTime(videoTime.current)} / {formatTime(videoTime.duration)}
+            </span>
           </div>
-          <span
-            className="text-[11px] font-medium tabular-nums text-white/70 flex-shrink-0"
-            style={{ minWidth: '70px', textAlign: 'right' }}
-          >
-            {formatTime(videoTime.current)} / {formatTime(videoTime.duration)}
-          </span>
-        </div>
-      )}
+        )}
 
-      {/* Pagination dots */}
-      {items.length > 1 && (
-        <div
-          className="flex items-center justify-center gap-1.5 pt-3 flex-shrink-0"
-          style={{ paddingBottom: '32px' }}
-        >
-          {items.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => goTo(idx)}
-              className={cn(
-                'rounded-full transition-all duration-200',
-                idx === currentIndex ? 'w-2 h-2 bg-primary scale-110' : 'w-1.5 h-1.5 bg-primary/30'
-              )}
-              aria-label={`Go to image ${idx + 1}`}
-            />
-          ))}
-        </div>
-      )}
+        {/* Pagination dots */}
+        {items.length > 1 && (
+          <div className="flex items-center justify-center gap-1.5 py-3">
+            {items.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => goTo(idx)}
+                className={cn(
+                  'rounded-full transition-all duration-200',
+                  idx === currentIndex ? 'w-2 h-2 bg-primary scale-110' : 'w-1.5 h-1.5 bg-primary/30'
+                )}
+                aria-label={`Go to image ${idx + 1}`}
+              />
+            ))}
+          </div>
+        )}
 
-      {/* Bottom safe area spacer when no dots */}
-      {items.length <= 1 && (
-        <div className="flex-shrink-0" style={{ paddingBottom: '24px' }} />
-      )}
+        {/* Bottom spacer when no dots */}
+        {items.length <= 1 && <div className="h-3" />}
+
+        {/* Bottom safe area bar */}
+        <div className="h-11" />
+      </div>
     </motion.div>
   );
 }
