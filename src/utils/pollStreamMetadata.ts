@@ -20,8 +20,8 @@ interface PollOptions {
 }
 
 // Rate limit constants
-const DEFAULT_POLL_INTERVAL = 4000; // 4 seconds (increased from 2s to reduce rate limiting)
-const DEFAULT_MAX_ATTEMPTS = 20; // Reduced from 30 since interval is longer (80 seconds total)
+const DEFAULT_POLL_INTERVAL = 6000; // 6 seconds (increased from 4s to reduce rate limiting)
+const DEFAULT_MAX_ATTEMPTS = 15; // ~90 seconds total at 6s intervals
 const MAX_BACKOFF_DELAY = 30000; // 30 seconds max backoff
 const MAX_CONSECUTIVE_ERRORS = 5;
 
