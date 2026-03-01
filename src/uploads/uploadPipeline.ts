@@ -26,6 +26,9 @@ import { uploadVideoWithTus } from './tusVideoUpload';
 import { compressImage, isCompressibleImage } from './imageCompression';
 import { UploadSpeedTracker } from './uploadSpeedTracker';
 import { waitForOnline } from './networkStatus';
+import { uploadWakeLock } from './uploadWakeLock';
+import { uploadVisibilityMonitor } from './uploadVisibilityMonitor';
+import { getBackgroundUploadWarning } from './medianBridge';
 
 /**
  * Extract image dimensions from a File object
@@ -330,6 +333,17 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
   const uploadedStreamUids: string[] = [];
 
   try {
+    // Acquire wake lock and start visibility monitoring
+    await uploadWakeLock.acquire();
+    uploadVisibilityMonitor.start();
+
+    // Show background limitation warning for large uploads
+    const totalSizeMB = (job.files || []).reduce((sum: number, f: File) => sum + f.size, 0) / (1024 * 1024);
+    const bgWarning = getBackgroundUploadWarning(totalSizeMB);
+    if (bgWarning) {
+      toast.info(bgWarning, { duration: 8000 });
+    }
+
     // Phase A: Create post shell
     uploadManager.updateStatus(jobId, 'creating_post');
 
@@ -762,6 +776,8 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
         error: errorMsg,
       });
       toast.error('Upload failed', { description: 'Please try again' });
+      uploadWakeLock.release();
+      uploadVisibilityMonitor.stop();
       return;
     }
 
@@ -823,6 +839,8 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
 
     // Finalizing phase
     await finalizePost(jobId, postId, job, uploadedStreamUids);
+    uploadWakeLock.release();
+    uploadVisibilityMonitor.stop();
 
   } catch (error: any) {
     console.error('[uploadPipeline] processJob failed:', error);
@@ -876,9 +894,12 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
         await supabase.from('posts').delete().eq('id', currentJob.postId);
         console.log(`[uploadPipeline] Rolled back post ${currentJob.postId}`);
       } catch (cleanupError) {
-        console.warn(`[uploadPipeline] Failed to rollback post:`, cleanupError);
+      console.warn(`[uploadPipeline] Failed to rollback post:`, cleanupError);
       }
     }
+
+    uploadWakeLock.release();
+    uploadVisibilityMonitor.stop();
   }
 }
 
@@ -1141,6 +1162,8 @@ export async function retryFailedItems(jobId: string): Promise<boolean> {
   if (stillFailed === 0) {
     // All items now completed — finalize the post
     await finalizePost(jobId, postId, job, uploadedStreamUids);
+    uploadWakeLock.release();
+    uploadVisibilityMonitor.stop();
     toast.success('Upload complete');
     return true;
   } else {
@@ -1698,6 +1721,8 @@ export async function cancelJob(jobId: string): Promise<void> {
     }
   }
 
+  uploadWakeLock.release();
+  uploadVisibilityMonitor.stop();
   uploadManager.dismiss(jobId);
   toast.success('Upload cancelled');
 }
@@ -1709,3 +1734,10 @@ export async function cancelJob(jobId: string): Promise<void> {
 export function hasActiveUploads(): boolean {
   return uploadManager.getPendingJobs().length > 0;
 }
+
+// Module-level: log when app returns from background during active uploads
+uploadEventBus.on('upload:foregrounded', (event) => {
+  if (event.connectionMayBeStale && hasActiveUploads()) {
+    console.log(`[uploadPipeline] Foregrounded after ${event.backgroundDurationSeconds}s, uploads active — TUS will auto-retry`);
+  }
+});

@@ -9,6 +9,7 @@ import { hasActiveUploads } from '@/uploads/uploadPipeline';
 import { uploadEventBus } from '@/uploads/uploadEventBus';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { detectMedianBridge } from '@/uploads/medianBridge';
 
 /**
  * Adds a beforeunload handler that fires when uploads are active.
@@ -72,5 +73,13 @@ export function useUploadGuard() {
     };
 
     cleanupStaleUploads();
+  }, []);
+
+  // Log Median bridge capabilities for diagnostics
+  useEffect(() => {
+    const bridgeInfo = detectMedianBridge();
+    if (bridgeInfo.isMedianApp) {
+      console.log('[App] Running in Median native app:', bridgeInfo);
+    }
   }, []);
 }
