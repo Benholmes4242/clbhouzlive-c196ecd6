@@ -105,7 +105,7 @@ serve(async (req) => {
     const accountId = Deno.env.get('CLOUDFLARE_ACCOUNT_ID')!;
     const accessKeyId = Deno.env.get('R2_ACCESS_KEY_ID')!;
     const secretAccessKey = Deno.env.get('R2_SECRET_ACCESS_KEY')!;
-    const bucket = Deno.env.get('R2_HEADSHOTS_BUCKET')!;
+    const bucket = Deno.env.get('R2_HEADSHOTS_BUCKET') || 'player-headshots';
     const publicBaseUrl = Deno.env.get('R2_HEADSHOTS_PUBLIC_BASE_URL')!;
 
     if (!accountId || !accessKeyId || !secretAccessKey || !bucket) {
