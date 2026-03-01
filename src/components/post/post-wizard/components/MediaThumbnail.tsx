@@ -1,4 +1,5 @@
 import { X, Wand2, Play } from 'lucide-react';
+import { formatDuration } from '@/utils/formatDuration';
 import type { OrderedMediaItem } from '../types';
 import type { StudioEdits } from '@/types/studio';
 import { getFilterClass } from '@/utils/studioFilters';
@@ -106,6 +107,25 @@ export function MediaThumbnail({
           >
             <Play className="w-3.5 h-3.5 text-white ml-0.5" fill="white" />
           </div>
+        </div>
+      )}
+
+      {/* Duration badge for videos */}
+      {item.type === 'video' && item.duration != null && item.duration > 0 && (
+        <div
+          className="absolute bottom-1.5 right-1.5 z-[1] pointer-events-none"
+          style={{
+            background: 'rgba(0,0,0,0.6)',
+            backdropFilter: 'blur(8px)',
+            borderRadius: 4,
+            padding: '2px 5px',
+            fontSize: 11,
+            fontWeight: 500,
+            color: 'white',
+            lineHeight: 1,
+          }}
+        >
+          {formatDuration(item.duration)}
         </div>
       )}
 
