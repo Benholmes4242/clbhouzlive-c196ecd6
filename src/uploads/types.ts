@@ -86,6 +86,8 @@ export interface UploadJob {
     height?: number;
     aspectRatio?: number;
     duration?: number;
+    trimStart?: number | null;
+    trimEnd?: number | null;
   }>;
   studioEditsByMediaId?: Record<string, StudioEditsPayload>;
   
@@ -161,6 +163,8 @@ export interface UploadJobInput {
     height?: number;
     aspectRatio?: number;
     duration?: number;
+    trimStart?: number | null;
+    trimEnd?: number | null;
   }>;
   studioEditsByMediaId?: Record<string, StudioEditsPayload>;
   visibility?: 'anyone' | 'followers' | 'private';

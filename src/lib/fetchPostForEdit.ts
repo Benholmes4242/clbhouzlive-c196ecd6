@@ -62,7 +62,7 @@ export async function fetchPostForEdit(
   // Fetch media
   const { data: media } = await supabase
     .from('post_media')
-    .select('id, media_type, media_url, poster_url, display_order, width, height, aspect_ratio, duration_seconds')
+    .select('id, media_type, media_url, poster_url, display_order, width, height, aspect_ratio, duration_seconds, trim_start, trim_end')
     .eq('post_id', postId)
     .order('display_order', { ascending: true });
 

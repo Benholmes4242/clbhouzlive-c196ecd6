@@ -630,6 +630,9 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
             stream_id: streamId,
             poster_url: posterUrl,
             upload_status: 'completed' as any,
+            // Trim range (video only)
+            trim_start: mediaItem?.trimStart ?? null,
+            trim_end: mediaItem?.trimEnd ?? null,
             // Include dimensions (works for both images and videos after TUS)
             ...(width && height && {
               width,
@@ -1112,6 +1115,8 @@ export async function retryFailedItems(jobId: string): Promise<boolean> {
             upload_status: 'completed' as any,
             studio_edits: studioEditsJson,
             filter_id: filterId,
+            trim_start: mediaItem?.trimStart ?? null,
+            trim_end: mediaItem?.trimEnd ?? null,
             ...(width && height && { width, height, aspect_ratio: aspectRatioVal, orientation }),
           })
           .eq('id', existingRowId);
@@ -1127,6 +1132,8 @@ export async function retryFailedItems(jobId: string): Promise<boolean> {
           upload_status: 'completed' as any,
           studio_edits: studioEditsJson,
           filter_id: filterId,
+          trim_start: mediaItem?.trimStart ?? null,
+          trim_end: mediaItem?.trimEnd ?? null,
           ...(width && height && { width, height, aspect_ratio: aspectRatioVal, orientation }),
         });
       }

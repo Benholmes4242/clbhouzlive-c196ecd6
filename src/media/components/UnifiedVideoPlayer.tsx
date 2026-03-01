@@ -99,6 +99,11 @@ export interface UnifiedVideoPlayerProps {
   /** If true, MediaRuntime controls playback */
   managedByMediaRuntime?: boolean;
   
+  /** Trim range — start playback at this time */
+  trimStart?: number | null;
+  /** Trim range — loop/stop at this time */
+  trimEnd?: number | null;
+  
   /** Additional CSS classes */
   className?: string;
   /** Inline styles */
@@ -160,6 +165,8 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
       startTime,
       mediaId,
       managedByMediaRuntime = false,
+      trimStart,
+      trimEnd,
       className,
       style,
       onPlay,
@@ -433,6 +440,13 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
       const handlePlay = () => {
         updatePlaybackState('playing');
         onPlay?.();
+        // Trim: ensure playback starts within trim range
+        if (trimStart != null && video.currentTime < trimStart) {
+          video.currentTime = trimStart;
+        }
+        if (trimEnd != null && video.currentTime >= trimEnd) {
+          video.currentTime = trimStart || 0;
+        }
       };
 
       const handlePause = () => {
@@ -485,6 +499,10 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           clearTimeout(firstFrameTimeoutRef.current);
           firstFrameTimeoutRef.current = null;
         }
+        // Trim: seek to trim start on load
+        if (trimStart != null && video.currentTime < trimStart) {
+          video.currentTime = trimStart;
+        }
         // Poster crossfade moved to 'playing' handler — loadeddata only
         // means the first frame is decoded, not that playback has started.
         updatePlaybackState('ready');
@@ -503,6 +521,15 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           setDuration(dur);
         }
         onTimeUpdate?.(time, dur || 0);
+
+        // Trim: enforce trim_end boundary
+        if (trimEnd != null && time >= trimEnd) {
+          if (loop) {
+            video.currentTime = trimStart || 0;
+          } else {
+            video.pause();
+          }
+        }
 
         // Update buffered percentage
         if (video.buffered.length > 0 && dur > 0) {
@@ -545,7 +572,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         video.removeEventListener('timeupdate', handleTimeUpdate);
         video.removeEventListener('error', handleError);
       };
-    }, [mp4Fallback, onPlay, onPause, onEnded, onError, onTimeUpdate, onLoadedData, onCanPlayThrough, updatePlaybackState, playbackState]);
+    }, [mp4Fallback, onPlay, onPause, onEnded, onError, onTimeUpdate, onLoadedData, onCanPlayThrough, updatePlaybackState, playbackState, trimStart, trimEnd, loop]);
 
     // ============ HLS Setup ============
     useEffect(() => {
