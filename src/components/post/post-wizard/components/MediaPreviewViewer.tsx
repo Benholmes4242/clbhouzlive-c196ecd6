@@ -238,6 +238,19 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
             {item.type === 'video' && (
               <>
                 <button
+                  onClick={toggleMute}
+                  onTouchStart={(e) => e.stopPropagation()}
+                  onTouchEnd={(e) => e.stopPropagation()}
+                  className="w-9 h-9 rounded-full flex items-center justify-center active:bg-white/10 transition-colors"
+                  aria-label={isGloballyMuted ? 'Unmute' : 'Mute'}
+                >
+                  {isGloballyMuted ? (
+                    <VolumeX className="w-4 h-4 text-white" />
+                  ) : (
+                    <Volume2 className="w-4 h-4 text-white" />
+                  )}
+                </button>
+                <button
                   onClick={() => {
                     setShowPosterPicker(prev => !prev);
                     setShowTrimmer(false);
@@ -359,27 +372,6 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
                       </AnimatePresence>
                     )}
 
-                    {/* Mute button — only on active slide, lifted above bottom bar */}
-                    {isActive && (
-                      <button
-                        onClick={toggleMute}
-                        onTouchStart={(e) => e.stopPropagation()}
-                        onTouchEnd={(e) => e.stopPropagation()}
-                        className="absolute bottom-16 right-4 w-8 h-8 rounded-full flex items-center justify-center z-10"
-                        style={{
-                          background: 'rgba(0,0,0,0.45)',
-                          backdropFilter: 'blur(16px)',
-                          border: '1px solid rgba(255,255,255,0.15)',
-                        }}
-                        aria-label={isGloballyMuted ? 'Unmute' : 'Mute'}
-                      >
-                        {isGloballyMuted ? (
-                          <VolumeX className="w-4 h-4 text-white" />
-                        ) : (
-                          <Volume2 className="w-4 h-4 text-white" />
-                        )}
-                      </button>
-                    )}
 
                     {/* Text overlays — only on active slide */}
                     {isActive && slideEdits?.textOverlays && slideEdits.textOverlays.length > 0 && (
