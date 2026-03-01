@@ -11257,6 +11257,7 @@ export type Database = {
           is_creator: boolean
           is_official_club: boolean | null
           is_public: boolean | null
+          is_suspended: boolean
           is_test: boolean
           is_verified_business: boolean
           is_verified_golfer: boolean
@@ -11356,6 +11357,7 @@ export type Database = {
           is_creator?: boolean
           is_official_club?: boolean | null
           is_public?: boolean | null
+          is_suspended?: boolean
           is_test?: boolean
           is_verified_business?: boolean
           is_verified_golfer?: boolean
@@ -11455,6 +11457,7 @@ export type Database = {
           is_creator?: boolean
           is_official_club?: boolean | null
           is_public?: boolean | null
+          is_suspended?: boolean
           is_test?: boolean
           is_verified_business?: boolean
           is_verified_golfer?: boolean
