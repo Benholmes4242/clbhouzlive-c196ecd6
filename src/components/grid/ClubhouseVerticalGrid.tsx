@@ -1475,10 +1475,11 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
           <div
             style={{
               position: 'fixed',
+              bottom: 'calc(var(--bottom-nav-height, 64px) + 30px)',
               left: 0,
               right: 0,
-              bottom: 'calc(var(--bottom-nav-height, 64px))',
-              zIndex: 99,
+              height: '3px',
+              zIndex: 101,
               pointerEvents: 'auto',
             }}
           >
