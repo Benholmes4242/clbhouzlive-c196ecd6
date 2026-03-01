@@ -96,7 +96,7 @@ export function PosterFramePicker({
       </div>
 
       {/* Video preview */}
-      <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-black">
+      <div className="relative w-full aspect-video overflow-hidden bg-black">
         <video
           ref={videoRef}
           src={videoUrl}
