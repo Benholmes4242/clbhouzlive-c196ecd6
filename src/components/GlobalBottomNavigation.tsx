@@ -59,7 +59,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   // Prefetch routes on hover/touch for faster navigation
   // Calls both route prefetch AND hero video prefetch
   const handleNavPrefetch = useCallback((path: string) => {
-    console.log('[GlobalBottomNavigation] handleNavPrefetch called:', path);
+    triggerPrefetch(path);
     triggerPrefetch(path);
     handlePrefetch(path); // Also trigger hero video prefetch
   }, [triggerPrefetch, handlePrefetch]);
