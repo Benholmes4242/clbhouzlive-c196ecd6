@@ -210,99 +210,77 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* 3-item sliding window: prev, current, next */}
-      <div className="flex-1 relative overflow-hidden min-h-0">
-        {/* Floating controls overlay — sits ON TOP of media */}
-        <div
-          className="absolute inset-x-0 top-0 z-10 pointer-events-none"
-          style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 44px)' }}
-        >
-          <div
-            className="absolute inset-x-0 top-0"
-            style={{
-              height: 'calc(env(safe-area-inset-top, 0px) + 120px)',
-              background: 'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)',
-              pointerEvents: 'none',
-            }}
-          />
-          <div className="relative flex items-center justify-between px-4">
-            <button
-              onClick={onClose}
-              className="pointer-events-auto w-11 h-11 rounded-full flex items-center justify-center"
-              style={{
-                background: 'rgba(0,0,0,0.35)',
-                backdropFilter: 'blur(16px) saturate(180%)',
-                border: '1px solid rgba(255,255,255,0.12)',
-              }}
-              aria-label="Close preview"
-            >
-              <X className="w-4.5 h-4.5 text-white" />
-            </button>
-            <div className="flex items-center gap-2 pointer-events-auto">
-              {items.length > 1 && !isCover && (
+      {/* Solid black nav bar — matches Studio pattern */}
+      <div
+        className="flex-shrink-0"
+        style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 44px)' }}
+      >
+        <div className="h-11 flex items-center justify-between px-4">
+          <button
+            onClick={onClose}
+            className="w-11 h-11 rounded-full flex items-center justify-center active:bg-white/10 transition-colors"
+            aria-label="Close preview"
+          >
+            <X className="w-5 h-5 text-white" />
+          </button>
+          <div className="flex items-center gap-2">
+            {items.length > 1 && !isCover && (
+              <button
+                onClick={() => onSetCover?.(currentIndex)}
+                className="px-3 py-1.5 rounded-full text-xs font-semibold text-white/90 active:bg-white/10 transition-colors"
+                style={{
+                  background: 'rgba(255,255,255,0.1)',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                }}
+              >
+                Set as Cover
+              </button>
+            )}
+            {item.type === 'video' && (
+              <>
                 <button
-                  onClick={() => onSetCover?.(currentIndex)}
-                  className="px-3 py-1.5 rounded-full text-xs font-semibold text-white"
-                  style={{
-                    background: 'rgba(0,0,0,0.35)',
-                    backdropFilter: 'blur(16px) saturate(180%)',
-                    border: '1px solid rgba(255,255,255,0.12)',
+                  onClick={() => {
+                    setShowPosterPicker(prev => !prev);
+                    setShowTrimmer(false);
                   }}
+                  className={cn(
+                    'w-9 h-9 rounded-full flex items-center justify-center transition-colors',
+                    showPosterPicker ? 'bg-primary/20' : 'active:bg-white/10'
+                  )}
+                  aria-label="Choose cover frame"
                 >
-                  Set as Cover
+                  <ImageIcon className="w-4 h-4 text-white" />
                 </button>
-              )}
-              {item.type === 'video' && (
-                <>
-                  <button
-                    onClick={() => {
-                      setShowPosterPicker(prev => !prev);
-                      setShowTrimmer(false);
-                    }}
-                    className={`pointer-events-auto w-9 h-9 rounded-full flex items-center justify-center ${showPosterPicker ? 'bg-primary/20' : ''}`}
-                    style={{
-                      background: showPosterPicker ? undefined : 'rgba(0,0,0,0.35)',
-                      backdropFilter: 'blur(16px) saturate(180%)',
-                      border: '1px solid rgba(255,255,255,0.12)',
-                    }}
-                    aria-label="Choose cover frame"
-                  >
-                    <ImageIcon className="w-4 h-4 text-white" />
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowTrimmer(prev => !prev);
-                      setShowPosterPicker(false);
-                    }}
-                    className={`pointer-events-auto w-9 h-9 rounded-full flex items-center justify-center ${showTrimmer ? 'bg-primary/20' : ''}`}
-                    style={{
-                      background: showTrimmer ? undefined : 'rgba(0,0,0,0.35)',
-                      backdropFilter: 'blur(16px) saturate(180%)',
-                      border: '1px solid rgba(255,255,255,0.12)',
-                    }}
-                    aria-label="Trim video"
-                  >
-                    <Scissors className="w-4 h-4 text-white" />
-                  </button>
-                </>
-              )}
-              {showStudio && (
                 <button
-                  onClick={handleStudio}
-                  className="pointer-events-auto w-9 h-9 rounded-full flex items-center justify-center"
-                  style={{
-                    background: 'rgba(0,0,0,0.35)',
-                    backdropFilter: 'blur(16px) saturate(180%)',
-                    border: '1px solid rgba(255,255,255,0.12)',
+                  onClick={() => {
+                    setShowTrimmer(prev => !prev);
+                    setShowPosterPicker(false);
                   }}
-                  aria-label="Open studio"
+                  className={cn(
+                    'w-9 h-9 rounded-full flex items-center justify-center transition-colors',
+                    showTrimmer ? 'bg-primary/20' : 'active:bg-white/10'
+                  )}
+                  aria-label="Trim video"
                 >
-                  <Wand2 className="w-4 h-4 text-white" />
+                  <Scissors className="w-4 h-4 text-white" />
                 </button>
-              )}
-            </div>
+              </>
+            )}
+            {showStudio && (
+              <button
+                onClick={handleStudio}
+                className="w-9 h-9 rounded-full flex items-center justify-center active:bg-white/10 transition-colors"
+                aria-label="Open studio"
+              >
+                <Wand2 className="w-4 h-4 text-white" />
+              </button>
+            )}
           </div>
         </div>
+      </div>
+
+      {/* Media canvas */}
+      <div className="flex-1 relative overflow-hidden min-h-0">
         {[-1, 0, 1].map(offset => {
           const idx = currentIndex + offset;
           if (idx < 0 || idx >= items.length) return null;
