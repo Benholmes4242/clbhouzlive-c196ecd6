@@ -18,6 +18,7 @@ export interface ScheduledPostMedia {
   streamId?: string | null;
   trimStart?: number | null;
   trimEnd?: number | null;
+  posterTimestamp?: number | null;
 }
 
 export interface ScheduledPost {
@@ -60,7 +61,7 @@ export async function fetchScheduledPosts(): Promise<ScheduledPost[]> {
       id, user_id, content, scheduled_at, status, created_at,
       actor_type, actor_id, categories, badges, visibility, course_id,
       studio_music, audio_mode,
-      post_media (id, media_type, media_url, poster_url, width, height, aspect_ratio, duration_seconds, display_order, filter_id, studio_edits, stream_id, trim_start, trim_end)
+      post_media (id, media_type, media_url, poster_url, width, height, aspect_ratio, duration_seconds, display_order, filter_id, studio_edits, stream_id, trim_start, trim_end, poster_timestamp)
     `)
     .eq('user_id', user.id)
     .eq('status', 'scheduled')
@@ -101,6 +102,7 @@ export async function fetchScheduledPosts(): Promise<ScheduledPost[]> {
       streamId: m.stream_id,
       trimStart: m.trim_start,
       trimEnd: m.trim_end,
+      posterTimestamp: m.poster_timestamp,
     })).sort((a: any, b: any) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0)),
   }));
 }
@@ -118,7 +120,7 @@ export async function fetchScheduledPostForEdit(postId: string): Promise<Schedul
       id, user_id, content, scheduled_at, status, created_at,
       actor_type, actor_id, categories, badges, visibility, course_id,
       studio_music, audio_mode,
-      post_media (id, media_type, media_url, poster_url, width, height, aspect_ratio, duration_seconds, display_order, filter_id, studio_edits, stream_id, trim_start, trim_end),
+      post_media (id, media_type, media_url, poster_url, width, height, aspect_ratio, duration_seconds, display_order, filter_id, studio_edits, stream_id, trim_start, trim_end, poster_timestamp),
       golf_courses!posts_course_id_fkey (id, name, country, region)
     `)
     .eq('id', postId)
@@ -161,6 +163,7 @@ export async function fetchScheduledPostForEdit(postId: string): Promise<Schedul
       streamId: m.stream_id,
       trimStart: m.trim_start,
       trimEnd: m.trim_end,
+      posterTimestamp: m.poster_timestamp,
     })).sort((a: any, b: any) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0)),
     course: data.golf_courses ? {
       id: data.golf_courses.id,

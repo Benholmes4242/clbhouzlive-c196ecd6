@@ -88,6 +88,7 @@ export interface UploadJob {
     duration?: number;
     trimStart?: number | null;
     trimEnd?: number | null;
+    posterTimestamp?: number | null;
   }>;
   studioEditsByMediaId?: Record<string, StudioEditsPayload>;
   
@@ -165,6 +166,7 @@ export interface UploadJobInput {
     duration?: number;
     trimStart?: number | null;
     trimEnd?: number | null;
+    posterTimestamp?: number | null;
   }>;
   studioEditsByMediaId?: Record<string, StudioEditsPayload>;
   visibility?: 'anyone' | 'followers' | 'private';

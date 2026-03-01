@@ -29,6 +29,7 @@ export interface PostForEdit {
     duration_seconds: number | null;
     trim_start: number | null;
     trim_end: number | null;
+    poster_timestamp: number | null;
   }>;
   courses: Array<{
     id: string;
@@ -64,7 +65,7 @@ export async function fetchPostForEdit(
   // Fetch media
   const { data: media } = await supabase
     .from('post_media')
-    .select('id, media_type, media_url, poster_url, display_order, width, height, aspect_ratio, duration_seconds, trim_start, trim_end')
+    .select('id, media_type, media_url, poster_url, display_order, width, height, aspect_ratio, duration_seconds, trim_start, trim_end, poster_timestamp')
     .eq('post_id', postId)
     .order('display_order', { ascending: true });
 

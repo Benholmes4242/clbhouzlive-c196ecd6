@@ -52,6 +52,8 @@ export interface ComposerMediaItem {
   // Trim range (video only)
   trimStart?: number | null;
   trimEnd?: number | null;
+  // Poster frame timestamp (video only)
+  posterTimestamp?: number | null;
 }
 
 type SnapState = {

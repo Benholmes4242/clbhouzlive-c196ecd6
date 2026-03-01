@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { X, Wand2, Play, Pause, Volume2, VolumeX, Scissors } from 'lucide-react';
+import { X, Wand2, Play, Pause, Volume2, VolumeX, Scissors, Image as ImageIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { OrderedMediaItem } from '../types';
 import type { StudioEdits } from '@/types/studio';
@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import { VideoTrimmer } from './VideoTrimmer';
+import { PosterFramePicker } from './PosterFramePicker';
 
 function formatTime(seconds: number): string {
   if (!seconds || !isFinite(seconds)) return '0:00';
@@ -31,9 +32,11 @@ interface MediaPreviewViewerProps {
   showStudio?: boolean;
   /** Callback when trim range changes */
   onTrimChange?: (mediaIndex: number, trimStart: number | null, trimEnd: number | null) => void;
+  /** Callback when poster timestamp changes */
+  onPosterTimestampChange?: (mediaIndex: number, timestamp: number | null) => void;
 }
 
-export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onSetCover, coverIndex, studioEditsByMediaId, showStudio = true, onTrimChange }: MediaPreviewViewerProps) {
+export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onSetCover, coverIndex, studioEditsByMediaId, showStudio = true, onTrimChange, onPosterTimestampChange }: MediaPreviewViewerProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const touchStartTime = useRef<number>(0);
@@ -43,6 +46,7 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
   const [isSwiping, setIsSwiping] = useState(false);
   const [swipeOffset, setSwipeOffset] = useState(0);
   const [showTrimmer, setShowTrimmer] = useState(false);
+  const [showPosterPicker, setShowPosterPicker] = useState(false);
 
   // Fix 4: Use GlobalAudioContext for persistent mute state
   const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
@@ -62,7 +66,8 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
   useEffect(() => {
     setIsPlaying(true);
     setShowPlayIcon(false);
-    setShowTrimmer(false); // Hide trimmer on slide change
+    setShowTrimmer(false);
+    setShowPosterPicker(false);
 
     // Pause all non-active videos
     const allVideos = document.querySelectorAll('.preview-viewer-slide video');
@@ -247,18 +252,38 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
                 </button>
               )}
               {item.type === 'video' && (
-                <button
-                  onClick={() => setShowTrimmer(prev => !prev)}
-                  className={`pointer-events-auto w-9 h-9 rounded-full flex items-center justify-center ${showTrimmer ? 'bg-primary/20' : ''}`}
-                  style={{
-                    background: showTrimmer ? undefined : 'rgba(0,0,0,0.35)',
-                    backdropFilter: 'blur(16px) saturate(180%)',
-                    border: '1px solid rgba(255,255,255,0.12)',
-                  }}
-                  aria-label="Trim video"
-                >
-                  <Scissors className="w-4 h-4 text-white" />
-                </button>
+                <>
+                  <button
+                    onClick={() => {
+                      setShowPosterPicker(prev => !prev);
+                      setShowTrimmer(false);
+                    }}
+                    className={`pointer-events-auto w-9 h-9 rounded-full flex items-center justify-center ${showPosterPicker ? 'bg-primary/20' : ''}`}
+                    style={{
+                      background: showPosterPicker ? undefined : 'rgba(0,0,0,0.35)',
+                      backdropFilter: 'blur(16px) saturate(180%)',
+                      border: '1px solid rgba(255,255,255,0.12)',
+                    }}
+                    aria-label="Choose cover frame"
+                  >
+                    <ImageIcon className="w-4 h-4 text-white" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowTrimmer(prev => !prev);
+                      setShowPosterPicker(false);
+                    }}
+                    className={`pointer-events-auto w-9 h-9 rounded-full flex items-center justify-center ${showTrimmer ? 'bg-primary/20' : ''}`}
+                    style={{
+                      background: showTrimmer ? undefined : 'rgba(0,0,0,0.35)',
+                      backdropFilter: 'blur(16px) saturate(180%)',
+                      border: '1px solid rgba(255,255,255,0.12)',
+                    }}
+                    aria-label="Trim video"
+                  >
+                    <Scissors className="w-4 h-4 text-white" />
+                  </button>
+                </>
               )}
               {showStudio && (
                 <button
@@ -416,6 +441,20 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
           }}
           initialStart={item.trimStart ?? undefined}
           initialEnd={item.trimEnd ?? undefined}
+        />
+      )}
+
+      {/* Poster frame picker — mutually exclusive with trimmer */}
+      {item.type === 'video' && showPosterPicker && (
+        <PosterFramePicker
+          videoUrl={item.previewUrl}
+          duration={item.duration || 0}
+          onSelect={(timestamp) => {
+            onPosterTimestampChange?.(currentIndex, timestamp);
+          }}
+          initialTime={item.posterTimestamp ?? undefined}
+          trimStart={item.trimStart}
+          trimEnd={item.trimEnd}
         />
       )}
 
