@@ -10,6 +10,7 @@ import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 import { MentionBottomSheet, type MentionSuggestion } from '@/components/post/post-wizard/steps/MentionBottomSheet';
+import { useKeyboardHeight } from '@/hooks/useKeyboardHeight';
 
 interface WriteStepProps {
   title: string;
@@ -51,6 +52,7 @@ export function WriteStep({
 }: WriteStepProps) {
   const reviewLength = countGraphemes(review);
   const titleLength = countGraphemes(title);
+  const keyboardHeight = useKeyboardHeight();
   const [isTitleFocused, setIsTitleFocused] = useState(false);
   const [isReviewFocused, setIsReviewFocused] = useState(false);
   
@@ -278,6 +280,7 @@ export function WriteStep({
         onOpenChange={setShowMentions}
         query={mentionQuery}
         onSelect={handleMentionSelect}
+        bottomOffset={keyboardHeight}
       />
     </motion.div>
   );

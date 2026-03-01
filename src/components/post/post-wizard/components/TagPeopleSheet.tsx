@@ -10,6 +10,7 @@ interface TagPeopleSheetProps {
   selectedTags: TaggableEntity[];
   onTagsChange: (tags: TaggableEntity[]) => void;
   accentColor?: string;
+  bottomOffset?: number;
 }
 
 export function TagPeopleSheet({
@@ -18,6 +19,7 @@ export function TagPeopleSheet({
   selectedTags,
   onTagsChange,
   accentColor = '#f59e0b',
+  bottomOffset = 0,
 }: TagPeopleSheetProps) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<TaggableEntity[]>([]);
@@ -110,7 +112,7 @@ export function TagPeopleSheet({
 
       {/* Sheet */}
       <motion.div
-        className="fixed inset-x-0 bottom-0 z-[10011] flex flex-col"
+        className="fixed inset-x-0 z-[10011] flex flex-col"
         role="dialog"
         aria-modal="true"
         aria-label="Tag people"
@@ -119,6 +121,7 @@ export function TagPeopleSheet({
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
           maxHeight: '85vh',
+          bottom: bottomOffset,
         }}
         initial={{ y: '100%' }}
         animate={{ y: 0 }}
