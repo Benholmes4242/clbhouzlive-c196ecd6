@@ -1495,9 +1495,9 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
               position: 'fixed',
               left: 0,
               right: 0,
-              top: '50%',
-              zIndex: 9999,
-              height: 10,
+              bottom: 'calc(var(--bottom-nav-height, 64px) + 30px)',
+              zIndex: 101,
+              height: 3,
               background: 'rgba(255,255,255,0.15)',
               pointerEvents: 'none',
             }}
@@ -1506,7 +1506,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
               style={{
                 height: '100%',
                 width: `${videoProgress * 100}%`,
-                background: '#FF0000',
+                background: '#FFFFFF',
                 boxShadow: '0 0 8px rgba(255,255,255,0.45)',
                 borderRadius: 9999,
                 transition: 'width 0.1s linear',
