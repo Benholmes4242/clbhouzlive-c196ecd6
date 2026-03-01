@@ -49,8 +49,10 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
   const [showTrimmer, setShowTrimmer] = useState(false);
   const [showPosterPicker, setShowPosterPicker] = useState(false);
 
-  // Fix 4: Use GlobalAudioContext for persistent mute state
-  const { isGloballyMuted, toggleGlobalMute, markUserGestureUnmute } = useGlobalAudio();
+  // Self-contained mute system — ref is source of truth, state drives icon
+  const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
+  const isMutedRef = useRef(isGloballyMuted);
+  const [isMutedState, setIsMutedState] = useState(isGloballyMuted);
 
   // Time readout state for video scrub bar
   const [videoTime, setVideoTime] = useState<{ current: number; duration: number }>({ current: 0, duration: 0 });
@@ -85,16 +87,17 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
     }
   }, [currentIndex]);
 
-  // Release decoder on viewer close
+  // Release decoder on viewer close + sync mute state back
   useEffect(() => {
     return () => {
+      setGlobalMute(isMutedRef.current);
       if (videoRef.current) {
         videoRef.current.pause();
         videoRef.current.removeAttribute('src');
         videoRef.current.load();
       }
     };
-  }, []);
+  }, [setGlobalMute]);
 
   // Track video time for readout
   useEffect(() => {
@@ -194,36 +197,27 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
 
   const toggleMute = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    const newMuted = !isGloballyMuted;
+    const newMuted = !isMutedRef.current;
+    isMutedRef.current = newMuted;
+    setIsMutedState(newMuted);
 
-    // Protect unmute from being overridden by autoplay-muted-fallback
-    if (!newMuted) {
-      markUserGestureUnmute();
-    }
-
-    toggleGlobalMute();
-
-    // Immediately sync DOM — don't wait for React re-render
     if (videoRef.current) {
       videoRef.current.muted = newMuted;
-      // iOS requires play() within user gesture when unmuting
       if (!newMuted) {
         videoRef.current.play().catch(() => {});
       }
     }
-  }, [toggleGlobalMute, isGloballyMuted, markUserGestureUnmute]);
+  }, []);
 
-  // Fix React muted attribute bug — React doesn't update video.muted after mount
-  // currentIndex included so new video elements get synced on slide change
+  // Sync mute state to new video element on slide change
   useEffect(() => {
     if (videoRef.current) {
-      videoRef.current.muted = isGloballyMuted;
-      // If user has unmuted, ensure the new video plays with audio
-      if (!isGloballyMuted) {
+      videoRef.current.muted = isMutedRef.current;
+      if (!isMutedRef.current) {
         videoRef.current.play().catch(() => {});
       }
     }
-  }, [isGloballyMuted, currentIndex]);
+  }, [currentIndex]);
 
   if (!item) return null;
 
@@ -243,7 +237,7 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
       >
         <div className="h-11 flex items-center justify-between px-4">
           <button
-            onClick={onClose}
+            onClick={() => { setGlobalMute(isMutedRef.current); onClose(); }}
             onTouchStart={(e) => e.stopPropagation()}
             onTouchEnd={(e) => e.stopPropagation()}
             className="w-11 h-11 rounded-full flex items-center justify-center active:bg-white/10 transition-colors"
@@ -271,9 +265,9 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
                   onTouchStart={(e) => e.stopPropagation()}
                   onTouchEnd={(e) => e.stopPropagation()}
                   className="w-9 h-9 rounded-full flex items-center justify-center active:bg-white/10 transition-colors"
-                  aria-label={isGloballyMuted ? 'Unmute' : 'Mute'}
+                  aria-label={isMutedState ? 'Unmute' : 'Mute'}
                 >
-                  {isGloballyMuted ? (
+                  {isMutedState ? (
                     <VolumeX className="w-4 h-4 text-white" />
                   ) : (
                     <Volume2 className="w-4 h-4 text-white" />
@@ -365,7 +359,7 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
                       autoPlay={isActive}
                       loop
                       playsInline
-                      muted={!isActive || isGloballyMuted}
+                      muted={!isActive || isMutedRef.current}
                       className={cn('max-w-full max-h-full object-contain', slideFilterClass)}
                       style={slidePixelStyle}
                       onPlay={isActive ? () => setIsPlaying(true) : undefined}
