@@ -95,12 +95,12 @@ export function VideoTrimmer({
   const endPct = duration > 0 ? (endTime / duration) * 100 : 100;
 
   return (
-    <div className="px-4 py-3 space-y-2">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="space-y-2">
+      {/* Nav bar — matches Studio / MediaPreviewViewer pattern */}
+      <div className="h-11 flex items-center justify-between px-4 bg-black">
         <button
           onClick={toggleTrim}
-          className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${
+          className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${
             isEnabled ? 'text-primary' : 'text-white/50'
           }`}
         >
@@ -116,6 +116,8 @@ export function VideoTrimmer({
           </div>
         )}
       </div>
+
+      <div className="px-4 space-y-2 pb-3">
 
       {/* Track */}
       {isEnabled && (
@@ -171,6 +173,7 @@ export function VideoTrimmer({
           className="hidden"
         />
       )}
+      </div>
     </div>
   );
 }
