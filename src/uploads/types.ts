@@ -37,13 +37,23 @@ export type UploadJobStatus =
   | 'uploading_media'
   | 'finalizing'
   | 'complete'
-  | 'failed';
+  | 'failed'
+  | 'partial_failure';
 
 export type ActorType = 'personal' | 'business';
 
 export interface UploadJobProgress {
   totalFiles: number;
   uploadedFiles: number;
+  failedFiles?: number;
+}
+
+export interface PartialFailureDetails {
+  postId: string;
+  totalFiles: number;
+  completedFiles: number;
+  failedFiles: number;
+  failedIndices: number[];
 }
 
 export interface UploadJob {
@@ -94,6 +104,9 @@ export interface UploadJob {
   progress: UploadJobProgress;
 
   error?: string;
+  
+  // Partial failure tracking
+  partialFailure?: PartialFailureDetails;
 }
 
 // Review-specific data for review uploads
@@ -174,4 +187,6 @@ export interface SerializedUploadJob {
   // Files cannot be serialized - job will be marked failed on restore
   fileCount: number;
   visibility?: 'anyone' | 'followers' | 'private';
+  // Partial failure details (persist across page loads for cleanup)
+  partialFailure?: PartialFailureDetails;
 }
