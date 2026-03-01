@@ -83,10 +83,10 @@ export function PosterFramePicker({
     : 0;
 
   return (
-    <div className="px-4 py-3 space-y-3">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <span className="flex items-center gap-1.5 text-xs font-medium text-white/70">
+    <div className="space-y-3">
+      {/* Nav bar — matches Studio / MediaPreviewViewer pattern */}
+      <div className="h-11 flex items-center justify-between px-4 bg-black">
+        <span className="flex items-center gap-1.5 text-sm font-medium text-white/70">
           <ImageIcon size={14} />
           Cover frame
         </span>
@@ -95,7 +95,7 @@ export function PosterFramePicker({
         </span>
       </div>
 
-      {/* Video preview */}
+      <div className="px-4 space-y-3 pb-3">
       <div className="relative w-full aspect-video overflow-hidden bg-black">
         <video
           ref={videoRef}
@@ -146,6 +146,7 @@ export function PosterFramePicker({
             {formatTime(t)}
           </button>
         ))}
+      </div>
       </div>
     </div>
   );
