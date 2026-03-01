@@ -79,7 +79,8 @@ export type PostWizardAction =
   | { type: 'SET_SUBMITTING'; payload: boolean }
   | { type: 'RESET' }
   | { type: 'LOAD_DRAFT'; payload: Partial<PostWizardState> }
-  | { type: 'LOAD_EXISTING_POST'; payload: { postId: string; state: Partial<PostWizardState> } };
+  | { type: 'LOAD_EXISTING_POST'; payload: { postId: string; state: Partial<PostWizardState> } }
+  | { type: 'LOAD_SCHEDULED_POST'; payload: { postId: string; scheduledAt: Date | null; state: Partial<PostWizardState> } };
 
 // Props for the main wizard component
 export interface PostWizardProps {

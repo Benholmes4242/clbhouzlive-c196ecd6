@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 interface ScheduleSheetProps {
   isOpen: boolean;
   onClose: () => void;
-  onSchedule: (scheduledAt: Date) => void;
+  onSchedule: (scheduledAt: Date | null) => void;
   isScheduling?: boolean;
   initialDate?: Date;
 }
@@ -263,8 +263,8 @@ export default function ScheduleSheet({
               </div>
             </div>
             
-            {/* Footer - Action button */}
-            <div className="p-4 pt-0 pb-safe">
+            {/* Footer - Action buttons */}
+            <div className="p-4 pt-0 pb-safe space-y-2">
               <button
                 onClick={handleSchedule}
                 disabled={!isValidScheduleTime || isScheduling}
@@ -272,6 +272,17 @@ export default function ScheduleSheet({
               >
                 {isScheduling ? "Scheduling..." : "Schedule Post"}
               </button>
+              {initialDate && (
+                <button
+                  onClick={() => {
+                    onSchedule(null);
+                    onClose();
+                  }}
+                  className="w-full py-3 text-sm font-medium text-muted-foreground hover:text-destructive transition-colors"
+                >
+                  Remove schedule
+                </button>
+              )}
             </div>
           </motion.div>
         </>
