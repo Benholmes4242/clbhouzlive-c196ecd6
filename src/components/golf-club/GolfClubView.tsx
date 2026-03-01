@@ -164,7 +164,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
 
       {/* ← Back text link below hero */}
       {!isInModal && (
-        <div className="px-4 pt-3 pb-0 bg-muted">
+        <div className="px-4 pt-1.5 pb-0 bg-muted">
           <button
             type="button"
             onClick={() => safeGoBack(navigate, '/courses')}
