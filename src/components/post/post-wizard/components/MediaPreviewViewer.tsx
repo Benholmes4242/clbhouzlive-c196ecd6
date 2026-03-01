@@ -194,7 +194,19 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
   const toggleMute = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     toggleGlobalMute();
-  }, [toggleGlobalMute]);
+    // iOS requires play() within user gesture when unmuting
+    if (videoRef.current && isGloballyMuted) {
+      videoRef.current.muted = false;
+      videoRef.current.play().catch(() => {});
+    }
+  }, [toggleGlobalMute, isGloballyMuted]);
+
+  // Fix React muted attribute bug — React doesn't update video.muted after mount
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = isGloballyMuted;
+    }
+  }, [isGloballyMuted]);
 
   if (!item) return null;
 
