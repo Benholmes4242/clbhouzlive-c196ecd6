@@ -1470,7 +1470,7 @@ async function processReviewJob(jobId: string, job: any): Promise<void> {
             streamId = result.streamId;
             // Use proper URL generator instead of hardcoded URL
             publicUrl = generateStreamHlsUrl(streamId);
-            posterUrl = generateStreamThumbnailUrl(streamId, { width: 1280, height: 720, time: 1 });
+            posterUrl = generateStreamThumbnailUrl(streamId, { width: 1280, height: 720, time: (mediaItem as any)?.posterTimestamp ?? 1 });
             uploadedStreamUids.push(streamId);
             
           } catch (videoError: any) {

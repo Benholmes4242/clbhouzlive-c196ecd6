@@ -57,13 +57,16 @@ export function getThumbnailUrl(options: ThumbnailOptions): string {
 
   if (streamId) {
     // Cloudflare Stream thumbnail
-    // FIX: Removed time parameter - causes 400 errors for videos still processing
-    // or where time exceeds video duration. Cloudflare returns first frame by default.
     const sizeValue = height || width || THUMBNAIL_SIZE[size.toUpperCase() as keyof typeof THUMBNAIL_SIZE] || THUMBNAIL_SIZE.MEDIUM;
 
     url = `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${streamId}/thumbnails/thumbnail.jpg`;
     url += `?height=${sizeValue}`;
     url += `&fit=${fit}`;
+    // Include time parameter for custom poster frames (e.g., time=15s)
+    // Only added when explicitly set (not default 1s) to avoid 400s on processing videos
+    if (time !== THUMBNAIL_DEFAULT_TIME) {
+      url += `&time=${time}s`;
+    }
   } else if (imageUrl) {
     // For R2/Cloudflare Images, append size params if supported
     if (imageUrl.includes('imagedelivery.net')) {
@@ -107,10 +110,7 @@ export const thumbnailPresets = {
   /** Hero/featured thumbnail (1200px) */
   hero: (streamId: string) => getThumbnailUrl({ streamId, size: 'xlarge' }),
 
-  /** 
-   * @deprecated Time parameter removed - causes 400 errors on Cloudflare Stream.
-   * All thumbnails now use the default first frame.
-   */
-  atTime: (streamId: string, _timeSeconds: number) =>
-    getThumbnailUrl({ streamId, size: 'medium' }),
+  /** Generate thumbnail at a specific time offset (for poster frame selection) */
+  atTime: (streamId: string, timeSeconds: number) =>
+    getThumbnailUrl({ streamId, size: 'medium', time: timeSeconds }),
 };
