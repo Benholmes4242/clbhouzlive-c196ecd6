@@ -515,16 +515,33 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     let rafId: number;
     const tick = () => {
       const currentPostId = filteredPosts[currentIndex]?.id;
-      if (currentPostId) {
-        const videoEl = videoRefs.current[currentPostId];
-        if (videoEl && videoEl.duration && isFinite(videoEl.duration)) {
-          setVideoProgress(videoEl.currentTime / videoEl.duration);
-        } else {
-          setVideoProgress(0);
-        }
+      const refValue = currentPostId ? videoRefs.current[currentPostId] : null;
+      
+      // What type of element is the ref?
+      const tagName = refValue?.tagName;
+      const isVideoEl = refValue instanceof HTMLVideoElement;
+      
+      // If it's not a video, try to find one inside it
+      const actualVideo = isVideoEl ? refValue : (refValue as any)?.querySelector?.('video');
+      
+      console.log('[PROGRESS-DEBUG]', {
+        currentPostId: currentPostId?.slice(-8),
+        refTagName: tagName,
+        isVideoEl,
+        hasQuerySelector: !!(refValue as any)?.querySelector,
+        foundNestedVideo: !!actualVideo,
+        duration: actualVideo?.duration,
+        currentTime: actualVideo?.currentTime,
+        readyState: actualVideo?.readyState,
+        paused: actualVideo?.paused,
+      });
+
+      if (actualVideo && actualVideo.duration && isFinite(actualVideo.duration)) {
+        setVideoProgress(actualVideo.currentTime / actualVideo.duration);
       } else {
         setVideoProgress(0);
       }
+      
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
