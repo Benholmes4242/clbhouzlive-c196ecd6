@@ -102,8 +102,13 @@ export default function DraftsAndScheduledSheet({
   return (
     <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DrawerContent 
-        className="light min-h-[50vh] max-h-[85vh] bg-background border-t border-border rounded-t-3xl z-[10002]" 
-        style={{ zIndex: 10002 }}
+        className="light min-h-[50vh] max-h-[85vh] border-t-0 z-[10002]" 
+        style={{ 
+          zIndex: 10002,
+          backgroundColor: '#FFFFFF',
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+        }}
       >
         <VisuallyHidden>
           <DrawerDescription>Manage your drafts and scheduled posts</DrawerDescription>
@@ -111,21 +116,22 @@ export default function DraftsAndScheduledSheet({
         
         <div className="flex flex-col h-full max-h-[85vh]">
           {/* Header with title and close button */}
-          <div className="flex items-center justify-between px-4 pt-2 pb-1">
-            <DrawerTitle className="text-lg font-semibold text-foreground">
+          <div className="flex items-center justify-between px-5 pt-2 pb-1">
+            <DrawerTitle className="text-lg font-semibold" style={{ color: '#1A1A1A' }}>
               Your posts
             </DrawerTitle>
             <button
               onClick={onClose}
-              className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors"
+              className="w-8 h-8 rounded-full flex items-center justify-center active:scale-90 transition-transform"
+              style={{ backgroundColor: '#F5F5F7' }}
               aria-label="Close"
             >
-              <X className="w-4 h-4" />
+              <X className="w-4 h-4" style={{ color: '#7A7A7A' }} />
             </button>
           </div>
           
           {/* Tabs */}
-          <div className="px-4 pb-0">
+          <div className="px-5 pb-0">
             <div role="tablist" className="flex gap-6 border-b border-border/30">
               <button
                 role="tab"

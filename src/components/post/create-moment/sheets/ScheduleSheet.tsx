@@ -106,7 +106,7 @@ export default function ScheduleSheet({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/40 z-[10000]"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[10010]"
             onClick={onClose}
           />
           
@@ -115,23 +115,30 @@ export default function ScheduleSheet({
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed bottom-0 left-0 right-0 bg-background rounded-t-3xl border-t border-border z-[10001] flex flex-col"
-            style={{ maxHeight: '90vh' }}
+            transition={{ type: "spring", damping: 30, stiffness: 300 }}
+            className="fixed bottom-0 left-0 right-0 z-[10011] flex flex-col light"
+            style={{ 
+              maxHeight: '90vh',
+              backgroundColor: '#FFFFFF',
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+              paddingBottom: 'env(safe-area-inset-bottom)',
+            }}
           >
-            {/* Drag handle */}
-            <div className="flex justify-center pt-3 pb-2">
-              <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+            {/* Handle */}
+            <div className="flex justify-center pt-2.5 pb-1">
+              <div className="w-9 h-1 rounded-full" style={{ backgroundColor: '#E0E0E0' }} />
             </div>
             
             {/* Header */}
-            <div className="flex items-center justify-between px-4 pb-4">
-              <h2 className="text-xl font-semibold text-foreground">Schedule Post</h2>
+            <div className="flex items-center justify-between px-5 pb-4">
+              <h2 className="text-lg font-semibold" style={{ color: '#1A1A1A' }}>Schedule Post</h2>
               <button
                 onClick={onClose}
-                className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors"
+                className="w-8 h-8 rounded-full flex items-center justify-center active:scale-90 transition-transform"
+                style={{ backgroundColor: '#F5F5F7' }}
               >
-                <X size={16} />
+                <X className="w-4 h-4" style={{ color: '#7A7A7A' }} />
               </button>
             </div>
             
@@ -267,11 +274,15 @@ export default function ScheduleSheet({
             </div>
             
             {/* Footer - Action buttons */}
-            <div className="p-4 pt-0 pb-safe space-y-2">
+            <div className="px-5 pt-2 pb-4 space-y-2">
               <button
                 onClick={handleSchedule}
                 disabled={!isValidScheduleTime || isScheduling}
-                className="w-full h-14 bg-primary text-primary-foreground font-semibold rounded-full hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100 disabled:cursor-not-allowed active:scale-[0.97] transition-all duration-200"
+                className="w-full h-14 font-semibold rounded-full active:scale-[0.97] transition-all duration-200"
+                style={{
+                  backgroundColor: !isValidScheduleTime || isScheduling ? '#E5E5EA' : '#f59e0b',
+                  color: !isValidScheduleTime || isScheduling ? '#8E8E93' : '#FFFFFF',
+                }}
               >
                 {isScheduling ? "Scheduling..." : "Schedule Post"}
               </button>
@@ -282,7 +293,8 @@ export default function ScheduleSheet({
                     onSchedule(null);
                     onClose();
                   }}
-                  className="w-full py-3 text-sm font-medium text-muted-foreground hover:text-destructive transition-colors"
+                  className="w-full py-3 text-sm font-medium transition-colors"
+                  style={{ color: '#8E8E93' }}
                 >
                   Remove schedule
                 </button>
