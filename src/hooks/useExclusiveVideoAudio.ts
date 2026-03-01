@@ -17,7 +17,8 @@ export const useExclusiveVideoAudio = (videoId: string): ExclusiveVideoAudio => 
     setActiveVideo, 
     isVideoActive, 
     isGloballyMuted, 
-    setGlobalMute 
+    setGlobalMute,
+    markUserGestureUnmute
   } = useGlobalAudio();
   
   // This video is considered muted if either:
@@ -29,6 +30,7 @@ export const useExclusiveVideoAudio = (videoId: string): ExclusiveVideoAudio => 
   const toggleMute = useCallback(() => {
     if (isGloballyMuted) {
       // If globally muted, unmute and make this video active
+      markUserGestureUnmute();
       setGlobalMute(false);
       setActiveVideo(videoId);
     } else if (isActive) {

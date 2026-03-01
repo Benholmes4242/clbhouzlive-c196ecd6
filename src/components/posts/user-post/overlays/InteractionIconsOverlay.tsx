@@ -18,12 +18,12 @@ export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = (
   onInteractionClick,
   currentMediaType = 'image'
 }) => {
-  const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
+  const { isGloballyMuted, toggleGlobalMute, markUserGestureUnmute } = useGlobalAudio();
 
   const handleMuteToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (isGloballyMuted) markUserGestureUnmute();
     toggleGlobalMute();
-    // GlobalAudioContext handles muting - no need for VideoPlaybackManager
   };
 
   return (

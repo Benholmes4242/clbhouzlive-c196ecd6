@@ -36,7 +36,7 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
   // CHANGE 4: Use GlobalAudioContext as single source of truth for mute state.
   // Removed isolated carouselAudioPreference + sessionStorage — they caused drift
   // between the highlights carousel and the rest of the app.
-  const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
+  const { isGloballyMuted, setGlobalMute, markUserGestureUnmute } = useGlobalAudio();
   
   // Track if user has made a gesture for autoplay policies
   const [hasUserGesture, setHasUserGesture] = useState(false);
@@ -47,13 +47,14 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
   // Sync global mute state to carousel preference
   const updateCarouselAudioPreference = useCallback((preference: 'muted' | 'unmuted') => {
     const newMuted = preference === 'muted';
+    if (!newMuted) markUserGestureUnmute();
     setGlobalMute(newMuted);
     
     // Mark that user has made a gesture
     if (preference === 'unmuted') {
       setHasUserGesture(true);
     }
-  }, [setGlobalMute]);
+  }, [setGlobalMute, markUserGestureUnmute]);
 
   const register = useCallback((id: string, el: PlayerEl | null) => {
     console.log('🎥 Registering video element:', id, el ? 'with element' : 'null');

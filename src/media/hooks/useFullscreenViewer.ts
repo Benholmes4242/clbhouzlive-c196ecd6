@@ -171,7 +171,7 @@ export function useFullscreenViewer(
   const [activeVideoRef, setActiveVideoRef] = useState<React.RefObject<HTMLVideoElement> | null>(null);
   
   // Use global audio context instead of local state
-  const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
+  const { isGloballyMuted, setGlobalMute, markUserGestureUnmute } = useGlobalAudio();
   
   // UI state
   const [commentsOpen, setCommentsOpen] = useState(false);
@@ -342,8 +342,9 @@ export function useFullscreenViewer(
 
   // Audio toggle helper
   const toggleMute = useCallback(() => {
+    if (isGloballyMuted) markUserGestureUnmute();
     setGlobalMute(!isGloballyMuted);
-  }, [isGloballyMuted, setGlobalMute]);
+  }, [isGloballyMuted, setGlobalMute, markUserGestureUnmute]);
 
   return {
     isOpen,
