@@ -47,15 +47,11 @@ export function DiscardActionSheet({
           >
             {/* Main actions card — frosted glass */}
             <div 
-              className="rounded-2xl overflow-hidden mb-2"
-              style={{ 
-                backgroundColor: 'rgba(255,255,255,0.97)', 
-                backdropFilter: 'blur(20px)',
-                boxShadow: '0 -4px 40px -8px rgba(0,0,0,0.12)',
-              }}
+              className="rounded-2xl overflow-hidden mb-2 shadow-xl"
+              style={{ backgroundColor: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(20px)' }}
             >
               {/* Header */}
-              <div className="px-4 py-3.5 text-center" style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+              <div className="px-4 py-3 text-center border-b border-gray-200/50">
                 <h3 className="text-sm font-semibold text-gray-500">
                   {title}
                 </h3>
@@ -67,26 +63,21 @@ export function DiscardActionSheet({
               {/* Exit - Destructive */}
               <button
                 onClick={onDiscard}
-                className="w-full py-4 text-center text-lg font-normal flex items-center justify-center gap-2 transition-colors active:bg-gray-50"
-                style={{ color: '#ef4444' }}
+                className="w-full py-4 text-center text-red-500 text-lg font-normal active:bg-gray-100 transition-colors flex items-center justify-center gap-2"
               >
-                <Trash2 className="h-4.5 w-4.5" />
+                <Trash2 className="h-5 w-5" />
                 Exit
               </button>
             </div>
             
-            {/* Keep Editing - Separate card, matches Post Wizard exactly */}
+            {/* Keep Editing - Separate card, amber accent */}
             <div 
-              className="rounded-2xl overflow-hidden"
-              style={{ 
-                backgroundColor: 'rgba(255,255,255,0.97)', 
-                backdropFilter: 'blur(20px)',
-                boxShadow: '0 2px 12px -4px rgba(0,0,0,0.08)',
-              }}
+              className="rounded-2xl overflow-hidden shadow-xl"
+              style={{ backgroundColor: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(20px)' }}
             >
               <button
                 onClick={onKeepEditing}
-                className="w-full py-4 text-center text-lg font-semibold transition-colors active:bg-gray-50 text-primary"
+                className="w-full py-4 text-center text-primary text-lg font-semibold active:bg-gray-100 transition-colors"
               >
                 Keep Editing
               </button>
