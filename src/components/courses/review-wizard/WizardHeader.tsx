@@ -93,16 +93,15 @@ export function WizardHeader({
       <div className="flex items-center gap-1 min-w-[72px]">
         <button
           onClick={handleBackOrClose}
-          className="w-9 h-9 rounded-full flex items-center justify-center active:scale-[0.97] transition-all duration-100 disabled:opacity-50"
+          className="w-10 h-10 rounded-full flex items-center justify-center active:scale-[0.97] transition-all duration-100 disabled:opacity-50"
           style={{
-            background: 'hsl(var(--muted) / 0.8)',
-            border: '1.5px solid hsl(var(--border))',
+            background: '#F5F5F7',
           }}
           aria-label={isFirstStep ? 'Close' : 'Back'}
           disabled={isSubmitting || isDeleting}
         >
           {isFirstStep ? (
-            <X className="h-4 w-4 text-foreground" />
+            <X className="h-[18px] w-[18px]" style={{ color: '#8E8E93' }} />
           ) : (
             <ChevronLeft className="h-5 w-5 text-foreground" />
           )}
@@ -146,11 +145,16 @@ export function WizardHeader({
         <button
           onClick={handleNextOrSubmit}
           disabled={!isNextEnabled}
-          className="px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 active:scale-[0.97]"
+          className="text-[15px] font-semibold px-[18px] py-[7px] rounded-full transition-all duration-200 active:scale-[0.96]"
           style={{
-            background: isNextEnabled ? '#1C1C1E' : 'hsl(var(--muted))',
-            color: isNextEnabled ? '#FFFFFF' : 'hsl(var(--muted-foreground))',
-            opacity: isNextEnabled ? 1 : 0.5,
+            background: isLastStep
+              ? (isNextEnabled ? '#f59e0b' : '#F5F5F7')
+              : (isNextEnabled ? '#1C1C1E' : '#F5F5F7'),
+            color: isLastStep
+              ? (isNextEnabled ? '#FFFFFF' : '#AEAEB2')
+              : (isNextEnabled ? '#FFFFFF' : '#AEAEB2'),
+            boxShadow: isLastStep && isNextEnabled ? '0 2px 12px rgba(245,158,11,0.22)' : 'none',
+            pointerEvents: isNextEnabled ? 'auto' : 'none',
           }}
         >
           {isSubmitting ? (

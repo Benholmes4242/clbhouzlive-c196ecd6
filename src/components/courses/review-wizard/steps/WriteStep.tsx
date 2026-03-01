@@ -8,6 +8,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { CharacterRing } from '@/components/post/post-wizard/components/CharacterRing';
 
 import { MentionBottomSheet, type MentionSuggestion } from '@/components/post/post-wizard/steps/MentionBottomSheet';
 import { useKeyboardHeight } from '@/hooks/useKeyboardHeight';
@@ -226,20 +227,9 @@ export function WriteStep({
             style={{ minHeight: '120px' }}
             maxLength={MAX_REVIEW_LENGTH + 100}
           />
-          <AnimatePresence>
-            {reviewLength > 0 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex justify-end mt-1"
-              >
-                <span className={cn("text-[11px] tabular-nums", getReviewCounterColor())}>
-                  {reviewLength}/{MAX_REVIEW_LENGTH}
-                </span>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <div className="flex justify-end mt-1">
+            <CharacterRing current={reviewLength} max={MAX_REVIEW_LENGTH} />
+          </div>
         </motion.div>
 
         {/* Prompt chips — always visible when body is short */}
