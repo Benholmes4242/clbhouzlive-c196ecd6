@@ -2,6 +2,7 @@
 // A* polished: theme tokens, badge consistency, staggered animations, contextual actions
 
 import React, { useState, useEffect } from 'react';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Drawer, DrawerContent, DrawerTitle, DrawerDescription } from '@/components/ui/drawer';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
@@ -63,20 +64,24 @@ export default function DraftsAndScheduledSheet({
   const handleDeleteDraft = async (draftId: string) => {
     await deleteDraft(draftId);
     setConfirmDeleteId(null);
+    analyticsEvents.track('draft_deleted', {});
   };
 
   const handleDeleteAll = async () => {
     await deleteAllDrafts();
     setShowDeleteAllConfirm(false);
+    analyticsEvents.track('draft_all_deleted', { count: drafts.length });
     onClose();
   };
 
   const handlePostNow = async (postId: string) => {
     await publishNow(postId);
+    analyticsEvents.track('scheduled_post_published_now', {});
   };
 
   const handleDeleteScheduled = async (postId: string) => {
     await deletePost(postId);
+    analyticsEvents.track('scheduled_post_deleted', {});
   };
 
   const getActorLabel = (actorType: string) => {
@@ -348,8 +353,8 @@ export default function DraftsAndScheduledSheet({
 function DraftsEmptyState() {
   return (
     <div className="flex-1 flex flex-col items-center justify-center py-12 px-4">
-      <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center mb-4">
-        <FileText className="w-7 h-7 text-amber-400" />
+      <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(245,158,11,0.10)' }}>
+        <FileText className="w-7 h-7" style={{ color: '#f59e0b' }} />
       </div>
       <h3 className="text-lg font-semibold text-foreground mb-1">
         No drafts yet
@@ -365,8 +370,8 @@ function DraftsEmptyState() {
 function ScheduledEmptyState() {
   return (
     <div className="flex-1 flex flex-col items-center justify-center py-12 px-4">
-      <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mb-4">
-        <Calendar className="w-7 h-7 text-blue-400" />
+      <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(245,158,11,0.10)' }}>
+        <Calendar className="w-7 h-7" style={{ color: '#f59e0b' }} />
       </div>
       <h3 className="text-lg font-semibold text-foreground mb-1">
         No scheduled posts
@@ -449,6 +454,10 @@ const DraftItem = React.memo(function DraftItem({
                 src={draft.media[0].posterUrl || draft.media[0].mediaUrl}
                 alt=""
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  // Show fallback icon (parent bg-muted is already visible)
+                }}
               />
               {draft.media.length > 1 && (
                 <div className="absolute bottom-1 right-1 px-1.5 py-0.5 text-[10px] font-medium bg-black/70 text-white rounded">

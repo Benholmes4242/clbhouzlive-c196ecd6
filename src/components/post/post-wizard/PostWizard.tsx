@@ -32,6 +32,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { pickMediaFiles, validateMediaFiles } from '@/utils/media/pickMediaFiles';
 import { normalizeFilesToMediaItems } from '@/lib/mediaUtils';
 import { TaggableEntity } from '@/components/post/create-moment/types';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { MentionBottomSheet, MentionSuggestion } from './steps/MentionBottomSheet';
 import { POST_LIMITS } from '@/constants/postLimits';
 import { useKeyboardHeight } from '@/hooks/useKeyboardHeight';
@@ -519,7 +520,9 @@ export function PostWizard({
     setScheduledAt(date);
     setShowScheduleSheet(false);
     if (date) {
+      const minutesAhead = Math.round((date.getTime() - Date.now()) / 60000);
       toast.success('Post scheduled');
+      analyticsEvents.track('post_scheduled', { schedule_minutes_ahead: minutesAhead });
     } else {
       toast.success('Schedule removed');
     }
@@ -534,6 +537,7 @@ export function PostWizard({
     loadDraft(draft);
     setShowDraftsSheet(false);
     toast.success('Draft loaded');
+    analyticsEvents.track('draft_loaded', { media_count: draft.media?.length || 0, has_course: !!draft.courseId });
   }, [loadDraft, state.caption, state.mediaItems.length]);
 
   const confirmLoadDraft = useCallback(() => {
@@ -549,6 +553,7 @@ export function PostWizard({
     loadScheduledPost(post);
     setShowDraftsSheet(false);
     toast.success('Editing scheduled post');
+    analyticsEvents.track('scheduled_post_edited', { has_media: (post.media?.length || 0) > 0 });
   }, [loadScheduledPost]);
 
   const draftSaveInput = useMemo(() => ({
@@ -601,6 +606,9 @@ export function PostWizard({
   }, [state.mediaItems, getDraftFn, deleteDraftMediaFn, uploadMedia, getEdits]);
 
   const handleSaveDraft = useCallback(async () => {
+    // Fix 3.1: Empty draft prevention
+    const hasContent = state.caption.trim().length > 0 || state.mediaItems.length > 0;
+    if (!hasContent) { toast.error('Add a caption or media to save a draft'); return; }
     if (!state.currentDraftId && !canCreateDraft) { toast.error('Maximum drafts reached'); return; }
     setIsSavingDraft(true);
     try {
@@ -610,6 +618,7 @@ export function PostWizard({
         if (!success) { toast.error('Failed to update draft'); return; }
         await syncDraftMedia(state.currentDraftId);
         toast.success('Draft updated');
+        analyticsEvents.track('draft_saved', { media_count: state.mediaItems.length, has_course: state.selectedCourses.length > 0, is_update: true });
       } else {
         // CREATE new draft
         const draft = await createDraft(draftSaveInput);
@@ -624,11 +633,15 @@ export function PostWizard({
           }
         }
         toast.success('Draft saved');
+        analyticsEvents.track('draft_saved', { media_count: state.mediaItems.length, has_course: state.selectedCourses.length > 0, is_update: false });
       }
     } catch { toast.error('Failed to save draft'); } finally { setIsSavingDraft(false); }
   }, [state, canCreateDraft, createDraft, updateDraftFn, uploadMedia, getEdits, draftSaveInput, syncDraftMedia]);
 
   const handleSaveDraftAndClose = useCallback(async () => {
+    // Fix 3.1: Empty draft prevention
+    const hasContent = state.caption.trim().length > 0 || state.mediaItems.length > 0;
+    if (!hasContent) { toast.error('Add a caption or media to save a draft'); return; }
     if (!state.currentDraftId && !canCreateDraft) { toast.error('Maximum drafts reached'); return; }
     setIsSavingDraft(true);
     try {
@@ -638,6 +651,7 @@ export function PostWizard({
         if (!success) { toast.error('Failed to update draft'); return; }
         await syncDraftMedia(state.currentDraftId);
         toast.success('Draft updated');
+        analyticsEvents.track('draft_saved', { media_count: state.mediaItems.length, has_course: state.selectedCourses.length > 0, is_update: true });
       } else {
         // CREATE new draft
         const draft = await createDraft(draftSaveInput);
@@ -654,6 +668,7 @@ export function PostWizard({
           }
         }
         toast.success('Draft saved');
+        analyticsEvents.track('draft_saved', { media_count: state.mediaItems.length, has_course: state.selectedCourses.length > 0, is_update: false });
       }
       setShowCloseConfirm(false);
       onClose();
