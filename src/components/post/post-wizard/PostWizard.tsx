@@ -376,9 +376,16 @@ export function PostWizard({
           course_id: state.selectedCourses[0]?.id || null,
           updated_at: new Date().toISOString(),
         };
-        // If editing a scheduled post, persist schedule changes
+        // Persist schedule changes
         if (state.scheduledAt) {
+          // User kept or changed the schedule time
           updatePayload.scheduled_at = state.scheduledAt.toISOString();
+          updatePayload.status = 'scheduled';
+        } else {
+          // User removed the schedule — publish immediately
+          updatePayload.scheduled_at = null;
+          updatePayload.status = 'published';
+          updatePayload.created_at = new Date().toISOString();
         }
         const { data: updatedRows, error } = await supabase
           .from('posts')
@@ -439,7 +446,10 @@ export function PostWizard({
         window.dispatchEvent(new CustomEvent('postUpdated'));
         queryClient.invalidateQueries({ queryKey: ['scheduled-posts'] });
         queryClient.invalidateQueries({ queryKey: ['scheduled-posts-count'] });
-        toast.success(state.scheduledAt ? 'Scheduled post updated' : 'Post updated');
+        toast.success(state.scheduledAt ? 'Scheduled post updated' : 'Post published');
+        if (!state.scheduledAt) {
+          analyticsEvents.track('scheduled_post_unscheduled', {});
+        }
         onClose();
         return;
       }
