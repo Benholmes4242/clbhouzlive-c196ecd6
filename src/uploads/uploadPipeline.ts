@@ -387,6 +387,7 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
     } else if (hasNewFiles && job.files.length > 0) {
       // Phase B: Upload new media files sequentially (normal flow)
       // Now using TUS for videos and compression for images
+      // PARTIAL FAILURE: continue on error, track per-file results
 
     // Track uploaded media for image processing
     const uploadedMediaForProcessing: Array<{
@@ -397,6 +398,14 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
       studioEdits?: any;
       filterId?: string | null;
     }> = [];
+
+    // Track per-file upload results for partial failure recovery
+    interface FileUploadResult {
+      index: number;
+      status: 'completed' | 'failed';
+      error?: string;
+    }
+    const fileUploadResults: FileUploadResult[] = [];
 
     for (let index = 0; index < job.files.length; index++) {
       const file = job.files[index];
@@ -606,6 +615,7 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
             filter_id: filterId,
             stream_id: streamId,
             poster_url: posterUrl,
+            upload_status: 'completed' as any,
             // Include dimensions (works for both images and videos after TUS)
             ...(width && height && {
               width,
@@ -651,6 +661,8 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
           fileId,
         });
 
+        fileUploadResults.push({ index, status: 'completed' });
+
       } catch (fileError: any) {
         console.error(`[uploadPipeline] Failed to upload file ${file.name}:`, fileError);
         
@@ -661,8 +673,28 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
           fileId,
           error: fileError?.message || 'Upload failed',
         });
+
+        // Create a placeholder post_media row with 'failed' status for tracking
+        try {
+          await supabase.from('post_media').insert({
+            post_id: postId,
+            media_type: file.type.startsWith('image/') ? 'image' : 'video',
+            media_url: '', // No URL yet
+            display_order: index,
+            upload_status: 'failed' as any,
+          });
+        } catch (insertErr) {
+          console.warn(`[uploadPipeline] Failed to create placeholder media row:`, insertErr);
+        }
         
-        throw fileError;
+        fileUploadResults.push({ 
+          index, 
+          status: 'failed', 
+          error: fileError?.message || 'Upload failed',
+        });
+        
+        // CONTINUE to next file — don't throw
+        continue;
       }
     }
 
@@ -670,6 +702,70 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
     if (uploadedMediaForProcessing.length > 0) {
       queueImageProcessing(uploadedMediaForProcessing);
     }
+
+    // === CHECK FOR PARTIAL FAILURE ===
+    const completedCount = fileUploadResults.filter(r => r.status === 'completed').length;
+    const failedCount = fileUploadResults.filter(r => r.status === 'failed').length;
+
+    if (failedCount > 0 && completedCount > 0) {
+      // PARTIAL FAILURE — some files uploaded, some didn't
+      // Keep the post row (status stays 'uploading') so it doesn't appear in feeds
+      console.log(`[uploadPipeline] Partial failure: ${completedCount}/${job.files.length} completed, ${failedCount} failed`);
+
+      uploadManager.markPartialFailure(jobId, {
+        postId,
+        totalFiles: job.files.length,
+        completedFiles: completedCount,
+        failedFiles: failedCount,
+        failedIndices: fileUploadResults
+          .filter(r => r.status === 'failed')
+          .map(r => r.index),
+      });
+
+      uploadEventBus.emit('upload:partial-failure', {
+        type: 'upload:partial-failure',
+        jobId,
+        completedFiles: completedCount,
+        failedFiles: failedCount,
+        totalFiles: job.files.length,
+      });
+
+      toast.warning(
+        `${completedCount} of ${job.files.length} files uploaded`,
+        { description: 'Tap the banner to retry failed items' }
+      );
+      return; // Don't finalize — wait for retry
+    }
+
+    if (failedCount > 0 && completedCount === 0) {
+      // ALL FAILED — clean up everything (existing behavior)
+      console.error(`[uploadPipeline] All ${failedCount} files failed to upload`);
+      
+      // Clean up orphaned Cloudflare Stream assets
+      if (uploadedStreamUids.length > 0) {
+        await cleanupStreamAssets(uploadedStreamUids);
+      }
+
+      // Delete the post row
+      try {
+        await supabase.from('posts').delete().eq('id', postId);
+        console.log(`[uploadPipeline] Rolled back post ${postId}`);
+      } catch (cleanupError) {
+        console.warn(`[uploadPipeline] Failed to rollback post:`, cleanupError);
+      }
+
+      const errorMsg = 'All files failed to upload. Please try again.';
+      uploadManager.markFailed(jobId, errorMsg);
+      uploadEventBus.emit('upload:failed', {
+        type: 'upload:failed',
+        jobId,
+        error: errorMsg,
+      });
+      toast.error('Upload failed', { description: 'Please try again' });
+      return;
+    }
+
+    // ALL SUCCEEDED — continue to finalization below
     } // End of else block for normal file upload flow
 
     // Phase C: Handle restored media (from drafts/scheduled posts - already uploaded)
@@ -707,6 +803,7 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
             duration_seconds: item.duration || null,
             studio_edits: studioEditsJson,
             filter_id: filterId,
+            upload_status: 'completed' as any,
           });
 
         if (mediaError) {
@@ -725,66 +822,7 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
     }
 
     // Finalizing phase
-    uploadManager.updateStatus(jobId, 'finalizing', postId);
-
-    // Handle tags
-    if (job.selectedTags && job.selectedTags.length > 0) {
-      try {
-        await handlePostTags(postId, job.selectedTags, job.userId, job.caption || '');
-      } catch (tagError) {
-        console.warn(`[uploadPipeline] Tag handling error (non-fatal):`, tagError);
-      }
-    }
-
-    // Handle course info - store as "Played at" line in content, NOT as a post_tag
-    // Golf clubs are not @mentions - they use the "Played at" CTA instead
-    if (job.courseInfo) {
-      try {
-        // Update content with course info (the CoursePostBadge renders this as a clickable CTA)
-        const updatedContent = `${job.caption || ''}\n\n📍 Played at ${job.courseInfo.name}, ${job.courseInfo.country}`.trim();
-        await supabase.from('posts').update({ content: updatedContent }).eq('id', postId);
-      } catch (courseError) {
-        console.warn(`[uploadPipeline] Course info error (non-fatal):`, courseError);
-      }
-    }
-
-    // Mark stream assets as attached (success path)
-    if (uploadedStreamUids.length > 0) {
-      await markStreamAssetsAttached(uploadedStreamUids, postId);
-    }
-
-    // Update post status to 'published' now that all media is uploaded
-    // Only for non-scheduled posts (scheduled posts stay in 'scheduled' status)
-    if (!job.scheduledAt) {
-      const { error: statusError } = await supabase
-        .from('posts')
-        .update({ status: 'published' })
-        .eq('id', postId);
-      
-      if (statusError) {
-        console.warn('[uploadPipeline] Failed to update post status to published:', statusError);
-      } else {
-        console.log(`[uploadPipeline] Post ${postId} now published`);
-      }
-    }
-
-    // Mark complete and show success toast
-    uploadManager.markComplete(jobId, postId);
-    
-    // Emit upload complete event for the progress banner
-    uploadEventBus.emit('upload:complete', {
-      type: 'upload:complete',
-      jobId,
-      postId,
-      actorType: job.actorType,
-      actorId: job.actorId,
-      isScheduled: !!job.scheduledAt,
-      scheduledAt: job.scheduledAt instanceof Date 
-        ? job.scheduledAt.toISOString() 
-        : job.scheduledAt || undefined,
-    });
-    
-    // PostSuccessScreen handles all post-success feedback
+    await finalizePost(jobId, postId, job, uploadedStreamUids);
 
   } catch (error: any) {
     console.error('[uploadPipeline] processJob failed:', error);
@@ -832,11 +870,11 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
     }
 
     // Try to clean up partial post if we got one created
-    const job = uploadManager.getJob(jobId);
-    if (job?.postId) {
+    const currentJob = uploadManager.getJob(jobId);
+    if (currentJob?.postId) {
       try {
-        await supabase.from('posts').delete().eq('id', job.postId);
-        console.log(`[uploadPipeline] Rolled back post ${job.postId}`);
+        await supabase.from('posts').delete().eq('id', currentJob.postId);
+        console.log(`[uploadPipeline] Rolled back post ${currentJob.postId}`);
       } catch (cleanupError) {
         console.warn(`[uploadPipeline] Failed to rollback post:`, cleanupError);
       }
@@ -845,8 +883,275 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
 }
 
 /**
- * Process a review upload job
+ * Finalize a post after all media has been uploaded successfully.
+ * Handles tags, course info, stream asset tracking, and status update.
  */
+async function finalizePost(jobId: string, postId: string, job: any, uploadedStreamUids: string[]): Promise<void> {
+  uploadManager.updateStatus(jobId, 'finalizing', postId);
+
+  // Handle tags
+  if (job.selectedTags && job.selectedTags.length > 0) {
+    try {
+      await handlePostTags(postId, job.selectedTags, job.userId, job.caption || '');
+    } catch (tagError) {
+      console.warn(`[uploadPipeline] Tag handling error (non-fatal):`, tagError);
+    }
+  }
+
+  // Handle course info
+  if (job.courseInfo) {
+    try {
+      const updatedContent = `${job.caption || ''}\n\n📍 Played at ${job.courseInfo.name}, ${job.courseInfo.country}`.trim();
+      await supabase.from('posts').update({ content: updatedContent }).eq('id', postId);
+    } catch (courseError) {
+      console.warn(`[uploadPipeline] Course info error (non-fatal):`, courseError);
+    }
+  }
+
+  // Mark stream assets as attached
+  if (uploadedStreamUids.length > 0) {
+    await markStreamAssetsAttached(uploadedStreamUids, postId);
+  }
+
+  // Update post status to 'published' (or keep 'scheduled' for scheduled posts)
+  if (!job.scheduledAt) {
+    const { error: statusError } = await supabase
+      .from('posts')
+      .update({ status: 'published' })
+      .eq('id', postId);
+    
+    if (statusError) {
+      console.warn('[uploadPipeline] Failed to update post status to published:', statusError);
+    } else {
+      console.log(`[uploadPipeline] Post ${postId} now published`);
+    }
+  }
+
+  // Mark complete
+  uploadManager.markComplete(jobId, postId);
+  
+  uploadEventBus.emit('upload:complete', {
+    type: 'upload:complete',
+    jobId,
+    postId,
+    actorType: job.actorType,
+    actorId: job.actorId,
+    isScheduled: !!job.scheduledAt,
+    scheduledAt: job.scheduledAt instanceof Date 
+      ? job.scheduledAt.toISOString() 
+      : job.scheduledAt || undefined,
+  });
+}
+
+/**
+ * Retry only the failed media items for a partially-failed upload job.
+ * Requires the original File objects to still be in memory (no page refresh).
+ */
+export async function retryFailedItems(jobId: string): Promise<boolean> {
+  const job = uploadManager.getJob(jobId);
+  if (!job?.partialFailure || !job.files) {
+    console.warn('[uploadPipeline] Cannot retry: job not found or no partial failure info');
+    return false;
+  }
+
+  const { postId, failedIndices } = job.partialFailure;
+
+  // Check that File objects are still available
+  if (job.files.length === 0) {
+    toast.error('Upload data is no longer available', {
+      description: 'Please create the post again',
+    });
+    return false;
+  }
+
+  // Mark job as uploading again
+  uploadManager.updateStatus(jobId, 'uploading_media', postId);
+
+  // Track new stream UIDs for cleanup if retry also fails
+  const uploadedStreamUids: string[] = [];
+  let newlyCompleted = 0;
+  let stillFailed = 0;
+  const stillFailedIndices: number[] = [];
+
+  for (const idx of failedIndices) {
+    const file = job.files[idx];
+    if (!file) {
+      console.warn(`[uploadPipeline] No file for index ${idx}, skipping`);
+      stillFailed++;
+      stillFailedIndices.push(idx);
+      continue;
+    }
+
+    const mediaItem = job.mediaItems?.[idx];
+    const fileId = mediaItem?.id || `file-${idx}`;
+
+    // Find the failed post_media row for this item
+    const { data: mediaRow } = await supabase
+      .from('post_media')
+      .select('id')
+      .eq('post_id', postId)
+      .eq('display_order', idx)
+      .limit(1);
+
+    const existingRowId = mediaRow?.[0]?.id;
+
+    try {
+      const fileName = `${Date.now()}-${idx}-${Math.random().toString(36).substring(2, 15)}`;
+      const fileExtension = file.name.split('.').pop() || 'unknown';
+      const fullFileName = `${fileName}.${fileExtension}`;
+      const mediaType = file.type.startsWith('image/') ? 'image' : 'video';
+
+      let publicUrl = '';
+      let streamId: string | null = null;
+      let posterUrl: string | null = null;
+      let width: number | null = null;
+      let height: number | null = null;
+      let aspectRatioVal: number | null = null;
+      let orientation: string | null = null;
+
+      if (file.type.startsWith('video/')) {
+        const speedTracker = new UploadSpeedTracker();
+        const result = await new Promise<{ streamId: string }>((resolve, reject) => {
+          uploadVideoWithTus({
+            file,
+            metadata: { postId, userId: job.userId },
+            onProgress: (bytesUploaded, bytesTotal) => {
+              speedTracker.addSample(bytesUploaded);
+              uploadEventBus.emit('file:upload-progress', {
+                type: 'file:upload-progress',
+                jobId,
+                fileId,
+                fileName: file.name,
+                progress: Math.round((bytesUploaded / bytesTotal) * 100),
+                bytesUploaded,
+                bytesTotal,
+                speed: speedTracker.getSpeed(),
+                eta: speedTracker.getETA(bytesTotal - bytesUploaded),
+              });
+            },
+            onSuccess: (sid) => resolve({ streamId: sid }),
+            onError: (error) => reject(error),
+          }).catch(reject);
+        });
+        
+        streamId = result.streamId;
+        publicUrl = generateStreamHlsUrl(streamId);
+        posterUrl = generateStreamThumbnailUrl(streamId, { width: 1280, height: 720, time: 1 });
+        uploadedStreamUids.push(streamId);
+      } else {
+        let fileToUpload = file;
+        if (isCompressibleImage(file)) {
+          const compressionResult = await compressImage(file, {
+            maxSizeMB: 2, maxWidthOrHeight: 2048, quality: 0.85, preserveExif: true,
+          });
+          fileToUpload = compressionResult.file;
+          width = compressionResult.width;
+          height = compressionResult.height;
+          aspectRatioVal = parseFloat((width / height).toFixed(4));
+          orientation = width === height ? 'square' : width > height ? 'landscape' : 'portrait';
+        } else {
+          const dims = await getImageDimensions(file);
+          if (dims) { width = dims.width; height = dims.height; aspectRatioVal = dims.aspectRatio; orientation = dims.orientation; }
+        }
+        
+        const result = await uploadToCloudflareR2(fileToUpload, 'clbhouz-post-images', fullFileName);
+        if (!result.success || !result.publicUrl) throw new Error(result.error || 'Image upload failed');
+        publicUrl = result.publicUrl;
+      }
+
+      // Get studio edits
+      const edits = mediaItem?.id ? job.studioEditsByMediaId?.[mediaItem.id] : undefined;
+      const filterId = edits?.filter ?? null;
+      const studioEditsJson = edits ? JSON.parse(JSON.stringify(edits)) : null;
+
+      if (existingRowId) {
+        // Update existing failed row
+        await supabase
+          .from('post_media')
+          .update({
+            media_url: publicUrl,
+            stream_id: streamId,
+            poster_url: posterUrl,
+            upload_status: 'completed' as any,
+            studio_edits: studioEditsJson,
+            filter_id: filterId,
+            ...(width && height && { width, height, aspect_ratio: aspectRatioVal, orientation }),
+          })
+          .eq('id', existingRowId);
+      } else {
+        // Insert new row
+        await supabase.from('post_media').insert({
+          post_id: postId,
+          media_type: file.type.startsWith('image/') ? 'image' : 'video',
+          media_url: publicUrl,
+          display_order: idx,
+          stream_id: streamId,
+          poster_url: posterUrl,
+          upload_status: 'completed' as any,
+          studio_edits: studioEditsJson,
+          filter_id: filterId,
+          ...(width && height && { width, height, aspect_ratio: aspectRatioVal, orientation }),
+        });
+      }
+
+      // Poll video metadata in background
+      if (streamId && existingRowId) {
+        pollAndUpdateVideoMetadata(streamId, existingRowId);
+      }
+
+      newlyCompleted++;
+      
+      uploadEventBus.emit('file:upload-complete', {
+        type: 'file:upload-complete',
+        jobId,
+        fileId,
+      });
+
+    } catch (error: any) {
+      console.error(`[uploadPipeline] Retry file ${idx} failed:`, error);
+      
+      if (existingRowId) {
+        await supabase.from('post_media')
+          .update({ upload_status: 'failed' as any })
+          .eq('id', existingRowId);
+      }
+      
+      stillFailed++;
+      stillFailedIndices.push(idx);
+    }
+  }
+
+  // Check final state
+  if (stillFailed === 0) {
+    // All items now completed — finalize the post
+    await finalizePost(jobId, postId, job, uploadedStreamUids);
+    toast.success('Upload complete');
+    return true;
+  } else {
+    // Still have failures
+    uploadManager.markPartialFailure(jobId, {
+      postId,
+      totalFiles: job.partialFailure!.totalFiles,
+      completedFiles: job.partialFailure!.completedFiles + newlyCompleted,
+      failedFiles: stillFailed,
+      failedIndices: stillFailedIndices,
+    });
+
+    uploadEventBus.emit('upload:partial-failure', {
+      type: 'upload:partial-failure',
+      jobId,
+      completedFiles: job.partialFailure!.completedFiles + newlyCompleted,
+      failedFiles: stillFailed,
+      totalFiles: job.partialFailure!.totalFiles,
+    });
+
+    toast.warning(
+      `${stillFailed} file(s) still failed`,
+      { description: 'Check your connection and try again' }
+    );
+    return false;
+  }
+}
 async function processReviewJob(jobId: string, job: any): Promise<void> {
   const reviewData = job.reviewData;
   

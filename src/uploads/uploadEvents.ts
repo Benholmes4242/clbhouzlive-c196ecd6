@@ -59,6 +59,14 @@ export interface UploadFailedEvent {
   postId?: string;
 }
 
+export interface UploadPartialFailureEvent {
+  type: 'upload:partial-failure';
+  jobId: string;
+  completedFiles: number;
+  failedFiles: number;
+  totalFiles: number;
+}
+
 // Per-file upload events for progress tracking
 export interface FileUploadStartEvent {
   type: 'file:upload-start';
@@ -102,6 +110,7 @@ export type UploadEvent =
   | UploadProgressEvent
   | UploadCompleteEvent
   | UploadFailedEvent
+  | UploadPartialFailureEvent
   | ReviewRatingCreatedEvent
   | FileUploadStartEvent
   | FileUploadProgressEvent

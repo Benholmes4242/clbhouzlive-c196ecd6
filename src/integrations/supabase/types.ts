@@ -6448,6 +6448,7 @@ export type Database = {
           processing_status: string | null
           stream_id: string | null
           studio_edits: Json | null
+          upload_status: string
           width: number | null
         }
         Insert: {
@@ -6475,6 +6476,7 @@ export type Database = {
           processing_status?: string | null
           stream_id?: string | null
           studio_edits?: Json | null
+          upload_status?: string
           width?: number | null
         }
         Update: {
@@ -6502,6 +6504,7 @@ export type Database = {
           processing_status?: string | null
           stream_id?: string | null
           studio_edits?: Json | null
+          upload_status?: string
           width?: number | null
         }
         Relationships: [

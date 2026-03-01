@@ -1,7 +1,7 @@
 // Upload Manager - Framework-agnostic singleton for managing upload jobs
 
 import { nanoid } from 'nanoid';
-import type { UploadJob, UploadJobInput, SerializedUploadJob, UploadJobStatus } from './types';
+import type { UploadJob, UploadJobInput, SerializedUploadJob, UploadJobStatus, PartialFailureDetails } from './types';
 import { uploadEventBus } from './uploadEventBus';
 
 const STORAGE_KEY = 'clbhouz_upload_jobs';
@@ -84,11 +84,11 @@ class UploadManager {
   }
 
   /**
-   * Get pending jobs (queued or in-progress)
+   * Get pending jobs (queued or in-progress, including partial_failure)
    */
   getPendingJobs(): UploadJob[] {
     return this.getAllJobs().filter(
-      j => j.status === 'queued' || j.status === 'creating_post' || j.status === 'uploading_media' || j.status === 'finalizing'
+      j => j.status === 'queued' || j.status === 'creating_post' || j.status === 'uploading_media' || j.status === 'finalizing' || j.status === 'partial_failure'
     );
   }
 
@@ -218,11 +218,12 @@ class UploadManager {
    */
   resetForRetry(jobId: string): void {
     const job = this.jobs.get(jobId);
-    if (!job || job.status !== 'failed') return;
+    if (!job || (job.status !== 'failed' && job.status !== 'partial_failure')) return;
 
     job.status = 'queued';
     job.error = undefined;
     job.progress.uploadedFiles = 0;
+    job.partialFailure = undefined;
     
     this.persistToStorage();
 
@@ -231,6 +232,23 @@ class UploadManager {
       jobId,
       status: 'queued',
     });
+  }
+
+  /**
+   * Mark job as partial failure (some files uploaded, some failed)
+   */
+  markPartialFailure(jobId: string, details: PartialFailureDetails): void {
+    const job = this.jobs.get(jobId);
+    if (!job) return;
+
+    job.status = 'partial_failure';
+    job.partialFailure = details;
+    job.postId = details.postId;
+    
+    this.clearProcessing(jobId);
+    this.persistToStorage();
+
+    console.log(`[UploadManager] Job ${jobId} partial failure: ${details.completedFiles}/${details.totalFiles} completed`);
   }
 
   /**
@@ -252,6 +270,7 @@ class UploadManager {
         error: job.error,
         fileCount: job.files.length,
         visibility: job.visibility,
+        partialFailure: job.partialFailure,
       }));
 
       localStorage.setItem(STORAGE_KEY, JSON.stringify(serialized));
@@ -278,6 +297,8 @@ class UploadManager {
 
         // Mark in-progress jobs as failed (files can't be restored)
         const wasMidUpload = ['queued', 'creating_post', 'uploading_media', 'finalizing'].includes(s.status);
+        // Partial failures survive restore — they have a postId but need retry or cleanup
+        const isPartialFailure = s.status === 'partial_failure';
         
         const job: UploadJob = {
           jobId: s.jobId,
@@ -293,6 +314,7 @@ class UploadManager {
           error: wasMidUpload ? 'Upload interrupted - page was refreshed' : s.error,
           files: [],
           visibility: s.visibility,
+          partialFailure: isPartialFailure ? s.partialFailure : undefined,
         };
 
         this.jobs.set(s.jobId, job);

@@ -30,6 +30,7 @@ uploadEventBus.on('upload:status', notifyListeners);
 uploadEventBus.on('upload:progress', notifyListeners);
 uploadEventBus.on('upload:complete', notifyListeners);
 uploadEventBus.on('upload:failed', notifyListeners);
+uploadEventBus.on('upload:partial-failure', notifyListeners);
 
 // Initialize cache
 cachedJobs = uploadManager.getAllJobs();
@@ -41,11 +42,12 @@ export function useUploadJobs() {
   const jobs = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 
   const pendingJobs = jobs.filter(
-    j => j.status === 'queued' || j.status === 'creating_post' || j.status === 'uploading_media' || j.status === 'finalizing'
+    j => j.status === 'queued' || j.status === 'creating_post' || j.status === 'uploading_media' || j.status === 'finalizing' || j.status === 'partial_failure'
   );
   
   const failedJobs = jobs.filter(j => j.status === 'failed');
   const completedJobs = jobs.filter(j => j.status === 'complete');
+  const partialFailureJobs = jobs.filter(j => j.status === 'partial_failure');
 
   const retry = useCallback((jobId: string) => {
     return retryJob(jobId);
@@ -61,8 +63,10 @@ export function useUploadJobs() {
     pendingJobs,
     failedJobs,
     completedJobs,
+    partialFailureJobs,
     hasPending: pendingJobs.length > 0,
     hasFailed: failedJobs.length > 0,
+    hasPartialFailure: partialFailureJobs.length > 0,
     retry,
     dismiss,
   };

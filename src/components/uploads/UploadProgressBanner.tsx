@@ -5,20 +5,21 @@
  * - File progress, upload speed, ETA
  * - Retry button for failed uploads
  * - Cancel button for in-progress uploads
+ * - Partial failure recovery with "Retry failed" and "Discard"
  */
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, AlertCircle, CheckCircle, Loader2, Star, RotateCcw } from 'lucide-react';
+import { X, AlertCircle, CheckCircle, Loader2, Star, RotateCcw, AlertTriangle } from 'lucide-react';
 import { uploadEventBus } from '@/uploads/uploadEventBus';
 import { formatBytes, formatDuration, formatBytesPerSecond } from '@/uploads/uploadSpeedTracker';
-import { retryJob, cancelJob } from '@/uploads/uploadPipeline';
+import { retryJob, cancelJob, retryFailedItems } from '@/uploads/uploadPipeline';
 import { cn } from '@/lib/utils';
 
 interface ActiveUpload {
   jobId: string;
   uploadType: 'post' | 'review';
-  status: 'uploading' | 'complete' | 'failed' | 'paused';
+  status: 'uploading' | 'complete' | 'failed' | 'paused' | 'partial_failure';
   currentFile: number;
   totalFiles: number;
   fileName: string;
@@ -27,6 +28,9 @@ interface ActiveUpload {
   eta: number;
   error?: string;
   hasFiles?: boolean; // Whether File objects are still in memory
+  // Partial failure details
+  completedFiles?: number;
+  failedFiles?: number;
   metadata?: {
     courseName?: string;
   };
@@ -112,12 +116,27 @@ export function UploadProgressBanner() {
         return { ...u, status: 'failed', error: event.error };
       }));
     };
+
+    const handlePartialFailure = (event: any) => {
+      setActiveUploads(prev => prev.map(u => {
+        if (u.jobId !== event.jobId) return u;
+        return {
+          ...u,
+          status: 'partial_failure' as const,
+          completedFiles: event.completedFiles,
+          failedFiles: event.failedFiles,
+          totalFiles: event.totalFiles,
+          percentage: Math.round((event.completedFiles / event.totalFiles) * 100),
+        };
+      }));
+    };
     
     const unsubEnqueued = uploadEventBus.on('upload:enqueued', handleEnqueued);
     const unsubProgress = uploadEventBus.on('upload:progress', handleProgress);
     const unsubComplete = uploadEventBus.on('upload:complete', handleComplete);
     const unsubFailed = uploadEventBus.on('upload:failed', handleFailed);
     const unsubFileProgress = uploadEventBus.on('file:upload-progress', handleFileProgress);
+    const unsubPartialFailure = uploadEventBus.on('upload:partial-failure', handlePartialFailure);
     
     return () => {
       unsubEnqueued();
@@ -125,6 +144,7 @@ export function UploadProgressBanner() {
       unsubComplete();
       unsubFailed();
       unsubFileProgress();
+      unsubPartialFailure();
     };
   }, []);
   
@@ -133,17 +153,28 @@ export function UploadProgressBanner() {
     setActiveUploads(prev => prev.filter(u => u.jobId !== jobId));
   };
 
-  const handleRetry = (jobId: string) => {
-    const success = retryJob(jobId);
-    if (success) {
-      setActiveUploads(prev => prev.map(u => 
-        u.jobId === jobId ? { ...u, status: 'uploading', percentage: 0, error: undefined } : u
+  const handleRetry = async (jobId: string) => {
+    const upload = activeUploads.find(u => u.jobId === jobId);
+
+    if (upload?.status === 'partial_failure') {
+      // Retry only failed items
+      setActiveUploads(prev => prev.map(u =>
+        u.jobId === jobId ? { ...u, status: 'uploading' as const } : u
       ));
+      await retryFailedItems(jobId);
+    } else {
+      // Full retry (existing behavior)
+      const success = retryJob(jobId);
+      if (success) {
+        setActiveUploads(prev => prev.map(u => 
+          u.jobId === jobId ? { ...u, status: 'uploading' as const, percentage: 0, error: undefined } : u
+        ));
+      }
     }
   };
 
-  const handleCancel = (jobId: string) => {
-    cancelJob(jobId);
+  const handleCancel = async (jobId: string) => {
+    await cancelJob(jobId);
     setActiveUploads(prev => prev.filter(u => u.jobId !== jobId));
   };
   
@@ -185,6 +216,7 @@ function UploadProgressItem({ upload, onDismiss, onRetry, onCancel }: UploadProg
   const isFailed = upload.status === 'failed';
   const isComplete = upload.status === 'complete';
   const isUploading = upload.status === 'uploading' || upload.status === 'paused';
+  const isPartialFailure = upload.status === 'partial_failure';
   
   return (
     <div className="px-4 py-3">
@@ -193,6 +225,8 @@ function UploadProgressItem({ upload, onDismiss, onRetry, onCancel }: UploadProg
         <div className="flex items-center gap-2">
           {isComplete ? (
             <CheckCircle className="h-4 w-4 text-green-500" />
+          ) : isPartialFailure ? (
+            <AlertTriangle className="h-4 w-4 text-primary" />
           ) : isFailed ? (
             <AlertCircle className="h-4 w-4 text-destructive" />
           ) : upload.uploadType === 'review' ? (
@@ -203,9 +237,11 @@ function UploadProgressItem({ upload, onDismiss, onRetry, onCancel }: UploadProg
           <span className="text-sm font-medium text-foreground">
             {isComplete
               ? 'Upload complete'
-              : isFailed
-                ? 'Upload failed'
-                : `Uploading ${upload.currentFile} of ${upload.totalFiles}`}
+              : isPartialFailure
+                ? `${upload.completedFiles} of ${upload.totalFiles} uploaded`
+                : isFailed
+                  ? 'Upload failed'
+                  : `Uploading ${upload.currentFile} of ${upload.totalFiles}`}
           </span>
         </div>
         
@@ -219,6 +255,25 @@ function UploadProgressItem({ upload, onDismiss, onRetry, onCancel }: UploadProg
             >
               Cancel
             </button>
+          )}
+
+          {/* Partial failure actions */}
+          {isPartialFailure && (
+            <>
+              <button
+                onClick={onRetry}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors"
+              >
+                <RotateCcw className="h-3 w-3" />
+                Retry failed
+              </button>
+              <button
+                onClick={onCancel}
+                className="px-2 py-1 rounded-full text-xs font-medium text-muted-foreground hover:bg-muted/50 transition-colors"
+              >
+                Discard
+              </button>
+            </>
           )}
 
           {/* Retry button — visible on failure if files are still available */}
@@ -243,31 +298,53 @@ function UploadProgressItem({ upload, onDismiss, onRetry, onCancel }: UploadProg
       </div>
       
       {/* Progress bar */}
-      <div className="relative h-1.5 bg-muted rounded-full overflow-hidden">
-        <motion.div
-          className={cn(
-            "absolute inset-y-0 left-0 rounded-full",
-            isComplete ? "bg-green-500" : isFailed ? "bg-destructive" : "bg-primary"
-          )}
-          initial={{ width: 0 }}
-          animate={{ width: `${upload.percentage}%` }}
-          transition={{ duration: 0.3 }}
-        />
-      </div>
+      {isPartialFailure ? (
+        // Split progress bar: green for completed, red for failed
+        <div className="relative h-1.5 bg-muted rounded-full overflow-hidden flex">
+          <motion.div
+            className="bg-green-500 rounded-l-full"
+            initial={{ width: 0 }}
+            animate={{ width: `${((upload.completedFiles || 0) / (upload.totalFiles || 1)) * 100}%` }}
+            transition={{ duration: 0.3 }}
+          />
+          <motion.div
+            className="bg-destructive"
+            initial={{ width: 0 }}
+            animate={{ width: `${((upload.failedFiles || 0) / (upload.totalFiles || 1)) * 100}%` }}
+            transition={{ duration: 0.3 }}
+          />
+        </div>
+      ) : (
+        <div className="relative h-1.5 bg-muted rounded-full overflow-hidden">
+          <motion.div
+            className={cn(
+              "absolute inset-y-0 left-0 rounded-full",
+              isComplete ? "bg-green-500" : isFailed ? "bg-destructive" : "bg-primary"
+            )}
+            initial={{ width: 0 }}
+            animate={{ width: `${upload.percentage}%` }}
+            transition={{ duration: 0.3 }}
+          />
+        </div>
+      )}
       
       {/* Details row */}
       <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
         <span className="truncate max-w-[200px]">
-          {upload.fileName}
+          {isPartialFailure
+            ? `${upload.failedFiles} file${(upload.failedFiles || 0) !== 1 ? 's' : ''} failed — tap Retry to try again`
+            : upload.fileName}
         </span>
         <div className="flex items-center gap-3">
-          {upload.speed > 0 && !isComplete && !isFailed && (
+          {upload.speed > 0 && !isComplete && !isFailed && !isPartialFailure && (
             <span>{formatBytesPerSecond(upload.speed)}</span>
           )}
-          {upload.eta > 0 && !isComplete && !isFailed && (
+          {upload.eta > 0 && !isComplete && !isFailed && !isPartialFailure && (
             <span>{formatDuration(upload.eta)} left</span>
           )}
-          <span className="font-medium">{upload.percentage}%</span>
+          {!isPartialFailure && (
+            <span className="font-medium">{upload.percentage}%</span>
+          )}
         </div>
       </div>
       
