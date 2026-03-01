@@ -168,7 +168,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           <button
             type="button"
             onClick={() => safeGoBack(navigate, '/courses')}
-            className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity min-h-[44px]"
+            className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity min-h-[36px]"
           >
             <ChevronLeft size={14} />
             Back
@@ -177,7 +177,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       )}
 
       {/* Claimed By Badge */}
-      <div className="px-4 pt-3 pb-1 bg-muted">
+      <div className="px-4 pt-0 pb-0 bg-muted">
         <CourseClaimBadge courseId={course.id} />
       </div>
 
