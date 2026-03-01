@@ -181,16 +181,9 @@ export function draftMediaToComposerItem(media: DraftMediaItem): ComposerMediaIt
  * Stream assets are cleaned up by the orphan cleanup cron
  */
 export async function cleanupDraftMedia(mediaItems: DraftMediaItem[]): Promise<void> {
-  // For now, we rely on:
-  // 1. R2 lifecycle rules to clean up old draft files
-  // 2. Stream orphan cleanup cron to handle videos
-  // 3. DB cascade delete to remove references
-  
-  // Log for tracking
   console.log('[draftMediaUpload] Cleanup requested for', mediaItems.length, 'items');
   
-  // Future enhancement: Add explicit R2 delete via edge function
-  // For videos, we could call cloudflare-stream-delete
+  // Clean up Stream videos
   for (const item of mediaItems) {
     if (item.streamId) {
       try {
@@ -200,6 +193,35 @@ export async function cleanupDraftMedia(mediaItems: DraftMediaItem[]): Promise<v
         console.log('[draftMediaUpload] Deleted stream asset:', item.streamId);
       } catch (err) {
         console.warn('[draftMediaUpload] Failed to delete stream asset:', item.streamId, err);
+      }
+    }
+  }
+
+  // Clean up R2 images
+  const imageItems = mediaItems.filter(m => m.mediaType === 'image' && m.mediaUrl);
+  if (imageItems.length > 0) {
+    const objectKeys = imageItems
+      .map(m => {
+        try {
+          const url = new URL(m.mediaUrl);
+          const path = url.pathname.startsWith('/') ? url.pathname.slice(1) : url.pathname;
+          return path;
+        } catch {
+          console.error('[draftMediaUpload] Invalid media URL:', m.mediaUrl);
+          return null;
+        }
+      })
+      .filter((key): key is string => key !== null && key.startsWith('drafts/'));
+
+    if (objectKeys.length > 0) {
+      try {
+        await supabase.functions.invoke('cloudflare-r2-delete', {
+          body: { objectKeys },
+        });
+        console.log('[draftMediaUpload] Deleted R2 objects:', objectKeys);
+      } catch (err) {
+        // Non-fatal — R2 lifecycle rules serve as fallback
+        console.warn('[draftMediaUpload] Failed to delete R2 draft images:', err);
       }
     }
   }

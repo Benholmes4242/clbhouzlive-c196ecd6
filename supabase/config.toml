@@ -178,3 +178,6 @@ verify_jwt = false
 
 [functions.manage-player-headshot]
 verify_jwt = false
+
+[functions.cloudflare-r2-delete]
+verify_jwt = false

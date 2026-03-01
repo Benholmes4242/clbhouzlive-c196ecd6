@@ -35,6 +35,7 @@ const createInitialState = (userId?: string): PostWizardState => ({
   scheduledAt: null,
   isEditMode: false,
   editPostId: null,
+  currentDraftId: null,
   isSubmitting: false,
   isDirty: false,
 });
@@ -176,7 +177,7 @@ function postWizardReducer(
       return createInitialState(state.actor.id);
 
     case 'LOAD_DRAFT':
-      return { ...state, ...action.payload, isDirty: false };
+      return { ...state, ...action.payload, currentDraftId: action.payload.currentDraftId ?? null, isDirty: false };
 
     case 'LOAD_EXISTING_POST':
       return {
@@ -365,6 +366,7 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
         studioEditsByMediaId,
         coverIndex: 0,
         currentStep: 'media',
+        currentDraftId: draft.id,
       },
     });
   }, []);
