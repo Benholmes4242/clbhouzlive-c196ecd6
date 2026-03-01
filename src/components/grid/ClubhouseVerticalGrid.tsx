@@ -234,7 +234,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
   })());
   const [isMutedState, setIsMutedState] = useState<boolean>(isMutedRef.current);
   const [videoProgress, setVideoProgress] = useState(0);
-  const scrubberRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
   
   const PORTRAIT_MIN_AR = 1.2;
@@ -532,19 +531,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     return () => cancelAnimationFrame(rafId);
   }, [currentIndex, filteredPosts]);
 
-  // Position scrubber flush above bottom nav
-  useEffect(() => {
-    const position = () => {
-      const nav = document.querySelector('.bottom-nav-fixed');
-      if (nav && scrubberRef.current) {
-        const navRect = nav.getBoundingClientRect();
-        scrubberRef.current.style.bottom = `${window.innerHeight - navRect.top}px`;
-      }
-    };
-    position();
-    window.addEventListener('resize', position);
-    return () => window.removeEventListener('resize', position);
-  }, []);
 
   // Sync back to GlobalAudioContext on unmount
   useEffect(() => {
@@ -1506,11 +1492,11 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
 
         return (
           <div
-            ref={scrubberRef}
             style={{
               position: 'fixed',
               left: 0,
               right: 0,
+              bottom: 'calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px))',
               height: 3,
               zIndex: 101,
               background: 'rgba(255,255,255,0.15)',
