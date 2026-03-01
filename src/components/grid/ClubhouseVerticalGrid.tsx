@@ -531,7 +531,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     return () => cancelAnimationFrame(rafId);
   }, [currentIndex, filteredPosts]);
 
-
   // Sync back to GlobalAudioContext on unmount
   useEffect(() => {
     return () => {
@@ -1496,9 +1495,9 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
               position: 'fixed',
               left: 0,
               right: 0,
-              bottom: 'calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px))',
-              height: 3,
+              bottom: 'calc(var(--bottom-nav-height, 64px) + 30px)',
               zIndex: 101,
+              height: 3,
               background: 'rgba(255,255,255,0.15)',
               pointerEvents: 'none',
             }}
