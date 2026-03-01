@@ -14,6 +14,7 @@ import {
 import { ComposerMediaItem } from '@/hooks/useSnapModal';
 import { TaggableEntity, GolfCourse, MomentVisibility } from '../create-moment/types';
 import type { DraftWithMedia } from '@/services/drafts';
+import type { ScheduledPost } from '@/services/posts/scheduledPosts';
 import { revokeMediaItemUrls } from '@/lib/mediaUtils';
 
 // Step order for navigation
@@ -187,6 +188,17 @@ function postWizardReducer(
         currentStep: 'caption',
       };
 
+    case 'LOAD_SCHEDULED_POST':
+      return {
+        ...state,
+        ...action.payload.state,
+        isEditMode: true,
+        editPostId: action.payload.postId,
+        scheduledAt: action.payload.scheduledAt ?? null,
+        isDirty: false,
+        currentStep: 'media',
+      };
+
     default:
       return state;
   }
@@ -357,6 +369,56 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
     });
   }, []);
 
+  // Load scheduled post into wizard for editing
+  const loadScheduledPost = useCallback((post: ScheduledPost) => {
+    const mediaItems: OrderedMediaItem[] = (post.media || []).map((m, idx) => ({
+      id: m.id,
+      type: m.mediaType as 'image' | 'video',
+      previewUrl: m.mediaUrl,
+      posterUrl: m.posterUrl || undefined,
+      file: undefined,
+      order: m.displayOrder ?? idx,
+      width: m.width ?? undefined,
+      height: m.height ?? undefined,
+      aspectRatio: m.aspectRatio ?? undefined,
+      duration: m.durationSeconds ?? undefined,
+    }));
+
+    const studioEditsByMediaId: Record<string, StudioEdits> = {};
+    (post.media || []).forEach(m => {
+      if (m.studioEdits) {
+        studioEditsByMediaId[m.id] = m.studioEdits as StudioEdits;
+      }
+    });
+
+    let selectedCourses: GolfCourse[] = [];
+    if (post.courseId) {
+      // We only have courseId from the list view; name will be minimal
+      selectedCourses = [{ id: post.courseId, name: '', country: '' }];
+    }
+
+    dispatch({
+      type: 'LOAD_SCHEDULED_POST',
+      payload: {
+        postId: post.id,
+        scheduledAt: post.scheduledAt ? new Date(post.scheduledAt) : null,
+        state: {
+          mediaItems,
+          activeMediaId: mediaItems.length > 0 ? mediaItems[0].id : null,
+          caption: post.content || '',
+          selectedCourses,
+          visibility: (post.visibility || 'anyone') as MomentVisibility,
+          actor: {
+            type: (post.actorType || 'personal') as 'personal' | 'business',
+            id: post.actorId,
+          },
+          studioEditsByMediaId,
+          coverIndex: 0,
+        },
+      },
+    });
+  }, []);
+
   // Load existing post into wizard for editing
   const loadExistingPost = useCallback(async (postData: import('@/lib/fetchPostForEdit').PostForEdit) => {
     const { post, media, courses } = postData;
@@ -472,6 +534,7 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
     reset,
     loadDraft,
     loadExistingPost,
+    loadScheduledPost,
     
     // Validation
     canProceedFromMedia,

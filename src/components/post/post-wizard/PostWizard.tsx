@@ -147,6 +147,7 @@ export function PostWizard({
     setCoverIndex,
     loadDraft,
     loadExistingPost,
+    loadScheduledPost,
   } = usePostWizard({
     initialMedia,
     initialCourses,
@@ -367,14 +368,19 @@ export function PostWizard({
           setSubmitting(false);
           return;
         }
+        const updatePayload: Record<string, any> = {
+          content: state.caption.trim() || null,
+          visibility: state.visibility,
+          course_id: state.selectedCourses[0]?.id || null,
+          updated_at: new Date().toISOString(),
+        };
+        // If editing a scheduled post, persist schedule changes
+        if (state.scheduledAt) {
+          updatePayload.scheduled_at = state.scheduledAt.toISOString();
+        }
         const { data: updatedRows, error } = await supabase
           .from('posts')
-          .update({
-            content: state.caption.trim() || null,
-            visibility: state.visibility,
-            course_id: state.selectedCourses[0]?.id || null,
-            updated_at: new Date().toISOString(),
-          })
+          .update(updatePayload)
           .eq('id', state.editPostId)
           .eq('user_id', user.id)
           .select('id');
@@ -429,7 +435,9 @@ export function PostWizard({
         queryClient.invalidateQueries({ queryKey: postKeys.actorPosts(state.actor.type as 'personal' | 'business', state.actor.id) });
         queryClient.invalidateQueries({ queryKey: ['post', state.editPostId] });
         window.dispatchEvent(new CustomEvent('postUpdated'));
-        toast.success('Post updated');
+        queryClient.invalidateQueries({ queryKey: ['scheduled-posts'] });
+        queryClient.invalidateQueries({ queryKey: ['scheduled-posts-count'] });
+        toast.success(state.scheduledAt ? 'Scheduled post updated' : 'Post updated');
         onClose();
         return;
       }
@@ -496,9 +504,14 @@ export function PostWizard({
     setVisibility(visibility);
   }, [setVisibility]);
 
-  const handleScheduleSelect = useCallback((date: Date) => {
+  const handleScheduleSelect = useCallback((date: Date | null) => {
     setScheduledAt(date);
     setShowScheduleSheet(false);
+    if (date) {
+      toast.success('Post scheduled');
+    } else {
+      toast.success('Schedule removed');
+    }
   }, [setScheduledAt]);
 
   const handleLoadDraft = useCallback((draft: DraftWithMedia) => {
@@ -507,10 +520,17 @@ export function PostWizard({
     toast.success('Draft loaded');
   }, [loadDraft]);
 
+  const handleEditScheduledPost = useCallback((post: import('@/services/posts/scheduledPosts').ScheduledPost) => {
+    loadScheduledPost(post);
+    setShowDraftsSheet(false);
+    toast.success('Editing scheduled post');
+  }, [loadScheduledPost]);
+
   const handleSaveDraft = useCallback(async () => {
     if (!canCreateDraft) { toast.error('Maximum drafts reached'); return; }
+    setIsSavingDraft(true);
     try {
-      await createDraft({
+      const draft = await createDraft({
         actorType: state.actor.type, actorId: state.actor.id,
         content: state.caption || null, visibility: state.visibility,
         categories: [], badges: [],
@@ -519,9 +539,19 @@ export function PostWizard({
         courseCountry: state.selectedCourses[0]?.country || null,
         courseData: state.selectedCourses.length > 0 ? state.selectedCourses.map(c => ({ id: c.id, name: c.name, country: c.country, region: c.region })) : null,
       });
+      if (draft?.id && state.mediaItems.length > 0) {
+        const mediaWithFiles = state.mediaItems.filter(item => item.file);
+        if (mediaWithFiles.length > 0) {
+          const result = await uploadMedia(draft.id, mediaWithFiles, (mediaId) => state.studioEditsByMediaId[mediaId]);
+          if (result.failed.length > 0) {
+            toast.warning(`Draft saved, but ${result.failed.length} media file(s) failed to upload`);
+            return;
+          }
+        }
+      }
       toast.success('Draft saved');
-    } catch { toast.error('Failed to save draft'); }
-  }, [state, canCreateDraft, createDraft]);
+    } catch { toast.error('Failed to save draft'); } finally { setIsSavingDraft(false); }
+  }, [state, canCreateDraft, createDraft, uploadMedia]);
 
   const handleSaveDraftAndClose = useCallback(async () => {
     if (!canCreateDraft) { toast.error('Maximum drafts reached'); return; }
@@ -863,7 +893,7 @@ export function PostWizard({
               isOpen={showDraftsSheet}
               onClose={() => setShowDraftsSheet(false)}
               onLoadDraft={handleLoadDraft}
-              onEditScheduledPost={() => setShowDraftsSheet(false)}
+              onEditScheduledPost={handleEditScheduledPost}
               onSaveDraft={handleSaveDraft}
               canSaveDraft={canCreateDraft && state.isDirty}
             />
