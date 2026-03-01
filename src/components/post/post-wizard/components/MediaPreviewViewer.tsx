@@ -12,6 +12,7 @@ import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import { VideoTrimmer } from './VideoTrimmer';
 import { PosterFramePicker } from './PosterFramePicker';
+import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 
 function formatTime(seconds: number): string {
   if (!seconds || !isFinite(seconds)) return '0:00';
@@ -487,24 +488,21 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
           </div>
         )}
 
-        {/* Pagination dots */}
+        {/* Pagination dots — clubhouse-style */}
         {items.length > 1 && (
           <div
-            className="flex items-center justify-center gap-1.5 py-3"
+            className="relative h-8"
             onTouchStart={(e) => e.stopPropagation()}
             onTouchMove={(e) => e.stopPropagation()}
           >
-            {items.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => goTo(idx)}
-                className={cn(
-                  'rounded-full transition-all duration-200',
-                  idx === currentIndex ? 'w-2 h-2 bg-primary scale-110' : 'w-1.5 h-1.5 bg-primary/30'
-                )}
-                aria-label={`Go to image ${idx + 1}`}
-              />
-            ))}
+            <MediaNavigationDots
+              mediaCount={items.length}
+              currentIndex={currentIndex}
+              onJump={goTo}
+              bottomOffset={8}
+              activeColor="bg-primary"
+              inactiveColor="bg-primary/30"
+            />
           </div>
         )}
 
