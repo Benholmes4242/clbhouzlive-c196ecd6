@@ -29,21 +29,6 @@ const FollowButton: React.FC<FollowButtonProps> = ({
     return isFollowing ? "secondary" : "default";
   };
 
-  if (isFollowing) {
-    return (
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={onFollow}
-        disabled={loading}
-        className="px-4 py-2 text-sm h-8 flex-shrink-0 border-[#E0E0E0] bg-white text-[#0F0F0F] hover:bg-gray-50"
-      >
-        {getButtonIcon()}
-        <span className="ml-1">{getButtonText()}</span>
-      </Button>
-    );
-  }
-
   return (
     <Button
       variant="gradient"
