@@ -169,7 +169,7 @@ export function WriteStep({
               : '1.5px solid transparent',
           }}
         >
-          <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+          <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[1.5px]">
             Headline
           </label>
           <input
@@ -212,7 +212,7 @@ export function WriteStep({
               : '1.5px solid transparent',
           }}
         >
-          <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+          <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[1.5px]">
             Your review
           </label>
           <textarea

@@ -166,9 +166,9 @@ export function MediaStep({
             <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-green-400 to-blue-500 shrink-0" />
           )}
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-foreground truncate">{course.name}</p>
+            <p className="text-[15px] font-semibold text-foreground truncate">{course.name}</p>
             {locationText && (
-              <p className="text-[11px] text-muted-foreground truncate">{locationText}</p>
+              <p className="text-sm text-muted-foreground truncate">{locationText}</p>
             )}
           </div>
         </motion.div>

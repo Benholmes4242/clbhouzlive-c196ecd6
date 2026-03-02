@@ -107,7 +107,7 @@ export function PreviewStep({
           >
             <button
               onClick={onClose}
-              className="absolute z-50 w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center transition-all active:scale-95"
+              className="absolute z-50 w-11 h-11 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center transition-all active:scale-95"
               style={{
                 top: 'calc(max(var(--sat, env(safe-area-inset-top, 0px)), 47px) + 12px)',
                 left: '16px',
@@ -134,13 +134,13 @@ export function PreviewStep({
         <div className="flex-1 flex flex-col px-4 pb-4 relative">
           <button
             onClick={onClose}
-            className="absolute top-0 right-0 z-50 w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors active:scale-[0.97]"
+            className="absolute top-0 right-0 z-50 w-11 h-11 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-muted/80 transition-colors active:scale-[0.97]"
             aria-label="Close"
           >
             <X className="h-5 w-5" />
           </button>
           <div className="flex-1 flex flex-col items-center justify-center">
-            <div className="w-full max-w-sm bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+            <div className="w-full max-w-sm bg-card rounded-2xl border border-border/50 overflow-hidden shadow-sm">
               {course && (
                 <div className="flex items-center gap-3 p-4 border-b border-gray-100">
                   {course.thumbnail_image && (
@@ -148,7 +148,7 @@ export function PreviewStep({
                   )}
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-foreground truncate">{course.name}</h3>
-                    {courseLocation && <p className="text-sm text-gray-400">{courseLocation}</p>}
+                    {courseLocation && <p className="text-sm text-muted-foreground/60">{courseLocation}</p>}
                   </div>
                 </div>
               )}

@@ -149,24 +149,24 @@ export function ReviewPostingOptionsSheet({
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-          className="absolute bottom-0 left-0 right-0 rounded-t-3xl overflow-hidden"
+           className="absolute bottom-0 left-0 right-0 rounded-t-[20px] overflow-hidden"
           style={{ 
-            backgroundColor: '#F8FAFC',
+            backgroundColor: 'var(--bg-page)',
             paddingBottom: 'env(safe-area-inset-bottom, 16px)',
             maxHeight: '85vh',
           }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Handle */}
-          <div className="flex justify-center pt-3 pb-1">
-            <div className="w-10 h-1 rounded-full bg-muted-foreground/20" />
+          <div className="flex justify-center pt-2.5 pb-1">
+            <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
           </div>
 
           {/* Scrollable Content */}
           <div className="overflow-y-auto" style={{ maxHeight: 'calc(85vh - 80px)' }}>
             {/* Account Section */}
             <div className="px-5 pt-3 pb-4">
-              <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+              <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[1.5px] mb-3">
                 Account
               </h3>
               
@@ -228,7 +228,7 @@ export function ReviewPostingOptionsSheet({
 
             {/* Who Can See Section */}
             <div className="px-5 pt-4 pb-2">
-              <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+              <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[1.5px] mb-3">
                 Who can see this?
               </h3>
               
