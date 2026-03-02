@@ -359,7 +359,7 @@ const ProfilePageV2Content: React.FC = () => {
       {/* Children with pointer-events: auto remain interactive */}
       <div className="relative pointer-events-none" style={{ zIndex: 1 }}>
         {/* Hero Image Container - full-bleed behind notch */}
-        <div className="relative w-full overflow-hidden" style={{ height: '45dvh' }}>
+        <div className="relative w-full overflow-hidden" style={{ height: '35dvh' }}>
           {heroUrl ? (
             <img 
               src={heroUrl} 
@@ -470,7 +470,7 @@ const ProfilePageV2Content: React.FC = () => {
 
         {/* HCP + Golfer pills - right side, just below header photo */}
         {/* Reduced gap: mt-3 → mt-2 (8px from golfer badge to next element) */}
-        <div className="absolute right-5 z-20 flex items-center gap-2 pointer-events-auto" style={{ top: 'calc(200px + max(env(safe-area-inset-top, 0px), 47px) + 8px)' }}>
+        <div className="absolute right-5 z-20 flex items-center gap-2 pointer-events-auto" style={{ top: 'calc(35dvh + 24px)' }}>
           {/* HCP pill - white, bigger size */}
           {profile?.eg_handicap_index != null && (
             <span 

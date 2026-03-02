@@ -237,7 +237,7 @@ const BusinessProfilePage: React.FC = () => {
       {/* Hero Section - full-bleed immersive, extends behind notch */}
       <div className="relative pointer-events-none" style={{ zIndex: 1 }}>
         {/* Hero Image Container - full-bleed behind notch */}
-        <div className="relative w-full overflow-hidden" style={{ height: '45dvh' }}>
+        <div className="relative w-full overflow-hidden" style={{ height: '35dvh' }}>
           {heroUrl ? (
             <img 
               src={heroUrl} 
@@ -343,7 +343,7 @@ const BusinessProfilePage: React.FC = () => {
         </div>
 
         {/* Pills row - right side, just below header photo */}
-        <div className="absolute right-5 z-20 flex items-center gap-2 pointer-events-auto" style={{ top: 'calc(200px + max(env(safe-area-inset-top, 0px), 47px) + 8px)' }}>
+        <div className="absolute right-5 z-20 flex items-center gap-2 pointer-events-auto" style={{ top: 'calc(35dvh + 24px)' }}>
           {/* Location pill - city only */}
           {(() => {
             const cityDisplay = getCityOnly({ city: business.city, region: business.region, country: business.country, location: business.location });
