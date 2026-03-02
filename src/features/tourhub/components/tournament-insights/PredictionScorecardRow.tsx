@@ -1,5 +1,5 @@
 /**
- * PredictionScorecardRow - Card-based player row for both Live and Results states
+ * PredictionScorecardRow - Borderless player row with separator
  */
 
 import React from 'react';
@@ -14,6 +14,7 @@ interface PredictionScorecardRowProps {
   prediction: TrackedPrediction;
   index: number;
   isCompleted?: boolean;
+  isLast?: boolean;
 }
 
 function getAccuracyBorderColor(pos: number | null, status?: string) {
@@ -27,6 +28,7 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
   prediction,
   index,
   isCompleted,
+  isLast = false,
 }) => {
   const isCut = prediction.performanceStatus === 'cut';
   const isWD = prediction.performanceStatus === 'withdrawn';
@@ -37,28 +39,6 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
 
   const offLead = prediction.actualPosition !== null ? prediction.actualPosition - 1 : null;
 
-  // Card backgrounds
-  const getCardStyle = () => {
-    if (isCompleted && isWinner) {
-      return {
-        background: 'linear-gradient(135deg, #F0FDF4 0%, #FEFCE8 100%)',
-        border: '1.5px solid rgba(22, 163, 74, 0.25)',
-      };
-    }
-    if (!isCompleted && isLeader) {
-      return {
-        background: 'linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 100%)',
-        border: '1.5px solid rgba(22, 163, 74, 0.2)',
-      };
-    }
-    return {
-      background: 'hsl(var(--background))',
-      border: '1px solid hsl(var(--border))',
-    };
-  };
-
-  const cardStyle = getCardStyle();
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -68,12 +48,11 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
         ease: [0.16, 1, 0.3, 1],
         delay: index * 0.05,
       }}
-      className="relative overflow-hidden"
+      className="relative"
       style={{
-        ...cardStyle,
-        borderRadius: 16,
-        padding: isWinner ? '16px' : '14px 16px',
+        padding: '16px 4px',
         opacity: isWD ? 0.5 : isCut ? 0.6 : 1,
+        borderBottom: isLast ? 'none' : '1px solid hsl(var(--border) / 0.3)',
       }}
     >
       {/* Leader left accent */}
@@ -86,7 +65,7 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
             bottom: 0,
             width: 3,
             background: '#16A34A',
-            borderRadius: '16px 0 0 16px',
+            borderRadius: '2px',
           }}
         />
       )}

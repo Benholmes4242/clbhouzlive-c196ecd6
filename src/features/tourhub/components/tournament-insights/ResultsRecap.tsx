@@ -52,7 +52,7 @@ export const ResultsRecap: React.FC<ResultsRecapProps> = ({
       {/* Breakdown row */}
       <div
         className="w-full flex border border-border overflow-hidden"
-        style={{ borderRadius: 12, marginBottom: 16 }}
+        style={{ borderRadius: 12, marginBottom: 20 }}
       >
         {[
           { label: 'Top 5', value: accuracy.inTop5 },
@@ -98,6 +98,7 @@ export const ResultsRecap: React.FC<ResultsRecapProps> = ({
             alignItems: 'center',
             gap: 8,
             borderLeft: '3px solid #CA8A04',
+            marginBottom: 28,
           }}
         >
           <span style={{ fontSize: 14 }}>✦</span>
