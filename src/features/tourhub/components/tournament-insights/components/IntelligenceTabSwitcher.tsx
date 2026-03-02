@@ -1,9 +1,10 @@
 /**
- * IntelligenceTabSwitcher - Underline-style sub-tab toggle
- * Used within Upcoming view for Top 5 Picks / Course DNA switching
+ * IntelligenceTabSwitcher - Canonical Tier 2 sub-tab style
+ * Orange underline, 44px tap targets, no bottom border
  */
 
 import React from 'react';
+import { motion } from 'framer-motion';
 
 type IntelligenceTab = 'courseDNA' | 'predictions';
 
@@ -29,44 +30,26 @@ const IntelligenceTabSwitcher: React.FC<IntelligenceTabSwitcherProps> = ({
       ];
 
   return (
-    <div
-      className="flex mb-4"
-      style={{
-        borderBottom: '1px solid hsl(var(--border))',
-        maxWidth: 320,
-      }}
-    >
+    <div className="flex items-center gap-1 mb-4">
       {options.map((opt) => {
         const isActive = activeTab === opt.value;
         return (
           <button
             key={opt.value}
             onClick={() => onTabChange(opt.value)}
-            className="relative flex-1 transition-colors duration-200"
-            style={{
-              padding: '12px 0',
-              fontSize: 13,
-              fontWeight: 600,
-              color: isActive
-                ? 'hsl(var(--foreground))'
-                : 'hsl(var(--muted-foreground))',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-            }}
+            className={`relative px-3 py-2 min-h-[44px] text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.97] ${
+              isActive
+                ? 'text-foreground font-semibold'
+                : 'text-muted-foreground font-medium hover:text-foreground'
+            }`}
+            style={{ background: 'none', border: 'none', cursor: 'pointer' }}
           >
             {opt.label}
             {isActive && (
-              <span
-                style={{
-                  position: 'absolute',
-                  bottom: -1,
-                  left: '20%',
-                  right: '20%',
-                  height: 2,
-                  backgroundColor: 'hsl(var(--foreground))',
-                  borderRadius: 1,
-                }}
+              <motion.div
+                layoutId="intelligence-tab-underline"
+                className="absolute bottom-0 left-0 right-0 h-[3px] rounded-full bg-[hsl(var(--tab-orange))]"
+                transition={{ type: 'spring', stiffness: 500, damping: 35 }}
               />
             )}
           </button>
