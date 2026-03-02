@@ -106,7 +106,7 @@ export default function ScheduleSheet({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[10010]"
+            className="fixed inset-0 bg-black/40 z-[10010]"
             onClick={onClose}
           />
           
@@ -150,7 +150,7 @@ export default function ScheduleSheet({
                 <div className="flex items-center justify-between mb-4">
                   <button
                     onClick={handlePrevMonth}
-                    className="w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center transition-colors"
+                    className="w-11 h-11 rounded-full hover:bg-muted flex items-center justify-center transition-colors"
                   >
                     <ChevronLeft className="w-5 h-5 text-muted-foreground" />
                   </button>
@@ -159,7 +159,7 @@ export default function ScheduleSheet({
                   </span>
                   <button
                     onClick={handleNextMonth}
-                    className="w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center transition-colors"
+                    className="w-11 h-11 rounded-full hover:bg-muted flex items-center justify-center transition-colors"
                   >
                     <ChevronRight className="w-5 h-5 text-muted-foreground" />
                   </button>
@@ -189,7 +189,7 @@ export default function ScheduleSheet({
                         aria-label={`${format(date, 'MMMM d, yyyy')}${isSelected ? ', selected' : ''}${!isValid ? ', unavailable' : ''}`}
                         onClick={() => date && isValid && setSelectedDate(date)}
                         className={cn(
-                          "aspect-square rounded-full flex items-center justify-center text-sm font-medium transition-colors mx-auto w-10 h-10",
+                          "aspect-square rounded-full flex items-center justify-center text-sm font-medium transition-colors mx-auto w-11 h-11",
                           isSelected && "bg-primary text-primary-foreground",
                           !isSelected && !isValid && "text-muted-foreground/30 cursor-not-allowed",
                           !isSelected && isValid && "hover:bg-muted text-foreground",
@@ -209,7 +209,7 @@ export default function ScheduleSheet({
               <div className="mt-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Clock className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-medium text-muted-foreground">Select Time</span>
+                  <span className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: '#AEAEB2' }}>Select Time</span>
                 </div>
                 
                 <div className="flex items-center gap-3">
@@ -293,7 +293,7 @@ export default function ScheduleSheet({
                     onSchedule(null);
                     onClose();
                   }}
-                  className="w-full py-3 text-sm font-medium transition-colors"
+                  className="w-full min-h-[44px] flex items-center justify-center text-sm font-semibold transition-colors"
                   style={{ color: '#8E8E93' }}
                 >
                   Remove schedule

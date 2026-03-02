@@ -84,7 +84,7 @@ function RadioDot({ selected }: { selected: boolean }) {
         "w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200 border-2",
         selected
           ? "border-amber-500 bg-amber-500"
-          : "border-gray-300 bg-transparent"
+          : "border-border bg-transparent"
       )}
     >
       <AnimatePresence>
@@ -200,7 +200,7 @@ export function ReviewPostingOptionsSheet({
                       <div className="flex-1 text-left min-w-0">
                         <div className="flex items-center gap-1.5">
                           <span className={cn(
-                            "font-medium text-sm truncate",
+                            "font-semibold text-sm truncate",
                             canReview ? "text-foreground" : "text-muted-foreground"
                           )}>
                             {actor.name}
@@ -259,7 +259,7 @@ export function ReviewPostingOptionsSheet({
                       </div>
                       
                       <div className="flex-1 text-left">
-                        <p className="font-medium text-sm text-foreground">
+                        <p className="font-semibold text-sm text-foreground">
                           {option.label}
                         </p>
                         <p className="text-xs text-muted-foreground mt-0.5">
@@ -281,7 +281,7 @@ export function ReviewPostingOptionsSheet({
             <button
               onClick={handleDone}
               className="w-full h-12 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[0.98] text-white"
-              style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)' }}
+              style={{ backgroundColor: '#f59e0b' }}
             >
               Done
             </button>

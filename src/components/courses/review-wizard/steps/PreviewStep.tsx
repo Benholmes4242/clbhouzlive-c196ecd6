@@ -142,28 +142,28 @@ export function PreviewStep({
           <div className="flex-1 flex flex-col items-center justify-center">
             <div className="w-full max-w-sm bg-card rounded-2xl border border-border/50 overflow-hidden shadow-sm">
               {course && (
-                <div className="flex items-center gap-3 p-4 border-b border-gray-100">
+                <div className="flex items-center gap-3 p-4 border-b border-border">
                   {course.thumbnail_image && (
                     <img src={course.thumbnail_image} alt={course.name} className="w-14 h-14 rounded-xl object-cover" />
                   )}
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-foreground truncate">{course.name}</h3>
-                    {courseLocation && <p className="text-sm text-muted-foreground/60">{courseLocation}</p>}
+                    {courseLocation && <p className="text-sm text-muted-foreground">{courseLocation}</p>}
                   </div>
                 </div>
               )}
-              <div className="p-4 text-center border-b border-gray-100">
+              <div className="p-4 text-center border-b border-border">
                 <div className="inline-flex items-baseline gap-1">
                   <span className="text-4xl font-bold" style={{ color: (rating ?? 0) >= 9.0 ? '#f59e0b' : '#6b7280' }}>
                     {rating?.toFixed(1) || '0.0'}
                   </span>
-                  <span className="text-lg text-gray-400">/10</span>
+                  <span className="text-lg text-muted-foreground">/10</span>
                 </div>
               </div>
               {(title || review) && (
                 <div className="p-4">
-                  {title && <h4 className="font-medium text-foreground mb-1">{title}</h4>}
-                  {review && <p className="text-sm text-gray-400 line-clamp-3">{review}</p>}
+                  {title && <h4 className="font-semibold text-foreground mb-1">{title}</h4>}
+                  {review && <p className="text-sm text-muted-foreground line-clamp-3">{review}</p>}
                 </div>
               )}
             </div>
@@ -172,7 +172,7 @@ export function PreviewStep({
           <div className="mt-6 text-center space-y-3">
             <div>
               <h3 className="text-lg font-semibold text-foreground">Share this review to your Clubhouse feed?</h3>
-              <p className="text-sm text-gray-500 mt-1">Your review has been saved. Share it as a post for others to see.</p>
+              <p className="text-sm text-muted-foreground mt-1">Your review has been saved. Share it as a post for others to see.</p>
             </div>
             <div className="flex flex-col gap-3 pt-2 max-w-xs mx-auto w-full">
               <button
@@ -184,11 +184,11 @@ export function PreviewStep({
                 <Share2 className="h-5 w-5" />
                 {isSharing ? 'Sharing...' : 'Share to Clubhouse'}
               </button>
-              <div className="flex items-center justify-center gap-1.5 text-gray-400">
+              <div className="flex items-center justify-center gap-1.5 text-muted-foreground">
                 <VisIcon className="w-3 h-3" />
                 <span className="text-[11px]">{visInfo.label}</span>
               </div>
-              <Button variant="ghost" className="w-full text-gray-500 hover:text-foreground" onClick={onSkip} disabled={isSharing}>
+              <Button variant="ghost" className="w-full text-muted-foreground hover:text-foreground" onClick={onSkip} disabled={isSharing}>
                 Skip for Now
               </Button>
             </div>

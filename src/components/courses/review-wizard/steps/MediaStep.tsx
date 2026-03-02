@@ -225,7 +225,7 @@ export function MediaStep({
 
           {/* Counter */}
           <p
-            className="text-sm font-medium tabular-nums text-center mt-2"
+            className="text-[11px] font-semibold tabular-nums text-center mt-2"
             style={{
               color: media.length >= MAX_MEDIA_ITEMS ? 'hsl(var(--destructive))' : 'hsl(var(--muted-foreground))',
             }}

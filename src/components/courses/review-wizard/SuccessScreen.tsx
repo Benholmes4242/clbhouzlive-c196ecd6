@@ -128,7 +128,7 @@ export function SuccessScreen({
         {isShared ? (
           <button
             onClick={onViewPost}
-            className="px-6 py-3 rounded-full text-sm font-semibold text-white active:scale-[0.97] transition-all"
+            className="px-6 rounded-full text-sm font-semibold text-white active:scale-[0.97] transition-all min-h-[44px] flex items-center justify-center"
             style={{ background: '#1C1C1E' }}
           >
             <span className="flex items-center gap-2">
@@ -139,7 +139,7 @@ export function SuccessScreen({
         ) : (
           <button
             onClick={onViewReview}
-            className="px-6 py-3 rounded-full text-sm font-semibold text-white active:scale-[0.97] transition-all"
+            className="px-6 rounded-full text-sm font-semibold text-white active:scale-[0.97] transition-all min-h-[44px] flex items-center justify-center"
             style={{ background: '#1C1C1E' }}
           >
             <span className="flex items-center gap-2">
@@ -151,7 +151,7 @@ export function SuccessScreen({
         
         <button
           onClick={onDone}
-          className="px-6 py-3 rounded-full text-sm font-semibold text-foreground active:scale-[0.97] transition-all"
+          className="px-6 rounded-full text-sm font-semibold text-foreground active:scale-[0.97] transition-all min-h-[44px] flex items-center justify-center"
           style={{ border: '1.5px solid hsl(var(--border))' }}
         >
           Done

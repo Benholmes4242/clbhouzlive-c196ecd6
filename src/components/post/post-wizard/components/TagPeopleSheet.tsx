@@ -230,7 +230,7 @@ export function TagPeopleSheet({
                   </span>
                   <button
                     onClick={() => removeChip(tag.id)}
-                    className="active:scale-90 transition-transform ml-0.5"
+                    className="min-h-[44px] min-w-[44px] flex items-center justify-center active:scale-90 transition-transform ml-0.5"
                   >
                     <X className="w-3.5 h-3.5" style={{ color: '#AEAEB2' }} />
                   </button>
@@ -279,7 +279,7 @@ export function TagPeopleSheet({
           ) : localSelected.length > 0 ? (
             <>
               <p
-                className="text-xs font-semibold uppercase tracking-wider px-2 py-2"
+                className="text-[11px] font-semibold uppercase tracking-[1.5px] px-2 py-2"
                 style={{ color: '#AEAEB2' }}
               >
                 Tagged

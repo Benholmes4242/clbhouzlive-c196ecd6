@@ -25,7 +25,7 @@ const ToolButton = ({ icon, label, active, onClick }: ToolButtonProps) => (
     <div className="transition-colors">
       {icon}
     </div>
-    <span className="text-xs font-medium transition-colors">
+    <span className="text-xs font-semibold transition-colors">
       {label}
     </span>
   </motion.button>

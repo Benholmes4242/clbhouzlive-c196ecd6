@@ -175,7 +175,7 @@ export function WriteStep({
           <input
             id="review-title"
             type="text"
-            className="w-full bg-transparent text-foreground text-[16px] font-medium mt-1 outline-none placeholder:text-muted-foreground/40"
+            className="w-full bg-transparent text-foreground text-[16px] font-semibold mt-1 outline-none placeholder:text-muted-foreground/40"
             placeholder="Sum up your experience"
             value={title}
             onChange={(e) => onTitleChange(e.target.value.slice(0, MAX_TITLE_LENGTH))}

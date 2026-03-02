@@ -199,23 +199,23 @@ export default function StudioShelf({
               <div className="flex items-center justify-between px-4 h-11">
                 <button
                   onClick={handleCancelAttempt}
-                  className="flex items-center gap-1 -ml-1"
+                  className="flex items-center gap-1 -ml-1 min-h-[44px]"
                 >
                   <ArrowLeft className="w-5 h-5 text-white/90" />
-                  <span className="text-sm font-medium text-white/90">Back</span>
+                  <span className="text-sm font-semibold text-white/90">Back</span>
                 </button>
                 <div className="flex items-center gap-3">
                   {hasChanges && (
                     <button
                       onClick={handleResetAll}
-                      className="text-sm font-medium text-white/60"
+                      className="text-sm font-semibold text-white/60 min-h-[44px] flex items-center"
                     >
                       Reset
                     </button>
                   )}
                   <button
                     onClick={() => onClose()}
-                    className="px-4 py-1.5 rounded-full text-sm font-semibold text-white bg-primary"
+                    className="px-4 rounded-full text-sm font-semibold text-white bg-primary min-h-[44px] flex items-center"
                   >
                     Done
                   </button>
@@ -414,7 +414,7 @@ export default function StudioShelf({
                       >
                         ✨
                       </motion.div>
-                      <p className="text-sm font-medium text-white">
+                      <p className="text-sm font-semibold text-white">
                         Choose a tool to enhance your moment
                       </p>
                       <p className="text-xs mt-1" style={{ color: '#AEAEB2' }}>
