@@ -66,7 +66,7 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
   const badge = getBadgeConfig();
 
   return (
-    <div className="relative overflow-hidden rounded-b-2xl" style={{ height: `${Math.round(306 * 0.8)}px` }}>
+    <div className="relative overflow-hidden" style={{ height: `${Math.round(306 * 0.8)}px` }}>
       {/* Background Image */}
       <img
         src={imageUrl}
