@@ -76,10 +76,10 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       className={cn(
-        "bg-card rounded-2xl border border-border p-6 shadow-[0_1px_3px_rgba(0,0,0,0.05)]",
+        "p-6",
         className
-      )}
-    >
+      )}>
+
       {/* Header */}
       <div className="text-center mb-1">
         <p className="text-sm font-semibold text-muted-foreground tracking-normal">
