@@ -5,7 +5,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
-import PickBadge from './components/PickBadge';
 import ActualPositionBadge from './components/ActualPositionBadge';
 import LivePositionDisplay from './components/LivePositionDisplay';
 import type { TrackedPrediction } from './types';
@@ -92,16 +91,13 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
       )}
 
       <div className="flex items-center gap-3">
-        {/* Pick badge */}
-        <PickBadge pickNumber={prediction.predictedRank} />
-
-        {/* Avatar */}
+        {/* Avatar — squircle */}
         <div
           className="overflow-hidden flex-shrink-0"
           style={{
             width: 44,
             height: 44,
-            borderRadius: '50%',
+            borderRadius: '34%',
             border: `2px solid ${borderColor}`,
           }}
         >
