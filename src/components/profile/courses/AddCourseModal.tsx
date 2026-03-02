@@ -16,7 +16,6 @@ import { useUserTopTenCourses } from '@/hooks/useUserTopTenCourses';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Search, X, Star, Plus, Trash2, ChevronUp, ChevronDown, GripVertical, Trophy, RotateCcw } from 'lucide-react';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { toast } from 'sonner';
@@ -136,7 +135,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-3 p-3 bg-card/50 rounded-xl border border-border/50 ${
+      className={`flex items-center gap-3 p-3 bg-card rounded-xl border border-border/30 ${
         isDragging ? 'shadow-lg' : ''
       }`}
     >
@@ -168,9 +167,12 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
       {/* Course info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="font-medium truncate text-sm">{course.name}</span>
+          <span className="font-semibold truncate text-sm">{course.name}</span>
           {!course.is_pinned && (
-            <span className="flex-shrink-0 px-1.5 py-0.5 text-[10px] font-medium bg-amber-100 text-amber-700 rounded">
+            <span 
+              className="flex-shrink-0 px-1.5 py-0.5 text-[10px] font-semibold rounded-full border"
+              style={{ backgroundColor: 'rgba(245,158,11,0.08)', color: '#f59e0b', borderColor: 'rgba(245,158,11,0.25)' }}
+            >
               Auto
             </span>
           )}
@@ -413,10 +415,11 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
         </div>
         <button
           onClick={onClose}
-          className="min-h-[44px] min-w-[44px] flex items-center justify-center -mr-2 rounded-full hover:bg-muted/50 transition-colors active:scale-[0.95]"
+          className="min-h-[44px] min-w-[44px] flex items-center justify-center -mr-2 rounded-full transition-colors active:scale-[0.95]"
+          style={{ backgroundColor: '#F5F5F7' }}
           aria-label="Close"
         >
-          <X className="w-5 h-5 text-muted-foreground" />
+          <X className="w-4 h-4" style={{ color: '#7A7A7A' }} />
         </button>
       </div>
 
@@ -428,10 +431,10 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
           <button
             onClick={() => setActiveTab('manage')}
             className={cn(
-              "flex-1 px-4 py-2 text-sm font-medium rounded-full transition-all duration-150 active:scale-[0.98]",
+              "flex-1 px-4 py-1.5 text-sm rounded-full transition-all duration-150 active:scale-[0.98]",
               activeTab === 'manage'
-                ? "bg-card text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
+                ? "bg-foreground text-background font-semibold shadow-sm"
+                : "text-muted-foreground font-medium hover:text-foreground"
             )}
           >
             Manage ({topTen.length}/10)
@@ -439,10 +442,10 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
           <button
             onClick={() => setActiveTab('add')}
             className={cn(
-              "flex-1 px-4 py-2 text-sm font-medium rounded-full transition-all duration-150 active:scale-[0.98]",
+              "flex-1 px-4 py-1.5 text-sm rounded-full transition-all duration-150 active:scale-[0.98]",
               activeTab === 'add'
-                ? "bg-card text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
+                ? "bg-foreground text-background font-semibold shadow-sm"
+                : "text-muted-foreground font-medium hover:text-foreground"
             )}
           >
             Add Course
@@ -453,14 +456,33 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
       {/* Search input - only show in add tab */}
       {activeTab === 'add' && (
         <div className="px-5 pb-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
+        <div className="relative">
+            <Search 
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none transition-colors"
+              style={{ color: searchQuery ? '#f59e0b' : '#AEAEB2' }}
+            />
+            <input
+              ref={searchInputRef}
               placeholder="Search your played courses..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-              ref={searchInputRef}
+              className="w-full pl-10 pr-4 text-sm outline-none transition-all"
+              style={{
+                height: 44,
+                borderRadius: 12,
+                backgroundColor: '#F5F5F7',
+                border: '1.5px solid rgba(0,0,0,0.07)',
+                color: '#1A1A1A',
+                caretColor: '#f59e0b',
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = '#f59e0b';
+                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(245,158,11,0.10)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(0,0,0,0.07)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
             />
           </div>
         </div>
@@ -590,7 +612,10 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
               {/* Rated courses section */}
               {ratedCourses.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-medium text-muted-foreground mb-3">
+                  <h3 
+                    className="text-[11px] font-semibold uppercase tracking-[1.5px] mb-3"
+                    style={{ color: '#AEAEB2' }}
+                  >
                     Your rated courses
                   </h3>
                   <div className="space-y-2">
@@ -612,7 +637,10 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
               {/* Unrated courses section */}
               {unratedCourses.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-medium text-muted-foreground mb-3">
+                  <h3 
+                    className="text-[11px] font-semibold uppercase tracking-[1.5px] mb-3"
+                    style={{ color: '#AEAEB2' }}
+                  >
                     Rate to add
                   </h3>
                   <div className="space-y-2">
@@ -653,18 +681,18 @@ const CourseRow: React.FC<CourseRowProps> = ({
   actionIcon,
   isSecondary = false,
 }) => (
-  <div className="flex items-center gap-3 p-3 bg-card/50 rounded-xl border border-border/50">
+  <div className="flex items-center gap-3 p-3 bg-card rounded-xl border border-border/30">
     {course.thumbnail_image && (
       <img
         src={course.thumbnail_image}
         alt={course.name}
         loading="lazy"
         decoding="async"
-        className="w-14 h-14 object-cover rounded-lg flex-shrink-0"
+        className="w-14 h-14 object-cover rounded-[10px] flex-shrink-0"
       />
     )}
     <div className="flex-1 min-w-0">
-      <div className="font-medium truncate text-sm">{course.name}</div>
+      <div className="font-semibold truncate text-sm">{course.name}</div>
       <div className="text-xs text-muted-foreground truncate">
         {course.sub_country || course.country}
       </div>
@@ -677,14 +705,23 @@ const CourseRow: React.FC<CourseRowProps> = ({
         </div>
       )}
     </div>
-    <Button
-      size="sm"
-      variant={isSecondary ? "outline" : "default"}
+    <button
       onClick={onAction}
-      className="flex-shrink-0 gap-1.5 active:scale-[0.95]"
+      className="flex-shrink-0 flex items-center justify-center active:scale-[0.95] transition-transform"
+      style={{
+        width: 44,
+        height: 44,
+        borderRadius: 12,
+        padding: 0,
+        border: '1.5px solid',
+        ...(isSecondary 
+          ? { borderColor: 'rgba(0,0,0,0.12)', backgroundColor: 'transparent', color: 'inherit' }
+          : { backgroundColor: 'rgba(245,158,11,0.08)', borderColor: 'rgba(245,158,11,0.3)', color: '#f59e0b' }
+        ),
+      }}
+      aria-label={actionLabel}
     >
       {actionIcon}
-      <span className="hidden sm:inline">{actionLabel}</span>
-    </Button>
+    </button>
   </div>
 );

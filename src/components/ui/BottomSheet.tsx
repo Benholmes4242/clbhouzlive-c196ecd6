@@ -100,10 +100,10 @@ export function BottomSheet({
       {/* Backdrop with fade animation */}
       <div
         className={cn(
-          "fixed inset-0 backdrop-blur-sm transition-opacity duration-300",
+          "fixed inset-0 transition-opacity duration-300",
           isAnimating ? "opacity-100" : "opacity-0"
         )}
-        style={{ zIndex: zIndexBase, backgroundColor: 'rgba(28,25,23,0.4)' }}
+        style={{ zIndex: zIndexBase, backgroundColor: 'rgba(0,0,0,0.4)' }}
         onClick={onClose}
         aria-hidden="true"
       />
@@ -111,14 +111,14 @@ export function BottomSheet({
       <div
         ref={sheetRef}
         className={cn(
-          "fixed bottom-0 left-0 right-0 bg-background rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] transition-transform duration-300 ease-out",
+          "fixed bottom-0 left-0 right-0 bg-background rounded-t-[20px] transition-transform duration-300 ease-out",
           isAnimating ? "translate-y-0" : "translate-y-full",
           className
         )}
         style={{ 
           zIndex: zIndexBase + 1,
           maxHeight: '90vh',
-          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
           ...style,
         }}
         role="dialog"
@@ -127,12 +127,12 @@ export function BottomSheet({
       >
         {/* Draggable grabber area - larger and more visible */}
         <div 
-          className="w-full pt-4 pb-3 cursor-grab active:cursor-grabbing touch-none"
+          className="w-full pt-2.5 pb-1 cursor-grab active:cursor-grabbing touch-none"
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          <div className="w-10 h-1 mx-auto rounded-full bg-muted-foreground/30" />
+          <div className="w-9 h-1 mx-auto rounded-full bg-muted-foreground/30" />
         </div>
         {children}
       </div>
