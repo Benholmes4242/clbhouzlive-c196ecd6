@@ -359,7 +359,7 @@ const ProfilePageV2Content: React.FC = () => {
       {/* Children with pointer-events: auto remain interactive */}
       <div className="relative pointer-events-none" style={{ zIndex: 1 }}>
         {/* Hero Image Container - full-bleed behind notch */}
-        <div className="relative w-full overflow-hidden" style={{ height: 'calc(200px + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}>
+        <div className="relative w-full overflow-hidden" style={{ height: '45dvh' }}>
           {heroUrl ? (
             <img 
               src={heroUrl} 
