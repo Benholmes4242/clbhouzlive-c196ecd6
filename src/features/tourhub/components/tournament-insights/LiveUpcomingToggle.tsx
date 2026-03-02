@@ -39,7 +39,7 @@ export const LiveUpcomingToggle: React.FC<LiveUpcomingToggleProps> = ({
           <button
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
-            className="flex-1 flex items-center justify-center gap-1.5 transition-all duration-200"
+            className="flex-1 flex items-center justify-center gap-1.5 transition-all duration-200 whitespace-nowrap"
             style={{
               padding: '10px 16px',
               borderRadius: 10,
