@@ -192,7 +192,7 @@ export default function DraftsAndScheduledSheet({
                 {activeTab === 'drafts' && onSaveDraft && canSaveDraft && (
                   <button
                     onClick={onSaveDraft}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-primary text-sm font-medium hover:bg-primary/10 rounded-lg transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-primary text-sm font-semibold hover:bg-primary/10 rounded-lg transition-colors min-h-[44px]"
                   >
                     <Save className="w-3.5 h-3.5" />
                     Save
@@ -224,7 +224,7 @@ export default function DraftsAndScheduledSheet({
                         <Save className="w-5 h-5 text-primary" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground">Save current post as draft</p>
+                        <p className="text-sm font-semibold text-foreground">Save current post as draft</p>
                         <p className="text-xs text-muted-foreground">Resume editing later</p>
                       </div>
                     </button>
@@ -246,13 +246,13 @@ export default function DraftsAndScheduledSheet({
                   ))}
                   
                   {/* Clear all drafts */}
-                  {drafts.length >= 2 && (
-                    <button
-                      onClick={() => setShowDeleteAllConfirm(true)}
-                      disabled={isDeleting}
-                      className="w-full py-3 text-sm font-medium text-destructive hover:text-destructive/80 transition-colors disabled:opacity-50"
-                    >
-                      Clear all drafts
+                    {drafts.length >= 2 && (
+                      <button
+                        onClick={() => setShowDeleteAllConfirm(true)}
+                        disabled={isDeleting}
+                        className="w-full min-h-[44px] flex items-center justify-center text-sm font-semibold text-destructive hover:text-destructive/80 transition-colors disabled:opacity-50"
+                      >
+                        Clear all drafts
                     </button>
                   )}
                 </div>
@@ -305,13 +305,13 @@ export default function DraftsAndScheduledSheet({
                   <button
                     onClick={handleDeleteAll}
                     disabled={isDeleting}
-                    className="px-6 py-2.5 text-sm font-medium text-destructive-foreground bg-destructive rounded-xl hover:bg-destructive/90 disabled:opacity-50 transition-colors"
+                    className="px-6 py-2.5 text-sm font-semibold text-destructive-foreground bg-destructive rounded-xl hover:bg-destructive/90 disabled:opacity-50 transition-colors min-h-[44px]"
                   >
                     {isDeleting ? 'Deleting...' : 'Delete All'}
                   </button>
                   <button
                     onClick={() => setShowDeleteAllConfirm(false)}
-                    className="px-6 py-2.5 text-sm font-medium bg-muted text-foreground rounded-xl hover:bg-muted/80 transition-colors"
+                    className="px-6 py-2.5 text-sm font-semibold bg-muted text-foreground rounded-xl hover:bg-muted/80 transition-colors min-h-[44px]"
                   >
                     Cancel
                   </button>
@@ -337,13 +337,13 @@ export default function DraftsAndScheduledSheet({
                 <div className="flex gap-3">
                   <button
                     onClick={onConfirmOverwrite}
-                    className="px-6 py-2.5 text-sm font-medium text-primary-foreground bg-primary rounded-xl hover:bg-primary/90 transition-colors"
+                    className="px-6 py-2.5 text-sm font-semibold text-primary-foreground bg-primary rounded-xl hover:bg-primary/90 transition-colors min-h-[44px]"
                   >
                     Replace
                   </button>
                   <button
                     onClick={onCancelOverwrite}
-                    className="px-6 py-2.5 text-sm font-medium bg-muted text-foreground rounded-xl hover:bg-muted/80 transition-colors"
+                    className="px-6 py-2.5 text-sm font-semibold bg-muted text-foreground rounded-xl hover:bg-muted/80 transition-colors min-h-[44px]"
                   >
                     Cancel
                   </button>
@@ -440,13 +440,13 @@ const DraftItem = React.memo(function DraftItem({
             <button
               onClick={onDelete}
               disabled={isDeleting}
-              className="px-4 py-2 text-sm font-medium text-destructive-foreground bg-destructive rounded-xl hover:bg-destructive/90 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 text-sm font-semibold text-destructive-foreground bg-destructive rounded-xl hover:bg-destructive/90 disabled:opacity-50 transition-colors min-h-[44px]"
             >
               Delete
             </button>
             <button
               onClick={onCancelDelete}
-              className="px-4 py-2 text-sm font-medium bg-muted text-foreground rounded-xl hover:bg-muted/80 transition-colors"
+              className="px-4 py-2 text-sm font-semibold bg-muted text-foreground rounded-xl hover:bg-muted/80 transition-colors min-h-[44px]"
             >
               Cancel
             </button>

@@ -145,7 +145,7 @@ export function WizardHeader({
         <button
           onClick={handleNextOrSubmit}
           disabled={!isNextEnabled}
-          className="text-[15px] font-semibold px-[18px] py-[7px] rounded-full transition-all duration-200 active:scale-[0.96]"
+          className="text-[15px] font-semibold px-[18px] min-h-[44px] flex items-center rounded-full transition-all duration-200 active:scale-[0.96]"
           style={{
             background: isLastStep
               ? (isNextEnabled ? '#f59e0b' : '#F5F5F7')

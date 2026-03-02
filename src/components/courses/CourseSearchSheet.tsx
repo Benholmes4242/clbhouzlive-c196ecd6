@@ -164,7 +164,7 @@ export function CourseSearchSheet({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[10010] touch-none bg-black/40 backdrop-blur-sm"
+            className="fixed inset-0 z-[10010] touch-none bg-black/40"
             onClick={onClose}
             onTouchMove={(e) => e.preventDefault()}
           />
@@ -187,7 +187,7 @@ export function CourseSearchSheet({
               "shadow-[0_-4px_32px_rgba(0,0,0,0.1)]"
             )}
             style={{
-              maxHeight: '65vh',
+              maxHeight: '85vh',
               paddingBottom: isMobile ? 'env(safe-area-inset-bottom)' : 0,
               backgroundColor: '#FFFFFF',
             }}

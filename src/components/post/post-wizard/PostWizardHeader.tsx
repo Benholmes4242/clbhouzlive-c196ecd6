@@ -38,7 +38,7 @@ export function PostWizardHeader({
       {/* Cancel */}
       <button
         onClick={onClose}
-        className="text-[17px] font-normal min-w-[72px] text-left active:opacity-60 transition-opacity"
+        className="text-[17px] font-medium min-w-[72px] text-left min-h-[44px] flex items-center active:opacity-60 transition-opacity"
         style={{ color: '#7A7A7A' }}
       >
         Cancel
@@ -55,7 +55,7 @@ export function PostWizardHeader({
         {isDirty && !isEditMode && onOpenSchedule && (
           <button
             onClick={onOpenSchedule}
-            className="w-9 h-9 rounded-full flex items-center justify-center active:scale-[0.90] transition-transform"
+            className="w-11 h-11 rounded-full flex items-center justify-center active:scale-[0.90] transition-transform"
             style={{
               background: isScheduled ? 'rgba(245, 158, 11, 0.1)' : 'transparent',
             }}
@@ -74,7 +74,7 @@ export function PostWizardHeader({
         <button
           onClick={onPost}
           disabled={!canPost || isSubmitting}
-          className="text-[15px] font-semibold px-[18px] py-[7px] rounded-full transition-all duration-400 active:scale-[0.96]"
+          className="text-[15px] font-semibold px-[18px] min-h-[44px] flex items-center rounded-full transition-all duration-400 active:scale-[0.96]"
           style={{
             color: canPost ? '#FFFFFF' : '#AEAEB2',
             background: canPost ? '#f59e0b' : '#F5F5F7',

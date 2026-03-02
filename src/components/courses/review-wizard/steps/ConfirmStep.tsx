@@ -127,7 +127,7 @@ export function ConfirmStep({
               <button
                 type="button"
                 onClick={() => onGoToStep(1)}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-end text-xs font-medium active:scale-[0.97] transition-all"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-end text-xs font-semibold active:scale-[0.97] transition-all"
                 style={{ color: '#f59e0b' }}
               >
                 Edit
@@ -158,7 +158,7 @@ export function ConfirmStep({
               <button
                 type="button"
                 onClick={() => onGoToStep(1)}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-end text-xs font-medium active:scale-[0.97] transition-all"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-end text-xs font-semibold active:scale-[0.97] transition-all"
                 style={{ color: '#f59e0b' }}
               >
                 Edit
@@ -213,7 +213,7 @@ export function ConfirmStep({
               <button
                 type="button"
                 onClick={() => onGoToStep(2)}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-end text-xs font-medium active:scale-[0.97] transition-all"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-end text-xs font-semibold active:scale-[0.97] transition-all"
                 style={{ color: '#f59e0b' }}
               >
                 Edit
@@ -237,7 +237,7 @@ export function ConfirmStep({
               <button
                 type="button"
                 onClick={() => onGoToStep(3)}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-end text-xs font-medium active:scale-[0.97] transition-all"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-end text-xs font-semibold active:scale-[0.97] transition-all"
                 style={{ color: '#f59e0b' }}
               >
                 Edit

@@ -296,7 +296,7 @@ export function RateStep({
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center text-sm font-medium text-muted-foreground mb-3"
+            className="text-center text-sm font-semibold text-muted-foreground mb-3"
           >
             {overallTier.label}
           </motion.p>

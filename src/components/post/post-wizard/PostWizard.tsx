@@ -837,7 +837,7 @@ export function PostWizard({
                     </span>
                     <button
                       onClick={() => setShowProfileSelector(true)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border text-[12px] font-medium active:scale-[0.95] active:bg-[rgba(245,158,11,0.05)] transition-all"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border text-[12px] font-semibold active:scale-[0.95] active:bg-[rgba(245,158,11,0.05)] transition-all"
                       style={{ borderColor: 'rgba(0,0,0,0.07)', color: '#d97706' }}
                     >
                       <Globe className="w-3 h-3" style={{ color: '#f59e0b' }} />
