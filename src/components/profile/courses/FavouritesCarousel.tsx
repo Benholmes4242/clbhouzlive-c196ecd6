@@ -212,7 +212,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
   return (
     <section className={cn("w-full", className)}>
       {/* Refined Header */}
-      <div className="flex items-center justify-between mb-4 px-4">
+      <div className="flex items-start justify-between mb-4 px-4">
         <div className="flex items-center gap-3">
           {/* Trophy icon - subtle gold tint */}
           <div 
@@ -227,23 +227,23 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
             <h2 className="text-lg font-semibold text-foreground">
               {getTitle()}
             </h2>
-            <p className="text-sm text-muted-foreground">
-              {getSubtitle()}
-            </p>
+            <div className="flex items-center gap-2">
+              <p className="text-sm text-muted-foreground">
+                {getSubtitle()}
+              </p>
+              <span className="text-muted-foreground text-sm">{courseCount}/10</span>
+            </div>
           </div>
         </div>
         
-        <div className="flex flex-col items-center">
-          {isOwnProfile && onManage && (
-            <button 
-              onClick={onManage}
-              className="text-sm font-medium text-amber-600 min-h-[44px] flex items-center active:scale-[0.98]"
-            >
-              Manage
-            </button>
-          )}
-          <span className="text-muted-foreground text-xs -mt-2">{courseCount}/10</span>
-        </div>
+        {isOwnProfile && onManage && (
+          <button 
+            onClick={onManage}
+            className="text-sm font-medium text-amber-600 min-h-[44px] flex items-center active:scale-[0.98]"
+          >
+            Manage
+          </button>
+        )}
       </div>
       
       {/* Carousel - snap scroll with gap */}
