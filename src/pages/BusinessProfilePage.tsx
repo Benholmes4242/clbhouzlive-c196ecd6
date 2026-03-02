@@ -292,7 +292,7 @@ const BusinessProfilePage: React.FC = () => {
         <div className="absolute left-5 z-20 pointer-events-auto" style={{ bottom: '-62px' }}>
           <button
             className="relative cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
-            onClick={() => setIsAvatarLightboxOpen(true)}
+            onClick={() => { if (uploadingLogo) return; setIsAvatarLightboxOpen(true); }}
             aria-label="View business logo"
           >
             <div className="relative w-[124px] h-[124px]">
