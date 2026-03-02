@@ -172,6 +172,14 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
         </div>
       )}
       
+      {/* Readability gradient */}
+      <div 
+        className="absolute bottom-0 left-0 right-0 pointer-events-none z-10"
+        style={{
+          height: '35vh',
+          background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 70%, transparent 100%)'
+        }}
+      />
     </div>
   );
 }), (prevProps, nextProps) => (
@@ -921,7 +929,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                 onTouchStart={(e) => handleMediaTouchStart(e, item.id, hasMultipleMedia)}
                 onTouchEnd={(e) => handleMediaTouchEnd(e, item.id, hasMultipleMedia, currentMediaIndex, mediaItems.length)}
                 className="relative w-full h-full z-10"
-                style={{ paddingBottom: 0 }}
+                style={{ paddingBottom: 'calc(var(--bottom-nav-height, 64px) + 30px)' }}
                 data-media-container
               >
                 {/* Double-tap heart burst */}
@@ -1137,6 +1145,13 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                         
                         {/* Navigation dots moved to CreatorCapsule dotsSlot */}
                         
+                        <div 
+                          className="absolute bottom-0 left-0 right-0 pointer-events-none z-10"
+                          style={{
+                            height: '35vh',
+                            background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 70%, transparent 100%)'
+                          }}
+                        />
                       </>
                     )}
                   </div>
@@ -1169,26 +1184,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                 )}
                 {/* Right chevron lives inside CinematicActionRail as the top slot */}
               </div>
-
-              {/* Bottom vignette gradient — post card level, full-bleed */}
-              <div
-                className="absolute bottom-0 left-0 right-0 pointer-events-none"
-                style={{
-                  height: '50%',
-                  zIndex: 20,
-                  background: `linear-gradient(to top, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.30) 8%, rgba(0,0,0,0.18) 18%, rgba(0,0,0,0.10) 30%, rgba(0,0,0,0.04) 45%, transparent 60%)`
-                }}
-              />
-
-              {/* Top vignette gradient — header/status bar readability */}
-              <div
-                className="absolute top-0 left-0 right-0 pointer-events-none"
-                style={{
-                  height: '25%',
-                  zIndex: 20,
-                  background: `linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.18) 20%, rgba(0,0,0,0.06) 45%, transparent 70%)`
-                }}
-              />
 
               {/* Scrubber removed from per-card — now fixed outside scroll container */}
 
