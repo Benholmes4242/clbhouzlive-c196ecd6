@@ -21,8 +21,8 @@ const ClaimCourseCTA: React.FC<ClaimCourseCTAProps> = ({ clubId, clubName }) => 
   };
 
   return (
-    <section className="px-4 py-5 bg-muted">
-      <div className="bg-card border border-border rounded-xl p-6 text-center">
+    <section className="px-4 py-5">
+      <div className="p-6 text-center">
         <div className="mx-auto mb-3 h-12 w-12 rounded-full bg-muted flex items-center justify-center">
           <Building2 className="h-6 w-6 text-muted-foreground" />
         </div>

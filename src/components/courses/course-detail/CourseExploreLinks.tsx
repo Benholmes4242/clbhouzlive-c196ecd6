@@ -43,7 +43,7 @@ const CourseExploreLinks: React.FC<CourseExploreLinksProps> = ({ course }) => {
   const primaryListName = membership?.top100_lists?.name ?? 'Worldwide';
 
   return (
-    <div className="px-4 pt-4 pb-2 bg-muted">
+    <div className="px-4 pt-4 pb-2">
       <div className="mb-3">
         <SectionHeading title="Explore More" />
       </div>

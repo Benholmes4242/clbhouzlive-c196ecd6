@@ -130,7 +130,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
           <SectionHeading title="Media" />
         </div>
         <div className="px-4">
-          <div className="rounded-2xl bg-card shadow-sm px-4 py-5 border border-border text-center">
+          <div className="px-4 py-5 text-center">
             <p className="text-sm font-semibold text-foreground mb-1">
               No photos or videos yet
             </p>
@@ -140,7 +140,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
             <button
               type="button"
               onClick={() => navigate(`/courses/${clubId}/rate`)}
-              className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg text-sm font-semibold bg-secondary text-foreground shadow-sm hover:bg-secondary/80 active:scale-[0.98] transition"
+              className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg text-sm font-semibold bg-background text-foreground border border-border shadow-sm hover:bg-background/80 active:scale-[0.98] transition"
             >
               Share your experience
             </button>
