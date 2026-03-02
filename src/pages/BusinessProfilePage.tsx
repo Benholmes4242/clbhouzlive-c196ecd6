@@ -252,12 +252,18 @@ const BusinessProfilePage: React.FC = () => {
           {isOwner && (
             <button
               onClick={() => setCoverSheetOpen(true)}
-              className="absolute bottom-3 right-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm active:scale-[0.95] transition-transform z-10 pointer-events-auto"
+              className="absolute bottom-3 right-3 h-9 w-9 flex items-center justify-center rounded-full active:scale-[0.95] transition-transform z-10 pointer-events-auto"
+              style={{
+                background: 'rgba(0, 0, 0, 0.45)',
+                backdropFilter: 'blur(24px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+              }}
             >
               {uploadingCover ? (
-                <Loader2 className="w-5 h-5 text-white animate-spin" />
+                <Loader2 className="w-4 h-4 text-white animate-spin" />
               ) : (
-                <Camera className="w-5 h-5 text-white" />
+                <Camera className="w-4 h-4 text-white" />
               )}
             </button>
           )}
@@ -267,11 +273,17 @@ const BusinessProfilePage: React.FC = () => {
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 active:scale-95 transition-all z-10 pointer-events-auto"
-          style={{ top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
+          className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-full active:scale-95 transition-all z-10 pointer-events-auto"
+          style={{
+            top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
+            background: 'rgba(0, 0, 0, 0.45)',
+            backdropFilter: 'blur(24px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+          }}
           aria-label="Back"
         >
-          <ArrowLeft className="h-5 w-5 text-white" />
+          <ArrowLeft className="h-4.5 w-4.5 text-white" />
         </button>
 
         {/* Avatar - squircle, left-aligned, positioned OUTSIDE the overflow-hidden container */}
@@ -312,13 +324,19 @@ const BusinessProfilePage: React.FC = () => {
           {isOwner && (
             <button
               onClick={(e) => { e.stopPropagation(); setLogoSheetOpen(true); }}
-              className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-card border border-border flex items-center justify-center shadow-sm active:scale-[0.95] transition-transform z-30"
+              className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center active:scale-[0.95] transition-transform z-30"
+              style={{
+                background: 'rgba(0, 0, 0, 0.45)',
+                backdropFilter: 'blur(24px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+              }}
               aria-label="Change logo"
             >
               {uploadingLogo ? (
-                <Loader2 className="w-4 h-4 text-muted-foreground animate-spin" />
+                <Loader2 className="w-3.5 h-3.5 text-white animate-spin" />
               ) : (
-                <Camera className="w-4 h-4 text-muted-foreground" />
+                <Camera className="w-3.5 h-3.5 text-white" />
               )}
             </button>
           )}

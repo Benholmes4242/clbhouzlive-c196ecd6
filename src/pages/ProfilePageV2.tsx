@@ -373,7 +373,13 @@ const ProfilePageV2Content: React.FC = () => {
           {isSelf && (
             <button
               onClick={() => navigate('/edit-profile')}
-              className="absolute bottom-3 right-3 h-9 w-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center active:scale-[0.95] z-10 pointer-events-auto transition-transform"
+              className="absolute bottom-3 right-3 h-9 w-9 rounded-full flex items-center justify-center active:scale-[0.95] z-10 pointer-events-auto transition-transform"
+              style={{
+                background: 'rgba(0, 0, 0, 0.45)',
+                backdropFilter: 'blur(24px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+              }}
               aria-label="Change cover photo"
             >
               <Camera className="w-4 h-4 text-white" />
@@ -385,11 +391,17 @@ const ProfilePageV2Content: React.FC = () => {
         <button
           type="button"
           onClick={() => safeGoBack(navigate, '/clubhouse')}
-          className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 active:scale-95 transition-all z-10 pointer-events-auto"
-          style={{ top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
+          className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-full active:scale-95 transition-all z-10 pointer-events-auto"
+          style={{
+            top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
+            background: 'rgba(0, 0, 0, 0.45)',
+            backdropFilter: 'blur(24px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+          }}
           aria-label="Back"
         >
-          <ArrowLeft className="h-5 w-5 text-white" />
+          <ArrowLeft className="h-4.5 w-4.5 text-white" />
         </button>
 
         {/* Avatar - squircle, left-aligned with About title (px-5), positioned relative to hero bottom */}
@@ -441,10 +453,16 @@ const ProfilePageV2Content: React.FC = () => {
             {isSelf && (
               <button
                 onClick={(e) => { e.stopPropagation(); navigate('/edit-profile'); }}
-                className="absolute bottom-0 right-0 h-7 w-7 rounded-full bg-foreground flex items-center justify-center border-2 border-card active:scale-[0.95] z-30 pointer-events-auto transition-transform"
+                className="absolute bottom-0 right-0 h-7 w-7 rounded-full flex items-center justify-center active:scale-[0.95] z-30 pointer-events-auto transition-transform"
+                style={{
+                  background: 'rgba(0, 0, 0, 0.45)',
+                  backdropFilter: 'blur(24px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                }}
                 aria-label="Change profile photo"
               >
-                <Camera className="w-3.5 h-3.5 text-background" />
+                <Camera className="w-3.5 h-3.5 text-white" />
               </button>
             )}
           </div>
