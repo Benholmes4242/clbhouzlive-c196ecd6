@@ -245,19 +245,20 @@ const BusinessProfilePage: React.FC = () => {
               className="w-full h-full object-cover object-center"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/30" />
+            <div className="w-full h-full bg-muted" />
           )}
 
           {/* P7: Cover photo edit button for owners */}
           {isOwner && (
             <button
               onClick={() => setCoverSheetOpen(true)}
-              className="absolute bottom-3 right-3 h-9 w-9 flex items-center justify-center rounded-full active:scale-[0.95] transition-transform z-10 pointer-events-auto"
+              className="absolute bottom-3 right-3 h-11 w-11 flex items-center justify-center rounded-full active:scale-[0.95] transition-transform z-10 pointer-events-auto"
               style={{
                 background: 'rgba(0, 0, 0, 0.45)',
                 backdropFilter: 'blur(24px) saturate(180%)',
                 WebkitBackdropFilter: 'blur(24px) saturate(180%)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.35)',
               }}
             >
               {uploadingCover ? (
@@ -273,13 +274,14 @@ const BusinessProfilePage: React.FC = () => {
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-full active:scale-95 transition-all z-10 pointer-events-auto"
+          className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-full active:scale-95 transition-all z-10 pointer-events-auto"
           style={{
             top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
             background: 'rgba(0, 0, 0, 0.45)',
             backdropFilter: 'blur(24px) saturate(180%)',
             WebkitBackdropFilter: 'blur(24px) saturate(180%)',
             border: '1px solid rgba(255, 255, 255, 0.1)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.35)',
           }}
           aria-label="Back"
         >
