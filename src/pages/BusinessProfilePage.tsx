@@ -283,7 +283,7 @@ const BusinessProfilePage: React.FC = () => {
           }}
           aria-label="Back"
         >
-          <ArrowLeft className="h-4.5 w-4.5 text-white" />
+          <ArrowLeft className="h-4 w-4 text-white" />
         </button>
 
         {/* Avatar - squircle, left-aligned, positioned OUTSIDE the overflow-hidden container */}

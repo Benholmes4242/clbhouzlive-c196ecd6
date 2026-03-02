@@ -401,7 +401,7 @@ const ProfilePageV2Content: React.FC = () => {
           }}
           aria-label="Back"
         >
-          <ArrowLeft className="h-4.5 w-4.5 text-white" />
+          <ArrowLeft className="h-4 w-4 text-white" />
         </button>
 
         {/* Avatar - squircle, left-aligned with About title (px-5), positioned relative to hero bottom */}
