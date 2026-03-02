@@ -91,13 +91,13 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
         </div>
       )}
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2.5">
         {/* Avatar — squircle shape */}
         <div
           className="overflow-hidden flex-shrink-0 bg-muted"
           style={{
-            width: 44,
-            height: Math.round(44 * 1.05),
+            width: 40,
+            height: Math.round(40 * 1.05),
             borderRadius: '34%',
             border: `1.5px solid ${borderColor}`,
           }}
