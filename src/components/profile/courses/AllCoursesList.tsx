@@ -183,10 +183,10 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
 
       {/* Section header */}
       <div className="mb-3">
-        <h2 className="text-[15px] font-semibold text-foreground">
+        <h2 className="text-[17px] font-semibold text-foreground">
           Course History
         </h2>
-        <p className="text-xs text-muted-foreground mt-0.5">
+        <p className="text-[13px] text-muted-foreground mt-0.5">
           {ownerSubtitle}
         </p>
       </div>

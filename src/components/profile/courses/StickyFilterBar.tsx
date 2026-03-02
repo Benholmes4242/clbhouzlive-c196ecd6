@@ -43,7 +43,7 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
   return (
     <div className="py-2">
       <div 
-        className="flex items-stretch rounded-xl overflow-hidden bg-muted"
+        className="inline-flex bg-muted rounded-full p-1 w-full"
       >
         {filters.map((filter) => {
           const isActive = activeFilter === filter.id;
@@ -52,10 +52,10 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
               key={filter.id}
               onClick={() => onFilterChange(filter.id)}
               className={cn(
-                "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98]",
+                "relative flex-1 py-1.5 px-4 text-sm transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98]",
                 isActive
-                  ? "bg-card text-foreground shadow-sm m-1 rounded-lg"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "bg-foreground text-background rounded-full font-semibold shadow-sm"
+                  : "text-muted-foreground font-medium hover:text-foreground"
               )}
             >
               {filter.label}

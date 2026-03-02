@@ -82,7 +82,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
 
       {/* Header */}
       <div className="text-center mb-1">
-        <p className="text-sm font-semibold text-muted-foreground tracking-normal">
+        <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: '#AEAEB2' }}>
           {isOwnProfile ? "Your Course Legacy" : `${displayName || "Their"}'s Course Legacy`}
         </p>
       </div>

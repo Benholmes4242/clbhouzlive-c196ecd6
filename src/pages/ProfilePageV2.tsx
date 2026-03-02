@@ -373,7 +373,7 @@ const ProfilePageV2Content: React.FC = () => {
           {isSelf && (
             <button
               onClick={() => navigate('/edit-profile')}
-              className="absolute bottom-3 right-3 h-9 w-9 rounded-full flex items-center justify-center active:scale-[0.95] z-10 pointer-events-auto transition-transform"
+              className="absolute bottom-3 right-3 h-11 w-11 rounded-full flex items-center justify-center active:scale-[0.95] z-10 pointer-events-auto transition-transform"
               style={{
                 background: 'rgba(0, 0, 0, 0.45)',
                 backdropFilter: 'blur(24px) saturate(180%)',
@@ -391,13 +391,14 @@ const ProfilePageV2Content: React.FC = () => {
         <button
           type="button"
           onClick={() => safeGoBack(navigate, '/clubhouse')}
-          className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-full active:scale-95 transition-all z-10 pointer-events-auto"
+           className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-full active:scale-95 transition-all z-10 pointer-events-auto"
           style={{
             top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
             background: 'rgba(0, 0, 0, 0.45)',
             backdropFilter: 'blur(24px) saturate(180%)',
             WebkitBackdropFilter: 'blur(24px) saturate(180%)',
             border: '1px solid rgba(255, 255, 255, 0.1)',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
           }}
           aria-label="Back"
         >
@@ -455,10 +456,11 @@ const ProfilePageV2Content: React.FC = () => {
                 onClick={(e) => { e.stopPropagation(); navigate('/edit-profile'); }}
                 className="absolute bottom-0 right-0 h-7 w-7 rounded-full flex items-center justify-center active:scale-[0.95] z-30 pointer-events-auto transition-transform"
                 style={{
-                  background: 'rgba(0, 0, 0, 0.45)',
-                  backdropFilter: 'blur(24px) saturate(180%)',
-                  WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                   background: 'rgba(0, 0, 0, 0.45)',
+                   backdropFilter: 'blur(24px) saturate(180%)',
+                   WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+                   border: '1px solid rgba(255, 255, 255, 0.1)',
+                   boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
                 }}
                 aria-label="Change profile photo"
               >
@@ -869,7 +871,7 @@ const ProfilePageV2Content: React.FC = () => {
           }}
         >
           <div 
-            className="flex items-stretch rounded-xl overflow-hidden bg-muted"
+            className="inline-flex bg-muted rounded-full p-1 w-full"
             style={{ 
               touchAction: 'auto',
               pointerEvents: 'auto'
@@ -882,10 +884,10 @@ const ProfilePageV2Content: React.FC = () => {
                   key={tab.id}
                   onClick={() => handleTabChange(tab.id)}
                   className={cn(
-                    "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98]",
+                    "relative flex-1 py-1.5 px-4 text-sm transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98]",
                     isActive 
-                      ? "bg-card text-foreground shadow-sm m-1 rounded-lg" 
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "bg-foreground text-background rounded-full font-semibold shadow-sm" 
+                      : "text-muted-foreground font-medium hover:text-foreground"
                   )}
                   style={{ touchAction: 'auto' }}
                 >
@@ -903,7 +905,7 @@ const ProfilePageV2Content: React.FC = () => {
       </div>
 
       {/* Bottom Navigation Spacer */}
-      <div className="h-20" />
+      <div style={{ height: 'max(env(safe-area-inset-bottom, 0px), 20px)' }} />
 
       {/* Avatar Lightbox */}
       <AvatarLightbox

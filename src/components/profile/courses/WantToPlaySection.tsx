@@ -192,10 +192,10 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
         {/* Section header */}
         <div className="flex items-center justify-between mb-3">
           <div>
-            <h2 className="text-[15px] font-semibold text-foreground">
+           <h2 className="text-[17px] font-semibold text-foreground">
               Courses to Play
             </h2>
-            <p className="text-xs text-muted-foreground mt-0.5">
+            <p className="text-[13px] text-muted-foreground mt-0.5">
               0 courses on the bucket list
             </p>
           </div>
@@ -257,10 +257,10 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
       {/* Section header */}
       <div className="flex items-center justify-between mb-3">
         <div>
-          <h2 className="text-[15px] font-semibold text-foreground">
+          <h2 className="text-[17px] font-semibold text-foreground">
             Courses to Play
           </h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <p className="text-[13px] text-muted-foreground mt-0.5">
             {totalCourses} {totalCourses === 1 ? 'course' : 'courses'} on the bucket list
           </p>
         </div>
