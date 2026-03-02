@@ -4499,6 +4499,55 @@ html[data-immersive="true"] .app-shell--topSpacer {
   filter: invert(1) !important;
 }
 
+/* Canonical dark glass for Mapbox attribution controls */
+.expanded-map-glass-controls .mapboxgl-ctrl-attrib {
+  background: rgba(0, 0, 0, 0.45) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 999px !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+  padding: 2px 8px !important;
+  font-size: 10px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25) !important;
+}
+
+.expanded-map-glass-controls .mapboxgl-ctrl-attrib a {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.expanded-map-glass-controls .mapboxgl-ctrl-attrib-inner {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.expanded-map-glass-controls .mapboxgl-ctrl-attrib.mapboxgl-compact .mapboxgl-ctrl-attrib-inner {
+  background: rgba(0, 0, 0, 0.45) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 12px !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25) !important;
+}
+
+.expanded-map-glass-controls .mapboxgl-ctrl-attrib.mapboxgl-compact button {
+  background: rgba(0, 0, 0, 0.45) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 999px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25) !important;
+}
+
+.expanded-map-glass-controls .mapboxgl-ctrl-attrib.mapboxgl-compact button .mapboxgl-ctrl-icon {
+  filter: invert(1) !important;
+}
+
+.expanded-map-glass-controls .mapboxgl-ctrl-logo {
+  filter: brightness(0) invert(1) !important;
+  opacity: 0.7 !important;
+}
+
 /* Center zoom controls vertically on Top 100 Map */
 .top100-map-shell .mapboxgl-ctrl-bottom-right {
   bottom: auto !important;
