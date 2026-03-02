@@ -256,7 +256,7 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     return (
       <div className="flex flex-col">
         {/* Header skeleton */}
-        <section className="px-4 pt-6 pb-6 bg-muted">
+        <section className="px-4 pt-6 pb-6">
           <div className="space-y-2">
             <div className="h-3 w-24 bg-muted-foreground/10 rounded animate-pulse" />
             <div className="h-4 w-32 bg-muted-foreground/10 rounded animate-pulse" />
@@ -264,12 +264,12 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
           </div>
         </section>
         {/* Filter skeleton */}
-        <section className="px-4 pt-4 pb-4 bg-muted">
+        <section className="px-4 pt-4 pb-4">
           <div className="h-3 w-20 bg-muted-foreground/10 rounded animate-pulse mb-3" />
           <div className="h-10 w-full bg-muted-foreground/10 rounded-sq-md animate-pulse" />
         </section>
         {/* Fix 7: Grid skeleton matches 2-col mobile layout */}
-        <section className="bg-muted">
+        <section className="">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-[1px] bg-border">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div key={i} className="aspect-square bg-muted animate-pulse" />
@@ -284,7 +284,7 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
   if (isError) {
     return (
       <section className="px-4 py-8 bg-muted">
-        <div className="rounded-sq-lg border border-border bg-card px-4 py-6 text-center">
+        <div className="rounded-sq-lg border border-border px-4 py-6 text-center">
           <p className="text-sm font-semibold text-foreground">Couldn't load media</p>
           <p className="mt-1 text-xs text-muted-foreground">
             Something went wrong. Please try again.
@@ -308,7 +308,7 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
       <div className="flex flex-col">
         {/* Summary Card */}
         {hasAnyMedia && (
-          <section className="bg-muted">
+          <section className="">
             <CourseMediaSummaryCard
               photoCount={summary.photoCount}
               videoCount={summary.videoCount}
@@ -321,7 +321,7 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
 
         {/* Sort/Filter Bar */}
         {hasAnyMedia && (
-          <section className="px-4 pt-8 pb-6 bg-muted">
+          <section className="px-4 pt-8 pb-6">
             <Tabs value={filterMode} onValueChange={(v) => setFilterMode(v as MediaFilterMode)} className="w-full">
               <TabsList className="bg-transparent border-0 px-0 py-0 gap-0 w-full flex justify-center">
                 {filterOptions.map((option) => (
@@ -340,7 +340,7 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
 
         {/* Empty state - no media at all */}
         {!hasAnyMedia && !isLoading && (
-          <section className="px-4 py-8 bg-muted flex flex-col items-center text-center">
+          <section className="px-4 py-8 flex flex-col items-center text-center">
             <div className="h-12 w-12 rounded-full bg-muted-foreground/10 flex items-center justify-center mb-4">
               <svg className="h-6 w-6 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -354,7 +354,7 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
             <button
               type="button"
               onClick={() => navigate(`/courses/${courseId}/rate`)}
-              className="inline-flex items-center gap-2 rounded-sq-pill bg-muted text-foreground ring-1 ring-border px-5 py-2.5 text-sm font-medium hover:bg-muted/80 active:scale-[0.98] transition-all min-h-[44px]"
+              className="inline-flex items-center gap-2 rounded-sq-pill bg-background text-foreground ring-1 ring-border px-5 py-2.5 text-sm font-medium hover:bg-background/80 active:scale-[0.98] transition-all min-h-[44px]"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -369,7 +369,7 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
 
         {/* Filtered empty state */}
         {hasAnyMedia && filteredItems.length === 0 && !isLoading && (
-          <section className="px-4 py-8 bg-muted flex flex-col items-center text-center">
+          <section className="px-4 py-8 flex flex-col items-center text-center">
             <p className="text-sm font-semibold text-foreground mb-1">
               {filterMode === 'photos' ? 'No photos yet' : 'No videos yet'}
             </p>
@@ -388,7 +388,7 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
 
         {/* Square Media Grid — Fix 3: pass index for fetchPriority */}
         {filteredItems.length > 0 && (
-          <section className="bg-muted">
+          <section className="">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-[1px] bg-border">
               {mediaItems.map((item, index) => {
                 const isVisible = visibleIndices.has(index);
