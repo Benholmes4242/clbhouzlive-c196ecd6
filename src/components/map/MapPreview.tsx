@@ -160,7 +160,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
           }}
         >
           <Maximize2 className="h-3 w-3" />
-          <span>Tap to expand</span>
+          <span>Expand</span>
         </button>
       )}
 
