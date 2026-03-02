@@ -332,6 +332,7 @@ const BusinessProfilePage: React.FC = () => {
                 backdropFilter: 'blur(24px) saturate(180%)',
                 WebkitBackdropFilter: 'blur(24px) saturate(180%)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.35)',
               }}
               aria-label="Change logo"
             >
@@ -381,7 +382,7 @@ const BusinessProfilePage: React.FC = () => {
       <div className="pt-[68px] px-5 text-left relative z-10 pointer-events-auto">
         {/* Name + Verified */}
         <div className="flex items-center gap-1.5">
-          <h1 className="text-[28px] font-semibold text-foreground">
+          <h1 className="text-[28px] font-bold text-foreground">
             {business.name}
           </h1>
           {business.is_verified && <VerifiedBadge size="lg" />}
@@ -459,22 +460,24 @@ const BusinessProfilePage: React.FC = () => {
 
       {/* Stats row — tappable */}
       <div className="mt-6 px-5">
-        <div className="flex items-center gap-6">
+        <div className="flex items-center">
           {/* Posts — taps scroll to Activity tab */}
           <button
             type="button"
             onClick={() => setActiveTab('content')}
-            className="flex items-center gap-1.5 min-h-[44px] cursor-pointer active:opacity-70 transition-opacity"
+            className="flex items-center gap-1.5 min-h-[44px] cursor-pointer active:opacity-70 transition-opacity pr-6"
           >
             <span className="text-sm text-muted-foreground">Posts</span>
             <span className="text-base font-semibold text-foreground">{postsCount}</span>
           </button>
+
+          <div className="w-px h-6 bg-border/50 self-center" />
           
           {/* Followers — taps navigate to business followers list */}
           <button
             type="button"
             onClick={() => navigate(`/business/${business.slug || business.id}/followers`)}
-            className="flex items-center gap-1.5 min-h-[44px] cursor-pointer active:opacity-70 transition-opacity"
+            className="flex items-center gap-1.5 min-h-[44px] cursor-pointer active:opacity-70 transition-opacity pl-6"
           >
             <span className="text-sm text-muted-foreground">Followers</span>
             <span className="text-base font-semibold text-foreground">{followersCount}</span>
@@ -483,10 +486,10 @@ const BusinessProfilePage: React.FC = () => {
       </div>
 
       {/* White content sheet */}
-      <div className="pt-5 pb-32 min-h-[60vh]">
+      <div className="pt-5 pb-2 min-h-[60vh]">
         {/* About section */}
         <section className="px-5 mb-6">
-          <h3 className="text-xl font-semibold text-foreground mb-2">About</h3>
+          <h3 className="text-[17px] font-semibold text-foreground mb-2">About</h3>
           {bioText ? (
             <div>
               <p 
@@ -502,7 +505,8 @@ const BusinessProfilePage: React.FC = () => {
               {(isBioClamped || bioExpanded) && (
                 <button
                   onClick={() => setBioExpanded(!bioExpanded)}
-                  className="text-sm font-medium mt-1 hover:underline text-muted-foreground min-h-[44px] flex items-center active:scale-[0.98] transition-transform"
+                  className="text-sm font-semibold mt-1 min-h-[44px] flex items-center active:scale-[0.98] transition-transform"
+                  style={{ color: '#f59e0b' }}
                 >
                   {bioExpanded ? 'Show less' : 'More'}
                 </button>
@@ -521,7 +525,7 @@ const BusinessProfilePage: React.FC = () => {
               href={ensureProtocol(business.website)}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-full bg-muted border border-border px-3 min-h-[44px] text-sm font-medium text-foreground active:scale-[0.98] transition-transform mr-2 mb-2"
+              className="inline-flex items-center gap-1.5 rounded-full bg-muted border border-border px-3 min-h-[44px] text-sm font-semibold text-foreground active:scale-[0.98] transition-transform mr-2 mb-2"
               onClick={() => trackBusinessAction(business.id, 'website', user?.id)}
             >
               <ExternalLink className="w-3.5 h-3.5" />
@@ -533,7 +537,7 @@ const BusinessProfilePage: React.FC = () => {
           {business.phone && (
             <button
               onClick={handleCall}
-              className="inline-flex items-center gap-1.5 rounded-full bg-muted border border-border px-3 min-h-[44px] text-sm font-medium text-foreground active:scale-[0.98] transition-transform mr-2 mb-2"
+              className="inline-flex items-center gap-1.5 rounded-full bg-muted border border-border px-3 min-h-[44px] text-sm font-semibold text-foreground active:scale-[0.98] transition-transform mr-2 mb-2"
             >
               <Phone className="w-3.5 h-3.5" />
               Call
@@ -558,9 +562,7 @@ const BusinessProfilePage: React.FC = () => {
 
         {/* Segmented control tabs */}
         <section className="px-4 py-2 pointer-events-auto">
-          <div 
-            className="flex items-stretch rounded-xl overflow-hidden bg-muted"
-          >
+          <div className="inline-flex bg-muted rounded-full p-1 w-full">
             {tabs.map((tab) => {
               const isActive = activeTab === tab.id;
               return (
@@ -568,10 +570,10 @@ const BusinessProfilePage: React.FC = () => {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as BusinessTab)}
                   className={cn(
-                    "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98]",
+                    "relative flex-1 min-h-[44px] transition-all duration-200 whitespace-nowrap active:scale-[0.98]",
                     isActive 
-                      ? "bg-card text-foreground shadow-sm m-1 rounded-lg border border-border" 
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "bg-foreground text-background rounded-full px-4 py-1.5 text-sm font-semibold shadow-sm" 
+                      : "text-muted-foreground px-4 py-1.5 text-sm font-medium hover:text-foreground"
                   )}
                 >
                   {tab.label}
@@ -588,7 +590,7 @@ const BusinessProfilePage: React.FC = () => {
       </div>
 
       {/* Bottom Navigation Spacer */}
-      <div className="h-20" />
+      <div style={{ height: 'max(env(safe-area-inset-bottom, 0px), 20px)' }} />
 
       {/* Scroll to top FAB */}
       <ScrollToTopGlass />

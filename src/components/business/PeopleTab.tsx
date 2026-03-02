@@ -111,7 +111,7 @@ export function PeopleTab({
           onClick={() => setManageModalOpen(true)}
           className="w-full flex items-center justify-between px-4 min-h-[44px] mt-2 active:opacity-70 transition-opacity"
         >
-          <span className="text-sm text-muted-foreground font-medium">Manage team</span>
+          <span className="text-sm text-muted-foreground font-semibold">Manage team</span>
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
         </button>
       )}

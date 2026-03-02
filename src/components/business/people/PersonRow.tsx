@@ -39,7 +39,7 @@ export function PersonRow({
     <button
       type="button"
       onClick={onClick}
-      className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-muted/30 active:bg-muted/40 transition-colors"
+      className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-muted/30 active:bg-muted/40 transition-colors min-h-[44px]"
     >
       {/* Avatar */}
       <div className="h-12 w-12 rounded-sq-md overflow-hidden bg-muted flex items-center justify-center shrink-0">
@@ -54,7 +54,7 @@ export function PersonRow({
       <div className="min-w-0 flex-1">
         {/* Line 1: Name + verified */}
         <div className="flex items-center gap-1.5">
-          <span className="font-medium text-foreground truncate">{name}</span>
+          <span className="font-semibold text-foreground truncate">{name}</span>
           {isVerified && <VerifiedBadge size="sm" />}
         </div>
 
@@ -76,7 +76,7 @@ export function PersonRow({
       </div>
 
       {/* Chevron */}
-      <div className="text-muted-foreground/50 shrink-0">
+      <div className="text-muted-foreground/50 shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center">
         <ChevronRight className="h-5 w-5" />
       </div>
     </button>
