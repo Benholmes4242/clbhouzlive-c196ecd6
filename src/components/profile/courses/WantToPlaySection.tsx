@@ -202,7 +202,7 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
         </div>
         
         {/* Empty state card */}
-        <div className="bg-card rounded-2xl border border-border p-8 shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
+        <div className="p-8">
           <div className="flex flex-col items-center justify-center text-center">
             {/* Icon */}
             <div className="w-14 h-14 rounded-full bg-muted border border-border flex items-center justify-center mb-4">
