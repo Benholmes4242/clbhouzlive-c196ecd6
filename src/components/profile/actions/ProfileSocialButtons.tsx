@@ -121,7 +121,7 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
     return (
       <div className="flex gap-2">
         <Button
-          variant="default"
+          variant="secondary"
           size="sm"
           onClick={() => {
             analyticsEvents.social.friendRequestResponded({
@@ -138,7 +138,7 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
           Accept
         </Button>
         <Button
-          variant="outline"
+          variant="secondary"
           size="sm"
           onClick={() => {
             analyticsEvents.social.friendRequestResponded({
@@ -181,7 +181,7 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" disabled={friendLoading} className={isMobile ? 'flex-1' : ''}>
+            <Button variant="secondary" size="sm" disabled={friendLoading} className={isMobile ? 'flex-1' : ''}>
               <UserMinus className="w-4 h-4 mr-1" />
               Pending
             </Button>
@@ -197,7 +197,7 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
 
     return (
       <Button
-        variant="outline"
+        variant="secondary"
         size="sm"
         onClick={() => {
           analyticsEvents.social.friendRequestSent({
@@ -217,7 +217,7 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
 
   const followButton = (
     <Button
-      variant={relationship.isFollowing ? 'secondary' : 'default'}
+      variant="secondary"
       size="sm"
       onClick={() => {
         analyticsEvents.social.followToggled({
