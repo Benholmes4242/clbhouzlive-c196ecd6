@@ -59,6 +59,7 @@ export function BusinessLocationCard({
         name={businessName}
         locationText={displayLocation}
         showOwnerPrompt={isOwner && !isLinkedClub}
+        colorful
       />
     </div>
   );
