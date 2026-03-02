@@ -71,15 +71,8 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
           showExpandButton={true}
           onExpand={() => setExpanded(true)}
           colorful={colorful}
+          locationText={locationText}
         />
-        
-        {/* Location meta footer */}
-        <div className="px-3 py-2.5 bg-card border-t border-border">
-          <div className="flex items-center gap-2">
-            <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-            <span className="text-sm text-foreground font-medium">{locationText}</span>
-          </div>
-        </div>
       </div>
 
       <MapExpandedView

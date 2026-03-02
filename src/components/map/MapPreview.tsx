@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { Maximize2 } from 'lucide-react';
+import { Maximize2, MapPin } from 'lucide-react';
 import { createGlassyMarkerElement } from './MapMarker';
 import { MAP_CONFIG } from '@/config/maps';
 
@@ -16,6 +16,7 @@ interface MapPreviewProps {
   onExpand?: () => void;
   interactive?: boolean;
   colorful?: boolean;
+  locationText?: string;
 }
 
 /**
@@ -33,6 +34,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
   onExpand,
   interactive = false,
   colorful = false,
+  locationText,
 }) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -147,7 +149,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
       {showExpandButton && onExpand && (
         <button
           type="button"
-          className="pointer-events-none absolute bottom-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 text-white text-xs font-medium"
+          className="pointer-events-none absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 text-white text-xs font-medium"
           style={{
             background: 'rgba(0, 0, 0, 0.45)',
             backdropFilter: 'blur(24px) saturate(180%)',
@@ -160,6 +162,23 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
           <Maximize2 className="h-3 w-3" />
           <span>Tap to expand</span>
         </button>
+      )}
+
+      {locationText && (
+        <div
+          className="pointer-events-none absolute bottom-3 left-3 inline-flex items-center gap-1.5 px-3 py-1.5 text-white text-xs font-medium max-w-[calc(100%-24px)]"
+          style={{
+            background: 'rgba(0, 0, 0, 0.45)',
+            backdropFilter: 'blur(24px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.25)',
+            borderRadius: '999px',
+          }}
+        >
+          <MapPin className="h-3 w-3 flex-shrink-0" />
+          <span className="truncate">{locationText}</span>
+        </div>
       )}
     </div>
   );
