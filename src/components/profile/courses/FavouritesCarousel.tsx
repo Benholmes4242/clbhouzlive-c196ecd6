@@ -233,7 +233,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
           </div>
         </div>
         
-        <div className="flex flex-col items-end gap-0.5">
+        <div className="flex flex-col items-end">
           {isOwnProfile && onManage && (
             <button 
               onClick={onManage}
@@ -242,7 +242,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
               Manage
             </button>
           )}
-          <span className="text-muted-foreground text-sm">{courseCount}/10</span>
+          <span className="text-muted-foreground text-xs -mt-2">{courseCount}/10</span>
         </div>
       </div>
       
