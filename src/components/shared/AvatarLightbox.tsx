@@ -7,10 +7,12 @@
  * - Tap outside / X button / Escape key to dismiss
  * - Swipe down to dismiss on mobile
  * - Body scroll lock when open
- * - Fallback for missing images
+ * - Fallback for missing/broken images
+ * - Hardware back button closes lightbox
+ * - iOS safe area awareness
  */
 
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { X } from 'lucide-react';
@@ -39,6 +41,14 @@ export const AvatarLightbox: React.FC<AvatarLightboxProps> = ({
   shape = 'squircle',
   fallbackInitial,
 }) => {
+  const [imgFailed, setImgFailed] = useState(false);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
+
+  // Reset image error state when URL changes
+  useEffect(() => {
+    setImgFailed(false);
+  }, [imageUrl]);
+
   // Handle escape key
   const handleEscape = useCallback((e: KeyboardEvent) => {
     if (e.key === 'Escape') {
@@ -46,8 +56,8 @@ export const AvatarLightbox: React.FC<AvatarLightboxProps> = ({
     }
   }, [onClose]);
 
+  // Scroll lock + escape key + focus management
   useEffect(() => {
-    // Capture original styles before any modifications
     const originalOverflow = document.body.style.overflow;
     const originalPosition = document.body.style.position;
     const originalTop = document.body.style.top;
@@ -56,16 +66,19 @@ export const AvatarLightbox: React.FC<AvatarLightboxProps> = ({
 
     if (isOpen) {
       document.addEventListener('keydown', handleEscape);
-      // Prevent body scroll
       document.body.style.overflow = 'hidden';
       document.body.style.position = 'fixed';
       document.body.style.top = `-${scrollY}px`;
       document.body.style.width = '100%';
+
+      // Focus close button on open
+      requestAnimationFrame(() => {
+        closeBtnRef.current?.focus();
+      });
     }
 
     return () => {
       document.removeEventListener('keydown', handleEscape);
-      // Always restore original styles on cleanup - prevents frozen scroll/touch
       document.body.style.overflow = originalOverflow;
       document.body.style.position = originalPosition;
       document.body.style.top = originalTop;
@@ -75,6 +88,15 @@ export const AvatarLightbox: React.FC<AvatarLightboxProps> = ({
       }
     };
   }, [isOpen, handleEscape]);
+
+  // Hardware back button: close lightbox instead of navigating away
+  useEffect(() => {
+    if (!isOpen) return;
+    window.history.pushState({ lightbox: true }, '');
+    const handlePop = () => onClose();
+    window.addEventListener('popstate', handlePop);
+    return () => window.removeEventListener('popstate', handlePop);
+  }, [isOpen, onClose]);
 
   // Handle backdrop click
   const handleBackdropClick = (e: React.MouseEvent) => {
@@ -92,13 +114,18 @@ export const AvatarLightbox: React.FC<AvatarLightboxProps> = ({
 
   const shapeClass = shape === 'circle' 
     ? 'rounded-full' 
-    : 'clbhouz-squircle'; // Use the app's squircle class
+    : 'clbhouz-squircle';
+
+  const showFallback = !imageUrl || imgFailed;
 
   const content = (
     <AnimatePresence>
       {isOpen && (
         <motion.div
           className="fixed inset-0 z-[9999] flex items-center justify-center"
+          role="dialog"
+          aria-modal="true"
+          aria-label={altText}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -113,9 +140,11 @@ export const AvatarLightbox: React.FC<AvatarLightboxProps> = ({
             exit={{ opacity: 0 }}
           />
 
-          {/* Close button */}
+          {/* Close button — safe area aware */}
           <motion.button
-            className="absolute top-4 right-4 z-50 w-11 h-11 flex items-center justify-center text-white/80 hover:text-white bg-black/30 rounded-full transition-colors"
+            ref={closeBtnRef}
+            className="absolute right-4 z-50 w-11 h-11 flex items-center justify-center text-white/80 hover:text-white bg-black/30 rounded-full transition-colors"
+            style={{ top: 'max(16px, env(safe-area-inset-top, 16px))' }}
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -147,29 +176,33 @@ export const AvatarLightbox: React.FC<AvatarLightboxProps> = ({
             onDragEnd={handleDragEnd}
             style={{ touchAction: 'none' }}
           >
-            {imageUrl ? (
+            {showFallback ? (
+              fallbackInitial ? (
+                <div className="w-full h-full bg-slate-200 flex items-center justify-center">
+                  <span className="text-6xl sm:text-7xl md:text-8xl font-bold text-slate-600">
+                    {fallbackInitial}
+                  </span>
+                </div>
+              ) : (
+                <div className="w-full h-full bg-slate-200 flex items-center justify-center">
+                  <span className="text-slate-400 text-sm">No image</span>
+                </div>
+              )
+            ) : (
               <img
                 src={imageUrl}
                 alt={altText}
                 className="w-full h-full object-cover"
                 draggable={false}
+                onError={() => setImgFailed(true)}
               />
-            ) : fallbackInitial ? (
-              <div className="w-full h-full bg-slate-200 flex items-center justify-center">
-                <span className="text-6xl sm:text-7xl md:text-8xl font-bold text-slate-600">
-                  {fallbackInitial}
-                </span>
-              </div>
-            ) : (
-              <div className="w-full h-full bg-slate-200 flex items-center justify-center">
-                <span className="text-slate-400 text-sm">No image</span>
-              </div>
             )}
           </motion.div>
 
-          {/* Hint text */}
+          {/* Hint text — safe area aware */}
           <motion.p
-            className="absolute bottom-6 left-0 right-0 text-center text-white/50 text-sm"
+            className="absolute left-0 right-0 text-center text-white/50 text-sm"
+            style={{ bottom: 'max(24px, calc(env(safe-area-inset-bottom, 0px) + 16px))' }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
