@@ -190,7 +190,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             >
               {formatDescription(displayDescription)}
               {!showFullDescription && shouldShowReadMore && (
-                <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-[hsl(var(--muted))] to-transparent pointer-events-none" />
+                <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-[var(--bg-page)] to-transparent pointer-events-none" />
               )}
             </div>
             {shouldShowReadMore && (

@@ -63,7 +63,7 @@ import { ProfileTouchDebugProvider, useProfileTouchDebug } from '@/components/pr
 import { ProfileTouchDebugPanel } from '@/components/profile/debug/ProfileTouchDebugPanel';
 
 // Background color - uses CSS variable for theme support
-const BG_COLOR = 'hsl(var(--background))';
+const BG_COLOR = 'var(--bg-page)';
 
 // UUID v4 detection regex
 const isUuid = (v: string) =>
@@ -748,7 +748,7 @@ const ProfilePageV2Content: React.FC = () => {
 
       {/* White content sheet */}
       {/* relative z-10 ensures white sheet and all content is above hero overlay */}
-      <div className="bg-card pt-4 pb-32 min-h-[60vh] relative z-10 pointer-events-auto">
+      <div className="pt-4 pb-32 min-h-[60vh] relative z-10 pointer-events-auto">
         {/* About section - removed "About" heading, just the bio text */}
         {/* mb-5 → mb-4 (16px from about text to clubs divider) */}
         {/* Fix 1: Bio section — contextual handling */}

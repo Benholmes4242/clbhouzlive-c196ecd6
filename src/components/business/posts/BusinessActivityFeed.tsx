@@ -532,7 +532,7 @@ export function BusinessActivityFeed({
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
     <div>
       {/* Sub-tabs: Activity / Tagged */}
-      <div className="flex justify-center border-b border-border/50 bg-card">
+      <div className="flex justify-center border-b border-border/50">
         <button
           onClick={() => setFeedTab('activity')}
           className={cn(

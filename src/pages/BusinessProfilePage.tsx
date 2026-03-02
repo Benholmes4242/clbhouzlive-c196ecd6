@@ -233,7 +233,7 @@ const BusinessProfilePage: React.FC = () => {
   const heroUrl = business.cover_image_url || '';
 
   return (
-    <PageRoot className="min-h-screen bg-background" immersiveStatusBar immersive>
+    <PageRoot className="min-h-screen" style={{ background: 'var(--bg-page)' }} immersiveStatusBar immersive>
       {/* Hero Section - full-bleed immersive, extends behind notch */}
       <div className="relative pointer-events-none" style={{ zIndex: 1 }}>
         {/* Hero Image Container - full-bleed behind notch */}
@@ -486,7 +486,7 @@ const BusinessProfilePage: React.FC = () => {
       </div>
 
       {/* White content sheet */}
-      <div className="bg-card pt-5 pb-32 min-h-[60vh]">
+      <div className="pt-5 pb-32 min-h-[60vh]">
         {/* About section */}
         <section className="px-5 mb-6">
           <h3 className="text-xl font-semibold text-foreground mb-2">About</h3>

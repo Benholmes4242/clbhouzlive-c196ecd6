@@ -104,10 +104,10 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   }
 
   return (
-      <div className={isInModal ? "w-full" : "min-h-screen w-full bg-muted"}>
+      <div className={isInModal ? "w-full" : "min-h-screen w-full bg-[var(--bg-page)]"}>
       {/* Hero Image - bleeds into safe area */}
       <div 
-        className="relative overflow-hidden bg-muted"
+        className="relative overflow-hidden bg-[var(--bg-page)]"
         style={{
           height: '45dvh',
           minHeight: '220px',
@@ -164,7 +164,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
 
       {/* ← Back text link below hero */}
       {!isInModal && (
-        <div className="px-4 pt-1.5 pb-0 bg-muted">
+        <div className="px-4 pt-1.5 pb-0 bg-[var(--bg-page)]">
           <button
             type="button"
             onClick={() => safeGoBack(navigate, '/courses')}
@@ -177,7 +177,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       )}
 
       {/* Claimed By Badge */}
-      <div className="px-4 pt-0 pb-0 bg-muted">
+      <div className="px-4 pt-0 pb-0 bg-[var(--bg-page)]">
         <CourseClaimBadge courseId={course.id} />
       </div>
 
@@ -185,7 +185,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       <CourseTabs activeTab={activeTab as any} onChange={handleTabChange as any} />
 
       {/* Phase 3: Keep-mounted tabs - render all visited tabs, hide inactive */}
-      <div className="course-hero-wrapper bg-muted">
+      <div className="course-hero-wrapper bg-[var(--bg-page)]">
         <Tabs value={activeTab} onValueChange={handleTabChange}>
           {/* About Tab - always rendered */}
           <TabsContent 

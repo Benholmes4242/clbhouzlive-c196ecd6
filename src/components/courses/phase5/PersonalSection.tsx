@@ -40,7 +40,7 @@ export const PersonalSection: React.FC<PersonalSectionProps> = ({
 
   if (isLoading) {
     return (
-      <section className={cn("px-4 py-5 bg-white space-y-4", className)}>
+      <section className={cn("px-4 py-5 space-y-4", className)}>
         <div className="flex items-center gap-2">
           <Skeleton className="h-4 w-4" />
           <Skeleton className="h-5 w-32" />
@@ -51,7 +51,7 @@ export const PersonalSection: React.FC<PersonalSectionProps> = ({
   }
 
   return (
-    <section className={cn("px-4 py-5 bg-card space-y-5", className)}>
+    <section className={cn("px-4 py-5 space-y-5", className)}>
       {/* Section header */}
       <div className="flex items-center gap-2">
         <User className="h-4 w-4 text-muted-foreground" />
