@@ -114,7 +114,7 @@ export const BusinessProfileActions: React.FC<BusinessProfileActionsProps> = ({
 
   const followButton = (
     <Button
-      variant={relationship.isFollowing ? 'secondary' : 'default'}
+      variant="secondary"
       size="sm"
       onClick={() => {
         analyticsEvents.social.followToggled({
