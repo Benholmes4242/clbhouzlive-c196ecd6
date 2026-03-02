@@ -91,9 +91,9 @@ export function PeopleTab({
       ];
 
   return (
-    <div className="-mx-5 px-0 bg-muted">
-      {/* Header + tabs - white card */}
-      <div className="bg-white max-w-full px-4">
+    <div className="-mx-5 px-0">
+      {/* Header + tabs */}
+      <div className="max-w-full px-4">
         {/* Centered Segmented Tabs (golf clubs only) */}
         {isGolfClub && (
           <SegmentedTabs
@@ -109,7 +109,7 @@ export function PeopleTab({
         <button
           type="button"
           onClick={() => setManageModalOpen(true)}
-          className="w-full flex items-center justify-between px-4 min-h-[44px] bg-white mt-2 active:opacity-70 transition-opacity"
+          className="w-full flex items-center justify-between px-4 min-h-[44px] mt-2 active:opacity-70 transition-opacity"
         >
           <span className="text-sm text-muted-foreground font-medium">Manage team</span>
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -118,7 +118,7 @@ export function PeopleTab({
 
       {/* Loading skeleton */}
       {isLoading && (
-        <div className="px-4 py-4 space-y-3 bg-white mt-3">
+        <div className="px-4 py-4 space-y-3 mt-3">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="flex items-center gap-3 animate-pulse">
               <div className="w-16 h-16 rounded-sq-md bg-muted" />
