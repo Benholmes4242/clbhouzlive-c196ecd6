@@ -200,7 +200,7 @@ export function BusinessProfilePosts({
           </p>
           {membership?.canManage && (
             <Button 
-              className="rounded-full bg-slate-800 hover:bg-slate-900 text-white" 
+              className="rounded-lg bg-card hover:bg-muted text-foreground border border-border/60 font-semibold" 
               onClick={handleCreatePost}
             >
               Create your first post
