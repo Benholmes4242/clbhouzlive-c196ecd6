@@ -233,7 +233,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
           </div>
         </div>
         
-        <div className="flex flex-col items-end">
+        <div className="flex flex-col items-center">
           {isOwnProfile && onManage && (
             <button 
               onClick={onManage}
