@@ -392,12 +392,7 @@ const BusinessProfilePage: React.FC = () => {
       <div className="mt-3 px-5 flex items-center gap-2 relative z-10 pointer-events-auto">
         {/* P1+P3: Follow button — h-11, matching personal profile gradient variant */}
         <button 
-          className={cn(
-            "h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98] disabled:opacity-60",
-            isFollowing
-              ? "bg-muted text-foreground border border-border"
-              : "bg-card border border-foreground text-foreground"
-          )}
+          className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98] disabled:opacity-60 border border-border bg-card text-foreground"
           onClick={handleFollowToggle}
           disabled={followBusy}
         >
