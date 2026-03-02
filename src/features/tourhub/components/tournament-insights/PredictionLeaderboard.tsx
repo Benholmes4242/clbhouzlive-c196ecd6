@@ -28,7 +28,7 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
     return aPos - bPos;
   });
 
-  const visibleCards = isCompleted && !showAll ? sorted.slice(0, 3) : sorted;
+  const visibleCards = isCompleted ? sorted.slice(0, 3) : sorted;
   const hasMore = isCompleted && sorted.length > 3 && !showAll;
 
   return (

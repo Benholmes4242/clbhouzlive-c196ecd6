@@ -34,11 +34,8 @@ export const ResultsRecap: React.FC<ResultsRecapProps> = ({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      className="bg-background border border-border overflow-hidden flex flex-col items-center"
-      style={{
-        borderRadius: 24,
-        padding: '28px 24px 24px',
-      }}
+      className="flex flex-col items-center"
+      style={{ padding: '8px 0 0' }}
     >
       {/* Accuracy Ring */}
       <AccuracyRing hit={accuracy.inTop10} total={accuracy.totalPredictions} size={120} />
