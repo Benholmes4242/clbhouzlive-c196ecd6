@@ -343,7 +343,7 @@ const BusinessProfilePage: React.FC = () => {
         </div>
 
         {/* Pills row - right side, just below header photo */}
-        <div className="absolute right-5 z-20 flex items-center gap-2 pointer-events-auto" style={{ top: 'calc(35dvh + 24px)' }}>
+        <div className="absolute right-5 z-20 flex items-center gap-2 pointer-events-auto" style={{ top: 'calc(35dvh + 12px)' }}>
           {/* Location pill - city only */}
           {(() => {
             const cityDisplay = getCityOnly({ city: business.city, region: business.region, country: business.country, location: business.location });

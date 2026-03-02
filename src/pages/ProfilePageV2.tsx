@@ -470,7 +470,7 @@ const ProfilePageV2Content: React.FC = () => {
 
         {/* HCP + Golfer pills - right side, just below header photo */}
         {/* Reduced gap: mt-3 → mt-2 (8px from golfer badge to next element) */}
-        <div className="absolute right-5 z-20 flex items-center gap-2 pointer-events-auto" style={{ top: 'calc(35dvh + 24px)' }}>
+        <div className="absolute right-5 z-20 flex items-center gap-2 pointer-events-auto" style={{ top: 'calc(35dvh + 12px)' }}>
           {/* HCP pill - white, bigger size */}
           {profile?.eg_handicap_index != null && (
             <span 
