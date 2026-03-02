@@ -65,7 +65,7 @@ export function BusinessFollowButton({ businessId, className }: BusinessFollowBu
     return (
       <Button
         variant="outline"
-        className={className}
+        className={`${className} border-[#E0E0E0] bg-white text-[#0F0F0F] hover:bg-gray-50`}
         onClick={handleClick}
         disabled={isPending}
       >
