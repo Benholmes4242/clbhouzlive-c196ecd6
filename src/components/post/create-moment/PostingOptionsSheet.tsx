@@ -96,13 +96,13 @@ export function PostingOptionsSheet({
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-          className="absolute bottom-0 left-0 right-0 rounded-t-3xl overflow-hidden"
+          className="absolute bottom-0 left-0 right-0 rounded-t-[20px] overflow-hidden"
           style={{ maxHeight: '85vh', backgroundColor: '#FFFFFF' }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Handle */}
-          <div className="flex justify-center pt-3 pb-1">
-            <div className="w-9 h-1 rounded-full" style={{ backgroundColor: '#E0E0E0' }} />
+          <div className="flex justify-center pt-2.5 pb-1">
+            <div className="w-9 h-1 rounded-full bg-muted-foreground/30" />
           </div>
 
           {/* Scrollable Content */}
@@ -110,8 +110,8 @@ export function PostingOptionsSheet({
             {/* Account Section */}
             <div className="px-5 pt-3 pb-4">
               <h3
-                className="uppercase tracking-wider mb-3"
-                style={{ fontSize: '12px', fontWeight: 600, color: '#AEAEB2' }}
+                className="uppercase tracking-[1.5px] mb-3"
+                style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2' }}
               >
                 Account
               </h3>
@@ -186,8 +186,8 @@ export function PostingOptionsSheet({
             {/* Who Can See Section */}
             <div className="px-5 pt-4 pb-2">
               <h3
-                className="uppercase tracking-wider mb-3"
-                style={{ fontSize: '12px', fontWeight: 600, color: '#AEAEB2' }}
+                className="uppercase tracking-[1.5px] mb-3"
+                style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2' }}
               >
                 Who can see this?
               </h3>

@@ -195,20 +195,20 @@ export function CourseSearchSheet({
             {/* Handle bar */}
             {isMobile && (
               <div className="flex justify-center pt-2.5 pb-1">
-                <div className="w-9 h-1 rounded-full" style={{ backgroundColor: '#E0E0E0' }} />
+                <div className="w-9 h-1 rounded-full bg-muted-foreground/30" />
               </div>
             )}
 
             {/* Header */}
             <div className="px-5 pb-4">
               <div className="flex items-center justify-between mb-4">
-                <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#1A1A1A' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#1A1A1A' }}>
                   Choose Golf Club
                 </h3>
                 <button
                   onClick={onClose}
-                  className="w-8 h-8 rounded-full flex items-center justify-center transition-colors active:opacity-60"
-                  style={{ color: '#AEAEB2' }}
+                  className="w-11 h-11 rounded-full flex items-center justify-center transition-colors active:opacity-60"
+                  style={{ backgroundColor: '#F5F5F7', color: '#7A7A7A' }}
                   aria-label="Close search"
                 >
                   <X className="w-4.5 h-4.5" />
@@ -279,8 +279,8 @@ export function CourseSearchSheet({
                     {/* Suggestions label */}
                     {!isSearchMode && (
                       <p
-                        className="uppercase tracking-wider mb-2 mt-1 px-1"
-                        style={{ fontSize: '12px', fontWeight: 600, color: '#AEAEB2' }}
+                        className="uppercase tracking-[1.5px] mb-2 mt-1 px-1"
+                        style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2' }}
                       >
                         Your courses
                       </p>

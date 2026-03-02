@@ -102,7 +102,7 @@ export function TagPeopleSheet({
       {/* Backdrop */}
       <motion.div
         className="fixed inset-0 z-[10010]"
-        style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
+        style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -130,7 +130,7 @@ export function TagPeopleSheet({
       >
         {/* Handle */}
         <div className="flex justify-center pt-2.5 pb-1">
-          <div className="w-9 h-1 rounded-full" style={{ backgroundColor: '#E0E0E0' }} />
+          <div className="w-9 h-1 rounded-full bg-muted-foreground/30" />
         </div>
 
         {/* Header */}
@@ -140,7 +140,7 @@ export function TagPeopleSheet({
           </h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full flex items-center justify-center active:scale-90 transition-transform"
+            className="w-11 h-11 rounded-full flex items-center justify-center active:scale-90 transition-transform"
             style={{ backgroundColor: '#F5F5F7' }}
           >
             <X className="w-4 h-4" style={{ color: '#7A7A7A' }} />
@@ -161,7 +161,7 @@ export function TagPeopleSheet({
               onFocus={() => setSearchFocused(true)}
               onBlur={() => setSearchFocused(false)}
               placeholder="Search people and businesses..."
-              className="w-full text-[15px] outline-none transition-all duration-200"
+              className="w-full text-sm outline-none transition-all duration-200"
               style={{
                 backgroundColor: '#F5F5F7',
                 color: '#1A1A1A',
@@ -245,7 +245,7 @@ export function TagPeopleSheet({
           {query.trim() ? (
             <>
               <p
-                className="text-xs font-semibold uppercase tracking-wider px-2 py-2"
+                className="text-[11px] font-semibold uppercase tracking-[1.5px] px-2 py-2"
                 style={{ color: '#AEAEB2' }}
               >
                 Results
