@@ -785,7 +785,7 @@ export function PostWizard({
     >
       <div
         className="light fixed inset-0 z-[9999] flex flex-col overflow-hidden"
-        style={{ backgroundColor: '#F8FAFC', touchAction: 'pan-y pinch-zoom', overscrollBehavior: 'contain' }}
+        style={{ backgroundColor: 'var(--bg-page)', touchAction: 'pan-y pinch-zoom', overscrollBehavior: 'contain' }}
       >
         {showSuccess ? (
           <PostSuccessScreen
@@ -832,7 +832,7 @@ export function PostWizard({
                 <div className="flex-1 min-w-0 flex flex-col gap-3.5">
                   {/* User info + audience pill */}
                   <div className="flex items-center gap-2">
-                    <span className="text-[15px] font-semibold tracking-tight" style={{ color: '#1A1A1A' }}>
+                    <span className="text-[15px] font-semibold tracking-tight text-foreground">
                       {actorDisplayInfo.name || 'You'}
                     </span>
                     <button
@@ -947,7 +947,7 @@ export function PostWizard({
             <div
               className="flex-shrink-0 flex items-center justify-between px-5 pt-2.5"
               style={{
-                borderTop: '0.5px solid rgba(0,0,0,0.07)',
+                borderTop: '0.5px solid hsl(var(--border) / 0.3)',
                 paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 28px)',
               }}
             >

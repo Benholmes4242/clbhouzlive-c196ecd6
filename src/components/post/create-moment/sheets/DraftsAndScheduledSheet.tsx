@@ -122,7 +122,7 @@ export default function DraftsAndScheduledSheet({
             </DrawerTitle>
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-full flex items-center justify-center active:scale-90 transition-transform"
+              className="w-11 h-11 rounded-full flex items-center justify-center active:scale-90 transition-transform"
               style={{ backgroundColor: '#F5F5F7' }}
               aria-label="Close"
             >

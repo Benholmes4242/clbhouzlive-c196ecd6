@@ -32,7 +32,7 @@ export function PostWizardHeader({
       style={{
         height: 'calc(52px + max(env(safe-area-inset-top, 0px), 47px))',
         paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
-        borderBottom: '0.5px solid rgba(0,0,0,0.07)',
+        borderBottom: '0.5px solid hsl(var(--border) / 0.3)',
       }}
     >
       {/* Cancel */}
@@ -45,7 +45,7 @@ export function PostWizardHeader({
       </button>
 
       {/* Center title */}
-      <span className="text-[17px] font-semibold tracking-tight" style={{ color: '#1A1A1A' }}>
+      <span className="text-[17px] font-semibold tracking-tight text-foreground">
         {isEditMode ? 'Edit Post' : 'New Moment'}
       </span>
 

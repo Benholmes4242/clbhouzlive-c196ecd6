@@ -127,7 +127,7 @@ export default function ScheduleSheet({
           >
             {/* Handle */}
             <div className="flex justify-center pt-2.5 pb-1">
-              <div className="w-9 h-1 rounded-full" style={{ backgroundColor: '#E0E0E0' }} />
+              <div className="w-9 h-1 rounded-full bg-muted-foreground/30" />
             </div>
             
             {/* Header */}
@@ -135,7 +135,7 @@ export default function ScheduleSheet({
               <h2 className="text-lg font-semibold" style={{ color: '#1A1A1A' }}>Schedule Post</h2>
               <button
                 onClick={onClose}
-                className="w-8 h-8 rounded-full flex items-center justify-center active:scale-90 transition-transform"
+                className="w-11 h-11 rounded-full flex items-center justify-center active:scale-90 transition-transform"
                 style={{ backgroundColor: '#F5F5F7' }}
               >
                 <X className="w-4 h-4" style={{ color: '#7A7A7A' }} />
