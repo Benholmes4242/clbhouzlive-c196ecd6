@@ -100,13 +100,13 @@ export const CourseDNACard = memo(function CourseDNACard({ items, inline, course
               viewport={{ once: true }}
               className="flex items-center gap-3 p-4 rounded-xl bg-muted/50"
             >
-              {/* Skill icon — 40x40 */}
+              {/* Skill icon — 32x32 */}
               <div 
-                className="w-10 h-10 rounded-[10px] flex items-center justify-center flex-shrink-0"
+                className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
                 style={{ background: getIconBg(item.tier) }}
               >
                 <IconComponent 
-                  className="w-5 h-5" 
+                  className="w-4 h-4" 
                   style={{ color: hexColor }}
                   strokeWidth={2} 
                 />
@@ -118,9 +118,9 @@ export const CourseDNACard = memo(function CourseDNACard({ items, inline, course
                   <span className="text-foreground" style={{ fontSize: '14px', fontWeight: 600 }}>
                     {item.label}
                   </span>
-                  <span 
+                   <span 
                     className="uppercase"
-                    style={{ fontSize: '10px', fontWeight: 600, color: hexColor, letterSpacing: '0.05em' }}
+                    style={{ fontSize: '10px', fontWeight: 700, color: hexColor, letterSpacing: '0.08em' }}
                   >
                     {tierToLabel[item.tier]}
                   </span>

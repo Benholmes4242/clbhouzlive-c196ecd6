@@ -21,12 +21,6 @@ interface TournamentHeroCardProps {
   isCompleted?: boolean;
 }
 
-const getBadgeAccent = (isLive: boolean, isCompleted: boolean): string => {
-  if (isLive) return '#22c55e';
-  if (isCompleted) return '#F59E0B';
-  return '#3478F6';
-};
-
 export const TournamentHeroCard = memo(function TournamentHeroCard({
   tournament,
   isLive = false,
@@ -34,10 +28,9 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
 }: TournamentHeroCardProps) {
   const venueImageQuery = useVenueImage(tournament.courseName, null);
   const imageUrl = venueImageQuery.data?.imageUrl || tournament.heroImageUrl;
-  const badgeAccent = getBadgeAccent(isLive, isCompleted);
 
   const pillStyle = {
-    fontSize: '10px',
+    fontSize: '11px',
     fontWeight: 500 as const,
     letterSpacing: '0.05em',
     color: 'rgba(255, 255, 255, 0.85)',
@@ -46,6 +39,31 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
     WebkitBackdropFilter: 'blur(24px) saturate(180%)',
     border: '1px solid rgba(255, 255, 255, 0.15)',
   };
+
+  // Badge config per state
+  const getBadgeConfig = () => {
+    if (isLive) {
+      return {
+        label: 'LIVE TOURNAMENT',
+        bg: 'rgba(220, 38, 38, 0.9)',
+        showDot: true,
+      };
+    }
+    if (isCompleted) {
+      return {
+        label: 'LATEST RESULTS',
+        bg: 'rgba(255, 255, 255, 0.15)',
+        showDot: false,
+      };
+    }
+    return {
+      label: 'NEXT TOURNAMENT',
+      bg: 'rgba(255, 255, 255, 0.15)',
+      showDot: false,
+    };
+  };
+
+  const badge = getBadgeConfig();
 
   return (
     <div className="relative overflow-hidden rounded-b-2xl" style={{ height: `${Math.round(306 * 0.8)}px` }}>
@@ -57,7 +75,7 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
         loading="eager"
       />
 
-      {/* Gradient Overlay — richer bottom, lighter middle, whisper at top */}
+      {/* Gradient Overlay */}
       <div
         className="absolute inset-0"
         style={{
@@ -65,28 +83,41 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
         }}
       />
 
-      {/* Top Left Badge — state-colored left border */}
+      {/* Top Left Badge */}
       <div className="absolute top-4 left-4">
         <span
-          className="px-3 py-[5px] rounded-[8px] uppercase font-bold inline-block"
+          className="inline-flex items-center gap-1.5 uppercase font-bold"
           style={{
-            fontSize: '11px',
-            letterSpacing: '0.8px',
+            fontSize: '10px',
+            fontWeight: 700,
+            letterSpacing: '0.1em',
             color: 'rgba(255, 255, 255, 0.95)',
-            background: 'rgba(0, 0, 0, 0.45)',
-            backdropFilter: 'blur(24px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+            background: badge.bg,
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
             border: '1px solid rgba(255, 255, 255, 0.15)',
-            borderLeft: `3px solid ${badgeAccent}`,
+            padding: '5px 12px',
+            borderRadius: '8px',
           }}
         >
-          {isLive ? 'LIVE TOURNAMENT' : isCompleted ? 'LATEST RESULTS' : 'NEXT TOURNAMENT'}
+          {badge.showDot && (
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: 3,
+                backgroundColor: 'white',
+                animation: 'pulse 1.5s infinite',
+                flexShrink: 0,
+              }}
+            />
+          )}
+          {badge.label}
         </span>
       </div>
 
       {/* Content — anchored bottom left */}
       <div className="absolute bottom-0 left-0 right-0 px-4 pb-5 pt-4">
-        {/* Tournament Name — 22px/800 with text shadow */}
         <h2
           className="leading-tight mb-1"
           style={{
@@ -99,7 +130,6 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
           {tournament.name}
         </h2>
 
-        {/* Course + Dates */}
         <p
           className="mb-3"
           style={{
@@ -118,14 +148,21 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
             .map((text, i) => (
               <span
                 key={i}
-                className="px-2.5 py-1 rounded-[6px] uppercase"
-                style={pillStyle}
+                className="uppercase"
+                style={{ ...pillStyle, padding: '4px 10px', borderRadius: '6px' }}
               >
                 {text}
               </span>
             ))}
         </div>
       </div>
+
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.4; }
+        }
+      `}</style>
     </div>
   );
 });

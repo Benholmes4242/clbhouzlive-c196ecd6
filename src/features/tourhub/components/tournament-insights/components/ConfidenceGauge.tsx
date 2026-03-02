@@ -11,6 +11,7 @@ interface ConfidenceGaugeProps {
   accentColor?: string;
   animationDelay?: number;
   isWithdrawn?: boolean;
+  size?: number;
 }
 
 const tierToPercentage: Record<ConfidenceTier, number> = {
@@ -24,6 +25,7 @@ const ConfidenceGauge: React.FC<ConfidenceGaugeProps> = ({
   accentColor = '#94A3B8',
   animationDelay = 500,
   isWithdrawn = false,
+  size: sizeProp,
 }) => {
   const percentage = isWithdrawn ? 0 : tierToPercentage[tier];
   const arcColor = isWithdrawn ? '#94A3B8' : accentColor;
@@ -50,26 +52,14 @@ const ConfidenceGauge: React.FC<ConfidenceGaugeProps> = ({
     return () => observer.disconnect();
   }, [percentage, animationDelay]);
 
-  const size = 60;
-  const strokeWidth = 5;
+  const size = sizeProp ?? 60;
+  const strokeWidth = 3.5;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const dashOffset = circumference - (circumference * animatedPct) / 100;
 
   return (
-    <div ref={gaugeRef} className="flex flex-col items-center gap-1">
-      <span
-        className="text-muted-foreground"
-        style={{
-          fontSize: 10,
-          fontWeight: 600,
-          letterSpacing: '0.5px',
-          textTransform: 'uppercase' as const,
-          opacity: 0.6,
-        }}
-      >
-        AI Confidence
-      </span>
+    <div ref={gaugeRef} className="flex flex-col items-center">
       <div className="relative" style={{ width: size, height: size }}>
         <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
           <circle

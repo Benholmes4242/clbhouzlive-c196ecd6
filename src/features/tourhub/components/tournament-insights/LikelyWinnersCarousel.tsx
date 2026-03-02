@@ -1,15 +1,15 @@
 /**
  * TopPicksCarousel (formerly LikelyWinnersCarousel)
  * Premium player scouting cards with confidence gauges.
+ * Phase 6 refinements: top accent bar, 52px gauge, dot bullets, pill pagination
  */
 
 import { memo, useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Info, TrendingUp, MapPin, Flame, Trophy, Target, Sparkles } from 'lucide-react';
+import { Info } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
 import type { WinnerProfile, ContenderCard } from './types';
 import ConfidenceGauge from './components/ConfidenceGauge';
-import { getReasonIcon, type ReasonIconResult } from './utils/getReasonIcon';
 import { PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 
 interface LikelyWinnersCarouselProps {
@@ -29,26 +29,15 @@ interface PickCard {
   isWithdrawn?: boolean;
 }
 
-const ICON_MAP: Record<ReasonIconResult['icon'], React.ComponentType<any>> = {
-  TrendingUp,
-  BarChart3: TrendingUp,
-  MapPin,
-  Flag: MapPin,
-  Flame,
-  Zap: Flame,
-  Trophy,
-  Target,
-  Sparkles,
-};
-
-function ReasonIcon({ text }: { text: string }) {
-  const { icon, color } = getReasonIcon(text);
-  const IconComp = ICON_MAP[icon] || Sparkles;
-  return <IconComp className="w-[18px] h-[18px] flex-shrink-0 mt-[1px]" style={{ color, opacity: 0.8 }} strokeWidth={1.8} />;
-}
-
-// Refined accent colors
-const ACCENT_COLORS = ['#E8920B', '#059669', '#059669', '#94A3B8', '#94A3B8'];
+// Accent colors: gold for #1, green for #2-3, slate for #4-5
+const ACCENT_COLORS = ['#D97706', '#16A34A', '#16A34A', '#94A3B8', '#94A3B8'];
+const ACCENT_GRADIENTS = [
+  'linear-gradient(90deg, #D97706, rgba(217,119,6,0.5))',
+  'linear-gradient(90deg, #16A34A, rgba(22,163,74,0.5))',
+  'linear-gradient(90deg, #16A34A, rgba(22,163,74,0.5))',
+  'linear-gradient(90deg, #94A3B8, rgba(148,163,184,0.5))',
+  'linear-gradient(90deg, #94A3B8, rgba(148,163,184,0.5))',
+];
 
 export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
   featured,
@@ -115,11 +104,9 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
         className="mb-4"
       >
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <h3 className="text-foreground" style={{ fontSize: '18px', fontWeight: 700 }}>
-              Top 5 Picks
-            </h3>
-          </div>
+          <h3 className="text-foreground" style={{ fontSize: '18px', fontWeight: 700 }}>
+            Top 5 Picks
+          </h3>
           <button
             onClick={() => setShowConfidenceInfo(!showConfidenceInfo)}
             className="flex items-center gap-1 active:opacity-70 transition-opacity text-muted-foreground/60"
@@ -135,20 +122,17 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
               className="mt-2 p-3 rounded-xl bg-card border border-border/50"
-              style={{
-                fontSize: '12px',
-                lineHeight: 1.5,
-              }}
+              style={{ fontSize: '12px', lineHeight: 1.5 }}
             >
               <span className="text-muted-foreground">
-                AI confidence is calculated from course history, recent form, strokes gained metrics, and field strength. Higher scores indicate stronger statistical alignment with what this course rewards.
+                AI confidence is calculated from course history, recent form, strokes gained metrics, and field strength.
               </span>
             </motion.div>
           )}
         </AnimatePresence>
       </motion.div>
 
-      {/* Swipeable carousel — gap-4 for breathing room */}
+      {/* Swipeable carousel */}
       <div
         ref={scrollRef}
         className="flex gap-4 pb-2 -mx-4 px-4"
@@ -165,6 +149,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
         {allPicks.map((pick, i) => {
           const isFeatured = i === 0;
           const accentColor = ACCENT_COLORS[i] ?? '#94A3B8';
+          const accentGradient = ACCENT_GRADIENTS[i] ?? ACCENT_GRADIENTS[4];
 
           return (
             <motion.div
@@ -183,11 +168,23 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                 minWidth: isFeatured ? 'calc(100% - 28px)' : 'calc(100% - 36px)',
                 scrollSnapAlign: 'start',
                 border: '1px solid hsl(var(--border) / 0.4)',
-                borderLeft: `4px solid ${accentColor}`,
                 opacity: pick.isWithdrawn ? 0.6 : undefined,
                 boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
               }}
             >
+              {/* Top accent bar */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 3,
+                  background: accentGradient,
+                  borderRadius: '16px 16px 0 0',
+                }}
+              />
+
               {/* Avatar + Name row */}
               <div className="flex items-start gap-3.5 p-5 pb-0">
                 <div className="relative flex-shrink-0">
@@ -251,22 +248,44 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                   </div>
                 </div>
 
-                <div>
+                <div className="flex flex-col items-center gap-1">
+                  <span
+                    className="text-muted-foreground"
+                    style={{
+                      fontSize: 9,
+                      fontWeight: 600,
+                      letterSpacing: '0.1em',
+                      textTransform: 'uppercase',
+                      opacity: 0.6,
+                    }}
+                  >
+                    AI CONFIDENCE
+                  </span>
                   <ConfidenceGauge
                     tier={pick.confidenceTier}
                     accentColor={accentColor}
                     animationDelay={400 + i * 80}
                     isWithdrawn={pick.isWithdrawn}
+                    size={52}
                   />
                 </div>
               </div>
 
-              {/* Bullet points */}
+              {/* Bullet points with colored dots */}
               {pick.bullets.length > 0 && (
                 <div className="flex flex-col gap-2.5 px-5 pb-5 pt-3">
                   {pick.bullets.slice(0, 3).map((bullet, j) => (
                     <div key={j} className="flex items-start gap-2">
-                      <ReasonIcon text={bullet} />
+                      <span
+                        className="flex-shrink-0"
+                        style={{
+                          width: 4,
+                          height: 4,
+                          borderRadius: 2,
+                          marginTop: 7,
+                          backgroundColor: j === 0 ? accentColor : 'hsl(var(--muted-foreground))',
+                        }}
+                      />
                       <span
                         className="text-muted-foreground"
                         style={{ fontSize: 14, lineHeight: 1.625 }}
@@ -282,19 +301,20 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
         })}
       </div>
 
-      {/* Dot indicators — 20px active pill */}
+      {/* Pagination dots — active = 16px pill */}
       {allPicks.length > 1 && (
         <div className="flex items-center justify-center gap-1.5 mt-3">
           {allPicks.map((_, i) => (
             <div
               key={i}
-              className="rounded-full transition-all duration-200"
+              className="rounded-full"
               style={{
-                width: i === activeIndex ? '20px' : '6px',
+                width: i === activeIndex ? '16px' : '6px',
                 height: '6px',
                 background: i === activeIndex
                   ? 'hsl(var(--foreground))'
-                  : 'hsl(var(--muted-foreground) / 0.2)',
+                  : 'hsl(var(--border))',
+                transition: 'width 0.3s ease',
               }}
             />
           ))}
