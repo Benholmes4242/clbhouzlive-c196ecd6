@@ -567,7 +567,7 @@ const ProfilePageV2Content: React.FC = () => {
       {/* z-10 ensures content is above hero's z-1, pointer-events-auto ensures tappability */}
       <div className="pt-[68px] px-5 text-left relative z-10 pointer-events-auto">
         {/* Name - smaller, more bold */}
-        <h1 className="text-[28px] font-semibold text-foreground">
+        <h1 className="text-[28px] font-bold text-foreground">
           {displayName}
         </h1>
       </div>
@@ -580,7 +580,7 @@ const ProfilePageV2Content: React.FC = () => {
           <div className="flex items-center gap-3 w-full">
             <button
               onClick={() => navigate('/edit-profile')}
-              className="flex-1 h-11 rounded-full bg-muted text-foreground font-medium text-sm flex items-center justify-center gap-2 border border-border active:scale-[0.98] transition-transform"
+              className="flex-1 h-11 rounded-full bg-muted text-foreground font-semibold text-sm flex items-center justify-center gap-2 border border-border active:scale-[0.98] transition-transform"
             >
               <Pencil className="w-4 h-4" />
               Edit Profile
@@ -737,7 +737,7 @@ const ProfilePageV2Content: React.FC = () => {
       {/* relative z-10 ensures stats row is above hero overlay */}
       <div className="mt-3 px-5 relative z-10 pointer-events-auto">
         <motion.div 
-          className="flex items-center justify-between"
+          className="flex items-center justify-evenly"
           initial="hidden"
           animate="show"
           variants={{
@@ -763,6 +763,8 @@ const ProfilePageV2Content: React.FC = () => {
             />
           </motion.button>
           
+          <div className="w-px h-6 bg-border/50 self-center" />
+          
           {/* Followers */}
           <motion.button
             onClick={() => {
@@ -783,6 +785,8 @@ const ProfilePageV2Content: React.FC = () => {
               className="text-base font-semibold text-foreground"
             />
           </motion.button>
+          
+          {isPersonal && <div className="w-px h-6 bg-border/50 self-center" />}
           
           {/* Friends */}
           {isPersonal && (
@@ -829,7 +833,8 @@ const ProfilePageV2Content: React.FC = () => {
             {profile.bio.split('\n').length > 4 && !bioExpanded && (
               <button 
                 onClick={() => setBioExpanded(true)}
-                className="text-sm text-muted-foreground mt-1 min-h-[44px] flex items-center active:scale-[0.98]"
+                className="text-sm font-medium mt-1 min-h-[44px] flex items-center active:scale-[0.98]"
+                style={{ color: '#f59e0b' }}
               >
                 Read more
                 <ChevronDown className="w-4 h-4 ml-1" />
@@ -845,7 +850,7 @@ const ProfilePageV2Content: React.FC = () => {
                     href={ensureProtocol(website)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-full bg-muted border border-border px-3 min-h-[44px] text-sm font-medium text-muted-foreground hover:text-foreground transition-colors active:scale-[0.98]"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-muted border border-border px-3 min-h-[44px] text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors active:scale-[0.98]"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
                     {formatUrlForDisplay(website)}
@@ -858,7 +863,8 @@ const ProfilePageV2Content: React.FC = () => {
           <section className="px-5 mb-4">
             <button
               onClick={() => navigate('/edit-profile')}
-              className="text-sm text-muted-foreground italic min-h-[44px] flex items-center active:opacity-70 transition-opacity"
+              className="text-sm font-medium italic min-h-[44px] flex items-center active:opacity-70 transition-opacity"
+              style={{ color: '#f59e0b' }}
             >
               Add a bio
             </button>
@@ -871,7 +877,7 @@ const ProfilePageV2Content: React.FC = () => {
                     href={ensureProtocol(website)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-full bg-muted border border-border px-3 min-h-[44px] text-sm font-medium text-muted-foreground hover:text-foreground transition-colors active:scale-[0.98]"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-muted border border-border px-3 min-h-[44px] text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors active:scale-[0.98]"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
                     {formatUrlForDisplay(website)}
@@ -889,7 +895,7 @@ const ProfilePageV2Content: React.FC = () => {
                   href={ensureProtocol(website)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-full bg-muted border border-border px-3 min-h-[44px] text-sm font-medium text-muted-foreground hover:text-foreground transition-colors active:scale-[0.98]"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-muted border border-border px-3 min-h-[44px] text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors active:scale-[0.98]"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                   {formatUrlForDisplay(website)}

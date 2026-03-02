@@ -82,7 +82,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
 
       {/* Header */}
       <div className="text-center mb-1">
-        <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: '#AEAEB2' }}>
+        <p className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground">
           {isOwnProfile ? "Your Course Legacy" : `${displayName || "Their"}'s Course Legacy`}
         </p>
       </div>
@@ -125,9 +125,10 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
               <Star className="w-4 h-4 text-amber-500" />
             </div>
             <div>
-              <p className="text-lg font-semibold text-foreground leading-tight">
-                {avgRating.toFixed(1)}
-              </p>
+              <AnimatedNumber 
+                value={Number(avgRating.toFixed(1))} 
+                className="text-lg font-semibold text-foreground leading-tight"
+              />
               <p className="text-xs text-muted-foreground">Avg Rating</p>
             </div>
           </div>

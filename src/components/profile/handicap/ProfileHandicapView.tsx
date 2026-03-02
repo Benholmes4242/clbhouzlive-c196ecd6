@@ -209,7 +209,7 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
                   <button
                     onClick={handleRegisterInterest}
                     disabled={isRegistering}
-                    className="inline-flex items-center px-4 py-2 bg-card border border-border text-sm font-medium text-foreground rounded-full shadow-sm hover:bg-muted transition-colors disabled:opacity-50 min-h-[44px] active:scale-[0.98]"
+                    className="inline-flex items-center px-4 py-2 bg-card border border-border text-sm font-semibold text-foreground rounded-full shadow-sm hover:bg-muted transition-colors disabled:opacity-50 min-h-[44px] active:scale-[0.98]"
                   >
                     {isRegistering ? 'Saving...' : 'Get early access'}
                   </button>
