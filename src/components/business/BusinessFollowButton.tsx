@@ -35,6 +35,7 @@ export function BusinessFollowButton({ businessId, className }: BusinessFollowBu
   });
 
   const isPending = followPending || unfollowPending;
+  const neutralFollowButtonClass = `${className} border-[#E0E0E0] bg-white text-[#0F0F0F] hover:bg-gray-50`;
 
   const handleClick = async () => {
     if (!user) return;
@@ -47,7 +48,7 @@ export function BusinessFollowButton({ businessId, className }: BusinessFollowBu
 
   if (!user) {
     return (
-      <Button variant="default" className={className} disabled>
+      <Button variant="outline" className={neutralFollowButtonClass} disabled>
         Follow
       </Button>
     );
@@ -55,7 +56,7 @@ export function BusinessFollowButton({ businessId, className }: BusinessFollowBu
 
   if (statusLoading) {
     return (
-      <Button variant="outline" className={className} disabled>
+      <Button variant="outline" className={neutralFollowButtonClass} disabled>
         ...
       </Button>
     );
@@ -65,7 +66,7 @@ export function BusinessFollowButton({ businessId, className }: BusinessFollowBu
     return (
       <Button
         variant="outline"
-        className={`${className} border-[#E0E0E0] bg-white text-[#0F0F0F] hover:bg-gray-50`}
+        className={neutralFollowButtonClass}
         onClick={handleClick}
         disabled={isPending}
       >
@@ -77,8 +78,8 @@ export function BusinessFollowButton({ businessId, className }: BusinessFollowBu
 
   return (
     <Button
-      variant="gradient"
-      className={className}
+      variant="outline"
+      className={neutralFollowButtonClass}
       onClick={handleClick}
       disabled={isPending}
     >
