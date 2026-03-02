@@ -475,6 +475,7 @@ const ProfilePageV2Content: React.FC = () => {
             logPoint('profile_photo.pointerdown', { x: t?.clientX, y: t?.clientY, via: 'touchstart' });
           }}
           onClick={() => {
+            if (isUploadingAvatar) return;
             logPoint('profile_photo.click');
             setIsAvatarLightboxOpen(true);
           }}
