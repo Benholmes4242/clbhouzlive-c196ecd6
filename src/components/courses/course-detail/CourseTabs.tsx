@@ -32,7 +32,7 @@ export function CourseTabs({ activeTab, onChange, reviewCount, mediaCount }: Cou
   };
 
   return (
-    <section className="px-4 pt-1 pb-3 bg-muted">
+    <section className="px-4 pt-1 pb-3">
       <div className="flex items-stretch rounded-xl overflow-hidden bg-transparent">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;

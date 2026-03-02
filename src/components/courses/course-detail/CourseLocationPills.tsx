@@ -42,7 +42,7 @@ const CourseLocationPills: React.FC<CourseLocationPillsProps> = ({ course }) => 
   if (!primaryRegionLabel) return null;
 
   return (
-    <div className="px-4 pt-3 pb-0 bg-muted">
+    <div className="px-4 pt-3 pb-0">
       <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
         {/* Level 1 – Primary region */}
         <button
