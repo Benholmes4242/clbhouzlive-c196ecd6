@@ -1,5 +1,5 @@
 /**
- * IntelligenceTabSwitcher - Refined pill-style sub-tab toggle
+ * IntelligenceTabSwitcher - Underline-style sub-tab toggle
  * Used within Upcoming view for Top 5 Picks / Course DNA switching
  */
 
@@ -30,10 +30,9 @@ const IntelligenceTabSwitcher: React.FC<IntelligenceTabSwitcherProps> = ({
 
   return (
     <div
-      className="flex bg-muted mb-4"
+      className="flex mb-4"
       style={{
-        borderRadius: 12,
-        padding: 3,
+        borderBottom: '1px solid hsl(var(--border))',
         maxWidth: 320,
       }}
     >
@@ -43,22 +42,33 @@ const IntelligenceTabSwitcher: React.FC<IntelligenceTabSwitcherProps> = ({
           <button
             key={opt.value}
             onClick={() => onTabChange(opt.value)}
-            className="flex-1 transition-all duration-200"
+            className="relative flex-1 transition-colors duration-200"
             style={{
-              padding: '10px 16px',
-              borderRadius: 10,
+              padding: '12px 0',
               fontSize: 13,
               fontWeight: 600,
               color: isActive
                 ? 'hsl(var(--foreground))'
                 : 'hsl(var(--muted-foreground))',
-              background: isActive ? 'hsl(var(--background))' : 'transparent',
-              boxShadow: isActive ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+              background: 'none',
               border: 'none',
               cursor: 'pointer',
             }}
           >
             {opt.label}
+            {isActive && (
+              <span
+                style={{
+                  position: 'absolute',
+                  bottom: -1,
+                  left: '20%',
+                  right: '20%',
+                  height: 2,
+                  backgroundColor: 'hsl(var(--foreground))',
+                  borderRadius: 1,
+                }}
+              />
+            )}
           </button>
         );
       })}

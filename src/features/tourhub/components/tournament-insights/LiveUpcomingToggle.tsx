@@ -1,6 +1,6 @@
 /**
- * LiveUpcomingToggle - Underline-style tab bar
- * Replaces SegmentedControl with minimal underline tabs
+ * LiveUpcomingToggle - Pill-style segmented tab bar
+ * Used for primary view switching (Next Up / Results / Live)
  */
 
 import React from 'react';
@@ -26,9 +26,11 @@ export const LiveUpcomingToggle: React.FC<LiveUpcomingToggleProps> = ({
 
   return (
     <div
-      className="flex"
+      className="flex bg-muted"
       style={{
-        borderBottom: '1px solid hsl(var(--border))',
+        borderRadius: 12,
+        padding: 3,
+        maxWidth: 320,
       }}
     >
       {tabs.map((tab) => {
@@ -37,15 +39,17 @@ export const LiveUpcomingToggle: React.FC<LiveUpcomingToggleProps> = ({
           <button
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
-            className="relative flex-1 flex items-center justify-center gap-1.5 transition-colors duration-200"
+            className="flex-1 flex items-center justify-center gap-1.5 transition-all duration-200"
             style={{
-              padding: '12px 0',
-              fontSize: '14px',
+              padding: '10px 16px',
+              borderRadius: 10,
+              fontSize: 13,
               fontWeight: 600,
               color: isActive
                 ? 'hsl(var(--foreground))'
                 : 'hsl(var(--muted-foreground))',
-              background: 'none',
+              background: isActive ? 'hsl(var(--background))' : 'transparent',
+              boxShadow: isActive ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
               border: 'none',
               cursor: 'pointer',
             }}
@@ -63,19 +67,6 @@ export const LiveUpcomingToggle: React.FC<LiveUpcomingToggleProps> = ({
               />
             )}
             <span>{tab.label}</span>
-            {isActive && (
-              <span
-                style={{
-                  position: 'absolute',
-                  bottom: -1,
-                  left: '20%',
-                  right: '20%',
-                  height: 2,
-                  backgroundColor: 'hsl(var(--foreground))',
-                  borderRadius: 1,
-                }}
-              />
-            )}
           </button>
         );
       })}
