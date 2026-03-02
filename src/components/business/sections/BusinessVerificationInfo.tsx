@@ -10,7 +10,7 @@ export function BusinessVerificationInfo() {
         description="Show golfers your business is authentic"
       />
       
-      <div className="bg-white rounded-xl border border-[#e2e8f0] p-5">
+      <div className="rounded-xl border border-border p-5">
         <div className="flex items-start gap-3 mb-4">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200/60 flex items-center justify-center flex-shrink-0">
             <CheckCircle2 className="w-5 h-5 text-emerald-600" />

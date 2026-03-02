@@ -49,7 +49,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   // Empty state
   if (totalRatings === 0) {
     return (
-      <div className="bg-gradient-to-br from-muted to-card rounded-2xl border border-border p-6 text-center">
+      <div className="p-6 text-center">
         <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
           <Star className="w-8 h-8 text-muted-foreground/40" />
         </div>
@@ -59,7 +59,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         </p>
         <Button
           onClick={onRateClick}
-          className="px-5 py-2.5 bg-secondary text-foreground text-sm font-medium rounded-full hover:bg-secondary/80 transition-colors shadow-sm active:scale-[0.98]"
+          className="px-5 py-2.5 bg-background text-foreground text-sm font-medium rounded-full hover:bg-background/80 transition-colors shadow-sm active:scale-[0.98] border border-border"
         >
           Rate this course
         </Button>

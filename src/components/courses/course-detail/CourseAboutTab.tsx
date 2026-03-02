@@ -129,7 +129,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <CourseLocationPills course={course} />
 
       {/* 2. Community Rating Section */}
-      <section className="px-4 pt-3 pb-5 bg-muted md:px-6 md:pt-4 space-y-5">
+      <section className="px-4 pt-3 pb-5 md:px-6 md:pt-4 space-y-5">
         <CommunityScoreCard
           courseId={course.id}
           courseName={course.name}
@@ -158,7 +158,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       </section>
 
       {/* Spacer */}
-      <div className="h-3 bg-muted" />
+      <div className="h-3" />
 
       {/* 3. Your Journey Section */}
       {user && (
@@ -166,19 +166,19 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       )}
 
       {/* Spacer */}
-      <div className="h-3 bg-muted" />
+      <div className="h-3" />
 
       {/* 4. Friends Who've Played */}
-      <section className="px-4 pt-4 pb-4 bg-muted md:px-6">
+      <section className="px-4 pt-4 pb-4 md:px-6">
         <CourseFriendsStrip courseId={course.id} courseName={course.name} />
       </section>
 
       {/* Spacer */}
-      <div className="h-3 bg-muted" />
+      <div className="h-3" />
 
       {/* 5. About Section */}
       {course.description && (
-        <section className="pt-8 pb-6 bg-muted space-y-4 md:pt-10">
+        <section className="pt-8 pb-6 space-y-4 md:pt-10">
           <div className="px-5">
             <SectionHeading title="About" />
           </div>
@@ -236,11 +236,11 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       )}
 
       {/* Spacer */}
-      <div className="h-3 bg-muted" />
+      <div className="h-3" />
 
       {/* 6. Top 100 Spotlight */}
       {course.id && (
-        <section className="px-4 pt-5 pb-5 bg-muted md:px-6">
+        <section className="px-4 pt-5 pb-5 md:px-6">
           <CourseTop100Spotlight
             courseId={course.id}
             courseName={course.name}
@@ -252,10 +252,10 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <CourseTop100Summary />
 
       {/* Spacer */}
-      <div className="h-3 bg-muted" />
+      <div className="h-3" />
 
       {/* 8. Location Section */}
-      <section className="pt-6 pb-5 bg-muted md:pt-8">
+      <section className="pt-6 pb-5 md:pt-8">
         <div className="px-5 mb-4">
           <SectionHeading title="Location" />
         </div>
@@ -288,11 +288,11 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       </section>
 
       {/* Spacer */}
-      <div className="h-3 bg-muted" />
+      <div className="h-3" />
 
       {/* 9. CTA for users who haven't rated yet */}
       {user && !userRating && ratingAggregates && ratingAggregates.review_count > 0 && (
-        <section className="px-4 pt-5 pb-5 bg-muted md:pt-6">
+        <section className="px-4 pt-5 pb-5 md:pt-6">
           <h3 className="text-lg font-semibold text-foreground mb-1">How do you rate this course?</h3>
           <p className="text-base text-muted-foreground mb-3">
             Add your rating to see how it compares with the clbhouz community.
@@ -304,7 +304,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       )}
 
       {/* Spacer */}
-      <div className="h-3 bg-muted" />
+      <div className="h-3" />
 
       {/* Claim This Course CTA - only for unclaimed courses with a club_id */}
       {!courseClaim && course.club_id && (
@@ -315,10 +315,10 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       )}
 
       {/* Spacer */}
-      <div className="h-3 bg-muted" />
+      <div className="h-3" />
 
       {/* 10. Media Section */}
-      <section className="pt-6 pb-5 bg-muted space-y-3 md:pt-8">
+      <section className="pt-6 pb-5 space-y-3 md:pt-8">
         <AboutMediaStrip 
           clubId={course.id} 
           onSeeAllClick={() => onTabChange?.('media')}
@@ -326,14 +326,14 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       </section>
 
       {/* Spacer */}
-      <div className="h-3 bg-muted" />
+      <div className="h-3" />
 
       {/* 11. Explore More Links */}
       <CourseExploreLinks course={course} />
 
       {/* 12. Visit Website */}
       {course.website_url && (
-        <section className="px-4 pt-2 pb-4 bg-muted">
+        <section className="px-4 pt-2 pb-4">
           <Button
             onClick={handleWebsiteClick}
             className="w-full flex items-center justify-center gap-2 h-11 rounded-lg bg-card text-foreground border border-border/60 hover:bg-muted active:scale-[0.98]"

@@ -50,7 +50,7 @@ export function BusinessProfileInfo({ business, canManage }: BusinessProfileInfo
       <div className="flex flex-col gap-3">
         {/* About — tab label provides heading, body text starts immediately */}
         {business.description && (
-          <section className="bg-card p-4 space-y-3">
+          <section className="p-4 space-y-3">
             {canManage && (
               <div className="flex justify-end">
                 <button
@@ -67,7 +67,7 @@ export function BusinessProfileInfo({ business, canManage }: BusinessProfileInfo
         )}
 
         {/* Contact */}
-        <section className="bg-card p-4 space-y-3">
+        <section className="p-4 space-y-3">
           <h2 className="text-base font-semibold text-foreground">Contact</h2>
           <div className="space-y-2">
             {business.phone && (
@@ -124,7 +124,7 @@ export function BusinessProfileInfo({ business, canManage }: BusinessProfileInfo
         </section>
 
         {/* Location */}
-        <section className="bg-card p-4 space-y-3">
+        <section className="p-4 space-y-3">
           <h2 className="text-base font-semibold text-foreground">Location</h2>
           {business.location ? (
             <div className="space-y-4">
@@ -153,7 +153,7 @@ export function BusinessProfileInfo({ business, canManage }: BusinessProfileInfo
         </section>
 
         {/* Business Details */}
-        <section className="bg-card p-4 space-y-3">
+        <section className="p-4 space-y-3">
           <h2 className="text-base font-semibold text-foreground">Business Details</h2>
           <div className="space-y-2">
             {business.category && (

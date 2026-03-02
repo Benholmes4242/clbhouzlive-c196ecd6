@@ -348,7 +348,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     return (
       <div className="flex flex-col">
         {/* Skeleton header */}
-        <section className="px-4 py-3 bg-muted">
+        <section className="px-4 py-3">
           <div className="flex items-center gap-3 animate-pulse">
             <div className="h-7 bg-muted-foreground/10 rounded w-16" />
             <div className="h-4 bg-muted-foreground/10 rounded w-24" />
@@ -356,7 +356,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         </section>
 
         {/* Skeleton reviews */}
-        <section className="px-4 pt-3 pb-4 bg-muted space-y-3">
+        <section className="px-4 pt-3 pb-4 space-y-3">
           {[1, 2, 3].map((i) => (
             <div key={i} className="rounded-2xl bg-card border border-border px-4 py-3 animate-pulse">
               <div className="flex gap-3">
@@ -377,7 +377,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   // Fix 2: Error state
   if (isError) {
     return (
-      <section className="px-4 py-8 bg-muted">
+      <section className="px-4 py-8">
         <div className="flex flex-col items-center text-center">
           <div className="h-10 w-10 rounded-full bg-muted-foreground/10 flex items-center justify-center mb-3">
             <AlertCircle className="h-5 w-5 text-muted-foreground/40" />
@@ -402,15 +402,15 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   if (!hasRatings) {
     return (
       <div className="flex flex-col">
-        <section className="px-4 pt-4 pb-5 bg-muted">
-          <div className="rounded-sq-md border border-border bg-card px-4 py-6 text-center">
+        <section className="px-4 pt-4 pb-5">
+          <div className="px-4 py-6 text-center">
             <p className="text-base font-semibold text-foreground">No reviews yet</p>
             <p className="mt-1 text-sm text-muted-foreground">
               Be the first to share your experience at {courseName}.
             </p>
             <button
               type="button"
-              className="mt-4 w-full h-11 rounded-sq-pill inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium bg-muted text-foreground transition hover:bg-muted/80 active:scale-[0.98]"
+              className="mt-4 w-full h-11 rounded-sq-pill inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium bg-background text-foreground border border-border transition hover:bg-background/80 active:scale-[0.98]"
               onClick={handleRateClick}
             >
               Write the first review
@@ -428,7 +428,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
     <div className="flex flex-col">
       {/* Compact rating context */}
-      <section className="px-4 py-4 bg-muted">
+      <section className="px-4 py-4">
         <div className="flex flex-col items-center gap-1">
           <span className={cn(
             "text-[40px] font-extrabold leading-none tabular-nums",
@@ -461,7 +461,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       </section>
 
       {/* Section 2 – Search bar */}
-      <section className="px-4 pt-4 pb-4 bg-muted">
+      <section className="px-4 pt-4 pb-4">
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
@@ -486,7 +486,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       </section>
 
       {/* Section 3 – Sort & Filter controls (16px from search) */}
-      <div className="px-5 pt-1 pb-4 bg-muted">
+      <div className="px-5 pt-1 pb-4">
         {/* Sort tabs */}
         <Tabs value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)} className="w-full">
           <TabsList className="bg-transparent border-0 px-0 py-0 gap-0 w-full flex justify-center">
@@ -512,7 +512,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       </div>
 
       {/* Section 4 – Reviews list */}
-      <section className="px-4 pt-6 pb-4 bg-muted">
+      <section className="px-4 pt-6 pb-4">
         {/* Write a review prompt - only for non-reviewers */}
         {!myReview && (
           <div className="mb-4">
@@ -605,7 +605,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
       {/* Section 5 – End message */}
       {filteredReviews.length > 0 && !searchQuery && !ratingFilter && (
-        <section className="px-4 pt-4 pb-6 bg-muted">
+        <section className="px-4 pt-4 pb-6">
           <div className="text-center">
             <p className="text-sm text-muted-foreground">
               No more reviews yet.
