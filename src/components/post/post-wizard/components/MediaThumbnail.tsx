@@ -122,7 +122,7 @@ export function MediaThumbnail({
       {showStudio && (
         <button
           onClick={(e) => { e.stopPropagation(); onStudio(); }}
-          className="absolute bottom-1.5 left-1.5 z-[2] w-9 h-9 flex items-center justify-center"
+          className="absolute bottom-1.5 left-1.5 z-[2] w-11 h-11 flex items-center justify-center"
           aria-label="Edit in studio"
         >
           <div
@@ -143,7 +143,7 @@ export function MediaThumbnail({
       {/* Remove button (top-right) — enlarged tap target */}
       <button
         onClick={(e) => { e.stopPropagation(); onRemove(); }}
-        className="absolute top-1.5 right-1.5 z-[2] w-9 h-9 flex items-center justify-center"
+        className="absolute top-1.5 right-1.5 z-[2] w-11 h-11 flex items-center justify-center"
         aria-label="Remove media"
       >
         <div

@@ -201,7 +201,7 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
                       e.stopPropagation();
                       handlePreviewToggle(track);
                     }}
-                    className="w-8 h-8 rounded-full flex items-center justify-center transition-all flex-shrink-0 active:scale-90"
+                    className="w-10 h-10 rounded-full flex items-center justify-center transition-all flex-shrink-0 active:scale-90"
                     style={isPlaying ? {
                       background: '#f59e0b',
                       color: '#FFFFFF',
@@ -222,7 +222,7 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
                     <div className="text-[13px] font-medium truncate leading-tight text-white">
                       {track.title}
                     </div>
-                    <div className="text-[11px] truncate leading-tight" style={{ color: '#7A7A7A' }}>
+                    <div className="text-[11px] truncate leading-tight" style={{ color: '#AEAEB2' }}>
                       {MOOD_DESCRIPTORS[track.mood] || track.mood}
                     </div>
                   </div>
