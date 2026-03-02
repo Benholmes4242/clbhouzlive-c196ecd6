@@ -536,29 +536,29 @@ export function BusinessActivityFeed({
         <button
           onClick={() => setFeedTab('activity')}
           className={cn(
-            'px-6 py-3 text-sm font-medium transition-colors relative min-h-[44px] active:opacity-70 transition-opacity',
+            'px-6 py-3 text-sm transition-colors relative min-h-[44px] active:opacity-70 transition-opacity',
             feedTab === 'activity'
-              ? 'text-foreground'
-              : 'text-muted-foreground hover:text-foreground'
+              ? 'text-foreground font-semibold'
+              : 'text-muted-foreground font-medium hover:text-foreground'
           )}
         >
           Posts
           {feedTab === 'activity' && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground" />
+            <div className="absolute bottom-0 left-0 right-0 h-[3px] rounded-full bg-primary" />
           )}
         </button>
         <button
           onClick={() => setFeedTab('tagged')}
           className={cn(
-            'px-6 py-3 text-sm font-medium transition-colors relative min-h-[44px] active:opacity-70 transition-opacity',
+            'px-6 py-3 text-sm transition-colors relative min-h-[44px] active:opacity-70 transition-opacity',
             feedTab === 'tagged'
-              ? 'text-foreground'
-              : 'text-muted-foreground hover:text-foreground'
+              ? 'text-foreground font-semibold'
+              : 'text-muted-foreground font-medium hover:text-foreground'
           )}
         >
           Tagged
           {feedTab === 'tagged' && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground" />
+            <div className="absolute bottom-0 left-0 right-0 h-[3px] rounded-full bg-primary" />
           )}
         </button>
       </div>
@@ -603,8 +603,8 @@ export function BusinessActivityFeed({
       {/* Error state */}
       {((feedTab === 'activity' && activityError) || (feedTab === 'tagged' && taggedError)) && filteredPosts.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 px-4">
-          <AlertCircle className="h-10 w-10 text-gray-200 mb-4" />
-          <p className="text-sm text-gray-500 mb-4">Couldn't load posts</p>
+          <AlertCircle className="h-10 w-10 text-muted-foreground/20 mb-4" />
+          <p className="text-sm text-muted-foreground mb-4">Couldn't load posts</p>
           <button
             onClick={() => {
               const activeKey = feedTab === 'activity'
@@ -612,7 +612,7 @@ export function BusinessActivityFeed({
                 : ['business-tagged-posts-infinite', businessId];
               queryClient.invalidateQueries({ queryKey: activeKey });
             }}
-            className="rounded-full bg-emerald-600 text-white text-sm font-medium px-5 py-2 active:scale-[0.97] transition-transform"
+            className="rounded-full bg-primary text-primary-foreground text-sm font-semibold px-5 py-2 active:scale-[0.97] transition-transform"
           >
             Try Again
           </button>
@@ -881,7 +881,7 @@ function EmptyState({
         <div className="w-16 h-16 rounded-full mx-auto mb-4 bg-muted border border-border flex items-center justify-center">
           <FileText className="h-7 w-7 text-muted-foreground" />
         </div>
-        <p className="text-base font-medium text-foreground mb-1">No long-form videos yet</p>
+        <p className="text-base font-semibold text-foreground mb-1">No long-form videos yet</p>
         <p className="text-sm text-muted-foreground">
           {tab === 'activity' ? 'Share video content 4+ minutes to engage your followers.' : 'No long-form videos have tagged this business yet.'}
         </p>
@@ -895,7 +895,7 @@ function EmptyState({
         <div className="w-16 h-16 rounded-full mx-auto mb-4 bg-muted border border-border flex items-center justify-center">
           <Video className="h-7 w-7 text-muted-foreground" />
         </div>
-        <p className="text-base font-medium text-foreground mb-1">No shorts yet</p>
+        <p className="text-base font-semibold text-foreground mb-1">No shorts yet</p>
         <p className="text-sm text-muted-foreground">
           {tab === 'activity' ? 'Share short videos under 4 minutes.' : 'No short videos have tagged this business yet.'}
         </p>
@@ -909,7 +909,7 @@ function EmptyState({
         <div className="w-16 h-16 rounded-full mx-auto mb-4 bg-muted border border-border flex items-center justify-center">
           <ImageIcon className="h-7 w-7 text-muted-foreground" />
         </div>
-        <p className="text-base font-medium text-foreground mb-1">No images yet</p>
+        <p className="text-base font-semibold text-foreground mb-1">No images yet</p>
         <p className="text-sm text-muted-foreground">
           {tab === 'activity' ? 'Share photos to showcase your business.' : 'No image posts have tagged this business yet.'}
         </p>
@@ -924,7 +924,7 @@ function EmptyState({
         <div className="w-16 h-16 rounded-full mx-auto mb-4 bg-muted border border-border flex items-center justify-center">
           <FileText className="h-7 w-7 text-muted-foreground" />
         </div>
-        <p className="text-base font-medium text-foreground mb-1">No posts yet</p>
+        <p className="text-base font-semibold text-foreground mb-1">No posts yet</p>
         <p className="text-sm text-muted-foreground mb-4">
           {canManage
             ? 'Create your first update for your members.'
@@ -948,7 +948,7 @@ function EmptyState({
       <div className="w-16 h-16 rounded-full mx-auto mb-4 bg-muted border border-border flex items-center justify-center">
         <Users className="h-7 w-7 text-muted-foreground" />
       </div>
-      <p className="text-base font-medium text-foreground mb-1">No tagged posts yet</p>
+      <p className="text-base font-semibold text-foreground mb-1">No tagged posts yet</p>
       <p className="text-sm text-muted-foreground max-w-xs mx-auto">
         When golfers or businesses tag {businessName || 'this club'}, you'll see it here.
       </p>

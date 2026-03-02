@@ -62,7 +62,7 @@ export function TeamRow({
         <div className="min-w-0 flex-1">
           {/* Line 1: Name + verified */}
           <div className="flex items-center gap-1.5">
-            <span className="font-medium text-foreground truncate">{name}</span>
+            <span className="font-semibold text-foreground truncate">{name}</span>
             {isVerified && <VerifiedBadge size="sm" />}
           </div>
 
@@ -112,7 +112,7 @@ export function TeamRow({
         <button
           type="button"
           onClick={onProfileClick}
-          className="text-muted-foreground/50 shrink-0"
+          className="text-muted-foreground/50 shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center"
         >
           <ChevronRight className="h-5 w-5" />
         </button>

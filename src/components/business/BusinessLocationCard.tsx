@@ -37,14 +37,14 @@ export function BusinessLocationCard({
   // For linked golf clubs without coords, show a different message (not "Add address")
   if (isLinkedClub && !hasValidCoords) {
     return (
-      <div className="mt-4 p-4 rounded-sq-md bg-slate-50 border border-slate-200">
+      <div className="mt-4 p-4 rounded-sq-md bg-muted border border-border">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center">
-            <MapPin className="h-5 w-5 text-[#64748b]" />
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-muted to-muted/80 border border-border/60 flex items-center justify-center">
+            <MapPin className="h-5 w-5 text-muted-foreground" />
           </div>
           <div>
-            <p className="text-sm font-medium text-slate-700">Map unavailable for this club record</p>
-            <p className="text-xs text-slate-500">Contact support if you need to update location details</p>
+            <p className="text-sm font-medium text-foreground">Map unavailable for this club record</p>
+            <p className="text-xs text-muted-foreground">Contact support if you need to update location details</p>
           </div>
         </div>
       </div>

@@ -12,8 +12,6 @@ interface BusinessProfileInfoProps {
   canManage?: boolean;
 }
 
-// Note: Highlights section removed - requires database table for real data
-
 export function BusinessProfileInfo({ business, canManage }: BusinessProfileInfoProps) {
   const navigate = useNavigate();
 
@@ -46,7 +44,7 @@ export function BusinessProfileInfo({ business, canManage }: BusinessProfileInfo
   };
 
   return (
-    <div className="-mx-5 px-0 pb-8" style={{ backgroundColor: '#F8FAFC' }}>
+    <div className="-mx-5 px-0 pb-8 bg-background">
       <div className="flex flex-col gap-3">
         {/* About — tab label provides heading, body text starts immediately */}
         {business.description && (
@@ -68,7 +66,7 @@ export function BusinessProfileInfo({ business, canManage }: BusinessProfileInfo
 
         {/* Contact */}
         <section className="p-4 space-y-3">
-          <h2 className="text-base font-semibold text-foreground">Contact</h2>
+          <h2 className="text-[17px] font-semibold text-foreground">Contact</h2>
           <div className="space-y-2">
             {business.phone && (
               <button 
@@ -79,7 +77,7 @@ export function BusinessProfileInfo({ business, canManage }: BusinessProfileInfo
                   <Phone className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-foreground">{business.phone}</p>
+                  <p className="text-sm font-semibold text-foreground">{business.phone}</p>
                   <p className="text-xs text-muted-foreground">Phone</p>
                 </div>
               </button>
@@ -94,7 +92,7 @@ export function BusinessProfileInfo({ business, canManage }: BusinessProfileInfo
                   <Mail className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-foreground">{business.email}</p>
+                  <p className="text-sm font-semibold text-foreground">{business.email}</p>
                   <p className="text-xs text-muted-foreground">Email</p>
                 </div>
               </button>
@@ -109,7 +107,7 @@ export function BusinessProfileInfo({ business, canManage }: BusinessProfileInfo
                   <Globe className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-foreground">
+                  <p className="text-sm font-semibold text-foreground">
                     {business.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
                   </p>
                   <p className="text-xs text-muted-foreground">Website</p>
@@ -125,7 +123,7 @@ export function BusinessProfileInfo({ business, canManage }: BusinessProfileInfo
 
         {/* Location */}
         <section className="p-4 space-y-3">
-          <h2 className="text-base font-semibold text-foreground">Location</h2>
+          <h2 className="text-[17px] font-semibold text-foreground">Location</h2>
           {business.location ? (
             <div className="space-y-4">
               <div className="flex items-start gap-3">
@@ -133,7 +131,7 @@ export function BusinessProfileInfo({ business, canManage }: BusinessProfileInfo
                   <MapPin className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-foreground">{business.location}</p>
+                  <p className="text-sm font-semibold text-foreground">{business.location}</p>
                   <p className="text-xs text-muted-foreground">Address</p>
                 </div>
               </div>
@@ -141,7 +139,7 @@ export function BusinessProfileInfo({ business, canManage }: BusinessProfileInfo
               <Button 
                 variant="outline" 
                 onClick={handleDirections} 
-                className="rounded-full w-full sm:w-auto text-foreground border-border hover:bg-muted active:scale-[0.97] transition-all"
+                className="h-11 rounded-full w-full sm:w-auto text-foreground border-border hover:bg-muted active:scale-[0.97] transition-all font-semibold"
               >
                 <MapPin className="h-4 w-4 mr-2" />
                 Get directions
@@ -154,39 +152,39 @@ export function BusinessProfileInfo({ business, canManage }: BusinessProfileInfo
 
         {/* Business Details */}
         <section className="p-4 space-y-3">
-          <h2 className="text-base font-semibold text-foreground">Business Details</h2>
+          <h2 className="text-[17px] font-semibold text-foreground">Business Details</h2>
           <div className="space-y-2">
             {business.category && (
-              <div className="flex items-center gap-3 p-2.5">
+              <div className="flex items-center gap-3 p-2.5 min-h-[44px]">
                 <div className="h-10 w-10 rounded-full bg-muted border border-border flex items-center justify-center">
                   <Building2 className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-foreground">{business.category}</p>
+                  <p className="text-sm font-semibold text-foreground">{business.category}</p>
                   <p className="text-xs text-muted-foreground">Category</p>
                 </div>
               </div>
             )}
             
             {business.is_verified && (
-              <div className="flex items-center gap-3 p-2.5">
-                <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
+              <div className="flex items-center gap-3 p-2.5 min-h-[44px]">
+                <div className="h-10 w-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
                   <VerifiedBadge size="lg" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-foreground">Verified Business</p>
+                  <p className="text-sm font-semibold text-foreground">Verified Business</p>
                   <p className="text-xs text-muted-foreground">This business has been verified by clbhouz</p>
                 </div>
               </div>
             )}
             
             {business.created_at && (
-              <div className="flex items-center gap-3 p-2.5">
+              <div className="flex items-center gap-3 p-2.5 min-h-[44px]">
                 <div className="h-10 w-10 rounded-full bg-muted border border-border flex items-center justify-center">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-foreground">
+                  <p className="text-sm font-semibold text-foreground">
                     {format(new Date(business.created_at), 'MMMM yyyy')}
                   </p>
                   <p className="text-xs text-muted-foreground">Member since</p>
