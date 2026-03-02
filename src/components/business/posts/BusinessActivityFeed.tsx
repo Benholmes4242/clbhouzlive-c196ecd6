@@ -932,7 +932,7 @@ function EmptyState({
         </p>
         {canManage && (
           <button
-            className="rounded-full bg-[#334E3D] hover:bg-[#2a4032] text-white px-6 py-3 min-h-[44px] text-sm font-medium transition-colors active:scale-[0.97] transition-transform"
+            className="rounded-lg bg-card hover:bg-muted text-foreground border border-border/60 px-6 py-3 min-h-[44px] text-sm font-semibold transition-colors active:scale-[0.97]"
             onClick={onCreatePost}
           >
             Create your first post
