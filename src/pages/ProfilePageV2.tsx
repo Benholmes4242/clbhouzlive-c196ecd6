@@ -580,7 +580,7 @@ const ProfilePageV2Content: React.FC = () => {
           <>
             <button 
               className="h-11 flex-1 rounded-full text-sm font-semibold text-white flex items-center justify-center gap-1.5 disabled:opacity-60 active:scale-[0.98] transition-transform"
-              style={{ background: isFollowing === 'following' ? '#334155' : '#64748b' }}
+              style={{ background: isFollowing === 'following' ? '#334155' : 'hsl(var(--destructive))' }}
               onClick={toggleFollow}
               disabled={followBusy || isFollowing === 'unknown'}
             >
