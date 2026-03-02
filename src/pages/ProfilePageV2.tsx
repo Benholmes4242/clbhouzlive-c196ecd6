@@ -3,7 +3,7 @@
  * Exact match to design mock
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 import { cn } from '@/lib/utils';
@@ -28,6 +28,8 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { safeGoBack } from '@/utils/navigation';
+import { uploadToR2Only } from '@/utils/r2OnlyUpload';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
 import {
@@ -178,6 +180,13 @@ const ProfilePageV2Content: React.FC = () => {
   const [isAvatarLightboxOpen, setIsAvatarLightboxOpen] = useState(false);
   const [showBlockDialog, setShowBlockDialog] = useState(false);
 
+  // Inline photo upload state
+  const avatarFileInputRef = useRef<HTMLInputElement>(null);
+  const heroFileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [isUploadingHero, setIsUploadingHero] = useState(false);
+  const queryClient = useQueryClient();
+
   const profileTypeInfo = getProfileType(profile?.user_type);
   const { isPersonal } = profileTypeInfo;
   const tabs = getProfileTabs(profile?.user_type);
@@ -212,6 +221,48 @@ const ProfilePageV2Content: React.FC = () => {
 
   // postsCount now comes from usePersonalPostsCount (fetches total from DB)
   const unlockedAchievements = achievements || [];
+
+  // Inline avatar upload handler
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user?.id) return;
+    setIsUploadingAvatar(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/profile-${Date.now()}.${fileExt}`;
+      const result = await uploadToR2Only(file, 'clbhouz-profile-images', fileName);
+      if (!result.success) throw new Error(result.error || 'Upload failed');
+      await supabase.from('user_profiles').update({ profile_photo_url: result.publicUrl }).eq('id', user.id);
+      queryClient.invalidateQueries({ queryKey: ['user-profile', profileUserId] });
+      toast.success('Profile photo updated');
+    } catch {
+      toast.error('Failed to update profile photo');
+    } finally {
+      setIsUploadingAvatar(false);
+      if (avatarFileInputRef.current) avatarFileInputRef.current.value = '';
+    }
+  };
+
+  // Inline hero/cover upload handler
+  const handleHeroUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user?.id) return;
+    setIsUploadingHero(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/header-${Date.now()}.${fileExt}`;
+      const result = await uploadToR2Only(file, 'clbhouz-profile-images', fileName);
+      if (!result.success) throw new Error(result.error || 'Upload failed');
+      await supabase.from('user_profiles').update({ header_photo_url: result.publicUrl }).eq('id', user.id);
+      queryClient.invalidateQueries({ queryKey: ['user-profile', profileUserId] });
+      toast.success('Cover photo updated');
+    } catch {
+      toast.error('Failed to update cover photo');
+    } finally {
+      setIsUploadingHero(false);
+      if (heroFileInputRef.current) heroFileInputRef.current.value = '';
+    }
+  };
 
   // Format handicap with 1 decimal place
   const formatHandicap = (hcp: number | null | undefined): string => {
@@ -372,7 +423,7 @@ const ProfilePageV2Content: React.FC = () => {
           {/* Cover photo edit affordance — self-profile only */}
           {isSelf && (
             <button
-              onClick={() => navigate('/edit-profile')}
+              onClick={() => heroFileInputRef.current?.click()}
               className="absolute bottom-3 right-3 h-11 w-11 rounded-full flex items-center justify-center active:scale-[0.95] z-10 pointer-events-auto transition-transform"
               style={{
                 background: 'rgba(0, 0, 0, 0.45)',
@@ -381,8 +432,13 @@ const ProfilePageV2Content: React.FC = () => {
                 border: '1px solid rgba(255, 255, 255, 0.1)',
               }}
               aria-label="Change cover photo"
+              disabled={isUploadingHero}
             >
-              <Camera className="w-4 h-4 text-white" />
+              {isUploadingHero ? (
+                <Loader2 className="w-4 h-4 text-white animate-spin" />
+              ) : (
+                <Camera className="w-4 h-4 text-white" />
+              )}
             </button>
           )}
         </div>
@@ -453,7 +509,7 @@ const ProfilePageV2Content: React.FC = () => {
             {/* Avatar edit affordance — self-profile only */}
             {isSelf && (
               <button
-                onClick={(e) => { e.stopPropagation(); navigate('/edit-profile'); }}
+                onClick={(e) => { e.stopPropagation(); avatarFileInputRef.current?.click(); }}
                 className="absolute bottom-0 right-0 h-7 w-7 rounded-full flex items-center justify-center active:scale-[0.95] z-30 pointer-events-auto transition-transform"
                 style={{
                    background: 'rgba(0, 0, 0, 0.45)',
@@ -463,8 +519,13 @@ const ProfilePageV2Content: React.FC = () => {
                    boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
                 }}
                 aria-label="Change profile photo"
+                disabled={isUploadingAvatar}
               >
-                <Camera className="w-3.5 h-3.5 text-white" />
+                {isUploadingAvatar ? (
+                  <Loader2 className="w-3.5 h-3.5 text-white animate-spin" />
+                ) : (
+                  <Camera className="w-3.5 h-3.5 text-white" />
+                )}
               </button>
             )}
           </div>
@@ -943,6 +1004,22 @@ const ProfilePageV2Content: React.FC = () => {
           </AlertDialogContent>
         </AlertDialog>
       )}
+
+      {/* Hidden file inputs for inline photo upload */}
+      <input
+        ref={avatarFileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleAvatarUpload}
+        className="hidden"
+      />
+      <input
+        ref={heroFileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleHeroUpload}
+        className="hidden"
+      />
     </PageRoot>
   );
 };
