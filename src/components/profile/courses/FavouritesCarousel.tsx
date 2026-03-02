@@ -310,7 +310,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
         <div className="pt-4 px-4">
           <button
             onClick={handleShare}
-            className="w-full py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground bg-background hover:bg-muted rounded-xl border border-border shadow-sm transition-colors flex items-center justify-center gap-2 min-h-[44px] active:scale-[0.98]"
+            className="w-full py-2.5 text-sm font-semibold text-foreground bg-card hover:bg-muted rounded-lg border border-border/60 transition-colors flex items-center justify-center gap-2 min-h-[44px] active:scale-[0.98]"
           >
             <Share2 className="w-4 h-4" />
             Share your Top 10
