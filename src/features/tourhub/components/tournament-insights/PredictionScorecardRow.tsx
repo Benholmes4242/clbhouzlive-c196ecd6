@@ -5,7 +5,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
-import PickBadge from './components/PickBadge';
+
 import ActualPositionBadge from './components/ActualPositionBadge';
 import LivePositionDisplay from './components/LivePositionDisplay';
 import type { TrackedPrediction } from './types';
@@ -92,30 +92,25 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
       )}
 
       <div className="flex items-center gap-3">
-        {/* Pick badge */}
-        <PickBadge pickNumber={prediction.predictedRank} />
-
-        {/* Avatar */}
+        {/* Avatar — squircle shape */}
         <div
-          className="overflow-hidden flex-shrink-0"
+          className="overflow-hidden flex-shrink-0 bg-muted"
           style={{
             width: 44,
-            height: 44,
-            borderRadius: '50%',
-            border: `2px solid ${borderColor}`,
+            height: Math.round(44 * 1.05),
+            borderRadius: '34%',
+            border: `1.5px solid ${borderColor}`,
           }}
         >
           {avatarUrl ? (
-            <div className="relative w-full h-full bg-muted">
-              <img
-                src={avatarUrl}
-                alt={prediction.playerName}
-                className="relative z-10 w-full h-full object-cover"
-                style={{ objectPosition: 'center 20%' }}
-                loading="lazy"
-                onError={(e) => { e.currentTarget.style.display = 'none'; }}
-              />
-            </div>
+            <img
+              src={avatarUrl}
+              alt={prediction.playerName}
+              className="w-full h-full object-cover"
+              style={{ objectPosition: 'center 20%' }}
+              loading="lazy"
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
           ) : (
             <div className="w-full h-full bg-muted" />
           )}
