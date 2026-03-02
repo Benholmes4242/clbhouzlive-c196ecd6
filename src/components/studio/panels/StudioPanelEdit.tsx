@@ -91,7 +91,7 @@ export default function StudioPanelEdit({ edits, updateEdits, mediaType, mediaUr
       <div className="flex-1 overflow-y-auto p-3 space-y-4">
         {/* Crop ratios */}
         <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#AEAEB2' }}>Crop Ratio</label>
+          <label className="block text-[11px] font-semibold uppercase tracking-[1.5px] mb-2" style={{ color: '#AEAEB2' }}>Crop Ratio</label>
           <div className="grid grid-cols-5 gap-1.5">
             {CROP_RATIOS.map(ratio => (
               <button
@@ -140,7 +140,7 @@ export default function StudioPanelEdit({ edits, updateEdits, mediaType, mediaUr
 
         {/* Transform controls */}
         <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#AEAEB2' }}>Transform</label>
+          <label className="block text-[11px] font-semibold uppercase tracking-[1.5px] mb-2" style={{ color: '#AEAEB2' }}>Transform</label>
           <div className="flex gap-2">
             <button
               onClick={handleRotate}

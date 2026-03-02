@@ -215,8 +215,7 @@ export default function StudioShelf({
                   )}
                   <button
                     onClick={() => onClose()}
-                    className="px-4 py-1.5 rounded-full text-sm font-semibold text-white"
-                    style={{ background: '#f59e0b' }}
+                    className="px-4 py-1.5 rounded-full text-sm font-semibold text-white bg-primary"
                   >
                     Done
                   </button>

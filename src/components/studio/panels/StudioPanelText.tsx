@@ -122,7 +122,7 @@ export default function StudioPanelText({
       {/* Layers header */}
       <div className="px-3 pt-2 pb-1.5 flex items-center gap-2">
         <Layers className="w-3.5 h-3.5" style={{ color: '#AEAEB2' }} />
-        <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#AEAEB2' }}>Layers</span>
+        <span className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: '#AEAEB2' }}>Layers</span>
         <span className="text-[11px] ml-auto" style={{ color: '#f59e0b' }}>{textBoxes.length}</span>
       </div>
       

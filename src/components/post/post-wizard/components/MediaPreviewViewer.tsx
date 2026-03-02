@@ -245,7 +245,7 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
           >
             <X className="w-5 h-5 text-white" />
           </button>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             {items.length > 1 && !isCover && (
               <button
                 onClick={() => onSetCover?.(currentIndex)}
@@ -264,7 +264,7 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
                   onClick={toggleMute}
                   onTouchStart={(e) => e.stopPropagation()}
                   onTouchEnd={(e) => e.stopPropagation()}
-                  className="w-9 h-9 rounded-full flex items-center justify-center active:bg-white/10 transition-colors"
+                  className="w-11 h-11 rounded-full flex items-center justify-center active:bg-white/10 transition-colors"
                   aria-label={isMutedState ? 'Unmute' : 'Mute'}
                 >
                   {isMutedState ? (
@@ -279,7 +279,7 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
                     setShowTrimmer(false);
                   }}
                   className={cn(
-                    'w-9 h-9 rounded-full flex items-center justify-center transition-colors',
+                    'w-11 h-11 rounded-full flex items-center justify-center transition-colors',
                     showPosterPicker ? 'bg-primary/20' : 'active:bg-white/10'
                   )}
                   aria-label="Choose cover frame"
@@ -292,7 +292,7 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
                     setShowPosterPicker(false);
                   }}
                   className={cn(
-                    'w-9 h-9 rounded-full flex items-center justify-center transition-colors',
+                    'w-11 h-11 rounded-full flex items-center justify-center transition-colors',
                     showTrimmer ? 'bg-primary/20' : 'active:bg-white/10'
                   )}
                   aria-label="Trim video"
@@ -304,7 +304,7 @@ export function MediaPreviewViewer({ items, initialIndex, onClose, onStudio, onS
             {showStudio && (
               <button
                 onClick={handleStudio}
-                className="w-9 h-9 rounded-full flex items-center justify-center active:bg-white/10 transition-colors"
+                className="w-11 h-11 rounded-full flex items-center justify-center active:bg-white/10 transition-colors"
                 aria-label="Open studio"
               >
                 <Wand2 className="w-4 h-4 text-white" />
