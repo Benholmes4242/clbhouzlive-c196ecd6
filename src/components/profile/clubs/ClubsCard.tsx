@@ -50,7 +50,7 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
           whileTap={{ scale: 0.985 }}
           transition={{ duration: 0.1 }}
           className={cn(
-            'inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground',
+            'inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground min-h-[44px]',
             'hover:text-foreground hover:underline hover:decoration-muted-foreground transition-all'
           )}
         >
@@ -106,9 +106,9 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
       {/* Home Club */}
       {homeClub && (
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-foreground">{homeClub.name}</span>
+          <span className="text-sm font-semibold text-foreground">{homeClub.name}</span>
           <span className={cn(
-            'px-2 py-0.5 text-xs font-medium rounded-full',
+            'px-2 py-0.5 text-xs font-semibold rounded-full',
             'border border-primary/20 bg-primary/5 text-primary'
           )}>
             Home club
