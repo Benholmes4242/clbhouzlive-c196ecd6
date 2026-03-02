@@ -217,7 +217,7 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
 
   const followButton = (
     <Button
-      variant="secondary"
+      variant={relationship.isFollowing ? 'secondary' : 'destructive'}
       size="sm"
       onClick={() => {
         analyticsEvents.social.followToggled({
