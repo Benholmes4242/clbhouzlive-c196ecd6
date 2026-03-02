@@ -113,7 +113,7 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
   }
 
   return (
-    <div className="px-4 py-6 space-y-6">
+    <div className="px-4 pt-6 pb-2 space-y-6">
       <ScrollToTopGlass />
 
       {/* Handicap Display Card */}
@@ -121,9 +121,9 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
         // Populated State
         <div className="bg-card rounded-2xl border border-border p-6 shadow-sm">
           {/* Header */}
-          <p className="text-sm font-semibold text-muted-foreground mb-3">
+           <p className="text-[11px] font-semibold uppercase tracking-[1.5px] mb-3" style={{ color: '#AEAEB2' }}>
             Handicap Index
-          </p>
+           </p>
           
           {/* Handicap Number */}
           <div className="mb-3">
@@ -143,7 +143,8 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
           {isOwnProfile && (
             <button
               onClick={() => setIsEditModalOpen(true)}
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors min-h-[44px] px-2 rounded-lg active:scale-[0.98]"
+              className="inline-flex items-center gap-1.5 text-sm font-medium hover:opacity-80 transition-colors min-h-[44px] px-2 rounded-lg active:scale-[0.98]"
+              style={{ color: '#f59e0b' }}
             >
               <Pencil className="h-3.5 w-3.5" />
               Edit handicap

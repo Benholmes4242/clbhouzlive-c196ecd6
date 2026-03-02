@@ -74,7 +74,7 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   }
 
   return (
-    <div className="pb-8">
+    <div className="pb-2">
       <ScrollToTopGlass />
 
       {/* Section 1: Course Legacy Summary Card */}

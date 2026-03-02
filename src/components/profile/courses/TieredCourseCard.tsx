@@ -78,7 +78,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
                 alt={course.name}
                 loading="lazy"
                 decoding="async"
-                className="w-24 h-[88px] object-cover transition-transform duration-300 group-hover:scale-105"
+                className="w-24 h-[88px] object-cover transition-transform duration-300 group-hover:scale-105 rounded-[10px]"
               />
             ) : (
               <div className="w-24 h-[88px] bg-gradient-to-br from-muted to-muted/50" />
@@ -152,7 +152,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
               alt={course.name}
               loading="lazy"
               decoding="async"
-              className="w-16 h-[68px] object-cover flex-shrink-0 opacity-80"
+              className="w-16 h-[68px] object-cover flex-shrink-0 opacity-80 rounded-[10px]"
             />
           ) : (
             <div className="w-16 h-[68px] bg-muted/50 flex-shrink-0" />
@@ -161,7 +161,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
           {/* Content - flexible column */}
           <div className="flex-1 py-2 px-2.5 flex flex-col justify-center min-w-0">
             {/* Course name - allow 2 lines */}
-            <div className="font-medium text-[13px] text-foreground/80 leading-tight line-clamp-2">
+            <div className="font-semibold text-[13px] text-foreground/80 leading-tight line-clamp-2">
               {course.name}
             </div>
             <div className="text-[11px] text-muted-foreground truncate mt-0.5">
@@ -208,7 +208,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
             alt={course.name}
             loading="lazy"
             decoding="async"
-            className="w-[72px] h-[76px] object-cover flex-shrink-0"
+            className="w-[72px] h-[76px] object-cover flex-shrink-0 rounded-[10px]"
           />
         ) : (
           <div className="w-[72px] h-[76px] bg-muted flex-shrink-0" />
@@ -217,7 +217,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
         {/* Content - flexible column */}
         <div className="flex-1 py-2 px-2.5 flex flex-col justify-center min-w-0">
           {/* Course name - single line, wrap to 2 only if needed */}
-          <div className="font-medium text-[13px] text-foreground leading-tight line-clamp-2 break-words">
+          <div className="font-semibold text-[13px] text-foreground leading-tight line-clamp-2 break-words">
             {course.name}
           </div>
           <div className="text-[11px] text-muted-foreground truncate mt-0.5">

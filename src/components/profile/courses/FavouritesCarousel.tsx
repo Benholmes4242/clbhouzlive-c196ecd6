@@ -295,13 +295,19 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
 
       {/* Minimal scroll indicator */}
       {courseCount > 1 && (
-        <div className="flex justify-center mt-4">
-          <div className="h-1 w-16 rounded-full bg-muted overflow-hidden">
-            <div 
-              className="h-full bg-foreground rounded-full transition-all duration-300"
-              style={{ width: `${Math.max(10, scrollProgress * 100)}%` }}
-            />
-          </div>
+        <div className="flex justify-center items-center gap-1 mt-4">
+          {Array.from({ length: courseCount }).map((_, i) => {
+            const isActive = Math.round(scrollProgress * (courseCount - 1)) === i;
+            return (
+              <div
+                key={i}
+                className={cn(
+                  "rounded-full transition-all duration-300",
+                  isActive ? "w-5 h-1.5 bg-primary" : "w-1.5 h-1.5 bg-primary/30"
+                )}
+              />
+            );
+          })}
         </div>
       )}
       
@@ -310,7 +316,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
         <div className="pt-4 px-4">
           <button
             onClick={handleShare}
-            className="w-full py-2.5 text-sm font-semibold text-foreground bg-card hover:bg-muted rounded-lg border border-border/60 transition-colors flex items-center justify-center gap-2 min-h-[44px] active:scale-[0.98]"
+            className="w-full py-2.5 text-sm font-semibold text-foreground bg-card hover:bg-muted rounded-full border border-border/60 transition-colors flex items-center justify-center gap-2 min-h-[44px] active:scale-[0.98]"
           >
             <Share2 className="w-4 h-4" />
             Share your Top 10
