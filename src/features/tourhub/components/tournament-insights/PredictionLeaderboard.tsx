@@ -40,21 +40,13 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
       style={{ marginBottom: 32 }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-1" style={{ marginBottom: 12 }}>
+      <div className="flex items-center justify-center px-1" style={{ marginBottom: 12 }}>
         <span
           className="text-muted-foreground uppercase"
           style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.12em' }}
         >
           {isCompleted ? 'OUR PICKS · BEST FINISHERS FIRST' : 'OUR PICKS · LIVE POSITIONS'}
         </span>
-        {!isCompleted && (
-          <span
-            className="text-muted-foreground uppercase"
-            style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.12em' }}
-          >
-            POS / OFF LEAD
-          </span>
-        )}
       </div>
 
       {/* Live status bar */}
