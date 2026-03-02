@@ -579,8 +579,7 @@ const ProfilePageV2Content: React.FC = () => {
           /* ── Other user: Follow + Add Friend + Overflow menu ── */
           <>
             <button 
-              className="h-11 flex-1 rounded-full text-sm font-semibold text-white flex items-center justify-center gap-1.5 disabled:opacity-60 active:scale-[0.98] transition-transform"
-              style={{ background: isFollowing === 'following' ? '#334155' : 'hsl(var(--destructive))' }}
+              className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 disabled:opacity-60 active:scale-[0.98] transition-transform border border-border bg-card text-foreground"
               onClick={toggleFollow}
               disabled={followBusy || isFollowing === 'unknown'}
             >
