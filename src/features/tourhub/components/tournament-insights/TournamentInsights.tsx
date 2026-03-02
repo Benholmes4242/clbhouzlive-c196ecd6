@@ -419,7 +419,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
         viewport={{ once: true }}
         style={{ marginBottom: '24px' }}
       >
-        <div className="mb-1">
+        <div className="mb-1 text-center">
           <h2
             className="text-foreground"
             style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.3px' }}
@@ -435,7 +435,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
 
         {/* Tab bar — only when multiple tabs */}
         {tabs.length > 1 && (
-          <div style={{ paddingTop: '12px' }}>
+          <div style={{ paddingTop: '12px' }} className="flex justify-center">
             <LiveUpcomingToggle
               tabs={tabs}
               activeTab={activeMainTab}
