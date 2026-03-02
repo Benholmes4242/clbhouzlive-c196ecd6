@@ -34,46 +34,54 @@ export const ResultsRecap: React.FC<ResultsRecapProps> = ({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      className="flex flex-col items-center"
       style={{ padding: '8px 0 0' }}
     >
-      {/* Top section — horizontal: ring + stats */}
-      <div className="flex items-center justify-center" style={{ gap: 20 }}>
-        {/* Accuracy Ring */}
-        <div className="flex-shrink-0">
-          <AccuracyRing hit={accuracy.inTop10} total={accuracy.totalPredictions} size={88} />
-        </div>
+      {/* Accuracy Ring */}
+      <AccuracyRing hit={accuracy.inTop10} total={accuracy.totalPredictions} size={120} />
 
-        {/* Right column: subtitle + breakdown */}
-        <div className="flex flex-col items-start min-w-0">
-          <p className="text-muted-foreground" style={{ fontSize: 14 }}>
-            picks finished in the{' '}
-            <span className="text-foreground" style={{ fontWeight: 700 }}>Top 10</span>
-          </p>
+      {/* Subtitle */}
+      <p
+        className="text-muted-foreground"
+        style={{ fontSize: 14, marginTop: 12, marginBottom: 20 }}
+      >
+        picks finished in the{' '}
+        <span className="text-foreground" style={{ fontWeight: 700 }}>Top 10</span>
+      </p>
 
-          {/* Breakdown values — raw numbers */}
-          <div className="flex items-baseline" style={{ gap: 20, marginTop: 10 }}>
-            {[
-              { label: 'Top 5', value: accuracy.inTop5 },
-              { label: 'Top 10', value: accuracy.inTop10 },
-              { label: 'Top 20', value: accuracy.inTop20 },
-            ].map((bucket) => (
-              <div key={bucket.label} className="flex flex-col items-center">
-                <span
-                  className="text-foreground"
-                  style={{ fontSize: 18, fontWeight: 700, lineHeight: 1.1 }}
-                >
-                  {bucket.value}
-                </span>
-                <span
-                  className="text-muted-foreground uppercase"
-                  style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.08em', marginTop: 2 }}
-                >
-                  {bucket.label}
-                </span>
-              </div>
-            ))}
+      {/* Breakdown row */}
+      <div
+        className="w-full flex border border-border overflow-hidden"
+        style={{ borderRadius: 12, marginBottom: 20 }}
+      >
+        {[
+          { label: 'Top 5', value: accuracy.inTop5 },
+          { label: 'Top 10', value: accuracy.inTop10 },
+          { label: 'Top 20', value: accuracy.inTop20 },
+        ].map((bucket, i) => (
+          <div
+            key={bucket.label}
+            className="flex-1 text-center"
+            style={{
+              padding: '12px 0',
+              borderRight: i < 2 ? '1px solid hsl(var(--border))' : 'none',
+              background: bucket.value > 0 ? 'rgba(22, 163, 74, 0.04)' : 'transparent',
+            }}
+          >
+            <div
+              className="text-foreground"
+              style={{ fontSize: 22, fontWeight: 800, lineHeight: 1.1 }}
+            >
+              {bucket.value}
+            </div>
+            <div
+              className="text-muted-foreground uppercase"
+              style={{ fontSize: 10, fontWeight: 600, marginTop: 4, letterSpacing: '0.08em' }}
+            >
+              {bucket.label}
+            </div>
           </div>
-        </div>
+        ))}
       </div>
 
       {/* Best call highlight */}
@@ -90,8 +98,7 @@ export const ResultsRecap: React.FC<ResultsRecapProps> = ({
             alignItems: 'center',
             gap: 8,
             borderLeft: '3px solid #CA8A04',
-            marginTop: 16,
-            marginBottom: 20,
+            marginBottom: 28,
           }}
         >
           <span style={{ fontSize: 14 }}>✦</span>

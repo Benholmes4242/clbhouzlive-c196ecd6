@@ -5,7 +5,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
-
+import PickBadge from './components/PickBadge';
 import ActualPositionBadge from './components/ActualPositionBadge';
 import LivePositionDisplay from './components/LivePositionDisplay';
 import type { TrackedPrediction } from './types';
@@ -50,7 +50,7 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
       }}
       className="relative"
       style={{
-        padding: '12px 4px',
+        padding: '16px 4px',
         opacity: isWD ? 0.5 : isCut ? 0.6 : 1,
         borderBottom: isLast ? 'none' : '1px solid hsl(var(--border) / 0.3)',
       }}
@@ -91,26 +91,31 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
         </div>
       )}
 
-      <div className="flex items-center gap-2.5">
-        {/* Avatar — squircle shape */}
+      <div className="flex items-center gap-3">
+        {/* Pick badge */}
+        <PickBadge pickNumber={prediction.predictedRank} />
+
+        {/* Avatar */}
         <div
-          className="overflow-hidden flex-shrink-0 bg-muted"
+          className="overflow-hidden flex-shrink-0"
           style={{
-            width: 40,
-            height: Math.round(40 * 1.05),
-            borderRadius: '34%',
-            border: `1.5px solid ${borderColor}`,
+            width: 44,
+            height: 44,
+            borderRadius: '50%',
+            border: `2px solid ${borderColor}`,
           }}
         >
           {avatarUrl ? (
-            <img
-              src={avatarUrl}
-              alt={prediction.playerName}
-              className="w-full h-full object-cover"
-              style={{ objectPosition: 'center 20%' }}
-              loading="lazy"
-              onError={(e) => { e.currentTarget.style.display = 'none'; }}
-            />
+            <div className="relative w-full h-full bg-muted">
+              <img
+                src={avatarUrl}
+                alt={prediction.playerName}
+                className="relative z-10 w-full h-full object-cover"
+                style={{ objectPosition: 'center 20%' }}
+                loading="lazy"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              />
+            </div>
           ) : (
             <div className="w-full h-full bg-muted" />
           )}
