@@ -37,14 +37,14 @@ export const ResultsRecap: React.FC<ResultsRecapProps> = ({
       style={{ padding: '8px 0 0' }}
     >
       {/* Top section — horizontal: ring + stats */}
-      <div className="flex items-center" style={{ gap: 20 }}>
+      <div className="flex items-center justify-center" style={{ gap: 20 }}>
         {/* Accuracy Ring */}
         <div className="flex-shrink-0">
           <AccuracyRing hit={accuracy.inTop10} total={accuracy.totalPredictions} size={88} />
         </div>
 
         {/* Right column: subtitle + breakdown */}
-        <div className="flex flex-col items-start flex-1 min-w-0">
+        <div className="flex flex-col items-start min-w-0">
           <p className="text-muted-foreground" style={{ fontSize: 14 }}>
             picks finished in the{' '}
             <span className="text-foreground" style={{ fontWeight: 700 }}>Top 10</span>
