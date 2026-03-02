@@ -40,7 +40,7 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
       style={{ marginBottom: 32 }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-1" style={{ marginBottom: 16 }}>
+      <div className="flex items-center justify-between px-1" style={{ marginBottom: 12 }}>
         <span
           className="text-muted-foreground uppercase"
           style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.12em' }}

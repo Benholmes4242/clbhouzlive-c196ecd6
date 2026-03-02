@@ -50,7 +50,7 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
       }}
       className="relative"
       style={{
-        padding: '16px 4px',
+        padding: '12px 4px',
         opacity: isWD ? 0.5 : isCut ? 0.6 : 1,
         borderBottom: isLast ? 'none' : '1px solid hsl(var(--border) / 0.3)',
       }}
