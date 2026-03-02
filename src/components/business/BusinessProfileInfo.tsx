@@ -46,7 +46,7 @@ export function BusinessProfileInfo({ business, canManage }: BusinessProfileInfo
   };
 
   return (
-    <div className="-mx-5 px-0 bg-muted pb-8">
+    <div className="-mx-5 px-0 pb-8" style={{ backgroundColor: '#F8FAFC' }}>
       <div className="flex flex-col gap-3">
         {/* About — tab label provides heading, body text starts immediately */}
         {business.description && (
