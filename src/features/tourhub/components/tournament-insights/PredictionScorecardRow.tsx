@@ -1,11 +1,13 @@
 /**
- * PredictionScorecardRow - OWGR-style row
- * 48px squircle avatars, 15px names, theme-aware colors
+ * PredictionScorecardRow - Card-based player row for both Live and Results states
  */
 
 import React from 'react';
 import { motion } from 'framer-motion';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import PickBadge from './components/PickBadge';
+import ActualPositionBadge from './components/ActualPositionBadge';
+import LivePositionDisplay from './components/LivePositionDisplay';
 import type { TrackedPrediction } from './types';
 
 interface PredictionScorecardRowProps {
@@ -14,51 +16,11 @@ interface PredictionScorecardRowProps {
   isCompleted?: boolean;
 }
 
-function getOrdinalSuffix(n: number): string {
-  const s = ['th', 'st', 'nd', 'rd'];
-  const v = n % 100;
-  return s[(v - 20) % 10] || s[v] || s[0];
-}
-
-function formatActual(prediction: TrackedPrediction, isCompleted?: boolean): string {
-  if (prediction.performanceStatus === 'cut') return 'MC';
-  if (prediction.performanceStatus === 'withdrawn') return 'WD';
-  if (prediction.actualPosition === null) return '—';
-  const prefix = prediction.actualPositionTied ? 'T' : '';
-  return `${prefix}${prediction.actualPosition}`;
-}
-
-interface OffLeadDisplay {
-  text: string | number;
-  color: string;
-  fontWeight?: number;
-  isDownArrow?: boolean;
-}
-
-function formatScore(score: number | null): string {
-  if (score === null) return 'E';
-  if (score === 0) return 'E';
-  return score > 0 ? `+${score}` : `${score}`;
-}
-
-function getOffLeadDisplay(prediction: TrackedPrediction, isCompleted?: boolean): OffLeadDisplay {
-  if (prediction.performanceStatus === 'cut') {
-    return { text: 'CUT', color: 'hsl(var(--muted-foreground) / 0.5)' };
-  }
-  if (prediction.performanceStatus === 'withdrawn') {
-    return { text: 'WD', color: 'hsl(var(--muted-foreground) / 0.5)' };
-  }
-  if (prediction.actualPosition === null || prediction.performanceStatus === 'not-started') {
-    return { text: '—', color: 'hsl(var(--muted-foreground) / 0.3)' };
-  }
-
-  const offLead = prediction.actualPosition - 1;
-
-  if (offLead === 0) {
-    return { text: formatScore(prediction.score), color: 'rgba(22,163,74,0.9)', fontWeight: 700 };
-  }
-
-  return { text: offLead, color: 'rgba(220,38,38,0.85)', fontWeight: 600, isDownArrow: true };
+function getAccuracyBorderColor(pos: number | null, status?: string) {
+  if (status === 'cut' || status === 'withdrawn' || pos === null) return 'hsl(var(--border))';
+  if (pos <= 3) return 'rgba(22,163,74,0.5)';
+  if (pos <= 10) return 'rgba(217,119,6,0.5)';
+  return 'rgba(220,38,38,0.2)';
 }
 
 export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
@@ -66,10 +28,36 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
   index,
   isCompleted,
 }) => {
-  const offLead = getOffLeadDisplay(prediction, isCompleted);
   const isCut = prediction.performanceStatus === 'cut';
   const isWD = prediction.performanceStatus === 'withdrawn';
+  const isWinner = prediction.actualPosition === 1;
+  const isLeader = !isCompleted && prediction.actualPosition === 1;
   const avatarUrl = getPlayerHeadshotUrl(prediction.playerName, 'pga');
+  const borderColor = getAccuracyBorderColor(prediction.actualPosition, prediction.performanceStatus);
+
+  const offLead = prediction.actualPosition !== null ? prediction.actualPosition - 1 : null;
+
+  // Card backgrounds
+  const getCardStyle = () => {
+    if (isCompleted && isWinner) {
+      return {
+        background: 'linear-gradient(135deg, #F0FDF4 0%, #FEFCE8 100%)',
+        border: '1.5px solid rgba(22, 163, 74, 0.25)',
+      };
+    }
+    if (!isCompleted && isLeader) {
+      return {
+        background: 'linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 100%)',
+        border: '1.5px solid rgba(22, 163, 74, 0.2)',
+      };
+    }
+    return {
+      background: 'hsl(var(--background))',
+      border: '1px solid hsl(var(--border))',
+    };
+  };
+
+  const cardStyle = getCardStyle();
 
   return (
     <motion.div
@@ -80,72 +68,138 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
         ease: [0.16, 1, 0.3, 1],
         delay: index * 0.05,
       }}
-      className="flex items-center px-4 py-3.5"
-      style={{ opacity: isWD ? 0.5 : isCut ? 0.6 : 1 }}
+      className="relative overflow-hidden"
+      style={{
+        ...cardStyle,
+        borderRadius: 16,
+        padding: isWinner ? '16px' : '14px 16px',
+        opacity: isWD ? 0.5 : isCut ? 0.6 : 1,
+      }}
     >
-      {/* PLAYER — 48px squircle Avatar + Name */}
-      <div className="flex items-center gap-2.5 flex-1 min-w-0">
+      {/* Leader left accent */}
+      {!isCompleted && isLeader && (
         <div
-          className="overflow-hidden border border-border/50 flex-shrink-0 bg-muted"
-          style={{ width: '48px', height: '48px', borderRadius: '34%' }}
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: 3,
+            background: '#16A34A',
+            borderRadius: '16px 0 0 16px',
+          }}
+        />
+      )}
+
+      {/* Winner badge */}
+      {isCompleted && isWinner && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            background: 'linear-gradient(135deg, #16A34A, #CA8A04)',
+            color: 'white',
+            fontSize: 9,
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            padding: '3px 8px',
+            borderRadius: 6,
+            textTransform: 'uppercase',
+          }}
+        >
+          WINNER
+        </div>
+      )}
+
+      <div className="flex items-center gap-3">
+        {/* Pick badge */}
+        <PickBadge pickNumber={prediction.predictedRank} />
+
+        {/* Avatar */}
+        <div
+          className="overflow-hidden flex-shrink-0"
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: '50%',
+            border: `2px solid ${borderColor}`,
+          }}
         >
           {avatarUrl ? (
-            <div className="relative w-full h-full">
-              <div className="absolute inset-0 bg-muted" />
+            <div className="relative w-full h-full bg-muted">
               <img
                 src={avatarUrl}
                 alt={prediction.playerName}
                 className="relative z-10 w-full h-full object-cover"
                 style={{ objectPosition: 'center 20%' }}
                 loading="lazy"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                }}
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
               />
             </div>
           ) : (
             <div className="w-full h-full bg-muted" />
           )}
         </div>
+
+        {/* Player info */}
         <div className="min-w-0 flex-1">
           <p
-            className="font-semibold text-foreground truncate leading-tight"
-            style={{ fontSize: '15px', textDecoration: isCut ? 'line-through' : undefined }}
+            className="text-foreground truncate leading-tight"
+            style={{
+              fontSize: 15,
+              fontWeight: isWinner || isLeader ? 700 : 600,
+              textDecoration: isCut ? 'line-through' : undefined,
+            }}
           >
             {prediction.playerName}
           </p>
-          {prediction.actualPosition !== null && prediction.score !== null && (
-            <p className="text-muted-foreground leading-tight" style={{ fontSize: '13px', marginTop: '3px' }}>
-              {prediction.score === 0 ? 'E' : prediction.score > 0 ? `+${prediction.score}` : prediction.score}
-              {prediction.thru !== null && prediction.thru > 0 ? ` · thru ${prediction.thru}` : ''}
-              {prediction.currentRound ? ` · R${prediction.currentRound}` : ''}
-            </p>
+          {prediction.score !== null && (
+            <div className="flex items-center gap-1.5">
+              <p
+                className="text-muted-foreground leading-tight"
+                style={{ fontSize: 13, marginTop: 3 }}
+              >
+                {prediction.score === 0 ? 'E' : prediction.score > 0 ? `+${prediction.score}` : prediction.score}
+                {!isCompleted && prediction.thru !== null && prediction.thru > 0 ? ` · thru ${prediction.thru}` : ''}
+                {!isCompleted && prediction.currentRound ? ` · R${prediction.currentRound}` : ''}
+              </p>
+              {/* Leader pulsing dot */}
+              {!isCompleted && isLeader && (
+                <span
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: 3,
+                    backgroundColor: '#16A34A',
+                    animation: 'pulse 2s infinite',
+                    flexShrink: 0,
+                  }}
+                />
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Right section — position display */}
+        <div className="flex-shrink-0 ml-auto">
+          {isCompleted ? (
+            <ActualPositionBadge
+              position={prediction.actualPosition}
+              isTied={prediction.actualPositionTied}
+              performanceStatus={prediction.performanceStatus}
+            />
+          ) : (
+            <LivePositionDisplay
+              position={prediction.actualPosition}
+              isTied={prediction.actualPositionTied}
+              offLead={offLead}
+              performanceStatus={prediction.performanceStatus}
+              score={prediction.score}
+            />
           )}
         </div>
       </div>
-
-      {/* ACTUAL */}
-      <div className="w-[52px] flex-shrink-0 text-center">
-        <span className="font-semibold text-foreground" style={{ fontSize: '17px' }}>
-          {formatActual(prediction, isCompleted)}
-        </span>
-      </div>
-
-      {/* OFF LEAD */}
-      <motion.div
-        className="w-[75px] flex-shrink-0 text-center"
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.3 + index * 0.05 }}
-      >
-        <span
-          style={{ color: offLead.color, fontWeight: offLead.fontWeight ?? 600, fontSize: '13px' }}
-        >
-          {offLead.isDownArrow ? (
-            <><span style={{ fontSize: '10px', marginRight: '1px' }}>▼</span>{offLead.text}</>
-          ) : offLead.text}
-        </span>
-      </motion.div>
     </motion.div>
   );
 };

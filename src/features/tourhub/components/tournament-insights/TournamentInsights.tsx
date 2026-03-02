@@ -1,27 +1,23 @@
 /**
- * TournamentInsights - Main container with toggle-based rendering
- * Pre-tournament: existing tab UI (Course DNA + Predictions)
- * In-progress: Live/Upcoming toggle with tracker or next tournament view
- * Completed: Falls back to next tournament or results recap
+ * TournamentInsights - Main container with tab-based rendering
+ * Phases: Pre-tournament, In-progress (Live), Completed (Results)
+ * Tab priority: Live > Next Up > Results
  */
 
 import React, { memo, useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight } from 'lucide-react';
 import { useTournamentInsights } from './hooks/useTournamentInsights';
 import { TournamentHeroCard } from './TournamentHeroCard';
 import { CourseDNACard } from './CourseDNACard';
 import { ClubhouseIntelligence } from './ClubhouseIntelligence';
 import { LikelyWinnersCarousel } from './LikelyWinnersCarousel';
-import { AccuracyHeadlineCard } from './AccuracyHeadlineCard';
 import { PredictionLeaderboard } from './PredictionLeaderboard';
 import { LiveUpcomingToggle } from './LiveUpcomingToggle';
 import { ResultsRecap } from './ResultsRecap';
 import { StaleBadge } from './StaleBadge';
 import IntelligenceTabSwitcher from './components/IntelligenceTabSwitcher';
-import type { IntelligenceView } from './types';
 
 type IntelligenceTab = 'courseDNA' | 'predictions';
 
@@ -64,12 +60,10 @@ export const TournamentInsights = memo(function TournamentInsights() {
     isStale,
   } = useTournamentInsights();
 
-  // Derived phase booleans — computed before early returns so hooks below are valid
   const isLive = tournamentPhase === 'in-progress';
   const isCompleted = tournamentPhase === 'completed';
 
-  // Independent live-score check — does NOT depend on tracker matching predictions.
-  // A lightweight HEAD count against sr_leaderboards; polls every 30s.
+  // Live score check for waiting-for-play detection
   const currentTournamentId = data?.tournament?.id ?? null;
   const { data: liveScoreCount } = useQuery({
     queryKey: ['live-score-check', currentTournamentId],
@@ -90,7 +84,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
   const hasLiveScores = (liveScoreCount ?? 0) > 0;
   const isWaitingForPlay = isLive && !hasLiveScores;
 
-  // Build set of withdrawn player IDs from tracker for WD badge overlay
+  // Withdrawn player IDs from tracker
   const withdrawnPlayerIds = useMemo(() => {
     if (!tracker) return undefined;
     const wdIds = new Set<string>();
@@ -100,20 +94,36 @@ export const TournamentInsights = memo(function TournamentInsights() {
     return wdIds.size > 0 ? wdIds : undefined;
   }, [tracker]);
 
-  const [activeTab, setActiveTab] = useState<IntelligenceTab>('courseDNA');
-  const [intelligenceView, setIntelligenceView] = useState<IntelligenceView>('live');
+  // ═══ TAB SYSTEM ═══
+  // Build available tabs based on tournament state
+  const tabs = useMemo(() => {
+    const result: Array<{ id: string; label: string; hasLiveDot?: boolean }> = [];
+    if (isLive) result.push({ id: 'live', label: 'Live', hasLiveDot: true });
+    if (hasUpcoming) result.push({ id: 'nextup', label: 'Next Up' });
+    if (isCompleted) result.push({ id: 'results', label: 'Results' });
+    // Pre-tournament with no completed: just show content directly (no tabs)
+    if (!isLive && !isCompleted && !hasUpcoming) {
+      result.push({ id: 'current', label: 'Current' });
+    }
+    return result;
+  }, [isLive, hasUpcoming, isCompleted]);
 
-  // Default to Top 5 Picks when switching to "Next Up" view
+  const [activeMainTab, setActiveMainTab] = useState(tabs[0]?.id || 'current');
+
+  // Reset active tab when tabs change
   useEffect(() => {
-    setActiveTab(intelligenceView === 'upcoming' ? 'predictions' : 'courseDNA');
-  }, [intelligenceView]);
+    if (tabs.length > 0 && !tabs.find(t => t.id === activeMainTab)) {
+      setActiveMainTab(tabs[0].id);
+    }
+  }, [tabs, activeMainTab]);
+
+  // Sub-tab for upcoming/pre-tournament content
+  const [activeSubTab, setActiveSubTab] = useState<IntelligenceTab>('predictions');
   const [showCourseDNA, setShowCourseDNA] = useState(false);
 
-  // Auto-expand Course DNA while waiting for play to begin
+  // Auto-expand Course DNA while waiting for play
   useEffect(() => {
-    if (isWaitingForPlay) {
-      setShowCourseDNA(true);
-    }
+    if (isWaitingForPlay) setShowCourseDNA(true);
   }, [isWaitingForPlay]);
 
   if (isLoading) return <TournamentInsightsSkeleton />;
@@ -131,8 +141,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
     return null;
   }
 
-  // Determine which tournament data to show for the hero card
-  // When upcoming is selected, use full insights if available, else preview as minimal fallback
+  // ═══ Hero card data resolution ═══
   const upcomingHeroData = nextTournamentInsights?.tournament ?? (nextTournamentPreview ? {
     id: nextTournamentPreview.id,
     name: nextTournamentPreview.name,
@@ -140,11 +149,265 @@ export const TournamentInsights = memo(function TournamentInsights() {
     dateRangeText: nextTournamentPreview.startDate,
     heroImageUrl: '',
   } : null);
-  const heroData = intelligenceView === 'upcoming' && upcomingHeroData
+
+  const isShowingUpcoming = activeMainTab === 'nextup';
+  const heroData = isShowingUpcoming && upcomingHeroData
     ? upcomingHeroData
     : data?.tournament ?? null;
-  const heroIsLive = isLive && intelligenceView === 'live';
-  const heroIsCompleted = isCompleted && intelligenceView === 'live';
+  const heroIsLive = isLive && activeMainTab === 'live';
+  const heroIsCompleted = isCompleted && activeMainTab === 'results';
+
+  // ═══ CONTENT RENDERERS ═══
+
+  const renderUpcomingContent = (insightsData: typeof nextTournamentInsights | typeof data, picksFirst: boolean = true) => {
+    if (!insightsData) {
+      if (nextTournamentPredictionsLoading) return <GeneratingPredictionsSkeleton />;
+      if (nextTournamentPreview) return <GeneratingPredictionsSkeleton label="Generating predictions…" />;
+      return (
+        <p className="text-sm text-muted-foreground text-center py-8">
+          No upcoming tournament data available yet.
+        </p>
+      );
+    }
+
+    return (
+      <>
+        <IntelligenceTabSwitcher activeTab={activeSubTab} onTabChange={setActiveSubTab} picksFirst={picksFirst} />
+
+        {activeSubTab === 'courseDNA' && (
+          <motion.div
+            key="courseDNA"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+            className="pb-6"
+          >
+            <div>
+              {insightsData.courseDNA.length > 0 && (
+                <CourseDNACard
+                  items={insightsData.courseDNA}
+                  courseName={insightsData.tournament.courseName}
+                  inline
+                />
+              )}
+              <ClubhouseIntelligence insight={insightsData.clubhouseIntelligence} inline />
+            </div>
+          </motion.div>
+        )}
+
+        {activeSubTab === 'predictions' && (
+          <motion.div
+            key="predictions"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+            className="pb-6 space-y-3"
+          >
+            {isStale && <StaleBadge />}
+            {insightsData.winners.length > 0 && (
+              <LikelyWinnersCarousel
+                featured={insightsData.winners[0]}
+                cards={insightsData.contenderCards}
+                withdrawnPlayerIds={withdrawnPlayerIds}
+              />
+            )}
+          </motion.div>
+        )}
+      </>
+    );
+  };
+
+  const renderLiveContent = () => {
+    if (isWaitingForPlay) {
+      return (
+        <div className="space-y-4 pb-6">
+          {/* Amber waiting banner */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              padding: '10px 16px',
+              borderRadius: '12px',
+              background: 'rgba(245, 158, 11, 0.08)',
+              border: '1px solid rgba(245, 158, 11, 0.15)',
+            }}
+          >
+            <div
+              style={{
+                width: '7px',
+                height: '7px',
+                borderRadius: '50%',
+                backgroundColor: 'rgba(245, 158, 11, 0.8)',
+                animation: 'pulse 2s ease-in-out infinite',
+                flexShrink: 0,
+              }}
+            />
+            <span
+              style={{
+                fontSize: '12.5px',
+                fontWeight: 600,
+                color: 'hsl(var(--foreground) / 0.6)',
+              }}
+            >
+              Play begins shortly — tracking starts when scores are in
+            </span>
+          </div>
+
+          {data.winners.length > 0 && (
+            <LikelyWinnersCarousel
+              featured={data.winners[0]}
+              cards={data.contenderCards}
+              withdrawnPlayerIds={withdrawnPlayerIds}
+            />
+          )}
+
+          <AnimatePresence>
+            {showCourseDNA && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                className="overflow-hidden"
+              >
+                <div>
+                  {data.courseDNA.length > 0 && (
+                    <CourseDNACard items={data.courseDNA} courseName={data.tournament.courseName} inline />
+                  )}
+                  <ClubhouseIntelligence insight={data.clubhouseIntelligence} inline />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      );
+    }
+
+    if (tracker) {
+      return (
+        <div className="space-y-4">
+          <PredictionLeaderboard allPicks={tracker.allPicks} isCompleted={false} />
+
+          {/* Course DNA toggle */}
+          <div
+            onClick={() => setShowCourseDNA(!showCourseDNA)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '14px 16px',
+              margin: '12px 0',
+              borderRadius: '12px',
+              cursor: 'pointer',
+            }}
+            className="active:scale-[0.98] transition-transform bg-muted/50 border border-border/40"
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '14px' }}>🧬</span>
+              <span className="text-foreground/70" style={{ fontSize: '13.5px', fontWeight: 600 }}>
+                {showCourseDNA ? 'Hide Course DNA' : 'View Course DNA'}
+              </span>
+            </div>
+            <span
+              className="text-muted-foreground"
+              style={{
+                fontSize: '16px',
+                transform: showCourseDNA ? 'rotate(90deg)' : 'rotate(0deg)',
+                transition: 'transform 0.2s ease',
+                display: 'inline-block',
+              }}
+            >
+              ›
+            </span>
+          </div>
+
+          <AnimatePresence>
+            {showCourseDNA && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                className="overflow-hidden"
+              >
+                <div>
+                  {data.courseDNA.length > 0 && (
+                    <CourseDNACard items={data.courseDNA} courseName={data.tournament.courseName} inline />
+                  )}
+                  <ClubhouseIntelligence insight={data.clubhouseIntelligence} inline />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      );
+    }
+
+    if (trackerLoading) {
+      return (
+        <div className="space-y-3 animate-pulse">
+          <div className="h-24 bg-black/[0.04] rounded-2xl" />
+          <div className="h-64 bg-black/[0.04] rounded-2xl" />
+        </div>
+      );
+    }
+
+    // Fallback: show predictions carousel
+    return (
+      <div className="pb-6">
+        {data.winners.length > 0 && (
+          <LikelyWinnersCarousel
+            featured={data.winners[0]}
+            cards={data.contenderCards}
+            withdrawnPlayerIds={withdrawnPlayerIds}
+          />
+        )}
+      </div>
+    );
+  };
+
+  const renderResultsContent = () => {
+    if (!tracker) return null;
+    const bestCall = getBestCall(tracker);
+    return (
+      <>
+        <ResultsRecap
+          predictions={{
+            tournament: {
+              id: data?.tournament.id ?? '', name: data?.tournament.name ?? '',
+              venueName: data?.tournament.courseName ?? '', venueCity: '', venueState: '',
+              startDate: '', endDate: '', purse: 0, par: 0, yardage: 0, status: 'complete',
+            },
+            topContenders: [], darkHorses: [],
+            courseAnalysis: { winnerProfile: '', keyStats: [], insight: '', difficulty: '' },
+            confidence: 0, generatedAt: '', isAIPowered: true, isStale: false,
+          }}
+          accuracy={tracker.accuracy}
+          bestCallName={bestCall?.playerName}
+          bestCallPredicted={bestCall?.predictedRank}
+          bestCallActual={bestCall?.actualPosition ?? undefined}
+        />
+        <PredictionLeaderboard allPicks={tracker.allPicks} isCompleted={true} />
+      </>
+    );
+  };
+
+  const renderContent = () => {
+    switch (activeMainTab) {
+      case 'live':
+        return renderLiveContent();
+      case 'nextup':
+        return renderUpcomingContent(nextTournamentInsights, true);
+      case 'results':
+        return renderResultsContent();
+      case 'current':
+        return renderUpcomingContent(data, false);
+      default:
+        return null;
+    }
+  };
 
   return (
     <section aria-label="Featured tournament analysis" className="space-y-0 px-4">
@@ -170,14 +433,13 @@ export const TournamentInsights = memo(function TournamentInsights() {
           )}
         </div>
 
-        {/* Live/Upcoming toggle */}
-        {(isLive || hasUpcoming) && (
+        {/* Tab bar — only when multiple tabs */}
+        {tabs.length > 1 && (
           <div style={{ paddingTop: '12px' }}>
             <LiveUpcomingToggle
-              activeView={intelligenceView}
-              onViewChange={setIntelligenceView}
-              hasUpcoming={hasUpcoming}
-              isLive={isLive}
+              tabs={tabs}
+              activeTab={activeMainTab}
+              onTabChange={setActiveMainTab}
             />
           </div>
         )}
@@ -188,7 +450,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
         <div className="-mx-4 relative">
           <AnimatePresence mode="wait">
             <motion.div
-              key={`hero-${intelligenceView}-${heroData?.id ?? 'none'}`}
+              key={`hero-${activeMainTab}-${heroData?.id ?? 'none'}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -200,458 +462,31 @@ export const TournamentInsights = memo(function TournamentInsights() {
         </div>
       )}
 
-      {/* ═══ Content area — phase & view dependent ═══ */}
+      {/* ═══ Content area ═══ */}
       <AnimatePresence mode="wait">
-        {/* PRE-TOURNAMENT — existing tab UI (when not viewing upcoming) */}
-        {tournamentPhase === 'pre-tournament' && intelligenceView === 'live' && (
-          <motion.div
-            key="pre-tournament"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-0 pt-6 bg-background"
-            style={{ borderTop: '1px solid hsl(var(--border) / 0.3)' }}
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-              viewport={{ once: true }}
-            >
-              <IntelligenceTabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
-            </motion.div>
-
-            {activeTab === 'courseDNA' && (
-              <motion.div
-                key="courseDNA"
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
-                className="pb-6"
-              >
-                <div>
-                  {data.courseDNA.length > 0 && (
-                    <CourseDNACard items={data.courseDNA} courseName={data.tournament.courseName} inline />
-                  )}
-                  <ClubhouseIntelligence insight={data.clubhouseIntelligence} inline />
-                </div>
-              </motion.div>
-            )}
-
-            {activeTab === 'predictions' && (
-              <motion.div
-                key="predictions"
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
-                className="pb-6 space-y-3"
-              >
-                {isStale && <StaleBadge />}
-                {data.winners.length > 0 && (
-                  <LikelyWinnersCarousel featured={data.winners[0]} cards={data.contenderCards} />
-                )}
-              </motion.div>
-            )}
-          </motion.div>
-        )}
-
-        {/* PRE-TOURNAMENT — UPCOMING VIEW */}
-        {tournamentPhase === 'pre-tournament' && intelligenceView === 'upcoming' && (
-          <motion.div
-            key="pre-upcoming"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-0 pt-6 bg-background"
-            style={{ borderTop: '1px solid hsl(var(--border) / 0.3)' }}
-          >
-            {nextTournamentInsights ? (
-              <>
-                <IntelligenceTabSwitcher activeTab={activeTab} onTabChange={setActiveTab} picksFirst />
-
-                {activeTab === 'courseDNA' && (
-                  <motion.div
-                    key="upcoming-courseDNA"
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-                    className="pb-6"
-                  >
-                    <div>
-                      {nextTournamentInsights.courseDNA.length > 0 && (
-                        <CourseDNACard
-                          items={nextTournamentInsights.courseDNA}
-                          courseName={nextTournamentInsights.tournament.courseName}
-                          inline
-                        />
-                      )}
-                      <ClubhouseIntelligence insight={nextTournamentInsights.clubhouseIntelligence} inline />
-                    </div>
-                  </motion.div>
-                )}
-
-                {activeTab === 'predictions' && (
-                  <motion.div
-                    key="upcoming-predictions"
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-                    className="pb-6"
-                  >
-                    {nextTournamentInsights.winners.length > 0 && (
-                      <LikelyWinnersCarousel
-                        featured={nextTournamentInsights.winners[0]}
-                        cards={nextTournamentInsights.contenderCards}
-                      />
-                    )}
-                  </motion.div>
-                )}
-              </>
-            ) : nextTournamentPredictionsLoading ? (
-              <GeneratingPredictionsSkeleton />
-            ) : nextTournamentPreview ? (
-              <GeneratingPredictionsSkeleton label="Generating predictions…" />
-            ) : (
-              <p className="text-sm text-muted-foreground text-center py-8">
-                No upcoming tournament data available yet.
-              </p>
-            )}
-          </motion.div>
-        )}
-
-        {/* IN-PROGRESS — LIVE VIEW */}
-        {isLive && intelligenceView === 'live' && (
-          <motion.div
-            key="in-progress-live"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-0 pt-6 bg-background"
-            style={{ borderTop: '1px solid hsl(var(--border) / 0.3)' }}
-          >
-            {isWaitingForPlay ? (
-              /* ── WAITING FOR PLAY: show predictions + Course DNA, not empty tracker ── */
-              <div className="space-y-4 pb-6">
-                {/* Amber "play begins shortly" banner */}
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    padding: '10px 16px',
-                    borderRadius: '12px',
-                    background: 'rgba(245, 158, 11, 0.08)',
-                    border: '1px solid rgba(245, 158, 11, 0.15)',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: '7px',
-                      height: '7px',
-                      borderRadius: '50%',
-                      backgroundColor: 'rgba(245, 158, 11, 0.8)',
-                      animation: 'pulse 2s ease-in-out infinite',
-                      flexShrink: 0,
-                    }}
-                  />
-                  <span
-                    style={{
-                      fontSize: '12.5px',
-                      fontWeight: 600,
-                      color: 'hsl(var(--foreground) / 0.6)',
-                    }}
-                  >
-                    Play begins shortly — tracking starts when scores are in
-                  </span>
-                </div>
-
-                {/* AI predicted contenders with confidence bars */}
-                {data.winners.length > 0 && (
-                  <LikelyWinnersCarousel
-                    featured={data.winners[0]}
-                    cards={data.contenderCards}
-                    withdrawnPlayerIds={withdrawnPlayerIds}
-                  />
-                )}
-
-                {/* Course DNA — auto-expanded via useEffect */}
-                <AnimatePresence>
-                  {showCourseDNA && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                      className="overflow-hidden"
-                    >
-                      <div>
-                        {data.courseDNA.length > 0 && (
-                          <CourseDNACard items={data.courseDNA} courseName={data.tournament.courseName} inline />
-                        )}
-                        <ClubhouseIntelligence insight={data.clubhouseIntelligence} inline />
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ) : tracker ? (
-              /* ── LIVE SCORES IN: show live tracking table ── */
-              <div className="space-y-4">
-                <PredictionLeaderboard allPicks={tracker.allPicks} isCompleted={false} />
-
-                {/* Course DNA toggle card */}
-                <div
-                  onClick={() => setShowCourseDNA(!showCourseDNA)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '14px 16px',
-                    margin: '12px 0',
-                    borderRadius: '12px',
-                    cursor: 'pointer',
-                  }}
-                  className="active:scale-[0.98] transition-transform bg-muted/50 border border-border/40"
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '14px' }}>🧬</span>
-                    <span className="text-foreground/70" style={{ fontSize: '13.5px', fontWeight: 600 }}>
-                      {showCourseDNA ? 'Hide Course DNA' : 'View Course DNA'}
-                    </span>
-                  </div>
-                  <span
-                    className="text-muted-foreground"
-                    style={{
-                      fontSize: '16px',
-                      transform: showCourseDNA ? 'rotate(90deg)' : 'rotate(0deg)',
-                      transition: 'transform 0.2s ease',
-                      display: 'inline-block',
-                    }}
-                  >
-                    ›
-                  </span>
-                </div>
-
-                <AnimatePresence>
-                  {showCourseDNA && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                      className="overflow-hidden"
-                    >
-                      <div>
-                        {data.courseDNA.length > 0 && (
-                          <CourseDNACard items={data.courseDNA} courseName={data.tournament.courseName} inline />
-                        )}
-                        <ClubhouseIntelligence insight={data.clubhouseIntelligence} inline />
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ) : trackerLoading ? (
-              <div className="space-y-3 animate-pulse">
-                <div className="h-24 bg-black/[0.04] rounded-2xl" />
-                <div className="h-64 bg-black/[0.04] rounded-2xl" />
-              </div>
-            ) : (
-              /* ── NO TRACKER: fallback to predictions carousel ── */
-              <div className="pb-6">
-                {data.winners.length > 0 && (
-                  <LikelyWinnersCarousel
-                    featured={data.winners[0]}
-                    cards={data.contenderCards}
-                    withdrawnPlayerIds={withdrawnPlayerIds}
-                  />
-                )}
-              </div>
-            )}
-          </motion.div>
-        )}
-
-        {/* UPCOMING VIEW — shown from any phase when toggled to upcoming */}
-        {intelligenceView === 'upcoming' && !isLive && (
-          <motion.div
-            key="upcoming-view"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-0 pt-6 bg-background"
-            style={{ borderTop: '1px solid hsl(var(--border) / 0.3)' }}
-          >
-            {nextTournamentInsights ? (
-              <>
-                <IntelligenceTabSwitcher activeTab={activeTab} onTabChange={setActiveTab} picksFirst />
-
-                {activeTab === 'courseDNA' && (
-                  <motion.div
-                    key="upcoming-courseDNA"
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-                    className="pb-6"
-                  >
-                    <div>
-                      {nextTournamentInsights.courseDNA.length > 0 && (
-                        <CourseDNACard
-                          items={nextTournamentInsights.courseDNA}
-                          courseName={nextTournamentInsights.tournament.courseName}
-                          inline
-                        />
-                      )}
-                      <ClubhouseIntelligence insight={nextTournamentInsights.clubhouseIntelligence} inline />
-                    </div>
-                  </motion.div>
-                )}
-
-                {activeTab === 'predictions' && (
-                  <motion.div
-                    key="upcoming-predictions"
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-                    className="pb-6"
-                  >
-                    {nextTournamentInsights.winners.length > 0 && (
-                      <LikelyWinnersCarousel
-                        featured={nextTournamentInsights.winners[0]}
-                        cards={nextTournamentInsights.contenderCards}
-                      />
-                    )}
-                  </motion.div>
-                )}
-              </>
-            ) : nextTournamentPredictionsLoading ? (
-              <GeneratingPredictionsSkeleton />
-            ) : nextTournamentPreview ? (
-              <GeneratingPredictionsSkeleton label="Generating predictions for this tournament…" />
-            ) : (
-              <p className="text-sm text-muted-foreground text-center py-8">
-                No upcoming tournament data available yet.
-              </p>
-            )}
-          </motion.div>
-        )}
-
-        {/* IN-PROGRESS — UPCOMING VIEW */}
-        {isLive && intelligenceView === 'upcoming' && (
-          <motion.div
-            key="in-progress-upcoming"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-0 pt-6 bg-background"
-            style={{ borderTop: '1px solid hsl(var(--border) / 0.3)' }}
-          >
-            {nextTournamentInsights ? (
-              <>
-                <IntelligenceTabSwitcher activeTab={activeTab} onTabChange={setActiveTab} picksFirst />
-
-                {activeTab === 'courseDNA' && (
-                  <motion.div
-                    key="upcoming-courseDNA"
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-                    className="pb-6"
-                  >
-                    <div>
-                      {nextTournamentInsights.courseDNA.length > 0 && (
-                        <CourseDNACard
-                          items={nextTournamentInsights.courseDNA}
-                          courseName={nextTournamentInsights.tournament.courseName}
-                          inline
-                        />
-                      )}
-                      <ClubhouseIntelligence insight={nextTournamentInsights.clubhouseIntelligence} inline />
-                    </div>
-                  </motion.div>
-                )}
-
-                {activeTab === 'predictions' && (
-                  <motion.div
-                    key="upcoming-predictions"
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-                    className="pb-6"
-                  >
-                    {nextTournamentInsights.winners.length > 0 && (
-                      <LikelyWinnersCarousel
-                        featured={nextTournamentInsights.winners[0]}
-                        cards={nextTournamentInsights.contenderCards}
-                      />
-                    )}
-                  </motion.div>
-                )}
-              </>
-            ) : nextTournamentPredictionsLoading ? (
-              <GeneratingPredictionsSkeleton />
-            ) : nextTournamentPreview ? (
-              <GeneratingPredictionsSkeleton label="Generating predictions for this tournament…" />
-            ) : (
-              <p className="text-sm text-muted-foreground text-center py-8">
-                No upcoming tournament data available yet.
-              </p>
-            )}
-          </motion.div>
-        )}
-
-        {/* COMPLETED — Results recap then fallback */}
-        {isCompleted && intelligenceView === 'live' && (
-          <motion.div
-            key="completed"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-0 pt-6 bg-background space-y-4"
-            style={{ borderTop: '1px solid hsl(var(--border) / 0.3)' }}
-          >
-            {tracker ? (
-              <>
-                <ResultsRecap
-                  predictions={{
-                    tournament: {
-                      id: data?.tournament.id ?? '', name: data?.tournament.name ?? '',
-                      venueName: data?.tournament.courseName ?? '', venueCity: '', venueState: '',
-                      startDate: '', endDate: '', purse: 0, par: 0, yardage: 0, status: 'complete',
-                    },
-                    topContenders: [], darkHorses: [],
-                    courseAnalysis: { winnerProfile: '', keyStats: [], insight: '', difficulty: '' },
-                    confidence: 0, generatedAt: '', isAIPowered: true, isStale: false,
-                  }}
-                  accuracy={tracker.accuracy}
-                  bestCallName={getBestCall(tracker)?.playerName}
-                  bestCallPredicted={getBestCall(tracker)?.predictedRank}
-                  bestCallActual={getBestCall(tracker)?.actualPosition ?? undefined}
-                />
-                <PredictionLeaderboard allPicks={tracker.allPicks} isCompleted={true} />
-              </>
-            ) : null}
-          </motion.div>
-        )}
+        <motion.div
+          key={activeMainTab}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-0 pt-6 bg-background"
+          style={{ borderTop: '1px solid hsl(var(--border) / 0.3)' }}
+        >
+          {renderContent()}
+        </motion.div>
       </AnimatePresence>
     </section>
   );
 });
 
+/** Best call = the pick with the lowest (best) actual finishing position */
 function getBestCall(tracker: { predictions: Array<{ playerName: string; predictedRank: number; actualPosition: number | null; performanceStatus: string }> }) {
   const eligible = tracker.predictions.filter(
     p => p.actualPosition !== null && p.performanceStatus !== 'cut' && p.performanceStatus !== 'withdrawn'
   );
   if (eligible.length === 0) return null;
   return eligible.reduce((best, curr) => {
-    const bestDelta = Math.abs(best.predictedRank - (best.actualPosition ?? 999));
-    const currDelta = Math.abs(curr.predictedRank - (curr.actualPosition ?? 999));
-    return currDelta < bestDelta ? curr : best;
+    return (curr.actualPosition ?? 999) < (best.actualPosition ?? 999) ? curr : best;
   });
 }

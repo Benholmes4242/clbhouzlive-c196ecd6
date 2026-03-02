@@ -38,6 +38,17 @@
   --th-accent-par: rgba(255, 255, 255, 0.7);
 
   /* ========================================
+     TOURNAMENT INTELLIGENCE - Accuracy Colors
+     ======================================== */
+  --th-accuracy-green: #16A34A;
+  --th-accuracy-amber: #D97706;
+  --th-accuracy-red: #DC2626;
+  --th-gold: #CA8A04;
+  --th-green-soft: #F0FDF4;
+  --th-amber-soft: #FFFBEB;
+  --th-red-soft: #FEF2F2;
+
+  /* ========================================
      TOUR HUB STATUS GRADIENTS
      ======================================== */
   --th-status-live: linear-gradient(135deg, #FF3B30 0%, #FF6B6B 100%);
