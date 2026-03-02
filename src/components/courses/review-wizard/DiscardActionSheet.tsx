@@ -52,10 +52,10 @@ export function DiscardActionSheet({
             >
               {/* Header */}
               <div className="px-4 py-3 text-center border-b border-gray-200/50">
-                <h3 className="text-sm font-semibold text-gray-500">
+                <h3 className="text-sm font-semibold text-muted-foreground">
                   {title}
                 </h3>
-                <p className="text-xs text-gray-400 mt-0.5">
+                <p className="text-xs text-muted-foreground/60 mt-0.5">
                   {subtitle}
                 </p>
               </div>
@@ -63,7 +63,7 @@ export function DiscardActionSheet({
               {/* Exit - Destructive */}
               <button
                 onClick={onDiscard}
-                className="w-full py-4 text-center text-red-500 text-lg font-normal active:bg-gray-100 transition-colors flex items-center justify-center gap-2"
+                className="w-full py-4 text-center text-destructive text-lg font-normal active:bg-gray-100 transition-colors flex items-center justify-center gap-2"
               >
                 <Trash2 className="h-5 w-5" />
                 Exit

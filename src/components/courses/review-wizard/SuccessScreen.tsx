@@ -49,7 +49,7 @@ export function SuccessScreen({
       {/* Close button */}
       <button
         onClick={onDone}
-        className="absolute top-4 right-4 z-50 w-9 h-9 rounded-full flex items-center justify-center transition-colors active:scale-[0.97]"
+        className="absolute top-4 right-4 z-50 w-11 h-11 rounded-full flex items-center justify-center transition-colors active:scale-[0.97]"
         style={{
           background: 'hsl(var(--muted) / 0.8)',
           border: '1.5px solid hsl(var(--border))',

@@ -123,11 +123,11 @@ export function ConfirmStep({
             }}
           >
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Your rating</p>
+              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[1.5px]">Your rating</p>
               <button
                 type="button"
                 onClick={() => onGoToStep(1)}
-                className="text-xs font-medium active:scale-[0.97] transition-all"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-end text-xs font-medium active:scale-[0.97] transition-all"
                 style={{ color: '#f59e0b' }}
               >
                 Edit
@@ -154,11 +154,11 @@ export function ConfirmStep({
             variants={staggerDelay(sectionIndex++)}
           >
             <div className="flex items-center justify-between mb-3">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Breakdown</p>
+              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[1.5px]">Breakdown</p>
               <button
                 type="button"
                 onClick={() => onGoToStep(1)}
-                className="text-xs font-medium active:scale-[0.97] transition-all"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-end text-xs font-medium active:scale-[0.97] transition-all"
                 style={{ color: '#f59e0b' }}
               >
                 Edit
@@ -209,11 +209,11 @@ export function ConfirmStep({
             style={{ background: 'hsl(var(--muted) / 0.5)' }}
           >
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Review</p>
+              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[1.5px]">Review</p>
               <button
                 type="button"
                 onClick={() => onGoToStep(2)}
-                className="text-xs font-medium active:scale-[0.97] transition-all"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-end text-xs font-medium active:scale-[0.97] transition-all"
                 style={{ color: '#f59e0b' }}
               >
                 Edit
@@ -233,11 +233,11 @@ export function ConfirmStep({
             variants={staggerDelay(sectionIndex++)}
           >
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Media</p>
+              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[1.5px]">Media</p>
               <button
                 type="button"
                 onClick={() => onGoToStep(3)}
-                className="text-xs font-medium active:scale-[0.97] transition-all"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-end text-xs font-medium active:scale-[0.97] transition-all"
                 style={{ color: '#f59e0b' }}
               >
                 Edit

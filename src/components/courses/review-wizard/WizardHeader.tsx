@@ -93,7 +93,7 @@ export function WizardHeader({
       <div className="flex items-center gap-1 min-w-[72px]">
         <button
           onClick={handleBackOrClose}
-          className="w-10 h-10 rounded-full flex items-center justify-center active:scale-[0.97] transition-all duration-100 disabled:opacity-50"
+          className="w-11 h-11 rounded-full flex items-center justify-center active:scale-[0.97] transition-all duration-100 disabled:opacity-50"
           style={{
             background: '#F5F5F7',
           }}
@@ -111,7 +111,7 @@ export function WizardHeader({
         {isEditMode && (
           <button
             onClick={onDelete}
-            className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50"
+            className="w-11 h-11 rounded-full flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50"
             aria-label="Delete review"
             disabled={isSubmitting || isDeleting}
           >

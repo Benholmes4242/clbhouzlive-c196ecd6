@@ -317,7 +317,7 @@ export function RateStep({
 
       {/* Category Ratings */}
       <div className="px-4 pt-4">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
+        <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[1.5px] mb-2">
           Rate each area
         </p>
         

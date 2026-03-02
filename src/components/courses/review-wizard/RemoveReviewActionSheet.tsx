@@ -47,10 +47,10 @@ export function RemoveReviewActionSheet({
             >
               {/* Header */}
               <div className="px-4 py-3 text-center border-b border-gray-200/50">
-                <h3 className="text-sm font-semibold text-gray-500">
+                <h3 className="text-sm font-semibold text-muted-foreground">
                   Remove this review?
                 </h3>
-                <p className="text-xs text-gray-400 mt-0.5">
+                <p className="text-xs text-muted-foreground/60 mt-0.5">
                   This action cannot be undone
                 </p>
               </div>
@@ -59,7 +59,7 @@ export function RemoveReviewActionSheet({
               <button
                 onClick={onRemove}
                 disabled={isRemoving}
-                className="w-full py-4 text-center text-red-500 text-lg font-normal active:bg-gray-100 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+                className="w-full py-4 text-center text-destructive text-lg font-normal active:bg-gray-100 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
               >
                 {isRemoving ? (
                   <>
@@ -83,7 +83,7 @@ export function RemoveReviewActionSheet({
               <button
                 onClick={onCancel}
                 disabled={isRemoving}
-                className="w-full py-4 text-center text-amber-500 text-lg font-semibold active:bg-gray-100 disabled:opacity-50 transition-colors"
+                className="w-full py-4 text-center text-primary text-lg font-semibold active:bg-gray-100 disabled:opacity-50 transition-colors"
               >
                 Cancel
               </button>

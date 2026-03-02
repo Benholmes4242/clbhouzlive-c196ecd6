@@ -321,7 +321,7 @@ export function ReviewWizard({
             )}
             style={{ 
               touchAction: 'pan-y',
-              backgroundColor: wizard.state.step === 'preview' ? undefined : '#F8FAFC',
+              backgroundColor: wizard.state.step === 'preview' ? undefined : 'var(--bg-page)',
             }}
           >
             {/* Header — consistent across all steps */}
@@ -451,7 +451,7 @@ export function ReviewWizard({
 
               {/* Scroll fade indicator */}
               {typeof wizard.state.step === 'number' && (
-                <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-[#F8FAFC] to-transparent pointer-events-none z-10" />
+                <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-[var(--bg-page)] to-transparent pointer-events-none z-10" />
               )}
             </div>
           </motion.div>
