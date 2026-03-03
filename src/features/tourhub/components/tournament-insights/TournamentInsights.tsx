@@ -419,7 +419,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
         viewport={{ once: true }}
         style={{ marginBottom: '24px' }}
       >
-        <div className="mb-1 text-center">
+        <div className="mb-1">
           <h2
             className="text-foreground"
             style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.3px' }}
