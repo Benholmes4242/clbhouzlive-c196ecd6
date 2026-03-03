@@ -29,18 +29,23 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
   });
 
   const visibleCards = isCompleted ? sorted.slice(0, 3) : sorted;
-  const totalVisible = showAll ? sorted.length : visibleCards.length;
   const hasMore = isCompleted && sorted.length > 3 && !showAll;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4, delay: isCompleted ? 0.9 : 0.1 }}
       style={{ marginBottom: 32 }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-1" style={{ marginBottom: 16 }}>
+      <motion.div
+        initial={isCompleted ? { opacity: 0 } : false}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4, delay: isCompleted ? 0.9 : 0 }}
+        className="flex items-center justify-between px-1"
+        style={{ marginBottom: 16 }}
+      >
         <span
           className="text-muted-foreground uppercase"
           style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.12em' }}
@@ -55,7 +60,7 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
             POS / OFF LEAD
           </span>
         )}
-      </div>
+      </motion.div>
 
       {/* Live status bar */}
       {!isCompleted && <LiveStatusBar allPicks={allPicks} />}
@@ -63,13 +68,23 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
       {/* Player rows */}
       <div>
         {visibleCards.map((prediction, i) => (
-          <PredictionScorecardRow
+          <motion.div
             key={prediction.playerId}
-            prediction={prediction}
-            index={i}
-            isCompleted={isCompleted}
-            isLast={!showAll && i === visibleCards.length - 1 && !hasMore}
-          />
+            initial={isCompleted ? { opacity: 0, y: 8 } : false}
+            animate={{ opacity: 1, y: 0 }}
+            transition={isCompleted ? {
+              duration: 0.4,
+              ease: [0.16, 1, 0.3, 1],
+              delay: 1.0 + i * 0.06,
+            } : undefined}
+          >
+            <PredictionScorecardRow
+              prediction={prediction}
+              index={i}
+              isCompleted={isCompleted}
+              isLast={!showAll && i === visibleCards.length - 1 && !hasMore}
+            />
+          </motion.div>
         ))}
 
         {/* Show more rows with animation */}

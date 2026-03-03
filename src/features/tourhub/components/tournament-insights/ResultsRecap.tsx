@@ -1,11 +1,9 @@
 /**
- * ResultsRecap - Post-tournament accuracy showcase
- * Centered AccuracyRing with breakdown row and best call highlight
+ * ResultsRecap - Compact horizontal layout with animated ring, stat pills, and best call banner
  */
 
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import AccuracyRing from './components/AccuracyRing';
 import type { AccuracyMetrics } from './types';
 import type { AIPredictionData } from '../../hooks/useAIPredictions';
 
@@ -23,92 +21,221 @@ function getOrdinalSuffix(n: number): string {
   return s[(v - 20) % 10] || s[v] || s[0];
 }
 
+/* ── Inline Accuracy Ring (84px SVG) ── */
+const RING_SIZE = 84;
+const RING_R = 36;
+const RING_STROKE = 5;
+const RING_C = 2 * Math.PI * RING_R; // ≈226
+
+const ScoreRing: React.FC<{ hit: number; total: number }> = ({ hit, total }) => {
+  const [visible, setVisible] = useState(false);
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  const pct = total > 0 ? (hit / total) * 100 : 0;
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      { threshold: 0.3 },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  // Count-up animation
+  useEffect(() => {
+    if (!visible || hit === 0) return;
+    let i = 0;
+    const iv = setInterval(() => {
+      i += 1;
+      setCount(i);
+      if (i >= hit) clearInterval(iv);
+    }, 180);
+    return () => clearInterval(iv);
+  }, [visible, hit]);
+
+  const offset = visible ? RING_C - (pct / 100) * RING_C : RING_C;
+
+  return (
+    <div ref={ref} className="relative" style={{ width: RING_SIZE, height: RING_SIZE, flexShrink: 0 }}>
+      <svg width={RING_SIZE} height={RING_SIZE} viewBox={`0 0 ${RING_SIZE} ${RING_SIZE}`}>
+        <circle
+          cx={RING_SIZE / 2} cy={RING_SIZE / 2} r={RING_R}
+          fill="none" stroke="#E7E5E4" strokeWidth={RING_STROKE}
+        />
+        <circle
+          cx={RING_SIZE / 2} cy={RING_SIZE / 2} r={RING_R}
+          fill="none" stroke="#16A34A" strokeWidth={RING_STROKE}
+          strokeLinecap="round"
+          strokeDasharray={RING_C}
+          strokeDashoffset={offset}
+          transform={`rotate(-90 ${RING_SIZE / 2} ${RING_SIZE / 2})`}
+          style={{ transition: `stroke-dashoffset 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s` }}
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.03em' }} className="text-foreground">
+          {visible ? count : 0}
+        </span>
+        <span style={{ fontWeight: 300 }} className="text-muted-foreground">/</span>
+        <span style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.03em' }} className="text-foreground">
+          {total}
+        </span>
+      </div>
+    </div>
+  );
+};
+
+/* ── Stat Pill ── */
+const StatPill: React.FC<{ label: string; value: number; index: number }> = ({ label, value, index }) => {
+  const active = value > 0;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: 0.5 + index * 0.08 }}
+      style={{
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5,
+        padding: '5px 10px',
+        borderRadius: 8,
+        background: active ? 'rgba(22, 163, 74, 0.06)' : '#F5F5F4',
+        border: `1px solid ${active ? 'rgba(22, 163, 74, 0.12)' : '#E7E5E4'}`,
+      }}
+    >
+      <span style={{
+        fontSize: 15, fontWeight: 800, letterSpacing: '-0.02em',
+        color: active ? '#16A34A' : '#A8A29E',
+      }}>
+        {value}
+      </span>
+      <span style={{
+        fontSize: 10, fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase',
+        color: active ? '#16A34A' : '#A8A29E', opacity: 0.8,
+      }}>
+        {label}
+      </span>
+    </motion.div>
+  );
+};
+
+/* ── Best Call Banner ── */
+const BestCallBanner: React.FC<{
+  name: string; predicted?: number; actual: number; isWinner: boolean;
+}> = ({ name, predicted, actual, isWinner }) => {
+  const iconBg = isWinner
+    ? 'linear-gradient(135deg, #CA8A04, #EAB308)'
+    : 'linear-gradient(135deg, #16A34A, #CA8A04)';
+  const iconChar = isWinner ? '🏆' : '✦';
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: 0.7 }}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+        padding: isWinner ? '13px 16px' : '11px 14px',
+        borderRadius: 12,
+        background: 'linear-gradient(135deg, rgba(22, 163, 74, 0.04) 0%, rgba(202, 138, 4, 0.04) 100%)',
+        border: '1px solid rgba(22, 163, 74, 0.08)',
+        marginBottom: 8,
+      }}
+    >
+      {/* Glow icon */}
+      <div
+        style={{
+          width: 28, height: 28, borderRadius: 8,
+          background: iconBg,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          flexShrink: 0,
+          animation: 'pulseGlow 3s infinite',
+        }}
+      >
+        <span style={{ fontSize: 13, color: 'white', lineHeight: 1 }}>{iconChar}</span>
+      </div>
+
+      {/* Text */}
+      <div style={{ minWidth: 0 }}>
+        <div style={{ fontSize: 13, lineHeight: 1.4 }}>
+          <span className="text-foreground" style={{ fontWeight: 700 }}>Best call</span>
+          <span className="text-muted-foreground"> — {name} </span>
+          <span style={{ fontSize: 11, color: '#A8A29E', fontWeight: 500 }}>Pick #{predicted ?? 1}</span>
+        </div>
+        <div style={{ fontSize: 12, fontWeight: isWinner ? 700 : 600, color: '#16A34A', marginTop: 1 }}>
+          {isWinner ? 'Won the tournament' : `Finished ${actual}${getOrdinalSuffix(actual)}`}
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+/* ── Gradient Separator ── */
+const GradientSeparator = () => (
+  <div style={{
+    height: 1,
+    background: 'linear-gradient(90deg, transparent, #E7E5E4 20%, #E7E5E4 80%, transparent)',
+    margin: '16px 0',
+  }} />
+);
+
+/* ── Main Component ── */
 export const ResultsRecap: React.FC<ResultsRecapProps> = ({
   accuracy,
   bestCallName,
   bestCallPredicted,
   bestCallActual,
 }) => {
+  const isWinner = bestCallActual === 1;
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      className="flex flex-col items-center"
-      style={{ padding: '8px 0 0' }}
-    >
-      {/* Accuracy Ring */}
-      <AccuracyRing hit={accuracy.inTop10} total={accuracy.totalPredictions} size={120} />
-
-      {/* Subtitle */}
-      <p
-        className="text-muted-foreground"
-        style={{ fontSize: 14, marginTop: 12, marginBottom: 20 }}
+    <div>
+      {/* Score + Stats horizontal layout */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+        style={{ display: 'flex', alignItems: 'flex-start', gap: 20, padding: '24px 0 20px' }}
       >
-        picks finished in the{' '}
-        <span className="text-foreground" style={{ fontWeight: 700 }}>Top 10</span>
-      </p>
+        {/* Left — Ring */}
+        <ScoreRing hit={accuracy.inTop10} total={accuracy.totalPredictions} />
 
-      {/* Breakdown row */}
-      <div
-        className="w-full flex border border-border overflow-hidden"
-        style={{ borderRadius: 12, marginBottom: 20 }}
-      >
-        {[
-          { label: 'Top 5', value: accuracy.inTop5 },
-          { label: 'Top 10', value: accuracy.inTop10 },
-          { label: 'Top 20', value: accuracy.inTop20 },
-        ].map((bucket, i) => (
-          <div
-            key={bucket.label}
-            className="flex-1 text-center"
-            style={{
-              padding: '12px 0',
-              borderRight: i < 2 ? '1px solid hsl(var(--border))' : 'none',
-              background: bucket.value > 0 ? 'rgba(22, 163, 74, 0.04)' : 'transparent',
-            }}
-          >
-            <div
-              className="text-foreground"
-              style={{ fontSize: 22, fontWeight: 800, lineHeight: 1.1 }}
-            >
-              {bucket.value}
-            </div>
-            <div
-              className="text-muted-foreground uppercase"
-              style={{ fontSize: 10, fontWeight: 600, marginTop: 4, letterSpacing: '0.08em' }}
-            >
-              {bucket.label}
-            </div>
+        {/* Right — Context + Stat Pills */}
+        <div style={{ paddingTop: 6 }}>
+          <p className="text-muted-foreground" style={{ fontSize: 14, marginBottom: 14 }}>
+            picks finished in the{' '}
+            <span className="text-foreground" style={{ fontWeight: 700 }}>Top 10</span>
+          </p>
+          <div style={{ display: 'flex', gap: 6 }}>
+            {[
+              { label: 'Top 5', value: accuracy.inTop5 },
+              { label: 'Top 10', value: accuracy.inTop10 },
+              { label: 'Top 20', value: accuracy.inTop20 },
+            ].map((s, i) => (
+              <StatPill key={s.label} label={s.label} value={s.value} index={i} />
+            ))}
           </div>
-        ))}
-      </div>
-
-      {/* Best call highlight */}
-      {bestCallName && bestCallActual != null && (
-        <div
-          className="w-full text-muted-foreground"
-          style={{
-            fontSize: 13,
-            fontWeight: 500,
-            padding: '12px 14px',
-            background: 'hsl(var(--muted) / 0.5)',
-            borderRadius: 10,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            borderLeft: '3px solid #CA8A04',
-            marginBottom: 28,
-          }}
-        >
-          <span style={{ fontSize: 14 }}>✦</span>
-          <span>
-            <span className="text-foreground" style={{ fontWeight: 600 }}>Best call:</span>
-            {' '}{bestCallName} (Pick #{bestCallPredicted ?? 1}) — Finished{' '}
-            {bestCallActual}{getOrdinalSuffix(bestCallActual)}
-          </span>
         </div>
+      </motion.div>
+
+      {/* Best Call Banner */}
+      {bestCallName && bestCallActual != null && (
+        <BestCallBanner
+          name={bestCallName}
+          predicted={bestCallPredicted}
+          actual={bestCallActual}
+          isWinner={isWinner}
+        />
       )}
-    </motion.div>
+
+      {/* Gradient separator */}
+      <GradientSeparator />
+    </div>
   );
 };
