@@ -126,12 +126,12 @@ export function PostSuccessScreen({
         </div>
 
         <span className="text-[20px] font-semibold tracking-tight" style={{ color: '#1A1A1A' }}>
-          {isScheduled ? 'Scheduled' : 'Posted'}
+          {isScheduled ? 'Locked in' : "You're live"}
         </span>
         <span className="text-[14px] font-normal -mt-2" style={{ color: '#7A7A7A' }}>
           {isScheduled && scheduledAt
             ? `Goes live ${formatScheduledTime(scheduledAt)}`
-            : 'Your clubhouse will see this'}
+            : 'Your moment is out there'}
         </span>
 
         {/* Review prompt card */}
