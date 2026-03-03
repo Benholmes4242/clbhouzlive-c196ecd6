@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
-import { Trophy } from 'lucide-react';
+import { Trophy, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
 import AchievementDetailModal from '@/components/achievements/AchievementDetailModal';
