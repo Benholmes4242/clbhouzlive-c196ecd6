@@ -99,20 +99,20 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
   }
 
   return (
-    <div className="px-5 pt-12 pb-12 space-y-0">
+    <div className="px-5 pt-12 pb-2 space-y-0">
       <ScrollToTopGlass />
 
       {/* Handicap Display — Cardless, Centered */}
       {handicapIndex !== null ? (
         <div className="pb-8 text-center">
           {/* Eyebrow Label */}
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground mb-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground mb-4">
             Handicap Index
           </p>
           
           {/* Handicap Number — Hero */}
           <div className="mb-2">
-            <span className="text-6xl font-light text-foreground tracking-tight tabular-nums">
+            <span className="text-6xl font-thin text-foreground tracking-tight tabular-nums">
               {formatHandicap(handicapIndex)}
             </span>
           </div>
@@ -128,7 +128,7 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
           {isOwnProfile && (
             <button
               onClick={() => setIsEditModalOpen(true)}
-              className="inline-flex items-center gap-1.5 mt-3 text-[13px] font-semibold text-amber-500 min-h-[44px] active:scale-95 transition-transform"
+              className="inline-flex items-center gap-1.5 mt-3 text-[13px] font-medium text-amber-500 min-h-[44px] active:scale-95 transition-transform"
             >
               <Pencil className="h-3.5 w-3.5" />
               Edit handicap
@@ -192,7 +192,7 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
                 <button
                   onClick={handleRegisterInterest}
                   disabled={isRegistering}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-amber-500 min-h-[44px] active:scale-95 transition-transform disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 text-[13px] font-semibold uppercase tracking-[1.5px] text-amber-500 min-h-[44px] active:scale-95 transition-transform disabled:opacity-50"
                 >
                   {isRegistering ? 'Saving...' : (
                     <>
