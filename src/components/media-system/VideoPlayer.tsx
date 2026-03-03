@@ -33,6 +33,9 @@ export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl }: Video
         videoRef.current.pause();
         setIsPlaying(false);
       }
+      // Reset loading state so skeleton is ready for re-activation
+      setIsLoading(true);
+      videoRef.current = null;
       return;
     }
 
@@ -49,7 +52,7 @@ export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl }: Video
       videoRef.current = video;
       video.muted = isMuted;
 
-      const onCanPlay = () => {
+      const onReady = () => {
         if (cancelled) return;
         setIsLoading(false);
         video.play().then(() => {
@@ -57,18 +60,61 @@ export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl }: Video
         }).catch(() => {});
       };
 
-      // Check if already ready
+      // Looping: when video ends, reset to start and replay
+      const onEnded = () => {
+        if (cancelled) return;
+        video.currentTime = 0;
+        video.play().catch(() => {});
+      };
+
+      // Listen for both canplay and loadeddata as fallbacks
+      const onCanPlay = () => {
+        video.removeEventListener('loadeddata', onLoadedData);
+        clearTimeout(safetyTimeout);
+        onReady();
+      };
+
+      const onLoadedData = () => {
+        video.removeEventListener('canplay', onCanPlay);
+        clearTimeout(safetyTimeout);
+        onReady();
+      };
+
+      // Safety timeout: if neither event fires within 5s, force reveal
+      const safetyTimeout = setTimeout(() => {
+        video.removeEventListener('canplay', onCanPlay);
+        video.removeEventListener('loadeddata', onLoadedData);
+        onReady();
+      }, 5000);
+
+      video.addEventListener('ended', onEnded);
+
+      // Check if already ready (cache hit — element may already have data loaded)
       if (video.readyState >= 3) {
-        onCanPlay();
+        clearTimeout(safetyTimeout);
+        onReady();
       } else {
         video.addEventListener('canplay', onCanPlay, { once: true });
+        video.addEventListener('loadeddata', onLoadedData, { once: true });
       }
+
+      // Cleanup function to remove all listeners on deactivation
+      return () => {
+        video.removeEventListener('ended', onEnded);
+        video.removeEventListener('canplay', onCanPlay);
+        video.removeEventListener('loadeddata', onLoadedData);
+        clearTimeout(safetyTimeout);
+      };
     };
 
-    activate();
+    let cleanupListeners: (() => void) | undefined;
+    activate().then((cleanup) => {
+      cleanupListeners = cleanup;
+    });
 
     return () => {
       cancelled = true;
+      cleanupListeners?.();
     };
   }, [isActive, hlsUrl, feedIndex, pool]);
 
