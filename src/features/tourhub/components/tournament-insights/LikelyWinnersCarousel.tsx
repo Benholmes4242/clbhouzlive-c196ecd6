@@ -1,6 +1,6 @@
 /**
- * TopPicksCarousel — Immersive portrait cards with player photo backgrounds
- * Photo fills top 55-60%, fades into card background, insights below
+ * TopPicksCarousel — Immersive portrait cards with dark glass + course image background
+ * Photo fills top 55-60%, fades into dark glass, insights below
  */
 
 import { memo, useState, useRef, useCallback, useEffect } from 'react';
@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import CountryFlag from '@/components/ui/country-flag';
 import type { WinnerProfile, ContenderCard } from './types';
+import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 
 import { PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 
@@ -15,6 +16,8 @@ interface LikelyWinnersCarouselProps {
   featured: WinnerProfile;
   cards: ContenderCard[];
   withdrawnPlayerIds?: Set<string>;
+  courseName?: string;
+  tournamentName?: string;
 }
 
 interface PickCard {
@@ -38,10 +41,17 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
   featured,
   cards,
   withdrawnPlayerIds,
+  courseName,
+  tournamentName,
 }: LikelyWinnersCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Fetch course image for card backgrounds
+  const venueImageQuery = useVenueImage(courseName ?? null, null);
+  const courseImageUrl =
+    venueImageQuery.data?.imageUrl || (tournamentName ? getFallbackCourseImage(tournamentName) : undefined);
 
   const contenderCards = cards.filter(c => c.type === 'contender').slice(0, 4);
 
@@ -108,23 +118,43 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
               key={pick.id}
               whileTap={{ scale: 0.98 }}
               transition={{ duration: 0.2 }}
-              className="w-[227px] rounded-[16px] overflow-hidden flex-shrink-0 snap-center flex flex-col"
+              className="w-[227px] rounded-[16px] overflow-hidden flex-shrink-0 snap-center flex flex-col relative"
               style={{
-                background: 'hsl(var(--background))',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
+                background: '#1a1a1a',
               }}
             >
+              {/* Course image background layer */}
+              {courseImageUrl && (
+                <div
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    backgroundImage: `url(${courseImageUrl})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }}
+                />
+              )}
+              {/* Dark glass overlay */}
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background: 'rgba(0, 0, 0, 0.45)',
+                  backdropFilter: 'blur(20px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                }}
+              />
+
               {/* Photo section — top ~48% */}
-              <div className="relative flex-shrink-0" style={{ height: 170 }}>
+              <div className="relative flex-shrink-0 z-[1]" style={{ height: 170 }}>
                 {imgFailed ? (
                   <div
                     className="w-full h-full flex items-center justify-center"
                     style={{
-                      background: 'linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--border)) 100%)',
-                      borderRadius: '22px 22px 0 0',
+                      background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%)',
+                      borderRadius: '16px 16px 0 0',
                     }}
                   >
-                    <span className="text-muted-foreground" style={{ fontSize: 24, fontWeight: 700 }}>
+                    <span style={{ fontSize: 24, fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>
                       {getInitials(pick.name)}
                     </span>
                   </div>
@@ -135,7 +165,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                     className="w-full h-full object-cover"
                     style={{
                       objectPosition: 'center 20%',
-                      borderRadius: '22px 22px 0 0',
+                      borderRadius: '16px 16px 0 0',
                       opacity: pick.isWithdrawn ? 0.4 : 1,
                     }}
                     loading="lazy"
@@ -144,11 +174,11 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                   />
                 )}
 
-                {/* Fade gradient — subtle, only at bottom edge */}
+                {/* Fade gradient — transitions into dark glass */}
                 <div
                   className="absolute inset-0 pointer-events-none"
                   style={{
-                    background: 'linear-gradient(to bottom, transparent 60%, hsla(var(--background) / 0.4) 100%)',
+                    background: 'linear-gradient(to bottom, transparent 55%, rgba(0, 0, 0, 0.6) 100%)',
                   }}
                 />
 
@@ -187,10 +217,10 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
 
               </div>
 
-              {/* Name + Flag + Bullets — natural flow below photo */}
-              <div className="flex flex-col flex-1 overflow-hidden" style={{ padding: '0 16px 14px' }}>
+              {/* Name + Flag + Bullets — on dark glass */}
+              <div className="flex flex-col flex-1 overflow-hidden relative z-[1]" style={{ padding: '0 16px 14px' }}>
                 {/* Name */}
-                <p className="text-foreground text-center" style={{ fontSize: 18, fontWeight: 600, lineHeight: 1.2, marginTop: 6 }}>
+                <p className="text-center" style={{ fontSize: 18, fontWeight: 600, lineHeight: 1.2, marginTop: 6, color: '#FFFFFF' }}>
                   {pick.name}
                 </p>
                 {/* Flag */}
@@ -211,7 +241,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                       fontSize: 12,
                       fontWeight: 600,
                       color: ACCENT_COLOR,
-                      background: 'rgba(34, 197, 94, 0.10)',
+                      background: 'rgba(34, 197, 94, 0.15)',
                       borderRadius: 999,
                       padding: '4px 12px',
                       letterSpacing: '0.3px',
@@ -227,14 +257,15 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                     {pick.bullets.slice(0, 3).map((bullet, j) => (
                       <div key={j}>
                         {j > 0 && (
-                          <div className="mx-auto" style={{ width: '80%', height: 0.5, background: 'rgba(0, 0, 0, 0.06)', margin: '10px auto' }} />
+                          <div className="mx-auto" style={{ width: '80%', height: 0.5, background: 'rgba(255, 255, 255, 0.10)', margin: '10px auto' }} />
                         )}
                         <p
-                          className="text-muted-foreground text-center"
+                          className="text-center"
                           style={{
                             fontSize: 13,
                             fontWeight: 400,
                             lineHeight: 1.4,
+                            color: 'rgba(255, 255, 255, 0.85)',
                             display: '-webkit-box',
                             WebkitLineClamp: 3,
                             WebkitBoxOrient: 'vertical',
