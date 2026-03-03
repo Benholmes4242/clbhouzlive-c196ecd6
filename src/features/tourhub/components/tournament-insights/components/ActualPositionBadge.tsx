@@ -54,16 +54,13 @@ const ActualPositionBadge: React.FC<ActualPositionBadgeProps> = ({
   return (
     <span
       style={{
-        display: 'inline-flex',
+        display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        minWidth: 44,
-        padding: '4px 10px',
-        borderRadius: 8,
+        width: 44,
         fontSize: 15,
         fontWeight: 700,
         color: tier.color,
-        background: tier.bg,
       }}
     >
       {prefix}{position}
