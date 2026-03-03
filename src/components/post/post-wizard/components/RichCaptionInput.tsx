@@ -18,6 +18,7 @@ interface RichCaptionInputProps {
   placeholder?: string;
   maxLength?: number;
   accentColor?: string;
+  onFocusChange?: (focused: boolean) => void;
 }
 
 export interface RichCaptionInputHandle {
@@ -45,6 +46,7 @@ export const RichCaptionInput = forwardRef<RichCaptionInputHandle, RichCaptionIn
       placeholder = "What's on your mind?",
       maxLength = 2200,
       accentColor = '#f59e0b',
+      onFocusChange,
     },
     ref
   ) {
@@ -183,14 +185,14 @@ export const RichCaptionInput = forwardRef<RichCaptionInputHandle, RichCaptionIn
         {/* Placeholder */}
         {isEmpty && (
           <div
-            className="absolute top-0 left-0 pointer-events-none select-none text-[20px] font-normal leading-[1.42] tracking-tight"
-            style={{ color: '#C7C7CC' }}
+            className="absolute top-0 left-0 pointer-events-none select-none text-[17px] font-normal leading-[1.42] tracking-tight"
+            style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }}
           >
             {placeholder}
           </div>
         )}
 
-        {/* ContentEditable div — WARNING 7: suppress autocorrect/spellcheck */}
+        {/* ContentEditable div */}
         <div
           ref={editorRef}
           contentEditable
@@ -199,6 +201,8 @@ export const RichCaptionInput = forwardRef<RichCaptionInputHandle, RichCaptionIn
           onPaste={handlePaste}
           onClick={handleCursorMove}
           onKeyUp={handleCursorMove}
+          onFocus={() => onFocusChange?.(true)}
+          onBlur={() => onFocusChange?.(false)}
           onCompositionStart={() => { isComposingRef.current = true; }}
           onCompositionEnd={() => {
             isComposingRef.current = false;
@@ -209,10 +213,10 @@ export const RichCaptionInput = forwardRef<RichCaptionInputHandle, RichCaptionIn
           data-gramm="false"
           data-gramm_editor="false"
           data-enable-grammarly="false"
-          className="w-full min-h-[130px] bg-transparent outline-none text-[20px] font-normal leading-[1.42] tracking-tight"
+          className="w-full min-h-[100px] bg-transparent outline-none text-[17px] font-normal leading-[1.42] tracking-tight"
           style={{
             caretColor: accentColor,
-            color: '#1A1A1A',
+            color: 'hsl(var(--foreground))',
             WebkitUserModify: 'read-write-plaintext-only' as any,
             wordBreak: 'break-word',
           }}

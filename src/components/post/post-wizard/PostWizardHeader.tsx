@@ -1,5 +1,6 @@
-// PostWizardHeader - Minimal composer header: Cancel | Title | [Clock] Post
-import { Loader2, Clock } from 'lucide-react';
+// PostWizardHeader - Redesigned: X | Avatar+Audience | Clock+Post
+import { Loader2, Clock, X, ChevronDown } from 'lucide-react';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 export interface PostWizardHeaderProps {
   onClose: () => void;
@@ -10,6 +11,11 @@ export interface PostWizardHeaderProps {
   isScheduled?: boolean;
   isDirty?: boolean;
   onOpenSchedule?: () => void;
+  // New: avatar + audience in header
+  avatarUrl?: string;
+  actorName?: string;
+  visibilityLabel?: string;
+  onAudienceClick?: () => void;
 }
 
 export function PostWizardHeader({
@@ -21,6 +27,10 @@ export function PostWizardHeader({
   isScheduled = false,
   isDirty = false,
   onOpenSchedule,
+  avatarUrl,
+  actorName = 'You',
+  visibilityLabel = 'Anyone',
+  onAudienceClick,
 }: PostWizardHeaderProps) {
   const buttonLabel = isSubmitting
     ? (isEditMode ? 'Saving…' : isScheduled ? 'Scheduling…' : 'Posting…')
@@ -28,30 +38,44 @@ export function PostWizardHeader({
 
   return (
     <header
-      className="flex items-center justify-between px-5 flex-shrink-0"
+      className="flex items-center justify-between px-4 flex-shrink-0"
       style={{
         height: 'calc(52px + max(env(safe-area-inset-top, 0px), 47px))',
         paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
         borderBottom: '0.5px solid hsl(var(--border) / 0.3)',
       }}
     >
-      {/* Cancel */}
+      {/* Left: X close button */}
+      <div className="min-w-[72px] flex items-center">
+        <button
+          onClick={onClose}
+          className="w-9 h-9 rounded-full flex items-center justify-center active:scale-[0.90] transition-transform"
+          style={{ background: 'hsl(var(--muted))' }}
+          aria-label="Close"
+        >
+          <X className="w-[18px] h-[18px]" style={{ color: '#8E8E93' }} />
+        </button>
+      </div>
+
+      {/* Center: Avatar + Audience pill */}
       <button
-        onClick={onClose}
-        className="text-[17px] font-medium min-w-[72px] text-left min-h-[44px] flex items-center active:opacity-60 transition-opacity"
-        style={{ color: '#7A7A7A' }}
+        onClick={onAudienceClick}
+        className="flex items-center gap-2 active:opacity-70 transition-opacity min-h-[44px]"
       >
-        Cancel
+        <SquircleAvatar
+          size={24}
+          src={avatarUrl}
+          alt={actorName}
+          fallback={actorName?.[0]?.toUpperCase() || 'U'}
+          hideRing
+        />
+        <span className="text-[13px] font-semibold text-foreground">{visibilityLabel}</span>
+        <ChevronDown className="w-3 h-3 text-muted-foreground" />
       </button>
 
-      {/* Center title */}
-      <span className="text-[17px] font-semibold tracking-tight text-foreground">
-        {isEditMode ? 'Edit Post' : 'New Moment'}
-      </span>
-
-      {/* Right side: Clock + Post button */}
+      {/* Right: Clock + Post button */}
       <div className="min-w-[72px] flex items-center justify-end gap-1.5">
-        {/* Schedule clock icon — visible when composer has content */}
+        {/* Schedule clock icon */}
         {isDirty && !isEditMode && onOpenSchedule && (
           <button
             onClick={onOpenSchedule}
@@ -64,7 +88,7 @@ export function PostWizardHeader({
             <Clock
               className="w-[19px] h-[19px]"
               style={{
-                color: isScheduled ? '#f59e0b' : '#AEAEB2',
+                color: isScheduled ? '#f59e0b' : 'hsl(var(--muted-foreground) / 0.5)',
               }}
             />
           </button>
@@ -76,8 +100,8 @@ export function PostWizardHeader({
           disabled={!canPost || isSubmitting}
           className="text-[15px] font-semibold px-[18px] min-h-[44px] flex items-center rounded-full transition-all duration-400 active:scale-[0.96]"
           style={{
-            color: canPost ? '#FFFFFF' : '#AEAEB2',
-            background: canPost ? '#f59e0b' : '#F5F5F7',
+            color: canPost ? '#FFFFFF' : 'hsl(var(--muted-foreground) / 0.5)',
+            background: canPost ? '#f59e0b' : 'hsl(var(--muted))',
             boxShadow: canPost ? '0 2px 12px rgba(245,158,11,0.22)' : 'none',
             pointerEvents: canPost ? 'auto' : 'none',
           }}

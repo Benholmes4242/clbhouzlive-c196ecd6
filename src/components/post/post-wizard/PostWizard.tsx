@@ -9,7 +9,7 @@ import type { StudioTool, StudioEdits } from '@/types/studio';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
-import { X, AlertTriangle, RefreshCw, Image, Camera, MapPin, UserPlus, Plus, Globe, ChevronDown, Clock, FileText } from 'lucide-react';
+import { X, AlertTriangle, RefreshCw, Image, Camera, MapPin, UserPlus, Plus, Globe, ChevronDown, ChevronRight, Clock, FileText } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
 import { ErrorBoundary as ReactErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { PostWizardProps } from './types';
@@ -175,6 +175,9 @@ export function PostWizard({
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const [showTagPeople, setShowTagPeople] = useState(false);
   const [pendingDraftToLoad, setPendingDraftToLoad] = useState<DraftWithMedia | null>(null);
+
+  // Caption focus state for card styling
+  const [captionFocused, setCaptionFocused] = useState(false);
 
   // Keyboard height for sheet avoidance
   const keyboardHeight = useKeyboardHeight();
@@ -378,11 +381,9 @@ export function PostWizard({
         };
         // Persist schedule changes
         if (state.scheduledAt) {
-          // User kept or changed the schedule time
           updatePayload.scheduled_at = state.scheduledAt.toISOString();
           updatePayload.status = 'scheduled';
         } else {
-          // User removed the schedule — publish immediately
           updatePayload.scheduled_at = null;
           updatePayload.status = 'published';
           updatePayload.created_at = new Date().toISOString();
@@ -764,6 +765,9 @@ export function PostWizard({
   // Can post
   const canPost = (state.mediaItems.length > 0 || state.isEditMode) && !state.isSubmitting && !!user;
 
+  // Character count
+  const captionGraphemeCount = countGraphemes(state.caption);
+
   if (!isOpen) return null;
 
   return createPortal(
@@ -803,7 +807,7 @@ export function PostWizard({
           />
         ) : (
           <>
-            {/* Header */}
+            {/* Header — Change 1: X | Avatar+Audience | Clock+Post */}
             <PostWizardHeader
               onClose={handleClose}
               onPost={handleSubmit}
@@ -813,40 +817,36 @@ export function PostWizard({
               isScheduled={!!state.scheduledAt}
               isDirty={state.isDirty}
               onOpenSchedule={() => setShowScheduleSheet(true)}
+              avatarUrl={actorDisplayInfo.avatarUrl}
+              actorName={actorDisplayInfo.name}
+              visibilityLabel={visibilityLabel}
+              onAudienceClick={() => setShowProfileSelector(true)}
             />
 
-            {/* Scrollable Composer */}
-            <div className="flex-1 overflow-y-auto px-5 pt-5 pb-6" style={{ scrollbarWidth: 'none' }}>
-              <div className="flex items-start gap-3 max-w-[680px] mx-auto">
-                {/* Avatar */}
-                <SquircleAvatar
-                  size={40}
-                  src={actorDisplayInfo.avatarUrl}
-                  alt={actorDisplayInfo.name || 'You'}
-                  fallback={actorDisplayInfo.name?.[0]?.toUpperCase() || 'U'}
-                  hideRing
-                  className="mt-0.5"
-                />
+            {/* Scrollable Composer — Changes 2-7 */}
+            <div className="flex-1 overflow-y-auto px-5 pt-4 pb-6" style={{ scrollbarWidth: 'none' }}>
+              <div className="max-w-[680px] mx-auto flex flex-col gap-3">
 
-                {/* Compose area */}
-                <div className="flex-1 min-w-0 flex flex-col gap-3.5">
-                  {/* User info + audience pill */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-[15px] font-semibold tracking-tight text-foreground">
-                      {actorDisplayInfo.name || 'You'}
-                    </span>
-                    <button
-                      onClick={() => setShowProfileSelector(true)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border text-[12px] font-semibold active:scale-[0.95] active:bg-[rgba(245,158,11,0.05)] transition-all"
-                      style={{ borderColor: 'rgba(0,0,0,0.07)', color: '#d97706' }}
-                    >
-                      <Globe className="w-3 h-3" style={{ color: '#f59e0b' }} />
-                      <span>{visibilityLabel}</span>
-                      <ChevronDown className="w-2.5 h-2.5 opacity-55" style={{ color: '#f59e0b' }} />
-                    </button>
-                  </div>
+                {/* Change 2: Text Input Card */}
+                <div
+                  className="rounded-2xl p-4 transition-all duration-150"
+                  style={{
+                    background: captionFocused
+                      ? 'rgba(245, 158, 11, 0.04)'
+                      : 'hsl(var(--muted) / 0.5)',
+                    border: captionFocused
+                      ? '1.5px solid rgba(245, 158, 11, 0.3)'
+                      : '1.5px solid transparent',
+                  }}
+                >
+                  {/* Floating label */}
+                  <p
+                    className="text-[11px] font-semibold uppercase tracking-[1.5px] mb-2"
+                    style={{ color: 'hsl(var(--muted-foreground))' }}
+                  >
+                    YOUR MOMENT
+                  </p>
 
-                  {/* Rich Caption Input (contentEditable with inline mentions) */}
                   <RichCaptionInput
                     ref={captionInputRef}
                     value={state.caption}
@@ -860,92 +860,190 @@ export function PostWizard({
                     placeholder="Share your moment..."
                     maxLength={POST_LIMITS.MAX_CAPTION_LENGTH}
                     accentColor="#f59e0b"
+                    onFocusChange={setCaptionFocused}
                   />
 
-                  {/* Media Zone */}
-                  <div>
-                    {state.mediaItems.length === 0 ? (
-                      <button
-                        onClick={() => handleAddMedia()}
-                        className="w-full flex flex-col items-center justify-center gap-2 py-7 rounded-2xl cursor-pointer transition-all active:scale-[0.985] active:bg-[rgba(245,158,11,0.04)]"
-                        style={{ border: '1.5px dashed rgba(245,158,11,0.25)' }}
-                      >
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(245,158,11,0.10)' }}>
-                          <Image className="w-[19px] h-[19px]" style={{ color: '#f59e0b' }} />
-                        </div>
-                        <span className="text-[13px] font-medium tracking-tight" style={{ color: '#AEAEB2' }}>
-                          Add photo or video
-                        </span>
-                      </button>
-                    ) : (
-                      <div className="flex gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
-                        {state.mediaItems.map((item, index) => (
-                          <MediaThumbnail
-                            key={item.id}
-                            item={item}
-                            index={index}
-                            isCover={index === state.coverIndex}
-                            totalItems={state.mediaItems.length}
-                            hasStudioEdits={hasNonEmptyStudioEdits(state.studioEditsByMediaId[item.id])}
-                            studioEdits={state.studioEditsByMediaId[item.id]}
-                            onRemove={() => removeMedia(item.id)}
-                            onExpand={() => setPreviewMediaIndex(index)}
-                            onStudio={() => handleOpenStudio(item.id)}
-                            onSetCover={() => setCoverIndex(index)}
-                            isViewerOpen={previewMediaIndex !== null}
-                          />
-                        ))}
-                        {state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT && (
-                          <button
-                            onClick={() => handleAddMedia()}
-                            className="flex-shrink-0 w-[160px] h-[160px] rounded-2xl flex items-center justify-center active:scale-[0.96] transition-transform"
-                            style={{ border: '1.5px dashed rgba(245,158,11,0.25)' }}
-                          >
-                            <Plus className="w-6 h-6" style={{ color: '#f59e0b' }} />
-                          </button>
-                        )}
-                      </div>
-                    )}
-                   </div>
-
-                  {/* Media counter */}
-                  {state.mediaItems.length > 0 && (
+                  {/* Character counter — inside card, bottom-right */}
+                  {captionGraphemeCount > 0 && (
                     <p
-                      className="text-[11px] font-medium tabular-nums text-center mt-1"
+                      className="text-[11px] font-semibold tabular-nums text-right mt-2"
                       style={{
-                        color: state.mediaItems.length >= POST_LIMITS.MAX_MEDIA_COUNT
+                        color: captionGraphemeCount > POST_LIMITS.MAX_CAPTION_LENGTH * 0.95
                           ? '#EF4444'
-                          : '#AEAEB2',
+                          : 'hsl(var(--muted-foreground) / 0.4)',
                       }}
                     >
-                      {state.mediaItems.length}/{POST_LIMITS.MAX_MEDIA_COUNT}
+                      {captionGraphemeCount}/{POST_LIMITS.MAX_CAPTION_LENGTH}
                     </p>
                   )}
+                </div>
 
-                  {state.selectedCourses.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5">
-                      {state.selectedCourses.map((course) => (
-                        <span
-                          key={course.id}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[12px] font-medium"
-                          style={{ background: 'rgba(245,158,11,0.10)', color: '#92400e' }}
-                        >
-                          <MapPin className="w-3 h-3 flex-shrink-0" />
-                          <span className="truncate max-w-[180px]">{course.name}</span>
-                          <button onClick={() => removeCourse(course.id)} className="ml-0.5 flex-shrink-0">
-                            <X className="w-3 h-3" />
-                          </button>
+                {/* Change 3: Media Upload Area */}
+                <div>
+                  {state.mediaItems.length === 0 ? (
+                    <button
+                      onClick={() => handleAddMedia()}
+                      className="w-full flex flex-col items-center justify-center gap-3 rounded-2xl cursor-pointer transition-all active:scale-[0.985]"
+                      style={{
+                        border: '2px dashed rgba(245,158,11,0.25)',
+                        aspectRatio: '16 / 10',
+                      }}
+                    >
+                      {/* Gradient icon container */}
+                      <div
+                        className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(245,158,11,0.12), rgba(245,158,11,0.04))',
+                        }}
+                      >
+                        <Image className="w-[26px] h-[26px]" style={{ color: '#f59e0b' }} />
+                      </div>
+                      <div className="flex flex-col items-center gap-1">
+                        <span className="text-[15px] font-semibold text-foreground">
+                          Add photo or video
                         </span>
+                        <span className="text-[13px] text-muted-foreground">
+                          Share up to 10 photos & videos
+                        </span>
+                      </div>
+                    </button>
+                  ) : (
+                    <div className="flex gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
+                      {state.mediaItems.map((item, index) => (
+                        <MediaThumbnail
+                          key={item.id}
+                          item={item}
+                          index={index}
+                          isCover={index === state.coverIndex}
+                          totalItems={state.mediaItems.length}
+                          hasStudioEdits={hasNonEmptyStudioEdits(state.studioEditsByMediaId[item.id])}
+                          studioEdits={state.studioEditsByMediaId[item.id]}
+                          onRemove={() => removeMedia(item.id)}
+                          onExpand={() => setPreviewMediaIndex(index)}
+                          onStudio={() => handleOpenStudio(item.id)}
+                          onSetCover={() => setCoverIndex(index)}
+                          isViewerOpen={previewMediaIndex !== null}
+                        />
                       ))}
+                      {state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT && (
+                        <button
+                          onClick={() => handleAddMedia()}
+                          className="flex-shrink-0 w-[160px] h-[160px] rounded-2xl flex items-center justify-center active:scale-[0.96] transition-transform"
+                          style={{ border: '1.5px dashed rgba(245,158,11,0.25)' }}
+                        >
+                          <Plus className="w-6 h-6" style={{ color: '#f59e0b' }} />
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
+
+                {/* Media counter */}
+                {state.mediaItems.length > 0 && (
+                  <p
+                    className="text-[11px] font-medium tabular-nums text-center -mt-1"
+                    style={{
+                      color: state.mediaItems.length >= POST_LIMITS.MAX_MEDIA_COUNT
+                        ? '#EF4444'
+                        : 'hsl(var(--muted-foreground) / 0.5)',
+                    }}
+                  >
+                    {state.mediaItems.length}/{POST_LIMITS.MAX_MEDIA_COUNT}
+                  </p>
+                )}
+
+                {/* Change 4: Inline Course Selector Row */}
+                <button
+                  onClick={() => { dismissCourseTooltip(); setShowCourseSearch(true); }}
+                  className="w-full flex items-center justify-between rounded-2xl active:scale-[0.985] transition-transform"
+                  style={{
+                    padding: '14px 16px',
+                    background: state.selectedCourses.length > 0
+                      ? 'rgba(245,158,11,0.06)'
+                      : 'hsl(var(--muted) / 0.3)',
+                    borderLeft: state.selectedCourses.length > 0
+                      ? '3px solid #f59e0b'
+                      : '3px solid transparent',
+                  }}
+                >
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <MapPin className="w-5 h-5 flex-shrink-0" style={{ color: '#f59e0b' }} />
+                    {state.selectedCourses.length > 0 ? (
+                      <div className="flex flex-wrap gap-1.5 min-w-0">
+                        {state.selectedCourses.map((course) => (
+                          <span
+                            key={course.id}
+                            className="inline-flex items-center gap-1 text-[14px] font-semibold text-foreground"
+                          >
+                            <span className="truncate max-w-[200px]">{course.name}</span>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); removeCourse(course.id); }}
+                              className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center"
+                              style={{ background: 'hsl(var(--muted))' }}
+                            >
+                              <X className="w-3 h-3 text-muted-foreground" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="text-[14px] font-medium text-muted-foreground">
+                        Tag a golf course
+                      </span>
+                    )}
+                  </div>
+                  <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }} />
+                </button>
+
+                {/* Change 4: Inline Tag People Row */}
+                <button
+                  onClick={() => { dismissFriendsTooltip(); setShowTagPeople(true); }}
+                  className="w-full flex items-center justify-between rounded-2xl active:scale-[0.985] transition-transform"
+                  style={{
+                    padding: '14px 16px',
+                    background: state.selectedTags.length > 0
+                      ? 'rgba(245,158,11,0.06)'
+                      : 'hsl(var(--muted) / 0.3)',
+                    borderLeft: state.selectedTags.length > 0
+                      ? '3px solid #f59e0b'
+                      : '3px solid transparent',
+                  }}
+                >
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <UserPlus className="w-5 h-5 flex-shrink-0" style={{ color: '#f59e0b' }} />
+                    {state.selectedTags.length > 0 ? (
+                      <div className="flex items-center gap-1.5">
+                        <div className="flex -space-x-1.5">
+                          {state.selectedTags.slice(0, 4).map((tag) => (
+                            <SquircleAvatar
+                              key={tag.id}
+                              size={24}
+                              src={tag.avatar_url}
+                              alt={tag.name}
+                              fallback={tag.name?.[0]?.toUpperCase() || '?'}
+                              hideRing
+                            />
+                          ))}
+                        </div>
+                        <span className="text-[14px] font-semibold text-foreground">
+                          {state.selectedTags.length} tagged
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-[14px] font-medium text-muted-foreground">
+                        Tag people
+                      </span>
+                    )}
+                  </div>
+                  <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }} />
+                </button>
+
               </div>
             </div>
 
-            {/* Bottom Toolbar */}
+            {/* Change 5: Simplified Bottom Toolbar — 3 icons only */}
             <div
-              className="flex-shrink-0 flex items-center justify-between px-5 pt-2.5"
+              className="flex-shrink-0 flex items-center px-5 pt-2.5"
               style={{
                 borderTop: '0.5px solid hsl(var(--border) / 0.3)',
                 paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 28px)',
@@ -954,14 +1052,6 @@ export function PostWizard({
               <div className="flex items-center gap-0.5">
                 <ToolButton icon={Image} onClick={() => handleAddMedia('gallery')} label="Photo" />
                 <ToolButton icon={Camera} onClick={() => handleAddMedia('camera')} label="Camera" />
-                <div className="relative">
-                  <ToolButton icon={MapPin} onClick={() => { dismissCourseTooltip(); setShowCourseSearch(true); }} label="Tag Course" />
-                  <ToolbarTooltipBubble text="Tag a golf course" visible={showCourseTooltip} />
-                </div>
-                <div className="relative">
-                  <ToolButton icon={UserPlus} onClick={() => { dismissFriendsTooltip(); setShowTagPeople(true); }} label="Tag Friends" />
-                  <ToolbarTooltipBubble text="Tag friends or businesses" visible={showFriendsTooltip} />
-                </div>
                 {/* Drafts button */}
                 <div className="relative">
                   <ToolButton icon={FileText} onClick={() => setShowDraftsSheet(true)} label="Drafts" />
@@ -975,7 +1065,6 @@ export function PostWizard({
                   )}
                 </div>
               </div>
-              <CharacterRing current={countGraphemes(state.caption)} max={POST_LIMITS.MAX_CAPTION_LENGTH} />
             </div>
 
             {/* === OVERLAYS === */}
