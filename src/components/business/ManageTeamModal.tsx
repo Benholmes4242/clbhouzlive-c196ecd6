@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { Search, ChevronRight, Loader2, X, UserPlus } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -9,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { TeamMember } from '@/hooks/useBusinessTeamMembers';
+import { EditAccessSheet } from './people/EditAccessSheet';
 import { cn } from '@/lib/utils';
 import {
   AlertDialog,
@@ -43,19 +43,25 @@ export function ManageTeamModal({
 }: ManageTeamModalProps) {
   const tm = useTeamManagement(businessId, currentTeam, { isOwner });
 
-  // Reset state when modal closes
+  // Reset state when sheet closes
   useEffect(() => {
     if (!open) tm.resetAll();
   }, [open]);
 
   return (
     <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-md max-h-[85vh] overflow-hidden flex flex-col p-0">
-          <DialogHeader className="px-5 pt-5 pb-3 border-b border-border/50">
+      <Sheet open={open} onOpenChange={onOpenChange}>
+        <SheetContent side="bottom" className="rounded-t-[20px] p-0 max-h-[85vh] flex flex-col" hideCloseButton>
+          {/* Drag handle */}
+          <div className="flex justify-center pt-2.5 pb-1">
+            <div className="w-9 h-1 rounded-full bg-muted-foreground/30" />
+          </div>
+
+          {/* Header */}
+          <div className="px-5 pt-2 pb-3 border-b border-border/50">
             <div className="flex items-center justify-between">
               <div>
-                <DialogTitle className="text-lg font-semibold">Manage team</DialogTitle>
+                <h2 className="text-lg font-semibold text-foreground">Manage team</h2>
                 <p className="text-sm text-muted-foreground mt-0.5">
                   Control who can edit this profile and appear as part of the team.
                 </p>
@@ -64,8 +70,9 @@ export function ManageTeamModal({
                 Done
               </Button>
             </div>
-          </DialogHeader>
+          </div>
 
+          {/* Scrollable content */}
           <div className="flex-1 overflow-y-auto px-5 py-4 space-y-6">
             {/* Add people section */}
             <div className="space-y-3">
@@ -203,7 +210,7 @@ export function ManageTeamModal({
                             <span className="text-xs text-muted-foreground">@{profile.username}</span>
                           )}
                         </div>
-                        <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-sq-pill">
+                        <span className="text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full">
                           {getAccessLabel(accessLevel)}
                         </span>
                         <ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -214,94 +221,28 @@ export function ManageTeamModal({
               )}
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Access Sheet */}
-      <Sheet open={!!tm.editingMember} onOpenChange={(open) => !open && tm.setEditingMember(null)}>
-        <SheetContent side="bottom" className="rounded-t-[20px] px-5 pb-8">
-          <SheetHeader className="pb-4">
-            <SheetTitle>Edit access</SheetTitle>
-          </SheetHeader>
-
-          {tm.editingMember?.profile && (
-            <div className="space-y-6">
-              <div className="flex items-center gap-3">
-                <SquircleAvatar src={tm.editingMember.profile.profile_photo_url} alt={tm.editingMember.profile.display_name || 'Member'} size={48} />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1">
-                    <span className="font-medium truncate">
-                      {tm.editingMember.profile.display_name || tm.editingMember.profile.username || 'Unknown'}
-                    </span>
-                    {tm.editingMember.profile.is_verified_golfer && <VerifiedBadge size="sm" />}
-                  </div>
-                  {tm.editingMember.profile.username && (
-                    <span className="text-sm text-muted-foreground">@{tm.editingMember.profile.username}</span>
-                  )}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm text-muted-foreground">Access level</Label>
-                <RadioGroup value={tm.editAccess} onValueChange={tm.setEditAccess}>
-                  {tm.availableAccessOptions.map((opt) => (
-                    <label key={opt.value} htmlFor={`edit-modal-${opt.value}`} className="flex items-start gap-3 py-3 min-h-[44px] cursor-pointer">
-                      <RadioGroupItem value={opt.value} id={`edit-modal-${opt.value}`} className="mt-0.5" />
-                      <div className="flex-1">
-                        <span className="text-sm font-medium">{opt.label}</span>
-                        <p className="text-xs text-muted-foreground mt-0.5">{opt.description}</p>
-                      </div>
-                    </label>
-                  ))}
-                </RadioGroup>
-              </div>
-
-              {/* Display title */}
-              <div className="space-y-1.5">
-                <Label className="text-sm text-muted-foreground font-medium">Display title</Label>
-                <Input
-                  placeholder="e.g. Head Professional, Director of Golf"
-                  value={tm.editDisplayTitle}
-                  onChange={(e) => tm.setEditDisplayTitle(e.target.value)}
-                  className="min-h-[44px]"
-                />
-              </div>
-
-              <div className="space-y-3 pt-2">
-                <Button 
-                  onClick={tm.handleSaveAccess} 
-                  disabled={tm.saving || !tm.hasChanges} 
-                  className={cn(
-                    "w-full",
-                    tm.hasChanges
-                      ? "bg-[hsl(var(--primary))] text-primary-foreground active:scale-[0.97]"
-                      : "opacity-40 bg-muted text-muted-foreground cursor-not-allowed"
-                  )}
-                >
-                  {tm.saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                  Save changes
-                </Button>
-                
-                {getAccessLevel(tm.editingMember) !== 'primary_manager' && (
-                  <Button 
-                    type="button"
-                    variant="ghost" 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      tm.setRemoveTarget(tm.editingMember);
-                      tm.setShowRemoveConfirm(true);
-                    }}
-                    className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
-                  >
-                    Remove from team
-                  </Button>
-                )}
-              </div>
-            </div>
-          )}
         </SheetContent>
       </Sheet>
+
+      {/* Edit Access Sheet */}
+      <EditAccessSheet
+        member={tm.editingMember}
+        onOpenChange={() => tm.setEditingMember(null)}
+        editAccess={tm.editAccess}
+        setEditAccess={tm.setEditAccess}
+        editDisplayTitle={tm.editDisplayTitle}
+        setEditDisplayTitle={tm.setEditDisplayTitle}
+        availableAccessOptions={tm.availableAccessOptions}
+        hasChanges={tm.hasChanges}
+        saving={tm.saving}
+        onSave={tm.handleSaveAccess}
+        onRemove={() => {
+          tm.setRemoveTarget(tm.editingMember);
+          tm.setShowRemoveConfirm(true);
+        }}
+        removing={tm.removing}
+        idPrefix="edit-modal"
+      />
 
       {/* Transfer ownership confirmation */}
       <AlertDialog open={tm.showTransferConfirm} onOpenChange={tm.setShowTransferConfirm}>

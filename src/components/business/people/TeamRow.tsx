@@ -42,7 +42,7 @@ export function TeamRow({
   const hasCustomTitle = !!displayTitle?.trim();
 
   return (
-    <div className="w-full flex items-center gap-3 px-4 py-0 hover:bg-muted/30 active:scale-[0.98] transition-all">
+    <div className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/30 active:scale-[0.98] transition-all">
       {/* Clickable profile area */}
       <button
         type="button"
@@ -63,7 +63,7 @@ export function TeamRow({
         <div className="min-w-0 flex-1">
           {/* Line 1: Name + verified */}
           <div className="flex items-center gap-1.5">
-            <span className="font-semibold text-foreground truncate">{name}</span>
+            <span className="text-sm font-semibold text-foreground truncate">{name}</span>
             {isVerified && <VerifiedBadge size="sm" />}
           </div>
 

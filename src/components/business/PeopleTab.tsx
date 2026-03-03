@@ -1,13 +1,25 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Briefcase, ChevronRight } from 'lucide-react';
+import { Users, Briefcase, ChevronRight, Loader2 } from 'lucide-react';
 import { useBusinessTeamMembers, TeamMember } from '@/hooks/useBusinessTeamMembers';
 import { useBusinessClubMembers } from '@/hooks/useBusinessClubMembers';
 import { ManageTeamModal } from './ManageTeamModal';
+import { EditAccessSheet } from './people/EditAccessSheet';
 import { SegmentedTabs } from './people/SegmentedTabs';
 import { PersonRow } from './people/PersonRow';
 import { TeamRow } from './people/TeamRow';
 import { EmptyState } from './people/EmptyState';
+import { useTeamManagement, getAccessLevel } from '@/hooks/useTeamManagement';
+import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface PeopleTabProps {
   businessId: string;
@@ -30,10 +42,12 @@ export function PeopleTab({
   const navigate = useNavigate();
   const isGolfClub = category === 'Golf Club';
   const [manageModalOpen, setManageModalOpen] = useState(false);
-  const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
   
   const { data: teamMembers = [], isLoading: teamLoading } = useBusinessTeamMembers(businessId);
   const { data: clubMembers = [], isLoading: membersLoading } = useBusinessClubMembers(businessId);
+
+  // Standalone team management for inline Edit Access + Remove
+  const tm = useTeamManagement(businessId, teamMembers, { isOwner });
 
   // Default to Members for golf clubs, Team for others
   const [activeSubTab, setActiveSubTab] = useState<SubTab>(isGolfClub ? 'members' : 'team');
@@ -104,15 +118,15 @@ export function PeopleTab({
         )}
       </div>
 
-      {/* Manage team entry point for owners */}
+      {/* Manage team entry point for owners — amber accent CTA */}
       {canManage && activeSubTab === 'team' && !isLoading && (
         <button
           type="button"
           onClick={() => setManageModalOpen(true)}
           className="w-full flex items-center justify-between px-4 min-h-[44px] mt-2 active:opacity-70 transition-opacity"
         >
-          <span className="text-sm text-muted-foreground font-semibold">Manage team</span>
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm text-amber-600 font-semibold">Manage team</span>
+          <ChevronRight className="h-4 w-4 text-amber-600" />
         </button>
       )}
 
@@ -134,7 +148,7 @@ export function PeopleTab({
       {/* Team list */}
       {!isLoading && activeSubTab === 'team' && (
         sortedTeamMembers.length > 0 ? (
-          <div className="flex flex-col" style={{ gap: '24px' }}>
+          <div className="flex flex-col divide-y divide-border/30 mt-2">
             {sortedTeamMembers.map((member) => {
               const profile = member.profile;
               if (!profile) return null;
@@ -151,7 +165,11 @@ export function PeopleTab({
                   displayTitle={member.display_title}
                   canManage={canManage}
                   onProfileClick={() => handleProfileClick(profile.id)}
-                  onEditAccess={canManage ? () => setEditingMember(member) : undefined}
+                  onEditAccess={canManage ? () => tm.setEditingMember(member) : undefined}
+                  onRemove={canManage && member.role !== 'owner' ? () => {
+                    tm.setRemoveTarget(member);
+                    tm.setShowRemoveConfirm(true);
+                  } : undefined}
                 />
               );
             })}
@@ -171,7 +189,7 @@ export function PeopleTab({
       {/* Members list - only for Golf Clubs */}
       {!isLoading && activeSubTab === 'members' && isGolfClub && (
         sortedClubMembers.length > 0 ? (
-          <div className="flex flex-col" style={{ gap: '24px' }}>
+          <div className="flex flex-col divide-y divide-border/30 mt-2">
             {sortedClubMembers.map((member) => (
               <PersonRow
                 key={member.id}
@@ -198,7 +216,7 @@ export function PeopleTab({
         )
       )}
 
-      {/* Manage Team Modal */}
+      {/* Manage Team Bottom Sheet */}
       <ManageTeamModal
         open={manageModalOpen}
         onOpenChange={setManageModalOpen}
@@ -206,6 +224,80 @@ export function PeopleTab({
         currentTeam={teamMembers}
         isOwner={isOwner}
       />
+
+      {/* Standalone Edit Access Sheet (from People tab ••• menu) */}
+      <EditAccessSheet
+        member={tm.editingMember}
+        onOpenChange={() => tm.setEditingMember(null)}
+        editAccess={tm.editAccess}
+        setEditAccess={tm.setEditAccess}
+        editDisplayTitle={tm.editDisplayTitle}
+        setEditDisplayTitle={tm.setEditDisplayTitle}
+        availableAccessOptions={tm.availableAccessOptions}
+        hasChanges={tm.hasChanges}
+        saving={tm.saving}
+        onSave={tm.handleSaveAccess}
+        onRemove={() => {
+          tm.setRemoveTarget(tm.editingMember);
+          tm.setShowRemoveConfirm(true);
+        }}
+        removing={tm.removing}
+        idPrefix="people-edit"
+      />
+
+      {/* Transfer ownership confirmation */}
+      <AlertDialog open={tm.showTransferConfirm} onOpenChange={tm.setShowTransferConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Make primary manager?</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <p>
+                You're about to make <strong>{tm.pendingTransfer?.memberName}</strong> the primary manager of this business.
+              </p>
+              <p>You'll become a manager.</p>
+              <p className="text-muted-foreground/80">This change can be updated later.</p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button onClick={tm.handleConfirmTransfer}>Confirm transfer</Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Remove confirmation */}
+      <AlertDialog
+        open={tm.showRemoveConfirm}
+        onOpenChange={(open) => {
+          tm.setShowRemoveConfirm(open);
+          if (!open) tm.setRemoveTarget(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove from team?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {(tm.removeTarget?.profile?.display_name || 'This person')} will no longer appear as part of this business team.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={tm.removing}
+              onClick={async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                await tm.handleRemoveMember();
+              }}
+            >
+              {tm.removing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Remove
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
