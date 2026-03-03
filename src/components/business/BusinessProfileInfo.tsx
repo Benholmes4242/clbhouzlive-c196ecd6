@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Phone, Mail, Globe, MapPin, Building2, Calendar, Pencil, ArrowUpRight } from 'lucide-react';
+import { Phone, Mail, Globe, MapPin, Building2, Calendar, Pencil, ArrowUpRight, ChevronDown } from 'lucide-react';
 import { BusinessProfile } from '@/hooks/useBusinessProfile';
 import { format } from 'date-fns';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
