@@ -53,7 +53,7 @@ const ConfidenceGauge: React.FC<ConfidenceGaugeProps> = ({
   }, [percentage, animationDelay]);
 
   const size = sizeProp ?? 60;
-  const strokeWidth = 3.5;
+  const strokeWidth = size <= 38 ? 3 : 3.5;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const dashOffset = circumference - (circumference * animatedPct) / 100;
@@ -88,7 +88,7 @@ const ConfidenceGauge: React.FC<ConfidenceGaugeProps> = ({
           className="absolute inset-0 flex items-center justify-center"
           style={{ color: arcColor }}
         >
-          <span style={{ fontSize: 17, fontWeight: 800, lineHeight: 1 }}>
+          <span style={{ fontSize: size <= 38 ? 11 : 17, fontWeight: size <= 38 ? 700 : 800, lineHeight: 1 }}>
             {isWithdrawn ? '—' : percentage}
           </span>
           {!isWithdrawn && (
