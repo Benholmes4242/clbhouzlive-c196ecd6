@@ -389,7 +389,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
           bestCallPredicted={bestCall?.predictedRank}
           bestCallActual={bestCall?.actualPosition ?? undefined}
         />
-        <PredictionLeaderboard allPicks={tracker.allPicks} isCompleted={true} />
+        <PredictionLeaderboard allPicks={tracker.allPicks} isCompleted={true} bestCallPlayerId={bestCall?.playerId} />
       </>
     );
   };
@@ -481,7 +481,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
 });
 
 /** Best call = the pick with the lowest (best) actual finishing position */
-function getBestCall(tracker: { predictions: Array<{ playerName: string; predictedRank: number; actualPosition: number | null; performanceStatus: string }> }) {
+function getBestCall(tracker: { predictions: Array<{ playerName: string; playerId: string; predictedRank: number; actualPosition: number | null; performanceStatus: string }> }) {
   const eligible = tracker.predictions.filter(
     p => p.actualPosition !== null && p.performanceStatus !== 'cut' && p.performanceStatus !== 'withdrawn'
   );
