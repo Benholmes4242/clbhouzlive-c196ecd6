@@ -216,12 +216,11 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                     {pick.name}
                   </p>
                   {pick.countryCode && (
-                    <div style={{ marginTop: 2 }}>
+                    <div style={{ marginTop: 2, filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.3))' }}>
                       <CountryFlag
                         country={pick.countryCode}
                         size="sm"
                         className="rounded-sm"
-                        style={{ filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.3))' }}
                       />
                     </div>
                   )}
