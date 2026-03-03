@@ -108,10 +108,10 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
               key={pick.id}
               whileTap={{ scale: 0.98 }}
               transition={{ duration: 0.2 }}
-              className="w-[227px] h-[292px] rounded-[22px] overflow-hidden flex-shrink-0 snap-center flex flex-col"
+              className="w-[227px] rounded-[16px] overflow-hidden flex-shrink-0 snap-center flex flex-col"
               style={{
                 background: 'hsl(var(--background))',
-                border: '1px solid hsl(var(--border) / 0.2)',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
               }}
             >
               {/* Photo section — top ~48% */}
