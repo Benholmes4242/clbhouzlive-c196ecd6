@@ -183,7 +183,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
       {/* Course info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="font-semibold truncate text-sm">{course.name}</span>
+          <span className="font-semibold truncate text-sm text-foreground">{course.name}</span>
         </div>
         <div className="text-xs text-muted-foreground truncate">
           {course.sub_country || course.country}
@@ -607,7 +607,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                       />
                     )}
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium truncate text-sm">{preSelectedCourse.name}</div>
+                      <div className="font-medium truncate text-sm text-foreground">{preSelectedCourse.name}</div>
                       <div className="text-xs text-muted-foreground truncate">
                         {preSelectedCourse.sub_country || preSelectedCourse.country}
                       </div>
@@ -707,7 +707,7 @@ const CourseRow: React.FC<CourseRowProps> = ({
       />
     )}
     <div className="flex-1 min-w-0">
-      <div className="font-semibold truncate text-sm">{course.name}</div>
+      <div className="font-semibold truncate text-sm text-foreground">{course.name}</div>
       <div className="text-xs text-muted-foreground truncate">
         {course.sub_country || course.country}
       </div>
