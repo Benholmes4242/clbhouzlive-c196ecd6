@@ -295,7 +295,7 @@ const BusinessProfilePage: React.FC = () => {
           {/* P7: Cover photo edit button for owners */}
           {isOwner && (
             <button
-              onClick={() => setCoverSheetOpen(true)}
+              onClick={() => heroFileInputRef.current?.click()}
               className="absolute bottom-3 right-3 h-11 w-11 flex items-center justify-center rounded-full active:scale-[0.95] transition-transform z-10 pointer-events-auto"
               style={{
                 background: 'rgba(0, 0, 0, 0.45)',
@@ -332,61 +332,69 @@ const BusinessProfilePage: React.FC = () => {
           <ArrowLeft className="h-4 w-4 text-white" />
         </button>
 
-        {/* Avatar - squircle, left-aligned, positioned OUTSIDE the overflow-hidden container */}
+        {/* Avatar - unified button, left-aligned */}
         <div className="absolute left-5 z-20 pointer-events-auto" style={{ bottom: '-62px' }}>
           <button
-            className="relative cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
-            onClick={() => { if (uploadingLogo) return; setIsAvatarLightboxOpen(true); }}
-            aria-label="View business logo"
+            className="relative w-[124px] h-[124px] block cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            onClick={() => {
+              if (isOwner) {
+                logoFileInputRef.current?.click();
+              } else {
+                if (uploadingLogo) return;
+                setIsAvatarLightboxOpen(true);
+              }
+            }}
+            aria-label={isOwner ? "Change business logo" : "View business logo"}
           >
-            <div className="relative w-[124px] h-[124px]">
-              {/* 2px background ring */}
-              <div className="clbhouz-squircle absolute inset-0 bg-background" />
+            {/* 2px background ring */}
+            <div className="clbhouz-squircle absolute inset-0 bg-background" />
 
-              {/* Avatar */}
+            {/* Logo image */}
+            <div
+              className="clbhouz-squircle absolute overflow-hidden"
+              style={{
+                inset: '2px',
+                boxShadow: '0 12px 30px rgba(15,15,15,0.22)',
+              }}
+            >
+              {business.logo_url ? (
+                <img
+                  src={business.logo_url}
+                  alt={business.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-muted flex items-center justify-center text-3xl font-bold text-muted-foreground">
+                  {initials}
+                </div>
+              )}
+            </div>
+
+            {/* Camera badge — owner only, visual hint */}
+            {isOwner && !uploadingLogo && (
               <div
-                className="clbhouz-squircle absolute overflow-hidden"
+                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-10"
                 style={{
-                  inset: '2px',
-                  boxShadow: '0 12px 30px rgba(15,15,15,0.22)',
+                  background: 'rgba(0,0,0,0.55)',
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
+                  border: '2px solid white',
                 }}
               >
-                {business.logo_url ? (
-                  <img
-                    src={business.logo_url}
-                    alt={business.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-muted flex items-center justify-center text-3xl font-bold text-muted-foreground">
-                    {initials}
-                  </div>
-                )}
-              </div>
-            </div>
-          </button>
-
-          {/* P7: Avatar camera badge for owners */}
-          {isOwner && (
-            <button
-              onClick={(e) => { e.stopPropagation(); setLogoSheetOpen(true); }}
-              className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center active:scale-[0.95] transition-transform z-30"
-              style={{
-                background: 'rgba(0, 0, 0, 0.45)',
-                backdropFilter: 'blur(24px) saturate(180%)',
-                WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.35)',
-              }}
-              aria-label="Change logo"
-            >
-              {uploadingLogo ? (
-                <Loader2 className="w-3.5 h-3.5 text-white animate-spin" />
-              ) : (
                 <Camera className="w-3.5 h-3.5 text-white" />
-              )}
-            </button>
-          )}
+              </div>
+            )}
+
+            {/* Spinner — during upload */}
+            {isOwner && uploadingLogo && (
+              <div
+                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-10"
+                style={{ background: 'rgba(0,0,0,0.55)', border: '2px solid white' }}
+              >
+                <div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              </div>
+            )}
+          </button>
         </div>
 
         {/* Pills row - right side, just below header photo */}
@@ -648,25 +656,21 @@ const BusinessProfilePage: React.FC = () => {
         fallbackInitial={initials}
       />
 
-      {/* P7: Image Action Sheets for owner editing */}
-      <BusinessImageActionSheet
-        open={logoSheetOpen}
-        onOpenChange={setLogoSheetOpen}
-        type="logo"
-        hasImage={!!business.logo_url}
-        uploading={uploadingLogo}
-        onUpload={async (file) => { await uploadLogo(file); }}
-        onRemove={async () => { await removeLogo(); }}
-      />
-      <BusinessImageActionSheet
-        open={coverSheetOpen}
-        onOpenChange={setCoverSheetOpen}
-        type="cover"
-        hasImage={!!business.cover_image_url}
-        uploading={uploadingCover}
-        onUpload={async (file) => { await uploadCover(file); }}
-        onRemove={async () => { await removeCover(); }}
-      />
+      {/* Hidden file inputs */}
+      <input ref={logoFileInputRef} type="file" accept="image/*" onChange={handleLogoFileSelected} className="hidden" />
+      <input ref={heroFileInputRef} type="file" accept="image/*" onChange={handleCoverFileSelected} className="hidden" />
+
+      {/* Crop Modal */}
+      {isCropModalOpen && cropImageSrc && (
+        <ImageCropModal
+          open={isCropModalOpen}
+          onOpenChange={handleCropCancel}
+          imageSrc={cropImageSrc}
+          aspectRatio={cropMode === 'cover' ? 3.2 : 1}
+          onCropComplete={handleCropComplete}
+          title={cropMode === 'cover' ? 'Crop Cover Photo' : 'Crop Logo'}
+        />
+      )}
     </PageRoot>
   );
 };
