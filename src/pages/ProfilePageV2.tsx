@@ -61,6 +61,7 @@ import { useProfileClubs } from '@/components/profile/hooks/useProfileClubs';
 import { GolfJourneyProgress } from '@/components/profile/phase6';
 import ProfileAchievementsRail from '@/components/profile/ProfileAchievementsRail';
 import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
+import { ImageCropModal } from '@/components/business/ImageCropModal';
 import { ProfileTouchDebugProvider, useProfileTouchDebug } from '@/components/profile/debug/ProfileTouchDebugProvider';
 import { ProfileTouchDebugPanel } from '@/components/profile/debug/ProfileTouchDebugPanel';
 
@@ -185,6 +186,9 @@ const ProfilePageV2Content: React.FC = () => {
   const heroFileInputRef = useRef<HTMLInputElement>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isUploadingHero, setIsUploadingHero] = useState(false);
+  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
+  const [cropMode, setCropMode] = useState<'avatar' | 'hero' | null>(null);
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
   const queryClient = useQueryClient();
 
   const profileTypeInfo = getProfileType(profile?.user_type);
@@ -222,15 +226,33 @@ const ProfilePageV2Content: React.FC = () => {
   // postsCount now comes from usePersonalPostsCount (fetches total from DB)
   const unlockedAchievements = achievements || [];
 
-  // Inline avatar upload handler
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // File selected handlers — open crop modal instead of uploading directly
+  const handleAvatarFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !user?.id) return;
+    if (!file) return;
+    setCropImageSrc(URL.createObjectURL(file));
+    setCropMode('avatar');
+    setIsCropModalOpen(true);
+    if (avatarFileInputRef.current) avatarFileInputRef.current.value = '';
+  };
+
+  const handleHeroFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCropImageSrc(URL.createObjectURL(file));
+    setCropMode('hero');
+    setIsCropModalOpen(true);
+    if (heroFileInputRef.current) heroFileInputRef.current.value = '';
+  };
+
+  // Upload handlers — receive cropped File from ImageCropModal
+  const handleAvatarUpload = async (croppedFile: File) => {
+    if (!user?.id) return;
     setIsUploadingAvatar(true);
     try {
-      const fileExt = file.name.split('.').pop();
+      const fileExt = croppedFile.name.split('.').pop() || 'jpg';
       const fileName = `${user.id}/profile-${Date.now()}.${fileExt}`;
-      const result = await uploadToR2Only(file, 'clbhouz-profile-images', fileName);
+      const result = await uploadToR2Only(croppedFile, 'clbhouz-profile-images', fileName);
       if (!result.success) throw new Error(result.error || 'Upload failed');
       await supabase.from('user_profiles').update({ profile_photo_url: result.publicUrl }).eq('id', user.id);
       queryClient.invalidateQueries({ queryKey: ['user-profile', profileUserId] });
@@ -239,19 +261,16 @@ const ProfilePageV2Content: React.FC = () => {
       toast.error('Failed to update profile photo');
     } finally {
       setIsUploadingAvatar(false);
-      if (avatarFileInputRef.current) avatarFileInputRef.current.value = '';
     }
   };
 
-  // Inline hero/cover upload handler
-  const handleHeroUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !user?.id) return;
+  const handleHeroUpload = async (croppedFile: File) => {
+    if (!user?.id) return;
     setIsUploadingHero(true);
     try {
-      const fileExt = file.name.split('.').pop();
+      const fileExt = croppedFile.name.split('.').pop() || 'jpg';
       const fileName = `${user.id}/header-${Date.now()}.${fileExt}`;
-      const result = await uploadToR2Only(file, 'clbhouz-profile-images', fileName);
+      const result = await uploadToR2Only(croppedFile, 'clbhouz-profile-images', fileName);
       if (!result.success) throw new Error(result.error || 'Upload failed');
       await supabase.from('user_profiles').update({ header_photo_url: result.publicUrl }).eq('id', user.id);
       queryClient.invalidateQueries({ queryKey: ['user-profile', profileUserId] });
@@ -260,7 +279,28 @@ const ProfilePageV2Content: React.FC = () => {
       toast.error('Failed to update cover photo');
     } finally {
       setIsUploadingHero(false);
-      if (heroFileInputRef.current) heroFileInputRef.current.value = '';
+    }
+  };
+
+  const handleCropComplete = (croppedFile: File) => {
+    setIsCropModalOpen(false);
+    if (cropImageSrc) {
+      URL.revokeObjectURL(cropImageSrc);
+      setCropImageSrc(null);
+    }
+    if (cropMode === 'avatar') handleAvatarUpload(croppedFile);
+    if (cropMode === 'hero') handleHeroUpload(croppedFile);
+    setCropMode(null);
+  };
+
+  const handleCropCancel = (open: boolean) => {
+    if (!open) {
+      if (cropImageSrc) {
+        URL.revokeObjectURL(cropImageSrc);
+        setCropImageSrc(null);
+      }
+      setIsCropModalOpen(false);
+      setCropMode(null);
     }
   };
 
@@ -1017,23 +1057,20 @@ const ProfilePageV2Content: React.FC = () => {
       )}
 
       {/* Hidden file inputs for inline photo upload */}
-      <input
-        ref={avatarFileInputRef}
-        type="file"
-        accept="image/*"
-        onChange={(e) => {
-          console.log('[Avatar Camera] File input onChange fired — files:', e.target.files);
-          handleAvatarUpload(e);
-        }}
-        className="hidden"
-      />
-      <input
-        ref={heroFileInputRef}
-        type="file"
-        accept="image/*"
-        onChange={handleHeroUpload}
-        className="hidden"
-      />
+      <input ref={avatarFileInputRef} type="file" accept="image/*" onChange={handleAvatarFileSelected} className="hidden" />
+      <input ref={heroFileInputRef} type="file" accept="image/*" onChange={handleHeroFileSelected} className="hidden" />
+
+      {/* Crop Modal */}
+      {isCropModalOpen && cropImageSrc && (
+        <ImageCropModal
+          open={isCropModalOpen}
+          onOpenChange={handleCropCancel}
+          imageSrc={cropImageSrc}
+          aspectRatio={cropMode === 'hero' ? 3.2 : 1}
+          onCropComplete={handleCropComplete}
+          title={cropMode === 'hero' ? 'Crop Cover Photo' : 'Crop Profile Photo'}
+        />
+      )}
     </PageRoot>
   );
 };
