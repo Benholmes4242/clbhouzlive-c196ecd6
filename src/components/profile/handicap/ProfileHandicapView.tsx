@@ -128,7 +128,7 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
           {isOwnProfile && (
             <button
               onClick={() => setIsEditModalOpen(true)}
-              className="inline-flex items-center gap-1.5 mt-3 text-[13px] font-medium text-amber-500 min-h-[44px] active:scale-95 transition-transform"
+              className="inline-flex items-center gap-1.5 mt-3 text-[0.8125rem] font-medium text-muted-foreground min-h-[44px] active:scale-95 transition-transform"
             >
               <Pencil className="h-3.5 w-3.5" />
               Edit handicap
