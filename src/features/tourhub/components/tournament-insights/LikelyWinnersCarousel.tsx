@@ -148,7 +148,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                 <div
                   className="absolute inset-0 pointer-events-none"
                   style={{
-                    background: 'linear-gradient(to bottom, transparent 70%, hsl(var(--background)) 98%)',
+                    background: 'linear-gradient(to bottom, transparent 85%, hsl(var(--background)) 98%)',
                   }}
                 />
 
