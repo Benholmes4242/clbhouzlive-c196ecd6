@@ -56,7 +56,7 @@ export function MediaThumbnail({
     : {};
 
   return (
-    <div className="relative flex-shrink-0 w-[160px] h-[160px] rounded-2xl overflow-hidden group">
+    <div className="relative flex-shrink-0 w-[208px] h-[208px] rounded-2xl overflow-hidden group">
       {/* Media with studio edits applied */}
       <div className="relative w-full h-full">
         {item.type === 'video' ? (
