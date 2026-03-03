@@ -262,6 +262,8 @@ export const TournamentInsights = memo(function TournamentInsights() {
               featured={data.winners[0]}
               cards={data.contenderCards}
               withdrawnPlayerIds={withdrawnPlayerIds}
+              courseName={data.tournament.courseName}
+              tournamentName={data.tournament.name}
             />
           )}
 
@@ -364,6 +366,8 @@ export const TournamentInsights = memo(function TournamentInsights() {
             featured={data.winners[0]}
             cards={data.contenderCards}
             withdrawnPlayerIds={withdrawnPlayerIds}
+            courseName={data.tournament.courseName}
+            tournamentName={data.tournament.name}
           />
         )}
       </div>
