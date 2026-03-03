@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { format } from 'date-fns';
-import { Plus, Pencil, Zap, Check, Target } from 'lucide-react';
+import { Plus, Pencil, Zap, Check, Target, ArrowRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -24,11 +24,7 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
   isOwnProfile,
 }) => {
   const queryClient = useQueryClient();
-  
-  // Modal state
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  
-  // Early access state
   const [hasRegisteredInterest, setHasRegisteredInterest] = useState(
     profile?.handicap_sync_interest ?? false
   );
@@ -39,7 +35,6 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
 
   const formatHandicap = (value: number | null): string => {
     if (value === null) return '—';
-    // Handle plus handicaps (negative numbers)
     if (value < 0) return `+${Math.abs(value).toFixed(1)}`;
     return value.toFixed(1);
   };
@@ -74,38 +69,29 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
     setHasRegisteredInterest(true);
     setIsRegistering(false);
     toast.success("You're on the list");
-    
-    // Invalidate queries
     queryClient.invalidateQueries({ queryKey: ['profile'], exact: false });
     queryClient.invalidateQueries({ queryKey: ['user-profile'], exact: false });
   };
 
   const handleHandicapSaved = () => {
-    // Invalidate queries to refresh data
     queryClient.invalidateQueries({ queryKey: ['profile'], exact: false });
     queryClient.invalidateQueries({ queryKey: ['user-profile'], exact: false });
   };
 
-  // Loading skeleton
   if (!profile) {
     return (
-      <div className="px-4 py-6 space-y-6">
-        {/* Handicap Card Skeleton */}
-        <div className="bg-card rounded-2xl border border-border p-6 shadow-sm animate-pulse">
-          <div className="h-3 w-24 bg-muted rounded mb-4" />
-          <div className="h-12 w-20 bg-muted rounded mb-3" />
-          <div className="h-4 w-40 bg-muted/60 rounded" />
+      <div className="px-5 pt-10 pb-6 space-y-8">
+        <div className="animate-pulse">
+          <div className="h-3 w-28 bg-muted rounded mb-5" />
+          <div className="h-16 w-24 bg-muted rounded mb-4" />
+          <div className="h-4 w-44 bg-muted/60 rounded" />
         </div>
-        
-        {/* Promo Card Skeleton */}
-        <div className="bg-muted rounded-2xl border border-border p-5 animate-pulse">
-          <div className="flex gap-4">
-            <div className="w-10 h-10 rounded-full bg-muted flex-shrink-0" />
-            <div className="flex-1 space-y-2">
-              <div className="h-4 w-48 bg-border rounded" />
-              <div className="h-3 w-full bg-muted/60 rounded" />
-              <div className="h-8 w-28 bg-border rounded-full mt-3" />
-            </div>
+        <div className="h-px bg-border/40" />
+        <div className="animate-pulse flex gap-4">
+          <div className="w-10 h-10 rounded-xl bg-muted flex-shrink-0" />
+          <div className="flex-1 space-y-2">
+            <div className="h-4 w-48 bg-muted rounded" />
+            <div className="h-3 w-full bg-muted/60 rounded" />
           </div>
         </div>
       </div>
@@ -113,66 +99,65 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
   }
 
   return (
-    <div className="px-4 pt-6 pb-2 space-y-6">
+    <div className="px-5 pt-10 pb-6 space-y-0">
       <ScrollToTopGlass />
 
-      {/* Handicap Display Card */}
+      {/* Handicap Display — Cardless */}
       {handicapIndex !== null ? (
-        // Populated State
-        <div className="bg-card rounded-2xl border border-border p-6 shadow-sm">
-          {/* Header */}
-           <p className="text-[11px] font-semibold uppercase tracking-[1.5px] mb-3" style={{ color: '#AEAEB2' }}>
+        <div className="pb-8">
+          {/* Eyebrow Label */}
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground mb-4">
             Handicap Index
-           </p>
+          </p>
           
-          {/* Handicap Number */}
-          <div className="mb-3">
-            <span className="text-5xl font-bold text-foreground tracking-tight tabular-nums">
+          {/* Handicap Number — Hero */}
+          <div className="mb-4">
+            <span className="text-6xl font-light text-foreground tracking-tight tabular-nums">
               {formatHandicap(handicapIndex)}
             </span>
           </div>
           
-          {/* Meta Info */}
-          {lastUpdatedAt && isOwnProfile && (
-            <p className="text-sm text-muted-foreground mb-4">
-              Last edited {formatDate(lastUpdatedAt)} · Added by you
-            </p>
-          )}
-          
-          {/* Edit Button - Only for own profile */}
+          {/* Meta + Edit inline */}
           {isOwnProfile && (
-            <button
-              onClick={() => setIsEditModalOpen(true)}
-              className="inline-flex items-center gap-1.5 text-[0.8125rem] font-medium text-muted-foreground min-h-[44px] px-2 rounded-lg active:scale-95 transition-transform"
-            >
-              <Pencil className="h-3.5 w-3.5 opacity-60" />
-              Edit handicap
-            </button>
+            <div className="flex items-center gap-0 text-sm text-muted-foreground">
+              {lastUpdatedAt && (
+                <span>Last edited {formatDate(lastUpdatedAt)} · Added by you</span>
+              )}
+              {lastUpdatedAt && (
+                <span className="w-px h-4 bg-border/60 mx-3 inline-block" />
+              )}
+              <button
+                onClick={() => setIsEditModalOpen(true)}
+                className="inline-flex items-center gap-1.5 font-semibold text-amber-500 min-h-[44px] active:scale-95 transition-transform"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+                Edit handicap
+              </button>
+            </div>
+          )}
+
+          {!isOwnProfile && lastUpdatedAt && (
+            <p className="text-sm text-muted-foreground">
+              Last updated {formatDate(lastUpdatedAt)}
+            </p>
           )}
         </div>
       ) : (
-        // Empty State
-        <div className="bg-card rounded-2xl border border-border p-8 shadow-sm">
-          <div className="flex flex-col items-center text-center">
-            {/* Icon */}
+        // Empty State — Cardless
+        <div className="pb-8">
+          <div className="flex flex-col items-center text-center py-8">
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-100 to-amber-50 flex items-center justify-center mb-4">
               <Target className="h-7 w-7 text-amber-500" />
             </div>
-            
-            {/* Title */}
             <h3 className="text-lg font-semibold text-foreground mb-2">
               {isOwnProfile ? 'Add Your Handicap' : 'No Handicap Set'}
             </h3>
-            
-            {/* Description */}
             <p className="text-sm text-muted-foreground mb-5 max-w-xs">
               {isOwnProfile 
                 ? 'Track your handicap index to see your progress over time'
                 : "This golfer hasn't added their handicap yet"
               }
             </p>
-            
-            {/* CTA - Only for own profile */}
             {isOwnProfile && (
               <button
                 onClick={() => setIsEditModalOpen(true)}
@@ -186,13 +171,16 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
         </div>
       )}
 
-      {/* Official Handicap Sync Promo Card - Only show for own profile */}
+      {/* Divider */}
+      {isOwnProfile && <div className="h-px bg-border/40 mb-8" />}
+
+      {/* Official Sync Callout — Premium tinted section, no card */}
       {isOwnProfile && (
-        <div className="bg-muted rounded-2xl border border-border p-5">
-          {/* Header Row */}
+        <div className="rounded-2xl px-5 py-5 border-l-[3px] border-amber-400/60" style={{ backgroundColor: 'hsla(38, 92%, 50%, 0.04)' }}>
           <div className="flex gap-4">
-            <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-              <Zap className="h-5 w-5 text-amber-500" />
+            {/* Icon — gold gradient square */}
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center flex-shrink-0 shadow-sm">
+              <Zap className="h-5 w-5 text-white" />
             </div>
             <div className="flex-1 min-w-0">
               <h4 className="text-sm font-semibold text-foreground mb-1">
@@ -203,22 +191,25 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
               </p>
               
               {/* CTA */}
-              <div>
-                {!hasRegisteredInterest ? (
-                  <button
-                    onClick={handleRegisterInterest}
-                    disabled={isRegistering}
-                    className="inline-flex items-center px-4 py-2 bg-card border border-border text-sm font-semibold text-foreground rounded-full shadow-sm hover:bg-muted transition-colors disabled:opacity-50 min-h-[44px] active:scale-[0.98]"
-                  >
-                    {isRegistering ? 'Saving...' : 'Get early access'}
-                  </button>
-                ) : (
-                  <div className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-50 text-emerald-700 text-sm font-medium rounded-full">
-                    <Check className="h-4 w-4" />
-                    You're on the list
-                  </div>
-                )}
-              </div>
+              {!hasRegisteredInterest ? (
+                <button
+                  onClick={handleRegisterInterest}
+                  disabled={isRegistering}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-amber-500 min-h-[44px] active:scale-95 transition-transform disabled:opacity-50"
+                >
+                  {isRegistering ? 'Saving...' : (
+                    <>
+                      Get early access
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </>
+                  )}
+                </button>
+              ) : (
+                <div className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-emerald-600">
+                  <Check className="h-4 w-4" />
+                  You're on the list
+                </div>
+              )}
             </div>
           </div>
         </div>
