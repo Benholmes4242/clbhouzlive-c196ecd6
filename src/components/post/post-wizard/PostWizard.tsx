@@ -885,8 +885,8 @@ export function PostWizard({
                       onClick={() => handleAddMedia()}
                       className="w-full flex flex-col items-center justify-center gap-3 rounded-2xl cursor-pointer transition-all active:scale-[0.985]"
                       style={{
+                        border: '2px dashed rgba(245,158,11,0.25)',
                         aspectRatio: '16 / 10',
-                        background: 'hsl(var(--muted) / 0.5)',
                       }}
                     >
                       {/* Gradient icon container */}
@@ -898,9 +898,14 @@ export function PostWizard({
                       >
                         <Image className="w-[26px] h-[26px]" style={{ color: '#f59e0b' }} />
                       </div>
-                      <span className="text-[15px] font-semibold text-foreground">
-                        Add photo or video
-                      </span>
+                      <div className="flex flex-col items-center gap-1">
+                        <span className="text-[15px] font-semibold text-foreground">
+                          Add photo or video
+                        </span>
+                        <span className="text-[13px] text-muted-foreground">
+                          Share up to 10 photos & videos
+                        </span>
+                      </div>
                     </button>
                   ) : (
                     <div className="flex gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
