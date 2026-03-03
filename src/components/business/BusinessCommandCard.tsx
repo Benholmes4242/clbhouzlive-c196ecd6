@@ -97,12 +97,12 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
     return value >= 0 ? `+${value.toLocaleString()}` : value.toLocaleString();
   };
 
-  // Navigate to manage team page - close dropdown first
+  // Navigate to business profile (People tab) for team management
   const handleManageTeam = (e: React.MouseEvent) => {
     e.stopPropagation();
     setDropdownOpen(false);
     requestAnimationFrame(() => {
-      navigate(`/business/${business.id}/manage-team`);
+      navigate(`/business/${business.id}`);
     });
   };
 
