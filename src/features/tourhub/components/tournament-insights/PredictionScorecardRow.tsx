@@ -1,5 +1,8 @@
 /**
  * PredictionScorecardRow - Borderless player row with separator
+ * 
+ * Completed layout: [Position Badge] [Avatar] [Name + Flag] ... [Score (large)]
+ * Live layout:      [Pick #] [Avatar] [Name + Score] ... [Position/Off Lead]
  */
 
 import React from 'react';
@@ -8,6 +11,7 @@ import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeads
 import PickBadge from './components/PickBadge';
 import ActualPositionBadge from './components/ActualPositionBadge';
 import LivePositionDisplay from './components/LivePositionDisplay';
+import CountryFlag from '@/components/ui/country-flag';
 import type { TrackedPrediction } from './types';
 
 interface PredictionScorecardRowProps {
@@ -22,6 +26,12 @@ function getAccuracyBorderColor(pos: number | null, status?: string) {
   if (pos <= 3) return 'rgba(22,163,74,0.5)';
   if (pos <= 10) return 'rgba(217,119,6,0.5)';
   return 'rgba(220,38,38,0.2)';
+}
+
+function formatScore(score: number | null): string {
+  if (score === null) return '—';
+  if (score === 0) return 'E';
+  return score > 0 ? `+${score}` : `${score}`;
 }
 
 export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
@@ -55,7 +65,7 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
         borderBottom: isLast ? 'none' : '1px solid hsl(var(--border) / 0.3)',
       }}
     >
-      {/* Leader left accent */}
+      {/* Leader left accent (live only) */}
       {!isCompleted && isLeader && (
         <div
           style={{
@@ -92,8 +102,18 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
       )}
 
       <div className="flex items-center gap-3">
-        {/* Pick badge */}
-        <PickBadge pickNumber={prediction.predictedRank} />
+        {/* LEFT SECTION — differs between completed and live */}
+        {isCompleted ? (
+          /* Completed: Position badge on the left */
+          <ActualPositionBadge
+            position={prediction.actualPosition}
+            isTied={prediction.actualPositionTied}
+            performanceStatus={prediction.performanceStatus}
+          />
+        ) : (
+          /* Live: Pick number badge on the left */
+          <PickBadge pickNumber={prediction.predictedRank} />
+        )}
 
         {/* Avatar */}
         <div
@@ -133,42 +153,66 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
           >
             {prediction.playerName}
           </p>
-          {prediction.score !== null && (
-            <div className="flex items-center gap-1.5">
-              <p
-                className="text-muted-foreground leading-tight"
-                style={{ fontSize: 13, marginTop: 3 }}
-              >
-                {prediction.score === 0 ? 'E' : prediction.score > 0 ? `+${prediction.score}` : prediction.score}
-                {!isCompleted && prediction.thru !== null && prediction.thru > 0 ? ` · thru ${prediction.thru}` : ''}
-                {!isCompleted && prediction.currentRound ? ` · R${prediction.currentRound}` : ''}
-              </p>
-              {/* Leader pulsing dot */}
-              {!isCompleted && isLeader && (
+
+          {isCompleted ? (
+            /* Completed: Country flag under name */
+            <div className="flex items-center gap-1.5" style={{ marginTop: 3 }}>
+              <CountryFlag country={prediction.country} size="sm" />
+              {prediction.country && (
                 <span
-                  style={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: 3,
-                    backgroundColor: '#16A34A',
-                    animation: 'pulse 2s infinite',
-                    flexShrink: 0,
-                  }}
-                />
+                  className="text-muted-foreground leading-tight"
+                  style={{ fontSize: 12 }}
+                >
+                  {prediction.country}
+                </span>
               )}
             </div>
+          ) : (
+            /* Live: Score + thru info under name */
+            prediction.score !== null && (
+              <div className="flex items-center gap-1.5">
+                <p
+                  className="text-muted-foreground leading-tight"
+                  style={{ fontSize: 13, marginTop: 3 }}
+                >
+                  {formatScore(prediction.score)}
+                  {prediction.thru !== null && prediction.thru > 0 ? ` · thru ${prediction.thru}` : ''}
+                  {prediction.currentRound ? ` · R${prediction.currentRound}` : ''}
+                </p>
+                {/* Leader pulsing dot */}
+                {isLeader && (
+                  <span
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: 3,
+                      backgroundColor: '#16A34A',
+                      animation: 'pulse 2s infinite',
+                      flexShrink: 0,
+                    }}
+                  />
+                )}
+              </div>
+            )
           )}
         </div>
 
-        {/* Right section — position display */}
+        {/* RIGHT SECTION — differs between completed and live */}
         <div className="flex-shrink-0 ml-auto">
           {isCompleted ? (
-            <ActualPositionBadge
-              position={prediction.actualPosition}
-              isTied={prediction.actualPositionTied}
-              performanceStatus={prediction.performanceStatus}
-            />
+            /* Completed: Large score on the right */
+            <span
+              className="text-foreground"
+              style={{
+                fontSize: 18,
+                fontWeight: 700,
+                letterSpacing: '-0.2px',
+              }}
+            >
+              {isCut ? 'MC' : isWD ? 'WD' : formatScore(prediction.score)}
+            </span>
           ) : (
+            /* Live: Position display on the right */
             <LivePositionDisplay
               position={prediction.actualPosition}
               isTied={prediction.actualPositionTied}
