@@ -969,91 +969,163 @@ export function PostWizard({
                   </p>
                 )}
 
-                {/* Change 4: Inline Course Selector Row */}
-                <button
-                  onClick={() => { dismissCourseTooltip(); setShowCourseSearch(true); }}
-                  className="w-full flex items-center justify-between rounded-2xl active:scale-[0.985] transition-transform"
-                  style={{
-                    padding: '14px 16px',
-                    background: state.selectedCourses.length > 0
-                      ? 'rgba(245,158,11,0.06)'
-                      : 'hsl(var(--muted) / 0.3)',
-                    borderLeft: state.selectedCourses.length > 0
-                      ? '3px solid #f59e0b'
-                      : '3px solid transparent',
-                  }}
-                >
-                  <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <MapPin className="w-5 h-5 flex-shrink-0" style={{ color: '#f59e0b' }} />
-                    {state.selectedCourses.length > 0 ? (
-                      <div className="flex flex-wrap gap-1.5 min-w-0">
-                        {state.selectedCourses.map((course) => (
-                          <span
-                            key={course.id}
-                            className="inline-flex items-center gap-1 text-[14px] font-semibold text-foreground"
-                          >
-                            <span className="truncate max-w-[200px]">{course.name}</span>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); removeCourse(course.id); }}
-                              className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center"
-                              style={{ background: 'hsl(var(--muted))' }}
-                            >
-                              <X className="w-3 h-3 text-muted-foreground" />
-                            </button>
-                          </span>
-                        ))}
-                      </div>
-                    ) : (
-                      <span className="text-[14px] font-medium text-muted-foreground">
-                        Tag a golf course
-                      </span>
-                    )}
-                  </div>
-                  <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }} />
-                </button>
-
-                {/* Change 4: Inline Tag People Row */}
-                <button
-                  onClick={() => { dismissFriendsTooltip(); setShowTagPeople(true); }}
-                  className="w-full flex items-center justify-between rounded-2xl active:scale-[0.985] transition-transform"
-                  style={{
-                    padding: '14px 16px',
-                    background: state.selectedTags.length > 0
-                      ? 'rgba(245,158,11,0.06)'
-                      : 'hsl(var(--muted) / 0.3)',
-                    borderLeft: state.selectedTags.length > 0
-                      ? '3px solid #f59e0b'
-                      : '3px solid transparent',
-                  }}
-                >
-                  <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <UserPlus className="w-5 h-5 flex-shrink-0" style={{ color: '#f59e0b' }} />
-                    {state.selectedTags.length > 0 ? (
-                      <div className="flex items-center gap-1.5">
-                        <div className="flex -space-x-1.5">
-                          {state.selectedTags.slice(0, 4).map((tag) => (
-                            <SquircleAvatar
-                              key={tag.id}
-                              size={24}
-                              src={tag.avatar_url}
-                              alt={tag.name}
-                              fallback={tag.name?.[0]?.toUpperCase() || '?'}
-                              hideRing
-                            />
-                          ))}
+                {/* Change 4: Tag Course + Tag People with divider */}
+                <div className="rounded-2xl overflow-hidden" style={{ background: 'transparent' }}>
+                  {/* Course Row */}
+                  <button
+                    onClick={() => { dismissCourseTooltip(); setShowCourseSearch(true); }}
+                    className="w-full flex items-center justify-between transition-colors duration-100 active:bg-muted/50"
+                    style={{
+                      padding: '12px 16px',
+                      borderRadius: state.selectedCourses.length > 0 ? '16px' : undefined,
+                      background: state.selectedCourses.length > 0
+                        ? 'rgba(245,158,11,0.04)'
+                        : 'transparent',
+                      borderLeft: state.selectedCourses.length > 0
+                        ? '3px solid #f59e0b'
+                        : '3px solid transparent',
+                    }}
+                  >
+                    <div className="flex items-start gap-3 min-w-0 flex-1">
+                      <MapPin className="w-[18px] h-[18px] flex-shrink-0 mt-0.5" style={{ color: '#f59e0b' }} />
+                      {state.selectedCourses.length > 0 ? (
+                        <div className="flex flex-col gap-2 min-w-0 flex-1">
+                          {state.selectedCourses.length === 1 ? (
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className="text-[14px] font-semibold text-foreground truncate">{state.selectedCourses[0].name}</span>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); removeCourse(state.selectedCourses[0].id); }}
+                                className="flex-shrink-0 transition-colors"
+                                style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }}
+                                onPointerDown={(e) => { (e.currentTarget as HTMLElement).style.color = 'hsl(var(--muted-foreground) / 0.7)'; }}
+                                onPointerUp={(e) => { (e.currentTarget as HTMLElement).style.color = 'hsl(var(--muted-foreground) / 0.4)'; }}
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="flex flex-wrap gap-1.5">
+                                {state.selectedCourses.map((course) => (
+                                  <span
+                                    key={course.id}
+                                    className="inline-flex items-center gap-1.5 rounded-full transition-transform active:scale-95"
+                                    style={{
+                                      padding: '6px 12px',
+                                      background: 'hsl(var(--muted) / 0.6)',
+                                      border: '1px solid hsl(var(--border) / 0.3)',
+                                    }}
+                                  >
+                                    <span className="text-[12px] font-medium text-foreground truncate max-w-[180px]">{course.name}</span>
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); removeCourse(course.id); }}
+                                      className="flex-shrink-0 transition-colors"
+                                      style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }}
+                                      onPointerDown={(e) => { (e.currentTarget as HTMLElement).style.color = 'hsl(var(--destructive) / 0.6)'; }}
+                                      onPointerUp={(e) => { (e.currentTarget as HTMLElement).style.color = 'hsl(var(--muted-foreground) / 0.4)'; }}
+                                    >
+                                      <X className="w-3.5 h-3.5" />
+                                    </button>
+                                  </span>
+                                ))}
+                              </div>
+                              <span className="text-[12px] font-medium" style={{ color: '#f59e0b' }}>+ Add course</span>
+                            </>
+                          )}
                         </div>
-                        <span className="text-[14px] font-semibold text-foreground">
-                          {state.selectedTags.length} tagged
+                      ) : (
+                        <span className="text-[14px] font-medium text-muted-foreground">
+                          Tag a golf course
                         </span>
-                      </div>
-                    ) : (
-                      <span className="text-[14px] font-medium text-muted-foreground">
-                        Tag people
-                      </span>
-                    )}
-                  </div>
-                  <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }} />
-                </button>
+                      )}
+                    </div>
+                    <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: 'hsl(var(--muted-foreground) / 0.3)' }} />
+                  </button>
+
+                  {/* Subtle divider */}
+                  <div className="mx-4" style={{ height: '1px', background: 'hsl(var(--border) / 0.2)' }} />
+
+                  {/* People Row */}
+                  <button
+                    onClick={() => { dismissFriendsTooltip(); setShowTagPeople(true); }}
+                    className="w-full flex items-center justify-between transition-colors duration-100 active:bg-muted/50"
+                    style={{
+                      padding: '12px 16px',
+                      borderRadius: state.selectedTags.length > 0 ? '16px' : undefined,
+                      background: state.selectedTags.length > 0
+                        ? 'rgba(245,158,11,0.04)'
+                        : 'transparent',
+                      borderLeft: state.selectedTags.length > 0
+                        ? '3px solid #f59e0b'
+                        : '3px solid transparent',
+                    }}
+                  >
+                    <div className="flex items-start gap-3 min-w-0 flex-1">
+                      <UserPlus className="w-[18px] h-[18px] flex-shrink-0 mt-0.5" style={{ color: '#f59e0b' }} />
+                      {state.selectedTags.length > 0 ? (
+                        <div className="flex flex-col gap-2 min-w-0 flex-1">
+                          {state.selectedTags.length === 1 ? (
+                            <div className="flex items-center gap-2 min-w-0">
+                              <SquircleAvatar
+                                size={24}
+                                src={state.selectedTags[0].avatar_url}
+                                alt={state.selectedTags[0].name}
+                                fallback={state.selectedTags[0].name?.[0]?.toUpperCase() || '?'}
+                                hideRing
+                              />
+                              <span className="text-[14px] font-semibold text-foreground truncate">{state.selectedTags[0].name}</span>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const tag = state.selectedTags[0];
+                                  const mentionText = `@${(tag.username || tag.name).replace(/\s+/g, '')}`;
+                                  const escapeRegex = mentionText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                                  const removeRegex = new RegExp(`\\s*${escapeRegex}`, 'gi');
+                                  const newCaption = state.caption.replace(removeRegex, '').trim();
+                                  setCaption(newCaption);
+                                  setTags(state.selectedTags.filter(t => t.id !== tag.id));
+                                }}
+                                className="flex-shrink-0 transition-colors"
+                                style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }}
+                                onPointerDown={(e) => { (e.currentTarget as HTMLElement).style.color = 'hsl(var(--muted-foreground) / 0.7)'; }}
+                                onPointerUp={(e) => { (e.currentTarget as HTMLElement).style.color = 'hsl(var(--muted-foreground) / 0.4)'; }}
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="flex items-center gap-2">
+                                <div className="flex" style={{ marginLeft: 0 }}>
+                                  {state.selectedTags.slice(0, 3).map((tag, i) => (
+                                    <div key={tag.id} style={{ marginLeft: i === 0 ? 0 : -8, zIndex: 3 - i }}>
+                                      <SquircleAvatar
+                                        size={24}
+                                        src={tag.avatar_url}
+                                        alt={tag.name}
+                                        fallback={tag.name?.[0]?.toUpperCase() || '?'}
+                                        hideRing
+                                      />
+                                    </div>
+                                  ))}
+                                </div>
+                                <span className="text-[14px] font-medium text-foreground">
+                                  {state.selectedTags.length} tagged
+                                </span>
+                              </div>
+                              <span className="text-[12px] font-medium" style={{ color: '#f59e0b' }}>+ Tag more</span>
+                            </>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-[14px] font-medium text-muted-foreground">
+                          Tag people
+                        </span>
+                      )}
+                    </div>
+                    <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: 'hsl(var(--muted-foreground) / 0.3)' }} />
+                  </button>
+                </div>
 
               </div>
             </div>
