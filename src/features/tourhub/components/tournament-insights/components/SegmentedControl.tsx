@@ -42,7 +42,7 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({ options, value, onC
               <span
                 className="w-[6px] h-[6px] rounded-full flex-shrink-0"
                 style={{
-                  backgroundColor: '#22c55e',
+                  backgroundColor: '#16A34A',
                   animation: 'pulse 2s ease-in-out infinite',
                 }}
               />

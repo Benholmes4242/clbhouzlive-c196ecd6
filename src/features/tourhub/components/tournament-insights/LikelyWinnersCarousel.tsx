@@ -29,15 +29,12 @@ interface PickCard {
   isWithdrawn?: boolean;
 }
 
-// Accent colors: gold for #1, green for #2-3, slate for #4-5
-const ACCENT_COLORS = ['#D97706', '#16A34A', '#16A34A', '#94A3B8', '#94A3B8'];
-const ACCENT_GRADIENTS = [
-  'linear-gradient(90deg, #D97706, rgba(217,119,6,0.5))',
-  'linear-gradient(90deg, #16A34A, rgba(22,163,74,0.5))',
-  'linear-gradient(90deg, #16A34A, rgba(22,163,74,0.5))',
-  'linear-gradient(90deg, #94A3B8, rgba(148,163,184,0.5))',
-  'linear-gradient(90deg, #94A3B8, rgba(148,163,184,0.5))',
-];
+// Unified green accent — opacity-graduated by pick position
+const ACCENT_COLOR = '#16A34A';
+const ACCENT_OPACITIES = [1, 0.7, 0.7, 0.4, 0.4];
+const ACCENT_GRADIENTS = ACCENT_OPACITIES.map(
+  (op) => `linear-gradient(90deg, rgba(22,163,74,${op}), rgba(22,163,74,${op * 0.5}))`
+);
 
 export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
   featured,
