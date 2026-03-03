@@ -8,12 +8,12 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { useWinnerScorecardStats } from '../../../hooks/useWinnerScorecardStats';
-import { useWinnerSeasonStats } from '../../../hooks/useWinnerSeasonStats';
-import { useVenueImage, getFallbackCourseImage } from '../../../hooks/useVenueImage';
+import { useWinnerScorecardStats } from '../../hooks/useWinnerScorecardStats';
+import { useWinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
+import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import CountryFlag from '@/components/ui/country-flag';
-import type { TrackedPrediction } from '../types';
+import type { TrackedPrediction } from './types';
 
 /* ── Types ──────────────────────────────────────────────────────────── */
 
