@@ -15898,6 +15898,10 @@ export type Database = {
         }
         Returns: string
       }
+      sync_user_email: {
+        Args: { current_email: string; user_id_param: string }
+        Returns: undefined
+      }
       test_echo_insert: { Args: never; Returns: string }
       test_lab_clear_notifications: {
         Args: { p_target_user_id: string; p_test_user_id: string }
