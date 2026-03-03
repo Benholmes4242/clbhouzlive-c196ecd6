@@ -60,7 +60,7 @@ export function ProfileSuccessScreen({
           className="w-full rounded-xl font-semibold"
         >
           <User className="w-4 h-4 mr-2" />
-          View Profile
+          View my profile
         </Button>
         
         <Button

@@ -454,8 +454,8 @@ export function PersonalProfileWizard() {
   if (showSuccess) {
     return (
       <ProfileSuccessScreen
-        title="Profile Updated"
-        subtitle="Your profile is now live"
+        title="Looking good"
+        subtitle="Your profile is ready"
         onViewProfile={handleViewProfile}
         onDone={handleDone}
       />

@@ -3,9 +3,10 @@
  * Matches PostSuccessScreen aesthetic
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Check, Eye, ExternalLink, X } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { getScoreTier } from '@/utils/getScoreTier';
 import type { ReviewWizardCourse, SuccessVariant } from './types';
 
@@ -34,6 +35,17 @@ export function SuccessScreen({
 }: SuccessScreenProps) {
   const isShared = variant === 'shared';
   const tierData = rating ? getScoreTier(rating) : null;
+
+  useEffect(() => {
+    if (isShared) {
+      confetti({
+        particleCount: 80,
+        spread: 60,
+        origin: { y: 0.6 },
+        colors: ['#f59e0b', '#fbbf24', '#ffffff', '#d97706'],
+      });
+    }
+  }, []);
   
   return (
     <motion.div
@@ -80,7 +92,7 @@ export function SuccessScreen({
         transition={{ delay: 0.4 }}
         className="text-2xl font-bold text-foreground"
       >
-        {isShared ? 'Shared to Clubhouse' : (isEditMode ? 'Review updated' : 'Review saved')}
+        {isShared ? 'Your verdict is live' : (isEditMode ? 'Verdict updated' : 'Verdict saved')}
       </motion.h2>
 
       {/* Description */}
@@ -91,10 +103,10 @@ export function SuccessScreen({
         className="text-sm text-muted-foreground mt-2 text-center px-8"
       >
         {isShared 
-          ? 'Now live on Clubhouse'
+          ? (course?.name || 'Your review')
           : isEditMode
-            ? `Updated your verdict on ${course?.name || 'the course'}`
-            : `Your verdict on ${course?.name || 'the course'} is live`
+            ? `Your updated take on ${course?.name || 'the course'} is live`
+            : `Your take on ${course?.name || 'the course'} is on the record`
         }
       </motion.p>
 
@@ -133,7 +145,7 @@ export function SuccessScreen({
           >
             <span className="flex items-center gap-2">
               <ExternalLink className="h-4 w-4" />
-              View post
+              View on clbhouz
             </span>
           </button>
         ) : (
@@ -144,7 +156,7 @@ export function SuccessScreen({
           >
             <span className="flex items-center gap-2">
               <Eye className="h-4 w-4" />
-              View review
+              View my review
             </span>
           </button>
         )}
