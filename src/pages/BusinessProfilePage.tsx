@@ -559,7 +559,7 @@ const BusinessProfilePage: React.FC = () => {
                    onClick={() => setBioExpanded(!bioExpanded)}
                    className="text-[0.8125rem] font-medium text-muted-foreground mt-1 min-h-[44px] flex items-center gap-0.5 active:scale-95 transition-transform"
                  >
-                  {bioExpanded ? 'Show less' : 'More'}
+                  {bioExpanded ? 'Show less' : 'Show more'}
                 </button>
               )}
             </div>
