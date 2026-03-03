@@ -98,9 +98,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
           "relative w-[227px] h-[292px] rounded-[22px] overflow-hidden flex-shrink-0 cursor-pointer",
           className
         )}
-        style={{
-          boxShadow: '0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08)',
-        }}
+        style={{}}
       >
         {/* Background image - full bleed */}
         {course.thumbnail_image ? (
