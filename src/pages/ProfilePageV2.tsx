@@ -462,82 +462,74 @@ const ProfilePageV2Content: React.FC = () => {
         </button>
 
         {/* Avatar - squircle, left-aligned with About title (px-5), positioned relative to hero bottom */}
-        {/* Positioned absolutely but OUTSIDE the overflow-hidden container */}
-        <button
-          className="absolute left-5 z-20 cursor-pointer pointer-events-auto focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
+        {/* Outer wrapper is a div (not button) so the camera badge sibling gets its own hit area */}
+        <div
+          className="absolute left-5 z-20 pointer-events-auto"
           style={{ bottom: '-62px' }}
-          data-debug-id="profile-photo"
-          onPointerDown={(e) => {
-            logPoint('profile_photo.pointerdown', { x: e.clientX, y: e.clientY });
-          }}
-          onTouchStart={(e) => {
-            const t = e.touches?.[0];
-            logPoint('profile_photo.pointerdown', { x: t?.clientX, y: t?.clientY, via: 'touchstart' });
-          }}
-          onClick={() => {
-            console.log('[Avatar Parent] Parent button clicked — isUploadingAvatar:', isUploadingAvatar);
-            if (isUploadingAvatar) return;
-            logPoint('profile_photo.click');
-            setIsAvatarLightboxOpen(true);
-          }}
-          aria-label="View profile photo"
         >
           <div className="relative w-[124px] h-[124px]">
-            {/* 2px ring (matches background) */}
-            <div
-              className="clbhouz-squircle absolute inset-0 bg-background"
-            />
-
-            {/* Avatar */}
-            <div
-              className="clbhouz-squircle absolute overflow-hidden"
-              style={{
-                inset: '2px',
-                boxShadow: '0 12px 30px rgba(15,15,15,0.22)',
+            {/* Avatar button — opens lightbox */}
+            <button
+              className="w-full h-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
+              data-debug-id="profile-photo"
+              onPointerDown={(e) => {
+                logPoint('profile_photo.pointerdown', { x: e.clientX, y: e.clientY });
               }}
+              onTouchStart={(e) => {
+                const t = e.touches?.[0];
+                logPoint('profile_photo.pointerdown', { x: t?.clientX, y: t?.clientY, via: 'touchstart' });
+              }}
+              onClick={() => {
+                console.log('[Avatar Parent] Parent button clicked — isUploadingAvatar:', isUploadingAvatar);
+                if (isUploadingAvatar) return;
+                logPoint('profile_photo.click');
+                setIsAvatarLightboxOpen(true);
+              }}
+              aria-label="View profile photo"
             >
-              {profile?.profile_photo_url ? (
-                <img
-                  src={profile.profile_photo_url}
-                  alt={displayName}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-muted flex items-center justify-center text-3xl font-bold text-muted-foreground">
-                  {displayName.charAt(0)}
-                </div>
-              )}
-            </div>
-            {/* Avatar edit affordance — self-profile only */}
+              {/* 2px ring (matches background) */}
+              <div
+                className="clbhouz-squircle absolute inset-0 bg-background"
+              />
+
+              {/* Avatar */}
+              <div
+                className="clbhouz-squircle absolute"
+                style={{
+                  inset: '2px',
+                  boxShadow: '0 12px 30px rgba(15,15,15,0.22)',
+                }}
+              >
+                {profile?.profile_photo_url ? (
+                  <img
+                    src={profile.profile_photo_url}
+                    alt={displayName}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-muted flex items-center justify-center text-3xl font-bold text-muted-foreground">
+                    {displayName.charAt(0)}
+                  </div>
+                )}
+              </div>
+            </button>
+
+            {/* Camera badge — sibling, not child of squircle */}
             {isSelf && (
               <button
                 onClick={(e) => {
-                  console.log('[Avatar Camera] Badge clicked');
-                  console.log('[Avatar Camera] stopPropagation called');
                   e.stopPropagation();
-                  console.log('[Avatar Camera] avatarFileInputRef.current:', avatarFileInputRef.current);
-                  console.log('[Avatar Camera] isUploadingAvatar:', isUploadingAvatar);
-                  if (isUploadingAvatar) {
-                    console.log('[Avatar Camera] BLOCKED — upload in progress');
-                    return;
-                  }
-                  console.log('[Avatar Camera] Calling avatarFileInputRef.current?.click()');
+                  console.log('[Avatar Camera] Badge clicked — calling file input');
+                  if (isUploadingAvatar) return;
                   avatarFileInputRef.current?.click();
-                  console.log('[Avatar Camera] click() called');
-                }}
-                onTouchStart={(e) => {
-                  console.log('[Avatar Camera] onTouchStart fired on badge');
-                  e.stopPropagation();
                 }}
                 className="absolute bottom-0 right-0 h-7 w-7 rounded-full flex items-center justify-center active:scale-[0.95] z-30 pointer-events-auto transition-transform"
                 style={{
-                   background: 'rgba(0, 0, 0, 0.45)',
-                   backdropFilter: 'blur(24px) saturate(180%)',
-                   WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-                   border: '1px solid rgba(255, 255, 255, 0.1)',
-                   boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
-                   outline: '3px solid red',
-                   zIndex: 9999,
+                  background: 'rgba(0, 0, 0, 0.45)',
+                  backdropFilter: 'blur(24px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
                 }}
                 aria-label="Change profile photo"
                 disabled={isUploadingAvatar}
@@ -550,7 +542,7 @@ const ProfilePageV2Content: React.FC = () => {
               </button>
             )}
           </div>
-        </button>
+        </div>
 
         {/* HCP + Golfer pills - right side, just below header photo */}
         {/* Reduced gap: mt-3 → mt-2 (8px from golfer badge to next element) */}
