@@ -212,12 +212,11 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                 </p>
                 {/* Flag */}
                 {pick.countryCode && (
-                  <div className="flex justify-center" style={{ marginTop: 1 }}>
+                  <div className="flex justify-center" style={{ marginTop: 1, fontSize: 13 }}>
                     <CountryFlag
                       country={pick.countryCode}
                       size="sm"
                       className="rounded-sm"
-                      style={{ fontSize: 13 }}
                     />
                   </div>
                 )}
