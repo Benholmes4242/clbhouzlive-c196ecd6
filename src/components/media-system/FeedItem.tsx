@@ -1,9 +1,13 @@
 /**
  * FeedItem — one full-screen item in the vertical feed.
- * Registers with the viewport observer for activation.
+ * Renders MediaCarousel for multi-media, single VideoPlayer/ImageViewer for single.
+ * Includes SocialOverlay with auto-hide.
  */
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { VideoPlayer } from './VideoPlayer';
+import { ImageViewer } from './ImageViewer';
+import { MediaCarousel } from './MediaCarousel';
+import { SocialOverlay } from './SocialOverlay';
 import type { FeedPost } from './types/media';
 
 interface FeedItemProps {
@@ -16,6 +20,8 @@ interface FeedItemProps {
 
 export function FeedItem({ post, index, isActive, observe, unobserve }: FeedItemProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const [isScrubbing, setIsScrubbing] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
 
   useEffect(() => {
     const el = ref.current;
@@ -24,7 +30,17 @@ export function FeedItem({ post, index, isActive, observe, unobserve }: FeedItem
     return () => unobserve(el);
   }, [index, observe, unobserve]);
 
+  const handleLike = useCallback(() => {
+    setIsLiked((prev) => !prev);
+    // TODO: wire to actual like mutation
+  }, []);
+
+  const handleScrubStart = useCallback(() => setIsScrubbing(true), []);
+  const handleScrubEnd = useCallback(() => setIsScrubbing(false), []);
+
+  const isMultiMedia = post.mediaItems.length > 1;
   const media = post.mediaItems[0];
+
   if (!media) return null;
 
   return (
@@ -33,33 +49,43 @@ export function FeedItem({ post, index, isActive, observe, unobserve }: FeedItem
       className="relative w-full flex-shrink-0"
       style={{ height: '100dvh', scrollSnapAlign: 'start' }}
     >
-      {media.type === 'video' && media.hlsUrl ? (
+      {isMultiMedia ? (
+        <MediaCarousel
+          mediaItems={post.mediaItems}
+          feedIndex={index}
+          isActive={isActive}
+          onDoubleTapLike={handleLike}
+          onScrubStart={handleScrubStart}
+          onScrubEnd={handleScrubEnd}
+        />
+      ) : media.type === 'video' && media.hlsUrl ? (
         <VideoPlayer
           hlsUrl={media.hlsUrl}
           feedIndex={index}
           isActive={isActive}
           thumbnailUrl={media.thumbnailUrl}
           duration={media.duration}
+          onDoubleTapLike={handleLike}
+          onScrubStart={handleScrubStart}
+          onScrubEnd={handleScrubEnd}
         />
       ) : media.imageUrl ? (
-        <div className="w-full h-full flex items-center justify-center bg-black">
-          <img
-            src={media.imageUrl}
-            alt=""
-            className="max-w-full max-h-full object-contain"
-            draggable={false}
-          />
-        </div>
+        <ImageViewer
+          imageUrl={media.imageUrl}
+          thumbnailUrl={media.thumbnailUrl}
+          width={media.width}
+          height={media.height}
+        />
       ) : null}
 
-      {/* Caption overlay */}
-      {post.caption && (
-        <div className="absolute bottom-8 left-4 right-16 z-20 pointer-events-none">
-          <p className="text-white text-sm font-medium leading-snug drop-shadow-lg line-clamp-3">
-            {post.caption}
-          </p>
-        </div>
-      )}
+      {/* Social overlay */}
+      <SocialOverlay
+        post={post}
+        isActive={isActive}
+        isScrubbing={isScrubbing}
+        onLike={handleLike}
+        isLiked={isLiked}
+      />
     </div>
   );
 }
