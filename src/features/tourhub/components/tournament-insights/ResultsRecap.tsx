@@ -29,7 +29,8 @@ const RING_C = 2 * Math.PI * RING_R; // ≈226
 
 const ScoreRing: React.FC<{ hit: number; total: number }> = ({ hit, total }) => {
   const [visible, setVisible] = useState(false);
-  const [count, setCount] = useState(0);
+  const [hitCount, setHitCount] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
   const pct = total > 0 ? (hit / total) * 100 : 0;
 
@@ -44,17 +45,35 @@ const ScoreRing: React.FC<{ hit: number; total: number }> = ({ hit, total }) => 
     return () => obs.disconnect();
   }, []);
 
-  // Count-up animation
+  // Count-up for hit number
   useEffect(() => {
     if (!visible || hit === 0) return;
+    const duration = 400;
+    const steps = hit;
+    const interval = Math.max(Math.floor(duration / steps), 30);
     let i = 0;
     const iv = setInterval(() => {
       i += 1;
-      setCount(i);
+      setHitCount(i);
       if (i >= hit) clearInterval(iv);
-    }, 180);
+    }, interval);
     return () => clearInterval(iv);
   }, [visible, hit]);
+
+  // Count-up for total number
+  useEffect(() => {
+    if (!visible || total === 0) return;
+    const duration = 400;
+    const steps = total;
+    const interval = Math.max(Math.floor(duration / steps), 30);
+    let i = 0;
+    const iv = setInterval(() => {
+      i += 1;
+      setTotalCount(i);
+      if (i >= total) clearInterval(iv);
+    }, interval);
+    return () => clearInterval(iv);
+  }, [visible, total]);
 
   const offset = visible ? RING_C - (pct / 100) * RING_C : RING_C;
 
@@ -63,7 +82,7 @@ const ScoreRing: React.FC<{ hit: number; total: number }> = ({ hit, total }) => 
       <svg width={RING_SIZE} height={RING_SIZE} viewBox={`0 0 ${RING_SIZE} ${RING_SIZE}`}>
         <circle
           cx={RING_SIZE / 2} cy={RING_SIZE / 2} r={RING_R}
-          fill="none" stroke="#E7E5E4" strokeWidth={RING_STROKE}
+          fill="none" stroke="hsl(var(--border) / 0.3)" strokeWidth={RING_STROKE}
         />
         <circle
           cx={RING_SIZE / 2} cy={RING_SIZE / 2} r={RING_R}
@@ -77,11 +96,11 @@ const ScoreRing: React.FC<{ hit: number; total: number }> = ({ hit, total }) => 
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
         <span style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.03em' }} className="text-foreground">
-          {visible ? count : 0}
+          {visible ? hitCount : 0}
         </span>
         <span style={{ fontWeight: 300 }} className="text-muted-foreground">/</span>
         <span style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.03em' }} className="text-foreground">
-          {total}
+          {visible ? totalCount : 0}
         </span>
       </div>
     </div>
@@ -135,8 +154,9 @@ const BestCallLine: React.FC<{
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4, delay: 0.7 }}
-      style={{ fontSize: 13, lineHeight: 1.4, marginBottom: 16 }}
+      style={{ fontSize: 13, lineHeight: 1.4, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 4 }}
     >
+      <span style={{ fontSize: 14, color: '#16A34A', lineHeight: 1 }}>★</span>
       <span className="text-foreground" style={{ fontWeight: 700 }}>Best call</span>
       <span className="text-muted-foreground"> – </span>
       <span className="text-foreground" style={{ fontWeight: 700 }}>{name}, {finishText}</span>

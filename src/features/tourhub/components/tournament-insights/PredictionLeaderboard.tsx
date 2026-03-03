@@ -50,9 +50,9 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
       >
         <span
           className="text-muted-foreground uppercase"
-          style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.12em' }}
+          style={{ fontSize: 13, fontWeight: 600, letterSpacing: '0.05em' }}
         >
-          {isCompleted ? 'OUR PICKS · BEST FINISHERS FIRST' : 'OUR PICKS · LIVE POSITIONS'}
+          {isCompleted ? 'Our Picks' : 'OUR PICKS · LIVE POSITIONS'}
         </span>
         {!isCompleted && (
           <span
