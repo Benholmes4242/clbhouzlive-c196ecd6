@@ -184,14 +184,6 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span className="font-semibold truncate text-sm">{course.name}</span>
-          {!course.is_pinned && (
-            <span 
-              className="flex-shrink-0 px-1.5 py-0.5 text-[10px] font-semibold rounded-full border"
-              style={{ backgroundColor: 'rgba(245,158,11,0.08)', color: '#f59e0b', borderColor: 'rgba(245,158,11,0.25)' }}
-            >
-              Auto
-            </span>
-          )}
         </div>
         <div className="text-xs text-muted-foreground truncate">
           {course.sub_country || course.country}
@@ -449,12 +441,12 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
       {/* Tab Toggle - Hub Style */}
       <div className="px-5 pb-4">
         <div 
-          className="inline-flex items-center gap-1 p-1 rounded-full w-full"
+          className="inline-flex items-center gap-1 p-1 w-full"
         >
           <button
             onClick={() => setActiveTab('manage')}
             className={cn(
-              "flex-1 px-4 py-1.5 text-sm rounded-full transition-all duration-150 active:scale-[0.98]",
+              "flex-1 px-4 py-1.5 text-sm rounded-lg transition-all duration-150 active:scale-[0.98]",
               activeTab === 'manage'
                 ? "bg-foreground text-background font-semibold shadow-sm"
                 : "text-muted-foreground font-medium hover:text-foreground"
@@ -465,7 +457,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
           <button
             onClick={() => setActiveTab('add')}
             className={cn(
-              "flex-1 px-4 py-1.5 text-sm rounded-full transition-all duration-150 active:scale-[0.98]",
+              "flex-1 px-4 py-1.5 text-sm rounded-lg transition-all duration-150 active:scale-[0.98]",
               activeTab === 'add'
                 ? "bg-foreground text-background font-semibold shadow-sm"
                 : "text-muted-foreground font-medium hover:text-foreground"
