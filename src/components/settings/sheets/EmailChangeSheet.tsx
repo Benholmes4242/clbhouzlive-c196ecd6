@@ -19,7 +19,6 @@ export function EmailChangeSheet({ open, onOpenChange, currentEmail }: EmailChan
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
-    // Validation
     if (!newEmail.trim()) {
       toast.error('Please enter a new email address');
       return;
@@ -66,12 +65,10 @@ export function EmailChangeSheet({ open, onOpenChange, currentEmail }: EmailChan
         description: 'Check your inbox to finish updating your email.'
       });
 
-      // Clear form and close
       setNewEmail('');
       setConfirmEmail('');
       onOpenChange(false);
 
-      // Sign out after delay (existing behavior)
       setTimeout(async () => {
         await supabase.auth.signOut();
         window.location.href = '/auth';
@@ -95,30 +92,32 @@ export function EmailChangeSheet({ open, onOpenChange, currentEmail }: EmailChan
     onOpenChange(isOpen);
   };
 
+  const isDisabled = isSubmitting || !newEmail || !confirmEmail;
+
   return (
     <Sheet open={open} onOpenChange={handleClose}>
       <SheetContent 
         side="bottom" 
-        className="rounded-t-[18px] px-4 pb-8 bg-white max-w-full"
-        style={{ maxHeight: '85vh' }}
+        className="rounded-t-[20px] px-4 bg-background max-w-full"
+        style={{ maxHeight: '85vh', paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }}
       >
-        {/* Grab handle */}
-        <div className="flex justify-center pt-3 pb-4">
-          <div className="w-9 h-1 rounded-full bg-[#E4E6E9]" />
+        {/* Drag handle */}
+        <div className="flex justify-center pt-2.5 pb-1">
+          <div className="w-9 h-1 rounded-full bg-muted-foreground/30" />
         </div>
 
         <SheetHeader className="pb-4">
-          <SheetTitle className="text-center text-[#1F2428] text-lg font-semibold">
+          <SheetTitle className="text-center text-foreground text-lg font-semibold">
             Change email
           </SheetTitle>
-          <p className="text-center text-[13px] text-[#5E666D]">
+          <p className="text-center text-[13px] text-muted-foreground">
             You'll need to confirm the new email address.
           </p>
         </SheetHeader>
 
-        <div className="space-y-4 pt-2">
+        <div className="space-y-4 pt-4">
           <div className="space-y-2">
-            <Label htmlFor="new-email" className="text-[#5E666D] text-sm">
+            <Label htmlFor="new-email" className="text-sm font-medium text-foreground">
               New email address
             </Label>
             <Input
@@ -127,13 +126,13 @@ export function EmailChangeSheet({ open, onOpenChange, currentEmail }: EmailChan
               value={newEmail}
               onChange={(e) => setNewEmail(e.target.value)}
               placeholder="your@newemail.com"
-              className="h-12 bg-[#F8FAFC] border-[rgba(31,36,40,0.1)] focus:border-[#3A3F46]"
+              className="h-12 rounded-lg bg-muted border-border focus:border-amber-500"
               disabled={isSubmitting}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirm-email" className="text-[#5E666D] text-sm">
+            <Label htmlFor="confirm-email" className="text-sm font-medium text-foreground">
               Confirm new email
             </Label>
             <Input
@@ -142,15 +141,15 @@ export function EmailChangeSheet({ open, onOpenChange, currentEmail }: EmailChan
               value={confirmEmail}
               onChange={(e) => setConfirmEmail(e.target.value)}
               placeholder="Confirm your new email"
-              className="h-12 bg-[#F8FAFC] border-[rgba(31,36,40,0.1)] focus:border-[#3A3F46]"
+              className="h-12 rounded-lg bg-muted border-border focus:border-amber-500"
               disabled={isSubmitting}
             />
           </div>
 
           <Button
             onClick={handleSubmit}
-            disabled={isSubmitting || !newEmail || !confirmEmail}
-            className="w-full h-12 mt-4 bg-[#1F2428] text-white hover:bg-[#2A3038] rounded-xl font-medium"
+            disabled={isDisabled}
+            className="w-full h-12 mt-6 bg-foreground text-background hover:bg-foreground/90 rounded-xl font-semibold disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
               <>
