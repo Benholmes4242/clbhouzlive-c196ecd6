@@ -115,7 +115,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
               }}
             >
               {/* Photo section — top ~48% */}
-              <div className="relative flex-shrink-0" style={{ height: '48%' }}>
+              <div className="relative flex-shrink-0" style={{ height: 170 }}>
                 {imgFailed ? (
                   <div
                     className="w-full h-full flex items-center justify-center"
@@ -148,7 +148,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                 <div
                   className="absolute inset-0 pointer-events-none"
                   style={{
-                    background: 'linear-gradient(to bottom, transparent 85%, hsl(var(--background)) 98%)',
+                    background: 'linear-gradient(to bottom, transparent 60%, hsla(var(--background) / 0.4) 100%)',
                   }}
                 />
 
@@ -185,34 +185,17 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                   </div>
                 )}
 
-                {/* Confidence ring — top-right, 38px */}
-                <div
-                  className="absolute"
-                  style={{
-                    top: 10,
-                    right: 10,
-                    filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.15))',
-                  }}
-                >
-                  <ConfidenceGauge
-                    tier={pick.confidenceTier}
-                    accentColor={ACCENT_COLOR}
-                    animationDelay={400 + i * 80}
-                    isWithdrawn={pick.isWithdrawn}
-                    size={38}
-                  />
-                </div>
               </div>
 
               {/* Name + Flag + Bullets — natural flow below photo */}
-              <div className="flex flex-col flex-1 overflow-hidden" style={{ padding: '0 14px 14px' }}>
+              <div className="flex flex-col flex-1 overflow-hidden" style={{ padding: '0 16px 14px' }}>
                 {/* Name */}
-                <p className="text-foreground text-center" style={{ fontSize: 15, fontWeight: 700, lineHeight: 1.2, marginTop: 4 }}>
+                <p className="text-foreground text-center" style={{ fontSize: 18, fontWeight: 600, lineHeight: 1.2, marginTop: 6 }}>
                   {pick.name}
                 </p>
                 {/* Flag */}
                 {pick.countryCode && (
-                  <div className="flex justify-center" style={{ marginTop: 1, fontSize: 13 }}>
+                  <div className="flex justify-center" style={{ marginTop: 2, fontSize: 13 }}>
                     <CountryFlag
                       country={pick.countryCode}
                       size="sm"
@@ -221,26 +204,36 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                   </div>
                 )}
 
-                {/* Bullets */}
+                {/* Confidence pill */}
+                <div className="flex justify-center" style={{ marginTop: 6 }}>
+                  <span
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: ACCENT_COLOR,
+                      background: 'rgba(34, 197, 94, 0.10)',
+                      borderRadius: 999,
+                      padding: '4px 12px',
+                      letterSpacing: '0.3px',
+                    }}
+                  >
+                    {pick.confidenceTier === 'elite' ? '95' : pick.confidenceTier === 'high' ? '88' : '78'}% MATCH
+                  </span>
+                </div>
+
+                {/* Insights with hairline dividers */}
                 {pick.bullets.length > 0 && (
-                  <div className="flex flex-col" style={{ marginTop: 10, gap: 4 }}>
+                  <div className="flex flex-col" style={{ marginTop: 10 }}>
                     {pick.bullets.slice(0, 3).map((bullet, j) => (
-                      <div key={j} className="flex items-start" style={{ gap: 6 }}>
-                        <span
-                          className="flex-shrink-0"
+                      <div key={j}>
+                        {j > 0 && (
+                          <div className="mx-auto" style={{ width: '80%', height: 0.5, background: 'rgba(0, 0, 0, 0.06)', margin: '10px auto' }} />
+                        )}
+                        <p
+                          className="text-muted-foreground text-center"
                           style={{
-                            width: 3.5,
-                            height: 3.5,
-                            borderRadius: '50%',
-                            marginTop: 5,
-                            backgroundColor: 'hsl(var(--muted-foreground))',
-                          }}
-                        />
-                        <span
-                          className="text-muted-foreground"
-                          style={{
-                            fontSize: 11.5,
-                            fontWeight: 500,
+                            fontSize: 13,
+                            fontWeight: 400,
                             lineHeight: 1.4,
                             display: '-webkit-box',
                             WebkitLineClamp: 3,
@@ -249,7 +242,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                           }}
                         >
                           {bullet}
-                        </span>
+                        </p>
                       </div>
                     ))}
                   </div>
