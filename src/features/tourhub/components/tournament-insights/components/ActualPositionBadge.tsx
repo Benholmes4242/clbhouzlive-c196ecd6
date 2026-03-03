@@ -1,5 +1,6 @@
 /**
  * ActualPositionBadge - Accuracy-tinted position badge for completed state
+ * Outer div is always width: 48px, flexShrink: 0 so avatars align perfectly.
  */
 
 import React from 'react';
@@ -10,11 +11,19 @@ interface ActualPositionBadgeProps {
   performanceStatus?: string;
 }
 
+const CONTAINER_STYLE: React.CSSProperties = {
+  width: 48,
+  flexShrink: 0,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+};
+
 function getAccuracyTier(position: number | null) {
   if (position !== null && position <= 10) {
-    return { color: '#16A34A', bg: 'rgba(22,163,74,0.08)' };
+    return '#16A34A';
   }
-  return { color: 'hsl(var(--muted-foreground))', bg: 'transparent' };
+  return 'hsl(var(--muted-foreground))';
 }
 
 const ActualPositionBadge: React.FC<ActualPositionBadgeProps> = ({
@@ -24,47 +33,39 @@ const ActualPositionBadge: React.FC<ActualPositionBadgeProps> = ({
 }) => {
   if (performanceStatus === 'cut') {
     return (
-      <span
-        className="text-muted-foreground"
-        style={{ fontSize: 13, fontWeight: 600, opacity: 0.5, display: 'flex', alignItems: 'center', justifyContent: 'center', width: 44 }}
-      >
-        MC
-      </span>
+      <div style={CONTAINER_STYLE}>
+        <span style={{ fontSize: 13, fontWeight: 600, opacity: 0.5, color: 'hsl(var(--muted-foreground))' }}>
+          MC
+        </span>
+      </div>
     );
   }
   if (performanceStatus === 'withdrawn') {
     return (
-      <span
-        className="text-muted-foreground"
-        style={{ fontSize: 13, fontWeight: 600, opacity: 0.5, display: 'flex', alignItems: 'center', justifyContent: 'center', width: 44 }}
-      >
-        WD
-      </span>
+      <div style={CONTAINER_STYLE}>
+        <span style={{ fontSize: 13, fontWeight: 600, opacity: 0.5, color: 'hsl(var(--muted-foreground))' }}>
+          WD
+        </span>
+      </div>
     );
   }
   if (position === null) {
     return (
-      <span className="text-muted-foreground" style={{ fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', width: 44 }}>—</span>
+      <div style={CONTAINER_STYLE}>
+        <span style={{ fontSize: 13, fontWeight: 600, color: 'hsl(var(--muted-foreground))' }}>—</span>
+      </div>
     );
   }
 
-  const tier = getAccuracyTier(position);
+  const color = getAccuracyTier(position);
   const prefix = isTied ? 'T' : '';
 
   return (
-    <span
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: 44,
-        fontSize: 15,
-        fontWeight: 700,
-        color: tier.color,
-      }}
-    >
-      {prefix}{position}
-    </span>
+    <div style={CONTAINER_STYLE}>
+      <span style={{ fontSize: 15, fontWeight: 700, color }}>
+        {prefix}{position}
+      </span>
+    </div>
   );
 };
 
