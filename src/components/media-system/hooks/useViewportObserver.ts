@@ -3,14 +3,14 @@ import { useRef, useEffect, useCallback } from 'react';
 /**
  * Viewport observer that detects which feed item is currently dominant (>50% visible).
  * Includes 150ms debounce to prevent rapid switching during fast scrolling.
+ * Accepts an HTMLElement | null (not a ref) so re-render on element mount triggers the effect.
  */
 export function useViewportObserver(
-  containerRef: React.RefObject<HTMLElement | null>,
+  container: HTMLElement | null,
   onActiveChange: (index: number) => void
 ) {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const itemsRef = useRef<Map<Element, number>>(new Map());
-  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const currentActiveRef = useRef<number>(0);
 
   const observe = useCallback((element: HTMLElement, index: number) => {
@@ -24,10 +24,11 @@ export function useViewportObserver(
   }, []);
 
   useEffect(() => {
-    const container = containerRef.current;
     if (!container) return;
 
-    observerRef.current = new IntersectionObserver(
+    let debounceTimer: ReturnType<typeof setTimeout>;
+
+    const observer = new IntersectionObserver(
       (entries) => {
         let bestIndex: number | null = null;
         let bestRatio = 0;
@@ -43,25 +44,34 @@ export function useViewportObserver(
         }
 
         if (bestIndex !== null && bestIndex !== currentActiveRef.current) {
-          // Debounce to prevent rapid switching
-          if (debounceTimer.current) clearTimeout(debounceTimer.current);
-          debounceTimer.current = setTimeout(() => {
-            currentActiveRef.current = bestIndex!;
-            onActiveChange(bestIndex!);
+          clearTimeout(debounceTimer);
+          const candidateIndex = bestIndex;
+          debounceTimer = setTimeout(() => {
+            currentActiveRef.current = candidateIndex;
+            onActiveChange(candidateIndex);
           }, 150);
         }
       },
       {
         root: container,
-        threshold: [0, 0.5, 1.0],
+        rootMargin: '0px',
+        threshold: [0, 0.25, 0.5, 0.75, 1.0],
       }
     );
 
+    observerRef.current = observer;
+
+    // Re-observe any items that were registered before the observer was created
+    itemsRef.current.forEach((index, element) => {
+      observer.observe(element);
+    });
+
     return () => {
-      if (debounceTimer.current) clearTimeout(debounceTimer.current);
-      observerRef.current?.disconnect();
+      clearTimeout(debounceTimer);
+      observer.disconnect();
+      observerRef.current = null;
     };
-  }, [containerRef, onActiveChange]);
+  }, [container, onActiveChange]);
 
   return { observe, unobserve };
 }

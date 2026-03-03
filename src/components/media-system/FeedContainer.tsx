@@ -2,7 +2,7 @@
  * FeedContainer — vertical scroll-snap container for the media feed.
  * Includes gesture tracking for iOS autoplay and infinite scroll trigger.
  */
-import { useRef, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { FeedItem } from './FeedItem';
 import { useViewportObserver } from './hooks/useViewportObserver';
 import { useMediaStore } from './store/mediaStore';
@@ -15,7 +15,11 @@ interface FeedContainerProps {
 }
 
 export function FeedContainer({ posts, onNearEnd }: FeedContainerProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerEl, setContainerEl] = useState<HTMLDivElement | null>(null);
+  const containerCallbackRef = useCallback((node: HTMLDivElement | null) => {
+    setContainerEl(node);
+  }, []);
+
   const activeIndex = useMediaStore((s) => s.activeIndex);
   const setActiveIndex = useMediaStore((s) => s.setActiveIndex);
   const pool = useVideoPoolContext();
@@ -29,7 +33,7 @@ export function FeedContainer({ posts, onNearEnd }: FeedContainerProps) {
     [setActiveIndex]
   );
 
-  const { observe, unobserve } = useViewportObserver(containerRef, handleActiveChange);
+  const { observe, unobserve } = useViewportObserver(containerEl, handleActiveChange);
 
   // Infinite scroll: trigger when 3 items from end
   useEffect(() => {
@@ -40,12 +44,9 @@ export function FeedContainer({ posts, onNearEnd }: FeedContainerProps) {
 
   // iOS gesture priming: touchend gives us autoplay context
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
+    if (!containerEl) return;
 
     const onTouchEnd = () => {
-      // iOS requires play() in the same call stack as a user gesture.
-      // Find the active video element and prime it.
       const currentActiveIndex = useMediaStore.getState().activeIndex;
       const activePost = posts[currentActiveIndex];
       if (!activePost) return;
@@ -55,18 +56,17 @@ export function FeedContainer({ posts, onNearEnd }: FeedContainerProps) {
 
       const video = pool.getElement(activeUrl);
       if (video && video.paused) {
-        // This play() call is in the gesture call stack — iOS will honor it
         video.play().catch(() => {});
       }
     };
 
-    container.addEventListener('touchend', onTouchEnd, { passive: true });
-    return () => container.removeEventListener('touchend', onTouchEnd);
-  }, [posts, pool]);
+    containerEl.addEventListener('touchend', onTouchEnd, { passive: true });
+    return () => containerEl.removeEventListener('touchend', onTouchEnd);
+  }, [containerEl, posts, pool]);
 
   return (
     <div
-      ref={containerRef}
+      ref={containerCallbackRef}
       className="w-full h-[100dvh] overflow-y-scroll bg-black media-feed-scroller"
       style={{
         scrollSnapType: 'y mandatory',
