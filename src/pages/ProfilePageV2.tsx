@@ -462,86 +462,65 @@ const ProfilePageV2Content: React.FC = () => {
         </button>
 
         {/* Avatar - squircle, left-aligned with About title (px-5), positioned relative to hero bottom */}
-        {/* Outer wrapper is a div (not button) so the camera badge sibling gets its own hit area */}
         <div
           className="absolute left-5 z-20 pointer-events-auto"
           style={{ bottom: '-62px' }}
         >
-          <div className="relative w-[124px] h-[124px]">
-            {/* Avatar button — opens lightbox */}
-            <button
-              className="w-full h-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
-              data-debug-id="profile-photo"
-              onPointerDown={(e) => {
-                logPoint('profile_photo.pointerdown', { x: e.clientX, y: e.clientY });
-              }}
-              onTouchStart={(e) => {
-                const t = e.touches?.[0];
-                logPoint('profile_photo.pointerdown', { x: t?.clientX, y: t?.clientY, via: 'touchstart' });
-              }}
-              onClick={() => {
-                console.log('[Avatar Parent] Parent button clicked — isUploadingAvatar:', isUploadingAvatar);
-                if (isUploadingAvatar) return;
-                logPoint('profile_photo.click');
+          <button
+            className="relative w-[124px] h-[124px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            data-debug-id="profile-photo"
+            onPointerDown={(e) => {
+              logPoint('profile_photo.pointerdown', { x: e.clientX, y: e.clientY });
+            }}
+            onClick={() => {
+              if (isUploadingAvatar) return;
+              logPoint('profile_photo.click');
+              if (isSelf) {
+                avatarFileInputRef.current?.click();
+              } else {
                 setIsAvatarLightboxOpen(true);
+              }
+            }}
+            aria-label={isSelf ? "Change profile photo" : "View profile photo"}
+          >
+            {/* 2px ring (matches background) */}
+            <div className="clbhouz-squircle absolute inset-0 bg-background" />
+
+            {/* Avatar image */}
+            <div
+              className="clbhouz-squircle absolute overflow-hidden"
+              style={{
+                inset: '2px',
+                boxShadow: '0 12px 30px rgba(15,15,15,0.22)',
               }}
-              aria-label="View profile photo"
             >
-              {/* 2px ring (matches background) */}
-              <div
-                className="clbhouz-squircle absolute inset-0 bg-background"
-              />
+              {profile?.profile_photo_url ? (
+                <img
+                  src={profile.profile_photo_url}
+                  alt={displayName}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-muted flex items-center justify-center text-3xl font-bold text-muted-foreground">
+                  {displayName.charAt(0)}
+                </div>
+              )}
+            </div>
 
-              {/* Avatar */}
-              <div
-                className="clbhouz-squircle absolute"
-                style={{
-                  inset: '2px',
-                  boxShadow: '0 12px 30px rgba(15,15,15,0.22)',
-                }}
-              >
-                {profile?.profile_photo_url ? (
-                  <img
-                    src={profile.profile_photo_url}
-                    alt={displayName}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-muted flex items-center justify-center text-3xl font-bold text-muted-foreground">
-                    {displayName.charAt(0)}
-                  </div>
-                )}
-              </div>
-            </button>
-
-            {/* Camera badge — sibling, not child of squircle */}
+            {/* Camera overlay hint — own profile only */}
             {isSelf && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  console.log('[Avatar Camera] Badge clicked — calling file input');
-                  if (isUploadingAvatar) return;
-                  avatarFileInputRef.current?.click();
-                }}
-                className="absolute bottom-0 right-0 h-7 w-7 rounded-full flex items-center justify-center active:scale-[0.95] z-30 pointer-events-auto transition-transform"
-                style={{
-                  background: 'rgba(0, 0, 0, 0.45)',
-                  backdropFilter: 'blur(24px) saturate(180%)',
-                  WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
-                }}
-                aria-label="Change profile photo"
-                disabled={isUploadingAvatar}
+              <div
+                className="clbhouz-squircle absolute flex items-center justify-center"
+                style={{ inset: '2px', background: 'rgba(0,0,0,0.25)' }}
               >
                 {isUploadingAvatar ? (
-                  <Loader2 className="w-3.5 h-3.5 text-white animate-spin" />
+                  <div className="w-6 h-6 border-2 border-white/50 border-t-white rounded-full animate-spin" />
                 ) : (
-                  <Camera className="w-3.5 h-3.5 text-white" />
+                  <Camera className="w-6 h-6 text-white drop-shadow-sm" />
                 )}
-              </button>
+              </div>
             )}
-          </div>
+          </button>
         </div>
 
         {/* HCP + Golfer pills - right side, just below header photo */}
