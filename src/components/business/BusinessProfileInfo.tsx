@@ -21,7 +21,7 @@ function BioSection({ text }: { text: string }) {
   return (
     <section className="px-6 pb-8">
       <p
-        className="text-sm leading-relaxed text-foreground whitespace-pre-wrap"
+        className="text-base leading-relaxed text-foreground whitespace-pre-wrap"
         style={{ overflowWrap: 'anywhere' }}
       >
         {displayText}
@@ -48,7 +48,7 @@ function SectionDivider() {
 /* ── Section eyebrow heading ── */
 function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+    <h2 className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground mb-3">
       {children}
     </h2>
   );

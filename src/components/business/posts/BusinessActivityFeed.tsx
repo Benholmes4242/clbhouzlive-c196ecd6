@@ -6,6 +6,7 @@
  */
 
 import React, { useState, useCallback, useMemo, useLayoutEffect, useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { useBusinessPosts, BusinessPost } from '@/hooks/useBusinessPosts';
 import { useBusinessTaggedPosts, useHideTaggedPost } from '@/hooks/useBusinessTaggedPosts';
 import { useInfiniteBusinessPosts } from '@/hooks/useInfiniteBusinessPosts';
@@ -531,36 +532,29 @@ export function BusinessActivityFeed({
   return (
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
     <div>
-      {/* Sub-tabs: Posts / Tagged — Tier 2 orange underline */}
+      {/* Sub-tabs: Posts / Tagged — Tier 2 orange underline with sliding animation */}
       <div className="flex justify-center gap-1">
-        <button
-          onClick={() => setFeedTab('activity')}
-          className={cn(
-            'relative px-3 py-2 text-sm min-h-[44px] whitespace-nowrap transition-all duration-200 active:scale-[0.97]',
-            feedTab === 'activity'
-              ? 'text-foreground font-semibold'
-              : 'text-muted-foreground font-medium hover:text-foreground'
-          )}
-        >
-          Posts
-          {feedTab === 'activity' && (
-            <div className="absolute bottom-0 left-0 right-0 h-[3px] rounded-full bg-[hsl(var(--tab-orange))]" />
-          )}
-        </button>
-        <button
-          onClick={() => setFeedTab('tagged')}
-          className={cn(
-            'relative px-3 py-2 text-sm min-h-[44px] whitespace-nowrap transition-all duration-200 active:scale-[0.97]',
-            feedTab === 'tagged'
-              ? 'text-foreground font-semibold'
-              : 'text-muted-foreground font-medium hover:text-foreground'
-          )}
-        >
-          Tagged
-          {feedTab === 'tagged' && (
-            <div className="absolute bottom-0 left-0 right-0 h-[3px] rounded-full bg-[hsl(var(--tab-orange))]" />
-          )}
-        </button>
+        {(['activity', 'tagged'] as const).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setFeedTab(tab)}
+            className={cn(
+              'relative px-3 py-2 text-sm min-h-[44px] whitespace-nowrap transition-all duration-200 active:scale-[0.97]',
+              feedTab === tab
+                ? 'text-foreground font-semibold'
+                : 'text-muted-foreground font-medium hover:text-foreground'
+            )}
+          >
+            {tab === 'activity' ? 'Posts' : 'Tagged'}
+            {feedTab === tab && (
+              <motion.div
+                layoutId="business-activity-subtab-underline"
+                className="absolute bottom-0 left-0 right-0 h-[3px] rounded-full bg-[hsl(var(--tab-orange))]"
+                transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+              />
+            )}
+          </button>
+        ))}
       </div>
 
       {/* Controls container - only show when there are posts to filter */}
