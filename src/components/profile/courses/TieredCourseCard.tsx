@@ -1,11 +1,11 @@
 /**
  * TieredCourseCard - Visual hierarchy cards for All Courses Played
  * 
- * Top 100 courses use canonical dark glass T100 badge.
+ * Updated with Chartreus gold (#C1A84C) for Top 100 courses.
  */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar } from 'lucide-react';
+import { Calendar, Trophy } from 'lucide-react';
 import { RatingPill } from '@/components/ui/RatingPill';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
@@ -30,7 +30,7 @@ interface TieredCourseCardProps {
 
 /**
  * Tiered course card with clear visual hierarchy:
- * - Top 100: Larger cards with canonical glass T100 badge
+ * - Top 100: Larger cards with Chartreus accent (#C1A84C), trophy icon, strong visual weight
  * - Non-Top-100: Slightly smaller, muted styling - still readable
  */
 export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
@@ -55,14 +55,20 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
     }
   };
 
-  // Top 100 card - LARGER with T100 glass badge
+  // Top 100 card - LARGER with amber accent and trophy styling (premium treatment)
   if (isTop100) {
     return (
       <motion.div
         onClick={handleClick}
         whileTap={{ scale: 0.98 }}
-        className="relative bg-card rounded-xl overflow-hidden cursor-pointer hover:shadow-md transition-all group border border-border"
+        className="relative bg-card rounded-xl overflow-hidden cursor-pointer hover:shadow-md transition-all group border border-amber-400/30"
       >
+        {/* Trophy Chartreus accent line - prominent 2px */}
+        <div 
+          className="absolute top-0 left-0 right-0 h-[2px]" 
+          style={{ background: 'linear-gradient(90deg, rgba(193, 168, 76, 0.4) 0%, #C1A84C 50%, rgba(193, 168, 76, 0.4) 100%)' }} 
+        />
+        
         <div className="flex">
           {/* Thumbnail - LARGER for Top 100 */}
           <div className="relative flex-shrink-0">
@@ -77,16 +83,12 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
             ) : (
               <div className="w-24 h-[88px] bg-gradient-to-br from-muted to-muted/50" />
             )}
-            {/* T100 canonical glass badge */}
+            {/* Top 100 icon overlay - Chartreus */}
             <div 
-              className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-md flex items-center justify-center"
-              style={{
-                background: 'rgba(0, 0, 0, 0.45)',
-                backdropFilter: 'blur(24px) saturate(180%)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-              }}
+              className="absolute top-2 left-2 w-6 h-6 rounded-full flex items-center justify-center shadow-sm"
+              style={{ backgroundColor: 'rgba(193, 168, 76, 0.95)' }}
             >
-              <span className="text-[9px] font-bold text-white tracking-wide">T100</span>
+              <Trophy className="w-3 h-3 text-white" />
             </div>
           </div>
 
