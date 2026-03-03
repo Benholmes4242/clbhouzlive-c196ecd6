@@ -2,6 +2,7 @@
  * VideoPlayer — requests a pool element, handles playing/error/loop lifecycle.
  * Uses 'playing' event for skeleton transition (not canplay/loadeddata).
  * Integrates gapless loop hook for seamless looping.
+ * Supports double-tap-to-like and interactive scrubber.
  */
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useVideoPoolContext } from './VideoPoolProvider';
@@ -10,9 +11,10 @@ import { useGaplessLoop } from './hooks/useGaplessLoop';
 import { LoadingSkeleton } from './LoadingSkeleton';
 import { ErrorState } from './ErrorState';
 import { Scrubber } from './Scrubber';
-import { Play, Pause } from 'lucide-react';
+import { Play, Pause, Heart } from 'lucide-react';
 
 const MAX_RETRIES = 3;
+const DOUBLE_TAP_DELAY = 300;
 
 interface VideoPlayerProps {
   hlsUrl: string;
@@ -20,9 +22,15 @@ interface VideoPlayerProps {
   isActive: boolean;
   thumbnailUrl?: string;
   duration?: number;
+  onDoubleTapLike?: () => void;
+  onScrubStart?: () => void;
+  onScrubEnd?: () => void;
 }
 
-export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl, duration: mediaDuration }: VideoPlayerProps) {
+export function VideoPlayer({
+  hlsUrl, feedIndex, isActive, thumbnailUrl, duration: mediaDuration,
+  onDoubleTapLike, onScrubStart, onScrubEnd,
+}: VideoPlayerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const retryCountRef = useRef(0);
@@ -31,8 +39,13 @@ export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl, duratio
   const [showPlayIcon, setShowPlayIcon] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [videoDuration, setVideoDuration] = useState<number | null>(mediaDuration ?? null);
+  const [showDoubleTapHeart, setShowDoubleTapHeart] = useState(false);
   const pool = useVideoPoolContext();
   const isMuted = useMediaStore((s) => s.isMuted);
+
+  // Double-tap detection
+  const tapTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const tapCountRef = useRef(0);
 
   // Gapless loop
   useGaplessLoop(videoRef, isActive && !isLoading && !hasError, videoDuration);
@@ -50,9 +63,7 @@ export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl, duratio
       return;
     }
 
-    // Reset retry count on fresh activation
     retryCountRef.current = 0;
-
     let cancelled = false;
 
     const activate = async () => {
@@ -63,10 +74,7 @@ export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl, duratio
       setHasError(false);
 
       const video = await pool.assign(
-        hlsUrl,
-        feedIndex,
-        container,
-        // onPlaying callback — skeleton crossfade
+        hlsUrl, feedIndex, container,
         () => {
           if (cancelled) return;
           setIsLoading(false);
@@ -75,7 +83,6 @@ export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl, duratio
             setVideoDuration(video.duration);
           }
         },
-        // onError callback
         () => {
           if (cancelled) return;
           setIsLoading(false);
@@ -88,7 +95,6 @@ export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl, duratio
       videoRef.current = video;
       video.muted = isMuted;
 
-      // If already playing (cache hit), update state
       if (!video.paused && video.readyState >= 3) {
         setIsLoading(false);
         setIsPlaying(true);
@@ -99,10 +105,7 @@ export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl, duratio
     };
 
     activate();
-
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [isActive, hlsUrl, feedIndex, pool]);
 
   // Sync mute state
@@ -112,12 +115,9 @@ export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl, duratio
     }
   }, [isMuted, isActive]);
 
-  // Retry handler with max limit
+  // Retry handler
   const handleRetry = useCallback(() => {
-    if (retryCountRef.current >= MAX_RETRIES) {
-      // Give up — show permanent error state
-      return;
-    }
+    if (retryCountRef.current >= MAX_RETRIES) return;
     retryCountRef.current += 1;
 
     setHasError(false);
@@ -128,10 +128,7 @@ export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl, duratio
     const container = containerRef.current;
     if (!container) return;
 
-    pool.assign(
-      hlsUrl,
-      feedIndex,
-      container,
+    pool.assign(hlsUrl, feedIndex, container,
       () => {
         setIsLoading(false);
         setIsPlaying(true);
@@ -154,23 +151,41 @@ export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl, duratio
     });
   }, [hlsUrl, feedIndex, pool]);
 
-  // Tap to toggle play/pause
+  // Double-tap aware tap handler
   const handleTap = useCallback(() => {
     if (hasError) return;
     const video = videoRef.current;
     if (!video || !isActive) return;
 
-    if (video.paused) {
-      video.play().catch(() => {});
-      setIsPlaying(true);
-    } else {
-      video.pause();
-      setIsPlaying(false);
-    }
+    tapCountRef.current += 1;
 
-    setShowPlayIcon(true);
-    setTimeout(() => setShowPlayIcon(false), 800);
-  }, [isActive, hasError]);
+    if (tapCountRef.current === 1) {
+      // Wait for potential second tap
+      tapTimerRef.current = setTimeout(() => {
+        // Single tap → toggle play/pause
+        tapCountRef.current = 0;
+        if (video.paused) {
+          video.play().catch(() => {});
+          setIsPlaying(true);
+        } else {
+          video.pause();
+          setIsPlaying(false);
+        }
+        setShowPlayIcon(true);
+        setTimeout(() => setShowPlayIcon(false), 800);
+      }, DOUBLE_TAP_DELAY);
+    } else if (tapCountRef.current >= 2) {
+      // Double tap → like
+      clearTimeout(tapTimerRef.current);
+      tapCountRef.current = 0;
+      setShowDoubleTapHeart(true);
+      setTimeout(() => setShowDoubleTapHeart(false), 900);
+      onDoubleTapLike?.();
+    }
+  }, [isActive, hasError, onDoubleTapLike]);
+
+  // Cleanup tap timer
+  useEffect(() => () => { clearTimeout(tapTimerRef.current); }, []);
 
   const canRetry = retryCountRef.current < MAX_RETRIES;
 
@@ -180,13 +195,8 @@ export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl, duratio
       className="relative w-full h-full"
       onClick={handleTap}
     >
-      {/* Poster-first loading: show thumbnail as background while loading */}
-      <LoadingSkeleton
-        visible={isLoading && !hasError}
-        posterUrl={thumbnailUrl}
-      />
+      <LoadingSkeleton visible={isLoading && !hasError} posterUrl={thumbnailUrl} />
 
-      {/* Error state */}
       {hasError && <ErrorState onRetry={handleRetry} canRetry={canRetry} />}
 
       {/* Play/Pause overlay */}
@@ -219,8 +229,39 @@ export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl, duratio
         </div>
       )}
 
+      {/* Double-tap heart animation */}
+      {showDoubleTapHeart && (
+        <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none">
+          <Heart
+            className="text-white"
+            fill="red"
+            style={{
+              width: 80,
+              height: 80,
+              animation: 'double-tap-heart 0.9s ease-out forwards',
+              filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.5))',
+            }}
+          />
+          <style>{`
+            @keyframes double-tap-heart {
+              0% { transform: scale(0); opacity: 0; }
+              12% { transform: scale(1.3); opacity: 1; color: white; }
+              25% { transform: scale(1.0); opacity: 1; }
+              70% { transform: scale(1.0); opacity: 1; }
+              100% { transform: scale(0.8); opacity: 0; }
+            }
+          `}</style>
+        </div>
+      )}
+
       {/* Scrubber */}
-      <Scrubber videoElement={isActive && !hasError ? videoRef.current : null} />
+      <Scrubber
+        videoRef={videoRef}
+        isActive={isActive && !hasError}
+        duration={videoDuration}
+        onScrubStart={onScrubStart}
+        onScrubEnd={onScrubEnd}
+      />
     </div>
   );
 }
