@@ -210,6 +210,7 @@ const GlobalQueueDrawer = lazy(() => import("./components/videos/GlobalQueueDraw
 const SeasonShop = lazy(() => import("./pages/SeasonShop"));
 const ChallengesPage = lazy(() => import("./pages/ChallengesPage"));
 const InsightsPage = lazy(() => import("./pages/InsightsPage"));
+const FullscreenMediaViewer = lazy(() => import("./components/media-system/FullscreenMediaViewer"));
 const BusinessDirectoryPage = lazy(() => import("./pages/BusinessDirectoryPage"));
 const BusinessInsightsPage = lazy(() => import("./pages/BusinessInsightsPage"));
 const BusinessInsightsPageV2 = lazy(() => import("./pages/BusinessInsightsPageV2"));
@@ -334,6 +335,7 @@ function AppRoutes() {
         
         <Route path="/videos" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><VideosPage /></Suspense>} />
         <Route path="/video/:videoId" element={<Suspense fallback={null}><VideoPlayerModal /></Suspense>} />
+        <Route path="/mediaplayer" element={<Suspense fallback={null}><FullscreenMediaViewer /></Suspense>} />
         {/* Legacy creator routes - redirect to home (creators now handled via Business profiles or Personal Creator Mode) */}
         <Route path="/creator/*" element={<Navigate to="/" replace />} />
         <Route path="/creators/*" element={<Navigate to="/" replace />} />
