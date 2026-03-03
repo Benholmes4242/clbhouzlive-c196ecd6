@@ -19,6 +19,7 @@ interface PredictionScorecardRowProps {
   index: number;
   isCompleted?: boolean;
   isLast?: boolean;
+  isBestCall?: boolean;
 }
 
 function getAccuracyBorderColor() {
@@ -36,6 +37,7 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
   index,
   isCompleted,
   isLast = false,
+  isBestCall = false,
 }) => {
   const isCut = prediction.performanceStatus === 'cut';
   const isWD = prediction.performanceStatus === 'withdrawn';
@@ -113,26 +115,50 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
         )}
 
         {/* Avatar — squircle shape */}
-        <div
-          className="overflow-hidden flex-shrink-0 bg-muted"
-          style={{
-            width: 44,
-            height: Math.round(44 * 1.05),
-            borderRadius: '34%',
-            border: `2px solid ${borderColor}`,
-          }}
-        >
-          {avatarUrl ? (
-            <img
-              src={avatarUrl}
-              alt={prediction.playerName}
-              className="w-full h-full object-cover"
-              style={{ objectPosition: 'center 20%' }}
-              loading="lazy"
-              onError={(e) => { e.currentTarget.style.display = 'none'; }}
-            />
-          ) : (
-            <div className="w-full h-full bg-muted" />
+        <div className="relative flex-shrink-0">
+          <div
+            className="overflow-hidden bg-muted"
+            style={{
+              width: 44,
+              height: Math.round(44 * 1.05),
+              borderRadius: '34%',
+              border: `2px solid ${borderColor}`,
+            }}
+          >
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt={prediction.playerName}
+                className="w-full h-full object-cover"
+                style={{ objectPosition: 'center 20%' }}
+                loading="lazy"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              />
+            ) : (
+              <div className="w-full h-full bg-muted" />
+            )}
+          </div>
+          {/* Best call gold star */}
+          {isBestCall && (
+            <div
+              style={{
+                position: 'absolute',
+                bottom: -2,
+                right: -4,
+                width: 18,
+                height: 18,
+                borderRadius: '50%',
+                background: '#CA8A04',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 0 0 2px hsl(var(--background))',
+                fontSize: 10,
+                lineHeight: 1,
+              }}
+            >
+              ★
+            </div>
           )}
         </div>
 

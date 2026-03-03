@@ -11,11 +11,13 @@ import type { TrackedPrediction } from './types';
 interface PredictionLeaderboardProps {
   allPicks: TrackedPrediction[];
   isCompleted?: boolean;
+  bestCallPlayerId?: string;
 }
 
 export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
   allPicks,
   isCompleted,
+  bestCallPlayerId,
 }) => {
   const [showAll, setShowAll] = useState(false);
 
@@ -83,6 +85,7 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
               index={i}
               isCompleted={isCompleted}
               isLast={!showAll && i === visibleCards.length - 1 && !hasMore}
+              isBestCall={isCompleted && prediction.playerId === bestCallPlayerId}
             />
           </motion.div>
         ))}
@@ -101,6 +104,7 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
                 index={3 + i}
                 isCompleted={isCompleted}
                 isLast={i === sorted.length - 4}
+                isBestCall={isCompleted && prediction.playerId === bestCallPlayerId}
               />
             </motion.div>
           ))}

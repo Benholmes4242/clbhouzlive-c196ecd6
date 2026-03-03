@@ -123,56 +123,24 @@ const StatPill: React.FC<{ label: string; value: number; index: number }> = ({ l
   );
 };
 
-/* ── Best Call Banner ── */
-const BestCallBanner: React.FC<{
-  name: string; predicted?: number; actual: number; isWinner: boolean;
-}> = ({ name, predicted, actual, isWinner }) => {
-  const iconBg = isWinner
-    ? 'linear-gradient(135deg, #CA8A04, #EAB308)'
-    : 'linear-gradient(135deg, #16A34A, #CA8A04)';
-  const iconChar = isWinner ? '🏆' : '✦';
+/* ── Best Call Text Line ── */
+const BestCallLine: React.FC<{
+  name: string; actual: number;
+}> = ({ name, actual }) => {
+  const isWinner = actual === 1;
+  const finishText = isWinner ? 'Won the tournament' : `Finished ${actual}${getOrdinalSuffix(actual)}`;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: 0.7 }}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 10,
-        padding: isWinner ? '13px 16px' : '11px 14px',
-        borderRadius: 12,
-        background: 'linear-gradient(135deg, rgba(22, 163, 74, 0.04) 0%, rgba(202, 138, 4, 0.04) 100%)',
-        border: '1px solid rgba(22, 163, 74, 0.08)',
-        marginBottom: 8,
-      }}
+    <motion.p
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4, delay: 0.7 }}
+      style={{ fontSize: 13, lineHeight: 1.4, marginBottom: 16 }}
     >
-      {/* Glow icon */}
-      <div
-        style={{
-          width: 28, height: 28, borderRadius: 8,
-          background: iconBg,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          flexShrink: 0,
-          animation: 'pulseGlow 3s infinite',
-        }}
-      >
-        <span style={{ fontSize: 13, color: 'white', lineHeight: 1 }}>{iconChar}</span>
-      </div>
-
-      {/* Text */}
-      <div style={{ minWidth: 0 }}>
-        <div style={{ fontSize: 13, lineHeight: 1.4 }}>
-          <span className="text-foreground" style={{ fontWeight: 700 }}>Best call</span>
-          <span className="text-muted-foreground"> — {name} </span>
-          <span style={{ fontSize: 11, color: '#A8A29E', fontWeight: 500 }}>Pick #{predicted ?? 1}</span>
-        </div>
-        <div style={{ fontSize: 12, fontWeight: isWinner ? 700 : 600, color: '#16A34A', marginTop: 1 }}>
-          {isWinner ? 'Won the tournament' : `Finished ${actual}${getOrdinalSuffix(actual)}`}
-        </div>
-      </div>
-    </motion.div>
+      <span className="text-foreground" style={{ fontWeight: 700 }}>Best call</span>
+      <span className="text-muted-foreground"> – </span>
+      <span className="text-foreground" style={{ fontWeight: 700 }}>{name}, {finishText}</span>
+    </motion.p>
   );
 };
 
@@ -224,14 +192,9 @@ export const ResultsRecap: React.FC<ResultsRecapProps> = ({
         </div>
       </motion.div>
 
-      {/* Best Call Banner */}
+      {/* Best Call Text */}
       {bestCallName && bestCallActual != null && (
-        <BestCallBanner
-          name={bestCallName}
-          predicted={bestCallPredicted}
-          actual={bestCallActual}
-          isWinner={isWinner}
-        />
+        <BestCallLine name={bestCallName} actual={bestCallActual} />
       )}
 
       {/* Gradient separator */}
