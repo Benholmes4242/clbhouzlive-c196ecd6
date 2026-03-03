@@ -22,7 +22,7 @@ export function useVideoPool() {
   const poolRef = useRef<PoolElement[]>([]);
   const hiddenContainerRef = useRef<HTMLDivElement | null>(null);
   const sessionCache = useSessionCache();
-  const initialized = useRef(false);
+  
   const lastSwipeTime = useRef(0);
 
   // Tracked event listeners per pool element index
