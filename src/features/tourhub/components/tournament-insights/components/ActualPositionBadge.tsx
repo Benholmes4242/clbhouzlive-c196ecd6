@@ -48,7 +48,7 @@ const ActualPositionBadge: React.FC<ActualPositionBadgeProps> = ({
     );
   }
 
-  const tier = getAccuracyTier();
+  const tier = getAccuracyTier(position);
   const prefix = isTied ? 'T' : '';
 
   return (
