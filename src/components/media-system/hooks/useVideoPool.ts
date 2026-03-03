@@ -9,7 +9,7 @@ import {
   recoverMediaError,
   retryLoad,
 } from '../utils/hlsManager';
-import { crossfadeTransition } from '../utils/audioFade';
+import { fadeOut, fadeIn } from '../utils/audioFade';
 import { useSessionCache } from './useSessionCache';
 import { useMediaStore } from '../store/mediaStore';
 
@@ -175,8 +175,8 @@ export function useVideoPool() {
         for (let i = 0; i < pool.length; i++) {
           const p = pool[i];
           if (p.assignedIndex === feedIndex) continue; // never recycle self
-          // Never recycle immediately adjacent to active
           const dist = Math.abs((p.assignedIndex ?? 0) - activeIndex);
+          if (dist <= 1) continue; // NEVER recycle immediately adjacent to active
           // Score: higher = more recyclable
           const score = dist * 1_000_000 + (Date.now() - p.lastUsedAt);
           if (score > bestScore) {
@@ -212,10 +212,10 @@ export function useVideoPool() {
 
         // Audio fade out (or instant if rapid/muted)
         if (!isMuted && !rapid && !video.paused) {
-          // Quick fade before detach
-          video.volume = 0;
+          await fadeOut(video);
+        } else {
+          video.pause();
         }
-        video.pause();
 
         // Detach HLS
         detachMedia(video);
@@ -223,10 +223,8 @@ export function useVideoPool() {
         removeAllTrackedListeners(targetIdx, video);
       }
 
-      // ── Step 1f: Reset element ────────────────────────────────
+      // ── Step 1f: Reset element (detachMedia already handles src removal)
       video.currentTime = 0;
-      video.removeAttribute('src');
-      video.load();
 
       // ── Step 2: MOVE element to new container ─────────────────
       container.appendChild(video);
@@ -245,17 +243,30 @@ export function useVideoPool() {
         onError?.();
       }, TIMING.LOAD_TIMEOUT_MS);
 
-      // Error handler
+      // Error handler with recovery verification
       const handleHlsError = (type: string, details: string) => {
         console.error('[Pool] HLS error:', type, details);
         clearTimeout(loadTimeout);
-        // Attempt recovery
+
+        let recovered = false;
         if (type === 'mediaError') {
-          const recovered = recoverMediaError(video);
-          if (!recovered) onError?.();
+          recovered = recoverMediaError(video);
         } else if (type === 'networkError') {
-          const retried = retryLoad(video);
-          if (!retried) onError?.();
+          recovered = retryLoad(video);
+        }
+
+        if (recovered) {
+          // Give recovery 5 seconds to succeed
+          const recoveryTimeout = setTimeout(() => {
+            if (video.paused || video.readyState < 3) {
+              onError?.();
+            }
+          }, 5000);
+          const onRecoveryPlaying = () => {
+            clearTimeout(recoveryTimeout);
+            video.removeEventListener('playing', onRecoveryPlaying);
+          };
+          video.addEventListener('playing', onRecoveryPlaying, { once: true });
         } else {
           onError?.();
         }
@@ -288,7 +299,16 @@ export function useVideoPool() {
       }
 
       // ── Step 5: PLAY ──────────────────────────────────────────
+      const isMutedNow = useMediaStore.getState().isMuted;
+      if (!isMutedNow && !rapid) {
+        video.volume = 0; // Start silent, fade in after play
+      }
       const playOk = await safePlay(video);
+
+      // Fade in audio if unmuted
+      if (playOk && !isMutedNow && !rapid) {
+        fadeIn(video, useMediaStore.getState().volume); // Fire and forget
+      }
 
       // ── Step 6: Signal ready on 'playing' event ───────────────
       if (video.readyState >= 3 && !video.paused) {
@@ -349,6 +369,11 @@ export function useVideoPool() {
 
       elem.video.pause();
       removeAllTrackedListeners(idx, elem.video);
+      detachMedia(elem.video);
+
+      // Clear assignment
+      elem.assignedUrl = null;
+      elem.assignedIndex = null;
 
       if (hiddenContainerRef.current) {
         hiddenContainerRef.current.appendChild(elem.video);

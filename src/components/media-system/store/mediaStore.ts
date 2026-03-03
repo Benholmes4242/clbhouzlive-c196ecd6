@@ -10,15 +10,8 @@ interface MediaStore {
   isMuted: boolean;
   volume: number;
 
-  // Pool State (metadata — actual elements in refs)
-  poolAssignments: Map<number, string>; // feedIndex → poolId
-
   // Carousel State
   carouselPositions: Map<number, number>; // feedIndex → mediaIndex
-
-  // UI State
-  overlayVisible: boolean;
-  scrubbing: boolean;
 
   // Error State
   errorItems: Set<number>;
@@ -46,11 +39,7 @@ export const useMediaStore = create<MediaStore>((set) => ({
   isMuted: true,
   volume: 1,
 
-  poolAssignments: new Map(),
   carouselPositions: new Map(),
-
-  overlayVisible: false,
-  scrubbing: false,
 
   errorItems: new Set(),
   retryingItems: new Set(),

@@ -6,7 +6,8 @@ import { Volume2, VolumeX } from 'lucide-react';
 import { useMediaStore } from './store/mediaStore';
 
 export function MuteButton() {
-  const { isMuted, toggleMute } = useMediaStore();
+  const isMuted = useMediaStore((s) => s.isMuted);
+  const toggleMute = useMediaStore((s) => s.toggleMute);
 
   return (
     <button
