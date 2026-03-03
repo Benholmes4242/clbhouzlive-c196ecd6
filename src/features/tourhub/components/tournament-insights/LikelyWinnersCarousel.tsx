@@ -108,16 +108,15 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
               key={pick.id}
               whileTap={{ scale: 0.98 }}
               transition={{ duration: 0.2 }}
-              className="relative w-[227px] h-[292px] rounded-[22px] overflow-hidden flex-shrink-0 snap-center"
+              className="w-[227px] h-[292px] rounded-[22px] overflow-hidden flex-shrink-0 snap-center flex flex-col"
               style={{
                 background: 'hsl(var(--background))',
-                border: '1px solid hsl(var(--border) / 0.3)',
+                border: '1px solid hsl(var(--border) / 0.2)',
               }}
             >
-              {/* Photo section — top 48% */}
-              <div className="absolute top-0 left-0 right-0" style={{ height: '48%' }}>
+              {/* Photo section — top ~48% */}
+              <div className="relative flex-shrink-0" style={{ height: '48%' }}>
                 {imgFailed ? (
-                  /* Gradient placeholder with initials */
                   <div
                     className="w-full h-full flex items-center justify-center"
                     style={{
@@ -145,15 +144,15 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                   />
                 )}
 
-                {/* Fade gradient — photo dissolves into card background */}
+                {/* Fade gradient — subtle, only at bottom edge */}
                 <div
                   className="absolute inset-0 pointer-events-none"
                   style={{
-                    background: 'linear-gradient(to bottom, transparent 40%, hsl(var(--background)) 100%)',
+                    background: 'linear-gradient(to bottom, transparent 55%, hsl(var(--background)) 95%)',
                   }}
                 />
 
-                {/* WD badge — centered on photo */}
+                {/* WD badge */}
                 {pick.isWithdrawn && (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <span
@@ -172,7 +171,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                   </div>
                 )}
 
-                {/* Promoted pill — top-left on photo */}
+                {/* Promoted pill */}
                 {pick.promoted && (
                   <div
                     className="absolute top-3 left-3 text-xs font-semibold rounded-full"
@@ -186,10 +185,12 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                   </div>
                 )}
 
-                {/* Confidence ring — top-right on photo */}
+                {/* Confidence ring — top-right, 38px */}
                 <div
-                  className="absolute top-3 right-3"
+                  className="absolute"
                   style={{
+                    top: 10,
+                    right: 10,
                     filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.15))',
                   }}
                 >
@@ -198,63 +199,63 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                     accentColor={ACCENT_COLOR}
                     animationDelay={400 + i * 80}
                     isWithdrawn={pick.isWithdrawn}
-                    size={44}
+                    size={38}
                   />
                 </div>
               </div>
 
-              {/* Player name & flag — below photo, on card background */}
-              <div className="absolute left-0 right-0 text-center" style={{ top: '48%', padding: '4px 16px 0' }}>
-                <p className="text-foreground" style={{ fontSize: 16, fontWeight: 700, lineHeight: 1.2 }}>
+              {/* Name + Flag + Bullets — natural flow below photo */}
+              <div className="flex flex-col flex-1 overflow-hidden" style={{ padding: '0 14px 14px' }}>
+                {/* Name */}
+                <p className="text-foreground text-center" style={{ fontSize: 15, fontWeight: 700, lineHeight: 1.2, marginTop: 4 }}>
                   {pick.name}
                 </p>
+                {/* Flag */}
                 {pick.countryCode && (
-                  <div className="flex justify-center" style={{ marginTop: 2 }}>
+                  <div className="flex justify-center" style={{ marginTop: 1 }}>
                     <CountryFlag
                       country={pick.countryCode}
                       size="sm"
                       className="rounded-sm"
+                      style={{ fontSize: 13 }}
                     />
                   </div>
                 )}
-              </div>
 
-              {/* Insight bullets — bottom section */}
-              {pick.bullets.length > 0 && (
-                <div
-                  className="absolute bottom-0 left-0 right-0 flex flex-col"
-                  style={{ padding: '12px 16px 16px', gap: 6 }}
-                >
-                  {pick.bullets.slice(0, 3).map((bullet, j) => (
-                    <div key={j} className="flex items-start gap-1.5">
-                      <span
-                        className="flex-shrink-0"
-                        style={{
-                          width: 4,
-                          height: 4,
-                          borderRadius: 2,
-                          marginTop: 6,
-                          backgroundColor: ACCENT_COLOR,
-                        }}
-                      />
-                      <span
-                        className="text-muted-foreground"
-                        style={{
-                          fontSize: 12,
-                          fontWeight: 500,
-                          lineHeight: 1.4,
-                          display: '-webkit-box',
-                          WebkitLineClamp: 3,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                        }}
-                      >
-                        {bullet}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
+                {/* Bullets */}
+                {pick.bullets.length > 0 && (
+                  <div className="flex flex-col" style={{ marginTop: 10, gap: 4 }}>
+                    {pick.bullets.slice(0, 3).map((bullet, j) => (
+                      <div key={j} className="flex items-start" style={{ gap: 6 }}>
+                        <span
+                          className="flex-shrink-0"
+                          style={{
+                            width: 3.5,
+                            height: 3.5,
+                            borderRadius: '50%',
+                            marginTop: 5,
+                            backgroundColor: ACCENT_COLOR,
+                          }}
+                        />
+                        <span
+                          className="text-muted-foreground"
+                          style={{
+                            fontSize: 11.5,
+                            fontWeight: 500,
+                            lineHeight: 1.4,
+                            display: '-webkit-box',
+                            WebkitLineClamp: 3,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          {bullet}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </motion.div>
           );
         })}
