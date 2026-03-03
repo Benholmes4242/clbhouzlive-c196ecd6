@@ -17,32 +17,42 @@ export function EmailChangeSheet({ open, onOpenChange, currentEmail }: EmailChan
   const [newEmail, setNewEmail] = useState('');
   const [confirmEmail, setConfirmEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<{ newEmail?: string; confirmEmail?: string }>({});
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const clearError = (field: 'newEmail' | 'confirmEmail') => {
+    setErrors(prev => ({ ...prev, [field]: undefined }));
+  };
+
+  const validate = (): boolean => {
+    const newErrors: { newEmail?: string; confirmEmail?: string } = {};
+
+    if (!newEmail.trim()) {
+      newErrors.newEmail = 'Please enter a new email address';
+    } else if (!emailRegex.test(newEmail)) {
+      newErrors.newEmail = 'Please enter a valid email address';
+    } else if (newEmail.toLowerCase() === currentEmail.toLowerCase()) {
+      newErrors.newEmail = 'This is already your current email';
+    }
+
+    if (!confirmEmail.trim()) {
+      newErrors.confirmEmail = 'Please confirm your new email';
+    } else if (newEmail && confirmEmail && newEmail !== confirmEmail) {
+      newErrors.confirmEmail = "Emails don't match";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async () => {
-    if (!newEmail.trim()) {
-      toast.error('Please enter a new email address');
-      return;
-    }
-    
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(newEmail)) {
-      toast.error('Please enter a valid email address');
-      return;
-    }
-
-    if (newEmail !== confirmEmail) {
-      toast.error('Email addresses do not match');
-      return;
-    }
-
-    if (newEmail.toLowerCase() === currentEmail.toLowerCase()) {
-      toast.error('New email must be different from current email');
-      return;
-    }
+    if (!validate()) return;
 
     setIsSubmitting(true);
 
     try {
+      // Step 1: Server-side validation (cooldown, same-email check, format)
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         toast.error('Session expired. Please log in again.');
@@ -50,29 +60,49 @@ export function EmailChangeSheet({ open, onOpenChange, currentEmail }: EmailChan
       }
 
       const { data, error } = await supabase.functions.invoke('secure-email-change', {
-        body: { newEmail, currentEmail },
+        body: { newEmail },
         headers: { Authorization: `Bearer ${session.access_token}` }
       });
 
       if (error) throw error;
 
       if (data?.error) {
-        toast.error(data.error);
+        // Map server errors to inline field errors where possible
+        if (data.error.includes('different from your current email')) {
+          setErrors({ newEmail: 'This is already your current email' });
+        } else if (data.error.includes('cooldown')) {
+          toast.error(data.error);
+        } else {
+          toast.error(data.error);
+        }
         return;
       }
 
-      toast.success('Confirmation sent', {
-        description: 'Check your inbox to finish updating your email.'
+      // Step 2: Trigger Supabase's built-in confirmation email flow
+      const { error: updateError } = await supabase.auth.updateUser({ email: newEmail });
+
+      if (updateError) {
+        // Handle specific Supabase errors
+        const msg = updateError.message?.toLowerCase() || '';
+        if (msg.includes('already registered') || msg.includes('already in use') || msg.includes('unique')) {
+          setErrors({ newEmail: 'This email is already associated with another account' });
+        } else {
+          toast.error('Could not send confirmation email', {
+            description: updateError.message || 'Please try again in a moment.'
+          });
+        }
+        return;
+      }
+
+      // Success — confirmation email sent, email NOT changed yet
+      toast.success('Confirmation link sent', {
+        description: `We've sent a confirmation link to ${newEmail}. Your email will update once you confirm.`
       });
 
       setNewEmail('');
       setConfirmEmail('');
+      setErrors({});
       onOpenChange(false);
-
-      setTimeout(async () => {
-        await supabase.auth.signOut();
-        window.location.href = '/auth';
-      }, 3000);
 
     } catch (err: any) {
       console.error('[EmailChange] error:', err);
@@ -85,9 +115,12 @@ export function EmailChangeSheet({ open, onOpenChange, currentEmail }: EmailChan
   };
 
   const handleClose = (isOpen: boolean) => {
+    // Block dismiss during submission so the user sees the result
+    if (!isOpen && isSubmitting) return;
     if (!isOpen) {
       setNewEmail('');
       setConfirmEmail('');
+      setErrors({});
     }
     onOpenChange(isOpen);
   };
@@ -124,11 +157,14 @@ export function EmailChangeSheet({ open, onOpenChange, currentEmail }: EmailChan
               id="new-email"
               type="email"
               value={newEmail}
-              onChange={(e) => setNewEmail(e.target.value)}
+              onChange={(e) => { setNewEmail(e.target.value); clearError('newEmail'); }}
               placeholder="your@newemail.com"
-              className="h-12 rounded-lg bg-muted border-border focus:border-amber-500"
+              className={`h-12 rounded-lg bg-muted ${errors.newEmail ? 'border-destructive focus:border-destructive' : 'border-border focus:border-amber-500'}`}
               disabled={isSubmitting}
             />
+            {errors.newEmail && (
+              <p className="text-xs text-destructive mt-1">{errors.newEmail}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -139,11 +175,14 @@ export function EmailChangeSheet({ open, onOpenChange, currentEmail }: EmailChan
               id="confirm-email"
               type="email"
               value={confirmEmail}
-              onChange={(e) => setConfirmEmail(e.target.value)}
+              onChange={(e) => { setConfirmEmail(e.target.value); clearError('confirmEmail'); }}
               placeholder="Confirm your new email"
-              className="h-12 rounded-lg bg-muted border-border focus:border-amber-500"
+              className={`h-12 rounded-lg bg-muted ${errors.confirmEmail ? 'border-destructive focus:border-destructive' : 'border-border focus:border-amber-500'}`}
               disabled={isSubmitting}
             />
+            {errors.confirmEmail && (
+              <p className="text-xs text-destructive mt-1">{errors.confirmEmail}</p>
+            )}
           </div>
 
           <Button
