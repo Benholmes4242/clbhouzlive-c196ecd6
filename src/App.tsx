@@ -210,6 +210,7 @@ const GlobalQueueDrawer = lazy(() => import("./components/videos/GlobalQueueDraw
 const SeasonShop = lazy(() => import("./pages/SeasonShop"));
 const ChallengesPage = lazy(() => import("./pages/ChallengesPage"));
 const InsightsPage = lazy(() => import("./pages/InsightsPage"));
+const FullscreenMediaViewer = lazy(() => import("./components/media-system/FullscreenMediaViewer"));
 const BusinessDirectoryPage = lazy(() => import("./pages/BusinessDirectoryPage"));
 const BusinessInsightsPage = lazy(() => import("./pages/BusinessInsightsPage"));
 const BusinessInsightsPageV2 = lazy(() => import("./pages/BusinessInsightsPageV2"));
