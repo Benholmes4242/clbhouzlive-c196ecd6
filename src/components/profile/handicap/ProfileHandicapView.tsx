@@ -99,47 +99,40 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
   }
 
   return (
-    <div className="px-5 pt-10 pb-6 space-y-0">
+    <div className="px-5 pt-12 pb-12 space-y-0">
       <ScrollToTopGlass />
 
-      {/* Handicap Display — Cardless */}
+      {/* Handicap Display — Cardless, Centered */}
       {handicapIndex !== null ? (
-        <div className="pb-8">
+        <div className="pb-8 text-center">
           {/* Eyebrow Label */}
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground mb-4">
             Handicap Index
           </p>
           
           {/* Handicap Number — Hero */}
-          <div className="mb-4">
+          <div className="mb-2">
             <span className="text-6xl font-light text-foreground tracking-tight tabular-nums">
               {formatHandicap(handicapIndex)}
             </span>
           </div>
           
-          {/* Meta + Edit inline */}
-          {isOwnProfile && (
-            <div className="flex items-center gap-0 text-sm text-muted-foreground">
-              {lastUpdatedAt && (
-                <span>Last edited {formatDate(lastUpdatedAt)} · Added by you</span>
-              )}
-              {lastUpdatedAt && (
-                <span className="w-px h-4 bg-border/60 mx-3 inline-block" />
-              )}
-              <button
-                onClick={() => setIsEditModalOpen(true)}
-                className="inline-flex items-center gap-1.5 font-semibold text-amber-500 min-h-[44px] active:scale-95 transition-transform"
-              >
-                <Pencil className="h-3.5 w-3.5" />
-                Edit handicap
-              </button>
-            </div>
+          {/* Meta line */}
+          {lastUpdatedAt && (
+            <p className="text-[13px] text-muted-foreground">
+              Last edited {formatDate(lastUpdatedAt)} · By you
+            </p>
           )}
 
-          {!isOwnProfile && lastUpdatedAt && (
-            <p className="text-sm text-muted-foreground">
-              Last updated {formatDate(lastUpdatedAt)}
-            </p>
+          {/* Edit CTA — standalone centered */}
+          {isOwnProfile && (
+            <button
+              onClick={() => setIsEditModalOpen(true)}
+              className="inline-flex items-center gap-1.5 mt-3 text-[13px] font-semibold text-amber-500 min-h-[44px] active:scale-95 transition-transform"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+              Edit handicap
+            </button>
           )}
         </div>
       ) : (
@@ -171,8 +164,12 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
         </div>
       )}
 
-      {/* Divider */}
-      {isOwnProfile && <div className="h-px bg-border/40 mb-10" />}
+      {/* Faded Divider */}
+      {isOwnProfile && (
+        <div className="mb-8">
+          <div className="h-px mx-auto" style={{ background: 'linear-gradient(to right, transparent, hsl(var(--border)) 30%, hsl(var(--border)) 70%, transparent)' }} />
+        </div>
+      )}
 
       {/* Official Sync Callout — Premium tinted section, no card */}
       {isOwnProfile && (
