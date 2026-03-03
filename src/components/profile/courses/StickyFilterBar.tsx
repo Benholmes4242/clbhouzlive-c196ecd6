@@ -27,7 +27,7 @@ interface StickyFilterBarProps {
 const filters: { id: CourseFilterType; label: string; showCount?: boolean }[] = [
   { id: 'all', label: 'All' },
   { id: 'top100', label: 'Top 100', showCount: true },
-  { id: 'highest-rated', label: 'Rating' },
+  { id: 'highest-rated', label: 'Review' },
   { id: 'recently-played', label: 'Recent' },
 ];
 
