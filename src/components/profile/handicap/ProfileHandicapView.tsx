@@ -172,7 +172,7 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
       )}
 
       {/* Divider */}
-      {isOwnProfile && <div className="h-px bg-border/40 mb-8" />}
+      {isOwnProfile && <div className="h-px bg-border/40 mb-10" />}
 
       {/* Official Sync Callout — Premium tinted section, no card */}
       {isOwnProfile && (
