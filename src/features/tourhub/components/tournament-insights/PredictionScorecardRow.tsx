@@ -115,27 +115,25 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
           <PickBadge pickNumber={prediction.predictedRank} />
         )}
 
-        {/* Avatar */}
+        {/* Avatar — squircle shape */}
         <div
-          className="overflow-hidden flex-shrink-0"
+          className="overflow-hidden flex-shrink-0 bg-muted"
           style={{
             width: 44,
-            height: 44,
-            borderRadius: '50%',
+            height: Math.round(44 * 1.05),
+            borderRadius: '34%',
             border: `2px solid ${borderColor}`,
           }}
         >
           {avatarUrl ? (
-            <div className="relative w-full h-full bg-muted">
-              <img
-                src={avatarUrl}
-                alt={prediction.playerName}
-                className="relative z-10 w-full h-full object-cover"
-                style={{ objectPosition: 'center 20%' }}
-                loading="lazy"
-                onError={(e) => { e.currentTarget.style.display = 'none'; }}
-              />
-            </div>
+            <img
+              src={avatarUrl}
+              alt={prediction.playerName}
+              className="w-full h-full object-cover"
+              style={{ objectPosition: 'center 20%' }}
+              loading="lazy"
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
           ) : (
             <div className="w-full h-full bg-muted" />
           )}
@@ -156,16 +154,8 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
 
           {isCompleted ? (
             /* Completed: Country flag under name */
-            <div className="flex items-center gap-1.5" style={{ marginTop: 3 }}>
+            <div className="flex items-center" style={{ marginTop: 3 }}>
               <CountryFlag country={prediction.country} size="sm" />
-              {prediction.country && (
-                <span
-                  className="text-muted-foreground leading-tight"
-                  style={{ fontSize: 12 }}
-                >
-                  {prediction.country}
-                </span>
-              )}
             </div>
           ) : (
             /* Live: Score + thru info under name */
