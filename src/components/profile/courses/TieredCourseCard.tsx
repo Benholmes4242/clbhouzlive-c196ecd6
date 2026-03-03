@@ -5,7 +5,7 @@
  */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Trophy, ChevronRight } from 'lucide-react';
+import { Calendar, Trophy } from 'lucide-react';
 import { RatingPill } from '@/components/ui/RatingPill';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
@@ -112,17 +112,14 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
             )}
           </div>
 
-          {/* Rating column - fixed width, bottom-right aligned */}
-          <div className="flex flex-col items-end justify-end pb-2.5 pr-3 pl-2 flex-shrink-0 min-w-[72px]">
+          {/* Rating column - fixed width, bottom-right aligned with date */}
+          <div className="flex flex-col items-center justify-end pb-2.5 pr-3 pl-2 flex-shrink-0 min-w-[72px]">
             {isRated && course.rating_value ? (
               <>
                 <span className="text-sm font-semibold text-foreground mb-0.5">
                   {course.rating_value.toFixed(1)}
                 </span>
                 <RatingPill score={course.rating_value} className="text-[10px] px-2 py-0.5" />
-                <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground mt-1">
-                  Review <ChevronRight className="w-3 h-3" />
-                </span>
               </>
             ) : isOwnProfile ? (
               <button 
@@ -237,16 +234,13 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
         </div>
 
         {/* Rating column - fixed width, bottom-right aligned with date */}
-        <div className="flex flex-col items-end justify-end pb-2 pr-2.5 pl-2 flex-shrink-0 min-w-[68px]">
+        <div className="flex flex-col items-center justify-end pb-2 pr-2.5 pl-2 flex-shrink-0 min-w-[68px]">
           {course.rating_value && (
             <>
               <span className="text-sm font-semibold text-foreground mb-0.5">
                 {course.rating_value.toFixed(1)}
               </span>
               <RatingPill score={course.rating_value} className="text-[9px] px-1.5 py-0.5" />
-              <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground mt-1">
-                Review <ChevronRight className="w-3 h-3" />
-              </span>
             </>
           )}
         </div>
