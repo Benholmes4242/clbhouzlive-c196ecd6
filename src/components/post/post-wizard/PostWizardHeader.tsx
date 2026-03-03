@@ -69,7 +69,6 @@ export function PostWizardHeader({
           fallback={actorName?.[0]?.toUpperCase() || 'U'}
           hideRing
         />
-        <span className="text-[13px] font-semibold text-foreground">{visibilityLabel}</span>
         <ChevronDown className="w-3 h-3 text-muted-foreground" />
       </button>
 
