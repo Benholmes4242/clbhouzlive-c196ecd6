@@ -35,7 +35,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
   const navigate = useNavigate();
   const { topTen, isLoading } = useUserTopTenCourses(userId);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   // Stable sorted course IDs for consistent query key (only for pinned courses without ratings)
   const courseIdsNeedingRatings = React.useMemo(() => 
@@ -80,15 +80,18 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
     staleTime: 60_000,
   });
 
-  // Handle scroll progress
+  // Handle scroll — discrete card index detection
   const handleScroll = useCallback(() => {
     if (!scrollContainerRef.current) return;
-    const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-    const maxScroll = scrollWidth - clientWidth;
-    if (maxScroll > 0) {
-      setScrollProgress(scrollLeft / maxScroll);
-    }
-  }, []);
+    const container = scrollContainerRef.current;
+    const { scrollLeft } = container;
+    const firstCard = container.firstElementChild as HTMLElement | null;
+    const cardWidth = firstCard?.offsetWidth ?? 227;
+    const gap = parseFloat(getComputedStyle(container).gap) || 16;
+    const stepWidth = cardWidth + gap;
+    const newIndex = stepWidth > 0 ? Math.round(scrollLeft / stepWidth) : 0;
+    setActiveIndex(Math.max(0, Math.min(newIndex, topTen.length - 1)));
+  }, [topTen.length]);
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -212,7 +215,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
   return (
     <section className={cn("w-full", className)}>
       {/* Refined Header */}
-      <div className="flex items-start justify-between mb-4 px-4">
+      <div className="flex items-center justify-between mb-4 px-4">
         <div className="flex items-center gap-3">
           {/* Trophy icon - subtle gold tint */}
           <div 
@@ -297,7 +300,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
       {courseCount > 1 && (
         <div className="flex justify-center items-center gap-1 mt-4">
           {Array.from({ length: courseCount }).map((_, i) => {
-            const isActive = Math.round(scrollProgress * (courseCount - 1)) === i;
+            const isActive = i === activeIndex;
             return (
               <div
                 key={i}
