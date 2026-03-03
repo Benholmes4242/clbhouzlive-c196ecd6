@@ -455,7 +455,7 @@ const ProfilePageV2Content: React.FC = () => {
             <img 
               src={heroUrl} 
               alt="Profile cover" 
-              className="w-full h-full object-cover object-bottom"
+              className="w-full h-full object-cover object-center"
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/40" />
