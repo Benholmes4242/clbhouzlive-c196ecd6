@@ -1,6 +1,6 @@
 /**
- * TopPicksCarousel — Portrait cards matching Personal Top 10 style
- * Gradient backgrounds with centered headshots, rank badges, and confidence rings
+ * TopPicksCarousel — Immersive portrait cards with player photo backgrounds
+ * Photo fills top 55-60%, fades into card background, insights below
  */
 
 import { memo, useState, useRef, useCallback, useEffect } from 'react';
@@ -30,12 +30,17 @@ interface PickCard {
 
 const ACCENT_COLOR = '#16A34A';
 
+function getInitials(name: string): string {
+  return name.split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
+}
+
 export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
   featured,
   cards,
   withdrawnPlayerIds,
 }: LikelyWinnersCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const contenderCards = cards.filter(c => c.type === 'contender').slice(0, 4);
@@ -67,7 +72,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
     const el = scrollRef.current;
     if (!el) return;
     const scrollLeft = el.scrollLeft;
-    const cardWidth = 227 + 16; // card width + gap
+    const cardWidth = 227 + 16;
     const idx = Math.round(scrollLeft / cardWidth);
     setActiveIndex(Math.min(idx, allPicks.length - 1));
   }, [allPicks.length]);
@@ -78,6 +83,10 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
     el.addEventListener('scroll', handleScroll, { passive: true });
     return () => el.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
+
+  const handleImageError = useCallback((id: string) => {
+    setFailedImages(prev => new Set(prev).add(id));
+  }, []);
 
   return (
     <div>
@@ -91,145 +100,175 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
           WebkitOverflowScrolling: 'touch',
         }}
       >
-        {allPicks.map((pick, i) => (
-          <motion.div
-            key={pick.id}
-            whileTap={{ scale: 0.98 }}
-            transition={{ duration: 0.2 }}
-            className="relative w-[227px] h-[292px] rounded-[22px] overflow-hidden flex-shrink-0 snap-center"
-            style={{
-              background: 'linear-gradient(165deg, hsl(var(--muted)) 0%, hsl(var(--background)) 100%)',
-              opacity: pick.isWithdrawn ? 0.6 : 1,
-            }}
-          >
-            {/* Green accent bar */}
-            <div
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 3,
-                background: ACCENT_COLOR,
-                borderRadius: '22px 22px 0 0',
-              }}
-            />
+        {allPicks.map((pick, i) => {
+          const imgFailed = failedImages.has(pick.id) || !pick.avatarUrl;
 
-            {/* Rank badge — top-left */}
-            <div
-              className="absolute top-4 left-4 flex items-center px-3 py-1.5 rounded-full"
+          return (
+            <motion.div
+              key={pick.id}
+              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.2 }}
+              className="relative w-[227px] h-[292px] rounded-[22px] overflow-hidden flex-shrink-0 snap-center"
               style={{
-                background: 'hsl(var(--muted))',
-                border: '1px solid hsl(var(--border))',
+                background: 'hsl(var(--background))',
+                border: '1px solid hsl(var(--border) / 0.3)',
               }}
             >
-              <span className="text-foreground font-semibold text-sm">#{i + 1}</span>
-            </div>
-
-            {/* Confidence ring — top-right */}
-            <div className="absolute top-3 right-3">
-              <ConfidenceGauge
-                tier={pick.confidenceTier}
-                accentColor={ACCENT_COLOR}
-                animationDelay={400 + i * 80}
-                isWithdrawn={pick.isWithdrawn}
-                size={44}
-              />
-            </div>
-
-            {/* WD badge */}
-            {pick.isWithdrawn && (
-              <div
-                className="absolute top-12 left-4 px-1.5 py-0.5 rounded-md font-bold uppercase"
-                style={{
-                  fontSize: 9,
-                  letterSpacing: '0.5px',
-                  background: '#EF4444',
-                  color: 'white',
-                  lineHeight: 1.2,
-                }}
-              >
-                WD
-              </div>
-            )}
-
-            {/* Center content — avatar, name, flag */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ paddingTop: 48, paddingBottom: 80 }}>
-              {/* Player headshot */}
-              <div className="relative flex-shrink-0">
-                <img
-                  src={pick.avatarUrl || PLAYER_SILHOUETTE_URL}
-                  alt={pick.name}
-                  className="object-cover"
-                  style={{
-                    width: 60,
-                    height: 60,
-                    borderRadius: '50%',
-                    objectPosition: 'center 20%',
-                    border: '2px solid hsl(var(--border))',
-                  }}
-                  loading="lazy"
-                  onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-                />
-              </div>
-
-              {/* Player name */}
-              <p
-                className="text-foreground text-center truncate w-full px-4"
-                style={{ fontSize: 16, fontWeight: 700, marginTop: 8 }}
-              >
-                {pick.name}
-              </p>
-
-              {/* Flag + promoted */}
-              <div className="flex items-center gap-1.5 mt-0.5">
-                {pick.countryCode && (
-                  <CountryFlag country={pick.countryCode} size="sm" className="rounded-sm" />
-                )}
-                {pick.promoted && (
-                  <span
-                    className="text-[10px] font-semibold px-2 py-0.5 rounded-md"
+              {/* Photo section — top 60% */}
+              <div className="absolute top-0 left-0 right-0" style={{ height: '60%' }}>
+                {imgFailed ? (
+                  /* Gradient placeholder with initials */
+                  <div
+                    className="w-full h-full flex items-center justify-center"
                     style={{
-                      background: 'rgba(59, 130, 246, 0.08)',
-                      color: 'rgb(59, 130, 246)',
+                      background: 'linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--border)) 100%)',
+                      borderRadius: '22px 22px 0 0',
+                    }}
+                  >
+                    <span className="text-muted-foreground" style={{ fontSize: 24, fontWeight: 700 }}>
+                      {getInitials(pick.name)}
+                    </span>
+                  </div>
+                ) : (
+                  <img
+                    src={pick.avatarUrl}
+                    alt={pick.name}
+                    className="w-full h-full object-cover"
+                    style={{
+                      objectPosition: 'center 20%',
+                      borderRadius: '22px 22px 0 0',
+                      opacity: pick.isWithdrawn ? 0.4 : 1,
+                    }}
+                    loading="lazy"
+                    decoding="async"
+                    onError={() => handleImageError(pick.id)}
+                  />
+                )}
+
+                {/* Fade gradient — photo dissolves into card background */}
+                <div
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    background: 'linear-gradient(to bottom, transparent 40%, hsl(var(--background)) 100%)',
+                  }}
+                />
+
+                {/* WD badge — centered on photo */}
+                {pick.isWithdrawn && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span
+                      className="font-bold uppercase"
+                      style={{
+                        fontSize: 14,
+                        letterSpacing: '1px',
+                        background: '#EF4444',
+                        color: 'white',
+                        padding: '4px 12px',
+                        borderRadius: 8,
+                      }}
+                    >
+                      WD
+                    </span>
+                  </div>
+                )}
+
+                {/* Promoted pill — top-left on photo */}
+                {pick.promoted && (
+                  <div
+                    className="absolute top-3 left-3 text-xs font-semibold rounded-full"
+                    style={{
+                      padding: '2px 8px',
+                      background: 'rgba(22, 163, 74, 0.15)',
+                      color: ACCENT_COLOR,
                     }}
                   >
                     Promoted
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Insight bullets — bottom */}
-            {pick.bullets.length > 0 && (
-              <div className="absolute bottom-0 left-0 right-0 flex flex-col gap-1.5 px-4 pb-4">
-                {pick.bullets.slice(0, 3).map((bullet, j) => (
-                  <div key={j} className="flex items-start gap-1.5">
-                    <span
-                      className="flex-shrink-0"
-                      style={{
-                        width: 4,
-                        height: 4,
-                        borderRadius: 2,
-                        marginTop: 5,
-                        backgroundColor: ACCENT_COLOR,
-                      }}
-                    />
-                    <span
-                      className="text-muted-foreground truncate"
-                      style={{ fontSize: 12, fontWeight: 500, lineHeight: 1.3 }}
-                    >
-                      {bullet}
-                    </span>
                   </div>
-                ))}
+                )}
+
+                {/* Confidence ring — top-right on photo */}
+                <div
+                  className="absolute top-3 right-3"
+                  style={{
+                    filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.15))',
+                  }}
+                >
+                  <ConfidenceGauge
+                    tier={pick.confidenceTier}
+                    accentColor={ACCENT_COLOR}
+                    animationDelay={400 + i * 80}
+                    isWithdrawn={pick.isWithdrawn}
+                    size={44}
+                  />
+                </div>
+
+                {/* Player name — bottom-left overlay on photo */}
+                <div className="absolute left-4" style={{ bottom: '38%' }}>
+                  <p
+                    style={{
+                      fontSize: 17,
+                      fontWeight: 700,
+                      color: 'white',
+                      textShadow: '0 1px 6px rgba(0,0,0,0.4)',
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {pick.name}
+                  </p>
+                  {pick.countryCode && (
+                    <div style={{ marginTop: 2, filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.3))' }}>
+                      <CountryFlag
+                        country={pick.countryCode}
+                        size="sm"
+                        className="rounded-sm"
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
-            )}
-          </motion.div>
-        ))}
+
+              {/* Insight bullets — bottom 40% */}
+              {pick.bullets.length > 0 && (
+                <div
+                  className="absolute bottom-0 left-0 right-0 flex flex-col"
+                  style={{ padding: '12px 16px 16px', gap: 6 }}
+                >
+                  {pick.bullets.slice(0, 3).map((bullet, j) => (
+                    <div key={j} className="flex items-start gap-1.5">
+                      <span
+                        className="flex-shrink-0"
+                        style={{
+                          width: 4,
+                          height: 4,
+                          borderRadius: 2,
+                          marginTop: 6,
+                          backgroundColor: ACCENT_COLOR,
+                        }}
+                      />
+                      <span
+                        className="text-muted-foreground"
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 500,
+                          lineHeight: 1.4,
+                          display: '-webkit-box',
+                          WebkitLineClamp: 3,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        {bullet}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </motion.div>
+          );
+        })}
       </div>
 
-      {/* Pagination dots — match Personal Top 10 */}
+      {/* Pagination dots */}
       {allPicks.length > 1 && (
         <div className="flex items-center justify-center gap-1 mt-4">
           {allPicks.map((_, i) => (
