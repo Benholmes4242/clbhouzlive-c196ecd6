@@ -371,25 +371,29 @@ export const TournamentInsights = memo(function TournamentInsights() {
   const renderResultsContent = () => {
     if (!tracker) return null;
     const bestCall = getBestCall(tracker);
+    const bestCallPick = bestCall
+      ? tracker.allPicks.find((p) => p.playerId === bestCall.playerId) ?? null
+      : null;
+    // Remaining picks exclude the best pick (it's in the spotlight card)
+    const remainingPicks = bestCallPick
+      ? tracker.allPicks.filter((p) => p.playerId !== bestCallPick.playerId)
+      : tracker.allPicks;
+
     return (
       <>
-        <ResultsRecap
-          predictions={{
-            tournament: {
-              id: data?.tournament.id ?? '', name: data?.tournament.name ?? '',
-              venueName: data?.tournament.courseName ?? '', venueCity: '', venueState: '',
-              startDate: '', endDate: '', purse: 0, par: 0, yardage: 0, status: 'complete',
-            },
-            topContenders: [], darkHorses: [],
-            courseAnalysis: { winnerProfile: '', keyStats: [], insight: '', difficulty: '' },
-            confidence: 0, generatedAt: '', isAIPowered: true, isStale: false,
-          }}
-          accuracy={tracker.accuracy}
-          bestCallName={bestCall?.playerName}
-          bestCallPredicted={bestCall?.predictedRank}
-          bestCallActual={bestCall?.actualPosition ?? undefined}
+        {bestCallPick && data?.tournament && (
+          <BestPickSpotlight
+            bestPick={bestCallPick}
+            tournamentId={data.tournament.id}
+            courseName={data.tournament.courseName}
+            tournamentName={data.tournament.name}
+          />
+        )}
+        <PredictionLeaderboard
+          allPicks={remainingPicks}
+          isCompleted={true}
+          bestCallPlayerId={bestCall?.playerId}
         />
-        <PredictionLeaderboard allPicks={tracker.allPicks} isCompleted={true} bestCallPlayerId={bestCall?.playerId} />
       </>
     );
   };
