@@ -22,7 +22,7 @@ export function useVideoPool() {
   const poolRef = useRef<PoolElement[]>([]);
   const hiddenContainerRef = useRef<HTMLDivElement | null>(null);
   const sessionCache = useSessionCache();
-  const initialized = useRef(false);
+  
   const lastSwipeTime = useRef(0);
 
   // Tracked event listeners per pool element index
@@ -52,8 +52,8 @@ export function useVideoPool() {
 
   // ── Pool element creation ─────────────────────────────────────────
   useEffect(() => {
-    if (initialized.current) return;
-    initialized.current = true;
+    // Idempotency: if pool already has elements and container exists, skip
+    if (poolRef.current.length > 0 && hiddenContainerRef.current) return;
 
     const container = document.createElement('div');
     container.style.cssText =
@@ -95,6 +95,10 @@ export function useVideoPool() {
         p.video.load();
       });
       container.remove();
+
+      // Reset refs so re-mount creates fresh pool
+      poolRef.current = [];
+      hiddenContainerRef.current = null;
     };
   }, [removeAllTrackedListeners]);
 
