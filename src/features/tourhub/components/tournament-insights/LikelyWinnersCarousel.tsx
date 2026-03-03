@@ -132,9 +132,9 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                   <img
                     src={pick.avatarUrl}
                     alt={pick.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                     style={{
-                      objectPosition: 'center 25%',
+                      objectPosition: 'center top',
                       borderRadius: '22px 22px 0 0',
                       opacity: pick.isWithdrawn ? 0.4 : 1,
                     }}
