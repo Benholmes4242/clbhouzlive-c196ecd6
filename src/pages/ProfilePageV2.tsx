@@ -538,7 +538,7 @@ const ProfilePageV2Content: React.FC = () => {
               </button>
             )}
           </div>
-        </button>
+        </div>
 
         {/* HCP + Golfer pills - right side, just below header photo */}
         {/* Reduced gap: mt-3 → mt-2 (8px from golfer badge to next element) */}
