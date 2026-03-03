@@ -475,6 +475,7 @@ const ProfilePageV2Content: React.FC = () => {
             logPoint('profile_photo.pointerdown', { x: t?.clientX, y: t?.clientY, via: 'touchstart' });
           }}
           onClick={() => {
+            console.log('[Avatar Parent] Parent button clicked — isUploadingAvatar:', isUploadingAvatar);
             if (isUploadingAvatar) return;
             logPoint('profile_photo.click');
             setIsAvatarLightboxOpen(true);
@@ -510,7 +511,24 @@ const ProfilePageV2Content: React.FC = () => {
             {/* Avatar edit affordance — self-profile only */}
             {isSelf && (
               <button
-                onClick={(e) => { e.stopPropagation(); avatarFileInputRef.current?.click(); }}
+                onClick={(e) => {
+                  console.log('[Avatar Camera] Badge clicked');
+                  console.log('[Avatar Camera] stopPropagation called');
+                  e.stopPropagation();
+                  console.log('[Avatar Camera] avatarFileInputRef.current:', avatarFileInputRef.current);
+                  console.log('[Avatar Camera] isUploadingAvatar:', isUploadingAvatar);
+                  if (isUploadingAvatar) {
+                    console.log('[Avatar Camera] BLOCKED — upload in progress');
+                    return;
+                  }
+                  console.log('[Avatar Camera] Calling avatarFileInputRef.current?.click()');
+                  avatarFileInputRef.current?.click();
+                  console.log('[Avatar Camera] click() called');
+                }}
+                onTouchStart={(e) => {
+                  console.log('[Avatar Camera] onTouchStart fired on badge');
+                  e.stopPropagation();
+                }}
                 className="absolute bottom-0 right-0 h-7 w-7 rounded-full flex items-center justify-center active:scale-[0.95] z-30 pointer-events-auto transition-transform"
                 style={{
                    background: 'rgba(0, 0, 0, 0.45)',
@@ -518,6 +536,8 @@ const ProfilePageV2Content: React.FC = () => {
                    WebkitBackdropFilter: 'blur(24px) saturate(180%)',
                    border: '1px solid rgba(255, 255, 255, 0.1)',
                    boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
+                   outline: '3px solid red',
+                   zIndex: 9999,
                 }}
                 aria-label="Change profile photo"
                 disabled={isUploadingAvatar}
@@ -1016,7 +1036,10 @@ const ProfilePageV2Content: React.FC = () => {
         ref={avatarFileInputRef}
         type="file"
         accept="image/*"
-        onChange={handleAvatarUpload}
+        onChange={(e) => {
+          console.log('[Avatar Camera] File input onChange fired — files:', e.target.files);
+          handleAvatarUpload(e);
+        }}
         className="hidden"
       />
       <input
