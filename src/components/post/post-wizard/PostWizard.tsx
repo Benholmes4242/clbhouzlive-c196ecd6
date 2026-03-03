@@ -824,8 +824,8 @@ export function PostWizard({
             />
 
             {/* Scrollable Composer — Changes 2-7 */}
-            <div className="flex-1 overflow-y-auto px-5 pt-4 pb-6" style={{ scrollbarWidth: 'none' }}>
-              <div className="max-w-[680px] mx-auto flex flex-col gap-3">
+            <div className="flex-1 overflow-y-auto px-4 pt-4 pb-6" style={{ scrollbarWidth: 'none' }}>
+              <div className="max-w-[680px] mx-auto flex flex-col" style={{ gap: '12px' }}>
 
                 {/* Change 2: Text Input Card */}
                 <div
@@ -863,19 +863,19 @@ export function PostWizard({
                     onFocusChange={setCaptionFocused}
                   />
 
-                  {/* Character counter — inside card, bottom-right */}
-                  {captionGraphemeCount > 0 && (
-                    <p
-                      className="text-[11px] font-semibold tabular-nums text-right mt-2"
-                      style={{
-                        color: captionGraphemeCount > POST_LIMITS.MAX_CAPTION_LENGTH * 0.95
-                          ? '#EF4444'
-                          : 'hsl(var(--muted-foreground) / 0.4)',
-                      }}
-                    >
-                      {captionGraphemeCount}/{POST_LIMITS.MAX_CAPTION_LENGTH}
-                    </p>
-                  )}
+                  {/* Character counter — inside card, bottom-right, fade in */}
+                  <p
+                    className="text-[11px] font-semibold tabular-nums text-right mt-2 transition-opacity duration-200"
+                    style={{
+                      color: captionGraphemeCount > POST_LIMITS.MAX_CAPTION_LENGTH * 0.95
+                        ? '#EF4444'
+                        : 'hsl(var(--muted-foreground) / 0.4)',
+                      opacity: captionGraphemeCount > 0 ? 1 : 0,
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    {captionGraphemeCount > 0 ? `${captionGraphemeCount}/${POST_LIMITS.MAX_CAPTION_LENGTH}` : '\u00A0'}
+                  </p>
                 </div>
 
                 {/* Change 3: Media Upload Area */}
@@ -883,10 +883,22 @@ export function PostWizard({
                   {state.mediaItems.length === 0 ? (
                     <button
                       onClick={() => handleAddMedia()}
-                      className="w-full flex flex-col items-center justify-center gap-3 rounded-2xl cursor-pointer transition-all active:scale-[0.985]"
+                      className="w-full flex flex-col items-center justify-center gap-3 rounded-2xl cursor-pointer transition-all duration-100 active:scale-[0.985]"
                       style={{
-                        background: 'hsl(var(--muted) / 0.5)',
-                        aspectRatio: '16 / 10',
+                        border: '2px dashed rgba(245, 158, 11, 0.2)',
+                        background: 'transparent',
+                        padding: '32px 0',
+                      }}
+                      onPointerDown={(e) => {
+                        const el = e.currentTarget;
+                        el.style.background = 'rgba(245, 158, 11, 0.04)';
+                      }}
+                      onPointerUp={(e) => {
+                        const el = e.currentTarget;
+                        setTimeout(() => { el.style.background = 'transparent'; }, 100);
+                      }}
+                      onPointerLeave={(e) => {
+                        e.currentTarget.style.background = 'transparent';
                       }}
                     >
                       {/* Gradient icon container */}
@@ -898,9 +910,14 @@ export function PostWizard({
                       >
                         <Image className="w-[26px] h-[26px]" style={{ color: '#f59e0b' }} />
                       </div>
-                      <span className="text-[15px] font-semibold text-foreground">
-                        Add photo or video
-                      </span>
+                      <div className="flex flex-col items-center gap-1">
+                        <span className="text-[14px] font-semibold text-foreground">
+                          Add photo or video
+                        </span>
+                        <span className="text-[12px] text-muted-foreground">
+                          Up to 10 photos & videos
+                        </span>
+                      </div>
                     </button>
                   ) : (
                     <div className="flex gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
@@ -923,8 +940,11 @@ export function PostWizard({
                       {state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT && (
                         <button
                           onClick={() => handleAddMedia()}
-                          className="flex-shrink-0 w-[160px] h-[160px] rounded-2xl flex items-center justify-center active:scale-[0.96] transition-transform"
-                          style={{ background: 'hsl(var(--muted) / 0.5)' }}
+                          className="flex-shrink-0 w-[160px] h-[160px] rounded-xl flex items-center justify-center active:scale-[0.96] transition-transform"
+                          style={{
+                            border: '2px dashed rgba(245, 158, 11, 0.2)',
+                            background: 'transparent',
+                          }}
                         >
                           <Plus className="w-6 h-6" style={{ color: '#f59e0b' }} />
                         </button>
@@ -936,109 +956,183 @@ export function PostWizard({
                 {/* Media counter */}
                 {state.mediaItems.length > 0 && (
                   <p
-                    className="text-[11px] font-medium tabular-nums text-center -mt-1"
+                    className="text-[12px] font-medium tabular-nums text-center"
                     style={{
                       color: state.mediaItems.length >= POST_LIMITS.MAX_MEDIA_COUNT
                         ? '#EF4444'
-                        : 'hsl(var(--muted-foreground) / 0.5)',
+                        : 'hsl(var(--muted-foreground))',
+                      marginTop: '0px',
+                      marginBottom: '0px',
                     }}
                   >
                     {state.mediaItems.length}/{POST_LIMITS.MAX_MEDIA_COUNT}
                   </p>
                 )}
 
-                {/* Change 4: Inline Course Selector Row */}
-                <button
-                  onClick={() => { dismissCourseTooltip(); setShowCourseSearch(true); }}
-                  className="w-full flex items-center justify-between rounded-2xl active:scale-[0.985] transition-transform"
-                  style={{
-                    padding: '14px 16px',
-                    background: state.selectedCourses.length > 0
-                      ? 'rgba(245,158,11,0.06)'
-                      : 'hsl(var(--muted) / 0.3)',
-                    borderLeft: state.selectedCourses.length > 0
-                      ? '3px solid #f59e0b'
-                      : '3px solid transparent',
-                  }}
-                >
-                  <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <MapPin className="w-5 h-5 flex-shrink-0" style={{ color: '#f59e0b' }} />
-                    {state.selectedCourses.length > 0 ? (
-                      <div className="flex flex-wrap gap-1.5 min-w-0">
-                        {state.selectedCourses.map((course) => (
-                          <span
-                            key={course.id}
-                            className="inline-flex items-center gap-1 text-[14px] font-semibold text-foreground"
-                          >
-                            <span className="truncate max-w-[200px]">{course.name}</span>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); removeCourse(course.id); }}
-                              className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center"
-                              style={{ background: 'hsl(var(--muted))' }}
-                            >
-                              <X className="w-3 h-3 text-muted-foreground" />
-                            </button>
-                          </span>
-                        ))}
-                      </div>
-                    ) : (
-                      <span className="text-[14px] font-medium text-muted-foreground">
-                        Tag a golf course
-                      </span>
-                    )}
-                  </div>
-                  <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }} />
-                </button>
-
-                {/* Change 4: Inline Tag People Row */}
-                <button
-                  onClick={() => { dismissFriendsTooltip(); setShowTagPeople(true); }}
-                  className="w-full flex items-center justify-between rounded-2xl active:scale-[0.985] transition-transform"
-                  style={{
-                    padding: '14px 16px',
-                    background: state.selectedTags.length > 0
-                      ? 'rgba(245,158,11,0.06)'
-                      : 'hsl(var(--muted) / 0.3)',
-                    borderLeft: state.selectedTags.length > 0
-                      ? '3px solid #f59e0b'
-                      : '3px solid transparent',
-                  }}
-                >
-                  <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <UserPlus className="w-5 h-5 flex-shrink-0" style={{ color: '#f59e0b' }} />
-                    {state.selectedTags.length > 0 ? (
-                      <div className="flex items-center gap-1.5">
-                        <div className="flex -space-x-1.5">
-                          {state.selectedTags.slice(0, 4).map((tag) => (
-                            <SquircleAvatar
-                              key={tag.id}
-                              size={24}
-                              src={tag.avatar_url}
-                              alt={tag.name}
-                              fallback={tag.name?.[0]?.toUpperCase() || '?'}
-                              hideRing
-                            />
-                          ))}
+                {/* Change 4: Tag Course + Tag People with divider */}
+                <div className="rounded-2xl overflow-hidden" style={{ background: 'transparent' }}>
+                  {/* Course Row */}
+                  <button
+                    onClick={() => { dismissCourseTooltip(); setShowCourseSearch(true); }}
+                    className="w-full flex items-center justify-between transition-colors duration-100 active:bg-muted/50"
+                    style={{
+                      padding: '12px 16px',
+                      borderRadius: state.selectedCourses.length > 0 ? '16px' : undefined,
+                      background: state.selectedCourses.length > 0
+                        ? 'rgba(245,158,11,0.04)'
+                        : 'transparent',
+                      borderLeft: state.selectedCourses.length > 0
+                        ? '3px solid #f59e0b'
+                        : '3px solid transparent',
+                    }}
+                  >
+                    <div className="flex items-start gap-3 min-w-0 flex-1">
+                      <MapPin className="w-[18px] h-[18px] flex-shrink-0 mt-0.5" style={{ color: '#f59e0b' }} />
+                      {state.selectedCourses.length > 0 ? (
+                        <div className="flex flex-col gap-2 min-w-0 flex-1">
+                          {state.selectedCourses.length === 1 ? (
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className="text-[14px] font-semibold text-foreground truncate">{state.selectedCourses[0].name}</span>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); removeCourse(state.selectedCourses[0].id); }}
+                                className="flex-shrink-0 transition-colors"
+                                style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }}
+                                onPointerDown={(e) => { (e.currentTarget as HTMLElement).style.color = 'hsl(var(--muted-foreground) / 0.7)'; }}
+                                onPointerUp={(e) => { (e.currentTarget as HTMLElement).style.color = 'hsl(var(--muted-foreground) / 0.4)'; }}
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="flex flex-wrap gap-1.5">
+                                {state.selectedCourses.map((course) => (
+                                  <span
+                                    key={course.id}
+                                    className="inline-flex items-center gap-1.5 rounded-full transition-transform active:scale-95"
+                                    style={{
+                                      padding: '6px 12px',
+                                      background: 'hsl(var(--muted) / 0.6)',
+                                      border: '1px solid hsl(var(--border) / 0.3)',
+                                    }}
+                                  >
+                                    <span className="text-[12px] font-medium text-foreground truncate max-w-[180px]">{course.name}</span>
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); removeCourse(course.id); }}
+                                      className="flex-shrink-0 transition-colors"
+                                      style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }}
+                                      onPointerDown={(e) => { (e.currentTarget as HTMLElement).style.color = 'hsl(var(--destructive) / 0.6)'; }}
+                                      onPointerUp={(e) => { (e.currentTarget as HTMLElement).style.color = 'hsl(var(--muted-foreground) / 0.4)'; }}
+                                    >
+                                      <X className="w-3.5 h-3.5" />
+                                    </button>
+                                  </span>
+                                ))}
+                              </div>
+                              <span className="text-[12px] font-medium" style={{ color: '#f59e0b' }}>+ Add course</span>
+                            </>
+                          )}
                         </div>
-                        <span className="text-[14px] font-semibold text-foreground">
-                          {state.selectedTags.length} tagged
+                      ) : (
+                        <span className="text-[14px] font-medium text-muted-foreground">
+                          Tag a golf course
                         </span>
-                      </div>
-                    ) : (
-                      <span className="text-[14px] font-medium text-muted-foreground">
-                        Tag people
-                      </span>
-                    )}
-                  </div>
-                  <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }} />
-                </button>
+                      )}
+                    </div>
+                    <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: 'hsl(var(--muted-foreground) / 0.3)' }} />
+                  </button>
+
+                  {/* Subtle divider */}
+                  <div className="mx-4" style={{ height: '1px', background: 'hsl(var(--border) / 0.2)' }} />
+
+                  {/* People Row */}
+                  <button
+                    onClick={() => { dismissFriendsTooltip(); setShowTagPeople(true); }}
+                    className="w-full flex items-center justify-between transition-colors duration-100 active:bg-muted/50"
+                    style={{
+                      padding: '12px 16px',
+                      borderRadius: state.selectedTags.length > 0 ? '16px' : undefined,
+                      background: state.selectedTags.length > 0
+                        ? 'rgba(245,158,11,0.04)'
+                        : 'transparent',
+                      borderLeft: state.selectedTags.length > 0
+                        ? '3px solid #f59e0b'
+                        : '3px solid transparent',
+                    }}
+                  >
+                    <div className="flex items-start gap-3 min-w-0 flex-1">
+                      <UserPlus className="w-[18px] h-[18px] flex-shrink-0 mt-0.5" style={{ color: '#f59e0b' }} />
+                      {state.selectedTags.length > 0 ? (
+                        <div className="flex flex-col gap-2 min-w-0 flex-1">
+                          {state.selectedTags.length === 1 ? (
+                            <div className="flex items-center gap-2 min-w-0">
+                              <SquircleAvatar
+                                size={24}
+                                src={state.selectedTags[0].avatar_url}
+                                alt={state.selectedTags[0].name}
+                                fallback={state.selectedTags[0].name?.[0]?.toUpperCase() || '?'}
+                                hideRing
+                              />
+                              <span className="text-[14px] font-semibold text-foreground truncate">{state.selectedTags[0].name}</span>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const tag = state.selectedTags[0];
+                                  const mentionText = `@${(tag.username || tag.name).replace(/\s+/g, '')}`;
+                                  const escapeRegex = mentionText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                                  const removeRegex = new RegExp(`\\s*${escapeRegex}`, 'gi');
+                                  const newCaption = state.caption.replace(removeRegex, '').trim();
+                                  setCaption(newCaption);
+                                  setTags(state.selectedTags.filter(t => t.id !== tag.id));
+                                }}
+                                className="flex-shrink-0 transition-colors"
+                                style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }}
+                                onPointerDown={(e) => { (e.currentTarget as HTMLElement).style.color = 'hsl(var(--muted-foreground) / 0.7)'; }}
+                                onPointerUp={(e) => { (e.currentTarget as HTMLElement).style.color = 'hsl(var(--muted-foreground) / 0.4)'; }}
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="flex items-center gap-2">
+                                <div className="flex" style={{ marginLeft: 0 }}>
+                                  {state.selectedTags.slice(0, 3).map((tag, i) => (
+                                    <div key={tag.id} style={{ marginLeft: i === 0 ? 0 : -8, zIndex: 3 - i }}>
+                                      <SquircleAvatar
+                                        size={24}
+                                        src={tag.avatar_url}
+                                        alt={tag.name}
+                                        fallback={tag.name?.[0]?.toUpperCase() || '?'}
+                                        hideRing
+                                      />
+                                    </div>
+                                  ))}
+                                </div>
+                                <span className="text-[14px] font-medium text-foreground">
+                                  {state.selectedTags.length} tagged
+                                </span>
+                              </div>
+                              <span className="text-[12px] font-medium" style={{ color: '#f59e0b' }}>+ Tag more</span>
+                            </>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-[14px] font-medium text-muted-foreground">
+                          Tag people
+                        </span>
+                      )}
+                    </div>
+                    <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: 'hsl(var(--muted-foreground) / 0.3)' }} />
+                  </button>
+                </div>
 
               </div>
             </div>
 
             {/* Change 5: Simplified Bottom Toolbar — 3 icons only */}
             <div
-              className="flex-shrink-0 flex items-center px-5 pt-2.5"
+              className="flex-shrink-0 flex items-center px-4 pt-2.5"
               style={{
                 borderTop: '0.5px solid hsl(var(--border) / 0.3)',
                 paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 28px)',
