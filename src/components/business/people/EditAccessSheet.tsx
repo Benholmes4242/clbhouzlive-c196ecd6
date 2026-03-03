@@ -55,24 +55,24 @@ export function EditAccessSheet({
 
   return (
     <Sheet open={!!member} onOpenChange={(open) => !open && onOpenChange(false)}>
-      <SheetContent side="bottom" className="rounded-t-[20px] px-5 pb-8">
+      <SheetContent side="bottom" className="rounded-t-[20px] px-5" style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom, 0px))' }}>
         {/* Drag handle */}
         <div className="flex justify-center pt-2.5 pb-1">
           <div className="w-9 h-1 rounded-full bg-muted-foreground/30" />
         </div>
 
-        <SheetHeader className="pb-4">
-          <SheetTitle>Edit access</SheetTitle>
+        <SheetHeader className="pb-0">
+          <SheetTitle className="text-lg font-semibold text-foreground">Edit access</SheetTitle>
         </SheetHeader>
 
         {profile && (
           <div className="space-y-6">
             {/* User display */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 mt-4">
               <SquircleAvatar src={profile.profile_photo_url} alt={profile.display_name || 'Member'} size={48} />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1">
-                  <span className="font-medium truncate">
+                  <span className="text-base font-medium text-foreground truncate">
                     {profile.display_name || profile.username || 'Unknown'}
                   </span>
                   {profile.is_verified_golfer && <VerifiedBadge size="sm" />}
@@ -84,8 +84,8 @@ export function EditAccessSheet({
             </div>
 
             {/* Access level */}
-            <div className="space-y-2">
-              <Label className="text-sm text-muted-foreground">Access level</Label>
+            <div className="space-y-3 mt-6">
+              <Label className="text-sm font-semibold text-foreground">Access level</Label>
               <RadioGroup value={editAccess} onValueChange={setEditAccess}>
                 {availableAccessOptions.map((opt) => (
                   <label key={opt.value} htmlFor={`${idPrefix}-${opt.value}`} className="flex items-start gap-3 py-3 min-h-[44px] cursor-pointer">
@@ -100,8 +100,8 @@ export function EditAccessSheet({
             </div>
 
             {/* Display title */}
-            <div className="space-y-1.5">
-              <Label className="text-sm text-muted-foreground font-medium">Display title</Label>
+            <div className="space-y-1.5 mt-6">
+              <Label className="text-sm font-semibold text-foreground">Display title</Label>
               <Input
                 placeholder="e.g. Head Professional, Director of Golf"
                 value={editDisplayTitle}
