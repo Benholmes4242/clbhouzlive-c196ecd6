@@ -154,7 +154,7 @@ const BestCallLine: React.FC<{
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4, delay: 0.7 }}
-      style={{ fontSize: 13, lineHeight: 1.4, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 4 }}
+      style={{ fontSize: 13, lineHeight: 1.4, marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}
     >
       <span style={{ fontSize: 14, color: '#16A34A', lineHeight: 1 }}>★</span>
       <span className="text-foreground" style={{ fontWeight: 700 }}>Best call</span>
