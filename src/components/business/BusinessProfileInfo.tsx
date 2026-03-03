@@ -60,7 +60,7 @@ export function BusinessProfileInfo({ business, canManage }: BusinessProfileInfo
                 </button>
               </div>
             )}
-            <ExpandableText text={business.description} lines={4} />
+            <BioText text={business.description} />
           </section>
         )}
 
