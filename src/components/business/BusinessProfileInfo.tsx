@@ -1,60 +1,140 @@
 import React, { useState } from 'react';
-import { Phone, Mail, Globe, MapPin, Building2, Calendar, Pencil } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Phone, Mail, Globe, MapPin, Building2, Calendar, Pencil, ArrowUpRight } from 'lucide-react';
 import { BusinessProfile } from '@/hooks/useBusinessProfile';
 import { format } from 'date-fns';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { useNavigate } from 'react-router-dom';
-
-const BIO_CHAR_LIMIT = 200;
-
-function BioText({ text }: { text: string }) {
-  const [expanded, setExpanded] = useState(false);
-  const shouldTruncate = text.length > BIO_CHAR_LIMIT;
-  const displayText = !expanded && shouldTruncate ? text.slice(0, BIO_CHAR_LIMIT).trimEnd() + '…' : text;
-
-  return (
-    <div>
-      <p className="text-sm leading-relaxed text-foreground whitespace-pre-wrap" style={{ overflowWrap: 'anywhere' }}>
-        {displayText}
-      </p>
-      {shouldTruncate && (
-        <button
-          type="button"
-          onClick={() => setExpanded(v => !v)}
-          className="text-[0.8125rem] font-medium text-muted-foreground mt-1 min-h-[44px] active:scale-95 transition-transform"
-        >
-          {expanded ? 'Show less' : 'Show more'}
-        </button>
-      )}
-    </div>
-  );
-}
 
 interface BusinessProfileInfoProps {
   business: BusinessProfile;
   canManage?: boolean;
 }
 
+/* ── Bio with Show more / Show less ── */
+const BIO_CHAR_LIMIT = 200;
+
+function BioSection({ text, canManage, onEdit }: { text: string; canManage?: boolean; onEdit: () => void }) {
+  const [expanded, setExpanded] = useState(false);
+  const shouldTruncate = text.length > BIO_CHAR_LIMIT;
+  const displayText = !expanded && shouldTruncate ? text.slice(0, BIO_CHAR_LIMIT).trimEnd() + '…' : text;
+
+  return (
+    <section className="px-6 pb-8">
+      <p
+        className="text-base leading-relaxed text-foreground whitespace-pre-wrap"
+        style={{ overflowWrap: 'anywhere' }}
+      >
+        {displayText}
+      </p>
+
+      <div className="flex items-center gap-4 mt-2">
+        {shouldTruncate && (
+          <button
+            type="button"
+            onClick={() => setExpanded(v => !v)}
+            className="text-[0.8125rem] font-semibold text-amber-500 min-h-[44px] flex items-center active:scale-95 transition-transform"
+          >
+            {expanded ? 'Show less' : 'Show more'}
+          </button>
+        )}
+        {canManage && (
+          <button
+            type="button"
+            onClick={onEdit}
+            className="text-[0.8125rem] font-medium text-muted-foreground min-h-[44px] flex items-center gap-1 active:scale-95 transition-transform"
+          >
+            <Pencil className="h-3.5 w-3.5 opacity-60" />
+            Edit
+          </button>
+        )}
+      </div>
+    </section>
+  );
+}
+
+/* ── Thin section divider ── */
+function SectionDivider() {
+  return <div className="mx-6 h-px bg-border/40" />;
+}
+
+/* ── Section eyebrow heading ── */
+function SectionHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+      {children}
+    </h2>
+  );
+}
+
+/* ── Contact row ── */
+function ContactRow({
+  icon: Icon,
+  value,
+  label,
+  onClick,
+  isLink = false,
+}: {
+  icon: React.ElementType;
+  value: string;
+  label: string;
+  onClick?: () => void;
+  isLink?: boolean;
+}) {
+  const Wrapper = onClick ? 'button' : 'div';
+  return (
+    <Wrapper
+      {...(onClick ? { type: 'button' as const, onClick } : {})}
+      className="flex items-start gap-3 w-full text-left min-h-[44px] py-1.5 active:opacity-70 transition-opacity"
+    >
+      <Icon className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+      <div className="min-w-0 flex-1">
+        <p className={`text-sm font-medium truncate ${isLink ? 'text-amber-500' : 'text-foreground'}`}>
+          {value}
+          {isLink && <ArrowUpRight className="inline h-3 w-3 ml-0.5 opacity-70" />}
+        </p>
+        <p className="text-xs text-muted-foreground">{label}</p>
+      </div>
+    </Wrapper>
+  );
+}
+
+/* ── Detail row (Business Details section) ── */
+function DetailRow({
+  icon: Icon,
+  value,
+  label,
+}: {
+  icon: React.ElementType;
+  value: React.ReactNode;
+  label: string;
+}) {
+  return (
+    <div className="flex items-start gap-3 py-1.5">
+      <Icon className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+      <div>
+        <p className="text-sm font-medium text-foreground">{value}</p>
+        <p className="text-xs text-muted-foreground">{label}</p>
+      </div>
+    </div>
+  );
+}
+
+/* ── Main component ── */
 export function BusinessProfileInfo({ business, canManage }: BusinessProfileInfoProps) {
   const navigate = useNavigate();
 
   const handleCall = () => {
-    if (business.phone) {
-      window.location.href = `tel:${business.phone}`;
-    }
+    if (business.phone) window.location.href = `tel:${business.phone}`;
   };
 
   const handleEmail = () => {
-    if (business.email) {
-      window.location.href = `mailto:${business.email}`;
-    }
+    if (business.email) window.location.href = `mailto:${business.email}`;
   };
 
   const handleWebsite = () => {
     if (business.website) {
-      const url = business.website.startsWith('http') 
-        ? business.website 
+      const url = business.website.startsWith('http')
+        ? business.website
         : `https://${business.website}`;
       window.open(url, '_blank', 'noopener,noreferrer');
     }
@@ -67,157 +147,107 @@ export function BusinessProfileInfo({ business, canManage }: BusinessProfileInfo
     }
   };
 
+  const handleEdit = () => navigate(`/business/${business.id}/edit`);
+
+  // Shorten location: prefer "City, Country" or fall back to full location
+  const shortLocation =
+    business.city && business.country
+      ? `${business.city}, ${business.country}`
+      : business.location || null;
+
+  const hasContact = business.phone || business.email || business.website;
+  const showCategory = business.category && business.category !== 'Other';
+
   return (
-    <div className="-mx-5 px-0 pb-8 bg-background">
-      <div className="flex flex-col gap-3">
-        {/* About — tab label provides heading, body text starts immediately */}
-        {business.description && (
-          <section className="p-4 space-y-3">
-            {canManage && (
-              <div className="flex justify-end">
+    <div className="-mx-5 px-0 pb-20 bg-background">
+      {/* Bio */}
+      {business.description && (
+        <BioSection text={business.description} canManage={canManage} onEdit={handleEdit} />
+      )}
+
+      {/* Contact */}
+      {hasContact && (
+        <>
+          <SectionDivider />
+          <section className="px-6 py-5">
+            <SectionHeading>Contact</SectionHeading>
+            <div className="flex flex-col divide-y divide-border/30">
+              {business.phone && (
+                <ContactRow icon={Phone} value={business.phone} label="Phone" onClick={handleCall} />
+              )}
+              {business.email && (
+                <ContactRow icon={Mail} value={business.email} label="Email" onClick={handleEmail} isLink />
+              )}
+              {business.website && (
+                <ContactRow
+                  icon={Globe}
+                  value={business.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                  label="Website"
+                  onClick={handleWebsite}
+                  isLink
+                />
+              )}
+            </div>
+          </section>
+        </>
+      )}
+
+      {/* Location */}
+      {shortLocation && (
+        <>
+          <SectionDivider />
+          <section className="px-6 py-5">
+            <SectionHeading>Location</SectionHeading>
+            <div className="flex items-start gap-3">
+              <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+              <div>
+                <p className="text-sm font-medium text-foreground">{shortLocation}</p>
                 <button
-                  onClick={() => navigate(`/business/${business.id}/edit`)}
-                  className="min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground active:opacity-70 transition-opacity"
-                  aria-label="Edit business info"
+                  type="button"
+                  onClick={handleDirections}
+                  className="text-[0.8125rem] font-semibold text-amber-500 mt-1 min-h-[44px] flex items-center gap-0.5 active:scale-95 transition-transform"
                 >
-                  <Pencil className="h-4 w-4" />
+                  Get directions
+                  <ArrowUpRight className="h-3.5 w-3.5 opacity-70" />
                 </button>
               </div>
-            )}
-            <BioText text={business.description} />
-          </section>
-        )}
-
-        {/* Contact */}
-        <section className="p-4 space-y-3">
-          <h2 className="text-[17px] font-semibold text-foreground">Contact</h2>
-          <div className="space-y-2">
-            {business.phone && (
-              <button 
-                onClick={handleCall}
-                className="flex items-center gap-3 w-full text-left hover:bg-muted rounded-sq-sm p-2.5 min-h-[44px] active:scale-[0.98] transition-all"
-              >
-                <div className="h-10 w-10 rounded-full bg-muted border border-border flex items-center justify-center">
-                  <Phone className="h-4 w-4 text-muted-foreground" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">{business.phone}</p>
-                  <p className="text-xs text-muted-foreground">Phone</p>
-                </div>
-              </button>
-            )}
-            
-            {business.email && (
-              <button 
-                onClick={handleEmail}
-                className="flex items-center gap-3 w-full text-left hover:bg-muted rounded-sq-sm p-2.5 min-h-[44px] active:scale-[0.98] transition-all"
-              >
-                <div className="h-10 w-10 rounded-full bg-muted border border-border flex items-center justify-center">
-                  <Mail className="h-4 w-4 text-muted-foreground" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">{business.email}</p>
-                  <p className="text-xs text-muted-foreground">Email</p>
-                </div>
-              </button>
-            )}
-            
-            {business.website && (
-              <button 
-                onClick={handleWebsite}
-                className="flex items-center gap-3 w-full text-left hover:bg-muted rounded-sq-sm p-2.5 min-h-[44px] active:scale-[0.98] transition-all"
-              >
-                <div className="h-10 w-10 rounded-full bg-muted border border-border flex items-center justify-center">
-                  <Globe className="h-4 w-4 text-muted-foreground" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">
-                    {business.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
-                  </p>
-                  <p className="text-xs text-muted-foreground">Website</p>
-                </div>
-              </button>
-            )}
-
-            {!business.phone && !business.email && !business.website && (
-              <p className="text-sm text-muted-foreground italic">No contact information available.</p>
-            )}
-          </div>
-        </section>
-
-        {/* Location */}
-        <section className="p-4 space-y-3">
-          <h2 className="text-[17px] font-semibold text-foreground">Location</h2>
-          {business.location ? (
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="h-10 w-10 rounded-full bg-muted border border-border flex items-center justify-center flex-shrink-0">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">{business.location}</p>
-                  <p className="text-xs text-muted-foreground">Address</p>
-                </div>
-              </div>
-              
-              <Button 
-                variant="outline" 
-                onClick={handleDirections} 
-                className="h-11 rounded-full w-full sm:w-auto text-foreground border-border hover:bg-muted active:scale-[0.97] transition-all font-semibold"
-              >
-                <MapPin className="h-4 w-4 mr-2" />
-                Get directions
-              </Button>
             </div>
-          ) : (
-            <p className="text-sm text-muted-foreground italic">No location information available.</p>
-          )}
-        </section>
+          </section>
+        </>
+      )}
 
-        {/* Business Details */}
-        <section className="p-4 space-y-3">
-          <h2 className="text-[17px] font-semibold text-foreground">Business Details</h2>
-          <div className="space-y-2">
-            {business.category && (
-              <div className="flex items-center gap-3 p-2.5 min-h-[44px]">
-                <div className="h-10 w-10 rounded-full bg-muted border border-border flex items-center justify-center">
-                  <Building2 className="h-4 w-4 text-muted-foreground" />
+      {/* Business Details */}
+      {(showCategory || business.is_verified || business.created_at) && (
+        <>
+          <SectionDivider />
+          <section className="px-6 py-5">
+            <SectionHeading>Business Details</SectionHeading>
+            <div className="flex flex-col gap-1">
+              {showCategory && (
+                <DetailRow icon={Building2} value={business.category!} label="Category" />
+              )}
+              {business.is_verified && (
+                <div className="flex items-start gap-3 py-1.5">
+                  <div className="mt-0.5 shrink-0">
+                    <VerifiedBadge size="sm" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Verified Business</p>
+                    <p className="text-xs text-muted-foreground">Verified by clbhouz</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">{business.category}</p>
-                  <p className="text-xs text-muted-foreground">Category</p>
-                </div>
-              </div>
-            )}
-            
-            {business.is_verified && (
-              <div className="flex items-center gap-3 p-2.5 min-h-[44px]">
-                <div className="h-10 w-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                  <VerifiedBadge size="lg" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">Verified Business</p>
-                  <p className="text-xs text-muted-foreground">This business has been verified by clbhouz</p>
-                </div>
-              </div>
-            )}
-            
-            {business.created_at && (
-              <div className="flex items-center gap-3 p-2.5 min-h-[44px]">
-                <div className="h-10 w-10 rounded-full bg-muted border border-border flex items-center justify-center">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">
-                    {format(new Date(business.created_at), 'MMMM yyyy')}
-                  </p>
-                  <p className="text-xs text-muted-foreground">Member since</p>
-                </div>
-              </div>
-            )}
-          </div>
-        </section>
-      </div>
+              )}
+              {business.created_at && (
+                <DetailRow
+                  icon={Calendar}
+                  value={format(new Date(business.created_at), 'MMMM yyyy')}
+                  label="Member since"
+                />
+              )}
+            </div>
+          </section>
+        </>
+      )}
     </div>
   );
 }
