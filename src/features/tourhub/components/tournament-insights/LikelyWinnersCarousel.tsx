@@ -134,7 +134,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                     alt={pick.name}
                     className="w-full h-full object-cover"
                     style={{
-                      objectPosition: 'center 20%',
+                      objectPosition: 'center 15%',
                       borderRadius: '22px 22px 0 0',
                       opacity: pick.isWithdrawn ? 0.4 : 1,
                     }}
@@ -143,14 +143,6 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                     onError={() => handleImageError(pick.id)}
                   />
                 )}
-
-                {/* Fade gradient — subtle, only at bottom edge */}
-                <div
-                  className="absolute inset-0 pointer-events-none"
-                  style={{
-                    background: 'linear-gradient(to bottom, transparent 55%, hsl(var(--background)) 95%)',
-                  }}
-                />
 
                 {/* WD badge */}
                 {pick.isWithdrawn && (
