@@ -209,6 +209,8 @@ export const TournamentInsights = memo(function TournamentInsights() {
                 featured={insightsData.winners[0]}
                 cards={insightsData.contenderCards}
                 withdrawnPlayerIds={withdrawnPlayerIds}
+                courseName={insightsData.tournament.courseName}
+                tournamentName={insightsData.tournament.name}
               />
             )}
           </motion.div>
