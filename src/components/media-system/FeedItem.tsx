@@ -24,7 +24,6 @@ export function FeedItem({ post, index, isActive, observe, unobserve }: FeedItem
     return () => unobserve(el);
   }, [index, observe, unobserve]);
 
-  // Use first media item for Phase 1
   const media = post.mediaItems[0];
   if (!media) return null;
 
@@ -40,6 +39,7 @@ export function FeedItem({ post, index, isActive, observe, unobserve }: FeedItem
           feedIndex={index}
           isActive={isActive}
           thumbnailUrl={media.thumbnailUrl}
+          duration={media.duration}
         />
       ) : media.imageUrl ? (
         <div className="w-full h-full flex items-center justify-center bg-black">
@@ -52,11 +52,9 @@ export function FeedItem({ post, index, isActive, observe, unobserve }: FeedItem
         </div>
       ) : null}
 
-      {/* Caption overlay — bottom left */}
+      {/* Caption overlay */}
       {post.caption && (
-        <div
-          className="absolute bottom-8 left-4 right-16 z-20 pointer-events-none"
-        >
+        <div className="absolute bottom-8 left-4 right-16 z-20 pointer-events-none">
           <p className="text-white text-sm font-medium leading-snug drop-shadow-lg line-clamp-3">
             {post.caption}
           </p>

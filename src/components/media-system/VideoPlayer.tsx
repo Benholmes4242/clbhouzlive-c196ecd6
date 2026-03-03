@@ -1,11 +1,14 @@
 /**
- * VideoPlayer — requests a pool element, positions it, handles canplay.
- * Shows LoadingSkeleton until video is ready to play.
+ * VideoPlayer — requests a pool element, handles playing/error/loop lifecycle.
+ * Uses 'playing' event for skeleton transition (not canplay/loadeddata).
+ * Integrates gapless loop hook for seamless looping.
  */
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useVideoPoolContext } from './VideoPoolProvider';
 import { useMediaStore } from './store/mediaStore';
+import { useGaplessLoop } from './hooks/useGaplessLoop';
 import { LoadingSkeleton } from './LoadingSkeleton';
+import { ErrorState } from './ErrorState';
 import { Scrubber } from './Scrubber';
 import { Play, Pause } from 'lucide-react';
 
@@ -14,27 +17,32 @@ interface VideoPlayerProps {
   feedIndex: number;
   isActive: boolean;
   thumbnailUrl?: string;
+  duration?: number;
 }
 
-export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl }: VideoPlayerProps) {
+export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl, duration: mediaDuration }: VideoPlayerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
   const [showPlayIcon, setShowPlayIcon] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [videoDuration, setVideoDuration] = useState<number | null>(mediaDuration ?? null);
   const pool = useVideoPoolContext();
   const isMuted = useMediaStore((s) => s.isMuted);
 
-  // Assign/release pool element based on active state
+  // Gapless loop
+  useGaplessLoop(videoRef, isActive && !isLoading && !hasError, videoDuration);
+
+  // Assign/release pool element
   useEffect(() => {
     if (!isActive || !containerRef.current) {
-      // Pause if we have a video ref
       if (videoRef.current) {
         videoRef.current.pause();
         setIsPlaying(false);
       }
-      // Reset loading state so skeleton is ready for re-activation
       setIsLoading(true);
+      setHasError(false);
       videoRef.current = null;
       return;
     }
@@ -46,75 +54,49 @@ export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl }: Video
       if (!container || cancelled) return;
 
       setIsLoading(true);
-      const video = await pool.assign(hlsUrl, feedIndex, container);
-      if (cancelled || !video) return;
+      setHasError(false);
 
+      const video = await pool.assign(
+        hlsUrl,
+        feedIndex,
+        container,
+        // onPlaying callback — skeleton crossfade
+        () => {
+          if (cancelled) return;
+          setIsLoading(false);
+          setIsPlaying(true);
+          // Capture duration
+          if (video && video.duration && isFinite(video.duration)) {
+            setVideoDuration(video.duration);
+          }
+        },
+        // onError callback
+        () => {
+          if (cancelled) return;
+          setIsLoading(false);
+          setHasError(true);
+          useMediaStore.getState().markError(feedIndex);
+        }
+      );
+
+      if (cancelled || !video) return;
       videoRef.current = video;
       video.muted = isMuted;
 
-      const onReady = () => {
-        if (cancelled) return;
+      // If already playing (cache hit), update state
+      if (!video.paused && video.readyState >= 3) {
         setIsLoading(false);
-        video.play().then(() => {
-          if (!cancelled) setIsPlaying(true);
-        }).catch(() => {});
-      };
-
-      // Looping: when video ends, reset to start and replay
-      const onEnded = () => {
-        if (cancelled) return;
-        video.currentTime = 0;
-        video.play().catch(() => {});
-      };
-
-      // Listen for both canplay and loadeddata as fallbacks
-      const onCanPlay = () => {
-        video.removeEventListener('loadeddata', onLoadedData);
-        clearTimeout(safetyTimeout);
-        onReady();
-      };
-
-      const onLoadedData = () => {
-        video.removeEventListener('canplay', onCanPlay);
-        clearTimeout(safetyTimeout);
-        onReady();
-      };
-
-      // Safety timeout: if neither event fires within 5s, force reveal
-      const safetyTimeout = setTimeout(() => {
-        video.removeEventListener('canplay', onCanPlay);
-        video.removeEventListener('loadeddata', onLoadedData);
-        onReady();
-      }, 5000);
-
-      video.addEventListener('ended', onEnded);
-
-      // Check if already ready (cache hit — element may already have data loaded)
-      if (video.readyState >= 3) {
-        clearTimeout(safetyTimeout);
-        onReady();
-      } else {
-        video.addEventListener('canplay', onCanPlay, { once: true });
-        video.addEventListener('loadeddata', onLoadedData, { once: true });
+        setIsPlaying(true);
+        if (video.duration && isFinite(video.duration)) {
+          setVideoDuration(video.duration);
+        }
       }
-
-      // Cleanup function to remove all listeners on deactivation
-      return () => {
-        video.removeEventListener('ended', onEnded);
-        video.removeEventListener('canplay', onCanPlay);
-        video.removeEventListener('loadeddata', onLoadedData);
-        clearTimeout(safetyTimeout);
-      };
     };
 
-    let cleanupListeners: (() => void) | undefined;
-    activate().then((cleanup) => {
-      cleanupListeners = cleanup;
-    });
+    activate();
 
     return () => {
       cancelled = true;
-      cleanupListeners?.();
     };
   }, [isActive, hlsUrl, feedIndex, pool]);
 
@@ -125,8 +107,47 @@ export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl }: Video
     }
   }, [isMuted, isActive]);
 
+  // Retry handler
+  const handleRetry = useCallback(() => {
+    setHasError(false);
+    setIsLoading(true);
+    useMediaStore.getState().clearError(feedIndex);
+    useMediaStore.getState().markRetrying(feedIndex);
+
+    // Re-trigger by toggling active state via re-mount
+    // Force re-assign by releasing and re-acquiring
+    const container = containerRef.current;
+    if (!container) return;
+
+    pool.assign(
+      hlsUrl,
+      feedIndex,
+      container,
+      () => {
+        setIsLoading(false);
+        setIsPlaying(true);
+        useMediaStore.getState().clearRetrying(feedIndex);
+        if (videoRef.current?.duration && isFinite(videoRef.current.duration)) {
+          setVideoDuration(videoRef.current.duration);
+        }
+      },
+      () => {
+        setIsLoading(false);
+        setHasError(true);
+        useMediaStore.getState().clearRetrying(feedIndex);
+        useMediaStore.getState().markError(feedIndex);
+      }
+    ).then((video) => {
+      if (video) {
+        videoRef.current = video;
+        video.muted = useMediaStore.getState().isMuted;
+      }
+    });
+  }, [hlsUrl, feedIndex, pool]);
+
   // Tap to toggle play/pause
   const handleTap = useCallback(() => {
+    if (hasError) return; // ErrorState handles its own tap
     const video = videoRef.current;
     if (!video || !isActive) return;
 
@@ -140,7 +161,7 @@ export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl }: Video
 
     setShowPlayIcon(true);
     setTimeout(() => setShowPlayIcon(false), 800);
-  }, [isActive]);
+  }, [isActive, hasError]);
 
   return (
     <div
@@ -148,21 +169,17 @@ export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl }: Video
       className="relative w-full h-full"
       onClick={handleTap}
     >
-      {/* Poster image while loading */}
-      {thumbnailUrl && isLoading && (
-        <img
-          src={thumbnailUrl}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover z-[5]"
-          draggable={false}
-        />
-      )}
+      {/* Poster-first loading: show thumbnail as background while loading */}
+      <LoadingSkeleton
+        visible={isLoading && !hasError}
+        posterUrl={thumbnailUrl}
+      />
 
-      {/* Shimmer skeleton */}
-      <LoadingSkeleton visible={isLoading} />
+      {/* Error state */}
+      {hasError && <ErrorState onRetry={handleRetry} />}
 
       {/* Play/Pause overlay */}
-      {showPlayIcon && (
+      {showPlayIcon && !hasError && (
         <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none">
           <div
             className="w-16 h-16 rounded-full flex items-center justify-center"
@@ -192,7 +209,7 @@ export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl }: Video
       )}
 
       {/* Scrubber */}
-      <Scrubber videoElement={isActive ? videoRef.current : null} />
+      <Scrubber videoElement={isActive && !hasError ? videoRef.current : null} />
     </div>
   );
 }
