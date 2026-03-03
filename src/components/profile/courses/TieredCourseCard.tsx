@@ -5,7 +5,7 @@
  */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Trophy } from 'lucide-react';
+import { Calendar, Trophy, ChevronRight } from 'lucide-react';
 import { RatingPill } from '@/components/ui/RatingPill';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
