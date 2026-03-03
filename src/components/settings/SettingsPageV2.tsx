@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   User, Mail, AtSign, Sparkles, EyeOff, ExternalLink, 
   ShieldBan, Bell, Lock, HelpCircle, MessageSquare, 
-  Headphones, FileText, Shield, ScrollText, Trash2, ArrowLeft,
+  Headphones, FileText, Shield, ScrollText, Trash2, ChevronLeft,
   Smartphone, Eye, CheckCircle2
 } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
@@ -916,13 +916,13 @@ function SettingsHeader({ onBack }: { onBack: () => void }) {
         paddingTop: 'max(env(safe-area-inset-top), 0px)',
       }}
     >
-      {/* Back button - pill style */}
-      <div className="pt-4 pb-3 px-4">
+      {/* Back link — matches tour player page pattern */}
+      <div className="px-4" style={{ padding: '12px 16px 8px 16px' }}>
         <button
           onClick={onBack}
-          className="inline-flex items-center gap-1 px-3 min-h-[44px] text-sm font-medium text-muted-foreground bg-muted hover:bg-muted/80 rounded-full transition-all active:opacity-70 active:scale-[0.97]"
+          className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity min-h-[44px]"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ChevronLeft size={14} />
           Back
         </button>
       </div>
