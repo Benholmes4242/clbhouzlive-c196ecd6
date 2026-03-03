@@ -139,7 +139,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
         isDragging ? 'shadow-lg' : ''
       }`}
     >
-      {/* Drag handle - centered vertically */}
+      {/* Drag handle */}
       <div 
         {...attributes}
         {...listeners}
@@ -148,20 +148,36 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
         <GripVertical className="w-5 h-5 text-muted-foreground/50" />
       </div>
 
-      {/* Position badge - gold/silver/bronze/slate */}
-      <div 
-        className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
-        style={{
-          background: badgeStyle.bg,
-          boxShadow: badgeStyle.shadow,
-        }}
-      >
-        <span 
-          className="text-xs font-bold"
-          style={{ color: badgeStyle.text }}
+      {/* Thumbnail with rank badge overlay */}
+      <div className="relative flex-shrink-0">
+        {course.thumbnail_image ? (
+          <img
+            src={course.thumbnail_image}
+            alt={course.name}
+            loading="lazy"
+            decoding="async"
+            className="w-14 h-14 object-cover rounded-[10px]"
+          />
+        ) : (
+          <div className="w-14 h-14 rounded-[10px] bg-muted flex items-center justify-center">
+            <Trophy className="w-5 h-5 text-muted-foreground/40" />
+          </div>
+        )}
+        {/* Rank badge - overlapping top-left */}
+        <div 
+          className="absolute -top-1.5 -left-1.5 w-6 h-6 rounded-full flex items-center justify-center border-2 border-card"
+          style={{
+            background: badgeStyle.bg,
+            boxShadow: badgeStyle.shadow,
+          }}
         >
-          #{position}
-        </span>
+          <span 
+            className="text-[10px] font-bold leading-none"
+            style={{ color: badgeStyle.text }}
+          >
+            {position}
+          </span>
+        </div>
       </div>
 
       {/* Course info */}
@@ -180,6 +196,13 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
         <div className="text-xs text-muted-foreground truncate">
           {course.sub_country || course.country}
         </div>
+        {course.rating != null && (
+          <div className="flex items-center mt-0.5">
+            <span className="text-xs text-foreground font-medium">
+              {typeof course.rating === 'number' ? course.rating.toFixed(1) : course.rating}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Reorder buttons */}
@@ -187,7 +210,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
         <button
           onClick={() => onMoveUp(index)}
           disabled={index === 0 || isReordering}
-          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.95]"
+          className="min-h-[32px] min-w-[32px] flex items-center justify-center rounded hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.95]"
           aria-label="Move up"
         >
           <ChevronUp className="w-4 h-4 text-muted-foreground" />
@@ -195,7 +218,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
         <button
           onClick={() => onMoveDown(index)}
           disabled={index === totalItems - 1 || isReordering}
-          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.95]"
+          className="min-h-[32px] min-w-[32px] flex items-center justify-center rounded hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.95]"
           aria-label="Move down"
         >
           <ChevronDown className="w-4 h-4 text-muted-foreground" />
@@ -206,7 +229,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
       <button
         onClick={() => onRemove(course.course_id)}
         disabled={isRemoving}
-        className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-destructive/10 text-destructive/70 hover:text-destructive transition-colors disabled:opacity-50 active:scale-[0.95]"
+        className="min-h-[44px] min-w-[32px] flex items-center justify-center rounded-lg hover:bg-destructive/10 text-destructive/70 hover:text-destructive transition-colors disabled:opacity-50 active:scale-[0.95]"
         aria-label="Remove from Top 10"
       >
         <Trash2 className="w-4 h-4" />
@@ -697,8 +720,7 @@ const CourseRow: React.FC<CourseRowProps> = ({
         {course.sub_country || course.country}
       </div>
       {course.has_rating && course.rating_value && (
-        <div className="flex items-center gap-1 mt-0.5">
-          <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+        <div className="flex items-center mt-0.5">
           <span className="text-xs text-foreground font-medium">
             {course.rating_value.toFixed(1)}
           </span>
