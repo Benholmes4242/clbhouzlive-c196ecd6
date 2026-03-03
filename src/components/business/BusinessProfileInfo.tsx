@@ -31,9 +31,13 @@ function BioSection({ text }: { text: string }) {
         <button
           type="button"
           onClick={() => setExpanded(v => !v)}
-          className="text-[0.8125rem] font-medium text-amber-600 mt-1 active:scale-95 transition-transform"
+          className="mt-1 text-[0.8125rem] font-medium text-muted-foreground flex items-center gap-0.5 transition-colors min-h-[44px] active:scale-95 transition-transform"
+          aria-expanded={expanded}
         >
-          {expanded ? 'Show less' : 'Show more'}
+          {expanded ? 'Show less' : 'Read more'}
+          <ChevronDown
+            className={`w-3.5 h-3.5 opacity-60 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
+          />
         </button>
       )}
     </section>
