@@ -181,10 +181,12 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
             </div>
             <div className="flex-1 min-w-0">
               <h4 className="text-sm font-semibold text-foreground mb-1">
-                Official handicap sync — launching soon
+                Official handicap sync coming soon!
               </h4>
               <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-                We're finalising connections with official handicap authorities. Once live, your handicap will update automatically across clbhouz.
+                We're currently finalising integrations with the relevant golfing authorities in your region. At the moment, your governing body appears to still be completing its onboarding process — a little slow off the tee!
+                <br /><br />
+                Once everything is live, your handicap will update automatically in real time across clbhouz.
               </p>
               
               {/* CTA */}
