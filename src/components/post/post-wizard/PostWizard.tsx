@@ -1132,7 +1132,7 @@ export function PostWizard({
 
             {/* Change 5: Simplified Bottom Toolbar — 3 icons only */}
             <div
-              className="flex-shrink-0 flex items-center px-5 pt-2.5"
+              className="flex-shrink-0 flex items-center px-4 pt-2.5"
               style={{
                 borderTop: '0.5px solid hsl(var(--border) / 0.3)',
                 paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 28px)',

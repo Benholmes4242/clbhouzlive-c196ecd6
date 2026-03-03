@@ -102,6 +102,7 @@ export function PostWizardHeader({
             color: canPost ? '#FFFFFF' : 'hsl(var(--muted-foreground) / 0.5)',
             background: canPost ? '#f59e0b' : 'hsl(var(--muted))',
             boxShadow: canPost ? '0 2px 12px rgba(245,158,11,0.22)' : 'none',
+            opacity: canPost ? 1 : 0.5,
             pointerEvents: canPost ? 'auto' : 'none',
           }}
         >
