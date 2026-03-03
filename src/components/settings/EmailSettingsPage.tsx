@@ -42,23 +42,33 @@ export function EmailSettingsPage() {
   const handleSubmit = async () => {
     setIsUpdating(true);
     try {
+      // Step 1: Server-side validation (cooldown, same-email, format)
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error('Session expired. Please log in again.');
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke('secure-email-change', {
-        body: { newEmail, currentEmail: user?.email }
+        body: { newEmail },
+        headers: { Authorization: `Bearer ${session.access_token}` }
       });
 
       if (error) throw error;
-      if (data.error) throw new Error(data.error);
+      if (data?.error) throw new Error(data.error);
 
-      toast.success('Confirmation sent', {
-        description: 'Check your inbox to finish updating your email.'
+      // Step 2: Trigger Supabase's built-in confirmation email flow
+      const { error: updateError } = await supabase.auth.updateUser({ email: newEmail });
+      if (updateError) throw updateError;
+
+      toast.success('Confirmation link sent', {
+        description: `We've sent a confirmation link to ${newEmail}. Your email will update once you confirm.`
       });
 
       setNewEmail('');
       setConfirmEmail('');
       setShowConfirm(false);
 
-      // Sign out after short delay
-      setTimeout(() => supabase.auth.signOut(), 3000);
     } catch (err: any) {
       console.error('[EmailSettings] error:', err);
       toast.error("Couldn't update email", {
@@ -79,7 +89,7 @@ export function EmailSettingsPage() {
   };
 
   return (
-    <PageRoot className="min-h-screen bg-[#F8FAFC]">
+    <PageRoot className="min-h-screen bg-background">
       <header 
         className="sticky top-0 z-50 px-4 py-3 flex items-center gap-3"
         style={{
@@ -93,36 +103,34 @@ export function EmailSettingsPage() {
       >
         <button
           onClick={() => navigate('/settings')}
-          className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[rgba(31,36,40,0.06)] transition-colors"
+          className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-muted transition-colors"
         >
-          <ArrowLeft className="w-5 h-5 text-[#1F2428]" />
+          <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
-        <h1 className="text-lg font-semibold text-[#1F2428]">Change email</h1>
+        <h1 className="text-lg font-semibold text-foreground">Change email</h1>
       </header>
 
       <div className="max-w-md mx-auto px-4 md:px-6 py-8">
         <div className="space-y-6">
           {/* Info */}
-          <div 
-            className="flex items-start gap-3 p-4 rounded-[14px] border border-[rgba(31,36,40,0.06)] bg-[#FAFAFB]"
-          >
-            <Mail className="w-4 h-4 text-[#97A1AA] mt-0.5 flex-shrink-0" />
-            <p className="text-[13px] text-[#5E666D] leading-relaxed">
+          <div className="flex items-start gap-3 p-4 rounded-[14px] border border-border bg-muted">
+            <Mail className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+            <p className="text-[13px] text-muted-foreground leading-relaxed">
               You'll need to confirm the new email address.
             </p>
           </div>
 
           {/* Current email */}
           <div className="space-y-2">
-            <Label className="text-[#5E666D]">Current email</Label>
-            <div className="px-4 py-3 rounded-[12px] bg-[#EDEFF2] border border-[rgba(31,36,40,0.06)] text-[#97A1AA] text-[15px]">
+            <Label className="text-muted-foreground">Current email</Label>
+            <div className="px-4 py-3 rounded-lg bg-muted border border-border text-muted-foreground text-[15px]">
               {maskEmail(user?.email)}
             </div>
           </div>
 
           {/* New email */}
           <div className="space-y-2">
-            <Label htmlFor="new-email" className="text-[#1F2428]">
+            <Label htmlFor="new-email" className="text-foreground">
               New email address
             </Label>
             <Input
@@ -131,14 +139,14 @@ export function EmailSettingsPage() {
               value={newEmail}
               onChange={(e) => setNewEmail(e.target.value)}
               placeholder="Enter new email"
-              className="bg-white border-[rgba(31,36,40,0.1)] text-[#1F2428] placeholder:text-[#97A1AA]"
+              className="bg-muted border-border text-foreground placeholder:text-muted-foreground focus:border-amber-500"
               disabled={isUpdating}
             />
           </div>
 
           {/* Confirm email */}
           <div className="space-y-2">
-            <Label htmlFor="confirm-email" className="text-[#1F2428]">
+            <Label htmlFor="confirm-email" className="text-foreground">
               Confirm new email
             </Label>
             <Input
@@ -147,20 +155,20 @@ export function EmailSettingsPage() {
               value={confirmEmail}
               onChange={(e) => setConfirmEmail(e.target.value)}
               placeholder="Confirm new email"
-              className="bg-white border-[rgba(31,36,40,0.1)] text-[#1F2428] placeholder:text-[#97A1AA]"
+              className="bg-muted border-border text-foreground placeholder:text-muted-foreground focus:border-amber-500"
               disabled={isUpdating}
             />
           </div>
 
           {/* Validation messages */}
           {newEmail && !isValidEmail(newEmail) && (
-            <p className="text-[13px] text-red-600">Please enter a valid email address</p>
+            <p className="text-[13px] text-destructive">Please enter a valid email address</p>
           )}
           {newEmail && confirmEmail && newEmail !== confirmEmail && (
-            <p className="text-[13px] text-red-600">Email addresses don't match</p>
+            <p className="text-[13px] text-destructive">Email addresses don't match</p>
           )}
           {newEmail === user?.email && (
-            <p className="text-[13px] text-[#97A1AA]">This is your current email address</p>
+            <p className="text-[13px] text-muted-foreground">This is your current email address</p>
           )}
 
           {/* Submit */}
@@ -168,7 +176,7 @@ export function EmailSettingsPage() {
             type="button"
             onClick={() => setShowConfirm(true)}
             disabled={!isValid || isUpdating}
-            className="w-full bg-[#1F2428] text-white hover:bg-[#2A3038] disabled:opacity-50"
+            className="w-full bg-foreground text-background hover:bg-foreground/90 disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100"
           >
             {isUpdating && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
             Send confirmation email
@@ -178,24 +186,24 @@ export function EmailSettingsPage() {
 
       {/* Confirmation dialog */}
       <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
-        <AlertDialogContent className="bg-white border-[rgba(31,36,40,0.1)]">
+        <AlertDialogContent className="bg-background border-border">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-[#1F2428]">Change email address</AlertDialogTitle>
-            <AlertDialogDescription className="text-[#5E666D]">
-              Your email will be updated to <strong className="text-[#1F2428]">{newEmail}</strong>.
-              You'll need to sign in again with your new email address.
+            <AlertDialogTitle className="text-foreground">Change email address</AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
+              A confirmation link will be sent to <strong className="text-foreground">{newEmail}</strong>.
+              Your email will update once you confirm via the link.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-[#EDEFF2] border-transparent text-[#1F2428] hover:bg-[#E4E6E9]">
+            <AlertDialogCancel className="bg-muted border-transparent text-foreground hover:bg-muted/80">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleSubmit}
               disabled={isUpdating}
-              className="bg-[#1F2428] text-white hover:bg-[#2A3038]"
+              className="bg-foreground text-background hover:bg-foreground/90"
             >
-              {isUpdating ? 'Sending...' : 'Change email now'}
+              {isUpdating ? 'Sending...' : 'Send confirmation'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
