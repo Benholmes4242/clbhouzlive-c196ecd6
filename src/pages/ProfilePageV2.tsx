@@ -455,7 +455,7 @@ const ProfilePageV2Content: React.FC = () => {
             <img 
               src={heroUrl} 
               alt="Profile cover" 
-              className="w-full h-full object-cover object-bottom"
+              className="w-full h-full object-cover object-center"
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/40" />
@@ -1066,7 +1066,7 @@ const ProfilePageV2Content: React.FC = () => {
           open={isCropModalOpen}
           onOpenChange={handleCropCancel}
           imageSrc={cropImageSrc}
-          aspectRatio={cropMode === 'hero' ? 3.2 : 1}
+          aspectRatio={cropMode === 'hero' ? window.innerWidth / (window.innerHeight * 0.35) : 1}
           onCropComplete={handleCropComplete}
           title={cropMode === 'hero' ? 'Crop Cover Photo' : 'Crop Profile Photo'}
         />
