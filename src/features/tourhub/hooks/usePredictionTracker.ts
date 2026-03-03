@@ -40,7 +40,7 @@ async function fetchTrackerData(
   // is the internal Supabase UUID (sr_players.id). We must key the map by sr_id.
   const { data: leaderboard } = await supabase
     .from('sr_leaderboards')
-    .select('player_id, position, position_tied, score, strokes, thru, status, round_1, round_2, round_3, round_4, sr_players!inner(sr_id, full_name)')
+    .select('player_id, position, position_tied, score, strokes, thru, status, round_1, round_2, round_3, round_4, sr_players!inner(sr_id, full_name, country)')
     .eq('tournament_id', tournamentId);
 
   // Key by Sportradar sr_id so predictions can be matched correctly
@@ -154,6 +154,7 @@ function buildTrackedPrediction(
     currentRound,
     positionDelta,
     performanceStatus,
+    country: (lb?.sr_players as any)?.country ?? null,
   };
 }
 
