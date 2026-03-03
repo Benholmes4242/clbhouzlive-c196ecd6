@@ -463,9 +463,7 @@ const ProfilePageV2Content: React.FC = () => {
 
         {/* Avatar - squircle, left-aligned with About title (px-5), positioned relative to hero bottom */}
         {/* Positioned absolutely but OUTSIDE the overflow-hidden container */}
-        <div
-          role="button"
-          tabIndex={0}
+        <button
           className="absolute left-5 z-20 cursor-pointer pointer-events-auto focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
           style={{ bottom: '-62px' }}
           data-debug-id="profile-photo"
@@ -480,12 +478,6 @@ const ProfilePageV2Content: React.FC = () => {
             if (isUploadingAvatar) return;
             logPoint('profile_photo.click');
             setIsAvatarLightboxOpen(true);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              if (!isUploadingAvatar) setIsAvatarLightboxOpen(true);
-            }
           }}
           aria-label="View profile photo"
         >
@@ -538,7 +530,7 @@ const ProfilePageV2Content: React.FC = () => {
               </button>
             )}
           </div>
-        </div>
+        </button>
 
         {/* HCP + Golfer pills - right side, just below header photo */}
         {/* Reduced gap: mt-3 → mt-2 (8px from golfer badge to next element) */}
