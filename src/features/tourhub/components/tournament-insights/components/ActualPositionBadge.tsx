@@ -10,8 +10,11 @@ interface ActualPositionBadgeProps {
   performanceStatus?: string;
 }
 
-function getAccuracyTier() {
-  return { color: '#16A34A', bg: 'rgba(22,163,74,0.08)' };
+function getAccuracyTier(position: number | null) {
+  if (position !== null && position <= 10) {
+    return { color: '#16A34A', bg: 'rgba(22,163,74,0.08)' };
+  }
+  return { color: 'hsl(var(--muted-foreground))', bg: 'transparent' };
 }
 
 const ActualPositionBadge: React.FC<ActualPositionBadgeProps> = ({
