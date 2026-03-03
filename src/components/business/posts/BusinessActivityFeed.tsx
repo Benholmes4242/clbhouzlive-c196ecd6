@@ -6,6 +6,7 @@
  */
 
 import React, { useState, useCallback, useMemo, useLayoutEffect, useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { useBusinessPosts, BusinessPost } from '@/hooks/useBusinessPosts';
 import { useBusinessTaggedPosts, useHideTaggedPost } from '@/hooks/useBusinessTaggedPosts';
 import { useInfiniteBusinessPosts } from '@/hooks/useInfiniteBusinessPosts';
