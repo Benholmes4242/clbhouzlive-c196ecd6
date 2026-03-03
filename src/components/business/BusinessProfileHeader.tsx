@@ -290,7 +290,7 @@ export function BusinessProfileHeader({
                    onClick={() => setBioExpanded(!bioExpanded)}
                    className="text-[0.8125rem] font-medium text-muted-foreground mt-1 active:scale-95 transition-transform"
                  >
-                  {bioExpanded ? 'Show less' : 'Show more'}
+                  {bioExpanded ? 'Show less' : 'test'}
                 </button>
               )}
             </div>
