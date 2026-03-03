@@ -42,7 +42,7 @@ export function PersonRow({
       className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-muted/30 active:bg-muted/40 transition-colors min-h-[44px]"
     >
       {/* Avatar */}
-      <div className="h-12 w-12 rounded-sq-md overflow-hidden bg-muted flex items-center justify-center shrink-0">
+      <div className="h-12 w-12 rounded-sq-md overflow-hidden flex items-center justify-center shrink-0">
         <SquircleAvatar
           src={profilePhotoUrl}
           alt={name}

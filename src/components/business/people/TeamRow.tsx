@@ -50,7 +50,7 @@ export function TeamRow({
         className="flex items-center gap-3 flex-1 min-w-0 text-left"
       >
         {/* Avatar — 64px for premium showcase */}
-        <div className="h-16 w-16 rounded-sq-md overflow-hidden bg-muted flex items-center justify-center shrink-0">
+        <div className="h-16 w-16 rounded-sq-md overflow-hidden flex items-center justify-center shrink-0">
           <SquircleAvatar
             src={profilePhotoUrl}
             alt={name}
