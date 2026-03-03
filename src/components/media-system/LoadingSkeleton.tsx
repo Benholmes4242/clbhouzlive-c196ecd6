@@ -1,21 +1,55 @@
 /**
- * LoadingSkeleton — fullscreen dark shimmer while video loads.
- * Fades out (200ms) when video fires canplay.
+ * LoadingSkeleton — poster-first loading with shimmer overlay.
+ *
+ * Layer 1: Dark background fallback
+ * Layer 2: Poster/thumbnail (CSS background-image for GPU compositing)
+ * Layer 3: Shimmer overlay (only visible while poster is loading)
  */
-export function LoadingSkeleton({ visible }: { visible: boolean }) {
+import { useState } from 'react';
+
+interface LoadingSkeletonProps {
+  visible: boolean;
+  posterUrl?: string;
+}
+
+export function LoadingSkeleton({ visible, posterUrl }: LoadingSkeletonProps) {
+  const [posterLoaded, setPosterLoaded] = useState(false);
+
+  // Pre-load poster image
+  if (posterUrl && !posterLoaded) {
+    const img = new Image();
+    img.onload = () => setPosterLoaded(true);
+    img.src = posterUrl;
+  }
+
   return (
     <div
       className="absolute inset-0 z-10 pointer-events-none transition-opacity duration-200"
       style={{ opacity: visible ? 1 : 0 }}
     >
+      {/* Layer 1: Dark background */}
       <div
-        className="w-full h-full"
-        style={{
-          background: 'linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%)',
-        }}
-      >
+        className="absolute inset-0"
+        style={{ background: 'linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%)' }}
+      />
+
+      {/* Layer 2: Poster thumbnail (GPU-composited via background-image) */}
+      {posterUrl && (
         <div
-          className="w-full h-full"
+          className="absolute inset-0 transition-opacity duration-150"
+          style={{
+            backgroundImage: `url(${posterUrl})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            opacity: posterLoaded ? 1 : 0,
+          }}
+        />
+      )}
+
+      {/* Layer 3: Shimmer overlay (only shows while poster hasn't loaded) */}
+      {!posterLoaded && (
+        <div
+          className="absolute inset-0"
           style={{
             background:
               'linear-gradient(90deg, rgba(255,255,255,0.0) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.0) 75%)',
@@ -23,7 +57,8 @@ export function LoadingSkeleton({ visible }: { visible: boolean }) {
             animation: 'media-shimmer 1.5s infinite ease-in-out',
           }}
         />
-      </div>
+      )}
+
       <style>{`
         @keyframes media-shimmer {
           0% { background-position: -200% 0; }
