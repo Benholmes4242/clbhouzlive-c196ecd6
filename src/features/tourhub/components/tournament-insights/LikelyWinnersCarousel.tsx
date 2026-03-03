@@ -280,7 +280,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                           height: 4,
                           borderRadius: 2,
                           marginTop: 7,
-                          backgroundColor: j === 0 ? accentColor : 'hsl(var(--muted-foreground))',
+                          backgroundColor: j === 0 ? ACCENT_COLOR : 'hsl(var(--muted-foreground))',
                         }}
                       />
                       <span
