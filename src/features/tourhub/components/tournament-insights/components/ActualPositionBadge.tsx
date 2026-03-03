@@ -26,7 +26,7 @@ const ActualPositionBadge: React.FC<ActualPositionBadgeProps> = ({
     return (
       <span
         className="text-muted-foreground"
-        style={{ fontSize: 13, fontWeight: 600, opacity: 0.5, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 44 }}
+        style={{ fontSize: 13, fontWeight: 600, opacity: 0.5, display: 'flex', alignItems: 'center', justifyContent: 'center', width: 44 }}
       >
         MC
       </span>
@@ -36,7 +36,7 @@ const ActualPositionBadge: React.FC<ActualPositionBadgeProps> = ({
     return (
       <span
         className="text-muted-foreground"
-        style={{ fontSize: 13, fontWeight: 600, opacity: 0.5, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 44 }}
+        style={{ fontSize: 13, fontWeight: 600, opacity: 0.5, display: 'flex', alignItems: 'center', justifyContent: 'center', width: 44 }}
       >
         WD
       </span>
@@ -44,7 +44,7 @@ const ActualPositionBadge: React.FC<ActualPositionBadgeProps> = ({
   }
   if (position === null) {
     return (
-      <span className="text-muted-foreground" style={{ fontSize: 13, fontWeight: 600, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 44 }}>—</span>
+      <span className="text-muted-foreground" style={{ fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', width: 44 }}>—</span>
     );
   }
 
