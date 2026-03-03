@@ -5,7 +5,7 @@
  * Layer 2: Poster/thumbnail (CSS background-image for GPU compositing)
  * Layer 3: Shimmer overlay (only visible while poster is loading)
  */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface LoadingSkeletonProps {
   visible: boolean;
@@ -15,12 +15,23 @@ interface LoadingSkeletonProps {
 export function LoadingSkeleton({ visible, posterUrl }: LoadingSkeletonProps) {
   const [posterLoaded, setPosterLoaded] = useState(false);
 
-  // Pre-load poster image
-  if (posterUrl && !posterLoaded) {
+  // Pre-load poster image in useEffect (not render body)
+  useEffect(() => {
+    if (!posterUrl) return;
+    setPosterLoaded(false);
+
     const img = new Image();
     img.onload = () => setPosterLoaded(true);
+    img.onerror = () => setPosterLoaded(false);
     img.src = posterUrl;
-  }
+    // If already cached by browser, onload fires synchronously
+    if (img.complete) setPosterLoaded(true);
+
+    return () => {
+      img.onload = null;
+      img.onerror = null;
+    };
+  }, [posterUrl]);
 
   return (
     <div

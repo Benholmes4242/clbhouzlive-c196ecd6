@@ -6,6 +6,7 @@ import { useRef, useCallback, useEffect } from 'react';
 import { FeedItem } from './FeedItem';
 import { useViewportObserver } from './hooks/useViewportObserver';
 import { useMediaStore } from './store/mediaStore';
+import { useVideoPoolContext } from './VideoPoolProvider';
 import type { FeedPost } from './types/media';
 
 interface FeedContainerProps {
@@ -17,6 +18,7 @@ export function FeedContainer({ posts, onNearEnd }: FeedContainerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const activeIndex = useMediaStore((s) => s.activeIndex);
   const setActiveIndex = useMediaStore((s) => s.setActiveIndex);
+  const pool = useVideoPoolContext();
 
   const handleActiveChange = useCallback(
     (index: number) => {
@@ -34,19 +36,31 @@ export function FeedContainer({ posts, onNearEnd }: FeedContainerProps) {
     }
   }, [activeIndex, posts.length, onNearEnd]);
 
-  // iOS gesture priming: touch events give us autoplay context
+  // iOS gesture priming: touchend gives us autoplay context
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     const onTouchEnd = () => {
-      // The touchend provides gesture context for iOS autoplay
-      // The pool's safePlay handles the actual retry logic
+      // iOS requires play() in the same call stack as a user gesture.
+      // Find the active video element and prime it.
+      const currentActiveIndex = useMediaStore.getState().activeIndex;
+      const activePost = posts[currentActiveIndex];
+      if (!activePost) return;
+
+      const activeUrl = activePost.mediaItems?.[0]?.hlsUrl;
+      if (!activeUrl) return;
+
+      const video = pool.getElement(activeUrl);
+      if (video && video.paused) {
+        // This play() call is in the gesture call stack — iOS will honor it
+        video.play().catch(() => {});
+      }
     };
 
     container.addEventListener('touchend', onTouchEnd, { passive: true });
     return () => container.removeEventListener('touchend', onTouchEnd);
-  }, []);
+  }, [posts, pool]);
 
   return (
     <div

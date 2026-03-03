@@ -12,6 +12,8 @@ import { ErrorState } from './ErrorState';
 import { Scrubber } from './Scrubber';
 import { Play, Pause } from 'lucide-react';
 
+const MAX_RETRIES = 3;
+
 interface VideoPlayerProps {
   hlsUrl: string;
   feedIndex: number;
@@ -23,6 +25,7 @@ interface VideoPlayerProps {
 export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl, duration: mediaDuration }: VideoPlayerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const retryCountRef = useRef(0);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [showPlayIcon, setShowPlayIcon] = useState(false);
@@ -47,6 +50,9 @@ export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl, duratio
       return;
     }
 
+    // Reset retry count on fresh activation
+    retryCountRef.current = 0;
+
     let cancelled = false;
 
     const activate = async () => {
@@ -65,7 +71,6 @@ export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl, duratio
           if (cancelled) return;
           setIsLoading(false);
           setIsPlaying(true);
-          // Capture duration
           if (video && video.duration && isFinite(video.duration)) {
             setVideoDuration(video.duration);
           }
@@ -107,15 +112,19 @@ export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl, duratio
     }
   }, [isMuted, isActive]);
 
-  // Retry handler
+  // Retry handler with max limit
   const handleRetry = useCallback(() => {
+    if (retryCountRef.current >= MAX_RETRIES) {
+      // Give up — show permanent error state
+      return;
+    }
+    retryCountRef.current += 1;
+
     setHasError(false);
     setIsLoading(true);
     useMediaStore.getState().clearError(feedIndex);
     useMediaStore.getState().markRetrying(feedIndex);
 
-    // Re-trigger by toggling active state via re-mount
-    // Force re-assign by releasing and re-acquiring
     const container = containerRef.current;
     if (!container) return;
 
@@ -147,7 +156,7 @@ export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl, duratio
 
   // Tap to toggle play/pause
   const handleTap = useCallback(() => {
-    if (hasError) return; // ErrorState handles its own tap
+    if (hasError) return;
     const video = videoRef.current;
     if (!video || !isActive) return;
 
@@ -163,6 +172,8 @@ export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl, duratio
     setTimeout(() => setShowPlayIcon(false), 800);
   }, [isActive, hasError]);
 
+  const canRetry = retryCountRef.current < MAX_RETRIES;
+
   return (
     <div
       ref={containerRef}
@@ -176,7 +187,7 @@ export function VideoPlayer({ hlsUrl, feedIndex, isActive, thumbnailUrl, duratio
       />
 
       {/* Error state */}
-      {hasError && <ErrorState onRetry={handleRetry} />}
+      {hasError && <ErrorState onRetry={handleRetry} canRetry={canRetry} />}
 
       {/* Play/Pause overlay */}
       {showPlayIcon && !hasError && (
