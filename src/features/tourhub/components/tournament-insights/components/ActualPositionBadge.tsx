@@ -57,7 +57,7 @@ const ActualPositionBadge: React.FC<ActualPositionBadgeProps> = ({
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
-        minWidth: 36,
+        minWidth: 44,
         padding: '4px 10px',
         borderRadius: 8,
         fontSize: 15,
