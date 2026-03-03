@@ -106,7 +106,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
             <div className="w-9 h-9 rounded-full bg-muted border border-border flex items-center justify-center">
               <Globe className="w-4 h-4 text-muted-foreground" />
             </div>
-            <div>
+            <div className="text-center">
               <AnimatedNumber 
                 value={countriesPlayed} 
                 className="text-lg font-semibold text-foreground leading-tight"
@@ -124,7 +124,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200/60 flex items-center justify-center">
               <Star className="w-4 h-4 text-amber-500" />
             </div>
-            <div>
+            <div className="text-center">
               <AnimatedNumber 
                 value={Number(avgRating.toFixed(1))} 
                 className="text-lg font-semibold text-foreground leading-tight"
