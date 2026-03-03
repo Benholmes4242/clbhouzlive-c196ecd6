@@ -449,7 +449,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
       {/* Tab Toggle - Hub Style */}
       <div className="px-5 pb-4">
         <div 
-          className="inline-flex items-center gap-1 p-1 rounded-full w-full bg-muted"
+          className="inline-flex items-center gap-1 p-1 rounded-full w-full"
         >
           <button
             onClick={() => setActiveTab('manage')}
