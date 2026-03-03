@@ -195,8 +195,8 @@ export function ImageCropModal({
           {/* Hint text */}
           <p className="text-xs text-center text-muted-foreground">
             {isLogo 
-              ? 'Position your logo in the circle. It will display as a squircle.'
-              : 'Position your cover photo. Recommended: 1600×500px'
+              ? 'Position your photo in the circle. Final shape will be slightly squarer.'
+              : 'Position your cover photo in the frame.'
             }
           </p>
 
