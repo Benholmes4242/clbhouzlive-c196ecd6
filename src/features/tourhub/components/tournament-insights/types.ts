@@ -99,6 +99,7 @@ export interface TrackedPrediction {
   currentRound: number | null;
   positionDelta: number | null;
   performanceStatus: 'outperforming' | 'matching' | 'underperforming' | 'cut' | 'withdrawn' | 'not-started';
+  country: string | null;
 }
 
 export interface AccuracyMetrics {
