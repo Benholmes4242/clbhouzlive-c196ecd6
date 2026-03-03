@@ -2,8 +2,8 @@
  * PredictionLeaderboard - Borderless row layout for both Live and Results states
  */
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
 import { PredictionScorecardRow } from './PredictionScorecardRow';
 import LiveStatusBar from './components/LiveStatusBar';
 import type { TrackedPrediction } from './types';
@@ -19,8 +19,6 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
   isCompleted,
   bestCallPlayerId,
 }) => {
-  const [showAll, setShowAll] = useState(false);
-
   if (allPicks.length === 0) return null;
 
   // Sort by actual position (best first) for both live and completed
@@ -29,9 +27,6 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
     const bPos = b.actualPosition ?? 999;
     return aPos - bPos;
   });
-
-  const visibleCards = isCompleted ? sorted.slice(0, 3) : sorted;
-  const hasMore = isCompleted && sorted.length > 3 && !showAll;
 
   return (
     <motion.div
@@ -79,9 +74,9 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
       {/* Live status bar */}
       {!isCompleted && <LiveStatusBar allPicks={allPicks} />}
 
-      {/* Player rows */}
+      {/* Player rows — always show all */}
       <div>
-        {visibleCards.map((prediction, i) => (
+        {sorted.map((prediction, i) => (
           <motion.div
             key={prediction.playerId}
             initial={isCompleted ? { opacity: 0, y: 8 } : false}
@@ -96,51 +91,12 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
               prediction={prediction}
               index={i}
               isCompleted={isCompleted}
-              isLast={!showAll && i === visibleCards.length - 1 && !hasMore}
+              isLast={i === sorted.length - 1}
               isBestCall={isCompleted && prediction.playerId === bestCallPlayerId}
             />
           </motion.div>
         ))}
-
-        {/* Show more rows with animation */}
-        <AnimatePresence>
-          {isCompleted && showAll && sorted.slice(3).map((prediction, i) => (
-            <motion.div
-              key={prediction.playerId}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: i * 0.05 }}
-            >
-              <PredictionScorecardRow
-                prediction={prediction}
-                index={3 + i}
-                isCompleted={isCompleted}
-                isLast={i === sorted.length - 4}
-                isBestCall={isCompleted && prediction.playerId === bestCallPlayerId}
-              />
-            </motion.div>
-          ))}
-        </AnimatePresence>
       </div>
-
-      {/* Show all button */}
-      {hasMore && (
-        <button
-          onClick={() => setShowAll(true)}
-          className="w-full bg-muted text-muted-foreground hover:bg-border transition-colors"
-          style={{
-            padding: 12,
-            borderRadius: 12,
-            fontSize: 13,
-            fontWeight: 600,
-            border: 'none',
-            cursor: 'pointer',
-            marginTop: 8,
-          }}
-        >
-          Show all {sorted.length} picks
-        </button>
-      )}
     </motion.div>
   );
 };
