@@ -177,7 +177,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                   left: 0,
                   right: 0,
                   height: 3,
-                  background: accentGradient,
+                  background: ACCENT_GRADIENTS[i] ?? ACCENT_GRADIENTS[4],
                   borderRadius: '16px 16px 0 0',
                 }}
               />
@@ -194,7 +194,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                       height: isFeatured ? 72 : 60,
                       borderRadius: '34%',
                       objectPosition: 'center 20%',
-                      border: `2px solid ${accentColor}`,
+                      border: '2px solid hsl(var(--border))',
                     }}
                     loading="lazy"
                     onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
