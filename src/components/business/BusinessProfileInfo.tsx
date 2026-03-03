@@ -13,7 +13,7 @@ interface BusinessProfileInfoProps {
 /* ── Bio with Show more / Show less ── */
 const BIO_CHAR_LIMIT = 200;
 
-function BioSection({ text, canManage, onEdit }: { text: string; canManage?: boolean; onEdit: () => void }) {
+function BioSection({ text }: { text: string }) {
   const [expanded, setExpanded] = useState(false);
   const shouldTruncate = text.length > BIO_CHAR_LIMIT;
   const displayText = !expanded && shouldTruncate ? text.slice(0, BIO_CHAR_LIMIT).trimEnd() + '…' : text;
@@ -21,33 +21,21 @@ function BioSection({ text, canManage, onEdit }: { text: string; canManage?: boo
   return (
     <section className="px-6 pb-8">
       <p
-        className="text-base leading-relaxed text-foreground whitespace-pre-wrap"
+        className="text-sm leading-relaxed text-foreground whitespace-pre-wrap"
         style={{ overflowWrap: 'anywhere' }}
       >
         {displayText}
       </p>
 
-      <div className="flex items-center gap-4 mt-2">
-        {shouldTruncate && (
-          <button
-            type="button"
-            onClick={() => setExpanded(v => !v)}
-            className="text-[0.8125rem] font-semibold text-amber-500 min-h-[44px] flex items-center active:scale-95 transition-transform"
-          >
-            {expanded ? 'Show less' : 'Show more'}
-          </button>
-        )}
-        {canManage && (
-          <button
-            type="button"
-            onClick={onEdit}
-            className="text-[0.8125rem] font-medium text-muted-foreground min-h-[44px] flex items-center gap-1 active:scale-95 transition-transform"
-          >
-            <Pencil className="h-3.5 w-3.5 opacity-60" />
-            Edit
-          </button>
-        )}
-      </div>
+      {shouldTruncate && (
+        <button
+          type="button"
+          onClick={() => setExpanded(v => !v)}
+          className="text-[0.8125rem] font-medium text-muted-foreground mt-1 active:scale-95 transition-transform"
+        >
+          {expanded ? 'Show less' : 'Show more'}
+        </button>
+      )}
     </section>
   );
 }
