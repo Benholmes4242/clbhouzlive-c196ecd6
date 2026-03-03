@@ -444,7 +444,7 @@ const BusinessProfilePage: React.FC = () => {
       </div>
 
       {/* Action Buttons */}
-      <div className="mt-3 px-5 flex items-center gap-2 relative z-10 pointer-events-auto">
+      <div className="mt-4 px-5 flex items-center gap-2 relative z-10 pointer-events-auto">
         {/* P1+P3: Follow button — h-11, matching personal profile gradient variant */}
         <button 
           className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98] disabled:opacity-60 border border-border/60 bg-card text-foreground"
@@ -512,7 +512,7 @@ const BusinessProfilePage: React.FC = () => {
       </div>
 
       {/* Stats row — tappable */}
-      <div className="mt-6 px-5">
+      <div className="mt-6 px-5 mb-6">
         <div className="flex items-center">
           {/* Posts — taps scroll to Activity tab */}
           <button
@@ -550,7 +550,7 @@ const BusinessProfilePage: React.FC = () => {
       </div>
 
       {/* White content sheet */}
-      <div className="pt-5 pb-2 min-h-[60vh]">
+      <div className="pb-2 min-h-[60vh]">
         {/* About section */}
         <section className="px-5 mb-6">
           <h3 className="text-[17px] font-semibold text-foreground mb-2">About</h3>
@@ -653,7 +653,7 @@ const BusinessProfilePage: React.FC = () => {
       </div>
 
       {/* Bottom Navigation Spacer */}
-      <div style={{ height: 'max(env(safe-area-inset-bottom, 0px), 20px)' }} />
+      <div style={{ height: 'max(env(safe-area-inset-bottom, 0px), 20px)', paddingBottom: '80px' }} />
 
       {/* Scroll to top FAB */}
       <ScrollToTopGlass />

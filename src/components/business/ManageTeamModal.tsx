@@ -178,14 +178,14 @@ export function ManageTeamModal({
 
             {/* Current team section */}
             <div className="space-y-3">
-              <h3 className="text-sm font-medium text-foreground">Current team</h3>
+              <h3 className="text-xs font-semibold uppercase tracking-[1.5px] text-muted-foreground">Current team</h3>
               
               {currentTeam.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-6">
                   No team members yet
                 </p>
               ) : (
-                <div className="space-y-1">
+                <div className="divide-y divide-border/30">
                   {currentTeam.map((member) => {
                     const profile = member.profile;
                     if (!profile) return null;
@@ -196,7 +196,7 @@ export function ManageTeamModal({
                       <button
                         key={member.id}
                         onClick={() => tm.setEditingMember(member)}
-                        className="w-full flex items-center gap-3 p-3 rounded-sq-md hover:bg-muted/50 transition-colors text-left"
+                        className="w-full flex items-center gap-3 py-3 px-1 hover:bg-muted/50 transition-colors text-left"
                       >
                         <SquircleAvatar src={profile.profile_photo_url} alt={profile.display_name || 'Member'} size={40} />
                         <div className="flex-1 min-w-0">
@@ -210,7 +210,7 @@ export function ManageTeamModal({
                             <span className="text-xs text-muted-foreground">@{profile.username}</span>
                           )}
                         </div>
-                        <span className="text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full">
+                        <span className="text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full border border-border/60">
                           {getAccessLabel(accessLevel)}
                         </span>
                         <ChevronRight className="h-4 w-4 text-muted-foreground" />

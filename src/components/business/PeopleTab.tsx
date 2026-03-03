@@ -123,7 +123,7 @@ export function PeopleTab({
         <button
           type="button"
           onClick={() => setManageModalOpen(true)}
-          className="w-full flex items-center justify-between px-4 min-h-[44px] mt-2 active:opacity-70 transition-opacity"
+          className="w-full flex items-center justify-between px-4 min-h-[44px] mt-4 active:opacity-70 transition-opacity"
         >
           <span className="text-sm text-amber-600 font-semibold">Manage team</span>
           <ChevronRight className="h-4 w-4 text-amber-600" />
@@ -148,7 +148,7 @@ export function PeopleTab({
       {/* Team list */}
       {!isLoading && activeSubTab === 'team' && (
         sortedTeamMembers.length > 0 ? (
-          <div className="flex flex-col divide-y divide-border/30 mt-2">
+          <div className="flex flex-col divide-y divide-border/30 mt-4 pb-20">
             {sortedTeamMembers.map((member) => {
               const profile = member.profile;
               if (!profile) return null;
