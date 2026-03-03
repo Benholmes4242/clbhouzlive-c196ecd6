@@ -27,6 +27,8 @@ export function useVideoPool() {
 
   // Tracked event listeners per pool element index
   const listenerMap = useRef<Map<number, Map<string, EventListener>>>(new Map());
+  // Recovery timeouts per pool element — cleared on detach to prevent stale onError
+  const recoveryTimeouts = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
 
   // ── Tracked listener helpers ──────────────────────────────────────
   const addTrackedListener = useCallback(
@@ -84,6 +86,8 @@ export function useVideoPool() {
 
     return () => {
       destroyAll();
+      recoveryTimeouts.current.forEach((timeout) => clearTimeout(timeout));
+      recoveryTimeouts.current.clear();
       pool.forEach((p, idx) => {
         removeAllTrackedListeners(idx, p.video);
         p.video.pause();
@@ -196,8 +200,6 @@ export function useVideoPool() {
       const video = target.video;
 
       if (target.assignedUrl) {
-        // Find previous element for crossfade
-        const prevVideo = target.video;
         const isMuted = useMediaStore.getState().isMuted;
 
         // Save session state
@@ -209,6 +211,13 @@ export function useVideoPool() {
 
         // Remove all tracked listeners
         removeAllTrackedListeners(targetIdx, video);
+
+        // Clear any active recovery timeout for this element
+        const activeRecoveryTimeout = recoveryTimeouts.current.get(targetIdx);
+        if (activeRecoveryTimeout) {
+          clearTimeout(activeRecoveryTimeout);
+          recoveryTimeouts.current.delete(targetIdx);
+        }
 
         // Audio fade out (or instant if rapid/muted)
         if (!isMuted && !rapid && !video.paused) {
@@ -256,14 +265,24 @@ export function useVideoPool() {
         }
 
         if (recovered) {
-          // Give recovery 5 seconds to succeed
+          // Clear any previous recovery timeout for this element
+          const existingTimeout = recoveryTimeouts.current.get(targetIdx);
+          if (existingTimeout) clearTimeout(existingTimeout);
+
           const recoveryTimeout = setTimeout(() => {
+            recoveryTimeouts.current.delete(targetIdx);
             if (video.paused || video.readyState < 3) {
               onError?.();
             }
           }, 5000);
+          recoveryTimeouts.current.set(targetIdx, recoveryTimeout);
+
           const onRecoveryPlaying = () => {
-            clearTimeout(recoveryTimeout);
+            const timeout = recoveryTimeouts.current.get(targetIdx);
+            if (timeout) {
+              clearTimeout(timeout);
+              recoveryTimeouts.current.delete(targetIdx);
+            }
             video.removeEventListener('playing', onRecoveryPlaying);
           };
           video.addEventListener('playing', onRecoveryPlaying, { once: true });
