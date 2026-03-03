@@ -114,8 +114,8 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                 border: '1px solid hsl(var(--border) / 0.3)',
               }}
             >
-              {/* Photo section — top 60% */}
-              <div className="absolute top-0 left-0 right-0" style={{ height: '60%' }}>
+              {/* Photo section — top 48% */}
+              <div className="absolute top-0 left-0 right-0" style={{ height: '48%' }}>
                 {imgFailed ? (
                   /* Gradient placeholder with initials */
                   <div
@@ -201,33 +201,25 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                     size={44}
                   />
                 </div>
-
-                {/* Player name — bottom-left overlay on photo */}
-                <div className="absolute left-4" style={{ bottom: '38%' }}>
-                  <p
-                    style={{
-                      fontSize: 17,
-                      fontWeight: 700,
-                      color: 'white',
-                      textShadow: '0 1px 6px rgba(0,0,0,0.4)',
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    {pick.name}
-                  </p>
-                  {pick.countryCode && (
-                    <div style={{ marginTop: 2, filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.3))' }}>
-                      <CountryFlag
-                        country={pick.countryCode}
-                        size="sm"
-                        className="rounded-sm"
-                      />
-                    </div>
-                  )}
-                </div>
               </div>
 
-              {/* Insight bullets — bottom 40% */}
+              {/* Player name & flag — below photo, on card background */}
+              <div className="absolute left-0 right-0 text-center" style={{ top: '48%', padding: '4px 16px 0' }}>
+                <p className="text-foreground" style={{ fontSize: 16, fontWeight: 700, lineHeight: 1.2 }}>
+                  {pick.name}
+                </p>
+                {pick.countryCode && (
+                  <div className="flex justify-center" style={{ marginTop: 2 }}>
+                    <CountryFlag
+                      country={pick.countryCode}
+                      size="sm"
+                      className="rounded-sm"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Insight bullets — bottom section */}
               {pick.bullets.length > 0 && (
                 <div
                   className="absolute bottom-0 left-0 right-0 flex flex-col"
