@@ -335,6 +335,7 @@ function AppRoutes() {
         
         <Route path="/videos" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><VideosPage /></Suspense>} />
         <Route path="/video/:videoId" element={<Suspense fallback={null}><VideoPlayerModal /></Suspense>} />
+        <Route path="/mediaplayer" element={<Suspense fallback={null}><FullscreenMediaViewer /></Suspense>} />
         {/* Legacy creator routes - redirect to home (creators now handled via Business profiles or Personal Creator Mode) */}
         <Route path="/creator/*" element={<Navigate to="/" replace />} />
         <Route path="/creators/*" element={<Navigate to="/" replace />} />
