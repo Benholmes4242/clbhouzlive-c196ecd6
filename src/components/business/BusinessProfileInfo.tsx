@@ -150,7 +150,7 @@ export function BusinessProfileInfo({ business, canManage }: BusinessProfileInfo
     <div className="-mx-5 px-0 pb-20 bg-background">
       {/* Bio */}
       {business.description && (
-        <BioSection text={business.description} canManage={canManage} onEdit={handleEdit} />
+        <BioSection text={business.description} />
       )}
 
       {/* Contact */}
