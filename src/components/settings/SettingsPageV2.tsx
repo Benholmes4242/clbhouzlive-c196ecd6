@@ -445,7 +445,7 @@ export function SettingsPageV2() {
     <PageRoot className="min-h-screen w-full bg-background">
       <SettingsHeader onBack={() => navigate(-1)} />
       
-      <div className="w-full max-w-2xl mx-auto py-6 pb-32 space-y-6">
+      <div className="w-full max-w-2xl mx-auto py-6 pb-32 space-y-8">
         
         {/* ========== ACCOUNT ========== */}
         <SettingsSection title="Account">
@@ -687,7 +687,7 @@ export function SettingsPageV2() {
         </SettingsSection>
 
         {/* Version info */}
-        <p className="text-xs text-muted-foreground text-center py-8">
+        <p className="text-[11px] text-muted-foreground/60 text-center py-10 tracking-wide">
           Clbhouz v1.0.0 (Beta)
         </p>
       </div>
@@ -928,8 +928,8 @@ function SettingsHeader({ onBack }: { onBack: () => void }) {
       </div>
       
       {/* Title centered below */}
-      <div className="mx-auto flex max-w-5xl flex-col gap-1 px-4 pb-5">
-        <h1 className="text-center text-2xl font-semibold tracking-tight text-foreground">
+      <div className="mx-auto flex max-w-5xl flex-col gap-1 px-4 pb-8">
+        <h1 className="text-center text-[28px] font-bold tracking-tight text-foreground">
           Settings
         </h1>
         <p className="text-center text-sm text-muted-foreground">

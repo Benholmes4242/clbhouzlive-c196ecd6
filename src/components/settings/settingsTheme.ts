@@ -1,6 +1,9 @@
 /** Shared icon color theme for settings rows */
 export type IconTheme = 'account' | 'creator' | 'privacy' | 'notifications' | 'security' | 'support' | 'legal' | 'danger' | 'default';
 
+// TODO: Add dark mode variants for icon container colors in a future pass.
+// These hardcoded light-mode colors (bg-blue-50, etc.) intentionally mimic
+// iOS Settings per-category coloring but won't adapt to dark mode.
 export const iconThemeStyles: Record<IconTheme, { bg: string; text: string }> = {
   account: { bg: 'bg-blue-50', text: 'text-blue-500' },
   creator: { bg: 'bg-purple-50', text: 'text-purple-500' },
