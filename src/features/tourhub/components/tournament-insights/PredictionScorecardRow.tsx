@@ -62,12 +62,12 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
         padding: '16px 4px',
         opacity: isWD ? 0.5 : isCut ? 0.6 : 1,
         borderBottom: isLast ? 'none' : '1px solid hsl(var(--border) / 0.15)',
-        transition: 'background-color 150ms ease',
+        transition: 'background-color 100ms ease',
         cursor: 'pointer',
       }}
       onPointerDown={(e) => {
         const el = e.currentTarget;
-        el.style.backgroundColor = 'hsl(var(--muted) / 0.5)';
+        el.style.backgroundColor = 'hsl(var(--muted) / 0.3)';
       }}
       onPointerUp={(e) => {
         const el = e.currentTarget;
@@ -181,8 +181,8 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
           <p
             className="text-foreground truncate leading-tight"
             style={{
-              fontSize: 15,
-              fontWeight: isWinner || isLeader ? 700 : 600,
+              fontSize: 16,
+              fontWeight: 700,
               textDecoration: isCut ? 'line-through' : undefined,
             }}
           >
@@ -229,10 +229,10 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
           {isCompleted ? (
             /* Completed: Score on the right */
             <span
-              className={prediction.score !== null && prediction.score > 0 ? 'text-muted-foreground' : 'text-foreground'}
+              className={prediction.score !== null && prediction.score < 0 ? 'text-foreground' : 'text-muted-foreground'}
               style={{
                 fontSize: 16,
-                fontWeight: 600,
+                fontWeight: 500,
                 letterSpacing: '-0.2px',
               }}
             >

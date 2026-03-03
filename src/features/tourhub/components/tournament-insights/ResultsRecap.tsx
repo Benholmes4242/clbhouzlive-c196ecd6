@@ -95,7 +95,7 @@ const ScoreRing: React.FC<{ hit: number; total: number }> = ({ hit, total }) => 
         />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
-        <span style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.03em' }} className="text-foreground">
+        <span style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.03em', color: '#16A34A' }}>
           {visible ? hitCount : 0}
         </span>
         <span style={{ fontWeight: 300 }} className="text-muted-foreground">/</span>
