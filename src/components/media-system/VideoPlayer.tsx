@@ -234,7 +234,6 @@ export function VideoPlayer({
         <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none">
           <Heart
             className="text-white"
-            fill="red"
             style={{
               width: 80,
               height: 80,
@@ -244,11 +243,11 @@ export function VideoPlayer({
           />
           <style>{`
             @keyframes double-tap-heart {
-              0% { transform: scale(0); opacity: 0; }
-              12% { transform: scale(1.3); opacity: 1; color: white; }
-              25% { transform: scale(1.0); opacity: 1; }
-              70% { transform: scale(1.0); opacity: 1; }
-              100% { transform: scale(0.8); opacity: 0; }
+              0% { transform: scale(0); opacity: 0; color: white; fill: white; }
+              12% { transform: scale(1.3); opacity: 1; color: white; fill: white; }
+              25% { transform: scale(1.0); opacity: 1; color: #ef4444; fill: #ef4444; }
+              70% { transform: scale(1.0); opacity: 1; color: #ef4444; fill: #ef4444; }
+              100% { transform: scale(0.8); opacity: 0; color: #ef4444; fill: #ef4444; }
             }
           `}</style>
         </div>

@@ -100,12 +100,20 @@ export function SocialOverlay({ post, isActive, isScrubbing, onLike, isLiked = f
   return (
     <div
       className="absolute inset-0 z-20 pointer-events-none"
-      onTouchStart={handleInteraction}
       style={{
         transition: `opacity ${TIMINGS.FADE_DURATION}ms ease`,
         opacity: overlayOpacity,
       }}
     >
+      {/* Transparent touch layer to reset auto-hide when overlay is dimmed */}
+      <div
+        className="absolute inset-0 z-0"
+        style={{ pointerEvents: opacity < 1 ? 'auto' : 'none' }}
+        onTouchStart={() => {
+          handleInteraction();
+          // Don't stopPropagation — let touch pass through to video for play/pause
+        }}
+      />
       {/* Mute button — top right */}
       <button
         onClick={(e) => { e.stopPropagation(); toggleMute(); handleInteraction(); }}

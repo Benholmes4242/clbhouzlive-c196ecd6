@@ -23,6 +23,8 @@ export function FeedContainer({ posts, onNearEnd }: FeedContainerProps) {
   const handleActiveChange = useCallback(
     (index: number) => {
       setActiveIndex(index);
+      // Reset the new post's carousel to first item
+      useMediaStore.getState().setCarouselPosition(index, 0);
     },
     [setActiveIndex]
   );

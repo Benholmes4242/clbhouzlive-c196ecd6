@@ -168,7 +168,7 @@ export function MediaCarousel({
       {/* Chevron arrows */}
       {activeMedia > 0 && (
         <button
-          className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full flex items-center justify-center"
+          className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full flex items-center justify-center"
           style={{ background: 'rgba(0,0,0,0.3)' }}
           onClick={(e) => { e.stopPropagation(); goTo(activeMedia - 1); }}
           aria-label="Previous media"
@@ -178,7 +178,7 @@ export function MediaCarousel({
       )}
       {activeMedia < total - 1 && (
         <button
-          className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full flex items-center justify-center"
+          className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full flex items-center justify-center"
           style={{ background: 'rgba(0,0,0,0.3)' }}
           onClick={(e) => { e.stopPropagation(); goTo(activeMedia + 1); }}
           aria-label="Next media"
