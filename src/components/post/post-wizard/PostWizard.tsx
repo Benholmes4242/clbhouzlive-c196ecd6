@@ -825,7 +825,7 @@ export function PostWizard({
 
             {/* Scrollable Composer — Changes 2-7 */}
             <div className="flex-1 overflow-y-auto px-5 pt-4 pb-6" style={{ scrollbarWidth: 'none' }}>
-              <div className="max-w-[680px] mx-auto flex flex-col gap-3">
+              <div className="max-w-[680px] mx-auto flex flex-col" style={{ gap: '12px' }}>
 
                 {/* Change 2: Text Input Card */}
                 <div
