@@ -100,7 +100,7 @@ export function useVideoPool() {
 
       if (!target) return null;
 
-      // 4. Save session state of recycled element
+      // 4. Save session state of recycled element and fully reset
       if (target.assignedUrl) {
         const video = target.video;
         sessionCache.save(target.assignedUrl, {
@@ -112,13 +112,18 @@ export function useVideoPool() {
         detachMedia(video);
       }
 
-      // 5. Assign new source
+      // 5. Reset element before reuse — clear stale buffered data
+      const video = target.video;
+      video.removeAttribute('src');
+      video.load();
+
+      // 6. Assign new source
       target.assignedUrl = hlsUrl;
       target.assignedIndex = feedIndex;
       target.lastUsedAt = Date.now();
-      container.appendChild(target.video);
+      container.appendChild(video);
 
-      await attachMedia(target.video, hlsUrl);
+      await attachMedia(video, hlsUrl);
 
       // 6. Restore session state if available
       const saved = sessionCache.restore(hlsUrl);
