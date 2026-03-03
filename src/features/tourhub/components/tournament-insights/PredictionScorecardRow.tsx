@@ -21,11 +21,8 @@ interface PredictionScorecardRowProps {
   isLast?: boolean;
 }
 
-function getAccuracyBorderColor(pos: number | null, status?: string) {
-  if (status === 'cut' || status === 'withdrawn' || pos === null) return 'hsl(var(--border))';
-  if (pos <= 3) return 'rgba(22,163,74,0.5)';
-  if (pos <= 10) return 'rgba(217,119,6,0.5)';
-  return 'rgba(220,38,38,0.2)';
+function getAccuracyBorderColor() {
+  return 'hsl(var(--border))';
 }
 
 function formatScore(score: number | null): string {
@@ -45,7 +42,7 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
   const isWinner = prediction.actualPosition === 1;
   const isLeader = !isCompleted && prediction.actualPosition === 1;
   const avatarUrl = getPlayerHeadshotUrl(prediction.playerName, 'pga');
-  const borderColor = getAccuracyBorderColor(prediction.actualPosition, prediction.performanceStatus);
+  const borderColor = getAccuracyBorderColor();
 
   const offLead = prediction.actualPosition !== null ? prediction.actualPosition - 1 : null;
 
