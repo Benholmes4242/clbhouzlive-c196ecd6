@@ -216,7 +216,7 @@ export function Scrubber({ videoRef, isActive, duration, onScrubStart, onScrubEn
     <>
       {/* Invisible touch capture zone — bottom 60px */}
       <div
-        className="absolute left-0 right-0 z-25"
+        className="absolute left-0 right-0 z-[25]"
         style={{ bottom: 0, height: TOUCH_ZONE_HEIGHT }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
