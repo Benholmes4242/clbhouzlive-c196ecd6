@@ -182,11 +182,10 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
             logPoint('achievements.view_all.pointerdown', { x: t?.clientX, y: t?.clientY, via: 'touchstart' });
           }}
           onClick={handleViewAll}
-          className="inline-flex items-center justify-center gap-1 text-xs font-semibold min-h-[44px] min-w-[44px] px-2"
-          style={{ color: '#f59e0b' }}
+          className="inline-flex items-center justify-center gap-0.5 text-[0.8125rem] font-medium text-muted-foreground min-h-[44px] min-w-[44px] px-2 active:scale-95 transition-transform"
         >
           View all
-          <ChevronRight className="h-3.5 w-3.5" />
+          <ChevronRight className="h-3.5 w-3.5 opacity-60" />
         </button>
       </div>
 

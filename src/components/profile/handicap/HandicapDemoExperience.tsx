@@ -107,9 +107,9 @@ const HandicapDemoExperience: React.FC = () => {
         </div>
         {/* View all CTA */}
         <div className="border-t border-border px-5 py-3">
-          <button className="w-full flex items-center justify-center gap-1 text-sm font-medium text-primary-accent hover:text-primary-accent/80 transition-colors">
+          <button className="w-full flex items-center justify-center gap-0.5 text-[0.8125rem] font-medium text-muted-foreground active:scale-95 transition-transform">
             View all rounds
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-3.5 w-3.5 opacity-60" />
           </button>
         </div>
       </section>
