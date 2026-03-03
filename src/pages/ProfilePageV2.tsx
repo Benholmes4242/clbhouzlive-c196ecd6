@@ -1036,7 +1036,10 @@ const ProfilePageV2Content: React.FC = () => {
         ref={avatarFileInputRef}
         type="file"
         accept="image/*"
-        onChange={handleAvatarUpload}
+        onChange={(e) => {
+          console.log('[Avatar Camera] File input onChange fired — files:', e.target.files);
+          handleAvatarUpload(e);
+        }}
         className="hidden"
       />
       <input
