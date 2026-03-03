@@ -49,12 +49,13 @@ export function TeamRow({
         onClick={onProfileClick}
         className="flex items-center gap-3 flex-1 min-w-0 text-left"
       >
-        {/* Avatar — 64px for premium showcase */}
-        <div className="h-16 w-16 rounded-sq-md overflow-hidden flex items-center justify-center shrink-0">
+        {/* Avatar — 40px matching leaderboard rows */}
+        <div className="h-10 w-10 rounded-sq-md overflow-hidden flex items-center justify-center shrink-0">
           <SquircleAvatar
             src={profilePhotoUrl}
             alt={name}
-            size={64}
+            size={40}
+            hideRing
           />
         </div>
 
