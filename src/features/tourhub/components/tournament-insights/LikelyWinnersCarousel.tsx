@@ -1,12 +1,11 @@
 /**
- * TopPicksCarousel (formerly LikelyWinnersCarousel)
- * Premium player scouting cards with confidence gauges.
- * Phase 6 refinements: top accent bar, 52px gauge, dot bullets, pill pagination
+ * TopPicksCarousel — Portrait cards matching Personal Top 10 style
+ * Gradient backgrounds with centered headshots, rank badges, and confidence rings
  */
 
 import { memo, useState, useRef, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Info } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 import CountryFlag from '@/components/ui/country-flag';
 import type { WinnerProfile, ContenderCard } from './types';
 import ConfidenceGauge from './components/ConfidenceGauge';
@@ -29,22 +28,15 @@ interface PickCard {
   isWithdrawn?: boolean;
 }
 
-// Unified green accent — opacity-graduated by pick position
 const ACCENT_COLOR = '#16A34A';
-const ACCENT_OPACITIES = [1, 0.7, 0.7, 0.4, 0.4];
-const ACCENT_GRADIENTS = ACCENT_OPACITIES.map(
-  (op) => `linear-gradient(90deg, rgba(22,163,74,${op}), rgba(22,163,74,${op * 0.5}))`
-);
 
 export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
   featured,
   cards,
   withdrawnPlayerIds,
 }: LikelyWinnersCarouselProps) {
-  const [showConfidenceInfo, setShowConfidenceInfo] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const hasAnimatedRef = useRef(false);
 
   const contenderCards = cards.filter(c => c.type === 'contender').slice(0, 4);
 
@@ -74,8 +66,9 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
-    const cardWidth = el.offsetWidth - 20;
-    const idx = Math.round(el.scrollLeft / cardWidth);
+    const scrollLeft = el.scrollLeft;
+    const cardWidth = 227 + 16; // card width + gap
+    const idx = Math.round(scrollLeft / cardWidth);
     setActiveIndex(Math.min(idx, allPicks.length - 1));
   }, [allPicks.length]);
 
@@ -86,231 +79,166 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
     return () => el.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
 
-  useEffect(() => {
-    hasAnimatedRef.current = true;
-  }, []);
-
   return (
     <div>
-      {/* Section header */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        viewport={{ once: true }}
-        className="mb-4"
-      >
-        <div className="flex items-center justify-between">
-          <h3 className="text-foreground" style={{ fontSize: '18px', fontWeight: 700 }}>
-            Top 5 Picks
-          </h3>
-          <button
-            onClick={() => setShowConfidenceInfo(!showConfidenceInfo)}
-            className="flex items-center gap-1 active:opacity-70 transition-opacity text-muted-foreground/60"
-          >
-            <Info className="w-3.5 h-3.5" />
-          </button>
-        </div>
-
-        <AnimatePresence>
-          {showConfidenceInfo && (
-            <motion.div
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              className="mt-2 p-3 rounded-xl bg-card border border-border/50"
-              style={{ fontSize: '12px', lineHeight: 1.5 }}
-            >
-              <span className="text-muted-foreground">
-                AI confidence is calculated from course history, recent form, strokes gained metrics, and field strength.
-              </span>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
-
-      {/* Swipeable carousel */}
+      {/* Carousel */}
       <div
         ref={scrollRef}
-        className="flex gap-4 pb-2 -mx-4 px-4"
+        className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide px-4"
         style={{
-          overflowX: 'auto',
-          overflowY: 'hidden',
-          scrollSnapType: 'x mandatory',
-          WebkitOverflowScrolling: 'touch',
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
-          scrollPaddingLeft: '16px',
+          WebkitOverflowScrolling: 'touch',
         }}
       >
-        {allPicks.map((pick, i) => {
-          const isFeatured = i === 0;
-
-          return (
-            <motion.div
-              key={pick.id}
-              initial={hasAnimatedRef.current ? false : { opacity: 0, y: 20 }}
-              whileInView={{ opacity: pick.isWithdrawn ? 0.6 : 1, y: 0 }}
-              transition={{
-                delay: hasAnimatedRef.current ? 0 : 0.08 * i,
-                duration: 0.4,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-              viewport={{ once: true }}
-              className="rounded-2xl flex-shrink-0 relative overflow-hidden bg-card"
+        {allPicks.map((pick, i) => (
+          <motion.div
+            key={pick.id}
+            whileTap={{ scale: 0.98 }}
+            transition={{ duration: 0.2 }}
+            className="relative w-[227px] h-[292px] rounded-[22px] overflow-hidden flex-shrink-0 snap-center"
+            style={{
+              background: 'linear-gradient(165deg, hsl(var(--muted)) 0%, hsl(var(--background)) 100%)',
+              opacity: pick.isWithdrawn ? 0.6 : 1,
+            }}
+          >
+            {/* Green accent bar */}
+            <div
               style={{
-                width: isFeatured ? 'calc(100% - 28px)' : 'calc(100% - 36px)',
-                minWidth: isFeatured ? 'calc(100% - 28px)' : 'calc(100% - 36px)',
-                scrollSnapAlign: 'start',
-                border: '1px solid hsl(var(--border) / 0.4)',
-                opacity: pick.isWithdrawn ? 0.6 : undefined,
-                boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 3,
+                background: ACCENT_COLOR,
+                borderRadius: '22px 22px 0 0',
+              }}
+            />
+
+            {/* Rank badge — top-left */}
+            <div
+              className="absolute top-4 left-4 flex items-center px-3 py-1.5 rounded-full"
+              style={{
+                background: 'hsl(var(--muted))',
+                border: '1px solid hsl(var(--border))',
               }}
             >
-              {/* Top accent bar */}
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: 3,
-                  background: ACCENT_GRADIENTS[i] ?? ACCENT_GRADIENTS[4],
-                  borderRadius: '16px 16px 0 0',
-                }}
+              <span className="text-foreground font-semibold text-sm">#{i + 1}</span>
+            </div>
+
+            {/* Confidence ring — top-right */}
+            <div className="absolute top-3 right-3">
+              <ConfidenceGauge
+                tier={pick.confidenceTier}
+                accentColor={ACCENT_COLOR}
+                animationDelay={400 + i * 80}
+                isWithdrawn={pick.isWithdrawn}
+                size={44}
               />
+            </div>
 
-              {/* Avatar + Name row */}
-              <div className="flex items-start gap-3.5 p-5 pb-0">
-                <div className="relative flex-shrink-0">
-                  <img
-                    src={pick.avatarUrl || PLAYER_SILHOUETTE_URL}
-                    alt={pick.name}
-                    className="object-cover"
-                    style={{
-                      width: isFeatured ? 72 : 60,
-                      height: isFeatured ? 72 : 60,
-                      borderRadius: '34%',
-                      objectPosition: 'center 20%',
-                      border: '2px solid hsl(var(--border))',
-                    }}
-                    loading="lazy"
-                    onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-                  />
-                  {pick.isWithdrawn && (
-                    <div
-                      className="absolute -top-1 -right-1 px-1.5 py-0.5 rounded-md font-bold uppercase"
-                      style={{
-                        fontSize: '9px',
-                        letterSpacing: '0.5px',
-                        background: '#EF4444',
-                        color: 'white',
-                        lineHeight: 1.2,
-                      }}
-                    >
-                      WD
-                    </div>
-                  )}
-                </div>
+            {/* WD badge */}
+            {pick.isWithdrawn && (
+              <div
+                className="absolute top-12 left-4 px-1.5 py-0.5 rounded-md font-bold uppercase"
+                style={{
+                  fontSize: 9,
+                  letterSpacing: '0.5px',
+                  background: '#EF4444',
+                  color: 'white',
+                  lineHeight: 1.2,
+                }}
+              >
+                WD
+              </div>
+            )}
 
-                <div className="flex-1 min-w-0">
-                  <span
-                    className="block tracking-tight text-foreground"
-                    style={{
-                      fontSize: isFeatured ? 18 : 16,
-                      fontWeight: isFeatured ? 600 : 500,
-                      lineHeight: 1.2,
-                      marginBottom: 4,
-                    }}
-                  >
-                    {pick.name}
-                  </span>
-                  <div className="flex items-center gap-1.5">
-                    {pick.countryCode && (
-                      <CountryFlag country={pick.countryCode} size="sm" className="rounded-sm" />
-                    )}
-                    {pick.promoted && (
-                      <span
-                        className="text-[10px] font-semibold px-2 py-0.5 rounded-md inline-block"
-                        style={{
-                          background: 'rgba(59, 130, 246, 0.08)',
-                          color: 'rgb(59, 130, 246)',
-                        }}
-                      >
-                        Promoted pick
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex flex-col items-center gap-1">
-                  <span
-                    className="text-muted-foreground"
-                    style={{
-                      fontSize: 9,
-                      fontWeight: 600,
-                      letterSpacing: '0.1em',
-                      textTransform: 'uppercase',
-                      opacity: 0.6,
-                    }}
-                  >
-                    AI CONFIDENCE
-                  </span>
-                  <ConfidenceGauge
-                    tier={pick.confidenceTier}
-                    accentColor={ACCENT_COLOR}
-                    animationDelay={400 + i * 80}
-                    isWithdrawn={pick.isWithdrawn}
-                    size={52}
-                  />
-                </div>
+            {/* Center content — avatar, name, flag */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ paddingTop: 48, paddingBottom: 80 }}>
+              {/* Player headshot */}
+              <div className="relative flex-shrink-0">
+                <img
+                  src={pick.avatarUrl || PLAYER_SILHOUETTE_URL}
+                  alt={pick.name}
+                  className="object-cover"
+                  style={{
+                    width: 60,
+                    height: 60,
+                    borderRadius: '50%',
+                    objectPosition: 'center 20%',
+                    border: '2px solid hsl(var(--border))',
+                  }}
+                  loading="lazy"
+                  onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+                />
               </div>
 
-              {/* Bullet points with colored dots */}
-              {pick.bullets.length > 0 && (
-                <div className="flex flex-col gap-2.5 px-5 pb-5 pt-3">
-                  {pick.bullets.slice(0, 3).map((bullet, j) => (
-                    <div key={j} className="flex items-start gap-2">
-                      <span
-                        className="flex-shrink-0"
-                        style={{
-                          width: 4,
-                          height: 4,
-                          borderRadius: 2,
-                          marginTop: 7,
-                          backgroundColor: j === 0 ? ACCENT_COLOR : 'hsl(var(--muted-foreground))',
-                        }}
-                      />
-                      <span
-                        className="text-muted-foreground"
-                        style={{ fontSize: 14, lineHeight: 1.625 }}
-                      >
-                        {bullet}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </motion.div>
-          );
-        })}
+              {/* Player name */}
+              <p
+                className="text-foreground text-center truncate w-full px-4"
+                style={{ fontSize: 16, fontWeight: 700, marginTop: 8 }}
+              >
+                {pick.name}
+              </p>
+
+              {/* Flag + promoted */}
+              <div className="flex items-center gap-1.5 mt-0.5">
+                {pick.countryCode && (
+                  <CountryFlag country={pick.countryCode} size="sm" className="rounded-sm" />
+                )}
+                {pick.promoted && (
+                  <span
+                    className="text-[10px] font-semibold px-2 py-0.5 rounded-md"
+                    style={{
+                      background: 'rgba(59, 130, 246, 0.08)',
+                      color: 'rgb(59, 130, 246)',
+                    }}
+                  >
+                    Promoted
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Insight bullets — bottom */}
+            {pick.bullets.length > 0 && (
+              <div className="absolute bottom-0 left-0 right-0 flex flex-col gap-1.5 px-4 pb-4">
+                {pick.bullets.slice(0, 3).map((bullet, j) => (
+                  <div key={j} className="flex items-start gap-1.5">
+                    <span
+                      className="flex-shrink-0"
+                      style={{
+                        width: 4,
+                        height: 4,
+                        borderRadius: 2,
+                        marginTop: 5,
+                        backgroundColor: ACCENT_COLOR,
+                      }}
+                    />
+                    <span
+                      className="text-muted-foreground truncate"
+                      style={{ fontSize: 12, fontWeight: 500, lineHeight: 1.3 }}
+                    >
+                      {bullet}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </motion.div>
+        ))}
       </div>
 
-      {/* Pagination dots — active = 16px pill */}
+      {/* Pagination dots — match Personal Top 10 */}
       {allPicks.length > 1 && (
-        <div className="flex items-center justify-center gap-1.5 mt-3">
+        <div className="flex items-center justify-center gap-1 mt-4">
           {allPicks.map((_, i) => (
             <div
               key={i}
-              className="rounded-full"
-              style={{
-                width: i === activeIndex ? '16px' : '6px',
-                height: '6px',
-                background: i === activeIndex
-                  ? 'hsl(var(--foreground))'
-                  : 'hsl(var(--border))',
-                transition: 'width 0.3s ease',
-              }}
+              className={cn(
+                "rounded-full transition-all duration-300",
+                i === activeIndex ? "w-5 h-1.5 bg-primary" : "w-1.5 h-1.5 bg-primary/30"
+              )}
             />
           ))}
         </div>
