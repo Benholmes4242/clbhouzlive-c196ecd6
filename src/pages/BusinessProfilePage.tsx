@@ -503,11 +503,10 @@ const BusinessProfilePage: React.FC = () => {
                 {bioText}
               </p>
               {(isBioClamped || bioExpanded) && (
-                <button
-                  onClick={() => setBioExpanded(!bioExpanded)}
-                  className="text-sm font-semibold mt-1 min-h-[44px] flex items-center active:scale-[0.98] transition-transform"
-                  style={{ color: '#f59e0b' }}
-                >
+                 <button
+                   onClick={() => setBioExpanded(!bioExpanded)}
+                   className="text-[0.8125rem] font-medium text-muted-foreground mt-1 min-h-[44px] flex items-center gap-0.5 active:scale-95 transition-transform"
+                 >
                   {bioExpanded ? 'Show less' : 'More'}
                 </button>
               )}

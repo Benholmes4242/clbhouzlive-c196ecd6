@@ -286,10 +286,10 @@ export function BusinessProfileHeader({
                 {displayBio}
               </p>
               {shouldTruncateBio && (
-                <button
-                  onClick={() => setBioExpanded(!bioExpanded)}
-                  className="text-sm font-medium text-[#F7931E] mt-1 hover:underline"
-                >
+                 <button
+                   onClick={() => setBioExpanded(!bioExpanded)}
+                   className="text-[0.8125rem] font-medium text-muted-foreground mt-1 active:scale-95 transition-transform"
+                 >
                   {bioExpanded ? 'Show less' : 'More'}
                 </button>
               )}
