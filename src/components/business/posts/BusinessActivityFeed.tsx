@@ -531,12 +531,12 @@ export function BusinessActivityFeed({
   return (
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
     <div>
-      {/* Sub-tabs: Activity / Tagged */}
-      <div className="flex justify-center border-b border-border/50">
+      {/* Sub-tabs: Posts / Tagged — Tier 2 orange underline */}
+      <div className="flex justify-center gap-1">
         <button
           onClick={() => setFeedTab('activity')}
           className={cn(
-            'px-6 py-3 text-sm transition-colors relative min-h-[44px] active:opacity-70 transition-opacity',
+            'relative px-3 py-2 text-sm min-h-[44px] whitespace-nowrap transition-all duration-200 active:scale-[0.97]',
             feedTab === 'activity'
               ? 'text-foreground font-semibold'
               : 'text-muted-foreground font-medium hover:text-foreground'
@@ -544,13 +544,13 @@ export function BusinessActivityFeed({
         >
           Posts
           {feedTab === 'activity' && (
-            <div className="absolute bottom-0 left-0 right-0 h-[3px] rounded-full bg-primary" />
+            <div className="absolute bottom-0 left-0 right-0 h-[3px] rounded-full bg-[hsl(var(--tab-orange))]" />
           )}
         </button>
         <button
           onClick={() => setFeedTab('tagged')}
           className={cn(
-            'px-6 py-3 text-sm transition-colors relative min-h-[44px] active:opacity-70 transition-opacity',
+            'relative px-3 py-2 text-sm min-h-[44px] whitespace-nowrap transition-all duration-200 active:scale-[0.97]',
             feedTab === 'tagged'
               ? 'text-foreground font-semibold'
               : 'text-muted-foreground font-medium hover:text-foreground'
@@ -558,7 +558,7 @@ export function BusinessActivityFeed({
         >
           Tagged
           {feedTab === 'tagged' && (
-            <div className="absolute bottom-0 left-0 right-0 h-[3px] rounded-full bg-primary" />
+            <div className="absolute bottom-0 left-0 right-0 h-[3px] rounded-full bg-[hsl(var(--tab-orange))]" />
           )}
         </button>
       </div>

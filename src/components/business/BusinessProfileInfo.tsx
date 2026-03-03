@@ -1,11 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Phone, Mail, Globe, MapPin, Building2, Calendar, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BusinessProfile } from '@/hooks/useBusinessProfile';
 import { format } from 'date-fns';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
-import { ExpandableText } from '@/components/common/ExpandableText';
 import { useNavigate } from 'react-router-dom';
+
+const BIO_CHAR_LIMIT = 200;
+
+function BioText({ text }: { text: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const shouldTruncate = text.length > BIO_CHAR_LIMIT;
+  const displayText = !expanded && shouldTruncate ? text.slice(0, BIO_CHAR_LIMIT).trimEnd() + '…' : text;
+
+  return (
+    <div>
+      <p className="text-sm leading-relaxed text-foreground whitespace-pre-wrap" style={{ overflowWrap: 'anywhere' }}>
+        {displayText}
+      </p>
+      {shouldTruncate && (
+        <button
+          type="button"
+          onClick={() => setExpanded(v => !v)}
+          className="text-[0.8125rem] font-medium text-muted-foreground mt-1 min-h-[44px] active:scale-95 transition-transform"
+        >
+          {expanded ? 'Show less' : 'Show more'}
+        </button>
+      )}
+    </div>
+  );
+}
 
 interface BusinessProfileInfoProps {
   business: BusinessProfile;
@@ -60,7 +84,7 @@ export function BusinessProfileInfo({ business, canManage }: BusinessProfileInfo
                 </button>
               </div>
             )}
-            <ExpandableText text={business.description} lines={4} />
+            <BioText text={business.description} />
           </section>
         )}
 

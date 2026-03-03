@@ -613,7 +613,7 @@ const BusinessProfilePage: React.FC = () => {
 
         {/* Segmented control tabs */}
         <section className="px-4 py-2 pointer-events-auto">
-          <div className="inline-flex bg-muted rounded-full p-1 w-full">
+          <div className="flex items-center justify-center gap-1 w-full">
             {tabs.map((tab) => {
               const isActive = activeTab === tab.id;
               return (
@@ -623,7 +623,7 @@ const BusinessProfilePage: React.FC = () => {
                   className={cn(
                     "relative flex-1 min-h-[44px] transition-all duration-200 whitespace-nowrap active:scale-[0.98]",
                     isActive 
-                      ? "bg-foreground text-background rounded-full px-4 py-1.5 text-sm font-semibold shadow-sm" 
+                      ? "bg-foreground text-background rounded-lg px-4 py-1.5 text-sm font-semibold shadow-sm" 
                       : "text-muted-foreground px-4 py-1.5 text-sm font-medium hover:text-foreground"
                   )}
                 >
