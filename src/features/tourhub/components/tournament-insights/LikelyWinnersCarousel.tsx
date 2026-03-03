@@ -225,21 +225,32 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                 {pick.bullets.length > 0 && (
                   <div className="flex flex-col" style={{ marginTop: 10, gap: 4 }}>
                     {pick.bullets.slice(0, 3).map((bullet, j) => (
-                      <p
-                        key={j}
-                        className="text-muted-foreground text-center"
-                        style={{
-                          fontSize: 11.5,
-                          fontWeight: 500,
-                          lineHeight: 1.4,
-                          display: '-webkit-box',
-                          WebkitLineClamp: 3,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                        }}
-                      >
-                        {bullet}
-                      </p>
+                      <div key={j} className="flex items-start" style={{ gap: 6 }}>
+                        <span
+                          className="flex-shrink-0"
+                          style={{
+                            width: 3.5,
+                            height: 3.5,
+                            borderRadius: '50%',
+                            marginTop: 5,
+                            backgroundColor: ACCENT_COLOR,
+                          }}
+                        />
+                        <span
+                          className="text-muted-foreground"
+                          style={{
+                            fontSize: 11.5,
+                            fontWeight: 500,
+                            lineHeight: 1.4,
+                            display: '-webkit-box',
+                            WebkitLineClamp: 3,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          {bullet}
+                        </span>
+                      </div>
                     ))}
                   </div>
                 )}
