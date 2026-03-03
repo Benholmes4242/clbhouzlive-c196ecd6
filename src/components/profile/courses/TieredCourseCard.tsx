@@ -20,6 +20,7 @@ export interface CourseCardData {
   last_played_at: string | null;
   rating_value: number | null;
   has_rating: boolean;
+  rating_id: string | null;
 }
 
 interface TieredCourseCardProps {
