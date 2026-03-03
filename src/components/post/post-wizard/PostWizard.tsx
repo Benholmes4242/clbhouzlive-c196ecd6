@@ -824,7 +824,7 @@ export function PostWizard({
             />
 
             {/* Scrollable Composer — Changes 2-7 */}
-            <div className="flex-1 overflow-y-auto px-5 pt-4 pb-6" style={{ scrollbarWidth: 'none' }}>
+            <div className="flex-1 overflow-y-auto px-4 pt-4 pb-6" style={{ scrollbarWidth: 'none' }}>
               <div className="max-w-[680px] mx-auto flex flex-col" style={{ gap: '12px' }}>
 
                 {/* Change 2: Text Input Card */}
@@ -863,19 +863,19 @@ export function PostWizard({
                     onFocusChange={setCaptionFocused}
                   />
 
-                  {/* Character counter — inside card, bottom-right */}
-                  {captionGraphemeCount > 0 && (
-                    <p
-                      className="text-[11px] font-semibold tabular-nums text-right mt-2"
-                      style={{
-                        color: captionGraphemeCount > POST_LIMITS.MAX_CAPTION_LENGTH * 0.95
-                          ? '#EF4444'
-                          : 'hsl(var(--muted-foreground) / 0.4)',
-                      }}
-                    >
-                      {captionGraphemeCount}/{POST_LIMITS.MAX_CAPTION_LENGTH}
-                    </p>
-                  )}
+                  {/* Character counter — inside card, bottom-right, fade in */}
+                  <p
+                    className="text-[11px] font-semibold tabular-nums text-right mt-2 transition-opacity duration-200"
+                    style={{
+                      color: captionGraphemeCount > POST_LIMITS.MAX_CAPTION_LENGTH * 0.95
+                        ? '#EF4444'
+                        : 'hsl(var(--muted-foreground) / 0.4)',
+                      opacity: captionGraphemeCount > 0 ? 1 : 0,
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    {captionGraphemeCount > 0 ? `${captionGraphemeCount}/${POST_LIMITS.MAX_CAPTION_LENGTH}` : '\u00A0'}
+                  </p>
                 </div>
 
                 {/* Change 3: Media Upload Area */}
@@ -883,10 +883,22 @@ export function PostWizard({
                   {state.mediaItems.length === 0 ? (
                     <button
                       onClick={() => handleAddMedia()}
-                      className="w-full flex flex-col items-center justify-center gap-3 rounded-2xl cursor-pointer transition-all active:scale-[0.985]"
+                      className="w-full flex flex-col items-center justify-center gap-3 rounded-2xl cursor-pointer transition-all duration-100 active:scale-[0.985]"
                       style={{
-                        background: 'hsl(var(--muted) / 0.5)',
-                        aspectRatio: '16 / 10',
+                        border: '2px dashed rgba(245, 158, 11, 0.2)',
+                        background: 'transparent',
+                        padding: '32px 0',
+                      }}
+                      onPointerDown={(e) => {
+                        const el = e.currentTarget;
+                        el.style.background = 'rgba(245, 158, 11, 0.04)';
+                      }}
+                      onPointerUp={(e) => {
+                        const el = e.currentTarget;
+                        setTimeout(() => { el.style.background = 'transparent'; }, 100);
+                      }}
+                      onPointerLeave={(e) => {
+                        e.currentTarget.style.background = 'transparent';
                       }}
                     >
                       {/* Gradient icon container */}
@@ -898,9 +910,14 @@ export function PostWizard({
                       >
                         <Image className="w-[26px] h-[26px]" style={{ color: '#f59e0b' }} />
                       </div>
-                      <span className="text-[15px] font-semibold text-foreground">
-                        Add photo or video
-                      </span>
+                      <div className="flex flex-col items-center gap-1">
+                        <span className="text-[14px] font-semibold text-foreground">
+                          Add photo or video
+                        </span>
+                        <span className="text-[12px] text-muted-foreground">
+                          Up to 10 photos & videos
+                        </span>
+                      </div>
                     </button>
                   ) : (
                     <div className="flex gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
@@ -923,8 +940,11 @@ export function PostWizard({
                       {state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT && (
                         <button
                           onClick={() => handleAddMedia()}
-                          className="flex-shrink-0 w-[160px] h-[160px] rounded-2xl flex items-center justify-center active:scale-[0.96] transition-transform"
-                          style={{ background: 'hsl(var(--muted) / 0.5)' }}
+                          className="flex-shrink-0 w-[160px] h-[160px] rounded-xl flex items-center justify-center active:scale-[0.96] transition-transform"
+                          style={{
+                            border: '2px dashed rgba(245, 158, 11, 0.2)',
+                            background: 'transparent',
+                          }}
                         >
                           <Plus className="w-6 h-6" style={{ color: '#f59e0b' }} />
                         </button>
@@ -936,11 +956,13 @@ export function PostWizard({
                 {/* Media counter */}
                 {state.mediaItems.length > 0 && (
                   <p
-                    className="text-[11px] font-medium tabular-nums text-center -mt-1"
+                    className="text-[12px] font-medium tabular-nums text-center"
                     style={{
                       color: state.mediaItems.length >= POST_LIMITS.MAX_MEDIA_COUNT
                         ? '#EF4444'
-                        : 'hsl(var(--muted-foreground) / 0.5)',
+                        : 'hsl(var(--muted-foreground))',
+                      marginTop: '0px',
+                      marginBottom: '0px',
                     }}
                   >
                     {state.mediaItems.length}/{POST_LIMITS.MAX_MEDIA_COUNT}
