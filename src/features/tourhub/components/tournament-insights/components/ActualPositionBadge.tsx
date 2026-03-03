@@ -10,8 +10,9 @@ interface ActualPositionBadgeProps {
   performanceStatus?: string;
 }
 
-function getAccuracyTier() {
-  return { color: '#16A34A', bg: 'rgba(22,163,74,0.08)' };
+function getAccuracyTier(pos: number) {
+  if (pos <= 10) return { color: 'rgba(245, 158, 11, 0.9)', bg: 'rgba(245, 158, 11, 0.08)' };
+  return { color: 'hsl(var(--muted-foreground))', bg: 'hsl(var(--muted))' };
 }
 
 const ActualPositionBadge: React.FC<ActualPositionBadgeProps> = ({
@@ -45,7 +46,7 @@ const ActualPositionBadge: React.FC<ActualPositionBadgeProps> = ({
     );
   }
 
-  const tier = getAccuracyTier();
+  const tier = getAccuracyTier(position);
   const prefix = isTied ? 'T' : '';
 
   return (
