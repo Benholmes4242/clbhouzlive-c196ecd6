@@ -42,15 +42,15 @@ export function TeamRow({
   const hasCustomTitle = !!displayTitle?.trim();
 
   return (
-    <div className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/30 active:scale-[0.98] transition-all">
+    <div className="w-full flex items-center gap-3 px-4 py-0 hover:bg-muted/30 active:scale-[0.98] transition-all">
       {/* Clickable profile area */}
       <button
         type="button"
         onClick={onProfileClick}
         className="flex items-center gap-3 flex-1 min-w-0 text-left"
       >
-        {/* Avatar — 40px matching leaderboard rows */}
-        <div className="h-10 w-10 rounded-sq-md overflow-hidden flex items-center justify-center shrink-0">
+        {/* Avatar — 40px squircle */}
+        <div className="shrink-0">
           <SquircleAvatar
             src={profilePhotoUrl}
             alt={name}
