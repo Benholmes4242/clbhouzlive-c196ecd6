@@ -26,11 +26,12 @@ export const LiveUpcomingToggle: React.FC<LiveUpcomingToggleProps> = ({
 
   return (
     <div
-      className="flex bg-muted"
+      className="flex"
       style={{
         borderRadius: 12,
         padding: 3,
         maxWidth: 320,
+        gap: 4,
       }}
     >
       {tabs.map((tab) => {
@@ -46,10 +47,10 @@ export const LiveUpcomingToggle: React.FC<LiveUpcomingToggleProps> = ({
               fontSize: 13,
               fontWeight: 600,
               color: isActive
-                ? 'hsl(var(--foreground))'
+                ? 'hsl(var(--background))'
                 : 'hsl(var(--muted-foreground))',
-              background: isActive ? 'hsl(var(--background))' : 'transparent',
-              boxShadow: isActive ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+              background: isActive ? 'hsl(var(--foreground))' : 'transparent',
+              boxShadow: 'none',
               border: 'none',
               cursor: 'pointer',
             }}
