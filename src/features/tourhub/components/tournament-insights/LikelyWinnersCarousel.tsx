@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import CountryFlag from '@/components/ui/country-flag';
 import type { WinnerProfile, ContenderCard } from './types';
-import ConfidenceGauge from './components/ConfidenceGauge';
+
 import { PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 
 interface LikelyWinnersCarouselProps {
