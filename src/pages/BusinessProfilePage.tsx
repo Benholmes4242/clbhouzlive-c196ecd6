@@ -26,7 +26,7 @@ import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { BusinessLocationCard } from '@/components/business/BusinessLocationCard';
-import { BusinessImageActionSheet } from '@/components/business/BusinessImageActionSheet';
+import { ImageCropModal } from '@/components/business/ImageCropModal';
 import { trackBusinessProfileVisit, trackBusinessAction } from '@/lib/businessAnalyticsTracking';
 import { getCityOnly, getCityCountry } from '@/lib/locationDisplay';
 import { toast } from 'sonner';
@@ -66,14 +66,58 @@ const BusinessProfilePage: React.FC = () => {
 
   // Image upload hooks (P7: owner affordances)
   const { uploadLogo, removeLogo, uploadCover, removeCover, uploadingLogo, uploadingCover } = useBusinessImageUpload(business?.id);
-  const [logoSheetOpen, setLogoSheetOpen] = useState(false);
-  const [coverSheetOpen, setCoverSheetOpen] = useState(false);
+  const logoFileInputRef = useRef<HTMLInputElement>(null);
+  const heroFileInputRef = useRef<HTMLInputElement>(null);
+  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
+  const [cropMode, setCropMode] = useState<'logo' | 'cover' | null>(null);
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
 
   const [activeTab, setActiveTab] = useState<BusinessTab>('content');
   const [bioExpanded, setBioExpanded] = useState(false);
   const [isBioClamped, setIsBioClamped] = useState(false);
   const [isAvatarLightboxOpen, setIsAvatarLightboxOpen] = useState(false);
   const bioRef = useRef<HTMLParagraphElement>(null);
+
+  // File selected handlers — open crop modal
+  const handleLogoFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCropImageSrc(URL.createObjectURL(file));
+    setCropMode('logo');
+    setIsCropModalOpen(true);
+    if (logoFileInputRef.current) logoFileInputRef.current.value = '';
+  };
+
+  const handleCoverFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCropImageSrc(URL.createObjectURL(file));
+    setCropMode('cover');
+    setIsCropModalOpen(true);
+    if (heroFileInputRef.current) heroFileInputRef.current.value = '';
+  };
+
+  const handleCropComplete = (croppedFile: File) => {
+    setIsCropModalOpen(false);
+    if (cropImageSrc) {
+      URL.revokeObjectURL(cropImageSrc);
+      setCropImageSrc(null);
+    }
+    if (cropMode === 'logo') uploadLogo(croppedFile);
+    if (cropMode === 'cover') uploadCover(croppedFile);
+    setCropMode(null);
+  };
+
+  const handleCropCancel = (open: boolean) => {
+    if (!open) {
+      if (cropImageSrc) {
+        URL.revokeObjectURL(cropImageSrc);
+        setCropImageSrc(null);
+      }
+      setIsCropModalOpen(false);
+      setCropMode(null);
+    }
+  };
 
   // Check ownership
   const isOwner = membership?.canManage;
