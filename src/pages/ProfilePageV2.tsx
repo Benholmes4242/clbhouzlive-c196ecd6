@@ -833,8 +833,7 @@ const ProfilePageV2Content: React.FC = () => {
             {profile.bio.split('\n').length > 4 && !bioExpanded && (
               <button 
                 onClick={() => setBioExpanded(true)}
-                className="text-sm font-medium mt-1 min-h-[44px] flex items-center active:scale-[0.98]"
-                style={{ color: '#f59e0b' }}
+                className="text-[0.8125rem] font-medium text-muted-foreground mt-1 min-h-[44px] flex items-center gap-0.5 active:scale-95 transition-transform"
               >
                 Read more
                 <ChevronDown className="w-4 h-4 ml-1" />
