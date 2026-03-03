@@ -63,13 +63,12 @@ export function PostWizardHeader({
         className="flex items-center gap-2 active:opacity-70 transition-opacity min-h-[44px]"
       >
         <SquircleAvatar
-          size={24}
+          size={28}
           src={avatarUrl}
           alt={actorName}
           fallback={actorName?.[0]?.toUpperCase() || 'U'}
           hideRing
         />
-        <span className="text-[13px] font-semibold text-foreground">{visibilityLabel}</span>
         <ChevronDown className="w-3 h-3 text-muted-foreground" />
       </button>
 
