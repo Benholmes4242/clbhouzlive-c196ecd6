@@ -38,14 +38,26 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
     queryFn: async () => {
       const courseIds = userActivity.map(a => a.course_id);
       
-      const { data, error } = await supabase
-        .from('golf_courses')
-        .select('id, name, country, sub_country, thumbnail_image')
-        .in('id', courseIds);
+      const [coursesResult, ratingsResult] = await Promise.all([
+        supabase
+          .from('golf_courses')
+          .select('id, name, country, sub_country, thumbnail_image')
+          .in('id', courseIds),
+        supabase
+          .from('course_ratings')
+          .select('id, course_id')
+          .eq('user_id', userId)
+          .eq('is_mock', false)
+          .in('course_id', courseIds),
+      ]);
 
-      if (error) throw error;
+      if (coursesResult.error) throw coursesResult.error;
 
-      return (data || []).map(course => {
+      // Build a map of course_id -> rating_id
+      const ratingIdMap = new Map<string, string>();
+      (ratingsResult.data || []).forEach(r => ratingIdMap.set(r.course_id, r.id));
+
+      return (coursesResult.data || []).map(course => {
         const activity = userActivity.find(a => a.course_id === course.id);
         return {
           ...course,
@@ -53,6 +65,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
           last_played_at: activity?.last_played_at || null,
           rating_value: activity?.rating_value || null,
           has_rating: activity?.has_rating || false,
+          rating_id: ratingIdMap.get(course.id) || null,
         } as CourseCardData;
       });
     },
