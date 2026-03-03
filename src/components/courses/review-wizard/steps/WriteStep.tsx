@@ -163,8 +163,8 @@ export function WriteStep({
           transition={{ delay: 0.05 }}
           className="shrink-0 rounded-2xl p-4 transition-all duration-200"
           style={{
-            background: isTitleFocused ? 'rgba(245, 158, 11, 0.04)' : 'hsl(var(--muted) / 0.5)',
-            border: isTitleFocused
+            background: (isTitleFocused || title.length > 0) ? 'rgba(245, 158, 11, 0.04)' : 'hsl(var(--muted) / 0.5)',
+            border: (isTitleFocused || title.length > 0)
               ? '1.5px solid rgba(245, 158, 11, 0.3)'
               : '1.5px solid transparent',
           }}
@@ -206,8 +206,8 @@ export function WriteStep({
           transition={{ delay: 0.1 }}
           className="flex-1 flex flex-col min-h-0 rounded-2xl p-4 transition-all duration-200"
           style={{
-            background: isReviewFocused ? 'rgba(245, 158, 11, 0.04)' : 'hsl(var(--muted) / 0.5)',
-            border: isReviewFocused
+            background: (isReviewFocused || review.length > 0) ? 'rgba(245, 158, 11, 0.04)' : 'hsl(var(--muted) / 0.5)',
+            border: (isReviewFocused || review.length > 0)
               ? '1.5px solid rgba(245, 158, 11, 0.3)'
               : '1.5px solid transparent',
           }}

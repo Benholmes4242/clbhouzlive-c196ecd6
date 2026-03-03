@@ -831,10 +831,10 @@ export function PostWizard({
                 <div
                   className="rounded-2xl p-4 transition-all duration-150"
                   style={{
-                    background: captionFocused
+                    background: (captionFocused || state.caption.length > 0)
                       ? 'rgba(245, 158, 11, 0.04)'
                       : 'hsl(var(--muted) / 0.5)',
-                    border: captionFocused
+                    border: (captionFocused || state.caption.length > 0)
                       ? '1.5px solid rgba(245, 158, 11, 0.3)'
                       : '1.5px solid transparent',
                   }}
