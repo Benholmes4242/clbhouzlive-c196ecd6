@@ -101,7 +101,7 @@ export function FeaturedVideoSlot({
             <div className="flex items-center gap-3">
               <button
                 onClick={onEditClick}
-                className="text-xs text-primary font-medium min-h-[44px] flex items-center"
+                className="text-[0.8125rem] text-muted-foreground font-medium min-h-[44px] flex items-center active:scale-95 transition-transform"
               >
                 Change
               </button>

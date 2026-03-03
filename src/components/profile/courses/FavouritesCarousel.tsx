@@ -240,7 +240,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
           <div className="flex flex-col items-center">
             <button 
               onClick={onManage}
-              className="text-sm font-semibold text-amber-600 flex items-center min-h-[44px] active:scale-[0.98]"
+              className="text-[0.8125rem] font-medium text-muted-foreground flex items-center gap-0.5 min-h-[44px] active:scale-95 transition-transform"
             >
               Manage
             </button>

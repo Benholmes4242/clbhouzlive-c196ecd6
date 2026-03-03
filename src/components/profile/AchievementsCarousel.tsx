@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
-import { Trophy } from 'lucide-react';
+import { Trophy, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
 import AchievementDetailModal from '@/components/achievements/AchievementDetailModal';
@@ -136,14 +136,13 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
             <div className="flex items-center gap-2">
               <h3 className="text-xl md:text-2xl text-foreground">Achievements</h3>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
+            <button
               onClick={() => setAchievementsModalOpen(true)}
-              className="text-black hover:text-black/80"
+              className="flex items-center gap-0.5 text-[0.8125rem] font-medium text-muted-foreground min-h-[44px] active:scale-95 transition-transform"
             >
               See All
-            </Button>
+              <ChevronRight className="w-3.5 h-3.5 opacity-60" />
+            </button>
           </div>
 
           {/* Static Grid Layout - No carousel */}
