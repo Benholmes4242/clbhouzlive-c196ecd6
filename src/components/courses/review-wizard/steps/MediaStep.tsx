@@ -211,7 +211,7 @@ export function MediaStep({
               <button
                 onClick={handlePickMedia}
                 disabled={isPickerOpen}
-                className="flex-shrink-0 w-[160px] h-[160px] rounded-2xl flex items-center justify-center disabled:opacity-50"
+                className="flex-shrink-0 w-[208px] h-[208px] rounded-2xl flex items-center justify-center disabled:opacity-50"
                 style={{ border: '1.5px dashed rgba(245,158,11,0.25)' }}
               >
                 {isPickerOpen ? (
