@@ -62,7 +62,7 @@ const ActualPositionBadge: React.FC<ActualPositionBadgeProps> = ({
 
   return (
     <div style={CONTAINER_STYLE}>
-      <span style={{ fontSize: 15, fontWeight: 800, color }}>
+      <span style={{ fontSize: 17, fontWeight: 800, letterSpacing: '-0.02em', color }}>
         {prefix}{position}
       </span>
     </div>

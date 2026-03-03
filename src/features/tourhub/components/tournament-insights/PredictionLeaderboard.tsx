@@ -45,22 +45,34 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
         initial={isCompleted ? { opacity: 0 } : false}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4, delay: isCompleted ? 0.9 : 0 }}
-        className="flex items-center justify-between px-1"
+        className="px-1"
         style={{ marginBottom: 16 }}
       >
-        <span
-          className="text-muted-foreground uppercase"
-          style={{ fontSize: 13, fontWeight: 600, letterSpacing: '0.05em' }}
-        >
-          {isCompleted ? 'Our Picks' : 'OUR PICKS · LIVE POSITIONS'}
-        </span>
-        {!isCompleted && (
-          <span
-            className="text-muted-foreground uppercase"
-            style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.12em' }}
-          >
-            POS / OFF LEAD
-          </span>
+        {isCompleted ? (
+          <div>
+            <span
+              className="text-foreground"
+              style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.01em' }}
+            >
+              Our Picks
+            </span>
+            <div style={{ height: 1, background: 'hsl(var(--border) / 0.15)', marginTop: 8 }} />
+          </div>
+        ) : (
+          <div className="flex items-center justify-between">
+            <span
+              className="text-muted-foreground uppercase"
+              style={{ fontSize: 13, fontWeight: 600, letterSpacing: '0.05em' }}
+            >
+              OUR PICKS · LIVE POSITIONS
+            </span>
+            <span
+              className="text-muted-foreground uppercase"
+              style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.12em' }}
+            >
+              POS / OFF LEAD
+            </span>
+          </div>
         )}
       </motion.div>
 
