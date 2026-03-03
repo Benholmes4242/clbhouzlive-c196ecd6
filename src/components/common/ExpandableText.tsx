@@ -39,14 +39,13 @@ export const ExpandableText: React.FC<ExpandableTextProps> = ({
       {shouldTruncate && (
         <button
           type="button"
-          className="mt-1 text-sm font-semibold flex items-center gap-1 transition-colors relative z-10 min-h-[44px]"
-          style={{ color: '#f59e0b' }}
+          className="mt-1 text-[0.8125rem] font-medium text-muted-foreground flex items-center gap-0.5 transition-colors relative z-10 min-h-[44px] active:scale-95 transition-transform"
           onClick={() => setExpanded((v) => !v)}
           aria-expanded={expanded}
         >
           {expanded ? 'Show less' : 'Read more'}
           <ChevronDown
-            className={`w-3 h-3 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
+            className={`w-3.5 h-3.5 opacity-60 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
           />
         </button>
       )}
