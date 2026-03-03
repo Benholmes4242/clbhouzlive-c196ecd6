@@ -61,7 +61,20 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
       style={{
         padding: '16px 4px',
         opacity: isWD ? 0.5 : isCut ? 0.6 : 1,
-        borderBottom: isLast ? 'none' : '1px solid hsl(var(--border) / 0.3)',
+        borderBottom: isLast ? 'none' : '1px solid hsl(var(--border) / 0.15)',
+        transition: 'background-color 150ms ease',
+        cursor: 'pointer',
+      }}
+      onPointerDown={(e) => {
+        const el = e.currentTarget;
+        el.style.backgroundColor = 'hsl(var(--muted) / 0.5)';
+      }}
+      onPointerUp={(e) => {
+        const el = e.currentTarget;
+        setTimeout(() => { el.style.backgroundColor = 'transparent'; }, 100);
+      }}
+      onPointerLeave={(e) => {
+        e.currentTarget.style.backgroundColor = 'transparent';
       }}
     >
       {/* Leader left accent (live only) */}
@@ -114,14 +127,14 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
           <PickBadge pickNumber={prediction.predictedRank} />
         )}
 
-        {/* Avatar — squircle shape */}
+        {/* Avatar — round */}
         <div className="relative flex-shrink-0">
           <div
             className="overflow-hidden bg-muted"
             style={{
-              width: 44,
-              height: Math.round(44 * 1.05),
-              borderRadius: '34%',
+              width: 40,
+              height: 40,
+              borderRadius: '50%',
               border: `2px solid ${borderColor}`,
             }}
           >
@@ -138,7 +151,7 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
               <div className="w-full h-full bg-muted" />
             )}
           </div>
-          {/* Best call gold star */}
+           {/* Best call green star */}
           {isBestCall && (
             <div
               style={{
@@ -148,13 +161,14 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
                 width: 18,
                 height: 18,
                 borderRadius: '50%',
-                background: '#CA8A04',
+                background: '#16A34A',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 boxShadow: '0 0 0 2px hsl(var(--background))',
                 fontSize: 10,
                 lineHeight: 1,
+                color: 'white',
               }}
             >
               ★
@@ -213,12 +227,12 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
         {/* RIGHT SECTION — differs between completed and live */}
         <div className="flex-shrink-0 ml-auto">
           {isCompleted ? (
-            /* Completed: Large score on the right */
+            /* Completed: Score on the right */
             <span
-              className="text-foreground"
+              className={prediction.score !== null && prediction.score > 0 ? 'text-muted-foreground' : 'text-foreground'}
               style={{
-                fontSize: 18,
-                fontWeight: 700,
+                fontSize: 16,
+                fontWeight: 600,
                 letterSpacing: '-0.2px',
               }}
             >
