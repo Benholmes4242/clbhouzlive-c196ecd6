@@ -237,17 +237,15 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
         </div>
         
         {isOwnProfile && onManage ? (
-          <div className="flex flex-col items-center">
-            <button 
-              onClick={onManage}
-              className="text-[0.8125rem] font-medium text-muted-foreground flex items-center gap-0.5 min-h-[44px] active:scale-95 transition-transform"
-            >
-              Manage
-            </button>
-            <span className="text-muted-foreground text-xs">{courseCount}/10</span>
-          </div>
+          <button 
+            onClick={onManage}
+            className="flex items-center gap-0.5 text-[0.8125rem] font-medium text-muted-foreground min-h-[44px] active:scale-95 transition-transform"
+          >
+            Manage
+            <ChevronRight className="w-3.5 h-3.5 opacity-60" />
+          </button>
         ) : (
-          <span className="text-muted-foreground text-xs self-end mb-0.5">{courseCount}/10</span>
+          <span className="text-muted-foreground text-xs">{courseCount}/10</span>
         )}
       </div>
       
