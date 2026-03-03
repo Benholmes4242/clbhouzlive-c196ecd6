@@ -44,7 +44,11 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
   const isRated = course.has_rating && course.rating_value !== null;
 
   const handleClick = () => {
-    navigate(`/courses/${course.id}`);
+    if (course.rating_id) {
+      navigate(`/courses/${course.id}?tab=reviews&review=${course.rating_id}`);
+    } else {
+      navigate(`/courses/${course.id}`);
+    }
   };
 
   const handleRateClick = (e: React.MouseEvent) => {
