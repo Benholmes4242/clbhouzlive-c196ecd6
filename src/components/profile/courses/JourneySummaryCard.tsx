@@ -102,31 +102,35 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
       <div className="flex justify-center gap-8">
         {/* Countries */}
         {countriesPlayed > 0 && (
-          <div className="flex flex-col items-center text-center">
-            <div className="w-9 h-9 rounded-full bg-muted border border-border flex items-center justify-center mb-1.5">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-full bg-muted border border-border flex items-center justify-center">
               <Globe className="w-4 h-4 text-muted-foreground" />
             </div>
-            <AnimatedNumber 
-              value={countriesPlayed} 
-              className="text-lg font-semibold text-foreground leading-tight"
-            />
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {countriesPlayed === 1 ? 'Country' : 'Countries'}
-            </p>
+            <div>
+              <AnimatedNumber 
+                value={countriesPlayed} 
+                className="text-lg font-semibold text-foreground leading-tight"
+              />
+              <p className="text-xs text-muted-foreground">
+                {countriesPlayed === 1 ? 'country' : 'countries'}
+              </p>
+            </div>
           </div>
         )}
 
         {/* Average Rating */}
         {avgRating !== null && avgRating > 0 && (
-          <div className="flex flex-col items-center text-center">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200/60 flex items-center justify-center mb-1.5">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200/60 flex items-center justify-center">
               <Star className="w-4 h-4 text-amber-500" />
             </div>
-            <AnimatedNumber 
-              value={Number(avgRating.toFixed(1))} 
-              className="text-lg font-semibold text-foreground leading-tight"
-            />
-            <p className="text-xs text-muted-foreground mt-0.5">Avg Rating</p>
+            <div>
+              <AnimatedNumber 
+                value={Number(avgRating.toFixed(1))} 
+                className="text-lg font-semibold text-foreground leading-tight"
+              />
+              <p className="text-xs text-muted-foreground">Avg Rating</p>
+            </div>
           </div>
         )}
       </div>
