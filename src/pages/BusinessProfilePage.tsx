@@ -16,7 +16,7 @@ import { useBusinessImageUpload } from '@/hooks/useBusinessImageUpload';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   Phone, Globe, MapPin, MoreHorizontal, Check, ExternalLink, Loader2, 
-  ChevronRight, Share2, Link2, AlertCircle, ArrowLeft, Camera, Flag
+  ChevronRight, Share2, Link2, AlertCircle, ArrowLeft, Camera, Flag, Pencil
 } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
@@ -447,7 +447,7 @@ const BusinessProfilePage: React.FC = () => {
       <div className="mt-3 px-5 flex items-center gap-2 relative z-10 pointer-events-auto">
         {/* P1+P3: Follow button — h-11, matching personal profile gradient variant */}
         <button 
-          className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98] disabled:opacity-60 border border-border bg-card text-foreground"
+          className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98] disabled:opacity-60 border border-border/60 bg-card text-foreground"
           onClick={handleFollowToggle}
           disabled={followBusy}
         >
@@ -474,6 +474,7 @@ const BusinessProfilePage: React.FC = () => {
             {isOwner ? (
               <>
                 <DropdownMenuItem onClick={() => navigate(`/business/${business.id}/edit`)}>
+                  <Pencil className="h-4 w-4 mr-2" />
                   Edit business profile
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -529,10 +530,21 @@ const BusinessProfilePage: React.FC = () => {
           <button
             type="button"
             onClick={() => navigate(`/business/${business.slug || business.id}/followers`)}
-            className="flex items-center gap-1.5 min-h-[44px] cursor-pointer active:opacity-70 transition-opacity pl-6"
+            className="flex items-center gap-1.5 min-h-[44px] cursor-pointer active:opacity-70 transition-opacity px-6"
           >
             <span className="text-sm text-muted-foreground">Followers</span>
             <span className="text-base font-semibold text-foreground">{followersCount}</span>
+          </button>
+
+          <div className="w-px h-6 bg-border/50 self-center" />
+
+          {/* Following */}
+          <button
+            type="button"
+            className="flex items-center gap-1.5 min-h-[44px] cursor-pointer active:opacity-70 transition-opacity pl-6"
+          >
+            <span className="text-sm text-muted-foreground">Following</span>
+            <span className="text-base font-semibold text-foreground">0</span>
           </button>
         </div>
       </div>
