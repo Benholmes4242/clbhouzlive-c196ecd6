@@ -507,17 +507,31 @@ const ProfilePageV2Content: React.FC = () => {
               )}
             </div>
 
-            {/* Camera overlay hint — own profile only */}
-            {isSelf && (
+            {/* Camera badge — bottom right, Instagram style */}
+            {isSelf && !isUploadingAvatar && (
               <div
-                className="clbhouz-squircle absolute flex items-center justify-center"
-                style={{ inset: '2px', background: 'rgba(0,0,0,0.25)' }}
+                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-10"
+                style={{
+                  background: 'rgba(0, 0, 0, 0.55)',
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
+                  border: '2px solid white',
+                }}
               >
-                {isUploadingAvatar ? (
-                  <div className="w-6 h-6 border-2 border-white/50 border-t-white rounded-full animate-spin" />
-                ) : (
-                  <Camera className="w-6 h-6 text-white drop-shadow-sm" />
-                )}
+                <Camera className="w-3.5 h-3.5 text-white" />
+              </div>
+            )}
+
+            {/* Spinner badge — shows during upload */}
+            {isSelf && isUploadingAvatar && (
+              <div
+                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-10"
+                style={{
+                  background: 'rgba(0, 0, 0, 0.55)',
+                  border: '2px solid white',
+                }}
+              >
+                <div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
               </div>
             )}
           </button>
