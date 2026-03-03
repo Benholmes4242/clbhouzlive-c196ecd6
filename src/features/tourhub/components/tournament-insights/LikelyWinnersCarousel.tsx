@@ -260,7 +260,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                   </span>
                   <ConfidenceGauge
                     tier={pick.confidenceTier}
-                    accentColor={accentColor}
+                    accentColor={ACCENT_COLOR}
                     animationDelay={400 + i * 80}
                     isWithdrawn={pick.isWithdrawn}
                     size={52}
