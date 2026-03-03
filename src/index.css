@@ -218,6 +218,14 @@ html.lightbox-open {
   
   /* Tab underline orange - exact #f79e1b */
   --tab-orange: 38 93% 54%;
+
+  /* Tournament Intelligence semantic colors */
+  --intelligence-green: 142 64% 38%;    /* #16A34A - success/top performance */
+  --intelligence-amber: 33 90% 44%;     /* #D97706 - good/solid performance */
+  --intelligence-gold: 43 96% 40%;      /* #CA8A04 - best call highlight */
+  --intelligence-critical: 4 100% 56%;  /* #FF3B30 - course DNA critical */
+  --intelligence-significant: 33 100% 50%; /* #FF9500 - course DNA significant */
+  --intelligence-useful: 214 96% 55%;   /* #3478F6 - course DNA useful */
   /* ========================================
      GLOBAL VERTICAL SPACING SYSTEM
      ======================================== */

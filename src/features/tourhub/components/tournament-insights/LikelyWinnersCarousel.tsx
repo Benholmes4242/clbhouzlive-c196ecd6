@@ -29,15 +29,12 @@ interface PickCard {
   isWithdrawn?: boolean;
 }
 
-// Accent colors: gold for #1, green for #2-3, slate for #4-5
-const ACCENT_COLORS = ['#D97706', '#16A34A', '#16A34A', '#94A3B8', '#94A3B8'];
-const ACCENT_GRADIENTS = [
-  'linear-gradient(90deg, #D97706, rgba(217,119,6,0.5))',
-  'linear-gradient(90deg, #16A34A, rgba(22,163,74,0.5))',
-  'linear-gradient(90deg, #16A34A, rgba(22,163,74,0.5))',
-  'linear-gradient(90deg, #94A3B8, rgba(148,163,184,0.5))',
-  'linear-gradient(90deg, #94A3B8, rgba(148,163,184,0.5))',
-];
+// Unified green accent — opacity-graduated by pick position
+const ACCENT_COLOR = '#16A34A';
+const ACCENT_OPACITIES = [1, 0.7, 0.7, 0.4, 0.4];
+const ACCENT_GRADIENTS = ACCENT_OPACITIES.map(
+  (op) => `linear-gradient(90deg, rgba(22,163,74,${op}), rgba(22,163,74,${op * 0.5}))`
+);
 
 export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
   featured,
@@ -148,8 +145,6 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
       >
         {allPicks.map((pick, i) => {
           const isFeatured = i === 0;
-          const accentColor = ACCENT_COLORS[i] ?? '#94A3B8';
-          const accentGradient = ACCENT_GRADIENTS[i] ?? ACCENT_GRADIENTS[4];
 
           return (
             <motion.div
@@ -180,7 +175,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                   left: 0,
                   right: 0,
                   height: 3,
-                  background: accentGradient,
+                  background: ACCENT_GRADIENTS[i] ?? ACCENT_GRADIENTS[4],
                   borderRadius: '16px 16px 0 0',
                 }}
               />
@@ -197,7 +192,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                       height: isFeatured ? 72 : 60,
                       borderRadius: '34%',
                       objectPosition: 'center 20%',
-                      border: `2px solid ${accentColor}`,
+                      border: '2px solid hsl(var(--border))',
                     }}
                     loading="lazy"
                     onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
@@ -263,7 +258,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                   </span>
                   <ConfidenceGauge
                     tier={pick.confidenceTier}
-                    accentColor={accentColor}
+                    accentColor={ACCENT_COLOR}
                     animationDelay={400 + i * 80}
                     isWithdrawn={pick.isWithdrawn}
                     size={52}
@@ -283,7 +278,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                           height: 4,
                           borderRadius: 2,
                           marginTop: 7,
-                          backgroundColor: j === 0 ? accentColor : 'hsl(var(--muted-foreground))',
+                          backgroundColor: j === 0 ? ACCENT_COLOR : 'hsl(var(--muted-foreground))',
                         }}
                       />
                       <span
