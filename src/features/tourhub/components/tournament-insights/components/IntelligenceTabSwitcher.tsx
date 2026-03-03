@@ -30,7 +30,7 @@ const IntelligenceTabSwitcher: React.FC<IntelligenceTabSwitcherProps> = ({
       ];
 
   return (
-    <div className="flex items-center gap-1 mb-4">
+    <div className="flex items-center justify-center gap-1 mb-4">
       {options.map((opt) => {
         const isActive = activeTab === opt.value;
         return (
