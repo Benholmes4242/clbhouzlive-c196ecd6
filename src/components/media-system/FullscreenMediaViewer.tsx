@@ -1,12 +1,12 @@
 /**
  * FullscreenMediaViewer — standalone fullscreen media player page.
  * Uses React Query for paginated data fetching with infinite scroll.
+ * MuteButton is now inside SocialOverlay per-item, no standalone needed.
  */
 import { useCallback } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { VideoPoolProvider } from './VideoPoolProvider';
 import { FeedContainer } from './FeedContainer';
-import { MuteButton } from './MuteButton';
 import { usePreloader } from './hooks/usePreloader';
 import { supabase } from '@/integrations/supabase/client';
 import { CLOUDFLARE_STREAM_SUBDOMAIN } from '@/media/constants';
@@ -132,7 +132,6 @@ export default function FullscreenMediaViewer() {
   return (
     <VideoPoolProvider>
       <div className="w-full h-[100dvh] bg-black overflow-hidden">
-        <MuteButton />
         <FeedWithPreloader posts={posts} onNearEnd={handleNearEnd} />
       </div>
     </VideoPoolProvider>
