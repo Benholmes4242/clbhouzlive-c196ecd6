@@ -145,8 +145,8 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
       >
         {allPicks.map((pick, i) => {
           const isFeatured = i === 0;
-          const accentColor = ACCENT_COLORS[i] ?? '#94A3B8';
-          const accentGradient = ACCENT_GRADIENTS[i] ?? ACCENT_GRADIENTS[4];
+          const accentColor = ACCENT_COLOR;
+          const accentOpacity = ACCENT_OPACITIES[i] ?? 0.4;
 
           return (
             <motion.div
