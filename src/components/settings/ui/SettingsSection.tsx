@@ -10,11 +10,12 @@ interface SettingsSectionProps {
 }
 
 /**
- * SettingsSection - Card-based section with header and card container
+ * SettingsSection - Cardless section with header and flat content
  * 
  * Premium visual design:
- * - Section header: uppercase, subtle gray, outside card
- * - Card: white background, subtle shadow, rounded corners
+ * - Section header: uppercase, subtle gray, canonical tracking
+ * - No card wrapper — rows sit directly on page background
+ * - Danger Zone gets a subtle tinted background
  */
 export function SettingsSection({ 
   title, 
@@ -26,24 +27,21 @@ export function SettingsSection({
 
   return (
     <section className={cn('w-full px-4', className)}>
-      {/* Section header - outside card */}
+      {/* Section header */}
       <h2 
         className={cn(
-          'text-[11px] font-semibold tracking-[0.5px] mb-2.5 ml-1',
-          isDanger ? 'text-red-400' : 'text-muted-foreground'
+          'text-[11px] font-semibold uppercase tracking-[1.5px] mb-3 ml-1',
+          isDanger ? 'text-destructive' : 'text-muted-foreground'
         )}
       >
         {title}
       </h2>
 
-      {/* Card container */}
+      {/* Content — cardless for default, subtle tint for danger */}
       <div
         className={cn(
-          'w-full rounded-2xl overflow-hidden',
-          'shadow-sm',
-          isDanger 
-            ? 'bg-red-50/50 border border-red-100' 
-            : 'bg-card border border-border'
+          'w-full',
+          isDanger && 'bg-destructive/5 rounded-2xl'
         )}
       >
         {children}

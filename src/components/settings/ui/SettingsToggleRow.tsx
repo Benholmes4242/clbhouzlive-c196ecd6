@@ -63,7 +63,7 @@ export function SettingsToggleRow({
               {isBeta && <SettingsBadge>Beta</SettingsBadge>}
             </div>
             {subtitle && (
-              <p className="text-[13px] text-muted-foreground line-clamp-2 mt-0.5">{subtitle}</p>
+              <p className="text-[13px] text-muted-foreground line-clamp-2 mt-1">{subtitle}</p>
             )}
           </div>
         </div>
@@ -73,12 +73,12 @@ export function SettingsToggleRow({
             checked={checked}
             onCheckedChange={onCheckedChange}
             disabled={disabled || isLoading}
-            className="data-[state=checked]:bg-[#334E3D] data-[state=unchecked]:bg-gray-200"
+            className="data-[state=checked]:bg-primary data-[state=unchecked]:bg-muted"
           />
         </div>
 
         {showDivider && !isLast && !showHelper && (
-          <div className="absolute bottom-0 left-4 right-4 h-px bg-border/50" />
+          <div className="absolute bottom-0 left-16 right-0 h-px bg-border/40" />
         )}
       </div>
 
@@ -86,7 +86,7 @@ export function SettingsToggleRow({
         <div className={cn('px-4 pb-3 -mt-1', isIndented && 'pl-6')}>
           <p className="text-[12px] text-muted-foreground ml-[52px]">{helperNote}</p>
           {showDivider && !isLast && (
-            <div className="mt-3 h-px bg-border/50 -mx-4" style={{ marginLeft: '-16px', marginRight: '-16px' }} />
+            <div className="absolute bottom-0 left-16 right-0 h-px bg-border/40" />
           )}
         </div>
       )}

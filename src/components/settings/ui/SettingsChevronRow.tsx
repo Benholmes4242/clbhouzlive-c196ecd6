@@ -60,7 +60,7 @@ export function SettingsChevronRow({
             {isBeta && <SettingsBadge>Beta</SettingsBadge>}
           </div>
           {subtitle && (
-            <p className="text-[13px] text-muted-foreground line-clamp-2 mt-0.5">{subtitle}</p>
+            <p className="text-[13px] text-muted-foreground line-clamp-2 mt-1">{subtitle}</p>
           )}
         </div>
       </div>
@@ -77,7 +77,7 @@ export function SettingsChevronRow({
       </div>
 
       {showDivider && !isLast && (
-        <div className="absolute bottom-0 left-4 right-4 h-px bg-border/50" />
+        <div className="absolute bottom-0 left-16 right-0 h-px bg-border/40" />
       )}
     </button>
   );

@@ -65,7 +65,7 @@ export function SettingsRow({
             {isLocked && <Lock className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />}
           </div>
           {subtitle && (
-            <p className="text-[13px] text-muted-foreground line-clamp-2 mt-0.5">{subtitle}</p>
+            <p className="text-[13px] text-muted-foreground line-clamp-2 mt-1">{subtitle}</p>
           )}
         </div>
       </div>
@@ -78,7 +78,7 @@ export function SettingsRow({
       </div>
 
       {showDivider && !isLast && (
-        <div className="absolute bottom-0 left-4 right-4 h-px bg-border/50" />
+        <div className="absolute bottom-0 left-16 right-0 h-px bg-border/40" />
       )}
     </div>
   );
@@ -92,8 +92,8 @@ export function SettingsBadge({ children, variant = 'default' }: {
     <span
       className={cn(
         'text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full',
-        variant === 'default' && 'bg-[hsl(43,50%,53%)]/15 text-[hsl(43,50%,53%)]',
-        variant === 'destructive' && 'bg-red-100 text-red-600',
+        variant === 'default' && 'bg-amber-500/15 text-amber-600',
+        variant === 'destructive' && 'bg-destructive/15 text-destructive',
       )}
     >
       {children}
