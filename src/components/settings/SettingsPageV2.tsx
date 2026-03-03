@@ -108,6 +108,17 @@ export function SettingsPageV2() {
     }
   }, [profile]);
 
+  // Sync auth email to admin_profiles on settings page load
+  React.useEffect(() => {
+    if (!user?.id || !user?.email) return;
+    supabase.rpc('sync_user_email', {
+      user_id_param: user.id,
+      current_email: user.email,
+    }).then(({ error }) => {
+      if (error) console.warn('[SettingsSync] email sync failed:', error.message);
+    });
+  }, [user?.id, user?.email]);
+
   // Redirect if not logged in
   React.useEffect(() => {
     if (!loading && !user) {
