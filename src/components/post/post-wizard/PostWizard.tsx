@@ -1126,6 +1126,7 @@ export function PostWizard({
                 </div>
               </div>
             </div>
+            </div>
 
             {/* Change 5: Simplified Bottom Toolbar — 3 icons only */}
             <div
