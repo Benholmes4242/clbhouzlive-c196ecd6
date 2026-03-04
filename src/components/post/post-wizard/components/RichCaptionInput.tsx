@@ -143,7 +143,7 @@ export const RichCaptionInput = forwardRef<RichCaptionInputHandle, RichCaptionIn
         return;
       }
 
-      setIsEmpty(!plainText);
+      setIsEmpty(!plainText.trim());
       onChange(plainText);
 
       // BLOCKER 1 FIX: Sync selectedTags by checking which mentions still exist in the text
