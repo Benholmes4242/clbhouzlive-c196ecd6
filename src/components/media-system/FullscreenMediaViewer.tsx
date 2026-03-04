@@ -2,6 +2,7 @@
  * FullscreenMediaViewer — standalone fullscreen media player page.
  * Rebuilt with dual-tab feed system (Suggested / Friends).
  * Uses engagement-scored RPC for Suggested, chronological RPC for Friends.
+ * Manages cross-post follow overrides for instant sync.
  */
 import React, { useState, useCallback } from 'react';
 import { VideoPoolProvider } from './VideoPoolProvider';
@@ -13,6 +14,7 @@ import { FeedTabToggle } from './FeedTabToggle';
 import { LoadingSkeleton } from './LoadingSkeleton';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import type { FeedPost, FeedTab } from './types/media';
+import './styles/mediaPlayer.css';
 
 function FeedWithPreloader({
   posts,
@@ -20,12 +22,16 @@ function FeedWithPreloader({
   onRefresh,
   isRefreshing,
   hasNextPage,
+  followOverrides,
+  onFollowChange,
 }: {
   posts: FeedPost[];
   onNearEnd: () => void;
   onRefresh: () => Promise<void>;
   isRefreshing: boolean;
   hasNextPage: boolean;
+  followOverrides: Map<string, boolean>;
+  onFollowChange: (userId: string, isFollowed: boolean) => void;
 }) {
   usePreloader(posts);
   return (
@@ -35,6 +41,8 @@ function FeedWithPreloader({
       onRefresh={onRefresh}
       isRefreshing={isRefreshing}
       hasNextPage={hasNextPage}
+      followOverrides={followOverrides}
+      onFollowChange={onFollowChange}
     />
   );
 }
@@ -44,6 +52,7 @@ export default function FullscreenMediaViewer() {
   const userId = user?.id;
 
   const [activeTab, setActiveTab] = useState<FeedTab>('suggested');
+  const [followOverrides, setFollowOverrides] = useState<Map<string, boolean>>(new Map());
 
   const suggested = useSuggestedFeed(userId);
   const friends = useFriendsFeed(userId);
@@ -58,11 +67,20 @@ export default function FullscreenMediaViewer() {
 
   const handleRefresh = useCallback(async () => {
     activeFeed.resetSeen();
+    setFollowOverrides(new Map());
     await activeFeed.refetch();
   }, [activeFeed]);
 
   const handleTabChange = useCallback((tab: FeedTab) => {
     setActiveTab(tab);
+  }, []);
+
+  const handleFollowChange = useCallback((userId: string, isFollowed: boolean) => {
+    setFollowOverrides(prev => {
+      const next = new Map(prev);
+      next.set(userId, isFollowed);
+      return next;
+    });
   }, []);
 
   if (activeFeed.isLoading) {
@@ -104,6 +122,8 @@ export default function FullscreenMediaViewer() {
           onRefresh={handleRefresh}
           isRefreshing={activeFeed.isRefetching}
           hasNextPage={activeFeed.hasNextPage ?? true}
+          followOverrides={followOverrides}
+          onFollowChange={handleFollowChange}
         />
       </div>
     </VideoPoolProvider>

@@ -262,14 +262,6 @@ export function VideoPlayer({
               <Play className="w-6 h-6 text-white ml-0.5" fill="white" />
             )}
           </div>
-          <style>{`
-            @keyframes media-play-fade {
-              0% { opacity: 0; transform: scale(0.5); }
-              20% { opacity: 1; transform: scale(1); }
-              80% { opacity: 1; transform: scale(1); }
-              100% { opacity: 0; transform: scale(0.8); }
-            }
-          `}</style>
         </div>
       )}
 
@@ -285,15 +277,6 @@ export function VideoPlayer({
               filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.5))',
             }}
           />
-          <style>{`
-            @keyframes double-tap-heart {
-              0% { transform: scale(0); opacity: 0; color: white; fill: white; }
-              12% { transform: scale(1.3); opacity: 1; color: white; fill: white; }
-              25% { transform: scale(1.0); opacity: 1; color: #ef4444; fill: #ef4444; }
-              70% { transform: scale(1.0); opacity: 1; color: #ef4444; fill: #ef4444; }
-              100% { transform: scale(0.8); opacity: 0; color: #ef4444; fill: #ef4444; }
-            }
-          `}</style>
         </div>
       )}
 

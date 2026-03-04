@@ -330,12 +330,6 @@ export function Scrubber({ videoRef, isActive, duration, onScrubStart, onScrubEn
         )}
       </div>
 
-      <style>{`
-        @keyframes scrubber-loop-pulse {
-          0%, 100% { opacity: 0.3; }
-          50% { opacity: 0.7; }
-        }
-      `}</style>
     </>
   );
 }
