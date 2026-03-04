@@ -1,8 +1,6 @@
 /**
- * FullscreenMediaViewer — standalone fullscreen media player page.
- * Rebuilt with dual-tab feed system (Suggested / Friends).
- * Uses engagement-scored RPC for Suggested, chronological RPC for Friends.
- * Manages cross-post follow overrides for instant sync.
+ * FullscreenMediaViewer — pure video engine, no UI overlays.
+ * Only video playback, scroll/spring physics, and feed data hooks.
  */
 import React, { useState, useCallback, useEffect } from 'react';
 import { VideoPoolProvider } from './VideoPoolProvider';
@@ -10,7 +8,6 @@ import { FeedContainer } from './FeedContainer';
 import { usePreloader } from './hooks/usePreloader';
 import { useSuggestedFeed } from './hooks/useSuggestedFeed';
 import { useFriendsFeed } from './hooks/useFriendsFeed';
-import { MediaPlayerTopBar } from './MediaPlayerTopBar';
 import { LoadingSkeleton } from './LoadingSkeleton';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import type { FeedPost, FeedTab } from './types/media';
@@ -83,10 +80,6 @@ export default function FullscreenMediaViewer() {
     await activeFeed.refetch();
   }, [activeFeed]);
 
-  const handleTabChange = useCallback((tab: FeedTab) => {
-    setActiveTab(tab);
-  }, []);
-
   const handleFollowChange = useCallback((userId: string, isFollowed: boolean) => {
     setFollowOverrides(prev => {
       const next = new Map(prev);
@@ -99,7 +92,6 @@ export default function FullscreenMediaViewer() {
     return (
       <VideoPoolProvider>
         <div className="fixed inset-0 z-[9999] bg-black overflow-hidden">
-          <MediaPlayerTopBar activeTab={activeTab} onTabChange={handleTabChange} />
           <LoadingSkeleton visible={true} />
         </div>
       </VideoPoolProvider>
@@ -113,7 +105,6 @@ export default function FullscreenMediaViewer() {
           className="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center"
           style={{ fontFamily: '-apple-system, sans-serif' }}
         >
-           <MediaPlayerTopBar activeTab={activeTab} onTabChange={handleTabChange} />
           <p className="text-white/60 text-sm">
             {activeTab === 'friends'
               ? 'No posts from people you follow yet'
@@ -127,7 +118,6 @@ export default function FullscreenMediaViewer() {
   return (
     <VideoPoolProvider>
       <div className="fixed inset-0 z-[9999] bg-black overflow-hidden">
-        <MediaPlayerTopBar activeTab={activeTab} onTabChange={handleTabChange} />
         <FeedWithPreloader
           posts={activeFeed.posts}
           onNearEnd={handleNearEnd}
