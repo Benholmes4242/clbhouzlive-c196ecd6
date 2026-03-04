@@ -14,7 +14,7 @@ import { useFullscreenViewerContext } from '../hooks/useFullscreenViewer';
 import { useNavigate } from 'react-router-dom';
 import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule';
 import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicActionRail';
-import CarouselDots from '@/components/posts/CarouselDots';
+import { haptic } from '@/utils/haptics';
 import { useAudioFade } from '@/hooks/useAudioFade';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { useFollow } from '@/hooks/useFollow';
