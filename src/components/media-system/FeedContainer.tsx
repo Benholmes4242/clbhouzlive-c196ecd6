@@ -213,11 +213,11 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
     }
 
     // Track velocity (keep last 5)
-    velocityTracker.current.push({ y: touch.clientY, time: Date.now() });
+    velocityTracker.current.push({ y: clientY, time: Date.now() });
     if (velocityTracker.current.length > 5) velocityTracker.current.shift();
   }, [posts.length, itemHeight, onRefresh]);
 
-  const handleTouchEnd = useCallback(() => {
+  const endDrag = useCallback(() => {
     if (!isDragging.current) return;
     isDragging.current = false;
 
@@ -251,6 +251,44 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
     goToIndex(targetIndex, velocity);
   }, [posts.length, itemHeight, onRefresh, isRefreshing, goToIndex]);
 
+  // ── Touch handlers (delegate to shared drag logic) ──
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    if (!touch) return;
+    startDrag(touch.clientY);
+  }, [startDrag]);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    if (!touch) return;
+    moveDrag(touch.clientY);
+  }, [moveDrag]);
+
+  const handleTouchEnd = useCallback(() => {
+    endDrag();
+  }, [endDrag]);
+
+  // ── Mouse handlers (mirror touch for desktop/preview) ──
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    startDrag(e.clientY);
+  }, [startDrag]);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!isDragging.current) return;
+    e.preventDefault();
+    moveDrag(e.clientY);
+  }, [moveDrag]);
+
+  const handleMouseUp = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    endDrag();
+  }, [endDrag]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (isDragging.current) endDrag();
+  }, [endDrag]);
+
   // When refresh completes, spring back
   useEffect(() => {
     if (!isRefreshing && pullDistance > 0) {
@@ -268,6 +306,10 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseLeave}
     >
       {/* Pull-to-refresh indicator */}
       {onRefresh && (
