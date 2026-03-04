@@ -4,7 +4,7 @@
  * Uses engagement-scored RPC for Suggested, chronological RPC for Friends.
  * Manages cross-post follow overrides for instant sync.
  */
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { VideoPoolProvider } from './VideoPoolProvider';
 import { FeedContainer } from './FeedContainer';
 import { usePreloader } from './hooks/usePreloader';
@@ -54,6 +54,18 @@ export default function FullscreenMediaViewer() {
   const [activeTab, setActiveTab] = useState<FeedTab>('suggested');
   const [followOverrides, setFollowOverrides] = useState<Map<string, boolean>>(new Map());
 
+  // TEMPORARY: Hide app header/footer for fullscreen testing
+  useEffect(() => {
+    const header = document.querySelector('header, [data-header], .app-header');
+    const footer = document.querySelector('nav, [data-footer], .bottom-nav, .app-footer');
+    if (header) (header as HTMLElement).style.display = 'none';
+    if (footer) (footer as HTMLElement).style.display = 'none';
+    return () => {
+      if (header) (header as HTMLElement).style.display = '';
+      if (footer) (footer as HTMLElement).style.display = '';
+    };
+  }, []);
+
   const suggested = useSuggestedFeed(userId);
   const friends = useFriendsFeed(userId);
 
@@ -86,7 +98,7 @@ export default function FullscreenMediaViewer() {
   if (activeFeed.isLoading) {
     return (
       <VideoPoolProvider>
-        <div className="w-full h-[100dvh] bg-black overflow-hidden relative">
+        <div className="fixed inset-0 z-[9999] bg-black overflow-hidden">
           <FeedTabToggle activeTab={activeTab} onTabChange={handleTabChange} />
           <LoadingSkeleton visible={true} />
         </div>
@@ -98,7 +110,7 @@ export default function FullscreenMediaViewer() {
     return (
       <VideoPoolProvider>
         <div
-          className="w-full h-[100dvh] bg-black flex flex-col items-center justify-center relative"
+          className="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center"
           style={{ fontFamily: '-apple-system, sans-serif' }}
         >
           <FeedTabToggle activeTab={activeTab} onTabChange={handleTabChange} />
@@ -114,7 +126,7 @@ export default function FullscreenMediaViewer() {
 
   return (
     <VideoPoolProvider>
-      <div className="w-full h-[100dvh] bg-black overflow-hidden relative">
+      <div className="fixed inset-0 z-[9999] bg-black overflow-hidden">
         <FeedTabToggle activeTab={activeTab} onTabChange={handleTabChange} />
         <FeedWithPreloader
           posts={activeFeed.posts}
