@@ -48,6 +48,7 @@ export const RichCaptionInput = forwardRef<RichCaptionInputHandle, RichCaptionIn
       maxLength = 2200,
       accentColor = '#f59e0b',
       onFocusChange,
+      className,
     },
     ref
   ) {
