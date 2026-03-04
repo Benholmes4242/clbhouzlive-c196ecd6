@@ -436,13 +436,7 @@ const ClubhouseContent = () => {
             />
           )}
 
-          {/* Top 100 pills — z-20, top-left */}
-          {activeReview?.courseId && (
-            <Top100OverlayPills
-              courseId={activeReview.courseId}
-              className="fixed top-[calc(env(safe-area-inset-top,0px)+100px)] left-4 z-20"
-            />
-          )}
+          {/* Top 100 pills removed — ranking info accessible via course page */}
 
           {/* Media navigation dots for multi-media posts */}
           {activeMediaCount > 1 && (
@@ -485,6 +479,10 @@ const ClubhouseContent = () => {
               avatar: activePost.avatarUrl,
             }}
             caption={activePost.caption}
+            golfCourse={isActiveReview && activeReview ? {
+              id: activeReview.courseId,
+              name: activeReview.courseName,
+            } : undefined}
             isFollowing={isActivePostFollowed}
             isOwnPost={isOwnPost}
             isVisible={overlayVisible}
