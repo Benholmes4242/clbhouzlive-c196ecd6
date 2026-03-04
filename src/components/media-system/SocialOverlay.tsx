@@ -10,8 +10,6 @@ import { useMediaStore } from './store/mediaStore';
 import { toast } from 'sonner';
 import { haptic } from '@/utils/haptics';
 import type { FeedPost } from './types/media';
-import { toast } from 'sonner';
-import type { FeedPost } from './types/media';
 
 const TIMINGS = {
   FULL_OPACITY_DURATION: 3000,
