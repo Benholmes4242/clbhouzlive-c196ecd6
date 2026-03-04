@@ -356,16 +356,6 @@ html.lightbox-open {
   }
 }
 
-/* Post Wizard cinematic canvas shimmer */
-@keyframes shimmer-sweep {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
 /* Generic skeleton shimmer - use on any placeholder block */
 .clb-skeleton {
   position: relative;

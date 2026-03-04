@@ -19,8 +19,6 @@ interface RichCaptionInputProps {
   maxLength?: number;
   accentColor?: string;
   onFocusChange?: (focused: boolean) => void;
-  /** Overlay mode: white text on dark background (for hero caption) */
-  overlayMode?: boolean;
 }
 
 export interface RichCaptionInputHandle {
@@ -49,7 +47,6 @@ export const RichCaptionInput = forwardRef<RichCaptionInputHandle, RichCaptionIn
       maxLength = 2200,
       accentColor = '#f59e0b',
       onFocusChange,
-      overlayMode = false,
     },
     ref
   ) {
@@ -188,12 +185,8 @@ export const RichCaptionInput = forwardRef<RichCaptionInputHandle, RichCaptionIn
         {/* Placeholder */}
         {isEmpty && (
           <div
-            className="absolute top-0 left-0 pointer-events-none select-none leading-[1.42] tracking-tight"
-            style={{
-              color: overlayMode ? 'rgba(255,255,255,0.5)' : 'hsl(var(--muted-foreground) / 0.4)',
-              fontSize: overlayMode ? '15px' : '17px',
-              fontWeight: overlayMode ? 500 : 400,
-            }}
+            className="absolute top-0 left-0 pointer-events-none select-none text-[17px] font-normal leading-[1.42] tracking-tight"
+            style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }}
           >
             {placeholder}
           </div>
@@ -220,14 +213,10 @@ export const RichCaptionInput = forwardRef<RichCaptionInputHandle, RichCaptionIn
           data-gramm="false"
           data-gramm_editor="false"
           data-enable-grammarly="false"
-          className="w-full bg-transparent outline-none leading-[1.42] tracking-tight"
+          className="w-full min-h-[80px] bg-transparent outline-none text-[17px] font-normal leading-[1.42] tracking-tight"
           style={{
             caretColor: accentColor,
-            color: overlayMode ? '#FFFFFF' : 'hsl(var(--foreground))',
-            fontSize: overlayMode ? '15px' : '17px',
-            fontWeight: overlayMode ? 500 : 400,
-            textShadow: overlayMode ? '0 1px 4px rgba(0,0,0,0.4)' : undefined,
-            minHeight: overlayMode ? '22px' : '80px',
+            color: 'hsl(var(--foreground))',
             WebkitUserModify: 'read-write-plaintext-only' as any,
             wordBreak: 'break-word',
           }}

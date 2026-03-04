@@ -1,5 +1,5 @@
-// Post Wizard - Cinematic Media-First Composer
-// Single-screen composer with full-bleed hero media and overlay caption.
+// Post Wizard - Single-Screen Composer
+// Replaces the 3-step wizard with a unified composer surface.
 // State engine (usePostWizard), upload pipeline, and all services are unchanged.
 
 import React, { useEffect, useCallback, useState, useMemo, useRef } from 'react';
@@ -9,8 +9,8 @@ import type { StudioTool, StudioEdits } from '@/types/studio';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
-import { X, AlertTriangle, RefreshCw, Image, Camera, MapPin, UserPlus, Plus, Globe, ChevronDown, ChevronRight, Clock, FileText, Play } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { X, AlertTriangle, RefreshCw, Image, Camera, MapPin, UserPlus, Plus, Globe, ChevronDown, ChevronRight, Clock, FileText } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
 import { ErrorBoundary as ReactErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { PostWizardProps } from './types';
 import { usePostWizard } from './usePostWizard';
@@ -36,14 +36,11 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { MentionBottomSheet, MentionSuggestion } from './steps/MentionBottomSheet';
 import { POST_LIMITS } from '@/constants/postLimits';
 import { useKeyboardHeight } from '@/hooks/useKeyboardHeight';
-import { getFilterClass } from '@/utils/studioFilters';
-import { getRotateStyle } from '@/utils/studioEdit';
-import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
-import { cn } from '@/lib/utils';
 
 // New extracted components
 import { ToolButton } from './components/ToolButton';
 import { CharacterRing } from './components/CharacterRing';
+import { MediaThumbnail } from './components/MediaThumbnail';
 import { MediaPreviewViewer } from './components/MediaPreviewViewer';
 import { RichCaptionInput, type RichCaptionInputHandle } from './components/RichCaptionInput';
 import { TagPeopleSheet } from './components/TagPeopleSheet';
@@ -179,7 +176,7 @@ export function PostWizard({
   const [showTagPeople, setShowTagPeople] = useState(false);
   const [pendingDraftToLoad, setPendingDraftToLoad] = useState<DraftWithMedia | null>(null);
 
-  // Caption focus state
+  // Caption focus state for card styling
   const [captionFocused, setCaptionFocused] = useState(false);
 
   // Keyboard height for sheet avoidance
@@ -201,9 +198,6 @@ export function PostWizard({
 
   // Media preview viewer state
   const [previewMediaIndex, setPreviewMediaIndex] = useState<number | null>(null);
-
-  // Hero active media index (for carousel)
-  const [heroIndex, setHeroIndex] = useState(0);
 
   // Status bar — switch to dark (white icons) when fullscreen viewer is open over black
   const isViewerOpen = previewMediaIndex !== null;
@@ -240,7 +234,6 @@ export function PostWizard({
       setShowCloseConfirm(false);
       setPreviewMediaIndex(null);
       setShowStudio(false);
-      setHeroIndex(0);
     }
   }, [isOpen, reset]);
 
@@ -257,13 +250,6 @@ export function PostWizard({
       setActor({ type: activeActor.type === 'business' ? 'business' : 'personal', id: activeActor.id });
     }
   }, [activeActor, initialActorOverride, setActor]);
-
-  // Keep heroIndex in bounds
-  useEffect(() => {
-    if (heroIndex >= state.mediaItems.length && state.mediaItems.length > 0) {
-      setHeroIndex(state.mediaItems.length - 1);
-    }
-  }, [state.mediaItems.length, heroIndex]);
 
   // ---------------------------------------------------------------------------
   // Handlers
@@ -393,6 +379,7 @@ export function PostWizard({
           course_id: state.selectedCourses[0]?.id || null,
           updated_at: new Date().toISOString(),
         };
+        // Persist schedule changes
         if (state.scheduledAt) {
           updatePayload.scheduled_at = state.scheduledAt.toISOString();
           updatePayload.status = 'scheduled';
@@ -415,6 +402,7 @@ export function PostWizard({
           return;
         }
 
+        // Persist course changes: delete-and-reinsert post_courses
         await supabase.from('post_courses').delete().eq('post_id', state.editPostId);
         if (state.selectedCourses.length > 0) {
           const courseRows = state.selectedCourses.map((course, index) => ({
@@ -425,6 +413,7 @@ export function PostWizard({
           await supabase.from('post_courses').insert(courseRows);
         }
 
+        // Persist tag changes: delete-and-reinsert post_tags
         await supabase.from('post_tags').delete().eq('post_id', state.editPostId);
         if (state.selectedTags.length > 0) {
           const tagRows = state.selectedTags.map(tag => {
@@ -467,6 +456,7 @@ export function PostWizard({
       }
 
       // CREATE MODE
+      // Reorder media items so cover is first (display_order: 0)
       const reorderedItems = [...state.mediaItems];
       if (state.coverIndex > 0 && state.coverIndex < reorderedItems.length) {
         const [coverItem] = reorderedItems.splice(state.coverIndex, 1);
@@ -494,9 +484,11 @@ export function PostWizard({
         scheduledAt: state.scheduledAt ?? undefined,
       });
 
+      // If this post was created from a loaded draft, clean it up
       if (state.currentDraftId) {
         try {
           await deleteDraftFn(state.currentDraftId);
+          console.log('[PostWizard] Deleted source draft:', state.currentDraftId);
         } catch (err) {
           console.warn('[PostWizard] Failed to delete source draft:', err);
         }
@@ -605,24 +597,31 @@ export function PostWizard({
 
   const getEdits = useCallback((mediaId: string) => state.studioEditsByMediaId[mediaId], [state.studioEditsByMediaId]);
 
-  // Sync media for draft updates
+  // Sync media for draft updates: delete removed items, upload new ones
   const syncDraftMedia = useCallback(async (draftId: string) => {
     const existingDraft = await getDraftFn(draftId);
     const existingMedia = existingDraft?.media || [];
     const existingMediaIds = new Set(existingMedia.map(m => m.id));
+
+    // Items the user kept (restored from draft, still in wizard)
     const currentRestoredIds = new Set(
       state.mediaItems
         .filter(item => (item as any).isRestored && item.id)
         .map(item => item.id)
     );
+
+    // Delete removed media (was in DB, no longer in wizard)
     const removedMedia = existingMedia.filter(m => !currentRestoredIds.has(m.id));
     for (const removed of removedMedia) {
       await deleteDraftMediaFn(removed.id);
     }
+    // Clean up storage for removed items
     if (removedMedia.length > 0) {
       const { cleanupDraftMedia } = await import('@/services/drafts/draftMediaUpload');
       await cleanupDraftMedia(removedMedia);
     }
+
+    // Upload new media (has file object, not restored)
     const newMedia = state.mediaItems.filter(item => item.file && !(item as any).isRestored);
     if (newMedia.length > 0) {
       const result = await uploadMedia(draftId, newMedia, getEdits);
@@ -633,18 +632,21 @@ export function PostWizard({
   }, [state.mediaItems, getDraftFn, deleteDraftMediaFn, uploadMedia, getEdits]);
 
   const handleSaveDraft = useCallback(async () => {
+    // Fix 3.1: Empty draft prevention
     const hasContent = state.caption.trim().length > 0 || state.mediaItems.length > 0;
     if (!hasContent) { toast.error('Add a caption or media to save a draft'); return; }
     if (!state.currentDraftId && !canCreateDraft) { toast.error('Maximum drafts reached'); return; }
     setIsSavingDraft(true);
     try {
       if (state.currentDraftId) {
+        // UPDATE existing draft
         const success = await updateDraftFn(state.currentDraftId, draftSaveInput);
         if (!success) { toast.error('Failed to update draft'); return; }
         await syncDraftMedia(state.currentDraftId);
         toast.success('Draft updated');
         analyticsEvents.track('draft_saved', { media_count: state.mediaItems.length, has_course: state.selectedCourses.length > 0, is_update: true });
       } else {
+        // CREATE new draft
         const draft = await createDraft(draftSaveInput);
         if (draft?.id && state.mediaItems.length > 0) {
           const mediaWithFiles = state.mediaItems.filter(item => item.file);
@@ -663,18 +665,21 @@ export function PostWizard({
   }, [state, canCreateDraft, createDraft, updateDraftFn, uploadMedia, getEdits, draftSaveInput, syncDraftMedia]);
 
   const handleSaveDraftAndClose = useCallback(async () => {
+    // Fix 3.1: Empty draft prevention
     const hasContent = state.caption.trim().length > 0 || state.mediaItems.length > 0;
     if (!hasContent) { toast.error('Add a caption or media to save a draft'); return; }
     if (!state.currentDraftId && !canCreateDraft) { toast.error('Maximum drafts reached'); return; }
     setIsSavingDraft(true);
     try {
       if (state.currentDraftId) {
+        // UPDATE existing draft
         const success = await updateDraftFn(state.currentDraftId, draftSaveInput);
         if (!success) { toast.error('Failed to update draft'); return; }
         await syncDraftMedia(state.currentDraftId);
         toast.success('Draft updated');
         analyticsEvents.track('draft_saved', { media_count: state.mediaItems.length, has_course: state.selectedCourses.length > 0, is_update: true });
       } else {
+        // CREATE new draft
         const draft = await createDraft(draftSaveInput);
         if (draft?.id && state.mediaItems.length > 0) {
           const mediaWithFiles = state.mediaItems.filter(item => item.file);
@@ -719,10 +724,12 @@ export function PostWizard({
     setActiveOverlayId(null);
   }, []);
 
+  // Derive the active media item for studio
   const activeStudioItem = showStudio
     ? state.mediaItems.find(m => m.id === state.activeMediaId)
     : null;
 
+  // Current edits for the active media item
   const activeStudioEdits: StudioEdits = state.activeMediaId
     ? (state.studioEditsByMediaId[state.activeMediaId] || {})
     : {};
@@ -752,44 +759,14 @@ export function PostWizard({
     return availableActors.find(a => a.id === state.actor.id) || null;
   }, [availableActors, state.actor.id]);
 
+  // Visibility label
   const visibilityLabel = state.visibility === 'anyone' ? 'Anyone' : state.visibility === 'followers' ? 'Followers' : 'Private';
 
+  // Can post
   const canPost = (state.mediaItems.length > 0 || state.isEditMode) && !state.isSubmitting && !!user;
 
+  // Character count
   const captionGraphemeCount = countGraphemes(state.caption);
-
-  const hasMedia = state.mediaItems.length > 0;
-
-  // Hero swipe handling
-  const heroRef = useRef<HTMLDivElement>(null);
-  const touchStartX = useRef(0);
-
-  const handleHeroTouchStart = useCallback((e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-  }, []);
-
-  const handleHeroTouchEnd = useCallback((e: React.TouchEvent) => {
-    const dx = e.changedTouches[0].clientX - touchStartX.current;
-    if (Math.abs(dx) > 50) {
-      if (dx < 0 && heroIndex < state.mediaItems.length - 1) {
-        setHeroIndex(prev => prev + 1);
-      } else if (dx > 0 && heroIndex > 0) {
-        setHeroIndex(prev => prev - 1);
-      }
-    }
-  }, [heroIndex, state.mediaItems.length]);
-
-  // Get hero media item with studio edits
-  const heroItem = state.mediaItems[heroIndex];
-  const heroEdits = heroItem ? state.studioEditsByMediaId[heroItem.id] : undefined;
-  const heroFilterClass = heroEdits?.filter && heroEdits.filter !== 'normal' ? getFilterClass(heroEdits.filter) : '';
-  const heroTransforms: string[] = [];
-  if (heroEdits?.rotate) heroTransforms.push(`rotate(${heroEdits.rotate}deg)`);
-  if (heroEdits?.flipH) heroTransforms.push('scaleX(-1)');
-  if (heroEdits?.flipV) heroTransforms.push('scaleY(-1)');
-  const heroTransformStyle: React.CSSProperties = heroTransforms.length > 0
-    ? { transform: heroTransforms.join(' '), transformOrigin: 'center' }
-    : {};
 
   if (!isOpen) return null;
 
@@ -830,7 +807,7 @@ export function PostWizard({
           />
         ) : (
           <>
-            {/* Header */}
+            {/* Header — Change 1: X | Avatar+Audience | Clock+Post */}
             <PostWizardHeader
               onClose={handleClose}
               onPost={handleSubmit}
@@ -846,477 +823,314 @@ export function PostWizard({
               onAudienceClick={() => setShowProfileSelector(true)}
             />
 
-            {/* Main Content Area */}
-            <div className="flex-1 flex flex-col overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
-              <AnimatePresence mode="wait">
-                {!hasMedia ? (
-                  /* ========== EMPTY STATE: Cinematic Canvas ========== */
-                  <motion.div
-                    key="empty-canvas"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="flex-1 flex flex-col"
-                    style={{ padding: '12px 16px 0' }}
+            {/* Scrollable Composer — Changes 2-7 */}
+            <div className="flex-1 overflow-y-auto px-4 pt-4 pb-6" style={{ scrollbarWidth: 'none' }}>
+              <div className="max-w-[680px] mx-auto flex flex-col" style={{ gap: '12px' }}>
+
+                {/* Change 2: Text Input Card */}
+                <div
+                  className="rounded-2xl p-4 transition-all duration-150"
+                  style={{
+                    background: (captionFocused || state.caption.length > 0)
+                      ? 'rgba(245, 158, 11, 0.04)'
+                      : 'hsl(var(--muted) / 0.5)',
+                    border: (captionFocused || state.caption.length > 0)
+                      ? '1.5px solid rgba(245, 158, 11, 0.3)'
+                      : '1.5px solid transparent',
+                  }}
+                >
+                  {/* Floating label */}
+                  <p
+                    className="text-[11px] font-semibold uppercase tracking-[1.5px] mb-2"
+                    style={{ color: 'hsl(var(--muted-foreground))' }}
                   >
-                    {/* Canvas tap target */}
+                    YOUR MOMENT
+                  </p>
+
+                  <RichCaptionInput
+                    ref={captionInputRef}
+                    value={state.caption}
+                    onChange={handleCaptionChange}
+                    mentions={state.selectedTags}
+                    onMentionsChanged={(surviving) => {
+                      setTags(surviving);
+                    }}
+                    onCursorChange={handleCursorChange}
+                    onMentionQueryChange={handleMentionQueryChange}
+                    placeholder="Share your moment..."
+                    maxLength={POST_LIMITS.MAX_CAPTION_LENGTH}
+                    accentColor="#f59e0b"
+                    onFocusChange={setCaptionFocused}
+                  />
+
+                  {/* Character counter — inside card, bottom-right, fade in */}
+                  <p
+                    className="text-[11px] font-semibold tabular-nums text-right mt-2 transition-opacity duration-200"
+                    style={{
+                      color: captionGraphemeCount > POST_LIMITS.MAX_CAPTION_LENGTH * 0.95
+                        ? '#EF4444'
+                        : 'hsl(var(--muted-foreground) / 0.4)',
+                      opacity: captionGraphemeCount > 0 ? 1 : 0,
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    {captionGraphemeCount > 0 ? `${captionGraphemeCount}/${POST_LIMITS.MAX_CAPTION_LENGTH}` : '\u00A0'}
+                  </p>
+                </div>
+
+                {/* Change 3: Media Upload Area */}
+                <div>
+                  {state.mediaItems.length === 0 ? (
                     <button
                       onClick={() => handleAddMedia()}
-                      className="flex-1 flex flex-col items-center justify-center relative overflow-hidden transition-all active:brightness-105"
+                      className="w-full flex flex-col items-center justify-center gap-3 rounded-2xl cursor-pointer transition-all duration-100 active:scale-[0.985]"
                       style={{
-                        borderRadius: '24px',
-                        background: 'linear-gradient(145deg, rgba(245,158,11,0.03) 0%, rgba(245,158,11,0.08) 50%, rgba(245,158,11,0.03) 100%)',
-                        border: '1px solid rgba(245,158,11,0.08)',
-                        minHeight: '300px',
+                        border: '2px dashed rgba(245, 158, 11, 0.2)',
+                        background: 'transparent',
+                        padding: '32px 0',
+                      }}
+                      onPointerDown={(e) => {
+                        const el = e.currentTarget;
+                        el.style.background = 'rgba(245, 158, 11, 0.04)';
+                      }}
+                      onPointerUp={(e) => {
+                        const el = e.currentTarget;
+                        setTimeout(() => { el.style.background = 'transparent'; }, 100);
+                      }}
+                      onPointerLeave={(e) => {
+                        e.currentTarget.style.background = 'transparent';
                       }}
                     >
-                      {/* Shimmer overlay */}
+                      {/* Gradient icon container */}
                       <div
-                        className="absolute inset-0 pointer-events-none"
+                        className="w-14 h-14 rounded-2xl flex items-center justify-center"
                         style={{
-                          background: 'linear-gradient(110deg, transparent 30%, rgba(245,158,11,0.04) 50%, transparent 70%)',
-                          backgroundSize: '200% 100%',
-                          animation: 'shimmer-sweep 7s ease-in-out infinite',
-                        }}
-                      />
-
-                      {/* Icon */}
-                      <div
-                        className="w-[72px] h-[72px] rounded-2xl flex items-center justify-center"
-                        style={{
-                          background: 'linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.05))',
+                          background: 'linear-gradient(135deg, rgba(245,158,11,0.12), rgba(245,158,11,0.04))',
                         }}
                       >
-                        <Image className="w-8 h-8" style={{ color: '#f59e0b' }} />
+                        <Image className="w-[26px] h-[26px]" style={{ color: '#f59e0b' }} />
                       </div>
-                      <p
-                        className="mt-4 text-[20px] font-bold text-foreground"
-                        style={{ letterSpacing: '-0.02em' }}
-                      >
-                        Create your moment
-                      </p>
-                      <p className="mt-1.5 text-[14px] text-muted-foreground">
-                        Add photos and videos to get started
-                      </p>
+                      <div className="flex flex-col items-center gap-1">
+                        <span className="text-[14px] font-semibold text-foreground">
+                          Add photo or video
+                        </span>
+                        <span className="text-[12px] text-muted-foreground">
+                          Up to 10 photos & videos
+                        </span>
+                      </div>
                     </button>
-
-                    {/* Subtle caption below canvas */}
-                    <div style={{ padding: '8px 4px 12px' }}>
-                      <span
-                        className="text-[14px]"
-                        style={{ color: 'hsl(var(--muted-foreground) / 0.25)' }}
-                      >
-                        Add a caption…
-                      </span>
-                    </div>
-                  </motion.div>
-                ) : (
-                  /* ========== MEDIA ADDED STATE: Cinematic Hero ========== */
-                  <motion.div
-                    key="media-layout"
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="flex flex-col"
-                  >
-                    {/* Hero Image */}
-                    <div
-                      ref={heroRef}
-                      className="relative w-full overflow-hidden"
-                      style={{
-                        aspectRatio: '4/3',
-                        borderRadius: '0 0 24px 24px',
-                        background: '#111',
-                      }}
-                      onTouchStart={handleHeroTouchStart}
-                      onTouchEnd={handleHeroTouchEnd}
-                    >
-                      {/* Hero media */}
-                      <AnimatePresence mode="wait">
-                        {heroItem && (
-                          <motion.div
-                            key={heroItem.id}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.2 }}
-                            className="absolute inset-0"
-                          >
-                            {heroItem.type === 'video' ? (
-                              <>
-                                <img
-                                  src={heroItem.thumbnailUrl || heroItem.previewUrl}
-                                  className={cn('w-full h-full object-cover', heroFilterClass)}
-                                  style={heroTransformStyle}
-                                  alt=""
-                                />
-                                {/* Play button overlay */}
-                                <button
-                                  onClick={() => setPreviewMediaIndex(heroIndex)}
-                                  className="absolute inset-0 flex items-center justify-center z-[2]"
-                                >
-                                  <div
-                                    className="w-[52px] h-[52px] rounded-full flex items-center justify-center"
-                                    style={{
-                                      background: 'rgba(255,255,255,0.2)',
-                                      backdropFilter: 'blur(20px)',
-                                      border: '1px solid rgba(255,255,255,0.3)',
-                                    }}
-                                  >
-                                    <Play className="w-[22px] h-[22px] text-white ml-0.5" fill="white" />
-                                  </div>
-                                </button>
-                              </>
-                            ) : (
-                              <img
-                                src={heroItem.previewUrl}
-                                className={cn('w-full h-full object-cover', heroFilterClass)}
-                                style={heroTransformStyle}
-                                alt=""
-                                onClick={() => setPreviewMediaIndex(heroIndex)}
-                              />
-                            )}
-
-                            {/* Text overlays */}
-                            {heroEdits?.textOverlays && heroEdits.textOverlays.length > 0 && (
-                              <TextOverlayRenderer
-                                textOverlays={heroEdits.textOverlays}
-                                isEditable={false}
-                                safeAreaContext="feed"
-                              />
-                            )}
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-
-                      {/* Dot indicators at top */}
-                      {state.mediaItems.length > 1 && (
-                        <div className="absolute top-3 left-0 right-0 z-[3] flex items-center justify-center gap-1">
-                          {state.mediaItems.map((_, i) => (
-                            <button
-                              key={i}
-                              onClick={() => setHeroIndex(i)}
-                              className="transition-all duration-200"
-                              style={{
-                                width: i === heroIndex ? '18px' : '5px',
-                                height: '5px',
-                                borderRadius: '3px',
-                                background: i === heroIndex ? '#FFFFFF' : 'rgba(255,255,255,0.4)',
-                              }}
-                              aria-label={`Go to media ${i + 1}`}
-                            />
-                          ))}
-                        </div>
-                      )}
-
-                      {/* Dark gradient at bottom */}
-                      <div
-                        className="absolute bottom-0 left-0 right-0 z-[2] pointer-events-none"
-                        style={{
-                          height: '50%',
-                          background: captionFocused
-                            ? 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.25) 40%, transparent 100%)'
-                            : 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.2) 40%, transparent 100%)',
-                          transition: 'background 0.2s ease',
-                        }}
-                      />
-
-                      {/* Caption overlay on hero */}
-                      <div
-                        className="absolute bottom-0 left-0 right-0 z-[3]"
-                        style={{ padding: '16px 18px 18px' }}
-                      >
-                        <RichCaptionInput
-                          ref={captionInputRef}
-                          value={state.caption}
-                          onChange={handleCaptionChange}
-                          mentions={state.selectedTags}
-                          onMentionsChanged={(surviving) => {
-                            setTags(surviving);
-                          }}
-                          onCursorChange={handleCursorChange}
-                          onMentionQueryChange={handleMentionQueryChange}
-                          placeholder="Add a caption…"
-                          maxLength={POST_LIMITS.MAX_CAPTION_LENGTH}
-                          accentColor="#f59e0b"
-                          onFocusChange={setCaptionFocused}
-                          overlayMode
+                  ) : (
+                    <div className="flex gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
+                      {state.mediaItems.map((item, index) => (
+                        <MediaThumbnail
+                          key={item.id}
+                          item={item}
+                          index={index}
+                          isCover={index === state.coverIndex}
+                          totalItems={state.mediaItems.length}
+                          hasStudioEdits={hasNonEmptyStudioEdits(state.studioEditsByMediaId[item.id])}
+                          studioEdits={state.studioEditsByMediaId[item.id]}
+                          onRemove={() => removeMedia(item.id)}
+                          onExpand={() => setPreviewMediaIndex(index)}
+                          onStudio={() => handleOpenStudio(item.id)}
+                          onSetCover={() => setCoverIndex(index)}
+                          isViewerOpen={previewMediaIndex !== null}
                         />
-
-                        {/* Character counter */}
-                        <p
-                          className="text-[11px] font-semibold tabular-nums text-right mt-1 transition-opacity duration-200"
-                          style={{
-                            color: captionGraphemeCount > POST_LIMITS.MAX_CAPTION_LENGTH * 0.95
-                              ? '#EF4444'
-                              : 'rgba(255,255,255,0.35)',
-                            opacity: captionGraphemeCount > 0 ? 1 : 0,
-                            pointerEvents: 'none',
-                            fontVariantNumeric: 'tabular-nums',
-                          }}
-                        >
-                          {captionGraphemeCount > 0 ? `${captionGraphemeCount}/${POST_LIMITS.MAX_CAPTION_LENGTH}` : '\u00A0'}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Thumbnail Strip */}
-                    <div
-                      className="flex items-center gap-2"
-                      style={{ padding: '12px 16px 4px', overflowX: 'auto', scrollbarWidth: 'none' }}
-                    >
-                      {state.mediaItems.map((item, index) => {
-                        const edits = state.studioEditsByMediaId[item.id];
-                        const filterCls = edits?.filter && edits.filter !== 'normal' ? getFilterClass(edits.filter) : '';
-                        const tforms: string[] = [];
-                        if (edits?.rotate) tforms.push(`rotate(${edits.rotate}deg)`);
-                        if (edits?.flipH) tforms.push('scaleX(-1)');
-                        if (edits?.flipV) tforms.push('scaleY(-1)');
-                        const tStyle: React.CSSProperties = tforms.length > 0 ? { transform: tforms.join(' '), transformOrigin: 'center' } : {};
-                        const isActive = index === heroIndex;
-
-                        return (
-                          <motion.div
-                            key={item.id}
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.25, delay: index * 0.05 }}
-                            className="relative flex-shrink-0 overflow-hidden"
-                            style={{
-                              width: '64px',
-                              height: '64px',
-                              borderRadius: '10px',
-                              border: isActive ? '2.5px solid #f59e0b' : '2px solid rgba(0,0,0,0.06)',
-                              transform: isActive ? 'scale(1.02)' : 'scale(1)',
-                              transition: 'border 0.2s, transform 0.2s',
-                            }}
-                          >
-                            {/* Thumbnail image */}
-                            <button
-                              onClick={() => setHeroIndex(index)}
-                              className="w-full h-full"
-                            >
-                              <img
-                                src={item.thumbnailUrl || item.previewUrl}
-                                className={cn('w-full h-full object-cover', filterCls)}
-                                style={tStyle}
-                                alt=""
-                              />
-                            </button>
-
-                            {/* Video play icon */}
-                            {item.type === 'video' && (
-                              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                <Play className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.9)' }} fill="rgba(255,255,255,0.9)" />
-                              </div>
-                            )}
-
-                            {/* COVER badge on first */}
-                            {index === 0 && (
-                              <div
-                                className="absolute bottom-[3px] left-1/2 -translate-x-1/2 pointer-events-none"
-                                style={{
-                                  background: '#f59e0b',
-                                  color: '#FFFFFF',
-                                  fontSize: '9px',
-                                  fontWeight: 700,
-                                  padding: '2px 6px',
-                                  borderRadius: '4px',
-                                  lineHeight: '1',
-                                }}
-                              >
-                                COVER
-                              </div>
-                            )}
-
-                            {/* X remove */}
-                            <button
-                              onClick={(e) => { e.stopPropagation(); removeMedia(item.id); }}
-                              className="absolute top-[3px] right-[3px] z-[2] w-[18px] h-[18px] rounded-full flex items-center justify-center"
-                              style={{ background: 'rgba(0,0,0,0.5)' }}
-                              aria-label="Remove"
-                            >
-                              <X className="w-[10px] h-[10px] text-white" />
-                            </button>
-                          </motion.div>
-                        );
-                      })}
-
-                      {/* [+] Add more tile */}
+                      ))}
                       {state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT && (
                         <button
                           onClick={() => handleAddMedia()}
-                          className="flex-shrink-0 flex items-center justify-center active:scale-95 transition-transform"
+                          className="flex-shrink-0 w-[208px] h-[208px] rounded-xl flex items-center justify-center active:scale-[0.96] transition-transform"
                           style={{
-                            width: '64px',
-                            height: '64px',
-                            borderRadius: '10px',
-                            border: '1.5px dashed rgba(245,158,11,0.2)',
-                            background: 'rgba(245,158,11,0.08)',
+                            border: '2px dashed rgba(245, 158, 11, 0.2)',
+                            background: 'transparent',
                           }}
                         >
-                          <Plus className="w-5 h-5" style={{ color: '#f59e0b' }} />
+                          <Plus className="w-6 h-6" style={{ color: '#f59e0b' }} />
                         </button>
                       )}
-
-                      {/* Counter */}
-                      <span
-                        className="flex-shrink-0 text-[11px] font-semibold text-muted-foreground"
-                        style={{ fontVariantNumeric: 'tabular-nums', marginLeft: '4px' }}
-                      >
-                        {state.mediaItems.length}/{POST_LIMITS.MAX_MEDIA_COUNT}
-                      </span>
                     </div>
+                  )}
+                </div>
 
-                    {/* Metadata Pills */}
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.2, delay: 0.15 }}
-                      className="flex items-center gap-2"
-                      style={{ padding: '8px 16px 12px', overflowX: 'auto', scrollbarWidth: 'none' }}
-                    >
-                      {/* Course pills */}
+                {/* Media counter */}
+                {state.mediaItems.length > 0 && (
+                  <p
+                    className="text-[12px] font-medium tabular-nums text-center"
+                    style={{
+                      color: state.mediaItems.length >= POST_LIMITS.MAX_MEDIA_COUNT
+                        ? '#EF4444'
+                        : 'hsl(var(--muted-foreground))',
+                      marginTop: '0px',
+                      marginBottom: '0px',
+                    }}
+                  >
+                    {state.mediaItems.length}/{POST_LIMITS.MAX_MEDIA_COUNT}
+                  </p>
+                )}
+
+                {/* Change 4: Tag Course + Tag People with divider */}
+                <div className="rounded-2xl overflow-hidden" style={{ background: 'transparent' }}>
+                  {/* Course Row */}
+                  <button
+                    onClick={() => { dismissCourseTooltip(); setShowCourseSearch(true); }}
+                    className="w-full flex items-center justify-between transition-colors duration-100 active:bg-muted/50"
+                    style={{
+                      padding: '12px 16px',
+                      borderRadius: state.selectedCourses.length > 0 ? '16px' : undefined,
+                      background: state.selectedCourses.length > 0
+                        ? 'rgba(245,158,11,0.04)'
+                        : 'transparent',
+                      borderLeft: state.selectedCourses.length > 0
+                        ? '3px solid #f59e0b'
+                        : '3px solid transparent',
+                    }}
+                  >
+                    <div className="flex items-start gap-3 min-w-0 flex-1">
+                      <MapPin className="w-[18px] h-[18px] flex-shrink-0 mt-0.5" style={{ color: '#f59e0b' }} />
                       {state.selectedCourses.length > 0 ? (
-                        <>
-                          {state.selectedCourses.map(course => (
-                            <button
-                              key={course.id}
-                              onClick={() => removeCourse(course.id)}
-                              className="flex-shrink-0 flex items-center gap-1.5 rounded-full transition-all active:scale-95"
-                              style={{
-                                padding: '7px 14px',
-                                background: 'rgba(245,158,11,0.08)',
-                                border: '1px solid rgba(245,158,11,0.2)',
-                              }}
-                            >
-                              <MapPin className="w-[13px] h-[13px] flex-shrink-0" style={{ color: '#f59e0b' }} />
-                              <span className="text-[12px] font-semibold text-foreground truncate max-w-[120px]">{course.name}</span>
-                              <X className="w-3 h-3 flex-shrink-0" style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }} />
-                            </button>
-                          ))}
-                          {/* Add more course pill */}
-                          <button
-                            onClick={() => setShowCourseSearch(true)}
-                            className="flex-shrink-0 flex items-center gap-1.5 rounded-full active:scale-95 transition-transform"
-                            style={{
-                              padding: '7px 14px',
-                              background: 'rgba(0,0,0,0.03)',
-                              border: '1px solid rgba(0,0,0,0.06)',
-                            }}
-                          >
-                            <MapPin className="w-[13px] h-[13px] flex-shrink-0" style={{ color: '#f59e0b' }} />
-                            <Plus className="w-3 h-3" style={{ color: '#f59e0b' }} />
-                          </button>
-                        </>
-                      ) : (
-                        <button
-                          onClick={() => setShowCourseSearch(true)}
-                          className="flex-shrink-0 flex items-center gap-1.5 rounded-full active:scale-95 transition-transform"
-                          style={{
-                            padding: '7px 14px',
-                            background: 'rgba(0,0,0,0.03)',
-                            border: '1px solid rgba(0,0,0,0.06)',
-                          }}
-                        >
-                          <MapPin className="w-[13px] h-[13px] flex-shrink-0" style={{ color: '#f59e0b' }} />
-                          <span className="text-[12px] font-medium text-muted-foreground">Tag course</span>
-                        </button>
-                      )}
-
-                      {/* People pills */}
-                      {state.selectedTags.length > 0 ? (
-                        <>
-                          <button
-                            onClick={() => setShowTagPeople(true)}
-                            className="flex-shrink-0 flex items-center gap-1.5 rounded-full active:scale-95 transition-transform"
-                            style={{
-                              padding: '7px 14px',
-                              background: 'rgba(245,158,11,0.08)',
-                              border: '1px solid rgba(245,158,11,0.2)',
-                            }}
-                          >
-                            <UserPlus className="w-[13px] h-[13px] flex-shrink-0" style={{ color: '#f59e0b' }} />
-                            {/* Facepile */}
-                            <div className="flex items-center" style={{ marginLeft: 0 }}>
-                              {state.selectedTags.slice(0, 3).map((tag, i) => (
-                                <div
-                                  key={tag.id}
-                                  className="rounded-full overflow-hidden flex-shrink-0"
-                                  style={{
-                                    width: '20px',
-                                    height: '20px',
-                                    marginLeft: i === 0 ? 0 : '-6px',
-                                    zIndex: 3 - i,
-                                    border: '1.5px solid white',
-                                  }}
-                                >
-                                  {tag.avatar_url ? (
-                                    <img src={tag.avatar_url} alt="" className="w-full h-full object-cover" />
-                                  ) : (
-                                    <div className="w-full h-full bg-muted flex items-center justify-center text-[8px] font-bold text-muted-foreground">
-                                      {tag.name?.[0]?.toUpperCase() || '?'}
-                                    </div>
-                                  )}
-                                </div>
-                              ))}
+                        <div className="flex flex-col gap-2 min-w-0 flex-1">
+                          {state.selectedCourses.length === 1 ? (
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className="text-[14px] font-semibold text-foreground truncate">{state.selectedCourses[0].name}</span>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); removeCourse(state.selectedCourses[0].id); }}
+                                className="flex-shrink-0 transition-colors"
+                                style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }}
+                                onPointerDown={(e) => { (e.currentTarget as HTMLElement).style.color = 'hsl(var(--muted-foreground) / 0.7)'; }}
+                                onPointerUp={(e) => { (e.currentTarget as HTMLElement).style.color = 'hsl(var(--muted-foreground) / 0.4)'; }}
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
                             </div>
-                            <span className="text-[12px] font-semibold text-foreground">{state.selectedTags.length} tagged</span>
-                            <X
-                              className="w-3 h-3 flex-shrink-0"
-                              style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                // Remove all tags from caption
-                                let newCaption = state.caption;
-                                state.selectedTags.forEach(tag => {
+                          ) : (
+                            <>
+                              <div className="flex flex-wrap gap-1.5">
+                                {state.selectedCourses.map((course) => (
+                                  <span
+                                    key={course.id}
+                                    className="inline-flex items-center gap-1.5 rounded-full transition-transform active:scale-95"
+                                    style={{
+                                      padding: '6px 12px',
+                                      background: 'hsl(var(--muted) / 0.6)',
+                                      border: '1px solid hsl(var(--border) / 0.3)',
+                                    }}
+                                  >
+                                    <span className="text-[12px] font-medium text-foreground truncate max-w-[180px]">{course.name}</span>
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); removeCourse(course.id); }}
+                                      className="flex-shrink-0 transition-colors"
+                                      style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }}
+                                      onPointerDown={(e) => { (e.currentTarget as HTMLElement).style.color = 'hsl(var(--destructive) / 0.6)'; }}
+                                      onPointerUp={(e) => { (e.currentTarget as HTMLElement).style.color = 'hsl(var(--muted-foreground) / 0.4)'; }}
+                                    >
+                                      <X className="w-3.5 h-3.5" />
+                                    </button>
+                                  </span>
+                                ))}
+                              </div>
+                              <span className="text-[12px] font-medium" style={{ color: '#f59e0b' }}>+ Add course</span>
+                            </>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-[14px] font-medium text-muted-foreground">
+                          Tag a golf course
+                        </span>
+                      )}
+                    </div>
+                    <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: 'hsl(var(--muted-foreground) / 0.3)' }} />
+                  </button>
+
+                  {/* Subtle divider */}
+                  <div className="mx-4" style={{ height: '1px', background: 'hsl(var(--border) / 0.2)' }} />
+
+                  {/* People Row */}
+                  <button
+                    onClick={() => { dismissFriendsTooltip(); setShowTagPeople(true); }}
+                    className="w-full flex items-center justify-between transition-colors duration-100 active:bg-muted/50"
+                    style={{
+                      padding: '12px 16px',
+                      borderRadius: state.selectedTags.length > 0 ? '16px' : undefined,
+                      background: state.selectedTags.length > 0
+                        ? 'rgba(245,158,11,0.04)'
+                        : 'transparent',
+                      borderLeft: state.selectedTags.length > 0
+                        ? '3px solid #f59e0b'
+                        : '3px solid transparent',
+                    }}
+                  >
+                    <div className="flex items-start gap-3 min-w-0 flex-1">
+                      <UserPlus className="w-[18px] h-[18px] flex-shrink-0 mt-0.5" style={{ color: '#f59e0b' }} />
+                      {state.selectedTags.length > 0 ? (
+                        <div className="flex flex-col gap-2 min-w-0 flex-1">
+                          {state.selectedTags.length === 1 ? (
+                            <div className="flex items-center gap-2 min-w-0">
+                              <SquircleAvatar
+                                size={24}
+                                src={state.selectedTags[0].avatar_url}
+                                alt={state.selectedTags[0].name}
+                                fallback={state.selectedTags[0].name?.[0]?.toUpperCase() || '?'}
+                                hideRing
+                              />
+                              <span className="text-[14px] font-semibold text-foreground truncate">{state.selectedTags[0].name}</span>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const tag = state.selectedTags[0];
                                   const mentionText = `@${(tag.username || tag.name).replace(/\s+/g, '')}`;
                                   const escapeRegex = mentionText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                                   const removeRegex = new RegExp(`\\s*${escapeRegex}`, 'gi');
-                                  newCaption = newCaption.replace(removeRegex, '');
-                                });
-                                setCaption(newCaption.trim());
-                                setTags([]);
-                              }}
-                            />
-                          </button>
-                          {/* Add more people pill */}
-                          <button
-                            onClick={() => setShowTagPeople(true)}
-                            className="flex-shrink-0 flex items-center gap-1.5 rounded-full active:scale-95 transition-transform"
-                            style={{
-                              padding: '7px 14px',
-                              background: 'rgba(0,0,0,0.03)',
-                              border: '1px solid rgba(0,0,0,0.06)',
-                            }}
-                          >
-                            <UserPlus className="w-[13px] h-[13px] flex-shrink-0" style={{ color: '#f59e0b' }} />
-                            <Plus className="w-3 h-3" style={{ color: '#f59e0b' }} />
-                          </button>
-                        </>
+                                  const newCaption = state.caption.replace(removeRegex, '').trim();
+                                  setCaption(newCaption);
+                                  setTags(state.selectedTags.filter(t => t.id !== tag.id));
+                                }}
+                                className="flex-shrink-0 transition-colors"
+                                style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }}
+                                onPointerDown={(e) => { (e.currentTarget as HTMLElement).style.color = 'hsl(var(--muted-foreground) / 0.7)'; }}
+                                onPointerUp={(e) => { (e.currentTarget as HTMLElement).style.color = 'hsl(var(--muted-foreground) / 0.4)'; }}
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="flex items-center gap-2">
+                                <div className="flex" style={{ marginLeft: 0 }}>
+                                  {state.selectedTags.slice(0, 3).map((tag, i) => (
+                                    <div key={tag.id} style={{ marginLeft: i === 0 ? 0 : -8, zIndex: 3 - i }}>
+                                      <SquircleAvatar
+                                        size={24}
+                                        src={tag.avatar_url}
+                                        alt={tag.name}
+                                        fallback={tag.name?.[0]?.toUpperCase() || '?'}
+                                        hideRing
+                                      />
+                                    </div>
+                                  ))}
+                                </div>
+                                <span className="text-[14px] font-medium text-foreground">
+                                  {state.selectedTags.length} tagged
+                                </span>
+                              </div>
+                              <span className="text-[12px] font-medium" style={{ color: '#f59e0b' }}>+ Tag more</span>
+                            </>
+                          )}
+                        </div>
                       ) : (
-                        <button
-                          onClick={() => setShowTagPeople(true)}
-                          className="flex-shrink-0 flex items-center gap-1.5 rounded-full active:scale-95 transition-transform"
-                          style={{
-                            padding: '7px 14px',
-                            background: 'rgba(0,0,0,0.03)',
-                            border: '1px solid rgba(0,0,0,0.06)',
-                          }}
-                        >
-                          <UserPlus className="w-[13px] h-[13px] flex-shrink-0" style={{ color: '#f59e0b' }} />
-                          <span className="text-[12px] font-medium text-muted-foreground">Tag people</span>
-                        </button>
+                        <span className="text-[14px] font-medium text-muted-foreground">
+                          Tag people
+                        </span>
                       )}
-                    </motion.div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    </div>
+                    <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: 'hsl(var(--muted-foreground) / 0.3)' }} />
+                  </button>
+                </div>
+
+              </div>
             </div>
 
-            {/* Bottom Toolbar */}
+            {/* Change 5: Simplified Bottom Toolbar — 3 icons only */}
             <div
               className="flex-shrink-0 flex items-center px-4 pt-2.5"
               style={{
@@ -1327,6 +1141,7 @@ export function PostWizard({
               <div className="flex items-center gap-0.5">
                 <ToolButton icon={Image} onClick={() => handleAddMedia('gallery')} label="Photo" />
                 <ToolButton icon={Camera} onClick={() => handleAddMedia('camera')} label="Camera" />
+                {/* Drafts button */}
                 <div className="relative">
                   <ToolButton icon={FileText} onClick={() => setShowDraftsSheet(true)} label="Drafts" />
                   {drafts.length > 0 && (
@@ -1343,6 +1158,7 @@ export function PostWizard({
 
             {/* === OVERLAYS === */}
 
+            {/* Discard Action Sheet */}
             <DiscardActionSheet
               open={showCloseConfirm}
               onDiscard={confirmClose}
@@ -1352,6 +1168,7 @@ export function PostWizard({
               canSaveDraft={canCreateDraft}
             />
 
+            {/* Profile Selector */}
             <PostingOptionsSheet
               isOpen={showProfileSelector}
               onClose={() => setShowProfileSelector(false)}
@@ -1362,6 +1179,7 @@ export function PostWizard({
               onVisibilityChange={handleVisibilityChange}
             />
 
+            {/* Course Search */}
             <CourseSearchSheetBoundary
               isOpen={showCourseSearch}
               onClose={() => setShowCourseSearch(false)}
@@ -1370,6 +1188,7 @@ export function PostWizard({
               existingCourseIds={state.selectedCourses.map(c => c.id).filter(Boolean)}
             />
 
+            {/* Drafts & Scheduled */}
             <DraftsAndScheduledSheet
               isOpen={showDraftsSheet}
               onClose={() => { setShowDraftsSheet(false); setPendingDraftToLoad(null); }}
@@ -1382,6 +1201,7 @@ export function PostWizard({
               onCancelOverwrite={() => setPendingDraftToLoad(null)}
             />
 
+            {/* Schedule Sheet */}
             <ScheduleSheet
               isOpen={showScheduleSheet}
               onClose={() => setShowScheduleSheet(false)}
@@ -1389,6 +1209,7 @@ export function PostWizard({
               initialDate={state.scheduledAt ?? undefined}
             />
 
+            {/* Mention suggestions */}
             <MentionBottomSheet
               open={showMentions}
               onOpenChange={setShowMentions}
@@ -1397,6 +1218,7 @@ export function PostWizard({
               bottomOffset={keyboardHeight}
             />
 
+            {/* Tag People Sheet */}
             <AnimatePresence>
               {showTagPeople && (
                 <TagPeopleSheet
@@ -1431,6 +1253,7 @@ export function PostWizard({
               )}
             </AnimatePresence>
 
+            {/* Studio Shelf */}
             {showStudio && activeStudioItem && (
               <StudioShelf
                 open={showStudio}
@@ -1452,7 +1275,7 @@ export function PostWizard({
         )}
       </div>
 
-      {/* Fullscreen Media Preview Viewer */}
+      {/* Fullscreen Media Preview Viewer — rendered OUTSIDE overflow-hidden container */}
       <AnimatePresence>
         {previewMediaIndex !== null && (
           <MediaPreviewViewer
