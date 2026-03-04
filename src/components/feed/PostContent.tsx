@@ -7,7 +7,7 @@ import LazyImage from '@/components/ui/lazy-image';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import TaggedText from '@/components/posts/TaggedText';
 import CourseLocationRow from '@/components/posts/CourseLocationRow';
-import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
 
 interface Tag {
   id: string;
@@ -54,10 +54,8 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
   const [showControls, setShowControls] = useState(false);
   const mediaId = useId();
 
-  // Unified fullscreen for media
-  const { openFullscreen } = useUnifiedFullscreen('explore', {
-    allowLandscape: true,
-  });
+  // TODO: Wire to new media player
+  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
 
   const handleVideoClick = (e: React.MouseEvent) => {
     e.stopPropagation();

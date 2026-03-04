@@ -4,7 +4,7 @@ import { ArrowLeft, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LongFormVideoTile } from './LongFormVideoTile';
 import { useLongFormVideos } from '@/hooks/useLongFormVideos';
-import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
 
 interface VideosSearchResultsProps {
   query: string;
@@ -34,8 +34,8 @@ export const VideosSearchResults: React.FC<VideosSearchResultsProps> = ({
     limit: 50,
   });
 
-  // Build playlist for fullscreen player
-  const { openFullscreen } = useUnifiedFullscreen('explore', { allowLandscape: true });
+  // TODO: Wire to new media player
+  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
 
   const videosAsExploreItems = useMemo(() => {
     return videos.map(video => ({

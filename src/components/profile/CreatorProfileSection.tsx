@@ -6,7 +6,7 @@ import { CreatorBadge } from './CreatorBadge';
 import { CreatorAnalyticsCard } from './CreatorAnalyticsCard';
 import { useCreatorFeatures } from '@/hooks/useCreatorFeatures';
 import { PostPickerSheet } from './PostPickerSheet';
-import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
 
 interface CreatorProfileSectionProps {
   userId: string;
@@ -43,7 +43,8 @@ export function CreatorProfileSection({
     canPin,
   } = useCreatorFeatures(userId);
 
-  const { openFullscreen } = useUnifiedFullscreen('profile', {});
+  // TODO: Wire to new media player
+  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
 
   // Don't render for non-creators
   if (!isCreator || isLoading) {

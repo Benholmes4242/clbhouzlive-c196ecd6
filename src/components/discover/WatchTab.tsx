@@ -10,7 +10,7 @@ import { useState, useCallback, useEffect, useMemo } from 'react';
 import { WatchShortsGrid } from './WatchShortsGrid';
 import { WatchTabSkeleton } from './WatchTabSkeleton';
 import { useWatchShorts, WatchShort } from '@/hooks/useWatchShorts';
-import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
 import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
 import { useQueryClient } from '@tanstack/react-query';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -64,10 +64,8 @@ export function WatchTab() {
     };
   }, []);
   
-  // Fullscreen player hook
-  const { openFullscreen } = useUnifiedFullscreen('explore', {
-    allowLandscape: true,
-  });
+  // TODO: Wire to new media player
+  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
 
   // Shorts grid data
   const {

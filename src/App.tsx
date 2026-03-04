@@ -15,7 +15,7 @@ import { SecurityHeaders } from "@/components/security/SecurityHeaders";
 import { AppBootstrapLoader } from "@/components/AppBootstrapLoader";
 import AuthWrapper from "@/components/auth/AuthWrapper";
 import { GlobalAudioProvider } from './contexts/GlobalAudioContext';
-import { FullscreenPlayerProvider } from './contexts/FullscreenPlayerContext';
+// REMOVED: FullscreenPlayerProvider — Phase 5 fullscreen system deleted
 import { RehydrationProvider } from './contexts/RehydrationContext';
 // RETIRED: VideoManagerProvider and VideoPlaybackManagerProvider
 // These competed with MediaRuntime for playback control.
@@ -676,9 +676,7 @@ const AppInner: React.FC = () => {
                           <ScrollRestoration />
                           <MediaSystemProvider>
                             <GlobalAudioProvider>
-                              <FullscreenPlayerProvider>
-                                {/* RETIRED: VideoManagerProvider + VideoPlaybackManagerProvider removed */}
-                                {/* All playback control is now centralized in MediaSystemProvider */}
+                              {/* REMOVED: FullscreenPlayerProvider — Phase 5 fullscreen system deleted */}
                                 <TopTenProvider>
                                   <VideoPlaybackProvider>
                                       <ErrorBoundary>
@@ -703,7 +701,7 @@ const AppInner: React.FC = () => {
                                       </ErrorBoundary>
                                   </VideoPlaybackProvider>
                                 </TopTenProvider>
-                              </FullscreenPlayerProvider>
+                              {/* END REMOVED FullscreenPlayerProvider */}
                             </GlobalAudioProvider>
                           </MediaSystemProvider>
                           

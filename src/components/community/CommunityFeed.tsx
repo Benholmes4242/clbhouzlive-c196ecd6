@@ -9,7 +9,7 @@ import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/D
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
-import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
 import { useAdaptivePrefetch } from '@/hooks/useAdaptivePrefetch';
 import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
 import { useQueryClient } from '@tanstack/react-query';
@@ -253,13 +253,8 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     stopThreshold: 0.1,
   });
 
-  // Unified fullscreen player for Community content
-  const { openFullscreen } = useUnifiedFullscreen('explore', {
-    allowLandscape: true,
-    onLoadMore: loadMore,
-    hasMore,
-    isLoadingMore: loading,
-  });
+  // TODO: Wire to new media player
+  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
 
   // Paced loading state (Watch tab standard)
   const MIN_LOADING_DISPLAY_MS = 600;

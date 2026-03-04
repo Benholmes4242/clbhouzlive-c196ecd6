@@ -22,7 +22,7 @@ import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 
 import { useOptimisticPostInsertion } from '@/hooks/useOptimisticPostInsertion';
-import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 import type { ExploreContentItem } from '@/components/explore/types';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
@@ -187,40 +187,8 @@ const Discover = () => {
     }
   }, []);
 
-  // Use unified fullscreen player for Watch/Discover content
-  const { openFullscreen } = useUnifiedFullscreen('explore', {
-    allowLandscape: true,
-    
-    // Track current post when user swipes
-    onIndexChange: (index) => {
-      const currentPost = allContent[index];
-      setCurrentFullscreenPostId(currentPost?.id || null);
-    },
-    
-    // Like handler - uses engagement hook
-    onLike: (itemId) => {
-      toggleLike();
-    },
-    
-    // Comment handler - CommentsPage handles this automatically
-    onComment: (itemId) => {
-      // No action needed - CommentsPage opens automatically
-    },
-    
-    // Share handler
-    onShare: (itemId) => {
-      handleSharePost(itemId);
-    },
-    
-    // Close handler - reset current post
-    onClose: () => {
-      setCurrentFullscreenPostId(null);
-    },
-    
-    // Infinite scroll
-    onLoadMore: hasMore ? loadMore : undefined,
-    hasMore,
-  });
+  // TODO: Wire to new media player
+  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
 
   // ============================================
   // ALL CALLBACKS MUST USE useCallback HOOKS

@@ -12,7 +12,7 @@ import { MediaItem } from '@/types/media';
 import { ExploreContentItem } from '@/components/explore/types';
 import { getStreamPoster } from '@/utils/stream';
 import { FLAGS } from '@/config/flags';
-import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
 
 type Review = {
   id: string;
@@ -115,10 +115,8 @@ function ReviewCard({
   const [userVote, setUserVote] = React.useState<'helpful' | 'unhelpful' | 'none'>(review.userVote || 'none');
   const [pending, setPending] = React.useState(false);
 
-  // Use unified fullscreen for review media
-  const { openFullscreen } = useUnifiedFullscreen('explore', {
-    allowLandscape: true,
-  });
+  // TODO: Wire to new media player
+  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
 
   const MAX_THUMBS = 3;
 
