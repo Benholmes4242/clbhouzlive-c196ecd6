@@ -1,14 +1,17 @@
 /**
- * SocialOverlay — like, comment, share, mute + user info bar + auto-hide.
+ * SocialOverlay — action rail (like, comment, share, more) + mute button + auto-hide.
  *
  * Auto-hide: 100% → 70% after 3s → 50% after 5s.
- * During scrubbing: overlay hides completely (scrubber stays).
+ * During scrubbing: overlay hides completely.
+ * Mute button positioned below tab toggle, independent of action rail.
  */
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Heart, MessageCircle, Send, Volume2, VolumeX } from 'lucide-react';
+import { Heart, MessageCircle, Send, Volume2, VolumeX, MoreHorizontal } from 'lucide-react';
 import { useMediaStore } from './store/mediaStore';
 import { toast } from 'sonner';
 import { haptic } from '@/utils/haptics';
+import { supabase } from '@/integrations/supabase/client';
+import { MoreOptionsSheet } from './MoreOptionsSheet';
 import type { FeedPost } from './types/media';
 
 const TIMINGS = {
@@ -25,22 +28,22 @@ interface SocialOverlayProps {
   isScrubbing: boolean;
   onLike?: () => void;
   isLiked?: boolean;
+  likeCount?: number;
+  userId?: string;
 }
 
-export function SocialOverlay({ post, isActive, isScrubbing, onLike, isLiked = false }: SocialOverlayProps) {
+export function SocialOverlay({
+  post, isActive, isScrubbing, onLike,
+  isLiked = false, likeCount, userId,
+}: SocialOverlayProps) {
   const [opacity, setOpacity] = useState(1);
-  const [captionExpanded, setCaptionExpanded] = useState(false);
   const [likeAnimating, setLikeAnimating] = useState(false);
-  const [avatarError, setAvatarError] = useState(false);
   const isMuted = useMediaStore((s) => s.isMuted);
   const toggleMute = useMediaStore((s) => s.toggleMute);
   const dimTimer1 = useRef<ReturnType<typeof setTimeout>>();
   const dimTimer2 = useRef<ReturnType<typeof setTimeout>>();
 
-  // Reset avatar error when post changes
-  useEffect(() => {
-    setAvatarError(false);
-  }, [post.avatarUrl]);
+  const displayLikeCount = likeCount ?? post.likeCount;
 
   // ── Auto-hide logic ───────────────────────────────────────────
   const resetTimers = useCallback(() => {
@@ -56,7 +59,6 @@ export function SocialOverlay({ post, isActive, isScrubbing, onLike, isLiked = f
     }, TIMINGS.FULL_OPACITY_DURATION);
   }, []);
 
-  // Start timers when active
   useEffect(() => {
     if (isActive) resetTimers();
     return () => {
@@ -65,7 +67,6 @@ export function SocialOverlay({ post, isActive, isScrubbing, onLike, isLiked = f
     };
   }, [isActive, resetTimers]);
 
-  // Any touch resets opacity
   const handleInteraction = useCallback(() => {
     resetTimers();
   }, [resetTimers]);
@@ -81,17 +82,34 @@ export function SocialOverlay({ post, isActive, isScrubbing, onLike, isLiked = f
 
   // ── Share handler ─────────────────────────────────────────────
   const handleShare = useCallback(async () => {
+    haptic('medium');
     const url = `https://clbhouz.com/post/${post.id}`;
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: post.caption || 'Check this out', url });
-      } catch { /* user cancelled */ }
-    } else {
-      await navigator.clipboard.writeText(url);
-      toast.success('Link copied');
+    const shareData = { title: post.displayName, text: post.caption || 'Check this out', url };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(url);
+        toast.success('Link copied');
+      }
+
+      // Record share in Supabase
+      if (userId) {
+        supabase
+          .from('post_shares')
+          .insert({ post_id: post.id, user_id: userId })
+          .then(({ error }) => {
+            if (error && !error.message.includes('duplicate')) {
+              console.error('[Share] DB error:', error);
+            }
+          });
+      }
+    } catch {
+      // User cancelled share sheet
     }
     handleInteraction();
-  }, [post.id, post.caption, handleInteraction]);
+  }, [post.id, post.displayName, post.caption, userId, handleInteraction]);
 
   // ── Comment handler (placeholder) ─────────────────────────────
   const handleComment = useCallback(() => {
@@ -100,10 +118,7 @@ export function SocialOverlay({ post, isActive, isScrubbing, onLike, isLiked = f
     handleInteraction();
   }, [post.id, handleInteraction]);
 
-  // During scrubbing, hide overlay
   const overlayOpacity = isScrubbing ? 0 : opacity;
-
-  const displayName = post.username || 'Clbhouz User';
 
   return (
     <div
@@ -113,21 +128,19 @@ export function SocialOverlay({ post, isActive, isScrubbing, onLike, isLiked = f
         opacity: overlayOpacity,
       }}
     >
-      {/* Transparent touch layer to reset auto-hide when overlay is dimmed */}
+      {/* Transparent touch layer to reset auto-hide */}
       <div
         className="absolute inset-0 z-0"
         style={{ pointerEvents: opacity < 1 ? 'auto' : 'none' }}
-        onTouchStart={() => {
-          handleInteraction();
-          // Don't stopPropagation — let touch pass through to video for play/pause
-        }}
+        onTouchStart={() => handleInteraction()}
       />
-      {/* Mute button — top right */}
+
+      {/* Mute button — below tab toggle, right side */}
       <button
         onClick={(e) => { e.stopPropagation(); haptic('light'); toggleMute(); handleInteraction(); }}
         className="pointer-events-auto absolute z-30 flex items-center justify-center w-11 h-11 rounded-full"
         style={{
-          top: 'calc(env(safe-area-inset-top, 16px) + 16px)',
+          top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 8px)',
           right: 16,
           background: 'rgba(0,0,0,0.55)',
           border: '1px solid rgba(255,255,255,0.1)',
@@ -142,137 +155,116 @@ export function SocialOverlay({ post, isActive, isScrubbing, onLike, isLiked = f
         )}
       </button>
 
-      {/* Right-side action buttons */}
+      {/* Right-side action rail */}
       <div
-        className="pointer-events-auto absolute flex flex-col items-center gap-5"
+        className="pointer-events-auto absolute flex flex-col items-center"
         style={{
           right: 12,
           bottom: 180,
+          gap: 20,
           textShadow: '0 1px 3px rgba(0,0,0,0.5)',
         }}
       >
+        {/* Carousel indicator */}
+        {post.mediaItems.length > 1 && (
+          <div
+            className="flex items-center justify-center"
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: '50%',
+              background: 'rgba(0,0,0,0.35)',
+            }}
+          >
+            <span className="text-white text-xs font-semibold">
+              {post.mediaItems.length}
+            </span>
+          </div>
+        )}
+
         {/* Like */}
         <button
           onClick={(e) => { e.stopPropagation(); handleLike(); }}
-          className="flex flex-col items-center w-11 h-11 justify-center"
+          className="flex flex-col items-center justify-center"
+          style={{ width: 44, height: 44 }}
           aria-label="Like"
         >
           <Heart
-            className="w-7 h-7"
-            fill={isLiked ? '#ef4444' : 'none'}
-            color={isLiked ? '#ef4444' : 'white'}
+            className="w-[26px] h-[26px]"
+            fill={isLiked ? '#F59E0B' : 'none'}
+            color={isLiked ? '#F59E0B' : 'rgba(255,255,255,0.9)'}
             style={{
               filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))',
               transform: likeAnimating ? 'scale(1.2)' : 'scale(1)',
               transition: 'transform 150ms ease-out',
             }}
           />
-          <span className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.8)' }}>
-            {post.likeCount || ''}
-          </span>
+          {displayLikeCount > 0 && (
+            <span
+              className="mt-0.5"
+              style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}
+            >
+              {displayLikeCount}
+            </span>
+          )}
         </button>
 
         {/* Comment */}
         <button
           onClick={(e) => { e.stopPropagation(); handleComment(); }}
-          className="flex flex-col items-center w-11 h-11 justify-center"
+          className="flex flex-col items-center justify-center"
+          style={{ width: 44, height: 44 }}
           aria-label="Comment"
         >
           <MessageCircle
-            className="w-7 h-7 text-white"
+            className="w-[26px] h-[26px] text-white"
             style={{ filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }}
           />
-          <span className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.8)' }}>
-            {post.commentCount || ''}
-          </span>
+          {post.commentCount > 0 && (
+            <span
+              className="mt-0.5"
+              style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}
+            >
+              {post.commentCount}
+            </span>
+          )}
         </button>
 
         {/* Share */}
         <button
           onClick={(e) => { e.stopPropagation(); handleShare(); }}
-          className="flex flex-col items-center w-11 h-11 justify-center"
+          className="flex flex-col items-center justify-center"
+          style={{ width: 44, height: 44 }}
           aria-label="Share"
         >
           <Send
-            className="w-6 h-6 text-white"
+            className="w-[26px] h-[26px] text-white"
             style={{ filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }}
           />
-        </button>
-      </div>
-
-      {/* User info bar — bottom */}
-      <div
-        className="pointer-events-auto absolute z-20"
-        style={{
-          bottom: 80,
-          left: 12,
-          right: 80,
-        }}
-      >
-        {/* Gradient backdrop */}
-        <div
-          className="absolute inset-0 -m-3 rounded-lg"
-          style={{
-            background: 'linear-gradient(transparent, rgba(0,0,0,0.4))',
-            pointerEvents: 'none',
-          }}
-        />
-
-        <div className="relative flex items-center gap-2 mb-1">
-          {/* Avatar */}
-          {post.avatarUrl && !avatarError ? (
-            <img
-              src={post.avatarUrl}
-              alt={displayName}
-              className="w-9 h-9 rounded-full object-cover flex-shrink-0"
-              style={{ border: '2px solid rgba(255,255,255,0.3)' }}
-              onError={() => setAvatarError(true)}
-            />
-          ) : (
-            <div
-              className="w-9 h-9 rounded-full flex-shrink-0"
-              style={{ background: 'rgba(255,255,255,0.2)' }}
-            />
-          )}
-
-          {/* Username — truncated */}
-          <span
-            className="text-sm font-bold text-white truncate"
-            style={{
-              textShadow: '0 1px 3px rgba(0,0,0,0.5)',
-              maxWidth: '200px',
-            }}
-          >
-            {displayName}
-          </span>
-        </div>
-
-        {/* Caption */}
-        {post.caption && (
-          <div>
-            <p
-              className="text-[13px] text-white/90 leading-snug"
-              style={{
-                textShadow: '0 1px 2px rgba(0,0,0,0.4)',
-                display: '-webkit-box',
-                WebkitLineClamp: captionExpanded ? 6 : 2,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-              }}
+          {post.shareCount > 0 && (
+            <span
+              className="mt-0.5"
+              style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}
             >
-              {post.caption}
-            </p>
-            {post.caption.length > 80 && (
-              <button
-                onClick={(e) => { e.stopPropagation(); setCaptionExpanded(!captionExpanded); }}
-                className="text-xs mt-0.5"
-                style={{ color: 'rgba(255,255,255,0.6)' }}
-              >
-                {captionExpanded ? 'less' : 'more'}
-              </button>
-            )}
-          </div>
-        )}
+              {post.shareCount}
+            </span>
+          )}
+        </button>
+
+        {/* More options */}
+        <MoreOptionsSheet postId={post.id}>
+          <button
+            onClick={(e) => { e.stopPropagation(); handleInteraction(); }}
+            className="flex items-center justify-center"
+            style={{ width: 44, height: 44 }}
+            aria-label="More options"
+          >
+            <MoreHorizontal
+              className="w-[26px] h-[26px] text-white"
+              style={{ filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }}
+            />
+          </button>
+        </MoreOptionsSheet>
       </div>
     </div>
   );
