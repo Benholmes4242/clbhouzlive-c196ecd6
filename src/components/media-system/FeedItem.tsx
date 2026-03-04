@@ -16,10 +16,11 @@ interface FeedItemProps {
   hasNextPage?: boolean;
   followOverride?: boolean;
   onFollowChange?: (userId: string, isFollowed: boolean) => void;
+  onFirstFrameReady?: () => void;
 }
 
 export function FeedItem({
-  post, index, isActive,
+  post, index, isActive, onFirstFrameReady,
 }: FeedItemProps) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -82,6 +83,7 @@ export function FeedItem({
           isActive={isActive}
           thumbnailUrl={media.thumbnailUrl}
           duration={media.duration}
+          onFirstFrameReady={onFirstFrameReady}
         />
       ) : media.imageUrl ? (
         <ImageViewer

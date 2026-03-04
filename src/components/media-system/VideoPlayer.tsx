@@ -28,12 +28,14 @@ interface VideoPlayerProps {
   onDoubleTapLike?: () => void;
   onScrubStart?: () => void;
   onScrubEnd?: () => void;
+  onFirstFrameReady?: () => void;
 }
 
 export function VideoPlayer({
   hlsUrl, feedIndex, isActive, thumbnailUrl, duration: mediaDuration,
-  mp4Url, onDoubleTapLike, onScrubStart, onScrubEnd,
+  mp4Url, onDoubleTapLike, onScrubStart, onScrubEnd, onFirstFrameReady,
 }: VideoPlayerProps) {
+  const firstFrameFiredRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const retryCountRef = useRef(0);
@@ -87,6 +89,10 @@ export function VideoPlayer({
           setIsPlaying(true);
           if (videoEl && videoEl.duration && isFinite(videoEl.duration)) {
             setVideoDuration(videoEl.duration);
+          }
+          if (!firstFrameFiredRef.current && onFirstFrameReady) {
+            firstFrameFiredRef.current = true;
+            onFirstFrameReady();
           }
         },
         () => {
