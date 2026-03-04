@@ -331,10 +331,10 @@ const ClubhouseContent = () => {
   }, [activeReview, navigate]);
 
   // ── Double-tap like from VideoPlayer ──
-  // The VideoPlayer component already handles double-tap hearts visually,
-  // but we need to wire the actual like mutation. This is done via the
-  // FeedItem/VideoPlayer onDoubleTapLike prop which we don't have direct
-  // access to from here. For now, the action rail like button is the primary like path.
+  const handleDoubleTapLike = useCallback((postIndex: number) => {
+    const post = posts[postIndex];
+    if (post) handleLike(post);
+  }, [posts, handleLike]);
 
   // ============================================================================
   // EARLY RETURNS
@@ -413,6 +413,7 @@ const ClubhouseContent = () => {
             hasNextPage={hasNextPage}
             followOverrides={followOverrides}
             onFollowChange={handleFollowChange}
+            onDoubleTapLike={handleDoubleTapLike}
           />
         </VideoPoolProvider>
       )}
