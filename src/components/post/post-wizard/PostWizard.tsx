@@ -971,7 +971,7 @@ export function PostWizard({
             {/* Tag rows — anchored above toolbar */}
             <div className="flex-shrink-0 px-4">
               <div className="max-w-[680px] mx-auto">
-                <div className="rounded-2xl overflow-hidden" style={{ background: 'transparent' }}>
+                <div className="flex flex-col gap-3">
                   {/* Course Row */}
                   <button
                     onClick={() => { dismissCourseTooltip(); setShowCourseSearch(true); }}
@@ -1043,8 +1043,6 @@ export function PostWizard({
                     <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: 'hsl(var(--muted-foreground) / 0.3)' }} />
                   </button>
 
-                  {/* Subtle divider */}
-                  <div className="mx-4" style={{ height: '1px', background: 'hsl(var(--border) / 0.2)' }} />
 
                   {/* People Row */}
                   <button
