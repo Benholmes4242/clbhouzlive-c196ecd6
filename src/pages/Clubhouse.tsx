@@ -428,9 +428,9 @@ const ClubhouseContent = () => {
               media={activePost?.mediaItems?.map((m, i) => ({
                 id: m.id ?? `media-${i}`,
                 media_type: m.type === 'video' ? 'video' as const : 'image' as const,
-                url: m.imageUrl ?? '',
+                media_url: m.imageUrl ?? m.mp4Url ?? '',
                 stream_id: m.hlsUrl?.split('/').pop()?.replace('/manifest/video.m3u8', '') ?? undefined,
-                thumbnail_url: m.thumbnailUrl ?? undefined,
+                poster_url: m.thumbnailUrl ?? undefined,
                 display_order: i,
               })) ?? []}
               user={{

@@ -232,8 +232,8 @@ export function Scrubber({ videoRef, isActive, duration, onScrubStart, onScrubEn
       <div
         ref={barRef}
         className="absolute left-0 right-0 z-20 pointer-events-none"
-        style={{ bottom: bottomOffset }}
         style={{
+          bottom: bottomOffset,
           height: barHeight,
           transition: 'height 100ms ease-out',
         }}
