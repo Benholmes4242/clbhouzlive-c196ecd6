@@ -14,6 +14,7 @@ interface CreatorCapsuleProps {
   onProfile: () => void;
   isActive: boolean;
   isScrubbing: boolean;
+  isSelf?: boolean;
 }
 
 function VerifiedBadge() {
@@ -64,7 +65,7 @@ function getRelativeTime(createdAt: string): string {
   return new Date(createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
 
-export function CreatorCapsule({ post, isFollowed, onFollow, onProfile, isActive, isScrubbing }: CreatorCapsuleProps) {
+export function CreatorCapsule({ post, isFollowed, onFollow, onProfile, isActive, isScrubbing, isSelf }: CreatorCapsuleProps) {
   const [expanded, setExpanded] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
   const capsuleRef = useRef<HTMLDivElement>(null);
@@ -245,25 +246,27 @@ export function CreatorCapsule({ post, isFollowed, onFollow, onProfile, isActive
 
               {/* Action buttons */}
               <div className="flex items-center gap-2 pt-1">
-                <button
-                  onClick={handleFollow}
-                  className="h-8 px-4 rounded-full text-xs font-semibold transition-all"
-                  style={
-                    isFollowed
-                      ? {
-                          background: 'transparent',
-                          border: '1px solid rgba(255,255,255,0.3)',
-                          color: '#FFFFFF',
-                        }
-                      : {
-                          background: '#FFFFFF',
-                          border: '1px solid #FFFFFF',
-                          color: '#000000',
-                        }
-                  }
-                >
-                  {isFollowed ? 'Following' : 'Follow'}
-                </button>
+                {!isSelf && (
+                  <button
+                    onClick={handleFollow}
+                    className="h-8 px-4 rounded-full text-xs font-semibold transition-all"
+                    style={
+                      isFollowed
+                        ? {
+                            background: 'transparent',
+                            border: '1px solid rgba(255,255,255,0.3)',
+                            color: '#FFFFFF',
+                          }
+                        : {
+                            background: '#FFFFFF',
+                            border: '1px solid #FFFFFF',
+                            color: '#000000',
+                          }
+                    }
+                  >
+                    {isFollowed ? 'Following' : 'Follow'}
+                  </button>
+                )}
                 <button
                   onClick={handleProfile}
                   className="h-8 px-4 rounded-full text-xs font-semibold"
