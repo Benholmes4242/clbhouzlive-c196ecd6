@@ -110,7 +110,7 @@ const RatingConfirmationView = React.memo(function RatingConfirmationView(props:
       {/* Fullscreen Preview */}
       <div className="flex-1 relative overflow-hidden">
         <FullscreenReviewPost
-          mode="live"
+          mode="preview"
           courseId={courseId}
           courseName={courseName}
           heroSubtitle={heroSubtitle}

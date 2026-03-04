@@ -21,6 +21,9 @@ export interface ReviewData {
   courseName: string;
   courseImageUrl: string | null;
   rating: number;
+  courseRegion?: string | null;
+  courseCountry?: string | null;
+  courseSubCountry?: string | null;
 }
 
 /** Creator relationship to current user */

@@ -423,6 +423,13 @@ const ClubhouseContent = () => {
               mode="live"
               courseId={activeReview.courseId}
               courseName={activeReview.courseName}
+              heroSubtitle={
+                activeReview.courseSubCountry || activeReview.courseRegion
+                  ? [activeReview.courseSubCountry, activeReview.courseRegion, activeReview.courseCountry]
+                      .filter(Boolean)
+                      .join(', ')
+                  : activeReview.courseCountry || undefined
+              }
               rating={activeReview.rating}
               reviewId={activeReview.reviewId}
               media={activePost?.mediaItems?.map((m, i) => ({

@@ -89,7 +89,7 @@ export const ReviewBottomPanel: React.FC<ReviewBottomPanelProps> = ({
           background: 'rgba(0, 0, 0, 0.4)',
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',
-          borderColor: 'rgba(255, 255, 255, 0.06)',
+          borderColor: 'rgba(255, 255, 255, 0.10)',
         }}
       >
         {/* Matches regular CreatorCapsule layout exactly */}
@@ -126,7 +126,9 @@ export const ReviewBottomPanel: React.FC<ReviewBottomPanelProps> = ({
                 "flex items-center gap-0.5 mt-0.5",
                 "text-[11px] font-medium",
                 "transition-opacity duration-150",
-                "text-white/60 hover:text-white/80"
+                rating >= 9.0
+                  ? "text-amber-400/90 hover:text-amber-300"
+                  : "text-white/60 hover:text-white/80"
               )}
               style={{ WebkitTapHighlightColor: 'transparent' }}
             >
