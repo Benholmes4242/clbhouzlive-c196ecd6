@@ -1,6 +1,7 @@
 /**
  * TopPicksCarousel — Immersive portrait cards with dark glass + course image background
  * Photo fills top 55-60%, fades into dark glass, insights below
+ * z-index layers: 0=bg image, 1=glass overlay, 2=content
  */
 
 import { memo, useState, useRef, useCallback, useEffect } from 'react';
