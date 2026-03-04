@@ -115,19 +115,23 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
           const imgFailed = failedImages.has(pick.id) || !pick.avatarUrl;
 
           return (
-            <motion.div
+            <div
               key={pick.id}
-              whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.2 }}
-              className="flex-shrink-0 snap-center w-full rounded-[16px] overflow-hidden flex flex-col relative"
+              className="flex-shrink-0 snap-center"
               style={{
                 width: 227,
-                background: '#1a1a1a',
+                borderRadius: 16,
                 ...(i === 0 ? {
+                  boxShadow: '0 0 20px rgba(255, 255, 255, 0.25), 0 0 40px rgba(255, 255, 255, 0.08)',
                   border: '1px solid rgba(255, 255, 255, 0.20)',
-                  boxShadow: '0 0 12px rgba(255, 255, 255, 0.25), 0 8px 32px rgba(0, 0, 0, 0.25)',
                 } : {}),
               }}
+            >
+            <motion.div
+              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.2 }}
+              className="w-full rounded-[16px] overflow-hidden flex flex-col relative"
+              style={{ background: '#1a1a1a' }}
             >
               {/* Pre-blurred course image background — no backdrop-filter */}
               {courseImageUrl && (
@@ -303,6 +307,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                 )}
               </div>
             </motion.div>
+            </div>
           );
         })}
       </div>
