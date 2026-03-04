@@ -58,7 +58,7 @@ export function MediaPlayerTopBar({ activeTab, onTabChange }: MediaPlayerTopBarP
 
   const displayName = profile?.display_name || '';
   const { first } = splitName(displayName);
-  const avatarUrl = profile?.avatar_url;
+  const avatarUrl = profile?.profile_photo_url;
 
   return (
     <div
