@@ -10,6 +10,7 @@ import {
   retryLoad,
 } from '../utils/hlsManager';
 import { fadeOut, fadeIn } from '../utils/audioFade';
+import { segmentCache } from '../utils/segmentCache';
 import { useSessionCache } from './useSessionCache';
 import { useMediaStore } from '../store/mediaStore';
 
@@ -86,6 +87,7 @@ export function useVideoPool() {
 
     return () => {
       destroyAll();
+      segmentCache.clear();
       recoveryTimeouts.current.forEach((timeout) => clearTimeout(timeout));
       recoveryTimeouts.current.clear();
       pool.forEach((p, idx) => {
@@ -141,7 +143,8 @@ export function useVideoPool() {
       feedIndex: number,
       container: HTMLElement,
       onPlaying?: () => void,
-      onError?: () => void
+      onError?: () => void,
+      mp4Url?: string
     ): Promise<HTMLVideoElement | null> => {
       const pool = poolRef.current;
       if (!pool.length) return null;
@@ -290,9 +293,30 @@ export function useVideoPool() {
             video.removeEventListener('playing', onRecoveryPlaying);
           };
           video.addEventListener('playing', onRecoveryPlaying, { once: true });
-        } else {
-          onError?.();
-        }
+        } else if (mp4Url) {
+            // HLS recovery failed — try MP4 fallback
+            console.warn('[Pool] HLS failed, falling back to MP4:', mp4Url);
+            detachMedia(video);
+            video.src = mp4Url;
+            video.load();
+
+            const onMp4Ready = () => {
+              video.removeEventListener('canplay', onMp4Ready);
+              safePlay(video).then((ok) => {
+                if (ok) onPlaying?.();
+                else onError?.();
+              });
+            };
+            video.addEventListener('canplay', onMp4Ready, { once: true });
+
+            const mp4Timeout = setTimeout(() => {
+              video.removeEventListener('canplay', onMp4Ready);
+              onError?.();
+            }, 10000);
+            video.addEventListener('canplay', () => clearTimeout(mp4Timeout), { once: true });
+          } else {
+            onError?.();
+          }
       };
 
       // Try promote pre-created instance first

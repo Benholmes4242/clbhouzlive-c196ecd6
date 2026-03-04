@@ -24,6 +24,9 @@ function buildHlsUrl(id: string): string {
 function buildThumbnailUrl(id: string): string {
   return `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${id}/thumbnails/thumbnail.jpg?height=720&fit=crop`;
 }
+function buildMp4Url(id: string): string {
+  return `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${id}/downloads/default.mp4`;
+}
 
 async function fetchFeedPage(offset: number): Promise<{ posts: FeedPost[]; nextOffset: number }> {
   const { data, error } = await supabase
@@ -31,7 +34,12 @@ async function fetchFeedPage(offset: number): Promise<{ posts: FeedPost[]; nextO
     .select(`
       id, post_id, media_type, media_url, poster_url, stream_id,
       width, height, duration_seconds, display_order,
-      posts!inner ( id, user_id, content, like_count, comment_count, status )
+      posts!inner (
+        id, user_id, content, like_count, comment_count, status,
+        user_profiles:user_id (
+          id, username, display_name, profile_photo_url
+        )
+      )
     `)
     .eq('media_type', 'video')
     .not('stream_id', 'is', null)
@@ -53,11 +61,12 @@ async function fetchFeedPage(offset: number): Promise<{ posts: FeedPost[]; nextO
     if (!streamId) continue;
 
     if (!postMap.has(post.id)) {
+      const profile = post.user_profiles;
       postMap.set(post.id, {
         id: post.id,
         userId: post.user_id,
-        username: '',
-        avatarUrl: '',
+        username: profile?.display_name || profile?.username || '',
+        avatarUrl: profile?.profile_photo_url || '',
         caption: post.content || '',
         mediaItems: [],
         likeCount: post.like_count || 0,
@@ -70,6 +79,7 @@ async function fetchFeedPage(offset: number): Promise<{ posts: FeedPost[]; nextO
       id: row.id,
       type: 'video',
       hlsUrl: buildHlsUrl(streamId),
+      mp4Url: buildMp4Url(streamId),
       thumbnailUrl: row.poster_url || buildThumbnailUrl(streamId),
       width: row.width || 1080,
       height: row.height || 1920,

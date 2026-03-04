@@ -61,6 +61,7 @@ export function FeedItem({ post, index, isActive, observe, unobserve }: FeedItem
       ) : media.type === 'video' && media.hlsUrl ? (
         <VideoPlayer
           hlsUrl={media.hlsUrl}
+          mp4Url={media.mp4Url}
           feedIndex={index}
           isActive={isActive}
           thumbnailUrl={media.thumbnailUrl}

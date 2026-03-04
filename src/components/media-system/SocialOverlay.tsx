@@ -219,18 +219,30 @@ export function SocialOverlay({ post, isActive, isScrubbing, onLike, isLiked = f
               alt={displayName}
               className="w-9 h-9 rounded-full object-cover flex-shrink-0"
               style={{ border: '2px solid rgba(255,255,255,0.3)' }}
+              onError={(e) => {
+                // Hide broken avatar, show fallback
+                (e.currentTarget as HTMLImageElement).style.display = 'none';
+                const fallback = e.currentTarget.nextElementSibling as HTMLElement | null;
+                if (fallback) fallback.style.display = 'block';
+              }}
             />
-          ) : (
-            <div
-              className="w-9 h-9 rounded-full flex-shrink-0"
-              style={{ background: 'rgba(255,255,255,0.2)' }}
-            />
-          )}
+          ) : null}
+          {/* Fallback circle — hidden when avatar loads, shown on error or no URL */}
+          <div
+            className="w-9 h-9 rounded-full flex-shrink-0"
+            style={{
+              background: 'rgba(255,255,255,0.2)',
+              display: post.avatarUrl ? 'none' : 'block',
+            }}
+          />
 
-          {/* Username */}
+          {/* Username — truncated */}
           <span
             className="text-sm font-bold text-white truncate"
-            style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}
+            style={{
+              textShadow: '0 1px 3px rgba(0,0,0,0.5)',
+              maxWidth: '200px',
+            }}
           >
             {displayName}
           </span>

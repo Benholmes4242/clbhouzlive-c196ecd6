@@ -1,4 +1,5 @@
 import type HlsType from 'hls.js';
+import { createCachedLoader } from './cachedHlsLoader';
 
 export const HLS_CONFIG: Record<string, unknown> = {
   enableWorker: true,
@@ -81,7 +82,8 @@ export async function attachMedia(
   }
 
   return new Promise<void>((resolve) => {
-    const hls = new (Hls as any)(HLS_CONFIG) as InstanceType<typeof HlsType>;
+    const loader = createCachedLoader(Hls as any);
+    const hls = new (Hls as any)({ ...HLS_CONFIG, fLoader: loader }) as InstanceType<typeof HlsType>;
     hlsInstances.set(video, hls);
 
     // Resolve when manifest is parsed (video is ready to play)
@@ -164,7 +166,8 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
   const Hls = await getHls();
   if (!Hls || !Hls.isSupported()) return;
 
-  const hls = new (Hls as any)(HLS_CONFIG) as InstanceType<typeof HlsType>;
+  const loader = createCachedLoader(Hls as any);
+  const hls = new (Hls as any)({ ...HLS_CONFIG, fLoader: loader }) as InstanceType<typeof HlsType>;
   hls.loadSource(hlsUrl);
   preCreatedInstances.set(hlsUrl, hls);
 
