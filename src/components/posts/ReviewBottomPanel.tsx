@@ -83,12 +83,12 @@ export const ReviewBottomPanel: React.FC<ReviewBottomPanelProps> = ({
       <div
         className={cn(
           'overflow-hidden rounded-xl border',
-          'shadow-[0_4px_16px_rgba(0,0,0,0.2)]'
+          'shadow-[0_4px_16px_rgba(0,0,0,0.25)]'
         )}
         style={{
-          background: 'rgba(0, 0, 0, 0.4)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
+          background: 'rgba(0, 0, 0, 0.35)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
           borderColor: 'rgba(255, 255, 255, 0.10)',
         }}
       >
