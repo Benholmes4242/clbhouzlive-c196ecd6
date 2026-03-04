@@ -26,9 +26,11 @@ interface FeedContainerProps {
   onRefresh?: () => Promise<void>;
   isRefreshing?: boolean;
   hasNextPage?: boolean;
+  followOverrides?: Map<string, boolean>;
+  onFollowChange?: (userId: string, isFollowed: boolean) => void;
 }
 
-export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = false, hasNextPage = true }: FeedContainerProps) {
+export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = false, hasNextPage = true, followOverrides, onFollowChange }: FeedContainerProps) {
   const [itemHeight, setItemHeight] = useState(
     typeof window !== 'undefined' ? window.innerHeight : 800
   );
@@ -292,6 +294,8 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
             isActive={index === storeActiveIndex}
             isLastItem={index === posts.length - 1}
             hasNextPage={hasNextPage}
+            followOverride={followOverrides?.get(post.userId)}
+            onFollowChange={onFollowChange}
           />
         ))}
       </div>
