@@ -60,6 +60,7 @@ export const useMediaStore = create<MediaStore>((set) => ({
   toggleMute: () => set((s) => ({ isMuted: !s.isMuted })),
   setMuted: (muted) => set({ isMuted: muted }),
   setVolume: (v) => set({ volume: v }),
+  setUserPaused: (paused) => set({ userPaused: paused }),
 
   setCarouselPosition: (feedIndex, mediaIndex) =>
     set((s) => {
