@@ -58,12 +58,8 @@ export function ErrorState({ onRetry, canRetry = true }: ErrorStateProps) {
       >
         {canRetry ? 'Tap to retry' : 'Try again later'}
       </p>
-      <style>{`
-        @keyframes error-pulse {
-          0%, 100% { transform: scale(1); opacity: 0.8; }
-          50% { transform: scale(1.05); opacity: 1; }
-        }
-      `}</style>
+
+
     </div>
   );
 }
