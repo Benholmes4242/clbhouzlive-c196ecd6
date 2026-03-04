@@ -122,6 +122,10 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
               className="w-[227px] rounded-[16px] overflow-hidden flex-shrink-0 snap-center flex flex-col relative"
               style={{
                 background: '#1a1a1a',
+                ...(i === 0 ? {
+                  boxShadow: '0 0 20px rgba(255, 255, 255, 0.25), 0 0 40px rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.20)',
+                } : {}),
               }}
             >
               {/* Pre-blurred course image background — no backdrop-filter */}
