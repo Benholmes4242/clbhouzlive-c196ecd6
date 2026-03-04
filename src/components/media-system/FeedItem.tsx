@@ -1,34 +1,28 @@
 /**
  * FeedItem — one full-screen item in the vertical feed.
  * Renders MediaCarousel for multi-media, single VideoPlayer/ImageViewer for single.
- * Includes SocialOverlay with auto-hide.
+ * Includes SocialOverlay with auto-hide and EndOfFeed overlay.
  */
-import { useRef, useEffect, useState, useCallback } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import { VideoPlayer } from './VideoPlayer';
 import { ImageViewer } from './ImageViewer';
 import { MediaCarousel } from './MediaCarousel';
 import { SocialOverlay } from './SocialOverlay';
+import { EndOfFeed } from './EndOfFeed';
 import type { FeedPost } from './types/media';
 
 interface FeedItemProps {
   post: FeedPost;
   index: number;
   isActive: boolean;
-  observe: (el: HTMLElement, index: number) => void;
-  unobserve: (el: HTMLElement) => void;
+  isLastItem?: boolean;
+  hasNextPage?: boolean;
 }
 
-export function FeedItem({ post, index, isActive, observe, unobserve }: FeedItemProps) {
+export function FeedItem({ post, index, isActive, isLastItem = false, hasNextPage = true }: FeedItemProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [isScrubbing, setIsScrubbing] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    observe(el, index);
-    return () => unobserve(el);
-  }, [index, observe, unobserve]);
 
   const handleLike = useCallback(() => {
     setIsLiked((prev) => !prev);
@@ -47,7 +41,7 @@ export function FeedItem({ post, index, isActive, observe, unobserve }: FeedItem
     <div
       ref={ref}
       className="relative w-full flex-shrink-0"
-      style={{ height: '100dvh', scrollSnapAlign: 'start' }}
+      style={{ height: '100dvh' }}
     >
       {isMultiMedia ? (
         <MediaCarousel
@@ -87,6 +81,11 @@ export function FeedItem({ post, index, isActive, observe, unobserve }: FeedItem
         onLike={handleLike}
         isLiked={isLiked}
       />
+
+      {/* End of feed overlay */}
+      {isLastItem && !hasNextPage && (
+        <EndOfFeed visible={isActive} />
+      )}
     </div>
   );
 }

@@ -22,7 +22,8 @@ function buildHlsUrl(id: string): string {
   return `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${id}/manifest/video.m3u8`;
 }
 function buildThumbnailUrl(id: string): string {
-  return `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${id}/thumbnails/thumbnail.jpg?height=720&fit=crop`;
+  // time=0s ensures thumbnail matches the actual first frame for seamless crossfade
+  return `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${id}/thumbnails/thumbnail.jpg?time=0s&height=1080`;
 }
 function buildMp4Url(id: string): string {
   return `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${id}/downloads/default.mp4`;
@@ -91,9 +92,29 @@ async function fetchFeedPage(offset: number): Promise<{ posts: FeedPost[]; nextO
   return { posts: Array.from(postMap.values()), nextOffset: offset + PAGE_SIZE };
 }
 
-function FeedWithPreloader({ posts, onNearEnd }: { posts: FeedPost[]; onNearEnd: () => void }) {
+function FeedWithPreloader({
+  posts,
+  onNearEnd,
+  onRefresh,
+  isRefreshing,
+  hasNextPage,
+}: {
+  posts: FeedPost[];
+  onNearEnd: () => void;
+  onRefresh: () => Promise<void>;
+  isRefreshing: boolean;
+  hasNextPage: boolean;
+}) {
   usePreloader(posts);
-  return <FeedContainer posts={posts} onNearEnd={onNearEnd} />;
+  return (
+    <FeedContainer
+      posts={posts}
+      onNearEnd={onNearEnd}
+      onRefresh={onRefresh}
+      isRefreshing={isRefreshing}
+      hasNextPage={hasNextPage}
+    />
+  );
 }
 
 export default function FullscreenMediaViewer() {
@@ -103,6 +124,8 @@ export default function FullscreenMediaViewer() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    refetch,
+    isRefetching,
   } = useInfiniteQuery({
     queryKey: ['media-system-feed'],
     queryFn: ({ pageParam = 0 }) => fetchFeedPage(pageParam as number),
@@ -123,6 +146,10 @@ export default function FullscreenMediaViewer() {
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+  const handleRefresh = useCallback(async () => {
+    await refetch();
+  }, [refetch]);
+
   if (isLoading) {
     return (
       <div className="w-full h-[100dvh] bg-black flex items-center justify-center">
@@ -142,7 +169,13 @@ export default function FullscreenMediaViewer() {
   return (
     <VideoPoolProvider>
       <div className="w-full h-[100dvh] bg-black overflow-hidden">
-        <FeedWithPreloader posts={posts} onNearEnd={handleNearEnd} />
+        <FeedWithPreloader
+          posts={posts}
+          onNearEnd={handleNearEnd}
+          onRefresh={handleRefresh}
+          isRefreshing={isRefetching}
+          hasNextPage={!!hasNextPage}
+        />
       </div>
     </VideoPoolProvider>
   );
