@@ -190,7 +190,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
 
       {/* Golf Course CTA - one-line gap after caption */}
       {golfCourse && (
-        <div className={cn(caption && "mt-2")}>
+        <div className="mt-3">
           <CourseLocationRow
             course={golfCourse}
             showChevron

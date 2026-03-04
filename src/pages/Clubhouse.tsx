@@ -354,8 +354,10 @@ const ClubhouseContent = () => {
     <PageRoot 
       ref={clubhouseRootRef} 
       className="clubhouse-root" 
+      fixedHeight
+      hasBottomNav={false}
       style={{ 
-        "--bg-page": "#0F0F0F", 
+        "--bg-page": "#000000", 
         position: 'relative', 
         isolation: 'isolate', 
         zIndex: 0
@@ -423,7 +425,14 @@ const ClubhouseContent = () => {
               courseName={activeReview.courseName}
               rating={activeReview.rating}
               reviewId={activeReview.reviewId}
-              media={[]} 
+              media={activePost?.mediaItems?.map((m, i) => ({
+                id: m.id ?? `media-${i}`,
+                media_type: m.type === 'video' ? 'video' as const : 'image' as const,
+                url: m.imageUrl ?? '',
+                stream_id: m.hlsUrl?.split('/').pop()?.replace('/manifest/video.m3u8', '') ?? undefined,
+                thumbnail_url: m.thumbnailUrl ?? undefined,
+                display_order: i,
+              })) ?? []}
               user={{
                 name: activePost.displayName,
                 username: activePost.username,
@@ -434,13 +443,7 @@ const ClubhouseContent = () => {
             />
           )}
 
-          {/* Top 100 pills — z-20, top-left */}
-          {activeReview?.courseId && (
-            <Top100OverlayPills
-              courseId={activeReview.courseId}
-              className="fixed top-[calc(env(safe-area-inset-top,0px)+100px)] left-4 z-20"
-            />
-          )}
+          {/* REMOVED: Top100OverlayPills — not appropriate for feed context */}
 
           {/* Media navigation dots for multi-media posts */}
           {activeMediaCount > 1 && (
@@ -462,6 +465,7 @@ const ClubhouseContent = () => {
             onLike={() => handleLike(activePost)}
             onComment={() => setCommentsOpen(true)}
             onShare={() => handleShare(activePost)}
+            onMore={() => console.log('[More] Options for post:', activePost?.id)}
             onMuteToggle={toggleMute}
             isVideo={isActiveVideo}
             hasNextMedia={currentMediaIndex < activeMediaCount - 1}
@@ -483,6 +487,10 @@ const ClubhouseContent = () => {
               avatar: activePost.avatarUrl,
             }}
             caption={activePost.caption}
+            golfCourse={activePost.review ? {
+              id: activePost.review.courseId,
+              name: activePost.review.courseName,
+            } : undefined}
             isFollowing={isActivePostFollowed}
             isOwnPost={isOwnPost}
             isVisible={overlayVisible}

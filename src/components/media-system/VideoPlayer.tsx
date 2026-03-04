@@ -290,6 +290,7 @@ export function VideoPlayer({
         duration={videoDuration}
         onScrubStart={onScrubStart}
         onScrubEnd={onScrubEnd}
+        bottomOffset={94}
       />
     </div>
   );

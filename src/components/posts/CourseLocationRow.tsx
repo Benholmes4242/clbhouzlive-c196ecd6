@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, ChevronRight } from 'lucide-react';
+import { MapPinned, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface CourseInfo {
@@ -106,7 +106,7 @@ const CourseLocationRow: React.FC<CourseLocationRowProps> = ({
         className
       )}
     >
-      <MapPin 
+      <MapPinned 
         className={cn(
           "h-4 w-4 flex-shrink-0 mt-0.5",
           isDark ? "text-white/60" : "text-muted-foreground"

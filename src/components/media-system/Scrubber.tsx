@@ -22,6 +22,8 @@ interface ScrubberProps {
   onScrubStart?: () => void;
   /** Called when scrubbing ends */
   onScrubEnd?: () => void;
+  /** Pixels from the bottom of the parent container */
+  bottomOffset?: number;
 }
 
 function formatTime(seconds: number): string {
@@ -50,7 +52,7 @@ const FINE_SCRUB_FACTOR = 0.25;
 const HIDE_DELAY = 2000;
 const LOOP_PULSE_WINDOW = 0.5; // seconds before loop
 
-export function Scrubber({ videoRef, isActive, duration, onScrubStart, onScrubEnd }: ScrubberProps) {
+export function Scrubber({ videoRef, isActive, duration, onScrubStart, onScrubEnd, bottomOffset = 0 }: ScrubberProps) {
   const [progress, setProgress] = useState(0);
   const [buffered, setBuffered] = useState(0);
   const [scrubState, setScrubState] = useState<ScrubState>('default');
@@ -219,7 +221,7 @@ export function Scrubber({ videoRef, isActive, duration, onScrubStart, onScrubEn
       {/* Invisible touch capture zone — bottom 60px */}
       <div
         className="absolute left-0 right-0 z-[25]"
-        style={{ bottom: 0, height: TOUCH_ZONE_HEIGHT }}
+        style={{ bottom: bottomOffset, height: TOUCH_ZONE_HEIGHT }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -229,7 +231,8 @@ export function Scrubber({ videoRef, isActive, duration, onScrubStart, onScrubEn
       {/* Visual bar container */}
       <div
         ref={barRef}
-        className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none"
+        className="absolute left-0 right-0 z-20 pointer-events-none"
+        style={{ bottom: bottomOffset }}
         style={{
           height: barHeight,
           transition: 'height 100ms ease-out',
