@@ -16,44 +16,17 @@ interface FeedItemProps {
   hasNextPage?: boolean;
   followOverride?: boolean;
   onFollowChange?: (userId: string, isFollowed: boolean) => void;
-  onDoubleTapLike?: () => void;
 }
 
 export function FeedItem({
-  post, index, isActive, onDoubleTapLike,
+  post, index, isActive,
 }: FeedItemProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   const isMultiMedia = post.mediaItems.length > 1;
   const media = post.mediaItems[0];
 
-  // Review/text-only posts with no media — render dark background for overlay
-  if (!media) {
-    const courseImage = post.review?.courseImageUrl;
-    return (
-      <div
-        ref={ref}
-        className="relative w-full flex-shrink-0"
-        style={{ height: '100dvh' }}
-      >
-        <div className="relative w-full h-full bg-black overflow-hidden">
-          {/* Course hero image background if available */}
-          {courseImage && (
-            <>
-              <img
-                src={courseImage}
-                alt=""
-                draggable={false}
-                className="absolute inset-0 w-full h-full object-cover"
-                style={{ filter: 'blur(8px) brightness(0.4)', transform: 'scale(1.1)' }}
-              />
-              <div className="absolute inset-0 bg-black/40" />
-            </>
-          )}
-        </div>
-      </div>
-    );
-  }
+  if (!media) return null;
 
   return (
     <div
@@ -75,7 +48,6 @@ export function FeedItem({
           isActive={isActive}
           thumbnailUrl={media.thumbnailUrl}
           duration={media.duration}
-          onDoubleTapLike={onDoubleTapLike}
         />
       ) : media.imageUrl ? (
         <ImageViewer

@@ -29,10 +29,9 @@ interface FeedContainerProps {
   hasNextPage?: boolean;
   followOverrides?: Map<string, boolean>;
   onFollowChange?: (userId: string, isFollowed: boolean) => void;
-  onDoubleTapLike?: (postIndex: number) => void;
 }
 
-export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = false, hasNextPage = true, followOverrides, onFollowChange, onDoubleTapLike }: FeedContainerProps) {
+export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = false, hasNextPage = true, followOverrides, onFollowChange }: FeedContainerProps) {
   const [itemHeight, setItemHeight] = useState(
     typeof window !== 'undefined' ? window.innerHeight : 800
   );
@@ -321,7 +320,6 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
             hasNextPage={hasNextPage}
             followOverride={followOverrides?.get(post.userId)}
             onFollowChange={onFollowChange}
-            onDoubleTapLike={onDoubleTapLike ? () => onDoubleTapLike(index) : undefined}
           />
         ))}
       </div>
