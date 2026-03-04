@@ -1,5 +1,5 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { FeedPost } from '../types/media';
 import { interleaveReviews, deduplicatePosts } from '../utils/feedAlgorithm';
@@ -7,64 +7,63 @@ import { mapRowToFeedPost, groupMultiMedia } from '../utils/feedMapper';
 
 const PAGE_SIZE = 10;
 
-async function fetchFriendsPage(
-  userId: string,
-  cursor: string | null,
-  seenPostIds: string[]
-): Promise<{ posts: FeedPost[]; nextCursor: string | null }> {
-  const { data, error } = await supabase.rpc('get_friends_feed', {
-    p_user_id: userId,
-    p_page_size: PAGE_SIZE,
-    p_cursor: cursor,
-    p_seen_post_ids: seenPostIds,
-  });
-
-  if (error) {
-    console.error('[FriendsFeed] RPC error:', error);
-    return { posts: [], nextCursor: null };
-  }
-
-  if (!data || data.length === 0) {
-    return { posts: [], nextCursor: null };
-  }
-
-  const posts = groupMultiMedia((data as any[]).map(mapRowToFeedPost));
-  const interleaved = interleaveReviews(posts, 'friends');
-
-  const lastRow = data[data.length - 1] as any;
-  const nextCursor = data.length >= PAGE_SIZE ? lastRow.post_created_at : null;
-
-  return { posts: interleaved, nextCursor };
-}
-
 export function useFriendsFeed(userId: string | undefined) {
   const seenPostIds = useRef<string[]>([]);
 
   const query = useInfiniteQuery({
     queryKey: ['media-feed', 'friends', userId],
     queryFn: async ({ pageParam }) => {
-      if (!userId) return { posts: [], nextCursor: null };
-      const result = await fetchFriendsPage(
-        userId,
-        pageParam as string | null,
-        seenPostIds.current
-      );
-      for (const post of result.posts) {
-        if (!seenPostIds.current.includes(post.id)) {
-          seenPostIds.current.push(post.id);
+      if (!userId) return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
+
+      try {
+        const cursor = typeof pageParam === 'string' ? pageParam : undefined;
+
+        const { data, error } = await supabase.rpc('get_friends_feed', {
+          p_user_id: userId,
+          p_page_size: PAGE_SIZE,
+          ...(cursor ? { p_cursor: cursor } : {}),
+          p_seen_post_ids: seenPostIds.current,
+        });
+
+        if (error) {
+          console.error('[FriendsFeed] RPC error:', error);
+          return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
         }
+
+        if (!data || data.length === 0) {
+          return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
+        }
+
+        const rows = data as any[];
+        const posts = groupMultiMedia(rows.map(mapRowToFeedPost));
+        const interleaved = interleaveReviews(posts, 'friends');
+
+        for (const post of interleaved) {
+          if (!seenPostIds.current.includes(post.id)) {
+            seenPostIds.current.push(post.id);
+          }
+        }
+
+        const lastRow = rows[rows.length - 1];
+        const nextCursor: string | undefined =
+          rows.length >= PAGE_SIZE ? lastRow.post_created_at : undefined;
+
+        return { posts: interleaved, nextCursor };
+      } catch (err) {
+        console.error('[FriendsFeed] Unexpected error:', err);
+        return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
       }
-      return result;
     },
     getNextPageParam: (lastPage) => lastPage.nextCursor,
-    initialPageParam: null as string | null,
+    initialPageParam: undefined as string | undefined,
     enabled: !!userId,
     staleTime: 1 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
 
-  const allPosts = deduplicatePosts(
-    query.data?.pages.flatMap((p) => p.posts) ?? []
+  const allPosts = useMemo(
+    () => deduplicatePosts(query.data?.pages.flatMap((page) => page.posts) ?? []),
+    [query.data]
   );
 
   const resetSeen = useCallback(() => {
