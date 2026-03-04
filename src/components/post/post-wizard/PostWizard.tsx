@@ -853,7 +853,7 @@ export function PostWizard({
                     maxLength={POST_LIMITS.MAX_CAPTION_LENGTH}
                     accentColor="#f59e0b"
                     onFocusChange={setCaptionFocused}
-                    style={{ minHeight: '120px', fontSize: '16px' }}
+                    className="!min-h-[120px] !text-[16px]"
                   />
 
                   {/* Character counter — inside card, bottom-right, fade in */}

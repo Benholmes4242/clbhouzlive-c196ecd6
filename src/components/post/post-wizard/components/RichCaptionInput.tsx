@@ -214,7 +214,7 @@ export const RichCaptionInput = forwardRef<RichCaptionInputHandle, RichCaptionIn
           data-gramm="false"
           data-gramm_editor="false"
           data-enable-grammarly="false"
-          className="w-full min-h-[80px] bg-transparent outline-none text-[17px] font-normal leading-[1.42] tracking-tight"
+          className={`w-full min-h-[80px] bg-transparent outline-none text-[17px] font-normal leading-[1.42] tracking-tight ${className || ''}`}
           style={{
             caretColor: accentColor,
             color: 'hsl(var(--foreground))',
