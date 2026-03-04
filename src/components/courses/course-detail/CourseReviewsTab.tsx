@@ -23,7 +23,7 @@ import {
   MOCK_CYPRESS_POINT_REVIEWS 
 } from '@/features/courses/config';
 import { getScoreTier } from '@/utils/getScoreTier';
-import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
 import type { ExploreContentItem } from '@/components/explore/types';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
@@ -236,10 +236,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     setSearchQuery('');
   };
 
-  // Unified fullscreen for review media
-  const { openFullscreen } = useUnifiedFullscreen('course', {
-    allowLandscape: true,
-  });
+  // TODO: Wire to new media player
+  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
 
   // Convert review media to ExploreContentItem format and open fullscreen
   const handleReviewMediaClick = useCallback((media: ReviewMediaItem[], startIndex: number) => {

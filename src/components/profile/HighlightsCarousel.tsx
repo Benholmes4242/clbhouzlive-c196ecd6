@@ -12,7 +12,7 @@ import { warmHls, getHlsUrl } from '@/utils/videoPreload';
 import HighlightVideo from './HighlightVideo';
 import HighlightOverlays from './HighlightOverlays';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
-import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
 
 interface HighlightsCarouselProps {
   userId: string;
@@ -26,7 +26,8 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
   const railRef = useRef<HTMLDivElement>(null);
   const { isGloballyMuted, toggleGlobalMute, markUserGestureUnmute } = useGlobalAudio();
   const [activeIndex, setActiveIndex] = useState(0);
-  const { openFullscreen } = useUnifiedFullscreen('explore');
+  // TODO: Wire to new media player
+  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
 
   // Track active index via scroll position
   useEffect(() => {
