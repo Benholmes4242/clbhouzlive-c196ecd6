@@ -119,9 +119,10 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
               key={pick.id}
               whileTap={{ scale: 0.98 }}
               transition={{ duration: 0.2 }}
-              className="w-[227px] rounded-[16px] overflow-hidden flex-shrink-0 snap-center flex flex-col relative"
+              className="w-[227px] rounded-[16px] overflow-hidden flex-shrink-0 snap-center flex flex-col relative transform-gpu"
               style={{
                 background: '#1a1a1a',
+                willChange: 'transform',
               }}
             >
               {/* Course image background layer */}
