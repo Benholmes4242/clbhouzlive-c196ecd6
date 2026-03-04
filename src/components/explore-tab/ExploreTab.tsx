@@ -18,7 +18,7 @@ import ExploreErrorState from './ExploreErrorState';
 import { useInfiniteTrendingCourses } from '@/hooks/useInfiniteTrendingCourses';
 import { useExploreRegions } from '@/hooks/useExploreData';
 import { useExplorePrefetch, RegionKey, ExploreMoment, ExploreFilters, TimeFilter, SortFilter } from '@/hooks/useExploreMoments';
-// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
+import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 import { exploreMomentAdapter } from '@/adapters/exploreMomentAdapter';
 import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
 import { useQueryClient } from '@tanstack/react-query';
@@ -55,8 +55,9 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
   
   useExplorePrefetch();
   
-  // TODO: Wire to new media player
-  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
+  const { openFullscreen } = useUnifiedFullscreen('explore-moments', {
+    allowLandscape: true,
+  });
   
   const activeFilter = searchParams.get('sub') || 'all';
   

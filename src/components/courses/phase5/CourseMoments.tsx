@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { useUserCourseMoments } from '@/hooks/useUserCourseMoments';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
-// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
+import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface CourseMomentsProps {
@@ -25,8 +25,7 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
   const { data: moments, isLoading } = useUserCourseMoments(courseId);
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  // TODO: Wire to new media player
-  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
+  const { openFullscreen } = useUnifiedFullscreen('course');
 
   // Build fullscreen items from moments
   const fullscreenItems = useMemo(() => {

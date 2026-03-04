@@ -7,7 +7,7 @@ import {
   useUserPostLogic,
   UserPostData
 } from './user-post';
-// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
+import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 
 interface UserPostProps {
   post: UserPostData;
@@ -36,8 +36,13 @@ const UserPost = ({ post, allUserPosts = [], source = 'profile', onPostUpdated, 
     onPostDeleted
   });
 
-  // TODO: Wire to new media player
-  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
+  // Unified fullscreen for posts
+  const { openFullscreen } = useUnifiedFullscreen('profile', {
+    allowLandscape: true,
+    onLike: (itemId) => console.log('Like:', itemId),
+    onComment: (itemId) => console.log('Comment:', itemId),
+    onShare: (itemId) => console.log('Share:', itemId),
+  });
 
   // Filter posts with media for the unified player
   const postsWithMedia = useMemo(() => 

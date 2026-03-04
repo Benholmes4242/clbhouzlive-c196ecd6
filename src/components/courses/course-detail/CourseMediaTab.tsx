@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom';
 import { adaptClubMediaArrayToExploreItems } from '@/lib/adapters/clubMediaToExplore';
 import { adaptExploreContentToMediaItems } from '@/components/media-grid';
 import type { ExtendedMediaItem as NewMediaItem } from '@/components/media-grid';
-// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
+import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { CourseMediaSummaryCard } from './CourseMediaSummaryCard';
 import { SegmentedTabOption } from '@/components/ui/SegmentedTabs';
@@ -202,8 +202,31 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     }
   }, [courseId, courseName]);
 
-  // TODO: Wire to new media player
-  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
+  // Fix 6: Use 'course' source type instead of 'explore'
+  const { openFullscreen } = useUnifiedFullscreen('course', {
+    allowLandscape: true,
+    
+    onIndexChange: (index) => {
+      const currentItem = filteredItems[index];
+      setCurrentFullscreenPostId(currentItem?.id || null);
+    },
+    
+    onLike: (itemId) => {
+      toggleLike();
+    },
+    
+    onComment: (itemId) => {
+      // CommentsPage opens automatically
+    },
+    
+    onShare: (itemId) => {
+      handleShareReview(itemId);
+    },
+    
+    onClose: () => {
+      setCurrentFullscreenPostId(null);
+    },
+  });
 
   const handleMediaClick = useCallback((item: NewMediaItem) => {
     const index = filteredItems.findIndex(media => media.id === item.id);

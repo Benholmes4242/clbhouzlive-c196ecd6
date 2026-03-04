@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useFollow } from '@/hooks/useFollow';
 import { useUserProfilePosts } from '@/hooks/useUserProfilePosts';
-// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
+import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ImageWithFallback } from '@/components/common/ImageWithFallback';
 import { SheetPlaybackProvider, useSheetPlayback } from './SheetPlaybackContext';
@@ -123,8 +123,7 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
   const { isFollowing: followState, busy: followBusy, toggle: toggleFollow, ensureInitial } = useFollow(user?.id);
   
   const { posts, loading: postsLoading, error: postsError, isEmpty } = useUserProfilePosts(user?.id);
-  // TODO: Wire to new media player
-  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
+  const { openFullscreen } = useUnifiedFullscreen('profile', {});
   const [isClosing, setIsClosing] = useState(false);
   
   const headerRef = React.useRef<HTMLDivElement>(null);

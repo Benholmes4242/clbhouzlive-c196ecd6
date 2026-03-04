@@ -8,7 +8,7 @@ import { LongFormFeedCard } from './LongFormFeedCard';
 import { LongFormFeedCardSkeleton } from './LongFormFeedCardSkeleton';
 import { useInfiniteLongFormVideos } from '@/hooks/useInfiniteLongFormVideos';
 import { useFollowedUsers } from '@/hooks/useFollowedUsers';
-// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
+import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 import { useAdaptivePrefetch } from '@/hooks/useAdaptivePrefetch';
 import { runtimeUserTap } from '@/media';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
@@ -218,8 +218,13 @@ export const VideosSectionPage: React.FC = () => {
     });
   }, [videos, prefetchConfig]);
 
-  // TODO: Wire to new media player
-  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
+  // Unified fullscreen player
+  const { openFullscreen } = useUnifiedFullscreen('explore', {
+    allowLandscape: true,
+    onLoadMore: fetchNextPage,
+    hasMore,
+    isLoadingMore: isFetchingNextPage,
+  });
 
   // Convert to ExploreContentItem format for fullscreen
   const videosAsExploreItems = useMemo(() => {
