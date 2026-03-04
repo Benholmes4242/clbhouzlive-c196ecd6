@@ -73,7 +73,7 @@ export function useVideoPool() {
       video.setAttribute('webkit-playsinline', 'true');
       video.preload = 'auto';
       video.muted = true;
-      video.loop = false;
+      video.loop = true;
       video.crossOrigin = 'anonymous';
       video.style.cssText =
         'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;';

@@ -2,6 +2,7 @@
  * FeedContainer — spring-physics-driven vertical feed.
  * Replaces CSS scroll-snap with translateY + spring animations for natural feel.
  * Includes pull-to-refresh, rubber-band edges, and fling detection.
+ * Supports both touch (mobile) and mouse (desktop/preview) drag.
  *
  * Performance: During drag/spring, transforms are applied directly to the DOM
  * via refs (no React state updates per frame). State is synced only on settle.
@@ -34,7 +35,6 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
   const [itemHeight, setItemHeight] = useState(
     typeof window !== 'undefined' ? window.innerHeight : 800
   );
-  // offsetY state is used only for initial/settled render; during drag/spring we write to DOM directly
   const [offsetY, setOffsetY] = useState(0);
 
   const offsetRef = useRef(0);
@@ -121,7 +121,6 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
         }
       },
       () => {
-        // Spring complete — sync to React state
         offsetRef.current = targetY;
         setOffsetY(targetY);
         activeIndexRef.current = clamped;
@@ -129,7 +128,6 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
         useMediaStore.getState().setCarouselPosition(clamped, 0);
         haptic('light');
 
-        // Infinite scroll trigger
         if (clamped >= posts.length - 3 && posts.length > 0) {
           onNearEnd?.();
         }
@@ -145,27 +143,22 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
     const prev = samples[Math.max(0, samples.length - 3)];
     const dt = last.time - prev.time;
     if (dt === 0) return 0;
-    return (last.y - prev.y) / dt; // px/ms, negative = upward
+    return (last.y - prev.y) / dt;
   };
 
-  // ── Touch handlers ──
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    const touch = e.touches[0];
-    if (!touch) return;
-
+  // ── Shared drag logic (touch + mouse) ──
+  const startDrag = useCallback((clientY: number) => {
     cancelSpring.current?.();
     isDragging.current = true;
     isRefreshTriggered.current = false;
-    touchStartRef.current = { y: touch.clientY, time: Date.now(), offsetY: offsetRef.current };
-    velocityTracker.current = [{ y: touch.clientY, time: Date.now() }];
+    touchStartRef.current = { y: clientY, time: Date.now(), offsetY: offsetRef.current };
+    velocityTracker.current = [{ y: clientY, time: Date.now() }];
   }, []);
 
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+  const moveDrag = useCallback((clientY: number) => {
     if (!isDragging.current) return;
-    const touch = e.touches[0];
-    if (!touch) return;
 
-    const deltaY = touch.clientY - touchStartRef.current.y;
+    const deltaY = clientY - touchStartRef.current.y;
     const currentIndex = activeIndexRef.current;
     const maxOffset = 0;
     const minOffset = -(posts.length - 1) * itemHeight;
@@ -176,18 +169,15 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
       const overscroll = newOffset - maxOffset;
       newOffset = maxOffset + overscroll * RUBBER_BAND_FACTOR;
 
-      // Pull-to-refresh tracking (only on first item)
       if (currentIndex === 0 && onRefresh) {
         const actualPull = overscroll * RUBBER_BAND_FACTOR;
         pullDistanceRef.current = actualPull;
 
-        // Throttled state update for PullToRefresh rendering
         if (Math.abs(actualPull - lastRenderedPull.current) > PTR_RENDER_THRESHOLD || actualPull === 0) {
           lastRenderedPull.current = actualPull;
           setPullDistance(actualPull);
         }
 
-        // Haptic when crossing threshold
         if (actualPull >= PTR_THRESHOLD && !isRefreshTriggered.current) {
           isRefreshTriggered.current = true;
           haptic('medium');
@@ -206,41 +196,35 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
       }
     }
 
-    // Direct DOM manipulation — no React state update
     offsetRef.current = newOffset;
     if (trackRef.current) {
       trackRef.current.style.transform = `translateY(${newOffset}px)`;
     }
 
-    // Track velocity (keep last 5)
-    velocityTracker.current.push({ y: touch.clientY, time: Date.now() });
+    velocityTracker.current.push({ y: clientY, time: Date.now() });
     if (velocityTracker.current.length > 5) velocityTracker.current.shift();
   }, [posts.length, itemHeight, onRefresh]);
 
-  const handleTouchEnd = useCallback(() => {
+  const endDrag = useCallback(() => {
     if (!isDragging.current) return;
     isDragging.current = false;
 
-    const velocity = calculateVelocity(); // px/ms
+    const velocity = calculateVelocity();
     const currentIndex = activeIndexRef.current;
 
-    // Pull-to-refresh check
     if (currentIndex === 0 && pullDistanceRef.current >= PTR_THRESHOLD && onRefresh && !isRefreshing) {
       onRefresh();
     }
 
-    // Determine target index
     let targetIndex = currentIndex;
 
     if (Math.abs(velocity) > FLING_VELOCITY_THRESHOLD) {
-      // Fling
       if (velocity < 0 && currentIndex < posts.length - 1) {
         targetIndex = currentIndex + 1;
       } else if (velocity > 0 && currentIndex > 0) {
         targetIndex = currentIndex - 1;
       }
     } else {
-      // Snap to nearest based on current offset
       targetIndex = Math.round(-offsetRef.current / itemHeight);
       targetIndex = Math.max(0, Math.min(posts.length - 1, targetIndex));
     }
@@ -250,6 +234,44 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
     lastRenderedPull.current = 0;
     goToIndex(targetIndex, velocity);
   }, [posts.length, itemHeight, onRefresh, isRefreshing, goToIndex]);
+
+  // ── Touch handlers ──
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    if (!touch) return;
+    startDrag(touch.clientY);
+  }, [startDrag]);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    if (!touch) return;
+    moveDrag(touch.clientY);
+  }, [moveDrag]);
+
+  const handleTouchEnd = useCallback(() => {
+    endDrag();
+  }, [endDrag]);
+
+  // ── Mouse handlers (desktop/preview support) ──
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    startDrag(e.clientY);
+  }, [startDrag]);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!isDragging.current) return;
+    e.preventDefault();
+    moveDrag(e.clientY);
+  }, [moveDrag]);
+
+  const handleMouseUp = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    endDrag();
+  }, [endDrag]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (isDragging.current) endDrag();
+  }, [endDrag]);
 
   // When refresh completes, spring back
   useEffect(() => {
@@ -268,8 +290,11 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseLeave}
     >
-      {/* Pull-to-refresh indicator */}
       {onRefresh && (
         <PullToRefresh
           pullDistance={pullDistance}
@@ -278,7 +303,6 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
         />
       )}
 
-      {/* Feed track — transform applied via ref during drag/spring */}
       <div
         ref={trackRef}
         style={{
