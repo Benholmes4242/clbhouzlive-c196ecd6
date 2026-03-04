@@ -57,6 +57,7 @@ function FeedWithPreloader({
   hasNextPage,
   followOverrides,
   onFollowChange,
+  onDoubleTapLike,
 }: {
   posts: FeedPost[];
   onNearEnd: () => void;
@@ -65,6 +66,7 @@ function FeedWithPreloader({
   hasNextPage: boolean;
   followOverrides: Map<string, boolean>;
   onFollowChange: (userId: string, isFollowed: boolean) => void;
+  onDoubleTapLike: (postIndex: number) => void;
 }) {
   usePreloader(posts);
   return (
@@ -76,6 +78,7 @@ function FeedWithPreloader({
       hasNextPage={hasNextPage}
       followOverrides={followOverrides}
       onFollowChange={onFollowChange}
+      onDoubleTapLike={onDoubleTapLike}
     />
   );
 }
