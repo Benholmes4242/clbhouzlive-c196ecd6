@@ -77,14 +77,15 @@ export function VideoPlayer({
       setIsLoading(true);
       setHasError(false);
 
+      let videoEl: HTMLVideoElement | null = null;
       const video = await pool.assign(
         hlsUrl, feedIndex, container,
         () => {
           if (cancelled) return;
           setIsLoading(false);
           setIsPlaying(true);
-          if (video && video.duration && isFinite(video.duration)) {
-            setVideoDuration(video.duration);
+          if (videoEl && videoEl.duration && isFinite(videoEl.duration)) {
+            setVideoDuration(videoEl.duration);
           }
         },
         () => {
@@ -97,6 +98,7 @@ export function VideoPlayer({
       );
 
       if (cancelled || !video) return;
+      videoEl = video;
       videoRef.current = video;
       video.muted = isMuted;
 
