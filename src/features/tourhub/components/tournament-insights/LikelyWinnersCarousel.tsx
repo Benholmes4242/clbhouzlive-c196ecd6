@@ -115,18 +115,23 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
           const imgFailed = failedImages.has(pick.id) || !pick.avatarUrl;
 
           return (
-            <motion.div
+            <div
               key={pick.id}
-              whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.2 }}
-              className="w-[227px] rounded-[16px] overflow-hidden flex-shrink-0 snap-center flex flex-col relative"
+              className="flex-shrink-0 snap-center"
               style={{
-                background: '#1a1a1a',
+                width: 227,
+                borderRadius: 16,
                 ...(i === 0 ? {
                   boxShadow: '0 0 20px rgba(255, 255, 255, 0.25), 0 0 40px rgba(255, 255, 255, 0.08)',
                   border: '1px solid rgba(255, 255, 255, 0.20)',
                 } : {}),
               }}
+            >
+            <motion.div
+              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.2 }}
+              className="w-full rounded-[16px] overflow-hidden flex flex-col relative"
+              style={{ background: '#1a1a1a' }}
             >
               {/* Pre-blurred course image background — no backdrop-filter */}
               {courseImageUrl && (
@@ -261,8 +266,9 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                     style={{
                       fontSize: 12,
                       fontWeight: 600,
-                      color: ACCENT_COLOR,
-                      background: 'rgba(34, 197, 94, 0.15)',
+                      color: '#FFFFFF',
+                      background: 'rgba(255, 255, 255, 0.15)',
+                      border: '1px solid rgba(255, 255, 255, 0.25)',
                       borderRadius: 999,
                       padding: '4px 12px',
                       letterSpacing: '0.3px',
@@ -301,6 +307,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                 )}
               </div>
             </motion.div>
+            </div>
           );
         })}
       </div>
