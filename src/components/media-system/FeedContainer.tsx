@@ -2,6 +2,9 @@
  * FeedContainer — spring-physics-driven vertical feed.
  * Replaces CSS scroll-snap with translateY + spring animations for natural feel.
  * Includes pull-to-refresh, rubber-band edges, and fling detection.
+ *
+ * Performance: During drag/spring, transforms are applied directly to the DOM
+ * via refs (no React state updates per frame). State is synced only on settle.
  */
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { FeedItem } from './FeedItem';
@@ -15,6 +18,7 @@ import { haptic } from '@/utils/haptics';
 const FLING_VELOCITY_THRESHOLD = 0.4;   // px/ms — above this = fling
 const RUBBER_BAND_FACTOR = 0.35;
 const PTR_THRESHOLD = 80;               // px of actual pull to trigger refresh
+const PTR_RENDER_THRESHOLD = 10;        // px change to trigger PTR re-render
 
 interface FeedContainerProps {
   posts: FeedPost[];
@@ -28,8 +32,11 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
   const [itemHeight, setItemHeight] = useState(
     typeof window !== 'undefined' ? window.innerHeight : 800
   );
+  // offsetY state is used only for initial/settled render; during drag/spring we write to DOM directly
   const [offsetY, setOffsetY] = useState(0);
 
+  const offsetRef = useRef(0);
+  const trackRef = useRef<HTMLDivElement>(null);
   const cancelSpring = useRef<(() => void) | null>(null);
   const activeIndexRef = useRef(0);
   const touchStartRef = useRef({ y: 0, time: 0, offsetY: 0 });
@@ -39,9 +46,12 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
 
   // Pull-to-refresh state
   const [pullDistance, setPullDistance] = useState(0);
+  const pullDistanceRef = useRef(0);
+  const lastRenderedPull = useRef(0);
   const isRefreshTriggered = useRef(false);
 
   const setActiveIndex = useMediaStore((s) => s.setActiveIndex);
+  const storeActiveIndex = useMediaStore((s) => s.activeIndex);
   const pool = useVideoPoolContext();
 
   // Resize handling
@@ -53,16 +63,13 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
 
   // Recalculate offset when itemHeight changes (e.g. rotation)
   useEffect(() => {
-    setOffsetY(-activeIndexRef.current * itemHeight);
-  }, [itemHeight]);
-
-  // Infinite scroll trigger
-  useEffect(() => {
-    const idx = activeIndexRef.current;
-    if (onNearEnd && idx >= posts.length - 3 && posts.length > 0) {
-      onNearEnd();
+    const newOffset = -activeIndexRef.current * itemHeight;
+    offsetRef.current = newOffset;
+    setOffsetY(newOffset);
+    if (trackRef.current) {
+      trackRef.current.style.transform = `translateY(${newOffset}px)`;
     }
-  }, [posts.length, onNearEnd]);
+  }, [itemHeight]);
 
   // iOS gesture priming
   useEffect(() => {
@@ -92,6 +99,8 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
     const targetY = -clamped * itemHeight;
 
     cancelSpring.current?.();
+    pullDistanceRef.current = 0;
+    lastRenderedPull.current = 0;
     setPullDistance(0);
 
     const config = Math.abs(velocity) > FLING_VELOCITY_THRESHOLD
@@ -99,19 +108,32 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
       : SPRING_CONFIGS.snap;
 
     cancelSpring.current = flingSpring(
-      offsetY,
+      offsetRef.current,
       targetY,
       velocity * 1000,
       config,
-      (value) => setOffsetY(value),
+      (value) => {
+        offsetRef.current = value;
+        if (trackRef.current) {
+          trackRef.current.style.transform = `translateY(${value}px)`;
+        }
+      },
       () => {
+        // Spring complete — sync to React state
+        offsetRef.current = targetY;
+        setOffsetY(targetY);
         activeIndexRef.current = clamped;
         setActiveIndex(clamped);
         useMediaStore.getState().setCarouselPosition(clamped, 0);
         haptic('light');
+
+        // Infinite scroll trigger
+        if (clamped >= posts.length - 3 && posts.length > 0) {
+          onNearEnd?.();
+        }
       }
     );
-  }, [offsetY, posts.length, itemHeight, setActiveIndex]);
+  }, [posts.length, itemHeight, setActiveIndex, onNearEnd]);
 
   // ── Velocity from tracker ──
   const calculateVelocity = (): number => {
@@ -132,9 +154,9 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
     cancelSpring.current?.();
     isDragging.current = true;
     isRefreshTriggered.current = false;
-    touchStartRef.current = { y: touch.clientY, time: Date.now(), offsetY: offsetY };
+    touchStartRef.current = { y: touch.clientY, time: Date.now(), offsetY: offsetRef.current };
     velocityTracker.current = [{ y: touch.clientY, time: Date.now() }];
-  }, [offsetY]);
+  }, []);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     if (!isDragging.current) return;
@@ -155,7 +177,13 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
       // Pull-to-refresh tracking (only on first item)
       if (currentIndex === 0 && onRefresh) {
         const actualPull = overscroll * RUBBER_BAND_FACTOR;
-        setPullDistance(actualPull);
+        pullDistanceRef.current = actualPull;
+
+        // Throttled state update for PullToRefresh rendering
+        if (Math.abs(actualPull - lastRenderedPull.current) > PTR_RENDER_THRESHOLD || actualPull === 0) {
+          lastRenderedPull.current = actualPull;
+          setPullDistance(actualPull);
+        }
 
         // Haptic when crossing threshold
         if (actualPull >= PTR_THRESHOLD && !isRefreshTriggered.current) {
@@ -169,10 +197,18 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
       const overscroll = minOffset - newOffset;
       newOffset = minOffset - overscroll * RUBBER_BAND_FACTOR;
     } else {
-      setPullDistance(0);
+      if (pullDistanceRef.current !== 0) {
+        pullDistanceRef.current = 0;
+        lastRenderedPull.current = 0;
+        setPullDistance(0);
+      }
     }
 
-    setOffsetY(newOffset);
+    // Direct DOM manipulation — no React state update
+    offsetRef.current = newOffset;
+    if (trackRef.current) {
+      trackRef.current.style.transform = `translateY(${newOffset}px)`;
+    }
 
     // Track velocity (keep last 5)
     velocityTracker.current.push({ y: touch.clientY, time: Date.now() });
@@ -187,9 +223,8 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
     const currentIndex = activeIndexRef.current;
 
     // Pull-to-refresh check
-    if (currentIndex === 0 && pullDistance >= PTR_THRESHOLD && onRefresh && !isRefreshing) {
+    if (currentIndex === 0 && pullDistanceRef.current >= PTR_THRESHOLD && onRefresh && !isRefreshing) {
       onRefresh();
-      // Spring back after refresh (handled by isRefreshing effect)
     }
 
     // Determine target index
@@ -204,18 +239,22 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
       }
     } else {
       // Snap to nearest based on current offset
-      targetIndex = Math.round(-offsetY / itemHeight);
+      targetIndex = Math.round(-offsetRef.current / itemHeight);
       targetIndex = Math.max(0, Math.min(posts.length - 1, targetIndex));
     }
 
     setPullDistance(0);
+    pullDistanceRef.current = 0;
+    lastRenderedPull.current = 0;
     goToIndex(targetIndex, velocity);
-  }, [offsetY, posts.length, itemHeight, pullDistance, onRefresh, isRefreshing, goToIndex]);
+  }, [posts.length, itemHeight, onRefresh, isRefreshing, goToIndex]);
 
   // When refresh completes, spring back
   useEffect(() => {
     if (!isRefreshing && pullDistance > 0) {
       setPullDistance(0);
+      pullDistanceRef.current = 0;
+      lastRenderedPull.current = 0;
     }
   }, [isRefreshing]);
 
@@ -237,11 +276,12 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
         />
       )}
 
-      {/* Feed track */}
+      {/* Feed track — transform applied via ref during drag/spring */}
       <div
+        ref={trackRef}
         style={{
           transform: `translateY(${offsetY}px)`,
-          willChange: isDragging.current ? 'transform' : 'auto',
+          willChange: 'transform',
         }}
       >
         {posts.map((post, index) => (
@@ -249,7 +289,7 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
             key={post.id}
             post={post}
             index={index}
-            isActive={index === activeIndexRef.current}
+            isActive={index === storeActiveIndex}
             isLastItem={index === posts.length - 1}
             hasNextPage={hasNextPage}
           />
