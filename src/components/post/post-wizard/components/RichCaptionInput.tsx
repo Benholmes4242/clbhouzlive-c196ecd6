@@ -112,7 +112,13 @@ export const RichCaptionInput = forwardRef<RichCaptionInputHandle, RichCaptionIn
       const el = editorRef.current;
       if (!el) return;
 
-      const plainText = serializeToPlainText(el);
+      let plainText = serializeToPlainText(el);
+
+      // If all visible text is gone, clear residual browser HTML (<br>, empty <div>, &nbsp;)
+      if (!plainText.trim()) {
+        plainText = '';
+        el.innerHTML = '';
+      }
 
       // Enforce max length
       let graphemeLength: number;
