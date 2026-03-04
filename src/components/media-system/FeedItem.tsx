@@ -86,8 +86,10 @@ export function FeedItem({
   }, [isLiked, post.id, user?.id, likeMutation]);
 
   // ── Follow handler ──
+  const isSelf = user?.id === post.userId;
+
   const handleFollow = useCallback(() => {
-    if (!user?.id) return;
+    if (!user?.id || isSelf) return;
     const wasFollowed = isFollowed;
     setLocalFollowed(!wasFollowed);
     onFollowChange?.(post.userId, !wasFollowed);
@@ -196,6 +198,7 @@ export function FeedItem({
           onProfile={handleProfile}
           isActive={isActive}
           isScrubbing={isScrubbing}
+          isSelf={isSelf}
         />
       </div>
 
