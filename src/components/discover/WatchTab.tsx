@@ -64,10 +64,8 @@ export function WatchTab() {
     };
   }, []);
   
-  // Fullscreen player hook
-  const { openFullscreen } = useUnifiedFullscreen('explore', {
-    allowLandscape: true,
-  });
+  // TODO: Wire to new media player
+  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
 
   // Shorts grid data
   const {

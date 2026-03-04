@@ -43,7 +43,8 @@ export function CreatorProfileSection({
     canPin,
   } = useCreatorFeatures(userId);
 
-  const { openFullscreen } = useUnifiedFullscreen('profile', {});
+  // TODO: Wire to new media player
+  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
 
   // Don't render for non-creators
   if (!isCreator || isLoading) {

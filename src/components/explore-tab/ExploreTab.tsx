@@ -55,9 +55,8 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
   
   useExplorePrefetch();
   
-  const { openFullscreen } = useUnifiedFullscreen('explore-moments', {
-    allowLandscape: true,
-  });
+  // TODO: Wire to new media player
+  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
   
   const activeFilter = searchParams.get('sub') || 'all';
   

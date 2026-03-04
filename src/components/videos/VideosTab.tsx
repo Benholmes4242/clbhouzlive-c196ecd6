@@ -112,10 +112,8 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   const continueWatchingResult = useContinueWatching(6);
   const continueWatchingVideos = continueWatchingResult.videos;
 
-  // Unified fullscreen player for Videos content
-  const { openFullscreen } = useUnifiedFullscreen('explore', {
-    allowLandscape: true,
-  });
+  // TODO: Wire to new media player
+  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
 
   // Track if first video has been preloaded
   const hasPreloadedFirst = useRef(false);

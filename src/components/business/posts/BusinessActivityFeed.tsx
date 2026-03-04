@@ -257,13 +257,8 @@ export function BusinessActivityFeed({
       });
   }, [filteredPosts, businessId, businessName, businessLogo]);
 
-  // Unified fullscreen player hook
-  const { openFullscreen } = useUnifiedFullscreen('unified', {
-    allowLandscape: true,
-    onLoadMore: hasMore ? fetchMore : undefined,
-    hasMore,
-    isLoadingMore: isFetching,
-  });
+  // TODO: Wire to new media player
+  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
 
   // Handle post tap to open fullscreen viewer
   const handlePostTap = useCallback((post: GridPost, index: number) => {

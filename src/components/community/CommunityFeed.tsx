@@ -253,13 +253,8 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     stopThreshold: 0.1,
   });
 
-  // Unified fullscreen player for Community content
-  const { openFullscreen } = useUnifiedFullscreen('explore', {
-    allowLandscape: true,
-    onLoadMore: loadMore,
-    hasMore,
-    isLoadingMore: loading,
-  });
+  // TODO: Wire to new media player
+  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
 
   // Paced loading state (Watch tab standard)
   const MIN_LOADING_DISPLAY_MS = 600;

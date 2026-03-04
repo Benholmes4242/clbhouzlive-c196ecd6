@@ -218,13 +218,8 @@ export const VideosSectionPage: React.FC = () => {
     });
   }, [videos, prefetchConfig]);
 
-  // Unified fullscreen player
-  const { openFullscreen } = useUnifiedFullscreen('explore', {
-    allowLandscape: true,
-    onLoadMore: fetchNextPage,
-    hasMore,
-    isLoadingMore: isFetchingNextPage,
-  });
+  // TODO: Wire to new media player
+  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
 
   // Convert to ExploreContentItem format for fullscreen
   const videosAsExploreItems = useMemo(() => {
