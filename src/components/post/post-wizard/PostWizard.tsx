@@ -958,7 +958,7 @@ export function PostWizard({
                         ? '#EF4444'
                         : 'hsl(var(--muted-foreground))',
                       marginTop: '0px',
-                      marginBottom: '12px',
+                      marginBottom: '16px',
                     }}
                   >
                     {state.mediaItems.length}/{POST_LIMITS.MAX_MEDIA_COUNT}
