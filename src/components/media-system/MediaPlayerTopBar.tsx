@@ -1,101 +1,118 @@
 /**
- * MediaPlayerTopBar — matches ClubhouseTopBar layout exactly.
+ * MediaPlayerTopBar — self-contained top bar for the media player.
  * [Tab Toggle] [Search] [Profile Pill]
- * Transparent background, fixed position below safe area.
+ * No Clubhouse-specific imports. Uses auth hooks directly.
  */
-import React, { useState, useRef } from 'react';
-import { Search } from 'lucide-react';
-import { AnimatePresence } from 'framer-motion';
+import React, { useState } from 'react';
+import { Search, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { PostingAsPill } from '@/components/header/PostingAsPill';
-import { PostingAsMenu } from '@/components/header/PostingAsMenu';
-import { SearchOverlay } from '@/components/header/SearchOverlay';
 import { FeedTabToggle } from './FeedTabToggle';
-import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useUserProfile } from '@/hooks/useUserProfile';
 import { cn } from '@/lib/utils';
+import { splitName } from '@/utils/name';
 import type { FeedTab } from './types/media';
-import type { User } from '@supabase/supabase-js';
 
 interface MediaPlayerTopBarProps {
   activeTab: FeedTab;
   onTabChange: (tab: FeedTab) => void;
-  user: User | null;
 }
 
-export function MediaPlayerTopBar({ activeTab, onTabChange, user }: MediaPlayerTopBarProps) {
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const pillRef = useRef<HTMLButtonElement>(null);
-  const { hasUnread } = useUnreadNotifications();
+/** Inline squircle avatar – 24px, 34% radius, 1/1.05 aspect */
+function MiniSquircleAvatar({ src, name }: { src?: string | null; name: string }) {
+  const initials = name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map(p => p[0])
+    .join('')
+    .toUpperCase() || '?';
 
   return (
-    <>
-      {/* Floating bar — fixed below notch/safe area */}
-      <div
-        className="fixed left-4 right-4 z-40 pointer-events-auto flex items-center justify-between gap-2 min-w-0"
-        style={{
-          top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
-        }}
-      >
-        {/* Left: Tab Toggle */}
-        <div className="flex-shrink-1 min-w-0">
-          <FeedTabToggle
-            activeTab={activeTab}
-            onTabChange={onTabChange}
-          />
-        </div>
+    <div
+      className="flex-shrink-0 overflow-hidden bg-white/20 flex items-center justify-center"
+      style={{
+        width: 24,
+        height: 24 * 1.05,
+        borderRadius: '34%',
+        aspectRatio: '1 / 1.05',
+      }}
+    >
+      {src ? (
+        <img
+          src={src}
+          alt={name}
+          className="w-full h-full object-cover"
+          style={{ borderRadius: '34%' }}
+        />
+      ) : (
+        <span className="text-[10px] font-semibold text-white/90 select-none">{initials}</span>
+      )}
+    </div>
+  );
+}
 
-        {/* Right: Search + Profile Pill */}
-        <div className="flex items-center gap-1 flex-shrink-0">
-          <Button
-            variant="ghost"
-            size="icon"
-            className={cn(
-              'p-0 flex items-center justify-center rounded-full active:scale-[0.97] transition-all',
-              'h-11 w-11 flex-shrink-0',
-              'bg-transparent hover:bg-transparent border-0 shadow-none',
-              'text-white/70'
-            )}
-            onClick={() => setSearchOpen(true)}
-            aria-label="Search"
-          >
-            <Search className="h-5 w-5" />
-          </Button>
+export function MediaPlayerTopBar({ activeTab, onTabChange }: MediaPlayerTopBarProps) {
+  const { user } = useSupabaseSession();
+  const { data: profile } = useUserProfile(user?.id);
 
-          {user && (
-            <div className="flex-shrink-1 min-w-0">
-              <PostingAsPill
-                ref={pillRef}
-                onClick={() => setMenuOpen((v) => !v)}
-                isOpen={menuOpen}
-                hasUnreadNotifications={hasUnread}
-                useGlassTheme={true}
-              />
-            </div>
-          )}
-        </div>
+  const displayName = profile?.display_name || '';
+  const { first } = splitName(displayName);
+  const avatarUrl = profile?.avatar_url;
+
+  return (
+    <div
+      className="fixed left-4 right-4 z-40 pointer-events-auto flex items-center justify-between gap-2 min-w-0"
+      style={{
+        top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
+      }}
+    >
+      {/* Left: Tab Toggle */}
+      <div className="flex-shrink-1 min-w-0">
+        <FeedTabToggle activeTab={activeTab} onTabChange={onTabChange} />
       </div>
 
-      {/* PostingAs Menu */}
-      {user && (
-        <PostingAsMenu
-          isOpen={menuOpen}
-          onClose={() => setMenuOpen(false)}
-          useLightTheme={true}
-          anchorRef={pillRef}
-        />
-      )}
+      {/* Right: Search + Profile Pill */}
+      <div className="flex items-center gap-1 flex-shrink-0">
+        {/* Search – bare icon in transparent tap target */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn(
+            'p-0 flex items-center justify-center rounded-full active:scale-[0.97] transition-all',
+            'h-11 w-11 flex-shrink-0',
+            'bg-transparent hover:bg-transparent border-0 shadow-none',
+            'text-white/70'
+          )}
+          aria-label="Search"
+        >
+          <Search className="h-5 w-5" />
+        </Button>
 
-      {/* Search Overlay */}
-      <AnimatePresence>
-        {searchOpen && (
-          <SearchOverlay
-            isOpen={searchOpen}
-            onClose={() => setSearchOpen(false)}
-            useLightTheme={true}
-          />
+        {/* Profile Pill – glass capsule */}
+        {user && (
+          <button
+            className={cn(
+              'h-11 max-w-[160px] rounded-xl pl-1 pr-2',
+              'flex items-center gap-1.5 min-w-0',
+              'active:scale-[0.97] transition-transform',
+              'border border-white/10'
+            )}
+            style={{
+              background: 'rgba(0, 0, 0, 0.35)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
+            }}
+          >
+            <MiniSquircleAvatar src={avatarUrl} name={displayName || 'User'} />
+            <span className="text-sm font-medium text-white truncate max-w-[100px]">
+              {first || 'User'}
+            </span>
+            <ChevronDown className="h-3 w-3 text-white/70 flex-shrink-0" />
+          </button>
         )}
-      </AnimatePresence>
-    </>
+      </div>
+    </div>
   );
 }
