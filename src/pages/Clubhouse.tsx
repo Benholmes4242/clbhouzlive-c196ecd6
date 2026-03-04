@@ -57,6 +57,7 @@ function FeedWithPreloader({
   hasNextPage,
   followOverrides,
   onFollowChange,
+  onFirstFrameReady,
 }: {
   posts: FeedPost[];
   onNearEnd: () => void;
@@ -65,6 +66,7 @@ function FeedWithPreloader({
   hasNextPage: boolean;
   followOverrides: Map<string, boolean>;
   onFollowChange: (userId: string, isFollowed: boolean) => void;
+  onFirstFrameReady?: () => void;
 }) {
   usePreloader(posts);
   return (
@@ -76,6 +78,7 @@ function FeedWithPreloader({
       hasNextPage={hasNextPage}
       followOverrides={followOverrides}
       onFollowChange={onFollowChange}
+      onFirstFrameReady={onFirstFrameReady}
     />
   );
 }
@@ -410,6 +413,7 @@ const ClubhouseContent = () => {
             hasNextPage={hasNextPage}
             followOverrides={followOverrides}
             onFollowChange={handleFollowChange}
+            onFirstFrameReady={signalFirstFrameReady}
           />
         </VideoPoolProvider>
       )}
