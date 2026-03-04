@@ -70,7 +70,7 @@ export default function FullscreenMediaViewer() {
       <VideoPoolProvider>
         <div className="w-full h-[100dvh] bg-black overflow-hidden relative">
           <FeedTabToggle activeTab={activeTab} onTabChange={handleTabChange} />
-          <LoadingSkeleton />
+          <LoadingSkeleton visible={true} />
         </div>
       </VideoPoolProvider>
     );
