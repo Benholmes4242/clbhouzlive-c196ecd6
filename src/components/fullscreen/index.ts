@@ -1,9 +1,7 @@
 /**
- * Legacy fullscreen exports - re-export from new media system for compatibility
- * 
- * @deprecated Use imports from '@/media/fullscreen' directly
+ * Legacy fullscreen exports - DEPRECATED
+ * Phase 5 fullscreen system has been removed.
+ * These exports are kept as empty stubs to prevent import errors.
  */
 
-// Re-export new viewer for any remaining legacy imports
-export { FullscreenMediaViewer as UnifiedFullscreenViewer } from '@/media/fullscreen';
-export type { FullscreenMediaViewerProps as UnifiedFullscreenViewerProps } from '@/media/fullscreen';
+// No exports - Phase 5 fullscreen system has been removed

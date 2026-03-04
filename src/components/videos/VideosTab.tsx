@@ -20,7 +20,7 @@ import { ContinueWatchingSection } from './ContinueWatchingSection';
 import { useInfiniteLongFormVideos } from '@/hooks/useInfiniteLongFormVideos';
 import { useFollowedUsers } from '@/hooks/useFollowedUsers';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
-import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
 import { useContinueWatching } from '@/hooks/useContinueWatching';
 import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
 import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
@@ -112,10 +112,8 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   const continueWatchingResult = useContinueWatching(6);
   const continueWatchingVideos = continueWatchingResult.videos;
 
-  // Unified fullscreen player for Videos content
-  const { openFullscreen } = useUnifiedFullscreen('explore', {
-    allowLandscape: true,
-  });
+  // TODO: Wire to new media player
+  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
 
   // Track if first video has been preloaded
   const hasPreloadedFirst = useRef(false);

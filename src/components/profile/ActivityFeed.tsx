@@ -6,7 +6,7 @@ import { ActivityGridV2, useActivityPostsV2 } from './activity/v2';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { UnifiedMediaItem } from '@/components/shared/grid/types';
 import { CreatorProfileSection } from './CreatorProfileSection';
-import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { useUserFollow } from '@/hooks/useUserFollow';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
@@ -316,53 +316,8 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     navigate('/create-moment', { state: { editPostId: postId, backgroundLocation: location } });
   }, [navigate, location]);
 
-  // Use unified fullscreen player for activity items
-  const { openFullscreen } = useUnifiedFullscreen('profile', {
-    allowLandscape: true,
-    
-    // Track current post and creator when user swipes
-    onIndexChange: (index) => {
-      const currentItem = items[index];
-      setCurrentFullscreenPostId(currentItem?.postId || currentItem?.id || null);
-      setCurrentCreatorId(currentItem?.creator?.id || null);
-    },
-    
-    // Like handler
-    onLike: (itemId) => {
-      toggleLike();
-    },
-    
-    // Follow handler
-    onFollow: (creatorId) => {
-      toggleFollow(creatorId);
-    },
-    
-    // Comment handler
-    onComment: (itemId) => {
-      // CommentsPage opens automatically
-    },
-    
-    // Share handler
-    onShare: (itemId) => {
-      handleSharePost(itemId);
-    },
-    
-    // Close handler
-    onClose: () => {
-      setCurrentFullscreenPostId(null);
-      setCurrentCreatorId(null);
-    },
-    
-    // Infinite scroll
-    onLoadMore: hasMore ? fetchNextPage : undefined,
-    hasMore,
-    isLoadingMore: isFetchingNextPage,
-    
-    // Edit/Delete functionality for own posts
-    currentUserId: user?.id,
-    onEdit: isOwnProfile ? handleEditPost : undefined,
-    onDelete: isOwnProfile ? handleDeletePost : undefined,
-  });
+  // TODO: Wire to new media player
+  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
 
   // Handle item click for ActivityGridV2 - open unified fullscreen player
   const handleItemClick = useCallback((item: UnifiedMediaItem, index: number) => {

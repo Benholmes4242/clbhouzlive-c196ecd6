@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { navigationTabs } from './navigationTabs';
 
-import { prefetchClubhouseVideos } from '@/utils/clubhouseVideoPrefetch';
 import { prefetchProfileVideos, resolveUsernameToId } from '@/utils/profileVideoPrefetch';
 import { useActiveActor } from '@/context/ActiveActorContext';
 
@@ -66,10 +65,7 @@ export const useNavigationHandlers = () => {
    * Prefetches videos when user hovers over Watch/Discover, Clubhouse/Home, or Profile tabs.
    */
   const handlePrefetch = useCallback((path: string) => {
-    // Prefetch for Clubhouse/Home tab
-    if (path === '/clubhouse' || path === '/' || path.includes('clubhouse')) {
-      prefetchClubhouseVideos();
-    }
+    // TODO: Clubhouse prefetch removed — will be re-added with new media player
     
     // Prefetch for Profile page
     if (path.includes('/profile') || path.includes('/u/')) {
