@@ -291,9 +291,30 @@ export function useVideoPool() {
             video.removeEventListener('playing', onRecoveryPlaying);
           };
           video.addEventListener('playing', onRecoveryPlaying, { once: true });
-        } else {
-          onError?.();
-        }
+        } else if (mp4Url) {
+            // HLS recovery failed — try MP4 fallback
+            console.warn('[Pool] HLS failed, falling back to MP4:', mp4Url);
+            detachMedia(video);
+            video.src = mp4Url;
+            video.load();
+
+            const onMp4Ready = () => {
+              video.removeEventListener('canplay', onMp4Ready);
+              safePlay(video).then((ok) => {
+                if (ok) onPlaying?.();
+                else onError?.();
+              });
+            };
+            video.addEventListener('canplay', onMp4Ready, { once: true });
+
+            const mp4Timeout = setTimeout(() => {
+              video.removeEventListener('canplay', onMp4Ready);
+              onError?.();
+            }, 10000);
+            video.addEventListener('canplay', () => clearTimeout(mp4Timeout), { once: true });
+          } else {
+            onError?.();
+          }
       };
 
       // Try promote pre-created instance first
