@@ -177,24 +177,37 @@ export const BestPickSpotlight: React.FC<BestPickSpotlightProps> = ({
         boxShadow: '0 0 12px rgba(34, 197, 94, 0.25), 0 8px 32px rgba(0, 0, 0, 0.25)',
       }}
     >
-      {/* ── Background: course image + lighter overlay ──────────── */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage: courseImageUrl ? `url(${courseImageUrl})` : undefined,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      />
-      {/* Lighter frosted glass overlay */}
+      {/* ── Pre-blurred course image background — no backdrop-filter ── */}
+      {courseImageUrl && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '-20px',
+            left: '-20px',
+            right: '-20px',
+            bottom: '-20px',
+          }}
+        >
+          <img
+            src={courseImageUrl}
+            alt=""
+            aria-hidden="true"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              filter: 'blur(20px)',
+              WebkitFilter: 'blur(20px)',
+            }}
+          />
+        </div>
+      )}
+      {/* Dark tint overlay — solid, no backdrop-filter */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
           background: 'rgba(0, 0, 0, 0.52)',
-          backdropFilter: 'blur(16px) saturate(140%)',
-          WebkitBackdropFilter: 'blur(16px) saturate(140%)',
         }}
       />
 

@@ -124,26 +124,40 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                 background: '#1a1a1a',
               }}
             >
-              {/* Course image background layer */}
+              {/* Pre-blurred course image background — no backdrop-filter */}
               {courseImageUrl && (
                 <div
-                  className="absolute inset-0 pointer-events-none"
+                  className="absolute pointer-events-none"
                   style={{
                     zIndex: 0,
-                    backgroundImage: `url(${courseImageUrl})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
+                    top: '-20px',
+                    left: '-20px',
+                    right: '-20px',
+                    bottom: '-20px',
                   }}
-                />
+                >
+                  <img
+                    src={courseImageUrl}
+                    alt=""
+                    aria-hidden="true"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      filter: 'blur(20px)',
+                      WebkitFilter: 'blur(20px)',
+                    }}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
               )}
-              {/* Dark glass overlay */}
+              {/* Dark tint overlay — solid, no backdrop-filter */}
               <div
                 className="absolute inset-0 pointer-events-none"
                 style={{
                   zIndex: 1,
                   background: 'rgba(0, 0, 0, 0.45)',
-                  backdropFilter: 'blur(20px) saturate(180%)',
-                  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
                 }}
               />
 
