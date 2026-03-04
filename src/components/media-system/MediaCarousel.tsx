@@ -20,10 +20,10 @@ interface MediaCarouselProps {
   onScrubEnd?: () => void;
 }
 
-const SWIPE_VELOCITY_THRESHOLD = 0.3; // px/ms
-const SWIPE_DISPLACEMENT_FRACTION = 0.3; // 30% of screen width
+const SWIPE_VELOCITY_THRESHOLD = 0.3;
+const SWIPE_DISPLACEMENT_FRACTION = 0.3;
 const H_LOCK_RATIO = 1.5;
-const LOCK_THRESHOLD = 10; // px
+const LOCK_THRESHOLD = 10;
 
 type DirLock = 'none' | 'horizontal' | 'vertical';
 
@@ -67,19 +67,17 @@ export function MediaCarousel({
     const absDx = Math.abs(dx);
     const absDy = Math.abs(dy);
 
-    // Lock direction
     if (dirLock.current === 'none') {
       if (absDx > LOCK_THRESHOLD && absDx > absDy * H_LOCK_RATIO) {
         dirLock.current = 'horizontal';
       } else if (absDy > LOCK_THRESHOLD && absDy > absDx * H_LOCK_RATIO) {
         dirLock.current = 'vertical';
-        return; // Let feed handle vertical
+        return;
       }
     }
 
     if (dirLock.current === 'horizontal') {
       e.stopPropagation();
-      // Rubber-band at edges
       let offset = dx;
       if ((activeMedia === 0 && dx > 0) || (activeMedia === total - 1 && dx < 0)) {
         offset = dx / 3;
@@ -108,13 +106,11 @@ export function MediaCarousel({
       } else if (dx > 0 && activeMedia > 0) {
         goTo(activeMedia - 1);
       } else {
-        // Snap back
         setIsAnimating(true);
         setTranslateX(0);
         setTimeout(() => setIsAnimating(false), 260);
       }
     } else {
-      // Snap back
       setIsAnimating(true);
       setTranslateX(0);
       setTimeout(() => setIsAnimating(false), 260);
@@ -142,6 +138,7 @@ export function MediaCarousel({
             {item.type === 'video' && item.hlsUrl ? (
               <VideoPlayer
                 hlsUrl={item.hlsUrl}
+                mp4Url={item.mp4Url}
                 feedIndex={feedIndex * 100 + idx}
                 isActive={isActive && idx === activeMedia}
                 thumbnailUrl={item.thumbnailUrl}

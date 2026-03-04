@@ -2,7 +2,7 @@
  * VideoPlayer — requests a pool element, handles playing/error/loop lifecycle.
  * Uses 'playing' event for skeleton transition (not canplay/loadeddata).
  * Integrates gapless loop hook for seamless looping.
- * Supports double-tap-to-like and interactive scrubber.
+ * Supports double-tap-to-like, interactive scrubber, and MP4 fallback.
  */
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useVideoPoolContext } from './VideoPoolProvider';
@@ -22,6 +22,7 @@ interface VideoPlayerProps {
   isActive: boolean;
   thumbnailUrl?: string;
   duration?: number;
+  mp4Url?: string;
   onDoubleTapLike?: () => void;
   onScrubStart?: () => void;
   onScrubEnd?: () => void;
@@ -29,7 +30,7 @@ interface VideoPlayerProps {
 
 export function VideoPlayer({
   hlsUrl, feedIndex, isActive, thumbnailUrl, duration: mediaDuration,
-  onDoubleTapLike, onScrubStart, onScrubEnd,
+  mp4Url, onDoubleTapLike, onScrubStart, onScrubEnd,
 }: VideoPlayerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -88,7 +89,8 @@ export function VideoPlayer({
           setIsLoading(false);
           setHasError(true);
           useMediaStore.getState().markError(feedIndex);
-        }
+        },
+        mp4Url
       );
 
       if (cancelled || !video) return;
@@ -106,7 +108,7 @@ export function VideoPlayer({
 
     activate();
     return () => { cancelled = true; };
-  }, [isActive, hlsUrl, feedIndex, pool]);
+  }, [isActive, hlsUrl, feedIndex, pool, mp4Url]);
 
   // Sync mute state
   useEffect(() => {
@@ -142,14 +144,15 @@ export function VideoPlayer({
         setHasError(true);
         useMediaStore.getState().clearRetrying(feedIndex);
         useMediaStore.getState().markError(feedIndex);
-      }
+      },
+      mp4Url
     ).then((video) => {
       if (video) {
         videoRef.current = video;
         video.muted = useMediaStore.getState().isMuted;
       }
     });
-  }, [hlsUrl, feedIndex, pool]);
+  }, [hlsUrl, feedIndex, pool, mp4Url]);
 
   // Double-tap aware tap handler
   const handleTap = useCallback(() => {
@@ -160,9 +163,7 @@ export function VideoPlayer({
     tapCountRef.current += 1;
 
     if (tapCountRef.current === 1) {
-      // Wait for potential second tap
       tapTimerRef.current = setTimeout(() => {
-        // Single tap → toggle play/pause
         tapCountRef.current = 0;
         if (video.paused) {
           video.play().catch(() => {});
@@ -175,7 +176,6 @@ export function VideoPlayer({
         setTimeout(() => setShowPlayIcon(false), 800);
       }, DOUBLE_TAP_DELAY);
     } else if (tapCountRef.current >= 2) {
-      // Double tap → like
       clearTimeout(tapTimerRef.current);
       tapCountRef.current = 0;
       setShowDoubleTapHeart(true);
