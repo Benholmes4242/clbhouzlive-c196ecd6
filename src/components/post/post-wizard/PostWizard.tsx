@@ -967,6 +967,9 @@ export function PostWizard({
 
               </div>
 
+                {/* Flex spacer — absorbs dead space on tall screens, collapses to 0 when content overflows */}
+                <div className="flex-1 min-h-0" />
+
                 {/* Tag rows */}
                 <div className="px-4 pb-4">
                   <div className="max-w-[680px] mx-auto">
