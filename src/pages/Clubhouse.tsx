@@ -493,7 +493,8 @@ const ClubhouseContent = () => {
               rating: activeReview.rating,
               courseName: activeReview.courseName,
               courseId: activeReview.courseId,
-              courseImageUrl: activeReview.courseImageUrl || '',
+              tierLabel: activeReview.rating >= 9 ? 'Outstanding' : activeReview.rating >= 7 ? 'Excellent' : 'Good',
+              sourceReviewId: activeReview.reviewId,
             } : undefined}
             onReviewTap={handleReviewTap}
           />
