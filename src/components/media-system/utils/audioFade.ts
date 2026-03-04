@@ -1,10 +1,10 @@
 import { TIMING } from '../types/media';
 
-const FADE_STEPS = TIMING.AUDIO_FADE_STEPS;
-const STEP_INTERVAL = TIMING.AUDIO_FADE_MS / FADE_STEPS;
+const FADE_DURATION = TIMING.AUDIO_FADE_MS;
 
 /**
  * Fade a video element's volume to 0 then pause.
+ * Uses requestAnimationFrame instead of setInterval to avoid leaked timers.
  */
 export function fadeOut(video: HTMLVideoElement): Promise<void> {
   return new Promise((resolve) => {
@@ -15,24 +15,29 @@ export function fadeOut(video: HTMLVideoElement): Promise<void> {
     }
 
     const startVolume = video.volume;
-    let step = 0;
+    const startTime = performance.now();
 
-    const interval = setInterval(() => {
-      step++;
-      video.volume = Math.max(0, startVolume * (1 - step / FADE_STEPS));
+    function step(now: number) {
+      const elapsed = now - startTime;
+      const progress = Math.min(1, elapsed / FADE_DURATION);
+      video.volume = Math.max(0, startVolume * (1 - progress));
 
-      if (step >= FADE_STEPS) {
-        clearInterval(interval);
+      if (progress >= 1) {
         video.volume = 0;
         video.pause();
         resolve();
+      } else {
+        requestAnimationFrame(step);
       }
-    }, STEP_INTERVAL);
+    }
+
+    requestAnimationFrame(step);
   });
 }
 
 /**
  * Fade a video element's volume from 0 to targetVolume.
+ * Uses requestAnimationFrame instead of setInterval to avoid leaked timers.
  */
 export function fadeIn(video: HTMLVideoElement, targetVolume: number): Promise<void> {
   return new Promise((resolve) => {
@@ -42,18 +47,22 @@ export function fadeIn(video: HTMLVideoElement, targetVolume: number): Promise<v
     }
 
     video.volume = 0;
-    let step = 0;
+    const startTime = performance.now();
 
-    const interval = setInterval(() => {
-      step++;
-      video.volume = Math.min(targetVolume, targetVolume * (step / FADE_STEPS));
+    function step(now: number) {
+      const elapsed = now - startTime;
+      const progress = Math.min(1, elapsed / FADE_DURATION);
+      video.volume = Math.min(targetVolume, targetVolume * progress);
 
-      if (step >= FADE_STEPS) {
-        clearInterval(interval);
+      if (progress >= 1) {
         video.volume = targetVolume;
         resolve();
+      } else {
+        requestAnimationFrame(step);
       }
-    }, STEP_INTERVAL);
+    }
+
+    requestAnimationFrame(step);
   });
 }
 

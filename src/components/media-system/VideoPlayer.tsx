@@ -65,6 +65,7 @@ export function VideoPlayer({
     }
 
     retryCountRef.current = 0;
+    useMediaStore.getState().setUserPaused(false);
     let cancelled = false;
 
     const activate = async () => {
@@ -168,9 +169,11 @@ export function VideoPlayer({
         if (video.paused) {
           video.play().catch(() => {});
           setIsPlaying(true);
+          useMediaStore.getState().setUserPaused(false);
         } else {
           video.pause();
           setIsPlaying(false);
+          useMediaStore.getState().setUserPaused(true);
         }
         setShowPlayIcon(true);
         setTimeout(() => setShowPlayIcon(false), 800);
@@ -206,7 +209,6 @@ export function VideoPlayer({
             className="w-16 h-16 rounded-full flex items-center justify-center"
             style={{
               background: 'rgba(0,0,0,0.45)',
-              backdropFilter: 'blur(24px) saturate(180%)',
               border: '1px solid rgba(255,255,255,0.15)',
               boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
               animation: 'media-play-fade 0.8s ease-out forwards',

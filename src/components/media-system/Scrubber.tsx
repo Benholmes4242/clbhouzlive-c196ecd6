@@ -96,7 +96,7 @@ export function Scrubber({ videoRef, isActive, duration, onScrubStart, onScrubEn
         }
 
         // Loop pulse: short videos near end
-        if (dur < 180) {
+        if (dur < 30) {
           setLoopPulse(dur - video.currentTime < LOOP_PULSE_WINDOW);
         }
       }

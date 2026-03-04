@@ -28,8 +28,11 @@ export function useVideoPool() {
 
   // Tracked event listeners per pool element index
   const listenerMap = useRef<Map<number, Map<string, EventListener>>>(new Map());
-  // Recovery timeouts per pool element — cleared on detach to prevent stale onError
-  const recoveryTimeouts = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
+  // Recovery state per pool element — cleared on detach to prevent stale onError/listeners
+  const recoveryState = useRef<Map<number, {
+    timeout: ReturnType<typeof setTimeout>;
+    cleanup: () => void;
+  }>>(new Map());
 
   // ── Tracked listener helpers ──────────────────────────────────────
   const addTrackedListener = useCallback(
@@ -88,8 +91,11 @@ export function useVideoPool() {
     return () => {
       destroyAll();
       segmentCache.clear();
-      recoveryTimeouts.current.forEach((timeout) => clearTimeout(timeout));
-      recoveryTimeouts.current.clear();
+      recoveryState.current.forEach((state) => {
+        clearTimeout(state.timeout);
+        state.cleanup();
+      });
+      recoveryState.current.clear();
       pool.forEach((p, idx) => {
         removeAllTrackedListeners(idx, p.video);
         p.video.pause();
@@ -219,11 +225,12 @@ export function useVideoPool() {
         // Remove all tracked listeners
         removeAllTrackedListeners(targetIdx, video);
 
-        // Clear any active recovery timeout for this element
-        const activeRecoveryTimeout = recoveryTimeouts.current.get(targetIdx);
-        if (activeRecoveryTimeout) {
-          clearTimeout(activeRecoveryTimeout);
-          recoveryTimeouts.current.delete(targetIdx);
+        // Clear any active recovery state for this element
+        const activeRecovery = recoveryState.current.get(targetIdx);
+        if (activeRecovery) {
+          clearTimeout(activeRecovery.timeout);
+          activeRecovery.cleanup();
+          recoveryState.current.delete(targetIdx);
         }
 
         // Audio fade out (or instant if rapid/muted)
@@ -272,27 +279,35 @@ export function useVideoPool() {
         }
 
         if (recovered) {
-          // Clear any previous recovery timeout for this element
-          const existingTimeout = recoveryTimeouts.current.get(targetIdx);
-          if (existingTimeout) clearTimeout(existingTimeout);
-
-          const recoveryTimeout = setTimeout(() => {
-            recoveryTimeouts.current.delete(targetIdx);
-            if (video.paused || video.readyState < 3) {
-              onError?.();
-            }
-          }, 5000);
-          recoveryTimeouts.current.set(targetIdx, recoveryTimeout);
+          // Clear any previous recovery state for this element
+          const existingState = recoveryState.current.get(targetIdx);
+          if (existingState) {
+            clearTimeout(existingState.timeout);
+            existingState.cleanup();
+          }
 
           const onRecoveryPlaying = () => {
-            const timeout = recoveryTimeouts.current.get(targetIdx);
-            if (timeout) {
-              clearTimeout(timeout);
-              recoveryTimeouts.current.delete(targetIdx);
+            const state = recoveryState.current.get(targetIdx);
+            if (state) {
+              clearTimeout(state.timeout);
+              recoveryState.current.delete(targetIdx);
             }
             video.removeEventListener('playing', onRecoveryPlaying);
           };
           video.addEventListener('playing', onRecoveryPlaying, { once: true });
+
+          const recoveryTimeout = setTimeout(() => {
+            video.removeEventListener('playing', onRecoveryPlaying);
+            recoveryState.current.delete(targetIdx);
+            if (video.paused || video.readyState < 3) {
+              onError?.();
+            }
+          }, 5000);
+
+          recoveryState.current.set(targetIdx, {
+            timeout: recoveryTimeout,
+            cleanup: () => video.removeEventListener('playing', onRecoveryPlaying),
+          });
         } else if (mp4Url) {
             // HLS recovery failed — try MP4 fallback
             console.warn('[Pool] HLS failed, falling back to MP4:', mp4Url);

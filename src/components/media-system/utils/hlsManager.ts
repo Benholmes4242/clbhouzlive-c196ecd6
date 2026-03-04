@@ -15,6 +15,8 @@ export const HLS_CONFIG: Record<string, unknown> = {
   fragLoadingMaxRetry: 4,
 };
 
+const ATTACH_TIMEOUT = 8000;
+
 // ── HLS.js constructor cache ──────────────────────────────────────────
 let HlsConstructor: typeof HlsType | null = null;
 let hlsLoadPromise: Promise<typeof HlsType | null> | null = null;
@@ -49,12 +51,22 @@ export function getHlsInstance(video: HTMLVideoElement): InstanceType<typeof Hls
   return hlsInstances.get(video);
 }
 
+/** Build HLS config with cached loader if available. */
+function getHlsConfig(): Record<string, unknown> {
+  const config = { ...HLS_CONFIG };
+  if (HlsConstructor) {
+    const loader = createCachedLoader(HlsConstructor as any);
+    config.fLoader = loader;
+  }
+  return config;
+}
+
 /**
  * Attach an HLS source to a video element.
  * Returns a Promise that resolves when the manifest has been parsed (hls.js)
  * or loadedmetadata fires (native).
  *
- * Includes optional error callback for fatal HLS errors.
+ * Includes an 8s internal timeout to prevent hanging Promises.
  */
 export async function attachMedia(
   video: HTMLVideoElement,
@@ -65,8 +77,14 @@ export async function attachMedia(
   detachMedia(video);
 
   if (supportsNativeHls()) {
-    return new Promise<void>((resolve) => {
+    return new Promise<void>((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        video.removeEventListener('loadedmetadata', onMeta);
+        reject(new Error('Native HLS attach timeout'));
+      }, ATTACH_TIMEOUT);
+
       const onMeta = () => {
+        clearTimeout(timeout);
         video.removeEventListener('loadedmetadata', onMeta);
         resolve();
       };
@@ -81,18 +99,24 @@ export async function attachMedia(
     return;
   }
 
-  return new Promise<void>((resolve) => {
-    const loader = createCachedLoader(Hls as any);
-    const hls = new (Hls as any)({ ...HLS_CONFIG, fLoader: loader }) as InstanceType<typeof HlsType>;
+  return new Promise<void>((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      reject(new Error('HLS.js manifest parse timeout'));
+    }, ATTACH_TIMEOUT);
+
+    const hls = new (Hls as any)(getHlsConfig()) as InstanceType<typeof HlsType>;
     hlsInstances.set(video, hls);
 
-    // Resolve when manifest is parsed (video is ready to play)
-    hls.on((Hls as any).Events.MANIFEST_PARSED, () => resolve());
+    hls.on((Hls as any).Events.MANIFEST_PARSED, () => {
+      clearTimeout(timeout);
+      resolve();
+    });
 
-    // Error forwarding
     hls.on((Hls as any).Events.ERROR, (_event: unknown, data: any) => {
-      if (data.fatal && onError) {
-        onError(data.type, data.details);
+      if (data.fatal) {
+        clearTimeout(timeout);
+        if (onError) onError(data.type, data.details);
+        reject(new Error(`HLS fatal error: ${data.type} ${data.details}`));
       }
     });
 
@@ -166,8 +190,7 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
   const Hls = await getHls();
   if (!Hls || !Hls.isSupported()) return;
 
-  const loader = createCachedLoader(Hls as any);
-  const hls = new (Hls as any)({ ...HLS_CONFIG, fLoader: loader }) as InstanceType<typeof HlsType>;
+  const hls = new (Hls as any)(getHlsConfig()) as InstanceType<typeof HlsType>;
   hls.loadSource(hlsUrl);
   preCreatedInstances.set(hlsUrl, hls);
 

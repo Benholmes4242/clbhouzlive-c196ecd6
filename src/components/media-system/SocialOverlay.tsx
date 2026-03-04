@@ -30,10 +30,16 @@ export function SocialOverlay({ post, isActive, isScrubbing, onLike, isLiked = f
   const [opacity, setOpacity] = useState(1);
   const [captionExpanded, setCaptionExpanded] = useState(false);
   const [likeAnimating, setLikeAnimating] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
   const isMuted = useMediaStore((s) => s.isMuted);
   const toggleMute = useMediaStore((s) => s.toggleMute);
   const dimTimer1 = useRef<ReturnType<typeof setTimeout>>();
   const dimTimer2 = useRef<ReturnType<typeof setTimeout>>();
+
+  // Reset avatar error when post changes
+  useEffect(() => {
+    setAvatarError(false);
+  }, [post.avatarUrl]);
 
   // ── Auto-hide logic ───────────────────────────────────────────
   const resetTimers = useCallback(() => {
@@ -121,8 +127,7 @@ export function SocialOverlay({ post, isActive, isScrubbing, onLike, isLiked = f
         style={{
           top: 'calc(env(safe-area-inset-top, 16px) + 16px)',
           right: 16,
-          background: 'rgba(0,0,0,0.45)',
-          backdropFilter: 'blur(24px) saturate(180%)',
+          background: 'rgba(0,0,0,0.55)',
           border: '1px solid rgba(255,255,255,0.1)',
           boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
         }}
@@ -213,28 +218,20 @@ export function SocialOverlay({ post, isActive, isScrubbing, onLike, isLiked = f
 
         <div className="relative flex items-center gap-2 mb-1">
           {/* Avatar */}
-          {post.avatarUrl ? (
+          {post.avatarUrl && !avatarError ? (
             <img
               src={post.avatarUrl}
               alt={displayName}
               className="w-9 h-9 rounded-full object-cover flex-shrink-0"
               style={{ border: '2px solid rgba(255,255,255,0.3)' }}
-              onError={(e) => {
-                // Hide broken avatar, show fallback
-                (e.currentTarget as HTMLImageElement).style.display = 'none';
-                const fallback = e.currentTarget.nextElementSibling as HTMLElement | null;
-                if (fallback) fallback.style.display = 'block';
-              }}
+              onError={() => setAvatarError(true)}
             />
-          ) : null}
-          {/* Fallback circle — hidden when avatar loads, shown on error or no URL */}
-          <div
-            className="w-9 h-9 rounded-full flex-shrink-0"
-            style={{
-              background: 'rgba(255,255,255,0.2)',
-              display: post.avatarUrl ? 'none' : 'block',
-            }}
-          />
+          ) : (
+            <div
+              className="w-9 h-9 rounded-full flex-shrink-0"
+              style={{ background: 'rgba(255,255,255,0.2)' }}
+            />
+          )}
 
           {/* Username — truncated */}
           <span

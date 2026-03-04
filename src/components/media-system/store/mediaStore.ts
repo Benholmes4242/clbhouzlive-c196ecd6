@@ -10,6 +10,9 @@ interface MediaStore {
   isMuted: boolean;
   volume: number;
 
+  // Pause State
+  userPaused: boolean;
+
   // Carousel State
   carouselPositions: Map<number, number>; // feedIndex → mediaIndex
 
@@ -24,6 +27,7 @@ interface MediaStore {
   toggleMute: () => void;
   setMuted: (muted: boolean) => void;
   setVolume: (v: number) => void;
+  setUserPaused: (paused: boolean) => void;
   setCarouselPosition: (feedIndex: number, mediaIndex: number) => void;
   markError: (feedIndex: number) => void;
   clearError: (feedIndex: number) => void;
@@ -38,6 +42,8 @@ export const useMediaStore = create<MediaStore>((set) => ({
 
   isMuted: true,
   volume: 1,
+
+  userPaused: false,
 
   carouselPositions: new Map(),
 
