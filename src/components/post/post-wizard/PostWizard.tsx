@@ -966,12 +966,11 @@ export function PostWizard({
                 )}
 
               </div>
-            </div>
 
-            {/* Tag rows — anchored above toolbar */}
-            <div className="flex-shrink-0 px-4">
-              <div className="max-w-[680px] mx-auto">
-                <div className="flex flex-col gap-3">
+                {/* Tag rows */}
+                <div className="px-4 pb-4">
+                  <div className="max-w-[680px] mx-auto">
+                    <div className="flex flex-col gap-3">
                   {/* Course Row */}
                   <button
                     onClick={() => { dismissCourseTooltip(); setShowCourseSearch(true); }}
