@@ -18,7 +18,7 @@ import ExploreErrorState from './ExploreErrorState';
 import { useInfiniteTrendingCourses } from '@/hooks/useInfiniteTrendingCourses';
 import { useExploreRegions } from '@/hooks/useExploreData';
 import { useExplorePrefetch, RegionKey, ExploreMoment, ExploreFilters, TimeFilter, SortFilter } from '@/hooks/useExploreMoments';
-import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
 import { exploreMomentAdapter } from '@/adapters/exploreMomentAdapter';
 import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
 import { useQueryClient } from '@tanstack/react-query';

@@ -6,7 +6,7 @@ import { CreatorBadge } from './CreatorBadge';
 import { CreatorAnalyticsCard } from './CreatorAnalyticsCard';
 import { useCreatorFeatures } from '@/hooks/useCreatorFeatures';
 import { PostPickerSheet } from './PostPickerSheet';
-import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
 
 interface CreatorProfileSectionProps {
   userId: string;

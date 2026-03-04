@@ -20,7 +20,7 @@ import { ContinueWatchingSection } from './ContinueWatchingSection';
 import { useInfiniteLongFormVideos } from '@/hooks/useInfiniteLongFormVideos';
 import { useFollowedUsers } from '@/hooks/useFollowedUsers';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
-import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
 import { useContinueWatching } from '@/hooks/useContinueWatching';
 import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
 import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';

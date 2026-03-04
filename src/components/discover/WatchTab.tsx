@@ -10,7 +10,7 @@ import { useState, useCallback, useEffect, useMemo } from 'react';
 import { WatchShortsGrid } from './WatchShortsGrid';
 import { WatchTabSkeleton } from './WatchTabSkeleton';
 import { useWatchShorts, WatchShort } from '@/hooks/useWatchShorts';
-import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
 import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
 import { useQueryClient } from '@tanstack/react-query';
 import { useDebounce } from '@/hooks/useDebounce';

@@ -6,7 +6,7 @@ import { ActivityGridV2, useActivityPostsV2 } from './activity/v2';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { UnifiedMediaItem } from '@/components/shared/grid/types';
 import { CreatorProfileSection } from './CreatorProfileSection';
-import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { useUserFollow } from '@/hooks/useUserFollow';
 import { usePostDeletion } from '@/hooks/usePostDeletion';

@@ -42,7 +42,7 @@ import {
 import { ContentFilterPills, FilterOption } from '@/components/common/ContentFilterPills';
 
 // Fullscreen player integration
-import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
 import { UnifiedMediaItem } from '@/components/shared/grid/types';
 
 interface BusinessActivityFeedProps {

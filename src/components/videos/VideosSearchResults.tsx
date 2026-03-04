@@ -4,7 +4,7 @@ import { ArrowLeft, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LongFormVideoTile } from './LongFormVideoTile';
 import { useLongFormVideos } from '@/hooks/useLongFormVideos';
-import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
 
 interface VideosSearchResultsProps {
   query: string;

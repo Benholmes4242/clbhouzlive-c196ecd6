@@ -8,7 +8,7 @@ import { LongFormFeedCard } from './LongFormFeedCard';
 import { LongFormFeedCardSkeleton } from './LongFormFeedCardSkeleton';
 import { useInfiniteLongFormVideos } from '@/hooks/useInfiniteLongFormVideos';
 import { useFollowedUsers } from '@/hooks/useFollowedUsers';
-import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
 import { useAdaptivePrefetch } from '@/hooks/useAdaptivePrefetch';
 import { runtimeUserTap } from '@/media';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
