@@ -262,9 +262,6 @@ export function VideoPlayer({
               <Play className="w-6 h-6 text-white ml-0.5" fill="white" />
             )}
           </div>
-          </div>
-        </div>
-      )}
         </div>
       )}
 
@@ -280,9 +277,6 @@ export function VideoPlayer({
               filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.5))',
             }}
           />
-          />
-        </div>
-      )}
         </div>
       )}
 

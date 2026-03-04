@@ -72,6 +72,3 @@ export function PullToRefresh({ pullDistance, isRefreshing, threshold = 80 }: Pu
     </div>
   );
 }
-    </div>
-  );
-}

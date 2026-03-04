@@ -333,6 +333,3 @@ export function Scrubber({ videoRef, isActive, duration, onScrubStart, onScrubEn
     </>
   );
 }
-    </>
-  );
-}
