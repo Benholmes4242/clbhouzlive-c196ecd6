@@ -190,14 +190,26 @@ export const FullscreenOverlay: React.FC<FullscreenOverlayProps> = ({
   }, [item, viewer, navigate]);
 
   // Carousel dots for multi-media posts
+  // Elongated carousel dots matching Clubhouse feed style
   const dotsSlot = useMemo(() => {
     if (viewer.totalMediaInPost <= 1) return undefined;
     return (
-      <CarouselDots
-        count={viewer.totalMediaInPost}
-        activeIndex={viewer.currentMediaIndex}
-        onDotClick={viewer.goToMedia}
-      />
+      <div className="flex items-center gap-2" role="tablist" aria-label="Media pagination">
+        {Array.from({ length: viewer.totalMediaInPost }).map((_, i) => (
+          <button
+            key={i}
+            role="tab"
+            aria-selected={i === viewer.currentMediaIndex}
+            aria-label={`Go to media ${i + 1}`}
+            onClick={() => viewer.goToMedia(i)}
+            className={`h-1.5 rounded-full transition-all duration-200 ease-out ${
+              i === viewer.currentMediaIndex
+                ? 'w-5 bg-white/50'
+                : 'w-1.5 bg-white/25'
+            }`}
+          />
+        ))}
+      </div>
     );
   }, [viewer.totalMediaInPost, viewer.currentMediaIndex, viewer.goToMedia]);
 
