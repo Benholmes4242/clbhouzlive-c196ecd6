@@ -10,7 +10,7 @@ import { FeedContainer } from './FeedContainer';
 import { usePreloader } from './hooks/usePreloader';
 import { useSuggestedFeed } from './hooks/useSuggestedFeed';
 import { useFriendsFeed } from './hooks/useFriendsFeed';
-import { FeedTabToggle } from './FeedTabToggle';
+import { MediaPlayerTopBar } from './MediaPlayerTopBar';
 import { LoadingSkeleton } from './LoadingSkeleton';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import type { FeedPost, FeedTab } from './types/media';
@@ -99,7 +99,7 @@ export default function FullscreenMediaViewer() {
     return (
       <VideoPoolProvider>
         <div className="fixed inset-0 z-[9999] bg-black overflow-hidden">
-          <FeedTabToggle activeTab={activeTab} onTabChange={handleTabChange} />
+          <MediaPlayerTopBar activeTab={activeTab} onTabChange={handleTabChange} user={user ?? null} />
           <LoadingSkeleton visible={true} />
         </div>
       </VideoPoolProvider>
@@ -113,7 +113,7 @@ export default function FullscreenMediaViewer() {
           className="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center"
           style={{ fontFamily: '-apple-system, sans-serif' }}
         >
-          <FeedTabToggle activeTab={activeTab} onTabChange={handleTabChange} />
+          <MediaPlayerTopBar activeTab={activeTab} onTabChange={handleTabChange} user={user ?? null} />
           <p className="text-white/60 text-sm">
             {activeTab === 'friends'
               ? 'No posts from people you follow yet'
@@ -127,7 +127,7 @@ export default function FullscreenMediaViewer() {
   return (
     <VideoPoolProvider>
       <div className="fixed inset-0 z-[9999] bg-black overflow-hidden">
-        <FeedTabToggle activeTab={activeTab} onTabChange={handleTabChange} />
+        <MediaPlayerTopBar activeTab={activeTab} onTabChange={handleTabChange} user={user ?? null} />
         <FeedWithPreloader
           posts={activeFeed.posts}
           onNearEnd={handleNearEnd}
