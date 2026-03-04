@@ -229,7 +229,7 @@ export function FullscreenReviewPost({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [goToNext, goToPrevious]);
   
-  if (!sortedMedia.length) {
+  if (renderMedia && !sortedMedia.length) {
     return (
       <div className="relative w-full h-full bg-black flex items-center justify-center">
         <p className="text-white/60 text-sm">No media available</p>

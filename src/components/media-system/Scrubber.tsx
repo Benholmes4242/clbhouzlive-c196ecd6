@@ -216,23 +216,25 @@ export function Scrubber({ videoRef, isActive, duration, onScrubStart, onScrubEn
 
   return (
     <>
-      {/* Invisible touch capture zone — bottom 60px */}
+      {/* Invisible touch capture zone — fixed above bottom nav */}
       <div
-        className="absolute left-0 right-0 z-[25]"
-        style={{ bottom: 0, height: TOUCH_ZONE_HEIGHT }}
+        className="fixed left-0 right-0"
+        style={{ bottom: 'calc(30px + var(--bottom-nav-height, 64px))', height: TOUCH_ZONE_HEIGHT, zIndex: 101 }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
         onClick={(e) => e.stopPropagation()}
       />
 
-      {/* Visual bar container */}
+      {/* Visual bar container — fixed above bottom nav */}
       <div
         ref={barRef}
-        className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none"
+        className="fixed left-0 right-0 pointer-events-none"
         style={{
+          bottom: 'calc(30px + var(--bottom-nav-height, 64px))',
           height: barHeight,
           transition: 'height 100ms ease-out',
+          zIndex: 101,
         }}
       >
         {/* Background track */}

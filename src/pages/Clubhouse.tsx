@@ -43,7 +43,6 @@ import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicA
 import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule';
 import { CommentsPage } from '@/components/clubhouse/cinematic/CommentsPage';
 import { FullscreenReviewPost } from '@/components/posts/FullscreenReviewPost';
-import { Top100OverlayPills } from '@/components/clubhouse/Top100OverlayPills';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { getProfilePathById } from '@/lib/profileRoutes';
@@ -57,6 +56,7 @@ function FeedWithPreloader({
   hasNextPage,
   followOverrides,
   onFollowChange,
+  onDoubleTapLike,
 }: {
   posts: FeedPost[];
   onNearEnd: () => void;
@@ -65,6 +65,7 @@ function FeedWithPreloader({
   hasNextPage: boolean;
   followOverrides: Map<string, boolean>;
   onFollowChange: (userId: string, isFollowed: boolean) => void;
+  onDoubleTapLike: (postIndex: number) => void;
 }) {
   usePreloader(posts);
   return (
@@ -76,6 +77,7 @@ function FeedWithPreloader({
       hasNextPage={hasNextPage}
       followOverrides={followOverrides}
       onFollowChange={onFollowChange}
+      onDoubleTapLike={onDoubleTapLike}
     />
   );
 }
@@ -328,10 +330,10 @@ const ClubhouseContent = () => {
   }, [activeReview, navigate]);
 
   // ── Double-tap like from VideoPlayer ──
-  // The VideoPlayer component already handles double-tap hearts visually,
-  // but we need to wire the actual like mutation. This is done via the
-  // FeedItem/VideoPlayer onDoubleTapLike prop which we don't have direct
-  // access to from here. For now, the action rail like button is the primary like path.
+  const handleDoubleTapLike = useCallback((postIndex: number) => {
+    const post = posts[postIndex];
+    if (post) handleLike(post);
+  }, [posts, handleLike]);
 
   // ============================================================================
   // EARLY RETURNS
@@ -354,8 +356,10 @@ const ClubhouseContent = () => {
     <PageRoot 
       ref={clubhouseRootRef} 
       className="clubhouse-root" 
+      fixedHeight
+      hasBottomNav={false}
       style={{ 
-        "--bg-page": "#0F0F0F", 
+        "--bg-page": "#000000", 
         position: 'relative', 
         isolation: 'isolate', 
         zIndex: 0
@@ -408,6 +412,7 @@ const ClubhouseContent = () => {
             hasNextPage={hasNextPage}
             followOverrides={followOverrides}
             onFollowChange={handleFollowChange}
+            onDoubleTapLike={handleDoubleTapLike}
           />
         </VideoPoolProvider>
       )}
@@ -434,13 +439,7 @@ const ClubhouseContent = () => {
             />
           )}
 
-          {/* Top 100 pills — z-20, top-left */}
-          {activeReview?.courseId && (
-            <Top100OverlayPills
-              courseId={activeReview.courseId}
-              className="fixed top-[calc(env(safe-area-inset-top,0px)+100px)] left-4 z-20"
-            />
-          )}
+          {/* Top 100 pills removed — ranking info accessible via course page */}
 
           {/* Media navigation dots for multi-media posts */}
           {activeMediaCount > 1 && (
@@ -483,6 +482,10 @@ const ClubhouseContent = () => {
               avatar: activePost.avatarUrl,
             }}
             caption={activePost.caption}
+            golfCourse={isActiveReview && activeReview ? {
+              id: activeReview.courseId,
+              name: activeReview.courseName,
+            } : undefined}
             isFollowing={isActivePostFollowed}
             isOwnPost={isOwnPost}
             isVisible={overlayVisible}
