@@ -354,8 +354,10 @@ const ClubhouseContent = () => {
     <PageRoot 
       ref={clubhouseRootRef} 
       className="clubhouse-root" 
+      fixedHeight
+      hasBottomNav={false}
       style={{ 
-        "--bg-page": "#0F0F0F", 
+        "--bg-page": "#000000", 
         position: 'relative', 
         isolation: 'isolate', 
         zIndex: 0
