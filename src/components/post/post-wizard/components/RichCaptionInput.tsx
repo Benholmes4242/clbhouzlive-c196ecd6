@@ -19,6 +19,7 @@ interface RichCaptionInputProps {
   maxLength?: number;
   accentColor?: string;
   onFocusChange?: (focused: boolean) => void;
+  className?: string;
 }
 
 export interface RichCaptionInputHandle {
