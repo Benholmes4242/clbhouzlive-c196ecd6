@@ -303,7 +303,6 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                 )}
               </div>
             </motion.div>
-            </div>
           );
         })}
       </div>
