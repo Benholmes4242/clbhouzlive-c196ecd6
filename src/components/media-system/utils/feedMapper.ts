@@ -50,6 +50,9 @@ export function mapRowToFeedPost(row: any): FeedPost {
       courseName: row.review_course_name || 'Unknown Course',
       courseImageUrl: row.review_course_image || null,
       rating: Number(row.review_rating) || 0,
+      courseRegion: row.review_course_region || null,
+      courseCountry: row.review_course_country || null,
+      courseSubCountry: row.review_course_sub_country || null,
     };
   }
 
