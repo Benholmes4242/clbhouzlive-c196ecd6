@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { useMediaStore } from '../store/mediaStore';
 import { preCreateHlsInstance, supportsNativeHls } from '../utils/hlsManager';
+import { parseMasterManifest, parseSegmentManifest } from '../utils/manifestParser';
+import { segmentCache } from '../utils/segmentCache';
 import type { FeedPost } from '../types/media';
 
 /**
@@ -10,6 +12,7 @@ import type { FeedPost } from '../types/media';
  * Stage 2 — Thumbnail prefetch (3 items ahead): warm browser image cache.
  * Stage 3 — HLS instance pre-creation (1 item ahead, hls.js only):
  *           loadSource without attachMedia for near-instant promotion.
+ * Stage 4 — Segment prefetch (next item): fetch first 2 segments of lowest quality.
  *
  * Network-aware: reduces prefetch range on slow connections.
  * Uses AbortController to cancel speculative fetches on index change.
@@ -76,6 +79,43 @@ export function usePreloader(posts: FeedPost[]) {
           warmedManifests.current.add(prevUrl);
         } catch {
           // Silent
+        }
+      }
+
+      // ── Stage 4: Segment prefetch for next item ──────────────
+      if (strategy.stage === 'full' || strategy.stage === 'segments') {
+        const nextPost = posts[activeIndex + 1];
+        const nextUrl = nextPost?.mediaItems[0]?.hlsUrl;
+
+        if (nextUrl && !signal.aborted) {
+          try {
+            const masterResponse = await fetch(nextUrl, { signal, mode: 'cors' });
+            const masterText = await masterResponse.text();
+            const parsed = parseMasterManifest(masterText, nextUrl);
+
+            if (parsed.lowestLevel && !signal.aborted) {
+              const levelResponse = await fetch(parsed.lowestLevel.uri, { signal, mode: 'cors' });
+              const levelText = await levelResponse.text();
+              const segmentManifest = parseSegmentManifest(levelText, parsed.lowestLevel.uri);
+
+              // Prefetch first 2 segments
+              const firstSegments = segmentManifest.segments.slice(0, 2);
+              for (const seg of firstSegments) {
+                if (signal.aborted) break;
+                if (segmentCache.has(seg.uri)) continue;
+
+                try {
+                  const segResponse = await fetch(seg.uri, { signal, mode: 'cors' });
+                  const blob = await segResponse.blob();
+                  segmentCache.set(seg.uri, blob);
+                } catch {
+                  break;
+                }
+              }
+            }
+          } catch {
+            // Silent fail — speculative prefetching
+          }
         }
       }
     }
