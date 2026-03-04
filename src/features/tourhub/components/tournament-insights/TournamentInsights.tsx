@@ -108,14 +108,22 @@ export const TournamentInsights = memo(function TournamentInsights() {
     return result;
   }, [isLive, hasUpcoming, isCompleted]);
 
-  const [activeMainTab, setActiveMainTab] = useState(tabs[0]?.id || 'current');
+  // Compute default tab: Live > Next Up > Results
+  const getDefaultTab = useMemo(() => {
+    if (isLive) return 'live';
+    if (hasUpcoming) return 'nextup';
+    if (isCompleted) return 'results';
+    return 'current';
+  }, [isLive, hasUpcoming, isCompleted]);
 
-  // Reset active tab when tabs change
+  const [activeMainTab, setActiveMainTab] = useState(getDefaultTab);
+
+  // Sync active tab when available tabs change (e.g., data loads)
   useEffect(() => {
     if (tabs.length > 0 && !tabs.find(t => t.id === activeMainTab)) {
-      setActiveMainTab(tabs[0].id);
+      setActiveMainTab(getDefaultTab);
     }
-  }, [tabs, activeMainTab]);
+  }, [tabs, activeMainTab, getDefaultTab]);
 
   // Sub-tab for upcoming/pre-tournament content
   const [activeSubTab, setActiveSubTab] = useState<IntelligenceTab>('predictions');
