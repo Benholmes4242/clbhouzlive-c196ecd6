@@ -128,6 +128,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                 <div
                   className="absolute inset-0 pointer-events-none"
                   style={{
+                    zIndex: 0,
                     backgroundImage: `url(${courseImageUrl})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
@@ -138,6 +139,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
               <div
                 className="absolute inset-0 pointer-events-none"
                 style={{
+                  zIndex: 1,
                   background: 'rgba(0, 0, 0, 0.45)',
                   backdropFilter: 'blur(20px) saturate(180%)',
                   WebkitBackdropFilter: 'blur(20px) saturate(180%)',
@@ -145,7 +147,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
               />
 
               {/* Photo section — top ~48% */}
-              <div className="relative flex-shrink-0 z-[1]" style={{ height: 170 }}>
+              <div className="relative flex-shrink-0" style={{ height: 170, zIndex: 2 }}>
                 {imgFailed ? (
                   <div
                     className="w-full h-full flex items-center justify-center"
@@ -218,7 +220,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
               </div>
 
               {/* Name + Flag + Bullets — on dark glass */}
-              <div className="flex flex-col flex-1 overflow-hidden relative z-[1]" style={{ padding: '0 16px 14px' }}>
+              <div className="flex flex-col flex-1 overflow-hidden relative" style={{ padding: '0 16px 14px', zIndex: 2 }}>
                 {/* Name */}
                 <p className="text-center" style={{ fontSize: 18, fontWeight: 600, lineHeight: 1.2, marginTop: 6, color: '#FFFFFF' }}>
                   {pick.name}
