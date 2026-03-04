@@ -8,10 +8,12 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { useVideoPoolContext } from './VideoPoolProvider';
 import { useMediaStore } from './store/mediaStore';
 import { useGaplessLoop } from './hooks/useGaplessLoop';
+import { getHlsInstance } from './utils/hlsManager';
 import { LoadingSkeleton } from './LoadingSkeleton';
 import { ErrorState } from './ErrorState';
 import { Scrubber } from './Scrubber';
 import { Play, Pause, Heart } from 'lucide-react';
+import { haptic } from '@/utils/haptics';
 
 const MAX_RETRIES = 3;
 const DOUBLE_TAP_DELAY = 300;
@@ -183,12 +185,52 @@ export function VideoPlayer({
       tapCountRef.current = 0;
       setShowDoubleTapHeart(true);
       setTimeout(() => setShowDoubleTapHeart(false), 900);
+      haptic('medium');
       onDoubleTapLike?.();
     }
   }, [isActive, hasError, onDoubleTapLike]);
 
   // Cleanup tap timer
   useEffect(() => () => { clearTimeout(tapTimerRef.current); }, []);
+
+  // ── Quality transition masking (HLS level upgrades) ──
+  useEffect(() => {
+    if (!isActive || !videoRef.current) return;
+    const hls = getHlsInstance(videoRef.current);
+    if (!hls) return;
+
+    const video = videoRef.current;
+
+    const onLevelSwitching = (_event: unknown, data: any) => {
+      if (!video || !hls.levels) return;
+      const newLevel = data.level;
+      const currentLevel = hls.currentLevel;
+      // Only mask quality UPGRADES
+      if (newLevel > currentLevel) {
+        video.style.filter = 'blur(1.5px)';
+        video.style.transition = 'filter 150ms ease-out';
+      }
+    };
+
+    const onLevelSwitched = () => {
+      if (!video) return;
+      video.style.filter = 'none';
+      video.style.transition = 'filter 300ms ease-in';
+    };
+
+    // Use string event names to avoid needing the Hls constructor
+    (hls as any).on('hlsLevelSwitching', onLevelSwitching);
+    (hls as any).on('hlsLevelSwitched', onLevelSwitched);
+
+    return () => {
+      (hls as any).off('hlsLevelSwitching', onLevelSwitching);
+      (hls as any).off('hlsLevelSwitched', onLevelSwitched);
+      if (video) {
+        video.style.filter = '';
+        video.style.transition = '';
+      }
+    };
+  }, [isActive]);
 
   const canRetry = retryCountRef.current < MAX_RETRIES;
 
