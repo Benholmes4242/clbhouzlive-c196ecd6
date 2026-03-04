@@ -99,7 +99,7 @@ export default function FullscreenMediaViewer() {
     return (
       <VideoPoolProvider>
         <div className="fixed inset-0 z-[9999] bg-black overflow-hidden">
-          <MediaPlayerTopBar activeTab={activeTab} onTabChange={handleTabChange} user={user ?? null} />
+          <MediaPlayerTopBar activeTab={activeTab} onTabChange={handleTabChange} />
           <LoadingSkeleton visible={true} />
         </div>
       </VideoPoolProvider>
@@ -113,7 +113,7 @@ export default function FullscreenMediaViewer() {
           className="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center"
           style={{ fontFamily: '-apple-system, sans-serif' }}
         >
-          <MediaPlayerTopBar activeTab={activeTab} onTabChange={handleTabChange} user={user ?? null} />
+           <MediaPlayerTopBar activeTab={activeTab} onTabChange={handleTabChange} />
           <p className="text-white/60 text-sm">
             {activeTab === 'friends'
               ? 'No posts from people you follow yet'
@@ -127,7 +127,7 @@ export default function FullscreenMediaViewer() {
   return (
     <VideoPoolProvider>
       <div className="fixed inset-0 z-[9999] bg-black overflow-hidden">
-        <MediaPlayerTopBar activeTab={activeTab} onTabChange={handleTabChange} user={user ?? null} />
+        <MediaPlayerTopBar activeTab={activeTab} onTabChange={handleTabChange} />
         <FeedWithPreloader
           posts={activeFeed.posts}
           onNearEnd={handleNearEnd}
