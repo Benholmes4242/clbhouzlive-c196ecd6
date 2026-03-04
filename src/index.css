@@ -1969,7 +1969,12 @@ html[data-immersive="true"] .app-shell--topSpacer {
   }
 }
 
-/* Skeleton shimmer utility - iOS-style loading animation */
+@keyframes amber-shimmer {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
 .skeleton-shimmer {
   position: relative;
   overflow: hidden;
