@@ -1,9 +1,7 @@
 /**
  * Media System - Unified exports
  * 
- * Import all media components and hooks from this single entry point:
- * 
- * import { MediaSystemProvider, HLSPlayer, MediaTile, MediaFullscreenViewer, useMediaSystem, useMediaAutoplay, MediaRuntime, useMediaRuntime } from '@/media';
+ * Import all media components and hooks from this single entry point.
  */
 
 // ============================================
@@ -106,50 +104,6 @@ export type { HLSPlayerProps, HLSPlayerRef } from './HLSPlayer';
 
 export { default as MediaTile } from './MediaTile';
 export type { MediaTileProps } from './MediaTile';
-
-export { default as MediaFullscreenViewer } from './MediaFullscreenViewer';
-export type { MediaFullscreenViewerProps, MediaFullscreenItem } from './MediaFullscreenViewer';
-
-// ============================================
-// NEW FULLSCREEN VIEWER (Phase 5)
-// ============================================
-export { 
-  FullscreenMediaViewer,
-  FullscreenNavigation,
-  FullscreenMediaItem,
-  SingleMediaDisplay,
-  MediaCarousel,
-  FullscreenOverlay,
-  FullscreenControls,
-  FullscreenComments,
-} from './fullscreen';
-export type { FullscreenMediaViewerProps } from './fullscreen';
-
-export { 
-  useFullscreenViewer, 
-  useFullscreenViewerContext,
-  useFullscreenViewerOptional,
-  FullscreenViewerContext,
-} from './hooks/useFullscreenViewer';
-export type { 
-  FullscreenMediaItem as FullscreenMediaItemType,
-  UseFullscreenViewerOptions,
-  UseFullscreenViewerReturn,
-  FullscreenContext as FullscreenViewerContextType,
-} from './hooks/useFullscreenViewer';
-
-export { 
-  useSwipeNavigation, 
-  useVerticalSwipe, 
-  useHorizontalSwipe,
-} from './hooks/useSwipeNavigation';
-export type { 
-  SwipeNavigationOptions, 
-  SwipeNavigationReturn,
-} from './hooks/useSwipeNavigation';
-
-// Fullscreen adapters
-export { adaptItemsToFullscreen, createFetchMoreAdapter } from './fullscreenAdapters';
 
 // ============================================
 // UPLOAD HOOK (Phase 6)
