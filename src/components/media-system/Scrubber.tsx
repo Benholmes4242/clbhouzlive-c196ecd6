@@ -10,6 +10,7 @@
  * The bottom 60px zone captures all touch events to prevent feed scroll / tap-to-play.
  */
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { haptic } from '@/utils/haptics';
 
 type ScrubState = 'default' | 'hover' | 'scrubbing' | 'fine-scrub';
 
@@ -151,6 +152,7 @@ export function Scrubber({ videoRef, isActive, duration, onScrubStart, onScrubEn
     }
 
     setScrubState('scrubbing');
+    haptic('light');
     onScrubStart?.();
     seekTo(frac);
 

@@ -8,6 +8,9 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Heart, MessageCircle, Send, Volume2, VolumeX } from 'lucide-react';
 import { useMediaStore } from './store/mediaStore';
 import { toast } from 'sonner';
+import { haptic } from '@/utils/haptics';
+import type { FeedPost } from './types/media';
+import { toast } from 'sonner';
 import type { FeedPost } from './types/media';
 
 const TIMINGS = {
@@ -73,6 +76,7 @@ export function SocialOverlay({ post, isActive, isScrubbing, onLike, isLiked = f
   const handleLike = useCallback(() => {
     setLikeAnimating(true);
     setTimeout(() => setLikeAnimating(false), 350);
+    haptic('medium');
     onLike?.();
     handleInteraction();
   }, [onLike, handleInteraction]);
@@ -122,7 +126,7 @@ export function SocialOverlay({ post, isActive, isScrubbing, onLike, isLiked = f
       />
       {/* Mute button — top right */}
       <button
-        onClick={(e) => { e.stopPropagation(); toggleMute(); handleInteraction(); }}
+        onClick={(e) => { e.stopPropagation(); haptic('light'); toggleMute(); handleInteraction(); }}
         className="pointer-events-auto absolute z-30 flex items-center justify-center w-11 h-11 rounded-full"
         style={{
           top: 'calc(env(safe-area-inset-top, 16px) + 16px)',

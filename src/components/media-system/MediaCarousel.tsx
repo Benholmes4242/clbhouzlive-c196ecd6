@@ -9,6 +9,7 @@ import { ImageViewer } from './ImageViewer';
 import { CarouselIndicator } from './CarouselIndicator';
 import { useMediaStore } from './store/mediaStore';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { haptic } from '@/utils/haptics';
 import type { MediaItem } from './types/media';
 
 interface MediaCarouselProps {
@@ -46,6 +47,7 @@ export function MediaCarousel({
     setIsAnimating(true);
     setTranslateX(0);
     setCarouselPosition(feedIndex, clamped);
+    haptic('light');
     setTimeout(() => setIsAnimating(false), 260);
   }, [total, feedIndex, setCarouselPosition]);
 
