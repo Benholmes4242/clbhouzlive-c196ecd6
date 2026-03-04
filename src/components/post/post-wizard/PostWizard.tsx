@@ -1038,7 +1038,7 @@ export function PostWizard({
                         </div>
                       ) : (
                         <span className="text-[14px] font-medium text-muted-foreground">
-                          Tag a golf course
+                          Add a Course
                         </span>
                       )}
                     </div>
@@ -1120,7 +1120,7 @@ export function PostWizard({
                         </div>
                       ) : (
                         <span className="text-[14px] font-medium text-muted-foreground">
-                          Tag people
+                          Who's With You?
                         </span>
                       )}
                     </div>
