@@ -47,6 +47,9 @@ export function FeedContainer({ posts, onNearEnd }: FeedContainerProps) {
     if (!containerEl) return;
 
     const onTouchEnd = () => {
+      // Don't override intentional pause
+      if (useMediaStore.getState().userPaused) return;
+
       const currentActiveIndex = useMediaStore.getState().activeIndex;
       const activePost = posts[currentActiveIndex];
       if (!activePost) return;

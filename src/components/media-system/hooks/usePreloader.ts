@@ -12,7 +12,8 @@ import type { FeedPost } from '../types/media';
  * Stage 2 — Thumbnail prefetch (3 items ahead): warm browser image cache.
  * Stage 3 — HLS instance pre-creation (1 item ahead, hls.js only):
  *           loadSource without attachMedia for near-instant promotion.
- * Stage 4 — Segment prefetch (next item): fetch first 2 segments of lowest quality.
+ * Stage 4 — Segment prefetch (next item): reuse cached manifest text,
+ *           fetch first 2 segments of lowest quality.
  *
  * Network-aware: reduces prefetch range on slow connections.
  * Uses AbortController to cancel speculative fetches on index change.
@@ -22,6 +23,7 @@ export function usePreloader(posts: FeedPost[]) {
   const abortRef = useRef<AbortController | null>(null);
   const warmedManifests = useRef<Set<string>>(new Set());
   const warmedPosters = useRef<Set<string>>(new Set());
+  const manifestTextCache = useRef<Map<string, string>>(new Map());
 
   useEffect(() => {
     // Abort any in-flight preloads from previous index
@@ -50,7 +52,9 @@ export function usePreloader(posts: FeedPost[]) {
         const url = post?.mediaItems[0]?.hlsUrl;
         if (url && !warmedManifests.current.has(url)) {
           try {
-            await fetch(url, { signal, mode: 'cors' });
+            const response = await fetch(url, { signal, mode: 'cors' });
+            const text = await response.text();
+            manifestTextCache.current.set(url, text);
             warmedManifests.current.add(url);
           } catch {
             // Silent — speculative
@@ -75,7 +79,9 @@ export function usePreloader(posts: FeedPost[]) {
       const prevUrl = prev?.mediaItems[0]?.hlsUrl;
       if (prevUrl && !warmedManifests.current.has(prevUrl)) {
         try {
-          await fetch(prevUrl, { signal, mode: 'cors' });
+          const response = await fetch(prevUrl, { signal, mode: 'cors' });
+          const text = await response.text();
+          manifestTextCache.current.set(prevUrl, text);
           warmedManifests.current.add(prevUrl);
         } catch {
           // Silent
@@ -89,8 +95,13 @@ export function usePreloader(posts: FeedPost[]) {
 
         if (nextUrl && !signal.aborted) {
           try {
-            const masterResponse = await fetch(nextUrl, { signal, mode: 'cors' });
-            const masterText = await masterResponse.text();
+            // Use cached manifest text from Stage 1 if available
+            let masterText = manifestTextCache.current.get(nextUrl);
+            if (!masterText) {
+              const masterResponse = await fetch(nextUrl, { signal, mode: 'cors' });
+              masterText = await masterResponse.text();
+              manifestTextCache.current.set(nextUrl, masterText);
+            }
             const parsed = parseMasterManifest(masterText, nextUrl);
 
             if (parsed.lowestLevel && !signal.aborted) {
@@ -116,6 +127,18 @@ export function usePreloader(posts: FeedPost[]) {
           } catch {
             // Silent fail — speculative prefetching
           }
+        }
+      }
+
+      // Prune manifest text cache — keep only entries within 10 of active index
+      const urlsToKeep = new Set<string>();
+      for (let i = Math.max(0, activeIndex - 10); i <= activeIndex + 10 && i < posts.length; i++) {
+        const url = posts[i]?.mediaItems[0]?.hlsUrl;
+        if (url) urlsToKeep.add(url);
+      }
+      for (const key of manifestTextCache.current.keys()) {
+        if (!urlsToKeep.has(key)) {
+          manifestTextCache.current.delete(key);
         }
       }
     }
