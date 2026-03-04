@@ -104,7 +104,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
       {/* Carousel */}
       <div
         ref={scrollRef}
-        className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide px-4"
+        className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide px-4 items-stretch"
         style={{
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
@@ -130,8 +130,8 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
             <motion.div
               whileTap={{ scale: 0.98 }}
               transition={{ duration: 0.2 }}
-              className="w-full rounded-[16px] overflow-hidden flex flex-col relative"
-              style={{ background: '#1a1a1a' }}
+              className="w-full h-full rounded-[16px] overflow-hidden flex flex-col relative"
+              style={{ background: '#1a1a1a', minHeight: 390 }}
             >
               {/* Pre-blurred course image background — no backdrop-filter */}
               {courseImageUrl && (
@@ -244,7 +244,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
               </div>
 
               {/* Name + Flag + Bullets — on dark glass */}
-              <div className="flex flex-col flex-1 overflow-hidden relative" style={{ padding: '0 16px 14px', zIndex: 2 }}>
+              <div className="flex flex-col flex-1 overflow-hidden relative" style={{ padding: '0 16px 14px', zIndex: 2, justifyContent: 'flex-start' }}>
                 {/* Name */}
                 <p className="text-center" style={{ fontSize: 18, fontWeight: 600, lineHeight: 1.2, marginTop: 6, color: '#FFFFFF' }}>
                   {pick.name}
