@@ -10,6 +10,7 @@ import {
   retryLoad,
 } from '../utils/hlsManager';
 import { fadeOut, fadeIn } from '../utils/audioFade';
+import { segmentCache } from '../utils/segmentCache';
 import { useSessionCache } from './useSessionCache';
 import { useMediaStore } from '../store/mediaStore';
 
@@ -86,6 +87,7 @@ export function useVideoPool() {
 
     return () => {
       destroyAll();
+      segmentCache.clear();
       recoveryTimeouts.current.forEach((timeout) => clearTimeout(timeout));
       recoveryTimeouts.current.clear();
       pool.forEach((p, idx) => {
