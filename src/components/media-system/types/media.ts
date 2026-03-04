@@ -8,17 +8,44 @@ export interface MediaItem {
   width: number;
   height: number;
   duration?: number;
+  displayOrder?: number;
 }
+
+/** Feed tab modes */
+export type FeedTab = 'suggested' | 'friends';
+
+/** Review data attached to a post */
+export interface ReviewData {
+  reviewId: string;
+  courseId: string;
+  courseName: string;
+  courseImageUrl: string | null;
+  rating: number;
+}
+
+/** Creator relationship to current user */
+export type CreatorRelation = 'friend' | 'following' | 'none';
 
 export interface FeedPost {
   id: string;
   userId: string;
+  actorType: 'personal' | 'business';
+  actorId: string;
   username: string;
+  displayName: string;
   avatarUrl: string;
+  isVerified: boolean;
+  creatorRelation: CreatorRelation;
   caption: string;
   mediaItems: MediaItem[];
+  createdAt: string;
   likeCount: number;
   commentCount: number;
+  shareCount: number;
+  review: ReviewData | null;
+  isReview: boolean;
+  isLikedByMe: boolean;
+  isFollowedByMe: boolean;
 }
 
 export interface VideoSessionState {

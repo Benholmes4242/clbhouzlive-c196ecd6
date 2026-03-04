@@ -11271,6 +11271,7 @@ export type Database = {
           is_public: boolean | null
           is_suspended: boolean
           is_test: boolean
+          is_verified: boolean | null
           is_verified_business: boolean
           is_verified_golfer: boolean
           last_notifications_seen_at: string | null
@@ -11371,6 +11372,7 @@ export type Database = {
           is_public?: boolean | null
           is_suspended?: boolean
           is_test?: boolean
+          is_verified?: boolean | null
           is_verified_business?: boolean
           is_verified_golfer?: boolean
           last_notifications_seen_at?: string | null
@@ -11471,6 +11473,7 @@ export type Database = {
           is_public?: boolean | null
           is_suspended?: boolean
           is_test?: boolean
+          is_verified?: boolean | null
           is_verified_business?: boolean
           is_verified_golfer?: boolean
           last_notifications_seen_at?: string | null
@@ -14320,6 +14323,51 @@ export type Database = {
           username: string
         }[]
       }
+      get_friends_feed: {
+        Args: {
+          p_cursor?: string
+          p_page_size?: number
+          p_seen_post_ids?: string[]
+          p_user_id: string
+        }
+        Returns: {
+          business_is_verified: boolean
+          business_logo_url: string
+          business_name: string
+          comment_count: number
+          creator_avatar_url: string
+          creator_display_name: string
+          creator_is_verified: boolean
+          creator_relation: string
+          creator_username: string
+          display_order: number
+          duration_seconds: number
+          engagement_score: number
+          height: number
+          is_followed_by_me: boolean
+          is_liked_by_me: boolean
+          like_count: number
+          media_id: string
+          media_type: string
+          media_url: string
+          post_actor_id: string
+          post_actor_type: string
+          post_content: string
+          post_created_at: string
+          post_id: string
+          post_status: string
+          post_user_id: string
+          poster_url: string
+          review_course_id: string
+          review_course_image: string
+          review_course_name: string
+          review_rating: number
+          share_count: number
+          source_review_id: string
+          stream_id: string
+          width: number
+        }[]
+      }
       get_friends_first_post_ids: {
         Args: {
           p_current_user_id: string
@@ -14546,6 +14594,51 @@ export type Database = {
           season_key_param: string
         }
         Returns: Json
+      }
+      get_suggested_feed: {
+        Args: {
+          p_cursor?: string
+          p_page_size?: number
+          p_seen_post_ids?: string[]
+          p_user_id: string
+        }
+        Returns: {
+          business_is_verified: boolean
+          business_logo_url: string
+          business_name: string
+          comment_count: number
+          creator_avatar_url: string
+          creator_display_name: string
+          creator_is_verified: boolean
+          creator_relation: string
+          creator_username: string
+          display_order: number
+          duration_seconds: number
+          engagement_score: number
+          height: number
+          is_followed_by_me: boolean
+          is_liked_by_me: boolean
+          like_count: number
+          media_id: string
+          media_type: string
+          media_url: string
+          post_actor_id: string
+          post_actor_type: string
+          post_content: string
+          post_created_at: string
+          post_id: string
+          post_status: string
+          post_user_id: string
+          poster_url: string
+          review_course_id: string
+          review_course_image: string
+          review_course_name: string
+          review_rating: number
+          share_count: number
+          source_review_id: string
+          stream_id: string
+          width: number
+        }[]
       }
       get_top_video_reviews: {
         Args: { days_back?: number; result_limit?: number }
