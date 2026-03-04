@@ -141,7 +141,8 @@ export function useVideoPool() {
       feedIndex: number,
       container: HTMLElement,
       onPlaying?: () => void,
-      onError?: () => void
+      onError?: () => void,
+      mp4Url?: string
     ): Promise<HTMLVideoElement | null> => {
       const pool = poolRef.current;
       if (!pool.length) return null;
