@@ -368,7 +368,7 @@ export function PlayerScorecardCard({
               <div className="flex items-center gap-4">
                 <span className="text-sm text-white/50">{activeRoundData.holesCompleted} holes</span>
                 <span className="text-lg font-bold text-white">{activeRoundData.totalStrokes}</span>
-                <span className={`text-sm font-bold ${activeRoundData.totalToPar < 0 ? 'text-red-400' : activeRoundData.totalToPar > 0 ? 'text-blue-400' : 'text-white/70'}`}>
+                <span className={`text-sm font-bold ${activeRoundData.totalToPar < 0 ? SCORE_COLORS.birdie.tailwindText : activeRoundData.totalToPar > 0 ? SCORE_COLORS.bogey.tailwindText : 'text-white/70'}`}>
                   {formatScoreToPar(activeRoundData.totalToPar)}
                 </span>
               </div>
@@ -376,10 +376,11 @@ export function PlayerScorecardCard({
           )}
           <div className="flex items-center justify-center gap-3 mt-4 px-4">
             {[
-              { label: 'Eagle', color: 'bg-yellow-400/15 ring-1 ring-yellow-400/30' },
-              { label: 'Birdie', color: 'bg-red-400/15 ring-1 ring-red-400/30' },
-              { label: 'Par', color: 'bg-white/5' },
-              { label: 'Bogey', color: 'bg-blue-400/15 ring-1 ring-blue-400/30' },
+              { label: 'Eagle', color: SCORE_COLORS.eagle.tailwindBg },
+              { label: 'Birdie', color: SCORE_COLORS.birdie.tailwindBg },
+              { label: 'Par', color: SCORE_COLORS.par.tailwindBg },
+              { label: 'Bogey', color: SCORE_COLORS.bogey.tailwindBg },
+              { label: 'Double+', color: SCORE_COLORS.doublePlus.tailwindBg },
             ].map(({ label, color }) => (
               <div key={label} className="flex items-center gap-1">
                 <div className={`w-3 h-3 rounded ${color}`} />
