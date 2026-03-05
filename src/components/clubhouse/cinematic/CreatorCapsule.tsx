@@ -14,11 +14,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { ChevronUp, User, Music, ChevronRight } from 'lucide-react';
+import { ChevronUp, User, Music, ChevronRight, MapPinned } from 'lucide-react';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import CourseLocationRow from '@/components/posts/CourseLocationRow';
 import { getReviewOverlayTheme, type ExtractedReviewData } from '@/lib/postHelpers';
 import { RatingPill } from '@/components/ui/RatingPill';
+import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 
 /** Animated soundwave bars for music playback indicator */
 const SoundwaveAnimation: React.FC = () => (
@@ -47,6 +48,8 @@ interface GolfCourseInfo {
   country?: string | null;
   sub_country?: string | null;
   slug?: string | null;
+  /** Country name for display (e.g. 'Portugal') */
+  courseCountry?: string | null;
 }
 
 interface MusicTrackInfo {
@@ -165,10 +168,20 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
     .join('')
     .toUpperCase() || '?';
 
+  // Clean caption: strip embedded "Played at" course text
+  const cleanCaption = caption ? removeGolfCourseFromContent(caption) : '';
+  
   // Truncate caption for collapsed state
-  const truncatedCaption = caption && caption.length > 80 
-    ? `${caption.slice(0, 80)}...` 
-    : caption;
+  const truncatedCaption = cleanCaption && cleanCaption.length > 80 
+    ? `${cleanCaption.slice(0, 80)}...` 
+    : cleanCaption;
+
+  // Build course display label: "{name}, {country}" or just "{name}"
+  const courseDisplayLabel = golfCourse?.name
+    ? golfCourse.courseCountry
+      ? `${golfCourse.name}, ${golfCourse.courseCountry}`
+      : golfCourse.name
+    : null;
 
   // When the golf club tag is present, avoid the two-stage collapse (height first, then width)
   // by letting layout reflow immediately while the expanded panel animates out.
@@ -353,10 +366,20 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
         </div>
         
         {/* Caption preview (collapsed) */}
-        {!isExpanded && caption && (
+        {!isExpanded && truncatedCaption && (
           <p className="text-[11px] text-white/60 line-clamp-1 mt-0.5">
             {truncatedCaption}
           </p>
+        )}
+
+        {/* Course location (collapsed) — separate line */}
+        {!isExpanded && courseDisplayLabel && (
+          <div className="flex items-center gap-1 mt-1.5">
+            <MapPinned className="w-3.5 h-3.5 text-white/50 flex-shrink-0" />
+            <span className="text-[11px] text-white/50 truncate">
+              {courseDisplayLabel}
+            </span>
+          </div>
         )}
       </div>
 
