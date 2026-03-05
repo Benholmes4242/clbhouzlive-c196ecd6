@@ -362,7 +362,22 @@ export function useVideoPool() {
         }
       }
 
-      // ── Step 5: PLAY ──────────────────────────────────────────
+      // ── Step 5: Register playing listener BEFORE safePlay ────
+      let playingFired = false;
+      const onPlayingEvt: EventListener = () => {
+        if (playingFired || loadTimedOut) return;
+        playingFired = true;
+        clearTimeout(loadTimeout);
+        onPlaying?.();
+      };
+      addTrackedListener(targetIdx, video, 'playing', onPlayingEvt, { once: true });
+
+      // Belt-and-suspenders: already playing from cache
+      if (!video.paused && video.readyState >= 3) {
+        onPlayingEvt(new Event('playing'));
+      }
+
+      // NOW call safePlay
       const isMutedNow = useMediaStore.getState().isMuted;
       if (!isMutedNow && !rapid) {
         video.volume = 0; // Start silent, fade in after play
@@ -372,20 +387,6 @@ export function useVideoPool() {
       // Fade in audio if unmuted
       if (playOk && !isMutedNow && !rapid) {
         fadeIn(video, useMediaStore.getState().volume); // Fire and forget
-      }
-
-      // ── Step 6: Signal ready on 'playing' event ───────────────
-      if (video.readyState >= 3 && !video.paused) {
-        clearTimeout(loadTimeout);
-        onPlaying?.();
-      } else {
-        const onPlayingEvt: EventListener = () => {
-          if (!loadTimedOut) {
-            clearTimeout(loadTimeout);
-            onPlaying?.();
-          }
-        };
-        addTrackedListener(targetIdx, video, 'playing', onPlayingEvt, { once: true });
       }
 
       // Safety ended listener (gapless loop hook is primary)
@@ -407,7 +408,7 @@ export function useVideoPool() {
       addTrackedListener(targetIdx, video, 'error', onVideoError);
 
       if (!playOk) {
-        // Play failed — don't clear timeout, let it fire or show tap-to-play
+        // Play failed — clean up and show error
         clearTimeout(loadTimeout);
         onError?.();
       }
