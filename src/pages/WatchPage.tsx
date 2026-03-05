@@ -3,12 +3,12 @@ import { WatchHeader } from '@/components/watch/WatchHeader';
 import { WatchGrid, NearMeEmptyState } from '@/components/watch/WatchGrid';
 import { WatchSearchOverlay } from '@/components/watch/WatchSearchOverlay';
 import { useWatchShorts, type WatchFilter } from '@/components/watch/hooks/useWatchShorts';
-import { useAuth } from '@/hooks/useAuth';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { PullToRefresh } from '@/components/PullToRefresh';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 export default function WatchPage() {
-  const { user } = useAuth();
+  const { user } = useSupabaseSession();
   const [activeFilter, setActiveFilter] = useState<WatchFilter>('trending');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
