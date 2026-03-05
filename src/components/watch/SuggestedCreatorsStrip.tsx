@@ -249,8 +249,8 @@ const SuggestedCreatorsStrip: React.FC<SuggestedCreatorsStripProps> = ({ userId 
     );
   }
 
-  // Don't render if < 1 creator (temporarily lowered from 2 for pre-launch testing)
-  if (!creators || creators.length < 1) return null;
+  // Production: require at least 2 creators to render the strip
+  if (!creators || creators.length < 2) return null;
 
   return (
     <div style={{ gridColumn: '1 / -1', padding: '14px 0', background: '#FFFFFF', borderTop: '1px solid #F1F5F9', borderBottom: '1px solid #F1F5F9' }}>
