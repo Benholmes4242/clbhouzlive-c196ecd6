@@ -550,7 +550,7 @@ const ClubhouseContent = () => {
         </>
       )}
 
-      {/* ═══ PAGE-LEVEL SCRUBBER (DEBUG) ═══ */}
+      {/* ═══ PAGE-LEVEL SCRUBBER ═══ */}
       {activePost && isActiveVideo && (
         <Scrubber
           videoElement={activeVideoElement}
@@ -562,8 +562,6 @@ const ClubhouseContent = () => {
             right: 0,
             bottom: scrubberBottom,
             zIndex: 101,
-            background: 'red',
-            height: 20,
           }}
         />
       )}
