@@ -56,7 +56,7 @@ export function usePreloader(posts: FeedPost[]) {
           try {
             const response = await fetch(url, { signal, mode: 'cors' });
             const text = await response.text();
-            manifestTextCache.current.set(url, text);
+            manifestTextCache.set(url, text);
             warmedManifests.current.add(url);
           } catch {
             // Silent — speculative
@@ -83,7 +83,7 @@ export function usePreloader(posts: FeedPost[]) {
         try {
           const response = await fetch(prevUrl, { signal, mode: 'cors' });
           const text = await response.text();
-          manifestTextCache.current.set(prevUrl, text);
+          manifestTextCache.set(prevUrl, text);
           warmedManifests.current.add(prevUrl);
         } catch {
           // Silent
@@ -98,11 +98,11 @@ export function usePreloader(posts: FeedPost[]) {
         if (nextUrl && !signal.aborted) {
           try {
             // Use cached manifest text from Stage 1 if available
-            let masterText = manifestTextCache.current.get(nextUrl);
+            let masterText = manifestTextCache.get(nextUrl);
             if (!masterText) {
               const masterResponse = await fetch(nextUrl, { signal, mode: 'cors' });
               masterText = await masterResponse.text();
-              manifestTextCache.current.set(nextUrl, masterText);
+              manifestTextCache.set(nextUrl, masterText);
             }
             const parsed = parseMasterManifest(masterText, nextUrl);
 
@@ -138,9 +138,9 @@ export function usePreloader(posts: FeedPost[]) {
         const url = posts[i]?.mediaItems[0]?.hlsUrl;
         if (url) urlsToKeep.add(url);
       }
-      for (const key of manifestTextCache.current.keys()) {
+      for (const key of manifestTextCache.keys()) {
         if (!urlsToKeep.has(key)) {
-          manifestTextCache.current.delete(key);
+          manifestTextCache.delete(key);
         }
       }
     }
