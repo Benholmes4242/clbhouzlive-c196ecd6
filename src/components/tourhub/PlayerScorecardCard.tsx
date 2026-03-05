@@ -6,6 +6,7 @@ import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, X, Trophy } from 'lucide-react';
 import { usePlayerScorecard, type RoundScorecard, type HoleScore } from '@/hooks/usePlayerScorecard';
+import { getScoreTextClass, getScoreBgClass, SCORE_COLORS } from '@/features/tourhub/utils/scoreColors';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -33,23 +34,7 @@ interface PlayerScorecardCardProps {
   onClose: () => void;
 }
 
-// ── Score color helpers ────────────────────────────────────────────────────────
-
-function getScoreColor(scoreToPar: number): string {
-  if (scoreToPar <= -2) return 'text-yellow-400';
-  if (scoreToPar === -1) return 'text-red-400';
-  if (scoreToPar === 0) return 'text-white/70';
-  if (scoreToPar === 1) return 'text-blue-400';
-  return 'text-blue-300';
-}
-
-function getScoreBg(scoreToPar: number): string {
-  if (scoreToPar <= -2) return 'bg-yellow-400/15 ring-1 ring-yellow-400/30';
-  if (scoreToPar === -1) return 'bg-red-400/15 ring-1 ring-red-400/30';
-  if (scoreToPar === 0) return 'bg-white/5';
-  if (scoreToPar === 1) return 'bg-blue-400/15 ring-1 ring-blue-400/30';
-  return 'bg-blue-300/15 ring-1 ring-blue-300/30';
-}
+// Score color helpers now imported from @/features/tourhub/utils/scoreColors
 
 function formatScoreToPar(score: number): string {
   if (score === 0) return 'E';
@@ -66,8 +51,8 @@ function HoleCell({ hole }: { hole: HoleScore }) {
         {hole.holeNumber}
       </span>
       <span className="text-[10px] text-white/30">{hole.par}</span>
-      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${getScoreBg(hole.scoreToPar)}`}>
-        <span className={`text-sm font-bold ${getScoreColor(hole.scoreToPar)}`}>{hole.strokes}</span>
+      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${getScoreBgClass(hole.scoreToPar)}`}>
+        <span className={`text-sm font-bold ${getScoreTextClass(hole.scoreToPar)}`}>{hole.strokes}</span>
       </div>
     </div>
   );
@@ -89,10 +74,10 @@ function EmptyHoleCell({ holeNumber, par }: { holeNumber: number; par: number })
 
 function RoundSummary({ round }: { round: RoundScorecard }) {
   const stats = [
-    { label: 'Eagles', value: round.eagles, color: 'text-yellow-400' },
-    { label: 'Birdies', value: round.birdies, color: 'text-red-400' },
-    { label: 'Pars', value: round.pars, color: 'text-white/70' },
-    { label: 'Bogeys', value: round.bogeys, color: 'text-blue-400' },
+    { label: 'Eagles', value: round.eagles, color: SCORE_COLORS.eagle.tailwindText },
+    { label: 'Birdies', value: round.birdies, color: SCORE_COLORS.birdie.tailwindText },
+    { label: 'Pars', value: round.pars, color: SCORE_COLORS.par.tailwindText },
+    { label: 'Bogeys', value: round.bogeys, color: SCORE_COLORS.bogey.tailwindText },
   ].filter((s) => s.value > 0);
 
   return (
@@ -383,7 +368,7 @@ export function PlayerScorecardCard({
               <div className="flex items-center gap-4">
                 <span className="text-sm text-white/50">{activeRoundData.holesCompleted} holes</span>
                 <span className="text-lg font-bold text-white">{activeRoundData.totalStrokes}</span>
-                <span className={`text-sm font-bold ${activeRoundData.totalToPar < 0 ? 'text-red-400' : activeRoundData.totalToPar > 0 ? 'text-blue-400' : 'text-white/70'}`}>
+                <span className={`text-sm font-bold ${activeRoundData.totalToPar < 0 ? SCORE_COLORS.birdie.tailwindText : activeRoundData.totalToPar > 0 ? SCORE_COLORS.bogey.tailwindText : 'text-white/70'}`}>
                   {formatScoreToPar(activeRoundData.totalToPar)}
                 </span>
               </div>
@@ -391,10 +376,11 @@ export function PlayerScorecardCard({
           )}
           <div className="flex items-center justify-center gap-3 mt-4 px-4">
             {[
-              { label: 'Eagle', color: 'bg-yellow-400/15 ring-1 ring-yellow-400/30' },
-              { label: 'Birdie', color: 'bg-red-400/15 ring-1 ring-red-400/30' },
-              { label: 'Par', color: 'bg-white/5' },
-              { label: 'Bogey', color: 'bg-blue-400/15 ring-1 ring-blue-400/30' },
+              { label: 'Eagle', color: SCORE_COLORS.eagle.tailwindBg },
+              { label: 'Birdie', color: SCORE_COLORS.birdie.tailwindBg },
+              { label: 'Par', color: SCORE_COLORS.par.tailwindBg },
+              { label: 'Bogey', color: SCORE_COLORS.bogey.tailwindBg },
+              { label: 'Double+', color: SCORE_COLORS.doublePlus.tailwindBg },
             ].map(({ label, color }) => (
               <div key={label} className="flex items-center gap-1">
                 <div className={`w-3 h-3 rounded ${color}`} />

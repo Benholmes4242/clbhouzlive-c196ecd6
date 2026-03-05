@@ -157,7 +157,10 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
           name: fullName,
           firstName,
           lastName,
-          photoUrl: player.photo_url || player.headshot_override || undefined,
+          photoUrl: getPlayerHeadshotUrl(
+            player.full_name || `${player.first_name || ''} ${player.last_name || ''}`.trim(),
+            tourCode
+          ) || player.photo_url || player.headshot_override || undefined,
           countryCode: player.country_code || player.country || undefined,
           position: posDisplay,
           totalScore: entry.score ?? 0,
