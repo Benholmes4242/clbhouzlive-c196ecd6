@@ -342,7 +342,6 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
           </div>
         )}
       </div>
-
-    </>
+    </div>
   );
 }
