@@ -26,6 +26,8 @@ interface ScrubberProps {
   onScrubEnd?: () => void;
   /** Selector or ref for the bottom nav element to anchor against */
   bottomNavSelector?: string;
+  /** Position mode: 'absolute' (default, inside a container) or 'fixed' (page-level overlay) */
+  position?: 'absolute' | 'fixed';
 }
 
 function formatTime(seconds: number): string {
@@ -54,7 +56,7 @@ const FINE_SCRUB_FACTOR = 0.25;
 const HIDE_DELAY = 2000;
 const LOOP_PULSE_WINDOW = 0.5; // seconds before loop
 
-export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubStart, onScrubEnd, bottomNavSelector = '.global-bottom-nav' }: ScrubberProps) {
+export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubStart, onScrubEnd, bottomNavSelector = '.global-bottom-nav', position = 'absolute' }: ScrubberProps) {
   const [progress, setProgress] = useState(0);
   const [buffered, setBuffered] = useState(0);
   const [scrubState, setScrubState] = useState<ScrubState>('default');
@@ -243,7 +245,7 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
     <>
       {/* Invisible touch capture zone — bottom 60px */}
       <div
-        className="absolute left-0 right-0 z-[25]"
+        className={`${position} left-0 right-0 z-[25]`}
         style={{ bottom: bottomOffset, height: TOUCH_ZONE_HEIGHT }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -254,7 +256,7 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
       {/* Visual bar container */}
       <div
         ref={barRef}
-        className="absolute left-0 right-0 z-20 pointer-events-none"
+        className={`${position} left-0 right-0 z-20 pointer-events-none`}
         style={{
           bottom: bottomOffset,
           height: barHeight,
