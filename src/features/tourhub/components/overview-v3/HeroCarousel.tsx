@@ -12,6 +12,7 @@
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import type { PlayerInfo } from '@/components/tourhub/PlayerScorecardCard';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ChevronsUp, Trophy, Menu, X } from 'lucide-react';
@@ -27,6 +28,7 @@ import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWin
 import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { useLeaderboardRealtime } from '../../hooks/useLeaderboardRealtime';
 import { ExpandedLeaderboardList, ExpandedLeaderboardSkeleton, ExpandedLeaderboardError, ExpandedLeaderboardEmpty } from './ExpandedLeaderboard';
+import { PlayerScorecardCard } from '@/components/tourhub/PlayerScorecardCard';
 
 import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 import { getTourLogo } from '../../utils/tourLogos';
@@ -295,10 +297,15 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
     return `Won by ${margin} stroke${margin === 1 ? '' : 's'}`;
   })();
 
-  const handlePlayerTap = (playerId: string | null | undefined) => (e: React.MouseEvent) => {
+  const handlePlayerTapNav = (playerId: string | null | undefined) => (e: React.MouseEvent) => {
     e.stopPropagation();
     if (playerId) navigate(`/tourhub/player/${playerId}`);
   };
+
+  // Scorecard state — player tapped in expanded leaderboard
+  const [selectedPlayer, setSelectedPlayer] = useState<PlayerInfo | null>(null);
+  const handleScorecardTap = useCallback((player: PlayerInfo) => setSelectedPlayer(player), []);
+  const handleBackToLeaderboard = useCallback(() => setSelectedPlayer(null), []);
 
   // Fetch top 5 leaders for live tournaments only
   const { data: leaders = [], isLoading: leadersLoading } = useTournamentTopLeaders(
@@ -333,6 +340,11 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, [isExpanded, onToggleExpand]);
+
+  // Clear selected player when glass card collapses
+  useEffect(() => {
+    if (!isExpanded) setSelectedPlayer(null);
+  }, [isExpanded]);
 
   // Touch isolation for expanded scroll area
   const handleExpandedTouch = useCallback((e: React.TouchEvent) => {
@@ -603,23 +615,50 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     })()}
                   </p>
 
-                  {/* Expanded: Full Leaderboard */}
+                  {/* Expanded: Full Leaderboard or Scorecard */}
                   {isExpanded ? (
-                    isLoadingFull ? (
-                      <ExpandedLeaderboardSkeleton />
-                    ) : isFullError ? (
-                      <ExpandedLeaderboardError onRetry={() => refetchFull()} />
-                    ) : fullLeaderboard.length === 0 ? (
-                      <ExpandedLeaderboardEmpty />
-                    ) : (
-                      <ExpandedLeaderboardList
-                        entries={fullLeaderboard}
-                        tourCode={tournament.tourSlug}
-                        onTouchStart={handleExpandedTouch}
-                        onTouchMove={handleExpandedTouch}
-                        onTouchEnd={handleExpandedTouch}
-                      />
-                    )
+                    <AnimatePresence mode="wait">
+                      {selectedPlayer ? (
+                        <PlayerScorecardCard
+                          key="scorecard"
+                          player={selectedPlayer}
+                          tournamentId={tournament.id}
+                          tournamentName={tournament.name}
+                          courseName={tournament.venueName || ''}
+                          onBack={handleBackToLeaderboard}
+                          onClose={() => {
+                            setSelectedPlayer(null);
+                            onToggleExpand();
+                          }}
+                        />
+                      ) : (
+                        <motion.div
+                          key="leaderboard"
+                          initial={{ opacity: 1 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0, x: -40 }}
+                          transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+                          style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}
+                        >
+                          {isLoadingFull ? (
+                            <ExpandedLeaderboardSkeleton />
+                          ) : isFullError ? (
+                            <ExpandedLeaderboardError onRetry={() => refetchFull()} />
+                          ) : fullLeaderboard.length === 0 ? (
+                            <ExpandedLeaderboardEmpty />
+                          ) : (
+                            <ExpandedLeaderboardList
+                              entries={fullLeaderboard}
+                              tourCode={tournament.tourSlug}
+                              onTouchStart={handleExpandedTouch}
+                              onTouchMove={handleExpandedTouch}
+                              onTouchEnd={handleExpandedTouch}
+                              onPlayerTap={handleScorecardTap}
+                            />
+                          )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   ) : (
                     <>
                       {/* Mini Leaderboard */}
@@ -764,13 +803,13 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           style={{ display: 'flex', alignItems: 'center', gap: 10 }}
                         >
                           {/* 60px photo */}
-                          <button onClick={handlePlayerTap(podiumWinner.playerId)} className="transition-opacity active:opacity-70" style={{ flexShrink: 0 }}>
+                          <button onClick={handlePlayerTapNav(podiumWinner.playerId)} className="transition-opacity active:opacity-70" style={{ flexShrink: 0 }}>
                             <PlayerAvatar displayName={podiumWinner.displayName} fullName={podiumWinner.fullName} headshotOverride={podiumWinner.headshotOverride} tourCode={tournament.tourSlug} size={60} frosted />
                           </button>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             {/* Name + score */}
                             <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap' }}>
-                              <button onClick={handlePlayerTap(podiumWinner.playerId)} className="transition-opacity active:opacity-70" style={{ fontSize: '17px', fontWeight: 700, color: '#FFFFFF' }}>
+                              <button onClick={handlePlayerTapNav(podiumWinner.playerId)} className="transition-opacity active:opacity-70" style={{ fontSize: '17px', fontWeight: 700, color: '#FFFFFF' }}>
                                 {podiumWinner.displayName}
                               </button>
                               <span style={{ fontFamily: "'JetBrains Mono','SF Mono',monospace", fontSize: '17px', fontWeight: 700, color: getFinishedScoreColor(podiumWinner.score), flexShrink: 0 }}>
@@ -835,7 +874,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', gap: 6 }}
                       >
                         {runnerRows.map(row => (
-                          <PodiumRunnerRow key={row.position} row={row} tourCode={tournament.tourSlug} onPlayerTap={handlePlayerTap} />
+                          <PodiumRunnerRow key={row.position} row={row} tourCode={tournament.tourSlug} onPlayerTap={handlePlayerTapNav} />
                         ))}
                       </motion.div>
                     ) : (

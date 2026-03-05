@@ -6,6 +6,7 @@
 import React, { useState, useCallback } from 'react';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import type { Database } from '@/integrations/supabase/types';
+import type { PlayerInfo } from '@/components/tourhub/PlayerScorecardCard';
 
 // Derive types from the actual Supabase schema
 type SrLeaderboardRow = Database['public']['Tables']['sr_leaderboards']['Row'];
@@ -119,7 +120,15 @@ const ColumnHeaders = React.memo(function ColumnHeaders() {
 });
 
 // Single player row
-const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({ entry, tourCode }: { entry: LeaderboardEntryWithPlayer; tourCode: string }) {
+const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
+  entry,
+  tourCode,
+  onPlayerTap,
+}: {
+  entry: LeaderboardEntryWithPlayer;
+  tourCode: string;
+  onPlayerTap?: (player: PlayerInfo) => void;
+}) {
   const player = entry.player;
   if (!player) return null;
 
@@ -137,14 +146,40 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({ entr
   const isLeader = entry.position === 1;
   const isChaser = !isLeader;
 
+  // Derive current round from round columns
+  const currentRound = entry.round_4 != null ? 4 : entry.round_3 != null ? 3 : entry.round_2 != null ? 2 : 1;
+
+  const handleTap = onPlayerTap
+    ? () => {
+        onPlayerTap({
+          id: player.id,
+          srId: player.sr_id || '',
+          name: fullName,
+          firstName,
+          lastName,
+          photoUrl: player.photo_url || player.headshot_override || undefined,
+          countryCode: player.country_code || player.country || undefined,
+          position: posDisplay,
+          totalScore: entry.score ?? 0,
+          thru: thruDisplay,
+          currentRound,
+        });
+      }
+    : undefined;
+
   return (
-    <div
+    <button
+      type="button"
       role="listitem"
-      className="flex items-center"
+      onClick={handleTap}
+      className="flex items-center w-full text-left"
       style={{
         padding: isLeader ? '10px 16px' : '10px 16px',
         borderBottom: isLeader ? 'none' : '1px solid rgba(255,255,255,0.06)',
         opacity: isCut ? 0.4 : 1,
+        background: 'none',
+        border: isLeader ? undefined : 'none',
+        cursor: onPlayerTap ? 'pointer' : 'default',
         ...(isLeader ? {
           background: 'rgba(255, 255, 255, 0.08)',
           borderRadius: 10,
@@ -153,7 +188,7 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({ entr
         } : {}),
       }}
     >
-      {/* Position — matches .leaderboard-position / chaser dimming */}
+      {/* Position */}
       <span style={{
         width: 22,
         textAlign: 'center',
@@ -187,7 +222,7 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({ entr
         </span>
       </div>
 
-      {/* To Par — matches .leaderboard-score sizing */}
+      {/* To Par */}
       <span style={{
         width: 56,
         textAlign: 'right',
@@ -213,18 +248,20 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({ entr
       }}>
         {thruDisplay}
       </span>
-    </div>
+    </button>
   );
 });
+
 interface ExpandedLeaderboardListProps {
   entries: LeaderboardEntryWithPlayer[];
   tourCode: string;
   onTouchStart: (e: React.TouchEvent) => void;
   onTouchMove: (e: React.TouchEvent) => void;
   onTouchEnd: (e: React.TouchEvent) => void;
+  onPlayerTap?: (player: PlayerInfo) => void;
 }
 
-export function ExpandedLeaderboardList({ entries, tourCode, onTouchStart, onTouchMove, onTouchEnd }: ExpandedLeaderboardListProps) {
+export function ExpandedLeaderboardList({ entries, tourCode, onTouchStart, onTouchMove, onTouchEnd, onPlayerTap }: ExpandedLeaderboardListProps) {
   const [visibleCount, setVisibleCount] = useState(30);
 
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
@@ -259,6 +296,7 @@ export function ExpandedLeaderboardList({ entries, tourCode, onTouchStart, onTou
           key={entry.id}
           entry={entry}
           tourCode={tourCode}
+          onPlayerTap={onPlayerTap}
         />
       ))}
     </div>
