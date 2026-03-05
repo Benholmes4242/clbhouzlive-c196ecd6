@@ -37,6 +37,7 @@ import { useMediaStore } from '@/components/media-system/store/mediaStore';
 import { useLikeMutation } from '@/components/media-system/hooks/useLikeMutation';
 import { useFollowMutation } from '@/components/media-system/hooks/useFollowMutation';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { Scrubber } from '@/components/media-system/Scrubber';
 
 // ── Clubhouse UI overlays ──
 import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicActionRail';
