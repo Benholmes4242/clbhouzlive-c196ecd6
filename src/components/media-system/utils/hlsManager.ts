@@ -73,7 +73,7 @@ export async function attachMedia(
   hlsUrl: string,
   onError?: (type: string, details: string) => void
 ): Promise<void> {
-  console.log('[HLS] attachMedia called for url:', hlsUrl?.slice(-30));
+  
   // Always detach first
   detachMedia(video);
 
@@ -102,7 +102,7 @@ export async function attachMedia(
 
   return new Promise<void>((resolve, reject) => {
     const timeout = setTimeout(() => {
-      console.log('[HLS] ATTACH TIMEOUT after 8s for url:', hlsUrl?.slice(-30));
+      
       reject(new Error('HLS.js manifest parse timeout'));
     }, ATTACH_TIMEOUT);
 
@@ -110,7 +110,7 @@ export async function attachMedia(
     hlsInstances.set(video, hls);
 
     hls.on((Hls as any).Events.MANIFEST_PARSED, () => {
-      console.log('[HLS] MANIFEST_PARSED — levels:', hls.levels?.length);
+      
       clearTimeout(timeout);
       resolve();
     });
@@ -217,7 +217,7 @@ export function promotePreCreated(
   video: HTMLVideoElement,
   onError?: (type: string, details: string) => void
 ): InstanceType<typeof HlsType> | null {
-  console.log('[HLS] promotePreCreated called for url:', hlsUrl?.slice(-30));
+  
   const hls = preCreatedInstances.get(hlsUrl);
   if (!hls) return null;
 

@@ -4,7 +4,7 @@
  * Integrates gapless loop hook for seamless looping.
  * Supports double-tap-to-like, interactive scrubber, and MP4 fallback.
  */
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useVideoPoolContext } from './VideoPoolProvider';
 import { useMediaStore } from './store/mediaStore';
 import { useGaplessLoop } from './hooks/useGaplessLoop';
@@ -54,13 +54,16 @@ export function VideoPlayer({
   const tapTimerRef = useRef<ReturnType<typeof setTimeout>>();
   const tapCountRef = useRef(0);
 
+  // Track assigned URL to prevent duplicate assigns
+  const assignedUrlRef = useRef<string | null>(null);
+
   // Gapless loop
   useGaplessLoop(videoRef, isActive && !isLoading && !hasError, videoDuration);
 
   // Assign/release pool element
   useEffect(() => {
-    console.log('[VideoPlayer] Activation effect, isActive:', isActive, 'feedIndex:', feedIndex, 'hlsUrl:', hlsUrl?.slice(-30));
     if (!isActive || !containerRef.current) {
+      assignedUrlRef.current = null;
       if (videoRef.current) {
         videoRef.current.pause();
         setIsPlaying(false);
@@ -73,6 +76,10 @@ export function VideoPlayer({
       return;
     }
 
+    // Skip if already assigned for this exact URL
+    if (assignedUrlRef.current === hlsUrl) return;
+    assignedUrlRef.current = hlsUrl;
+
     retryCountRef.current = 0;
     useMediaStore.getState().setUserPaused(false);
     let cancelled = false;
@@ -83,14 +90,12 @@ export function VideoPlayer({
 
       setIsLoading(true);
       setHasError(false);
-      console.log('[VideoPlayer] Calling pool.assign for index:', feedIndex);
 
       let videoEl: HTMLVideoElement | null = null;
       const video = await pool.assign(
         hlsUrl, feedIndex, container,
         () => {
           if (cancelled) return;
-          console.log('[VideoPlayer] onPlaying callback fired, dismissing skeleton for index:', feedIndex);
           setIsLoading(false);
           setIsPlaying(true);
           if (videoEl && videoEl.duration && isFinite(videoEl.duration)) {
@@ -103,7 +108,6 @@ export function VideoPlayer({
         },
         () => {
           if (cancelled) return;
-          console.log('[VideoPlayer] onError callback fired for index:', feedIndex);
           setIsLoading(false);
           setHasError(true);
           useMediaStore.getState().markError(feedIndex);
@@ -128,8 +132,11 @@ export function VideoPlayer({
     };
 
     activate();
-    return () => { cancelled = true; };
-  }, [isActive, hlsUrl, feedIndex, pool, mp4Url]);
+    return () => {
+      cancelled = true;
+      assignedUrlRef.current = null;
+    };
+  }, [isActive, hlsUrl]);
 
   // Sync mute state
   useEffect(() => {
