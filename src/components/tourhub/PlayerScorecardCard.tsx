@@ -6,6 +6,7 @@ import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, X, Trophy } from 'lucide-react';
 import { usePlayerScorecard, type RoundScorecard, type HoleScore } from '@/hooks/usePlayerScorecard';
+import { getScoreTextClass, getScoreBgClass, SCORE_COLORS } from '@/features/tourhub/utils/scoreColors';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
