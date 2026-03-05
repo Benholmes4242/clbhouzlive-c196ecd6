@@ -57,6 +57,21 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
   const setActiveIndex = useMediaStore((s) => s.setActiveIndex);
   const storeActiveIndex = useMediaStore((s) => s.activeIndex);
   const pool = useVideoPoolContext();
+  const prevPostsRef = useRef(posts);
+
+  // Detect feed switch (posts array identity change) — reset scroll to top
+  useEffect(() => {
+    if (prevPostsRef.current !== posts && posts.length > 0) {
+      const newOffset = 0;
+      offsetRef.current = newOffset;
+      activeIndexRef.current = 0;
+      setOffsetY(newOffset);
+      if (trackRef.current) {
+        trackRef.current.style.transform = `translateY(0px)`;
+      }
+    }
+    prevPostsRef.current = posts;
+  }, [posts]);
 
   // Resize handling
   useEffect(() => {
