@@ -67,6 +67,7 @@ interface CommentsPageProps {
   isReview?: boolean;
   reviewRating?: number;
   caddiePickCommentId?: string | null;
+  onCommentPosted?: () => void;
 }
 
 interface ReplyingToState {
