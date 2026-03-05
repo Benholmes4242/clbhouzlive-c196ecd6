@@ -34,23 +34,7 @@ interface PlayerScorecardCardProps {
   onClose: () => void;
 }
 
-// ── Score color helpers ────────────────────────────────────────────────────────
-
-function getScoreColor(scoreToPar: number): string {
-  if (scoreToPar <= -2) return 'text-yellow-400';
-  if (scoreToPar === -1) return 'text-red-400';
-  if (scoreToPar === 0) return 'text-white/70';
-  if (scoreToPar === 1) return 'text-blue-400';
-  return 'text-blue-300';
-}
-
-function getScoreBg(scoreToPar: number): string {
-  if (scoreToPar <= -2) return 'bg-yellow-400/15 ring-1 ring-yellow-400/30';
-  if (scoreToPar === -1) return 'bg-red-400/15 ring-1 ring-red-400/30';
-  if (scoreToPar === 0) return 'bg-white/5';
-  if (scoreToPar === 1) return 'bg-blue-400/15 ring-1 ring-blue-400/30';
-  return 'bg-blue-300/15 ring-1 ring-blue-300/30';
-}
+// Score color helpers now imported from @/features/tourhub/utils/scoreColors
 
 function formatScoreToPar(score: number): string {
   if (score === 0) return 'E';
@@ -67,8 +51,8 @@ function HoleCell({ hole }: { hole: HoleScore }) {
         {hole.holeNumber}
       </span>
       <span className="text-[10px] text-white/30">{hole.par}</span>
-      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${getScoreBg(hole.scoreToPar)}`}>
-        <span className={`text-sm font-bold ${getScoreColor(hole.scoreToPar)}`}>{hole.strokes}</span>
+      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${getScoreBgClass(hole.scoreToPar)}`}>
+        <span className={`text-sm font-bold ${getScoreTextClass(hole.scoreToPar)}`}>{hole.strokes}</span>
       </div>
     </div>
   );
@@ -90,10 +74,10 @@ function EmptyHoleCell({ holeNumber, par }: { holeNumber: number; par: number })
 
 function RoundSummary({ round }: { round: RoundScorecard }) {
   const stats = [
-    { label: 'Eagles', value: round.eagles, color: 'text-yellow-400' },
-    { label: 'Birdies', value: round.birdies, color: 'text-red-400' },
-    { label: 'Pars', value: round.pars, color: 'text-white/70' },
-    { label: 'Bogeys', value: round.bogeys, color: 'text-blue-400' },
+    { label: 'Eagles', value: round.eagles, color: SCORE_COLORS.eagle.tailwindText },
+    { label: 'Birdies', value: round.birdies, color: SCORE_COLORS.birdie.tailwindText },
+    { label: 'Pars', value: round.pars, color: SCORE_COLORS.par.tailwindText },
+    { label: 'Bogeys', value: round.bogeys, color: SCORE_COLORS.bogey.tailwindText },
   ].filter((s) => s.value > 0);
 
   return (
