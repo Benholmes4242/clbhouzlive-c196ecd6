@@ -23,6 +23,7 @@ export function FeedItem({
   post, index, isActive, onFirstFrameReady,
 }: FeedItemProps) {
   const ref = useRef<HTMLDivElement>(null);
+  console.log('[FeedItem] Render index:', index, 'isActive:', isActive, 'hasHlsUrl:', !!post.mediaItems[0]?.hlsUrl);
 
   const isMultiMedia = post.mediaItems.length > 1;
   const media = post.mediaItems[0];

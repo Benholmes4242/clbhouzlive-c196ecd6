@@ -59,6 +59,7 @@ export function VideoPlayer({
 
   // Assign/release pool element
   useEffect(() => {
+    console.log('[VideoPlayer] Activation effect, isActive:', isActive, 'feedIndex:', feedIndex, 'hlsUrl:', hlsUrl?.slice(-30));
     if (!isActive || !containerRef.current) {
       if (videoRef.current) {
         videoRef.current.pause();
@@ -82,12 +83,14 @@ export function VideoPlayer({
 
       setIsLoading(true);
       setHasError(false);
+      console.log('[VideoPlayer] Calling pool.assign for index:', feedIndex);
 
       let videoEl: HTMLVideoElement | null = null;
       const video = await pool.assign(
         hlsUrl, feedIndex, container,
         () => {
           if (cancelled) return;
+          console.log('[VideoPlayer] onPlaying callback fired, dismissing skeleton for index:', feedIndex);
           setIsLoading(false);
           setIsPlaying(true);
           if (videoEl && videoEl.duration && isFinite(videoEl.duration)) {
@@ -100,6 +103,7 @@ export function VideoPlayer({
         },
         () => {
           if (cancelled) return;
+          console.log('[VideoPlayer] onError callback fired for index:', feedIndex);
           setIsLoading(false);
           setHasError(true);
           useMediaStore.getState().markError(feedIndex);
