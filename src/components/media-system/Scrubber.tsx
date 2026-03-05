@@ -221,12 +221,18 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
   const showThumb = scrubState !== 'default';
   const showTooltip = isScrubbing;
 
+  // When style is provided (page-level), wrap everything in a single positioned container
+  const useExternalStyle = !!style;
+
   return (
-    <>
+    <div style={useExternalStyle ? style : undefined}>
       {/* Invisible touch capture zone — bottom 60px */}
       <div
-        className="absolute left-0 right-0 z-[25]"
-        style={{ bottom: bottomOffset, height: TOUCH_ZONE_HEIGHT }}
+        className={useExternalStyle ? "left-0 right-0 z-[25]" : "absolute left-0 right-0 z-[25]"}
+        style={useExternalStyle
+          ? { height: TOUCH_ZONE_HEIGHT, position: 'relative', marginTop: -TOUCH_ZONE_HEIGHT + barHeight }
+          : { bottom: bottomOffset, height: TOUCH_ZONE_HEIGHT, position: 'absolute' }
+        }
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -236,12 +242,11 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
       {/* Visual bar container */}
       <div
         ref={barRef}
-        className="absolute left-0 right-0 z-20 pointer-events-none"
-        style={{
-          bottom: bottomOffset,
-          height: barHeight,
-          transition: 'height 100ms ease-out',
-        }}
+        className={useExternalStyle ? "left-0 right-0 pointer-events-none" : "absolute left-0 right-0 z-20 pointer-events-none"}
+        style={useExternalStyle
+          ? { height: barHeight, transition: 'height 100ms ease-out' }
+          : { bottom: bottomOffset, height: barHeight, transition: 'height 100ms ease-out' }
+        }
       >
         {/* Background track */}
         <div
