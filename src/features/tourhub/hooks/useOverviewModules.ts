@@ -500,9 +500,10 @@ async function getLeadersFromApiStats(season: any, tourSlug: TourId): Promise<Se
 }
 
 // Helper: Calculate leaders from sr_tournaments winner data + sr_leaderboards for live (Other Tours)
-async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId): Promise<SeasonLeadersResult> {
+async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId, cache?: TournamentsCache | null): Promise<SeasonLeadersResult> {
   
   // === PART 1: Get WINS from closed tournament winners ===
+  // NOTE: This queries the full season (not just 7-day cache window)
   const { data: closedTournaments } = await supabase
     .from('sr_tournaments')
     .select(`
@@ -517,7 +518,6 @@ async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId): 
     .not('winner_id', 'is', null);
   
   // Aggregate wins and earnings by player from closed tournaments
-  // NOTE: winner_id is UUID in DB, sr_id is TEXT - we need to convert to string
   const playerWinsMap = new Map<string, {
     srId: string;
     wins: number;
@@ -526,15 +526,12 @@ async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId): 
   }>();
   
   for (const tournament of closedTournaments || []) {
-    // Convert UUID to string for matching with sr_players.sr_id (TEXT)
     const winnerSrId = String(tournament.winner_id);
     if (!winnerSrId || winnerSrId === 'null') continue;
     
-    // Get winner info from raw_data (cast to any for JSON type)
     const rawData = tournament.raw_data as any;
     const winnerData = rawData?.winner;
     
-    // Estimate winner earnings (~18% of purse is typical)
     const purse = parseFloat(String(tournament.purse || rawData?.purse || '0'));
     const winnerEarnings = purse * 0.18;
     
@@ -552,14 +549,21 @@ async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId): 
     stats.estimatedEarnings += winnerEarnings;
   }
   
-  // === PART 2: Get live tournament leaders from sr_leaderboards ===
-  const { data: liveTournaments } = await supabase
-    .from('sr_tournaments')
-    .select('id')
-    .eq('season_id', season.id)
-    .eq('status', 'inprogress');
+  // === PART 2: Get live tournament IDs from cache (avoids another sr_tournaments query) ===
+  const liveTournamentIds = cache?.live
+    .filter(t => t.season_id === season.id)
+    .map(t => t.id) || [];
   
-  const liveTournamentIds = (liveTournaments || []).map(t => t.id);
+  // Fallback if cache doesn't cover this season
+  if (liveTournamentIds.length === 0) {
+    const { data: liveTournaments } = await supabase
+      .from('sr_tournaments')
+      .select('id')
+      .eq('season_id', season.id)
+      .eq('status', 'inprogress');
+    
+    liveTournamentIds.push(...(liveTournaments || []).map(t => t.id));
+  }
   
   let liveLeaderboardData: any[] = [];
   if (liveTournamentIds.length > 0) {
