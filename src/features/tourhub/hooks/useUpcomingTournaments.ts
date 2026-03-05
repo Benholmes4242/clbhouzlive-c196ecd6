@@ -1,11 +1,11 @@
 /**
- * useUpcomingTournaments - Fetches upcoming tournaments across ALL tours
+ * useUpcomingTournaments - Reads from shared tournaments cache
  * Used by the WhatsComing overview module
  * Returns chronologically ordered, limited to first N
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { useTournamentsCache } from '@/hooks/useTournamentsCache';
 import type { SeasonTournament } from './useSeasonTournaments';
 
 const TOUR_KEY_MAP: Record<string, string> = {
@@ -18,53 +18,15 @@ const TOUR_KEY_MAP: Record<string, string> = {
 };
 
 export function useUpcomingTournaments(limit = 6) {
+  const { data: cache } = useTournamentsCache();
+
   return useQuery({
-    queryKey: ['upcoming-tournaments', limit],
+    queryKey: ['upcoming-tournaments', limit, cache ? 'ready' : 'waiting'],
     queryFn: async (): Promise<SeasonTournament[]> => {
-      const currentYear = new Date().getFullYear();
+      if (!cache?.upcoming.length) return [];
 
-      // Get all season IDs for the current year
-      const { data: seasons, error: seasonError } = await supabase
-        .from('sr_seasons')
-        .select('id, tour_name, year')
-        .eq('year', currentYear);
-
-      if (seasonError) throw seasonError;
-      if (!seasons?.length) return [];
-
-      const seasonIds = seasons.map((s) => s.id);
-      const seasonMap = new Map(seasons.map((s) => [s.id, s]));
-
-      // Fetch upcoming/scheduled tournaments across all tours
-      const { data: tournaments, error } = await supabase
-        .from('sr_tournaments')
-        .select(`
-          id,
-          name,
-          status,
-          start_date,
-          end_date,
-          purse,
-          venue_name,
-          venue_city,
-          venue_state,
-          venue_country,
-          venue_par,
-          venue_yardage,
-          season_id
-        `)
-        .in('season_id', seasonIds)
-        .in('status', ['scheduled', 'created'])
-        .gte('start_date', new Date().toISOString().split('T')[0])
-        .order('start_date', { ascending: true })
-        .limit(limit);
-
-      if (error) throw error;
-      if (!tournaments?.length) return [];
-
-      return tournaments.map((t: any) => {
-        const season = seasonMap.get(t.season_id);
-        const tourKey = season?.tour_name?.toLowerCase() || '';
+      return cache.upcoming.slice(0, limit).map((t) => {
+        const tourKey = t.season?.tour_name?.toLowerCase() || '';
 
         return {
           id: t.id,
@@ -75,12 +37,12 @@ export function useUpcomingTournaments(limit = 6) {
           purse: t.purse,
           venueName: t.venue_name,
           venueCity: t.venue_city,
-          venueState: t.venue_state,
+          venueState: null,
           venueCountry: t.venue_country,
           venuePar: t.venue_par,
           venueYardage: t.venue_yardage,
-          tourName: TOUR_KEY_MAP[tourKey] || season?.tour_name || 'Tour Event',
-          year: season?.year || currentYear,
+          tourName: TOUR_KEY_MAP[tourKey] || t.season?.tour_name || 'Tour Event',
+          year: t.season?.year || new Date().getFullYear(),
           winnerId: null,
           winnerFirstName: null,
           winnerLastName: null,
@@ -88,6 +50,7 @@ export function useUpcomingTournaments(limit = 6) {
         };
       });
     },
-    staleTime: 10 * 60 * 1000,
+    enabled: !!cache,
+    staleTime: 30_000,
   });
 }

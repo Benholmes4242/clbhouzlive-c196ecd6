@@ -6,6 +6,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { TourId, TOUR_CONFIG } from './useOverviewData';
+import { useTournamentsCache, type CachedTournament, type TournamentsCache } from '@/hooks/useTournamentsCache';
 
 // ============================================================================
 // Types
@@ -130,34 +131,16 @@ function formatScore(score: number): string {
 // ============================================================================
 
 export function useLiveRightNow() {
+  const { data: cache, isLoading: cacheLoading } = useTournamentsCache();
+
   return useQuery({
-    queryKey: ['overview-live-right-now'],
+    queryKey: ['overview-live-right-now', cache ? 'ready' : 'waiting'],
     queryFn: async () => {
-      const today = new Date().toISOString().split('T')[0];
-      
-      // Get all live tournaments + "starting soon" tournaments (created/scheduled but within date range)
-      // Using .or() to combine: status=inprogress OR (status in created,scheduled AND start_date<=today AND end_date>=today)
-      const { data: tournaments, error: tError } = await supabase
-        .from('sr_tournaments')
-        .select(`
-          id,
-          name,
-          status,
-          start_date,
-          end_date,
-          purse,
-          venue_name,
-          venue_city,
-          season:sr_seasons!inner(tour_id, tour_name)
-        `)
-        .or(`status.eq.inprogress,and(status.in.(created,scheduled),start_date.lte.${today},end_date.gte.${today})`)
-        .order('start_date', { ascending: true });
+      if (!cache?.live.length) return [];
 
-      if (tError) throw tError;
-      if (!tournaments?.length) return [];
+      const tournamentIds = cache.live.map(t => t.id);
 
-      // Batch fetch leaders for ALL tournaments in a single query (fixes N+1)
-      const tournamentIds = tournaments.map((t: any) => t.id);
+      // Batch fetch leaders for ALL live tournaments in a single query
       const { data: allLeaders } = await supabase
         .from('sr_leaderboards')
         .select(`
@@ -172,7 +155,7 @@ export function useLiveRightNow() {
         .gt('strokes', 0)
         .not('position', 'is', null);
 
-      // Build leader map: tournament_id → first leader entry
+      // Build leader map
       const leaderMap: Record<string, any> = {};
       for (const entry of allLeaders || []) {
         if (!leaderMap[entry.tournament_id]) {
@@ -180,7 +163,7 @@ export function useLiveRightNow() {
         }
       }
 
-      return tournaments.map((t: any): LiveTournamentWithLeader => {
+      return cache.live.map((t): LiveTournamentWithLeader => {
         const leader = leaderMap[t.id] || null;
         const isStartingSoon = t.status !== 'inprogress' || !leader;
 
@@ -204,8 +187,9 @@ export function useLiveRightNow() {
         };
       });
     },
-    staleTime: 30_000,             // 30s — matches sync interval
-    refetchInterval: 60_000,       // 60s polling fallback
+    enabled: !!cache,
+    staleTime: 30_000,
+    refetchInterval: 60_000,
     refetchOnWindowFocus: true,
   });
 }
@@ -215,45 +199,31 @@ export function useLiveRightNow() {
 // ============================================================================
 
 export function useComingUpNext() {
+  const { data: cache } = useTournamentsCache();
+
   return useQuery({
-    queryKey: ['overview-coming-up-next'],
+    queryKey: ['overview-coming-up-next', cache ? 'ready' : 'waiting'],
     queryFn: async () => {
-      const today = new Date().toISOString().split('T')[0];
-      const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      if (!cache?.upcoming.length) return [];
 
-      // Only show tournaments with start_date > today (future)
-      // Tournaments starting today are shown in "Live Right Now" as "Starting Soon"
-      const { data, error } = await supabase
-        .from('sr_tournaments')
-        .select(`
-          id,
-          name,
-          start_date,
-          venue_city,
-          venue_country,
-          purse,
-          season:sr_seasons!inner(tour_id, tour_name)
-        `)
-        .in('status', ['scheduled', 'created'])
-        .gt('start_date', today)
-        .lte('start_date', nextWeek)
-        .order('start_date', { ascending: true })
-        .limit(8);
+      const sevenDaysFromNow = new Date(Date.now() + 7 * 86400000);
 
-      if (error) throw error;
-
-      return (data || []).map((row: any): UpcomingTournament => ({
-        id: row.id,
-        name: row.name,
-        startDate: row.start_date,
-        venueCity: row.venue_city,
-        venueCountry: row.venue_country,
-        purse: row.purse,
-        tourId: row.season.tour_id,
-        tourSlug: mapTourSlug(row.season.tour_name),
-      }));
+      return cache.upcoming
+        .filter(t => new Date(t.start_date) <= sevenDaysFromNow)
+        .slice(0, 8)
+        .map((row): UpcomingTournament => ({
+          id: row.id,
+          name: row.name,
+          startDate: row.start_date,
+          venueCity: row.venue_city,
+          venueCountry: row.venue_country,
+          purse: row.purse,
+          tourId: row.season.tour_id,
+          tourSlug: mapTourSlug(row.season.tour_name),
+        }));
     },
-    staleTime: 5 * 60 * 1000,
+    enabled: !!cache,
+    staleTime: 30_000,
   });
 }
 
@@ -336,11 +306,12 @@ interface SeasonLeadersResult extends TourLeadersData {
 }
 
 export function useSeasonLeaders(tourSlug: TourId) {
+  const { data: cache } = useTournamentsCache();
+
   return useQuery({
-    queryKey: ['overview-season-leaders', tourSlug],
+    queryKey: ['overview-season-leaders', tourSlug, cache ? 'ready' : 'waiting'],
     queryFn: async (): Promise<SeasonLeadersResult> => {
       // Map tour slug to EXACT tour_name match
-      // IMPORTANT: Use exact matches to avoid 'pga' matching 'LPGA'
       const tourNameMap: Record<TourId, string> = {
         'pga': 'pga',
         'euro': 'EURO',
@@ -351,14 +322,19 @@ export function useSeasonLeaders(tourSlug: TourId) {
       };
       const exactTourName = tourNameMap[tourSlug] || tourSlug;
       
-      // Golf seasons often span calendar years (e.g., 2025-2026 season)
-      // Try current year + 1 first (the "golf season year"), then current year, then previous
       const calendarYear = new Date().getFullYear();
       const yearsToTry = [calendarYear + 1, calendarYear, calendarYear - 1];
       
       let season = null;
       
-      // Helper to find the best season (prefer one with tournament data)
+      // Use the cache to check which seasons have closed tournaments (avoids per-tour head queries)
+      const cacheCompletedSeasonIds = new Set(
+        (cache?.completed || [])
+          .filter(t => t.winner_id)
+          .map(t => t.season_id)
+          .filter((id): id is string => !!id)
+      );
+      
       const findBestSeason = async (year: number): Promise<typeof season> => {
         const { data: seasons } = await supabase
           .from('sr_seasons')
@@ -366,7 +342,6 @@ export function useSeasonLeaders(tourSlug: TourId) {
           .eq('year', year)
           .ilike('tour_name', exactTourName);
         
-        // Find exact matches (case-insensitive)
         const matches = seasons?.filter(s => 
           s.tour_name.toLowerCase() === exactTourName.toLowerCase()
         ) || [];
@@ -374,7 +349,14 @@ export function useSeasonLeaders(tourSlug: TourId) {
         if (matches.length === 0) return null;
         if (matches.length === 1) return matches[0];
         
-        // Multiple seasons exist - prefer the one with closed tournaments with winners
+        // Multiple seasons: prefer one with closed tournaments (check cache first, no DB query)
+        for (const candidate of matches) {
+          if (cacheCompletedSeasonIds.has(candidate.id)) {
+            return candidate;
+          }
+        }
+        
+        // Cache didn't cover it (older data) — fall back to a single head query
         for (const candidate of matches) {
           const { count } = await supabase
             .from('sr_tournaments')
@@ -383,16 +365,12 @@ export function useSeasonLeaders(tourSlug: TourId) {
             .eq('status', 'closed')
             .not('winner_id', 'is', null);
           
-          if (count && count > 0) {
-            return candidate;
-          }
+          if (count && count > 0) return candidate;
         }
         
-        // No season has tournament data, return first match
         return matches[0];
       };
       
-      // Try each year in order
       for (const year of yearsToTry) {
         const found = await findBestSeason(year);
         if (found) {
@@ -426,13 +404,12 @@ export function useSeasonLeaders(tourSlug: TourId) {
       const hasApiStats = apiStatsCheck && apiStatsCheck.length > 0;
       
       if (hasApiStats) {
-        // === USE API STATISTICS (PGA Tour) ===
         return await getLeadersFromApiStats(season, tourSlug);
       } else {
-        // === CALCULATE FROM LEADERBOARDS (Other Tours) ===
-        return await calculateLeadersFromLeaderboards(season, tourSlug);
+        return await calculateLeadersFromLeaderboards(season, tourSlug, cache);
       }
     },
+    enabled: !!cache,
     staleTime: 5 * 60 * 1000,
   });
 }
@@ -523,9 +500,10 @@ async function getLeadersFromApiStats(season: any, tourSlug: TourId): Promise<Se
 }
 
 // Helper: Calculate leaders from sr_tournaments winner data + sr_leaderboards for live (Other Tours)
-async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId): Promise<SeasonLeadersResult> {
+async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId, cache?: TournamentsCache | null): Promise<SeasonLeadersResult> {
   
   // === PART 1: Get WINS from closed tournament winners ===
+  // NOTE: This queries the full season (not just 7-day cache window)
   const { data: closedTournaments } = await supabase
     .from('sr_tournaments')
     .select(`
@@ -540,7 +518,6 @@ async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId): 
     .not('winner_id', 'is', null);
   
   // Aggregate wins and earnings by player from closed tournaments
-  // NOTE: winner_id is UUID in DB, sr_id is TEXT - we need to convert to string
   const playerWinsMap = new Map<string, {
     srId: string;
     wins: number;
@@ -549,15 +526,12 @@ async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId): 
   }>();
   
   for (const tournament of closedTournaments || []) {
-    // Convert UUID to string for matching with sr_players.sr_id (TEXT)
     const winnerSrId = String(tournament.winner_id);
     if (!winnerSrId || winnerSrId === 'null') continue;
     
-    // Get winner info from raw_data (cast to any for JSON type)
     const rawData = tournament.raw_data as any;
     const winnerData = rawData?.winner;
     
-    // Estimate winner earnings (~18% of purse is typical)
     const purse = parseFloat(String(tournament.purse || rawData?.purse || '0'));
     const winnerEarnings = purse * 0.18;
     
@@ -575,14 +549,21 @@ async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId): 
     stats.estimatedEarnings += winnerEarnings;
   }
   
-  // === PART 2: Get live tournament leaders from sr_leaderboards ===
-  const { data: liveTournaments } = await supabase
-    .from('sr_tournaments')
-    .select('id')
-    .eq('season_id', season.id)
-    .eq('status', 'inprogress');
+  // === PART 2: Get live tournament IDs from cache (avoids another sr_tournaments query) ===
+  const liveTournamentIds = cache?.live
+    .filter(t => t.season_id === season.id)
+    .map(t => t.id) || [];
   
-  const liveTournamentIds = (liveTournaments || []).map(t => t.id);
+  // Fallback if cache doesn't cover this season
+  if (liveTournamentIds.length === 0) {
+    const { data: liveTournaments } = await supabase
+      .from('sr_tournaments')
+      .select('id')
+      .eq('season_id', season.id)
+      .eq('status', 'inprogress');
+    
+    liveTournamentIds.push(...(liveTournaments || []).map(t => t.id));
+  }
   
   let liveLeaderboardData: any[] = [];
   if (liveTournamentIds.length > 0) {
