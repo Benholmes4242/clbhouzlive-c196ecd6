@@ -588,6 +588,18 @@ const ClubhouseContent = () => {
         </>
       )}
 
+      {/* ═══ PAGE-LEVEL SCRUBBER ═══ */}
+      {isActiveVideo && activeVideoRef && (
+        <Scrubber
+          videoRef={activeVideoRef}
+          videoElement={activeVideoElement}
+          isActive={!!activeVideoElement}
+          duration={activeVideoElement?.duration ?? null}
+          position="fixed"
+          bottomNavSelector=".global-bottom-nav"
+        />
+      )}
+
       {/* Post Submission Handler */}
       <PostSubmissionHandler
         isComposerOpen={isComposerOpen}
