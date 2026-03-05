@@ -771,13 +771,13 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           style={{ display: 'flex', alignItems: 'center', gap: 10 }}
                         >
                           {/* 60px photo */}
-                          <button onClick={handlePlayerTap(podiumWinner.playerId)} className="transition-opacity active:opacity-70" style={{ flexShrink: 0 }}>
+                          <button onClick={handlePlayerTapNav(podiumWinner.playerId)} className="transition-opacity active:opacity-70" style={{ flexShrink: 0 }}>
                             <PlayerAvatar displayName={podiumWinner.displayName} fullName={podiumWinner.fullName} headshotOverride={podiumWinner.headshotOverride} tourCode={tournament.tourSlug} size={60} frosted />
                           </button>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             {/* Name + score */}
                             <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap' }}>
-                              <button onClick={handlePlayerTap(podiumWinner.playerId)} className="transition-opacity active:opacity-70" style={{ fontSize: '17px', fontWeight: 700, color: '#FFFFFF' }}>
+                              <button onClick={handlePlayerTapNav(podiumWinner.playerId)} className="transition-opacity active:opacity-70" style={{ fontSize: '17px', fontWeight: 700, color: '#FFFFFF' }}>
                                 {podiumWinner.displayName}
                               </button>
                               <span style={{ fontFamily: "'JetBrains Mono','SF Mono',monospace", fontSize: '17px', fontWeight: 700, color: getFinishedScoreColor(podiumWinner.score), flexShrink: 0 }}>
@@ -842,7 +842,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', gap: 6 }}
                       >
                         {runnerRows.map(row => (
-                          <PodiumRunnerRow key={row.position} row={row} tourCode={tournament.tourSlug} onPlayerTap={handlePlayerTap} />
+                          <PodiumRunnerRow key={row.position} row={row} tourCode={tournament.tourSlug} onPlayerTap={handlePlayerTapNav} />
                         ))}
                       </motion.div>
                     ) : (
