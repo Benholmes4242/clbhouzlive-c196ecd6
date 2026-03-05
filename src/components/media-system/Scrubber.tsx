@@ -124,14 +124,14 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
 
   // ── Seek the video ────────────────────────────────────────────
   const seekTo = useCallback((fraction: number) => {
-    const video = videoRef.current;
+    const video = videoElement ?? videoRef?.current;
     const dur = duration ?? video?.duration;
     if (!video || !dur || !isFinite(dur)) return;
     const clamped = Math.max(0, Math.min(1, fraction));
     video.currentTime = clamped * dur;
     setProgress(clamped);
     setTooltipTime(formatTime(clamped * dur));
-  }, [videoRef, duration]);
+  }, [videoElement, videoRef, duration]);
 
   // ── Touch handlers ────────────────────────────────────────────
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
@@ -152,7 +152,7 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
     lastScrubTimeRef.current = frac;
 
     // Pause video for scrubbing
-    const video = videoRef.current;
+    const video = videoElement ?? videoRef?.current;
     if (video) {
       wasPausedRef.current = video.paused;
       if (!video.paused) video.pause();
@@ -164,7 +164,7 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
     seekTo(frac);
 
     if (hideTimer.current) clearTimeout(hideTimer.current);
-  }, [videoRef, seekTo, onScrubStart]);
+  }, [videoElement, videoRef, seekTo, onScrubStart]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     e.stopPropagation();
@@ -206,7 +206,7 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
     }
 
     // Resume playback
-    const video = videoRef.current;
+    const video = videoElement ?? videoRef?.current;
     if (video && !wasPausedRef.current) {
       video.play().catch(() => {});
     }
@@ -214,7 +214,7 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
     setScrubState('hover');
     onScrubEnd?.();
     scheduleHide();
-  }, [videoRef, onScrubEnd, scheduleHide]);
+  }, [videoElement, videoRef, onScrubEnd, scheduleHide]);
 
   const barHeight = BAR_HEIGHTS[scrubState];
   const thumbSize = THUMB_SIZES[scrubState];
