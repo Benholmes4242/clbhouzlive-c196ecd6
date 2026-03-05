@@ -156,55 +156,56 @@ export function useLiveRightNow() {
       if (tError) throw tError;
       if (!tournaments?.length) return [];
 
-      // Fetch leaders for each tournament in parallel
-      // NOTE: Course images are now fetched in the component using useVenueImage hook
-      const tournamentsWithLeaders = await Promise.all(
-        tournaments.map(async (t: any) => {
-          // Fetch leader - only players who have actually played (strokes > 0 and position not null)
-          // This prevents showing "E" for players before play has started
-          const { data: leader } = await supabase
-            .from('sr_leaderboards')
-            .select(`
-              position,
-              score,
-              player_id,
-              player:sr_players!inner(id, first_name, last_name)
-            `)
-            .eq('tournament_id', t.id)
-            .gt('strokes', 0)
-            .not('position', 'is', null)
-            .order('position', { ascending: true })
-            .limit(1)
-            .maybeSingle();
+      // Batch fetch leaders for ALL tournaments in a single query (fixes N+1)
+      const tournamentIds = tournaments.map((t: any) => t.id);
+      const { data: allLeaders } = await supabase
+        .from('sr_leaderboards')
+        .select(`
+          tournament_id,
+          position,
+          score,
+          player_id,
+          player:sr_players!inner(id, first_name, last_name)
+        `)
+        .in('tournament_id', tournamentIds)
+        .eq('position', 1)
+        .gt('strokes', 0)
+        .not('position', 'is', null);
 
-          // Determine if this is a "starting soon" tournament (in date range but no actual play yet)
-          const isStartingSoon = t.status !== 'inprogress' || !leader;
+      // Build leader map: tournament_id → first leader entry
+      const leaderMap: Record<string, any> = {};
+      for (const entry of allLeaders || []) {
+        if (!leaderMap[entry.tournament_id]) {
+          leaderMap[entry.tournament_id] = entry;
+        }
+      }
 
-          return {
-            id: t.id,
-            name: t.name,
-            status: t.status,
-            startDate: t.start_date,
-            purse: t.purse,
-            tourId: t.season.tour_id,
-            tourSlug: mapTourSlug(t.season.tour_name),
-            venueName: t.venue_name,
-            venueCity: t.venue_city,
-            isStartingSoon,
-            leader: leader ? {
-              id: (leader.player as any).id,
-              name: `${(leader.player as any).first_name} ${(leader.player as any).last_name}`,
-              score: leader.score,
-              scoreDisplay: formatScore(leader.score),
-            } : null,
-          } as LiveTournamentWithLeader;
-        })
-      );
+      return tournaments.map((t: any): LiveTournamentWithLeader => {
+        const leader = leaderMap[t.id] || null;
+        const isStartingSoon = t.status !== 'inprogress' || !leader;
 
-      return tournamentsWithLeaders;
+        return {
+          id: t.id,
+          name: t.name,
+          status: t.status,
+          startDate: t.start_date,
+          purse: t.purse,
+          tourId: t.season.tour_id,
+          tourSlug: mapTourSlug(t.season.tour_name),
+          venueName: t.venue_name,
+          venueCity: t.venue_city,
+          isStartingSoon,
+          leader: leader ? {
+            id: (leader.player as any).id,
+            name: `${(leader.player as any).first_name} ${(leader.player as any).last_name}`,
+            score: leader.score,
+            scoreDisplay: formatScore(leader.score),
+          } : null,
+        };
+      });
     },
-    staleTime: 5 * 1000,          // 5s — Realtime handles freshness
-    refetchInterval: 30_000,       // 30s polling fallback for dropped realtime connections
+    staleTime: 30_000,             // 30s — matches sync interval
+    refetchInterval: 60_000,       // 60s polling fallback
     refetchOnWindowFocus: true,
   });
 }
