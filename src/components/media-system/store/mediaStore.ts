@@ -1,3 +1,4 @@
+import type React from 'react';
 import { create } from 'zustand';
 
 interface MediaStore {
@@ -54,6 +55,9 @@ export const useMediaStore = create<MediaStore>((set) => ({
 
   errorItems: new Set(),
   retryingItems: new Set(),
+
+  activeVideoElement: null,
+  activeVideoRef: null,
 
   setActiveIndex: (index) => set((s) => ({
     activeIndex: index,
