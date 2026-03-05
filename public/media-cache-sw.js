@@ -1,4 +1,4 @@
-const CACHE_NAME = 'clbhouz-media-v1';
+const CACHE_NAME = 'clbhouz-media-v2';
 const MAX_CACHE_SIZE_MB = 200;
 const MAX_CACHE_SIZE_BYTES = MAX_CACHE_SIZE_MB * 1024 * 1024;
 
@@ -27,28 +27,29 @@ self.addEventListener('fetch', (event) => {
       caches.open(CACHE_NAME).then(cache =>
         cache.match(event.request).then(cached => {
           const fetchPromise = fetch(event.request).then(response => {
-            if (response.ok) {
+            if (response.ok && response.status === 200) {
               cache.put(event.request, response.clone());
             }
             return response;
           }).catch(() => cached); // Fallback to cache if network fails
           
-          // Return cached immediately if available, otherwise wait for network
-          return cached || fetchPromise;
+          // Return cached immediately if available (only valid 200 entries), otherwise wait for network
+          return (cached && cached.status === 200) ? cached : fetchPromise;
         })
       )
     );
     return;
   }
   
-  // Segments: cache-first (immutable content-addressed files)
+  // Segments: cache-first, but only serve/store valid (status 200) responses
+  // Cloudflare Stream returns 206 for range requests — skip caching those
   if (CACHEABLE_PATTERN.test(url)) {
     event.respondWith(
       caches.match(event.request).then(cached => {
-        if (cached) return cached;
+        if (cached && cached.status === 200) return cached;
         
         return fetch(event.request).then(response => {
-          if (response.ok) {
+          if (response.ok && response.status === 200) {
             const clone = response.clone();
             caches.open(CACHE_NAME).then(cache => {
               cache.put(event.request, clone);
