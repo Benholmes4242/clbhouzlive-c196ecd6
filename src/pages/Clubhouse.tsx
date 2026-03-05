@@ -535,7 +535,8 @@ const ClubhouseContent = () => {
         </>
       )}
 
-      {/* ═══ PAGE-LEVEL SCRUBBER ═══ */}
+      {/* ═══ PAGE-LEVEL SCRUBBER (DEBUG) ═══ */}
+      {(() => { console.log('[Scrubber Debug] activePost:', !!activePost, 'isActiveVideo:', isActiveVideo, 'videoElement:', activeVideoElement); return null; })()}
       {activePost && isActiveVideo && (
         <Scrubber
           videoElement={activeVideoElement}
@@ -543,10 +544,12 @@ const ClubhouseContent = () => {
           duration={activePost.mediaItems?.[0]?.duration ?? null}
           style={{
             position: 'fixed',
-            left: 0,
-            right: 0,
-            bottom: 'var(--bottom-nav-height, 64px)',
-            zIndex: 101,
+            left: 20,
+            right: 20,
+            top: '50%',
+            zIndex: 9999,
+            background: 'red',
+            height: 20,
           }}
         />
       )}
