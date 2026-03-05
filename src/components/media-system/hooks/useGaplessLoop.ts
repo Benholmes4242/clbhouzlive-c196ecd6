@@ -1,8 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { TIMING } from '../types/media';
 
-const LOG_THROTTLE_MS = 1000;
-
 /**
  * RAF-based gapless loop: seeks back to 0 before the video reaches its end,
  * eliminating the black-frame flash caused by the native `ended` event.
@@ -17,7 +15,6 @@ export function useGaplessLoop(
 ) {
   const rafIdRef = useRef<number | null>(null);
   const isLoopingRef = useRef(false);
-  const lastLogRef = useRef(0);
 
   useEffect(() => {
     if (!isActive || !videoRef.current || !duration || duration <= 0) {
@@ -46,13 +43,6 @@ export function useGaplessLoop(
         }
 
         const remaining = duration! - video.currentTime;
-
-        // Throttled debug log
-        const now = Date.now();
-        if (now - lastLogRef.current > LOG_THROTTLE_MS) {
-          console.log('[GaplessLoop] RAF active, remaining:', remaining.toFixed(2));
-          lastLogRef.current = now;
-        }
 
         if (remaining <= threshold && remaining > 0) {
           isLoopingRef.current = true;

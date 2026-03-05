@@ -54,7 +54,6 @@ export function VideoPlayer({
   const tapCountRef = useRef(0);
 
   // Gapless loop
-  console.log('[GaplessLoop] duration:', videoDuration, 'isActive:', isActive, 'hasError:', hasError, 'isLoading:', isLoading);
   useGaplessLoop(videoRef, isActive && !isLoading && !hasError, videoDuration);
 
   // Assign/release pool element

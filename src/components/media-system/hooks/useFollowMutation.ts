@@ -44,6 +44,9 @@ export function useFollowMutation() {
         }
       }
     },
+    onError: (error) => {
+      console.error('[Follow] Mutation failed:', error);
+    },
     onSettled: () => {
       queryClient.invalidateQueries({
         queryKey: ['media-feed'],

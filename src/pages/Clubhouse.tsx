@@ -17,7 +17,8 @@ import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
 import { useSeasonRecap } from '@/hooks/useSeasonRecap';
 
 import { cn } from '@/lib/utils';
-import { Compass, ChevronLeft } from 'lucide-react';
+import { Compass, ChevronLeft, Flag, EyeOff, Link as LinkIcon } from 'lucide-react';
+import { Drawer, DrawerContent } from '@/components/ui/drawer';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { logRouteClubhouse, logLoadingPostsShow, logLoadingPostsHide } from '@/utils/bootTimeline';
 import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
@@ -180,6 +181,9 @@ const ClubhouseContent = () => {
   const handleFollow = useCallback((post: FeedPost | null) => {
     if (!user?.id || !post) return;
     
+    // Prevent self-follow
+    if (user.id === post.userId) return;
+    
     const currentlyFollowed = followOverrides.has(post.userId) 
       ? followOverrides.get(post.userId)! 
       : post.isFollowedByMe;
@@ -307,6 +311,7 @@ const ClubhouseContent = () => {
   const { data: seasonRecap } = useSeasonRecap(user?.id);
   const [showRecapModal, setShowRecapModal] = React.useState(false);
   const [chevronY, setChevronY] = useState<number | null>(null);
+  const [moreOptionsOpen, setMoreOptionsOpen] = useState(false);
 
   React.useEffect(() => {
     if (seasonRecap) {
@@ -316,6 +321,26 @@ const ClubhouseContent = () => {
 
   // ── Overlay visibility: hide during comments ──
   const overlayVisible = !commentsOpen;
+
+  // ── Pause/resume on app background/foreground ──
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        const activeEl = useMediaStore.getState().activeVideoElement;
+        if (activeEl && !activeEl.paused) {
+          activeEl.pause();
+        }
+      } else {
+        const store = useMediaStore.getState();
+        const activeEl = store.activeVideoElement;
+        if (activeEl && activeEl.paused && !store.userPaused) {
+          activeEl.play().catch(() => {});
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
   
   // ── Is active post a video? ──
   const isActiveVideo = (activePost?.mediaItems?.[0]?.hlsUrl || activePost?.mediaItems?.[0]?.mp4Url) ? true : false;
@@ -327,6 +352,29 @@ const ClubhouseContent = () => {
   // ── Is active post own? ──
   const isOwnPost = user?.id === activePost?.userId;
   
+  // ── Memoized golfCourse prop for CreatorCapsule ──
+  const golfCourse = useMemo(() => {
+    if (!activePost) return undefined;
+    if (activePost.review) {
+      return {
+        id: activePost.review.courseId,
+        name: activePost.review.courseName,
+        courseCountry: activePost.review.courseCountry || null,
+      };
+    }
+    if (activePost.caption) {
+      const extracted = extractGolfCourseFromContent(activePost.caption);
+      if (extracted) {
+        return {
+          id: null as string | null,
+          name: extracted.name,
+          courseCountry: extracted.country || null,
+        };
+      }
+    }
+    return undefined;
+  }, [activePost?.id, activePost?.review, activePost?.caption]);
+
   // ── Review data for FullscreenReviewPost ──
   const activeReview = activePost?.review ?? null;
   const isActiveReview = activePost?.isReview ?? false;
@@ -486,7 +534,7 @@ const ClubhouseContent = () => {
             onLike={() => handleLike(activePost)}
             onComment={() => setCommentsOpen(true)}
             onShare={() => handleShare(activePost)}
-            onMore={() => console.log('[More] Options for post:', activePost?.id)}
+            onMore={() => setMoreOptionsOpen(true)}
             onMuteToggle={toggleMute}
             isVideo={isActiveVideo}
             hasNextMedia={currentMediaIndex < activeMediaCount - 1}
@@ -537,26 +585,7 @@ const ClubhouseContent = () => {
               avatar: activePost.avatarUrl,
             }}
             caption={activePost.caption}
-            golfCourse={(() => {
-              if (activePost.review) {
-                return {
-                  id: activePost.review.courseId,
-                  name: activePost.review.courseName,
-                  courseCountry: activePost.review.courseCountry || null,
-                };
-              }
-              if (activePost.caption) {
-                const extracted = extractGolfCourseFromContent(activePost.caption);
-                if (extracted) {
-                  return {
-                    id: null,
-                    name: extracted.name,
-                    courseCountry: extracted.country || null,
-                  };
-                }
-              }
-              return undefined;
-            })()}
+            golfCourse={golfCourse}
             isFollowing={isActivePostFollowed}
             isOwnPost={isOwnPost}
             isVisible={overlayVisible}
@@ -572,6 +601,30 @@ const ClubhouseContent = () => {
             } : undefined}
             onReviewTap={handleReviewTap}
           />
+
+          {/* More options sheet */}
+          <Drawer open={moreOptionsOpen} onOpenChange={setMoreOptionsOpen}>
+            <DrawerContent className="bg-black/95 border-white/10">
+              <div className="p-4 space-y-2">
+                <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={() => { toast('Report submitted'); setMoreOptionsOpen(false); }}>
+                  <Flag className="w-5 h-5 text-white/60" />
+                  <span className="text-sm text-white">Report this post</span>
+                </button>
+                <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={() => { toast('Noted - we will show fewer like this'); setMoreOptionsOpen(false); }}>
+                  <EyeOff className="w-5 h-5 text-white/60" />
+                  <span className="text-sm text-white">Not interested</span>
+                </button>
+                <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={() => {
+                  navigator.clipboard.writeText(`${window.location.origin}/post/${activePost.id}`);
+                  toast.success('Link copied');
+                  setMoreOptionsOpen(false);
+                }}>
+                  <LinkIcon className="w-5 h-5 text-white/60" />
+                  <span className="text-sm text-white">Copy link</span>
+                </button>
+              </div>
+            </DrawerContent>
+          </Drawer>
 
           {/* Comments sheet — z-100+ */}
           <CommentsPage

@@ -4,8 +4,7 @@ import {
   HomeIcon,
   CameraIcon, 
   MapPinIcon, 
-  TrophyIcon, // Tour Hub icon
-  PlayIcon,   // Media Player (temp)
+  TrophyIcon,
 } from '@heroicons/react/24/outline';
 
 // Navigation tabs (5 tabs: Home, Discover, Moment, Tours, Courses)
@@ -15,5 +14,5 @@ export const navigationTabs = [
   { id: 'post', label: 'Moment', icon: CameraIcon, path: null, isAction: true },
   { id: 'tourhub', label: 'Tours', icon: TrophyIcon, path: '/tourhub' },
   { id: 'courses', label: 'Courses', icon: MapPinIcon, path: '/courses' },
-  { id: 'mediaplayer', label: 'Player', icon: PlayIcon, path: '/mediaplayer' },
+  
 ];
