@@ -535,6 +535,22 @@ const ClubhouseContent = () => {
         </>
       )}
 
+      {/* ═══ PAGE-LEVEL SCRUBBER ═══ */}
+      {activePost && isActiveVideo && (
+        <Scrubber
+          videoElement={activeVideoElement}
+          isActive={!!activeVideoElement}
+          duration={activePost.mediaItems?.[0]?.duration ?? null}
+          style={{
+            position: 'fixed',
+            left: 0,
+            right: 0,
+            bottom: 'var(--bottom-nav-height, 64px)',
+            zIndex: 101,
+          }}
+        />
+      )}
+
       {/* Post Submission Handler */}
       <PostSubmissionHandler
         isComposerOpen={isComposerOpen}
