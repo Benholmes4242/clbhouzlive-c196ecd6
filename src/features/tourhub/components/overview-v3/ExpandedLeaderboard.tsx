@@ -177,18 +177,13 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
       onClick={handleTap}
       className="flex items-center w-full text-left"
       style={{
-        padding: isLeader ? '10px 16px' : '10px 16px',
+        padding: '10px 16px',
         borderBottom: isLeader ? 'none' : '1px solid rgba(255,255,255,0.06)',
         opacity: isCut ? 0.4 : 1,
-        background: 'none',
-        border: isLeader ? undefined : 'none',
+        background: isLeader ? 'rgba(255, 255, 255, 0.08)' : 'none',
+        borderRadius: isLeader ? 10 : 0,
+        border: 'none',
         cursor: onPlayerTap ? 'pointer' : 'default',
-        ...(isLeader ? {
-          background: 'rgba(255, 255, 255, 0.08)',
-          borderRadius: 10,
-          margin: '0 8px',
-          padding: '10px 8px',
-        } : {}),
       }}
     >
       {/* Position */}
