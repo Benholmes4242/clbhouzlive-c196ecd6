@@ -254,7 +254,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
       onClick={onClick}
     >
       <div
-        className="relative overflow-hidden bg-white"
+        className={cn("relative overflow-hidden", hideRing ? "bg-transparent" : "bg-white")}
         style={{
           width: `${pixelSize}px`,
           aspectRatio: '1 / 1.05',
