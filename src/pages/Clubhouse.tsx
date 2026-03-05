@@ -501,6 +501,7 @@ const ClubhouseContent = () => {
             golfCourse={activePost.review ? {
               id: activePost.review.courseId,
               name: activePost.review.courseName,
+              courseCountry: activePost.review.courseCountry || null,
             } : undefined}
             isFollowing={isActivePostFollowed}
             isOwnPost={isOwnPost}
