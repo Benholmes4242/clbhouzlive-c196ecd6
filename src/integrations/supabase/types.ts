@@ -14658,6 +14658,21 @@ export type Database = {
         }
         Returns: Json
       }
+      get_suggested_creators: {
+        Args: { p_limit?: number; p_user_id: string }
+        Returns: {
+          avatar_url: string
+          display_name: string
+          handicap: number
+          home_course: string
+          is_followed: boolean
+          is_verified: boolean
+          total_engagement: number
+          user_id: string
+          username: string
+          video_count: number
+        }[]
+      }
       get_suggested_feed: {
         Args: {
           p_cursor?: string
