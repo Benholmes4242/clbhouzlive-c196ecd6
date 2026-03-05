@@ -48,6 +48,7 @@ import { Top100OverlayPills } from '@/components/clubhouse/Top100OverlayPills';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { getProfilePathById } from '@/lib/profileRoutes';
+import { Scrubber } from '@/components/media-system/Scrubber';
 
 /** Feed + preloader wrapper — preloader must be inside VideoPoolProvider */
 function FeedWithPreloader({
@@ -318,6 +319,10 @@ const ClubhouseContent = () => {
   
   // ── Is active post a video? ──
   const isActiveVideo = (activePost?.mediaItems?.[0]?.hlsUrl || activePost?.mediaItems?.[0]?.mp4Url) ? true : false;
+
+  // ── Active video element from store (for page-level scrubber) ──
+  const activeVideoElement = useMediaStore((s) => s.activeVideoElement);
+  const activeVideoRef = useMediaStore((s) => s.activeVideoRef);
   
   // ── Is active post own? ──
   const isOwnPost = user?.id === activePost?.userId;
