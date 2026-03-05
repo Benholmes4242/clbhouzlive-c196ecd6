@@ -610,7 +610,7 @@ const ClubhouseContent = () => {
                   <Flag className="w-5 h-5 text-white/60" />
                   <span className="text-sm text-white">Report this post</span>
                 </button>
-                <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={() => { toast('Noted — we'll show fewer like this'); setMoreOptionsOpen(false); }}>
+                <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={() => { toast('Noted - we will show fewer like this'); setMoreOptionsOpen(false); }}>
                   <EyeOff className="w-5 h-5 text-white/60" />
                   <span className="text-sm text-white">Not interested</span>
                 </button>
