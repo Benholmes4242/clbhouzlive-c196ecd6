@@ -190,13 +190,13 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   const expandedInner = (
     <div className="px-3 pb-3 space-y-3">
       {/* Caption (scrollable) */}
-      {caption && (
+      {cleanCaption && (
         <div 
           className="max-h-[100px] overflow-y-auto scrollbar-hide"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
           <p className="text-[13px] leading-relaxed text-white/90">
-            {caption}
+            {cleanCaption}
           </p>
         </div>
       )}
