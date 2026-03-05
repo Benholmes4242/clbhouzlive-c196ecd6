@@ -54,7 +54,7 @@ const FINE_SCRUB_FACTOR = 0.25;
 const HIDE_DELAY = 2000;
 const LOOP_PULSE_WINDOW = 0.5; // seconds before loop
 
-export function Scrubber({ videoRef, isActive, duration, onScrubStart, onScrubEnd, bottomOffset = 0 }: ScrubberProps) {
+export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubStart, onScrubEnd, bottomOffset = 0 }: ScrubberProps) {
   const [progress, setProgress] = useState(0);
   const [buffered, setBuffered] = useState(0);
   const [scrubState, setScrubState] = useState<ScrubState>('default');
