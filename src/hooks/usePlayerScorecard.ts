@@ -44,6 +44,8 @@ async function fetchPlayerScorecard(
   tournamentId: string,
   playerId: string,
 ): Promise<PlayerScorecardData | null> {
+  console.log('[Scorecard] Fetching:', { tournamentId, playerId });
+
   // Fetch all scorecard rows for this player in this tournament
   const { data: scorecardRows, error: scError } = await supabase
     .from('sr_scorecards')
