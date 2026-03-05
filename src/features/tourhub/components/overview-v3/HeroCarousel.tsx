@@ -766,8 +766,13 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           }}
                           aria-label="View full leaderboard"
                         >
-                          <ChevronsUp size={16} style={{ color: 'rgba(255, 255, 255, 0.7)' }} />
                           <span>View Full Leaderboard</span>
+                          <motion.div
+                            animate={{ y: [0, -3, 0] }}
+                            transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut', repeatDelay: 1 }}
+                          >
+                            <ChevronsUp size={16} style={{ color: 'rgba(255, 255, 255, 0.5)' }} />
+                          </motion.div>
                         </button>
                       ) : !isExpanded ? (
                         <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta">
