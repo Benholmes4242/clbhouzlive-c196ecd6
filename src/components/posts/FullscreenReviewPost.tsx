@@ -61,6 +61,9 @@ export interface FullscreenReviewPostProps {
   // Hide carousel arrows when used in Clubhouse feed (feed nav takes over)
   hideCarouselArrows?: boolean;
   
+  // Hide the built-in user capsule (e.g. when Clubhouse renders its own CreatorCapsule)
+  hideUserCapsule?: boolean;
+  
   // Optional: Render children (e.g., Clubhouse action bar) on top of the overlay
   children?: React.ReactNode;
   
@@ -88,6 +91,7 @@ export function FullscreenReviewPost({
   onBack,
   dotsBottomOffset,
   hideCarouselArrows = false,
+  hideUserCapsule = false,
   children,
   renderMedia = true,
 }: FullscreenReviewPostProps) {
@@ -337,11 +341,6 @@ export function FullscreenReviewPost({
                 {heroSubtitle}
               </p>
             )}
-            {mode === 'preview' && (
-              <span className="inline-block mt-1 px-1.5 py-0.5 rounded-full bg-white/20 backdrop-blur-sm text-white text-[10px] font-semibold uppercase tracking-wider">
-                Preview
-              </span>
-            )}
           </div>
           
           {/* Right: Rating Number (elegant, confident) — tier-aware: amber 9.0+, light slate below */}
@@ -503,7 +502,7 @@ export function FullscreenReviewPost({
       </BottomSheet>
       
       {/* Bottom-left user capsule - matches CreatorCapsule styling from Clubhouse (hidden in preview mode) */}
-      {user && mode !== 'preview' && (
+      {user && mode !== 'preview' && !hideUserCapsule && (
         <motion.div
           initial={{ opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : 20 }}
           animate={{ opacity: 1, y: 0 }}
