@@ -341,6 +341,11 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
     return () => window.removeEventListener('popstate', handlePopState);
   }, [isExpanded, onToggleExpand]);
 
+  // Clear selected player when glass card collapses
+  useEffect(() => {
+    if (!isExpanded) setSelectedPlayer(null);
+  }, [isExpanded]);
+
   // Touch isolation for expanded scroll area
   const handleExpandedTouch = useCallback((e: React.TouchEvent) => {
     e.stopPropagation();
