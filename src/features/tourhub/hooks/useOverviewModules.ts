@@ -306,11 +306,12 @@ interface SeasonLeadersResult extends TourLeadersData {
 }
 
 export function useSeasonLeaders(tourSlug: TourId) {
+  const { data: cache } = useTournamentsCache();
+
   return useQuery({
-    queryKey: ['overview-season-leaders', tourSlug],
+    queryKey: ['overview-season-leaders', tourSlug, cache ? 'ready' : 'waiting'],
     queryFn: async (): Promise<SeasonLeadersResult> => {
       // Map tour slug to EXACT tour_name match
-      // IMPORTANT: Use exact matches to avoid 'pga' matching 'LPGA'
       const tourNameMap: Record<TourId, string> = {
         'pga': 'pga',
         'euro': 'EURO',
@@ -321,14 +322,19 @@ export function useSeasonLeaders(tourSlug: TourId) {
       };
       const exactTourName = tourNameMap[tourSlug] || tourSlug;
       
-      // Golf seasons often span calendar years (e.g., 2025-2026 season)
-      // Try current year + 1 first (the "golf season year"), then current year, then previous
       const calendarYear = new Date().getFullYear();
       const yearsToTry = [calendarYear + 1, calendarYear, calendarYear - 1];
       
       let season = null;
       
-      // Helper to find the best season (prefer one with tournament data)
+      // Use the cache to check which seasons have closed tournaments (avoids per-tour head queries)
+      const cacheCompletedSeasonIds = new Set(
+        (cache?.completed || [])
+          .filter(t => t.winner_id)
+          .map(t => t.season_id)
+          .filter((id): id is string => !!id)
+      );
+      
       const findBestSeason = async (year: number): Promise<typeof season> => {
         const { data: seasons } = await supabase
           .from('sr_seasons')
@@ -336,7 +342,6 @@ export function useSeasonLeaders(tourSlug: TourId) {
           .eq('year', year)
           .ilike('tour_name', exactTourName);
         
-        // Find exact matches (case-insensitive)
         const matches = seasons?.filter(s => 
           s.tour_name.toLowerCase() === exactTourName.toLowerCase()
         ) || [];
@@ -344,7 +349,14 @@ export function useSeasonLeaders(tourSlug: TourId) {
         if (matches.length === 0) return null;
         if (matches.length === 1) return matches[0];
         
-        // Multiple seasons exist - prefer the one with closed tournaments with winners
+        // Multiple seasons: prefer one with closed tournaments (check cache first, no DB query)
+        for (const candidate of matches) {
+          if (cacheCompletedSeasonIds.has(candidate.id)) {
+            return candidate;
+          }
+        }
+        
+        // Cache didn't cover it (older data) — fall back to a single head query
         for (const candidate of matches) {
           const { count } = await supabase
             .from('sr_tournaments')
@@ -353,16 +365,12 @@ export function useSeasonLeaders(tourSlug: TourId) {
             .eq('status', 'closed')
             .not('winner_id', 'is', null);
           
-          if (count && count > 0) {
-            return candidate;
-          }
+          if (count && count > 0) return candidate;
         }
         
-        // No season has tournament data, return first match
         return matches[0];
       };
       
-      // Try each year in order
       for (const year of yearsToTry) {
         const found = await findBestSeason(year);
         if (found) {
@@ -396,13 +404,12 @@ export function useSeasonLeaders(tourSlug: TourId) {
       const hasApiStats = apiStatsCheck && apiStatsCheck.length > 0;
       
       if (hasApiStats) {
-        // === USE API STATISTICS (PGA Tour) ===
         return await getLeadersFromApiStats(season, tourSlug);
       } else {
-        // === CALCULATE FROM LEADERBOARDS (Other Tours) ===
-        return await calculateLeadersFromLeaderboards(season, tourSlug);
+        return await calculateLeadersFromLeaderboards(season, tourSlug, cache);
       }
     },
+    enabled: !!cache,
     staleTime: 5 * 60 * 1000,
   });
 }
