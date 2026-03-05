@@ -16,6 +16,8 @@ type ScrubState = 'default' | 'hover' | 'scrubbing' | 'fine-scrub';
 
 interface ScrubberProps {
   videoRef: React.RefObject<HTMLVideoElement | null>;
+  /** Reactive video element — triggers RAF restart when it changes from null */
+  videoElement?: HTMLVideoElement | null;
   isActive: boolean;
   duration: number | null;
   /** Called when scrubbing starts — parent can hide overlay */
