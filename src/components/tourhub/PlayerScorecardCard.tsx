@@ -284,14 +284,22 @@ export function PlayerScorecardCard({
       <div className="flex flex-col items-center px-4 pt-2 pb-4">
         <div className="relative mb-3">
           {player.photoUrl ? (
-            <img
-              src={player.photoUrl}
-              alt={player.name}
-              className="w-20 h-20 rounded-full object-cover ring-2 ring-white/20"
-            />
+            <div
+              className="overflow-hidden flex-shrink-0"
+              style={{ width: 80, height: 84, borderRadius: '34%', border: '1.5px solid #F8FAFC', background: '#F8FAFC' }}
+            >
+              <img
+                src={player.photoUrl}
+                alt={player.name}
+                className="w-full h-full object-cover object-top"
+              />
+            </div>
           ) : (
-            <div className="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center ring-2 ring-white/20">
-              <span className="text-2xl font-bold text-white/40">
+            <div
+              className="flex items-center justify-center flex-shrink-0"
+              style={{ width: 80, height: 84, borderRadius: '34%', border: '1.5px solid #F8FAFC', background: '#F8FAFC' }}
+            >
+              <span className="text-2xl font-bold" style={{ color: '#64748B' }}>
                 {player.firstName?.[0]}{player.lastName?.[0]}
               </span>
             </div>
