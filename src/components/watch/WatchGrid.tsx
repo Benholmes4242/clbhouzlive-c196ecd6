@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import WatchTile from './WatchTile';
 import WatchGridSkeleton from './WatchGridSkeleton';
+import SuggestedCreatorsStrip from './SuggestedCreatorsStrip';
 
 interface WatchGridProps {
   posts: FeedPost[];
@@ -10,6 +11,7 @@ interface WatchGridProps {
   isFetchingNextPage: boolean;
   fetchNextPage: () => void;
   gridRef: React.RefObject<HTMLDivElement>;
+  userId?: string;
 }
 
 const WatchGrid: React.FC<WatchGridProps> = ({
@@ -19,6 +21,7 @@ const WatchGrid: React.FC<WatchGridProps> = ({
   isFetchingNextPage,
   fetchNextPage,
   gridRef,
+  userId,
 }) => {
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -61,7 +64,14 @@ const WatchGrid: React.FC<WatchGridProps> = ({
         className="grid grid-cols-3 gap-[2px] px-[2px]"
       >
         {posts.map((post, i) => (
-          <WatchTile key={post.id} post={post} index={i} />
+          <React.Fragment key={post.id}>
+            <WatchTile post={post} index={i} />
+            {i === 8 && (
+              <div style={{ gridColumn: '1 / -1', padding: '12px 0' }}>
+                <SuggestedCreatorsStrip userId={userId} />
+              </div>
+            )}
+          </React.Fragment>
         ))}
       </div>
 
