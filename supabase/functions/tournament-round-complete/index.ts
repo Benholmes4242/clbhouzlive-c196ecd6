@@ -153,48 +153,28 @@ Deno.serve(async (req) => {
     // Small delay between API calls to be respectful
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    // ── 2. Fetch Scorecards for finished players ─────────────────────
-    // Get players who finished this round
-    const { data: finishedPlayers } = await supabase
-      .from('sr_leaderboards')
-      .select('player_id, sr_players!inner(sr_id)')
-      .eq('tournament_id', tournament.id)
-      .not('status', 'in', '("cut","wd","dq","dns")');
+    // ── 2. Bulk sync ALL players' scorecards for the completed round ──
+    // Uses /rounds/{round}/scores.json — returns entire field in one API call
+    console.log(`[RoundComplete] Triggering bulk scorecards sync for round ${roundNumber}`);
 
-    if (finishedPlayers?.length) {
-      // Fetch scorecards for up to 10 players to stay within CPU limits
-      // (scorecards are per-player API calls)
-      const playersToFetch = finishedPlayers.slice(0, 10);
-      
-      for (const player of playersToFetch) {
-        const playerSrId = player.sr_players?.sr_id;
-        if (!playerSrId) continue;
+    try {
+      const { error: bulkScError } = await supabase.functions.invoke('sportradar-sync', {
+        body: {
+          action: 'scorecards',
+          tournamentId: tournament.sr_id,
+          round: roundNumber,
+          year: year,
+        },
+      });
 
-        try {
-          const scorecardUrl = `${getTourBaseUrl(tour)}/${year}/tournaments/${tournament.sr_id}/scorecards/${playerSrId}/rounds/${roundNumber}.json`;
-          const scoreData = await fetchSportradar(scorecardUrl, sportradarApiKey);
-
-          const scores = scoreData.scores || scoreData.holes || [];
-          for (const hole of scores) {
-            const { error } = await supabase.from('sr_scorecards').upsert({
-              tournament_id: tournament.id,
-              player_id: player.player_id,
-              round_number: roundNumber,
-              hole_number: hole.number,
-              par: hole.par,
-              score: hole.score || hole.strokes,
-              strokes: hole.strokes,
-            }, { onConflict: 'tournament_id,player_id,round_number,hole_number' });
-            if (!error) scorecardsRecords++;
-          }
-
-          // Rate limit between player calls
-          await new Promise(resolve => setTimeout(resolve, 300));
-        } catch (err) {
-          console.error(`[RoundComplete] Scorecard error for ${playerSrId}:`, err.message);
-        }
+      if (bulkScError) {
+        console.error(`[RoundComplete] Bulk scorecards sync failed:`, bulkScError.message);
+      } else {
+        scorecardsRecords = 1; // Mark as synced (actual count handled by sportradar-sync)
+        console.log(`[RoundComplete] Bulk scorecards sync complete — all players, round ${roundNumber}`);
       }
-      console.log(`[RoundComplete] Scorecards: ${scorecardsRecords} records for ${playersToFetch.length} players`);
+    } catch (err) {
+      console.error(`[RoundComplete] Bulk scorecards error:`, err);
     }
 
     const totalDuration = Date.now() - startTime;

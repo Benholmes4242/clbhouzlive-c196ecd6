@@ -345,6 +345,53 @@ async function syncTournament(
     }
   }
 
+  // ── Periodic scorecards sync (every 3rd minute, offset by 1) ──────
+  const shouldSyncScorecards = (currentMinute % 3 === 1);
+
+  if (shouldSyncScorecards) {
+    try {
+      // Derive active round from leaderboard data: check round columns 4→1
+      let activeRound = 1;
+      const { data: roundCheck } = await supabase
+        .from('sr_leaderboards')
+        .select('round_1, round_2, round_3, round_4')
+        .eq('tournament_id', tournament.id)
+        .not('strokes', 'is', null)
+        .limit(5);
+
+      if (roundCheck?.length) {
+        for (let r = 4; r >= 1; r--) {
+          const key = `round_${r}`;
+          if (roundCheck.some((entry: any) => entry[key] !== null && entry[key] !== undefined)) {
+            activeRound = r;
+            break;
+          }
+        }
+      }
+
+      console.log(`[LiveSync] Triggering scorecards sync for ${tournament.name}, round ${activeRound}`);
+
+      const syncUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/sportradar-sync`;
+      await fetch(syncUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'scorecards',
+          tournamentId: tournament.sr_id,
+          round: activeRound,
+          year: year,
+        }),
+      });
+
+      console.log(`[LiveSync] Scorecards sync complete for ${tournament.name}, round ${activeRound}`);
+    } catch (e) {
+      console.warn(`[LiveSync] Scorecards sync failed for ${tournament.name}: ${e.message}`);
+    }
+  }
+
   // ── Lifecycle: check if Sportradar reports tournament as closed ───
   let transitionedToClosed = false;
   const closedStatuses = ['closed', 'complete', 'completed', 'official'];
