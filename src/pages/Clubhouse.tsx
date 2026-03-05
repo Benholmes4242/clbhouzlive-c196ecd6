@@ -426,7 +426,8 @@ const ClubhouseContent = () => {
           {isActiveReview && activeReview && (
             <div style={{ position: 'fixed', inset: 0, zIndex: 20, pointerEvents: 'none' }}>
               <FullscreenReviewPost
-                mode="preview"
+                mode="live"
+                hideUserCapsule
                 courseId={activeReview.courseId}
                 courseName={activeReview.courseName}
                 heroSubtitle={
@@ -482,14 +483,14 @@ const ClubhouseContent = () => {
             onMore={() => console.log('[More] Options for post:', activePost?.id)}
             onMuteToggle={toggleMute}
             isVideo={isActiveVideo}
-            hasNextMedia={currentMediaIndex < activeMediaCount - 1}
-            hasPrevMedia={currentMediaIndex > 0}
-            onNextMedia={activeMediaCount > 1 
+            hasNextMedia={isActiveReview ? false : currentMediaIndex < activeMediaCount - 1}
+            hasPrevMedia={isActiveReview ? false : currentMediaIndex > 0}
+            onNextMedia={isActiveReview ? undefined : (activeMediaCount > 1 
               ? () => useMediaStore.getState().setCarouselPosition(activeIndex, currentMediaIndex + 1) 
-              : undefined}
-            onPrevMedia={activeMediaCount > 1 
+              : undefined)}
+            onPrevMedia={isActiveReview ? undefined : (activeMediaCount > 1 
               ? () => useMediaStore.getState().setCarouselPosition(activeIndex, currentMediaIndex - 1) 
-              : undefined}
+              : undefined)}
           />
 
           {/* CreatorCapsule — z-50, bottom-left */}
