@@ -80,6 +80,50 @@ export const PRELOAD_CONFIG = {
   MAX_CONCURRENT_FETCHES: 3,
 } as const;
 
+/** Raw row shape returned by get_suggested_feed / get_friends_feed RPCs */
+export interface FeedRpcRow {
+  post_id: string;
+  post_content: string | null;
+  post_created_at: string;
+  post_user_id: string;
+  post_actor_type: string;
+  post_actor_id: string | null;
+  post_status: string;
+  source_review_id: string | null;
+  media_id: string | null;
+  media_type: string | null;
+  media_url: string | null;
+  poster_url: string | null;
+  stream_id: string | null;
+  duration_seconds: number | null;
+  width: number | null;
+  height: number | null;
+  display_order: number | null;
+  creator_username: string | null;
+  creator_display_name: string | null;
+  creator_avatar_url: string | null;
+  creator_is_verified: boolean;
+  business_name: string | null;
+  business_logo_url: string | null;
+  business_is_verified: boolean;
+  like_count: number;
+  comment_count: number;
+  share_count: number;
+  review_rating: number | null;
+  review_course_id: string | null;
+  review_course_name: string | null;
+  review_course_image: string | null;
+  review_course_region?: string | null;
+  review_course_country?: string | null;
+  review_course_sub_country?: string | null;
+  course_region: string | null;
+  course_country: string | null;
+  creator_relation: string;
+  is_liked_by_me: boolean;
+  is_followed_by_me: boolean;
+  engagement_score: number;
+}
+
 /** Timing constants */
 export const TIMING = {
   LOAD_TIMEOUT_MS: 10_000,

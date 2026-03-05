@@ -1,5 +1,5 @@
 import { CLOUDFLARE_STREAM_SUBDOMAIN } from '@/media/constants';
-import type { FeedPost, MediaItem, ReviewData, CreatorRelation } from '../types/media';
+import type { FeedPost, FeedRpcRow, MediaItem, ReviewData, CreatorRelation } from '../types/media';
 
 const UID_RE = /([0-9a-f]{32})/i;
 
@@ -24,7 +24,7 @@ function extractStreamId(mediaUrl: string): string | null {
  * Map a raw DB row from get_suggested_feed or get_friends_feed to a FeedPost.
  * This is the ONLY place where DB column names are referenced.
  */
-export function mapRowToFeedPost(row: any): FeedPost {
+export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
   const streamId = row.stream_id || extractStreamId(row.media_url || '');
   const isReview = !!row.source_review_id;
   const isBusiness = row.post_actor_type === 'business';
