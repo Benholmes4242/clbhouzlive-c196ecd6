@@ -104,7 +104,14 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
       if (!activeUrl) return;
       const video = pool.getElement(activeUrl);
       if (video && video.paused) {
-        video.play().catch(() => {});
+        // Register playing listener before play() for iOS gesture priming
+        const onPlaying = () => {
+          video.removeEventListener('playing', onPlaying);
+        };
+        video.addEventListener('playing', onPlaying, { once: true });
+        video.play().catch(() => {
+          video.removeEventListener('playing', onPlaying);
+        });
       }
     };
 
