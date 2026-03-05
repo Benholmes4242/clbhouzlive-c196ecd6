@@ -15,7 +15,7 @@ import { haptic } from '@/utils/haptics';
 type ScrubState = 'default' | 'hover' | 'scrubbing' | 'fine-scrub';
 
 interface ScrubberProps {
-  videoRef: React.RefObject<HTMLVideoElement | null>;
+  videoRef?: React.RefObject<HTMLVideoElement | null>;
   /** Reactive video element — triggers RAF restart when it changes from null */
   videoElement?: HTMLVideoElement | null;
   isActive: boolean;
@@ -24,8 +24,10 @@ interface ScrubberProps {
   onScrubStart?: () => void;
   /** Called when scrubbing ends */
   onScrubEnd?: () => void;
-  /** Pixels from the bottom of the parent container */
+  /** Pixels from the bottom of the parent container (used only when style is not provided) */
   bottomOffset?: number;
+  /** Optional style override — when provided, replaces internal absolute positioning */
+  style?: React.CSSProperties;
 }
 
 function formatTime(seconds: number): string {
@@ -49,12 +51,12 @@ const THUMB_SIZES: Record<ScrubState, number> = {
 };
 
 const TOUCH_ZONE_HEIGHT = 60;
-const FINE_SCRUB_THRESHOLD = -40; // deltaY px (negative = upward)
+const FINE_SCRUB_THRESHOLD = -40;
 const FINE_SCRUB_FACTOR = 0.25;
 const HIDE_DELAY = 2000;
-const LOOP_PULSE_WINDOW = 0.5; // seconds before loop
+const LOOP_PULSE_WINDOW = 0.5;
 
-export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubStart, onScrubEnd, bottomOffset = 0 }: ScrubberProps) {
+export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubStart, onScrubEnd, bottomOffset = 0, style }: ScrubberProps) {
   const [progress, setProgress] = useState(0);
   const [buffered, setBuffered] = useState(0);
   const [scrubState, setScrubState] = useState<ScrubState>('default');
