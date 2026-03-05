@@ -104,4 +104,5 @@ export const useMediaStore = create<MediaStore>((set) => ({
       next.delete(feedIndex);
       return { retryingItems: next };
     }),
+  setActiveVideoElement: (el, ref) => set({ activeVideoElement: el, activeVideoRef: ref }),
 }));
