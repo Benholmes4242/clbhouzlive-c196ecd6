@@ -84,8 +84,8 @@ export function useLiveLeaderTeaser() {
         isTied: false,
       };
     },
-    staleTime: 5_000,           // 5s — match other live surfaces
-    refetchInterval: 30_000,    // 30s polling fallback
+    staleTime: 30_000,          // 30s — matches sync interval
+    refetchInterval: 60_000,   // 60s polling fallback
   });
 }
 

@@ -554,7 +554,7 @@ export function useTourLeaderboard(tournamentId: string) {
       return data || [];
     },
     enabled: !!tournamentId,
-    staleTime: 5 * 1000,          // 5s — Realtime handles freshness
+    staleTime: 30_000,             // 30s — matches sync interval
     refetchInterval: false,        // No polling — Realtime pushes updates
     refetchOnWindowFocus: true,
   });

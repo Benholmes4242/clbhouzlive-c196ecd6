@@ -133,7 +133,7 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
       return result;
     },
     enabled: tournamentIds.length > 0,
-    staleTime: 5_000,
+    staleTime: 30_000,
     refetchInterval: false,
     refetchOnWindowFocus: true,
   });
