@@ -375,6 +375,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
       const newCommentId = await addComment(content || '', parentId, mediaUrl && mediaType ? { mediaUrl, mediaType } : undefined);
       if (parentId) setExpandedReplies(prev => new Set(prev).add(parentId));
       setTimeout(() => highlightComment(newCommentId, true), 150);
+      onCommentPosted?.();
     } catch (error) {
       console.error('Failed to add comment:', error);
     }
