@@ -245,7 +245,7 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
     <>
       {/* Invisible touch capture zone — bottom 60px */}
       <div
-        className="absolute left-0 right-0 z-[25]"
+        className={`${position} left-0 right-0 z-[25]`}
         style={{ bottom: bottomOffset, height: TOUCH_ZONE_HEIGHT }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -256,7 +256,7 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
       {/* Visual bar container */}
       <div
         ref={barRef}
-        className="absolute left-0 right-0 z-20 pointer-events-none"
+        className={`${position} left-0 right-0 z-20 pointer-events-none`}
         style={{
           bottom: bottomOffset,
           height: barHeight,
