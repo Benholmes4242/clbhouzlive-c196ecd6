@@ -424,35 +424,37 @@ const ClubhouseContent = () => {
         <>
           {/* Review overlay — z-10 */}
           {isActiveReview && activeReview && (
-            <FullscreenReviewPost
-              mode="live"
-              courseId={activeReview.courseId}
-              courseName={activeReview.courseName}
-              heroSubtitle={
-                activeReview.courseSubCountry || activeReview.courseRegion
-                  ? [activeReview.courseSubCountry, activeReview.courseRegion, activeReview.courseCountry]
-                      .filter(Boolean)
-                      .join(', ')
-                  : activeReview.courseCountry || undefined
-              }
-              rating={activeReview.rating}
-              reviewId={activeReview.reviewId}
-              media={activePost?.mediaItems?.map((m, i) => ({
-                id: m.id ?? `media-${i}`,
-                media_type: m.type === 'video' ? 'video' as const : 'image' as const,
-                media_url: m.imageUrl ?? m.mp4Url ?? '',
-                stream_id: m.hlsUrl?.split('/').pop()?.replace('/manifest/video.m3u8', '') ?? undefined,
-                poster_url: m.thumbnailUrl ?? undefined,
-                display_order: i,
-              })) ?? []}
-              user={{
-                name: activePost.displayName,
-                username: activePost.username,
-                avatar: activePost.avatarUrl,
-              }}
-              renderMedia={false}
-              hideCarouselArrows
-            />
+            <div style={{ position: 'fixed', inset: 0, zIndex: 20, pointerEvents: 'none' }}>
+              <FullscreenReviewPost
+                mode="preview"
+                courseId={activeReview.courseId}
+                courseName={activeReview.courseName}
+                heroSubtitle={
+                  activeReview.courseSubCountry || activeReview.courseRegion
+                    ? [activeReview.courseSubCountry, activeReview.courseRegion, activeReview.courseCountry]
+                        .filter(Boolean)
+                        .join(', ')
+                    : activeReview.courseCountry || undefined
+                }
+                rating={activeReview.rating}
+                reviewId={activeReview.reviewId}
+                media={activePost?.mediaItems?.map((m, i) => ({
+                  id: m.id ?? `media-${i}`,
+                  media_type: m.type === 'video' ? 'video' as const : 'image' as const,
+                  media_url: m.imageUrl ?? m.mp4Url ?? '',
+                  stream_id: m.hlsUrl?.split('/').pop()?.replace('/manifest/video.m3u8', '') ?? undefined,
+                  poster_url: m.thumbnailUrl ?? undefined,
+                  display_order: i,
+                })) ?? []}
+                user={{
+                  name: activePost.displayName,
+                  username: activePost.username,
+                  avatar: activePost.avatarUrl,
+                }}
+                renderMedia={false}
+                hideCarouselArrows
+              />
+            </div>
           )}
 
           {/* REMOVED: Top100OverlayPills — not appropriate for feed context */}
