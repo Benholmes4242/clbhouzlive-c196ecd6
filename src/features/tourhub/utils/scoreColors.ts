@@ -39,19 +39,19 @@ export const SCORE_COLORS = {
   },
   // Bogey
   bogey: {
+    text: '#EF4444',           // red
+    bg: 'rgba(239, 68, 68, 0.15)',
+    ring: 'rgba(239, 68, 68, 0.30)',
+    tailwindText: 'text-red-500',
+    tailwindBg: 'bg-red-500/15 ring-1 ring-red-500/30',
+  },
+  // Double bogey or worse
+  doublePlus: {
     text: '#FF9500',           // orange
     bg: 'rgba(255, 149, 0, 0.15)',
     ring: 'rgba(255, 149, 0, 0.30)',
     tailwindText: 'text-orange-400',
     tailwindBg: 'bg-orange-400/15 ring-1 ring-orange-400/30',
-  },
-  // Double bogey or worse
-  doublePlus: {
-    text: '#EF4444',           // red-500
-    bg: 'rgba(239, 68, 68, 0.15)',
-    ring: 'rgba(239, 68, 68, 0.30)',
-    tailwindText: 'text-red-500',
-    tailwindBg: 'bg-red-500/15 ring-1 ring-red-500/30',
   },
 } as const;
 
