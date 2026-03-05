@@ -199,45 +199,31 @@ export function useLiveRightNow() {
 // ============================================================================
 
 export function useComingUpNext() {
+  const { data: cache } = useTournamentsCache();
+
   return useQuery({
-    queryKey: ['overview-coming-up-next'],
+    queryKey: ['overview-coming-up-next', cache ? 'ready' : 'waiting'],
     queryFn: async () => {
-      const today = new Date().toISOString().split('T')[0];
-      const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      if (!cache?.upcoming.length) return [];
 
-      // Only show tournaments with start_date > today (future)
-      // Tournaments starting today are shown in "Live Right Now" as "Starting Soon"
-      const { data, error } = await supabase
-        .from('sr_tournaments')
-        .select(`
-          id,
-          name,
-          start_date,
-          venue_city,
-          venue_country,
-          purse,
-          season:sr_seasons!inner(tour_id, tour_name)
-        `)
-        .in('status', ['scheduled', 'created'])
-        .gt('start_date', today)
-        .lte('start_date', nextWeek)
-        .order('start_date', { ascending: true })
-        .limit(8);
+      const sevenDaysFromNow = new Date(Date.now() + 7 * 86400000);
 
-      if (error) throw error;
-
-      return (data || []).map((row: any): UpcomingTournament => ({
-        id: row.id,
-        name: row.name,
-        startDate: row.start_date,
-        venueCity: row.venue_city,
-        venueCountry: row.venue_country,
-        purse: row.purse,
-        tourId: row.season.tour_id,
-        tourSlug: mapTourSlug(row.season.tour_name),
-      }));
+      return cache.upcoming
+        .filter(t => new Date(t.start_date) <= sevenDaysFromNow)
+        .slice(0, 8)
+        .map((row): UpcomingTournament => ({
+          id: row.id,
+          name: row.name,
+          startDate: row.start_date,
+          venueCity: row.venue_city,
+          venueCountry: row.venue_country,
+          purse: row.purse,
+          tourId: row.season.tour_id,
+          tourSlug: mapTourSlug(row.season.tour_name),
+        }));
     },
-    staleTime: 5 * 60 * 1000,
+    enabled: !!cache,
+    staleTime: 30_000,
   });
 }
 
