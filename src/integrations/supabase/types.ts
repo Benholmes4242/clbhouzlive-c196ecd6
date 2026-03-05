@@ -14335,8 +14335,6 @@ export type Database = {
           business_logo_url: string
           business_name: string
           comment_count: number
-          course_country: string
-          course_region: string
           creator_avatar_url: string
           creator_display_name: string
           creator_is_verified: boolean
@@ -14360,9 +14358,12 @@ export type Database = {
           post_status: string
           post_user_id: string
           poster_url: string
+          review_course_country: string
           review_course_id: string
           review_course_image: string
           review_course_name: string
+          review_course_region: string
+          review_course_sub_country: string
           review_rating: number
           share_count: number
           source_review_id: string
@@ -14609,8 +14610,6 @@ export type Database = {
           business_logo_url: string
           business_name: string
           comment_count: number
-          course_country: string
-          course_region: string
           creator_avatar_url: string
           creator_display_name: string
           creator_is_verified: boolean
@@ -14634,9 +14633,12 @@ export type Database = {
           post_status: string
           post_user_id: string
           poster_url: string
+          review_course_country: string
           review_course_id: string
           review_course_image: string
           review_course_name: string
+          review_course_region: string
+          review_course_sub_country: string
           review_rating: number
           share_count: number
           source_review_id: string

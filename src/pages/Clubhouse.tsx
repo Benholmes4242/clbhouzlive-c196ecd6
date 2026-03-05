@@ -37,7 +37,6 @@ import { useMediaStore } from '@/components/media-system/store/mediaStore';
 import { useLikeMutation } from '@/components/media-system/hooks/useLikeMutation';
 import { useFollowMutation } from '@/components/media-system/hooks/useFollowMutation';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { Scrubber } from '@/components/media-system/Scrubber';
 
 // ── Clubhouse UI overlays ──
 import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicActionRail';
@@ -141,7 +140,6 @@ const ClubhouseContent = () => {
   const activeIndex = useMediaStore((s) => s.activeIndex);
   const isMuted = useMediaStore((s) => s.isMuted);
   const toggleMute = useMediaStore((s) => s.toggleMute);
-  const activeVideoElement = useMediaStore((s) => s.activeVideoElement);
   const activePost = posts[activeIndex] ?? null;
   
   // ── Optimistic like state ──
@@ -302,21 +300,6 @@ const ClubhouseContent = () => {
   } = useSnapModal();
 
   const [localSelectedTags, setLocalSelectedTags] = useState<any[]>([]);
-
-  // ── Measure bottom nav for scrubber positioning ──
-  const [scrubberBottom, setScrubberBottom] = useState(64);
-  useEffect(() => {
-    const measure = () => {
-      const nav = document.querySelector('.global-bottom-nav');
-      if (nav) {
-        const rect = nav.getBoundingClientRect();
-        setScrubberBottom(window.innerHeight - rect.top);
-      }
-    };
-    measure();
-    window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
-  }, []);
 
   // Season Recap Modal
   const { data: seasonRecap } = useSeasonRecap(user?.id);
@@ -548,22 +531,6 @@ const ClubhouseContent = () => {
             theme="dark"
           />
         </>
-      )}
-
-      {/* ═══ PAGE-LEVEL SCRUBBER ═══ */}
-      {activePost && isActiveVideo && (
-        <Scrubber
-          videoElement={activeVideoElement}
-          isActive={!!activeVideoElement}
-          duration={activePost.mediaItems?.[0]?.duration ?? null}
-          style={{
-            position: 'fixed',
-            left: 0,
-            right: 0,
-            bottom: scrubberBottom,
-            zIndex: 101,
-          }}
-        />
       )}
 
       {/* Post Submission Handler */}

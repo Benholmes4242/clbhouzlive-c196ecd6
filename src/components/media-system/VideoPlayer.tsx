@@ -2,8 +2,7 @@
  * VideoPlayer — requests a pool element, handles playing/error/loop lifecycle.
  * Uses 'playing' event for skeleton transition (not canplay/loadeddata).
  * Integrates gapless loop hook for seamless looping.
- * Supports double-tap-to-like and MP4 fallback.
- * Scrubber is rendered at page level (Clubhouse.tsx), not here.
+ * Supports double-tap-to-like, interactive scrubber, and MP4 fallback.
  */
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useVideoPoolContext } from './VideoPoolProvider';
@@ -12,6 +11,7 @@ import { useGaplessLoop } from './hooks/useGaplessLoop';
 import { getHlsInstance } from './utils/hlsManager';
 import { LoadingSkeleton } from './LoadingSkeleton';
 import { ErrorState } from './ErrorState';
+import { Scrubber } from './Scrubber';
 import { Play, Pause, Heart } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
 
@@ -26,12 +26,14 @@ interface VideoPlayerProps {
   duration?: number;
   mp4Url?: string;
   onDoubleTapLike?: () => void;
+  onScrubStart?: () => void;
+  onScrubEnd?: () => void;
   onFirstFrameReady?: () => void;
 }
 
 export function VideoPlayer({
   hlsUrl, feedIndex, isActive, thumbnailUrl, duration: mediaDuration,
-  mp4Url, onDoubleTapLike, onFirstFrameReady,
+  mp4Url, onDoubleTapLike, onScrubStart, onScrubEnd, onFirstFrameReady,
 }: VideoPlayerProps) {
   const firstFrameFiredRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -64,8 +66,6 @@ export function VideoPlayer({
       setIsLoading(true);
       setHasError(false);
       videoRef.current = null;
-      // Clear active video element in store when this player deactivates
-      useMediaStore.getState().setActiveVideoElement(null);
       return;
     }
 
@@ -107,8 +107,6 @@ export function VideoPlayer({
       if (cancelled || !video) return;
       videoEl = video;
       videoRef.current = video;
-      // Publish active video element to store for page-level scrubber
-      useMediaStore.getState().setActiveVideoElement(video);
       video.muted = isMuted;
 
       if (!video.paused && video.readyState >= 3) {
@@ -163,7 +161,6 @@ export function VideoPlayer({
     ).then((video) => {
       if (video) {
         videoRef.current = video;
-        useMediaStore.getState().setActiveVideoElement(video);
         video.muted = useMediaStore.getState().isMuted;
       }
     });
@@ -217,6 +214,7 @@ export function VideoPlayer({
       if (!video || !hls.levels) return;
       const newLevel = data.level;
       const currentLevel = hls.currentLevel;
+      // Only mask quality UPGRADES
       if (newLevel > currentLevel) {
         video.style.filter = 'blur(1.5px)';
         video.style.transition = 'filter 150ms ease-out';
@@ -229,6 +227,7 @@ export function VideoPlayer({
       video.style.transition = 'filter 300ms ease-in';
     };
 
+    // Use string event names to avoid needing the Hls constructor
     (hls as any).on('hlsLevelSwitching', onLevelSwitching);
     (hls as any).on('hlsLevelSwitched', onLevelSwitched);
 
@@ -289,6 +288,16 @@ export function VideoPlayer({
           />
         </div>
       )}
+
+      {/* Scrubber */}
+      <Scrubber
+        videoRef={videoRef}
+        isActive={isActive && !hasError}
+        duration={videoDuration}
+        onScrubStart={onScrubStart}
+        onScrubEnd={onScrubEnd}
+        bottomOffset={94}
+      />
     </div>
   );
 }
