@@ -45,6 +45,7 @@ const WatchPage: React.FC = () => {
           isFetchingNextPage={isFetchingNextPage}
           fetchNextPage={fetchNextPage}
           gridRef={gridRef as React.RefObject<HTMLDivElement>}
+          userId={userId}
         />
         <WatchAutoplay posts={posts} gridRef={gridRef as React.RefObject<HTMLDivElement>} />
         <WatchSearchOverlay
