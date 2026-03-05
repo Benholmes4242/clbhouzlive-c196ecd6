@@ -141,6 +141,7 @@ const ClubhouseContent = () => {
   const activeIndex = useMediaStore((s) => s.activeIndex);
   const isMuted = useMediaStore((s) => s.isMuted);
   const toggleMute = useMediaStore((s) => s.toggleMute);
+  const activeVideoElement = useMediaStore((s) => s.activeVideoElement);
   const activePost = posts[activeIndex] ?? null;
   
   // ── Optimistic like state ──
