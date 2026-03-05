@@ -141,10 +141,7 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
         <span className="leaderboard-position flex-shrink-0">
           {leader.position}
         </span>
-        <button
-          onClick={handlePlayerTap}
-          className="flex items-center gap-2 min-w-0 active:opacity-70 transition-opacity"
-        >
+        <div className="flex items-center gap-2 min-w-0">
           <div
             className="overflow-hidden flex-shrink-0"
             style={{ width: '32px', height: '33px', borderRadius: '34%', border: '1.5px solid #F8FAFC', background: '#F8FAFC' }}
@@ -166,7 +163,7 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
               <span className="leaderboard-thru-inline">{thruDisplay}</span>
             )}
           </span>
-        </button>
+        </div>
       </div>
       <span className={cn(
         "leaderboard-score flex-shrink-0 pr-2",

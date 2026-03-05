@@ -231,8 +231,8 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
         textAlign: 'right',
         flexShrink: 0,
         fontFamily: "'JetBrains Mono','SF Mono','Courier New',monospace",
-        fontSize: isLeader ? 22 : 16,
-        fontWeight: isLeader ? 800 : 700,
+        fontSize: 16,
+        fontWeight: 700,
         color: '#FFFFFF',
         fontVariantNumeric: 'tabular-nums',
       }}>
