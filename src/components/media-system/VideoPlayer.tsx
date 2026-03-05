@@ -11,7 +11,7 @@ import { useGaplessLoop } from './hooks/useGaplessLoop';
 import { getHlsInstance } from './utils/hlsManager';
 import { LoadingSkeleton } from './LoadingSkeleton';
 import { ErrorState } from './ErrorState';
-import { Scrubber } from './Scrubber';
+// Scrubber moved to page level (Clubhouse.tsx)
 import { Play, Pause, Heart } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
 
@@ -68,6 +68,7 @@ export function VideoPlayer({
       setHasError(false);
       videoRef.current = null;
       setVideoElement(null);
+      useMediaStore.getState().setActiveVideoElement(null, null);
       return;
     }
 
@@ -110,6 +111,7 @@ export function VideoPlayer({
       videoEl = video;
       videoRef.current = video;
       setVideoElement(video);
+      useMediaStore.getState().setActiveVideoElement(video, videoRef);
       video.muted = isMuted;
 
       if (!video.paused && video.readyState >= 3) {
@@ -292,16 +294,7 @@ export function VideoPlayer({
         </div>
       )}
 
-      {/* Scrubber */}
-      <Scrubber
-        videoRef={videoRef}
-        videoElement={videoElement}
-        isActive={isActive && !hasError}
-        duration={videoDuration}
-        onScrubStart={onScrubStart}
-        onScrubEnd={onScrubEnd}
-        bottomNavSelector=".global-bottom-nav"
-      />
+      {/* Scrubber rendered at page level in Clubhouse.tsx */}
     </div>
   );
 }
