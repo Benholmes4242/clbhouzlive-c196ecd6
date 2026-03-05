@@ -405,7 +405,14 @@ export function PlayerScorecardCard({
         </div>
       ) : (
         <div className="flex-1 flex flex-col items-center justify-center py-12">
-          <Trophy className="w-8 h-8 text-white/20 mb-3" />
+          <div className="w-14 h-14 rounded-full flex items-center justify-center mb-3"
+            style={{ 
+              background: 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+            }}
+          >
+            <Trophy className="w-6 h-6 text-white/40" />
+          </div>
           <p className="text-sm text-white/40 text-center">Scorecard data updating...</p>
           <p className="text-xs text-white/25 text-center mt-1">Hole-by-hole scores will appear as the round progresses</p>
         </div>
