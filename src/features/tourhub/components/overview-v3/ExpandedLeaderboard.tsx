@@ -146,6 +146,9 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
   const isLeader = entry.position === 1;
   const isChaser = !isLeader;
 
+  // Derive current round from round columns
+  const currentRound = entry.round_4 != null ? 4 : entry.round_3 != null ? 3 : entry.round_2 != null ? 2 : 1;
+
   const handleTap = onPlayerTap
     ? () => {
         onPlayerTap({
@@ -154,13 +157,12 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
           name: fullName,
           firstName,
           lastName,
-          photoUrl: player.headshot_url || undefined,
-          countryCode: player.country || undefined,
-          countryFlag: player.country_flag || undefined,
+          photoUrl: player.photo_url || player.headshot_override || undefined,
+          countryCode: player.country_code || player.country || undefined,
           position: posDisplay,
           totalScore: entry.score ?? 0,
           thru: thruDisplay,
-          currentRound: entry.current_round || undefined,
+          currentRound,
         });
       }
     : undefined;
