@@ -79,7 +79,8 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
       cancelAnimationFrame(rafRef.current);
       return;
     }
-    const video = videoRef.current;
+    // Use reactive videoElement prop if available, fall back to ref
+    const video = videoElement ?? videoRef.current;
     if (!video) return;
 
     const update = () => {
@@ -109,7 +110,7 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
     };
     rafRef.current = requestAnimationFrame(update);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [isActive, isScrubbing, videoRef]);
+  }, [isActive, isScrubbing, videoRef, videoElement]);
 
   // ── Auto-hide back to default ─────────────────────────────────
   const scheduleHide = useCallback(() => {
