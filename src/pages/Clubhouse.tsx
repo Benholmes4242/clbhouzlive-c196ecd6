@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
+import { extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ClubhouseTopBar } from '@/components/clubhouse/ClubhouseTopBar';
 import PostSubmissionHandler from '@/components/bottom-navigation/PostSubmissionHandler';
@@ -498,11 +499,26 @@ const ClubhouseContent = () => {
               avatar: activePost.avatarUrl,
             }}
             caption={activePost.caption}
-            golfCourse={activePost.review ? {
-              id: activePost.review.courseId,
-              name: activePost.review.courseName,
-              courseCountry: activePost.review.courseCountry || null,
-            } : undefined}
+            golfCourse={(() => {
+              if (activePost.review) {
+                return {
+                  id: activePost.review.courseId,
+                  name: activePost.review.courseName,
+                  courseCountry: activePost.review.courseCountry || null,
+                };
+              }
+              if (activePost.caption) {
+                const extracted = extractGolfCourseFromContent(activePost.caption);
+                if (extracted) {
+                  return {
+                    id: null,
+                    name: extracted.name,
+                    courseCountry: extracted.country || null,
+                  };
+                }
+              }
+              return undefined;
+            })()}
             isFollowing={isActivePostFollowed}
             isOwnPost={isOwnPost}
             isVisible={overlayVisible}
