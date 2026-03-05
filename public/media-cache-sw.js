@@ -21,18 +21,22 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = event.request.url;
   
-  // Manifests: network-first (they can change — ABR level selection)
+  // Manifests: stale-while-revalidate (serve cached, update in background)
   if (MANIFEST_PATTERN.test(url)) {
     event.respondWith(
-      fetch(event.request)
-        .then(response => {
-          if (response.ok) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-          }
-          return response;
+      caches.open(CACHE_NAME).then(cache =>
+        cache.match(event.request).then(cached => {
+          const fetchPromise = fetch(event.request).then(response => {
+            if (response.ok) {
+              cache.put(event.request, response.clone());
+            }
+            return response;
+          }).catch(() => cached); // Fallback to cache if network fails
+          
+          // Return cached immediately if available, otherwise wait for network
+          return cached || fetchPromise;
         })
-        .catch(() => caches.match(event.request))
+      )
     );
     return;
   }
