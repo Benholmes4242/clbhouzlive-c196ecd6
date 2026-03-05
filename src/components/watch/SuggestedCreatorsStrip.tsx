@@ -5,26 +5,53 @@ import { Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSuggestedCreators, type SuggestedCreator } from './hooks/useSuggestedCreators';
 
+// ── Format name as "First L." ──
+function shortName(displayName: string): string {
+  const parts = (displayName || '').trim().split(/\s+/);
+  if (parts.length < 2) return parts[0] || '?';
+  return `${parts[0]} ${parts[parts.length - 1][0]}.`;
+}
+
 // ── Shimmer placeholder ──
-const ShimmerCard: React.FC = () => (
-  <div
-    className="flex-shrink-0 rounded-2xl animate-[shimmer_1.5s_infinite]"
-    style={{
-      width: 140,
-      height: 200,
-      background: 'linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted)/0.5) 50%, hsl(var(--muted)) 75%)',
-      backgroundSize: '200% 100%',
-    }}
-  />
+const ShimmerItem: React.FC = () => (
+  <div className="flex-shrink-0 flex flex-col items-center" style={{ width: 80, gap: 6 }}>
+    <div
+      className="rounded-full animate-[shimmer_1.5s_infinite]"
+      style={{
+        width: 64,
+        height: 64,
+        background: 'linear-gradient(90deg, #E2E8F0 25%, #EEF2F7 50%, #E2E8F0 75%)',
+        backgroundSize: '200% 100%',
+      }}
+    />
+    <div
+      className="rounded animate-[shimmer_1.5s_infinite]"
+      style={{
+        width: 52,
+        height: 10,
+        background: 'linear-gradient(90deg, #E2E8F0 25%, #EEF2F7 50%, #E2E8F0 75%)',
+        backgroundSize: '200% 100%',
+      }}
+    />
+    <div
+      className="rounded-full animate-[shimmer_1.5s_infinite]"
+      style={{
+        width: 44,
+        height: 16,
+        background: 'linear-gradient(90deg, #E2E8F0 25%, #EEF2F7 50%, #E2E8F0 75%)',
+        backgroundSize: '200% 100%',
+      }}
+    />
+  </div>
 );
 
-// ── Single creator card ──
-interface CreatorCardProps {
+// ── Single creator item ──
+interface CreatorItemProps {
   creator: SuggestedCreator;
   currentUserId: string;
 }
 
-const CreatorCard: React.FC<CreatorCardProps> = ({ creator, currentUserId }) => {
+const CreatorItem: React.FC<CreatorItemProps> = ({ creator, currentUserId }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [following, setFollowing] = useState(creator.isFollowed);
@@ -41,11 +68,9 @@ const CreatorCard: React.FC<CreatorCardProps> = ({ creator, currentUserId }) => 
     async (e: React.MouseEvent) => {
       e.stopPropagation();
       if (busy) return;
-
       const wasFollowing = following;
       setFollowing(!wasFollowing);
       setBusy(true);
-
       try {
         if (wasFollowing) {
           await supabase
@@ -69,102 +94,126 @@ const CreatorCard: React.FC<CreatorCardProps> = ({ creator, currentUserId }) => 
     [busy, following, creator.userId, currentUserId, queryClient],
   );
 
-  const handleCardTap = useCallback(() => {
+  const handleProfileTap = useCallback(() => {
     navigate(`/profile/${creator.userId}`);
   }, [navigate, creator.userId]);
 
   return (
     <div
-      onClick={handleCardTap}
-      className="flex-shrink-0 flex flex-col items-center cursor-pointer active:scale-[0.97]"
-      style={{
-        width: 140,
-        borderRadius: 16,
-        background: 'hsl(var(--card))',
-        border: '1px solid hsl(var(--border))',
-        padding: '16px 12px',
-        gap: 6,
-        transition: 'transform 100ms ease',
-      }}
+      className="flex-shrink-0 flex flex-col items-center"
+      style={{ width: 80, gap: 6, scrollSnapAlign: 'start' }}
     >
-      {/* Avatar */}
-      <div className="relative" style={{ width: 56, height: 56 }}>
-        {creator.avatarUrl ? (
-          <img
-            src={creator.avatarUrl}
-            alt=""
-            className="w-full h-full rounded-full object-cover"
-          />
-        ) : (
-          <div
-            className="w-full h-full rounded-full flex items-center justify-center"
-            style={{
-              background: 'hsl(var(--muted))',
-              color: 'hsl(var(--muted-foreground))',
-              fontSize: 20,
-              fontWeight: 600,
-            }}
-          >
-            {initials}
-          </div>
-        )}
-        {creator.isVerified && (
-          <div
-            className="absolute flex items-center justify-center"
-            style={{
-              bottom: -2,
-              right: -2,
-              width: 16,
-              height: 16,
-              borderRadius: '50%',
-              background: '#D97706',
-              border: '2px solid hsl(var(--card))',
-            }}
-          >
-            <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
-          </div>
-        )}
+      {/* Avatar with amber ring */}
+      <div
+        onClick={handleProfileTap}
+        className="cursor-pointer"
+        style={{
+          width: 70,
+          height: 70,
+          borderRadius: '50%',
+          background: 'linear-gradient(135deg, #D97706, #F59E0B, #FBBF24)',
+          padding: 3,
+          flexShrink: 0,
+        }}
+      >
+        <div
+          style={{
+            width: '100%',
+            height: '100%',
+            borderRadius: '50%',
+            overflow: 'hidden',
+            background: '#FFFFFF',
+          }}
+        >
+          {creator.avatarUrl ? (
+            <img
+              src={creator.avatarUrl}
+              alt=""
+              className="w-full h-full object-cover"
+              style={{ borderRadius: '50%' }}
+            />
+          ) : (
+            <div
+              className="w-full h-full flex items-center justify-center"
+              style={{
+                background: '#E2E8F0',
+                color: '#64748B',
+                fontSize: 20,
+                fontWeight: 600,
+                borderRadius: '50%',
+              }}
+            >
+              {initials}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Display name */}
+      {/* Verified badge overlaid on avatar */}
+      {creator.isVerified && (
+        <div
+          className="flex items-center justify-center"
+          style={{
+            position: 'relative',
+            top: -18,
+            marginBottom: -18,
+            width: 16,
+            height: 16,
+            borderRadius: '50%',
+            background: '#D97706',
+            border: '2px solid #FFFFFF',
+            alignSelf: 'center',
+            marginLeft: 24,
+          }}
+        >
+          <Check className="w-2 h-2 text-white" strokeWidth={3} />
+        </div>
+      )}
+
+      {/* Name (First L.) */}
       <p
-        className="w-full text-center truncate"
-        style={{ fontSize: 13, fontWeight: 600, color: 'hsl(var(--foreground))' }}
+        onClick={handleProfileTap}
+        className="w-full text-center truncate cursor-pointer"
+        style={{ fontSize: 12, fontWeight: 600, color: '#1A1A1A', lineHeight: '16px' }}
       >
-        {creator.displayName}
+        {shortName(creator.displayName)}
       </p>
 
-      {/* Username */}
-      <p
-        className="w-full text-center truncate"
-        style={{ fontSize: 11, fontWeight: 400, color: 'hsl(var(--muted-foreground))' }}
+      {/* Handicap pill or video count */}
+      <div
+        className="flex items-center justify-center"
+        style={{
+          borderRadius: 10,
+          padding: '2px 8px',
+          fontSize: 10,
+          fontWeight: 600,
+          lineHeight: '14px',
+          ...(creator.handicap != null
+            ? { background: '#FEF3C7', color: '#92400E' }
+            : { background: '#F1F5F9', color: '#64748B' }),
+        }}
       >
-        @{creator.username}
-      </p>
-
-      {/* Handicap or video count */}
-      <p
-        className="text-center"
-        style={{ fontSize: 11, fontWeight: 500, color: 'hsl(var(--muted-foreground))' }}
-      >
-        {creator.handicap != null ? `⛳ ${creator.handicap}` : `🎬 ${creator.videoCount} videos`}
-      </p>
+        {creator.handicap != null
+          ? `HCP ${creator.handicap}`
+          : `${creator.videoCount} videos`}
+      </div>
 
       {/* Follow button */}
       <button
         onClick={handleFollow}
-        className="w-full active:scale-[0.96]"
+        className="active:scale-[0.96]"
         style={{
-          height: 32,
-          borderRadius: 8,
-          marginTop: 4,
-          fontSize: 12,
-          fontWeight: following ? 500 : 600,
-          background: following ? 'transparent' : 'hsl(var(--foreground))',
-          color: following ? 'hsl(var(--muted-foreground))' : 'hsl(var(--background))',
-          border: following ? '1px solid hsl(var(--border))' : 'none',
-          transition: 'transform 100ms ease',
+          width: 72,
+          height: 28,
+          borderRadius: 14,
+          fontSize: following ? 10 : 11,
+          fontWeight: 600,
+          background: following ? 'transparent' : '#1A1A1A',
+          color: following ? '#94A3B8' : '#FFFFFF',
+          border: following ? '1px solid #E2E8F0' : 'none',
           cursor: 'pointer',
+          transition: 'transform 100ms ease',
+          marginTop: 2,
         }}
       >
         {following ? 'Following' : 'Follow'}
@@ -181,29 +230,19 @@ interface SuggestedCreatorsStripProps {
 const SuggestedCreatorsStrip: React.FC<SuggestedCreatorsStripProps> = ({ userId }) => {
   const { data: creators, isLoading } = useSuggestedCreators(userId);
 
-  // Loading state
+  // Loading state — render with grid-spanning wrapper
   if (isLoading) {
     return (
-      <div>
-        <div
-          className="flex items-center justify-between"
-          style={{ padding: '0 16px', marginBottom: 10 }}
-        >
-          <span style={{ fontSize: 14, fontWeight: 600, color: 'hsl(var(--foreground))' }}>
-            Suggested Creators
-          </span>
-        </div>
+      <div style={{ gridColumn: '1 / -1', padding: '14px 0', background: '#FFFFFF', borderTop: '1px solid #F1F5F9', borderBottom: '1px solid #F1F5F9' }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', padding: '0 16px', marginBottom: 12 }}>
+          People to follow
+        </p>
         <div
           className="flex"
-          style={{
-            gap: 10,
-            overflowX: 'auto',
-            scrollbarWidth: 'none',
-            padding: '0 16px',
-          }}
+          style={{ gap: 16, overflowX: 'auto', scrollbarWidth: 'none', padding: '0 16px' }}
         >
-          {Array.from({ length: 4 }).map((_, i) => (
-            <ShimmerCard key={i} />
+          {Array.from({ length: 5 }).map((_, i) => (
+            <ShimmerItem key={i} />
           ))}
         </div>
       </div>
@@ -214,28 +253,17 @@ const SuggestedCreatorsStrip: React.FC<SuggestedCreatorsStripProps> = ({ userId 
   if (!creators || creators.length < 1) return null;
 
   return (
-    <div>
+    <div style={{ gridColumn: '1 / -1', padding: '14px 0', background: '#FFFFFF', borderTop: '1px solid #F1F5F9', borderBottom: '1px solid #F1F5F9' }}>
       {/* Header */}
-      <div
-        className="flex items-center justify-between"
-        style={{ padding: '0 16px', marginBottom: 10 }}
-      >
-        <span style={{ fontSize: 14, fontWeight: 600, color: 'hsl(var(--foreground))' }}>
-          Suggested Creators
-        </span>
-        <span
-          style={{ fontSize: 13, fontWeight: 500, color: 'hsl(var(--muted-foreground))' }}
-          className="cursor-pointer"
-        >
-          See All →
-        </span>
-      </div>
+      <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', padding: '0 16px', marginBottom: 12 }}>
+        People to follow
+      </p>
 
       {/* Scroll container */}
       <div
         className="flex"
         style={{
-          gap: 10,
+          gap: 16,
           overflowX: 'auto',
           scrollSnapType: 'x mandatory',
           scrollbarWidth: 'none',
@@ -244,9 +272,7 @@ const SuggestedCreatorsStrip: React.FC<SuggestedCreatorsStripProps> = ({ userId 
         }}
       >
         {creators.map((creator) => (
-          <div key={creator.userId} style={{ scrollSnapAlign: 'start' }}>
-            <CreatorCard creator={creator} currentUserId={userId!} />
-          </div>
+          <CreatorItem key={creator.userId} creator={creator} currentUserId={userId!} />
         ))}
       </div>
     </div>
