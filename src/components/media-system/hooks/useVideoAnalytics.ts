@@ -13,7 +13,7 @@ export function useVideoAnalytics(
   useEffect(() => {
     if (isActive && post && post.id !== impressionTrackedRef.current) {
       impressionTrackedRef.current = post.id;
-      trackEvent('video_impression', {
+      analyticsEvents.track('video_impression', {
         post_id: post.id,
         creator_id: post.userId,
         is_review: post.isReview,
