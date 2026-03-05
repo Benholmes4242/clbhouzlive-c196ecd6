@@ -103,16 +103,16 @@ const CreatorItem: React.FC<CreatorItemProps> = ({ creator, currentUserId }) => 
       className="flex-shrink-0 flex flex-col items-center"
       style={{ width: 80, gap: 6, scrollSnapAlign: 'start' }}
     >
-      {/* Avatar with amber ring */}
+      {/* Avatar with amber ring — squircle */}
       <div
         onClick={handleProfileTap}
         className="cursor-pointer"
         style={{
-          width: 70,
-          height: 70,
-          borderRadius: '50%',
-          background: 'linear-gradient(135deg, #D97706, #F59E0B, #FBBF24)',
-          padding: 3,
+          width: 64,
+          height: 67,
+          borderRadius: '34%',
+          border: '0.5px solid rgba(245, 158, 11, 0.9)',
+          padding: 1,
           flexShrink: 0,
         }}
       >
@@ -120,9 +120,9 @@ const CreatorItem: React.FC<CreatorItemProps> = ({ creator, currentUserId }) => 
           style={{
             width: '100%',
             height: '100%',
-            borderRadius: '50%',
+            borderRadius: '34%',
             overflow: 'hidden',
-            background: '#FFFFFF',
+            background: '#F8FAFC',
           }}
         >
           {creator.avatarUrl ? (
@@ -130,7 +130,7 @@ const CreatorItem: React.FC<CreatorItemProps> = ({ creator, currentUserId }) => 
               src={creator.avatarUrl}
               alt=""
               className="w-full h-full object-cover"
-              style={{ borderRadius: '50%' }}
+              style={{ borderRadius: '34%' }}
             />
           ) : (
             <div
@@ -140,7 +140,7 @@ const CreatorItem: React.FC<CreatorItemProps> = ({ creator, currentUserId }) => 
                 color: '#64748B',
                 fontSize: 20,
                 fontWeight: 600,
-                borderRadius: '50%',
+                borderRadius: '34%',
               }}
             >
               {initials}
@@ -179,11 +179,11 @@ const CreatorItem: React.FC<CreatorItemProps> = ({ creator, currentUserId }) => 
         {shortName(creator.displayName)}
       </p>
 
-      {/* Handicap pill or video count */}
+      {/* Handicap pill or video count — rounded-lg like primary tabs */}
       <div
         className="flex items-center justify-center"
         style={{
-          borderRadius: 10,
+          borderRadius: 8,
           padding: '2px 8px',
           fontSize: 10,
           fontWeight: 600,
@@ -205,12 +205,12 @@ const CreatorItem: React.FC<CreatorItemProps> = ({ creator, currentUserId }) => 
         style={{
           width: 72,
           height: 28,
-          borderRadius: 14,
+          borderRadius: 8,
           fontSize: following ? 10 : 11,
           fontWeight: 600,
-          background: following ? 'transparent' : '#1A1A1A',
-          color: following ? '#94A3B8' : '#FFFFFF',
-          border: following ? '1px solid #E2E8F0' : 'none',
+          background: following ? 'transparent' : 'hsl(var(--foreground))',
+          color: following ? '#94A3B8' : 'hsl(var(--background))',
+          border: following ? '1px solid hsl(var(--border))' : 'none',
           cursor: 'pointer',
           transition: 'transform 100ms ease',
           marginTop: 2,
