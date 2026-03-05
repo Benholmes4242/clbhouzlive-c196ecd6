@@ -303,6 +303,21 @@ const ClubhouseContent = () => {
 
   const [localSelectedTags, setLocalSelectedTags] = useState<any[]>([]);
 
+  // ── Measure bottom nav for scrubber positioning ──
+  const [scrubberBottom, setScrubberBottom] = useState(64);
+  useEffect(() => {
+    const measure = () => {
+      const nav = document.querySelector('.global-bottom-nav');
+      if (nav) {
+        const rect = nav.getBoundingClientRect();
+        setScrubberBottom(window.innerHeight - rect.top);
+      }
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, []);
+
   // Season Recap Modal
   const { data: seasonRecap } = useSeasonRecap(user?.id);
   const [showRecapModal, setShowRecapModal] = React.useState(false);
@@ -545,7 +560,7 @@ const ClubhouseContent = () => {
             position: 'fixed',
             left: 0,
             right: 0,
-            bottom: 'var(--bottom-nav-height, 64px)',
+            bottom: scrubberBottom,
             zIndex: 101,
             background: 'red',
             height: 20,
