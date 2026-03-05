@@ -484,19 +484,19 @@ const ClubhouseContent = () => {
             onMore={() => console.log('[More] Options for post:', activePost?.id)}
             onMuteToggle={toggleMute}
             isVideo={isActiveVideo}
-            hasNextMedia={isActiveReview ? false : currentMediaIndex < activeMediaCount - 1}
-            hasPrevMedia={isActiveReview ? false : currentMediaIndex > 0}
-            onNextMedia={isActiveReview ? undefined : (activeMediaCount > 1 
+            hasNextMedia={currentMediaIndex < activeMediaCount - 1}
+            hasPrevMedia={currentMediaIndex > 0}
+            onNextMedia={activeMediaCount > 1 
               ? () => useMediaStore.getState().setCarouselPosition(activeIndex, currentMediaIndex + 1) 
-              : undefined)}
-            onPrevMedia={isActiveReview ? undefined : (activeMediaCount > 1 
+              : undefined}
+            onPrevMedia={activeMediaCount > 1 
               ? () => useMediaStore.getState().setCarouselPosition(activeIndex, currentMediaIndex - 1) 
-              : undefined)}
+              : undefined}
             onChevronPositionChange={setChevronY}
           />
 
           {/* Left chevron — mirrors right chevron Y position for multi-media non-review posts */}
-          {!isActiveReview && currentMediaIndex > 0 && chevronY !== null && (
+          {currentMediaIndex > 0 && chevronY !== null && (
             <button
               onClick={() => useMediaStore.getState().setCarouselPosition(activeIndex, currentMediaIndex - 1)}
               style={{

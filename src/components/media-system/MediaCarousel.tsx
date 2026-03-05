@@ -8,7 +8,7 @@ import { VideoPlayer } from './VideoPlayer';
 import { ImageViewer } from './ImageViewer';
 import { CarouselIndicator } from './CarouselIndicator';
 import { useMediaStore } from './store/mediaStore';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+
 import { haptic } from '@/utils/haptics';
 import type { MediaItem } from './types/media';
 
@@ -164,27 +164,6 @@ export function MediaCarousel({
       {/* Carousel dots */}
       <CarouselIndicator total={total} activeIndex={activeMedia} />
 
-      {/* Chevron arrows */}
-      {activeMedia > 0 && (
-        <button
-          className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full flex items-center justify-center"
-          style={{ background: 'rgba(0,0,0,0.3)' }}
-          onClick={(e) => { e.stopPropagation(); goTo(activeMedia - 1); }}
-          aria-label="Previous media"
-        >
-          <ChevronLeft className="w-5 h-5 text-white" />
-        </button>
-      )}
-      {activeMedia < total - 1 && (
-        <button
-          className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full flex items-center justify-center"
-          style={{ background: 'rgba(0,0,0,0.3)' }}
-          onClick={(e) => { e.stopPropagation(); goTo(activeMedia + 1); }}
-          aria-label="Next media"
-        >
-          <ChevronRight className="w-5 h-5 text-white" />
-        </button>
-      )}
     </div>
   );
 }
