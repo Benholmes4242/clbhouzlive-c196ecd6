@@ -55,6 +55,12 @@ async function fetchPlayerScorecard(
     .order('round_number', { ascending: true })
     .order('hole_number', { ascending: true });
 
+  console.log('[Scorecard] Query result:', { 
+    rowCount: scorecardRows?.length || 0, 
+    error: scError?.message,
+    firstRow: scorecardRows?.[0] 
+  });
+
   if (scError || !scorecardRows?.length) return null;
 
   // Fetch course hole data for par/yardage
