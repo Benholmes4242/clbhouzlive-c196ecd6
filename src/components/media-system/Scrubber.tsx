@@ -16,6 +16,8 @@ type ScrubState = 'default' | 'hover' | 'scrubbing' | 'fine-scrub';
 
 interface ScrubberProps {
   videoRef: React.RefObject<HTMLVideoElement | null>;
+  /** Reactive video element — triggers RAF restart when it changes from null */
+  videoElement?: HTMLVideoElement | null;
   isActive: boolean;
   duration: number | null;
   /** Called when scrubbing starts — parent can hide overlay */
@@ -52,7 +54,7 @@ const FINE_SCRUB_FACTOR = 0.25;
 const HIDE_DELAY = 2000;
 const LOOP_PULSE_WINDOW = 0.5; // seconds before loop
 
-export function Scrubber({ videoRef, isActive, duration, onScrubStart, onScrubEnd, bottomOffset = 0 }: ScrubberProps) {
+export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubStart, onScrubEnd, bottomOffset = 0 }: ScrubberProps) {
   const [progress, setProgress] = useState(0);
   const [buffered, setBuffered] = useState(0);
   const [scrubState, setScrubState] = useState<ScrubState>('default');
@@ -77,7 +79,8 @@ export function Scrubber({ videoRef, isActive, duration, onScrubStart, onScrubEn
       cancelAnimationFrame(rafRef.current);
       return;
     }
-    const video = videoRef.current;
+    // Use reactive videoElement prop if available, fall back to ref
+    const video = videoElement ?? videoRef.current;
     if (!video) return;
 
     const update = () => {
@@ -107,7 +110,7 @@ export function Scrubber({ videoRef, isActive, duration, onScrubStart, onScrubEn
     };
     rafRef.current = requestAnimationFrame(update);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [isActive, isScrubbing, videoRef]);
+  }, [isActive, isScrubbing, videoRef, videoElement]);
 
   // ── Auto-hide back to default ─────────────────────────────────
   const scheduleHide = useCallback(() => {

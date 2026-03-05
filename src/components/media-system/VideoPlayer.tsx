@@ -39,6 +39,7 @@ export function VideoPlayer({
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const retryCountRef = useRef(0);
+  const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [showPlayIcon, setShowPlayIcon] = useState(false);
@@ -66,6 +67,7 @@ export function VideoPlayer({
       setIsLoading(true);
       setHasError(false);
       videoRef.current = null;
+      setVideoElement(null);
       return;
     }
 
@@ -107,6 +109,7 @@ export function VideoPlayer({
       if (cancelled || !video) return;
       videoEl = video;
       videoRef.current = video;
+      setVideoElement(video);
       video.muted = isMuted;
 
       if (!video.paused && video.readyState >= 3) {
@@ -292,11 +295,12 @@ export function VideoPlayer({
       {/* Scrubber */}
       <Scrubber
         videoRef={videoRef}
+        videoElement={videoElement}
         isActive={isActive && !hasError}
         duration={videoDuration}
         onScrubStart={onScrubStart}
         onScrubEnd={onScrubEnd}
-        bottomOffset={94}
+        bottomOffset={64}
       />
     </div>
   );
