@@ -67,6 +67,7 @@ export function VideoPlayer({
       setIsLoading(true);
       setHasError(false);
       videoRef.current = null;
+      setVideoElement(null);
       return;
     }
 
@@ -108,6 +109,7 @@ export function VideoPlayer({
       if (cancelled || !video) return;
       videoEl = video;
       videoRef.current = video;
+      setVideoElement(video);
       video.muted = isMuted;
 
       if (!video.paused && video.readyState >= 3) {
@@ -293,11 +295,12 @@ export function VideoPlayer({
       {/* Scrubber */}
       <Scrubber
         videoRef={videoRef}
+        videoElement={videoElement}
         isActive={isActive && !hasError}
         duration={videoDuration}
         onScrubStart={onScrubStart}
         onScrubEnd={onScrubEnd}
-        bottomOffset={94}
+        bottomOffset={64}
       />
     </div>
   );
