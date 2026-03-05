@@ -32,9 +32,10 @@
   --th-accent-bronze: #CD7F32;       /* #3 */
   --th-accent-live: #22C55E;         /* Live indicator */
   --th-accent-live-glow: rgba(34, 197, 94, 0.4);
-  --th-accent-birdie: #22C55E;       /* Under par */
-  --th-accent-bogey: #FF9500;        /* Over par */
-  --th-accent-eagle: #5856D6;        /* Eagle */
+  --th-accent-birdie: #22C55E;       /* Under par — green */
+  --th-accent-bogey: #FF9500;        /* Over par — orange */
+  --th-accent-eagle: #FACC15;        /* Eagle — yellow/gold */
+  --th-accent-double: #EF4444;       /* Double bogey+ — red */
   --th-accent-par: rgba(255, 255, 255, 0.7);
 
   /* ========================================
