@@ -300,7 +300,7 @@ export function VideoPlayer({
         duration={videoDuration}
         onScrubStart={onScrubStart}
         onScrubEnd={onScrubEnd}
-        bottomOffset={64}
+        bottomNavSelector=".global-bottom-nav"
       />
     </div>
   );

@@ -9,7 +9,7 @@
  *
  * The bottom 60px zone captures all touch events to prevent feed scroll / tap-to-play.
  */
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback, useLayoutEffect } from 'react';
 import { haptic } from '@/utils/haptics';
 
 type ScrubState = 'default' | 'hover' | 'scrubbing' | 'fine-scrub';
@@ -24,8 +24,8 @@ interface ScrubberProps {
   onScrubStart?: () => void;
   /** Called when scrubbing ends */
   onScrubEnd?: () => void;
-  /** Pixels from the bottom of the parent container */
-  bottomOffset?: number;
+  /** Selector or ref for the bottom nav element to anchor against */
+  bottomNavSelector?: string;
 }
 
 function formatTime(seconds: number): string {
@@ -54,7 +54,7 @@ const FINE_SCRUB_FACTOR = 0.25;
 const HIDE_DELAY = 2000;
 const LOOP_PULSE_WINDOW = 0.5; // seconds before loop
 
-export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubStart, onScrubEnd, bottomOffset = 0 }: ScrubberProps) {
+export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubStart, onScrubEnd, bottomNavSelector = '.global-bottom-nav' }: ScrubberProps) {
   const [progress, setProgress] = useState(0);
   const [buffered, setBuffered] = useState(0);
   const [scrubState, setScrubState] = useState<ScrubState>('default');
@@ -72,6 +72,26 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
   const lastScrubTimeRef = useRef(0); // video time at last fine-scrub anchor
   const isScrubbing = scrubState === 'scrubbing' || scrubState === 'fine-scrub';
   const prevProgressRef = useRef(0);
+
+  // ── Measure bottom nav position via DOM ───────────────────────
+  const [bottomOffset, setBottomOffset] = useState(64);
+  useLayoutEffect(() => {
+    const measure = () => {
+      const nav = document.querySelector(bottomNavSelector);
+      if (nav) {
+        const rect = nav.getBoundingClientRect();
+        setBottomOffset(window.innerHeight - rect.top);
+      }
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    // Re-measure periodically in case nav mounts late
+    const id = setInterval(measure, 1000);
+    return () => {
+      window.removeEventListener('resize', measure);
+      clearInterval(id);
+    };
+  }, [bottomNavSelector]);
 
   // ── RAF progress polling (paused during scrubbing) ────────────
   useEffect(() => {
