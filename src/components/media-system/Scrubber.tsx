@@ -26,6 +26,8 @@ interface ScrubberProps {
   onScrubEnd?: () => void;
   /** Selector or ref for the bottom nav element to anchor against */
   bottomNavSelector?: string;
+  /** Position mode: 'absolute' (default, inside a container) or 'fixed' (page-level overlay) */
+  position?: 'absolute' | 'fixed';
 }
 
 function formatTime(seconds: number): string {
@@ -54,7 +56,7 @@ const FINE_SCRUB_FACTOR = 0.25;
 const HIDE_DELAY = 2000;
 const LOOP_PULSE_WINDOW = 0.5; // seconds before loop
 
-export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubStart, onScrubEnd, bottomNavSelector = '.global-bottom-nav' }: ScrubberProps) {
+export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubStart, onScrubEnd, bottomNavSelector = '.global-bottom-nav', position = 'absolute' }: ScrubberProps) {
   const [progress, setProgress] = useState(0);
   const [buffered, setBuffered] = useState(0);
   const [scrubState, setScrubState] = useState<ScrubState>('default');
