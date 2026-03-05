@@ -86,6 +86,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   initialCommentId,
   initialParentCommentId,
   caddiePickCommentId,
+  onCommentPosted,
 }) => {
   // --- State ---
   const [newComment, setNewComment] = useState('');
