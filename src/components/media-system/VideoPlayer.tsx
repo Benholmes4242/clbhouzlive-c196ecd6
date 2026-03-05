@@ -46,6 +46,7 @@ export function VideoPlayer({
   const [isPlaying, setIsPlaying] = useState(false);
   const [videoDuration, setVideoDuration] = useState<number | null>(mediaDuration ?? null);
   const [showDoubleTapHeart, setShowDoubleTapHeart] = useState(false);
+  const [isBuffering, setIsBuffering] = useState(false);
   const pool = useVideoPoolContext();
   const isMuted = useMediaStore((s) => s.isMuted);
 
@@ -245,6 +246,26 @@ export function VideoPlayer({
     };
   }, [isActive]);
 
+  // ── Fix 5: Buffer stall indicator ──
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !isActive) return;
+
+    const onWaiting = () => setIsBuffering(true);
+    const onPlaying = () => setIsBuffering(false);
+    const onCanPlay = () => setIsBuffering(false);
+
+    video.addEventListener('waiting', onWaiting);
+    video.addEventListener('playing', onPlaying);
+    video.addEventListener('canplay', onCanPlay);
+
+    return () => {
+      video.removeEventListener('waiting', onWaiting);
+      video.removeEventListener('playing', onPlaying);
+      video.removeEventListener('canplay', onCanPlay);
+    };
+  }, [isActive]);
+
   const canRetry = retryCountRef.current < MAX_RETRIES;
 
   return (
@@ -256,6 +277,20 @@ export function VideoPlayer({
       <LoadingSkeleton visible={isLoading && !hasError} posterUrl={thumbnailUrl} />
 
       {hasError && <ErrorState onRetry={handleRetry} canRetry={canRetry} />}
+
+      {/* Buffering spinner (Fix 5) */}
+      {isBuffering && !isLoading && !hasError && (
+        <div className="absolute inset-0 flex items-center justify-center z-[15] pointer-events-none">
+          <div
+            className="w-10 h-10 rounded-full"
+            style={{
+              border: '3px solid rgba(255,255,255,0.2)',
+              borderTopColor: 'rgba(255,255,255,0.8)',
+              animation: 'spin 0.8s linear infinite',
+            }}
+          />
+        </div>
+      )}
 
       {/* Play/Pause overlay */}
       {showPlayIcon && !hasError && (
