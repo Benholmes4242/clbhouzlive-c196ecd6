@@ -115,17 +115,11 @@ interface LeaderboardRowProps {
 }
 
 function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreFlash, positionDelta = 0, tournamentTourSlug }: LeaderboardRowProps) {
-  const navigate = useNavigate();
   const abbreviatedName = `${leader.player.firstName[0]}. ${leader.player.lastName}`;
   const effectiveTourCode = leader.player.tourCode ?? tournamentTourSlug ?? 'pga';
   const photoUrl = getPlayerHeadshotUrl(leader.player.fullName, effectiveTourCode, leader.player.headshotOverride);
   const initials = `${leader.player.firstName[0]}${leader.player.lastName[0]}`.toUpperCase();
   const thruDisplay = formatThruDisplay(leader.thru, leader.round_1, leader.round_2, leader.round_3, leader.round_4, leader.status, leader.thruUpdatedAt, leader.tournamentTimezone);
-  
-  const handlePlayerTap = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    navigate(`/tourhub/player/${leader.player.id}`);
-  };
   
   return (
     <motion.div
@@ -141,10 +135,7 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
         <span className="leaderboard-position flex-shrink-0">
           {leader.position}
         </span>
-        <button
-          onClick={handlePlayerTap}
-          className="flex items-center gap-2 min-w-0 active:opacity-70 transition-opacity"
-        >
+        <div className="flex items-center gap-2 min-w-0">
           <div
             className="overflow-hidden flex-shrink-0"
             style={{ width: '32px', height: '33px', borderRadius: '34%', border: '1.5px solid #F8FAFC', background: '#F8FAFC' }}
@@ -166,7 +157,7 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
               <span className="leaderboard-thru-inline">{thruDisplay}</span>
             )}
           </span>
-        </button>
+        </div>
       </div>
       <span className={cn(
         "leaderboard-score flex-shrink-0 pr-2",
