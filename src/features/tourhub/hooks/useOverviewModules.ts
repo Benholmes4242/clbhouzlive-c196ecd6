@@ -131,34 +131,16 @@ function formatScore(score: number): string {
 // ============================================================================
 
 export function useLiveRightNow() {
+  const { data: cache, isLoading: cacheLoading } = useTournamentsCache();
+
   return useQuery({
-    queryKey: ['overview-live-right-now'],
+    queryKey: ['overview-live-right-now', cache ? 'ready' : 'waiting'],
     queryFn: async () => {
-      const today = new Date().toISOString().split('T')[0];
-      
-      // Get all live tournaments + "starting soon" tournaments (created/scheduled but within date range)
-      // Using .or() to combine: status=inprogress OR (status in created,scheduled AND start_date<=today AND end_date>=today)
-      const { data: tournaments, error: tError } = await supabase
-        .from('sr_tournaments')
-        .select(`
-          id,
-          name,
-          status,
-          start_date,
-          end_date,
-          purse,
-          venue_name,
-          venue_city,
-          season:sr_seasons!inner(tour_id, tour_name)
-        `)
-        .or(`status.eq.inprogress,and(status.in.(created,scheduled),start_date.lte.${today},end_date.gte.${today})`)
-        .order('start_date', { ascending: true });
+      if (!cache?.live.length) return [];
 
-      if (tError) throw tError;
-      if (!tournaments?.length) return [];
+      const tournamentIds = cache.live.map(t => t.id);
 
-      // Batch fetch leaders for ALL tournaments in a single query (fixes N+1)
-      const tournamentIds = tournaments.map((t: any) => t.id);
+      // Batch fetch leaders for ALL live tournaments in a single query
       const { data: allLeaders } = await supabase
         .from('sr_leaderboards')
         .select(`
@@ -173,7 +155,7 @@ export function useLiveRightNow() {
         .gt('strokes', 0)
         .not('position', 'is', null);
 
-      // Build leader map: tournament_id → first leader entry
+      // Build leader map
       const leaderMap: Record<string, any> = {};
       for (const entry of allLeaders || []) {
         if (!leaderMap[entry.tournament_id]) {
@@ -181,7 +163,7 @@ export function useLiveRightNow() {
         }
       }
 
-      return tournaments.map((t: any): LiveTournamentWithLeader => {
+      return cache.live.map((t): LiveTournamentWithLeader => {
         const leader = leaderMap[t.id] || null;
         const isStartingSoon = t.status !== 'inprogress' || !leader;
 
@@ -205,8 +187,9 @@ export function useLiveRightNow() {
         };
       });
     },
-    staleTime: 30_000,             // 30s — matches sync interval
-    refetchInterval: 60_000,       // 60s polling fallback
+    enabled: !!cache,
+    staleTime: 30_000,
+    refetchInterval: 60_000,
     refetchOnWindowFocus: true,
   });
 }
