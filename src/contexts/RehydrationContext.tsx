@@ -79,6 +79,14 @@ export function RehydrationProvider({ children }: RehydrationProviderProps) {
           'tournament-top-leaders', 'live-leader-teaser',
         ];
         
+        const p1Count = queryClient.getQueryCache().findAll({
+          predicate: (query) => PRIORITY_KEYS.includes(query.queryKey[0] as string) && query.isActive(),
+        }).length;
+        console.log(`[Rehydration] Priority 1: ${p1Count} active queries to refetch`, 
+          queryClient.getQueryCache().findAll({
+            predicate: (query) => PRIORITY_KEYS.includes(query.queryKey[0] as string) && query.isActive(),
+          }).map(q => q.queryKey));
+
         await queryClient.invalidateQueries({
           predicate: (query) => {
             const key = query.queryKey[0] as string;
@@ -89,6 +97,15 @@ export function RehydrationProvider({ children }: RehydrationProviderProps) {
 
         // Priority 2: Feed queries (after 500ms)
         await new Promise(resolve => setTimeout(resolve, 500));
+        
+        const p2Count = queryClient.getQueryCache().findAll({
+          predicate: (query) => FEED_QUERY_KEYS.includes(query.queryKey[0] as string) && query.isActive(),
+        }).length;
+        console.log(`[Rehydration] Priority 2: ${p2Count} active queries to refetch`,
+          queryClient.getQueryCache().findAll({
+            predicate: (query) => FEED_QUERY_KEYS.includes(query.queryKey[0] as string) && query.isActive(),
+          }).map(q => q.queryKey));
+
         await queryClient.invalidateQueries({
           predicate: (query) => {
             const key = query.queryKey[0] as string;
@@ -99,6 +116,15 @@ export function RehydrationProvider({ children }: RehydrationProviderProps) {
 
         // Priority 3: Everything else (after another 1000ms)
         await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        const p3Count = queryClient.getQueryCache().findAll({
+          predicate: (query) => {
+            const key = query.queryKey[0] as string;
+            return !PRIORITY_KEYS.includes(key) && !FEED_QUERY_KEYS.includes(key) && query.isActive();
+          },
+        }).length;
+        console.log(`[Rehydration] Priority 3: ${p3Count} active queries to refetch`);
+
         await queryClient.invalidateQueries({
           predicate: (query) => {
             const key = query.queryKey[0] as string;
@@ -106,7 +132,9 @@ export function RehydrationProvider({ children }: RehydrationProviderProps) {
           },
           refetchType: 'active',
         });
-        console.log('[Rehydration] Priority 3: All remaining queries invalidated');
+        
+        const totalCount = p1Count + p2Count + p3Count;
+        console.log(`[Rehydration] TOTAL: ${totalCount} queries refetched across 3 phases (P1:${p1Count} P2:${p2Count} P3:${p3Count})`);
       }
 
       // Wait a minimum display time for skeleton loaders (perceived performance)
