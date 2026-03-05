@@ -14,7 +14,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { ChevronUp, User, Music, ChevronRight, MapPinned } from 'lucide-react';
+import { ChevronUp, User, Music, ChevronRight } from 'lucide-react';
+import { FiMapPin } from 'react-icons/fi';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import CourseLocationRow from '@/components/posts/CourseLocationRow';
 import { getReviewOverlayTheme, type ExtractedReviewData } from '@/lib/postHelpers';
@@ -375,7 +376,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
         {/* Course location (collapsed) — separate line */}
         {!isExpanded && courseDisplayLabel && (
           <div className="flex items-center gap-1 mt-1.5">
-            <MapPinned className="w-3.5 h-3.5 text-white/50 flex-shrink-0" />
+            <FiMapPin size={14} className="text-white/50 flex-shrink-0" />
             <span className="text-[11px] text-white/50 truncate">
               {courseDisplayLabel}
             </span>
