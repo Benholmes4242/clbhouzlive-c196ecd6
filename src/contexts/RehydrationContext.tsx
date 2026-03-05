@@ -72,20 +72,45 @@ export function RehydrationProvider({ children }: RehydrationProviderProps) {
         console.log('[Rehydration] Light rehydration: Feed queries invalidated');
       } 
       else if (lifecycle.rehydrationLevel === 'full') {
-        // Full rehydration: Invalidate all active queries
+        // Staggered full rehydration to avoid connection stampede
+        // Priority 1: Critical live data (leaderboards, hero carousel)
+        const PRIORITY_KEYS = [
+          'hero-carousel-data', 'overview-live-right-now', 'live-arena',
+          'tournament-top-leaders', 'live-leader-teaser',
+        ];
+        
         await queryClient.invalidateQueries({
+          predicate: (query) => {
+            const key = query.queryKey[0] as string;
+            return PRIORITY_KEYS.includes(key);
+          },
+        });
+        console.log('[Rehydration] Priority 1: Live data invalidated');
+
+        // Priority 2: Feed queries (after 500ms)
+        await new Promise(resolve => setTimeout(resolve, 500));
+        await queryClient.invalidateQueries({
+          predicate: (query) => {
+            const key = query.queryKey[0] as string;
+            return FEED_QUERY_KEYS.includes(key);
+          },
+        });
+        console.log('[Rehydration] Priority 2: Feed queries invalidated');
+
+        // Priority 3: Everything else (after another 1000ms)
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        await queryClient.invalidateQueries({
+          predicate: (query) => {
+            const key = query.queryKey[0] as string;
+            return !PRIORITY_KEYS.includes(key) && !FEED_QUERY_KEYS.includes(key);
+          },
           refetchType: 'active',
         });
-        console.log('[Rehydration] Full rehydration: All active queries invalidated');
+        console.log('[Rehydration] Priority 3: All remaining queries invalidated');
       }
 
       // Wait a minimum display time for skeleton loaders (perceived performance)
       const MIN_SKELETON_DISPLAY_TIME = 400; // ms
-      
-      // Wait for queries to settle
-      await queryClient.refetchQueries({
-        type: 'active',
-      });
 
       const elapsed = Date.now() - startTime;
       if (elapsed < MIN_SKELETON_DISPLAY_TIME) {

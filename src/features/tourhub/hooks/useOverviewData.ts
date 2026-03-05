@@ -651,7 +651,7 @@ export function useTournamentLeader(tournamentId: string | undefined) {
       };
     },
     enabled: !!tournamentId,
-    staleTime: 30 * 1000,
+    staleTime: 30_000,
   });
 }
 
@@ -771,7 +771,7 @@ export function useTournamentTopLeaders(tournamentId: string | null) {
       });
     },
     enabled: !!tournamentId,
-    staleTime: 5 * 1000,          // 5s — Realtime handles freshness
+    staleTime: 30_000,             // 30s — matches sync interval
     refetchInterval: false,        // No polling — Realtime pushes updates
     refetchOnWindowFocus: true,
   });

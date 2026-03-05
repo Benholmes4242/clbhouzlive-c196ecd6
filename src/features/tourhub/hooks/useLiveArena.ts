@@ -143,41 +143,51 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
   if (tournamentsError) throw tournamentsError;
   if (!tournaments || tournaments.length === 0) return [];
 
-  // For each live tournament, fetch leaderboard data
+  // Batch fetch top 10 for ALL live tournaments in a single query (fixes N+1)
+  const tournamentIds = tournaments.map((t: any) => t.id);
+  const { data: allLeaderboard, error: lbError } = await supabase
+    .from('sr_leaderboards')
+    .select(`
+      id,
+      tournament_id,
+      player_id,
+      position,
+      score,
+      money,
+      thru,
+      thru_updated_at,
+      player:sr_players!sr_leaderboards_player_id_fkey (
+        id,
+        first_name,
+        last_name,
+        full_name,
+        photo_url,
+        country
+      )
+    `)
+    .in('tournament_id', tournamentIds)
+    .lte('position', 10)
+    .order('position', { ascending: true });
+
+  if (lbError) {
+    console.error('Error fetching leaderboards:', lbError);
+  }
+
+  // Group leaderboard entries by tournament_id
+  const leaderboardByTournament: Record<string, any[]> = {};
+  for (const entry of allLeaderboard || []) {
+    const tid = entry.tournament_id;
+    if (!leaderboardByTournament[tid]) leaderboardByTournament[tid] = [];
+    leaderboardByTournament[tid].push(entry);
+  }
+
   const results: LiveArenaTournament[] = [];
   
   for (const tournament of tournaments) {
-    // Fetch top 10 from leaderboard
-    const { data: leaderboard, error: lbError } = await supabase
-      .from('sr_leaderboards')
-      .select(`
-        id,
-        player_id,
-        position,
-        score,
-        money,
-        thru,
-        thru_updated_at,
-        player:sr_players!sr_leaderboards_player_id_fkey (
-          id,
-          first_name,
-          last_name,
-          full_name,
-          photo_url,
-          country
-        )
-      `)
-      .eq('tournament_id', tournament.id)
-      .lte('position', 10)
-      .order('position', { ascending: true });
-
-    if (lbError) {
-      console.error('Error fetching leaderboard:', lbError);
-      continue;
-    }
+    const leaderboard = leaderboardByTournament[tournament.id] || [];
 
     // Transform leaderboard data
-    const players: LiveArenaPlayer[] = (leaderboard || []).map((entry: any) => ({
+    const players: LiveArenaPlayer[] = leaderboard.map((entry: any) => ({
       id: entry.id,
       playerId: entry.player_id,
       position: entry.position,
@@ -212,7 +222,6 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
                      eventType.includes('european') || eventType.includes('dp') ? 'euro' :
                      eventType.includes('liv') ? 'liv' : 'pga';
     
-    // Current round isn't directly available, estimate from cut_round or default to 1
     const estimatedRound = tournament.cut_round ? Math.min(tournament.cut_round, 4) : 1;
     
     const momentumTags = generateMomentumTags(
@@ -257,7 +266,7 @@ export function useLiveArena() {
   return useQuery({
     queryKey: ['live-arena'],
     queryFn: fetchLiveArenaData,
-    staleTime: 5 * 1000,          // 5s — Realtime handles freshness
+    staleTime: 30_000,             // 30s — matches sync interval
     refetchInterval: false,        // No polling — Realtime pushes updates
     refetchOnWindowFocus: true,
     gcTime: 1000 * 60 * 10, // 10 minutes
