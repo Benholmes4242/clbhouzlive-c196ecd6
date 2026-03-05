@@ -284,19 +284,23 @@ export function FullscreenReviewPost({
       )}
       
       
-      {/* Top gradient - subtle fade behind panel */}
-      <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-black/30 via-black/15 to-transparent pointer-events-none z-[4]" />
+      {/* Top gradient - subtle fade behind panel (only when we render our own media) */}
+      {renderMedia && (
+        <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-black/30 via-black/15 to-transparent pointer-events-none z-[4]" />
+      )}
       
-      {/* Bottom gradient — strengthened multi-stop scrim for text legibility on any photo */}
-      <div 
-        className="absolute inset-x-0 bottom-0 pointer-events-none z-[5]" 
-        style={{
-          height: '50%',
-          background: mode === 'preview'
-            ? 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.7) 25%, rgba(0,0,0,0.3) 50%, transparent 100%)'
-            : 'linear-gradient(to top, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.15) 50%, transparent 100%)',
-        }}
-      />
+      {/* Bottom gradient — strengthened multi-stop scrim for text legibility on any photo (only when we render our own media) */}
+      {renderMedia && (
+        <div 
+          className="absolute inset-x-0 bottom-0 pointer-events-none z-[5]" 
+          style={{
+            height: '50%',
+            background: mode === 'preview'
+              ? 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.7) 25%, rgba(0,0,0,0.3) 50%, transparent 100%)'
+              : 'linear-gradient(to top, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.15) 50%, transparent 100%)',
+          }}
+        />
+      )}
       
       {/* Premium Top Overlay Panel - Entire tile opens review sheet */}
       <motion.button
