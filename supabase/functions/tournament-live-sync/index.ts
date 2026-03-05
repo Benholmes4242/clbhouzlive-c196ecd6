@@ -348,7 +348,7 @@ async function syncTournament(
   // ── Periodic scorecards sync (every 5th minute, offset by 1) ──────
   // PGA, DP World, Champions, LPGA, and Korn Ferry tours get hole-by-hole scorecards
   const scorecardTours = ['pga', 'euro', 'champ', 'lpga', 'pgad', 'liv'];
-  const shouldSyncScorecards = (currentMinute % 5 === 1) && scorecardTours.includes(tour);
+  const shouldSyncScorecards = (currentMinute % 5 === 1) && scorecardTours.includes(tour.toLowerCase());
 
   if (shouldSyncScorecards) {
     try {
