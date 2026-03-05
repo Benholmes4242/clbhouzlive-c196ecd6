@@ -16,6 +16,10 @@ interface MediaStore {
   // Carousel State
   carouselPositions: Map<number, number>; // feedIndex → mediaIndex
 
+  // Active Video Element (for page-level scrubber)
+  activeVideoElement: HTMLVideoElement | null;
+  activeVideoRef: React.RefObject<HTMLVideoElement | null> | null;
+
   // Error State
   errorItems: Set<number>;
   retryingItems: Set<number>;
@@ -33,6 +37,7 @@ interface MediaStore {
   clearError: (feedIndex: number) => void;
   markRetrying: (feedIndex: number) => void;
   clearRetrying: (feedIndex: number) => void;
+  setActiveVideoElement: (el: HTMLVideoElement | null, ref: React.RefObject<HTMLVideoElement | null> | null) => void;
 }
 
 export const useMediaStore = create<MediaStore>((set) => ({
