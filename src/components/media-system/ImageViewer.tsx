@@ -36,7 +36,7 @@ export function ImageViewer({ imageUrl, thumbnailUrl, width, height }: ImageView
           draggable={false}
           className="absolute inset-0 w-full h-full transition-opacity duration-200"
           style={{
-            objectFit: fit as any,
+            objectFit: fit as React.CSSProperties['objectFit'],
             opacity: loaded ? 0 : 1,
           }}
         />
@@ -49,7 +49,7 @@ export function ImageViewer({ imageUrl, thumbnailUrl, width, height }: ImageView
         draggable={false}
         className="absolute inset-0 w-full h-full transition-opacity duration-200"
         style={{
-          objectFit: fit as any,
+          objectFit: fit as React.CSSProperties['objectFit'],
           opacity: loaded ? 1 : 0,
         }}
         onLoad={() => setLoaded(true)}
