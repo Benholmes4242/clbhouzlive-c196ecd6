@@ -17,8 +17,6 @@ interface MediaCarouselProps {
   feedIndex: number;
   isActive: boolean;
   onDoubleTapLike?: () => void;
-  onScrubStart?: () => void;
-  onScrubEnd?: () => void;
 }
 
 const SWIPE_VELOCITY_THRESHOLD = 0.3;
@@ -30,7 +28,7 @@ type DirLock = 'none' | 'horizontal' | 'vertical';
 
 export function MediaCarousel({
   mediaItems, feedIndex, isActive,
-  onDoubleTapLike, onScrubStart, onScrubEnd,
+  onDoubleTapLike,
 }: MediaCarouselProps) {
   const activeMedia = useMediaStore((s) => s.carouselPositions.get(feedIndex) ?? 0);
   const setCarouselPosition = useMediaStore((s) => s.setCarouselPosition);
@@ -146,8 +144,6 @@ export function MediaCarousel({
                 thumbnailUrl={item.thumbnailUrl}
                 duration={item.duration}
                 onDoubleTapLike={onDoubleTapLike}
-                onScrubStart={onScrubStart}
-                onScrubEnd={onScrubEnd}
               />
             ) : item.imageUrl ? (
               <ImageViewer

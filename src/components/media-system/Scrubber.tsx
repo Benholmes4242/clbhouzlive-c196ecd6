@@ -15,7 +15,7 @@ import { haptic } from '@/utils/haptics';
 type ScrubState = 'default' | 'hover' | 'scrubbing' | 'fine-scrub';
 
 interface ScrubberProps {
-  videoRef: React.RefObject<HTMLVideoElement | null>;
+  videoRef?: React.RefObject<HTMLVideoElement | null>;
   /** Reactive video element — triggers RAF restart when it changes from null */
   videoElement?: HTMLVideoElement | null;
   isActive: boolean;
@@ -24,8 +24,10 @@ interface ScrubberProps {
   onScrubStart?: () => void;
   /** Called when scrubbing ends */
   onScrubEnd?: () => void;
-  /** Pixels from the bottom of the parent container */
+  /** Pixels from the bottom of the parent container (used only when style is not provided) */
   bottomOffset?: number;
+  /** Optional style override — when provided, replaces internal absolute positioning */
+  style?: React.CSSProperties;
 }
 
 function formatTime(seconds: number): string {
@@ -49,12 +51,12 @@ const THUMB_SIZES: Record<ScrubState, number> = {
 };
 
 const TOUCH_ZONE_HEIGHT = 60;
-const FINE_SCRUB_THRESHOLD = -40; // deltaY px (negative = upward)
+const FINE_SCRUB_THRESHOLD = -40;
 const FINE_SCRUB_FACTOR = 0.25;
 const HIDE_DELAY = 2000;
-const LOOP_PULSE_WINDOW = 0.5; // seconds before loop
+const LOOP_PULSE_WINDOW = 0.5;
 
-export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubStart, onScrubEnd, bottomOffset = 0 }: ScrubberProps) {
+export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubStart, onScrubEnd, bottomOffset = 0, style }: ScrubberProps) {
   const [progress, setProgress] = useState(0);
   const [buffered, setBuffered] = useState(0);
   const [scrubState, setScrubState] = useState<ScrubState>('default');
@@ -122,14 +124,14 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
 
   // ── Seek the video ────────────────────────────────────────────
   const seekTo = useCallback((fraction: number) => {
-    const video = videoRef.current;
+    const video = videoElement ?? videoRef?.current;
     const dur = duration ?? video?.duration;
     if (!video || !dur || !isFinite(dur)) return;
     const clamped = Math.max(0, Math.min(1, fraction));
     video.currentTime = clamped * dur;
     setProgress(clamped);
     setTooltipTime(formatTime(clamped * dur));
-  }, [videoRef, duration]);
+  }, [videoElement, videoRef, duration]);
 
   // ── Touch handlers ────────────────────────────────────────────
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
@@ -150,7 +152,7 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
     lastScrubTimeRef.current = frac;
 
     // Pause video for scrubbing
-    const video = videoRef.current;
+    const video = videoElement ?? videoRef?.current;
     if (video) {
       wasPausedRef.current = video.paused;
       if (!video.paused) video.pause();
@@ -162,7 +164,7 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
     seekTo(frac);
 
     if (hideTimer.current) clearTimeout(hideTimer.current);
-  }, [videoRef, seekTo, onScrubStart]);
+  }, [videoElement, videoRef, seekTo, onScrubStart]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     e.stopPropagation();
@@ -204,7 +206,7 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
     }
 
     // Resume playback
-    const video = videoRef.current;
+    const video = videoElement ?? videoRef?.current;
     if (video && !wasPausedRef.current) {
       video.play().catch(() => {});
     }
@@ -212,19 +214,25 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
     setScrubState('hover');
     onScrubEnd?.();
     scheduleHide();
-  }, [videoRef, onScrubEnd, scheduleHide]);
+  }, [videoElement, videoRef, onScrubEnd, scheduleHide]);
 
   const barHeight = BAR_HEIGHTS[scrubState];
   const thumbSize = THUMB_SIZES[scrubState];
   const showThumb = scrubState !== 'default';
   const showTooltip = isScrubbing;
 
+  // When style is provided (page-level), wrap everything in a single positioned container
+  const useExternalStyle = !!style;
+
   return (
-    <>
+    <div style={useExternalStyle ? style : undefined}>
       {/* Invisible touch capture zone — bottom 60px */}
       <div
-        className="absolute left-0 right-0 z-[25]"
-        style={{ bottom: bottomOffset, height: TOUCH_ZONE_HEIGHT }}
+        className={useExternalStyle ? "left-0 right-0 z-[25]" : "absolute left-0 right-0 z-[25]"}
+        style={useExternalStyle
+          ? { height: TOUCH_ZONE_HEIGHT, position: 'relative', marginTop: -TOUCH_ZONE_HEIGHT + barHeight }
+          : { bottom: bottomOffset, height: TOUCH_ZONE_HEIGHT, position: 'absolute' }
+        }
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -234,12 +242,11 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
       {/* Visual bar container */}
       <div
         ref={barRef}
-        className="absolute left-0 right-0 z-20 pointer-events-none"
-        style={{
-          bottom: bottomOffset,
-          height: barHeight,
-          transition: 'height 100ms ease-out',
-        }}
+        className={useExternalStyle ? "left-0 right-0 pointer-events-none" : "absolute left-0 right-0 z-20 pointer-events-none"}
+        style={useExternalStyle
+          ? { height: barHeight, transition: 'height 100ms ease-out' }
+          : { bottom: bottomOffset, height: barHeight, transition: 'height 100ms ease-out' }
+        }
       >
         {/* Background track */}
         <div
@@ -335,7 +342,6 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
           </div>
         )}
       </div>
-
-    </>
+    </div>
   );
 }

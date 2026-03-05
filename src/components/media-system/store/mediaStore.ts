@@ -20,6 +20,9 @@ interface MediaStore {
   errorItems: Set<number>;
   retryingItems: Set<number>;
 
+  // Active video element (for page-level scrubber)
+  activeVideoElement: HTMLVideoElement | null;
+
   // Actions
   setActiveIndex: (index: number) => void;
   setScrollDirection: (dir: 'up' | 'down' | null) => void;
@@ -33,6 +36,7 @@ interface MediaStore {
   clearError: (feedIndex: number) => void;
   markRetrying: (feedIndex: number) => void;
   clearRetrying: (feedIndex: number) => void;
+  setActiveVideoElement: (el: HTMLVideoElement | null) => void;
 }
 
 export const useMediaStore = create<MediaStore>((set) => ({
@@ -49,6 +53,8 @@ export const useMediaStore = create<MediaStore>((set) => ({
 
   errorItems: new Set(),
   retryingItems: new Set(),
+
+  activeVideoElement: null,
 
   setActiveIndex: (index) => set((s) => ({
     activeIndex: index,
@@ -95,4 +101,5 @@ export const useMediaStore = create<MediaStore>((set) => ({
       next.delete(feedIndex);
       return { retryingItems: next };
     }),
+  setActiveVideoElement: (el) => set({ activeVideoElement: el }),
 }));
