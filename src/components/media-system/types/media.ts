@@ -64,11 +64,22 @@ export interface PoolElement {
   lastUsedAt: number;
 }
 
+/** Adaptive pool sizing based on device memory */
+function getPoolSize(): number {
+  const deviceMemory = (navigator as any).deviceMemory;
+  if (deviceMemory && deviceMemory <= 4) {
+    return 3; // Reduced pool on low-memory devices
+  }
+  return 5; // Full pool on capable devices
+}
+
+const _poolSize = getPoolSize();
+
 /** Pool configuration constants */
 export const POOL_CONFIG = {
-  MAX_POOL_SIZE: 5,
-  PRELOAD_AHEAD: 2,
-  PRELOAD_BEHIND: 2,
+  MAX_POOL_SIZE: _poolSize,
+  PRELOAD_AHEAD: _poolSize >= 5 ? 2 : 1,
+  PRELOAD_BEHIND: _poolSize >= 5 ? 2 : 1,
   RECYCLE_THRESHOLD: 3,
 } as const;
 

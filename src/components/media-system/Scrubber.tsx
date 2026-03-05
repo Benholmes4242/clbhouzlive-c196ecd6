@@ -86,12 +86,21 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
       }
     };
     measure();
+
+    // Use ResizeObserver instead of setInterval for efficiency
+    const nav = document.querySelector(bottomNavSelector);
+    let observer: ResizeObserver | null = null;
+    if (nav) {
+      observer = new ResizeObserver(measure);
+      observer.observe(nav);
+    }
+
+    // Also measure on window resize (orientation change, keyboard)
     window.addEventListener('resize', measure);
-    // Re-measure periodically in case nav mounts late
-    const id = setInterval(measure, 1000);
+
     return () => {
+      observer?.disconnect();
       window.removeEventListener('resize', measure);
-      clearInterval(id);
     };
   }, [bottomNavSelector]);
 

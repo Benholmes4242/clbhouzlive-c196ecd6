@@ -396,6 +396,19 @@ const ClubhouseContent = () => {
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
+  // ── Fix: Auto-resume on network reconnect ──
+  useEffect(() => {
+    const handleOnline = () => {
+      const store = useMediaStore.getState();
+      const activeEl = store.activeVideoElement;
+      if (activeEl && activeEl.paused && !store.userPaused) {
+        activeEl.play().catch(() => {});
+      }
+    };
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
+  }, []);
+
   // ── Fix 3: Screen Wake Lock ──
   useEffect(() => {
     let wakeLock: WakeLockSentinel | null = null;
@@ -591,7 +604,6 @@ const ClubhouseContent = () => {
         }}>
           <VideoPoolProvider>
             <FeedWithPreloader
-              key={activeTab}
               posts={posts}
               onNearEnd={handleNearEnd}
               onRefresh={handleRefresh}

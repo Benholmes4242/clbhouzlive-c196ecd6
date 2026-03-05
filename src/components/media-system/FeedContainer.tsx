@@ -20,6 +20,7 @@ const FLING_VELOCITY_THRESHOLD = 0.4;   // px/ms — above this = fling
 const RUBBER_BAND_FACTOR = 0.35;
 const PTR_THRESHOLD = 80;               // px of actual pull to trigger refresh
 const PTR_RENDER_THRESHOLD = 10;        // px change to trigger PTR re-render
+const RENDER_WINDOW = 5;                // DOM virtualization: render ±5 items around active
 
 interface FeedContainerProps {
   posts: FeedPost[];
@@ -56,6 +57,21 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
   const setActiveIndex = useMediaStore((s) => s.setActiveIndex);
   const storeActiveIndex = useMediaStore((s) => s.activeIndex);
   const pool = useVideoPoolContext();
+  const prevPostsRef = useRef(posts);
+
+  // Detect feed switch (posts array identity change) — reset scroll to top
+  useEffect(() => {
+    if (prevPostsRef.current !== posts && posts.length > 0) {
+      const newOffset = 0;
+      offsetRef.current = newOffset;
+      activeIndexRef.current = 0;
+      setOffsetY(newOffset);
+      if (trackRef.current) {
+        trackRef.current.style.transform = `translateY(0px)`;
+      }
+    }
+    prevPostsRef.current = posts;
+  }, [posts]);
 
   // Resize handling
   useEffect(() => {
@@ -332,19 +348,33 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
           willChange: 'transform',
         }}
       >
-        {posts.map((post, index) => (
-          <FeedItem
-            key={post.id}
-            post={post}
-            index={index}
-            isActive={index === storeActiveIndex}
-            isLastItem={index === posts.length - 1}
-            hasNextPage={hasNextPage}
-            followOverride={followOverrides?.get(post.userId)}
-            onFollowChange={onFollowChange}
-            onFirstFrameReady={index === 0 ? onFirstFrameReady : undefined}
-          />
-        ))}
+        {posts.map((post, index) => {
+          const distance = Math.abs(index - storeActiveIndex);
+          
+          // DOM virtualization: only render FeedItems within ±5 of active
+          if (distance > RENDER_WINDOW) {
+            return (
+              <div
+                key={post.id}
+                style={{ height: '100dvh', flexShrink: 0 }}
+              />
+            );
+          }
+          
+          return (
+            <FeedItem
+              key={post.id}
+              post={post}
+              index={index}
+              isActive={index === storeActiveIndex}
+              isLastItem={index === posts.length - 1}
+              hasNextPage={hasNextPage}
+              followOverride={followOverrides?.get(post.userId)}
+              onFollowChange={onFollowChange}
+              onFirstFrameReady={index === 0 ? onFirstFrameReady : undefined}
+            />
+          );
+        })}
       </div>
     </div>
   );

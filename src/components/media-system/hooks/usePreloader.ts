@@ -3,6 +3,7 @@ import { useMediaStore } from '../store/mediaStore';
 import { preCreateHlsInstance, supportsNativeHls } from '../utils/hlsManager';
 import { parseMasterManifest, parseSegmentManifest } from '../utils/manifestParser';
 import { segmentCache } from '../utils/segmentCache';
+import { getManifestTextCache } from '../utils/cachedHlsLoader';
 import type { FeedPost } from '../types/media';
 
 /**
@@ -17,13 +18,14 @@ import type { FeedPost } from '../types/media';
  *
  * Network-aware: reduces prefetch range on slow connections.
  * Uses AbortController to cancel speculative fetches on index change.
+ * Manifest text cache is shared with cachedHlsLoader for dedup.
  */
 export function usePreloader(posts: FeedPost[]) {
   const activeIndex = useMediaStore((s) => s.activeIndex);
   const abortRef = useRef<AbortController | null>(null);
   const warmedManifests = useRef<Set<string>>(new Set());
   const warmedPosters = useRef<Set<string>>(new Set());
-  const manifestTextCache = useRef<Map<string, string>>(new Map());
+  const manifestTextCache = getManifestTextCache();
 
   useEffect(() => {
     // Abort any in-flight preloads from previous index
@@ -54,7 +56,7 @@ export function usePreloader(posts: FeedPost[]) {
           try {
             const response = await fetch(url, { signal, mode: 'cors' });
             const text = await response.text();
-            manifestTextCache.current.set(url, text);
+            manifestTextCache.set(url, text);
             warmedManifests.current.add(url);
           } catch {
             // Silent — speculative
@@ -81,7 +83,7 @@ export function usePreloader(posts: FeedPost[]) {
         try {
           const response = await fetch(prevUrl, { signal, mode: 'cors' });
           const text = await response.text();
-          manifestTextCache.current.set(prevUrl, text);
+          manifestTextCache.set(prevUrl, text);
           warmedManifests.current.add(prevUrl);
         } catch {
           // Silent
@@ -96,11 +98,11 @@ export function usePreloader(posts: FeedPost[]) {
         if (nextUrl && !signal.aborted) {
           try {
             // Use cached manifest text from Stage 1 if available
-            let masterText = manifestTextCache.current.get(nextUrl);
+            let masterText = manifestTextCache.get(nextUrl);
             if (!masterText) {
               const masterResponse = await fetch(nextUrl, { signal, mode: 'cors' });
               masterText = await masterResponse.text();
-              manifestTextCache.current.set(nextUrl, masterText);
+              manifestTextCache.set(nextUrl, masterText);
             }
             const parsed = parseMasterManifest(masterText, nextUrl);
 
@@ -136,9 +138,9 @@ export function usePreloader(posts: FeedPost[]) {
         const url = posts[i]?.mediaItems[0]?.hlsUrl;
         if (url) urlsToKeep.add(url);
       }
-      for (const key of manifestTextCache.current.keys()) {
+      for (const key of manifestTextCache.keys()) {
         if (!urlsToKeep.has(key)) {
-          manifestTextCache.current.delete(key);
+          manifestTextCache.delete(key);
         }
       }
     }

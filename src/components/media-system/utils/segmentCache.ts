@@ -10,7 +10,15 @@ interface CachedSegment {
   cachedAt: number;
 }
 
-const MAX_CACHE_SIZE_BYTES = 50 * 1024 * 1024; // 50MB
+function getMaxCacheSize(): number {
+  const deviceMemory = (navigator as any).deviceMemory; // GB, may be undefined
+  if (deviceMemory && deviceMemory <= 4) {
+    return 25 * 1024 * 1024; // 25MB on low-memory devices
+  }
+  return 50 * 1024 * 1024; // 50MB default
+}
+
+const MAX_CACHE_SIZE_BYTES = getMaxCacheSize();
 
 class SegmentCache {
   private cache = new Map<string, CachedSegment>();
