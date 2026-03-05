@@ -33,8 +33,7 @@ const HIDDEN_ROUTE_PREFIXES = [
 // Routes that use different nav styling (like clubhouse)
 const CLUBHOUSE_ROUTES = [
   '/', 
-  '/clubhouse',
-  '/watch',
+  '/clubhouse'
 ];
 
 // Routes that use the warm gradient Cleo design

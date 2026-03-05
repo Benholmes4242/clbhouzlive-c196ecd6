@@ -187,9 +187,6 @@ const DiscoverGamesPage = lazy(() => import("./features/games/pages/DiscoverGame
 // Public Echo Share Page
 const EchoSharePage = lazy(() => import("./pages/EchoSharePage").then(m => ({ default: m.EchoSharePage })));
 
-// Watch page (discovery grid)
-const WatchPage = lazy(() => import("./pages/WatchPage"));
-
 // Tour Hub pages
 const TourHubHomePage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubHomePage })));
 const TourHubLivePage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubLivePage })));
@@ -337,7 +334,6 @@ function AppRoutes() {
         <Route path="/post/:postId" element={<Suspense fallback={null}><PostDeepLinkPage /></Suspense>} />
         <Route path="/post/:postId/comment/:commentId" element={<Suspense fallback={null}><CommentDeepLinkPage /></Suspense>} />
         
-        <Route path="/watch" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={9} />}><WatchPage /></Suspense>} />
         <Route path="/videos" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><VideosPage /></Suspense>} />
         <Route path="/video/:videoId" element={<Suspense fallback={null}><VideoPlayerModal /></Suspense>} />
         
