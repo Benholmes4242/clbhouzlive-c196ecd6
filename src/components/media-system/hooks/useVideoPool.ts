@@ -123,14 +123,12 @@ export function useVideoPool() {
   // ── Safe play with iOS retry ──────────────────────────────────────
   const safePlay = useCallback(async (video: HTMLVideoElement): Promise<boolean> => {
     try {
-      console.log('[Pool:safePlay] Attempting play(), muted:', video.muted, 'paused:', video.paused, 'readyState:', video.readyState, 'src:', video.src?.slice(-30));
       await video.play();
-      console.log('[Pool:safePlay] play() SUCCESS');
       return true;
     } catch (error) {
       if (error instanceof DOMException) {
         if (error.name === 'NotAllowedError') {
-          console.log('[Pool:safePlay] NotAllowedError — retrying muted');
+          
           video.muted = true;
           useMediaStore.getState().setMuted(true);
           try {
@@ -141,11 +139,11 @@ export function useVideoPool() {
           }
         }
         if (error.name === 'AbortError') {
-          console.log('[Pool:safePlay] AbortError — returning false');
+          
           return false;
         }
       }
-      console.log('[Pool:safePlay] UNEXPECTED error:', (error as any)?.name, (error as any)?.message);
+      
       console.error('[Pool] safePlay failed:', error);
       return false;
     }
@@ -163,14 +161,14 @@ export function useVideoPool() {
     ): Promise<HTMLVideoElement | null> => {
       const pool = poolRef.current;
       if (!pool.length) return null;
-      console.log('[Pool:assign] START index:', feedIndex, 'url:', hlsUrl?.slice(-30));
+      
 
       const rapid = isRapidScrolling();
 
       // ── 1. Cache hit — same URL already loaded ────────────────
       const cachedIdx = pool.findIndex((p) => p.assignedUrl === hlsUrl);
       if (cachedIdx >= 0) {
-        console.log('[Pool:assign] Cache hit, same URL — calling safePlay');
+        
         const cached = pool[cachedIdx];
         cached.lastUsedAt = Date.now();
         cached.assignedIndex = feedIndex;
@@ -219,7 +217,7 @@ export function useVideoPool() {
       }
 
       if (!target || targetIdx < 0) return null;
-      console.log('[Pool:assign] Recycling element', targetIdx, 'for index', feedIndex);
+      
 
       // ── Step 1: DETACH from old item ──────────────────────────
       const video = target.video;
@@ -347,7 +345,7 @@ export function useVideoPool() {
       };
 
       // Try promote pre-created instance first
-      console.log('[Pool:assign] Attaching HLS for index:', feedIndex);
+      
       const promoted = promotePreCreated(hlsUrl, video, handleHlsError);
 
       if (!promoted) {
@@ -362,7 +360,7 @@ export function useVideoPool() {
         }
       }
 
-      console.log('[Pool:assign] HLS attached for index:', feedIndex);
+      
       if (loadTimedOut) return video;
 
       // ── Step 4: Restore session & play ────────────────────────
@@ -380,7 +378,7 @@ export function useVideoPool() {
         if (playingFired || loadTimedOut) return;
         playingFired = true;
         clearTimeout(loadTimeout);
-        console.log('[Pool:assign] playing event FIRED for index:', feedIndex);
+        
         onPlaying?.();
       };
       addTrackedListener(targetIdx, video, 'playing', onPlayingEvt, { once: true });
@@ -392,7 +390,7 @@ export function useVideoPool() {
 
       // NOW call safePlay
       const isMutedNow = useMediaStore.getState().isMuted;
-      console.log('[Pool:assign] Calling safePlay, video.muted:', video.muted, 'video.readyState:', video.readyState);
+      
       if (!isMutedNow && !rapid) {
         video.volume = 0; // Start silent, fade in after play
       }

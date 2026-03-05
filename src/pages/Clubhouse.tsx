@@ -138,7 +138,7 @@ const ClubhouseContent = () => {
   const posts = activeFeed.posts;
   const isLoading = activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? true;
-  console.log('[Clubhouse] Posts loaded:', posts.length, 'isLoading:', isLoading);
+  
   
   // Skeleton timing
   const { 

@@ -97,7 +97,7 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
 
     const onTouchEnd = () => {
       if (useMediaStore.getState().userPaused) return;
-      console.log('[FeedContainer] touchend gesture prime, attempting play');
+      
       const currentActiveIndex = useMediaStore.getState().activeIndex;
       const activePost = posts[currentActiveIndex];
       if (!activePost) return;
