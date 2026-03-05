@@ -69,6 +69,8 @@ interface ActionSlotProps {
   idleOpacity?: number;
   /** Opacity applied directly to the icon (e.g. 0.5 for muted state) */
   iconOpacity?: number;
+  /** Ref forwarded to the root slot div */
+  slotRef?: React.Ref<HTMLDivElement>;
 }
 
 /**
@@ -86,6 +88,7 @@ const ActionSlot: React.FC<ActionSlotProps> = ({
   isLikeButton = false,
   idleOpacity = 1,
   iconOpacity = 1,
+  slotRef,
 }) => {
   const [isPressed, setIsPressed] = useState(false);
   const [showLikePop, setShowLikePop] = useState(false);
@@ -114,6 +117,7 @@ const ActionSlot: React.FC<ActionSlotProps> = ({
 
   return (
     <div 
+      ref={slotRef}
       className="flex flex-col items-center transition-opacity duration-200"
       style={{ height: SLOT_HEIGHT, opacity: idleOpacity }}
     >
@@ -262,15 +266,14 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
     >
       {/* Slot 1: Right chevron — top of rail, only when there's a next media item */}
       {onNextMedia && hasNextMedia && (
-        <div ref={chevronSlotRef}>
-          <ActionSlot
-            icon={ChevronRight}
-            onClick={onNextMedia}
-            ariaLabel="Next media"
-            showCount={false}
-            idleOpacity={idleOpacity}
-          />
-        </div>
+        <ActionSlot
+          slotRef={chevronSlotRef}
+          icon={ChevronRight}
+          onClick={onNextMedia}
+          ariaLabel="Next media"
+          showCount={false}
+          idleOpacity={idleOpacity}
+        />
       )}
 
       {/* Slot 2: Like */}
