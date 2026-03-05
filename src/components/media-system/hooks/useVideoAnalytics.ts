@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type { FeedPost } from '../types/media';
-import { trackEvent } from '@/utils/analyticsEvents';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 export function useVideoAnalytics(
   post: FeedPost | null,
@@ -25,7 +25,7 @@ export function useVideoAnalytics(
       if (watchStartRef.current && post) {
         const watchTimeMs = Date.now() - watchStartRef.current;
         if (watchTimeMs > 1000) {
-          trackEvent('video_watch_time', {
+          analyticsEvents.track('video_watch_time', {
             post_id: post.id,
             watch_time_ms: watchTimeMs,
             watch_time_seconds: Math.round(watchTimeMs / 1000),
