@@ -56,20 +56,20 @@ async function fetchPlayerScorecard(
   if (scError || !scorecardRows?.length) return null;
 
   // Fetch course hole data for par/yardage
-  // Get course_id from the tournament
+  // Get venue_id from the tournament (sr_tournaments uses venue_id, not course_id)
   const { data: tournament } = await supabase
     .from('sr_tournaments')
-    .select('course_id')
+    .select('venue_id')
     .eq('id', tournamentId)
     .single();
 
   let courseHoles: Record<number, { par: number; yardage: number }> = {};
 
-  if (tournament?.course_id) {
+  if (tournament?.venue_id) {
     const { data: holes } = await supabase
       .from('sr_course_holes')
       .select('hole_number, par, yardage')
-      .eq('course_id', tournament.course_id)
+      .eq('course_id', tournament.venue_id)
       .order('hole_number', { ascending: true });
 
     if (holes) {

@@ -32,7 +32,7 @@
  * ```
  */
 import { useState, useCallback } from 'react';
-import type { PlayerInfo } from './PlayerScorecardCard';
+import type { PlayerInfo } from '@/components/tourhub/PlayerScorecardCard';
 
 export function useLeaderboardScorecard() {
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerInfo | null>(null);
