@@ -251,6 +251,11 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
         onClick={(e) => e.stopPropagation()}
+        role="slider"
+        aria-label="Video progress"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(progress * 100)}
       />
 
       {/* Visual bar container */}
