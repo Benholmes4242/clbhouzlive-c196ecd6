@@ -210,8 +210,8 @@ const SuggestedCreatorsStrip: React.FC<SuggestedCreatorsStripProps> = ({ userId 
     );
   }
 
-  // Don't render if < 2 creators
-  if (!creators || creators.length < 2) return null;
+  // Don't render if < 1 creator (temporarily lowered from 2 for pre-launch testing)
+  if (!creators || creators.length < 1) return null;
 
   return (
     <div>
