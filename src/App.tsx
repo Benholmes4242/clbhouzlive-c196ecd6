@@ -26,6 +26,7 @@ import '@/utils/hlsLoader';
 import { useImageUploadSafeguard } from '@/hooks/useImageUploadSafeguard';
 import { useGlobalMemoryMonitor } from '@/hooks/useMemoryMonitor';
 import { usePresenceTracker } from '@/hooks/usePresenceTracker';
+import { useAudioBridge } from '@/hooks/useAudioBridge';
 import { useLocationBroadcast } from '@/features/nearby/hooks/useLocationBroadcast';
 import { TopTenProvider } from '@/context/TopTenContext';
 import { VideoPlaybackProvider } from '@/context/VideoPlaybackContext';
@@ -620,6 +621,17 @@ const AppInner: React.FC = () => {
   
   // Real-time course ratings listener for instant card updates
   useCourseRatingsRealtime();
+  
+  // Bidirectional audio mute sync between MediaStore ↔ GlobalAudioContext
+  useAudioBridge();
+  
+  // Register media cache service worker for persistent HLS segment caching
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/media-cache-sw.js', { scope: '/' })
+        .catch(() => {});
+    }
+  }, []);
   // NOTE: useOnboardingEnforcer moved inside BrowserRouter (see OnboardingEnforcerWrapper below)
   
   // Run chat history migration once on app init

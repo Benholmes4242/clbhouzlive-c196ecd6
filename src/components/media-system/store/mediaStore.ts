@@ -46,7 +46,12 @@ export const useMediaStore = create<MediaStore>((set) => ({
   scrollDirection: null,
   isTransitioning: false,
 
-  isMuted: true,
+  isMuted: (() => {
+    try {
+      const stored = sessionStorage.getItem('clbhouz-muted');
+      return stored !== null ? stored === 'true' : true;
+    } catch { return true; }
+  })(),
   volume: 1,
 
   userPaused: false,
@@ -66,8 +71,15 @@ export const useMediaStore = create<MediaStore>((set) => ({
   setScrollDirection: (dir) => set({ scrollDirection: dir }),
   setIsTransitioning: (v) => set({ isTransitioning: v }),
 
-  toggleMute: () => set((s) => ({ isMuted: !s.isMuted })),
-  setMuted: (muted) => set({ isMuted: muted }),
+  toggleMute: () => set((s) => {
+    const newMuted = !s.isMuted;
+    try { sessionStorage.setItem('clbhouz-muted', String(newMuted)); } catch {}
+    return { isMuted: newMuted };
+  }),
+  setMuted: (muted) => {
+    try { sessionStorage.setItem('clbhouz-muted', String(muted)); } catch {}
+    return set({ isMuted: muted });
+  },
   setVolume: (v) => set({ volume: v }),
   setUserPaused: (paused) => set({ userPaused: paused }),
 
