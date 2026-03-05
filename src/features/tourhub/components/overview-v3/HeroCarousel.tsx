@@ -297,10 +297,15 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
     return `Won by ${margin} stroke${margin === 1 ? '' : 's'}`;
   })();
 
-  const handlePlayerTap = (playerId: string | null | undefined) => (e: React.MouseEvent) => {
+  const handlePlayerTapNav = (playerId: string | null | undefined) => (e: React.MouseEvent) => {
     e.stopPropagation();
     if (playerId) navigate(`/tourhub/player/${playerId}`);
   };
+
+  // Scorecard state — player tapped in expanded leaderboard
+  const [selectedPlayer, setSelectedPlayer] = useState<PlayerInfo | null>(null);
+  const handleScorecardTap = useCallback((player: PlayerInfo) => setSelectedPlayer(player), []);
+  const handleBackToLeaderboard = useCallback(() => setSelectedPlayer(null), []);
 
   // Fetch top 5 leaders for live tournaments only
   const { data: leaders = [], isLoading: leadersLoading } = useTournamentTopLeaders(
