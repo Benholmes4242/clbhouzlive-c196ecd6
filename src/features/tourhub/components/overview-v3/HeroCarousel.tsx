@@ -615,23 +615,50 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     })()}
                   </p>
 
-                  {/* Expanded: Full Leaderboard */}
+                  {/* Expanded: Full Leaderboard or Scorecard */}
                   {isExpanded ? (
-                    isLoadingFull ? (
-                      <ExpandedLeaderboardSkeleton />
-                    ) : isFullError ? (
-                      <ExpandedLeaderboardError onRetry={() => refetchFull()} />
-                    ) : fullLeaderboard.length === 0 ? (
-                      <ExpandedLeaderboardEmpty />
-                    ) : (
-                      <ExpandedLeaderboardList
-                        entries={fullLeaderboard}
-                        tourCode={tournament.tourSlug}
-                        onTouchStart={handleExpandedTouch}
-                        onTouchMove={handleExpandedTouch}
-                        onTouchEnd={handleExpandedTouch}
-                      />
-                    )
+                    <AnimatePresence mode="wait">
+                      {selectedPlayer ? (
+                        <PlayerScorecardCard
+                          key="scorecard"
+                          player={selectedPlayer}
+                          tournamentId={tournament.id}
+                          tournamentName={tournament.name}
+                          courseName={tournament.venueName || ''}
+                          onBack={handleBackToLeaderboard}
+                          onClose={() => {
+                            setSelectedPlayer(null);
+                            onToggleExpand();
+                          }}
+                        />
+                      ) : (
+                        <motion.div
+                          key="leaderboard"
+                          initial={{ opacity: 1 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0, x: -40 }}
+                          transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+                          style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}
+                        >
+                          {isLoadingFull ? (
+                            <ExpandedLeaderboardSkeleton />
+                          ) : isFullError ? (
+                            <ExpandedLeaderboardError onRetry={() => refetchFull()} />
+                          ) : fullLeaderboard.length === 0 ? (
+                            <ExpandedLeaderboardEmpty />
+                          ) : (
+                            <ExpandedLeaderboardList
+                              entries={fullLeaderboard}
+                              tourCode={tournament.tourSlug}
+                              onTouchStart={handleExpandedTouch}
+                              onTouchMove={handleExpandedTouch}
+                              onTouchEnd={handleExpandedTouch}
+                              onPlayerTap={handleScorecardTap}
+                            />
+                          )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   ) : (
                     <>
                       {/* Mini Leaderboard */}
