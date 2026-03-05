@@ -6,6 +6,7 @@
 import React from 'react';
 import type { WinnerStats } from '../../hooks/useWinnerScorecardStats';
 import type { WinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
+import { SCORE_COLORS } from '../../utils/scoreColors';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import type { TournamentFinisher } from '../../hooks/useTournamentLeadersWinners';
@@ -390,27 +391,27 @@ export function WinnerStatsPanel({
               <StatChip
                 value={tournamentStats!.holesInOne}
                 label={tournamentStats!.holesInOne === 1 ? 'Hole-in-1' : 'Holes-in-1'}
-                color="rgba(250,204,21,0.95)"
+                color={SCORE_COLORS.eagle.text}
               />
             )}
             {tournamentStats!.eagles > 0 && (
               <StatChip
                 value={tournamentStats!.eagles}
                 label={tournamentStats!.eagles === 1 ? 'Eagle' : 'Eagles'}
-                color="rgba(250,204,21,0.9)"
+                color={SCORE_COLORS.eagle.text}
               />
             )}
             <StatChip
               value={tournamentStats!.birdies}
               label="Birdies"
-              color="rgba(74,222,128,0.9)"
+              color={SCORE_COLORS.birdie.text}
             />
             <StatChip value={tournamentStats!.pars} label="Pars" />
             {tournamentStats!.bogeys > 0 && (
               <StatChip
                 value={tournamentStats!.bogeys}
                 label="Bogeys"
-                color="rgba(251,146,60,0.75)"
+                color={SCORE_COLORS.bogey.text}
               />
             )}
           </div>
