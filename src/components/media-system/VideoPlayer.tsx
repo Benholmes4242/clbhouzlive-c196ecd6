@@ -39,6 +39,7 @@ export function VideoPlayer({
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const retryCountRef = useRef(0);
+  const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [showPlayIcon, setShowPlayIcon] = useState(false);
