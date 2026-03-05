@@ -29,7 +29,7 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index }) => {
   return (
     <div
       data-watch-index={index}
-      className="relative aspect-[9/16] overflow-hidden rounded-[4px] cursor-pointer active:scale-[0.97]"
+      className="relative aspect-[4/5] overflow-hidden rounded-[4px] cursor-pointer active:scale-[0.97]"
       style={{ transition: 'transform 100ms ease' }}
       onClick={() => {
         console.log('[WatchPage] Tile tapped:', { postId: post.id, index });
