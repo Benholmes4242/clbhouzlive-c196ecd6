@@ -28,6 +28,7 @@ import { ClubhouseSkeleton } from '@/components/skeletons/ClubhouseSkeleton';
 import { ClubhouseTabProvider, useClubhouseTab, type ClubhouseTab } from '@/contexts/ClubhouseTabContext';
 import { clubhouseDebug } from '@/debug/clubhouseDebug';
 import MobileVideoDebugPanel from '@/components/debug/MobileVideoDebugPanel';
+import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 
 // ── New Media System imports ──
 import { VideoPoolProvider } from '@/components/media-system/VideoPoolProvider';
@@ -38,6 +39,8 @@ import { useFriendsFeed } from '@/components/media-system/hooks/useFriendsFeed';
 import { useMediaStore } from '@/components/media-system/store/mediaStore';
 import { useLikeMutation } from '@/components/media-system/hooks/useLikeMutation';
 import { useFollowMutation } from '@/components/media-system/hooks/useFollowMutation';
+import { MediaErrorBoundary } from '@/components/media-system/MediaErrorBoundary';
+import { useVideoAnalytics } from '@/components/media-system/hooks/useVideoAnalytics';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 // ── Clubhouse UI overlays ──
@@ -50,6 +53,7 @@ import { MediaNavigationDots } from '@/components/posts/user-post/overlays/Media
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import { Scrubber } from '@/components/media-system/Scrubber';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 /** Feed + preloader wrapper — preloader must be inside VideoPoolProvider */
 function FeedWithPreloader({
@@ -123,6 +127,9 @@ const ClubhouseContent = () => {
   const { activeActor } = useActiveActor();
   const queryClient = useQueryClient();
   
+  // ── Network status (Fix 9) ──
+  const { isOnline } = useNetworkStatus();
+  
   // ── Feed hooks (both tabs stay mounted for instant switching) ──
   const suggestedFeed = useSuggestedFeed(user?.id);
   const friendsFeed = useFriendsFeed(user?.id);
@@ -143,7 +150,12 @@ const ClubhouseContent = () => {
   const activeIndex = useMediaStore((s) => s.activeIndex);
   const isMuted = useMediaStore((s) => s.isMuted);
   const toggleMute = useMediaStore((s) => s.toggleMute);
-  const activePost = posts[activeIndex] ?? null;
+  
+  // ── Fix 7: Stable activePost memoization ──
+  const activePostId = posts[activeIndex]?.id;
+  const activePost = useMemo(() => {
+    return posts.find(p => p.id === activePostId) ?? null;
+  }, [posts, activePostId]);
   
   // ── Optimistic like state ──
   const likeMutation = useLikeMutation();
@@ -156,6 +168,9 @@ const ClubhouseContent = () => {
     const newState = { isLiked: !current.isLiked, count: current.isLiked ? current.count - 1 : current.count + 1 };
     
     setLocalLikeState(prev => new Map(prev).set(post.id, newState));
+    
+    // Fix 12: Analytics
+    analyticsEvents.track('video_like', { post_id: post.id, action: current.isLiked ? 'unlike' : 'like' });
     
     likeMutation.mutate(
       { 
@@ -194,6 +209,9 @@ const ClubhouseContent = () => {
       return next;
     });
     
+    // Fix 12: Analytics
+    analyticsEvents.track('video_follow', { target_id: post.userId, action: currentlyFollowed ? 'unfollow' : 'follow' });
+    
     followMutation.mutate(
       {
         targetUserId: post.userId,
@@ -229,6 +247,38 @@ const ClubhouseContent = () => {
   // ── Comments state ──
   const [commentsOpen, setCommentsOpen] = useState(false);
   
+  // ── Fix 2: Comment count overrides ──
+  const [commentCountOverrides, setCommentCountOverrides] = useState<Map<string, number>>(new Map());
+  const activeCommentCount = commentCountOverrides.get(activePost?.id ?? '') ?? activePost?.commentCount ?? 0;
+  
+  const handleCommentPosted = useCallback(() => {
+    if (activePost) {
+      setCommentCountOverrides(prev => {
+        const next = new Map(prev);
+        const current = next.get(activePost.id) ?? activePost.commentCount;
+        next.set(activePost.id, current + 1);
+        return next;
+      });
+    }
+  }, [activePost]);
+  
+  // ── Fix 1: Pause/resume video when comments open/close ──
+  useEffect(() => {
+    const activeEl = useMediaStore.getState().activeVideoElement;
+    if (!activeEl) return;
+    
+    if (commentsOpen) {
+      if (!activeEl.paused) {
+        activeEl.pause();
+      }
+    } else {
+      const userPaused = useMediaStore.getState().userPaused;
+      if (!userPaused) {
+        activeEl.play().catch(() => {});
+      }
+    }
+  }, [commentsOpen]);
+  
   // ── Carousel media index for multi-media posts ──
   const carouselPositions = useMediaStore((s) => s.carouselPositions);
   const currentMediaIndex = carouselPositions.get(activeIndex) ?? 0;
@@ -237,6 +287,7 @@ const ClubhouseContent = () => {
   // ── Share handler ──
   const handleShare = useCallback((post: FeedPost | null) => {
     if (!post) return;
+    analyticsEvents.track('video_share', { post_id: post.id });
     if (navigator.share) {
       navigator.share({
         title: post.displayName,
@@ -258,10 +309,12 @@ const ClubhouseContent = () => {
   // ── Tab switching: reset state ──
   useEffect(() => {
     if (prevTabRef.current !== activeTab) {
+      analyticsEvents.track('feed_tab_switch', { from: prevTabRef.current, to: activeTab });
       clubhouseDebug.tabChange(prevTabRef.current, activeTab);
       useMediaStore.getState().setActiveIndex(0);
       setLocalLikeState(new Map());
       setFollowOverrides(new Map());
+      setCommentCountOverrides(new Map());
       setCommentsOpen(false);
       prevTabRef.current = activeTab;
     }
@@ -279,6 +332,7 @@ const ClubhouseContent = () => {
     activeFeed.resetSeen();
     setLocalLikeState(new Map());
     setFollowOverrides(new Map());
+    setCommentCountOverrides(new Map());
     await activeFeed.refetch();
   }, [activeFeed]);
 
@@ -341,6 +395,37 @@ const ClubhouseContent = () => {
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
+
+  // ── Fix 3: Screen Wake Lock ──
+  useEffect(() => {
+    let wakeLock: WakeLockSentinel | null = null;
+
+    const requestWakeLock = async () => {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLock = await (navigator as any).wakeLock.request('screen');
+        }
+      } catch {
+        // Wake lock request failed (e.g., low battery)
+      }
+    };
+
+    requestWakeLock();
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        requestWakeLock();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      if (wakeLock) {
+        wakeLock.release().catch(() => {});
+      }
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
   
   // ── Is active post a video? ──
   const isActiveVideo = (activePost?.mediaItems?.[0]?.hlsUrl || activePost?.mediaItems?.[0]?.mp4Url) ? true : false;
@@ -351,6 +436,9 @@ const ClubhouseContent = () => {
   
   // ── Is active post own? ──
   const isOwnPost = user?.id === activePost?.userId;
+  
+  // ── Fix 12: Video analytics ──
+  useVideoAnalytics(activePost, !!activePost, activeVideoElement);
   
   // ── Memoized golfCourse prop for CreatorCapsule ──
   const golfCourse = useMemo(() => {
@@ -385,11 +473,29 @@ const ClubhouseContent = () => {
     navigate(`/courses/${activeReview.courseId}?tab=reviews&review=${activeReview.reviewId}`);
   }, [activeReview, navigate]);
 
-  // ── Double-tap like from VideoPlayer ──
-  // The VideoPlayer component already handles double-tap hearts visually,
-  // but we need to wire the actual like mutation. This is done via the
-  // FeedItem/VideoPlayer onDoubleTapLike prop which we don't have direct
-  // access to from here. For now, the action rail like button is the primary like path.
+  // ── Report handler (Fix 8) ──
+  const handleReport = useCallback(async () => {
+    if (!user?.id || !activePost?.id) return;
+    const { error } = await supabase
+      .from('post_reports')
+      .insert({ post_id: activePost.id, reporter_id: user.id } as any);
+    if (!error) {
+      toast.success('Report submitted');
+    }
+    setMoreOptionsOpen(false);
+  }, [user?.id, activePost?.id]);
+
+  // ── Not Interested handler (Fix 8) ──
+  const handleNotInterested = useCallback(async () => {
+    if (!user?.id || !activePost?.id) return;
+    const { error } = await supabase
+      .from('post_dismissals')
+      .insert({ post_id: activePost.id, user_id: user.id } as any);
+    if (!error) {
+      toast('Noted — we will show fewer like this');
+    }
+    setMoreOptionsOpen(false);
+  }, [user?.id, activePost?.id]);
 
   // ============================================================================
   // EARLY RETURNS
@@ -435,6 +541,27 @@ const ClubhouseContent = () => {
         user={user}
       />
 
+      {/* Fix 9: Offline indicator */}
+      {!isOnline && (
+        <div style={{
+          position: 'fixed',
+          top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)',
+          left: 16,
+          right: 16,
+          zIndex: 200,
+          background: 'rgba(239, 68, 68, 0.9)',
+          backdropFilter: 'blur(12px)',
+          borderRadius: 12,
+          padding: '10px 16px',
+          textAlign: 'center',
+          color: 'white',
+          fontSize: 13,
+          fontWeight: 600,
+        }}>
+          No internet connection
+        </div>
+      )}
+
       {/* ═══ MAIN FEED AREA ═══ */}
       {isLoading ? (
         <div className="flex flex-col items-center justify-center min-h-screen px-8 text-center">
@@ -458,19 +585,24 @@ const ClubhouseContent = () => {
           </p>
         </div>
       ) : (
-        <VideoPoolProvider>
-          <FeedWithPreloader
-            key={activeTab}
-            posts={posts}
-            onNearEnd={handleNearEnd}
-            onRefresh={handleRefresh}
-            isRefreshing={activeFeed.isRefetching}
-            hasNextPage={hasNextPage}
-            followOverrides={followOverrides}
-            onFollowChange={handleFollowChange}
-            onFirstFrameReady={signalFirstFrameReady}
-          />
-        </VideoPoolProvider>
+        <MediaErrorBoundary onReset={() => {
+          useMediaStore.getState().setActiveIndex(0);
+          activeFeed.refetch();
+        }}>
+          <VideoPoolProvider>
+            <FeedWithPreloader
+              key={activeTab}
+              posts={posts}
+              onNearEnd={handleNearEnd}
+              onRefresh={handleRefresh}
+              isRefreshing={activeFeed.isRefetching}
+              hasNextPage={hasNextPage}
+              followOverrides={followOverrides}
+              onFollowChange={handleFollowChange}
+              onFirstFrameReady={signalFirstFrameReady}
+            />
+          </VideoPoolProvider>
+        </MediaErrorBoundary>
       )}
 
       {/* ═══ OVERLAY LAYER ═══ */}
@@ -512,8 +644,6 @@ const ClubhouseContent = () => {
             </div>
           )}
 
-          {/* REMOVED: Top100OverlayPills — not appropriate for feed context */}
-
           {/* Media navigation dots for multi-media posts */}
           {activeMediaCount > 1 && (
             <MediaNavigationDots
@@ -527,7 +657,7 @@ const ClubhouseContent = () => {
           <CinematicActionRail
             postId={activePost.id}
             likesCount={activeLikeState.count}
-            commentsCount={activePost.commentCount}
+            commentsCount={activeCommentCount}
             hasLiked={activeLikeState.isLiked}
             isMuted={isMuted}
             isVisible={overlayVisible}
@@ -606,11 +736,11 @@ const ClubhouseContent = () => {
           <Drawer open={moreOptionsOpen} onOpenChange={setMoreOptionsOpen}>
             <DrawerContent className="bg-black/95 border-white/10">
               <div className="p-4 space-y-2">
-                <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={() => { toast('Report submitted'); setMoreOptionsOpen(false); }}>
+                <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={handleReport}>
                   <Flag className="w-5 h-5 text-white/60" />
                   <span className="text-sm text-white">Report this post</span>
                 </button>
-                <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={() => { toast('Noted - we will show fewer like this'); setMoreOptionsOpen(false); }}>
+                <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={handleNotInterested}>
                   <EyeOff className="w-5 h-5 text-white/60" />
                   <span className="text-sm text-white">Not interested</span>
                 </button>
@@ -637,6 +767,7 @@ const ClubhouseContent = () => {
             creatorAvatar={activePost.avatarUrl}
             caption={activePost.caption}
             theme="dark"
+            onCommentPosted={handleCommentPosted}
           />
         </>
       )}
