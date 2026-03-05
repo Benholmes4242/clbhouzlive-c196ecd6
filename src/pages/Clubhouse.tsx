@@ -476,9 +476,9 @@ const ClubhouseContent = () => {
   // ── Report handler (Fix 8) ──
   const handleReport = useCallback(async () => {
     if (!user?.id || !activePost?.id) return;
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('post_reports')
-      .insert({ post_id: activePost.id, reporter_id: user.id } as any);
+      .insert({ post_id: activePost.id, reporter_id: user.id });
     if (!error) {
       toast.success('Report submitted');
     }
@@ -488,9 +488,9 @@ const ClubhouseContent = () => {
   // ── Not Interested handler (Fix 8) ──
   const handleNotInterested = useCallback(async () => {
     if (!user?.id || !activePost?.id) return;
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('post_dismissals')
-      .insert({ post_id: activePost.id, user_id: user.id } as any);
+      .insert({ post_id: activePost.id, user_id: user.id });
     if (!error) {
       toast('Noted — we will show fewer like this');
     }

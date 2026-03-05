@@ -7,7 +7,7 @@
  * Performance: During drag/spring, transforms are applied directly to the DOM
  * via refs (no React state updates per frame). State is synced only on settle.
  */
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { FeedItem } from './FeedItem';
 import { PullToRefresh } from './PullToRefresh';
 import { useMediaStore } from './store/mediaStore';
@@ -96,6 +96,11 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
     return () => el.removeEventListener('touchend', onTouchEnd);
   }, [posts, pool]);
 
+  // ── Fix 10: prefers-reduced-motion ──
+  const prefersReducedMotion = useMemo(() => {
+    return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }, []);
+
   // ── Navigate to index ──
   const goToIndex = useCallback((index: number, velocity: number = 0) => {
     const clamped = Math.max(0, Math.min(posts.length - 1, index));
@@ -105,6 +110,22 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
     pullDistanceRef.current = 0;
     lastRenderedPull.current = 0;
     setPullDistance(0);
+
+    // Instant snap for reduced-motion users
+    if (prefersReducedMotion) {
+      offsetRef.current = targetY;
+      if (trackRef.current) {
+        trackRef.current.style.transform = `translateY(${targetY}px)`;
+      }
+      setOffsetY(targetY);
+      activeIndexRef.current = clamped;
+      setActiveIndex(clamped);
+      useMediaStore.getState().setCarouselPosition(clamped, 0);
+      if (clamped >= posts.length - 3 && posts.length > 0) {
+        onNearEnd?.();
+      }
+      return;
+    }
 
     const config = Math.abs(velocity) > FLING_VELOCITY_THRESHOLD
       ? SPRING_CONFIGS.fling
@@ -134,7 +155,7 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
         }
       }
     );
-  }, [posts.length, itemHeight, setActiveIndex, onNearEnd]);
+  }, [posts.length, itemHeight, setActiveIndex, onNearEnd, prefersReducedMotion]);
 
   // ── Velocity from tracker ──
   const calculateVelocity = (): number => {

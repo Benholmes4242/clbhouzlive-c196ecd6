@@ -75,6 +75,8 @@ export function useVideoPool() {
       video.muted = true;
       video.loop = true;
       video.crossOrigin = 'anonymous';
+      video.setAttribute('aria-label', 'Video content');
+      video.setAttribute('role', 'application');
       video.style.cssText =
         'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;';
 

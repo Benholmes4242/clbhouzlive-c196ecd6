@@ -67,6 +67,7 @@ interface CommentsPageProps {
   isReview?: boolean;
   reviewRating?: number;
   caddiePickCommentId?: string | null;
+  onCommentPosted?: () => void;
 }
 
 interface ReplyingToState {
@@ -85,6 +86,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   initialCommentId,
   initialParentCommentId,
   caddiePickCommentId,
+  onCommentPosted,
 }) => {
   // --- State ---
   const [newComment, setNewComment] = useState('');
@@ -373,6 +375,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
       const newCommentId = await addComment(content || '', parentId, mediaUrl && mediaType ? { mediaUrl, mediaType } : undefined);
       if (parentId) setExpandedReplies(prev => new Set(prev).add(parentId));
       setTimeout(() => highlightComment(newCommentId, true), 150);
+      onCommentPosted?.();
     } catch (error) {
       console.error('Failed to add comment:', error);
     }

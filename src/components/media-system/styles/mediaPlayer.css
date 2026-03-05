@@ -1,3 +1,8 @@
+/* Buffering spinner */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 /* VideoPlayer keyframes */
 @keyframes media-play-fade {
   0% { opacity: 0; transform: scale(0.5); }
