@@ -4,8 +4,7 @@ import {
   HomeIcon,
   CameraIcon, 
   MapPinIcon, 
-  TrophyIcon, // Tour Hub icon
-  PlayIcon,   // Media Player (temp)
+  TrophyIcon,
 } from '@heroicons/react/24/outline';
 
 // Navigation tabs (5 tabs: Home, Discover, Moment, Tours, Courses)
