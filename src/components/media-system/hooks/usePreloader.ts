@@ -3,6 +3,7 @@ import { useMediaStore } from '../store/mediaStore';
 import { preCreateHlsInstance, supportsNativeHls } from '../utils/hlsManager';
 import { parseMasterManifest, parseSegmentManifest } from '../utils/manifestParser';
 import { segmentCache } from '../utils/segmentCache';
+import { getManifestTextCache } from '../utils/cachedHlsLoader';
 import type { FeedPost } from '../types/media';
 
 /**
@@ -17,13 +18,14 @@ import type { FeedPost } from '../types/media';
  *
  * Network-aware: reduces prefetch range on slow connections.
  * Uses AbortController to cancel speculative fetches on index change.
+ * Manifest text cache is shared with cachedHlsLoader for dedup.
  */
 export function usePreloader(posts: FeedPost[]) {
   const activeIndex = useMediaStore((s) => s.activeIndex);
   const abortRef = useRef<AbortController | null>(null);
   const warmedManifests = useRef<Set<string>>(new Set());
   const warmedPosters = useRef<Set<string>>(new Set());
-  const manifestTextCache = useRef<Map<string, string>>(new Map());
+  const manifestTextCache = getManifestTextCache();
 
   useEffect(() => {
     // Abort any in-flight preloads from previous index
