@@ -22,6 +22,7 @@ export function useTournamentStatusRealtime() {
         },
         (payload: any) => {
           if (payload.old?.status !== payload.new?.status) {
+            queryClient.invalidateQueries({ queryKey: ['tournaments-cache'] });
             queryClient.invalidateQueries({ queryKey: ['ai-predictions'] });
             queryClient.invalidateQueries({ queryKey: ['tournament-top-leaders'] });
             queryClient.invalidateQueries({ queryKey: ['tourhub'] });
