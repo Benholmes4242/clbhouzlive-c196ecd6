@@ -60,9 +60,6 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default'
     }
   };
 
-  // Debug: verify handlePrefetch is from hook
-  console.log('[BottomNavigation] handlePrefetch type:', typeof handlePrefetch, 'exists:', !!handlePrefetch);
-
   return (
     <>
       <NavigationBar
