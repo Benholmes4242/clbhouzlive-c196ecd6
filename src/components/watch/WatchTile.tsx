@@ -1,5 +1,5 @@
 import React from 'react';
-import { Eye, Film } from 'lucide-react';
+import { Heart, Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 function formatDuration(seconds?: number): string {
@@ -63,7 +63,11 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index }) => {
         <div
           className="absolute bottom-1.5 right-1.5 z-10 rounded-[4px] flex items-center"
           style={{
-            background: 'rgba(0,0,0,0.75)',
+            background: 'rgba(0, 0, 0, 0.35)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
             padding: '2px 5px',
           }}
         >
@@ -78,11 +82,15 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index }) => {
         <div
           className="absolute bottom-1.5 left-1.5 z-10 rounded-[4px] flex items-center gap-[3px]"
           style={{
-            background: 'rgba(0,0,0,0.75)',
+            background: 'rgba(0, 0, 0, 0.35)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
             padding: '2px 5px',
           }}
         >
-          <Eye className="w-[10px] h-[10px] text-white" />
+          <Heart className="w-[10px] h-[10px]" style={{ color: 'rgba(245, 158, 11, 0.9)', fill: 'rgba(245, 158, 11, 0.9)' }} />
           <span className="text-[11px] font-medium text-white">
             {abbreviateCount(engagement)}
           </span>
