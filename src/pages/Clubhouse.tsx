@@ -90,9 +90,7 @@ function FeedWithPreloader({
   );
 }
 
-const chDbg = (tag: string, ...args: any[]) => {
-  console.log(`[${tag}] ${Date.now() % 100000}`, ...args);
-};
+
 
 const ClubhouseContent = () => {
   // ============================================================================
