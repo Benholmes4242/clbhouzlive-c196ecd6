@@ -58,5 +58,5 @@ export function useCommentsRealtime(postId: string, enabled: boolean = true) {
     return () => {
       supabase.removeChannel(commentsChannel);
     };
-  }, [postId, queryClient]);
+  }, [postId, queryClient, enabled]);
 }
