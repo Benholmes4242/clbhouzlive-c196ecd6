@@ -6,6 +6,10 @@ import { useWatchFeed } from './hooks/useWatchFeed';
 import WatchTile from './WatchTile';
 import WatchGridSkeleton from './WatchGridSkeleton';
 
+const dbg = (tag: string, ...args: any[]) => {
+  console.log(`[${tag}] ${Date.now() % 100000}`, ...args);
+};
+
 const TRENDING = [
   'Augusta National', 'The Open Championship', 'driver tips',
   'course vlogs', 'links golf', 'bunker shots',
@@ -31,6 +35,13 @@ const WatchSearchOverlay: React.FC<WatchSearchOverlayProps> = ({ isOpen, onClose
     searchQuery: activeQuery || undefined,
   });
 
+  // Log search results
+  useEffect(() => {
+    if (activeQuery) {
+      dbg('W:SEARCH', 'Results:', posts.length, 'for query:', activeQuery);
+    }
+  }, [posts.length, activeQuery]);
+
   // Auto-focus
   useEffect(() => {
     if (isOpen) {
@@ -47,6 +58,7 @@ const WatchSearchOverlay: React.FC<WatchSearchOverlayProps> = ({ isOpen, onClose
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       const trimmed = value.trim();
+      dbg('W:SEARCH', 'Search query:', trimmed);
       setActiveQuery(trimmed);
       if (trimmed) addSearch(trimmed);
     }, 300);
