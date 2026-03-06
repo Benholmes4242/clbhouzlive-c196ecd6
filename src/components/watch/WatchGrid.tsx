@@ -69,9 +69,9 @@ const WatchGrid: React.FC<WatchGridProps> = ({
         className="grid grid-cols-3 gap-[2px] px-[2px]"
       >
         {posts.map((post, i) => (
-          <React.Fragment key={post.id}>
+          <div key={post.id}>
             <WatchTile post={post} index={i} />
-          </React.Fragment>
+          </div>
         ))}
         {posts.length > 8 && <SuggestedCreatorsStrip userId={userId} />}
       </div>
