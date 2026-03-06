@@ -10,11 +10,21 @@ interface RelatedVideo {
   creatorName: string;
   creatorAvatarUrl: string;
   durationSeconds: number;
+  duration: string;
   viewCount: number;
+  views?: number;
+}
+
+function formatDuration(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
 interface UseRelatedLongFormVideosOptions {
   creatorId?: string;
+  creatorUserId?: string;
+  courseId?: string;
   category?: string;
   limit?: number;
 }
@@ -29,15 +39,6 @@ export function useRelatedLongFormVideos(
     queryKey: ['related-long-form-videos', videoId, options],
     queryFn: async () => {
       if (!videoId) return [];
-
-      // Fetch related videos based on the current video
-      const { data: postData } = await supabase
-        .from('posts')
-        .select('user_id, categories')
-        .eq('id', videoId)
-        .single();
-
-      if (!postData) return [];
 
       const { data: related, error } = await supabase
         .from('posts')
@@ -71,6 +72,7 @@ export function useRelatedLongFormVideos(
       return related.map((post: any) => {
         const media = post.post_media?.[0];
         const profile = post.user_profiles;
+        const dur = media?.duration_seconds || 0;
         return {
           id: post.id,
           title: post.content?.slice(0, 100) || 'Untitled',
@@ -80,8 +82,10 @@ export function useRelatedLongFormVideos(
             : media?.media_url || '',
           creatorName: profile?.display_name || profile?.username || 'Unknown',
           creatorAvatarUrl: profile?.avatar_url || '',
-          durationSeconds: media?.duration_seconds || 0,
+          durationSeconds: dur,
+          duration: formatDuration(dur),
           viewCount: 0,
+          views: 0,
         } as RelatedVideo;
       });
     },
