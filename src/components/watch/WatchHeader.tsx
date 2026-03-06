@@ -19,17 +19,12 @@ interface WatchHeaderProps {
 const WatchHeader: React.FC<WatchHeaderProps> = ({ activeFilter, onFilterChange, onOpenSearch, embedded = false }) => {
   return (
     <div className="bg-background">
-      <h1
-        className="text-center font-bold text-foreground"
+      <div
+        className="px-4"
         style={{
-          fontSize: '20px',
-          marginTop: embedded ? '12px' : 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
+          marginTop: embedded ? '24px' : 'calc(max(env(safe-area-inset-top, 0px), 47px) + 16px)',
         }}
       >
-        Watch
-      </h1>
-
-      <div className="px-4 mt-3">
         <button
           onClick={onOpenSearch}
           className="w-full flex items-center gap-2 rounded-xl border border-border bg-background shadow-sm"
@@ -41,7 +36,7 @@ const WatchHeader: React.FC<WatchHeaderProps> = ({ activeFilter, onFilterChange,
       </div>
 
       <div
-        className="flex gap-2 overflow-x-auto"
+        className="flex gap-2 overflow-x-auto justify-center"
         style={{
           padding: '12px 16px 8px',
           scrollbarWidth: 'none',
