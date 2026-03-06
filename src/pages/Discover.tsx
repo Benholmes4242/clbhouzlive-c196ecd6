@@ -40,8 +40,9 @@ import { toast } from 'sonner';
 const CommunityFeed = lazy(() => import('@/components/community/CommunityFeed'));
 const VideosTab = lazy(() => import('@/components/videos/VideosTab'));
 const ExploreTab = lazy(() => import('@/components/explore-tab/ExploreTab'));
+const WatchTab = lazy(() => import('@/components/discover/WatchTab'));
 
-type MainKey = 'videos' | 'explore' | 'following';
+type MainKey = 'watch' | 'videos' | 'explore' | 'following';
 
 const Discover = () => {
   const navigate = useNavigate();
@@ -261,6 +262,7 @@ const Discover = () => {
             <div className="px-1">
               <SegmentedControl
                 tabs={[
+                  { id: 'watch', label: 'Watch' },
                   { id: 'videos', label: 'Videos' },
                   { id: 'explore', label: 'Explore' },
                   { id: 'following', label: 'Friends' },
@@ -283,9 +285,16 @@ const Discover = () => {
             {/* Main Content - Conditional based on active tab with slide animation */}
             <SlidingPanels
               activeKey={main as MainKey}
-              order={['videos', 'explore', 'following'] as const}
+              order={['watch', 'videos', 'explore', 'following'] as const}
             >
               {(key: MainKey) => {
+                if (key === 'watch') {
+                  return (
+                    <Suspense fallback={null}>
+                      <WatchTab />
+                    </Suspense>
+                  );
+                }
                 if (key === 'explore') {
                   return (
                     <Suspense fallback={null}>
