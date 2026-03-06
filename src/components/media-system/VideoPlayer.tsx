@@ -58,55 +58,65 @@ export function VideoPlayer({
   const tapTimerRef = useRef<ReturnType<typeof setTimeout>>();
   const tapCountRef = useRef(0);
 
-  // Track assigned URL to prevent duplicate assigns
-  const assignedUrlRef = useRef<string | null>(null);
+  // Track assigned video key to prevent duplicate assigns
+  const assignedRef = useRef<{ url: string; feedIndex: number } | null>(null);
+  const isActiveRef = useRef(isActive);
+  isActiveRef.current = isActive;
+  const poolReady = pool.isReady();
 
   // Gapless loop
   useGaplessLoop(videoRef, isActive && !isLoading && !hasError, videoDuration);
 
   // Assign/release pool element
   useEffect(() => {
-    dbg('VP:EFFECT', 'isActive:', isActive, 'feedIndex:', feedIndex, 'hlsUrl:', hlsUrl?.slice(-40), 'assignedUrlRef:', assignedUrlRef.current?.slice(-40), 'poolReady:', pool.isReady());
-    if (!isActive || !containerRef.current || !pool.isReady()) {
-      assignedUrlRef.current = null;
-      if (videoRef.current) {
-        videoRef.current.pause();
-        setIsPlaying(false);
+    dbg('VP:EFFECT', 'isActive:', isActive, 'feedIndex:', feedIndex, 'hlsUrl:', hlsUrl?.slice(-40), 'assignedRef:', assignedRef.current ? `${assignedRef.current.url.slice(-40)}|${assignedRef.current.feedIndex}` : null, 'poolReady:', poolReady);
+
+    if (!isActive || !hlsUrl || !poolReady || !containerRef.current) {
+      if (!isActive) {
+        if (videoRef.current) {
+          videoRef.current.pause();
+          setIsPlaying(false);
+        }
+        setIsLoading(true);
+        dbg('VP:SKELETON', 'Skeleton visible:', true, 'feedIndex:', feedIndex);
+        setHasError(false);
+        videoRef.current = null;
+        setVideoElement(null);
+        dbg('VP:ELEMENT', 'Video element changed, feedIndex:', feedIndex, 'element:', false);
+        useMediaStore.getState().setActiveVideoElement(null, null);
       }
-      setIsLoading(true);
-      setHasError(false);
-      videoRef.current = null;
-      setVideoElement(null);
-      dbg('VP:ELEMENT', 'Video element changed, feedIndex:', feedIndex, 'element:', false);
-      useMediaStore.getState().setActiveVideoElement(null, null);
       return;
     }
 
-    // Skip if already assigned for this exact URL
-    if (assignedUrlRef.current === hlsUrl) {
-      dbg('VP:EFFECT', 'SKIPPED — already assigned for this URL');
+    if (assignedRef.current?.url === hlsUrl && assignedRef.current?.feedIndex === feedIndex) {
+      dbg('VP:EFFECT', 'SKIPPED — already assigned for this URL + feedIndex');
       return;
     }
-    assignedUrlRef.current = hlsUrl;
 
+    // Mark assigned immediately before async work
+    assignedRef.current = { url: hlsUrl, feedIndex };
     retryCountRef.current = 0;
+    setIsLoading(true);
+    dbg('VP:SKELETON', 'Skeleton visible:', true, 'feedIndex:', feedIndex);
+    setHasError(false);
     useMediaStore.getState().setUserPaused(false);
+
     let cancelled = false;
 
     const activate = async () => {
       const container = containerRef.current;
       if (!container || cancelled) return;
 
-      setIsLoading(true);
-      dbg('VP:SKELETON', 'Skeleton visible:', true, 'feedIndex:', feedIndex);
-      setHasError(false);
-
       dbg('VP:EFFECT', 'Calling pool.assign for feedIndex:', feedIndex);
       let videoEl: HTMLVideoElement | null = null;
       const video = await pool.assign(
-        hlsUrl, feedIndex, container,
+        hlsUrl,
+        feedIndex,
+        container,
         () => {
           if (cancelled) return;
+          if (!isActiveRef.current) return;
+          if (assignedRef.current?.url !== hlsUrl || assignedRef.current?.feedIndex !== feedIndex) return;
           dbg('VP:SKELETON', 'Dismissing skeleton for feedIndex:', feedIndex);
           setIsLoading(false);
           dbg('VP:SKELETON', 'Skeleton visible:', false, 'feedIndex:', feedIndex);
@@ -122,6 +132,7 @@ export function VideoPlayer({
         () => {
           if (cancelled) return;
           dbg('VP:ERROR', 'Error for feedIndex:', feedIndex);
+          assignedRef.current = null;
           setIsLoading(false);
           setHasError(true);
           useMediaStore.getState().markError(feedIndex);
@@ -129,7 +140,12 @@ export function VideoPlayer({
         mp4Url
       );
 
-      if (cancelled || !video) return;
+      if (cancelled) return;
+      if (!video) {
+        assignedRef.current = null;
+        return;
+      }
+
       videoEl = video;
       videoRef.current = video;
       setVideoElement(video);
@@ -148,12 +164,18 @@ export function VideoPlayer({
     };
 
     activate();
+
     return () => {
       cancelled = true;
       dbg('VP:EFFECT', 'CLEANUP for feedIndex:', feedIndex);
-      assignedUrlRef.current = null;
     };
-  }, [isActive, hlsUrl, pool]);
+  }, [isActive, hlsUrl, feedIndex, poolReady]);
+
+  useEffect(() => {
+    if (!isActive && assignedRef.current) {
+      assignedRef.current = null;
+    }
+  }, [isActive]);
 
   // Sync mute state
   useEffect(() => {
