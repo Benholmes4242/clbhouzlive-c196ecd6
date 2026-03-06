@@ -37,7 +37,14 @@ export function usePreloader(posts: FeedPost[]) {
     const controller = new AbortController();
     abortRef.current = controller;
 
-    dbg('PRELOAD', 'Starting preload for index:', activeIndex, 'url:', posts[activeIndex + 1]?.mediaItems[0]?.hlsUrl?.slice(-40));
+    const nextHlsUrl = posts[activeIndex + 1]?.mediaItems[0]?.hlsUrl;
+    dbg('PRELOAD', 'Starting preload for index:', activeIndex, 'url:', nextHlsUrl?.slice(-40));
+
+    // Skip preload if next post has no video (image/review post)
+    if (!nextHlsUrl) {
+      dbg('PRELOAD', 'Skipping — next post has no HLS URL');
+      return;
+    }
 
     const strategy = getPreloadStrategy();
 
@@ -46,11 +53,7 @@ export function usePreloader(posts: FeedPost[]) {
 
       // ── Stage 3: Pre-create HLS instance for next item ────────
       if (strategy.stage === 'full' && !supportsNativeHls()) {
-        const next = posts[activeIndex + 1];
-        const nextUrl = next?.mediaItems[0]?.hlsUrl;
-        if (nextUrl) {
-          preCreateHlsInstance(nextUrl).catch(() => {});
-        }
+        preCreateHlsInstance(nextHlsUrl).catch(() => {});
       }
 
       // ── Stage 1: Manifest warm (2 items ahead) ───────────────

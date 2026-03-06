@@ -71,17 +71,29 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
     };
   }, []);
 
-  // Detect feed switch (posts array identity change) — reset scroll to top
+  // Detect feed switch (posts array identity change)
+  // Only reset to top when the feed is completely replaced (tab switch),
+  // NOT when new pages are appended (infinite scroll).
   useEffect(() => {
     if (prevPostsRef.current !== posts && posts.length > 0) {
-      dbg('FEED:DATA', 'Posts updated, count:', posts.length, 'prev count:', prevPostsRef.current?.length);
-      const newOffset = 0;
-      offsetRef.current = newOffset;
-      activeIndexRef.current = 0;
-      setOffsetY(newOffset);
-      if (trackRef.current) {
-        trackRef.current.style.transform = `translateY(0px)`;
+      const prevPosts = prevPostsRef.current;
+      const isAppend = prevPosts && prevPosts.length > 0 &&
+        posts.length > prevPosts.length &&
+        posts[0]?.id === prevPosts[0]?.id;
+      
+      dbg('FEED:DATA', 'Posts updated, count:', posts.length, 'prev count:', prevPosts?.length, 'isAppend:', isAppend);
+      
+      if (!isAppend) {
+        // Full feed switch (tab change) — reset to top
+        const newOffset = 0;
+        offsetRef.current = newOffset;
+        activeIndexRef.current = 0;
+        setOffsetY(newOffset);
+        if (trackRef.current) {
+          trackRef.current.style.transform = `translateY(0px)`;
+        }
       }
+      // For appends, preserve current position — do nothing
     }
     prevPostsRef.current = posts;
   }, [posts]);

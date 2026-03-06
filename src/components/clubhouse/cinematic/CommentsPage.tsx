@@ -148,7 +148,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
 
   const { hiddenCommentIds, hideComment } = useHiddenComments(postId);
   const { setCaddiePick, removeCaddiePick } = useCaddiePick(postId);
-  useCommentsRealtime(postId);
+  useCommentsRealtime(postId, isOpen);
   const { getReactionsForComment, toggleReaction } = useCommentReactions(postId, currentUserId);
   const { activeActor } = useActiveActor();
   const { ambientColor } = useAmbientColor(postImageUrl, postId);

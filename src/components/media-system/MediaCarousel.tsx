@@ -141,7 +141,7 @@ export function MediaCarousel({
               <VideoPlayer
                 hlsUrl={item.hlsUrl}
                 mp4Url={item.mp4Url}
-                feedIndex={feedIndex * 100 + idx}
+                feedIndex={feedIndex}
                 isActive={isActive && idx === activeMedia}
                 thumbnailUrl={item.thumbnailUrl}
                 duration={item.duration}

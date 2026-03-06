@@ -66,8 +66,8 @@ export function VideoPlayer({
 
   // Assign/release pool element
   useEffect(() => {
-    dbg('VP:EFFECT', 'isActive:', isActive, 'feedIndex:', feedIndex, 'hlsUrl:', hlsUrl?.slice(-40), 'assignedUrlRef:', assignedUrlRef.current?.slice(-40));
-    if (!isActive || !containerRef.current) {
+    dbg('VP:EFFECT', 'isActive:', isActive, 'feedIndex:', feedIndex, 'hlsUrl:', hlsUrl?.slice(-40), 'assignedUrlRef:', assignedUrlRef.current?.slice(-40), 'poolReady:', pool.isReady());
+    if (!isActive || !containerRef.current || !pool.isReady()) {
       assignedUrlRef.current = null;
       if (videoRef.current) {
         videoRef.current.pause();
@@ -153,7 +153,7 @@ export function VideoPlayer({
       dbg('VP:EFFECT', 'CLEANUP for feedIndex:', feedIndex);
       assignedUrlRef.current = null;
     };
-  }, [isActive, hlsUrl]);
+  }, [isActive, hlsUrl, pool]);
 
   // Sync mute state
   useEffect(() => {
