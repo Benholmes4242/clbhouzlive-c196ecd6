@@ -6,10 +6,6 @@ import { segmentCache } from '../utils/segmentCache';
 import { getManifestTextCache } from '../utils/cachedHlsLoader';
 import type { FeedPost } from '../types/media';
 
-const dbg = (tag: string, ...args: any[]) => {
-  console.log(`[${tag}] ${Date.now() % 100000}`, ...args);
-};
-
 /**
  * Three-stage preload pipeline.
  *
@@ -38,11 +34,9 @@ export function usePreloader(posts: FeedPost[]) {
     abortRef.current = controller;
 
     const nextHlsUrl = posts[activeIndex + 1]?.mediaItems[0]?.hlsUrl;
-    dbg('PRELOAD', 'Starting preload for index:', activeIndex, 'url:', nextHlsUrl?.slice(-40));
 
     // Skip preload if next post has no video (image/review post)
     if (!nextHlsUrl) {
-      dbg('PRELOAD', 'Skipping — next post has no HLS URL');
       return;
     }
 
@@ -58,10 +52,7 @@ export function usePreloader(posts: FeedPost[]) {
 
       // ── Stage 1: Manifest warm (2 items ahead) ───────────────
       for (let offset = 1; offset <= strategy.ahead; offset++) {
-        if (signal.aborted) {
-          dbg('PRELOAD', 'Preload CANCELLED for index:', activeIndex);
-          return;
-        }
+        if (signal.aborted) return;
         const post = posts[activeIndex + offset];
         const url = post?.mediaItems[0]?.hlsUrl;
         if (url && !warmedManifests.current.has(url)) {
@@ -144,7 +135,7 @@ export function usePreloader(posts: FeedPost[]) {
         }
       }
 
-      dbg('PRELOAD', 'Preload complete for index:', activeIndex);
+      // Prune manifest text cache — keep only entries within 10 of active index
 
       // Prune manifest text cache — keep only entries within 10 of active index
       const urlsToKeep = new Set<string>();
@@ -162,7 +153,6 @@ export function usePreloader(posts: FeedPost[]) {
     run();
 
     return () => {
-      dbg('PRELOAD', 'Preload CANCELLED for index:', activeIndex);
       controller.abort();
     };
   }, [activeIndex, posts]);

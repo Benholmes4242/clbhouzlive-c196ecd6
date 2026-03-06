@@ -14,10 +14,6 @@ import { segmentCache } from '../utils/segmentCache';
 import { useSessionCache } from './useSessionCache';
 import { useMediaStore } from '../store/mediaStore';
 
-const dbg = (tag: string, ...args: any[]) => {
-  console.log(`[${tag}] ${Date.now() % 100000}`, ...args);
-};
-
 /**
  * Video Pool Manager — maintains 5 reusable <video> elements with
  * tracked listeners, full recycle sequence, error recovery, and
@@ -95,7 +91,6 @@ export function useVideoPool() {
     }
     poolRef.current = pool;
     setReady(true);
-    dbg('POOL', 'Pool created, element count:', pool.length);
 
     return () => {
       destroyAll();
@@ -130,31 +125,25 @@ export function useVideoPool() {
 
   // ── Safe play with iOS retry ──────────────────────────────────────
   const safePlay = useCallback(async (video: HTMLVideoElement): Promise<boolean> => {
-    dbg('POOL:PLAY', 'video.play() calling, muted:', video.muted, 'paused:', video.paused, 'readyState:', video.readyState, 'currentTime:', video.currentTime);
     try {
       await video.play();
-      dbg('POOL:PLAY', 'play() resolved OK');
       return true;
     } catch (error) {
       if (error instanceof DOMException) {
         if (error.name === 'NotAllowedError') {
-          dbg('POOL:PLAY', 'play() REJECTED:', error.name, error.message);
           video.muted = true;
           useMediaStore.getState().setMuted(true);
           try {
             await video.play();
-            dbg('POOL:PLAY', 'play() resolved OK after mute retry');
             return true;
           } catch {
             return false;
           }
         }
         if (error.name === 'AbortError') {
-          dbg('POOL:PLAY', 'play() REJECTED:', error.name, error.message);
           return false;
         }
       }
-      dbg('POOL:PLAY', 'play() REJECTED:', (error as any)?.name, (error as any)?.message);
       console.error('[Pool] safePlay failed:', error);
       return false;
     }
@@ -172,29 +161,24 @@ export function useVideoPool() {
     ): Promise<HTMLVideoElement | null> => {
       const pool = poolRef.current;
       if (!pool.length) return null;
-      dbg('POOL:ASSIGN', '>>> START feedIndex:', feedIndex, 'hlsUrl:', hlsUrl?.slice(-40));
-
       const rapid = isRapidScrolling();
 
       // ── 1. Cache hit — same URL already loaded ────────────────
       const cachedIdx = pool.findIndex((p) => p.assignedUrl === hlsUrl);
       if (cachedIdx >= 0) {
         const cached = pool[cachedIdx];
-        dbg('POOL:ASSIGN', 'Cache HIT — same URL, video.paused:', cached.video.paused, 'readyState:', cached.video.readyState);
         cached.lastUsedAt = Date.now();
         cached.assignedIndex = feedIndex;
         container.appendChild(cached.video);
         cached.video.muted = useMediaStore.getState().isMuted;
         const ok = await safePlay(cached.video);
         if (ok) {
-          dbg('POOL:EVENT', 'onPlaying callback invoked for feedIndex:', feedIndex);
           onPlaying?.();
         }
-        dbg('POOL:ASSIGN', '<<< END feedIndex:', feedIndex, 'success (cache hit)');
         return cached.video;
       }
 
-      dbg('POOL:ASSIGN', 'Cache MISS — need new assignment');
+      // ── 2. Find target element (unassigned or LRU) ────────────
 
       // ── 2. Find target element (unassigned or LRU) ────────────
       let target: PoolElement | undefined;
@@ -234,13 +218,11 @@ export function useVideoPool() {
       }
 
       if (!target || targetIdx < 0) return null;
-      dbg('POOL:ASSIGN', 'Recycling element', targetIdx, '→ feedIndex:', feedIndex);
 
       // ── Step 1: DETACH from old item ──────────────────────────
       const video = target.video;
 
       if (target.assignedUrl) {
-        dbg('POOL:DETACH', 'Detaching feedIndex:', target.assignedIndex, 'url:', target.assignedUrl?.slice(-40));
         const isMuted = useMediaStore.getState().isMuted;
 
         // Save session state
@@ -291,7 +273,6 @@ export function useVideoPool() {
       const loadTimeout = setTimeout(() => {
         loadTimedOut = true;
         console.warn('[Pool] Load timeout for', hlsUrl);
-        dbg('POOL:EVENT', 'onError callback invoked for feedIndex:', feedIndex, '(load timeout)');
         onError?.();
       }, TIMING.LOAD_TIMEOUT_MS);
 
@@ -329,7 +310,6 @@ export function useVideoPool() {
             video.removeEventListener('playing', onRecoveryPlaying);
             recoveryState.current.delete(targetIdx);
             if (video.paused || video.readyState < 3) {
-              dbg('POOL:EVENT', 'onError callback invoked for feedIndex:', feedIndex, '(recovery timeout)');
               onError?.();
             }
           }, 5000);
@@ -349,10 +329,8 @@ export function useVideoPool() {
               video.removeEventListener('canplay', onMp4Ready);
               safePlay(video).then((ok) => {
                 if (ok) {
-                  dbg('POOL:EVENT', 'onPlaying callback invoked for feedIndex:', feedIndex, '(mp4 fallback)');
                   onPlaying?.();
                 } else {
-                  dbg('POOL:EVENT', 'onError callback invoked for feedIndex:', feedIndex, '(mp4 play failed)');
                   onError?.();
                 }
               });
@@ -361,18 +339,15 @@ export function useVideoPool() {
 
             const mp4Timeout = setTimeout(() => {
               video.removeEventListener('canplay', onMp4Ready);
-              dbg('POOL:EVENT', 'onError callback invoked for feedIndex:', feedIndex, '(mp4 timeout)');
               onError?.();
             }, 10000);
             video.addEventListener('canplay', () => clearTimeout(mp4Timeout), { once: true });
           } else {
-            dbg('POOL:EVENT', 'onError callback invoked for feedIndex:', feedIndex, '(no recovery)');
             onError?.();
           }
       };
 
       // Try promote pre-created instance first
-      dbg('POOL:ASSIGN', 'Attaching HLS...');
       const promoted = promotePreCreated(hlsUrl, video, handleHlsError);
 
       if (!promoted) {
@@ -382,13 +357,11 @@ export function useVideoPool() {
         } catch (err) {
           clearTimeout(loadTimeout);
           console.error('[Pool] attachMedia failed:', err);
-          dbg('POOL:EVENT', 'onError callback invoked for feedIndex:', feedIndex, '(attachMedia failed)');
           onError?.();
           return video;
         }
       }
 
-      dbg('POOL:ASSIGN', 'HLS attached OK, readyState:', video.readyState);
       if (loadTimedOut) return video;
 
       // ── Step 4: Restore session & play ────────────────────────
@@ -406,8 +379,6 @@ export function useVideoPool() {
         if (playingFired || loadTimedOut) return;
         playingFired = true;
         clearTimeout(loadTimeout);
-        dbg('POOL:EVENT', 'playing event FIRED, feedIndex:', feedIndex, 'currentTime:', video.currentTime);
-        dbg('POOL:EVENT', 'onPlaying callback invoked for feedIndex:', feedIndex);
         onPlaying?.();
       };
       addTrackedListener(targetIdx, video, 'playing', onPlayingEvt, { once: true });
@@ -419,7 +390,6 @@ export function useVideoPool() {
 
       // NOW call safePlay
       const isMutedNow = useMediaStore.getState().isMuted;
-      dbg('POOL:ASSIGN', 'Calling safePlay, muted:', video.muted, 'paused:', video.paused, 'readyState:', video.readyState);
       if (!isMutedNow && !rapid) {
         video.volume = 0; // Start silent, fade in after play
       }
@@ -443,7 +413,6 @@ export function useVideoPool() {
         if (err) {
           console.error('[Pool] Video element error:', err.code, err.message);
           clearTimeout(loadTimeout);
-          dbg('POOL:EVENT', 'onError callback invoked for feedIndex:', feedIndex, '(video element error)');
           onError?.();
         }
       };
@@ -452,11 +421,9 @@ export function useVideoPool() {
       if (!playOk) {
         // Play failed — clean up and show error
         clearTimeout(loadTimeout);
-        dbg('POOL:EVENT', 'onError callback invoked for feedIndex:', feedIndex, '(play failed)');
         onError?.();
       }
 
-      dbg('POOL:ASSIGN', '<<< END feedIndex:', feedIndex, 'success');
       return video;
     },
     [sessionCache, isRapidScrolling, safePlay, removeAllTrackedListeners, addTrackedListener]
@@ -469,8 +436,6 @@ export function useVideoPool() {
       const idx = pool.findIndex((p) => p.assignedUrl === hlsUrl);
       if (idx < 0) return;
       const elem = pool[idx];
-      dbg('POOL:DETACH', 'Releasing url:', hlsUrl?.slice(-40));
-
       sessionCache.save(hlsUrl, {
         currentTime: elem.video.currentTime,
         wasMuted: elem.video.muted,

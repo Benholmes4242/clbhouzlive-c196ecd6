@@ -16,9 +16,6 @@ import { flingSpring, SPRING_CONFIGS } from './utils/spring';
 import type { FeedPost } from './types/media';
 import { haptic } from '@/utils/haptics';
 
-const dbg = (tag: string, ...args: any[]) => {
-  console.log(`[${tag}] ${Date.now() % 100000}`, ...args);
-};
 
 const FLING_VELOCITY_THRESHOLD = 0.4;   // px/ms — above this = fling
 const RUBBER_BAND_FACTOR = 0.35;
@@ -63,13 +60,6 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
   const pool = useVideoPoolContext();
   const prevPostsRef = useRef(posts);
 
-  // Mount/unmount logging
-  useEffect(() => {
-    dbg('FEED:MOUNT', 'FeedContainer mounted');
-    return () => {
-      dbg('FEED:MOUNT', 'FeedContainer unmounting');
-    };
-  }, []);
 
   // Detect feed switch (posts array identity change)
   // Only reset to top when the feed is completely replaced (tab switch),
@@ -80,8 +70,6 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
       const isAppend = prevPosts && prevPosts.length > 0 &&
         posts.length > prevPosts.length &&
         posts[0]?.id === prevPosts[0]?.id;
-      
-      dbg('FEED:DATA', 'Posts updated, count:', posts.length, 'prev count:', prevPosts?.length, 'isAppend:', isAppend);
       
       if (!isAppend) {
         // Full feed switch (tab change) — reset to top
@@ -122,8 +110,6 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
 
     const onTouchEnd = () => {
       if (useMediaStore.getState().userPaused) return;
-      dbg('FEED:GESTURE', 'touchend gesture prime fired');
-      
       const currentActiveIndex = useMediaStore.getState().activeIndex;
       const activePost = posts[currentActiveIndex];
       if (!activePost) return;
@@ -169,7 +155,6 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
       }
       setOffsetY(targetY);
       activeIndexRef.current = clamped;
-      dbg('FEED:INDEX', 'activeIndex changed:', activeIndexRef.current, '→', clamped, 'source: snap-reduced-motion');
       setActiveIndex(clamped);
       useMediaStore.getState().setCarouselPosition(clamped, 0);
       if (clamped >= posts.length - 3 && posts.length > 0) {
@@ -182,7 +167,6 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
       ? SPRING_CONFIGS.fling
       : SPRING_CONFIGS.snap;
 
-    dbg('FEED:SPRING', 'Spring START from:', activeIndexRef.current, 'to:', clamped);
     cancelSpring.current = flingSpring(
       offsetRef.current,
       targetY,
@@ -199,8 +183,6 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
         setOffsetY(targetY);
         const prevIdx = activeIndexRef.current;
         activeIndexRef.current = clamped;
-        dbg('FEED:SPRING', 'Spring SETTLED at index:', clamped);
-        dbg('FEED:INDEX', 'activeIndex changed:', prevIdx, '→', clamped, 'source: spring');
         setActiveIndex(clamped);
         useMediaStore.getState().setCarouselPosition(clamped, 0);
         haptic('light');

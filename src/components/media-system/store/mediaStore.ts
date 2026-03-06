@@ -1,10 +1,6 @@
 import type React from 'react';
 import { create } from 'zustand';
 
-const dbg = (tag: string, ...args: any[]) => {
-  console.log(`[${tag}] ${Date.now() % 100000}`, ...args);
-};
-
 interface MediaStore {
   // Feed State
   activeIndex: number;
@@ -69,7 +65,6 @@ export const useMediaStore = create<MediaStore>((set, get) => ({
   activeVideoRef: null,
 
   setActiveIndex: (index) => {
-    dbg('STORE', 'setActiveIndex:', index, 'prev:', get().activeIndex);
     set((s) => ({
       activeIndex: index,
       scrollDirection: index > s.activeIndex ? 'down' : index < s.activeIndex ? 'up' : s.scrollDirection,
@@ -80,18 +75,15 @@ export const useMediaStore = create<MediaStore>((set, get) => ({
 
   toggleMute: () => set((s) => {
     const newMuted = !s.isMuted;
-    dbg('STORE', 'setMuted:', newMuted);
     try { sessionStorage.setItem('clbhouz-muted', String(newMuted)); } catch {}
     return { isMuted: newMuted };
   }),
   setMuted: (muted) => {
-    dbg('STORE', 'setMuted:', muted);
     try { sessionStorage.setItem('clbhouz-muted', String(muted)); } catch {}
     return set({ isMuted: muted });
   },
   setVolume: (v) => set({ volume: v }),
   setUserPaused: (paused) => {
-    dbg('STORE', 'setUserPaused:', paused);
     set({ userPaused: paused });
   },
 
