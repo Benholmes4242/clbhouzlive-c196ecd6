@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import ExploreGrid from '@/components/explore/ExploreGrid';
-import { VideosTab } from '@/components/videos/VideosTab';
 
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { FILTER_TYPES } from '@/components/explore/types';
@@ -176,9 +175,9 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     navigate(`/u/${authorId}`);
   }, [navigate]);
 
-  // Videos tab - uses dedicated VideosTab with its own data fetching
+  // Videos tab is now handled by NewVideosTab in Discover.tsx SlidingPanels
   if (main === 'videos') {
-    return <VideosTab />;
+    return null;
   }
 
   // Show loading while content is null for other tabs

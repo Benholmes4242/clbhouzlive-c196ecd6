@@ -9,7 +9,6 @@ import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 import SegmentedControl from '@/components/discover/SegmentedControl';
 import ExploreFilters from '@/components/explore/ExploreFilters';
 import DiscoverVideosHeader from '@/components/discover/DiscoverVideosHeader';
-import VideoSearchOverlay from '@/components/videos/VideoSearchOverlay';
 import SlidingPanels from '@/components/ui/SlidingPanels';
 import { useVideoLengthFilter } from '@/hooks/useVideoLengthFilter';
 import { DURATION_FILTERS } from '@/constants/videoFilters';
@@ -38,7 +37,7 @@ import { toast } from 'sonner';
 
 // Lazy load heavy/inactive components for better initial bundle size
 const CommunityFeed = lazy(() => import('@/components/community/CommunityFeed'));
-const VideosTab = lazy(() => import('@/components/videos/VideosTab'));
+const NewVideosTab = lazy(() => import('@/components/discover/NewVideosTab'));
 const ExploreTab = lazy(() => import('@/components/explore-tab/ExploreTab'));
 const WatchTab = lazy(() => import('@/components/discover/WatchTab'));
 
@@ -221,12 +220,6 @@ const Discover = () => {
     }
   }, [allContent, openFullscreen]);
 
-  // Handle video click from VideosTab
-  // NOTE: VideosTab now handles fullscreen internally using its own data source.
-  // This callback is kept for any navigation or analytics, but doesn't open fullscreen.
-  const handleVideoClick = useCallback((_id: string) => {
-    // VideosTab handles fullscreen internally
-  }, []);
 
   // Handle media click from CommunityFeed (receives any item shape)
   const handleCommunityMediaClick = useCallback((item: any) => {
@@ -314,7 +307,7 @@ const Discover = () => {
                 // 'videos'
                 return (
                   <Suspense fallback={null}>
-                    <VideosTab onVideoClick={handleVideoClick} />
+                    <NewVideosTab />
                   </Suspense>
                 );
               }}
