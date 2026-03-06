@@ -5,7 +5,6 @@ import {
   CameraIcon, 
   MapPinIcon, 
   TrophyIcon,
-  PlayIcon,
 } from '@heroicons/react/24/outline';
 
 // Navigation tabs (6 tabs: Home, Discover, Moment, Tours, Courses, Watch)
