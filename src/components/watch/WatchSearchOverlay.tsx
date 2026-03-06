@@ -66,7 +66,7 @@ const WatchSearchOverlay: React.FC<WatchSearchOverlayProps> = ({ isOpen, onClose
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 40 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[200] flex flex-col bg-[var(--bg-page)] overflow-y-auto"
+          className="fixed inset-0 z-[200] flex flex-col bg-background overflow-y-auto"
           style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
         >
           {/* Top bar */}
