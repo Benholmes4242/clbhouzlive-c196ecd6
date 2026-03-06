@@ -178,7 +178,7 @@ export function useVideoPool() {
         return cached.video;
       }
 
-      dbg('POOL:ASSIGN', 'Cache MISS — need new assignment');
+      // ── 2. Find target element (unassigned or LRU) ────────────
 
       // ── 2. Find target element (unassigned or LRU) ────────────
       let target: PoolElement | undefined;

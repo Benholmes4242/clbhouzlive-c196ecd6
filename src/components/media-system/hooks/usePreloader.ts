@@ -135,7 +135,7 @@ export function usePreloader(posts: FeedPost[]) {
         }
       }
 
-      dbg('PRELOAD', 'Preload complete for index:', activeIndex);
+      // Prune manifest text cache — keep only entries within 10 of active index
 
       // Prune manifest text cache — keep only entries within 10 of active index
       const urlsToKeep = new Set<string>();
