@@ -4,7 +4,7 @@ import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import ExploreGrid from '@/components/explore/ExploreGrid';
 import { VideosTab } from '@/components/videos/VideosTab';
 import PhotosGrid from '@/components/discover/PhotosGrid';
-import { WatchTab } from '@/components/discover/WatchTab';
+
 
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { FILTER_TYPES } from '@/components/explore/types';
@@ -41,7 +41,6 @@ interface DiscoverContentProps {
 function getFilterTypeFromPills(main: string): string {
   // Map main pill to base filter type
   const mainToFilter: Record<string, string> = {
-    'shorts': FILTER_TYPES.VIDEOS,
     'videos': FILTER_TYPES.VIDEOS,
     'channels': FILTER_TYPES.CHANNELS,
     'following': FILTER_TYPES.FOLLOWING,
@@ -83,14 +82,6 @@ function applyTagFilter(content: ExploreContentItem[], selectedTags: string[]): 
 // Uses Lucide icons instead of emojis for consistency with Videos and Community pages
 import { getDiscoverCategories } from '@/components/post/create-moment/categoryDefinitions';
 
-const SHORTS_PILLS = [
-  { key: 'all', label: 'All', icon: undefined as React.ComponentType<{ className?: string }> | undefined },
-  ...getDiscoverCategories().map((cat) => ({
-    key: cat.id,
-    label: cat.label,
-    icon: cat.icon,
-  })),
-];
 
 export default function DiscoverContent({ onLike, onFollow, onMediaClick, searchQuery: externalSearchQuery, selectedTags = [] }: DiscoverContentProps) {
   const navigate = useNavigate();
@@ -99,34 +90,10 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   const [recentHistory, setRecentHistory] = useState<Set<string>>(new Set());
   const [likedItems, setLikedItems] = useState<Record<string, boolean>>({});
   
-  // Watch tab local state for command center
-  const [watchSearchQuery, setWatchSearchQuery] = useState('');
-  const [watchSortOption, setWatchSortOption] = useState<SortOption>(() => {
-    if (typeof window !== 'undefined') {
-      return (localStorage.getItem('watch-sort') as SortOption) || 'newest';
-    }
-    return 'newest';
-  });
-  const [watchActiveFilter, setWatchActiveFilter] = useState('all');
-  
-  // Persist sort preference
-  useEffect(() => {
-    localStorage.setItem('watch-sort', watchSortOption);
-  }, [watchSortOption]);
   
   // Use external search query if provided, otherwise use local
   const searchQuery = externalSearchQuery || watchSearchQuery;
   
-  // Convert pills to DiscoverCommandCenter format with Lucide icons
-  const watchPills: Pill[] = SHORTS_PILLS.map((pill) => {
-    const IconComponent = pill.icon;
-    return {
-      key: pill.key,
-      label: pill.label,
-      selected: watchActiveFilter === pill.key,
-      icon: IconComponent ? <IconComponent className="h-4 w-4" /> : undefined,
-    };
-  });
   
   // Fetch real Shorts data for inline blocks (only when on Videos tab)
   const { content: shortsContent, hasMore: hasMoreShorts, loadMore: loadMoreShorts } = useInfiniteExploreContent(
@@ -147,17 +114,13 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     }
   });
   
-  // Detect Shorts mode for compact view
-  const isShorts = main === 'shorts' || duration === 'shorts';
   
   // Get the filter type based on main pill
   const filterType = getFilterTypeFromPills(main);
   
   // Prepare duration filter for Videos/Shorts
   const durationFilter = React.useMemo(() => {
-    if (main !== 'videos' && main !== 'shorts') return undefined;
-    // If main is 'shorts', use shorts filter regardless of duration param
-    if (main === 'shorts') return getDurationFilter('shorts');
+    if (main !== 'videos') return undefined;
     return getDurationFilter(duration);
   }, [main, duration]);
   
@@ -167,7 +130,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     loading, 
     hasMore, 
     loadMore 
-  } = useInfiniteExploreContent(filterType, sub, durationFilter, watchSortOption);
+  } = useInfiniteExploreContent(filterType, sub, durationFilter);
 
   // Hero preloading is now handled by useTrendingHero (runs its own query)
   // No longer need useHeroPreload(content) here
@@ -330,7 +293,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     }
 
     // STEP 3: Apply tag filter (watchActiveFilter for shorts tab)
-    const activeTags = watchActiveFilter !== 'all' ? [watchActiveFilter] : selectedTags;
+    const activeTags = selectedTags;
     if (activeTags.length > 0) {
       filtered = applyTagFilter(filtered, activeTags);
     }
@@ -344,7 +307,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     }));
 
     return unique;
-  }, [content, searchQuery, selectedTags, watchActiveFilter, likedItems]);
+  }, [content, searchQuery, selectedTags, likedItems]);
 
   // Apply course clustering when 3+ items from same course in top 15 (for Shorts tab)
   // MUST be called unconditionally to satisfy React hooks rules
@@ -388,10 +351,6 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     });
   }, [gridContent]);
 
-  // Handle Watch/Shorts tab - uses new WatchTab component with its own fullscreen handling
-  if (main === 'shorts') {
-    return <WatchTab />;
-  }
 
   // Videos tab - uses dedicated VideosTab with its own data fetching
   if (main === 'videos') {

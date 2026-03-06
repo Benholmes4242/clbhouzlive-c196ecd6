@@ -41,55 +41,6 @@ export { useAppPrefetch as usePrefetch } from '@/hooks/useAppPrefetch';
 
 const PAGE_SIZE = 24;
 
-async function fetchWatchShortsBase() {
-  const { data, error } = await supabase
-    .from('posts')
-    .select(`
-      id,
-      content,
-      created_at,
-      user_id,
-      like_count,
-      post_media!inner (
-        id,
-        media_url,
-        media_type,
-        poster_url,
-        duration_seconds,
-        aspect_ratio,
-        width,
-        height
-      )
-    `)
-    .eq('visibility', 'anyone')
-    .eq('post_media.media_type', 'video')
-    .lte('post_media.duration_seconds', 240)
-    .order('created_at', { ascending: false })
-    .range(0, PAGE_SIZE - 1);
-
-  if (error) throw error;
-
-  // Transform to match expected format
-  return (data || []).filter(post => 
-    post.post_media && post.post_media.length > 0
-  ).map(post => ({
-    id: post.id,
-    content: post.content,
-    created_at: post.created_at,
-    user_id: post.user_id,
-    like_count: post.like_count || 0,
-    media: (post.post_media || []).map((m: any) => ({
-      id: m.id,
-      media_url: m.media_url,
-      media_type: m.media_type,
-      poster_url: m.poster_url,
-      duration_seconds: m.duration_seconds,
-      aspect_ratio: m.aspect_ratio,
-      width: m.width,
-      height: m.height,
-    })),
-  }));
-}
 
 // Fetch base clubhouse explore shorts data for prefetching
 async function fetchClubhouseBase() {
@@ -335,15 +286,6 @@ const ROUTE_CONFIGS: RoutePrefetchConfig[] = [
     queryFn: fetchClubhouseBase,
     extractVideoUrls: (data) => extractVideoUrlsFromArray(data, 8),
     videoPrefetchCount: 8,
-  },
-  {
-    path: '/discover',
-    // Use a stable query key that matches useWatchShorts
-    queryKey: ['watch-shorts-base'],
-    priority: 2,
-    queryFn: fetchWatchShortsBase,
-    extractVideoUrls: (data) => extractVideoUrlsFromArray(data, 12),
-    videoPrefetchCount: 12,
   },
   {
     // Community tab within Discover - prefetch community feed

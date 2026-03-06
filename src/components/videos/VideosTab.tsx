@@ -28,7 +28,7 @@ import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { getDiscoverCategories } from '@/components/post/create-moment/categoryDefinitions';
-import { watchTabDebug } from '@/debug/watchTabDebug';
+
 import type { LongFormVideo } from './LongFormVideoTile';
 import type { LongFormFeedVideo } from './LongFormFeedCard';
 
@@ -92,11 +92,6 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Debug lifecycle
-  useEffect(() => {
-    watchTabDebug.pageMount();
-    return () => watchTabDebug.pageUnmount();
-  }, []);
 
   // Command center state
   const [searchQuery, setSearchQuery] = useState('');

@@ -79,9 +79,6 @@ export function logDiscoverPageUnmount() {
   logEvent('DISCOVER_PAGE_UNMOUNT', 'page');
 }
 
-export function logWatchTabActive(tab: string) {
-  logEvent('WATCH_TAB_ACTIVE', 'page', undefined, { tab });
-}
 
 export function logDiscoverContentMount(itemCount: number) {
   logEvent('DISCOVER_CONTENT_MOUNT', 'page', undefined, { itemCount });

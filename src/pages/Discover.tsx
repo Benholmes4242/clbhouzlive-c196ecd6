@@ -3,7 +3,7 @@ import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton'
 import { DiscoverSkeleton } from '@/components/skeletons/DiscoverSkeleton';
 import { FadeInContent } from '@/components/ui/FadeInContent';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { logDiscoverPageMount, logDiscoverPageUnmount, logWatchTabActive } from '@/utils/discoverTimeline';
+import { logDiscoverPageMount, logDiscoverPageUnmount } from '@/utils/discoverTimeline';
 import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 
 import SegmentedControl from '@/components/discover/SegmentedControl';
@@ -13,7 +13,6 @@ import VideoSearchOverlay from '@/components/videos/VideoSearchOverlay';
 import SlidingPanels from '@/components/ui/SlidingPanels';
 import { useVideoLengthFilter } from '@/hooks/useVideoLengthFilter';
 import { DURATION_FILTERS } from '@/constants/videoFilters';
-import { ContinueWatchingSection } from '@/components/videos/ContinueWatchingSection';
 
 // import SuggestedUsersRedesigned from '@/components/discover/SuggestedUsersRedesigned'; // Stored for future use
 import DiscoverContent from '@/components/discover/DiscoverContent';
@@ -42,7 +41,7 @@ const CommunityFeed = lazy(() => import('@/components/community/CommunityFeed'))
 const VideosTab = lazy(() => import('@/components/videos/VideosTab'));
 const ExploreTab = lazy(() => import('@/components/explore-tab/ExploreTab'));
 
-type MainKey = 'shorts' | 'videos' | 'explore' | 'following';
+type MainKey = 'videos' | 'explore' | 'following';
 
 const Discover = () => {
   const navigate = useNavigate();
@@ -116,13 +115,10 @@ const Discover = () => {
     return { from: filter.from, to: filter.to };
   }, [durationFilter]);
 
-  // Detect Shorts mode for compact view
-  const isShorts = main === 'shorts' || durationFilter === 'shorts';
 
   // Derive activeFilter from URL main param (single source of truth)
   const activeFilter = React.useMemo(() => {
     const mainToFilter: Record<string, string> = {
-      'shorts': FILTER_TYPES.VIDEOS,
       'videos': FILTER_TYPES.VIDEOS,
       'explore': FILTER_TYPES.CHANNELS,
       'channels': FILTER_TYPES.CHANNELS, // Back-compat
@@ -139,12 +135,6 @@ const Discover = () => {
     setSelectedTags([]);
   }, [main]);
 
-  // Log when Watch tab becomes active
-  useEffect(() => {
-    if (main === 'shorts' || main === 'videos') {
-      logWatchTabActive(main);
-    }
-  }, [main]);
   
   // Get content for the vertical feed (we'll use the new DiscoverContent component for the grid)
   const { 
@@ -271,7 +261,6 @@ const Discover = () => {
             <div className="px-1">
               <SegmentedControl
                 tabs={[
-                  { id: 'shorts', label: 'Watch' },
                   { id: 'videos', label: 'Videos' },
                   { id: 'explore', label: 'Explore' },
                   { id: 'following', label: 'Friends' },
@@ -294,7 +283,7 @@ const Discover = () => {
             {/* Main Content - Conditional based on active tab with slide animation */}
             <SlidingPanels
               activeKey={main as MainKey}
-              order={['shorts', 'videos', 'explore', 'following'] as const}
+              order={['videos', 'explore', 'following'] as const}
             >
               {(key: MainKey) => {
                 if (key === 'explore') {
@@ -313,29 +302,11 @@ const Discover = () => {
                     </div>
                   );
                 }
-                if (key === 'videos') {
-                  return (
-                    <Suspense fallback={null}>
-                      <VideosTab onVideoClick={handleVideoClick} />
-                    </Suspense>
-                  );
-                }
-                // 'shorts' uses DiscoverContent
+                // 'videos'
                 return (
-                  <div className="md:container md:mx-auto md:px-0">
-                    {/* Continue Watching section at top of Shorts/Discover */}
-                    <ContinueWatchingSection
-                      onVideoClick={(id) => navigate(`/video/${id}`)}
-                      className="mb-6 mt-2"
-                    />
-                    <DiscoverContent
-                      onLike={handleLike}
-                      onFollow={handleFollow}
-                      onMediaClick={handleMediaClick}
-                      searchQuery={searchQuery}
-                      selectedTags={selectedTags}
-                    />
-                  </div>
+                  <Suspense fallback={null}>
+                    <VideosTab onVideoClick={handleVideoClick} />
+                  </Suspense>
                 );
               }}
             </SlidingPanels>

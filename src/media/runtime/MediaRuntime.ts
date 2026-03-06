@@ -18,7 +18,7 @@ import { MOBILE_VIDEO_DEBUG, logRuntimeRequestPlay, logRuntimePlayResult, logGes
 
 // ============ Types ============
 
-export type MediaSurface = 'grid' | 'fullscreen' | 'clubhouse' | 'hero' | 'videos' | 'watch' | 'watch-shorts' | 'profile' | 'explore-grid' | 'friends-feed' | 'miniplayer' | 'highlights' | 'course-highlights';
+export type MediaSurface = 'grid' | 'fullscreen' | 'clubhouse' | 'hero' | 'videos' | 'watch' | 'profile' | 'explore-grid' | 'friends-feed' | 'miniplayer' | 'highlights' | 'course-highlights';
 export type PlaybackReason = 'autoplay' | 'user' | 'resume';
 export type ErrorType = 'transient' | 'hls_fatal' | 'decode_unsupported';
 
@@ -103,7 +103,7 @@ const MAX_CONCURRENT_PER_SURFACE: Record<MediaSurface, number> = {
   'clubhouse': 1,      // Only 1 clubhouse (fullscreen feed)
   'videos': 1,         // Only 1 videos page video (YouTube-style long-form)
   'watch': 4,          // Allow 4 visible watch grid videos to play
-  'watch-shorts': 2,   // Watch tab shorts grid - diagonal pattern (1 per visible row)
+  
   'profile': 4,        // Allow 4 visible profile activity videos to play
   'explore-grid': 1,   // Explore discover grid - 1 video at a time in dense 2-column layout
   'friends-feed': 1,   // Friends feed - single column, 1 video at a time
@@ -122,7 +122,7 @@ const SURFACE_PRIORITY: Record<MediaSurface, number> = {
   'grid': 4,           // Medium - grid videos
   'videos': 5,         // Medium-low - videos page (long-form)
   'watch': 4,          // Same as grid - Watch tab grid videos
-  'watch-shorts': 4,   // Same as grid - Watch tab shorts grid
+  
   'profile': 4,        // Same as grid - Profile activity videos
   'explore-grid': 4,   // Same as grid - Explore discover grid
   'friends-feed': 4,   // Same as grid - Friends feed
@@ -486,20 +486,20 @@ class MediaRuntimeCore {
       this.state.activeMediaIds.clear();
     }
     
-    // Block grid/watch-shorts autoplay if fullscreen/clubhouse is active with user reason
+    // Block grid autoplay if fullscreen/clubhouse is active with user reason
     if ((this.state.activeSurface === 'fullscreen' || this.state.activeSurface === 'clubhouse') 
-        && (surface === 'grid' || surface === 'watch-shorts') && reason !== 'user') {
+        && surface === 'grid' && reason !== 'user') {
       if (DEBUG_MEDIA_RUNTIME) {
         console.log('[MediaRuntime] requestPlay blocked: fullscreen/clubhouse active');
       }
       return false;
     }
     
-    // When clubhouse/fullscreen starts, pause ALL grid/watch-shorts videos (priority system)
+    // When clubhouse/fullscreen starts, pause ALL grid videos (priority system)
     if ((surface === 'clubhouse' || surface === 'fullscreen') && reason !== 'autoplay') {
       const gridVideos = Array.from(this.state.activeMediaIds).filter(activeId => {
         const media = this.registry.get(activeId);
-        return media?.surface === 'grid' || media?.surface === 'watch-shorts';
+        return media?.surface === 'grid';
       });
       
       for (const gridId of gridVideos) {
