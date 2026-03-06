@@ -68,6 +68,7 @@ const CreatorItem: React.FC<CreatorItemProps> = ({ creator, currentUserId }) => 
     async (e: React.MouseEvent) => {
       e.stopPropagation();
       if (busy) return;
+      dbg('W:CREATORS', 'Follow tapped for:', creator.displayName, 'currently following:', following);
       const wasFollowing = following;
       setFollowing(!wasFollowing);
       setBusy(true);
@@ -230,6 +231,13 @@ interface SuggestedCreatorsStripProps {
 const SuggestedCreatorsStrip: React.FC<SuggestedCreatorsStripProps> = ({ userId }) => {
   const { data: creators, isLoading } = useSuggestedCreators(userId);
 
+  // Log when data loads
+  React.useEffect(() => {
+    if (!isLoading && creators) {
+      dbg('W:CREATORS', 'Loaded', creators.length, 'creators');
+    }
+  }, [creators, isLoading]);
+
   // Loading state — render with grid-spanning wrapper
   if (isLoading) {
     return (
@@ -250,7 +258,10 @@ const SuggestedCreatorsStrip: React.FC<SuggestedCreatorsStripProps> = ({ userId 
   }
 
   // Production: require at least 2 creators to render the strip
-  if (!creators || creators.length < 2) return null;
+  if (!creators || creators.length < 2) {
+    dbg('W:CREATORS', 'Strip hidden — only', creators?.length, 'creators');
+    return null;
+  }
 
   return (
     <div style={{ gridColumn: '1 / -1', padding: '14px 0', background: '#FFFFFF', borderTop: '1px solid #F1F5F9', borderBottom: '1px solid #F1F5F9' }}>
