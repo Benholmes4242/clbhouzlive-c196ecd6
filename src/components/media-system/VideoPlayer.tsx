@@ -15,10 +15,6 @@ import { ErrorState } from './ErrorState';
 import { Play, Pause, Heart } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
 
-const dbg = (tag: string, ...args: any[]) => {
-  console.log(`[${tag}] ${Date.now() % 100000}`, ...args);
-};
-
 const MAX_RETRIES = 3;
 const DOUBLE_TAP_DELAY = 300;
 
@@ -69,8 +65,6 @@ export function VideoPlayer({
 
   // Assign/release pool element
   useEffect(() => {
-    dbg('VP:EFFECT', 'isActive:', isActive, 'feedIndex:', feedIndex, 'hlsUrl:', hlsUrl?.slice(-40), 'assignedRef:', assignedRef.current ? `${assignedRef.current.url.slice(-40)}|${assignedRef.current.feedIndex}` : null, 'poolReady:', poolReady);
-
     if (!isActive || !hlsUrl || !poolReady || !containerRef.current) {
       if (!isActive) {
         if (videoRef.current) {
@@ -78,18 +72,15 @@ export function VideoPlayer({
           setIsPlaying(false);
         }
         setIsLoading(true);
-        dbg('VP:SKELETON', 'Skeleton visible:', true, 'feedIndex:', feedIndex);
         setHasError(false);
         videoRef.current = null;
         setVideoElement(null);
-        dbg('VP:ELEMENT', 'Video element changed, feedIndex:', feedIndex, 'element:', false);
         useMediaStore.getState().setActiveVideoElement(null, null);
       }
       return;
     }
 
     if (assignedRef.current?.url === hlsUrl && assignedRef.current?.feedIndex === feedIndex) {
-      dbg('VP:EFFECT', 'SKIPPED — already assigned for this URL + feedIndex');
       return;
     }
 
@@ -97,7 +88,6 @@ export function VideoPlayer({
     assignedRef.current = { url: hlsUrl, feedIndex };
     retryCountRef.current = 0;
     setIsLoading(true);
-    dbg('VP:SKELETON', 'Skeleton visible:', true, 'feedIndex:', feedIndex);
     setHasError(false);
     useMediaStore.getState().setUserPaused(false);
 
@@ -107,7 +97,6 @@ export function VideoPlayer({
       const container = containerRef.current;
       if (!container || cancelled) return;
 
-      dbg('VP:EFFECT', 'Calling pool.assign for feedIndex:', feedIndex);
       let videoEl: HTMLVideoElement | null = null;
       const video = await pool.assign(
         hlsUrl,
@@ -117,9 +106,7 @@ export function VideoPlayer({
           if (cancelled) return;
           if (!isActiveRef.current) return;
           if (assignedRef.current?.url !== hlsUrl || assignedRef.current?.feedIndex !== feedIndex) return;
-          dbg('VP:SKELETON', 'Dismissing skeleton for feedIndex:', feedIndex);
           setIsLoading(false);
-          dbg('VP:SKELETON', 'Skeleton visible:', false, 'feedIndex:', feedIndex);
           setIsPlaying(true);
           if (videoEl && videoEl.duration && isFinite(videoEl.duration)) {
             setVideoDuration(videoEl.duration);
@@ -131,7 +118,6 @@ export function VideoPlayer({
         },
         () => {
           if (cancelled) return;
-          dbg('VP:ERROR', 'Error for feedIndex:', feedIndex);
           assignedRef.current = null;
           setIsLoading(false);
           setHasError(true);
@@ -149,13 +135,11 @@ export function VideoPlayer({
       videoEl = video;
       videoRef.current = video;
       setVideoElement(video);
-      dbg('VP:ELEMENT', 'Video element changed, feedIndex:', feedIndex, 'element:', true);
       useMediaStore.getState().setActiveVideoElement(video, videoRef);
       video.muted = isMuted;
 
       if (!video.paused && video.readyState >= 3) {
         setIsLoading(false);
-        dbg('VP:SKELETON', 'Skeleton visible:', false, 'feedIndex:', feedIndex, '(already playing)');
         setIsPlaying(true);
         if (video.duration && isFinite(video.duration)) {
           setVideoDuration(video.duration);
@@ -167,7 +151,6 @@ export function VideoPlayer({
 
     return () => {
       cancelled = true;
-      dbg('VP:EFFECT', 'CLEANUP for feedIndex:', feedIndex);
     };
   }, [isActive, hlsUrl, feedIndex, poolReady]);
 

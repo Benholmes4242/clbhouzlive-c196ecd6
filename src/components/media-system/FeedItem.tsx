@@ -8,10 +8,6 @@ import { ImageViewer } from './ImageViewer';
 import { MediaCarousel } from './MediaCarousel';
 import type { FeedPost } from './types/media';
 
-const dbg = (tag: string, ...args: any[]) => {
-  console.log(`[${tag}] ${Date.now() % 100000}`, ...args);
-};
-
 interface FeedItemProps {
   post: FeedPost;
   index: number;
