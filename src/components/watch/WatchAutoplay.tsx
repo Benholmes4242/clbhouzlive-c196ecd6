@@ -93,7 +93,6 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
     const onCanPlay = () => {
       const poster = tile.querySelector('img');
       if (poster) {
-      if (poster) {
         poster.style.transition = 'opacity 200ms ease';
         poster.style.opacity = '0';
       }
