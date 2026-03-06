@@ -1,6 +1,10 @@
 import type HlsType from 'hls.js';
 import { createCachedLoader } from './cachedHlsLoader';
 
+const dbg = (tag: string, ...args: any[]) => {
+  console.log(`[${tag}] ${Date.now() % 100000}`, ...args);
+};
+
 export const HLS_CONFIG: Record<string, unknown> = {
   enableWorker: true,
   lowLatencyMode: false,
@@ -73,6 +77,7 @@ export async function attachMedia(
   hlsUrl: string,
   onError?: (type: string, details: string) => void
 ): Promise<void> {
+  dbg('HLS:ATTACH', 'attachMedia START, url:', hlsUrl?.slice(-40));
   
   // Always detach first
   detachMedia(video);
@@ -81,12 +86,14 @@ export async function attachMedia(
     return new Promise<void>((resolve, reject) => {
       const timeout = setTimeout(() => {
         video.removeEventListener('loadedmetadata', onMeta);
+        dbg('HLS:ATTACH', 'TIMEOUT waiting for loadedmetadata (native), url:', hlsUrl?.slice(-40));
         reject(new Error('Native HLS attach timeout'));
       }, ATTACH_TIMEOUT);
 
       const onMeta = () => {
         clearTimeout(timeout);
         video.removeEventListener('loadedmetadata', onMeta);
+        dbg('HLS:ATTACH', 'loadedmetadata fired (native), url:', hlsUrl?.slice(-40));
         resolve();
       };
       video.addEventListener('loadedmetadata', onMeta);
@@ -102,7 +109,7 @@ export async function attachMedia(
 
   return new Promise<void>((resolve, reject) => {
     const timeout = setTimeout(() => {
-      
+      dbg('HLS:ATTACH', 'TIMEOUT waiting for MANIFEST_PARSED, url:', hlsUrl?.slice(-40));
       reject(new Error('HLS.js manifest parse timeout'));
     }, ATTACH_TIMEOUT);
 
@@ -110,12 +117,13 @@ export async function attachMedia(
     hlsInstances.set(video, hls);
 
     hls.on((Hls as any).Events.MANIFEST_PARSED, () => {
-      
+      dbg('HLS:ATTACH', 'MANIFEST_PARSED, levels:', hls.levels?.length, 'url:', hlsUrl?.slice(-40));
       clearTimeout(timeout);
       resolve();
     });
 
     hls.on((Hls as any).Events.ERROR, (_event: unknown, data: any) => {
+      dbg('HLS:ERROR', 'type:', data.type, 'details:', data.details, 'fatal:', data.fatal, 'url:', hlsUrl?.slice(-40));
       if (data.fatal) {
         clearTimeout(timeout);
         if (onError) onError(data.type, data.details);
@@ -161,6 +169,7 @@ export function retryLoad(video: HTMLVideoElement): boolean {
 export function detachMedia(video: HTMLVideoElement): void {
   const hls = hlsInstances.get(video);
   if (hls) {
+    dbg('HLS:DESTROY', 'Destroying HLS instance');
     try { hls.detachMedia(); } catch { /* ignore */ }
     try { hls.removeAllListeners(); } catch { /* ignore */ }
     try { hls.destroy(); } catch { /* ignore */ }
@@ -217,9 +226,12 @@ export function promotePreCreated(
   video: HTMLVideoElement,
   onError?: (type: string, details: string) => void
 ): InstanceType<typeof HlsType> | null {
-  
+  dbg('HLS:PROMOTE', 'promotePreCreated START, url:', hlsUrl?.slice(-40));
   const hls = preCreatedInstances.get(hlsUrl);
-  if (!hls) return null;
+  if (!hls) {
+    dbg('HLS:PROMOTE', 'No pre-created instance found');
+    return null;
+  }
 
   preCreatedInstances.delete(hlsUrl);
   hlsInstances.set(video, hls);
@@ -228,11 +240,13 @@ export function promotePreCreated(
   const Hls = HlsConstructor;
   if (Hls && onError) {
     hls.on((Hls as any).Events.ERROR, (_event: unknown, data: any) => {
+      dbg('HLS:ERROR', 'type:', data.type, 'details:', data.details, 'fatal:', data.fatal, 'url:', hlsUrl?.slice(-40));
       if (data.fatal) onError(data.type, data.details);
     });
   }
 
   hls.attachMedia(video);
+  dbg('HLS:PROMOTE', 'promotePreCreated SUCCESS');
   return hls;
 }
 

@@ -1,6 +1,10 @@
 import type React from 'react';
 import { create } from 'zustand';
 
+const dbg = (tag: string, ...args: any[]) => {
+  console.log(`[${tag}] ${Date.now() % 100000}`, ...args);
+};
+
 interface MediaStore {
   // Feed State
   activeIndex: number;
@@ -41,7 +45,7 @@ interface MediaStore {
   setActiveVideoElement: (el: HTMLVideoElement | null, ref: React.RefObject<HTMLVideoElement | null> | null) => void;
 }
 
-export const useMediaStore = create<MediaStore>((set) => ({
+export const useMediaStore = create<MediaStore>((set, get) => ({
   activeIndex: 0,
   scrollDirection: null,
   isTransitioning: false,
@@ -64,24 +68,32 @@ export const useMediaStore = create<MediaStore>((set) => ({
   activeVideoElement: null,
   activeVideoRef: null,
 
-  setActiveIndex: (index) => set((s) => ({
-    activeIndex: index,
-    scrollDirection: index > s.activeIndex ? 'down' : index < s.activeIndex ? 'up' : s.scrollDirection,
-  })),
+  setActiveIndex: (index) => {
+    dbg('STORE', 'setActiveIndex:', index, 'prev:', get().activeIndex);
+    set((s) => ({
+      activeIndex: index,
+      scrollDirection: index > s.activeIndex ? 'down' : index < s.activeIndex ? 'up' : s.scrollDirection,
+    }));
+  },
   setScrollDirection: (dir) => set({ scrollDirection: dir }),
   setIsTransitioning: (v) => set({ isTransitioning: v }),
 
   toggleMute: () => set((s) => {
     const newMuted = !s.isMuted;
+    dbg('STORE', 'setMuted:', newMuted);
     try { sessionStorage.setItem('clbhouz-muted', String(newMuted)); } catch {}
     return { isMuted: newMuted };
   }),
   setMuted: (muted) => {
+    dbg('STORE', 'setMuted:', muted);
     try { sessionStorage.setItem('clbhouz-muted', String(muted)); } catch {}
     return set({ isMuted: muted });
   },
   setVolume: (v) => set({ volume: v }),
-  setUserPaused: (paused) => set({ userPaused: paused }),
+  setUserPaused: (paused) => {
+    dbg('STORE', 'setUserPaused:', paused);
+    set({ userPaused: paused });
+  },
 
   setCarouselPosition: (feedIndex, mediaIndex) =>
     set((s) => {

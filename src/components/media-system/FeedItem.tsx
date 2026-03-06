@@ -8,6 +8,10 @@ import { ImageViewer } from './ImageViewer';
 import { MediaCarousel } from './MediaCarousel';
 import type { FeedPost } from './types/media';
 
+const dbg = (tag: string, ...args: any[]) => {
+  console.log(`[${tag}] ${Date.now() % 100000}`, ...args);
+};
+
 interface FeedItemProps {
   post: FeedPost;
   index: number;
@@ -23,6 +27,13 @@ export function FeedItem({
   post, index, isActive, onFirstFrameReady,
 }: FeedItemProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const prevActiveRef = useRef<boolean>(isActive);
+
+  // Only log when isActive changes
+  if (prevActiveRef.current !== isActive) {
+    dbg('ITEM', 'index:', index, 'isActive:', isActive, 'type:', post.mediaItems[0]?.type || 'no-media', 'isReview:', !!post.isReview);
+    prevActiveRef.current = isActive;
+  }
 
   const isMultiMedia = post.mediaItems.length > 1;
   const media = post.mediaItems[0];
