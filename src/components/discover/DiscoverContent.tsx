@@ -91,8 +91,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   const [likedItems, setLikedItems] = useState<Record<string, boolean>>({});
   
   
-  // Use external search query if provided, otherwise use local
-  const searchQuery = externalSearchQuery || watchSearchQuery;
+  const searchQuery = externalSearchQuery || '';
   
   
   // Fetch real Shorts data for inline blocks (only when on Videos tab)
