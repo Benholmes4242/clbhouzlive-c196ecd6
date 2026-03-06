@@ -17,6 +17,10 @@ const prefersReducedMotion = typeof window !== 'undefined'
   ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
   : false;
 
+const dbg = (tag: string, ...args: any[]) => {
+  console.log(`[${tag}] ${Date.now() % 100000}`, ...args);
+};
+
 export interface ReviewMediaItem {
   id: string;
   media_type: 'image' | 'video';
@@ -95,6 +99,15 @@ export function FullscreenReviewPost({
   children,
   renderMedia = true,
 }: FullscreenReviewPostProps) {
+  
+  // Debug: mount/unmount + data ready
+  useEffect(() => {
+    dbg('REVIEW', 'Review overlay MOUNT, courseId:', courseId, 'rating:', rating);
+    dbg('REVIEW', 'Review data ready, courseName:', courseName, 'rating:', rating);
+    return () => {
+      dbg('REVIEW', 'Review overlay UNMOUNT');
+    };
+  }, []);
   
   const navigate = useNavigate();
   
