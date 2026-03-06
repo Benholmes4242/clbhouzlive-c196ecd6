@@ -1,4 +1,4 @@
-import { useRef, useCallback, useEffect } from 'react';
+import { useRef, useCallback, useEffect, useMemo, useState } from 'react';
 import type { PoolElement, VideoSessionState } from '../types/media';
 import { POOL_CONFIG, TIMING } from '../types/media';
 import {
@@ -27,7 +27,7 @@ export function useVideoPool() {
   const poolRef = useRef<PoolElement[]>([]);
   const hiddenContainerRef = useRef<HTMLDivElement | null>(null);
   const sessionCache = useSessionCache();
-  const readyRef = useRef(false);
+  const [ready, setReady] = useState(false);
   
   const lastSwipeTime = useRef(0);
 
@@ -94,7 +94,7 @@ export function useVideoPool() {
       });
     }
     poolRef.current = pool;
-    readyRef.current = true;
+    setReady(true);
     dbg('POOL', 'Pool created, element count:', pool.length);
 
     return () => {
@@ -116,7 +116,7 @@ export function useVideoPool() {
       // Reset refs so re-mount creates fresh pool
       poolRef.current = [];
       hiddenContainerRef.current = null;
-      readyRef.current = false;
+      setReady(false);
     };
   }, [removeAllTrackedListeners]);
 
@@ -497,7 +497,10 @@ export function useVideoPool() {
     return poolRef.current.find((p) => p.assignedUrl === hlsUrl)?.video ?? null;
   }, []);
 
-  const isReady = useCallback(() => readyRef.current, []);
+  const isReady = useCallback(() => ready, [ready]);
 
-  return { assign, release, getElement, isReady };
+  return useMemo(
+    () => ({ assign, release, getElement, isReady }),
+    [assign, release, getElement, isReady]
+  );
 }
