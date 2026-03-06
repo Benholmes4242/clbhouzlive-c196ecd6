@@ -2,7 +2,7 @@ import React from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { MoreHorizontal, Heart, MessageCircle, Share2, MapPin } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { DurationBadge } from '@/components/VideoCard/DurationBadge';
+
 import { VideoCardAutoplay } from './VideoCardAutoplay';
 
 interface VideoCardProps {
@@ -35,7 +35,7 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
 
   const handleTap = () => {
     // Fullscreen player wired in Phase 5
-    console.log('[VideoCard] tapped post:', post.id);
+    // Fullscreen player wired later
   };
 
   return (
