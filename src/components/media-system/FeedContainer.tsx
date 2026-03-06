@@ -16,9 +16,6 @@ import { flingSpring, SPRING_CONFIGS } from './utils/spring';
 import type { FeedPost } from './types/media';
 import { haptic } from '@/utils/haptics';
 
-const dbg = (tag: string, ...args: any[]) => {
-  console.log(`[${tag}] ${Date.now() % 100000}`, ...args);
-};
 
 const FLING_VELOCITY_THRESHOLD = 0.4;   // px/ms — above this = fling
 const RUBBER_BAND_FACTOR = 0.35;
