@@ -217,6 +217,7 @@ export function PlayerScorecardCard({
   onBack,
   onClose,
 }: PlayerScorecardCardProps) {
+  const navigate = useNavigate();
   const { data: scorecard, isLoading } = usePlayerScorecard(tournamentId, player.id);
   const [activeRound, setActiveRound] = useState<number>(
     player.currentRound || scorecard?.currentRound || 1
