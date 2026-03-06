@@ -5,6 +5,10 @@ import { Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSuggestedCreators, type SuggestedCreator } from './hooks/useSuggestedCreators';
 
+const dbg = (tag: string, ...args: any[]) => {
+  console.log(`[${tag}] ${Date.now() % 100000}`, ...args);
+};
+
 // ── Format name as "First L." ──
 function shortName(displayName: string): string {
   const parts = (displayName || '').trim().split(/\s+/);
