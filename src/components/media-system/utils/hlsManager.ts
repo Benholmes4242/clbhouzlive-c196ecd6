@@ -1,9 +1,6 @@
 import type HlsType from 'hls.js';
 import { createCachedLoader } from './cachedHlsLoader';
 
-const dbg = (tag: string, ...args: any[]) => {
-  console.log(`[${tag}] ${Date.now() % 100000}`, ...args);
-};
 
 export const HLS_CONFIG: Record<string, unknown> = {
   enableWorker: true,
