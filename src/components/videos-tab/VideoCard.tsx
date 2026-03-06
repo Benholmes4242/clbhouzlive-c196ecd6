@@ -6,6 +6,7 @@ import { DurationBadge } from '@/components/VideoCard/DurationBadge';
 
 interface VideoCardProps {
   post: FeedPost;
+  isAutoplayEligible?: boolean;
 }
 
 function formatCompact(n: number): string {
