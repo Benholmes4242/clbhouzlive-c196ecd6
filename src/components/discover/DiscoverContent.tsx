@@ -20,7 +20,6 @@ import { buildInterleavedFeed, InterleavedItem } from '@/utils/interleaveFeed';
 import { toast } from 'sonner';
 import { DiscoverCommandCenter, SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
 import { MOMENT_CATEGORIES } from '@/components/post/create-moment/categoryDefinitions';
-// Watch tab now uses WatchTab component with its own data fetching
 // Videos tab now uses VideosTab component with its own data fetching
 
 interface DiscoverContentProps {
@@ -244,7 +243,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   }, [main, duration]);
 
 
-  // Watch tab now uses WatchTab component with its own hero and shorts data
+  
 
   // Grid content: Start with unfiltered content, remove hero, THEN apply search/tag filters
   // This ensures hero stays constant while grid responds to filters
