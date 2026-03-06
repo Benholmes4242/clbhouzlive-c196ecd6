@@ -38,7 +38,7 @@ import { toast } from 'sonner';
 
 // Lazy load heavy/inactive components for better initial bundle size
 const CommunityFeed = lazy(() => import('@/components/community/CommunityFeed'));
-const VideosTab = lazy(() => import('@/components/videos/VideosTab'));
+const NewVideosTab = lazy(() => import('@/components/discover/NewVideosTab'));
 const ExploreTab = lazy(() => import('@/components/explore-tab/ExploreTab'));
 const WatchTab = lazy(() => import('@/components/discover/WatchTab'));
 
