@@ -1,0 +1,51 @@
+import { useState } from 'react';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useVideosFeed, type VideosFilter } from './hooks/useVideosFeed';
+import { VideosHeader } from './VideosHeader';
+import { VideosFeed } from './VideosFeed';
+
+interface VideosTabContentProps {
+  embedded?: boolean;
+}
+
+export default function VideosTabContent({ embedded = false }: VideosTabContentProps) {
+  const { user } = useSupabaseSession();
+  const [activeFilter, setActiveFilter] = useState<VideosFilter>('latest');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  const {
+    posts,
+    isLoading,
+    isError,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+    refetch,
+    resetSeen,
+  } = useVideosFeed({ userId: user?.id, filter: activeFilter });
+
+  const handleFilterChange = (filter: VideosFilter) => {
+    setActiveFilter(filter);
+    resetSeen();
+  };
+
+  return (
+    <div className="bg-background min-h-screen">
+      <VideosHeader
+        activeFilter={activeFilter}
+        onFilterChange={handleFilterChange}
+        onOpenSearch={() => setIsSearchOpen(true)}
+        embedded={embedded}
+      />
+      <VideosFeed
+        posts={posts}
+        isLoading={isLoading}
+        isError={isError}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+        fetchNextPage={fetchNextPage}
+        refetch={refetch}
+      />
+    </div>
+  );
+}
