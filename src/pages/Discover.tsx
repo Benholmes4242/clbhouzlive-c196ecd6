@@ -314,7 +314,7 @@ const Discover = () => {
                 // 'videos'
                 return (
                   <Suspense fallback={null}>
-                    <VideosTab onVideoClick={handleVideoClick} />
+                    <NewVideosTab />
                   </Suspense>
                 );
               }}
