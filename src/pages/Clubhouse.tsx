@@ -143,7 +143,6 @@ const ClubhouseContent = () => {
   const isLoading = activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? true;
   
-  // Debug: log posts data
   
   
   // Skeleton timing

@@ -113,8 +113,6 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
 
     const onTouchEnd = () => {
       if (useMediaStore.getState().userPaused) return;
-      dbg('FEED:GESTURE', 'touchend gesture prime fired');
-      
       const currentActiveIndex = useMediaStore.getState().activeIndex;
       const activePost = posts[currentActiveIndex];
       if (!activePost) return;
