@@ -31,7 +31,6 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
   const thumbnailUrl = firstVideo?.thumbnailUrl || '';
   const hlsUrl = firstVideo?.hlsUrl || '';
   const duration = firstVideo?.duration || 0;
-  const duration = firstVideo?.duration || 0;
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
 
   const handleTap = () => {
