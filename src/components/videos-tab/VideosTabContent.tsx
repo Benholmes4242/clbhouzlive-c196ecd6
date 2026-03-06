@@ -3,6 +3,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useVideosFeed, type VideosFilter } from './hooks/useVideosFeed';
 import { VideosHeader } from './VideosHeader';
 import { VideosFeed } from './VideosFeed';
+import { VideosSearchOverlay } from './VideosSearchOverlay';
 
 interface VideosTabContentProps {
   embedded?: boolean;
@@ -45,6 +46,11 @@ export default function VideosTabContent({ embedded = false }: VideosTabContentP
         isFetchingNextPage={isFetchingNextPage}
         fetchNextPage={fetchNextPage}
         refetch={refetch}
+      />
+      <VideosSearchOverlay
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        userId={user?.id}
       />
     </div>
   );
