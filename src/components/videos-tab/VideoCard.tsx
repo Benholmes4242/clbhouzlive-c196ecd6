@@ -9,9 +9,6 @@ import { CommentsPage } from '@/components/clubhouse/cinematic/CommentsPage';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VideoCardAutoplay } from './VideoCardAutoplay';
 import { VideoCardMenu } from './VideoCardMenu';
-import { CommentsPage } from '@/components/clubhouse/cinematic/CommentsPage';
-import { VideoCardAutoplay } from './VideoCardAutoplay';
-import { VideoCardMenu } from './VideoCardMenu';
 
 interface VideoCardProps {
   post: FeedPost;
