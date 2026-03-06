@@ -27,6 +27,7 @@ export function useVideoPool() {
   const poolRef = useRef<PoolElement[]>([]);
   const hiddenContainerRef = useRef<HTMLDivElement | null>(null);
   const sessionCache = useSessionCache();
+  const readyRef = useRef(false);
   
   const lastSwipeTime = useRef(0);
 
@@ -93,6 +94,7 @@ export function useVideoPool() {
       });
     }
     poolRef.current = pool;
+    readyRef.current = true;
     dbg('POOL', 'Pool created, element count:', pool.length);
 
     return () => {
@@ -114,6 +116,7 @@ export function useVideoPool() {
       // Reset refs so re-mount creates fresh pool
       poolRef.current = [];
       hiddenContainerRef.current = null;
+      readyRef.current = false;
     };
   }, [removeAllTrackedListeners]);
 
@@ -494,5 +497,7 @@ export function useVideoPool() {
     return poolRef.current.find((p) => p.assignedUrl === hlsUrl)?.video ?? null;
   }, []);
 
-  return { assign, release, getElement };
+  const isReady = useCallback(() => readyRef.current, []);
+
+  return { assign, release, getElement, isReady };
 }

@@ -2,11 +2,11 @@ import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-export function useCommentsRealtime(postId: string) {
+export function useCommentsRealtime(postId: string, enabled: boolean = true) {
   const queryClient = useQueryClient();
   
   useEffect(() => {
-    if (!postId) return;
+    if (!postId || !enabled) return;
     
     // Subscribe to comment changes
     const commentsChannel = supabase
