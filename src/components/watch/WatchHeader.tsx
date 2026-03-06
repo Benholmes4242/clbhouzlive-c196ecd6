@@ -2,10 +2,6 @@ import React from 'react';
 import { Search } from 'lucide-react';
 import type { WatchFilter } from './types';
 
-const dbg = (tag: string, ...args: any[]) => {
-  console.log(`[${tag}] ${Date.now() % 100000}`, ...args);
-};
-
 const FILTERS: { key: WatchFilter; label: string }[] = [
   { key: 'trending', label: 'Trending' },
   { key: 'latest', label: 'Latest' },
@@ -22,7 +18,6 @@ interface WatchHeaderProps {
 const WatchHeader: React.FC<WatchHeaderProps> = ({ activeFilter, onFilterChange, onOpenSearch }) => {
   return (
     <div className="bg-[var(--bg-page)]">
-      {/* Title */}
       <h1
         className="text-center font-bold text-foreground"
         style={{
@@ -33,7 +28,6 @@ const WatchHeader: React.FC<WatchHeaderProps> = ({ activeFilter, onFilterChange,
         Watch
       </h1>
 
-      {/* Search bar (button) */}
       <div className="px-4 mt-3">
         <button
           onClick={onOpenSearch}
@@ -45,7 +39,6 @@ const WatchHeader: React.FC<WatchHeaderProps> = ({ activeFilter, onFilterChange,
         </button>
       </div>
 
-      {/* Filter chips */}
       <div
         className="flex gap-2 overflow-x-auto"
         style={{
@@ -58,10 +51,7 @@ const WatchHeader: React.FC<WatchHeaderProps> = ({ activeFilter, onFilterChange,
           return (
             <button
               key={key}
-              onClick={() => {
-                dbg('W:HEADER', 'Filter tapped:', key);
-                onFilterChange(key);
-              }}
+              onClick={() => onFilterChange(key)}
               className="shrink-0 rounded-full active:scale-[0.96]"
               style={{
                 height: '32px',

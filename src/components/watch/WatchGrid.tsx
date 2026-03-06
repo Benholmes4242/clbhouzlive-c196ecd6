@@ -4,10 +4,6 @@ import WatchTile from './WatchTile';
 import WatchGridSkeleton from './WatchGridSkeleton';
 import SuggestedCreatorsStrip from './SuggestedCreatorsStrip';
 
-const dbg = (tag: string, ...args: any[]) => {
-  console.log(`[${tag}] ${Date.now() % 100000}`, ...args);
-};
-
 interface WatchGridProps {
   posts: FeedPost[];
   isLoading: boolean;
@@ -30,9 +26,7 @@ const WatchGrid: React.FC<WatchGridProps> = ({
   const sentinelRef = useRef<HTMLDivElement>(null);
   const prevPostCountRef = useRef(0);
 
-  // Log when post count changes
   if (posts.length !== prevPostCountRef.current) {
-    dbg('W:GRID', 'Rendering grid, posts:', posts.length, 'hasNextPage:', hasNextPage);
     prevPostCountRef.current = posts.length;
   }
 
@@ -43,8 +37,7 @@ const WatchGrid: React.FC<WatchGridProps> = ({
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-          dbg('W:GRID', 'Infinite scroll triggered, fetching next page');
+      if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
           fetchNextPage();
         }
       },
@@ -60,7 +53,6 @@ const WatchGrid: React.FC<WatchGridProps> = ({
   }
 
   if (!isLoading && posts.length === 0) {
-    dbg('W:GRID', 'Empty state shown');
     return (
       <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
         <span className="text-[48px]">⛳</span>
@@ -79,9 +71,9 @@ const WatchGrid: React.FC<WatchGridProps> = ({
         {posts.map((post, i) => (
           <React.Fragment key={post.id}>
             <WatchTile post={post} index={i} />
-            {i === 8 && <SuggestedCreatorsStrip userId={userId} />}
           </React.Fragment>
         ))}
+        {posts.length > 8 && <SuggestedCreatorsStrip userId={userId} />}
       </div>
 
       {/* Sentinel for infinite scroll */}

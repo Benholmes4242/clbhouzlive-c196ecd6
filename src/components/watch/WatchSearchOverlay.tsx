@@ -6,10 +6,6 @@ import { useWatchFeed } from './hooks/useWatchFeed';
 import WatchTile from './WatchTile';
 import WatchGridSkeleton from './WatchGridSkeleton';
 
-const dbg = (tag: string, ...args: any[]) => {
-  console.log(`[${tag}] ${Date.now() % 100000}`, ...args);
-};
-
 const TRENDING = [
   'Augusta National', 'The Open Championship', 'driver tips',
   'course vlogs', 'links golf', 'bunker shots',
@@ -35,14 +31,6 @@ const WatchSearchOverlay: React.FC<WatchSearchOverlayProps> = ({ isOpen, onClose
     searchQuery: activeQuery || undefined,
   });
 
-  // Log search results
-  useEffect(() => {
-    if (activeQuery) {
-      dbg('W:SEARCH', 'Results:', posts.length, 'for query:', activeQuery);
-    }
-  }, [posts.length, activeQuery]);
-
-  // Auto-focus
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => inputRef.current?.focus(), 100);
@@ -52,13 +40,11 @@ const WatchSearchOverlay: React.FC<WatchSearchOverlayProps> = ({ isOpen, onClose
     }
   }, [isOpen]);
 
-  // Debounced search
   const handleInputChange = useCallback((value: string) => {
     setInputValue(value);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       const trimmed = value.trim();
-      dbg('W:SEARCH', 'Search query:', trimmed);
       setActiveQuery(trimmed);
       if (trimmed) addSearch(trimmed);
     }, 300);
@@ -112,7 +98,6 @@ const WatchSearchOverlay: React.FC<WatchSearchOverlayProps> = ({ isOpen, onClose
           {/* Content */}
           {!hasQuery ? (
             <div className="px-4 py-2 space-y-6">
-              {/* Recent searches */}
               {searches.length > 0 && (
                 <div>
                   <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-[1px] mb-2">
@@ -136,7 +121,6 @@ const WatchSearchOverlay: React.FC<WatchSearchOverlayProps> = ({ isOpen, onClose
                 </div>
               )}
 
-              {/* Trending */}
               <div>
                 <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-[1px] mb-2">
                   Trending Searches
