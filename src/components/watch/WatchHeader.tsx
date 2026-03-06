@@ -13,16 +13,17 @@ interface WatchHeaderProps {
   activeFilter: WatchFilter;
   onFilterChange: (f: WatchFilter) => void;
   onOpenSearch: () => void;
+  embedded?: boolean;
 }
 
-const WatchHeader: React.FC<WatchHeaderProps> = ({ activeFilter, onFilterChange, onOpenSearch }) => {
+const WatchHeader: React.FC<WatchHeaderProps> = ({ activeFilter, onFilterChange, onOpenSearch, embedded = false }) => {
   return (
-    <div className="bg-[var(--bg-page)]">
+    <div className="bg-background">
       <h1
         className="text-center font-bold text-foreground"
         style={{
           fontSize: '20px',
-          marginTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
+          marginTop: embedded ? '12px' : 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
         }}
       >
         Watch
@@ -54,8 +55,8 @@ const WatchHeader: React.FC<WatchHeaderProps> = ({ activeFilter, onFilterChange,
               onClick={() => onFilterChange(key)}
               className="shrink-0 rounded-full active:scale-[0.96]"
               style={{
-                height: '32px',
-                padding: '0 14px',
+                minHeight: '36px',
+                padding: '0 16px',
                 fontSize: '13px',
                 fontWeight: isActive ? 600 : 500,
                 background: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--background))',

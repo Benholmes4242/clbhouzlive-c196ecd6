@@ -6,7 +6,7 @@ const WatchPageContent = lazy(() => import('@/components/watch/WatchPageContent'
 export default function WatchTab() {
   return (
     <Suspense fallback={<WatchGridSkeleton />}>
-      <WatchPageContent />
+      <WatchPageContent embedded />
     </Suspense>
   );
 }
