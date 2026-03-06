@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
 import { useCallback, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/utils/feedMapper';
@@ -67,6 +67,7 @@ export function useWatchFeed({ userId, filter, searchQuery, userLat, userLng }: 
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: undefined as string | undefined,
     enabled: !!userId,
+    placeholderData: keepPreviousData,
     staleTime: 2 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
@@ -88,6 +89,7 @@ export function useWatchFeed({ userId, filter, searchQuery, userLat, userLng }: 
   return {
     posts: allPosts,
     isLoading: query.isLoading,
+    isError: query.isError,
     hasNextPage: query.hasNextPage,
     isFetchingNextPage: query.isFetchingNextPage,
     fetchNextPage: query.fetchNextPage,

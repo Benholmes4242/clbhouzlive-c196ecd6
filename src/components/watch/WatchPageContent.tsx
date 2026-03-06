@@ -7,7 +7,11 @@ import WatchSearchOverlay from '@/components/watch/WatchSearchOverlay';
 import { useWatchFeed } from '@/components/watch/hooks/useWatchFeed';
 import type { WatchFilter } from '@/components/watch/types';
 
-const WatchPageContent: React.FC = () => {
+interface WatchPageContentProps {
+  embedded?: boolean;
+}
+
+const WatchPageContent: React.FC<WatchPageContentProps> = ({ embedded = false }) => {
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
   const [activeFilter, setActiveFilter] = useState<WatchFilter>('trending');
@@ -17,9 +21,11 @@ const WatchPageContent: React.FC = () => {
   const {
     posts,
     isLoading,
+    isError,
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
+    refetch,
     resetSeen,
   } = useWatchFeed({ userId, filter: activeFilter });
 
@@ -29,18 +35,21 @@ const WatchPageContent: React.FC = () => {
   };
 
   return (
-    <div className="bg-[var(--bg-page)] min-h-screen">
+    <div className="bg-background min-h-screen">
       <WatchHeader
         activeFilter={activeFilter}
         onFilterChange={handleFilterChange}
         onOpenSearch={() => setIsSearchOpen(true)}
+        embedded={embedded}
       />
       <WatchGrid
         posts={posts}
         isLoading={isLoading}
+        isError={isError}
         hasNextPage={hasNextPage}
         isFetchingNextPage={isFetchingNextPage}
         fetchNextPage={fetchNextPage}
+        refetch={refetch}
         gridRef={gridRef as React.RefObject<HTMLDivElement>}
         userId={userId}
       />

@@ -1,7 +1,7 @@
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { MainPill, FILTER_TO_MAIN_PILL } from "@/constants/discoverPills";
 import { parseTopics, stringifyTopics } from "@/constants/videoFilters";
-import { useEffect } from "react";
+
 
 export function useDiscoverQuery() {
   const [params] = useSearchParams();
@@ -24,17 +24,6 @@ export function useDiscoverQuery() {
   const topic = params.get("topic") || undefined;
   const channel = params.get("channel") || undefined;
 
-  // Canonicalize: if duration=shorts is set, redirect to main=shorts
-  useEffect(() => {
-    const duration = params.get("duration");
-    if (duration === "shorts" && main !== "shorts") {
-      navigate({ search: `?main=shorts` }, { replace: true });
-    }
-    // If on shorts tab but duration param exists, remove it
-    if (main === "shorts" && params.has("duration")) {
-      navigate({ search: `?main=shorts` }, { replace: true });
-    }
-  }, [params, main, navigate]);
 
   function setMain(next: MainPill) {
     navigate({ search: `?main=${next}` }, { replace: false });
