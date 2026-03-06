@@ -32,7 +32,7 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index }) => {
       className="relative aspect-[4/5] overflow-hidden rounded-[4px] cursor-pointer active:scale-[0.97]"
       style={{ transition: 'transform 100ms ease' }}
       onClick={() => {
-        console.log('[WatchPage] Tile tapped:', { postId: post.id, index });
+        // TODO: Wire to fullscreen player
       }}
     >
       {/* Poster or placeholder */}

@@ -85,17 +85,14 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       hls.currentLevel = 0;
       // @ts-ignore
       hls.autoLevelEnabled = false;
-      console.log('[WatchAutoplay] MANIFEST_PARSED, calling play() for index:', index);
-      video.play().then(() => {
-        console.log('[WatchAutoplay] play() SUCCESS for index:', index);
-      }).catch((err) => {
+      video.play().catch((err) => {
         console.warn('[WatchAutoplay] play() FAILED for index:', index, err?.name, err?.message);
       });
     });
 
     const onCanPlay = () => {
-      console.log('[WatchAutoplay] canplay fired, video.paused:', video.paused, 'index:', index);
       const poster = tile.querySelector('img');
+      if (poster) {
       if (poster) {
         poster.style.transition = 'opacity 200ms ease';
         poster.style.opacity = '0';

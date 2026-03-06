@@ -1,6 +1,5 @@
 export type MainPill =
   | "watch"
-  | "shorts"
   | "videos"
   | "explore"
   | "channels" // Back-compat alias
