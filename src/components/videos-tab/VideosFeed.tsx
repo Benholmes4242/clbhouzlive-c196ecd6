@@ -13,6 +13,7 @@ interface VideosFeedProps {
   isFetchingNextPage: boolean;
   fetchNextPage: () => void;
   refetch: () => void;
+  userId?: string;
 }
 
 export function VideosFeed({
@@ -23,6 +24,7 @@ export function VideosFeed({
   isFetchingNextPage,
   fetchNextPage,
   refetch,
+  userId,
 }: VideosFeedProps) {
   const fetchGuard = useRef(false);
   const [centerIndex, setCenterIndex] = useState(0);
@@ -117,12 +119,12 @@ export function VideosFeed({
     );
   }
 
-
   return (
-    <div className="flex flex-col gap-4 px-4 pb-4">
+    <div className="flex flex-col gap-0 pb-4">
       {posts.map((post, i) => (
         <div key={post.id} ref={setCardRef(i)} data-card-index={i}>
-          <VideoCard post={post} isAutoplayEligible={Math.abs(i - centerIndex) <= 2} />
+          <VideoCard post={post} isAutoplayEligible={Math.abs(i - centerIndex) <= 2} userId={userId} />
+          {i < posts.length - 1 && <div className="h-[1px] bg-border" />}
         </div>
       ))}
 
