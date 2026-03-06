@@ -143,6 +143,15 @@ const ClubhouseContent = () => {
   const isLoading = activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? true;
   
+  // Debug: log posts data
+  const prevPostsLenRef = useRef(0);
+  useEffect(() => {
+    if (posts.length !== prevPostsLenRef.current || prevPostsLenRef.current === 0) {
+      chDbg('CH:DATA', 'Posts:', posts.length, 'isLoading:', isLoading, 'tab:', activeTab);
+      prevPostsLenRef.current = posts.length;
+    }
+  }, [posts.length, isLoading, activeTab]);
+  
   
   // Skeleton timing
   const { 
@@ -314,6 +323,7 @@ const ClubhouseContent = () => {
   // ── Tab switching: reset state ──
   useEffect(() => {
     if (prevTabRef.current !== activeTab) {
+      chDbg('CH:TAB', 'Tab changed to:', activeTab);
       analyticsEvents.track('feed_tab_switch', { from: prevTabRef.current, to: activeTab });
       clubhouseDebug.tabChange(prevTabRef.current, activeTab);
       useMediaStore.getState().setActiveIndex(0);
