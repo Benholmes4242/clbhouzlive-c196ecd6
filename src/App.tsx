@@ -96,7 +96,6 @@ const VerifiedPage = lazy(() => import("./pages/auth/VerifiedPage"));
 const Signup = lazy(() => import("./pages/Signup"));
 const Clubhouse = lazy(() => import("./pages/Clubhouse"));
 const WatchPage = lazy(() => import("./pages/WatchPage"));
-const NewVideosPage = lazy(() => import("./pages/VideosPage"));
 const AccountTypeOnboarding = lazy(() => import("./pages/onboarding/AccountTypeOnboarding"));
 const ProfileTestPage = lazy(() => import("./pages/ProfileTestPage"));
 const EditProfilePage = lazy(() => import("./pages/EditProfilePage"));
@@ -204,8 +203,7 @@ const CollegeProfilePage = lazy(() => import("./features/tourhub/pages").then(m 
 const CollegeComparePage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.CollegeComparePage })));
 import { TourNavWrapper } from './features/tourhub/components/TourNavWrapper';
 
-// Videos2 page
-const VideosPage = lazy(() => import("./features/videos2/pages/VideosPage"));
+// Video Player Modal (Phase 6A-1)
 // Video Player Modal (Phase 6A-1)
 const VideoPlayerModal = lazy(() => import("./components/videos/VideoPlayerModal"));
 const MiniPlayer = lazy(() => import("./components/videos/MiniPlayer"));
@@ -319,7 +317,7 @@ function AppRoutes() {
         <Route path="/settings" element={<SettingsWrapped />} />
         <Route path="/discover" element={<Suspense fallback={<DiscoverSkeleton />}><DiscoverWrapped /></Suspense>} />
         <Route path="/watch" element={<Suspense fallback={<GenericPageSkeleton />}><DiscoverWrapped /></Suspense>} />
-        <Route path="/videos-new" element={<Suspense fallback={<GenericPageSkeleton />}><NewVideosPage /></Suspense>} />
+        <Route path="/videos" element={<Suspense fallback={<DiscoverSkeleton />}><DiscoverWrapped /></Suspense>} />
         <Route path="/discover/explore/region/:slug" element={<Suspense fallback={<GenericPageSkeleton />}><ExploreRegionPage /></Suspense>} />
         <Route path="/discover/explore/theme/:slug" element={<Suspense fallback={<GenericPageSkeleton />}><ExploreThemePage /></Suspense>} />
         <Route path="/courses" element={<Suspense fallback={<CoursesListSkeleton />}><CoursesWrapped /></Suspense>} />
@@ -338,7 +336,7 @@ function AppRoutes() {
         <Route path="/post/:postId" element={<Suspense fallback={null}><PostDeepLinkPage /></Suspense>} />
         <Route path="/post/:postId/comment/:commentId" element={<Suspense fallback={null}><CommentDeepLinkPage /></Suspense>} />
         
-        <Route path="/videos" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><VideosPage /></Suspense>} />
+        
         <Route path="/video/:videoId" element={<Suspense fallback={null}><VideoPlayerModal /></Suspense>} />
         
         {/* Legacy creator routes - redirect to home (creators now handled via Business profiles or Personal Creator Mode) */}
