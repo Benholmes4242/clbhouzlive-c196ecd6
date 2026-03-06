@@ -117,53 +117,6 @@ export function VideosFeed({
     );
   }
 
-  // --- Center index tracking for mount-gating autoplay ---
-  const [centerIndex, setCenterIndex] = useState(0);
-  const cardRefs = useRef<Map<number, HTMLDivElement>>(new Map());
-  const centerObserverRef = useRef<IntersectionObserver | null>(null);
-
-  const setCardRef = useCallback((index: number) => (el: HTMLDivElement | null) => {
-    if (el) {
-      cardRefs.current.set(index, el);
-    } else {
-      cardRefs.current.delete(index);
-    }
-  }, []);
-
-  useEffect(() => {
-    centerObserverRef.current?.disconnect();
-
-    const ratios = new Map<number, number>();
-
-    centerObserverRef.current = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          const idx = Number(entry.target.getAttribute('data-card-index'));
-          if (!isNaN(idx)) {
-            ratios.set(idx, entry.intersectionRatio);
-          }
-        }
-        let bestIdx = 0;
-        let bestRatio = 0;
-        for (const [idx, ratio] of ratios) {
-          if (ratio > bestRatio) {
-            bestRatio = ratio;
-            bestIdx = idx;
-          }
-        }
-        setCenterIndex(bestIdx);
-      },
-      { threshold: [0, 0.25, 0.5, 0.75, 1] }
-    );
-
-    for (const [, el] of cardRefs.current) {
-      centerObserverRef.current.observe(el);
-    }
-
-    return () => {
-      centerObserverRef.current?.disconnect();
-    };
-  }, [posts.length]);
 
   return (
     <div className="flex flex-col gap-4 px-4 pb-4">
