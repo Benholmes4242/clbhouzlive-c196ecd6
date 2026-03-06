@@ -278,7 +278,10 @@ export function PlayerScorecardCard({
 
       {/* ── Player Hero Section ───────────────────────────────────────── */}
       <div className="flex flex-col items-center px-4 pt-2 pb-4">
-        <div className="relative mb-3">
+        <button
+          onClick={() => navigate(`/tourhub/player/${player.id}`)}
+          className="relative mb-3 active:scale-95 transition-transform"
+        >
           {player.photoUrl ? (
             <div
               className="overflow-hidden flex-shrink-0"
@@ -303,7 +306,7 @@ export function PlayerScorecardCard({
           <div className="absolute -bottom-1 -right-1 bg-white rounded-full px-2 py-0.5 shadow-lg">
             <span className="text-xs font-bold text-black">{player.position}</span>
           </div>
-        </div>
+        </button>
 
         <h2 className="text-xl font-bold text-white text-center">{player.name}</h2>
         {player.countryFlag && <span className="text-base mt-0.5">{player.countryFlag}</span>}
