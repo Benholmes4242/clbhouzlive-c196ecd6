@@ -5,10 +5,6 @@ import { Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSuggestedCreators, type SuggestedCreator } from './hooks/useSuggestedCreators';
 
-const dbg = (tag: string, ...args: any[]) => {
-  console.log(`[${tag}] ${Date.now() % 100000}`, ...args);
-};
-
 // ── Format name as "First L." ──
 function shortName(displayName: string): string {
   const parts = (displayName || '').trim().split(/\s+/);
@@ -72,7 +68,6 @@ const CreatorItem: React.FC<CreatorItemProps> = ({ creator, currentUserId }) => 
     async (e: React.MouseEvent) => {
       e.stopPropagation();
       if (busy) return;
-      dbg('W:CREATORS', 'Follow tapped for:', creator.displayName, 'currently following:', following);
       const wasFollowing = following;
       setFollowing(!wasFollowing);
       setBusy(true);
@@ -108,7 +103,6 @@ const CreatorItem: React.FC<CreatorItemProps> = ({ creator, currentUserId }) => 
       className="flex-shrink-0 flex flex-col items-center"
       style={{ width: 80, gap: 6, scrollSnapAlign: 'start' }}
     >
-      {/* Avatar with amber ring — squircle */}
       <div
         onClick={handleProfileTap}
         className="cursor-pointer"
@@ -154,7 +148,6 @@ const CreatorItem: React.FC<CreatorItemProps> = ({ creator, currentUserId }) => 
         </div>
       </div>
 
-      {/* Verified badge overlaid on avatar */}
       {creator.isVerified && (
         <div
           className="flex items-center justify-center"
@@ -175,7 +168,6 @@ const CreatorItem: React.FC<CreatorItemProps> = ({ creator, currentUserId }) => 
         </div>
       )}
 
-      {/* Name (First L.) */}
       <p
         onClick={handleProfileTap}
         className="w-full text-center truncate cursor-pointer"
@@ -184,7 +176,6 @@ const CreatorItem: React.FC<CreatorItemProps> = ({ creator, currentUserId }) => 
         {shortName(creator.displayName)}
       </p>
 
-      {/* Handicap pill or video count — rounded-lg like primary tabs */}
       <div
         className="flex items-center justify-center"
         style={{
@@ -203,7 +194,6 @@ const CreatorItem: React.FC<CreatorItemProps> = ({ creator, currentUserId }) => 
           : `${creator.videoCount} videos`}
       </div>
 
-      {/* Follow button */}
       <button
         onClick={handleFollow}
         className="active:scale-[0.96]"
@@ -235,14 +225,6 @@ interface SuggestedCreatorsStripProps {
 const SuggestedCreatorsStrip: React.FC<SuggestedCreatorsStripProps> = ({ userId }) => {
   const { data: creators, isLoading } = useSuggestedCreators(userId);
 
-  // Log when data loads
-  React.useEffect(() => {
-    if (!isLoading && creators) {
-      dbg('W:CREATORS', 'Loaded', creators.length, 'creators');
-    }
-  }, [creators, isLoading]);
-
-  // Loading state — render with grid-spanning wrapper
   if (isLoading) {
     return (
       <div style={{ gridColumn: '1 / -1', padding: '14px 0', background: '#FFFFFF', borderTop: '1px solid #F1F5F9', borderBottom: '1px solid #F1F5F9' }}>
@@ -261,20 +243,16 @@ const SuggestedCreatorsStrip: React.FC<SuggestedCreatorsStripProps> = ({ userId 
     );
   }
 
-  // Production: require at least 2 creators to render the strip
   if (!creators || creators.length < 2) {
-    dbg('W:CREATORS', 'Strip hidden — only', creators?.length, 'creators');
     return null;
   }
 
   return (
     <div style={{ gridColumn: '1 / -1', padding: '14px 0', background: '#FFFFFF', borderTop: '1px solid #F1F5F9', borderBottom: '1px solid #F1F5F9' }}>
-      {/* Header */}
       <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', padding: '0 16px', marginBottom: 12 }}>
         People to follow
       </p>
 
-      {/* Scroll container */}
       <div
         className="flex"
         style={{
