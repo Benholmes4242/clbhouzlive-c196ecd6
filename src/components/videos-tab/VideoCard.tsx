@@ -3,9 +3,11 @@ import { formatDistanceToNow } from 'date-fns';
 import { MoreHorizontal, Heart, MessageCircle, Share2, MapPin } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { DurationBadge } from '@/components/VideoCard/DurationBadge';
+import { VideoCardAutoplay } from './VideoCardAutoplay';
 
 interface VideoCardProps {
   post: FeedPost;
+  isAutoplayEligible?: boolean;
 }
 
 function formatCompact(n: number): string {
@@ -24,9 +26,10 @@ function formatVideoDuration(totalSeconds: number): string {
   return `${m}:${pad(sec)}`;
 }
 
-export const VideoCard = React.memo(function VideoCard({ post }: VideoCardProps) {
+export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligible = false }: VideoCardProps) {
   const firstVideo = post.mediaItems.find(m => m.type === 'video');
   const thumbnailUrl = firstVideo?.thumbnailUrl || '';
+  const hlsUrl = firstVideo?.hlsUrl || '';
   const duration = firstVideo?.duration || 0;
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
 
@@ -89,9 +92,17 @@ export const VideoCard = React.memo(function VideoCard({ post }: VideoCardProps)
             loading="lazy"
           />
         )}
+        {/* Autoplay layer */}
+        {hlsUrl && isAutoplayEligible && (
+          <VideoCardAutoplay
+            hlsUrl={hlsUrl}
+            posterUrl={thumbnailUrl}
+            isEligible={isAutoplayEligible}
+          />
+        )}
         {/* Duration badge */}
         {duration > 0 && (
-          <span className="absolute bottom-2 right-2 px-1.5 py-0.5 text-xs font-medium rounded bg-black/60 text-white backdrop-blur-sm">
+          <span className="absolute bottom-2 right-2 px-1.5 py-0.5 text-xs font-medium rounded bg-black/60 text-white backdrop-blur-sm z-10">
             {formatVideoDuration(duration)}
           </span>
         )}

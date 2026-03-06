@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Loader2 } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -25,19 +25,64 @@ export function VideosFeed({
   refetch,
 }: VideosFeedProps) {
   const fetchGuard = useRef(false);
+  const [centerIndex, setCenterIndex] = useState(0);
+  const cardRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+  const centerObserverRef = useRef<IntersectionObserver | null>(null);
 
   const { ref: sentinelRef, inView } = useInView({
     rootMargin: '400px',
   });
 
+  const setCardRef = useCallback((index: number) => (el: HTMLDivElement | null) => {
+    if (el) {
+      cardRefs.current.set(index, el);
+    } else {
+      cardRefs.current.delete(index);
+    }
+  }, []);
+
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage && !fetchGuard.current) {
       fetchGuard.current = true;
       fetchNextPage();
-      // Reset guard after a tick
       setTimeout(() => { fetchGuard.current = false; }, 200);
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  useEffect(() => {
+    centerObserverRef.current?.disconnect();
+
+    const ratios = new Map<number, number>();
+
+    centerObserverRef.current = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const idx = Number(entry.target.getAttribute('data-card-index'));
+          if (!isNaN(idx)) {
+            ratios.set(idx, entry.intersectionRatio);
+          }
+        }
+        let bestIdx = 0;
+        let bestRatio = 0;
+        for (const [idx, ratio] of ratios) {
+          if (ratio > bestRatio) {
+            bestRatio = ratio;
+            bestIdx = idx;
+          }
+        }
+        setCenterIndex(bestIdx);
+      },
+      { threshold: [0, 0.25, 0.5, 0.75, 1] }
+    );
+
+    for (const [, el] of cardRefs.current) {
+      centerObserverRef.current.observe(el);
+    }
+
+    return () => {
+      centerObserverRef.current?.disconnect();
+    };
+  }, [posts.length]);
 
   // Loading state
   if (isLoading && posts.length === 0) {
@@ -72,10 +117,13 @@ export function VideosFeed({
     );
   }
 
+
   return (
     <div className="flex flex-col gap-4 px-4 pb-4">
-      {posts.map((post) => (
-        <VideoCard key={post.id} post={post} />
+      {posts.map((post, i) => (
+        <div key={post.id} ref={setCardRef(i)} data-card-index={i}>
+          <VideoCard post={post} isAutoplayEligible={Math.abs(i - centerIndex) <= 2} />
+        </div>
       ))}
 
       {/* Infinite scroll sentinel */}
