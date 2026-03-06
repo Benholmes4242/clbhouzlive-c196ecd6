@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { MoreHorizontal, Heart, MessageCircle, Share2, MapPin } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
-
+import { supabase } from '@/integrations/supabase/client';
 import { VideoCardAutoplay } from './VideoCardAutoplay';
 
 interface VideoCardProps {
   post: FeedPost;
   isAutoplayEligible?: boolean;
+  userId?: string;
 }
 
 function formatCompact(n: number): string {
@@ -26,55 +28,142 @@ function formatVideoDuration(totalSeconds: number): string {
   return `${m}:${pad(sec)}`;
 }
 
-export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligible = false }: VideoCardProps) {
+export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligible = false, userId }: VideoCardProps) {
+  const navigate = useNavigate();
   const firstVideo = post.mediaItems.find(m => m.type === 'video');
   const thumbnailUrl = firstVideo?.thumbnailUrl || '';
   const hlsUrl = firstVideo?.hlsUrl || '';
   const duration = firstVideo?.duration || 0;
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
 
+  const [expanded, setExpanded] = useState(false);
+  const [isLiked, setIsLiked] = useState(post.isLikedByMe);
+  const [likeCount, setLikeCount] = useState(post.likeCount);
+
   const handleTap = () => {
-    // Fullscreen player wired in Phase 5
     // Fullscreen player wired later
   };
 
+  const toggleLike = async () => {
+    if (!userId) return;
+    const newLiked = !isLiked;
+    setIsLiked(newLiked);
+    setLikeCount(prev => newLiked ? prev + 1 : Math.max(0, prev - 1));
+    navigator?.vibrate?.(10);
+
+    try {
+      if (newLiked) {
+        await supabase.from('post_likes').insert({
+          post_id: post.id,
+          user_id: userId,
+          actor_id: userId,
+          actor_type: 'personal',
+        });
+      } else {
+        await supabase.from('post_likes').delete().match({
+          post_id: post.id,
+          user_id: userId,
+        });
+      }
+    } catch (err) {
+      console.error('[VideoCard] Like toggle failed:', err);
+      // Revert on error
+      setIsLiked(!newLiked);
+      setLikeCount(prev => newLiked ? Math.max(0, prev - 1) : prev + 1);
+    }
+  };
+
+  const handleShare = async () => {
+    const shareUrl = `${window.location.origin}/video/${post.id}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: post.caption || 'Check out this video', url: shareUrl });
+      } catch {
+        /* user cancelled */
+      }
+    } else {
+      await navigator.clipboard.writeText(shareUrl);
+    }
+  };
+
   return (
-    <article className="bg-card rounded-2xl overflow-hidden shadow-sm">
+    <article className="bg-card overflow-hidden">
       {/* Creator header */}
       <div className="flex items-center gap-3 p-3">
-        <img
-          src={post.avatarUrl || '/placeholder.svg'}
-          alt={post.displayName}
-          className="h-9 w-9 rounded-full object-cover shrink-0 bg-muted"
-        />
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1">
-            <span className="text-sm font-semibold text-foreground truncate">
-              {post.displayName}
-            </span>
-            {post.isVerified && (
-              <svg className="h-3.5 w-3.5 text-primary shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
-              </svg>
-            )}
+        <button
+          onClick={() => navigate(`/profile/${post.userId}`)}
+          className="flex items-center gap-3 min-w-0 flex-1"
+        >
+          <img
+            src={post.avatarUrl || '/placeholder.svg'}
+            alt={post.displayName}
+            className="h-9 w-9 rounded-full object-cover shrink-0 bg-muted"
+          />
+          <div className="flex-1 min-w-0 text-left">
+            <div className="flex items-center gap-1">
+              <span className="text-sm font-semibold text-foreground truncate">
+                {post.displayName}
+              </span>
+              {post.isVerified && (
+                <svg className="h-3.5 w-3.5 text-primary shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
+                </svg>
+              )}
+            </div>
+            <span className="text-xs text-muted-foreground">{timeAgo}</span>
           </div>
-          <span className="text-xs text-muted-foreground">{timeAgo}</span>
-        </div>
-        <button className="p-1 text-muted-foreground" aria-label="More options">
-          <MoreHorizontal className="h-5 w-5" />
+        </button>
+        <button
+          onClick={() => { /* Menu wired later */ }}
+          className="p-2 -mr-2 rounded-full hover:bg-muted transition-colors"
+          aria-label="More options"
+        >
+          <MoreHorizontal className="w-5 h-5 text-muted-foreground" />
         </button>
       </div>
 
       {/* Caption */}
       {post.caption && (
-        <p className="text-sm text-foreground px-3 pb-2 line-clamp-2">{post.caption}</p>
+        <div className="px-3 pb-2">
+          <p className={`text-sm text-foreground ${expanded ? '' : 'line-clamp-2'}`}>
+            {post.caption}
+          </p>
+          {!expanded && post.caption.length > 100 && (
+            <button
+              onClick={() => setExpanded(true)}
+              className="text-sm font-semibold text-muted-foreground mt-0.5"
+            >
+              more
+            </button>
+          )}
+          {expanded && post.caption.length > 100 && (
+            <button
+              onClick={() => setExpanded(false)}
+              className="text-sm font-semibold text-muted-foreground mt-0.5"
+            >
+              less
+            </button>
+          )}
+        </div>
       )}
 
       {/* Course tag */}
       {post.review?.courseName && (
-        <div className="flex items-center gap-1 px-3 pb-2">
-          <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-          <span className="text-xs text-muted-foreground truncate">{post.review.courseName}</span>
+        <div className="px-3 pb-2">
+          {post.review.courseId ? (
+            <button
+              onClick={() => navigate(`/course/${post.review!.courseId}`)}
+              className="flex items-center gap-1 hover:underline"
+            >
+              <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground truncate">{post.review.courseName}</span>
+            </button>
+          ) : (
+            <div className="flex items-center gap-1">
+              <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground truncate">{post.review.courseName}</span>
+            </div>
+          )}
         </div>
       )}
 
@@ -110,18 +199,22 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
 
       {/* Engagement row */}
       <div className="flex items-center gap-5 px-3 py-2.5">
-        <span className="flex items-center gap-1 text-xs text-muted-foreground">
-          <Heart className="h-4 w-4" />
-          {formatCompact(post.likeCount)}
-        </span>
-        <span className="flex items-center gap-1 text-xs text-muted-foreground">
+        <button onClick={toggleLike} className="flex items-center gap-1 text-xs">
+          <Heart
+            className={`h-4 w-4 transition-colors ${isLiked ? 'fill-current text-red-500' : 'text-muted-foreground'}`}
+          />
+          <span className={isLiked ? 'text-red-500' : 'text-muted-foreground'}>
+            {formatCompact(likeCount)}
+          </span>
+        </button>
+        <button onClick={() => { /* Comment sheet wired later */ }} className="flex items-center gap-1 text-xs text-muted-foreground">
           <MessageCircle className="h-4 w-4" />
           {formatCompact(post.commentCount)}
-        </span>
-        <span className="flex items-center gap-1 text-xs text-muted-foreground">
+        </button>
+        <button onClick={handleShare} className="flex items-center gap-1 text-xs text-muted-foreground">
           <Share2 className="h-4 w-4" />
           {formatCompact(post.shareCount)}
-        </span>
+        </button>
       </div>
     </article>
   );
