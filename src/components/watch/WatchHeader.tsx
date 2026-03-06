@@ -2,6 +2,10 @@ import React from 'react';
 import { Search } from 'lucide-react';
 import type { WatchFilter } from './types';
 
+const dbg = (tag: string, ...args: any[]) => {
+  console.log(`[${tag}] ${Date.now() % 100000}`, ...args);
+};
+
 const FILTERS: { key: WatchFilter; label: string }[] = [
   { key: 'trending', label: 'Trending' },
   { key: 'latest', label: 'Latest' },
@@ -54,7 +58,10 @@ const WatchHeader: React.FC<WatchHeaderProps> = ({ activeFilter, onFilterChange,
           return (
             <button
               key={key}
-              onClick={() => onFilterChange(key)}
+              onClick={() => {
+                dbg('W:HEADER', 'Filter tapped:', key);
+                onFilterChange(key);
+              }}
               className="shrink-0 rounded-full active:scale-[0.96]"
               style={{
                 height: '32px',

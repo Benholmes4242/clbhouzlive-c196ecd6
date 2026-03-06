@@ -1,6 +1,10 @@
 import { useEffect, useRef, useCallback } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 
+const dbg = (tag: string, ...args: any[]) => {
+  console.log(`[${tag}] ${Date.now() % 100000}`, ...args);
+};
+
 function isAutoplayTile(index: number): boolean {
   return index % 6 === 0;
 }
@@ -20,12 +24,16 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
   const isSlowNetwork = useCallback(() => {
     const connection = (navigator as any).connection;
     const type = connection?.effectiveType || '4g';
+    dbg('W:AUTO', 'Network check:', type, 'slow:', type === '2g' || type === 'slow-2g');
     return type === '2g' || type === 'slow-2g';
   }, []);
 
   // Create single video element on mount
   useEffect(() => {
-    if (isSlowNetwork()) return;
+    if (isSlowNetwork()) {
+      dbg('W:AUTO', 'Autoplay DISABLED — slow network');
+      return;
+    }
 
     const video = document.createElement('video');
     video.muted = true;
@@ -34,8 +42,10 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
     video.setAttribute('webkit-playsinline', '');
     video.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;';
     videoRef.current = video;
+    dbg('W:AUTO', 'Video element created');
 
     return () => {
+      dbg('W:AUTO', 'Cleanup — destroying HLS, disconnecting observer');
       if (hlsRef.current) {
         hlsRef.current.destroy();
         hlsRef.current = null;
@@ -59,6 +69,8 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
     const hlsUrl = post?.mediaItems[0]?.hlsUrl;
     if (!hlsUrl) return;
 
+    dbg('W:AUTO', 'Attaching to tile index:', index, 'hlsUrl:', hlsUrl?.slice(-40));
+
     // Pause & detach previous
     video.pause();
     if (hlsRef.current) {
@@ -74,7 +86,11 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
     const { default: Hls } = await import('hls.js');
     if (!Hls.isSupported()) {
       video.src = hlsUrl;
-      video.play().catch(() => {});
+      video.play().then(() => {
+        dbg('W:AUTO', 'play() SUCCESS for index:', index);
+      }).catch((error) => {
+        dbg('W:AUTO', 'play() FAILED for index:', index, error?.name, error?.message);
+      });
       return;
     }
 
@@ -88,14 +104,20 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
     hls.loadSource(hlsUrl);
     hls.attachMedia(video);
     hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      dbg('W:AUTO', 'HLS manifest parsed for index:', index);
       hls.currentLevel = 0;
       // @ts-ignore
       hls.autoLevelEnabled = false;
-      video.play().catch(() => {});
+      video.play().then(() => {
+        dbg('W:AUTO', 'play() SUCCESS for index:', index);
+      }).catch((error) => {
+        dbg('W:AUTO', 'play() FAILED for index:', index, error?.name, error?.message);
+      });
     });
 
     // Crossfade: hide poster when video ready
     const onCanPlay = () => {
+      dbg('W:AUTO', 'Video canplay, crossfading poster for index:', index);
       const poster = tile.querySelector('img');
       if (poster) {
         poster.style.transition = 'opacity 200ms ease';
@@ -111,6 +133,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
   const detachCurrent = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
+    dbg('W:AUTO', 'Detaching from index:', activeIndexRef.current);
     video.pause();
     
     // Restore poster opacity on the tile we're leaving
@@ -137,6 +160,8 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
     const grid = gridRef.current;
     if (!grid || posts.length === 0) return;
 
+    dbg('W:AUTO', 'WatchAutoplay mounted, posts:', posts.length);
+
     // Disconnect previous observer
     observerRef.current?.disconnect();
 
@@ -148,6 +173,8 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
           const el = entry.target as HTMLElement;
           const idx = Number(el.dataset.watchIndex);
           if (isNaN(idx)) continue;
+
+          dbg('W:AUTO', 'IO fired, index:', idx, 'ratio:', entry.intersectionRatio.toFixed(2));
 
           if (entry.intersectionRatio < 0.2) {
             ratioMap.delete(idx);

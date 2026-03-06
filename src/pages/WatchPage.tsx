@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import WatchHeader from '@/components/watch/WatchHeader';
@@ -8,12 +8,20 @@ import WatchSearchOverlay from '@/components/watch/WatchSearchOverlay';
 import { useWatchFeed } from '@/components/watch/hooks/useWatchFeed';
 import type { WatchFilter } from '@/components/watch/types';
 
+const dbg = (tag: string, ...args: any[]) => {
+  console.log(`[${tag}] ${Date.now() % 100000}`, ...args);
+};
+
 const WatchPage: React.FC = () => {
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
   const [activeFilter, setActiveFilter] = useState<WatchFilter>('trending');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    dbg('W:PAGE', 'WatchPage mounted, userId:', userId);
+  }, []);
 
   const {
     posts,
@@ -25,7 +33,12 @@ const WatchPage: React.FC = () => {
     refetch,
   } = useWatchFeed({ userId, filter: activeFilter });
 
+  useEffect(() => {
+    dbg('W:PAGE', 'Posts:', posts.length, 'isLoading:', isLoading, 'filter:', activeFilter);
+  }, [posts.length, isLoading, activeFilter]);
+
   const handleFilterChange = (f: WatchFilter) => {
+    dbg('W:PAGE', 'Filter changed to:', f);
     setActiveFilter(f);
     resetSeen();
   };
@@ -36,7 +49,10 @@ const WatchPage: React.FC = () => {
         <WatchHeader
           activeFilter={activeFilter}
           onFilterChange={handleFilterChange}
-          onOpenSearch={() => setIsSearchOpen(true)}
+          onOpenSearch={() => {
+            dbg('W:PAGE', 'Search overlay: OPEN');
+            setIsSearchOpen(true);
+          }}
         />
         <WatchGrid
           posts={posts}
@@ -50,7 +66,10 @@ const WatchPage: React.FC = () => {
         <WatchAutoplay posts={posts} gridRef={gridRef as React.RefObject<HTMLDivElement>} />
         <WatchSearchOverlay
           isOpen={isSearchOpen}
-          onClose={() => setIsSearchOpen(false)}
+          onClose={() => {
+            dbg('W:PAGE', 'Search overlay: CLOSED');
+            setIsSearchOpen(false);
+          }}
           userId={userId}
         />
       </div>
