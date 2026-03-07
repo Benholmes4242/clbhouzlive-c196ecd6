@@ -22,8 +22,8 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
   const activeMapRef = useRef<Map<number, number>>(new Map()); // slot → tileIdx
   const prewarmObserverRef = useRef<IntersectionObserver | null>(null);
   const autoplayObserverRef = useRef<IntersectionObserver | null>(null);
-  const observedAutoplayRef = useRef<Set<number>>(new Set());
-  const observedPrewarmRef = useRef<Set<number>>(new Set());
+  const observedTilesRef = useRef<Set<number>>(new Set());
+  const prewarmedSetRef = useRef<Set<number>>(new Set());
   const postsRef = useRef<FeedPost[]>(posts);
   postsRef.current = posts;
 
@@ -207,7 +207,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
 
     const activeMap = activeMapRef.current;
     activeMap.clear();
-    observedAutoplayRef.current.clear();
+    observedTilesRef.current.clear();
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -246,8 +246,8 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       const tiles = grid.querySelectorAll('[data-watch-index]');
       tiles.forEach((tile) => {
         const idx = Number((tile as HTMLElement).dataset.watchIndex);
-        if (!observedAutoplayRef.current.has(idx)) {
-          observedAutoplayRef.current.add(idx);
+        if (!observedTilesRef.current.has(idx)) {
+          observedTilesRef.current.add(idx);
           observer.observe(tile);
         }
       });
@@ -257,7 +257,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       clearTimeout(timer);
       observer.disconnect();
       autoplayObserverRef.current = null;
-      observedAutoplayRef.current.clear();
+      observedTilesRef.current.clear();
       for (let slot = 0; slot < VIDEO_POOL_SIZE; slot++) {
         detachSlot(slot, activeMap.get(slot));
         const video = videoPoolRef.current[slot];
@@ -275,8 +275,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
     const grid = gridRef.current;
     if (!grid || posts.length === 0) return;
 
-    observedPrewarmRef.current.clear();
-    const prewarmedSet = new Set<number>();
+    prewarmedSetRef.current.clear();
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -284,11 +283,11 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
           if (!entry.isIntersecting) continue;
           const el = entry.target as HTMLElement;
           const idx = Number(el.dataset.watchIndex);
-          if (isNaN(idx) || prewarmedSet.has(idx)) continue;
+          if (isNaN(idx) || prewarmedSetRef.current.has(idx)) continue;
           const post = postsRef.current[idx];
           const hlsUrl = post?.mediaItems?.[0]?.hlsUrl;
           if (!hlsUrl) continue;
-          prewarmedSet.add(idx);
+          prewarmedSetRef.current.add(idx);
           perf('WATCH', 'pre-warm START tileIndex:', idx);
           prewarmTile(hlsUrl, idx);
         }
@@ -302,8 +301,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       const tiles = grid.querySelectorAll('[data-watch-index]');
       tiles.forEach((tile) => {
         const idx = Number((tile as HTMLElement).dataset.watchIndex);
-        if (!observedPrewarmRef.current.has(idx)) {
-          observedPrewarmRef.current.add(idx);
+        if (!prewarmedSetRef.current.has(idx)) {
           observer.observe(tile);
         }
       });
@@ -313,7 +311,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       clearTimeout(timer);
       observer.disconnect();
       prewarmObserverRef.current = null;
-      observedPrewarmRef.current.clear();
+      prewarmedSetRef.current.clear();
     };
   }, [posts, gridRef, isSlowNetwork, prewarmTile]);
 
@@ -324,13 +322,13 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
     const tiles = grid.querySelectorAll('[data-watch-index]');
     tiles.forEach((tile) => {
       const idx = Number((tile as HTMLElement).dataset.watchIndex);
-      if (prewarmObserverRef.current && !observedPrewarmRef.current.has(idx)) {
-        observedPrewarmRef.current.add(idx);
-        prewarmObserverRef.current.observe(tile);
-      }
-      if (autoplayObserverRef.current && !observedAutoplayRef.current.has(idx)) {
-        observedAutoplayRef.current.add(idx);
+      if (isNaN(idx)) return;
+      if (autoplayObserverRef.current && !observedTilesRef.current.has(idx)) {
+        observedTilesRef.current.add(idx);
         autoplayObserverRef.current.observe(tile);
+      }
+      if (prewarmObserverRef.current && !prewarmedSetRef.current.has(idx)) {
+        prewarmObserverRef.current.observe(tile);
       }
     });
   }, [posts.length, gridRef]);
