@@ -205,6 +205,7 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
   perf('HLS', 'preCreate START url:', hlsUrl.slice(-50));
   const hls = new (Hls as any)(getHlsConfig()) as InstanceType<typeof HlsType>;
 
+  // Wait for MANIFEST_PARSED so the instance is truly ready for instant promotion
   return new Promise<void>((resolve) => {
     hls.on((Hls as any).Events.MANIFEST_PARSED, () => {
       perf('HLS', 'preCreate MANIFEST_PARSED url:', hlsUrl.slice(-50));
@@ -217,7 +218,7 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
         preCreatedInstances.delete(hlsUrl);
         perf('HLS', 'preCreated MAP DELETE key:', hlsUrl, 'mapSize:', preCreatedInstances.size);
         try { hls.destroy(); } catch { /* ignore */ }
-        resolve();
+        resolve(); // resolve anyway to not block
       }
     });
 
