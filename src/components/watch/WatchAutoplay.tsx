@@ -101,7 +101,6 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
     tileEl.appendChild(video);
 
     const { default: Hls } = await import('hls.js');
-    const { createCachedLoader } = await import('@/components/media-system/utils/cachedHlsLoader');
     if (assignedTileRef.current[slot] !== tileIdx) return; // slot reassigned during async gap
 
     if (!Hls.isSupported()) {
@@ -115,7 +114,6 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       maxBufferLength: 5,
       maxMaxBufferLength: 10,
       enableWorker: true,
-      loader: createCachedLoader(Hls),
     });
     hlsPoolRef.current[slot] = hls;
     hls.loadSource(hlsUrl);
@@ -218,6 +216,8 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
         top2.splice(1, 1); // drop the second — same row
       }
     }
+
+    perf('WATCH', 'reconcile top2:', top2, 'ratioMap size:', ratioMapRef.current.size);
 
     
 
@@ -329,10 +329,16 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       { rootMargin: '800px' }
     );
 
-    const tiles = grid.querySelectorAll('[data-watch-index]');
-    tiles.forEach(tile => observer.observe(tile));
+    // Defer to next tick so tiles are in DOM
+    const timer = setTimeout(() => {
+      const tiles = grid.querySelectorAll('[data-watch-index]');
+      tiles.forEach(tile => observer.observe(tile));
+    }, 0);
 
-    return () => observer.disconnect();
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+    };
   }, [posts, gridRef, isSlowNetwork, prewarmTile]);
 
   return null;
