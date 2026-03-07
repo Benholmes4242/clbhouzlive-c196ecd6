@@ -257,6 +257,21 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
  * Destroy pre-created instances whose URLs are NOT in the keepUrls set.
  * Called when activeIndex changes to clean up stale preloads.
  */
+/**
+ * Imperatively pre-warm the first segment of an already-parsed preCreated instance.
+ * Call on SPRING so the SW caches the segment ~500ms before ACTIVATE.
+ */
+export function prewarmFirstSegment(hlsUrl: string): void {
+  const entry = preCreatedInstances.get(hlsUrl);
+  if (!entry) return;
+  const level = (entry as any).levels?.[0];
+  const frag = level?.details?.fragments?.[0];
+  if (frag?.url) {
+    perf('HLS', 'imperative pre-warm url:', frag.url.slice(-50));
+    fetch(frag.url, { mode: 'cors', credentials: 'omit' }).catch(() => {});
+  }
+}
+
 export function destroyStalePreCreated(keepUrls: Set<string>): void {
   for (const [url, hls] of preCreatedInstances) {
     if (!keepUrls.has(url)) {
