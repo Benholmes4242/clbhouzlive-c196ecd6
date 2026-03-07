@@ -297,6 +297,7 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
     setPullDistance(0);
     pullDistanceRef.current = 0;
     lastRenderedPull.current = 0;
+    perf('SWIPE', '>>> SPRING from:', currentIndex, 'to:', targetIndex);
     goToIndex(targetIndex, velocity);
   }, [posts.length, itemHeight, onRefresh, isRefreshing, goToIndex]);
 
