@@ -89,6 +89,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
     const onPlaying = () => {
       perf('WATCH', '<<< PLAYING tileIndex:', tileIdx, 'slot:', slot);
     };
+    (video as any)._onPlaying = onPlaying;
     video.addEventListener('playing', onPlaying, { once: true });
 
     const onCanPlay = () => {
@@ -102,6 +103,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
         video.play().catch(() => {});
       }
     };
+    (video as any)._onCanPlay = onCanPlay;
     video.addEventListener('canplay', onCanPlay, { once: true });
   }, [isSlowNetwork]);
 
@@ -123,6 +125,14 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       }
     }
 
+    if ((video as any)._onPlaying) {
+      video.removeEventListener('playing', (video as any)._onPlaying);
+      (video as any)._onPlaying = null;
+    }
+    if ((video as any)._onCanPlay) {
+      video.removeEventListener('canplay', (video as any)._onCanPlay);
+      (video as any)._onCanPlay = null;
+    }
     video.pause();
     if (video.parentElement) {
       video.parentElement.removeChild(video);
@@ -149,11 +159,11 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       .map(([idx]) => idx);
 
     // Enforce minimum gap: the two playing tiles must not be in the same row
-    // or adjacent rows — require at least COLUMNS tiles between them
     if (top2.length === 2) {
-      const gap = Math.abs(top2[0] - top2[1]);
-      if (gap < COLUMNS * 2) {
-        top2.splice(1, 1); // drop the second — too close
+      const row0 = Math.floor(top2[0] / COLUMNS);
+      const row1 = Math.floor(top2[1] / COLUMNS);
+      if (Math.abs(row0 - row1) < 1) {
+        top2.splice(1, 1); // drop the second — same row
       }
     }
 
