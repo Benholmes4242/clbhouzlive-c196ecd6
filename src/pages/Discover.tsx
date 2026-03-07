@@ -17,13 +17,12 @@ import { DURATION_FILTERS } from '@/constants/videoFilters';
 import DiscoverContent from '@/components/discover/DiscoverContent';
 import { ChannelsFeed } from '@/components/channels/ChannelsFeed';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
-import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
+
 
 import { useOptimisticPostInsertion } from '@/hooks/useOptimisticPostInsertion';
 // REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
 import { usePostEngagement } from '@/hooks/usePostEngagement';
-import type { ExploreContentItem } from '@/components/explore/types';
-import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
+import { FILTER_TYPES } from '@/components/explore/types';
 import { useUserTop100Intent } from '@/hooks/useUserTop100Intent';
 import { useTop100DiscoverRecommendations } from '@/hooks/useTop100DiscoverRecommendations';
 import { useTrendingTop100Moments } from '@/hooks/useTrendingTop100Moments';
@@ -136,23 +135,7 @@ const Discover = () => {
   }, [main]);
 
   
-  // Get content for the vertical feed (we'll use the new DiscoverContent component for the grid)
-  const { 
-    content, 
-    loading, 
-    hasMore, 
-    loadMore 
-  } = useInfiniteExploreContent(activeFilter, sub, durationRange);
-
   const { optimisticPosts } = useOptimisticPostInsertion();
-
-  // Combine optimistic posts with regular content
-  const allContent = React.useMemo(() => {
-    return [...optimisticPosts, ...(content || [])];
-  }, [optimisticPosts, content]);
-
-  // Get engagement state for current fullscreen post
-  const { toggleLike } = usePostEngagement(currentFullscreenPostId);
 
   // Share handler
   const handleSharePost = useCallback((postId: string) => {
@@ -168,7 +151,6 @@ const Discover = () => {
         }
       });
     } else {
-      // Fallback: Copy to clipboard
       navigator.clipboard.writeText(shareUrl).then(() => {
         toast.success('Copied to clipboard');
       }).catch(() => {
@@ -176,58 +158,6 @@ const Discover = () => {
       });
     }
   }, []);
-
-  // TODO: Wire to new media player
-  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
-
-  // ============================================
-  // ALL CALLBACKS MUST USE useCallback HOOKS
-  // Defined BEFORE any early returns
-  // ============================================
-
-  const handleLike = useCallback((contentId: string) => {
-    // Update likes optimistically via engagement hook
-  }, []);
-
-  const handleFollow = useCallback((contentId: string) => {
-    // Update follow status optimistically - could be enhanced with actual API call
-  }, []);
-
-  // Handle media click from DiscoverContent - opens unified fullscreen player
-  // CRITICAL FIX: Accept optional items array to use the correct data source
-  const handleMediaClick = useCallback((item: ExploreContentItem, index?: number, items?: any[]) => {
-    // If items array is provided, use it (e.g., from WatchGridV2 or Hero)
-    // Otherwise fall back to allContent (legacy behavior)
-    const playlist = items && items.length > 0 ? items : allContent;
-    
-    console.log('[Discover] handleMediaClick:', {
-      itemId: item.id?.slice(0, 8),
-      providedIndex: index,
-      usingProvidedItems: !!(items && items.length > 0),
-      playlistLength: playlist.length,
-      firstFiveIds: playlist.slice(0, 5).map((p: any) => (p.id || p.postId)?.slice(0, 8))
-    });
-    
-    // Find the index if not provided
-    const clickedIndex = index ?? playlist.findIndex(c => c.id === item.id);
-    
-    console.log('[Discover] Opening fullscreen at index:', clickedIndex, 'for item:', item.id?.slice(0, 8));
-    
-    if (clickedIndex !== -1) {
-      setCurrentFullscreenPostId(item.id); // Set initial post
-      // CRITICAL: Pass focusItemId so fullscreen viewer can find the item after deduplication
-      openFullscreen(playlist, clickedIndex, item.id);
-    }
-  }, [allContent, openFullscreen]);
-
-
-  // Handle media click from CommunityFeed (receives any item shape)
-  const handleCommunityMediaClick = useCallback((item: any) => {
-    const clickedIndex = allContent.findIndex(c => c.id === item.id);
-    if (clickedIndex !== -1) {
-      openFullscreen(allContent, clickedIndex);
-    }
-  }, [allContent, openFullscreen]);
 
   const handleUserFollow = useCallback((userId: string) => {
     console.log('User followed:', userId);
@@ -299,7 +229,7 @@ const Discover = () => {
                   return (
                     <div className="md:container md:mx-auto md:px-0">
                       <Suspense fallback={null}>
-                        <CommunityFeed onMediaClick={handleCommunityMediaClick} />
+                        <CommunityFeed />
                       </Suspense>
                     </div>
                   );
