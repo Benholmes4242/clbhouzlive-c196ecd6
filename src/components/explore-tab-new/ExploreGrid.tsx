@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback, type RefObject } from 'react';
+import { useRef, useEffect, useCallback, useMemo, type RefObject } from 'react';
 import { useInView } from 'react-intersection-observer';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { ExploreTile } from './ExploreTile';
@@ -46,6 +46,13 @@ export default function ExploreGrid({
     if (inView) loadMore();
   }, [inView, loadMore]);
 
+  // Only show posts tagged to a golf course.
+  // Currently course name is only available on review posts (via source_review_id → course_ratings → golf_courses).
+  // Non-review posts tagged at courses will need the get_explore_feed RPC updated to join post_tags for course names.
+  const coursePosts = useMemo(() => {
+    return posts.filter(post => !!post.review?.courseName);
+  }, [posts]);
+
   if (isLoading) {
     return <ExploreGridSkeleton />;
   }
@@ -66,24 +73,24 @@ export default function ExploreGrid({
     );
   }
 
-  if (posts.length === 0) {
+  if (coursePosts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-3">
-        <span className="text-3xl">🌍</span>
-        <p className="text-foreground text-sm font-medium">Nothing to explore yet</p>
+        <span className="text-3xl">🏌️</span>
+        <p className="text-foreground text-sm font-medium">No course content yet</p>
         <p className="text-muted-foreground text-xs text-center max-w-[240px]">
-          Golf content from around the world will appear here
+          Content tagged at golf courses will appear here
         </p>
       </div>
     );
   }
 
-  const showReviewsStrip = posts.length >= REVIEWS_STRIP_AFTER;
+  const showReviewsStrip = coursePosts.length >= REVIEWS_STRIP_AFTER;
 
   return (
     <>
       <div ref={gridRef} className="grid grid-cols-3 gap-[2px] px-[2px]">
-        {posts.map((post, index) => {
+        {coursePosts.map((post, index) => {
           const tile = <ExploreTile key={post.id} post={post} index={index} />;
 
           // Insert ReviewsOfTheWeekStrip after the 18th tile
