@@ -13,11 +13,9 @@ function isSlowNetwork(): boolean {
   return ect === '2g' || ect === 'slow-2g';
 }
 
-const prewarmedSet = new Set<number>();
-
-const prewarmTile = async (hlsUrl: string, idx: number) => {
-  if (prewarmedSet.has(idx)) return;
-  prewarmedSet.add(idx);
+const prewarmTile = async (hlsUrl: string, idx: number, seen: Set<number>) => {
+  if (seen.has(idx)) return;
+  seen.add(idx);
   try {
     const masterText = await fetch(hlsUrl, { mode: 'cors', credentials: 'omit' }).then(r => r.text());
     const masterLines = masterText.split('\n');
@@ -59,6 +57,7 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
   const activeMapRef = useRef<Map<number, number>>(new Map()); // slot → tileIdx
   const observerRef = useRef<IntersectionObserver | null>(null);
   const observedTilesRef = useRef<number>(0);
+  const prewarmedSetRef = useRef<Set<number>>(new Set());
 
   // Create video pool once on mount
   useEffect(() => {
@@ -94,6 +93,10 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
     if (!video) return;
 
     video.pause();
+    if ((video as any)._exploreCanPlayHandler) {
+      video.removeEventListener('canplay', (video as any)._exploreCanPlayHandler);
+      (video as any)._exploreCanPlayHandler = null;
+    }
     video.style.opacity = '0';
     video.removeAttribute('src');
     video.load();
@@ -132,9 +135,9 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
 
     const onCanPlay = () => {
       video.style.opacity = '1';
-      video.removeEventListener('canplay', onCanPlay);
     };
-    video.addEventListener('canplay', onCanPlay);
+    video.addEventListener('canplay', onCanPlay, { once: true });
+    (video as any)._exploreCanPlayHandler = onCanPlay;
 
     const isNativeHls = video.canPlayType('application/vnd.apple.mpegurl') !== '';
 
@@ -257,7 +260,7 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
 
             for (const nextIdx of videoIndices) {
               const nextHlsUrl = posts[nextIdx]?.mediaItems?.[0]?.hlsUrl;
-              if (nextHlsUrl) prewarmTile(nextHlsUrl, nextIdx);
+              if (nextHlsUrl) prewarmTile(nextHlsUrl, nextIdx, prewarmedSetRef.current);
             }
           }
         }
