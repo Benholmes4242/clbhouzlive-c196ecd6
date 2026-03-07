@@ -16,6 +16,10 @@ import { flingSpring, SPRING_CONFIGS } from './utils/spring';
 import type { FeedPost } from './types/media';
 import { haptic } from '@/utils/haptics';
 
+const perf = (tag: string, ...args: any[]) => {
+  console.log(`[PERF:${tag}] ${Date.now() % 100000}`, ...args);
+};
+
 
 const FLING_VELOCITY_THRESHOLD = 0.4;   // px/ms — above this = fling
 const RUBBER_BAND_FACTOR = 0.35;
@@ -179,10 +183,12 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
         }
       },
       () => {
+        perf('SWIPE', 'SETTLED at:', clamped);
         offsetRef.current = targetY;
         setOffsetY(targetY);
         const prevIdx = activeIndexRef.current;
         activeIndexRef.current = clamped;
+        perf('SWIPE', 'setActiveIndex:', clamped);
         setActiveIndex(clamped);
         useMediaStore.getState().setCarouselPosition(clamped, 0);
         haptic('light');
