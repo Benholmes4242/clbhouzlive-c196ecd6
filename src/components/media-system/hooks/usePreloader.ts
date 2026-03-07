@@ -54,6 +54,7 @@ export function usePreloader(posts: FeedPost[]) {
     // This runs IMMEDIATELY (not inside async run) for fastest pre-creation
     const adjacentUrls: string[] = [];
 
+    const currentUrl = posts[activeIndex]?.mediaItems[0]?.hlsUrl;
     const nextUrl = posts[activeIndex + 1]?.mediaItems[0]?.hlsUrl;
     const prevUrl = posts[activeIndex - 1]?.mediaItems[0]?.hlsUrl;
 
@@ -68,8 +69,11 @@ export function usePreloader(posts: FeedPost[]) {
       queuePreCreate(prevUrl);
     }
 
-    // Destroy any pre-created instances that are NOT N-1 or N+1
-    destroyStalePreCreated(new Set(adjacentUrls));
+    const keepUrls = new Set(adjacentUrls);
+    if (currentUrl) keepUrls.add(currentUrl);
+
+    // Destroy any pre-created instances that are NOT active/N-1/N+1
+    destroyStalePreCreated(keepUrls);
 
     async function run() {
       const signal = controller.signal;
