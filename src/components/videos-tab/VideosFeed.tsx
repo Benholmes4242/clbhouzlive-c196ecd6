@@ -29,6 +29,7 @@ export function VideosFeed({
   const fetchGuard = useRef(false);
   const [centerIndex, setCenterIndex] = useState(0);
   const cardRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+  const prewarmedSetRef = useRef<Set<number>>(new Set());
   const centerObserverRef = useRef<IntersectionObserver | null>(null);
 
   const { ref: sentinelRef, inView } = useInView({
