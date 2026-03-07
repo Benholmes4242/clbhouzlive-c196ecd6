@@ -152,7 +152,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
     // or adjacent rows — require at least COLUMNS tiles between them
     if (top2.length === 2) {
       const gap = Math.abs(top2[0] - top2[1]);
-      if (gap < COLUMNS) {
+      if (gap < COLUMNS * 2) {
         top2.splice(1, 1); // drop the second — too close
       }
     }
