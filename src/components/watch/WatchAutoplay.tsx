@@ -2,6 +2,10 @@ import { useEffect, useRef, useCallback } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 const VIDEO_POOL_SIZE = 2;
+const AUTOPLAY_THRESHOLD = 0.5;
+
+const isDesignatedTile = (idx: number) => idx % 6 === 0 || idx % 6 === 2;
+const slotForTile = (idx: number) => idx % 6 === 0 ? 0 : 1;
 
 const perf = (tag: string, ...args: any[]) => {
   console.log(`[PERF:${tag}] ${Date.now() % 100000}`, ...args);
@@ -15,8 +19,7 @@ interface WatchAutoplayProps {
 const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
   const videoPoolRef = useRef<HTMLVideoElement[]>([]);
   const hlsPoolRef = useRef<(any | null)[]>([null, null]);
-  const assignedTileRef = useRef<(number | null)[]>([null, null]);
-  const ratioMapRef = useRef<Map<number, number>>(new Map());
+  const activeMapRef = useRef<Map<number, number>>(new Map()); // slot → tileIdx
   const postsRef = useRef<FeedPost[]>(posts);
   postsRef.current = posts;
 
@@ -101,7 +104,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
     tileEl.appendChild(video);
 
     const { default: Hls } = await import('hls.js');
-    if (assignedTileRef.current[slot] !== tileIdx) return; // slot reassigned during async gap
+    if (activeMapRef.current.get(slot) !== tileIdx) return; // slot reassigned during async gap
 
     if (!Hls.isSupported()) {
       video.src = hlsUrl;
@@ -119,7 +122,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
     hls.loadSource(hlsUrl);
     hls.attachMedia(video);
     hls.on(Hls.Events.MANIFEST_PARSED, () => {
-      if (assignedTileRef.current[slot] !== tileIdx) return;
+      if (activeMapRef.current.get(slot) !== tileIdx) return;
       hls.currentLevel = 0;
       // @ts-ignore
       hls.autoLevelEnabled = false;
@@ -158,9 +161,9 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
   }, [isSlowNetwork]);
 
   const detachSlot = useCallback((slot: number) => {
-    perf('WATCH', 'DETACH slot:', slot, 'tileIndex:', assignedTileRef.current[slot]);
-    const currentTile = assignedTileRef.current[slot];
-    if (currentTile === null) return;
+    const currentTile = activeMapRef.current.get(slot);
+    perf('WATCH', 'DETACH slot:', slot, 'tileIndex:', currentTile);
+    if (currentTile === undefined) return;
 
     const video = videoPoolRef.current[slot];
     if (!video) return;
@@ -193,101 +196,56 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       hlsPoolRef.current[slot] = null;
     }
 
-    assignedTileRef.current[slot] = null;
+    activeMapRef.current.delete(slot);
   }, []);
 
-  const reconcilePool = useCallback(() => {
-    const currentPosts = postsRef.current;
-    const grid = gridRef.current;
-    if (!grid || currentPosts.length === 0) return;
-
-    // Sort visible tiles by ratio descending, take top 2
-    const COLUMNS = 3;
-    const top2 = [...ratioMapRef.current.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, VIDEO_POOL_SIZE)
-      .map(([idx]) => idx);
-
-    // Enforce minimum gap: the two playing tiles must not be in the same row
-    if (top2.length === 2) {
-      const row0 = Math.floor(top2[0] / COLUMNS);
-      const row1 = Math.floor(top2[1] / COLUMNS);
-      if (Math.abs(row0 - row1) < 1) {
-        top2.splice(1, 1); // drop the second — same row
-      }
-    }
-
-    perf('WATCH', 'reconcile top2:', top2, 'ratioMap size:', ratioMapRef.current.size);
-
-    
-
-    for (let slot = 0; slot < VIDEO_POOL_SIZE; slot++) {
-      const currentTile = assignedTileRef.current[slot];
-      const desiredTile = top2[slot] ?? null;
-
-      if (currentTile === desiredTile) continue;
-
-      // Don't steal a tile already assigned to the other slot
-      if (desiredTile !== null) {
-        const otherSlot = slot === 0 ? 1 : 0;
-        if (assignedTileRef.current[otherSlot] === desiredTile) continue;
-      }
-
-      // Detach from current tile
-      detachSlot(slot);
-
-      // Attach to new tile
-      if (desiredTile !== null) {
-        const post = currentPosts[desiredTile];
-        const hlsUrl = post?.mediaItems?.[0]?.hlsUrl;
-        if (!hlsUrl) continue;
-        const tileEl = grid.querySelector(`[data-watch-index="${desiredTile}"]`) as HTMLElement | null;
-        if (!tileEl) continue;
-
-        assignedTileRef.current[slot] = desiredTile;
-        perf('WATCH', 'ATTACH START tileIndex:', desiredTile, 'slot:', slot);
-        attachToTile(slot, desiredTile, hlsUrl, tileEl);
-      }
-    }
-  }, [gridRef, attachToTile, detachSlot]);
-
-  // IntersectionObserver — observe ALL tiles
+  // IntersectionObserver — observe designated tiles only
   useEffect(() => {
     if (isSlowNetwork()) return;
     const grid = gridRef.current;
     if (!grid || posts.length === 0 || videoPoolRef.current.length === 0) return;
 
-    ratioMapRef.current.clear();
+    const activeMap = activeMapRef.current;
+    activeMap.clear();
 
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           const el = entry.target as HTMLElement;
           const idx = Number(el.dataset.watchIndex);
-          if (isNaN(idx)) continue;
+          if (isNaN(idx) || !isDesignatedTile(idx)) continue;
 
-          if (entry.intersectionRatio === 0) {
-            ratioMapRef.current.delete(idx);
-            // If this tile was assigned, detach it
-            for (let slot = 0; slot < VIDEO_POOL_SIZE; slot++) {
-              if (assignedTileRef.current[slot] === idx) {
-                detachSlot(slot);
-              }
+          const slot = slotForTile(idx);
+          const post = postsRef.current[idx];
+          const hlsUrl = post?.mediaItems?.[0]?.hlsUrl;
+          if (!hlsUrl) continue;
+
+          if (entry.intersectionRatio >= AUTOPLAY_THRESHOLD) {
+            // attach if not already
+            if (activeMap.get(slot) !== idx) {
+              perf('WATCH', 'ATTACH START tileIndex:', idx, 'slot:', slot, 'ratio:', entry.intersectionRatio);
+              detachSlot(slot);
+              activeMap.set(slot, idx);
+              attachToTile(slot, idx, hlsUrl, el);
             }
           } else {
-            ratioMapRef.current.set(idx, entry.intersectionRatio);
+            if (activeMap.get(slot) === idx) {
+              perf('WATCH', 'BELOW THRESHOLD tileIndex:', idx, 'slot:', slot, 'ratio:', entry.intersectionRatio);
+              detachSlot(slot);
+            }
           }
         }
-
-        reconcilePool();
       },
-      { threshold: [0, 0.2, 0.6, 1.0] }
+      { threshold: [0, AUTOPLAY_THRESHOLD] }
     );
 
-    const tiles = grid.querySelectorAll('[data-watch-index]');
-    tiles.forEach((tile) => observer.observe(tile));
+    const timer = setTimeout(() => {
+      const tiles = grid.querySelectorAll('[data-watch-index]');
+      tiles.forEach((tile) => observer.observe(tile));
+    }, 0);
 
     return () => {
+      clearTimeout(timer);
       observer.disconnect();
       for (let slot = 0; slot < VIDEO_POOL_SIZE; slot++) {
         hlsPoolRef.current[slot]?.destroy();
@@ -297,11 +255,10 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
           video.pause();
           video.remove();
         }
-        assignedTileRef.current[slot] = null;
       }
-      ratioMapRef.current.clear();
+      activeMap.clear();
     };
-  }, [posts, gridRef, isSlowNetwork, reconcilePool, detachSlot]);
+  }, [posts, gridRef, isSlowNetwork, attachToTile, detachSlot]);
 
   // Pre-warm observer — fetch manifests + first segments before tiles enter viewport
   useEffect(() => {
