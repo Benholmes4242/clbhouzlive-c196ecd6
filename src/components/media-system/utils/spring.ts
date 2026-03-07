@@ -16,19 +16,19 @@ interface SpringState {
 }
 
 export const DEFAULT_CONFIG: SpringConfig = {
-  tension: 220,
-  friction: 24,
+  tension: 300,
+  friction: 30,
   mass: 1,
   precision: 0.5,
 };
 
 export const SPRING_CONFIGS = {
-  /** Normal snap — responsive with slight overshoot */
-  snap: { tension: 220, friction: 24, mass: 1, precision: 0.5 } as SpringConfig,
-  /** Fling — more momentum, more overshoot */
-  fling: { tension: 180, friction: 22, mass: 1, precision: 0.5 } as SpringConfig,
+  /** Normal snap — fast and responsive, TikTok-like (~300ms settle) */
+  snap: { tension: 300, friction: 30, mass: 1, precision: 0.5 } as SpringConfig,
+  /** Fling — snappy with slight momentum carry (~350ms settle) */
+  fling: { tension: 280, friction: 28, mass: 1, precision: 0.5 } as SpringConfig,
   /** Rubber-band return — snappier, no overshoot */
-  rubberBand: { tension: 300, friction: 30, mass: 1, precision: 0.5 } as SpringConfig,
+  rubberBand: { tension: 400, friction: 35, mass: 1, precision: 0.5 } as SpringConfig,
 };
 
 function stepSpring(

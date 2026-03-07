@@ -1,17 +1,21 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useMediaStore } from '../store/mediaStore';
-import { preCreateHlsInstance, supportsNativeHls } from '../utils/hlsManager';
+import { preCreateHlsInstance, destroyStalePreCreated, supportsNativeHls } from '../utils/hlsManager';
 import { parseMasterManifest, parseSegmentManifest } from '../utils/manifestParser';
 import { segmentCache } from '../utils/segmentCache';
 import { getManifestTextCache } from '../utils/cachedHlsLoader';
 import type { FeedPost } from '../types/media';
+
+const perf = (tag: string, ...args: any[]) => {
+  console.log(`[PERF:${tag}] ${Date.now() % 100000}`, ...args);
+};
 
 /**
  * Three-stage preload pipeline.
  *
  * Stage 1 — Manifest warm (2 items ahead): fetch manifest text (< 5 KB).
  * Stage 2 — Thumbnail prefetch (3 items ahead): warm browser image cache.
- * Stage 3 — HLS instance pre-creation (1 item ahead, hls.js only):
+ * Stage 3 — HLS instance pre-creation (N-1 AND N+1, hls.js only):
  *           loadSource without attachMedia for near-instant promotion.
  * Stage 4 — Segment prefetch (next item): reuse cached manifest text,
  *           fetch first 2 segments of lowest quality.
@@ -33,22 +37,33 @@ export function usePreloader(posts: FeedPost[]) {
     const controller = new AbortController();
     abortRef.current = controller;
 
-    const nextHlsUrl = posts[activeIndex + 1]?.mediaItems[0]?.hlsUrl;
-
-    // Skip preload if next post has no video (image/review post)
-    if (!nextHlsUrl) {
-      return;
-    }
-
     const strategy = getPreloadStrategy();
+
+    // ── Stage 3: Pre-create HLS instances for N-1 AND N+1 ────────
+    // This runs IMMEDIATELY (not inside async run) for fastest pre-creation
+    if (!supportsNativeHls()) {
+      const adjacentUrls: string[] = [];
+
+      const nextUrl = posts[activeIndex + 1]?.mediaItems[0]?.hlsUrl;
+      const prevUrl = posts[activeIndex - 1]?.mediaItems[0]?.hlsUrl;
+
+      if (nextUrl) {
+        adjacentUrls.push(nextUrl);
+        perf('PRELOAD', 'pre-create N+1 url:', nextUrl.slice(-50));
+        preCreateHlsInstance(nextUrl).catch(() => {});
+      }
+      if (prevUrl) {
+        adjacentUrls.push(prevUrl);
+        perf('PRELOAD', 'pre-create N-1 url:', prevUrl.slice(-50));
+        preCreateHlsInstance(prevUrl).catch(() => {});
+      }
+
+      // Destroy any pre-created instances that are NOT N-1 or N+1
+      destroyStalePreCreated(new Set(adjacentUrls));
+    }
 
     async function run() {
       const signal = controller.signal;
-
-      // ── Stage 3: Pre-create HLS instance for next item ────────
-      if (strategy.stage === 'full' && !supportsNativeHls()) {
-        preCreateHlsInstance(nextHlsUrl).catch(() => {});
-      }
 
       // ── Stage 1: Manifest warm (2 items ahead) ───────────────
       for (let offset = 1; offset <= strategy.ahead; offset++) {
@@ -81,13 +96,13 @@ export function usePreloader(posts: FeedPost[]) {
 
       // Also warm previous item's manifest for back-nav
       const prev = posts[activeIndex - 1];
-      const prevUrl = prev?.mediaItems[0]?.hlsUrl;
-      if (prevUrl && !warmedManifests.current.has(prevUrl)) {
+      const prevManifestUrl = prev?.mediaItems[0]?.hlsUrl;
+      if (prevManifestUrl && !warmedManifests.current.has(prevManifestUrl)) {
         try {
-          const response = await fetch(prevUrl, { signal, mode: 'cors' });
+          const response = await fetch(prevManifestUrl, { signal, mode: 'cors' });
           const text = await response.text();
-          manifestTextCache.set(prevUrl, text);
-          warmedManifests.current.add(prevUrl);
+          manifestTextCache.set(prevManifestUrl, text);
+          warmedManifests.current.add(prevManifestUrl);
         } catch {
           // Silent
         }
@@ -156,6 +171,18 @@ export function usePreloader(posts: FeedPost[]) {
       controller.abort();
     };
   }, [activeIndex, posts]);
+}
+
+/**
+ * Imperative preload function — call from FeedContainer when swipe target
+ * is determined (before spring starts). This runs the HLS pre-creation
+ * IN PARALLEL with the spring animation.
+ */
+export function preloadByUrl(hlsUrl: string | undefined): void {
+  if (!hlsUrl) return;
+  if (supportsNativeHls()) return;
+  perf('PRELOAD', 'imperative pre-create url:', hlsUrl.slice(-50));
+  preCreateHlsInstance(hlsUrl).catch(() => {});
 }
 
 function getPreloadStrategy(): { ahead: number; stage: 'manifest' | 'segments' | 'full' } {
