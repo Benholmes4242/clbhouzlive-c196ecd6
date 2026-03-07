@@ -204,13 +204,3 @@ function getPreloadStrategy(): { ahead: number; stage: 'manifest' | 'segments' |
   return { ahead: 1, stage: 'segments' };
 }
 
-function getPreloadStrategy(): { ahead: number; stage: 'manifest' | 'segments' | 'full' } {
-  const conn = (navigator as any).connection;
-  if (!conn) return { ahead: 2, stage: 'full' };
-
-  const type = conn.effectiveType;
-  if (type === '4g') return { ahead: 2, stage: 'full' };
-  if (type === '3g') return { ahead: 1, stage: 'segments' };
-  if (type === '2g' || type === 'slow-2g') return { ahead: 0, stage: 'manifest' };
-  return { ahead: 1, stage: 'segments' };
-}
