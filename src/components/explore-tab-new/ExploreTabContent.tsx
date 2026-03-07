@@ -4,6 +4,8 @@ import { useExploreFeed } from './hooks/useExploreFeed';
 import { useExploreRegionChips } from './hooks/useExploreRegionChips';
 import { ExploreHeader } from './ExploreHeader';
 import ExploreGrid from './ExploreGrid';
+import ExploreAutoplay from './ExploreAutoplay';
+import { ExploreSearchOverlay } from './ExploreSearchOverlay';
 
 interface ExploreTabContentProps {
   embedded?: boolean;
@@ -15,6 +17,7 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
 
   const [activeRegion, setActiveRegion] = useState<string | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const gridRef = useRef<HTMLDivElement | null>(null);
 
   const { regions, isLoading: regionsLoading } = useExploreRegionChips();
 
@@ -35,7 +38,6 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
   }, [resetSeen]);
 
   const handleOpenSearch = useCallback(() => {
-    // Phase 4: will open ExploreSearchOverlay
     setIsSearchOpen(true);
   }, []);
 
@@ -58,6 +60,15 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
         isFetchingNextPage={isFetchingNextPage}
         fetchNextPage={fetchNextPage}
         refetch={refetch}
+        gridRef={gridRef}
+      />
+
+      <ExploreAutoplay posts={posts} gridRef={gridRef} />
+
+      <ExploreSearchOverlay
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        userId={userId}
       />
     </div>
   );

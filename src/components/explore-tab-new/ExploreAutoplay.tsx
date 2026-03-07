@@ -37,8 +37,9 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
     const media = post.mediaItems[0];
     if (!media || media.type !== 'video') return;
 
-    const streamId = media.streamId;
-    if (!streamId) return;
+    const hlsUrl = media.hlsUrl;
+    const mp4Fallback = media.mp4Url;
+    if (!hlsUrl && !mp4Fallback) return;
 
     // Position video over tile
     video.style.position = 'absolute';
@@ -59,24 +60,29 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
       video.removeEventListener('canplay', onCanPlay);
     };
     video.addEventListener('canplay', onCanPlay);
+    if (!hlsUrl) {
+      // No HLS, use MP4 directly
+      if (mp4Fallback) {
+        video.src = mp4Fallback;
+        video.play().catch((e) => console.warn('[ExploreAutoplay] mp4 play failed:', e.message));
+      }
+      return;
+    }
 
-    // Try HLS first
-    const hlsUrl = getStreamUrl(streamId);
     const isNativeHls = video.canPlayType('application/vnd.apple.mpegurl') !== '';
 
     if (isNativeHls) {
-      // Safari native HLS
       video.src = hlsUrl;
       video.play().catch((e) => console.warn('[ExploreAutoplay] play failed:', e.message));
       return;
     }
 
-    // Dynamic import Hls.js
     import('hls.js').then(({ default: Hls }) => {
       if (!Hls.isSupported()) {
-        // Fallback to MP4
-        video.src = getMp4Url(streamId);
-        video.play().catch((e) => console.warn('[ExploreAutoplay] mp4 play failed:', e.message));
+        if (mp4Fallback) {
+          video.src = mp4Fallback;
+          video.play().catch((e) => console.warn('[ExploreAutoplay] mp4 play failed:', e.message));
+        }
         return;
       }
 
@@ -100,14 +106,17 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
           console.warn('[ExploreAutoplay] HLS fatal error, trying MP4 fallback');
           hls.destroy();
           hlsRef.current = null;
-          video.src = getMp4Url(streamId);
-          video.play().catch((e) => console.warn('[ExploreAutoplay] mp4 fallback play failed:', e.message));
+          if (mp4Fallback) {
+            video.src = mp4Fallback;
+            video.play().catch((e) => console.warn('[ExploreAutoplay] mp4 fallback play failed:', e.message));
+          }
         }
       });
     }).catch(() => {
-      // Hls.js import failed, use MP4
-      video.src = getMp4Url(streamId);
-      video.play().catch((e) => console.warn('[ExploreAutoplay] mp4 play failed:', e.message));
+      if (mp4Fallback) {
+        video.src = mp4Fallback;
+        video.play().catch((e) => console.warn('[ExploreAutoplay] mp4 play failed:', e.message));
+      }
     });
   }, []);
 
