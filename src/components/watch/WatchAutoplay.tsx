@@ -112,6 +112,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
     tileEl.appendChild(video);
 
     const { default: Hls } = await import('hls.js');
+    const { createCachedLoader } = await import('@/components/media-system/utils/cachedHlsLoader');
     if (activeMapRef.current.get(slot) !== tileIdx) return;
 
     if (!Hls.isSupported()) {
@@ -125,6 +126,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       maxBufferLength: 5,
       maxMaxBufferLength: 10,
       enableWorker: true,
+      loader: createCachedLoader(Hls),
     });
     hlsPoolRef.current[slot] = hls;
     hls.loadSource(hlsUrl);
