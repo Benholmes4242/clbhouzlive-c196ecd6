@@ -260,7 +260,7 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
 
             for (const nextIdx of videoIndices) {
               const nextHlsUrl = posts[nextIdx]?.mediaItems?.[0]?.hlsUrl;
-              if (nextHlsUrl) prewarmTile(nextHlsUrl, nextIdx);
+              if (nextHlsUrl) prewarmTile(nextHlsUrl, nextIdx, prewarmedSetRef.current);
             }
           }
         }
