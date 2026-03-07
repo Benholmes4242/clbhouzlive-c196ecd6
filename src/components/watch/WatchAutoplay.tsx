@@ -17,6 +17,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
   const hlsPoolRef = useRef<(any | null)[]>([null, null]);
   const assignedTileRef = useRef<(number | null)[]>([null, null]);
   const ratioMapRef = useRef<Map<number, number>>(new Map());
+  const observerRef = useRef<IntersectionObserver | null>(null);
   const postsRef = useRef<FeedPost[]>(posts);
   postsRef.current = posts;
 
@@ -212,9 +213,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
   useEffect(() => {
     if (isSlowNetwork()) return;
     const grid = gridRef.current;
-    if (!grid || posts.length === 0 || videoPoolRef.current.length === 0) return;
-
-    ratioMapRef.current.clear();
+    if (!grid || videoPoolRef.current.length === 0) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -241,11 +240,14 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       { threshold: [0, 0.2, 0.6, 1.0] }
     );
 
+    observerRef.current = observer;
+
     const tiles = grid.querySelectorAll('[data-watch-index]');
     tiles.forEach((tile) => observer.observe(tile));
 
     return () => {
       observer.disconnect();
+      observerRef.current = null;
       for (let slot = 0; slot < VIDEO_POOL_SIZE; slot++) {
         hlsPoolRef.current[slot]?.destroy();
         hlsPoolRef.current[slot] = null;
@@ -258,7 +260,17 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       }
       ratioMapRef.current.clear();
     };
-  }, [posts, gridRef, isSlowNetwork, reconcilePool, detachSlot]);
+  }, [gridRef, isSlowNetwork, reconcilePool, detachSlot]);
+
+  // Re-observe newly added tiles when posts grow
+  useEffect(() => {
+    const grid = gridRef.current;
+    if (!grid || videoPoolRef.current.length === 0) return;
+    const observer = observerRef.current;
+    if (!observer) return;
+    const tiles = grid.querySelectorAll('[data-watch-index]');
+    tiles.forEach((tile) => observer.observe(tile)); // observe() is idempotent
+  }, [posts.length, gridRef]);
 
   return null;
 };
