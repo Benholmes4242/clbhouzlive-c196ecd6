@@ -5,6 +5,41 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { VideoCard } from './VideoCard';
 import { VideosFeedSkeleton } from './VideosFeedSkeleton';
 
+async function prewarmVideo(hlsUrl: string, idx: number) {
+  try {
+    const masterText = await fetch(hlsUrl, { mode: 'cors', credentials: 'omit' }).then(r => r.text());
+    const masterLines = masterText.split('\n');
+    const streamIdx = masterLines.findIndex(l => l.startsWith('#EXT-X-STREAM-INF'));
+    const levelRelUrl = streamIdx >= 0 ? masterLines[streamIdx + 1]?.trim() : null;
+    if (!levelRelUrl || levelRelUrl.startsWith('#')) return;
+    const masterBase = hlsUrl.substring(0, hlsUrl.lastIndexOf('/') + 1);
+    const levelUrl = levelRelUrl.startsWith('http') ? levelRelUrl : new URL(levelRelUrl, masterBase).href;
+
+    const levelText = await fetch(levelUrl, { mode: 'cors', credentials: 'omit' }).then(r => r.text());
+    const lines = levelText.split('\n');
+    const base = levelUrl.substring(0, levelUrl.lastIndexOf('/') + 1);
+
+    const mapLine = lines.find(l => l.startsWith('#EXT-X-MAP:URI="'));
+    if (mapLine) {
+      const mapUri = mapLine.match(/#EXT-X-MAP:URI="([^"]+)"/)?.[1];
+      if (mapUri) {
+        const initUrl = mapUri.startsWith('http') ? mapUri : new URL(mapUri, base).href;
+        console.log(`[PERF:VIDEOS] pre-warm init tileIndex: ${idx}`);
+        fetch(initUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
+      }
+    }
+
+    const segLine = lines.find(l => l.trim() && !l.startsWith('#'));
+    if (segLine) {
+      const segUrl = segLine.trim().startsWith('http') ? segLine.trim() : new URL(segLine.trim(), base).href;
+      console.log(`[PERF:VIDEOS] pre-warm seg tileIndex: ${idx}`);
+      fetch(segUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
+    }
+  } catch {
+    // silent
+  }
+}
+
 interface VideosFeedProps {
   posts: FeedPost[];
   isLoading: boolean;
