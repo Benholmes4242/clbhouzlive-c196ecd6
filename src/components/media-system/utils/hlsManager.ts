@@ -192,23 +192,52 @@ const preCreatedInstances = new Map<string, InstanceType<typeof HlsType>>();
  * for near-instant playback.
  */
 export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
-  if (preCreatedInstances.has(hlsUrl)) return;
+  if (preCreatedInstances.has(hlsUrl)) {
+    perf('HLS', 'preCreate SKIP (already exists) url:', hlsUrl.slice(-50));
+    return;
+  }
   if (supportsNativeHls()) return; // native doesn't need pre-creation
 
   const Hls = await getHls();
   if (!Hls || !Hls.isSupported()) return;
 
+  perf('HLS', 'preCreate START url:', hlsUrl.slice(-50));
   const hls = new (Hls as any)(getHlsConfig()) as InstanceType<typeof HlsType>;
-  hls.loadSource(hlsUrl);
-  preCreatedInstances.set(hlsUrl, hls);
 
-  // Limit pre-created pool to 2
-  if (preCreatedInstances.size > 2) {
-    const oldest = preCreatedInstances.keys().next().value;
-    if (oldest) {
-      const old = preCreatedInstances.get(oldest);
-      old?.destroy();
-      preCreatedInstances.delete(oldest);
+  // Wait for MANIFEST_PARSED so the instance is truly ready for instant promotion
+  return new Promise<void>((resolve) => {
+    hls.on((Hls as any).Events.MANIFEST_PARSED, () => {
+      perf('HLS', 'preCreate MANIFEST_PARSED url:', hlsUrl.slice(-50));
+      resolve();
+    });
+
+    hls.on((Hls as any).Events.ERROR, (_event: unknown, data: any) => {
+      if (data.fatal) {
+        perf('HLS', 'preCreate ERROR url:', hlsUrl.slice(-50), data.details);
+        preCreatedInstances.delete(hlsUrl);
+        try { hls.destroy(); } catch { /* ignore */ }
+        resolve(); // resolve anyway to not block
+      }
+    });
+
+    hls.loadSource(hlsUrl);
+    preCreatedInstances.set(hlsUrl, hls);
+
+    // Safety timeout — don't wait forever
+    setTimeout(() => resolve(), 5000);
+  });
+}
+
+/**
+ * Destroy pre-created instances whose URLs are NOT in the keepUrls set.
+ * Called when activeIndex changes to clean up stale preloads.
+ */
+export function destroyStalePreCreated(keepUrls: Set<string>): void {
+  for (const [url, hls] of preCreatedInstances) {
+    if (!keepUrls.has(url)) {
+      perf('HLS', 'preCreate DESTROY stale url:', url.slice(-50));
+      try { hls.destroy(); } catch { /* ignore */ }
+      preCreatedInstances.delete(url);
     }
   }
 }
@@ -222,7 +251,7 @@ export function promotePreCreated(
   video: HTMLVideoElement,
   onError?: (type: string, details: string) => void
 ): InstanceType<typeof HlsType> | null {
-  perf('HLS', 'promotePreCreated START');
+  perf('HLS', 'promotePreCreated START url:', hlsUrl.slice(-50), 'preCreatedKeys:', [...preCreatedInstances.keys()].map(k => k.slice(-50)));
   const hls = preCreatedInstances.get(hlsUrl);
   if (!hls) {
     perf('HLS', 'promotePreCreated result:', false);

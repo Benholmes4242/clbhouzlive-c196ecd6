@@ -13,6 +13,7 @@ import { PullToRefresh } from './PullToRefresh';
 import { useMediaStore } from './store/mediaStore';
 import { useVideoPoolContext } from './VideoPoolProvider';
 import { flingSpring, SPRING_CONFIGS } from './utils/spring';
+import { usePreloader, preloadByUrl } from './hooks/usePreloader';
 import type { FeedPost } from './types/media';
 import { haptic } from '@/utils/haptics';
 
@@ -64,6 +65,8 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
   const pool = useVideoPoolContext();
   const prevPostsRef = useRef(posts);
 
+  // ── Mount the preloader pipeline ──
+  usePreloader(posts);
 
   // Detect feed switch (posts array identity change)
   // Only reset to top when the feed is completely replaced (tab switch),
@@ -151,6 +154,14 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
     lastRenderedPull.current = 0;
     setPullDistance(0);
 
+    // ── FIX 2: Start preloading target IMMEDIATELY (before spring) ──
+    if (clamped !== activeIndexRef.current) {
+      const targetPost = posts[clamped];
+      const targetUrl = targetPost?.mediaItems[0]?.hlsUrl;
+      perf('SWIPE', 'preload target:', clamped, 'url:', targetUrl?.slice(-50));
+      preloadByUrl(targetUrl);
+    }
+
     // Instant snap for reduced-motion users
     if (prefersReducedMotion) {
       offsetRef.current = targetY;
@@ -198,7 +209,7 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
         }
       }
     );
-  }, [posts.length, itemHeight, setActiveIndex, onNearEnd, prefersReducedMotion]);
+  }, [posts, itemHeight, setActiveIndex, onNearEnd, prefersReducedMotion]);
 
   // ── Velocity from tracker ──
   const calculateVelocity = (): number => {
