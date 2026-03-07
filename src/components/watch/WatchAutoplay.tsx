@@ -130,10 +130,20 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
     if (!grid || currentPosts.length === 0) return;
 
     // Sort visible tiles by ratio descending, take top 2
+    const COLUMNS = 3;
     const top2 = [...ratioMapRef.current.entries()]
       .sort((a, b) => b[1] - a[1])
       .slice(0, VIDEO_POOL_SIZE)
       .map(([idx]) => idx);
+
+    // Enforce minimum gap: the two playing tiles must not be in the same row
+    // or adjacent rows — require at least COLUMNS tiles between them
+    if (top2.length === 2) {
+      const gap = Math.abs(top2[0] - top2[1]);
+      if (gap < COLUMNS) {
+        top2.splice(1, 1); // drop the second — too close
+      }
+    }
 
     for (let slot = 0; slot < VIDEO_POOL_SIZE; slot++) {
       const currentTile = assignedTileRef.current[slot];
