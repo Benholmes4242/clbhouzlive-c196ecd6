@@ -17,11 +17,6 @@ import { usePreloader, preloadByUrl } from './hooks/usePreloader';
 import type { FeedPost } from './types/media';
 import { haptic } from '@/utils/haptics';
 
-const perf = (tag: string, ...args: any[]) => {
-  console.log(`[PERF:${tag}] ${Date.now() % 100000}`, ...args);
-};
-
-
 const FLING_VELOCITY_THRESHOLD = 0.4;   // px/ms — above this = fling
 const RUBBER_BAND_FACTOR = 0.35;
 const PTR_THRESHOLD = 80;               // px of actual pull to trigger refresh
@@ -158,7 +153,6 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
     if (clamped !== activeIndexRef.current) {
       const targetPost = posts[clamped];
       const targetUrl = targetPost?.mediaItems[0]?.hlsUrl;
-      perf('SWIPE', 'preload target:', clamped, 'url:', targetUrl?.slice(-50));
       preloadByUrl(targetUrl);
     }
 
@@ -194,12 +188,10 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
         }
       },
       () => {
-        perf('SWIPE', 'SETTLED at:', clamped);
         offsetRef.current = targetY;
         setOffsetY(targetY);
         const prevIdx = activeIndexRef.current;
         activeIndexRef.current = clamped;
-        perf('SWIPE', 'setActiveIndex:', clamped);
         setActiveIndex(clamped);
         useMediaStore.getState().setCarouselPosition(clamped, 0);
         haptic('light');
@@ -308,7 +300,6 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
     setPullDistance(0);
     pullDistanceRef.current = 0;
     lastRenderedPull.current = 0;
-    perf('SWIPE', '>>> SPRING from:', currentIndex, 'to:', targetIndex);
     goToIndex(targetIndex, velocity);
   }, [posts.length, itemHeight, onRefresh, isRefreshing, goToIndex]);
 

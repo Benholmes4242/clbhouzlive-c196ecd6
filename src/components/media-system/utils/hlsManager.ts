@@ -1,10 +1,6 @@
 import type HlsType from 'hls.js';
 import { createCachedLoader } from './cachedHlsLoader';
 
-const perf = (tag: string, ...args: any[]) => {
-  console.log(`[PERF:${tag}] ${Date.now() % 100000}`, ...args);
-};
-
 export const HLS_CONFIG: Record<string, unknown> = {
   enableWorker: true,
   lowLatencyMode: false,
@@ -79,7 +75,6 @@ export async function attachMedia(
 ): Promise<void> {
   // Always detach first
   detachMedia(video);
-  perf('HLS', 'attachMedia START url:', hlsUrl?.slice(-40));
 
   const Hls = await getHls();
   const canUseHlsJs = !!Hls && Hls.isSupported();
@@ -95,7 +90,6 @@ export async function attachMedia(
 
       hls.on((Hls as any).Events.MANIFEST_PARSED, () => {
         clearTimeout(timeout);
-        perf('HLS', 'MANIFEST_PARSED levels:', hls.levels?.length);
         resolve();
       });
 
@@ -107,7 +101,6 @@ export async function attachMedia(
         }
       });
 
-      perf('HLS', 'loadSource called');
       hls.loadSource(hlsUrl);
       hls.attachMedia(video);
     });
@@ -123,7 +116,6 @@ export async function attachMedia(
       const onMeta = () => {
         clearTimeout(timeout);
         video.removeEventListener('loadedmetadata', onMeta);
-        perf('HLS', 'loadedmetadata readyState:', video.readyState);
         resolve();
       };
       video.addEventListener('loadedmetadata', onMeta);
@@ -195,14 +187,12 @@ const preCreatedInstances = new Map<string, InstanceType<typeof HlsType>>();
  */
 export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
   if (preCreatedInstances.has(hlsUrl)) {
-    perf('HLS', 'preCreate SKIP (already exists) url:', hlsUrl.slice(-50));
     return;
   }
 
   const Hls = await getHls();
   if (!Hls || !Hls.isSupported()) return;
 
-  perf('HLS', 'preCreate START url:', hlsUrl.slice(-50));
   const hls = new (Hls as any)(getHlsConfig()) as InstanceType<typeof HlsType>;
 
   // Wait for MANIFEST_PARSED so the instance is truly ready for instant promotion
@@ -217,15 +207,12 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
       if (level?.details?.fragments?.length > 0) {
         const segUrl = level.details.fragments[0].url;
         if (segUrl) {
-          perf('HLS', 'preCreate pre-warm path: MANIFEST_PARSED direct fired', hlsUrl.slice(-50));
-          perf('HLS', 'preCreate first seg pre-warm url:', segUrl.slice(-50));
           fetch(segUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
         }
       } else {
         const levelUrl = data.levels?.[0]?.url;
         const levelUrlStr = Array.isArray(levelUrl) ? levelUrl[0] : levelUrl;
         if (levelUrlStr) {
-          perf('HLS', 'preCreate pre-warm: fetching level playlist', hlsUrl.slice(-50));
           fetch(levelUrlStr, { mode: 'cors', credentials: 'omit' })
             .then(r => r.text())
             .then(text => {
@@ -240,7 +227,6 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
                   const initUrl = mapUri.startsWith('http')
                     ? mapUri
                     : new URL(mapUri, base).href;
-                  perf('HLS', 'preCreate pre-warm init segment url:', initUrl.slice(-50));
                   fetch(initUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
                 }
               }
@@ -251,14 +237,10 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
                 const segUrl = segLine.trim().startsWith('http')
                   ? segLine.trim()
                   : new URL(segLine.trim(), base).href;
-                perf('HLS', 'preCreate pre-warm path: level-playlist-parse fired', hlsUrl.slice(-50));
-                perf('HLS', 'preCreate first seg pre-warm url:', segUrl.slice(-50));
                 fetch(segUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
               }
             })
-            .catch(err => {
-              perf('HLS', 'preCreate level playlist fetch ERROR:', String(err).slice(0, 100));
-            });
+            .catch(() => {});
         }
       }
 
@@ -267,9 +249,7 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
 
     hls.on((Hls as any).Events.ERROR, (_event: unknown, data: any) => {
       if (data.fatal) {
-        perf('HLS', 'preCreate ERROR url:', hlsUrl.slice(-50), data.details);
         preCreatedInstances.delete(hlsUrl);
-        perf('HLS', 'preCreated MAP DELETE key:', hlsUrl, 'mapSize:', preCreatedInstances.size);
         try { hls.destroy(); } catch { /* ignore */ }
         resolve(); // resolve anyway to not block
       }
@@ -290,7 +270,6 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
         const levelUrl = levelRelUrl.startsWith('http')
           ? levelRelUrl
           : new URL(levelRelUrl, masterBase).href;
-        perf('HLS', 'preCreate early pre-warm: level url resolved', levelUrl.slice(-50));
         return fetch(levelUrl, { mode: 'cors', credentials: 'omit' })
           .then(r => r.text())
           .then(levelText => {
@@ -302,7 +281,6 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
               const mapUri = mapLine.match(/#EXT-X-MAP:URI="([^"]+)"/)?.[1];
               if (mapUri) {
                 const initUrl = mapUri.startsWith('http') ? mapUri : new URL(mapUri, base).href;
-                perf('HLS', 'preCreate early pre-warm init:', initUrl.slice(-50));
                 fetch(initUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
               }
             }
@@ -312,7 +290,6 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
               const segUrl = segLine.trim().startsWith('http')
                 ? segLine.trim()
                 : new URL(segLine.trim(), base).href;
-              perf('HLS', 'preCreate early pre-warm seg:', segUrl.slice(-50));
               fetch(segUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
             }
           });
@@ -320,7 +297,6 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
       .catch(() => {});
 
     preCreatedInstances.set(hlsUrl, hls);
-    perf('HLS', 'preCreated MAP ADD key:', hlsUrl, 'mapSize:', preCreatedInstances.size);
 
     // Safety timeout — don't wait forever
     setTimeout(() => resolve(), 5000);
@@ -341,7 +317,6 @@ export function prewarmFirstSegment(hlsUrl: string): void {
   const level = (entry as any).levels?.[0];
   const frag = level?.details?.fragments?.[0];
   if (frag?.url) {
-    perf('HLS', 'imperative pre-warm url:', frag.url.slice(-50));
     fetch(frag.url, { mode: 'cors', credentials: 'omit' }).catch(() => {});
   }
 }
@@ -349,10 +324,8 @@ export function prewarmFirstSegment(hlsUrl: string): void {
 export function destroyStalePreCreated(keepUrls: Set<string>): void {
   for (const [url, hls] of preCreatedInstances) {
     if (!keepUrls.has(url)) {
-      perf('HLS', 'preCreate DESTROY stale url:', url.slice(-50));
       try { hls.destroy(); } catch { /* ignore */ }
       preCreatedInstances.delete(url);
-      perf('HLS', 'preCreated MAP DELETE key:', url, 'mapSize:', preCreatedInstances.size);
     }
   }
 }
@@ -366,15 +339,12 @@ export function promotePreCreated(
   video: HTMLVideoElement,
   onError?: (type: string, details: string) => void
 ): InstanceType<typeof HlsType> | null {
-  perf('HLS', 'promotePreCreated START url:', hlsUrl.slice(-50), 'preCreatedKeys:', [...preCreatedInstances.keys()].map(k => k.slice(-50)));
   const hls = preCreatedInstances.get(hlsUrl);
   if (!hls) {
-    perf('HLS', 'promotePreCreated result:', false);
     return null;
   }
 
   preCreatedInstances.delete(hlsUrl);
-  perf('HLS', 'preCreated MAP DELETE key:', hlsUrl, 'mapSize:', preCreatedInstances.size);
   hlsInstances.set(video, hls);
 
   // Wire up error forwarding
@@ -386,7 +356,6 @@ export function promotePreCreated(
   }
 
   hls.attachMedia(video);
-  perf('HLS', 'promotePreCreated result:', true);
   return hls;
 }
 
@@ -395,6 +364,5 @@ export function destroyPreCreated(): void {
   preCreatedInstances.forEach((hls, url) => {
     try { hls.destroy(); } catch { /* ignore */ }
     preCreatedInstances.delete(url);
-    perf('HLS', 'preCreated MAP DELETE key:', url, 'mapSize:', preCreatedInstances.size);
   });
 }

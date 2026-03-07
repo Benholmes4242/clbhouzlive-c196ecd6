@@ -15,10 +15,6 @@ import { ErrorState } from './ErrorState';
 import { Play, Pause, Heart } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
 
-const perf = (tag: string, ...args: any[]) => {
-  console.log(`[PERF:${tag}] ${Date.now() % 100000}`, ...args);
-};
-
 const MAX_RETRIES = 3;
 const DOUBLE_TAP_DELAY = 300;
 
@@ -101,10 +97,7 @@ export function VideoPlayer({
       const container = containerRef.current;
       if (!container || cancelled) return;
 
-      perf('VP', '>>> ACTIVATE feedIndex:', feedIndex);
-
       let videoEl: HTMLVideoElement | null = null;
-      perf('VP', 'pool.assign CALLED feedIndex:', feedIndex);
       const video = await pool.assign(
         hlsUrl,
         feedIndex,
@@ -115,7 +108,6 @@ export function VideoPlayer({
           if (assignedRef.current?.url !== hlsUrl || assignedRef.current?.feedIndex !== feedIndex) return;
           setIsLoading(false);
           setIsPlaying(true);
-          perf('VP', '<<< PLAYING feedIndex:', feedIndex);
           if (videoEl && videoEl.duration && isFinite(videoEl.duration)) {
             setVideoDuration(videoEl.duration);
           }
@@ -135,7 +127,6 @@ export function VideoPlayer({
       );
 
       if (cancelled) return;
-      perf('VP', 'pool.assign RESOLVED feedIndex:', feedIndex);
       if (!video) {
         assignedRef.current = null;
         return;
