@@ -215,9 +215,7 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
     const grid = gridRef.current;
     if (!grid || posts.length === 0) return;
 
-    // Clean up previous observer
     observerRef.current?.disconnect();
-
 
     const visibilityMap = new Map<number, number>();
 
@@ -230,19 +228,17 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
           visibilityMap.set(idx, entry.intersectionRatio);
         }
 
-        // Find most visible eligible tile
+        // Find most visible video tile
         let bestIdx = -1;
         let bestRatio = 0;
         for (const [idx, ratio] of visibilityMap) {
-          if (idx % ELIGIBLE_INTERVAL !== 0) continue;
           if (ratio > bestRatio) {
             bestRatio = ratio;
             bestIdx = idx;
           }
         }
 
-
-        // Detach if current tile is <20% visible
+        // Detach if current tile drops below 20%
         if (currentIndexRef.current !== null) {
           const currentRatio = visibilityMap.get(currentIndexRef.current) ?? 0;
           if (currentRatio < 0.2) {
@@ -250,27 +246,24 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
           }
         }
 
-        // Attach to best eligible if >=60% visible and different from current
+        // Attach to most visible video tile if >=60% visible and different from current
         if (bestIdx >= 0 && bestRatio >= 0.6 && bestIdx !== currentIndexRef.current) {
           const tile = grid.querySelector(`[data-explore-index="${bestIdx}"]`) as HTMLElement | null;
-          console.log('[EXPLORE:DEBUG2] bestIdx:', bestIdx, 
-            'tile found:', !!tile,
-            'post found:', !!posts[bestIdx],
-            'media:', posts[bestIdx]?.mediaItems?.[0]?.type,
-            'hlsUrl:', !!posts[bestIdx]?.mediaItems?.[0]?.hlsUrl,
-            'mp4Url:', !!posts[bestIdx]?.mediaItems?.[0]?.mp4Url
-          );
           const post = posts[bestIdx];
           const eligibleMedia = post?.mediaItems?.[0];
           if (tile && post && eligibleMedia && (eligibleMedia.hlsUrl || eligibleMedia.mp4Url)) {
             currentIndexRef.current = bestIdx;
             attach(tile, post, bestIdx);
 
-            // Pre-warm next 2 eligible tiles
-            for (let i = 1; i <= 2; i++) {
-              const nextIdx = bestIdx + (ELIGIBLE_INTERVAL * i);
-              const nextPost = posts[nextIdx];
-              const nextHlsUrl = nextPost?.mediaItems?.[0]?.hlsUrl;
+            // Pre-warm next 2 video tiles ahead
+            const videoIndices = posts
+              .map((p, i) => ({ i, hasVideo: !!(p.mediaItems?.[0]?.hlsUrl || p.mediaItems?.[0]?.mp4Url) }))
+              .filter(p => p.hasVideo && p.i > bestIdx)
+              .slice(0, 2)
+              .map(p => p.i);
+
+            for (const nextIdx of videoIndices) {
+              const nextHlsUrl = posts[nextIdx]?.mediaItems?.[0]?.hlsUrl;
               if (nextHlsUrl) prewarmTile(nextHlsUrl, nextIdx);
             }
           }
@@ -281,11 +274,13 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
 
     observerRef.current = observer;
 
-    // Observe all eligible tiles
+    // Observe only video tiles
     const tiles = grid.querySelectorAll('[data-explore-index]');
     tiles.forEach((tile) => {
       const idx = parseInt((tile as HTMLElement).dataset.exploreIndex ?? '', 10);
-      if (!isNaN(idx) && idx % ELIGIBLE_INTERVAL === 0) {
+      if (isNaN(idx)) return;
+      const media = posts[idx]?.mediaItems?.[0];
+      if (media?.hlsUrl || media?.mp4Url) {
         observer.observe(tile);
       }
     });
