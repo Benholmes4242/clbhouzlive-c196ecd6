@@ -3,6 +3,10 @@ import type { FeedPost } from '@/components/media-system/types/media';
 
 const VIDEO_POOL_SIZE = 2;
 
+const perf = (tag: string, ...args: any[]) => {
+  console.log(`[PERF:${tag}] ${Date.now() % 100000}`, ...args);
+};
+
 interface WatchAutoplayProps {
   posts: FeedPost[];
   gridRef: React.RefObject<HTMLDivElement>;
@@ -78,10 +82,17 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       hls.currentLevel = 0;
       // @ts-ignore
       hls.autoLevelEnabled = false;
+      perf('WATCH', 'PLAY ATTEMPT tileIndex:', tileIdx, 'slot:', slot, 'readyState:', video.readyState);
       video.play().catch(() => {});
     });
 
+    const onPlaying = () => {
+      perf('WATCH', '<<< PLAYING tileIndex:', tileIdx, 'slot:', slot);
+    };
+    video.addEventListener('playing', onPlaying, { once: true });
+
     const onCanPlay = () => {
+      perf('WATCH', 'CAN PLAY tileIndex:', tileIdx, 'readyState:', video.readyState);
       const poster = tileEl.querySelector('img');
       if (poster) {
         poster.style.transition = 'opacity 200ms ease';
@@ -95,6 +106,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
   }, [isSlowNetwork]);
 
   const detachSlot = useCallback((slot: number) => {
+    perf('WATCH', 'DETACH slot:', slot, 'tileIndex:', assignedTileRef.current[slot]);
     const currentTile = assignedTileRef.current[slot];
     if (currentTile === null) return;
 
@@ -169,6 +181,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
         if (!tileEl) continue;
 
         assignedTileRef.current[slot] = desiredTile;
+        perf('WATCH', 'ATTACH START tileIndex:', desiredTile, 'slot:', slot);
         attachToTile(slot, desiredTile, hlsUrl, tileEl);
       }
     }
@@ -198,6 +211,10 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
               }
             }
           } else {
+            const prev = ratioMapRef.current.get(idx);
+            if (!prev) {
+              perf('WATCH', '>>> VISIBLE tileIndex:', idx, 'ratio:', entry.intersectionRatio.toFixed(2));
+            }
             ratioMapRef.current.set(idx, entry.intersectionRatio);
           }
         }
