@@ -7,7 +7,7 @@ import { logDiscoverPageMount, logDiscoverPageUnmount } from '@/utils/discoverTi
 import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 
 import SegmentedControl from '@/components/discover/SegmentedControl';
-import ExploreFilters from '@/components/explore/ExploreFilters';
+
 import DiscoverVideosHeader from '@/components/discover/DiscoverVideosHeader';
 import SlidingPanels from '@/components/ui/SlidingPanels';
 import { useVideoLengthFilter } from '@/hooks/useVideoLengthFilter';
@@ -38,7 +38,7 @@ import { toast } from 'sonner';
 // Lazy load heavy/inactive components for better initial bundle size
 const CommunityFeed = lazy(() => import('@/components/community/CommunityFeed'));
 const NewVideosTab = lazy(() => import('@/components/discover/NewVideosTab'));
-const ExploreTab = lazy(() => import('@/components/explore-tab/ExploreTab'));
+const NewExploreTab = lazy(() => import('@/components/discover/NewExploreTab'));
 const WatchTab = lazy(() => import('@/components/discover/WatchTab'));
 
 type MainKey = 'watch' | 'videos' | 'explore' | 'following';
@@ -291,7 +291,7 @@ const Discover = () => {
                 if (key === 'explore') {
                   return (
                     <Suspense fallback={null}>
-                      <ExploreTab onMediaClick={handleCommunityMediaClick} />
+                      <NewExploreTab />
                     </Suspense>
                   );
                 }
