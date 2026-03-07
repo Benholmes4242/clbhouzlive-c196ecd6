@@ -253,6 +253,13 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
         // Attach to best eligible if >=60% visible and different from current
         if (bestIdx >= 0 && bestRatio >= 0.6 && bestIdx !== currentIndexRef.current) {
           const tile = grid.querySelector(`[data-explore-index="${bestIdx}"]`) as HTMLElement | null;
+          console.log('[EXPLORE:DEBUG2] bestIdx:', bestIdx, 
+            'tile found:', !!tile,
+            'post found:', !!posts[bestIdx],
+            'media:', posts[bestIdx]?.mediaItems?.[0]?.type,
+            'hlsUrl:', !!posts[bestIdx]?.mediaItems?.[0]?.hlsUrl,
+            'mp4Url:', !!posts[bestIdx]?.mediaItems?.[0]?.mp4Url
+          );
           const post = posts[bestIdx];
           const eligibleMedia = post?.mediaItems?.[0];
           if (tile && post && eligibleMedia && (eligibleMedia.hlsUrl || eligibleMedia.mp4Url)) {
