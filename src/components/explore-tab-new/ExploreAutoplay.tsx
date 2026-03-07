@@ -2,19 +2,10 @@ import { useEffect, useRef, useCallback, type RefObject } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 const ELIGIBLE_INTERVAL = 6;
-const CLOUDFLARE_STREAM_SUBDOMAIN = 'customer-2ut1aq1lhi1oeelo';
 
 interface ExploreAutoplayProps {
   posts: FeedPost[];
   gridRef: RefObject<HTMLDivElement | null>;
-}
-
-function getStreamUrl(streamId: string): string {
-  return `https://${CLOUDFLARE_STREAM_SUBDOMAIN}.cloudflarestream.com/${streamId}/manifest/video.m3u8`;
-}
-
-function getMp4Url(streamId: string): string {
-  return `https://${CLOUDFLARE_STREAM_SUBDOMAIN}.cloudflarestream.com/${streamId}/downloads/default.mp4`;
 }
 
 function isSlowNetwork(): boolean {
