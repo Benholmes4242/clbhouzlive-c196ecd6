@@ -1,6 +1,6 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 import { useMediaStore } from '../store/mediaStore';
-import { preCreateHlsInstance, destroyStalePreCreated, supportsNativeHls } from '../utils/hlsManager';
+import { preCreateHlsInstance, destroyStalePreCreated } from '../utils/hlsManager';
 import { parseMasterManifest, parseSegmentManifest } from '../utils/manifestParser';
 import { segmentCache } from '../utils/segmentCache';
 import { getManifestTextCache } from '../utils/cachedHlsLoader';
@@ -9,6 +9,17 @@ import type { FeedPost } from '../types/media';
 const perf = (tag: string, ...args: any[]) => {
   console.log(`[PERF:${tag}] ${Date.now() % 100000}`, ...args);
 };
+
+function queuePreCreate(url: string): void {
+  perf('PRELOAD', 'calling hlsManager.preCreate url:', url);
+  preCreateHlsInstance(url)
+    .then(() => {
+      perf('PRELOAD', 'preCreate returned for url:', url);
+    })
+    .catch(() => {
+      // Silent for speculative preloads
+    });
+}
 
 /**
  * Three-stage preload pipeline.
@@ -41,26 +52,28 @@ export function usePreloader(posts: FeedPost[]) {
 
     // ── Stage 3: Pre-create HLS instances for N-1 AND N+1 ────────
     // This runs IMMEDIATELY (not inside async run) for fastest pre-creation
-    if (!supportsNativeHls()) {
-      const adjacentUrls: string[] = [];
+    const adjacentUrls: string[] = [];
 
-      const nextUrl = posts[activeIndex + 1]?.mediaItems[0]?.hlsUrl;
-      const prevUrl = posts[activeIndex - 1]?.mediaItems[0]?.hlsUrl;
+    const currentUrl = posts[activeIndex]?.mediaItems[0]?.hlsUrl;
+    const nextUrl = posts[activeIndex + 1]?.mediaItems[0]?.hlsUrl;
+    const prevUrl = posts[activeIndex - 1]?.mediaItems[0]?.hlsUrl;
 
-      if (nextUrl) {
-        adjacentUrls.push(nextUrl);
-        perf('PRELOAD', 'pre-create N+1 url:', nextUrl.slice(-50));
-        preCreateHlsInstance(nextUrl).catch(() => {});
-      }
-      if (prevUrl) {
-        adjacentUrls.push(prevUrl);
-        perf('PRELOAD', 'pre-create N-1 url:', prevUrl.slice(-50));
-        preCreateHlsInstance(prevUrl).catch(() => {});
-      }
-
-      // Destroy any pre-created instances that are NOT N-1 or N+1
-      destroyStalePreCreated(new Set(adjacentUrls));
+    if (nextUrl) {
+      adjacentUrls.push(nextUrl);
+      perf('PRELOAD', 'pre-create N+1 url:', nextUrl.slice(-50));
+      queuePreCreate(nextUrl);
     }
+    if (prevUrl) {
+      adjacentUrls.push(prevUrl);
+      perf('PRELOAD', 'pre-create N-1 url:', prevUrl.slice(-50));
+      queuePreCreate(prevUrl);
+    }
+
+    const keepUrls = new Set(adjacentUrls);
+    if (currentUrl) keepUrls.add(currentUrl);
+
+    // Destroy any pre-created instances that are NOT active/N-1/N+1
+    destroyStalePreCreated(keepUrls);
 
     async function run() {
       const signal = controller.signal;
@@ -180,9 +193,8 @@ export function usePreloader(posts: FeedPost[]) {
  */
 export function preloadByUrl(hlsUrl: string | undefined): void {
   if (!hlsUrl) return;
-  if (supportsNativeHls()) return;
   perf('PRELOAD', 'imperative pre-create url:', hlsUrl.slice(-50));
-  preCreateHlsInstance(hlsUrl).catch(() => {});
+  queuePreCreate(hlsUrl);
 }
 
 function getPreloadStrategy(): { ahead: number; stage: 'manifest' | 'segments' | 'full' } {
@@ -195,3 +207,4 @@ function getPreloadStrategy(): { ahead: number; stage: 'manifest' | 'segments' |
   if (type === '2g' || type === 'slow-2g') return { ahead: 0, stage: 'manifest' };
   return { ahead: 1, stage: 'segments' };
 }
+

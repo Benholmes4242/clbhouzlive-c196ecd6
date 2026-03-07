@@ -81,6 +81,38 @@ export async function attachMedia(
   detachMedia(video);
   perf('HLS', 'attachMedia START url:', hlsUrl?.slice(-40));
 
+  const Hls = await getHls();
+  const canUseHlsJs = !!Hls && Hls.isSupported();
+
+  if (canUseHlsJs) {
+    return new Promise<void>((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject(new Error('HLS.js manifest parse timeout'));
+      }, ATTACH_TIMEOUT);
+
+      const hls = new (Hls as any)(getHlsConfig()) as InstanceType<typeof HlsType>;
+      hlsInstances.set(video, hls);
+
+      hls.on((Hls as any).Events.MANIFEST_PARSED, () => {
+        clearTimeout(timeout);
+        perf('HLS', 'MANIFEST_PARSED levels:', hls.levels?.length);
+        resolve();
+      });
+
+      hls.on((Hls as any).Events.ERROR, (_event: unknown, data: any) => {
+        if (data.fatal) {
+          clearTimeout(timeout);
+          if (onError) onError(data.type, data.details);
+          reject(new Error(`HLS fatal error: ${data.type} ${data.details}`));
+        }
+      });
+
+      perf('HLS', 'loadSource called');
+      hls.loadSource(hlsUrl);
+      hls.attachMedia(video);
+    });
+  }
+
   if (supportsNativeHls()) {
     return new Promise<void>((resolve, reject) => {
       const timeout = setTimeout(() => {
@@ -99,38 +131,8 @@ export async function attachMedia(
     });
   }
 
-  const Hls = await getHls();
-  if (!Hls || !Hls.isSupported()) {
-    video.src = hlsUrl;
-    return;
-  }
-
-  return new Promise<void>((resolve, reject) => {
-    const timeout = setTimeout(() => {
-      reject(new Error('HLS.js manifest parse timeout'));
-    }, ATTACH_TIMEOUT);
-
-    const hls = new (Hls as any)(getHlsConfig()) as InstanceType<typeof HlsType>;
-    hlsInstances.set(video, hls);
-
-    hls.on((Hls as any).Events.MANIFEST_PARSED, () => {
-      clearTimeout(timeout);
-      perf('HLS', 'MANIFEST_PARSED levels:', hls.levels?.length);
-      resolve();
-    });
-
-    hls.on((Hls as any).Events.ERROR, (_event: unknown, data: any) => {
-      if (data.fatal) {
-        clearTimeout(timeout);
-        if (onError) onError(data.type, data.details);
-        reject(new Error(`HLS fatal error: ${data.type} ${data.details}`));
-      }
-    });
-
-    perf('HLS', 'loadSource called');
-    hls.loadSource(hlsUrl);
-    hls.attachMedia(video);
-  });
+  video.src = hlsUrl;
+  return;
 }
 
 /**
@@ -196,7 +198,6 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
     perf('HLS', 'preCreate SKIP (already exists) url:', hlsUrl.slice(-50));
     return;
   }
-  if (supportsNativeHls()) return; // native doesn't need pre-creation
 
   const Hls = await getHls();
   if (!Hls || !Hls.isSupported()) return;
@@ -215,6 +216,7 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
       if (data.fatal) {
         perf('HLS', 'preCreate ERROR url:', hlsUrl.slice(-50), data.details);
         preCreatedInstances.delete(hlsUrl);
+        perf('HLS', 'preCreated MAP DELETE key:', hlsUrl, 'mapSize:', preCreatedInstances.size);
         try { hls.destroy(); } catch { /* ignore */ }
         resolve(); // resolve anyway to not block
       }
@@ -222,6 +224,7 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
 
     hls.loadSource(hlsUrl);
     preCreatedInstances.set(hlsUrl, hls);
+    perf('HLS', 'preCreated MAP ADD key:', hlsUrl, 'mapSize:', preCreatedInstances.size);
 
     // Safety timeout — don't wait forever
     setTimeout(() => resolve(), 5000);
@@ -238,6 +241,7 @@ export function destroyStalePreCreated(keepUrls: Set<string>): void {
       perf('HLS', 'preCreate DESTROY stale url:', url.slice(-50));
       try { hls.destroy(); } catch { /* ignore */ }
       preCreatedInstances.delete(url);
+      perf('HLS', 'preCreated MAP DELETE key:', url, 'mapSize:', preCreatedInstances.size);
     }
   }
 }
@@ -259,6 +263,7 @@ export function promotePreCreated(
   }
 
   preCreatedInstances.delete(hlsUrl);
+  perf('HLS', 'preCreated MAP DELETE key:', hlsUrl, 'mapSize:', preCreatedInstances.size);
   hlsInstances.set(video, hls);
 
   // Wire up error forwarding
@@ -276,8 +281,9 @@ export function promotePreCreated(
 
 /** Destroy all pre-created instances. */
 export function destroyPreCreated(): void {
-  preCreatedInstances.forEach((hls) => {
+  preCreatedInstances.forEach((hls, url) => {
     try { hls.destroy(); } catch { /* ignore */ }
+    preCreatedInstances.delete(url);
+    perf('HLS', 'preCreated MAP DELETE key:', url, 'mapSize:', preCreatedInstances.size);
   });
-  preCreatedInstances.clear();
 }
