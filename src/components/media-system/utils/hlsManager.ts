@@ -222,26 +222,20 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
           fetch(segUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
         }
       } else {
-        // Level details not available — fetch the level playlist ourselves
-        // so we don't have to wait for HLS.js attachMedia to trigger LEVEL_LOADED
         const levelUrl = data.levels?.[0]?.url;
-        if (levelUrl) {
+        const levelUrlStr = Array.isArray(levelUrl) ? levelUrl[0] : levelUrl;
+        if (levelUrlStr) {
           perf('HLS', 'preCreate pre-warm: fetching level playlist', hlsUrl.slice(-50));
-          perf('HLS', 'preCreate level playlist URL:', levelUrl.slice(-80));
-          fetch(levelUrl, { mode: 'cors', credentials: 'omit' })
-            .then(r => {
-              perf('HLS', 'preCreate level playlist fetch status:', String(r.status));
-              return r.text();
-            })
+          fetch(levelUrlStr, { mode: 'cors', credentials: 'omit' })
+            .then(r => r.text())
             .then(text => {
-              perf('HLS', 'preCreate level playlist text length:', String(text.length));
-              perf('HLS', 'preCreate level playlist first 200 chars:', text.slice(0, 200).replace(/\n/g, '|'));
-              // Parse first segment URL from the m3u8 text
               const lines = text.split('\n');
               const segLine = lines.find(l => l.trim() && !l.startsWith('#'));
               if (segLine) {
-                const base = levelUrl.substring(0, levelUrl.lastIndexOf('/') + 1);
-                const segUrl = segLine.startsWith('http') ? segLine.trim() : base + segLine.trim();
+                const base = levelUrlStr.substring(0, levelUrlStr.lastIndexOf('/') + 1);
+                const segUrl = segLine.trim().startsWith('http')
+                  ? segLine.trim()
+                  : new URL(segLine.trim(), base).href;
                 perf('HLS', 'preCreate pre-warm path: level-playlist-parse fired', hlsUrl.slice(-50));
                 perf('HLS', 'preCreate first seg pre-warm url:', segUrl.slice(-50));
                 fetch(segUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
@@ -250,6 +244,8 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
             .catch(err => {
               perf('HLS', 'preCreate level playlist fetch ERROR:', String(err).slice(0, 100));
             });
+        }
+      }
         }
       }
 
