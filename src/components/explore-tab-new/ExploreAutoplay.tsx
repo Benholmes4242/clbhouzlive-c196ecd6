@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback, type RefObject } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 
-const ELIGIBLE_INTERVAL = 6;
+
 
 const perf = (tag: string, ...args: any[]) => {
   console.log(`[PERF:${tag}] ${Date.now() % 100000}`, ...args);
