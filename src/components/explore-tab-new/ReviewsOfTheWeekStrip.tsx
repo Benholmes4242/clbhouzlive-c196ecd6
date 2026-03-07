@@ -67,13 +67,19 @@ function ReviewsOfTheWeekStripInner() {
             }}
             className="shrink-0 w-[140px] aspect-[3/4] rounded-xl overflow-hidden relative bg-muted focus:outline-none"
           >
-            {review.thumbnail_url && (
+            {review.thumbnail_url ? (
               <img
                 src={review.thumbnail_url}
                 alt=""
                 loading="lazy"
                 className="absolute inset-0 w-full h-full object-cover"
               />
+            ) : (
+              <div className="absolute inset-0 w-full h-full bg-muted flex items-center justify-center p-2">
+                <span className="text-[10px] text-muted-foreground text-center font-medium leading-tight">
+                  {review.course_name}
+                </span>
+              </div>
             )}
 
             {/* Bottom gradient */}
