@@ -207,7 +207,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
 
     const activeMap = activeMapRef.current;
     activeMap.clear();
-    observedAutoplayRef.current.clear();
+    observedTilesRef.current.clear();
 
     const observer = new IntersectionObserver(
       (entries) => {
