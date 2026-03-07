@@ -218,9 +218,6 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
     // Clean up previous observer
     observerRef.current?.disconnect();
 
-    console.log('[EXPLORE:DEBUG] posts video check:', 
-      posts.slice(0,30).map((p,i) => ({ i, type: p.mediaItems?.[0]?.type, hasHls: !!p.mediaItems?.[0]?.hlsUrl }))
-    );
 
     const visibilityMap = new Map<number, number>();
 
@@ -244,11 +241,6 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
           }
         }
 
-        console.log('[EXPLORE:DEBUG] visibilityMap:', 
-          [...visibilityMap.entries()].filter(([idx]) => idx % 6 === 0),
-          'bestIdx:', bestIdx, 'bestRatio:', bestRatio,
-          'currentIndex:', currentIndexRef.current
-        );
 
         // Detach if current tile is <20% visible
         if (currentIndexRef.current !== null) {
@@ -264,7 +256,8 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
 
           const tile = grid.querySelector(`[data-explore-index="${bestIdx}"]`) as HTMLElement | null;
           const post = posts[bestIdx];
-          if (tile && post && post.mediaItems[0]?.type === 'video') {
+          const eligibleMedia = post?.mediaItems?.[0];
+          if (tile && post && eligibleMedia && (eligibleMedia.hlsUrl || eligibleMedia.mp4Url)) {
             currentIndexRef.current = bestIdx;
             attach(tile, post, bestIdx);
 
