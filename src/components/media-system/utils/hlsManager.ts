@@ -81,6 +81,38 @@ export async function attachMedia(
   detachMedia(video);
   perf('HLS', 'attachMedia START url:', hlsUrl?.slice(-40));
 
+  const Hls = await getHls();
+  const canUseHlsJs = !!Hls && Hls.isSupported();
+
+  if (canUseHlsJs) {
+    return new Promise<void>((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject(new Error('HLS.js manifest parse timeout'));
+      }, ATTACH_TIMEOUT);
+
+      const hls = new (Hls as any)(getHlsConfig()) as InstanceType<typeof HlsType>;
+      hlsInstances.set(video, hls);
+
+      hls.on((Hls as any).Events.MANIFEST_PARSED, () => {
+        clearTimeout(timeout);
+        perf('HLS', 'MANIFEST_PARSED levels:', hls.levels?.length);
+        resolve();
+      });
+
+      hls.on((Hls as any).Events.ERROR, (_event: unknown, data: any) => {
+        if (data.fatal) {
+          clearTimeout(timeout);
+          if (onError) onError(data.type, data.details);
+          reject(new Error(`HLS fatal error: ${data.type} ${data.details}`));
+        }
+      });
+
+      perf('HLS', 'loadSource called');
+      hls.loadSource(hlsUrl);
+      hls.attachMedia(video);
+    });
+  }
+
   if (supportsNativeHls()) {
     return new Promise<void>((resolve, reject) => {
       const timeout = setTimeout(() => {
@@ -99,38 +131,8 @@ export async function attachMedia(
     });
   }
 
-  const Hls = await getHls();
-  if (!Hls || !Hls.isSupported()) {
-    video.src = hlsUrl;
-    return;
-  }
-
-  return new Promise<void>((resolve, reject) => {
-    const timeout = setTimeout(() => {
-      reject(new Error('HLS.js manifest parse timeout'));
-    }, ATTACH_TIMEOUT);
-
-    const hls = new (Hls as any)(getHlsConfig()) as InstanceType<typeof HlsType>;
-    hlsInstances.set(video, hls);
-
-    hls.on((Hls as any).Events.MANIFEST_PARSED, () => {
-      clearTimeout(timeout);
-      perf('HLS', 'MANIFEST_PARSED levels:', hls.levels?.length);
-      resolve();
-    });
-
-    hls.on((Hls as any).Events.ERROR, (_event: unknown, data: any) => {
-      if (data.fatal) {
-        clearTimeout(timeout);
-        if (onError) onError(data.type, data.details);
-        reject(new Error(`HLS fatal error: ${data.type} ${data.details}`));
-      }
-    });
-
-    perf('HLS', 'loadSource called');
-    hls.loadSource(hlsUrl);
-    hls.attachMedia(video);
-  });
+  video.src = hlsUrl;
+  return;
 }
 
 /**
