@@ -12,7 +12,7 @@ import { FeedItem } from './FeedItem';
 import { PullToRefresh } from './PullToRefresh';
 import { useMediaStore } from './store/mediaStore';
 import { useVideoPoolContext } from './VideoPoolProvider';
-import { flingSpring, SPRING_CONFIGS } from './utils/spring';
+// spring utils no longer used — instant snap replaces spring animation
 import { usePreloader, preloadByUrl } from './hooks/usePreloader';
 import type { FeedPost } from './types/media';
 import { haptic } from '@/utils/haptics';
@@ -139,10 +139,7 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
     return () => el.removeEventListener('touchend', onTouchEnd);
   }, [posts, pool]);
 
-  // ── Fix 10: prefers-reduced-motion ──
-  const prefersReducedMotion = useMemo(() => {
-    return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  }, []);
+  // prefersReducedMotion no longer needed — all transitions are instant
 
   // Track whether early activation already fired during this drag
   const earlyActivatedRef = useRef(false);
