@@ -230,9 +230,24 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
             .then(r => r.text())
             .then(text => {
               const lines = text.split('\n');
+              const base = levelUrlStr.substring(0, levelUrlStr.lastIndexOf('/') + 1);
+
+              // Pre-warm init segment (#EXT-X-MAP) if present
+              const mapLine = lines.find(l => l.startsWith('#EXT-X-MAP:URI="'));
+              if (mapLine) {
+                const mapUri = mapLine.match(/#EXT-X-MAP:URI="([^"]+)"/)?.[1];
+                if (mapUri) {
+                  const initUrl = mapUri.startsWith('http')
+                    ? mapUri
+                    : new URL(mapUri, base).href;
+                  perf('HLS', 'preCreate pre-warm init segment url:', initUrl.slice(-50));
+                  fetch(initUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
+                }
+              }
+
+              // Pre-warm first media segment
               const segLine = lines.find(l => l.trim() && !l.startsWith('#'));
               if (segLine) {
-                const base = levelUrlStr.substring(0, levelUrlStr.lastIndexOf('/') + 1);
                 const segUrl = segLine.trim().startsWith('http')
                   ? segLine.trim()
                   : new URL(segLine.trim(), base).href;
