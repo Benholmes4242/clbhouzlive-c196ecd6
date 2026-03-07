@@ -87,6 +87,21 @@ export function VideosFeed({
     };
   }, [posts.length]);
 
+  // Pre-warm upcoming videos when centerIndex changes
+  useEffect(() => {
+    if (!posts || posts.length === 0) return;
+
+    for (let i = centerIndex + 1; i <= centerIndex + 3; i++) {
+      if (i >= posts.length) break;
+      if (prewarmedSetRef.current.has(i)) continue;
+      const hlsUrl = posts[i]?.mediaItems?.[0]?.hlsUrl;
+      if (!hlsUrl) continue;
+      prewarmedSetRef.current.add(i);
+      console.log(`[PERF:VIDEOS] pre-warm START tileIndex: ${i}`);
+      prewarmVideo(hlsUrl, i);
+    }
+  }, [centerIndex, posts]);
+
   // Loading state
   if (isLoading && posts.length === 0) {
     return <VideosFeedSkeleton />;
