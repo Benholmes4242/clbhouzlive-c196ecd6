@@ -6,16 +6,9 @@ import { segmentCache } from '../utils/segmentCache';
 import { getManifestTextCache } from '../utils/cachedHlsLoader';
 import type { FeedPost } from '../types/media';
 
-const perf = (tag: string, ...args: any[]) => {
-  console.log(`[PERF:${tag}] ${Date.now() % 100000}`, ...args);
-};
-
 function queuePreCreate(url: string): void {
-  perf('PRELOAD', 'calling hlsManager.preCreate url:', url);
   preCreateHlsInstance(url)
-    .then(() => {
-      perf('PRELOAD', 'preCreate returned for url:', url);
-    })
+    .then(() => {})
     .catch(() => {
       // Silent for speculative preloads
     });
@@ -62,22 +55,18 @@ export function usePreloader(posts: FeedPost[]) {
 
     if (nextUrl) {
       adjacentUrls.push(nextUrl);
-      perf('PRELOAD', 'pre-create N+1 url:', nextUrl.slice(-50));
       queuePreCreate(nextUrl);
     }
     if (nextNextUrl) {
       adjacentUrls.push(nextNextUrl);
-      perf('PRELOAD', 'pre-create N+2 url:', nextNextUrl.slice(-50));
       queuePreCreate(nextNextUrl);
     }
     if (prevUrl) {
       adjacentUrls.push(prevUrl);
-      perf('PRELOAD', 'pre-create N-1 url:', prevUrl.slice(-50));
       queuePreCreate(prevUrl);
     }
     if (prevPrevUrl) {
       adjacentUrls.push(prevPrevUrl);
-      perf('PRELOAD', 'pre-create N-2 url:', prevPrevUrl.slice(-50));
       queuePreCreate(prevPrevUrl);
     }
 
@@ -205,7 +194,6 @@ export function usePreloader(posts: FeedPost[]) {
  */
 export function preloadByUrl(hlsUrl: string | undefined): void {
   if (!hlsUrl) return;
-  perf('PRELOAD', 'imperative pre-create url:', hlsUrl.slice(-50));
   // If already pre-created (from previous N+1), pre-warm first segment immediately
   prewarmFirstSegment(hlsUrl);
   queuePreCreate(hlsUrl);
@@ -221,4 +209,3 @@ function getPreloadStrategy(): { ahead: number; stage: 'manifest' | 'segments' |
   if (type === '2g' || type === 'slow-2g') return { ahead: 0, stage: 'manifest' };
   return { ahead: 1, stage: 'segments' };
 }
-

@@ -14,10 +14,6 @@ import { segmentCache } from '../utils/segmentCache';
 import { useSessionCache } from './useSessionCache';
 import { useMediaStore } from '../store/mediaStore';
 
-const perf = (tag: string, ...args: any[]) => {
-  console.log(`[PERF:${tag}] ${Date.now() % 100000}`, ...args);
-};
-
 /**
  * Video Pool Manager — maintains 5 reusable <video> elements with
  * tracked listeners, full recycle sequence, error recovery, and
@@ -165,14 +161,12 @@ export function useVideoPool() {
     ): Promise<HTMLVideoElement | null> => {
       const pool = poolRef.current;
       if (!pool.length) return null;
-      perf('POOL', '>>> ASSIGN feedIndex:', feedIndex);
       const rapid = isRapidScrolling();
 
       // ── 1. Cache hit — same URL already loaded ────────────────
       const cachedIdx = pool.findIndex((p) => p.assignedUrl === hlsUrl);
       if (cachedIdx >= 0) {
         const cached = pool[cachedIdx];
-        perf('POOL', 'CACHE HIT readyState:', cached.video.readyState);
         cached.lastUsedAt = Date.now();
         cached.assignedIndex = feedIndex;
         container.appendChild(cached.video);
@@ -224,13 +218,11 @@ export function useVideoPool() {
       }
 
       if (!target || targetIdx < 0) return null;
-      perf('POOL', 'CACHE MISS recycling:', targetIdx);
 
       // ── Step 1: DETACH from old item ──────────────────────────
       const video = target.video;
 
       if (target.assignedUrl) {
-        perf('POOL', 'DETACH START');
         const isMuted = useMediaStore.getState().isMuted;
 
         // Save session state
@@ -260,10 +252,8 @@ export function useVideoPool() {
 
         // Detach HLS
         detachMedia(video);
-        perf('POOL', 'DETACH DONE');
       } else {
         removeAllTrackedListeners(targetIdx, video);
-        perf('POOL', 'DETACH DONE');
       }
 
       // ── Step 1f: Reset element (detachMedia already handles src removal)
@@ -358,7 +348,6 @@ export function useVideoPool() {
       };
 
       // Try promote pre-created instance first
-      perf('POOL', 'HLS ATTACH START');
       const promoted = promotePreCreated(hlsUrl, video, handleHlsError);
 
       if (!promoted) {
@@ -374,7 +363,6 @@ export function useVideoPool() {
       }
 
       if (loadTimedOut) return video;
-      perf('POOL', 'HLS ATTACH DONE readyState:', video.readyState);
 
       // ── Step 4: Restore session & play ────────────────────────
       const saved = sessionCache.restore(hlsUrl);
@@ -391,7 +379,6 @@ export function useVideoPool() {
         if (playingFired || loadTimedOut) return;
         playingFired = true;
         clearTimeout(loadTimeout);
-        perf('POOL', 'PLAYING EVENT feedIndex:', feedIndex);
         onPlaying?.();
       };
       addTrackedListener(targetIdx, video, 'playing', onPlayingEvt, { once: true });
@@ -406,9 +393,7 @@ export function useVideoPool() {
       if (!isMutedNow && !rapid) {
         video.volume = 0; // Start silent, fade in after play
       }
-      perf('POOL', 'SAFE_PLAY START readyState:', video.readyState);
       const playOk = await safePlay(video);
-      perf('POOL', 'SAFE_PLAY DONE success:', playOk);
 
       // Fade in audio if unmuted
       if (playOk && !isMutedNow && !rapid) {
