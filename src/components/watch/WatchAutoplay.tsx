@@ -176,7 +176,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       }
     }
 
-    perf('WATCH', 'reconcile top2:', top2, 'assigned:', [...assignedTileRef.current]);
+    
 
     for (let slot = 0; slot < VIDEO_POOL_SIZE; slot++) {
       const currentTile = assignedTileRef.current[slot];
