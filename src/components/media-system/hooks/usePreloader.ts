@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useMediaStore } from '../store/mediaStore';
-import { preCreateHlsInstance, destroyStalePreCreated } from '../utils/hlsManager';
+import { preCreateHlsInstance, destroyStalePreCreated, prewarmFirstSegment } from '../utils/hlsManager';
 import { parseMasterManifest, parseSegmentManifest } from '../utils/manifestParser';
 import { segmentCache } from '../utils/segmentCache';
 import { getManifestTextCache } from '../utils/cachedHlsLoader';
@@ -194,6 +194,8 @@ export function usePreloader(posts: FeedPost[]) {
 export function preloadByUrl(hlsUrl: string | undefined): void {
   if (!hlsUrl) return;
   perf('PRELOAD', 'imperative pre-create url:', hlsUrl.slice(-50));
+  // If already pre-created (from previous N+1), pre-warm first segment immediately
+  prewarmFirstSegment(hlsUrl);
   queuePreCreate(hlsUrl);
 }
 
