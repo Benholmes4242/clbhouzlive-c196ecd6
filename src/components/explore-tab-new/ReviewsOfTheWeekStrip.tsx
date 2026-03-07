@@ -16,8 +16,9 @@ function ReviewsOfTheWeekStripInner() {
   const { data: reviews } = useQuery({
     queryKey: ['explore-reviews-of-week'],
     queryFn: async (): Promise<ReviewItem[]> => {
+      // TODO: Change back to 7 or 30 for production
       const { data, error } = await supabase.rpc('get_top_video_reviews', {
-        days_back: 7,
+        days_back: 365,
         result_limit: 10,
       });
 
